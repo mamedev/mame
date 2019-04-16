@@ -53,12 +53,6 @@ READ8_MEMBER( cmi_alphanumeric_keyboard_device::col_r )
 	}
 }
 
-READ_LINE_MEMBER( cmi_alphanumeric_keyboard_device::rts_r )
-{
-//  printf("ANK RTS?\n");
-	return 0;
-}
-
 WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::rxd_w )
 {
 	m_pia->cb2_w(state);
@@ -66,7 +60,7 @@ WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::rxd_w )
 
 WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::cts_w )
 {
-	m_pia->ca2_w(state);
+	m_pia->ca1_w(state);
 }
 
 WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::txd_w )
@@ -200,16 +194,15 @@ void cmi_alphanumeric_keyboard_device::device_add_mconfig(machine_config &config
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_kbdcpu, M6802_IRQ_LINE);
 
-	PIA6821(config, m_pia); // pia_config
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(cmi_alphanumeric_keyboard_device::col_r));
-	m_pia->readcb1_handler().set(FUNC(cmi_alphanumeric_keyboard_device::rts_r));
 	m_pia->ca2_handler().set(FUNC(cmi_alphanumeric_keyboard_device::rts_w));
 	m_pia->cb2_handler().set(FUNC(cmi_alphanumeric_keyboard_device::txd_w));
 	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
-	clock_device &pia_clock(CLOCK(config, "pia_clock", 3.84_MHz_XTAL / 400));
-	pia_clock.signal_handler().set(m_pia, FUNC(pia6821_device::ca1_w));
+	clock_device &pia_clock(CLOCK(config, "pia_clock", 3.84_MHz_XTAL / 4 / 100)); // E clock divided by MC14158
+	pia_clock.signal_handler().set(m_pia, FUNC(pia6821_device::cb1_w));
 }
 
 ROM_START( cmi_ankbd )
