@@ -1258,5 +1258,7 @@ COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state,
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
-COMP( 198?, cadd810,		ibm5150, 0,		 cadd810,		 pccga,	   pc_state, empty_init,	"CompuAdd",						   "810",					MACHINE_NOT_WORKING )
-COMP( 198?, juko16,			ibm5150, 0,		 juko16,		 pccga,	   pc_state, empty_init,	"JUKO",							   "NEST 8086 and V30",		MACHINE_NOT_WORKING )
+COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
+COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
+
+
