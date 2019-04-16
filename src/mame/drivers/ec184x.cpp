@@ -47,6 +47,7 @@ public:
 	void ec1847(machine_config &config);
 	void ec1840(machine_config &config);
 
+	void init_ec1840();
 	void init_ec1841();
 
 private:
@@ -153,6 +154,14 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
+void ec184x_state::init_ec1840()
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_readwrite_bank(0, m_ram->size()-1, "bank10");
+	membank("bank10")->set_base(m_ram->pointer());
+}
+
 void ec184x_state::init_ec1841()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -206,7 +215,7 @@ void ec184x_state::ec1847_map(address_map &map)
 void ec184x_state::ec1840_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x00ff).m("mb", FUNC(ibm5150_mb_device::map));
+	map(0x0000, 0x00ff).m("mb", FUNC(ec1840_mb_device::map));
 }
 
 void ec184x_state::ec1841_io(address_map &map)
@@ -232,7 +241,7 @@ void ec184x_state::ec1840(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1840_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	IBM5150_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	EC1840_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
@@ -246,7 +255,7 @@ void ec184x_state::ec1840(machine_config &config)
 
 	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
-	RAM(config, m_ram).set_default_size("512K");
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 }
 
 void ec184x_state::ec1841(machine_config &config)
@@ -375,7 +384,7 @@ ROM_START( ec1847 )
 ROM_END
 
 //    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  STATE         INIT         COMPANY      FULLNAME   FLAGS
-COMP( 1987, ec1840, ibm5150, 0,      ec1840,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1840", MACHINE_NOT_WORKING )
+COMP( 1986, ec1840, ibm5150, 0,      ec1840,  0,     ec184x_state, init_ec1840, "<unknown>", "EC-1840", 0 )
 COMP( 1987, ec1841, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1841", 0 )
 COMP( 1989, ec1845, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1845", MACHINE_NOT_WORKING )
 COMP( 1990, ec1847, ibm5150, 0,      ec1847,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1847", MACHINE_NOT_WORKING )
