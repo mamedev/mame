@@ -4,8 +4,8 @@
 
     Fairlight Intelligent Alphanumeric Keyboard
 
-    This ASCII keyboard was developed for Fairlight's Qasar System. The
-    output signals are driven at RS232 levels, though the connector is
+    This ASCII serial keyboard was developed for Fairlight's Qasar System.
+    The output signals are driven at RS232 levels, though the connector is
     custom.
 
 ***************************************************************************/
@@ -205,7 +205,7 @@ void cmi_alphanumeric_keyboard_device::device_add_mconfig(machine_config &config
 	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
-	clock_device &pia_clock(CLOCK(config, "pia_clock", 3.84_MHz_XTAL / 4 / 100)); // E clock divided by MC14158
+	clock_device &pia_clock(CLOCK(config, "pia_clock", 3.84_MHz_XTAL / 4 / 100)); // E clock divided by MC14518
 	pia_clock.signal_handler().set(m_pia, FUNC(pia6821_device::cb1_w));
 }
 
