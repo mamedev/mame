@@ -563,39 +563,40 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( fp )
+//  machine_config( fp )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(fp_state::fp)
+void fp_state::fp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 15_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(fp_mem)
-	MCFG_DEVICE_IO_MAP(fp_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 15_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp_state::fp_mem);
+	m_maincpu->set_addrmap(AS_IO, &fp_state::fp_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD(HD63B01V1_TAG, HD6301, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
-	MCFG_DEVICE_DISABLE()
+	HD6301(config, m_soundcpu, 2000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
+	m_soundcpu->set_disable();
 
 	/* video hardware */
 	config.set_default_layout(layout_apricotp);
 
-	MCFG_SCREEN_ADD(SCREEN_LCD_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(fp_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
+	screen_lcd.set_refresh_hz(50);
+	screen_lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_lcd.set_screen_update(FUNC(fp_state::screen_update));
+	screen_lcd.set_size(640, 200);
+	screen_lcd.set_visarea_full();
+	screen_lcd.set_palette("palette");
 
-	MCFG_SCREEN_ADD(SCREEN_CRT_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG, SCREEN_TYPE_RASTER));
+	screen_crt.set_refresh_hz(50);
+	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
+	screen_crt.set_size(640, 256);
+	screen_crt.set_visarea_full();
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_act_f1);
 
 	MC6845(config, m_crtc, 4000000);
@@ -606,8 +607,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
 	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");
-MACHINE_CONFIG_END
+}
 
 
 

@@ -51,10 +51,11 @@ void qs_state::qs7_prog_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 }
 
-MACHINE_CONFIG_START(qs_state::qs7)
+void qs_state::qs7(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83048, XTAL(10'000'000)) /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
-	MCFG_DEVICE_PROGRAM_MAP(qs7_prog_map)
+	H83048(config, m_maincpu, XTAL(10'000'000)); /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &qs_state::qs7_prog_map);
 
 		//MCFG_ALESIS_KEYSCAN_ASIC_ADD("keyscan")
 
@@ -76,7 +77,7 @@ MACHINE_CONFIG_START(qs_state::qs7)
 		//MCFG_PCMCIA_ADD("pcmcia")
 		//MIDI
 		//RS232
-MACHINE_CONFIG_END
+}
 
 ROM_START( alesqs7 )
 	ROM_REGION( 0x80000, "maincpu", 0 )

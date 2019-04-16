@@ -60,9 +60,7 @@ public:
 	*/
 	uint8_t get_flip_state(void) { return m_pf_control_0[0]&0x80; };
 
-
 	void set_colmask(int data) { m_gfxcolmask = data; }
-	void set_bppmultmask( int mult, int mask ) { m_bppmult = mult; m_bppmask = mask; } // stadium hero has 3bpp tiles
 	void set_flip_screen(bool flip);
 
 	uint8_t m_gfxcolmask;
@@ -71,37 +69,37 @@ public:
 
 	/* 16-bit accessors */
 
-	DECLARE_WRITE16_MEMBER( pf_control_0_w );
-	DECLARE_READ16_MEMBER( pf_control_1_r );
-	DECLARE_WRITE16_MEMBER( pf_control_1_w );
+	void pf_control_0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_control_1_r(offs_t offset);
+	void pf_control_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( pf_data_w );
-	DECLARE_READ16_MEMBER( pf_data_r );
-	DECLARE_WRITE16_MEMBER( pf_rowscroll_w );
-	DECLARE_READ16_MEMBER( pf_rowscroll_r );
-	DECLARE_WRITE16_MEMBER( pf_colscroll_w );
-	DECLARE_READ16_MEMBER( pf_colscroll_r );
+	void pf_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_data_r(offs_t offset);
+	void pf_rowscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_rowscroll_r(offs_t offset);
+	void pf_colscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_colscroll_r(offs_t offset);
 
 	/* 8-bit accessors */
 
-	/* for dec8.cpp, pcktgal.cpp */
-	DECLARE_READ8_MEMBER( pf_data_8bit_r );
-	DECLARE_WRITE8_MEMBER( pf_data_8bit_w );
+	/* for dec8.cpp, pcktgal.cpp (Big endian CPU (6809, etc) based games) */
+	u8 pf_data_8bit_r(offs_t offset);
+	void pf_data_8bit_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER( pf_control0_8bit_w );
-	DECLARE_READ8_MEMBER( pf_control1_8bit_r );
-	DECLARE_WRITE8_MEMBER( pf_control1_8bit_w );
+	void pf_control0_8bit_w(offs_t offset, u8 data);
+	u8 pf_control1_8bit_r(offs_t offset);
+	void pf_control1_8bit_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( pf_rowscroll_8bit_r );
-	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_w );
+	u8 pf_rowscroll_8bit_r(offs_t offset);
+	void pf_rowscroll_8bit_w(offs_t offset, u8 data);
 
-	/* for hippodrm (dec0.cpp) and actfancr / triothep (H6280 based games)*/
-	DECLARE_WRITE8_MEMBER( pf_control0_8bit_packed_w );
-	DECLARE_WRITE8_MEMBER( pf_control1_8bit_swap_w );
-	DECLARE_READ8_MEMBER( pf_data_8bit_swap_r );
-	DECLARE_WRITE8_MEMBER( pf_data_8bit_swap_w );
-	DECLARE_READ8_MEMBER( pf_rowscroll_8bit_swap_r );
-	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_swap_w );
+	/* for hippodrm (dec0.cpp) and actfancr / triothep (Little endian CPU (HuC6280, etc) based games)*/
+	void pf_control0_8bit_packed_w(offs_t offset, u8 data);
+	void pf_control1_8bit_swap_w(offs_t offset, u8 data);
+	u8 pf_data_8bit_swap_r(offs_t offset);
+	void pf_data_8bit_swap_w(offs_t offset, u8 data);
+	u8 pf_rowscroll_8bit_swap_r(offs_t offset);
+	void pf_rowscroll_8bit_swap_w(offs_t offset, u8 data);
 
 protected:
 	virtual void device_start() override;
@@ -111,8 +109,11 @@ protected:
 	uint8_t m_gfxregion16x16;
 	int m_wide;
 
-	uint8_t m_bppmult;
-	uint8_t m_bppmask;
+	uint8_t m_bppmult_8x8;
+	uint8_t m_bppmask_8x8;
+
+	uint8_t m_bppmult_16x16;
+	uint8_t m_bppmask_16x16;
 
 	void custom_tilemap_draw(bitmap_ind16 &bitmap,
 							const rectangle &cliprect,
@@ -122,7 +123,8 @@ protected:
 							const uint16_t *control0,
 							const uint16_t *control1,
 							int flags,
-							uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition);
+							uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition,
+							uint8_t bppmult, uint8_t bppmask);
 
 private:
 	TILEMAP_MAPPER_MEMBER(tile_shape0_scan);

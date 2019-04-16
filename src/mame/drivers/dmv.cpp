@@ -817,8 +817,8 @@ void dmv_state::dmv(machine_config &config)
 	m_dmac->out_iow_callback<1>().set_log("Write DMA CH2");
 	m_dmac->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dmac->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
-	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_r));
-	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_w));
+	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::dma_r));
+	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::dma_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
 
 	I8272A(config, m_fdc, 8'000'000, true);

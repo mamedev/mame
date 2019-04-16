@@ -603,6 +603,16 @@ READ8_MEMBER( model1_state::dpram_r )
 	return m_dpram->right_r(offset);
 }
 
+WRITE8_MEMBER( model1_state::gen_outputs_w )
+{
+	// generic output lines, output to outx where x = bit
+	// eg. out0 = coin counter 1, see below for per-game descriptions
+	for (int i = 0; i < 8; i++)
+		m_outs[i] = BIT(data, i);
+
+	m_digits[1] = data;
+}
+
 WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
 	// 7654----  unknown (not used?)
@@ -628,8 +638,6 @@ WRITE8_MEMBER( model1_state::vr_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::swa_outputs_w )
@@ -683,6 +691,11 @@ WRITE8_MEMBER( model1_state::netmerc_outputs_w )
 	// -------0  coin counter 1
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model1_state::drive_board_w )
+{
+	m_digits[0] = data;
 }
 
 READ8_MEMBER( model1_state::r360_r )
@@ -877,7 +890,7 @@ WRITE16_MEMBER(model1_state::md0_w)
 WRITE16_MEMBER(model1_state::p_w)
 {
 	uint16_t old = m_paletteram16[offset];
-	m_palette->write16(space, offset, data, mem_mask);
+	m_palette->write16(offset, data, mem_mask);
 	if(0 && m_paletteram16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
 }
@@ -1291,7 +1304,7 @@ ROM_START( vr )
 	ROM_LOAD32_WORD( "mpr-14894.30", 0x800000, 0x200000, CRC(830a71bc) SHA1(884378e8a5afeb819daf5285d0d205986d566340) )
 	ROM_LOAD32_WORD( "mpr-14895.31", 0x800002, 0x200000, CRC(af027ac5) SHA1(523f03d90358ddb7d0e96fd06b9a65cebfc09f24) )
 	ROM_LOAD32_WORD( "mpr-14896.32", 0xc00000, 0x200000, CRC(382091dc) SHA1(efa266f0f6bfe36ad1c365e588fff33b01e166dd) )
-	ROM_LOAD32_WORD( "mpr-14879.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
+	ROM_LOAD32_WORD( "mpr-14897.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
 
 	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-14898.39", 0x000000, 0x80000, CRC(61da2bb6) SHA1(7a12ba522d64a1aeec1ca6f5a87ee063692131f9) )
@@ -1342,7 +1355,7 @@ ROM_START( vformula )
 	ROM_LOAD32_WORD( "mpr-14894.30", 0x800000, 0x200000, CRC(830a71bc) SHA1(884378e8a5afeb819daf5285d0d205986d566340) )
 	ROM_LOAD32_WORD( "mpr-14895.31", 0x800002, 0x200000, CRC(af027ac5) SHA1(523f03d90358ddb7d0e96fd06b9a65cebfc09f24) )
 	ROM_LOAD32_WORD( "mpr-14896.32", 0xc00000, 0x200000, CRC(382091dc) SHA1(efa266f0f6bfe36ad1c365e588fff33b01e166dd) )
-	ROM_LOAD32_WORD( "mpr-14879.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
+	ROM_LOAD32_WORD( "mpr-14897.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
 
 	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-14898.39", 0x000000, 0x80000, CRC(61da2bb6) SHA1(7a12ba522d64a1aeec1ca6f5a87ee063692131f9) )
@@ -1738,6 +1751,7 @@ void model1_state::vf(machine_config &config)
 	ioboard.set_default_bios_tag("epr14869b");
 	ioboard.in_callback<2>().set_ioport("IN.2");
 	ioboard.output_callback().set(FUNC(model1_state::vf_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 }
 
 void model1_state::vr(machine_config &config)
@@ -1747,10 +1761,12 @@ void model1_state::vr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_comm_mem);
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.drive_write_callback().set(FUNC(model1_state::drive_board_w));
 	ioboard.an_callback<0>().set_ioport("WHEEL");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 }
@@ -1762,10 +1778,12 @@ void model1_state::vformula(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_comm_mem);
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.drive_write_callback().set(FUNC(model1_state::drive_board_w));
 	ioboard.an_callback<0>().set_ioport("WHEEL");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
 }
@@ -1782,6 +1800,7 @@ void model1_state::swa(machine_config &config)
 	ioboard.an_callback<4>().set_ioport("STICK2X");
 	ioboard.an_callback<5>().set_ioport("STICK2Y");
 	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	SPEAKER(config, "dleft").front_left();
 	SPEAKER(config, "dright").front_right();
@@ -1809,6 +1828,7 @@ void model1_state::wingwar(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("STICKY");
 	ioboard.an_callback<2>().set_ioport("THROTTLE");
 	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 
@@ -1824,6 +1844,7 @@ void model1_state::wingwar360(machine_config &config)
 	ioboard.drive_write_callback().set(FUNC(model1_state::r360_w));
 	ioboard.an_callback<2>().set_constant(0);
 	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
@@ -1850,6 +1871,7 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STICKX");
 	ioboard.an_callback<2>().set_ioport("STICKY");
 	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }

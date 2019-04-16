@@ -435,6 +435,7 @@ public:
 	void init_magicard();
 
 private:
+	u16 m_vector;
 	required_shared_ptr<uint16_t> m_magicram;
 	required_shared_ptr<uint16_t> m_magicramb;
 	required_shared_ptr<uint16_t> m_pcab_vregs;
@@ -476,6 +477,7 @@ private:
 	void magicard_mem(address_map &map);
 	void ramdac_map(address_map &map);
 	void scc68070_mem(address_map &map);
+	void cpu_space_map(address_map &map);
 };
 
 
@@ -982,13 +984,25 @@ void magicard_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
+
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
+//In practice, needs a *real* 68070 emu
+void magicard_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff2, 0xfffff3).lr16("irq 2", [this]() -> u16 { return m_vector; });
+}
+
 INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 {
-	if(machine().input().code_pressed(KEYCODE_Z)) //vblank?
-		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xe4 / 4);
-	if(machine().input().code_pressed(KEYCODE_X)) //uart irq
-		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xf0 / 4);
+	if(machine().input().code_pressed(KEYCODE_Z)) { //vblank?
+		m_vector = 0xe4;
+		device.execute().set_input_line(1, HOLD_LINE);
+	}
+	if(machine().input().code_pressed(KEYCODE_X)) { //uart irq
+		m_vector = 0xf0;
+		device.execute().set_input_line(1, HOLD_LINE);
+	}	
 }
 
 void magicard_state::ramdac_map(address_map &map)
@@ -1001,6 +1015,7 @@ void magicard_state::magicard(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A / 2);    /* SCC-68070 CCA84 datasheet */
 	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::magicard_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &magicard_state::cpu_space_map);
 	m_maincpu->set_vblank_int("screen", FUNC(magicard_state::magicard_irq)); /* no interrupts? (it erases the vectors..) */
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

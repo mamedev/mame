@@ -289,7 +289,7 @@ space. This mapper uses 32KB sized banks.
 READ8_MEMBER(gb_state::gb_cart_r)
 {
 	if (m_bios_disable && m_cartslot)
-		return m_cartslot->read_rom(space, offset);
+		return m_cartslot->read_rom(offset);
 	else
 	{
 		if (offset < 0x100)
@@ -309,7 +309,7 @@ READ8_MEMBER(gb_state::gb_cart_r)
 		}
 		else if (m_cartslot)
 		{
-			return m_cartslot->read_rom(space, offset);
+			return m_cartslot->read_rom(offset);
 		}
 		else
 			return 0xff;
@@ -319,7 +319,7 @@ READ8_MEMBER(gb_state::gb_cart_r)
 READ8_MEMBER(gb_state::gbc_cart_r)
 {
 	if (m_bios_disable && m_cartslot)
-		return m_cartslot->read_rom(space, offset);
+		return m_cartslot->read_rom(offset);
 	else
 	{
 		if (offset < 0x100)
@@ -344,7 +344,7 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 		}
 		else if (m_cartslot)
 		{
-			return m_cartslot->read_rom(space, offset);
+			return m_cartslot->read_rom(offset);
 		}
 		else
 			return 0xff;
@@ -354,13 +354,13 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 WRITE8_MEMBER(gb_state::gb_bank_w)
 {
 	if (m_cartslot)
-		m_cartslot->write_bank(space, offset, data);
+		m_cartslot->write_bank(offset, data);
 }
 
 READ8_MEMBER(gb_state::gb_ram_r)
 {
 	if (m_cartslot)
-		return m_cartslot->read_ram(space, offset);
+		return m_cartslot->read_ram(offset);
 	else
 		return 0xff;
 }
@@ -368,7 +368,7 @@ READ8_MEMBER(gb_state::gb_ram_r)
 WRITE8_MEMBER(gb_state::gb_ram_w)
 {
 	if (m_cartslot)
-		m_cartslot->write_ram(space, offset, data);
+		m_cartslot->write_ram(offset, data);
 }
 
 READ8_MEMBER(gb_state::gb_echo_r)
@@ -384,7 +384,7 @@ WRITE8_MEMBER(gb_state::gb_echo_w)
 READ8_MEMBER(megaduck_state::cart_r)
 {
 	if (m_cartslot)
-		return m_cartslot->read_rom(space, offset);
+		return m_cartslot->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -392,13 +392,13 @@ READ8_MEMBER(megaduck_state::cart_r)
 WRITE8_MEMBER(megaduck_state::bank1_w)
 {
 	if (m_cartslot)
-		m_cartslot->write_bank(space, offset, data);
+		m_cartslot->write_bank(offset, data);
 }
 
 WRITE8_MEMBER(megaduck_state::bank2_w)
 {
 	if (m_cartslot)
-		m_cartslot->write_ram(space, offset, data); /* used for bankswitch, but we re-use GB name */
+		m_cartslot->write_ram(offset, data); /* used for bankswitch, but we re-use GB name */
 }
 
 

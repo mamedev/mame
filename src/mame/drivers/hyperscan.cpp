@@ -539,7 +539,7 @@ void hyperscan_state::spg290_timers_update()
 					if (elem.control & 0x08000000)
 					{
 						elem.control |= 0x04000000;
-						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56);
+						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56); // SCORE7
 					}
 				}
 				else
@@ -558,12 +558,12 @@ WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
 	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
 	{
 		m_ppu.irq_status |= 0x01;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
 	}
 	else if (!state && m_ppu.irq_control & 0x02) // VBlanking End IRQ
 	{
 		m_ppu.irq_status |= 0x02;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
 	}
 }
 
@@ -581,7 +581,7 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			// TODO: replace with real I2C emulation
 			m_i2c.rdata = 0;
 
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39); // SCORE7
 		}
 		break;
 	}
@@ -621,22 +621,23 @@ void hyperscan_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(hyperscan_state::hyperscan)
+void hyperscan_state::hyperscan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
-	MCFG_DEVICE_PROGRAM_MAP(spg290_mem)
+	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // 108MHz S+core 7
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyperscan_state::spg290_mem);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperscan_state, spg290_vblank_irq))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(hyperscan_state::spg290_screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.screen_vblank().set(FUNC(hyperscan_state::spg290_vblank_irq));
+}
 
 
 /* ROM definition */

@@ -519,8 +519,11 @@ static GFXDECODE_START( gfx_pcherc )
 GFXDECODE_END
 
 ROM_START( hercules )
-	ROM_REGION(0x1000,"gfx1", 0)
-	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
+	ROM_REGION(0x1000, "gfx1", 0)
+	ROM_SYSTEM_BIOS(0, "cp437", "Code page 437")
+	ROMX_LOAD("um2301.bin", 0x0000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "mzv", "Mazovia (Polish)") // dumped from a Taiwanese-made card using the SiS 86C22 chip
+	ROMX_LOAD("hgc_mzv_2301.bin", 0x0000, 0x1000, CRC(9431b9e0) SHA1(3279dfeed4a0f5daa7b57d455c96eafdcbb6bf41), ROM_BIOS(1))
 ROM_END
 
 //**************************************************************************

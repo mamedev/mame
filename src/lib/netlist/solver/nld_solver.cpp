@@ -358,7 +358,7 @@ namespace devices
 	#endif
 	#endif
 				default:
-					log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
+					log().info(MI_1_NO_SPECIFIC_SOLVER, net_count);
 					if (net_count <= 8)
 					{
 						ms = create_solver<double, -8>(net_count, sname);

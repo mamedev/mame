@@ -92,6 +92,11 @@ namespace
 			return memregion("eprom")->base();
 		}
 
+		virtual memory_region* get_cart_memregion() override
+		{
+			return memregion("eprom");
+		}
+
 	private:
 		WRITE8_MEMBER(write_left)   { m_ldac->write(data); }
 		WRITE8_MEMBER(write_right)  { m_rdac->write(data); }

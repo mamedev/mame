@@ -771,12 +771,12 @@ WRITE8_MEMBER(attache_state::memmap_w)
 
 READ8_MEMBER(attache_state::dma_mask_r)
 {
-	return m_dma->read(space,0x0f);
+	return m_dma->read(0x0f);
 }
 
 WRITE8_MEMBER(attache_state::dma_mask_w)
 {
-	m_dma->write(space,0x0f,data);
+	m_dma->write(0x0f,data);
 }
 
 READ8_MEMBER(attache_state::fdc_dma_r)
@@ -906,7 +906,7 @@ WRITE8_MEMBER(attache816_state::z80_comms_ctrl_w)
 WRITE_LINE_MEMBER(attache816_state::ppi_irq)
 {
 	if(m_x86_irq_enable & 0x01)
-		m_extcpu->set_input_line_and_vector(0,state,0x03);
+		m_extcpu->set_input_line_and_vector(0,state,0x03); // I8086
 }
 
 WRITE_LINE_MEMBER(attache816_state::x86_dsr)

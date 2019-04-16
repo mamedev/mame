@@ -40,7 +40,7 @@ WRITE16_MEMBER(magmax_state::cpu_irq_ack_w)
 
 READ8_MEMBER(magmax_state::sound_r)
 {
-	return (m_soundlatch->read(space, 0) << 1) | m_LS74_q;
+	return (m_soundlatch->read() << 1) | m_LS74_q;
 }
 
 WRITE8_MEMBER(magmax_state::ay8910_portB_0_w)

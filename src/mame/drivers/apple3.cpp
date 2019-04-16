@@ -25,6 +25,7 @@
 #include "bus/a2bus/a2applicard.h"
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/mouse.h"
+#include "bus/a2bus/a2zipdrive.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -44,6 +45,7 @@ static void apple3_cards(device_slot_interface &device)
 	device.option_add("applicard", A2BUS_APPLICARD);    // PCPI Applicard
 	device.option_add("thclock", A2BUS_THUNDERCLOCK);   // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
 	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
+	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  // Focus Drive IDE card
 }
 
 static void a3_floppies(device_slot_interface &device)

@@ -71,7 +71,7 @@ namespace devices
 		void LE_invert();
 
 		template <typename T>
-		void LE_compute_x(T * x);
+		void LE_compute_x(T & x);
 
 
 		template <typename T1, typename T2>
@@ -94,7 +94,7 @@ namespace devices
 		float_ext_type m_A[storage_N][m_pitch];
 		float_ext_type m_Ainv[storage_N][m_pitch];
 		float_ext_type m_W[storage_N][m_pitch];
-		float_ext_type m_RHS[storage_N]; // right hand side - contains currents
+		std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
 		float_ext_type m_lA[storage_N][m_pitch];
 		float_ext_type m_lAinv[storage_N][m_pitch];
@@ -186,7 +186,7 @@ namespace devices
 	template <typename FT, int SIZE>
 	template <typename T>
 	void matrix_solver_sm_t<FT, SIZE>::LE_compute_x(
-			T * x)
+			T & x)
 	{
 		const std::size_t kN = size();
 
@@ -208,7 +208,7 @@ namespace devices
 		static constexpr const bool incremental = true;
 		const std::size_t iN = size();
 
-		float_type new_V[storage_N]; // = { 0.0 };
+		std::array<float_type, storage_N> new_V; // = { 0.0 };
 
 		if ((m_cnt % 50) == 0)
 		{
@@ -225,8 +225,8 @@ namespace devices
 			}
 			for (std::size_t row = 0; row < iN; row ++)
 			{
-				float_type v[m_pitch] = {0};
-				std::size_t cols[m_pitch];
+				std::array<float_type, m_pitch> v = {0};
+				std::array<std::size_t, m_pitch> cols;
 				std::size_t colcount = 0;
 
 				auto &nz = m_terms[row]->m_nz;
@@ -242,9 +242,9 @@ namespace devices
 				if (colcount > 0)
 				{
 					float_type lamba = 0.0;
-					float_type w[m_pitch] = {0};
+					std::array<float_type, m_pitch> w = {0};
 
-					float_type z[m_pitch];
+					std::array<float_type, m_pitch> z;
 					/* compute w and lamba */
 					for (std::size_t i = 0; i < iN; i++)
 						z[i] = Ainv(i, row); /* u is row'th column */

@@ -134,7 +134,7 @@ MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	m_maincpu->reset();
-	m_maincpu->set_input_line_vector(0, 0xee); // fdc vector
+	m_maincpu->set_input_line_vector(0, 0xee); // Z80 - fdc vector
 }
 
 void dmax8000_state::init_dmax8000()
@@ -152,11 +152,12 @@ static void floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(dmax8000_state::dmax8000)
+void dmax8000_state::dmax8000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4'000'000) // no idea what crystal is used, but 4MHz clock is confirmed
-	MCFG_DEVICE_PROGRAM_MAP(dmax8000_mem)
-	MCFG_DEVICE_IO_MAP(dmax8000_io)
+	Z80(config, m_maincpu, 4'000'000); // no idea what crystal is used, but 4MHz clock is confirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::dmax8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::dmax8000_io);
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
@@ -198,7 +199,7 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	// this is all guess
 	rtc.set_mode24(0); // 12 hour
 	rtc.set_day1(1);   // monday
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

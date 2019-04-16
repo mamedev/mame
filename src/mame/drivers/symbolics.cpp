@@ -133,11 +133,11 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     //m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-    m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
     if (!(m_parity_error_has_occurred[offset]))
     {
         //m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
-        m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+        m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
         m_parity_error_has_occurred[offset] = true;
     }
     ram += offset;
@@ -147,10 +147,10 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
-    m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
     if (!(m_parity_error_has_occurred[offset]))
     {
-        m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+        m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
         m_parity_error_has_occurred[offset] = true;
     }
     COMBINE_DATA(&ram[offset]);

@@ -39,7 +39,7 @@ READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco104->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -48,7 +48,7 @@ WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 
@@ -205,33 +205,32 @@ DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 	return (bank & 0x70) << 8;
 }
 
-MACHINE_CONFIG_START(dietgo_state::dietgo)
-
+void dietgo_state::dietgo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* DE102 (verified on pcb) */
-	MCFG_DEVICE_PROGRAM_MAP(dietgo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(28'000'000)/2); /* DE102 (verified on pcb) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dietgo_state::dietgo_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &dietgo_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dietgo_state::irq6_line_hold));
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4/3);  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dietgo_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(dietgo_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 1024);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dietgo);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -265,9 +264,8 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); /* verified on pcb */
+}
 
 
 /* Diet Go Go */

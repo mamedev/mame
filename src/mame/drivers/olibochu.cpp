@@ -263,7 +263,7 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 	for (c = 15; c >= 0; c--)
 		if (m_cmd & (1 << c)) break;
 
-	if (c >= 0) m_soundlatch->write(space, 0, 15 - c);
+	if (c >= 0) m_soundlatch->write(15 - c);
 }
 
 
@@ -453,10 +453,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
 void olibochu_state::olibochu(machine_config &config)

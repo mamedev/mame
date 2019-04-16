@@ -104,13 +104,35 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
+#include "render.h"
 #include "softlist.h"
 #include "speaker.h"
 
 #include "pcw.lh"
 
-#define VERBOSE 1
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG_PRN      (1U <<  1)
+#define LOG_STROBE   (1U <<  2)
+#define LOG_PAR      (1U <<  3)
+#define LOG_EXP      (1U <<  4)
+#define LOG_MEM      (1U <<  5)
+#define LOG_SYS      (1U <<  6)
+#define LOG_BANK     (1U <<  7)
+#define LOG_RRAM     (1U <<  8)
+#define LOG_IRQ      (1U <<  9)
+
+//#define VERBOSE (LOG_SYS)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGPRN(...)     LOGMASKED(LOG_PRN,      __VA_ARGS__)
+#define LOGSTROBE(...)  LOGMASKED(LOG_STROBE,   __VA_ARGS__)
+#define LOGPAR(...)     LOGMASKED(LOG_PAR,      __VA_ARGS__)
+#define LOGEXP(...)     LOGMASKED(LOG_EXP,      __VA_ARGS__)
+#define LOGMEM(...)     LOGMASKED(LOG_MEM,      __VA_ARGS__)
+#define LOGSYS(...)     LOGMASKED(LOG_SYS,      __VA_ARGS__)
+#define LOGBANK(...)    LOGMASKED(LOG_BANK,     __VA_ARGS__)
+#define LOGRRAM(...)    LOGMASKED(LOG_RRAM,     __VA_ARGS__)
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ,      __VA_ARGS__)
 
 static const uint8_t half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
 static const uint8_t full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
@@ -223,28 +245,24 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 void pcw_state::pcw_update_read_memory_block(int block, int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	char block_name[10];
+	char block_name[32];
 
-	sprintf(block_name,"bank%d",block+1);
+	snprintf(block_name, sizeof(block_name), "bank%d", block + 1);
 	/* bank 3? */
 	if (bank == 3)
 	{
-		/* when upper 16 bytes are accessed use keyboard read
-		   handler */
-		space.install_read_handler(
-			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
-//      LOG(("MEM: read block %i -> bank %i\n",block,bank));
+		/* when upper 16 bytes are accessed use keyboard read handler */
+		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
+		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	else
 	{
 		/* restore bank handler across entire block */
 		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
-//      LOG(("MEM: read block %i -> bank %i\n",block,bank));
+		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 }
-
-
 
 void pcw_state::pcw_update_write_memory_block(int block, int bank)
 {
@@ -252,7 +270,7 @@ void pcw_state::pcw_update_write_memory_block(int block, int bank)
 
 	sprintf(block_name,"bank%d",block+5);
 	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
-//  LOG(("MEM: write block %i -> bank %i\n",block,bank));
+	LOGMEM("MEM: write block %i -> bank %i\n", block, bank);
 }
 
 
@@ -359,18 +377,18 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 	/* check interrupts */
 	pcw_update_irqs();
 	/* return data */
-	//LOG(("SYS: IRQ counter read, returning %02x\n",data));
+	LOGIRQ("IRQ counter read, returning %02x\n", data);
 	return data;
 }
 
 
 WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 {
-	//LOG(("BANK: %2x %x\n",offset, data));
+	LOGBANK("BANK: %2x %x\n", offset, data);
 	m_banks[offset] = data;
 
 	pcw_update_mem(offset, data);
-//  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
+	LOGBANK("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
@@ -391,24 +409,24 @@ WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
 
 	m_roller_ram_addr = (((data>>5) & 0x07)<<14) |
 							((data & 0x01f)<<9);
-	LOG(("Roller-RAM: Address set to 0x%05x\n",m_roller_ram_addr));
+	LOGRRAM("Roller-RAM: Address set to 0x%05x\n", m_roller_ram_addr);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_pointer_table_top_scan_w)
 {
 	m_roller_ram_offset = data;
-	LOG(("Roller-RAM: offset set to 0x%05x\n",m_roller_ram_offset));
+	LOGRRAM("Roller-RAM: offset set to 0x%05x\n", m_roller_ram_offset);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 {
 	m_vdu_video_control_register = data;
-	LOG(("Roller-RAM: control reg set to 0x%02x\n",data));
+	LOGRRAM("Roller-RAM: control reg set to 0x%02x\n", data);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
-	LOG(("SYSTEM CONTROL: %d\n",data));
+	LOGSYS("SYSTEM CONTROL: %d\n", data);
 
 	switch (data)
 	{
@@ -424,7 +442,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 1:
 		{
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			popmessage("SYS: Reboot");
+			LOGSYS("SYS: Reboot");
 		}
 		break;
 
@@ -571,7 +589,7 @@ READ8_MEMBER(pcw_state::pcw_system_status_r)
 the PCW custom ASIC */
 READ8_MEMBER(pcw_state::pcw_expansion_r)
 {
-	logerror("pcw expansion r: %04x\n",offset+0x080);
+	LOGEXP("pcw expansion r: %04x\n", offset+0x080);
 
 	switch (offset+0x080)
 	{
@@ -620,7 +638,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 the PCW custom ASIC */
 WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 {
-	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
+	LOGEXP("pcw expansion w: %04x %02x\n", offset+0x080, data);
 }
 
 void pcw_state::pcw_printer_fire_pins(uint16_t pins)
@@ -676,7 +694,12 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
  */
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 {
-	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
+	LOGPRN("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",
+		   m_printer_p2 & 0x40 ? " " : "6",
+		   m_printer_p2 & 0x20 ? " " : "5",
+		   m_printer_p2 & 0x10 ? " " : "4",
+		   m_printer_shift_output,m_printer_headpos);
+
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
 		uint8_t stepper_state = (m_printer_shift_output >> 4) & 0x0f;
@@ -684,25 +707,25 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 		{
 			m_printer_headpos += 2;
 			m_head_motor_state++;
-			logerror("Printer head moved forward by 2 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved forward by 2 to %i\n", m_printer_headpos);
 		}
 		if(stepper_state == half_step_table[(m_head_motor_state + 1) & 0x03])
 		{
 			m_printer_headpos += 1;
 			m_head_motor_state++;
-			logerror("Printer head moved forward by 1 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved forward by 1 to %i\n", m_printer_headpos);
 		}
 		if(stepper_state == full_step_table[(m_head_motor_state - 1) & 0x03])
 		{
 			m_printer_headpos -= 2;
 			m_head_motor_state--;
-			logerror("Printer head moved back by 2 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved back by 2 to %i\n", m_printer_headpos);
 		}
 		if(stepper_state == half_step_table[(m_head_motor_state - 1) & 0x03])
 		{
 			m_printer_headpos -= 1;
 			m_head_motor_state--;
-			logerror("Printer head moved back by 1 to %i\n",m_printer_headpos);
+			LOGPRN("Printer head moved back by 1 to %i\n", m_printer_headpos);
 		}
 		if(m_printer_headpos < 0)
 			m_printer_headpos = 0;
@@ -741,21 +764,21 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 
 READ8_MEMBER(pcw_state::mcu_printer_p1_r)
 {
-//  logerror("PRN: MCU reading data from P1\n");
+	LOGPRN("PRN: MCU reading data from P1\n");
 	return m_printer_pins & 0x00ff;
 }
 
 WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
 {
 	m_printer_pins = (m_printer_pins & 0x0100) | data;
-	//popmessage("PRN: Print head position = %i",m_printer_headpos);
-	logerror("PRN: MCU writing %02x to P1 [%03x/%03x]\n",data,m_printer_pins,~m_printer_pins & 0x1ff);
+	LOGPRN("PRN: Print head position = %i", m_printer_headpos);
+	LOGPRN("PRN: MCU writing %02x to P1 [%03x/%03x]\n", data,m_printer_pins, ~m_printer_pins & 0x1ff);
 }
 
 READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 {
 	uint8_t ret = 0x00;
-//  logerror("PRN: MCU reading data from P2\n");
+	LOGPRN("PRN: MCU reading data from P2\n");
 	ret |= 0x80;  // make sure bail bar is in
 	ret |= (m_printer_p2 & 0x70);
 	ret |= (m_printer_pins & 0x100) ? 0x01 : 0x00;  // ninth pin
@@ -765,7 +788,7 @@ READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 
 WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 {
-	//logerror("PRN: MCU writing %02x to P2\n",data);
+	LOGPRN("PRN: MCU writing %02x to P2\n", data);
 	m_printer_p2 = data & 0x70;
 
 	// handle shift/store
@@ -780,7 +803,7 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 	}
 	if((data & 0x08) != 0)  // strobe
 	{
-		logerror("Strobe active [%02x]\n",m_printer_shift);
+		LOGSTROBE("Strobe active [%02x]\n",m_printer_shift);
 		m_printer_shift_output = m_printer_shift;
 		m_prn_stepper->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.00000001));
 	}
@@ -915,14 +938,14 @@ READ8_MEMBER(pcw_state::pcw9512_parallel_r)
 		return 0xff^0x020;
 	}
 
-	logerror("pcw9512 parallel r: offs: %04x\n", (int) offset);
+	LOGPAR("pcw9512 parallel r: offs: %04x\n", (int) offset);
 	return 0x00;
 }
 
 /* TODO: Implement parallel port! */
 WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 {
-	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
+	LOGPAR("pcw9512 parallel w: offs: %04x data: %02x\n", offset, data);
 }
 
 void pcw_state::pcw_io(address_map &map)
@@ -998,11 +1021,12 @@ void pcw_state::machine_reset()
 	m_printer_headpos = 0x00; // bring printer head to left margin
 	m_printer_shift = 0;
 	m_printer_shift_output = 0;
+	machine().render().first_target()->set_view(0);
 }
 
 void pcw_state::init_pcw()
 {
-	m_maincpu->set_input_line_vector(0, 0x0ff);
+	m_maincpu->set_input_line_vector(0, 0x0ff); // Z80
 
 	/* lower 4 bits are interrupt counter */
 	m_system_status = 0x000;
@@ -1212,16 +1236,26 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,    IPT_UNUSED)
 INPUT_PORTS_END
 
-static void pcw_floppies(device_slot_interface &device)
+static void pcw_ssfloppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
+
+static void pcw_dsfloppies(device_slot_interface &device)
 {
 	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
+
+static void pcw_35floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 /* PCW8256, PCW8512, PCW9256 */
 void pcw_state::pcw(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	Z80(config, m_maincpu, XTAL(32'000'000) / 8); /* clock supplied to chip, but in reality it is 3.4 MHz due to z80 wait cycles*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
 
@@ -1247,14 +1281,13 @@ void pcw_state::pcw(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT);
-	m_screen->set_visarea(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1);
+	m_screen->set_raw(32_MHz_XTAL / 3, 720 + 20, 8, 720 + 8, 256 + 32, 8, 256 + 8); // Hand tuned to get 50Hz, it is all in the Amstrad ASIC, 32MHz in and video out
 	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(pcw_state::pcw_colours), PCW_NUM_COLOURS);
+	PALETTE(config, m_palette, FUNC(pcw_state::set_9xxx_palette), PCW_NUM_COLOURS);
+	PALETTE(config, m_ppalette, FUNC(pcw_state::set_printer_palette), PCW_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1262,9 +1295,6 @@ void pcw_state::pcw(machine_config &config)
 
 	UPD765A(config, m_fdc, 4'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
-
-	FLOPPY_CONNECTOR(config, "upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pcw");
 
@@ -1277,34 +1307,98 @@ void pcw_state::pcw(machine_config &config)
 void pcw_state::pcw8256(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
+
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_floppy_formats);
+
 	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
 	printer.set_refresh_hz(50);
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
 	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
-	printer.set_palette(m_palette);
+	printer.set_palette(m_ppalette);
 
 	config.set_default_layout(layout_pcw);
 }
 
 void pcw_state::pcw8512(machine_config &config)
 {
-	pcw8256(config);
+	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
+
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsdd", floppy_image_device::default_floppy_formats);
+
+	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	printer.set_refresh_hz(50);
+	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
+	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
+	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
+	printer.set_palette(m_ppalette);
+
+	config.set_default_layout(layout_pcw);
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
 }
 
-/* PCW9512, PCW9512+, PCW10 */
+/* PCW9512 */
 void pcw_state::pcw9512(machine_config &config)
 {
 	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
+
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_floppy_formats);
+
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
 }
 
+/* PCW9256 */
+void pcw_state::pcw9256(machine_config &config)
+{
+	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
+
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_35floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_35floppies, nullptr, floppy_image_device::default_floppy_formats);
+
+	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);
+}
+
+/* PCW9512+ */
+void pcw_state::pcw9512p(machine_config &config)
+{
+	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
+
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_35floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_35floppies, nullptr, floppy_image_device::default_floppy_formats);
+
+	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);
+
+	/* internal ram */
+	m_ram->set_default_size("512K");
+}
+
+/* PCW10 - essentially the same as pcw9512+ */
+void pcw_state::pcw10(machine_config &config)
+{
+	pcw(config);
+	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
+
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_35floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_35floppies, nullptr, floppy_image_device::default_floppy_formats);
+
+	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);
+
+	/* internal ram */
+	m_ram->set_default_size("512K");
+}
 
 /***************************************************************************
 
@@ -1348,6 +1442,15 @@ ROM_START(pcw9512)
 	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
 ROM_END
 
+ROM_START(pcw9512p)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_FILL(0x0000,0x10000,0x00)
+	ROM_REGION(0x2000,"printer_mcu",0) // i8041 daisywheel (schematics say i8039?)
+	ROM_LOAD("40103.ic109", 0, 0x2000, CRC(a64d450a) SHA1(ebbf0ef19d39912c1c127c748514dd299915f88b))
+	ROM_REGION(0x400,"keyboard_mcu",0) // i8048
+	ROM_LOAD("40027.ic801", 0, 0x400, CRC(25260958) SHA1(210e7e25228c79d2920679f217d68e4f14055825))
+ROM_END
+
 ROM_START(pcw10)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_FILL(0x0000,0x10000,0x00)
@@ -1360,9 +1463,10 @@ ROM_END
 
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT CLASS      INIT      COMPANY        FULLNAME */
-COMP( 1985, pcw8256, 0,       0,      pcw8256, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
-COMP( 1985, pcw8512, pcw8256, 0,      pcw8512, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9256, pcw8256, 0,      pcw8256, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9512, pcw8256, 0,      pcw9512, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
-COMP( 1993, pcw10,   pcw8256, 0,      pcw8512, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT CLASS      INIT      COMPANY        FULLNAME */
+COMP( 1985, pcw8256,  0,       0,      pcw8256,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
+COMP( 1985, pcw8512,  pcw8256, 0,      pcw8512,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9512,  pcw8256, 0,      pcw9512,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512",       MACHINE_NOT_WORKING)
+COMP( 1991, pcw9256,  pcw8256, 0,      pcw9256,  pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
+COMP( 1991, pcw9512p, pcw8256, 0,      pcw9512p, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
+COMP( 1993, pcw10,    pcw8256, 0,      pcw10,    pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)

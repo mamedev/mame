@@ -374,7 +374,7 @@ keyboard, VFD display, and use the SC-01 speech chip. --> driver k28.cpp
     - MCU: TMS1400 MP7324
     - TMS51xx: TMS5110A
     - VSM: 16KB CM62084
-    - LCD: unknown 8*16-seg
+    - LCD: SMOS SMC1112 MCU to 8*14-seg display
 
 K28 modules:
 
@@ -394,7 +394,7 @@ K28 modules:
 
   TODO:
   - why doesn't lantutor work?
-  - identify and emulate k28 LCD
+  - emulate k28 LCD
   - emulate other known devices
 
 
@@ -419,13 +419,15 @@ K28 modules:
 #include "snspellsp.lh"
 #include "tntell.lh" // keyboard overlay
 
+namespace {
+
 // The master clock is a single stage RC oscillator into TMS5100 RCOSC:
 // In an early 1979 Speak & Spell, C is 68pf, R is a 50kohm trimpot which is set to around 33.6kohm
 // (measured in-circuit). CPUCLK is this osc freq /2, ROMCLK is this osc freq /4.
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
 // which is 640kHz for 8KHz according to the TMS5100 documentation.
 
-#define MASTER_CLOCK 640_kHz_XTAL
+#define MASTER_CLOCK 640000
 
 
 class tispeak_state : public hh_tms1k_state
@@ -504,7 +506,6 @@ private:
 
 	u8 m_overlay;
 };
-
 
 void tispeak_state::machine_start()
 {
@@ -738,7 +739,8 @@ void tispeak_state::k28_prepare_display(u8 old, u8 data)
 WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, bitswap<4>(data,1,2,3,4));
+	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
+	m_tms5100->ctl_w(space, 0, r & 0xf);
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -752,7 +754,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 
 	// R7-R10: LCD data
 	k28_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
-	m_r = data;
+	m_r = r;
 }
 
 WRITE16_MEMBER(tispeak_state::k28_write_o)
@@ -763,8 +765,8 @@ WRITE16_MEMBER(tispeak_state::k28_write_o)
 
 READ8_MEMBER(tispeak_state::k28_read_k)
 {
-	// K: TMS5100 CTL, multiplexed inputs
-	return m_tms5100->ctl_r(space, 0) | read_inputs(9);
+	// K: TMS5100 CTL, multiplexed inputs (also tied to R1234)
+	return m_tms5100->ctl_r(space, 0) | read_inputs(9) | (m_r & 0xf);
 }
 
 
@@ -1877,6 +1879,8 @@ ROM_START( k28m2 )
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
 	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
 ROM_END
+
+} // anonymous namespace
 
 
 

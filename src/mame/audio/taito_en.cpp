@@ -112,6 +112,11 @@ void taito_en_device::en_sound_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("osram");  // mirror
 }
 
+void taito_en_device::fc7_map(address_map &map)
+{
+	map(0xfffffd, 0xfffffd).r(m_duart68681, FUNC(mc68681_device::get_irq_vector));
+}
+
 
 /*************************************
  *
@@ -142,18 +147,6 @@ WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
 void taito_en_device::es5505_clock_changed(u32 data)
 {
 	m_pump->set_unscaled_clock(data);
-}
-
-
-/*************************************
- *
- *  M68681 callback
- *
- *************************************/
-
-IRQ_CALLBACK_MEMBER(taito_en_device::duart_iack)
-{
-	return m_duart68681->get_irq_vector();
 }
 
 
@@ -204,7 +197,7 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_audiocpu, XTAL(30'476'100) / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_en_device::en_sound_map);
-	m_audiocpu->set_irq_acknowledge_callback(FUNC(taito_en_device::duart_iack));
+	m_audiocpu->set_addrmap(m68000_device::AS_CPU_SPACE, &taito_en_device::fc7_map);
 
 	ES5510(config, m_esp, XTAL(10'000'000)); // from Gun Buster schematics
 	m_esp->set_disable();

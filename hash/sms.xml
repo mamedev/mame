@@ -7407,11 +7407,10 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="5080"/>
 		<part name="cart" interface="sms_cart">
-			<!-- PCB info based on SMS Power -->
-			<feature name="pcb" value="??" />
-			<feature name="ic1" value="MPR-10156" />
+			<feature name="pcb" value="171-5519" />
+			<feature name="ic1" value="MPR-11074" />
 			<dataarea name="rom" size="131072">
-				<rom name="mpr-10156.ic1" size="131072" crc="4aaad0d6" sha1="650f15ebbd149f5c357f089d7bd305fcb20b068f" offset="000000" />
+				<rom name="mpr-11074.ic1" size="131072" crc="4aaad0d6" sha1="650f15ebbd149f5c357f089d7bd305fcb20b068f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7423,7 +7422,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="5080, GB-1304"/>
 		<part name="cart" interface="sms_cart">
-			<!-- PCB info based on US cart (nepereny's), to check the cart with MPR-11074 reported at SMS Power -->
+			<!-- PCB info based on US cart (nepereny's), to check the cart with MPR-10156 listed at SMS Power -->
 			<feature name="pcb" value="171-5365-01" />
 			<feature name="ic1" value="315-5208" /> <!-- Sega Memory Controller -->
 			<feature name="ic2" value="MPR-10151" />
@@ -7798,25 +7797,25 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!--
-             The mode for 2 players requires 2 Mark III consoles, both with
-             the SK-1100 keyboard, plus a cable to link the keyboards through
-             their printer port. To emulate this setup, it is necessary to run
-             two instances of MAME and make a point-to-point connection between
-             them using the bitbanger (bitb) stream that is provided by the
-             kblink device, that simulates the function of the cable link.
-             Example for a localhost (127.0.0.1) connection:
+	         The mode for 2 players requires 2 Mark III consoles, both with
+	         the SK-1100 keyboard, plus a cable to link the keyboards through
+	         their printer port. To emulate this setup, it is necessary to run
+	         two instances of MAME and make a point-to-point connection between
+	         them using the bitbanger (bitb) stream that is provided by the
+	         kblink device, that simulates the function of the cable link.
+	         Example for a localhost (127.0.0.1) connection:
 
-             mame64 -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
-             mame64 -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
+	         mame64 -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
+	         mame64 -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
 
-             After run both instances, press the CR key on the keyboard when
-             the title screen is displayed. Next, when asked which player
-             (1 or 2), the user needs to press 1 on the keyboard of one
-             instance, switch to the other instance and press 2 on the keyboard
-             (due to key 1 is mapped by default to the PAUSE function of the
-             console, it is recommended first remap PAUSE to avoid conflict).
-             Next, when LEVEL 1 appears on the screen, press the SPACE key on
-             each instance to start playing the game.
+	         After run both instances, press the CR key on the keyboard when
+	         the title screen is displayed. Next, when asked which player
+	         (1 or 2), the user needs to press 1 on the keyboard of one
+	         instance, switch to the other instance and press 2 on the keyboard
+	         (due to key 1 is mapped by default to the PAUSE function of the
+	         console, it is recommended first remap PAUSE to avoid conflict).
+	         Next, when LEVEL 1 appears on the screen, press the SPACE key on
+	         each instance to start playing the game.
 	-->
 	<software name="f16falcjc" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (Jpn, MyCard)</description>

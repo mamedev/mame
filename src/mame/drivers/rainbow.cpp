@@ -1374,7 +1374,7 @@ void rainbow_state::update_8088_irqs()
 		{
 			if (m_irq_mask & (1 << i))
 			{
-				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high);
+				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high); // I8088
 				break;
 			}
 		}
@@ -1548,16 +1548,16 @@ WRITE8_MEMBER(rainbow_state::rtc_w)
 		{
 		case 0x00: // Write to 0xED0FE
 			if (m_rtc->chip_enable())
-				m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
 			else
-				m_rtc->read_0(space, 0); // (RTC ACTIVATION) read magic pattern 0
+				m_rtc->read_0(); // (RTC ACTIVATION) read magic pattern 0
 			break;
 
 		case 0x01: // Write to 0xED0FF
 			if (m_rtc->chip_enable())
-				m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
 			else
-				m_rtc->read_1(space, 0); // (RTC ACTIVATION) read magic pattern 1
+				m_rtc->read_1(); // (RTC ACTIVATION) read magic pattern 1
 			break;
 		}
 	}
@@ -1576,7 +1576,7 @@ READ8_MEMBER(rainbow_state::rtc_r)
 #ifdef ASSUME_RAINBOW_A_HARDWARE
 		case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)
 			if (m_rtc->chip_enable())
-				return m_rtc->read_data(space, 0) & 0x01;
+				return m_rtc->read_data() & 0x01;
 			 else
 				m_rtc->chip_reset();
 #else
@@ -1586,25 +1586,25 @@ READ8_MEMBER(rainbow_state::rtc_r)
 
 		case 0x0001:  // RTC_WRITE_DATA_1 0xFC001
 		case 0x2001:  // RTC_WRITE_DATA_1 0xFE001 (MIRROR)
-			m_rtc->write_data(space, offset & 0x01);
+			m_rtc->write_data(offset & 0x01);
 			break;
 
 		// Read actual time/date from ClikClok:
 		case 0x0004:  // 0xFC004
 		case 0x2004:  // 0xFE004 (MIRROR)
 			if (m_rtc->chip_enable())
-				return (m_rtc->read_data(space, 0) & 0x01);
+				return (m_rtc->read_data() & 0x01);
 
 		// (RTC ACTIVATION) read magic pattern 0
 		case 0x0100:  // 0xFC100
 		case 0x2100:  // 0xFE100 (MIRROR)
-			m_rtc->read_0(space, 0);
+			m_rtc->read_0();
 			break;
 
 		// (RTC ACTIVATION) read magic pattern 1
 		case 0x0101:  // 0xFC101
 		case 0x2101:  // 0xFE101 (MIRROR)
-			m_rtc->read_1(space, 0);
+			m_rtc->read_1();
 			break;
 
 		// RESET
@@ -2240,7 +2240,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 	// The interrupt vector address(F7H) placed on the bus is hardwired into the Z80A interrupt vector encoder.
 	// The F7H interrupt vector address causes the Z80A processor to perform an RST 30 instruction in
 	// interrupt mode 0
-	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
+	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7); // Z80
 	m_z80_mailbox = data;
 
 	m_intz80 = true;
@@ -2756,7 +2756,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device, cd_ba_w) );
+			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(FUNC(upd7201_new_device::cd_ba_r), &*m_mpsc), write8sm_delegate(FUNC(upd7201_new_device::cd_ba_w), &*m_mpsc));
 			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}

@@ -103,7 +103,7 @@ uint8_t electron_cumana_device::read(offs_t offset, int infc, int infd, int romq
 			break;
 		case 0x98:
 		case 0x9c:
-			data = m_rtc->read(machine().dummy_space(), BIT(offset, 2));
+			data = m_rtc->read(BIT(offset, 2));
 			break;
 		}
 	}
@@ -151,7 +151,7 @@ void electron_cumana_device::write(offs_t offset, uint8_t data, int infc, int in
 			break;
 		case 0x98:
 		case 0x9c:
-			m_rtc->write(machine().dummy_space(), BIT(offset, 2), data);
+			m_rtc->write(BIT(offset, 2), data);
 			break;
 		}
 	}

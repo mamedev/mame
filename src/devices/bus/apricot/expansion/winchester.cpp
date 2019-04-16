@@ -136,7 +136,7 @@ READ8_MEMBER( apricot_winchester_device::hdc_data_r )
 		LOGDATA("hdc_data_r[%04x]\n", m_ram_ptr);
 
 		data = m_ram[m_ram_ptr];
-		if (m_ram_ptr < 0x1fff)
+		if (!machine().side_effects_disabled() && (m_ram_ptr < 0x1fff))
 			m_ram_ptr++;
 	}
 

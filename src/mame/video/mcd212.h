@@ -122,6 +122,9 @@ public:
 	// construction/destruction
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto int1_callback() { return m_int1_callback.bind(); }
+	auto int2_callback() { return m_int2_callback.bind(); }
+
 	// device members
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
@@ -196,10 +199,15 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	// interrupt callbacks
+	devcb_write_line m_int1_callback;
+	devcb_write_line m_int2_callback;
+
 	required_device<screen_device> m_lcd;
 
 	// internal state

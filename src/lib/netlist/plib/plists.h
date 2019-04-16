@@ -34,13 +34,18 @@ public:
 	using iterator = C *;
 	using const_iterator = const C *;
 
-	uninitialised_array_t() noexcept = default;
+	//uninitialised_array_t() noexcept = default;
+	uninitialised_array_t() noexcept
+	: m_initialized(0)
+	{
+	}
 
 	COPYASSIGNMOVE(uninitialised_array_t, delete)
 	~uninitialised_array_t() noexcept
 	{
-		for (std::size_t i=0; i<N; i++)
-			(*this)[i].~C();
+		if (m_initialized>=N)
+			for (std::size_t i=0; i<N; i++)
+				(*this)[i].~C();
 	}
 
 	size_t size() const { return N; }
@@ -58,6 +63,7 @@ public:
 	template<typename... Args>
 	void emplace(const std::size_t index, Args&&... args)
 	{
+		m_initialized++;
 		// allocate on buffer
 		new (&m_buf[index]) C(std::forward<Args>(args)...);
 	}
@@ -78,6 +84,7 @@ private:
 	/* ensure proper alignment */
 	PALIGNAS_VECTOROPT()
 	std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
+	unsigned m_initialized;
 };
 
 // ----------------------------------------------------------------------------------------

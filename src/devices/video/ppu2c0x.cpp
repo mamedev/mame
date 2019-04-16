@@ -676,6 +676,9 @@ void ppu2c0x_device::draw_background(uint8_t *line_priority)
 
 		index1 = tile_index + x;
 
+		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
+		page2 = readbyte(index1);
+
 		// this is attribute table stuff! (actually read 2 in PPUspeak)!
 		/* Figure out which byte in the color table to use */
 		pos = ((index1 & 0x380) >> 4) | ((index1 & 0x1f) >> 2);
@@ -685,10 +688,6 @@ void ppu2c0x_device::draw_background(uint8_t *line_priority)
 
 		/* figure out which bits in the color table to use */
 		color_bits = ((index1 & 0x40) >> 4) + (index1 & 0x02);
-
-		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
-		address = index1 & 0x3ff;
-		page2 = readbyte(index1);
 
 		// 27/12/2002
 		if (!m_latch.isnull())
@@ -1341,21 +1340,4 @@ uint32_t ppu2c0x_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
 	render(bitmap, 0, 0, 0, 0);
 	return 0;
-}
-
-/*************************************
- *
- *  Utility functions
- *
- *************************************/
-
-rgb_t ppu2c0x_device::get_pixel(int x, int y)
-{
-	if (x >= VISIBLE_SCREEN_WIDTH)
-		x = VISIBLE_SCREEN_WIDTH - 1;
-
-	if (y >= VISIBLE_SCREEN_HEIGHT)
-		y = VISIBLE_SCREEN_HEIGHT - 1;
-
-	return rgb_t(m_bitmap->pix32(y, x));
 }

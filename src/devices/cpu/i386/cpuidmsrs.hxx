@@ -314,12 +314,15 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 		case 0x250: // MTRRfix64K_00000
 			// 8 bits for each 64k block starting at address 0
+			ret = m_msr_mtrrfix[0];
 			break;
 		case 0x258: // MTRRfix16K_80000
 			// 8 bits for each 16k block starting at address 0x80000
+			ret = m_msr_mtrrfix[1];
 			break;
 		case 0x259: // MTRRfix16K_A0000
 			// 8 bits for each 16k block starting at address 0xa0000
+			ret = m_msr_mtrrfix[2];
 			break;
 		case 0x268: // MTRRfix4K_C0000
 		case 0x269: // MTRRfix4K_C8000
@@ -330,6 +333,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 		case 0x26e: // MTRRfix4K_F0000
 		case 0x26f: // MTRRfix4K_F8000
 			// 8 bits for each 4k block
+			ret = m_msr_mtrrfix[3 + offset - 0x268];
 			break;
 		case 0x400: // MC0_CTL
 			break;
@@ -343,6 +347,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			// 20    MtrrVarDramEn    - Enable top of memory address and I/O range registers
 			// 19    MtrrFixDramModEn - Enable modification of RdDram and WrDram bits in fixed MTRRs
 			// 18    MtrrFixDramEn    - Enable RdDram and WrDram attributes in fixed MTRRs
+			ret = m_msr_sys_cfg;
 			break;
 		case 0xC0010015: // HWCR
 			break;
@@ -359,6 +364,7 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 		case 0xC001001A: // TOP_MEM
 			// 39-23 TOM16-0 - Top of Memory, accesses from this address onward are directed to mmio
+			ret = (uint64_t)m_msr_top_mem;
 			break;
 		case 0xC001001D: // TOP_MEM2
 			break;
@@ -399,10 +405,16 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0x2ff: // MTRRdefType
 			break;
 		case 0x250: // MTRRfix64K_00000
+			m_msr_mtrrfix[0] = data;
+			parse_mtrrfix(data, 0, 64);
 			break;
 		case 0x258: // MTRRfix16K_80000
+			m_msr_mtrrfix[1] = data;
+			parse_mtrrfix(data, 0x80000, 16);
 			break;
 		case 0x259: // MTRRfix16K_A0000
+			m_msr_mtrrfix[2] = data;
+			parse_mtrrfix(data, 0xa0000, 16);
 			break;
 		case 0x268: // MTRRfix4K_C0000-F8000
 		case 0x269:
@@ -412,6 +424,8 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0x26d:
 		case 0x26e:
 		case 0x26f:
+			m_msr_mtrrfix[3 + offset - 0x268] = data;
+			parse_mtrrfix(data, 0xc0000 + (offset - 0x268) * 0x8000, 4);
 			break;
 		case 0x400: // MC0_CTL
 			break;
@@ -422,6 +436,7 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0x40c: // MC3_CTL
 			break;
 		case 0xC0010010: // SYS_CFG
+			m_msr_sys_cfg = data;
 			break;
 		case 0xC0010015: // HWCR
 			break;
@@ -431,6 +446,7 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0xC0010019:
 			break;
 		case 0xC001001A: // TOP_MEM
+			m_msr_top_mem = (offs_t)data;
 			break;
 		case 0xC0010113: // SMM_MASK
 			break;

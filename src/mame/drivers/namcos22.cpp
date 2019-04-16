@@ -1194,7 +1194,6 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
-#include "machine/namcomcu.h"
 #include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
@@ -1434,7 +1433,7 @@ WRITE8_MEMBER(namcos22_state::ss22_syscon_w)
 00008bf0: sys[0x00] := 0x04 // vblank
 00008bf8: sys[0x08] := 0xff // ?
 */
-INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
+INTERRUPT_GEN_MEMBER(namcos22s_state::namcos22s_interrupt)
 {
 	// vblank irq
 	int line = 1 << 0;
@@ -1735,7 +1734,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
 		m_cpuled[i] = (~data << i & 0x80) ? 0 : 1;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
+WRITE32_MEMBER(namcos22s_state::namcos22s_chipselect_w)
 {
 	// assume that this register is for chip enable/disable
 	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
@@ -1957,38 +1956,38 @@ void namcos22_state::namcos22_am(address_map &map)
 
 
 // System Super22
-void namcos22_state::namcos22s_am(address_map &map)
+void namcos22s_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
+	map(0x400000, 0x40001f).rw(FUNC(namcos22s_state::namcos22_keycus_r), FUNC(namcos22s_state::namcos22_keycus_w));
 	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
-	map(0x420000, 0x42000f).rw(FUNC(namcos22_state::namcos22_sci_r), FUNC(namcos22_state::namcos22_sci_w)); // C139 SCI registers
-	map(0x430000, 0x430003).w(FUNC(namcos22_state::namcos22_cpuleds_w)).umask32(0xffff0000);
-	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r)).umask32(0xffff0000);
-	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
+	map(0x420000, 0x42000f).rw(FUNC(namcos22s_state::namcos22_sci_r), FUNC(namcos22s_state::namcos22_sci_w)); // C139 SCI registers
+	map(0x430000, 0x430003).w(FUNC(namcos22s_state::namcos22_cpuleds_w)).umask32(0xffff0000);
+	map(0x440000, 0x440003).r(FUNC(namcos22s_state::namcos22_dipswitch_r)).umask32(0xffff0000);
+	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_portbit_r), FUNC(namcos22s_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
-	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::syscon_r), FUNC(namcos22_state::ss22_syscon_w));
-	map(0x800000, 0x800003).w(FUNC(namcos22_state::namcos22s_chipselect_w));
-	map(0x810000, 0x81000f).rw(FUNC(namcos22_state::namcos22s_czattr_r), FUNC(namcos22_state::namcos22s_czattr_w));
-	map(0x810200, 0x8103ff).rw(FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
+	map(0x700000, 0x70001f).rw(FUNC(namcos22s_state::syscon_r), FUNC(namcos22s_state::ss22_syscon_w));
+	map(0x800000, 0x800003).w(FUNC(namcos22s_state::namcos22s_chipselect_w));
+	map(0x810000, 0x81000f).rw(FUNC(namcos22s_state::namcos22s_czattr_r), FUNC(namcos22s_state::namcos22s_czattr_w));
+	map(0x810200, 0x8103ff).rw(FUNC(namcos22s_state::namcos22s_czram_r), FUNC(namcos22s_state::namcos22s_czram_w));
 	map(0x820000, 0x8202ff).nopw(); // leftover of old (non-super) video mixer device
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
-	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
-	map(0x860000, 0x860007).rw(FUNC(namcos22_state::spotram_r), FUNC(namcos22_state::spotram_w));
-	map(0x880000, 0x89dfff).ram().w(FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
-	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22_state::namcos22_textram_w)).share("textram");
-	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w));
+	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22s_state::namcos22_paletteram_w)).share("paletteram");
+	map(0x860000, 0x860007).rw(FUNC(namcos22s_state::spotram_r), FUNC(namcos22s_state::spotram_w));
+	map(0x880000, 0x89dfff).ram().w(FUNC(namcos22s_state::namcos22_cgram_w)).share("cgram");
+	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_textram_w)).share("textram");
+	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22s_state::namcos22_tilemapattr_r), FUNC(namcos22s_state::namcos22_tilemapattr_w));
 	map(0x900000, 0x90ffff).ram().share("vics_data");
-	map(0x940000, 0x94007f).rw(FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
+	map(0x940000, 0x94007f).rw(FUNC(namcos22s_state::namcos22s_vics_control_r), FUNC(namcos22s_state::namcos22s_vics_control_w)).share("vics_control");
 	map(0x980000, 0x9affff).ram().share("spriteram"); // C374
-	map(0xa04000, 0xa0bfff).rw(FUNC(namcos22_state::namcos22_shared_r), FUNC(namcos22_state::namcos22_shared_w)); // COM RAM
-	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
+	map(0xa04000, 0xa0bfff).rw(FUNC(namcos22s_state::namcos22_shared_r), FUNC(namcos22s_state::namcos22_shared_w)); // COM RAM
+	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22s_state::namcos22_dspram_r), FUNC(namcos22s_state::namcos22_dspram_w)).share("polygonram");
 	map(0xe00000, 0xe3ffff).ram(); // workram
 }
 
 
 // Time Crisis gun
-READ16_MEMBER(namcos22_state::namcos22_gun_r)
+READ16_MEMBER(namcos22s_state::timecris_gun_r)
 {
 	u16 xpos = m_opt[0]->read();
 	u16 ypos = m_opt[1]->read();
@@ -2017,20 +2016,20 @@ READ16_MEMBER(namcos22_state::namcos22_gun_r)
 	}
 }
 
-void namcos22_state::timecris_am(address_map &map)
+void namcos22s_state::timecris_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x430000, 0x43000f).r(FUNC(namcos22_state::namcos22_gun_r)).umask32(0xffff0000);
+	map(0x430000, 0x43000f).r(FUNC(namcos22s_state::timecris_gun_r)).umask32(0xffff0000);
 }
 
 
 // Alpine Surfer protection
-READ32_MEMBER(namcos22_state::alpinesa_prot_r)
+READ32_MEMBER(namcos22s_state::alpinesa_prot_r)
 {
 	return m_alpinesa_protection;
 }
 
-WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
+WRITE32_MEMBER(namcos22s_state::alpinesa_prot_w)
 {
 	switch (data)
 	{
@@ -2051,11 +2050,11 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 	}
 }
 
-void namcos22_state::alpinesa_am(address_map &map)
+void namcos22s_state::alpinesa_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x200000, 0x200003).r(FUNC(namcos22_state::alpinesa_prot_r));
-	map(0x300000, 0x300003).w(FUNC(namcos22_state::alpinesa_prot_w));
+	map(0x200000, 0x200003).r(FUNC(namcos22s_state::alpinesa_prot_r));
+	map(0x300000, 0x300003).w(FUNC(namcos22s_state::alpinesa_prot_w));
 }
 
 
@@ -2727,21 +2726,10 @@ void namcos22_state::iomcu_s22_program(address_map &map)
 	// is there any external memory or MMIO on this one?
 }
 
-void namcos22_state::mcu_s22_io(address_map &map)
-{
-	map(M37710_PORT4, M37710_PORT4).r(FUNC(namcos22_state::mcu_port4_s22_r));
-}
-
-void namcos22_state::iomcu_s22_io(address_map &map)
-{
-	map(M37710_PORT4, M37710_PORT4).r(FUNC(namcos22_state::iomcu_port4_s22_r));
-	map(0x00, 0xff).noprw();
-}
-
 
 // System Super22 M37710
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::mcu_irq)
 {
 	int scanline = param;
 
@@ -2754,7 +2742,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-WRITE8_MEMBER(namcos22_state::mb87078_gain_changed)
+WRITE8_MEMBER(namcos22s_state::mb87078_gain_changed)
 {
 	m_c352->set_output_gain(offset ^ 3, data / 100.0);
 }
@@ -2817,7 +2805,7 @@ WRITE8_MEMBER(namcos22_state::mb87078_gain_changed)
   other: ?
 */
 
-WRITE8_MEMBER(namcos22_state::mcu_port4_w)
+WRITE8_MEMBER(namcos22s_state::mcu_port4_w)
 {
 	// d3: input port select for port 5
 	// d4: port 5 direction?
@@ -2839,40 +2827,40 @@ WRITE8_MEMBER(namcos22_state::mcu_port4_w)
 	m_mcu_iocontrol = data;
 }
 
-READ8_MEMBER(namcos22_state::mcu_port4_r)
+READ8_MEMBER(namcos22s_state::mcu_port4_r)
 {
 	return m_mcu_iocontrol;
 }
 
-WRITE8_MEMBER(namcos22_state::mcu_port5_w)
+WRITE8_MEMBER(namcos22s_state::mcu_port5_w)
 {
 	m_mcu_outdata = data;
 }
 
-READ8_MEMBER(namcos22_state::mcu_port5_r)
+READ8_MEMBER(namcos22s_state::mcu_port5_r)
 {
 	u16 inputs = m_inputs->read();
 	return (m_mcu_iocontrol & 8) ? inputs & 0xff : inputs >> 8;
 }
 
-WRITE8_MEMBER(namcos22_state::mcu_port6_w)
+WRITE8_MEMBER(namcos22s_state::mcu_port6_w)
 {
 	// always 2?
 }
 
-READ8_MEMBER(namcos22_state::mcu_port6_r)
+READ8_MEMBER(namcos22s_state::mcu_port6_r)
 {
 	// discarded
 	return 0;
 }
 
-READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
+template <int Channel>
+u16 namcos22s_state::mcu_adc_r(offs_t offset)
 {
-	u16 adc = m_adc_ports[offset >> 1 & 7].read_safe(0);
-	return (offset & 1) ? adc >> 8 : adc;
+	return m_adc_ports[offset].read_safe(0);
 }
 
-void namcos22_state::mcu_program(address_map &map)
+void namcos22s_state::mcu_program(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0x004000, 0x00bfff).ram().share("shareram");
@@ -2881,14 +2869,6 @@ void namcos22_state::mcu_program(address_map &map)
 	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa - writes data to RAM, but then never reads from there)
 	map(0x301000, 0x301001).nopw(); // watchdog? LEDs?
 	map(0x308000, 0x308003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0x00ff);
-}
-
-void namcos22_state::mcu_io(address_map &map)
-{
-	map(M37710_PORT4, M37710_PORT4).rw(FUNC(namcos22_state::mcu_port4_r), FUNC(namcos22_state::mcu_port4_w));
-	map(M37710_PORT5, M37710_PORT5).rw(FUNC(namcos22_state::mcu_port5_r), FUNC(namcos22_state::mcu_port5_w));
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcos22_state::mcu_port6_r), FUNC(namcos22_state::mcu_port6_w));
-	map(M37710_ADC0_L, M37710_ADC7_H).r(FUNC(namcos22_state::namcos22s_mcu_adc_r));
 }
 
 
@@ -2985,12 +2965,12 @@ void namcos22_state::handle_cybrcomm_io()
 
 // Alpine skiing games
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::alpine_steplock_callback)
 {
 	m_motor_status = param;
 }
 
-WRITE8_MEMBER(namcos22_state::alpine_mcu_port4_w)
+WRITE8_MEMBER(namcos22s_state::alpine_mcu_port4_w)
 {
 	if (~m_mcu_iocontrol & data & 0x20)
 	{
@@ -3018,22 +2998,16 @@ WRITE8_MEMBER(namcos22_state::alpine_mcu_port4_w)
 	mcu_port4_w(space, offset, data);
 }
 
-void namcos22_state::alpine_io_map(address_map &map)
-{
-	mcu_io(map);
-	map(M37710_PORT4, M37710_PORT4).w(FUNC(namcos22_state::alpine_mcu_port4_w));
-}
-
 
 // Prop Cycle
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_interrupt)
 {
 	m_mcu->set_input_line(M37710_LINE_TIMERA3OUT, param ? ASSERT_LINE : CLEAR_LINE);
 	m_mcu->pulse_input_line(M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 {
 	// arbitrary timer for reading optical pedal
 	int pedal = m_opt[0]->read() - 0x80;
@@ -3063,13 +3037,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 
 // Armadillo Racing
 
-TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
+TIMER_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_interrupt)
 {
 	m_mcu->set_input_line((param & 1) ? M37710_LINE_TIMERA2OUT : M37710_LINE_TIMERA3OUT, (param & 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_update)
 {
 	// arbitrary timer for reading optical trackball
 	// -1.0 .. 1.0
@@ -3363,7 +3337,7 @@ INPUT_PORTS_END
 
 /*********************************************************************************************/
 
-CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
+CUSTOM_INPUT_MEMBER(namcos22s_state::alpine_motor_read)
 {
 	return m_motor_status >> (uintptr_t)param & 1;
 }
@@ -3377,8 +3351,8 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, 0) // steps are free
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, 1) // steps are locked
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22s_state, alpine_motor_read, 0) // steps are free
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22s_state, alpine_motor_read, 1) // steps are locked
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
@@ -3792,7 +3766,6 @@ void namcos22_state::machine_start()
 	m_keycus_rng = 0;
 	m_su_82 = 0;
 	m_irq_state = 0;
-	m_mcu_iocontrol = 0;
 	m_old_coin_state = 0;
 	m_credits1 = m_credits2 = 0;
 
@@ -3830,16 +3803,9 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_dsp_upload_state));
 	save_item(NAME(m_UploadDestIdx));
-	save_item(NAME(m_alpinesa_protection));
-	save_item(NAME(m_motor_status));
-	save_item(NAME(m_mcu_iocontrol));
-	save_item(NAME(m_mcu_outdata));
 	save_item(NAME(m_su_82));
 	save_item(NAME(m_keycus_id));
 	save_item(NAME(m_keycus_rng));
-	save_item(NAME(m_chipselect));
-	save_item(NAME(m_spotram_enable));
-	save_item(NAME(m_spotram_address));
 	save_item(NAME(m_cz_adjust));
 	save_item(NAME(m_dspram_bank));
 	save_item(NAME(m_dspram16_latch));
@@ -3876,6 +3842,21 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_pdp_base));
 }
 
+void namcos22s_state::machine_start()
+{
+	namcos22_state::machine_start();
+
+	m_mcu_iocontrol = 0;
+
+	save_item(NAME(m_spotram_enable));
+	save_item(NAME(m_spotram_address));
+	save_item(NAME(m_alpinesa_protection));
+	save_item(NAME(m_motor_status));
+	save_item(NAME(m_mcu_iocontrol));
+	save_item(NAME(m_mcu_outdata));
+	save_item(NAME(m_chipselect));
+}
+
 // System22
 void namcos22_state::namcos22(machine_config &config)
 {
@@ -3908,11 +3889,11 @@ void namcos22_state::namcos22(machine_config &config)
 
 	NAMCO_C74(config, m_mcu, 49.152_MHz_XTAL/3); // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos22_state::mcu_s22_program);
-	m_mcu->set_addrmap(AS_IO, &namcos22_state::mcu_s22_io);
+	m_mcu->p4_in_cb().set(FUNC(namcos22_state::mcu_port4_s22_r));
 
 	NAMCO_C74(config, m_iomcu, 6.144_MHz_XTAL);
 	m_iomcu->set_addrmap(AS_PROGRAM, &namcos22_state::iomcu_s22_program);
-	m_iomcu->set_addrmap(AS_IO, &namcos22_state::iomcu_s22_io);
+	m_iomcu->p4_in_cb().set(FUNC(namcos22_state::iomcu_port4_s22_r));
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
@@ -3947,33 +3928,42 @@ void namcos22_state::cybrcomm(machine_config &config)
 }
 
 // System Super22
-void namcos22_state::namcos22s(machine_config &config)
+void namcos22s_state::namcos22s(machine_config &config)
 {
 	namcos22(config);
 
 	/* basic machine hardware */
 	M68EC020(config.replace(), m_maincpu, 49.152_MHz_XTAL/2); // MC68EC020FG25
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::namcos22s_am);
-	m_maincpu->set_vblank_int("screen", FUNC(namcos22_state::namcos22s_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22s_state::namcos22s_am);
+	m_maincpu->set_vblank_int("screen", FUNC(namcos22s_state::namcos22s_interrupt));
 
 	M37710S4(config.replace(), m_mcu, 49.152_MHz_XTAL/3);
-	m_mcu->set_addrmap(AS_PROGRAM, &namcos22_state::mcu_program);
-	m_mcu->set_addrmap(AS_IO, &namcos22_state::mcu_io);
-	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22_state::mcu_irq), "screen", 0, 240);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos22s_state::mcu_program);
+	m_mcu->p4_in_cb().set(FUNC(namcos22s_state::mcu_port4_r));
+	m_mcu->p4_out_cb().set(FUNC(namcos22s_state::mcu_port4_w));
+	m_mcu->p5_in_cb().set(FUNC(namcos22s_state::mcu_port5_r));
+	m_mcu->p5_out_cb().set(FUNC(namcos22s_state::mcu_port5_w));
+	m_mcu->p6_in_cb().set(FUNC(namcos22s_state::mcu_port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcos22s_state::mcu_port6_w));
+	m_mcu->an0_cb().set(FUNC(namcos22s_state::mcu_adc_r<0>));
+	m_mcu->an1_cb().set(FUNC(namcos22s_state::mcu_adc_r<1>));
+	m_mcu->an2_cb().set(FUNC(namcos22s_state::mcu_adc_r<2>));
+	m_mcu->an3_cb().set(FUNC(namcos22s_state::mcu_adc_r<3>));
+	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22s_state::mcu_irq), "screen", 0, 240);
 	config.m_minimum_quantum = attotime::from_hz(9000); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	config.device_remove("iomcu");
 
 	MB87078(config, m_mb87078);
-	m_mb87078->gain_changed().set(FUNC(namcos22_state::mb87078_gain_changed));
+	m_mb87078->gain_changed().set(FUNC(namcos22s_state::mb87078_gain_changed));
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22s));
+	m_screen->set_screen_update(FUNC(namcos22s_state::screen_update_namcos22s));
 
 	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_super);
 }
 
-void namcos22_state::airco22b(machine_config &config)
+void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
@@ -3982,23 +3972,23 @@ void namcos22_state::airco22b(machine_config &config)
 	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
 }
 
-void namcos22_state::alpine(machine_config &config)
+void namcos22s_state::alpine(machine_config &config)
 {
 	namcos22s(config);
 
-	m_mcu->set_addrmap(AS_IO, &namcos22_state::alpine_io_map);
+	m_mcu->p4_out_cb().set(FUNC(namcos22s_state::alpine_mcu_port4_w));
 
-	TIMER(config, m_motor_timer).configure_generic(FUNC(namcos22_state::alpine_steplock_callback));
+	TIMER(config, m_motor_timer).configure_generic(FUNC(namcos22s_state::alpine_steplock_callback));
 }
 
-void namcos22_state::alpinesa(machine_config &config)
+void namcos22s_state::alpinesa(machine_config &config)
 {
 	alpine(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::alpinesa_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22s_state::alpinesa_am);
 }
 
-void namcos22_state::cybrcycc(machine_config &config)
+void namcos22s_state::cybrcycc(machine_config &config)
 {
 	namcos22s(config);
 
@@ -4007,7 +3997,7 @@ void namcos22_state::cybrcycc(machine_config &config)
 	m_c352->add_route(2, "tank", 1.00);
 }
 
-void namcos22_state::dirtdash(machine_config &config)
+void namcos22s_state::dirtdash(machine_config &config)
 {
 	namcos22s(config);
 
@@ -4016,14 +4006,14 @@ void namcos22_state::dirtdash(machine_config &config)
 	m_c352->add_route(3, "road", 1.00);
 }
 
-void namcos22_state::timecris(machine_config &config)
+void namcos22s_state::timecris(machine_config &config)
 {
 	namcos22s(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::timecris_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22s_state::timecris_am);
 }
 
-void namcos22_state::tokyowar(machine_config &config)
+void namcos22s_state::tokyowar(machine_config &config)
 {
 	namcos22s(config);
 
@@ -4034,28 +4024,28 @@ void namcos22_state::tokyowar(machine_config &config)
 	m_c352->add_route(3, "seat", 1.00);
 }
 
-void namcos22_state::propcycl(machine_config &config)
+void namcos22s_state::propcycl(machine_config &config)
 {
 	namcos22s(config);
 
-	TIMER(config, "pc_p_upd").configure_periodic(FUNC(namcos22_state::propcycl_pedal_update), attotime::from_msec(20));
-	TIMER(config, m_pc_pedal_interrupt).configure_generic(FUNC(namcos22_state::propcycl_pedal_interrupt));
+	TIMER(config, "pc_p_upd").configure_periodic(FUNC(namcos22s_state::propcycl_pedal_update), attotime::from_msec(20));
+	TIMER(config, m_pc_pedal_interrupt).configure_generic(FUNC(namcos22s_state::propcycl_pedal_interrupt));
 }
 
-MACHINE_START_MEMBER(namcos22_state,adillor)
+MACHINE_START_MEMBER(namcos22s_state,adillor)
 {
 	machine_start();
 
 	for (auto & elem : m_ar_tb_interrupt)
-		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
+		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22s_state::adillor_trackball_interrupt),this));
 }
 
-void namcos22_state::adillor(machine_config &config)
+void namcos22s_state::adillor(machine_config &config)
 {
 	namcos22s(config);
 
-	TIMER(config, "ar_tb_upd").configure_periodic(FUNC(namcos22_state::adillor_trackball_update), attotime::from_msec(20));
-	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
+	TIMER(config, "ar_tb_upd").configure_periodic(FUNC(namcos22s_state::adillor_trackball_update), attotime::from_msec(20));
+	MCFG_MACHINE_START_OVERRIDE(namcos22s_state,adillor)
 }
 
 
@@ -5614,7 +5604,7 @@ ROM_END
 // MCU speed cheats (every bit helps with these games)
 
 // for MCU BIOS v1.41
-READ16_MEMBER(namcos22_state::mcu141_speedup_r)
+READ16_MEMBER(namcos22s_state::mcu141_speedup_r)
 {
 	if ((m_mcu->pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
@@ -5630,7 +5620,7 @@ WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 }
 
 // for MCU BIOS v1.20/v1.30
-READ16_MEMBER(namcos22_state::mcu130_speedup_r)
+READ16_MEMBER(namcos22s_state::mcu130_speedup_r)
 {
 	if ((m_mcu->pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
@@ -5657,18 +5647,18 @@ void namcos22_state::install_c74_speedup()
 		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),this), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),this));
 }
 
-void namcos22_state::install_130_speedup()
+void namcos22s_state::install_130_speedup()
 {
 	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu130_speedup_r),this), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu130_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
 }
 
-void namcos22_state::install_141_speedup()
+void namcos22s_state::install_141_speedup()
 {
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu141_speedup_r),this), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu141_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
 }
 
 
@@ -5711,7 +5701,7 @@ void namcos22_state::init_cybrcomm()
 	install_c74_speedup();
 }
 
-void namcos22_state::init_alpiner()
+void namcos22s_state::init_alpiner()
 {
 	m_gametype = NAMCOS22_ALPINE_RACER;
 	install_130_speedup();
@@ -5719,7 +5709,7 @@ void namcos22_state::init_alpiner()
 	m_motor_status = 2;
 }
 
-void namcos22_state::init_alpiner2()
+void namcos22s_state::init_alpiner2()
 {
 	m_gametype = NAMCOS22_ALPINE_RACER_2;
 	install_130_speedup();
@@ -5727,7 +5717,7 @@ void namcos22_state::init_alpiner2()
 	m_motor_status = 2;
 }
 
-void namcos22_state::init_alpinesa()
+void namcos22s_state::init_alpinesa()
 {
 	m_gametype = NAMCOS22_ALPINE_SURFER;
 	install_141_speedup();
@@ -5735,13 +5725,13 @@ void namcos22_state::init_alpinesa()
 	m_motor_status = 2;
 }
 
-void namcos22_state::init_airco22()
+void namcos22s_state::init_airco22()
 {
 	m_gametype = NAMCOS22_AIR_COMBAT22;
 	install_130_speedup(); // S22-BIOS ver1.20 namco all rights reserved 94/12/21
 }
 
-void namcos22_state::init_propcycl()
+void namcos22s_state::init_propcycl()
 {
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
@@ -5765,37 +5755,37 @@ void namcos22_state::init_propcycl()
 	install_141_speedup();
 }
 
-void namcos22_state::init_cybrcyc()
+void namcos22s_state::init_cybrcyc()
 {
 	m_gametype = NAMCOS22_CYBER_CYCLES;
 	install_130_speedup();
 }
 
-void namcos22_state::init_timecris()
+void namcos22s_state::init_timecris()
 {
 	m_gametype = NAMCOS22_TIME_CRISIS;
 	install_130_speedup();
 }
 
-void namcos22_state::init_tokyowar()
+void namcos22s_state::init_tokyowar()
 {
 	m_gametype = NAMCOS22_TOKYO_WARS;
 	install_141_speedup();
 }
 
-void namcos22_state::init_aquajet()
+void namcos22s_state::init_aquajet()
 {
 	m_gametype = NAMCOS22_AQUA_JET;
 	install_141_speedup();
 }
 
-void namcos22_state::init_adillor()
+void namcos22s_state::init_adillor()
 {
 	m_gametype = NAMCOS22_ARMADILLO_RACING;
 	install_141_speedup();
 }
 
-void namcos22_state::init_dirtdash()
+void namcos22s_state::init_dirtdash()
 {
 	m_gametype = NAMCOS22_DIRT_DASH;
 	install_141_speedup();
@@ -5824,17 +5814,17 @@ GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, init_vict
 GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 
 // System Super22 games
-GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
-GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
-GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
-GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
-GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
-GAME( 1997, adillor,  0,         adillor,   adillor,   namcos22_state, init_adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41
+GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22s_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22s_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22s_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22s_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22s_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22s_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22s_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22s_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
+GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22s_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
+GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22s_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
+GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22s_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
+GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22s_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
+GAME( 1997, adillor,  0,         adillor,   adillor,   namcos22s_state, init_adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41

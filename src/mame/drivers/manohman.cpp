@@ -156,8 +156,7 @@ public:
 private:
 	virtual void machine_start() override;
 	void mem_map(address_map &map);
-
-	IRQ_CALLBACK_MEMBER(iack_handler);
+	void cpu_space_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -167,17 +166,6 @@ private:
 
 void manohman_state::machine_start()
 {
-}
-
-
-IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
-{
-	if (irqline >= M68K_IRQ_4)
-		return m_duart->get_irq_vector();
-	else if (irqline >= M68K_IRQ_2)
-		return m_pit->irq_tiack();
-	else
-		return M68K_INT_ACK_SPURIOUS; // doesn't really matter
 }
 
 
@@ -196,6 +184,13 @@ void manohman_state::mem_map(address_map &map)
 	map(0x600002, 0x600003).nopw(); // output through shift register?
 	map(0x600004, 0x600005).nopr();
 	map(0x600006, 0x600007).noprw(); //(r) is discarded (watchdog?)
+}
+
+void manohman_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff4, 0xfffff5).r(m_pit, FUNC(pit68230_device::irq_tiack));
+	map(0xfffff8, 0xfffff9).r(m_duart, FUNC(mc68681_device::get_irq_vector));
 }
 
 /*
@@ -246,7 +241,7 @@ void manohman_state::manohman(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(8'000'000)); // MC68000P8
 	m_maincpu->set_addrmap(AS_PROGRAM, &manohman_state::mem_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(manohman_state::iack_handler));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &manohman_state::cpu_space_map);
 
 	PIT68230(config, m_pit, XTAL(8'000'000)); // MC68230P8
 	m_pit->timer_irq_callback().set_inputline("maincpu", M68K_IRQ_2);

@@ -7,11 +7,10 @@
     Disk image formats
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_ACORN_DSK_H
+#define MAME_FORMATS_ACORN_DSK_H
 
 #pragma once
-
-#ifndef ACORN_DSK_H
-#define ACORN_DSK_H
 
 #include "flopimg.h"
 #include "wd177x_dsk.h"
@@ -136,4 +135,4 @@ extern const floppy_format_type FLOPPY_ACORN_ADFS_NEW_FORMAT;
 extern const floppy_format_type FLOPPY_OPUS_DDOS_FORMAT;
 extern const floppy_format_type FLOPPY_OPUS_DDCPM_FORMAT;
 
-#endif // ACORN_DSK_H
+#endif // MAME_FORMATS_ACORN_DSK_H

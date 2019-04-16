@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/m6502/n2a03.h"
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
 #include "emupal.h"
@@ -119,7 +120,7 @@ private:
 	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_cartcpu;
+	required_device<n2a03_device> m_cartcpu;
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 

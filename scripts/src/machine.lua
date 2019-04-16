@@ -2616,14 +2616,28 @@ end
 ---------------------------------------------------
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/sunplus_gcm394.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if (MACHINES["SPG2XX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/spg2xx.cpp",
 		MAME_DIR .. "src/devices/machine/spg2xx.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_audio.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_audio.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_io.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_io.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_sysdma.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_sysdma.h",
+		MAME_DIR .. "src/devices/machine/spg2xx_video.cpp",
+		MAME_DIR .. "src/devices/machine/spg2xx_video.h",
 		MAME_DIR .. "src/devices/machine/spg110.cpp",
 		MAME_DIR .. "src/devices/machine/spg110.h",
+		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
+		MAME_DIR .. "src/devices/machine/spg110_video.h",
+		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
+		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
 	}
 end
 

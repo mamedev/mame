@@ -324,7 +324,7 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 	}
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	}
 	else
 	{
@@ -492,14 +492,15 @@ void bitgraph_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bitgraph_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void bitgraph_state::bg_motherboard(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(40);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1024, 768);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(bitgraph_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -551,13 +552,13 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	m_pia->readpb_handler().set(FUNC(bitgraph_state::pia_pb_r));
 	m_pia->writepb_handler().set(FUNC(bitgraph_state::pia_pb_w));
 
-	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
+	ER2055(config, m_earom, 0);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, XTAL(1'294'400));
 	m_psg->port_a_write_callback().set(FUNC(bitgraph_state::earom_write));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 #ifdef UNUSED_FUNCTION
 void bitgraph_state::bg_ppu(machine_config &config)

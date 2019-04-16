@@ -321,7 +321,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 void rc702_state::kbd_put(u8 data)
 {
-	m_pio->pa_w(machine().dummy_space(), 0, data);
+	m_pio->port_a_write(data);
 	m_pio->strobe_a(0);
 	m_pio->strobe_a(1);
 }
@@ -359,8 +359,8 @@ void rc702_state::rc702(machine_config &config)
 	m_dma->out_eop_callback().set(FUNC(rc702_state::eop_w)).invert();   // real line is active low, mame has it backwards
 	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
 	m_dma->out_memw_callback().set(FUNC(rc702_state::memory_write_byte));
-	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));

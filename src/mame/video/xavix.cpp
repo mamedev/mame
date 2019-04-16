@@ -109,61 +109,97 @@ WRITE8_MEMBER(xavix_state::spriteram_w)
 	}
 }
 
-double xavix_state::hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
 void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 {
 	uint16_t dat;
 	dat = shval;
 	dat |= lval << 8;
 
-	int l_raw = (dat & 0x1f00) >> 8;
-	int s_raw = (dat & 0x00e0) >> 5;
+	int y_raw = (dat & 0x1f00) >> 8;
+	int c_raw = (dat & 0x00e0) >> 5;
 	int h_raw = (dat & 0x001f) >> 0;
 
-	//if (h_raw > 24)
-	//  LOG("hraw >24 (%02x)\n", h_raw);
+	// The dividers may be dynamic
+	double y = y_raw / 20.0;
+	double c = c_raw /  5.0;
 
-	//if (l_raw > 24)
-	//  LOG("lraw >24 (%02x)\n", l_raw);
+	// These weights may be dynamic too.  They're standard NTSC values, would they change on PAL?
+	const double wr = 0.299;
+	const double wg = 0.587;
+	const double wb = 0.114;
 
-	//if (s_raw > 7)
-	//  LOG("s_raw >5 (%02x)\n", s_raw);
+	// Table of hues
+	// Values 24+ are transparent
 
-	double l = (double)l_raw / 24.0f; // ekara and drgqst go up to 23 during fades, expect that to be brightest
-	l = l * (std::atan(1)*2); // does not appear to be a linear curve
-	l = std::sin(l);
+	const double hues[32][3] = {
+		{ 1.00, 0.00, 0.00 },
+		{ 1.00, 0.25, 0.00 },
+		{ 1.00, 0.50, 0.00 },
+		{ 1.00, 0.75, 0.00 },
+		{ 1.00, 1.00, 0.00 },
+		{ 0.75, 1.00, 0.00 },
+		{ 0.50, 1.00, 0.00 },
+		{ 0.25, 1.00, 0.00 },
+		{ 0.00, 1.00, 0.00 },
+		{ 0.00, 1.00, 0.25 },
+		{ 0.00, 1.00, 0.50 },
+		{ 0.00, 1.00, 0.75 },
+		{ 0.00, 1.00, 1.00 },
+		{ 0.00, 0.75, 1.00 },
+		{ 0.00, 0.50, 1.00 },
+		{ 0.00, 0.25, 1.00 },
+		{ 0.00, 0.00, 1.00 },
+		{ 0.25, 0.00, 1.00 },
+		{ 0.50, 0.00, 1.00 },
+		{ 0.75, 0.00, 1.00 },
+		{ 1.00, 0.00, 1.00 },
+		{ 1.00, 0.00, 0.75 },
+		{ 1.00, 0.00, 0.50 },
+		{ 1.00, 0.00, 0.25 },
 
-	double s = (double)s_raw / 7.0f;
-	s = s * (std::atan(1)*2); // does not appear to be a linear curve
-	s = std::sin(s);
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+		{ 0   , 0   , 0    },
+	};
 
-	double h = (double)h_raw / 24.0f; // hue values 24-31 render as transparent
+	double r0 = hues[h_raw][0];
+	double g0 = hues[h_raw][1];
+	double b0 = hues[h_raw][2];
 
-	double r, g, b;
+	double z = wr * r0 + wg * g0 + wb * b0;
 
-	if (s == 0) {
-		r = g = b = l; // greyscale
-	}
-	else {
-		double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-		double p = 2 * l - q;
-		r = hue2rgb(p, q, h + 1 / 3.0f);
-		g = hue2rgb(p, q, h);
-		b = hue2rgb(p, q, h - 1 / 3.0f);
-	}
+	if(y < z)
+		c *= y/z;
+	else if(z < 1)
+		c *= (1-y) / (1-z);
 
-	int r_real = r * 255.0f;
-	int g_real = g * 255.0f;
-	int b_real = b * 255.0f;
+	double r1 = (r0 - z) * c + y;
+	double g1 = (g0 - z) * c + y;
+	double b1 = (b0 - z) * c + y;
+
+	if(r1 < 0)
+		r1 = 0;
+	else if(r1 > 1)
+		r1 = 1.0;
+
+	if(g1 < 0)
+		g1 = 0;
+	else if(g1 > 1)
+		g1 = 1.0;
+
+	if(b1 < 0)
+		b1 = 0;
+	else if(b1 > 1)
+		b1 = 1.0;
+
+	int r_real = r1 * 255.0f;
+	int g_real = g1 * 255.0f;
+	int b_real = b1 * 255.0f;
 
 	m_palette->set_pen_color(pen, r_real, g_real, b_real);
 }

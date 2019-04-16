@@ -137,12 +137,12 @@ WRITE_LINE_MEMBER(cpc_rs232_device::pit_out2_w)
 
 READ8_MEMBER(cpc_rs232_device::dart_r)
 {
-	return m_dart->ba_cd_r(space,offset);
+	return m_dart->ba_cd_r(offset);
 }
 
 WRITE8_MEMBER(cpc_rs232_device::dart_w)
 {
-	m_dart->ba_cd_w(space,offset,data);
+	m_dart->ba_cd_w(offset,data);
 }
 
 READ8_MEMBER(cpc_rs232_device::pit_r)

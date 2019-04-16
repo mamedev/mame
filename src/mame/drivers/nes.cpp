@@ -51,8 +51,8 @@ INPUT_PORTS_END
 void nes_state::nes(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_state::nes_map);
+	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.0988);
@@ -72,13 +72,10 @@ void nes_state::nes(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	// note APU sound level here was specified as 0.90, not 0.50 like the others
-	// not sure how to adjust it when it's inside the CPU?
+	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
-	m_ctrl1->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
-	m_ctrl2->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 
 	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("nes");
@@ -114,7 +111,6 @@ void nes_state::famicom(machine_config &config)
 	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
-	m_exp->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("famicom_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
@@ -145,7 +141,6 @@ void nes_state::famipalc(machine_config &config)
 	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
-	m_exp->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
 }

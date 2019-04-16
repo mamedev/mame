@@ -301,7 +301,7 @@ READ8_MEMBER( segahang_state::sound_data_r )
 {
 	// assert ACK
 	m_i8255_1->pc6_w(CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 

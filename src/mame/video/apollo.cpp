@@ -1469,7 +1469,7 @@ WRITE8_MEMBER( apollo_graphics_15i::apollo_ccr_w )
 		case 0x401:
 			// LUT data register
 			m_lut_data = data;
-			if ((m_lut_control & LUT_R_W) == 1)
+			if ((m_lut_control & LUT_R_W) == LUT_R_W)
 			{
 				MLOG1(("apollo_graphics_15i::apollo_ccr_w: writing LUT data register with RW = 1 in LUT Control register"));
 			}

@@ -395,6 +395,14 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
+WRITE_LINE_MEMBER(astrocde_state::lightpen_trigger_w)
+{
+	if (state)
+	{
+		uint8_t res_shift = 1 - m_video_mode;
+		astrocade_trigger_lightpen(mame_vpos_to_astrocade_vpos(m_screen->vpos()) & ~res_shift, (m_screen->hpos() >> res_shift) + 12);
+	}
+}
 
 void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback)
 {
@@ -405,14 +413,14 @@ void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeed
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((m_interrupt_enabl & 0x01) == 0)
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0); // Z80
 			m_intoff_timer->adjust(m_screen->time_until_pos(vfeedback));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0); // Z80
 			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 
@@ -445,14 +453,14 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector); // Z80
 			m_intoff_timer->adjust(m_screen->time_until_vblank_end());
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector); // Z80
 			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 	}

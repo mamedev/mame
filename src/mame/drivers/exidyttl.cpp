@@ -95,11 +95,10 @@ void exidyttl_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(exidyttl_state::attack)
-
+void exidyttl_state::attack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(attack)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_attack);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -109,13 +108,12 @@ MACHINE_CONFIG_START(exidyttl_state::attack)
 	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(exidyttl_state::deathrac)
-
+void exidyttl_state::deathrac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(attack)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_attack);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -125,7 +123,7 @@ MACHINE_CONFIG_START(exidyttl_state::deathrac)
 	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

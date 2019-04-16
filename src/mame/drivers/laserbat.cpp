@@ -409,7 +409,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a); // S2650
 }
 
 void laserbat_state_base::init_laserbat()

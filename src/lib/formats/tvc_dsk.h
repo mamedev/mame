@@ -7,13 +7,15 @@
     Videoton TVC HBF format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_TVC_DSK_H
+#define MAME_FORMATS_TVC_DSK_H
 
-#ifndef TVC_DSK_H_
-#define TVC_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class tvc_format : public wd177x_format {
+class tvc_format : public wd177x_format
+{
 public:
 	tvc_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_TVC_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_TVC_DSK_H

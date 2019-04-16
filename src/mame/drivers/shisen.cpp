@@ -251,6 +251,7 @@ void shisen_state::shisen(machine_config &config)
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
@@ -298,7 +299,7 @@ ROM_START( sichuan2 )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
 	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
 	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
 	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
@@ -332,7 +333,7 @@ ROM_START( sichuan2a )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
 	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
 	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
 	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
@@ -365,7 +366,7 @@ ROM_START( shisen )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
 	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
 	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
 	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
@@ -438,7 +439,7 @@ ROM_START( matchit )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x40000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* no samples on this board */
 ROM_END
 

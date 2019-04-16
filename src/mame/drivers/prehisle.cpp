@@ -24,7 +24,7 @@
 
 WRITE16_MEMBER(prehisle_state::soundcmd_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

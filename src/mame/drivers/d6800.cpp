@@ -126,7 +126,8 @@ void d6800_state::d6800_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("videoram");
-	map(0x0200, 0x0fff).ram();
+	map(0x0200, 0x17ff).ram();
+	//map(0x1800, 0x1fff).rom();   // for dreamsoft_1, if we can find a good copy
 	map(0x8010, 0x8013).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc000, 0xc7ff).mirror(0x3800).rom();
 }
@@ -408,17 +409,17 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 
 MACHINE_CONFIG_START(d6800_state::d6800)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(d6800_map)
+	M6800(config, m_maincpu, XTAL(4'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &d6800_state::d6800_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(64, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 63, 0, 31)
-	MCFG_SCREEN_UPDATE_DRIVER(d6800_state, screen_update_d6800)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_size(64, 32);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(d6800_state::screen_update_d6800));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(25));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -451,11 +452,14 @@ MACHINE_CONFIG_END
 
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "0", "Original")
-	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
-	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "1", "Dreamsoft")
-	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(0, "0", "Original")   // "chipos"
+	ROMX_LOAD( "d6800.bin",     0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
+	ROM_RELOAD(                 0xc400, 0x0400 )
+	//ROMX_LOAD( "d6800d1.bin",   0x1800, 0x0800, BAD_DUMP CRC(e552cae3) SHA1(0b90504922d46b9c46278924768c45b1b276709f), ROM_BIOS(0) )   // need a good dump, this one is broken
+	ROM_SYSTEM_BIOS(1, "d2", "Dreamsoft2")
+	ROMX_LOAD( "d6800d2.bin",   0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "d2m", "Dreamsoft2m")
+	ROMX_LOAD( "d6800d2m.bin",  0xc000, 0x0800, CRC(eec8e56f) SHA1(f587ccbc0872f2982d61120d033f481a862b902b), ROM_BIOS(2) )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS

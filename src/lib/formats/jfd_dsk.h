@@ -7,13 +7,15 @@
     JASPP Floppy Disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_JFD_DSK_H
+#define MAME_FORMATS_JFD_DSK_H
 
-#ifndef JFD_DSK_H_
-#define JFD_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
-class jfd_format : public floppy_image_format_t {
+class jfd_format : public floppy_image_format_t
+{
 public:
 	jfd_format();
 
@@ -28,4 +30,4 @@ public:
 
 extern const floppy_format_type FLOPPY_JFD_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_JFD_DSK_H

@@ -230,11 +230,11 @@ public:
 
 private:
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER(cruread);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(read_by_9901);
+	uint8_t read_by_9901(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
 	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
 	DECLARE_WRITE_LINE_MEMBER(joystick_select);
@@ -242,11 +242,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
 
 	DECLARE_WRITE_LINE_MEMBER(clock_out);
-	DECLARE_WRITE_LINE_MEMBER(dbin_line);
 
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
 
@@ -279,7 +278,7 @@ private:
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	void memmap_setoffset(address_map &map);
+	void memmap_setaddress(address_map &map);
 };
 
 /*
@@ -291,9 +290,9 @@ void geneve_state::memmap(address_map &map)
 	map(0x0000, 0xffff).rw(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::readm), FUNC(bus::ti99::internal::geneve_mapper_device::writem));
 }
 
-void geneve_state::memmap_setoffset(address_map &map)
+void geneve_state::memmap_setaddress(address_map &map)
 {
-	map(0x0000, 0xffff).r(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setoffset));
+	map(0x0000, 0xffff).w(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setaddress));
 }
 
 /*
@@ -306,11 +305,8 @@ void geneve_state::memmap_setoffset(address_map &map)
 */
 void geneve_state::crumap(address_map &map)
 {
-	map(0x0000, 0x0fff).r(FUNC(geneve_state::cruread));
-	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x7fff).w(FUNC(geneve_state::cruwrite));
-	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0xffff).rw(FUNC(geneve_state::cruread), FUNC(geneve_state::cruwrite));
+	map(0x0000, 0x003f).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 static INPUT_PORTS_START(geneve_common)
@@ -360,7 +356,7 @@ INPUT_PORTS_END
 #define CRU_CONTROL_BASE 0x1ee0
 #define CRU_SSTEP_BASE 0x13c0
 
-WRITE8_MEMBER ( geneve_state::cruwrite )
+void geneve_state::cruwrite(offs_t offset, uint8_t data)
 {
 	int addroff = offset << 1;
 
@@ -427,14 +423,14 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	}
 	else
 	{
-		m_peribox->cruwrite(space, addroff, data);
+		m_peribox->cruwrite(addroff, data);
 	}
 }
 
-READ8_MEMBER( geneve_state::cruread )
+uint8_t geneve_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
-	int addroff = offset << 4;
+	uint16_t addroff = offset << 1;
 
 	// Single step
 	// 13c0 - 13fe: 0001 0011 11xx xxx0
@@ -449,7 +445,7 @@ READ8_MEMBER( geneve_state::cruread )
 	// so we just don't arrive here
 
 	// Propagate the CRU access to external devices
-	m_peribox->crureadz(space, addroff, &value);
+	m_peribox->crureadz(addroff, &value);
 	return value;
 }
 
@@ -457,7 +453,7 @@ READ8_MEMBER( geneve_state::cruread )
     CRU callbacks
 ***********************************************************************/
 
-READ8_MEMBER( geneve_state::read_by_9901 )
+uint8_t geneve_state::read_by_9901(offs_t offset)
 {
 	int answer = 0;
 
@@ -565,7 +561,7 @@ WRITE_LINE_MEMBER( geneve_state::video_wait_states )
     but again it is ignored. Anyway, the TMS9995 has only two external inputs
     (INT1 and INT4).
 */
-WRITE8_MEMBER( geneve_state::tms9901_interrupt )
+void geneve_state::tms9901_interrupt(offs_t offset, uint8_t data)
 {
 	/* INTREQ is connected to INT1. */
 	m_cpu->set_input_line(INT_9995_INT1, data);
@@ -635,7 +631,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 	m_tms9901->set_single_int(8, state);
 }
 
-WRITE8_MEMBER( geneve_state::external_operation )
+void geneve_state::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP)
@@ -649,14 +645,6 @@ WRITE_LINE_MEMBER( geneve_state::clock_out )
 {
 	m_tms9901->phi_line(state);
 	m_mapper->clock_in(state);
-}
-
-/*
-    DBIN line from the CPU. Used to control wait state generation.
-*/
-WRITE_LINE_MEMBER( geneve_state::dbin_line )
-{
-	m_mapper->dbin_in(state);
 }
 
 void geneve_state::init_geneve()
@@ -695,7 +683,8 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-MACHINE_CONFIG_START(geneve_state::geneve)
+void geneve_state::geneve(machine_config &config)
+{
 	geneve_common(config);
 
 	// Mapper
@@ -707,9 +696,10 @@ MACHINE_CONFIG_START(geneve_state::geneve)
 	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
 	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
 	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(geneve_state::genmod)
+void geneve_state::genmod(machine_config &config)
+{
 	geneve_common(config);
 
 	// Mapper
@@ -721,18 +711,18 @@ MACHINE_CONFIG_START(geneve_state::genmod)
 	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
 	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
 	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(geneve_state::geneve_common)
+void geneve_state::geneve_common(machine_config &config)
+{
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_cpu, 12000000);
 	m_cpu->set_addrmap(AS_PROGRAM, &geneve_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &geneve_state::crumap);
-	m_cpu->set_addrmap(tms9995_device::AS_SETOFFSET, &geneve_state::memmap_setoffset);
+	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &geneve_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(geneve_state::external_operation));
 	m_cpu->clkout_cb().set(FUNC(geneve_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(geneve_state::dbin_line));
 
 	// Video hardware
 	v99x8_device& video(V9938(config, TI_VDP_TAG, XTAL(21'477'272))); // typical 9938 clock, not verified
@@ -786,7 +776,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 
 	// SRAM 384K (max; stock Geneve: 32K, but later MDOS releases require 64K)
 	RAM(config, GENEVE_SRAM_TAG).set_default_size("384K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 /*
     ROM loading

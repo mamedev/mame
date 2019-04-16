@@ -202,7 +202,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_io_w)
 	switch (offset)
 	{
 		case 0x400: combatscb_priority_w(space, 0, data); break;
-		case 0x800: m_soundlatch->write(space, offset, data); break;
+		case 0x800: m_soundlatch->write(data); break;
 		case 0xc00: combatsc_vreg_w(space, 0, data); break;
 		default: m_io_ram[offset] = data; break;
 	}
@@ -311,7 +311,7 @@ WRITE8_MEMBER(combatsc_state::protection_clock_w)
 
 WRITE8_MEMBER(combatsc_state::combatsc_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 READ8_MEMBER(combatsc_state::combatsc_busy_r)

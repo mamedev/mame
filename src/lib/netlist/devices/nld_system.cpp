@@ -19,20 +19,6 @@ namespace netlist
 
 
 	// ----------------------------------------------------------------------------------------
-	// clock
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_UPDATE_PARAM(clock)
-	{
-		m_inc = netlist_time::from_double(1.0 / (m_freq() * 2.0));
-	}
-
-	NETLIB_UPDATE(clock)
-	{
-		m_Q.push(!m_feedback(), m_inc);
-	}
-
-	// ----------------------------------------------------------------------------------------
 	// extclock
 	// ----------------------------------------------------------------------------------------
 
@@ -123,6 +109,7 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(function, "AFUNC",                  "N,FUNC")
 	NETLIB_DEVICE_IMPL(analog_input,        "ANALOG_INPUT",           "IN")
 	NETLIB_DEVICE_IMPL(clock,               "CLOCK",                  "FREQ")
+	NETLIB_DEVICE_IMPL(varclock,            "VARCLOCK",               "FUNC")
 	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
 	NETLIB_DEVICE_IMPL(res_sw,              "RES_SWITCH",             "+IN,+P1,+P2")
 	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")

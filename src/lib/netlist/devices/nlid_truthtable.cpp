@@ -207,7 +207,6 @@ namespace netlist
 			if (idx != plib::container::npos)
 				connect(m_Q[i], m_I[idx]);
 		}
-
 		m_ign = 0;
 	}
 
@@ -236,6 +235,9 @@ namespace netlist
 			/* update truthtable family definitions */
 			if (m_family_name != "")
 				m_family_desc = anetlist.setup().family_from_model(m_family_name);
+
+			if (m_family_desc == nullptr)
+				throw nl_exception("family description not found for {1}", m_family_name);
 
 			return pool().make_poolptr<tt_type>(anetlist, name, m_family_desc, m_ttbl, m_desc);
 		}

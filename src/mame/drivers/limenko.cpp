@@ -198,7 +198,7 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
+		m_soundlatch->acknowledge_w();
 }
 
 /*****************************************************************************************************
@@ -273,7 +273,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	// check m_spotty_sound_cmd bits...
 
 	if(m_spotty_sound_cmd == 0xf7)
-		return m_soundlatch->read(space,0);
+		return m_soundlatch->read();
 	else
 		return m_oki->read();
 }
@@ -1143,10 +1143,10 @@ void limenko_state::init_spotty()
 	save_item(NAME(m_spotty_sound_cmd));
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_SUPPORTS_SAVE )
 
 // this game only uses the same graphics chip used in Limenko's system
 GAME( 2001, spotty,   0,      spotty,  spotty,   limenko_state, init_spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

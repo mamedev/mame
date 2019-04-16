@@ -235,26 +235,25 @@ void goindol_state::machine_reset()
 	m_prot_toggle = 0;
 }
 
-MACHINE_CONFIG_START(goindol_state::goindol)
-
+void goindol_state::goindol(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* XTAL confirmed, divisor is not */
-	MCFG_DEVICE_PROGRAM_MAP(goindol_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", goindol_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);  /* XTAL confirmed, divisor is not */
+	m_maincpu->set_addrmap(AS_PROGRAM, &goindol_state::goindol_map);
+	m_maincpu->set_vblank_int("screen", FUNC(goindol_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* XTAL confirmed, divisor is not */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(goindol_state, irq0_line_hold, 4*60)
-
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000)/2)); /* XTAL confirmed, divisor is not */
+	audiocpu.set_addrmap(AS_PROGRAM, &goindol_state::sound_map);
+	audiocpu.set_periodic_int(FUNC(goindol_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goindol_state, screen_update_goindol)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goindol_state::screen_update_goindol));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goindol);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -264,9 +263,8 @@ MACHINE_CONFIG_START(goindol_state::goindol)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8)   /* Confirmed pitch from recording */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);   /* Confirmed pitch from recording */
+}
 
 
 

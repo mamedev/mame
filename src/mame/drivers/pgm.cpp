@@ -282,7 +282,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 	{
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
@@ -291,7 +291,7 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 {
 	if (PGMLOGERROR)
 		logerror("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
-	m_soundlatch3->write(space, 0, data);
+	m_soundlatch3->write(data);
 }
 
 
@@ -399,12 +399,10 @@ INPUT_PORTS_START( pgm )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-//  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )  // test 1p+2p
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )  // what should i use?
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service 1p+2p
-//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 )  // test 3p+4p
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  // what should i use?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service 3p+4p
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Test-Key 1P+2P")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service 1P+2P")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Test-Key 3P+4P")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service 3P+4P")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
@@ -4883,44 +4881,44 @@ GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,    pgm,      pgm_arm_type3_s
 
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
-GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
-GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm,     pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
 
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
 // the only difference between 'ket' and 'ket1' is the ROM fill at 0x1443bc-0x1c88cd, on ket1 it seems to be randomized / garbage data, on ket it's all 0xff, both have been seen on more than one PCB.
-GAME( 2002, ket,          0,         pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ket,          0,         pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ketbl,        ket,       pgm_arm_type2,         pgm,     pgm_arm_type2_state, init_ddp2,     ROT270, "bootleg",            "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver., bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
 // these are modern hacks, some of them have been seen on original PCBs, also reportedly on a bootleg PCB with mostly original components but the ARM replaced with a custom chip.
 // this is a significantly reworked version of the game
-GAME( 2014, ketarr,    ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr151, ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
-GAME( 2012, ketarr15,  ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr10,  ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2014, ketarr,    ket,       pgm_arm_type1_cave,       ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr151, ket,       pgm_arm_type1_cave,       ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
+GAME( 2012, ketarr15,  ket,       pgm_arm_type1_cave,       ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr10,  ket,       pgm_arm_type1_cave,       ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // these simplify the scoring system
-GAME( 2012, ketarrs151, ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarrs15,  ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrs151, ket,       pgm_arm_type1_cave,      ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrs15,  ket,       pgm_arm_type1_cave,      ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // this has the 'programmed slowdown' removed.
-GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 FAST. VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave,      ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 FAST. VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // this version is stupid, it just simulates what happens if the protection chip isn't returning proper values
 // ROM_LOAD16_WORD_SWAP( "ketarrb_v100.u38", 0x000000, 0x200000, CRC(ec7a4f92) SHA1(6351fb386586956fbdb5f0730c481fb539cc267a) )
-// GAME( 2002, ketarrb,    ket,       pgm_arm_type1_cave,   pgm,     pgm_arm_type1_state, init_ket,      ROT270, "trap15", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 BACK. VER)", MACHINE_SUPPORTS_SAVE )
+// GAME( 2002, ketarrb,    ket,       pgm_arm_type1_cave,   ddp3,    pgm_arm_type1_state, init_ket,      ROT270, "trap15", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 BACK. VER)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_espgal,   ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    espgal,  pgm_arm_type1_state, init_espgal,   ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, espgalbl,     espgal,    pgm_arm_type2,         pgm,     pgm_arm_type2_state, init_ddp2,     ROT270, "bootleg",            "Espgaluda (2003/10/15 Master Ver, bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 //泡泡鱼/Pào pào yú (China)

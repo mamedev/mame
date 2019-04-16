@@ -142,6 +142,18 @@ public:
 
 	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto iack2_callback() { return m_iack2_callback.bind(); }
+	auto iack4_callback() { return m_iack4_callback.bind(); }
+	auto iack5_callback() { return m_iack5_callback.bind(); }
+	auto iack7_callback() { return m_iack7_callback.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(in2_w);
+	DECLARE_WRITE_LINE_MEMBER(in4_w);
+	DECLARE_WRITE_LINE_MEMBER(in5_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(int1_w);
+	DECLARE_WRITE_LINE_MEMBER(int2_w);
+
 	// external callbacks
 	void uart_rx(uint8_t data);
 	void uart_tx(uint8_t data);
@@ -261,19 +273,28 @@ public:
 
 	dma_regs_t& dma() { return m_dma; }
 
-	uint16_t get_lir() { return m_lir; }
+	uint8_t iack_r(offs_t offset);
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
+	void update_ipl();
+
 	void uart_rx_check();
 	void uart_tx_check();
 	void set_timer_callback(int channel);
+
+	// callbacks
+	devcb_read8 m_iack2_callback;
+	devcb_read8 m_iack4_callback;
+	devcb_read8 m_iack5_callback;
+	devcb_read8 m_iack7_callback;
 
 	// internal state
 	uint16_t m_seeds[10];
@@ -282,9 +303,21 @@ private:
 	uint16_t m_mcu_value;
 	uint8_t m_mcu_ack;
 
+	uint8_t m_ipl;
+	int m_in2_line;
+	int m_in4_line;
+	int m_in5_line;
+	int m_nmi_line;
+	int m_int1_line;
+	int m_int2_line;
+
 	uint16_t m_lir;
 	uint8_t m_picr1;
 	uint8_t m_picr2;
+	bool m_timer_int;
+	bool m_i2c_int;
+	bool m_uart_rx_int;
+	bool m_uart_tx_int;
 
 	i2c_regs_t m_i2c;
 	uart_regs_t m_uart;

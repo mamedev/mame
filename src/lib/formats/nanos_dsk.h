@@ -7,9 +7,10 @@
     nanos format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_NANOS_DSK_H
+#define MAME_FORMATS_NANOS_DSK_H
 
-#ifndef NANOS_DSK_H_
-#define NANOS_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
@@ -27,4 +28,4 @@ private:
 
 extern const floppy_format_type FLOPPY_NANOS_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_NANOS_DSK_H

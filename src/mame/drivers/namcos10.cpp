@@ -1242,8 +1242,8 @@ ROM_END
 
 
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, init_gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

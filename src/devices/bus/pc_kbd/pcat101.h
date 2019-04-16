@@ -33,14 +33,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override { m_maincpu->set_input_line(M68705_IRQ_LINE, state); };
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override { };
+	virtual void data_write(int state) override;
 
 private:
-	// ports A, C: matrix column
-	// port D: matrix row
-	// port B: clock/data and leds
-
 	enum
 	{
 		LED_SCROLL = 0,
@@ -48,9 +43,17 @@ private:
 		LED_CAPS
 	};
 
-	required_device<m68705_device> m_maincpu;
-	required_ioport_array<16> m_column;
+	u8 portb_r();
+	void portb_w(u8 data);
+	u8 portd_r();
+
+	required_device<m68705_device> m_mcu;
+	required_ioport_array<16> m_matrix;
 	output_finder<3> m_leds;
+
+	u8 m_porta;
+	u8 m_portb;
+	u8 m_portc;
 };
 
 // device type definition

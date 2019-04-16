@@ -1572,7 +1572,7 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 }
 
 
-WRITE8_MEMBER(taitoz_state::coin_control_w)
+void taitoz_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -1591,68 +1591,14 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
+void taitoz_state::sound_bankswitch_w(u8 data)
 {
 	membank("z80bank")->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-
-#ifdef MAME_DEBUG
-//  if (data & 0xff00)
-//  {
-//      char buf[80];
-//
-//      sprintf(buf,"taitoz_sound_w to high byte: %04x",data);
-//      popmessage(buf);
-//  }
-#endif
-}
-
-READ16_MEMBER(taitoz_state::taitoz_sound_r)
-{
-	if (offset == 1)
-		return (m_tc0140syt->master_comm_r(space, 0) & 0xff);
-	else
-		return 0;
-}
-
-#if 0
-WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(0, (data >> 8) & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(0, (data >> 8) & 0xff);
-
-#ifdef MAME_DEBUG
-	if (data & 0xff)
-	{
-		char buf[80];
-
-		sprintf(buf,"taitoz_msb_sound_w to low byte: %04x",data);
-		popmessage(buf);
-	}
-#endif
-}
-
-READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(0) & 0xff) << 8);
-	else
-		return 0;
-}
-#endif
-
 
 /**** sound pan control ****/
-WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
+void taitoz_state::pancontrol_w(offs_t offset, u8 data)
 {
 	m_filter[offset & 3]->flt_volume_set_volume(data / 255.0f);
 }
@@ -1670,8 +1616,8 @@ void taitoz_state::contcirc_map(address_map &map)
 	map(0x084000, 0x087fff).ram().share("share1");
 	map(0x090000, 0x090001).w(FUNC(taitoz_state::contcirc_out_w));    /* road palette bank, sub CPU reset, 3d glasses control */
 	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
-	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300000, 0x301fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));    /* "root ram" */
 	map(0x400000, 0x4006ff).ram().share("spriteram");
 }
@@ -1683,7 +1629,8 @@ void taitoz_state::contcirc_cpub_map(address_map &map)
 	map(0x084000, 0x087fff).ram().share("share1");
 	map(0x100001, 0x100001).r(FUNC(taitoz_state::contcirc_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x100003, 0x100003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
-	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 
@@ -1696,10 +1643,11 @@ void taitoz_state::chasehq_map(address_map &map)
 	map(0x400001, 0x400001).r(FUNC(taitoz_state::chasehq_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x400003, 0x400003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
 	map(0x800000, 0x800001).w(FUNC(taitoz_state::chasehq_cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
-	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
 	map(0xe00000, 0xe003ff).rw(FUNC(taitoz_state::chasehq_motor_r), FUNC(taitoz_state::chasehq_motor_w)); /* motor cpu */
 }
@@ -1722,8 +1670,8 @@ void taitoz_state::enforce_map(address_map &map)
 	map(0x300000, 0x3006ff).ram().share("spriteram");
 	map(0x400000, 0x401fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));    /* "root ram" ??? */
 	map(0x500000, 0x500007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
-	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void taitoz_state::enforce_cpub_map(address_map &map)
@@ -1731,7 +1679,8 @@ void taitoz_state::enforce_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x300000, 0x300003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 }
 
@@ -1746,8 +1695,8 @@ void taitoz_state::bshark_map(address_map &map)
 	map(0x800000, 0x80000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
-	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void taitoz_state::bsharkjjs_map(address_map &map)
@@ -1760,8 +1709,8 @@ void taitoz_state::bsharkjjs_map(address_map &map)
 //  map(0x800000, 0x80000f) // No analog stick, this is the Joystick version
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
-	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void taitoz_state::bshark_cpub_map(address_map &map)
@@ -1769,7 +1718,7 @@ void taitoz_state::bshark_cpub_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x108000, 0x10bfff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
-	map(0x400000, 0x400007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0x400000, 0x400007).w(FUNC(taitoz_state::pancontrol_w)).umask16(0x00ff);  /* pan */
 //  map(0x40000a, 0x40000b).r(FUNC(taitoz_state::taitoz_unknown_r));  // ???
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).noprw(); // interrupt controller?
@@ -1787,10 +1736,11 @@ void taitoz_state::sci_map(address_map &map)
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x200010, 0x20001f).r(FUNC(taitoz_state::sci_steer_input_r));
 //  map(0x400000, 0x400001).w(FUNC(taitoz_state::cpua_ctrl_w));  // ?? doesn't seem to fit what's written
-	map(0x420000, 0x420003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x420001, 0x420001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x420003, 0x420003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xc00000, 0xc03fff).ram().share("spriteram");
 	map(0xc08000, 0xc08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w));
 }
@@ -1811,10 +1761,11 @@ void taitoz_state::nightstr_map(address_map &map)
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x800000, 0x800001).w(FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
-	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
 	map(0xe00000, 0xe00011).w(FUNC(taitoz_state::nightstr_motor_w));    /* Motor outputs */
 	map(0xe40000, 0xe4000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
@@ -1837,8 +1788,8 @@ void taitoz_state::aquajack_map(address_map &map)
 	map(0x200000, 0x200001).w(FUNC(taitoz_state::cpua_ctrl_w));  // not needed, but it's probably like the others
 	map(0x300000, 0x300007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0x800000, 0x801fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));
-	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xc40000, 0xc403ff).ram().share("spriteram");
 }
 
@@ -1848,7 +1799,8 @@ void taitoz_state::aquajack_cpub_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x300003, 0x300003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800800, 0x80083f).r(FUNC(taitoz_state::aquajack_unknown_r)); // Read regularly after write to 800800...
 //  map(0x800800, 0x800801).w(FUNC(taitoz_state::taitoz_unknown_w));
 //  map(0x900000, 0x900007).rw(FUNC(taitoz_state::taitoz_unknown_r), FUNC(taitoz_state::taitoz_unknown_w));
@@ -1861,8 +1813,8 @@ void taitoz_state::spacegun_map(address_map &map)
 	map(0x30c000, 0x30ffff).ram();
 	map(0x310000, 0x31ffff).ram().share("share1");
 	map(0x500000, 0x5005ff).ram().share("spriteram");
-	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xb00000, 0xb00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
 }
 
@@ -1875,7 +1827,7 @@ void taitoz_state::spacegun_cpub_map(address_map &map)
 	map(0xc00000, 0xc00007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0xc0000c, 0xc0000d).noprw(); // interrupt controller?
 	map(0xc0000e, 0xc0000f).noprw();
-	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::pancontrol_w)).umask16(0x00ff);  /* pan */
 	map(0xe00000, 0xe00001).w(FUNC(taitoz_state::spacegun_gun_output_w));    /* gun outputs */
 	map(0xf00000, 0xf0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
@@ -1889,11 +1841,12 @@ void taitoz_state::dblaxle_map(address_map &map)
 	map(0x400000, 0x40000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x400010, 0x40001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
 	map(0x600000, 0x600001).w(FUNC(taitoz_state::dblaxle_cpua_ctrl_w));  /* could this be causing int6 ? */
-	map(0x620000, 0x620003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x620001, 0x620001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x620003, 0x620003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemap mirror */
-	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
-	map(0xa30000, 0xa3002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemap mirror */
+	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
+	map(0xa30000, 0xa3002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0xc00000, 0xc03fff).ram().share("spriteram"); /* mostly unused ? */
 	map(0xc08000, 0xc08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* set in int6, seems to stay zero */
 }
@@ -1916,10 +1869,11 @@ void taitoz_state::racingb_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x300010, 0x30001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
 	map(0x500002, 0x500003).w(FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x520000, 0x520003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x520001, 0x520001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x520003, 0x520003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x700000, 0x701fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
-	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
+	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0xb00000, 0xb03fff).ram().share("spriteram"); /* mostly unused ? */
 	map(0xb08000, 0xb08001).rw(FUNC(taitoz_state::sci_spriteframe_r), FUNC(taitoz_state::sci_spriteframe_w)); /* alternates 0/0x100 */
 }
@@ -1944,7 +1898,7 @@ void taitoz_state::z80_sound_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).w(FUNC(taitoz_state::taitoz_pancontrol)); /* pan */
+	map(0xe400, 0xe403).w(FUNC(taitoz_state::pancontrol_w)); /* pan */
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
@@ -3249,9 +3203,8 @@ void taitoz_state::contcirc(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3321,9 +3274,8 @@ void taitoz_state::chasehq(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3395,9 +3347,8 @@ void taitoz_state::enforce(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3466,9 +3417,8 @@ void taitoz_state::bshark_base(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3553,9 +3503,8 @@ void taitoz_state::sci(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3632,9 +3581,8 @@ void taitoz_state::nightstr(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3706,9 +3654,8 @@ void taitoz_state::aquajack(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3783,10 +3730,9 @@ void taitoz_state::spacegun(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag("palette");
+	m_tc0100scn->set_palette("palette");
 
 	TC0110PCR(config, m_tc0110pcr, 0, "palette");
 
@@ -3853,7 +3799,7 @@ void taitoz_state::dblaxle(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
@@ -3925,7 +3871,7 @@ void taitoz_state::racingb(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 

@@ -124,7 +124,7 @@ void subhuntr_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(subhuntr_state::subhuntr_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
 }
 
 static const gfx_layout tiles8x8_layout =

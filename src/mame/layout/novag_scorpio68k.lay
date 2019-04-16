@@ -103,12 +103,12 @@
 	<element name="text_r8a"><text string="Go"><color red="0.3" green="0.7" blue="0.7" /></text></element>
 	<element name="text_r8b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
 
-	<element name="text_king"><text string="&#x265a;"><color red="0.3" green="0.7" blue="0.7" /></text></element>
-	<element name="text_queen"><text string="&#x265b;"><color red="0.3" green="0.7" blue="0.7" /></text></element>
-	<element name="text_rook"><text string="&#x265c;"><color red="0.3" green="0.7" blue="0.7" /></text></element>
-	<element name="text_bishop"><text string="&#x265d;"><color red="0.3" green="0.7" blue="0.7" /></text></element>
-	<element name="text_knight"><text string="&#x265e;"><color red="0.3" green="0.7" blue="0.7" /></text></element>
-	<element name="text_pawn"><text string="&#x265f;"><color red="0.3" green="0.7" blue="0.7" /></text></element>
+	<element name="text_king"><text string="[K]"><color red="0.3" green="0.7" blue="0.7" /></text></element>
+	<element name="text_queen"><text string="[Q]"><color red="0.3" green="0.7" blue="0.7" /></text></element>
+	<element name="text_rook"><text string="[R]"><color red="0.3" green="0.7" blue="0.7" /></text></element>
+	<element name="text_bishop"><text string="[B]"><color red="0.3" green="0.7" blue="0.7" /></text></element>
+	<element name="text_knight"><text string="[N]"><color red="0.3" green="0.7" blue="0.7" /></text></element>
+	<element name="text_pawn"><text string="[P]"><color red="0.3" green="0.7" blue="0.7" /></text></element>
 
 
 <!-- build screen -->
@@ -315,12 +315,12 @@
 		<bezel element="black"><bounds x="105.25" y="60.29" width="6" height="4" /></bezel>
 		<bezel element="black"><bounds x="105.25" y="68.00" width="6" height="4" /></bezel>
 
-		<bezel element="text_king"><bounds x="95" y="17.5" width="2.5" height="2.5" /></bezel>
-		<bezel element="text_queen"><bounds x="95" y="25.21" width="3" height="3" /></bezel>
-		<bezel element="text_bishop"><bounds x="95" y="32.93" width="3" height="3" /></bezel>
-		<bezel element="text_knight"><bounds x="95" y="40.64" width="3" height="3" /></bezel>
-		<bezel element="text_rook"><bounds x="95" y="48.36" width="3" height="3" /></bezel>
-		<bezel element="text_pawn"><bounds x="95" y="56.07" width="3" height="3" /></bezel>
+		<bezel element="text_king"><bounds x="95" y="18.20" width="2.5" height="1.4" /></bezel>
+		<bezel element="text_queen"><bounds x="95" y="25.91" width="3" height="1.4" /></bezel>
+		<bezel element="text_bishop"><bounds x="95" y="33.63" width="3" height="1.4" /></bezel>
+		<bezel element="text_knight"><bounds x="95" y="41.34" width="3" height="1.4" /></bezel>
+		<bezel element="text_rook"><bounds x="95" y="49.06" width="3" height="1.4" /></bezel>
+		<bezel element="text_pawn"><bounds x="95" y="56.77" width="3" height="1.4" /></bezel>
 
 		<bezel element="hlb" inputtag="IN.7" inputmask="0x400"><bounds x="86" y="14.00" width="6" height="4" /><color alpha="0.12" /></bezel>
 		<bezel element="hlb" inputtag="IN.6" inputmask="0x400"><bounds x="86" y="21.71" width="6" height="4" /><color alpha="0.12" /></bezel>

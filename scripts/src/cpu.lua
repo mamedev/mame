@@ -1087,6 +1087,7 @@ if (CPUS["I386"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i386/i386.cpp",
 		MAME_DIR .. "src/devices/cpu/i386/i386.h",
+		MAME_DIR .. "src/devices/cpu/i386/cache.h",
 		MAME_DIR .. "src/devices/cpu/i386/cycles.h",
 		MAME_DIR .. "src/devices/cpu/i386/i386op16.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/i386op32.hxx",
@@ -2816,4 +2817,55 @@ end
 if (CPUS["HPC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hpc/hpcdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hpc/hpcdasm.h")
+end
+
+--------------------------------------------------
+-- Yamaha Multiple Effects Generator
+--@src/devices/sound/meg.h,CPUS["MEG"] = true
+--------------------------------------------------
+
+if (CPUS["MEG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/meg.cpp",
+		MAME_DIR .. "src/devices/sound/meg.h",
+	}
+end
+
+if (CPUS["MEG"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.h")
+end
+
+--------------------------------------------------
+-- Yamaha DSPV
+--@src/devices/sound/dspv.h,CPUS["DSPV"] = true
+--------------------------------------------------
+
+if (CPUS["DSPV"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dspv.cpp",
+		MAME_DIR .. "src/devices/sound/dspv.h",
+	}
+end
+
+if (CPUS["DSPV"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/dspvd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/dspvd.h")
+end
+
+--------------------------------------------------
+--  National Semiconductor NS32000 series
+--@src/devices/cpu/ns32000/ns32000.h,CPUS["NS32000"] = true
+--------------------------------------------------
+
+if (CPUS["NS32000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
+		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
+	}
+end
+
+if (CPUS["NS32000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
 end

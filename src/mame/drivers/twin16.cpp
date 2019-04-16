@@ -88,7 +88,7 @@ WRITE16_MEMBER(twin16_state::CPUA_register_w)
 		int falling_edge = old & ~m_CPUA_register;
 
 		if (rising_edge & 0x08)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 		if (falling_edge & 0x40)
 			spriteram_process();
@@ -136,7 +136,7 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 		machine().bookkeeping().coin_counter_w(0, m_CPUA_register & 0x01);
 		machine().bookkeeping().coin_counter_w(1, m_CPUA_register & 0x02);

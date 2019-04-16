@@ -59,6 +59,7 @@
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
+ @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
@@ -137,8 +138,6 @@
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
-  - arrball: shot button is unresponsive sometimes, maybe BTANB? no video of game on Youtube
-    ROM is good, PLAs are good, input mux is good
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
@@ -228,7 +227,7 @@
 #include "tcfballa.lh"
 #include "timaze.lh"
 #include "xl25.lh" // clickable
-#include "zodiac.lh"
+#include "zodiac.lh" // clickable
 
 //#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
@@ -392,6 +391,23 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 			ret |= 1 << i;
 
 	return ret;
+}
+
+void hh_tms1k_state::switch_change(int sel, u32 mask, bool next)
+{
+	// config switches (for direct control)
+	ioport_field *inp = m_inp_matrix[sel]->field(mask);
+
+	if (next && inp->has_next_setting())
+		inp->select_next_setting();
+	else if (!next && inp->has_previous_setting())
+		inp->select_previous_setting();
+}
+
+INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
+{
+	// when an input is directly wired to MCU INIT pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
@@ -634,7 +650,7 @@ READ8_MEMBER(arrball_state::read_k)
 
 static INPUT_PORTS_START( arrball )
 	PORT_START("IN.0") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shot")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shot") // pressed when START lights up
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Stop")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x08, 0x00, "Speed" )
@@ -1207,7 +1223,7 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter") PORT_CHAR(13)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear") PORT_CHAR(8)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Clear") PORT_CHAR(8)
 
 	PORT_START("IN.5") // R8
 	PORT_CONFNAME( 0x03, 0x01, "Mode")
@@ -2915,8 +2931,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void eleciq(machine_config &config);
 };
 
@@ -2999,14 +3013,8 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
-{
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void eleciq_state::eleciq(machine_config &config)
 {
@@ -3845,7 +3853,8 @@ void einvader_state::einvader(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(939, 1080);
-	screen.set_visarea(0, 939-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvader);
 
@@ -4317,8 +4326,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	void f2pbball(machine_config &config);
 };
 
@@ -4381,14 +4388,8 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, nullptr)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
-{
-	// reset button is directly wired to TMS1000 INIT pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void f2pbball_state::f2pbball(machine_config &config)
 {
@@ -4671,7 +4672,7 @@ static INPUT_PORTS_START( gpoker )
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("9/Deal") // DL, shares pad with 9
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // 9/DL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Entry") // CE
 
@@ -4689,6 +4690,10 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Total") // T
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
+
+	PORT_START("FAKE") // 9/DL are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal") // DL
 INPUT_PORTS_END
 
 void gpoker_state::gpoker(machine_config &config)
@@ -4770,7 +4775,7 @@ WRITE16_MEMBER(gjackpot_state::write_r)
                           DB]    SP]
     [1]    [2]    [3]    [DS]   [DR]
                           BT]    HT]
-    [10/1] [T]    [MD    [CH    [AC]
+    [10/0] [T]    [MD    [CH    [AC]
                    GO]    ST]
 */
 
@@ -4851,7 +4856,136 @@ ROM_END
 
 /***************************************************************************
 
-  Gakken Galaxy Invader 1000
+  Gakken Invader
+  * PCB label GAKKEN, INVADER, KS-00779
+  * TMS1370 MP2110
+  * cyan VFD display Itron? CP5008A, 1-bit sound
+
+  known releases:
+  - World: Invader
+  - USA(1): Galaxy Invader, published by CGL
+  - USA(2): Fire Away, published by Tandy
+  - USA(3): Electron Blaster, published by Vanity Fair
+
+  On the real thing, the joystick is "sticky"(it doesn't autocenter when you let go).
+  There's also a version with a cyan/red VFD, possibly the same ROM.
+
+***************************************************************************/
+
+class ginv_state : public hh_tms1k_state
+{
+public:
+	ginv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+	void ginv(machine_config &config);
+};
+
+// handlers
+
+void ginv_state::prepare_display()
+{
+	display_matrix(12, 9, m_plate, m_grid);
+}
+
+WRITE16_MEMBER(ginv_state::write_r)
+{
+	// R9,R10: input mux
+	m_inp_mux = data >> 9 & 3;
+
+	// R15: speaker out
+	m_speaker->level_w(data >> 15 & 1);
+
+	// R0-R8: VFD grid
+	// R11-R14: VFD plate
+	m_grid = data & 0x1ff;
+	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv_state::write_o)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | data;
+	prepare_display();
+}
+
+READ8_MEMBER(ginv_state::read_k)
+{
+	// K1-K4: multiplexed inputs (K8 is fire button)
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+// config
+
+static INPUT_PORTS_START( ginv )
+	PORT_START("IN.0") // R9
+	PORT_CONFNAME( 0x07, 0x02, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x05, EQUALS, 0x00) // joystick centered
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+void ginv_state::ginv(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(ginv_state::read_k));
+	m_maincpu->r().set(FUNC(ginv_state::write_r));
+	m_maincpu->o().set(FUNC(ginv_state::write_o));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(236, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ginv )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp2110", 0x0000, 0x0800, CRC(f09c5588) SHA1(06eb8ed512eaf5367ea30c2b633219e105ddfd14) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
+
+	ROM_REGION( 142959, "svg", 0)
+	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Invader 1000
   * TMS1370 MP2139 (die label 1170 MP2139)
   * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
 
@@ -4936,7 +5070,7 @@ INPUT_PORTS_END
 void ginv1000_state::ginv1000(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 340000); // approximation
+	TMS1370(config, m_maincpu, 350000); // approximation
 	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
 	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
 	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
@@ -4946,7 +5080,8 @@ void ginv1000_state::ginv1000(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(226, 1080);
-	screen.set_visarea(0, 226-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -5097,7 +5232,8 @@ void ginv2000_state::ginv2000(machine_config &config)
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
 	screen.set_size(364, 1080);
-	screen.set_visarea(0, 364-1, 0, 1080-1);
+	screen.set_visarea_full();
+
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
@@ -5934,9 +6070,9 @@ WRITE16_MEMBER(horseran_state::write_r)
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
 	// R2: HLCD0569 _CS
-	m_lcd->write_cs(data >> 2 & 1);
-	m_lcd->write_data(data >> 1 & 1);
-	m_lcd->write_clock(data & 1);
+	m_lcd->cs_w(data >> 2 & 1);
+	m_lcd->data_w(data >> 1 & 1);
+	m_lcd->clock_w(data & 1);
 
 	// R3-R10: input mux
 	m_inp_mux = data >> 3 & 0xff;
@@ -6727,6 +6863,12 @@ static INPUT_PORTS_START( simon )
 	PORT_CONFSETTING(    0x04, "2" )
 	PORT_CONFSETTING(    0x08, "3" )
 	PORT_CONFSETTING(    0x01, "4" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<0>, 0x07)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x07)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f)
 INPUT_PORTS_END
 
 void simon_state::simon(machine_config &config)
@@ -6885,6 +7027,14 @@ static INPUT_PORTS_START( ssimon )
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
 	PORT_CONFSETTING(    0x02, "Super" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<0>, 0x0f)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x0f)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<4>, 0x0f)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<4>, 0x0f)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<6>, 0x03)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<6>, 0x03)
 INPUT_PORTS_END
 
 void ssimon_state::ssimon(machine_config &config)
@@ -8376,8 +8526,6 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(show_arm_position);
-
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -8385,13 +8533,6 @@ public:
 };
 
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(alphie_state::show_arm_position)
-{
-	// arm position 1(up) to 5(down)
-	output().set_value("q_pos", 32 - count_leading_zeros(m_inp_matrix[1]->read()));
-	output().set_value("a_pos", 32 - count_leading_zeros(m_inp_matrix[2]->read()));
-}
 
 WRITE16_MEMBER(alphie_state::write_r)
 {
@@ -8422,17 +8563,25 @@ READ8_MEMBER(alphie_state::read_k)
 
 // config
 
-static const ioport_value alphie_armpos_table[5] = { 0x01, 0x02, 0x04, 0x08, 0x10 };
-
 static INPUT_PORTS_START( alphie )
 	PORT_START("IN.0") // K1
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 
 	PORT_START("IN.1") // K2
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_PLAYER(2) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Question Arm")
+	PORT_CONFNAME( 0x1f, 0x01, "Question" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x10, "5" )
 
 	PORT_START("IN.2") // K4
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(5) PORT_REMAP_TABLE(alphie_armpos_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Answer Arm")
+	PORT_CONFNAME( 0x1f, 0x01, "Answer" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x10, "5" )
 
 	PORT_START("IN.3") // K8
 	PORT_CONFNAME( 0x0f, 0x01, "Activity" )
@@ -8440,6 +8589,14 @@ static INPUT_PORTS_START( alphie )
 	PORT_CONFSETTING(    0x02, "Lunar Landing" )
 	PORT_CONFSETTING(    0x04, "Robot Land" )
 	PORT_CONFSETTING(    0x08, "Tunes" )
+
+	PORT_START("SWITCH") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<1>, 0x1f) PORT_NAME("Question Arm Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<1>, 0x1f) PORT_NAME("Question Arm Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<2>, 0x1f) PORT_NAME("Answer Arm Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<2>, 0x1f) PORT_NAME("Answer Arm Down")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f) PORT_NAME("Activity Selector Left")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f) PORT_NAME("Activity Selector Right")
 INPUT_PORTS_END
 
 // output PLA is guessed
@@ -8458,7 +8615,6 @@ void alphie_state::alphie(machine_config &config)
 	m_maincpu->r().set(FUNC(alphie_state::write_r));
 	m_maincpu->o().set(FUNC(alphie_state::write_o));
 
-	TIMER(config, "arm_position").configure_periodic(FUNC(alphie_state::show_arm_position), attotime::from_msec(50));
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_alphie);
 
@@ -10329,7 +10485,7 @@ COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  emp
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
-COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, h2hbaskb,   0,         0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
@@ -10360,6 +10516,7 @@ CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     emp
 
 CONS( 1979, gpoker,     0,         0, gpoker,    gpoker,    gpoker_state,    empty_init, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  empty_init, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ginv,       0,         0, ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

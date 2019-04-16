@@ -137,7 +137,12 @@ void nbmj8688_state::ojousan_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+void nbmj8688_state::bikkuri_map(address_map &map)
+{
+	secolove_map(map);
 
+	map(0xf800, 0xffff).rom();
+}
 
 READ8_MEMBER(nbmj8688_state::ff_r)
 {
@@ -166,10 +171,26 @@ void nbmj8688_state::secolove_io_map(address_map &map)
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
+void nbmj8688_state::bikkuri_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
+	map(0x81, 0x81).r("psg", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("psg", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
+	map(0x90, 0x97).w(FUNC(nbmj8688_state::blitter_w));
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(nbmj8688_state::barline_output_w));
+	map(0xc0, 0xcf).w(FUNC(nbmj8688_state::clut_w));
+	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
+	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
+}
+
 WRITE8_MEMBER(nbmj8688_state::barline_output_w)
 {
-	machine().bookkeeping().coin_lockout_w(0,~data & 0x80);
-	machine().bookkeeping().coin_counter_w(0,data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
 }
 
 void nbmj8688_state::barline_io_map(address_map &map)
@@ -2442,6 +2463,47 @@ static INPUT_PORTS_START( nightlov )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bikkuri ) // TODO: should be looked at by someone who understands Japanese and / or the gameplay
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, "Game Out Rate" ) PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x07, "95%" )
+	PORT_DIPSETTING(    0x06, "90%" )
+	PORT_DIPSETTING(    0x05, "85%" )
+	PORT_DIPSETTING(    0x04, "80%" )
+	PORT_DIPSETTING(    0x03, "75%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x00, "60%" )
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:8")
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:2") // switch test?
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:7")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_INCLUDE( nbmjcontrols )
+INPUT_PORTS_END
 
 READ8_MEMBER(nbmj8688_state::dipsw1_r)
 {
@@ -2790,6 +2852,17 @@ void nbmj8688_state::ojousanm(machine_config &config)
 	ojousan(config);
 
 	m_nb1413m3->set_type(NB1413M3_OJOUSANM);
+}
+
+void nbmj8688_state::bikkuri(machine_config &config)
+{
+	NBMJDRV_4096(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::bikkuri_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::bikkuri_io_map);
+
+	// m_nb1413m3->set_type(NB1413M3_OJOUSANM); // what's the correct type here?
 }
 
 void nbmj8688_state::swinggal(machine_config &config)
@@ -3814,6 +3887,26 @@ ROM_START( barline )
 	ROM_LOAD( "16061.k7", 0x000, 0x104, CRC(d25ccac8) SHA1(cfad5a4cd9609ac2461314d77a5e0cecd326c63b) )
 ROM_END
 
+ROM_START( bikkuri )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "12.2c.27512", 0x00000, 0x10000, CRC(b5caab77) SHA1(e42657a17e0e4644524d116950b152c7dd23528f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "13.9e.27512", 0x00000, 0x10000, CRC(d264f352) SHA1(dd75ed368f6afa6b42a6ae720077f18b839e2674) )
+	ROM_LOAD( "14.9f.27512", 0x10000, 0x10000, CRC(40e15d4b) SHA1(5a055cdff4841d1dec3578fc886f53cc8eb1328c) )
+	ROM_LOAD( "15.9g.27512", 0x20000, 0x10000, CRC(cf8a3bb6) SHA1(0e25d0440d1479a30010850329c519249f5a65ed) )
+	ROM_LOAD( "19.9h.27512", 0x30000, 0x10000, CRC(a0735d2d) SHA1(30bb62dab6057f6fb7c60ffc514ca81b027ef8b8) )
+	ROM_LOAD( "20.9i.27512", 0x40000, 0x10000, CRC(abe6c935) SHA1(846b93e5028319d2ec8e2bcfde52af7110d6d3be) )
+	ROM_LOAD( "21.9j.27512", 0x50000, 0x10000, CRC(b4c708da) SHA1(f474c5a24c9b72c2c38272915c45ea7dcebcde18) )
+	ROM_LOAD( "22.9k.27512", 0x60000, 0x10000, CRC(dc79f73b) SHA1(eb47e7a218610d53ba78a2cb344d8fc491ab7fbd) )
+	ROM_LOAD( "23.9l.27512", 0x70000, 0x10000, CRC(f18bbe10) SHA1(ce7862b9a812523ddadfc7137a47da197d9a2df0) )
+
+	ROM_REGION( 0x500, "pals", ROMREGION_ERASE00 ) // no dump attempt made, there might be more
+	ROM_LOAD( "pal10l8nc.8a",  0x000, 0x02c, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.3g", 0x100, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.8k", 0x300, 0x104, NO_DUMP )
+ROM_END
+
 
 /* 8-bit palette */
 GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE )
@@ -3839,6 +3932,7 @@ GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, nbmj8688_state, empty
 GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal [BET] (Japan 871221)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, korinai,  0,        korinai,         korinai,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, korinaim, korinai,  korinaim,        korinaim, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bikkuri,  0,        bikkuri,         bikkuri,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bikkuri Pro Wrestling (Japan 881221, Ver 1.05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // nb1413m3 type /emulation, inputs need to be looked at by someone who understands gameplay / Japanese
 
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        housemnq,        housemnq, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "House Mannequin (Japan 870217)", MACHINE_SUPPORTS_SAVE )

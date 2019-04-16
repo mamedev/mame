@@ -440,9 +440,9 @@ void m62_audio_device::device_add_mconfig(machine_config &config)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-	snd_nl.set_constructor(netlist_kidniki);
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(netlist_kidniki)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, "snd_nl:ibd", "I_BD0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "snd_nl:isd", "I_SD0.IN", 0);

@@ -126,8 +126,8 @@ void gunbustr_state::gunbustr_map(address_map &map)
 	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gunbustr_gun_r), FUNC(gunbustr_state::gunbustr_gun_w));                       /* gun coord read */
-	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
-	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xc00000, 0xc03fff).ram();                                                             /* network ram ?? */
 }
@@ -230,12 +230,12 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-MACHINE_CONFIG_START(gunbustr_state::gunbustr)
-
+void gunbustr_state::gunbustr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gunbustr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gunbustr_state::gunbustr_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gunbustr_state::gunbustr_interrupt)); /* VBL */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -250,20 +250,20 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(gunbustr_state::screen_update_gunbustr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x07);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(-1, 0);
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************/
 

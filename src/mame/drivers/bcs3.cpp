@@ -384,8 +384,8 @@ void bcs3_state::init_bcs3d()
 	s_cols = 29;
 }
 
-MACHINE_CONFIG_START(bcs3_state::bcs3)
-
+void bcs3_state::bcs3(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(5'000'000) /2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bcs3_state::bcs3_mem);
@@ -393,13 +393,13 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(28*8, 12*10)
-	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(28*8, 12*10);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bcs3_state::screen_update_bcs3));
+	screen.set_palette("palette");
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bcs3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -409,10 +409,10 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
 	CASSETTE(config, m_cass);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bcs3_state::bcs3a)
-
+void bcs3_state::bcs3a(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(7'000'000) /2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bcs3_state::bcs3a_mem);
@@ -420,13 +420,13 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(29*8, 12*10)
-	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3a)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(29*8, 12*10);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bcs3_state::screen_update_bcs3a));
+	screen.set_palette("palette");
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bcs3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -436,14 +436,14 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
 	CASSETTE(config, m_cass);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bcs3_state::bcs3b)
+void bcs3_state::bcs3b(machine_config &config)
+{
 	bcs3a(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(40*8, 24*10)
-	MCFG_SCREEN_VISIBLE_AREA(0,40*8-1,0,24*10-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(40*8, 24*10);
+	subdevice<screen_device>("screen")->set_visarea(0, 40*8-1, 0, 24*10-1);
+}
 
 
 /* ROM definition */

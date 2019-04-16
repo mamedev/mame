@@ -372,10 +372,7 @@ template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
 	else if (BIT(m_irq, 3)) vector = 0x88;
 	else                    vector = 0x84; // very wrong, need test cases for other things
 
-	m_maincpu->set_input_line_and_vector(
-			INPUT_LINE_IRQ0,
-			m_irq ? ASSERT_LINE : CLEAR_LINE,
-			vector);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, m_irq ? ASSERT_LINE : CLEAR_LINE, vector); // Z80
 }
 
 

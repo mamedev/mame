@@ -178,12 +178,12 @@ void sfcbox_state::snes_map(address_map &map)
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
 {
-	return m_spc700->spc_ram_r(space, offset + 0x100);
+	return m_spc700->spc_ram_r(offset + 0x100);
 }
 
 WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 {
-	m_spc700->spc_ram_w(space, offset + 0x100, data);
+	m_spc700->spc_ram_w(offset + 0x100, data);
 }
 
 void sfcbox_state::spc_mem(address_map &map)
@@ -479,7 +479,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SNES_SOUND(config, m_spc700);
+	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
 	m_spc700->add_route(0, "lspeaker", 1.00);
 	m_spc700->add_route(1, "rspeaker", 1.00);
 

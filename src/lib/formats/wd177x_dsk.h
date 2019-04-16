@@ -7,9 +7,10 @@
     helper for simple wd177x-formatted disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_WD177X_DSK_H
+#define MAME_FORMATS_WD177X_DSK_H
 
-#ifndef WD177X_DSK_H
-#define WD177X_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -60,4 +61,4 @@ protected:
 	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 };
 
-#endif /* WD177X_DSK_H */
+#endif // MAME_FORMATS_WD177X_DSK_H

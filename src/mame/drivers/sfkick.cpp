@@ -588,7 +588,7 @@ void sfkick_state::machine_reset()
 
 WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 {
-	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
 void sfkick_state::sfkick(machine_config &config)

@@ -677,6 +677,18 @@ void unsp_device::generate_update_nz(drcuml_block &block)
     single opcode
 ------------------------------------------------------------------*/
 
+bool unsp_device::generate_f_group_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc)
+{
+	return false;
+}
+
+bool unsp_newer_device::generate_f_group_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc)
+{
+	// TODO: handle the extended opcodes
+	return true;
+}
+
+
 bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = (uint32_t)desc->opptr.w[0];
@@ -1297,6 +1309,9 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			UML_MOV(block, I1, I2);
 			UML_CALLH(block, *m_mem_write);
 			return true;
+
+		case 0x0f: // Extended
+			return generate_f_group_opcode(block, compiler, desc);
 
 		default:
 			return false;

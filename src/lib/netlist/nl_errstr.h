@@ -41,7 +41,7 @@
 #define MF_1_UNKNOWN_SOLVER_TYPE                "Unknown solver type: {1}"
 #define MF_1_NETGROUP_SIZE_EXCEEDED_1           "Encountered netgroup with > {1} nets"
 
-#define MW_1_NO_SPECIFIC_SOLVER                 "No specific solver found for netlist of size {1}"
+#define MI_1_NO_SPECIFIC_SOLVER                 "No specific solver found for netlist of size {1}"
 
 // nl_base.cpp
 
@@ -82,14 +82,17 @@
 #define MF_2_MODEL_PARAMETERS_NOT_UPPERCASE_1_2 "model parameters should be uppercase:{1} {2}"
 #define MF_2_ENTITY_1_NOT_FOUND_IN_MODEL_2      "Entity {1} not found in model {2}"
 #define MF_1_UNKNOWN_NUMBER_FACTOR_IN_1         "Unknown number factor in: {1}"
-#define MF_1_NOT_FOUND_IN_SOURCE_COLLECTION     "unable to find {1} in source collection"
+#define MF_1_NOT_FOUND_IN_SOURCE_COLLECTION     "unable to find {1} in sources collection"
 
 #define MW_3_OVERWRITING_PARAM_1_OLD_2_NEW_3    "Overwriting {1} old <{2}> new <{3}>"
 #define MW_1_CONNECTING_1_TO_ITSELF             "Connecting {1} to itself. This may be right, though"
-#define MW_1_DUMMY_1_WITHOUT_CONNECTIONS        "Found dummy terminal {1} without connections"
+#define MI_1_DUMMY_1_WITHOUT_CONNECTIONS        "Found dummy terminal {1} without connections"
+#define MI_1_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS "Found analog output {1} without connections"
+#define MI_1_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS "Found logic output {1} without connections"
+#define MW_1_LOGIC_INPUT_1_WITHOUT_CONNECTIONS  "Found logic input {1} without connections"
 #define MW_1_TERMINAL_1_WITHOUT_CONNECTIONS     "Found terminal {1} without connections"
-#define MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3 "Found device {1} connected only to railterminals {2}/{3}. Will be removed"
-#define MW_1_DATA_1_NOT_FOUND                   "unable to find data named {1} in source collection"
+#define MI_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3 "Found device {1} connected only to railterminals {2}/{3}. Will be removed"
+#define MW_1_DATA_1_NOT_FOUND                   "unable to find data {1} in sources collection"
 
 // nld_mm5837.cpp
 
@@ -97,7 +100,7 @@
 
 // nlid_proxy.cpp
 
-#define MW_1_NO_POWER_TERMINALS_ON_DEVICE_1     "D/A Proxy: Found no valid combination of power terminals on device {1}"
+#define MI_1_NO_POWER_TERMINALS_ON_DEVICE_1     "D/A Proxy: Found no valid combination of power terminals on device {1}"
 
 
 #endif /* NL_ERRSTR_H_ */

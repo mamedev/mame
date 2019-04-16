@@ -742,6 +742,13 @@ void memory_manager::allocate(device_memory_interface &memory)
 			// allocate one of the appropriate type
 			switch (spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
 			{
+				case  8|(4+1):
+					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_LITTLE>>(*this, spacenum);
+					else
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_BIG   >>(*this, spacenum);
+					break;
+
 				case  8|(4-0):
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 						memory.allocate<address_space_specific<0,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
@@ -1124,28 +1131,9 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 		}
 	}
 
-	// Check if we have to adjust the unitmask and addresses
 	nunitmask = 0xffffffffffffffffU >> (64 - m_config.data_width());
 	if (unitmask)
 		nunitmask &= unitmask;
-	if ((addrstart & default_lowbits_mask) || ((~addrend) & default_lowbits_mask)) {
-		if ((addrstart ^ addrend) & ~default_lowbits_mask)
-			fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start or end is unaligned while the range spans more than one slot (granularity = %d).\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, default_lowbits_mask + 1);
-		offs_t lowbyte = m_config.addr2byte(addrstart & default_lowbits_mask);
-		offs_t highbyte = m_config.addr2byte((addrend & default_lowbits_mask) + 1);
-		if (m_config.endianness() == ENDIANNESS_LITTLE) {
-			u64 hmask = 0xffffffffffffffffU >> (64 - 8*highbyte);
-			nunitmask = (nunitmask << (8*lowbyte)) & hmask;
-		} else {
-			u64 hmask = 0xffffffffffffffffU >> ((64 - m_config.data_width()) + 8*lowbyte);
-			nunitmask = (nunitmask << (m_config.data_width() - 8*highbyte)) & hmask;
-		}
-
-		addrstart &= ~default_lowbits_mask;
-		addrend |= default_lowbits_mask;
-		if(changing_bits < default_lowbits_mask)
-			changing_bits = default_lowbits_mask;
-	}
 
 	nstart = addrstart;
 	nend = addrend;
@@ -2643,6 +2631,8 @@ template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrSh
 }
 
 
+template class memory_access_cache<0,  1, ENDIANNESS_LITTLE>;
+template class memory_access_cache<0,  1, ENDIANNESS_BIG>;
 template class memory_access_cache<0,  0, ENDIANNESS_LITTLE>;
 template class memory_access_cache<0,  0, ENDIANNESS_BIG>;
 template class memory_access_cache<1,  3, ENDIANNESS_LITTLE>;

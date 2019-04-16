@@ -247,11 +247,10 @@ private:
 	DECLARE_MACHINE_RESET(ti99_8);
 
 	// Processor connections with the main board
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
-	DECLARE_WRITE8_MEMBER( external_operation );
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
+	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// Connections from outside towards the CPU (callbacks)
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
@@ -267,7 +266,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt );
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(read_by_9901);
+	uint8_t read_by_9901(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
@@ -275,11 +274,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
 	DECLARE_WRITE_LINE_MEMBER(cassette_motor);
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(offs_t offset, uint8_t data);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	void memmap_setoffset(address_map &map);
+	void memmap_setaddress(address_map &map);
 
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
@@ -313,9 +312,9 @@ void ti99_8_state::memmap(address_map &map)
 	map(0x0000, 0xffff).rw(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::read), FUNC(bus::ti99::internal::mainboard8_device::write));
 }
 
-void ti99_8_state::memmap_setoffset(address_map &map)
+void ti99_8_state::memmap_setaddress(address_map &map)
 {
-	map(0x0000, 0xffff).r(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::setoffset));
+	map(0x0000, 0xffff).w(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::setaddress));
 }
 
 /*
@@ -327,11 +326,8 @@ void ti99_8_state::memmap_setoffset(address_map &map)
 
 void ti99_8_state::crumap(address_map &map)
 {
-	map(0x0000, 0x02ff).r(FUNC(ti99_8_state::cruread));
-	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x17ff).w(FUNC(ti99_8_state::cruwrite));
-	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0x2fff).rw(FUNC(ti99_8_state::cruread), FUNC(ti99_8_state::cruwrite));
+	map(0x0000, 0x003f).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /* ti99/8 : 54-key keyboard */
@@ -437,28 +433,27 @@ static INPUT_PORTS_START(ti99_8)
 INPUT_PORTS_END
 
 
-READ8_MEMBER( ti99_8_state::cruread )
+uint8_t ti99_8_state::cruread(offs_t offset)
 {
-	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset);
 	uint8_t value = 0;
 
 	// Let the mapper, the gromport, and the p-box decide whether they want
 	// to change the value at the CRU address
-	// Also, we translate the bit addresses to base addresses
-	m_mainboard->crureadz(space, offset<<4, &value);
-	m_gromport->crureadz(space, offset<<4, &value);
-	m_ioport->crureadz(space, offset<<4, &value);
+	m_mainboard->crureadz(offset<<1, &value);
+	m_gromport->crureadz(offset<<1, &value);
+	m_ioport->crureadz(offset<<1, &value);
 
-	LOGMASKED(LOG_CRU, "CRU %04x -> %02x\n", offset<<4, value);
+	LOGMASKED(LOG_CRU, "CRU %04x -> %x\n", offset<<1, value);
 	return value;
 }
 
-WRITE8_MEMBER( ti99_8_state::cruwrite )
+void ti99_8_state::cruwrite(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_CRU, "CRU %04x <- %x\n", offset<<1, data);
-	m_mainboard->cruwrite(space, offset<<1, data);
-	m_gromport->cruwrite(space, offset<<1, data);
-	m_ioport->cruwrite(space, offset<<1, data);
+	m_mainboard->cruwrite(offset<<1, data);
+	m_gromport->cruwrite(offset<<1, data);
+	m_ioport->cruwrite(offset<<1, data);
 }
 
 /***************************************************************************
@@ -469,7 +464,7 @@ WRITE8_MEMBER( ti99_8_state::cruwrite )
     keyboard column selection.)
 ***************************************************************************/
 
-READ8_MEMBER( ti99_8_state::read_by_9901 )
+uint8_t ti99_8_state::read_by_9901(offs_t offset)
 {
 	int answer=0;
 	uint8_t joyst;
@@ -604,7 +599,7 @@ WRITE_LINE_MEMBER( ti99_8_state::cassette_output )
 	m_cassette->output(state==ASSERT_LINE? +1 : -1);
 }
 
-WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
+void ti99_8_state::tms9901_interrupt(offs_t offset, uint8_t data)
 {
 	m_cpu->set_input_line(INT_9995_INT1, data);
 }
@@ -678,7 +673,7 @@ WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
 
-WRITE8_MEMBER( ti99_8_state::external_operation )
+void ti99_8_state::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset == IDLE_OP) return;
@@ -693,14 +688,6 @@ WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 {
 	m_tms9901->phi_line(state);
 	m_mainboard->clock_in(state);
-}
-
-/*
-   Data bus in (DBIN) line from the CPU.
-*/
-WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
-{
-	m_mainboard->dbin_in(state);
 }
 
 void ti99_8_state::driver_start()
@@ -741,10 +728,9 @@ void ti99_8_state::ti99_8(machine_config& config)
 	TMS9995_MP9537(config, m_cpu, XTAL(10'738'635));
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_8_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_8_state::crumap);
-	m_cpu->set_addrmap(tms9995_device::AS_SETOFFSET, &ti99_8_state::memmap_setoffset);
+	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &ti99_8_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(ti99_8_state::external_operation));
 	m_cpu->clkout_cb().set(FUNC(ti99_8_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(ti99_8_state::dbin_line));
 	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::holda_line));
 
 	// 9901 configuration

@@ -88,17 +88,17 @@ WRITE8_MEMBER( ampro_state::port00_w )
 READ8_MEMBER( ampro_state::io_r )
 {
 	if (offset < 0x40)
-		return m_ctc->read(space, offset>>4);
+		return m_ctc->read(offset>>4);
 	else
-		return m_dart->ba_cd_r(space, offset>>2);
+		return m_dart->ba_cd_r(offset>>2);
 }
 
 WRITE8_MEMBER( ampro_state::io_w )
 {
 	if (offset < 0x40)
-		m_ctc->write(space, offset>>4, data);
+		m_ctc->write(offset>>4, data);
 	else
-		m_dart->ba_cd_w(space, offset>>2, data);
+		m_dart->ba_cd_w(offset>>2, data);
 }
 
 void ampro_state::ampro_mem(address_map &map)

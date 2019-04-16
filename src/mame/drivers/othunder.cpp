@@ -294,7 +294,7 @@ TODO:
                 INTERRUPTS
 ***********************************************************/
 
-WRITE16_MEMBER( othunder_state::irq_ack_w )
+void othunder_state::irq_ack_w(offs_t offset, u16 data)
 {
 	switch (offset)
 	{
@@ -329,7 +329,7 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-WRITE8_MEMBER(othunder_state::eeprom_w)
+void othunder_state::eeprom_w(u8 data)
 {
 
 /*              0000000x    SOL-1 (gun solenoid)
@@ -353,7 +353,7 @@ WRITE8_MEMBER(othunder_state::eeprom_w)
 	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(othunder_state::coins_w)
+void othunder_state::coins_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -366,28 +366,12 @@ WRITE8_MEMBER(othunder_state::coins_w)
             SOUND
 *****************************************/
 
-WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
+void othunder_state::sound_bankswitch_w(u8 data)
 {
 	membank("z80bank")->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(othunder_state::sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-}
-
-READ16_MEMBER(othunder_state::sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
-}
-
-WRITE8_MEMBER(othunder_state::tc0310fam_w)
+void othunder_state::tc0310fam_w(offs_t offset, u8 data)
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
 	   PSG output is routed to both chips. */
@@ -427,9 +411,10 @@ void othunder_state::othunder_map(address_map &map)
 	map(0x090000, 0x09000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
 	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
-	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x300000, 0x300003).rw(FUNC(othunder_state::sound_r), FUNC(othunder_state::sound_w));
+	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x300003, 0x300003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x400000, 0x4005ff).ram().share("spriteram");
 	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x600000, 0x600003).w(FUNC(othunder_state::irq_ack_w));
@@ -646,10 +631,9 @@ void othunder_state::othunder(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 

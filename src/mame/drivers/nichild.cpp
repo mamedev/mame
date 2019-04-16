@@ -60,7 +60,6 @@ private:
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(portd_w);
 	DECLARE_WRITE8_MEMBER(gfxbank_w);
-	INTERRUPT_GEN_MEMBER(vdp_irq);
 
 	void nichild_io(address_map &map);
 	void nichild_map(address_map &map);
@@ -215,29 +214,20 @@ void nichild_state::machine_reset()
 {
 }
 
-#if 0
 static const z80_daisy_config daisy_chain_main[] =
 {
 	TMPZ84C011_DAISY_INTERNAL,
 	{ nullptr }
 };
-#endif
-
-
-INTERRUPT_GEN_MEMBER(nichild_state::vdp_irq)
-{
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x76);
-}
 
 
 void nichild_state::nichild(machine_config &config)
 {
 	/* basic machine hardware */
 	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/4);
-	//m_maincpu->set_daisy_config(daisy_chain_main);
+	m_maincpu->set_daisy_config(daisy_chain_main);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nichild_state::nichild_map);
 	m_maincpu->set_addrmap(AS_IO, &nichild_state::nichild_io);
-	m_maincpu->set_vblank_int("screen", FUNC(nichild_state::vdp_irq));
 	m_maincpu->in_pb_callback().set(FUNC(nichild_state::mux_r));
 	m_maincpu->out_pa_callback().set(FUNC(nichild_state::porta_w));
 	m_maincpu->out_pb_callback().set(FUNC(nichild_state::portb_w));
@@ -249,8 +239,8 @@ void nichild_state::nichild(machine_config &config)
 	V9938(config, m_v9938, MAIN_CLOCK);
 	m_v9938->set_screen_ntsc("screen");
 	m_v9938->set_vram_size(0x40000);
-//  m_v9938->int_cb().set_inputline("maincpu", 0);
-//  m_v9938->int_cb().set(FUNC(nichild_state::vdp_irq));
+	m_v9938->int_cb().set(m_maincpu, FUNC(tmpz84c011_device::trg3)).invert();
+
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */

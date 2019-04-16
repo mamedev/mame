@@ -164,7 +164,7 @@ void h89_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_port_f2 & 0x02)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 }
 
 WRITE8_MEMBER( h89_state::port_f2_w )

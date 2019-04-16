@@ -2,16 +2,16 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone module
+    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
     Preliminary driver by R. Belmont and O. Galibert
 
-    CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
+    MU100 CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
     Sound ASIC: Yamaha XS725A0/SWP30
     RAM: 1 MSM51008 (1 meg * 1 bit = 128KBytes)
 
     I/O ports from service manual:
 
-    Port 1:
+    Port 1
         0 - LCD data, SW data, LED 1
         1 - LCD data, SW data, LED 2
         2 - LCD data, SW data, LED 3
@@ -51,6 +51,7 @@
         5 - (in) Off Line Detection
         6 - (out) Signal for rotary encoder (REB)
         7 - (out) Signal for rotary encoder (REA)
+
 
     Port F:
         0 - (out) (sws) LED,SW Strobe data latch
@@ -119,11 +120,10 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h8s2655.h"
-#include "video/hd44780.h"
+#include "machine/mulcd.h"
 #include "sound/swp30.h"
 
 #include "debugger.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -243,7 +243,7 @@ public:
 	}
 
 protected:
-	virtual u16 adc7_r();
+	virtual u16 adc_type_r();
 
 private:
 	enum {
@@ -252,20 +252,32 @@ private:
 		P2_LCD_ENABLE = 0x04
 	};
 
+	enum {
+		P6_LCD_RS     = 0x04,
+		P6_LCD_RW     = 0x02,
+		P6_LCD_ENABLE = 0x01
+	};
+
+	enum {
+		PA_LCD_RS     = 0x02,
+		PA_LCD_ENABLE = 0x20,
+		PA_LCD_RW     = 0x40
+	};
+
 	required_device<h8s2655_device> m_maincpu;
 	required_device<swp30_device> m_swp30;
-	required_device<hd44780_device> m_lcd;
+	required_device<mulcd_device> m_lcd;
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
-	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pf, cur_pg;
+	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
 	u8 cur_ic32;
-	float contrast;
 
-	u16 adc0_r();
-	u16 adc2_r();
-	u16 adc4_r();
-	u16 adc6_r();
+	u16 adc_zero_r();
+	u16 adc_ar_r();
+	u16 adc_al_r();
+	u16 adc_midisw_r();
+	u16 adc_battery_r();
 
 	void p1_w(u16 data);
 	u16 p1_r();
@@ -276,11 +288,11 @@ private:
 	u16 p6_r();
 	void pa_w(u16 data);
 	u16 pa_r();
+	void pb_w(u16 data);
+	u16 pb_r();
 	void pf_w(u16 data);
 	void pg_w(u16 data);
 
-	float lightlevel(const u8 *src, const u8 *render);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
@@ -294,7 +306,7 @@ public:
 	{ }
 
 private:
-	virtual u16 adc7_r() override;
+	virtual u16 adc_type_r() override;
 };
 
 void mu100_state::prg_write_tap(offs_t address, u16 data, u16 mem_mask)
@@ -453,59 +465,9 @@ void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
 	}
 }
 
-#include "../drivers/ymmu100.hxx"
-
 void mu100_state::machine_start()
 {
-	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pf = cur_pg = cur_ic32 = 0xff;
-	contrast = 1.0;
-}
-
-float mu100_state::lightlevel(const u8 *src, const u8 *render)
-{
-	u8 l = *src;
-	if(l == 0)
-		return 1.0;
-	int slot = (src[1] << 8) | src[2];
-	if(slot >= 0xff00)
-		return (255-l)/255.0;
-
-	int bit = slot & 7;
-	int adr = (slot >> 3);
-	if(render[adr] & (1 << bit))
-		return 1-(1-(255-l)/255.0f)*contrast;
-	return 0.95f;
-}
-
-u32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	const u8 *render = m_lcd->render();
-	const u8 *src = ymmu100_bkg + 15;
-
-	for(int y=0; y<241; y++) {
-		u32 *pix = reinterpret_cast<u32 *>(bitmap.raw_pixptr(y));
-		for(int x=0; x<800; x++) {
-			float light = lightlevel(src, render);
-			u32 col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
-			*pix++ = col;
-			src += 3;
-		}
-		for(int x=800; x<900; x++)
-			*pix++ = 0;
-	}
-
-	for(int i=0; i<6; i++)
-		if(cur_ic32 & (1 << (i == 5 ? 7 : i))) {
-			int x = 830 + 40*(i & 1);
-			int y = 55 + 65*(i >> 1);
-			for(int yy=-9; yy <= 9; yy++) {
-				int dx = int(sqrt((float)(99-yy*yy)));
-				u32 *pix = reinterpret_cast<u32 *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
-				for(int xx=0; xx<2*dx+1; xx++)
-					*pix++ = 0x00ff00;
-			}
-		}
-	return 0;
+	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pc = cur_pf = cur_pg = cur_ic32 = 0xff;
 }
 
 void mu100_state::mu100_map(address_map &map)
@@ -515,38 +477,43 @@ void mu100_state::mu100_map(address_map &map)
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
 }
 
-u16 mu100_state::adc0_r()
+// Grounded adc input
+u16 mu100_state::adc_zero_r()
 {
-	//  logerror("adc0_r\n");
 	return 0;
 }
 
-u16 mu100_state::adc2_r()
+// Analog input right (also sent to the swp)
+u16 mu100_state::adc_ar_r()
 {
-	logerror("adc2_r\n");
+	return 0;
+}
+
+// Analog input left (also sent to the swp)
+u16 mu100_state::adc_al_r()
+{
 	return 0;
 }
 
 // Put the host switch to pure midi
-u16 mu100_state::adc4_r()
+u16 mu100_state::adc_midisw_r()
 {
 	return 0;
 }
 
 // Battery level
-u16 mu100_state::adc6_r()
+u16 mu100_state::adc_battery_r()
 {
-	logerror("adc6_r\n");
-	return 0x3ff;
+	return 0x200;
 }
 
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
-u16 mu100_state::adc7_r()
+u16 mu100_state::adc_type_r()
 {
 	return 0;
 }
 
-u16 mu100r_state::adc7_r()
+u16 mu100r_state::adc_type_r()
 {
 	return 0x3ff;
 }
@@ -591,7 +558,7 @@ void mu100_state::p2_w(u16 data)
 				m_lcd->control_write(cur_p1);
 		}
 	}
-	contrast = (8 - ((cur_p2 >> 3) & 7))/8.0;
+	m_lcd->set_contrast((8 - ((cur_p2 >> 3) & 7))/8.0);
 	cur_p2 = data;
 }
 
@@ -633,8 +600,10 @@ u16 mu100_state::pa_r()
 
 void mu100_state::pf_w(u16 data)
 {
-	if(!(cur_pf & 0x01) && (data & 0x01))
+	if(!(cur_pf & 0x01) && (data & 0x01)) {
 		cur_ic32 = cur_p1;
+		m_lcd->set_leds((cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2));
+	}
 	cur_pf = data;
 }
 
@@ -654,11 +623,14 @@ void mu100_state::mu100_iomap(address_map &map)
 	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
 	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
 	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc0_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc2_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc4_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc6_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc7_r));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
+	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
+	map(h8_device::ADC_1, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
+	map(h8_device::ADC_5, h8_device::ADC_5).r(FUNC(mu100_state::adc_zero_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_type_r));
 }
 
 void mu100_state::swp30_map(address_map &map)
@@ -674,15 +646,7 @@ void mu100_state::mu100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
 	m_maincpu->set_addrmap(AS_IO, &mu100_state::mu100_iomap);
 
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
+	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -722,10 +686,6 @@ ROM_START( mu100 )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
 // Identical to the mu100
@@ -743,10 +703,6 @@ ROM_START( mu100r )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
 CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )

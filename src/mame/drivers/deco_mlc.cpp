@@ -279,7 +279,7 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco146->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -288,7 +288,7 @@ WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 
@@ -507,24 +507,24 @@ void deco_mlc_state::machine_reset()
 	m_vbl_i = 0xffffffff;
 }
 
-MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
-
+void deco_mlc_state::avengrgs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, SH2, 42000000/2) /* 21 MHz clock confirmed on real board */
-	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
+	SH2(config, m_maincpu, 42000000/2); /* 21 MHz clock confirmed on real board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::avengrgs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(deco_mlc_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(deco_mlc_state::screen_vblank_mlc));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deco_mlc);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -534,29 +534,29 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_ymz, YMZ280B, 42000000 / 3)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, 42000000 / 3);
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(deco_mlc_state::mlc)
-
+void deco_mlc_state::mlc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
-	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
+	ARM(config, m_maincpu, 42000000/6); /* 42 MHz -> 7MHz clock confirmed on real board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(deco_mlc_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(deco_mlc_state::screen_vblank_mlc));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deco_mlc);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -569,10 +569,10 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_ymz, YMZ280B, 42000000 / 3)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, 42000000 / 3);
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
 void deco_mlc_state::mlc_6bpp(machine_config &config)
 {
@@ -581,16 +581,16 @@ void deco_mlc_state::mlc_6bpp(machine_config &config)
 	m_gfxdecode->set_info(gfx_6bpp);
 }
 
-MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
+void deco_mlc_state::mlc_5bpp(machine_config &config)
+{
 	mlc(config);
 
 	m_gfxdecode->set_info(gfx_5bpp);
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
-	MCFG_DEVICE_MODIFY("ymz")
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	m_ymz->add_route(1, "lspeaker", 1.0);
+	m_ymz->add_route(0, "rspeaker", 1.0);
+}
 
 /***************************************************************************/
 

@@ -46,6 +46,7 @@ protected:
 	uint32_t      execute_input_lines() const override;
 	void        execute_set_input(int irqline, int state) override;
 
+	// The clock is internally divided by 4
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
 

@@ -2207,7 +2207,7 @@ void pc8801_state::machine_reset()
 	m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 	m_mouse.phase = 0;
 
-	m_fdccpu->set_input_line_vector(0, 0);
+	m_fdccpu->set_input_line_vector(0, 0); // Z80
 
 	{
 		m_txt_color = 2;

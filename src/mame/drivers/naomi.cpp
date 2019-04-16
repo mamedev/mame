@@ -1728,7 +1728,7 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi_state::soundram_r), FUNC(naomi_state::soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
 	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi_state::naomi_g2bus_r));
@@ -1787,7 +1787,7 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(FUNC(naomi2_state::soundram_r), FUNC(naomi2_state::soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
 	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(FUNC(naomi2_state::naomi_g2bus_r));
@@ -1964,7 +1964,7 @@ void atomiswave_state::aw_map(address_map &map)
 	map(0x00600000, 0x006007ff).rw(FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::soundram_r), FUNC(atomiswave_state::soundram_w));           // sound RAM (8 MB)
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
@@ -2008,8 +2008,14 @@ void atomiswave_state::aw_port(address_map &map)
 void dc_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x007fffff).ram().share("dc_sound_ram");                /* shared with SH-4 */
+	map(0x00000000, 0x007fffff).rw(FUNC(naomi_state::soundram_r), FUNC(naomi_state::soundram_w));                /* shared with SH-4 */
 	map(0x00800000, 0x00807fff).rw(FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
+}
+
+void dc_state::aica_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x7fffff).ram().share("dc_sound_ram");
 }
 
 /*
@@ -2908,7 +2914,6 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER(naomi_state,naomi)
 {
 	naomi_state::machine_reset();
-	m_aica->set_ram_base(dc_sound_ram, 8*1024*1024);
 }
 
 /*
@@ -2951,11 +2956,11 @@ void dc_state::naomi_aw_base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	m_aica->set_master(true);
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
-	m_aica->add_route(0, "lspeaker", 2.0);
-	m_aica->add_route(1, "rspeaker", 2.0);
+	m_aica->set_addrmap(0, &dc_state::aica_map);
+	m_aica->add_route(0, "lspeaker", 1.0);
+	m_aica->add_route(1, "rspeaker", 1.0);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 }

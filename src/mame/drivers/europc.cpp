@@ -587,18 +587,16 @@ void europc_pc_state::europc2(machine_config &config)
 }
 
 //Euro XT
-MACHINE_CONFIG_START(europc_pc_state::euroxt)
+void europc_pc_state::euroxt(machine_config &config)
+{
 	europc(config);
 
 	m_ram->set_default_size("768K");
 
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "xtide", false) // FIXME: determine ISA bus clock
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa2")->set_default_option(nullptr);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "xtide", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+}
 
 ROM_START( europc )
 	ROM_REGION(0x10000,"bios", 0)
@@ -636,7 +634,10 @@ ROM_END
 ROM_START( euroxt )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
-	ROM_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2))
+	ROM_SYSTEM_BIOS( 0, "v1.01", "EuroXT v1.01" )
+	ROMX_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "v1.02", "EuroXT v1.02" )
+	ROMX_LOAD("euro_xt_bios_id.nr.51463_v1.02.bin", 0x8000, 0x8000, CRC(c36de60e) SHA1(c668cc9c5f3325233f30eac654678e1b8b7a7847), ROM_BIOS(1))
 ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS

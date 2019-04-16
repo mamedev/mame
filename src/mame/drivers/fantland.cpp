@@ -74,7 +74,7 @@ WRITE8_MEMBER(fantland_state::nmi_enable_w)
 
 WRITE8_MEMBER(fantland_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -805,32 +805,32 @@ WRITE_LINE_MEMBER(fantland_state::vblank_irq)
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4); // I8088
 }
 
-MACHINE_CONFIG_START(fantland_state::fantland)
-
+void fantland_state::fantland(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)        // ?
-	MCFG_DEVICE_PROGRAM_MAP(fantland_map)
+	I8086(config, m_maincpu, 8000000);        // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_map);
 
-	MCFG_DEVICE_ADD("audiocpu", I8088, 8000000)        // ?
-	MCFG_DEVICE_PROGRAM_MAP(fantland_sound_map)
-	MCFG_DEVICE_IO_MAP(fantland_sound_iomap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fantland_state, fantland_sound_irq,  8000)
+	I8088(config, m_audiocpu, 8000000);        // ?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fantland_state::fantland_sound_iomap);
+	m_audiocpu->set_periodic_int(FUNC(fantland_state::fantland_sound_irq), attotime::from_hz(8000));
 	// NMI when soundlatch is written
 
 	config.m_minimum_quantum = attotime::from_hz(8000);  // sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(352,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(352,256);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(fantland_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(fantland_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
@@ -846,34 +846,34 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-MACHINE_CONFIG_END
+}
 
 
 WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 {
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4); // I8088
 }
 
-MACHINE_CONFIG_START(fantland_state::galaxygn)
-
+void fantland_state::galaxygn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(16'000'000) / 2) // AMD P8088-2
-	MCFG_DEVICE_PROGRAM_MAP(galaxygn_map)
+	I8088(config, m_maincpu, XTAL(16'000'000) / 2); // AMD P8088-2
+	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::galaxygn_map);
 
-	MCFG_DEVICE_ADD("audiocpu", V20, XTAL(7'995'500)) // NEC D70108C-8
-	MCFG_DEVICE_PROGRAM_MAP(fantland_sound_map)
-	MCFG_DEVICE_IO_MAP(galaxygn_sound_iomap)
+	V20(config, m_audiocpu, XTAL(7'995'500)); // NEC D70108C-8
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fantland_state::galaxygn_sound_iomap);
 	// IRQ by YM2151, NMI when soundlatch is written
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(352,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(352,256);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(fantland_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(fantland_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
@@ -887,7 +887,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	ymsnd.irq_handler().set(FUNC(fantland_state::galaxygn_sound_irq));
 	ymsnd.add_route(0, "speaker", 1.0);
 	ymsnd.add_route(1, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 void borntofi_state::machine_start()

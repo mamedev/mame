@@ -291,6 +291,12 @@ void micro3d_state::soundmem_io(address_map &map)
 	map(0xff01, 0xff01).w(FUNC(micro3d_state::micro3d_snd_dac_b));
 }
 
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16("duart irq", [this]() -> u16 { return m_duart->get_irq_vector(); });
+}
+
 
 /*************************************
  *
@@ -303,6 +309,7 @@ void micro3d_state::micro3d(machine_config &config)
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro3d_state::hostmem);
 	m_maincpu->set_vblank_int("screen", FUNC(micro3d_state::micro3d_vblank));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &micro3d_state::cpu_space_map);
 
 	TMS34010(config, m_vgb, 40_MHz_XTAL);
 	m_vgb->set_addrmap(AS_PROGRAM, &micro3d_state::vgbmem);
@@ -465,10 +472,10 @@ ROM_END
 ROM_START( f15se21 )
 	/* Host PCB (MPG DW-00011C-0011-01) */
 	ROM_REGION( 0x180000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "500.hst", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
-	ROM_LOAD16_BYTE( "501.hst", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
-	ROM_LOAD16_BYTE( "502.hst", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
-	ROM_LOAD16_BYTE( "503.hst", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
+	ROM_LOAD16_BYTE( "110-00001-500.u67", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
+	ROM_LOAD16_BYTE( "110-00001-501.u91", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
+	ROM_LOAD16_BYTE( "110-00001-502.u68", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
+	ROM_LOAD16_BYTE( "110-00001-503.u92", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
 
 	ROM_LOAD16_BYTE( "004.hst", 0x080001, 0x20000, CRC(81671ce1) SHA1(51ff641ccbc9dea640a62944910abe73d796b062) )
 	ROM_LOAD16_BYTE( "005.hst", 0x080000, 0x20000, CRC(bdaa7db5) SHA1(52cd832cdd44e609e8cd269469b806e2cd27d63d) )

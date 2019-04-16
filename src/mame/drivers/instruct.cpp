@@ -214,12 +214,12 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 
 		// Check INT sw & key
 		if (BIT(switches, 1))
-			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector);
+			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
 		else
 		// process ac input
 		{
 			m_irqstate ^= 1;
-			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector);
+			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
 		}
 	}
 }

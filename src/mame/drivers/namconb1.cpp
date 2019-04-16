@@ -274,7 +274,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "includes/namconb1.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/namcomcu.h"
 #include "sound/c352.h"
 
 #include "speaker.h"
@@ -797,58 +796,10 @@ READ8_MEMBER(namconb1_state::port7_r)
 // Is this madness?  No, this is Namco.  They didn't have enough digital ports for all 4 players,
 // so the 8 bits of player 3 got routed to the 8 analog inputs.  +5V on the analog input will
 // register full scale, so it works...
-READ8_MEMBER(namconb1_state::dac7_r)// bit 7
+template <int Bit>
+uint16_t namconb1_state::dac_bit_r()
 {
-	return m_p3.read_safe(0xff)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac6_r)// bit 3
-{
-	return (m_p3.read_safe(0xff)<<1)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac5_r)// bit 2
-{
-	return (m_p3.read_safe(0xff)<<2)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac4_r)// bit 1
-{
-	return (m_p3.read_safe(0xff)<<3)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac3_r)// bit 0
-{
-	return (m_p3.read_safe(0xff)<<4)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac2_r)// bit 4
-{
-	return (m_p3.read_safe(0xff)<<5)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac1_r)// bit 5
-{
-	return (m_p3.read_safe(0xff)<<6)&0x80;
-}
-
-READ8_MEMBER(namconb1_state::dac0_r)// bit 6
-{
-	return (m_p3.read_safe(0xff)<<7)&0x80;
-}
-
-void namconb1_state::namcoc75_io(address_map &map)
-{
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namconb1_state::port6_r), FUNC(namconb1_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).r(FUNC(namconb1_state::port7_r));
-	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namconb1_state::dac7_r));
-	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namconb1_state::dac6_r));
-	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namconb1_state::dac5_r));
-	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namconb1_state::dac4_r));
-	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namconb1_state::dac3_r));
-	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namconb1_state::dac2_r));
-	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namconb1_state::dac1_r));
-	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namconb1_state::dac0_r));
+	return (m_p3.read_safe(0xff)<<(7-Bit))&0x80;
 }
 
 
@@ -1043,7 +994,17 @@ void namconb1_state::namconb1(machine_config &config)
 
 	NAMCO_C75(config, m_mcu, MASTER_CLOCK/3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
-	m_mcu->set_addrmap(AS_IO, &namconb1_state::namcoc75_io);
+	m_mcu->p6_in_cb().set(FUNC(namconb1_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namconb1_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namconb1_state::port7_r));
+	m_mcu->an7_cb().set(FUNC(namconb1_state::dac_bit_r<7>));
+	m_mcu->an6_cb().set(FUNC(namconb1_state::dac_bit_r<3>));
+	m_mcu->an5_cb().set(FUNC(namconb1_state::dac_bit_r<2>));
+	m_mcu->an4_cb().set(FUNC(namconb1_state::dac_bit_r<1>));
+	m_mcu->an3_cb().set(FUNC(namconb1_state::dac_bit_r<0>));
+	m_mcu->an2_cb().set(FUNC(namconb1_state::dac_bit_r<4>));
+	m_mcu->an1_cb().set(FUNC(namconb1_state::dac_bit_r<5>));
+	m_mcu->an0_cb().set(FUNC(namconb1_state::dac_bit_r<6>));
 
 	EEPROM_2816(config, "eeprom");
 

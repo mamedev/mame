@@ -550,11 +550,11 @@ READ8_MEMBER( intv_state::intvkb_iocart_r )
 /* Set Reset and INTR/INTRM Vector */
 void intv_state::machine_reset()
 {
-	m_maincpu->set_input_line_vector(CP1610_RESET, 0x1000);
+	m_maincpu->set_input_line_vector(CP1610_RESET, 0x1000); // CP1610
 
 	/* These are actually the same vector, and INTR is unused */
-	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x1004);
-	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x1004);
+	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x1004); // CP1610
+	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x1004); // CP1610
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(cp1610_cpu_device::CP1610_R7, 0x1000);
@@ -598,35 +598,35 @@ void intv_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case INTV_RAM:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd000, 0xd7ff, read16_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd000, 0xd7ff, read16sm_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16sm_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
 				break;
 			case INTV_GFACT:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8800, 0x8fff, read16_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8800, 0x8fff, read16sm_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16sm_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
 				break;
 			case INTV_VOICE:
 				m_cart->late_subslot_setup();
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16sm_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16sm_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
 
 				// passthru for RAM-equipped carts
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16sm_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16sm_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
 				break;
 			case INTV_ECS:
 				m_cart->late_subslot_setup();
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00f0, 0x00ff, read16_delegate(FUNC(intv_cart_slot_device::read_ay),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ay),(intv_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x47ff, read16_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00f0, 0x00ff, read16sm_delegate(FUNC(intv_cart_slot_device::read_ay),(intv_cart_slot_device*)m_cart), write16sm_delegate(FUNC(intv_cart_slot_device::write_ay),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x47ff, read16sm_delegate(FUNC(intv_cart_slot_device::read_ram),(intv_cart_slot_device*)m_cart), write16sm_delegate(FUNC(intv_cart_slot_device::write_ram),(intv_cart_slot_device*)m_cart));
 
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000, 0x2fff, write16_delegate(FUNC(intv_cart_slot_device::write_rom20),(intv_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x7000, 0x7fff, write16_delegate(FUNC(intv_cart_slot_device::write_rom70),(intv_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000, 0xefff, write16_delegate(FUNC(intv_cart_slot_device::write_rome0),(intv_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xf000, 0xffff, write16_delegate(FUNC(intv_cart_slot_device::write_romf0),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000, 0x2fff, write16sm_delegate(FUNC(intv_cart_slot_device::write_rom20),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x7000, 0x7fff, write16sm_delegate(FUNC(intv_cart_slot_device::write_rom70),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000, 0xefff, write16sm_delegate(FUNC(intv_cart_slot_device::write_rome0),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xf000, 0xffff, write16sm_delegate(FUNC(intv_cart_slot_device::write_romf0),(intv_cart_slot_device*)m_cart));
 
 				// passthru for Intellivoice expansion
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0080, 0x0081, read16sm_delegate(FUNC(intv_cart_slot_device::read_speech),(intv_cart_slot_device*)m_cart), write16sm_delegate(FUNC(intv_cart_slot_device::write_speech),(intv_cart_slot_device*)m_cart));
 
 				// passthru for RAM-equipped carts
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8800, 0x8fff, write16sm_delegate(FUNC(intv_cart_slot_device::write_88),(intv_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000, 0xd7ff, write16sm_delegate(FUNC(intv_cart_slot_device::write_d0),(intv_cart_slot_device*)m_cart));
 				break;
 		}
 

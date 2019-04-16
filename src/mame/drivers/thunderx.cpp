@@ -362,7 +362,7 @@ WRITE8_MEMBER(thunderx_state::gbusters_videobank_w)
 
 WRITE8_MEMBER(thunderx_state::sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(thunderx_state::k007232_bankswitch_w)

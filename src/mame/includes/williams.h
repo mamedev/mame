@@ -68,10 +68,10 @@ public:
 	void init_robotron();
 	void init_bubbles();
 
-	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
-	DECLARE_WRITE8_MEMBER(williams_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(defender_video_control_w);
-	DECLARE_READ8_MEMBER(williams_video_counter_r);
+	u8 williams_49way_port_0_r();
+	void williams_snd_cmd_w(u8 data);
+	void defender_video_control_w(u8 data);
+	u8 williams_video_counter_r();
 	DECLARE_WRITE8_MEMBER(williams_watchdog_reset_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
@@ -109,12 +109,12 @@ protected:
 	uint8_t m_blitter_remap_index;
 	const uint8_t *m_blitter_remap;
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
-	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
-	DECLARE_WRITE8_MEMBER(williams_cmos_w);
-	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
-	DECLARE_WRITE8_MEMBER(defender_bank_select_w);
-	DECLARE_READ8_MEMBER(mayday_protection_r);
-	DECLARE_WRITE8_MEMBER(sinistar_vram_select_w);
+	void williams_vram_select_w(u8 data);
+	void williams_cmos_w(offs_t offset, u8 data);
+	void bubbles_cmos_w(offs_t offset, u8 data);
+	void defender_bank_select_w(u8 data);
+	u8 mayday_protection_r(offs_t offset);
+	void sinistar_vram_select_w(u8 data);
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
 
 	DECLARE_MACHINE_START(defender);
@@ -124,7 +124,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 
-	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
+	void playball_snd_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 
@@ -197,12 +197,12 @@ private:
 	uint8_t m_vram_bank;
 	uint8_t m_rom_bank;
 
-	DECLARE_WRITE8_MEMBER(blaster_vram_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_bank_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_remap_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_video_control_w);
+	void blaster_vram_select_w(u8 data);
+	void blaster_bank_select_w(u8 data);
+	void blaster_remap_select_w(u8 data);
+	void blaster_video_control_w(u8 data);
 	TIMER_CALLBACK_MEMBER(blaster_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
+	void blaster_snd_cmd_w(u8 data);
 
 	DECLARE_MACHINE_START(blaster);
 	DECLARE_VIDEO_START(blaster);
@@ -244,20 +244,20 @@ protected:
 	uint8_t m_williams2_tilemap_config;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_WRITE8_MEMBER(williams2_bank_select_w);
+	void williams2_bank_select_w(u8 data);
 	DECLARE_WRITE8_MEMBER(williams2_watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(williams2_7segment_w);
-	DECLARE_WRITE8_MEMBER(williams2_paletteram_w);
-	DECLARE_WRITE8_MEMBER(williams2_fg_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_bg_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_tileram_w);
-	DECLARE_WRITE8_MEMBER(williams2_xscroll_low_w);
-	DECLARE_WRITE8_MEMBER(williams2_xscroll_high_w);
-	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
+	void williams2_7segment_w(u8 data);
+	void williams2_paletteram_w(offs_t offset, u8 data);
+	void williams2_fg_select_w(u8 data);
+	void williams2_bg_select_w(u8 data);
+	void williams2_tileram_w(offs_t offset, u8 data);
+	void williams2_xscroll_low_w(u8 data);
+	void williams2_xscroll_high_w(u8 data);
+	void williams2_blit_window_enable_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
 	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
+	void williams2_snd_cmd_w(u8 data);
 
 	DECLARE_MACHINE_START(williams2);
 	DECLARE_MACHINE_RESET(williams2);
@@ -290,7 +290,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	void lamp_w(u8 data);
 
 	DECLARE_MACHINE_START(tshoot);
 

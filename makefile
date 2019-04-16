@@ -1582,7 +1582,7 @@ clean: genieclean
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 	-@rm -rf 3rdparty/bgfx/.build
 
-GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
@@ -1606,7 +1606,7 @@ generate: \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/mame/drivers/ymmu100.hxx \
+		$(GENDIR)/mame/machine/mulcd.hxx \
 		$(SRC)/devices/cpu/m68000/m68kops.cpp \
 		$(GENDIR)/includes/SDL2
 
@@ -1625,14 +1625,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.207"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.208"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.207" > $@
+	@echo #define BARE_BUILD_VERSION "0.208" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1644,9 +1644,9 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 	@echo Compressing $<...
 	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/mame/drivers/ymmu100.hxx: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
+$(GENDIR)/mame/machine/mulcd.hxx: $(SRC)/mame/machine/mulcd.ppm scripts/build/file2str.py
 	@echo Converting $<...
-	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg uint8_t
+	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ mulcd_bkg uint8_t
 
 $(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
 ifeq ($(TARGETOS),asmjs)

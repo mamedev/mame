@@ -96,7 +96,7 @@ INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 
 WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -319,28 +319,28 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(espial_state::espial)
-
+void espial_state::espial(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(espial_map)
+	Z80(config, m_maincpu, 3072000);   /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &espial_state::espial_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(espial_state::espial_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
-	MCFG_DEVICE_PROGRAM_MAP(espial_sound_map)
-	MCFG_DEVICE_IO_MAP(espial_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
+	Z80(config, m_audiocpu, 3072000);  /* 2 MHz?????? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &espial_state::espial_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &espial_state::espial_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(espial_state::espial_sound_nmi_gen), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(espial_state::screen_update_espial));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_espial);
 	PALETTE(config, m_palette, FUNC(espial_state::espial_palette), 256);
@@ -352,22 +352,21 @@ MACHINE_CONFIG_START(espial_state::espial)
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(espial_state::netwars)
+void espial_state::netwars(machine_config &config)
+{
 	espial(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(netwars_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &espial_state::netwars_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(32*8, 64*8)
+	subdevice<screen_device>("screen")->set_size(32*8, 64*8);
 
 	MCFG_VIDEO_START_OVERRIDE(espial_state,netwars)
-MACHINE_CONFIG_END
+}
 
 
 

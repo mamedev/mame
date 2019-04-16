@@ -138,8 +138,7 @@ private:
 
 uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = generic_space();
-	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
@@ -159,7 +158,7 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco104->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -168,7 +167,7 @@ WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 WRITE_LINE_MEMBER( dblewing_state::soundlatch_irq_w )
@@ -352,17 +351,17 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 	return 0; // sprites always on top?
 }
 
-MACHINE_CONFIG_START(dblewing_state::dblewing)
-
+void dblewing_state::dblewing(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
-	MCFG_DEVICE_PROGRAM_MAP(dblewing_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(28'000'000)/2);   /* DE102 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dblewing_state::dblewing_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &dblewing_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dblewing_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'220'000)/9)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io)
+	Z80(config, m_audiocpu, XTAL(32'220'000)/9);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dblewing_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &dblewing_state::sound_io);
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
@@ -370,19 +369,18 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.443)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dblewing_state, screen_update_dblewing)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58.443);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(dblewing_state::screen_update_dblewing));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 4096);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dblewing);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -418,9 +416,8 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 

@@ -175,10 +175,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
 
@@ -563,8 +563,8 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-MACHINE_CONFIG_START(_1942_state::_1942)
-
+void _1942_state::_1942(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 4 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
@@ -611,21 +611,19 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	/* NETLIST configuration using internal AY8910 resistor values */
 
 	/* Minimize resampling between ay8910 and netlist */
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, AUDIO_CLOCK / 8 / 2)
-	MCFG_NETLIST_SETUP(nl_1942)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 3, "R_AY2_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 4, "R_AY2_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 5, "R_AY2_3.R")
+	NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2)
+		.set_source(NETLIST_NAME(nl_1942))
+		.add_route(ALL_OUTPUTS, "mono", 5.0);
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin3", 3, "R_AY2_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin4", 4, "R_AY2_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin5", 5, "R_AY2_3.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "R1.1")
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "R1.1").set_mult_offset(70000.0, 0.0);
 	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "VR.2")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(70000.0, 0.0)
-
-MACHINE_CONFIG_END
+}
 
 
 void _1942p_state::_1942p(machine_config &config)
@@ -653,7 +651,6 @@ void _1942p_state::_1942p(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(_1942p_state::screen_update));
 	screen.set_palette(m_palette);
-
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -25,7 +25,6 @@ TODO:
 #include "machine/cdicdic.h"
 #include "includes/cdi.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cdrom.h"
 #include "romload.h"
 #include "sound/cdda.h"
@@ -560,8 +559,7 @@ void cdicdic_device::sample_trigger()
 
 		// Set the CDIC interrupt line
 		verboselog(*this, 0, "%s", "Setting CDIC interrupt line for soundmap decode\n" );
-		m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+		m_int_callback(ASSERT_LINE);
 	}
 	else
 	{
@@ -713,8 +711,7 @@ void cdicdic_device::process_delayed_command()
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(*this, 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
-					m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-					m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+					m_int_callback(ASSERT_LINE);
 				}
 				else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 				{
@@ -732,8 +729,7 @@ void cdicdic_device::process_delayed_command()
 					{
 						//printf( "Setting CDIC interrupt line\n" );
 						verboselog(*this, 0, "%s", "Setting CDIC interrupt line for message sector\n" );
-						m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-						m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+						m_int_callback(ASSERT_LINE);
 					}
 					else
 					{
@@ -752,8 +748,7 @@ void cdicdic_device::process_delayed_command()
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(*this, 0, "%s", "Setting CDIC interrupt line for data sector\n" );
-					m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-					m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+					m_int_callback(ASSERT_LINE);
 				}
 
 				if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
@@ -847,8 +842,7 @@ void cdicdic_device::process_delayed_command()
 			}
 
 			verboselog(*this, 0, "%s", "Setting CDIC interrupt line for CDDA sector\n" );
-			m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+			m_int_callback(ASSERT_LINE);
 			break;
 		}
 		case 0x2c: // Seek
@@ -898,8 +892,7 @@ void cdicdic_device::process_delayed_command()
 			m_time = next_msf << 8;
 
 			verboselog(*this, 0, "%s", "Setting CDIC interrupt line for Seek sector\n" );
-			m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+			m_int_callback(ASSERT_LINE);
 			break;
 		}
 	}
@@ -945,7 +938,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			m_audio_buffer &= 0x7fff;
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
-				m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+				m_int_callback(CLEAR_LINE);
 				verboselog(*this, 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
@@ -959,7 +952,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			m_x_buffer &= 0x7fff;
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
-				m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+				m_int_callback(CLEAR_LINE);
 				verboselog(*this, 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
@@ -1049,7 +1042,6 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 			uint32_t count = m_scc->dma().channel[0].transfer_counter;
 			uint32_t index = 0;
 			uint32_t device_index = (data & 0x3fff) >> 1;
-			address_space &memory_space = m_maincpu->space(AS_PROGRAM);
 			verboselog(*this, 0, "memory address counter: %08x\n", m_scc->dma().channel[0].memory_address_counter);
 			verboselog(*this, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
 			verboselog(*this, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
@@ -1058,11 +1050,11 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 			{
 				if(m_scc->dma().channel[0].operation_control & OCR_D)
 				{
-					memory_space.write_word(index * 2, m_ram[device_index++]);
+					m_memory_space->write_word(index * 2, m_ram[device_index++]);
 				}
 				else
 				{
-					m_ram[device_index++] = memory_space.read_word(index * 2);
+					m_ram[device_index++] = m_memory_space->read_word(index * 2);
 				}
 			}
 			m_scc->dma().channel[0].memory_address_counter += m_scc->dma().channel[0].transfer_counter * 2;
@@ -1159,12 +1151,24 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 
 cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDI_CDIC, tag, owner, clock)
-	, m_maincpu(*this, ":maincpu")
+	, m_int_callback(*this)
+	, m_memory_space(*this, ":maincpu", AS_PROGRAM)
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_scc(*this, ":scc68070")
 	, m_cdda(*this, ":cdda")
 	, m_cdrom_dev(*this, ":cdrom")
 {
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void cdicdic_device::device_resolve_objects()
+{
+	m_int_callback.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -1233,6 +1237,8 @@ void cdicdic_device::device_reset()
 		m_cd = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 		m_cdda->set_cdrom(m_cd);
 	}
+
+	m_int_callback(CLEAR_LINE);
 }
 
 WRITE16_MEMBER( cdicdic_device::ram_w )

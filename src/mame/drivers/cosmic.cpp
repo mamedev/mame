@@ -340,7 +340,15 @@ READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (m_in_ports[0]->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
+	if (offset >= 4)
+		return BIT(m_in_ports[0]->read(), offset);
+	else
+		return BIT(m_screen->vpos(), offset + 4);
+}
+
+READ8_MEMBER(cosmic_state::cosmicg_port_1_r)
+{
+	return BIT(m_in_ports[1]->read(), offset);
 }
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
@@ -415,10 +423,10 @@ void cosmic_state::cosmicg_map(address_map &map)
 
 void cosmic_state::cosmicg_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(FUNC(cosmic_state::cosmicg_port_0_r));
-	map(0x01, 0x01).portr("IN1");
-	map(0x00, 0x15).w(FUNC(cosmic_state::cosmicg_output_w));
-	map(0x16, 0x17).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x0000, 0x000f).r(FUNC(cosmic_state::cosmicg_port_0_r));
+	map(0x0010, 0x001f).r(FUNC(cosmic_state::cosmicg_port_1_r));
+	map(0x0000, 0x002b).w(FUNC(cosmic_state::cosmicg_output_w));
+	map(0x002c, 0x002f).w(FUNC(cosmic_state::cosmic_color_register_w));
 }
 
 
@@ -1026,10 +1034,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
 }
 
 

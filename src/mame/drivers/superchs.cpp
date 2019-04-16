@@ -122,8 +122,8 @@ void superchs_state::superchs_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram().share("ram");
 	map(0x140000, 0x141fff).ram().share("spriteram");
-	map(0x180000, 0x18ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
-	map(0x1b0000, 0x1b002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x180000, 0x18ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));
+	map(0x1b0000, 0x1b002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x200000, 0x20ffff).ram().share("shared_ram");
 	map(0x240000, 0x240003).w(FUNC(superchs_state::cpua_ctrl_w));
 	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
@@ -136,7 +136,7 @@ void superchs_state::superchs_cpub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x20ffff).ram();
-	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
+	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::ram_w)); /* Only written upon errors */
 	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
 	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
@@ -146,7 +146,7 @@ void superchs_state::chase3_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x400000, 0x40ffff).ram();
-	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
+	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::ram_w)); /* Only written upon errors */
 	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
 	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
@@ -268,7 +268,7 @@ void superchs_state::superchs(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);

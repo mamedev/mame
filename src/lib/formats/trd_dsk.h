@@ -7,9 +7,10 @@
     TRD disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_TRD_DSK_H
+#define MAME_FORMATS_TRD_DSK_H
 
-#ifndef TRD_DSK_H
-#define TRD_DSK_H
+#pragma once
 
 #include "wd177x_dsk.h"
 
@@ -27,4 +28,4 @@ private:
 
 extern const floppy_format_type FLOPPY_TRD_FORMAT;
 
-#endif /* TRD_DSK_H */
+#endif // MAME_FORMATS_TRD_DSK_H

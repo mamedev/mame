@@ -336,7 +336,7 @@ void sexpert_state::sexpert(machine_config &config)
 	m_screen->set_refresh_hz(60); // arbitrary
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(6*16+1, 10);
-	m_screen->set_visarea(0, 6*16, 0, 10-1);
+	m_screen->set_visarea_full();
 	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	m_screen->set_palette("palette");
 

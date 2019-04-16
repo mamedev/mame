@@ -44,7 +44,7 @@ Notes:
 
 WRITE8_MEMBER(nbmj8991_state::soundbank_w)
 {
-	if (!(data & 0x80)) m_soundlatch->clear_w(space, 0, 0);
+	if (!(data & 0x80)) m_soundlatch->clear_w();
 	membank("bank1")->set_entry(data & 0x03);
 }
 

@@ -93,14 +93,16 @@ uint32_t pic8259_device::acknowledge()
 		/* is this IRQ pending and enabled? */
 		if ((m_irr & mask) && !(m_imr & mask))
 		{
-			LOG("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
-			if (!m_level_trig_mode)
-				m_irr &= ~mask;
+			if (!machine().side_effects_disabled()) {
+				LOG("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
+				if (!m_level_trig_mode)
+					m_irr &= ~mask;
 
-			if (!m_auto_eoi)
-				m_isr |= mask;
+				if (!m_auto_eoi)
+					m_isr |= mask;
 
-			set_timer();
+				set_timer();
+			}
 
 			if ((m_cascade!=0) && (m_master!=0) && (mask & m_slave))
 			{
@@ -122,7 +124,8 @@ uint32_t pic8259_device::acknowledge()
 			}
 		}
 	}
-	logerror("Spurious IRQ\n");
+	if (!machine().side_effects_disabled())
+		logerror("Spurious IRQ\n");
 	if (is_x86())
 		return m_base + 7;
 	else

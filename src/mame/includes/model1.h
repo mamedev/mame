@@ -57,6 +57,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
 		, m_digits(*this, "digit%u", 0U)
+		, m_outs(*this, "out%u", 0U)
 	{
 	}
 
@@ -505,16 +506,16 @@ private:
 
 	// I/O related
 	output_finder<2> m_digits;
+	output_finder<8> m_outs;
 	DECLARE_READ8_MEMBER(dpram_r);
+	DECLARE_WRITE8_MEMBER(gen_outputs_w);
 	DECLARE_WRITE8_MEMBER(vf_outputs_w);
 	DECLARE_WRITE8_MEMBER(vr_outputs_w);
 	DECLARE_WRITE8_MEMBER(swa_outputs_w);
 	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
 	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
 	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
+	DECLARE_WRITE8_MEMBER(drive_board_w);
 };
-
-
-/*----------- defined in machine/model1.c -----------*/
 
 #endif // MAME_INCLUDES_MODEL1_H

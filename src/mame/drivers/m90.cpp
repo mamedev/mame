@@ -701,30 +701,28 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int sample = m_audio->sample_r(space,0);
+	int sample = m_audio->sample_r();
 	if (sample)
-		m_audio->sample_w(space,0,sample);
+		m_audio->sample_w(sample);
 }
 
 INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int sample = m_audio->sample_r(space,0);
+	int sample = m_audio->sample_r();
 	if (sample != 0x80)
-		m_audio->sample_w(space,0,sample);
+		m_audio->sample_w(sample);
 }
 
 WRITE_LINE_MEMBER(m90_state::dynablsb_vblank_int_w)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4); // V30
 }
 
 WRITE_LINE_MEMBER(m90_state::bomblord_vblank_int_w)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4); // V30
 }
 
 
@@ -765,7 +763,8 @@ void m90_state::m90(machine_config &config)
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
 
-	IREM_M72_AUDIO(config, "m72");
+	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
@@ -894,7 +893,7 @@ ROM_START( hasamu )
 	ROM_LOAD( "hasc-c2.bin",    0x040000, 0x20000, CRC(d90f9a68) SHA1(c9eab3e87dd5d3eb88461be493d88f5482c9e257) )
 	ROM_LOAD( "hasc-c3.bin",    0x060000, 0x20000, CRC(6cfe0d39) SHA1(104feeacbbc86b168c41cd37fc5797781d9b5a0f) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* No samples */
 ROM_END
 
@@ -913,7 +912,7 @@ ROM_START( dynablst )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) )
 ROM_END
 
@@ -932,7 +931,7 @@ ROM_START( bombrman )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) )
 ROM_END
 
@@ -951,7 +950,7 @@ ROM_START( atompunk )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) ) /* Labeled as 9134HD002 */
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) ) /* Labeled as 9134HD003 */
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) ) /* Labeled as 9132E9001 */
 ROM_END
 
@@ -970,7 +969,7 @@ ROM_START( dynablstb )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
@@ -989,7 +988,7 @@ ROM_START( dynablstb2 )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
@@ -1019,7 +1018,7 @@ ROM_START( dynablstb3 )
 	ROM_LOAD( "5.ic108",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "4.ic107",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
@@ -1077,7 +1076,7 @@ ROM_START( bbmanw )
 	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
 	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
 
-	ROM_REGION( 0x20000, "samples", 0 )
+	ROM_REGION( 0x20000, "m72", 0 )
 	ROM_LOAD( "bbm2-v0.30",    0x0000, 0x20000, CRC(4ad889ed) SHA1(b685892a2348f17f89c6d6ce91216f6cf1e33751) )
 ROM_END
 
@@ -1096,7 +1095,7 @@ ROM_START( bbmanwj )
 	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
 	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bbm2-v0-b.30",  0x0000, 0x20000, CRC(0ae655ff) SHA1(78752182662fd8f5b55bbbc2787c9f2b04096ea1) )
 ROM_END
 
@@ -1115,7 +1114,7 @@ ROM_START( bbmanwja )
 	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
 	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bbm2-v0-b.30",  0x0000, 0x20000, CRC(0ae655ff) SHA1(78752182662fd8f5b55bbbc2787c9f2b04096ea1) )
 ROM_END
 
@@ -1134,7 +1133,7 @@ ROM_START( newapunk )
 	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
 	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
 	ROM_LOAD( "bbm2-v0.30",    0x0000, 0x20000, CRC(4ad889ed) SHA1(b685892a2348f17f89c6d6ce91216f6cf1e33751) )
 ROM_END
 
@@ -1157,7 +1156,7 @@ ROM_START( bomblord )
 	// ROM_LOAD( "bomblord.7",  0x100000, 0x40000, CRC(68935e94) SHA1(6725c7ad49bd0ee6ed1db22193852a11cdf95aaa) )
 	ROM_LOAD( "27c020_8.u72",  0x180000, 0x40000, CRC(6a423b24) SHA1(d30dac90a7dc2a616714eae7450ae0edef566c31) )
 
-	ROM_REGION( 0x20000, "samples", 0 )
+	ROM_REGION( 0x20000, "m72", 0 )
 	ROM_LOAD( "27c010_2.u104",    0x0000, 0x20000, CRC(37d356bd) SHA1(15f187954f94e2b1a4757e4a27ab7be9598972ff) )
 
 	ROM_REGION( 0x700, "plds", ROMREGION_ERASE00 ) // all read protected
@@ -1185,7 +1184,7 @@ ROM_START( quizf1 )
 	ROM_LOAD( "qf1-c2-.83",   0x100000, 0x80000, CRC(0b1460ae) SHA1(c6394e6bb2a4e3722c20d9f291cb6ba7aad5766d) )
 	ROM_LOAD( "qf1-c3-.84",   0x180000, 0x80000, CRC(2d32ff37) SHA1(f414f6bad1ffc4396fd757155e602bdefdc99408) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
 	ROM_LOAD( "qf1-v0-.30",   0x0000, 0x40000, CRC(b8d16e7c) SHA1(28a20afb171dc68848f9fe793f53571d4c7502dd) )
 ROM_END
 
@@ -1204,7 +1203,7 @@ ROM_START( riskchal )
 	ROM_LOAD( "rc_c2.rom",    0x100000, 0x80000, CRC(687164d7) SHA1(0f0beb0a85ae5ae4434d1e45a27bbe67f5ee378a) )
 	ROM_LOAD( "rc_c3.rom",    0x180000, 0x80000, CRC(c86be6af) SHA1(c8a66b8b38a62e3eebb4a0e65a85e20f91182097) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
 	ROM_LOAD( "rc_v0.rom",    0x0000, 0x40000, CRC(cddac360) SHA1(a3b18325991473c6d54b778a02bed86180aad37c) )
 ROM_END
 
@@ -1223,7 +1222,7 @@ ROM_START( gussun )
 	ROM_LOAD( "rc_c2.rom",    0x100000, 0x80000, CRC(687164d7) SHA1(0f0beb0a85ae5ae4434d1e45a27bbe67f5ee378a) )
 	ROM_LOAD( "rc_c3.rom",    0x180000, 0x80000, CRC(c86be6af) SHA1(c8a66b8b38a62e3eebb4a0e65a85e20f91182097) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
 	ROM_LOAD( "rc_v0.rom",    0x0000, 0x40000, CRC(cddac360) SHA1(a3b18325991473c6d54b778a02bed86180aad37c) )
 ROM_END
 
@@ -1242,7 +1241,7 @@ ROM_START( matchit2 )
 	ROM_LOAD( "ic83.rom",     0x100000, 0x80000, CRC(2bd65dc6) SHA1(b50dec707ea5a71972df0a8dc47141d75e8f874e) )
 	ROM_LOAD( "ic84.rom",     0x180000, 0x80000, CRC(876d5fdb) SHA1(723c58268be60f4973e914df238b264708d3f1e3) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* Does this have a sample rom? */
 ROM_END
 
@@ -1261,7 +1260,7 @@ ROM_START( shisen2 )
 	ROM_LOAD( "ic83.rom",     0x100000, 0x80000, CRC(2bd65dc6) SHA1(b50dec707ea5a71972df0a8dc47141d75e8f874e) )
 	ROM_LOAD( "ic84.rom",     0x180000, 0x80000, CRC(876d5fdb) SHA1(723c58268be60f4973e914df238b264708d3f1e3) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	ROM_REGION( 0x20000, "m72", ROMREGION_ERASE00 ) /* samples */
 	/* Does this have a sample rom? */
 ROM_END
 

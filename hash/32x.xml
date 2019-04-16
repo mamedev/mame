@@ -112,8 +112,63 @@
 		</part>
 	</software>
 
+	<!-- Dump by Radar -->
+	<software name="pinochio">
+		<description>Pinocchio (Euro, Prototype 19951206)</description>
+		<year>1995</year>
+		<publisher>Virgin</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="_32x_cart">
+			<feature name="pcb" value="837-11069" />
+			<feature name="ic1" value="EPROM [M27C4001]" />
+			<feature name="ic2" value="EPROM [M27C4001]" />
+			<feature name="ic3" value="EPROM [M27C4001]" />
+			<feature name="ic4" value="EPROM [M27C4001]" />
+			<feature name="ic5" value="EPROM [M27C4001]" />
+			<feature name="ic6" value="EPROM [M27C4001]" />
+			<feature name="ic7" value="EPROM [M27C4001]" />
+			<feature name="ic8" value="EPROM [M27C4001]" />
+			<feature name="u015" value="SRAM [HM62256ALFP-10T]" />
+			<feature name="u016" value="315-5709" />
+			<feature name="u0114" value="26B" />
+			<feature name="u0116" value="HC32" />
+			<feature name="u0125" value="ALS245A" />
+			<feature name="u0126" value="ALS245A" />
+			<feature name="u0127" value="ALS245A" />
+			<feature name="u0129" value="ALS245A" />
+			<feature name="u0130" value="ALS245A" />
+			<feature name="u0131" value="HC139" />
+			<feature name="dipswitch" value="SW0135" /> <!-- ('.'.'') -->
+			<feature name="battery" value="[empty]" />
+			<dataarea name="rom" size="4194304">
+				<rom name="u1.ic1" size="524288" crc="1553d1c6" sha1="18f00cbf8278ed709ec02cc2e5808ef4d0c479c1" offset="000000" />
+				<rom name="u2.ic2" size="524288" crc="eff61056" sha1="e4693a6ea0b4498a13a1bf00e8064139f02e03ad" offset="0x80000" />
+				<rom name="u3.ic2" size="524288" crc="218a0656" sha1="6a0cd97ab525a9d1dd10263bdd022427eddfeefe" offset="0x100000" />
+				<rom name="u4.ic2" size="524288" crc="1c39dbd1" sha1="57331a3a680852251a0780559238c2cc3c1d1ad0" offset="0x180000" />
+				<rom name="u5.ic2" size="524288" crc="6cbe0e12" sha1="830b81eb6db6487612f13999a671e98b9f782236" offset="0x200000" />
+				<rom name="u6.ic2" size="524288" crc="70ee204d" sha1="4b476e494faf041439b4cb1916654eb231f6f49e" offset="0x280000" />
+				<rom name="u7.ic2" size="524288" crc="63e613df" sha1="b40b7a72ece079452a1417f526a00473da7d3b7f" offset="0x300000" />
+				<rom name="u8.ic2" size="524288" crc="7ecb16f0" sha1="9668cb5addd612fd34f3740155adfe3b64e4fec1" offset="0x380000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dump by Porchy -->
+	<software name="cf2">
+		<description>Clay Fighter 2 (Euro, USA, Jpn, Prototype 19950429)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
+		<part name="cart" interface="_32x_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="clayfighter 2 32x odd 4-28-95.u1"  size="524288" crc="55cd507f" sha1="82a620ad9d8de5cdda5504401625dc44011c4444" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="clayfighter 2 32x even 4-29-95.u2" size="524288" crc="5cc3c228" sha1="7ebad951b63619c65b848018a774082364d57964" offset="0x000000" loadflag="load16_byte"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Old interleaved/unconfirmed dump -->
-<!-- PCB info and part numbers are taken from SMS Power and from nepereny's PCB pictures ando other sources -->
+<!-- PCB info and part numbers are taken from SMS Power and from nepereny's PCB pictures and other sources -->
 
 	<software name="aburner">
 		<description>After Burner Complete (Euro)</description>
@@ -1123,19 +1178,6 @@
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 1229 - dec 30, 1994, 15.31).bin" size="4194304" crc="36a294e0" sha1="883c7748c3c352b44238d2bdc9152ac9651e99fb" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cf2">
-		<description>Clay Fighter 2 (Jpn, USA, Euro Prototype)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="clay_fighter_2_32x_odd_4_28_95.u1"  size="524288" crc="55cd507f" sha1="82a620ad9d8de5cdda5504401625dc44011c4444" offset="0x000001" loadflag="load16_byte"/>
-				<rom name="clay_fighter_2_32x_even_4_29_95.u2" size="524288" crc="5cc3c228" sha1="7ebad951b63619c65b848018a774082364d57964" offset="0x000000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>

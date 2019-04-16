@@ -3,12 +3,13 @@
 /*
  * NEC PC-6001 cassette format handling
  */
+#ifndef MAME_FORMATS_PC6001_CAS_H
+#define MAME_FORMATS_PC6001_CAS_H
 
-#ifndef PC6001_CAS_H_
-#define PC6001_CAS_H_
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( pc6001_cassette_formats );
 
-#endif /*PC6001_CAS_H_*/
+#endif // MAME_FORMATS_PC6001_CAS_H

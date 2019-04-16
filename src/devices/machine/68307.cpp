@@ -34,9 +34,14 @@ WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 
 
 
-void m68307_cpu_device::m68307_internal_map(address_map &map)
+void m68307_cpu_device::internal_map(address_map &map)
 {
 	map(0x000000f0, 0x000000ff).rw(FUNC(m68307_cpu_device::m68307_internal_base_r), FUNC(m68307_cpu_device::m68307_internal_base_w));
+}
+
+void m68307_cpu_device::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).r(FUNC(m68307_cpu_device::int_ack)).umask16(0x00ff);
 }
 
 
@@ -52,7 +57,7 @@ void m68307_cpu_device::device_add_mconfig(machine_config &config)
 
 
 m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, address_map_constructor(FUNC(m68307_cpu_device::m68307_internal_map), this)),
+	: m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, address_map_constructor(FUNC(m68307_cpu_device::internal_map), this)),
 	m_write_irq(*this),
 	m_write_a_tx(*this),
 	m_write_b_tx(*this),
@@ -68,6 +73,8 @@ m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *
 	m_m68307_scrlow = 0;
 	m_m68307_currentcs = 0;
 	m_ipl = 0;
+
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(m68307_cpu_device::cpu_space_map), this);
 }
 
 
@@ -88,6 +95,14 @@ void m68307_cpu_device::device_reset()
 	m_m68307_scrlow = 0xf010;
 
 	set_ipl(0);
+}
+
+void m68307_cpu_device::m68k_reset_peripherals()
+{
+	m_duart->reset();
+
+	if (m_m68307MBUS) m_m68307MBUS->reset();
+	if (m_m68307TIMER) m_m68307TIMER->reset();
 }
 
 
@@ -207,21 +222,17 @@ void m68307_cpu_device::licr2_interrupt()
 		set_ipl(prioritylevel);
 }
 
-IRQ_CALLBACK_MEMBER(m68307_cpu_device::int_ack)
+uint8_t m68307_cpu_device::int_ack(offs_t offset)
 {
-	uint8_t type = m_m68307SIM->get_int_type(this, irqline);
-	logerror("Interrupt acknowledged: level %d, type %01X\n", irqline, type);
+	uint8_t type = m_m68307SIM->get_int_type(this, offset);
+	if (!machine().side_effects_disabled())
+		logerror("Interrupt acknowledged: level %d, type %01X\n", offset, type);
 
 	// UART provides its own vector
 	if (type == 0x0c)
 		return m_duart->get_irq_vector();
 	else
 		return (m_m68307SIM->m_pivr & 0xf0) | type;
-}
-
-void m68307_cpu_device::device_config_complete()
-{
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(m68307_cpu_device::int_ack), this));
 }
 
 void m68307_cpu_device::device_start()

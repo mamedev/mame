@@ -87,10 +87,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { m_pio->strobe_a(state); }
 	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { m_pio->strobe_b(state); }
 
-	DECLARE_WRITE8_MEMBER( pa_w ) { m_pio->pa_w(space, offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->pa_r(space, offset, mem_mask); }
-	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->pb_w(space, offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->pb_r(space, offset, mem_mask); }
+	DECLARE_WRITE8_MEMBER( pa_w ) { m_pio->port_a_write(data); }
+	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->port_a_read(); }
+	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->port_b_write(data); }
+	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->port_b_read(); }
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { m_pio->pa0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { m_pio->pa1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { m_pio->pa2_w(state); }

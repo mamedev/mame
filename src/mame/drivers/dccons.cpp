@@ -392,7 +392,7 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
+	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -433,8 +433,14 @@ void dc_cons_state::dc_port(address_map &map)
 void dc_cons_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x001fffff).ram().share("dc_sound_ram");        /* shared with SH-4 */
+	map(0x00000000, 0x001fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));        /* shared with SH-4 */
 	map(0x00800000, 0x00807fff).rw(FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
+}
+
+void dc_cons_state::aica_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("dc_sound_ram");
 }
 
 static INPUT_PORTS_START( dc )
@@ -593,7 +599,8 @@ void dc_cons_state::gdrom_config(device_t *device)
 	MCFG_SOUND_ROUTE(1, "^^aica", 1.0)
 }
 
-MACHINE_CONFIG_START(dc_cons_state::dc)
+void dc_cons_state::dc(machine_config &config)
+{
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
@@ -611,8 +618,8 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
+	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_audio_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
@@ -658,10 +665,10 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	dcctrl3.set_port_tag<7>("P4:A5");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
-	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480); /* TODO: where pclk actually comes? */
+	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
+	PALETTE(config, "palette").set_entries(0x1000);
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
@@ -669,9 +676,9 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	SPEAKER(config, "rspeaker").front_right();
 
 	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	m_aica->set_master(true);
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
 	m_aica->add_route(0, "lspeaker", 1.0);
 	m_aica->add_route(1, "rspeaker", 1.0);
 
@@ -680,13 +687,13 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	ATA_INTERFACE(config, m_ata, 0);
 	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
-	MCFG_DEVICE_MODIFY("ata:0")
-	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
-	MCFG_SLOT_DEFAULT_OPTION("gdrom")
+	ata_slot_device &ata_0(*subdevice<ata_slot_device>("ata:0"));
+	ata_0.option_add("gdrom", GDROM);
+	ata_0.set_option_machine_config("gdrom", gdrom_config);
+	ata_0.set_default_option("gdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("dc");
-MACHINE_CONFIG_END
+}
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \

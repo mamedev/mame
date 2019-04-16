@@ -185,7 +185,7 @@ void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 // ----------------------------------------------------------------------------------------
 
 detail::netlist_ref::netlist_ref(netlist_state_t &nl)
-: m_netlist(nl.setup().exec()) { }
+: m_netlist(nl.exec()) { }
 
 // ----------------------------------------------------------------------------------------
 // object_t
@@ -237,9 +237,7 @@ detail::terminal_type detail::core_terminal_t::type() const
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbacks)
-	: m_state(plib::make_unique<netlist_state_t>(aname,
-		std::move(callbacks),
-		plib::make_unique<setup_t>(*this))) // FIXME, ugly but needed to have netlist_state_t constructed first
+	: m_state(plib::make_unique<netlist_state_t>(aname, *this, std::move(callbacks)))
 	, m_solver(nullptr)
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
@@ -256,13 +254,14 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 // ----------------------------------------------------------------------------------------
 
 netlist_state_t::netlist_state_t(const pstring &aname,
-	plib::unique_ptr<callbacks_t> &&callbacks,
-	plib::unique_ptr<setup_t> &&setup)
+	netlist_t & anetlist,
+	plib::unique_ptr<callbacks_t> &&callbacks)
 : m_name(aname)
+, m_netlist(anetlist)
 , m_state()
 , m_callbacks(std::move(callbacks)) // Order is important here
 , m_log(*m_callbacks)
-, m_setup(std::move(setup))
+, m_setup(plib::make_unique<setup_t>(*this))
 {
 	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 	m_lib = plib::make_unique<plib::dynlib>(libpath);
@@ -989,12 +988,9 @@ pstring param_t::get_initial(const device_t &dev, bool *found)
 	return res;
 }
 
-
-const pstring param_model_t::model_type()
+const pstring param_model_t::type()
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return m_map["COREMODEL"];
+	return state().setup().models().type(str());
 }
 
 param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
@@ -1017,27 +1013,22 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
 void param_model_t::changed()
 {
 	state().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
-	m_map.clear();
 }
 
-const pstring param_model_t::model_value_str(const pstring &entity)
+const pstring param_model_t::value_str(const pstring &entity)
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return state().setup().model_value_str(m_map, entity);
+	return state().setup().models().value_str(str(), entity);
 }
 
-nl_double param_model_t::model_value(const pstring &entity)
+nl_double param_model_t::value(const pstring &entity)
 {
-	if (m_map.size() == 0)
-		state().setup().model_parse(this->Value(), m_map);
-	return state().setup().model_value(m_map, entity);
+	return state().setup().models().value(str(), entity);
 }
 
 
 plib::unique_ptr<plib::pistream> param_data_t::stream()
 {
-	return device().setup().get_data_stream(Value());
+	return device().setup().get_data_stream(str());
 }
 
 	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
@@ -1045,10 +1036,31 @@ plib::unique_ptr<plib::pistream> param_data_t::stream()
 		return dynamic_cast<const logic_t *>(this) != nullptr;
 	}
 
+	bool detail::core_terminal_t::is_logic_input() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_input_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_logic_output() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_output_t *>(this) != nullptr;
+	}
+
 	bool detail::core_terminal_t::is_analog() const NL_NOEXCEPT
 	{
 		return dynamic_cast<const analog_t *>(this) != nullptr;
 	}
+
+	bool detail::core_terminal_t::is_analog_input() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_input_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_analog_output() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_output_t *>(this) != nullptr;
+	}
+
 
 	bool detail::net_t::is_logic() const NL_NOEXCEPT
 	{

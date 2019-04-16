@@ -190,6 +190,11 @@ void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 READ8_MEMBER( a2bus_transwarp_device::dma_r )
 {
+	if (offset == 0xc070)
+	{
+		hit_slot_joy();
+	}
+
 	if ((offset >= 0xc090) && (offset <= 0xc0ff))
 	{
 		hit_slot(((offset >> 4) & 0xf) - 8);
@@ -211,6 +216,11 @@ READ8_MEMBER( a2bus_transwarp_device::dma_r )
 WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 {
 	//if ((offset >= 0xc070) && (offset <= 0xc07f)) printf("%02x to %04x\n", data, offset);
+
+	if (offset == 0xc070)
+	{
+		hit_slot_joy();
+	}
 
 	if (offset == 0xc072)
 	{
@@ -242,5 +252,17 @@ void a2bus_transwarp_device::hit_slot(int slot)
 			// slow down for 20 uSec, should be more than enough
 			m_timer->adjust(attotime::from_usec(20));
 		}
+	}
+}
+
+void a2bus_transwarp_device::hit_slot_joy()
+{
+	// only do slot slowdown if acceleration is enabled
+	if (!(m_dsw2->read() & 0x80))
+	{
+		// accleration's on
+		m_ourcpu->set_unscaled_clock(1021800);
+		// PREAD main loop counts up to 11*256 uSec, add 1 to cover the setup
+		m_timer->adjust(attotime::from_usec(11*257));
 	}
 }

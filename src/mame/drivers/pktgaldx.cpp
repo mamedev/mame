@@ -80,7 +80,7 @@ READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
+	uint16_t data = m_deco104->read_data( real_address&0x7fff, cs );
 	return data;
 }
 
@@ -88,7 +88,7 @@ WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
-	m_deco104->write_data( space, real_address&0x7fff, data, mem_mask, cs );
+	m_deco104->write_data( real_address&0x7fff, data, mem_mask, cs );
 }
 
 WRITE_LINE_MEMBER( pktgaldx_state::vblank_w )
@@ -360,7 +360,6 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);

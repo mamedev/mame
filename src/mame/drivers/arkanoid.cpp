@@ -1344,12 +1344,12 @@ Pixel clock: 3 MHz = 192 HTotal, assuming it's 6 MHz
 #define ARKANOID_VBEND 16
 #define ARKANOID_VBSTART 240
 
-MACHINE_CONFIG_START(arkanoid_state::arkanoid)
-
+void arkanoid_state::arkanoid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::arkanoid_map);
+	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
@@ -1359,14 +1359,14 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	config.m_minimum_quantum = attotime::from_hz(6000);                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART);
+	screen.set_screen_update(FUNC(arkanoid_state::screen_update_arkanoid));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arkanoid);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
@@ -1379,7 +1379,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	aysnd.port_a_read_callback().set_ioport("UNUSED");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
-MACHINE_CONFIG_END
+}
 
 void arkanoid_state::p3mcu(machine_config &config)
 {
@@ -1401,15 +1401,15 @@ void arkanoid_state::p3mcuay(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
 }
 
-MACHINE_CONFIG_START(arkanoid_state::bootleg)
+void arkanoid_state::bootleg(machine_config &config)
+{
 	arkanoid(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::bootleg_map);
 
 	config.device_remove("mcu");
-MACHINE_CONFIG_END
+}
 
 void arkanoid_state::aysnd(machine_config &config)
 {
@@ -1423,24 +1423,24 @@ void arkanoid_state::aysnd(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(arkanoid_state::hexa)
-
+void arkanoid_state::hexa(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* Imported from arkanoid - correct? */
-	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);  /* Imported from arkanoid - correct? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::hexa_map);
+	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART);
+	screen.set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexa);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -1451,39 +1451,39 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(arkanoid_state::hexaa)
+void arkanoid_state::hexaa(machine_config &config)
+{
 	hexa(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hexaa_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::hexaa_map);
+	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(12'000'000)/2) // ?
-	MCFG_DEVICE_PROGRAM_MAP(hexaa_sub_map)
-	MCFG_DEVICE_IO_MAP(hexaa_sub_iomap)
-MACHINE_CONFIG_END
+	z80_device &subcpu(Z80(config, "subcpu", XTAL(12'000'000)/2)); // ?
+	subcpu.set_addrmap(AS_PROGRAM, &arkanoid_state::hexaa_sub_map);
+	subcpu.set_addrmap(AS_IO, &arkanoid_state::hexaa_sub_iomap);
+}
 
 
-MACHINE_CONFIG_START(arkanoid_state::brixian)
-
+void arkanoid_state::brixian(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(brixian_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::brixian_map);
+	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
 	/* there is a 68705 but it's only role appears to be to copy data to RAM at startup */
 	/* the RAM is also battery backed, making the 68705 almost redundant as long as the battery doesn't die(!) */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART);
+	screen.set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arkanoid);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
@@ -1494,7 +1494,7 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 

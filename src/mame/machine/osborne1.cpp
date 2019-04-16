@@ -477,13 +477,13 @@ bool osborne1_state::set_bit_9(uint8_t value)
 void osborne1_state::update_irq()
 {
 	if (m_pia0->irq_a_state())
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF0);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF0); // Z80
 	else if (m_pia1->irq_a_state())
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF8);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xF8); // Z80
 	else if (m_acia_irq_state)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xFC);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xFC); // Z80
 	else
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, CLEAR_LINE, 0xFE);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, CLEAR_LINE, 0xFE); // Z80
 }
 
 void osborne1_state::update_acia_rxc_txc()

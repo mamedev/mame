@@ -61,10 +61,10 @@ void cpc_pds_device::device_reset()
 
 READ8_MEMBER(cpc_pds_device::pio_r)
 {
-	return m_pio->read(space,offset);
+	return m_pio->read(offset);
 }
 
 WRITE8_MEMBER(cpc_pds_device::pio_w)
 {
-	m_pio->write(space,offset,data);
+	m_pio->write(offset,data);
 }

@@ -412,11 +412,11 @@ image_init_result cococart_slot_device::call_load()
 	{
 		memory_region *cart_mem = m_cart->get_cart_memregion();
 		uint8_t *base = cart_mem->base();
-		offs_t read_length, cart_legnth = cart_mem->bytes();;
+		offs_t read_length, cart_length = cart_mem->bytes();;
 
 		if (!loaded_through_softlist())
 		{
-			read_length = fread(base, cart_legnth);
+			read_length = fread(base, cart_length);
 		}
 		else
 		{
@@ -424,7 +424,7 @@ image_init_result cococart_slot_device::call_load()
 			memcpy(base, get_software_region("rom"), read_length);
 		}
 
-		while (read_length < cart_legnth)
+		while (read_length < cart_length)
 		{
 			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
 			memcpy(base + read_length, base, len);

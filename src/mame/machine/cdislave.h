@@ -40,6 +40,8 @@ public:
 	// construction/destruction
 	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto int_callback() { return m_int_callback.bind(); }
+
 	// external callbacks
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
 
@@ -50,6 +52,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -58,7 +61,8 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
-	required_device<cpu_device> m_maincpu;
+	devcb_write_line m_int_callback;
+
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	required_ioport m_mousex;

@@ -175,7 +175,7 @@
 
 WRITE8_MEMBER(cyclwarr_state::cyclwarr_sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -847,7 +847,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* V30 - VBL */
 }
 
 WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)

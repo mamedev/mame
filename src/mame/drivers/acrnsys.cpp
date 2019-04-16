@@ -123,7 +123,7 @@ void acrnsys_state::a6502_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x03ff).ram();
-	map(0x0e00, 0x0e7f).mirror(0x100).rw(m_ins8154, FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w));
+	map(0x0e00, 0x0e7f).mirror(0x100).rw(m_ins8154, FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io));
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 

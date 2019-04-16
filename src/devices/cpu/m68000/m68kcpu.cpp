@@ -640,9 +640,12 @@ void m68000_base_device::set_irq_line(int irqline, int state)
 		vstate &= ~(1 << irqline);
 	m_virq_state = vstate;
 
-	for(blevel = 7; blevel > 0; blevel--)
-		if(vstate & (1 << blevel))
-			break;
+	if(m_interrupt_mixer) {
+		for(blevel = 7; blevel > 0; blevel--)
+			if(vstate & (1 << blevel))
+				break;
+	} else
+		blevel = vstate;
 
 	m_int_level = blevel << 8;
 
@@ -920,7 +923,7 @@ void m68000_base_device::init_cpu_common(void)
 	//this = device;//deviceparam;
 	m_program = &space(AS_PROGRAM);
 	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68000_base_device::standard_irq_callback_member), this);
+	m_cpu_space = &space(m_cpu_space_id);
 
 	/* disable all MMUs */
 	m_has_pmmu         = 0;
@@ -2019,17 +2022,12 @@ std::unique_ptr<util::disasm_interface> m68000_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
-std::unique_ptr<util::disasm_interface> m68301_device::create_disassembler()
-{
-	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
-}
-
 std::unique_ptr<util::disasm_interface> m68008_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
 
-std::unique_ptr<util::disasm_interface> m68008plcc_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68008fn_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
@@ -2124,18 +2122,24 @@ void m68000_base_device::m68ki_exception_interrupt(uint32_t int_level)
 	if(m_stopped)
 		return;
 
-	/* Acknowledge the interrupt */
-	vector = m_int_ack_callback(*this, int_level);
+	/* Inform the device than an interrupt is taken */
+	if(m_interrupt_mixer)
+		standard_irq_callback(int_level);
+	else
+		for(int i=0; i<3; i++)
+			if(int_level & (1<<i))
+				standard_irq_callback(i);
 
-	/* Get the interrupt vector */
-	if(vector == M68K_INT_ACK_AUTOVECTOR)
-		/* Use the autovectors.  This is the most commonly used implementation */
-		vector = EXCEPTION_INTERRUPT_AUTOVECTOR+int_level;
-	else if(vector == M68K_INT_ACK_SPURIOUS)
-		/* Called if no devices respond to the interrupt acknowledge */
-		vector = EXCEPTION_SPURIOUS_INTERRUPT;
-	else if(vector > 255)
-		return;
+	/* Acknowledge the interrupt by reading the cpu space. */
+	/* We require the handlers for autovector to return the correct
+	   vector, including for spurious interrupts. */
+
+	// 68000 and 68010 assert UDS as well as LDS for IACK cycles but disregard D8-D15
+	// 68008 definitely reads only one byte from CPU space, and the 68020 byte-sizes the request
+	if(CPU_TYPE_IS_EC020_PLUS() || m_cpu_type == CPU_TYPE_008)
+		vector = m_cpu_space->read_byte(0xfffffff1 | (int_level << 1));
+	else
+		vector = m_cpu_space->read_word(0xfffffff0 | (int_level << 1)) & 0xff;
 
 	/* Start exception processing */
 	sr = m68ki_init_exception();
@@ -2175,7 +2179,10 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 										const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map)
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
+		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
+		m_interrupt_mixer(true),
+		m_cpu_space_id(AS_CPU_SPACE)
 {
 	clear_all();
 }
@@ -2185,7 +2192,10 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 										const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits)
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
+		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
+		m_interrupt_mixer(true),
+		m_cpu_space_id(AS_CPU_SPACE)
 {
 	clear_all();
 }
@@ -2262,7 +2272,6 @@ void m68000_base_device::clear_all()
 	m_cyc_instruction = nullptr;
 	m_cyc_exception = nullptr;
 
-	m_int_ack_callback = device_irq_acknowledge_delegate();
 	m_program = nullptr;
 
 	m_space = nullptr;
@@ -2307,6 +2316,26 @@ void m68000_base_device::clear_all()
 	m_internal = nullptr;
 }
 
+void m68000_base_device::autovectors_map(address_map &map)
+{
+	// Eventually add the sync to E due to vpa
+	// 8-bit handlers are used here to be compatible with all bus widths
+	map(0x3, 0x3).lr8("avec1", []() -> u8 { return autovector(1); });
+	map(0x5, 0x5).lr8("avec2", []() -> u8 { return autovector(2); });
+	map(0x7, 0x7).lr8("avec3", []() -> u8 { return autovector(3); });
+	map(0x9, 0x9).lr8("avec4", []() -> u8 { return autovector(4); });
+	map(0xb, 0xb).lr8("avec5", []() -> u8 { return autovector(5); });
+	map(0xd, 0xd).lr8("avec6", []() -> u8 { return autovector(6); });
+	map(0xf, 0xf).lr8("avec7", []() -> u8 { return autovector(7); });
+}
+
+void m68000_base_device::default_autovectors_map(address_map &map)
+{
+	if(m_cpu_space_id == AS_CPU_SPACE && !has_configured_map(AS_CPU_SPACE)) {
+		offs_t mask = make_bitmask<offs_t>(m_program_config.addr_width());
+		map(mask - 0xf, mask).m(*this, FUNC(m68000_base_device::autovectors_map));
+	}
+}
 
 void m68000_base_device::device_start()
 {
@@ -2349,22 +2378,34 @@ void m68000_base_device::execute_set_input(int inputnum, int state)
 device_memory_interface::space_config_vector m68000_base_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
-		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_OPCODES, &m_oprogram_config)
-		};
+		if(m_cpu_space_id == AS_CPU_SPACE)
+			return space_config_vector {
+				std::make_pair(AS_PROGRAM, &m_program_config),
+				std::make_pair(AS_OPCODES, &m_oprogram_config),
+				std::make_pair(AS_CPU_SPACE, &m_cpu_space_config)
+			};
+		else
+			return space_config_vector {
+				std::make_pair(AS_PROGRAM, &m_program_config),
+				std::make_pair(AS_OPCODES, &m_oprogram_config)
+			};
 	else
-		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config)
-		};
+		if(m_cpu_space_id == AS_CPU_SPACE)
+			return space_config_vector {
+				std::make_pair(AS_PROGRAM, &m_program_config),
+				std::make_pair(AS_CPU_SPACE, &m_cpu_space_config)
+			};
+		else
+			return space_config_vector {
+				std::make_pair(AS_PROGRAM, &m_program_config)
+			};
 }
 
 
 
 DEFINE_DEVICE_TYPE(M68000,      m68000_device,      "m68000",       "Motorola MC68000")
-DEFINE_DEVICE_TYPE(M68301,      m68301_device,      "m68301",       "Motorola MC68301")
-DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008")
-DEFINE_DEVICE_TYPE(M68008PLCC,  m68008plcc_device,  "m68008plcc",   "Motorola MC68008PLCC")
+DEFINE_DEVICE_TYPE(M68008,      m68008_device,      "m68008",       "Motorola MC68008") // 48-pin plastic or ceramic DIP
+DEFINE_DEVICE_TYPE(M68008FN,    m68008fn_device,    "m68008fn",     "Motorola MC68008FN") // 52-pin PLCC
 DEFINE_DEVICE_TYPE(M68010,      m68010_device,      "m68010",       "Motorola MC68010")
 DEFINE_DEVICE_TYPE(M68EC020,    m68ec020_device,    "m68ec020",     "Motorola MC68EC020")
 DEFINE_DEVICE_TYPE(M68020,      m68020_device,      "m68020",       "Motorola MC68020")
@@ -2405,21 +2446,6 @@ m68000_device::m68000_device(const machine_config &mconfig, const char *tag, dev
 
 
 
-m68301_device::m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68301, 16,24)
-{
-}
-
-
-void m68301_device::device_start()
-{
-	init_cpu_m68000();
-}
-
-
-
-
-
 
 /* m68008_device */
 
@@ -2434,12 +2460,12 @@ void m68008_device::device_start()
 }
 
 
-m68008plcc_device::m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, tag, owner, clock, M68008PLCC, 8,22)
+m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m68000_base_device(mconfig, tag, owner, clock, M68008FN, 8,22)
 {
 }
 
-void m68008plcc_device::device_start()
+void m68008fn_device::device_start()
 {
 	init_cpu_m68008();
 }

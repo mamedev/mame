@@ -27,6 +27,7 @@
 
 /* Devices */
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "formats/tzx_cas.h"
 #include "machine/bankdev.h"
 
@@ -42,6 +43,8 @@ public:
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
+		m_upd765(*this, "upd765"),
+		m_flop(*this, "upd765:%u", 0U),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
@@ -79,6 +82,8 @@ private:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
+	required_device<upd765a_device> m_upd765;
+	required_device_array<floppy_connector, 2> m_flop;
 	required_device<address_map_bank_device> m_bank1;
 	required_device<address_map_bank_device> m_bank2;
 	required_ioport_array<9> m_io_ports;
@@ -115,8 +120,9 @@ uint8_t elwro800_state::nmi_r()
 
 WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 {
-	m_upd765_0->get_device()->mon_w(!BIT(data, 0));
-	m_upd765_1->get_device()->mon_w(!BIT(data, 1));
+	for (int i = 0; i < 2; i++)
+		if (m_flop[i]->get_device())
+			m_flop[i]->get_device()->mon_w(!BIT(data, i));
 
 	m_upd765->tc_w(data & 0x04);
 
@@ -284,11 +290,11 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 		// CSFDC
 		if (offset & 1)
 		{
-			return m_upd765->fifo_r(space, 0, 0xff);
+			return m_upd765->fifo_r();
 		}
 		else
 		{
-			return m_upd765->msr_r(space, 0, 0xff);
+			return m_upd765->msr_r();
 		}
 	}
 	else if (!BIT(cs,4))
@@ -332,7 +338,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 		// CSFDC
 		if (offset & 1)
 		{
-			m_upd765->fifo_w(space, 0, data, 0xff);
+			m_upd765->fifo_w(data);
 		}
 	}
 	else if (!BIT(cs,4))
@@ -554,24 +560,24 @@ static GFXDECODE_START( gfx_elwro800 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(elwro800_state::elwro800)
-
+void elwro800_state::elwro800(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 14_MHz_XTAL / 4)    /* 3.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(elwro800_mem)
-	MCFG_DEVICE_IO_MAP(elwro800_io)
-	MCFG_DEVICE_OPCODES_MAP(elwro800_m1)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", elwro800_state,  elwro800jr_interrupt)
+	Z80(config, m_maincpu, 14_MHz_XTAL / 4);    /* 3.5 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &elwro800_state::elwro800_mem);
+	m_maincpu->set_addrmap(AS_IO, &elwro800_state::elwro800_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &elwro800_state::elwro800_m1);
+	m_maincpu->set_vblank_int("screen", FUNC(elwro800_state::elwro800jr_interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT);
 	// Sync and interrupt timings determined by 2716 EPROM
-	MCFG_SCREEN_UPDATE_DRIVER(elwro800_state, screen_update_spectrum )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, elwro800_state, screen_vblank_spectrum))
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_screen_update(FUNC(elwro800_state::screen_update_spectrum));
+	screen.screen_vblank().set(FUNC(elwro800_state::screen_vblank_spectrum));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
@@ -615,7 +621,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&elwro800_state::elwro800_bank1).set_data_width(8).set_stride(0x2000);
 	ADDRESS_MAP_BANK(config, "bank2").set_map(&elwro800_state::elwro800_bank2).set_data_width(8).set_stride(0x2000);
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

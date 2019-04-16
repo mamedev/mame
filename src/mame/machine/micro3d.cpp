@@ -34,7 +34,7 @@
 
 WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(3, state, m_duart->get_irq_vector());
+	m_maincpu->set_input_line(3, state);
 }
 
 WRITE_LINE_MEMBER(micro3d_state::duart_txb)

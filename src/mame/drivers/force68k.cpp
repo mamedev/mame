@@ -617,30 +617,35 @@ void force68k_state::fccpu1(machine_config &config)
        * CPU-6 family is device and adressmap compatible with CPU-1 but with additions
        * such as an optional 68881 FPU
        */
-MACHINE_CONFIG_START (force68k_state::fccpu6)
-	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(8'000'000))         /* Jumper B10 Mode B */
-	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
-MACHINE_CONFIG_END
+void force68k_state::fccpu6(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(8'000'000));        /* Jumper B10 Mode B */
+	m_maincpu->set_addrmap(AS_PROGRAM, &force68k_state::force68k_mem);
+}
 
-MACHINE_CONFIG_START (force68k_state::fccpu6a)
-	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(12'500'000))        /* Jumper B10 Mode A */
-	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
-MACHINE_CONFIG_END
+void force68k_state::fccpu6a(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(12'500'000));        /* Jumper B10 Mode A */
+	m_maincpu->set_addrmap(AS_PROGRAM, &force68k_state::force68k_mem);
+}
 
-MACHINE_CONFIG_START (force68k_state::fccpu6v)
-	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(8'000'000))         /* Jumper B10 Mode B */
-	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
-MACHINE_CONFIG_END
+void force68k_state::fccpu6v(machine_config &config)
+{
+	M68010(config, m_maincpu, XTAL(8'000'000));         /* Jumper B10 Mode B */
+	m_maincpu->set_addrmap(AS_PROGRAM, &force68k_state::force68k_mem);
+}
 
-MACHINE_CONFIG_START (force68k_state::fccpu6va)
-	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
-	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
-MACHINE_CONFIG_END
+void force68k_state::fccpu6va(machine_config &config)
+{
+	M68010(config, m_maincpu, XTAL(12'500'000));        /* Jumper B10 Mode A */
+	m_maincpu->set_addrmap(AS_PROGRAM, &force68k_state::force68k_mem);
+}
 
-MACHINE_CONFIG_START (force68k_state::fccpu6vb)
-	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
-	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
-MACHINE_CONFIG_END
+void force68k_state::fccpu6vb(machine_config &config)
+{
+	M68010(config, m_maincpu, XTAL(12'500'000));        /* Jumper B10 Mode A */
+	m_maincpu->set_addrmap(AS_PROGRAM, &force68k_state::force68k_mem);
+}
 #endif
 
 /* ROM definitions */

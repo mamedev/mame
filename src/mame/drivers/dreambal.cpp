@@ -83,8 +83,7 @@ private:
 
 uint32_t dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = generic_space();
-	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen->pf_update(nullptr, nullptr);
@@ -103,7 +102,7 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco104->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -112,7 +111,7 @@ WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 void dreambal_state::dreambal_map(address_map &map)
@@ -311,21 +310,21 @@ void dreambal_state::machine_reset()
 }
 
 // xtals = 28.000, 9.8304
-MACHINE_CONFIG_START(dreambal_state::dreambal)
-
+void dreambal_state::dreambal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(dreambal_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
+	M68000(config, m_maincpu, 28000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreambal_state::dreambal_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dreambal_state::irq6_line_hold)); // 5 valid too?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dreambal_state, screen_update_dreambal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(dreambal_state::screen_update_dreambal));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x400/2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dreambal);
@@ -338,7 +337,6 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	m_deco104->port_c_cb().set_ioport("DSW");
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -356,10 +354,8 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 9830400/8, okim6295_device::PIN7_HIGH)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 9830400/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 

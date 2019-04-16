@@ -50,30 +50,23 @@ public:
 
 	virtual void map(address_map &map) override = 0;
 
-	DECLARE_READ8_MEMBER (sra_r);
-	DECLARE_READ8_MEMBER (srb_r);
-	DECLARE_READ8_MEMBER (dor_r);
-	DECLARE_WRITE8_MEMBER(dor_w);
-	DECLARE_READ8_MEMBER (tdr_r);
-	DECLARE_WRITE8_MEMBER(tdr_w);
-	uint8_t read_msr();
-	DECLARE_READ8_MEMBER (msr_r);
-	DECLARE_WRITE8_MEMBER(dsr_w);
-	uint8_t read_fifo();
-	void write_fifo(uint8_t data);
-	DECLARE_READ8_MEMBER (fifo_r) { return read_fifo(); }
-	DECLARE_WRITE8_MEMBER(fifo_w) { write_fifo(data); }
-	DECLARE_READ8_MEMBER (dir_r);
-	DECLARE_WRITE8_MEMBER(ccr_w);
+	uint8_t sra_r();
+	uint8_t srb_r();
+	uint8_t dor_r();
+	void dor_w(uint8_t data);
+	uint8_t tdr_r();
+	void tdr_w(uint8_t data);
+	uint8_t msr_r();
+	void dsr_w(uint8_t data);
+	uint8_t fifo_r();
+	void fifo_w(uint8_t data);
+	uint8_t dir_r() { return do_dir_r(); }
+	void ccr_w(uint8_t data);
 
 	virtual uint8_t do_dir_r() override;
 
 	uint8_t dma_r() override;
 	void dma_w(uint8_t data) override;
-
-	// Same as the previous ones, but as memory-mappable members
-	DECLARE_READ8_MEMBER(mdma_r);
-	DECLARE_WRITE8_MEMBER(mdma_w);
 
 	bool get_irq() const;
 	bool get_drq() const;
@@ -264,7 +257,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed;
 
 	bool external_ready;
 
@@ -477,7 +470,15 @@ public:
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
-	DECLARE_WRITE8_MEMBER(auxcmd_w);
+	void auxcmd_w(uint8_t data);
+
+protected:
+	upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class upd72069_device : public upd72065_device {
+public:
+	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class n82077aa_device : public upd765_family_device {
@@ -528,7 +529,7 @@ public:
 	auto input_handler() { return m_input_handler.bind(); }
 
 	virtual void map(address_map &map) override;
-	DECLARE_READ8_MEMBER( input_r );
+	uint8_t input_r();
 
 protected:
 	virtual void device_start() override;
@@ -543,7 +544,7 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE8_MEMBER(cr1_w);
+	void cr1_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -556,6 +557,7 @@ DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
 DECLARE_DEVICE_TYPE(UPD72065,       upd72065_device)
+DECLARE_DEVICE_TYPE(UPD72069,       upd72069_device)
 DECLARE_DEVICE_TYPE(I82072,         i82072_device)
 DECLARE_DEVICE_TYPE(SMC37C78,       smc37c78_device)
 DECLARE_DEVICE_TYPE(N82077AA,       n82077aa_device)

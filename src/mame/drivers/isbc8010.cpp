@@ -224,9 +224,9 @@ void isbc8010_state::isbc8010(machine_config &config)
 //  hd6402.read_si_callback().set(FUNC(sdk80_state::nascom1_hd6402_si));
 //  hd6402.write_so_callback().set(FUNC(sdk80_state::nascom1_hd6402_so));
 
-//	clock_device &uart_clock(CLOCK(config, "uart_clock", (XTAL(16'000'000) / 16) / 256));
-//	uart_clock.signal_handler().set("hd6402", FUNC(ay31015_device::write_tcp));
-//	uart_clock.signal_handler().append("hd6402", FUNC(ay31015_device::write_rcp));
+//  clock_device &uart_clock(CLOCK(config, "uart_clock", (XTAL(16'000'000) / 16) / 256));
+//  uart_clock.signal_handler().set("hd6402", FUNC(ay31015_device::write_tcp));
+//  uart_clock.signal_handler().append("hd6402", FUNC(ay31015_device::write_rcp));
 
 	/* Devices */
 //  i8279_device &kbdc(I8279(config, "i8279", 3100000)); // based on divider

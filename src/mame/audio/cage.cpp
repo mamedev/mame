@@ -469,7 +469,7 @@ WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 {
 	if (LOG_COMM)
 		logerror("%s Data from CAGE = %04X\n", machine().describe_context(), data);
-	m_soundlatch->write(space, 0, data, mem_mask);
+	m_soundlatch->write(data);
 	m_cage_to_cpu_ready = 1;
 	update_control_lines();
 }
@@ -489,10 +489,10 @@ READ32_MEMBER( atari_cage_device::cage_io_status_r )
 uint16_t atari_cage_device::main_r()
 {
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(machine().dummy_space(), 0, 0));
+		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read());
 	m_cage_to_cpu_ready = 0;
 	update_control_lines();
-	return m_soundlatch->read(machine().dummy_space(), 0, 0xffff);
+	return m_soundlatch->read();
 }
 
 

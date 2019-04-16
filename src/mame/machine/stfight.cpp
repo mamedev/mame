@@ -122,7 +122,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_STFIGHT_INTERRUPT_1:
 		// Do a RST08
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80
 		break;
 	default:
 		assert_always(false, "Unknown id in stfight_state::device_timer");
@@ -132,7 +132,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 {
 	// Do a RST10
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 	m_int1_timer->adjust(attotime::from_hz(120));
 }
 

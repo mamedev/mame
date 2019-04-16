@@ -93,11 +93,11 @@ void concept_state::concept_set_interrupt(int level, int state)
 
 	if (final_level)
 		/* assert interrupt */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1 + final_level - 1, ASSERT_LINE);
 	else
 	{
 		/* clear all interrupts */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + level - 1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1 + level - 1, CLEAR_LINE);
 	}
 }
 
@@ -224,7 +224,7 @@ READ8_MEMBER(concept_state::io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!m_clock_enable)
-			return m_mm58274->read(space, m_clock_address);
+			return m_mm58274->read(m_clock_address);
 		break;
 
 	case 7:
@@ -330,7 +330,7 @@ WRITE8_MEMBER(concept_state::io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!m_clock_enable)
-			m_mm58274->write(space, m_clock_address, data & 0xf);
+			m_mm58274->write(m_clock_address, data & 0xf);
 		break;
 
 	case 7:

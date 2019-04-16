@@ -57,9 +57,14 @@ public:
 
 	u8 read_inputs(int columns);
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 	virtual void power_off();
+
+	void switch_change(int sel, u32 mask, bool next);
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, true); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, false); }
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)

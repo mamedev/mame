@@ -419,7 +419,7 @@ WRITE_LINE_MEMBER(looping_state::looping_spcint)
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 }
 
@@ -567,7 +567,7 @@ void looping_state::looping_map(address_map &map)
 
 void looping_state::looping_io_map(address_map &map)
 {
-	map(0x400, 0x407).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x0800, 0x080f).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
 
@@ -587,8 +587,8 @@ void looping_state::looping_sound_map(address_map &map)
 
 void looping_state::looping_sound_io_map(address_map &map)
 {
-	map(0x000, 0x007).w("sen0", FUNC(ls259_device::write_d0));
-	map(0x008, 0x00f).w("sen1", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0));
+	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0));
 }
 
 

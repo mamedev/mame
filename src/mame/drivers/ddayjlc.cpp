@@ -349,8 +349,8 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 
 WRITE8_MEMBER(ddayjlc_state::sound_w)
 {
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(ddayjlc_state::flip_screen_w)
@@ -599,26 +599,26 @@ void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 	palette.set_pen_color(0x203, rgb_t(0xff, 0xff, 0xff));
 }
 
-MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
-
+void ddayjlc_state::ddayjlc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	Z80(config, m_maincpu, 12000000/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 12000000/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(ddayjlc_state::screen_update_ddayjlc));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(ddayjlc_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddayjlc);
 	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200+4);
@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	AY8910(config, "ay2", 12000000/6).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( ddayjlc )

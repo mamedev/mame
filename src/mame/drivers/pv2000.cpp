@@ -184,8 +184,7 @@ void pv2000_state::pv2000_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 
-	map(0x4000, 0x4000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x4001, 0x4001).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x4000, 0x4001).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 
 	map(0x7000, 0x7fff).ram();
 	//AM_RANGE(0x8000, 0xbfff) ext ram?
@@ -365,7 +364,7 @@ void pv2000_state::machine_reset()
 	m_key_pressed = 0;
 	m_keyb_column = 0;
 
-	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
+	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff); // Z80
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 

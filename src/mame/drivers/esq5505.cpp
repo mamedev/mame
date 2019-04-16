@@ -194,7 +194,8 @@ public:
 	void init_sq1();
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+	void cpu_space_map(address_map &map);
+
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 private:
@@ -253,20 +254,11 @@ FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
 	FLOPPY_ESQIMG_FORMAT
 FLOPPY_FORMATS_END
 
-IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
+void esq5505_state::cpu_space_map(address_map &map)
 {
-	switch(irqline)
-	{
-	case 1:
-		return M68K_INT_ACK_AUTOVECTOR;
-	case 2:
-		return dmac_irq_vector;
-	case 3:
-		return duart_irq_vector;
-	default:
-		logerror("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
-		return 0;
-	}
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff4, 0xfffff5).lr16("dmac irq", [this]() -> u16 { return dmac_irq_vector; });
+	map(0xfffff6, 0xfffff7).lr16("duart irq", [this]() -> u16 { return duart_irq_vector; });
 }
 
 void esq5505_state::machine_start()
@@ -320,13 +312,13 @@ void esq5505_state::update_irq_to_maincpu()
 	{
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 	}
 	else if (dmac_irq_state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	}
 	else if (otis_irq_state)
 	{
@@ -623,7 +615,7 @@ void esq5505_state::vfx(machine_config &config)
 {
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfx_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(esq5505_state::maincpu_irq_acknowledge_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
@@ -714,7 +706,7 @@ void esq5505_state::vfx32(machine_config &config)
 {
 	M68000(config, m_maincpu, 30.4761_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(esq5505_state::maincpu_irq_acknowledge_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();

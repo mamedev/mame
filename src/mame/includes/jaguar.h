@@ -271,9 +271,9 @@ private:
 
 	image_init_result quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
+	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);
 	void dsp_rom_map(address_map &map);
 	void gpu_map(address_map &map);

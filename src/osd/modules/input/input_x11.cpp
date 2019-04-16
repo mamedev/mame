@@ -533,10 +533,34 @@ public:
 
 	void handle_event(XEvent &xevent) override
 	{
-		devicelist()->for_each_device([&xevent](auto device)
+		XID deviceid;
+		if (xevent.type == motion_type)
 		{
-			downcast<x11_input_device*>(device)->queue_events(&xevent, 1);
+			XDeviceMotionEvent *motion = reinterpret_cast<XDeviceMotionEvent *>(&xevent);
+			deviceid = motion->deviceid;
+		}
+		else if (xevent.type == button_press_type || xevent.type == button_release_type)
+		{
+			XDeviceButtonEvent *button = reinterpret_cast<XDeviceButtonEvent *>(&xevent);
+			deviceid = button->deviceid;
+		}
+		else
+		{
+			return;
+		}
+
+		// Figure out which lightgun this event id destined for
+		auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [deviceid](auto &device)
+		{
+			std::unique_ptr<device_info> &ptr = device;
+			return downcast<x11_input_device*>(ptr.get())->x11_state.deviceid == deviceid;
 		});
+
+		// If we find a matching lightgun, dispatch the event to the lightgun
+		if (target_device != devicelist()->end())
+		{
+			downcast<x11_input_device*>((*target_device).get())->queue_events(&xevent, 1);
+		}
 	}
 
 private:
