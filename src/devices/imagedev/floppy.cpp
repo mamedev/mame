@@ -784,6 +784,25 @@ attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, in
 	return base + attotime::from_nsec((uint64_t(next_position)*2000/floppy_ratio_1+1)/2);
 }
 
+int floppy_image_device::get_rddata(const attotime &when)
+{
+	if(!image || mon)
+		return -1;
+
+	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
+	uint32_t cells = buf.size();
+	if(cells <= 1)
+		return -1;
+
+	attotime base;
+	int index = find_index(find_position(base, when), buf);
+
+	if(index == -1)
+		return -1;
+
+	return (buf[index] & floppy_image::MG_MASK) >> floppy_image::MG_SHIFT;
+}
+
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
 	if(!image || mon)

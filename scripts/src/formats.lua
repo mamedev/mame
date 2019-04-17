@@ -727,6 +727,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/dvk_mx_dsk.h,FORMATS["DVK_MX_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["DVK_MX_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/dvk_mx_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/dvk_mx_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/esq16_dsk.h,FORMATS["ESQ16_DSK"] = true
 --------------------------------------------------
 

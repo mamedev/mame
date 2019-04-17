@@ -88,6 +88,9 @@ void i82072_device::map(address_map &map)
 
 void smc37c78_device::map(address_map &map)
 {
+	// per MXONPC readme, SMC FDC37C93xFR supports PS/2 mode
+	map(0x0, 0x0).r(FUNC(smc37c78_device::sra_r));
+	map(0x1, 0x1).r(FUNC(smc37c78_device::srb_r));
 	map(0x2, 0x2).rw(FUNC(smc37c78_device::dor_r), FUNC(smc37c78_device::dor_w));
 	map(0x3, 0x3).rw(FUNC(smc37c78_device::tdr_r), FUNC(smc37c78_device::tdr_w));
 	map(0x4, 0x4).rw(FUNC(smc37c78_device::msr_r), FUNC(smc37c78_device::dsr_w));
@@ -386,7 +389,33 @@ uint8_t upd765_family_device::sra_r()
 
 uint8_t upd765_family_device::srb_r()
 {
-	return 0;
+	uint8_t srb = 0;
+	const uint8_t ds[4] = { 0x43, 0x23, 0x62, 0x61 };
+	int rddata = -2;
+	if(mode == MODE_M30)
+	{
+		srb = ds[dor & 3];
+		srb |= 0x80;
+	}
+	else
+	{
+		srb = 0xc0;
+		if(selected_drive == 0)
+			srb |= 0x20;
+		if(flopi[0].dev)
+			srb |= flopi[0].dev->mon_r();
+		if(flopi[1].dev)
+			srb |= (flopi[1].dev->mon_r() << 1);
+	}
+	// XXX wrdata, we f/f
+	if(flopi[selected_drive].dev)
+	{
+		rddata = flopi[selected_drive].dev->get_rddata(machine().time());
+		if(rddata==1)
+			srb |= 0x08;
+	}
+	LOGREGS("srb = %02x (drive %d rddata %d)\n", srb, selected_drive, rddata);
+	return srb;
 }
 
 uint8_t upd765_family_device::dor_r()
@@ -640,7 +669,7 @@ uint8_t upd765_family_device::fifo_pop(bool internal)
 	if(!fifo_write && !fifo_pos)
 		disable_transfer();
 	int thr = fifocfg & 15;
-	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & 0x20)))
+	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)))
 		enable_transfer();
 	return r;
 }
@@ -1695,7 +1724,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+			if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
@@ -2050,7 +2079,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+			if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}

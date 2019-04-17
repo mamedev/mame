@@ -126,6 +126,7 @@ public:
 	void index_resync();
 	attotime time_next_index();
 	attotime get_next_transition(const attotime &from_when);
+	int get_rddata(const attotime &when);
 	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
 	void set_write_splice(const attotime &when);
 	int get_sides() { return sides; }
