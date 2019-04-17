@@ -201,7 +201,7 @@ u8 aim65_state::z32_pb_r ()
     d3 = kb/tty switch
 */
 
-	uint8_t data = ioport("switches")->read();
+	uint8_t data = ioport("switches")->read() & 8;
 	m_kb_en = BIT(data, 3);
 
 	if (m_ca2)

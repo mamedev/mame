@@ -43,12 +43,12 @@ void aim65_state::mem_map(address_map &map)
 	map(0x1000, 0x3fff).noprw(); /* User available expansions */
 	map(0x4000, 0x7fff).rom(); /* 4 ROM sockets in 16K PROM/ROM module */
 	map(0x8000, 0x9fff).noprw(); /* User available expansions */
-	map(0xa000, 0xa00f).mirror(0x3f0).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write)); // user via
-	map(0xa400, 0xa47f).m("riot", FUNC(mos6532_new_device::ram_map));
-	map(0xa480, 0xa497).m("riot", FUNC(mos6532_new_device::io_map));
+	map(0xa000, 0xa00f).mirror(0x3f0).rw(m_via1, FUNC(via6522_device::read), FUNC(via6522_device::write)); // user via
+	map(0xa400, 0xa47f).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0xa480, 0xa497).m(m_riot, FUNC(mos6532_new_device::io_map));
 	map(0xa498, 0xa7ff).noprw(); /* Not available */
-	map(0xa800, 0xa80f).mirror(0x3f0).rw("via0", FUNC(via6522_device::read), FUNC(via6522_device::write)); // system via
-	map(0xac00, 0xac03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa800, 0xa80f).mirror(0x3f0).rw(m_via0, FUNC(via6522_device::read), FUNC(via6522_device::write)); // system via
+	map(0xac00, 0xac03).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xac04, 0xac43).ram(); /* PIA RAM */
 	map(0xac44, 0xafff).noprw(); /* Not available */
 	map(0xb000, 0xffff).rom(); /* 5 ROM sockets */
@@ -88,7 +88,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")           PORT_CODE(KEYCODE_Y)          PORT_CHAR('y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")           PORT_CODE(KEYCODE_R)          PORT_CHAR('r')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")           PORT_CODE(KEYCODE_W)          PORT_CHAR('w')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")         PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")         PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("KEY.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")      PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
@@ -141,10 +141,25 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("switches")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, aim65_state, reset_button, nullptr)
 	PORT_DIPNAME(0x08, 0x08, "KB/TTY") PORT_DIPLOCATION("S3:1")
 	PORT_DIPSETTING(0x00, "TTY")
 	PORT_DIPSETTING(0x08, "KB")
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(aim65_state::reset_button)
+{
+	// Reset all devices
+	// If you're using TTY, you must press DEL after the reset.
+	if (newval)
+	{
+		m_via0->reset();
+		m_via1->reset();
+		m_pia->reset();
+		m_riot->reset();
+	}
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
 /***************************************************************************
@@ -211,10 +226,10 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	/* other devices */
-	mos6532_new_device &riot(MOS6532_NEW(config, "riot", AIM65_CLOCK));
-	riot.pa_wr_callback().set([this] (u8 data) { m_riot_port_a = data; });
-	riot.pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
-	riot.irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	MOS6532_NEW(config, m_riot, AIM65_CLOCK);
+	m_riot->pa_wr_callback().set([this] (u8 data) { m_riot_port_a = data; });
+	m_riot->pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
+	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	VIA6522(config, m_via0, AIM65_CLOCK);
 	m_via0->readpb_handler().set([this] () { return aim65_state::z32_pb_r(); });
@@ -226,14 +241,14 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	//m_via0->cb1_handler().set(FUNC(aim65_state::z32_cb1_w));
 	// out CB2 turn printer on
 	//m_via0->cb2_handler().set(FUNC(aim65_state::z32_cb2_w));
-	m_via0->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+	m_via0->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	via6522_device &via1(VIA6522(config, "via1", AIM65_CLOCK));
-	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+	VIA6522(config, m_via1, AIM65_CLOCK);
+	m_via1->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
-	pia.writepa_handler().set([this] (u8 data) { aim65_state::u1_pa_w(data); });
-	pia.writepb_handler().set([this] (u8 data) { aim65_state::u1_pb_w(data); });
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set([this] (u8 data) { aim65_state::u1_pa_w(data); });
+	m_pia->writepb_handler().set([this] (u8 data) { aim65_state::u1_pb_w(data); });
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);

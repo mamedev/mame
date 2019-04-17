@@ -49,11 +49,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_rs232(*this, "rs232")
 		, m_via0(*this, "via0")
+		, m_via1(*this, "via1")
+		, m_pia(*this, "pia")
+		, m_riot(*this, "riot")
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{
 	}
 
 	void aim65(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
 	virtual void machine_start() override;
@@ -99,6 +104,9 @@ private:
 	output_finder<20> m_digits;
 	required_device<rs232_port_device> m_rs232;
 	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
+	required_device<pia6821_device> m_pia;
+	required_device<mos6532_new_device> m_riot;
 	required_ioport_array<8> m_io_keyboard;
 };
 
