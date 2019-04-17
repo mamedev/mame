@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle
+// copyright-holders:hap
+// thanks-to:Sean Riddle
 /***************************************************************************
 
   National Semiconductor COP400 MCU handhelds or other simple devices,

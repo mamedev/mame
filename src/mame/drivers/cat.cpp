@@ -919,7 +919,7 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 void cat_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff2, 0xfffff3).lr16("interrupt 1", [this]() -> u16 { m_maincpu->set_input_line(1, CLEAR_LINE); return 0x19; });
+	map(0xfffff3, 0xfffff3).lr8("interrupt 1", [this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); });
 }
 
 MACHINE_START_MEMBER(cat_state,cat)

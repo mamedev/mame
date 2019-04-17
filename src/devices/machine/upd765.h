@@ -257,7 +257,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed;
 
 	bool external_ready;
 
@@ -471,6 +471,14 @@ public:
 
 	virtual void map(address_map &map) override;
 	void auxcmd_w(uint8_t data);
+
+protected:
+	upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class upd72069_device : public upd72065_device {
+public:
+	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class n82077aa_device : public upd765_family_device {
@@ -549,6 +557,7 @@ DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
 DECLARE_DEVICE_TYPE(UPD72065,       upd72065_device)
+DECLARE_DEVICE_TYPE(UPD72069,       upd72069_device)
 DECLARE_DEVICE_TYPE(I82072,         i82072_device)
 DECLARE_DEVICE_TYPE(SMC37C78,       smc37c78_device)
 DECLARE_DEVICE_TYPE(N82077AA,       n82077aa_device)

@@ -7,8 +7,7 @@ Driver file to handle emulation of the Novag/Videomaster Chess Champion MK I
 Initial version by PeT mess@utanet.at 2000,2001.
 
 TODO:
-- verify cncchess beeper duration/frequency
-- cncchess middle leds
+- cncchess sound is wrong, it should be a long dual-tone alarm sound
 
 *******************************************************************************
 
@@ -89,17 +88,20 @@ public:
 		m_beeper(*this, "beeper"),
 		m_keypad(*this, "LINE%u", 1U),
 		m_delay_display(*this, "delay_display_%u", 0),
-		m_out_digit(*this, "digit%u", 0U)
+		m_out_digit(*this, "digit%u", 0U),
+		m_out_led(*this, "led%u", 0U),
+		m_out_leda(*this, "led%ua", 0U)
 	{ }
 
 	void cmpchess(machine_config &config);
 	void mk1(machine_config &config);
 	void cnc(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -109,6 +111,8 @@ private:
 	required_ioport_array<4> m_keypad;
 	required_device_array<timer_device, 4> m_delay_display;
 	output_finder<4> m_out_digit;
+	output_finder<4> m_out_led;
+	output_finder<4> m_out_leda;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -117,7 +121,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
+	void clear_digit(int i);
 	void update_display();
+	void update_reset(ioport_value state);
 
 	DECLARE_READ8_MEMBER(beeper_r);
 	DECLARE_WRITE8_MEMBER(input_w);
@@ -139,6 +145,8 @@ void mk1_state::machine_start()
 {
 	// resolve handlers
 	m_out_digit.resolve();
+	m_out_led.resolve();
+	m_out_leda.resolve();
 
 	// zerofill
 	m_inp_mux = 0;
@@ -153,17 +161,30 @@ void mk1_state::machine_start()
 	save_item(NAME(m_blink));
 }
 
-INPUT_CHANGED_MEMBER(mk1_state::reset_switch)
+void mk1_state::machine_reset()
+{
+	update_reset(ioport("RESET")->read());
+}
+
+void mk1_state::clear_digit(int i)
+{
+	// clear digit + connected leds
+	m_out_digit[i] = 0;
+	m_out_led[i] = 0;
+	m_out_leda[i] = 0;
+}
+
+void mk1_state::update_reset(ioport_value state)
 {
 	// reset switch is tied to F3850 RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// clear display
-	if (newval)
+	if (state)
 	{
 		m_digit_select = 0xff;
 		for (int i = 0; i < 4; i++)
-			m_out_digit[i] = 0;
+			clear_digit(i);
 	}
 }
 
@@ -179,7 +200,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::delay_display)
 {
 	// clear digits if inactive
 	if (BIT(m_digit_select, param))
-		m_out_digit[param] = 0;
+		clear_digit(param);
 }
 
 void mk1_state::update_display()
@@ -189,11 +210,15 @@ void mk1_state::update_display()
 	{
 		if (!BIT(m_digit_select, i))
 		{
-			// display panel goes into automated blink mode if DP segment is held high
-			// and DP segment itself only appears to be active if no other segments are
-			u8 mask = (m_digit_data == 1) ? 0x80 : 0x7f;
-			mask = (m_blink && m_digit_data & 1) ? 0 : mask;
-			m_out_digit[i] = bitswap<8>(m_digit_data,0,2,1,3,4,5,6,7) & mask;
+			// display panel goes into automated blink mode if DP segment is held high,
+			// and DP segment itself by default only appears to be active if no other segments are
+			u8 dmask = (m_digit_data == 1) ? 0x80 : 0x7f;
+			u8 bmask = (m_blink && m_digit_data & 1) ? 0 : 0xff;
+			m_out_digit[i] = bitswap<8>(m_digit_data,0,2,1,3,4,5,6,7) & dmask & bmask;
+
+			// output led separately too
+			m_out_led[i] = (m_out_digit[i] & 0x80) ? 1 : 0;
+			m_out_leda[i] = m_digit_data & bmask & 1; // for ignoring dmask above
 		}
 	}
 }
@@ -207,7 +232,7 @@ READ8_MEMBER(mk1_state::beeper_r)
 	if (!machine().side_effects_disabled() && m_beeper != nullptr)
 	{
 		m_beeper->set_state(1);
-		m_beeper_off->adjust(attotime::from_msec(50)); // guessed
+		m_beeper_off->adjust(attotime::from_msec(50)); // wrong, see TODO
 	}
 
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -318,7 +343,7 @@ static INPUT_PORTS_START( cmpchess )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / ep") // enter piece(position)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, mk1_state, reset_switch, nullptr) PORT_NAME("Reset Switch") // L.S. switch on the MK I
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, mk1_state, reset_switch, nullptr) PORT_NAME("Reset Switch") // L.S. switch on the MK I
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cncchess )
@@ -347,7 +372,7 @@ static INPUT_PORTS_START( cncchess )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("H / GO")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, mk1_state, reset_switch, nullptr) PORT_NAME("Reset")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mk1_state, reset_switch, nullptr) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 
@@ -397,7 +422,7 @@ void mk1_state::cnc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 2000); // guessed
+	BEEP(config, m_beeper, 2000); // wrong, see TODO
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 	TIMER(config, "beeper_off").configure_generic(FUNC(mk1_state::beeper_off));
 }
@@ -436,4 +461,4 @@ ROM_END
 CONS( 1977, cmpchess, 0,        0, cmpchess, cmpchess, mk1_state, empty_init, "Data Cash Systems", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, ccmk1,    cmpchess, 0, mk1,      cmpchess, mk1_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, cncchess, 0,        0, cnc,      cncchess, mk1_state, empty_init, "Conic", "Computer Chess (Conic)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cncchess, 0,        0, cnc,      cncchess, mk1_state, empty_init, "Conic", "Computer Chess (Conic)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

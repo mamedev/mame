@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, Couriersud
 
 #include "audio/nl_zac1b11142.h"
 #include "netlist/devices/net_lib.h"
@@ -277,19 +277,88 @@ NETLIST_START(zac1b11142_schematics)
 
 NETLIST_END()
 
+NETLIST_START(zac1b11142_schematics_speech)
+
+	CS(I_SP, 0)	// Fed through stream ...
+
+	LM3900(U5D4)
+	CAP(C31, CAP_U(0.22))
+	CAP(C33, CAP_P(470))
+	CAP(C30, CAP_P(47))
+	CAP(C8,  CAP_U(0.1))
+	RES(R63, RES_K(2.2))
+	RES(R62, RES_K(220))
+	RES(R61, RES_K(860))
+	RES(R50, RES_K(820))
+	RES(R49, RES_K(820))
+	RES(R11, RES_K(2.2))
+	RES(R4,  RES_K(10))
+	POT(P2,  RES_K(10))
+
+	NET_C(GND, C31.2, R63.2, R50.2, P2.3, U5D4.GND)
+	NET_C(VCC, U5D4.VCC, I_SP.1)
+
+	NET_C(C31.1, I_SP.2, R63.1, R62.1)
+	NET_C(R62.2, C33.1)
+	NET_C(C33.2, R61.1)
+	NET_C(R61.2, R49.1, C30.1, U5D4.MINUS)
+	NET_C(R50.1, U5D4.PLUS)
+	NET_C(R49.2, C30.2, R11.1, U5D4.OUT)
+	NET_C(R11.2, P2.1)
+	NET_C(P2.2, R4.1)
+	NET_C(R4.2, C8.1)
+
+	NET_C(C8.2, R1.1)
+
+NETLIST_END()
+
+NETLIST_START(zac1b11142_schematics_dac)
+
+	CS(I_DAC, 0)	// Fed through stream ...
+
+	QBJT_EB(T4, "2N4401")
+
+	CAP(C20, CAP_U(0.01))
+	CAP(C21, CAP_U(0.1))
+	RES(R13, RES_M(3.3))
+	RES(R15, RES_K(3.3))
+	RES(R16, RES_K(2.2))
+	RES(R17, RES_K(3.3))
+	RES(R18, RES_K(10))
+	POT(P3,  RES_K(10))
+
+	NET_C(GND, T4.B, R17.2, C20.2, P3.3)
+	NET_C(VCC, R15.1)
+	NET_C(I_M5, R13.1, I_DAC.2)
+	NET_C(I_DAC.1, T4.E, R13.2)
+	NET_C(T4.C, R15.2, R17.1, C20.1, R16.2)
+	NET_C(R16.1, P3.1)
+	NET_C(P3.2, R18.1)
+	NET_C(R18.2, C21.1)
+	NET_C(C21.2, C8.2)
+NETLIST_END()
 
 NETLIST_START(zac1b11142)
 
 	SOLVER(Solver, 48000)
+	#if (USE_FRONTIERS)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.METHOD, "MAT_CR")
 	PARAM(Solver.PARALLEL, 4)
 	PARAM(Solver.DYNAMIC_TS, 0)
-	PARAM(Solver.DYNAMIC_LTE, 5e-2)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
-
+	#else
+	PARAM(Solver.ACCURACY, 1e-6)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.METHOD, "MAT_CR")
+	PARAM(Solver.PARALLEL, 0)
+	PARAM(Solver.DYNAMIC_TS, 0)
+	PARAM(Solver.DYNAMIC_LTE, 5e-1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-6)
+	#endif
 	LOCAL_SOURCE(zac1b11142_schematics)
+	LOCAL_SOURCE(zac1b11142_schematics_speech)
+	LOCAL_SOURCE(zac1b11142_schematics_dac)
 
 	ANALOG_INPUT(I_P12, 11.3) // +12V dropped with a 1N4004
 	ANALOG_INPUT(I_P5, 5)
@@ -333,6 +402,8 @@ NETLIST_START(zac1b11142)
 	ALIAS(ANAL6, R_AY4H_C.2)
 
 	INCLUDE(zac1b11142_schematics)
+	INCLUDE(zac1b11142_schematics_speech)
+	INCLUDE(zac1b11142_schematics_dac)
 
 	RES(R1, RES_K(100))
 	RES(R3, RES_K(10))
@@ -342,9 +413,6 @@ NETLIST_START(zac1b11142)
 	NET_C(R3.2, C7.1)
 	NET_C(C7.2, R1.1)   // Connect to Pin 2 - also other sounds are mixed in here <- sound out
 	NET_C(R1.2, GND)    // Actually connected to ~6V from pin 3 of TDA1510
-
-	// FIXME: connect other sounds to netlist as well for proper mixing
-	// FIXME: make P1 controllable by mame ui (see pong for an example)
 
 	#if (USE_FRONTIERS)
 	OPTIMIZE_FRONTIER(R124.1, RES_K(39), 50)
@@ -357,4 +425,8 @@ NETLIST_START(zac1b11142)
 	OPTIMIZE_FRONTIER(R96.1, RES_K(4.7), 50)
 	#endif
 
+	// Reverse so that volume raises with raising percentage in ui
+	PARAM(P1.REVERSE, 1)
+	PARAM(P2.REVERSE, 1)
+	PARAM(P3.REVERSE, 1)
 NETLIST_END()

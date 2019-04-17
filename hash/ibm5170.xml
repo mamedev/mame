@@ -8744,6 +8744,29 @@
 		</part>
 	</software>
 
+	<software name="colonize">
+		<description>Sid Meier's Colonization</description>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<info name="developer" value="Microprose" />
+		<info name="version" value="2.25 - 15 Sept 94" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3d8870fe" sha1="05e48f9484e17216f372226327b637867f04f23f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="e7b9f904" sha1="5a24d1a62607f477ff41de5686f7fb6e19f3c6e9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="8e1d0f15" sha1="a37fe28e8662fa6855eef9347d83ed3fcafc0b06" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="corncob">
 		<description>Corncob Deluxe</description>
 		<year>1992</year>
@@ -9536,6 +9559,19 @@
 		</part>
 	</software>
 
+	<software name="krustyfh">
+		<description>Krusty's Fun House</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
+		<info name="developer" value="Audiogenic Software" />
+		<info name="ported by" value="Denton Designs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Krusty's Fun House [Acclaim] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4a41461f" sha1="21e1ef6a7806d3620366baf1b84fa43e71c13617" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="kyrandia">
 		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One</description>
 		<year>1992</year>
@@ -10848,6 +10884,23 @@
 		</part>
 	</software>
 
+	<software name="mjflight">
+		<description>Michael Jordan in Flight</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Pacific Gameworks, ZCT Systems Group" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Michael Jordan in Flight [Electronic Arts] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="a9de8087" sha1="dbba3b92d0a56f5a5afa3c86f539cbb1cafe3f6c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Michael Jordan in Flight [Electronic Arts] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c8002fd1" sha1="7bc70f93d506a5e3408945fc9a32de285a9877ce" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="msroa">
 		<description>Microsoft Return of Arcade</description>
 		<year>1996</year>

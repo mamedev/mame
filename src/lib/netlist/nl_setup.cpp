@@ -272,8 +272,10 @@ pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) 
 void setup_t::register_term(detail::core_terminal_t &term)
 {
 	if (!m_terminals.insert({term.name(), &term}).second)
+	{
 		log().fatal(MF_2_ADDING_1_2_TO_TERMINAL_LIST, termtype_as_str(term),
 				term.name());
+	}
 	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
 
@@ -766,11 +768,20 @@ void setup_t::resolve_inputs()
 	{
 		detail::core_terminal_t *term = i.second;
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
-			log().warning(MW_1_DUMMY_1_WITHOUT_CONNECTIONS, term->name());
+			log().info(MI_1_DUMMY_1_WITHOUT_CONNECTIONS, term->name());
 		else if (!term->has_net())
 			errstr += plib::pfmt("Found terminal {1} without a net\n")(term->name());
 		else if (term->net().num_cons() == 0)
-			log().warning(MW_1_TERMINAL_1_WITHOUT_CONNECTIONS, term->name());
+		{
+			if (term->is_logic_input())
+				log().warning(MW_1_LOGIC_INPUT_1_WITHOUT_CONNECTIONS, term->name());
+			else if (term->is_logic_output())
+				log().info(MI_1_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS, term->name());
+			else if (term->is_analog_output())
+				log().info(MI_1_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS, term->name());
+			else
+				log().warning(MW_1_TERMINAL_1_WITHOUT_CONNECTIONS, term->name());
+		}
 	}
 	//FIXME: error string handling
 	if (errstr != "")
@@ -912,6 +923,7 @@ nl_double models_t::value(pstring model, pstring entity)
 	{
 		case 'M': factor = 1e6; break;
 		case 'k': factor = 1e3; break;
+		case 'K': factor = 1e3; break;
 		case 'm': factor = 1e-3; break;
 		case 'u': factor = 1e-6; break;
 		case 'n': factor = 1e-9; break;
@@ -1072,7 +1084,7 @@ void setup_t::prepare_to_run()
 				// FIXME: get device name, check for device
 			}
 			else
-				log().info("Unknown parameter: {}", p.first);
+				log().warning("Unknown parameter: {}", p.first);
 		}
 	}
 
@@ -1104,7 +1116,7 @@ void setup_t::prepare_to_run()
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{
-			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
+			log().info(MI_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
 				t->name(), t->m_N.net().name(), t->m_P.net().name());
 			t->m_N.net().remove_terminal(t->m_N);
 			t->m_P.net().remove_terminal(t->m_P);
@@ -1143,7 +1155,11 @@ bool source_t::parse(nlparse_t &setup, const pstring &name)
 		return false;
 	else
 	{
-		return setup.parse_stream(stream(name), name);
+		auto strm(stream(name));
+		if (strm)
+			return setup.parse_stream(std::move(strm), name);
+		else
+			return false;
 	}
 }
 

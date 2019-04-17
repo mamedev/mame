@@ -134,6 +134,7 @@ public:
 	void cdimono2_mem(address_map &map);
 	void cdimono2_servo_mem(address_map &map);
 	void cdimono2_slave_mem(address_map &map);
+	void cdi070_cpuspace(address_map &map);
 };
 
 /*----------- debug defines -----------*/

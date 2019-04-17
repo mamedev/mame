@@ -408,8 +408,8 @@ void polepos_state::machine_start()
 void polepos_state::machine_reset()
 {
 	/* set the interrupt vectors (this shouldn't be needed) */
-	m_subcpu->set_input_line_vector(0, Z8000_NVI);
-	m_subcpu2->set_input_line_vector(0, Z8000_NVI);
+	m_subcpu->set_input_line_vector(0, Z8000_NVI); // Z8002
+	m_subcpu2->set_input_line_vector(0, Z8000_NVI); // Z8002
 }
 
 

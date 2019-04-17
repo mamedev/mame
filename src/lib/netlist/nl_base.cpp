@@ -1036,10 +1036,31 @@ plib::unique_ptr<plib::pistream> param_data_t::stream()
 		return dynamic_cast<const logic_t *>(this) != nullptr;
 	}
 
+	bool detail::core_terminal_t::is_logic_input() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_input_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_logic_output() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_output_t *>(this) != nullptr;
+	}
+
 	bool detail::core_terminal_t::is_analog() const NL_NOEXCEPT
 	{
 		return dynamic_cast<const analog_t *>(this) != nullptr;
 	}
+
+	bool detail::core_terminal_t::is_analog_input() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_input_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_analog_output() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_output_t *>(this) != nullptr;
+	}
+
 
 	bool detail::net_t::is_logic() const NL_NOEXCEPT
 	{

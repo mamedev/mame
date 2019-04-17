@@ -146,7 +146,7 @@ enum
 #define LOG_DETAIL     (1U<<31)  // Increased detail
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_ADDRESSBUS )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
 
@@ -2746,15 +2746,22 @@ void tms99xx_device::alu_int()
 }
 
 /**************************************************************************/
+
+/*
+    The minimum number of cycles applies to a command like STWP R0.
+*/
 uint32_t tms99xx_device::execute_min_cycles() const
 {
-	return 2;
+	return 8;
 }
 
-// TODO: Compute this value, just a wild guess for the average
+/*
+    The maximum number of cycles applies to a DIV command, depending on the
+    data to be divided, and the mode of adressing.
+*/
 uint32_t tms99xx_device::execute_max_cycles() const
 {
-	return 10;
+	return 124;
 }
 
 uint32_t tms99xx_device::execute_input_lines() const

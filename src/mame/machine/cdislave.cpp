@@ -23,10 +23,7 @@ TODO:
 
 #include "emu.h"
 #include "machine/cdislave.h"
-#include "machine/cdi070.h"
 #include "includes/cdi.h"
-
-#include "cpu/m68000/m68000.h"
 
 
 // device type definition
@@ -57,8 +54,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 {
 	verboselog(*this, 0, "%s", "Asserting IRQ2\n" );
-	m_maincpu->set_input_line_vector(M68K_IRQ_2, 26);
-	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	m_int_callback(ASSERT_LINE);
 	m_interrupt_timer->adjust(attotime::never);
 }
 
@@ -155,8 +151,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 				case 0xf4:
 				case 0xf7:
 					verboselog(*this, 0, "%s", "slave_r: De-asserting IRQ2\n" );
-					m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-					break;
+					m_int_callback(CLEAR_LINE);					break;
 			}
 		}
 		m_channel[offset].m_out_index++;
@@ -434,12 +429,23 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 
 cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDI_SLAVE, tag, owner, clock)
-	, m_maincpu(*this, ":maincpu")
+	, m_int_callback(*this)
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_mousex(*this, "MOUSEX")
 	, m_mousey(*this, "MOUSEY")
 	, m_mousebtn(*this, "MOUSEBTN")
 {
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void cdislave_device::device_resolve_objects()
+{
+	m_int_callback.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -529,4 +535,6 @@ void cdislave_device::device_reset()
 
 	m_fake_mouse_x = 0;
 	m_fake_mouse_y = 0;
+
+	m_int_callback(CLEAR_LINE);
 }

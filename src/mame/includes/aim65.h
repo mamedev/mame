@@ -16,6 +16,7 @@
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
+#include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/mos6530n.h"
@@ -29,6 +30,10 @@ class aim65_state : public driver_device
 public:
 	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_riot_port_a(0)
+		, m_pb_save(0)
+		, m_kb_en(true)
+		, m_ca2(true)
 		, m_maincpu(*this, "maincpu")
 		, m_cassette1(*this, "cassette")
 		, m_cassette2(*this, "cassette2")
@@ -42,6 +47,9 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_ds(*this, "ds%u", 1)
 		, m_digits(*this, "digit%u", 0U)
+		, m_rs232(*this, "rs232")
+		, m_via0(*this, "via0")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 	{
 	}
 
@@ -50,14 +58,13 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
-	DECLARE_WRITE8_MEMBER(aim65_pia_b_w);
-	DECLARE_READ8_MEMBER(aim65_riot_b_r);
-	DECLARE_WRITE8_MEMBER(aim65_riot_a_w);
-	DECLARE_WRITE8_MEMBER(aim65_pb_w);
-	DECLARE_READ8_MEMBER(aim65_pb_r);
+	void u1_pa_w(u8 data);
+	void u1_pb_w(u8 data);
+	u8 z33_pb_r();
+	void z32_pb_w(u8 data);
+	u8 z32_pb_r();
 
-	template <unsigned D> DECLARE_WRITE16_MEMBER(aim65_update_ds);
+	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z24_load) { return load_cart(image, m_z24, "z24"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z25_load) { return load_cart(image, m_z25, "z25"); }
@@ -69,11 +76,13 @@ protected:
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
 
-	void aim65_mem(address_map &map);
+	void mem_map(address_map &map);
 
 private:
 	uint8_t m_riot_port_a;
 	uint8_t m_pb_save;
+	bool m_kb_en;
+	bool m_ca2;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
@@ -88,6 +97,9 @@ private:
 	required_device<ram_device> m_ram;
 	required_device_array<dl1416_device, 5> m_ds;
 	output_finder<20> m_digits;
+	required_device<rs232_port_device> m_rs232;
+	required_device<via6522_device> m_via0;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 

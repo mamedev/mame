@@ -328,8 +328,7 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 void atarikee_state::atarikee(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_atarikee);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_atarikee);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -344,20 +343,20 @@ void atarikee_state::atarikee(machine_config &config)
 //#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
-MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
+void stuntcyc_state::stuntcyc(machine_config &config)
+{
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK);
-	m_maincpu->set_constructor(netlist_stuntcyc);
+	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK).set_source(netlist_stuntcyc);
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit1",  "probe_bit1",  stuntcyc_state, probe_bit1_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit2",  "probe_bit2",  stuntcyc_state, probe_bit2_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit3",  "probe_bit3",  stuntcyc_state, probe_bit3_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit4",  "probe_bit4",  stuntcyc_state, probe_bit4_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit5",  "probe_bit5",  stuntcyc_state, probe_bit5_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit6",  "probe_bit6",  stuntcyc_state, probe_bit6_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_clock", "probe_clock", stuntcyc_state, probe_clock_cb, "")
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit0", 0).set_params("probe_bit0", FUNC(stuntcyc_state::probe_bit0_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit1", 0).set_params("probe_bit1", FUNC(stuntcyc_state::probe_bit1_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit2", 0).set_params("probe_bit2", FUNC(stuntcyc_state::probe_bit2_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit3", 0).set_params("probe_bit3", FUNC(stuntcyc_state::probe_bit3_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit4", 0).set_params("probe_bit4", FUNC(stuntcyc_state::probe_bit4_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit5", 0).set_params("probe_bit5", FUNC(stuntcyc_state::probe_bit5_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit6", 0).set_params("probe_bit6", FUNC(stuntcyc_state::probe_bit6_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_clock", 0).set_params("probe_clock", FUNC(stuntcyc_state::probe_clock_cb));
 
 /* video hardware */
 	SCREEN(config, m_probe_screen, SCREEN_TYPE_RASTER);
@@ -369,13 +368,14 @@ MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	//m_video->set_vert_params(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL);
 	//m_video->set_fieldcount(1);
 	//m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gtrak10_state::gtrak10)
+void gtrak10_state::gtrak10(machine_config &config)
+{
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_constructor(netlist_gtrak10);
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(netlist_gtrak10);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	/* video hardware */
 
@@ -408,8 +408,7 @@ MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
 	//m_video->set_gain(1.50);
-
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( gtrak10 )
 	// TODO

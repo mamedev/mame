@@ -25,7 +25,6 @@ TODO:
 #include "video/mcd212.h"
 #include "includes/cdi.h"
 
-#include "cpu/m68000/m68000.h"
 #include "screen.h"
 
 
@@ -603,24 +602,10 @@ void mcd212_device::process_ica(int channel)
 				verboselog(*this, 11, "%08x: %08x: ICA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
 				m_channel[1].csrr |= 1 << (2 - channel);
 				if(m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
-				{
-					uint8_t interrupt = (state->m_scc->get_lir() >> 4) & 7;
-					if(interrupt)
-					{
-						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
-					}
-				}
+					m_int1_callback(ASSERT_LINE);
 #if 0
 				if(m_channel[1].csrr & MCD212_CSR2R_IT2)
-				{
-					uint8_t interrupt = state->m_scc68070_regs.lir & 7;
-					if(interrupt)
-					{
-						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
-						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
-					}
-				}
+					m_int2_callback(ASSERT_LINE);
 #endif
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
@@ -693,24 +678,10 @@ void mcd212_device::process_dca(int channel)
 				verboselog(*this, 11, "%08x: %08x: DCA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
 				m_channel[1].csrr |= 1 << (2 - channel);
 				if(m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
-				{
-					uint8_t interrupt = (state->m_scc->get_lir() >> 4) & 7;
-					if(interrupt)
-					{
-						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
-					}
-				}
+					m_int1_callback(ASSERT_LINE);
 #if 0
 				if(m_channel[1].csrr & MCD212_CSR2R_IT2)
-				{
-					uint8_t interrupt = state->m_scc68070_regs.lir & 7;
-					if(interrupt)
-					{
-						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
-						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
-					}
-				}
+					m_int2_callback(ASSERT_LINE);
 #endif
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
@@ -1328,7 +1299,6 @@ void mcd212_device::draw_scanline(int y)
 
 READ16_MEMBER( mcd212_device::regs_r )
 {
-	cdi_state *state = machine().driver_data<cdi_state>();
 	uint8_t channel = 1 - (offset / 8);
 
 	switch(offset)
@@ -1342,20 +1312,14 @@ READ16_MEMBER( mcd212_device::regs_r )
 				{
 					return m_channel[0].csrr;
 				}
-				else
+				else if (!machine().side_effects_disabled())
 				{
 					uint8_t old_csr = m_channel[1].csrr;
-					uint8_t interrupt1 = (state->m_scc->get_lir() >> 4) & 7;
-					//uint8_t interrupt2 = state->m_scc68070_regs.lir & 7;
 					m_channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
-					if(interrupt1)
-					{
-						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
-					}
-					//if(interrupt2)
-					//{
-					//  state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
-					//}
+					if (old_csr & MCD212_CSR2R_IT1)
+						m_int1_callback(CLEAR_LINE);
+					if (old_csr & MCD212_CSR2R_IT2)
+						m_int2_callback(CLEAR_LINE);
 					return old_csr;
 				}
 			}
@@ -1511,6 +1475,9 @@ void mcd212_device::device_reset()
 	}
 	memset(m_region_flag_0, 0, 768);
 	memset(m_region_flag_1, 0, 768);
+
+	m_int1_callback(CLEAR_LINE);
+	m_int2_callback(CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -1520,8 +1487,22 @@ void mcd212_device::device_reset()
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCD212, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_int1_callback(*this)
+	, m_int2_callback(*this)
 	, m_lcd(*this, ":lcd")
 {
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void mcd212_device::device_resolve_objects()
+{
+	m_int1_callback.resolve_safe();
+	m_int2_callback.resolve_safe();
 }
 
 //-------------------------------------------------

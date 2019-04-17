@@ -234,7 +234,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 
 WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
 {
-	m_audiocpu->set_input_line_vector(0, 0x03);
+	m_audiocpu->set_input_line_vector(0, 0x03); // S2650
 	//m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	m_audiocpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }

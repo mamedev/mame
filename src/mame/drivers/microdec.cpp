@@ -173,7 +173,7 @@ void microdec_state::machine_reset()
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
-	m_maincpu->set_input_line_vector(0, 0x7f);
+	m_maincpu->set_input_line_vector(0, 0x7f); // Z80
 }
 
 static void microdec_floppies(device_slot_interface &device)

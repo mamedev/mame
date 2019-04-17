@@ -511,8 +511,8 @@ INPUT_PORTS_END
 *         Machine Drivers          *
 ***********************************/
 
-MACHINE_CONFIG_START(cocoloco_state::cocoloco)
-
+void cocoloco_state::cocoloco(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cocoloco_state::cocoloco_map);
@@ -537,18 +537,16 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(nl_cocoloco)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(NETLIST_NAME(nl_cocoloco))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RAMP.1")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0 * 1.5, 0)
-
-MACHINE_CONFIG_END
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5, 0);
+}
 
 
 /***********************************

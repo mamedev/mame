@@ -20,11 +20,17 @@ This is the world's 1st released dedicated chess computer. Oddly, the rows/colum
 are reversed: left to right is 1-8, bottom to top is A-H, eg. pawn from D2 to D4
 is 4B to 4D here.
 
-PCB label PC-P-86, P179 C-2 7.77
-NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
-Everything goes via a NEC B8228, its special features are unused.
-NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
-8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
+The CC1 patent(US4235442) refers to a Hewlett Packard chess program. It was eventually
+found out that it was written for a HP-9810A by Alan A. Wray in 1974, and CC1 is very
+similar to it. Ron C. Nelson must have ported the algorithms to 8080 when he wrote
+his Altair 8800 chess program, and this is what made it into CC1.
+
+CC1 hardware overview:
+- PCB label PC-P-86, P179 C-2 7.77
+- NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
+- Everything goes via a NEC B8228, its special features are unused.
+- NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
+- 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
 
 Chess Challenger 3 is on the same hardware, but with double ROM size, and they
 corrected the reversed chess notation. It was also offered as an upgrade to CC1.

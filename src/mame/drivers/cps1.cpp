@@ -357,7 +357,7 @@ void cps_state::cpu_space_map(address_map &map)
 									 // clear the IPL1 and IPL2 flip-flops
 									 m_maincpu->set_input_line(2, CLEAR_LINE);
 									 m_maincpu->set_input_line(4, CLEAR_LINE);
-									 return 0x19+offset; });
+									 return m68000_device::autovector(offset+1); });
 }
 
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Kevin Horton
+// copyright-holders:hap
+// thanks-to:Kevin Horton
 /***************************************************************************
 
   Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,

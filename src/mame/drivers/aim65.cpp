@@ -1,26 +1,17 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner, Dan Boris, Dirk Best, Robbbert
 /******************************************************************************
- PeT mess@utanet.at Nov 2000pia6821_device
-Updated by Dan Boris, 3/4/2007
+ PeT mess@utanet.at Nov 2000
+Updated by Dan Boris, 2000-04-03
 Rewrite in progress, Dirk Best, 2007-07-31
+Updated by Robbbert 2019-04-14
 
 ToDo:
     - Printer. Tried to implement this but it was not working, currently disabled.
-    - Dual tape interface (done, but see bugs below)
-    - Implement punchtape reader/writer and TTY keyboard
+    - Implement punchtape reader/writer
     - Front panel Reset switch (switch S1)
     - Front panel Run/Step switch (switch S2)
 
-Bugs
-    - Cassette should output data on PB7, but the bit stays High.
-    - At the end of saving, both motors sometimes get turned on!
-    - CA2 should switch the cassette circuits between input and output.
-      It goes High on Read (correct) but doesn't go Low for Write.
-    - Read of CA1 is to check the printer, but it never happens.
-    - Write to CB1 should occur to activate printer's Start line, but it
-      also never happens.
-    - The common factor is the 6522, maybe it has problems..
 
 ******************************************************************************/
 
@@ -47,17 +38,17 @@ static constexpr XTAL AIM65_CLOCK(4_MHz_XTAL / 4);
 ***************************************************************************/
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
-void aim65_state::aim65_mem(address_map &map)
+void aim65_state::mem_map(address_map &map)
 {
 	map(0x1000, 0x3fff).noprw(); /* User available expansions */
 	map(0x4000, 0x7fff).rom(); /* 4 ROM sockets in 16K PROM/ROM module */
 	map(0x8000, 0x9fff).noprw(); /* User available expansions */
-	map(0xa000, 0xa00f).mirror(0x3f0).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)); // user via
+	map(0xa000, 0xa00f).mirror(0x3f0).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write)); // user via
 	map(0xa400, 0xa47f).m("riot", FUNC(mos6532_new_device::ram_map));
 	map(0xa480, 0xa497).m("riot", FUNC(mos6532_new_device::io_map));
 	map(0xa498, 0xa7ff).noprw(); /* Not available */
-	map(0xa800, 0xa80f).mirror(0x3f0).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write)); // system via
-	map(0xac00, 0xac03).rw("pia6821", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa800, 0xa80f).mirror(0x3f0).rw("via0", FUNC(via6522_device::read), FUNC(via6522_device::write)); // system via
+	map(0xac00, 0xac03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xac04, 0xac43).ram(); /* PIA RAM */
 	map(0xac44, 0xafff).noprw(); /* Not available */
 	map(0xb000, 0xffff).rom(); /* 5 ROM sockets */
@@ -69,7 +60,7 @@ void aim65_state::aim65_mem(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( aim65 )
-	PORT_START("keyboard_0")
+	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")       PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".  >")        PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
@@ -79,7 +70,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")           PORT_CODE(KEYCODE_Z)          PORT_CHAR('z')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("keyboard_1")
+	PORT_START("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LF  @")       PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(10)  PORT_CHAR('@')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")           PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
@@ -89,7 +80,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")           PORT_CODE(KEYCODE_A)          PORT_CHAR('a')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("keyboard_2")
+	PORT_START("KEY.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Print")       PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
@@ -99,7 +90,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")           PORT_CODE(KEYCODE_W)          PORT_CHAR('w')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")         PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
-	PORT_START("keyboard_3")
+	PORT_START("KEY.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")      PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-  =")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('-') PORT_CHAR('=')
@@ -109,7 +100,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")           PORT_CODE(KEYCODE_E)          PORT_CHAR('e')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")           PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')
 
-	PORT_START("keyboard_4")
+	PORT_START("KEY.4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")        PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":  *")        PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(':') PORT_CHAR('*')
@@ -119,7 +110,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3  #")        PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1  !")        PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
 
-	PORT_START("keyboard_5")
+	PORT_START("KEY.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
@@ -129,7 +120,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2  \"")       PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")          PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(UCHAR_MAMEKEY(F3))
 
-	PORT_START("keyboard_6")
+	PORT_START("KEY.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")         PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";  +")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
@@ -139,7 +130,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")           PORT_CODE(KEYCODE_S)          PORT_CHAR('s')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")          PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(UCHAR_MAMEKEY(F2))
 
-	PORT_START("keyboard_7")
+	PORT_START("KEY.7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/  ?")        PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
@@ -185,59 +176,74 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 	return image_init_result::PASS;
 }
 
+// TTY terminal settings. To use, turn KB/TTY switch to TTY, reset, press DEL. All input to be in UPPERCASE.
+static DEVICE_INPUT_DEFAULTS_START( serial_term )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, AIM65_CLOCK); /* 1 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aim65_state::aim65_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aim65_state::mem_map);
 
 	config.set_default_layout(layout_aim65);
 
 	/* alpha-numeric display */
 	DL1416T(config, m_ds[0], u32(0));
-	m_ds[0]->update().set(FUNC(aim65_state::aim65_update_ds<1>));
+	m_ds[0]->update().set(FUNC(aim65_state::update_ds<1>));
 	DL1416T(config, m_ds[1], u32(0));
-	m_ds[1]->update().set(FUNC(aim65_state::aim65_update_ds<2>));
+	m_ds[1]->update().set(FUNC(aim65_state::update_ds<2>));
 	DL1416T(config, m_ds[2], u32(0));
-	m_ds[2]->update().set(FUNC(aim65_state::aim65_update_ds<3>));
+	m_ds[2]->update().set(FUNC(aim65_state::update_ds<3>));
 	DL1416T(config, m_ds[3], u32(0));
-	m_ds[3]->update().set(FUNC(aim65_state::aim65_update_ds<4>));
+	m_ds[3]->update().set(FUNC(aim65_state::update_ds<4>));
 	DL1416T(config, m_ds[4], u32(0));
-	m_ds[4]->update().set(FUNC(aim65_state::aim65_update_ds<5>));
+	m_ds[4]->update().set(FUNC(aim65_state::update_ds<5>));
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.1);
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	/* other devices */
 	mos6532_new_device &riot(MOS6532_NEW(config, "riot", AIM65_CLOCK));
-	riot.pa_wr_callback().set(FUNC(aim65_state::aim65_riot_a_w));
-	riot.pb_rd_callback().set(FUNC(aim65_state::aim65_riot_b_r));
+	riot.pa_wr_callback().set([this] (u8 data) { m_riot_port_a = data; });
+	riot.pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
 	riot.irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
-	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
+	VIA6522(config, m_via0, AIM65_CLOCK);
+	m_via0->readpb_handler().set([this] () { return aim65_state::z32_pb_r(); });
+	m_via0->writepb_handler().set([this] (u8 data) { aim65_state::z32_pb_w(data); });
 	// in CA1 printer ready?
-	via0.writepb_handler().set(FUNC(aim65_state::aim65_pb_w));
-	// out CB1 printer start
 	// out CA2 cass control (H=in)
+	m_via0->ca2_handler().set([this] (bool state) { m_ca2 = state; });
+	// out CB1 printer start
+	//m_via0->cb1_handler().set(FUNC(aim65_state::z32_cb1_w));
 	// out CB2 turn printer on
-	via0.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+	//m_via0->cb2_handler().set(FUNC(aim65_state::z32_cb2_w));
+	m_via0->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	via6522_device &via1(VIA6522(config, "via6522_1", AIM65_CLOCK));
+	via6522_device &via1(VIA6522(config, "via1", AIM65_CLOCK));
 	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	pia6821_device &pia(PIA6821(config, "pia6821", 0));
-	pia.writepa_handler().set(FUNC(aim65_state::aim65_pia_a_w));
-	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set([this] (u8 data) { aim65_state::u1_pa_w(data); });
+	pia.writepb_handler().set([this] (u8 data) { aim65_state::u1_pb_w(data); });
 
-	// Deck 1 can play and record
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-
-	// Deck 2 can only record
 	CASSETTE(config, m_cassette2);
-	m_cassette2->set_default_state(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+
+	/* TTY interface */
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	//m_rs232->rxd_handler().set(m_via0, FUNC(via6522_device::write_pb6));  // function disabled in 6522via.cpp
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(serial_term));
 
 	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_z26_cart")
 	MCFG_GENERIC_EXTENSIONS("z26")

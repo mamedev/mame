@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle, Kevin Horton
+// copyright-holders:hap
+// thanks-to:Sean Riddle, Kevin Horton
 /***************************************************************************
 
   This driver is a collection of simple dedicated handheld and tabletop

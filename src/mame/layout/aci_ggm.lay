@@ -1,0 +1,294 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0.16" green="0.16" blue="0.16" /></rect></element>
+	<element name="disk_white"><disk><color red="0.73" green="0.73" blue="0.73" /></disk></element>
+	<element name="brown"><rect><color red="0.25" green="0.1" blue="0.05" /></rect></element>
+
+	<element name="digit" defstate="0">
+		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
+	</element>
+
+	<element name="seg_disk" defstate="0">
+		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
+		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
+	</element>
+	<element name="seg_rect" defstate="0">
+		<rect state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></rect>
+		<rect state="1"><color red="0.2" green="1.0" blue="0.85" /></rect>
+	</element>
+
+	<element name="reset" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.8" height="3.7" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<disk state="0">
+			<bounds x="0.0" y="1.9" width="1.8" height="1.8" />
+			<color red="0.4" green="0.4" blue="0.4" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.0" y="0.0" width="1.8" height="1.8" />
+			<color red="0.4" green="0.4" blue="0.4" />
+		</disk>
+	</element>
+
+	<element name="hl" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="text_r1"><text string="MEM"><color red="0.3" green="0.3" blue="0.3" /></text></element>
+	<element name="text_r2"><text string="ON"><color red="0.3" green="0.3" blue="0.3" /></text></element>
+
+	<element name="text_boris01">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="RESTORE"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris02">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="G.7"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris03">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="H.8"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris04">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="9"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris05">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="CE"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris06a">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="HALT /" align="1"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris06b">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="HINT" align="1"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris07">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="D.4"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris08">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="E.5"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris09">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="F.6"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris10">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="TIME"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris11">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string=".BEST"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris12">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="A.1"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris13">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="B.2"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris14">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="C.3"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris15">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="RANK"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris16">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="LEVEL"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris17">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="0"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris18">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="-"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris19">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="B/W"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+	<element name="text_boris20">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="ENTER"><color red="0.8" green="0.7" blue="0.4" /></text>
+	</element>
+
+	<element name="text_borisp">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="[P]"><color red="0.8" green="0.1" blue="0.15" /></text>
+	</element>
+	<element name="text_borisn">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="[N]"><color red="0.8" green="0.1" blue="0.15" /></text>
+	</element>
+	<element name="text_borisb">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="[B]"><color red="0.8" green="0.1" blue="0.15" /></text>
+	</element>
+	<element name="text_borisr">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="[R]"><color red="0.8" green="0.1" blue="0.15" /></text>
+	</element>
+	<element name="text_borisq">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="[Q]"><color red="0.8" green="0.1" blue="0.15" /></text>
+	</element>
+	<element name="text_borisk">
+		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
+		<text string="[K]"><color red="0.8" green="0.1" blue="0.15" /></text>
+	</element>
+
+<!-- groups -->
+
+	<group name="display">
+		<bounds x="0" y="0" width="88" height="19" />
+
+		<repeat count="8">
+			<param name="i" start="7" increment="-1" />
+			<param name="digit_x" start="0" increment="11" />
+			<param name="dp_x" start="8.8" increment="11" />
+			<param name="ap1_x" start="10.1" increment="11" />
+			<param name="ap2_x" start="10.5" increment="11" />
+			<param name="dot_x" start="3.5" increment="11" />
+
+			<bezel name="digit~i~" element="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></bezel>
+			<bezel name="~i~.14" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
+			<bezel name="~i~.15" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
+			<bezel name="~i~.15" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
+			<bezel element="disk_white"><bounds x="~dot_x~" y="17.1" width="1.9" height="1.9" /></bezel>
+		</repeat>
+	</group>
+
+	<group name="buttons_base">
+		<bounds x="0" y="0" width="19.5" height="13.5" />
+
+		<repeat count="4">
+			<param name="y" start="0" increment="3.5" />
+			<repeat count="5">
+				<param name="x" start="0" increment="4" />
+				<bezel element="~basecolor~"><bounds x="~x~" y="~y~" width="3.5" height="3" /></bezel>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="buttons_boris">
+		<bounds x="0" y="0" width="19.5" height="13.5" />
+
+		<bezel element="text_boris01"><bounds x="0.1" y="0.9" width="3.3" height="1" /></bezel>
+		<bezel element="text_boris02"><bounds x="4.1" y="0.01" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris03"><bounds x="8.1" y="0.01" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris04"><bounds x="12.1" y="0.4" width="3.3" height="1.9" /></bezel>
+		<bezel element="text_boris05"><bounds x="16.1" y="0.6" width="3.3" height="1.5" /></bezel>
+
+		<bezel element="text_boris06a"><bounds x="0.6" y="4.0" width="2.8" height="1" /></bezel>
+		<bezel element="text_boris06b"><bounds x="0.6" y="5.0" width="2.8" height="1" /></bezel>
+		<bezel element="text_boris07"><bounds x="4.1" y="3.51" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris08"><bounds x="8.1" y="3.51" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris09"><bounds x="12.1" y="3.51" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris10"><bounds x="16.1" y="4.4" width="3.3" height="1" /></bezel>
+
+		<bezel element="text_boris11"><bounds x="0.1" y="7.9" width="3.3" height="1" /></bezel>
+		<bezel element="text_boris12"><bounds x="4.1" y="7.01" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris13"><bounds x="8.1" y="7.01" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris14"><bounds x="12.1" y="7.01" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris15"><bounds x="16.1" y="7.9" width="3.3" height="1" /></bezel>
+
+		<bezel element="text_boris16"><bounds x="0.1" y="11.4" width="3.3" height="1" /></bezel>
+		<bezel element="text_boris17"><bounds x="4.1" y="10.9" width="3.3" height="1.9" /></bezel>
+		<bezel element="text_boris18"><bounds x="8.1" y="10.9" width="3.3" height="1.9" /></bezel>
+		<bezel element="text_boris19"><bounds x="12.1" y="11.1" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_boris20"><bounds x="16.1" y="11.4" width="3.3" height="1" /></bezel>
+
+		<bezel element="text_borisp"><bounds x="4.1" y="8.3" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_borisn"><bounds x="8.1" y="8.3" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_borisb"><bounds x="12.1" y="8.3" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_borisr"><bounds x="4.1" y="4.8" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_borisq"><bounds x="8.1" y="4.8" width="3.3" height="1.5" /></bezel>
+		<bezel element="text_borisk"><bounds x="12.1" y="4.8" width="3.3" height="1.5" /></bezel>
+	</group>
+
+	<group name="buttons_click">
+		<bounds x="0" y="0" width="19.5" height="13.5" />
+
+		<bezel element="hl" inputtag="IN.3" inputmask="0x08"><bounds x="0"  y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x04"><bounds x="4"  y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="8"  y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x10"><bounds x="12" y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x10"><bounds x="16" y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+
+		<bezel element="hl" inputtag="IN.3" inputmask="0x02"><bounds x="0"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x10"><bounds x="4"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x01"><bounds x="8"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x02"><bounds x="12" y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="16" y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+
+		<bezel element="hl" inputtag="IN.3" inputmask="0x04"><bounds x="0"  y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="4"  y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="8"  y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="12" y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="16" y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+
+		<bezel element="hl" inputtag="IN.3" inputmask="0x01"><bounds x="0"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x01"><bounds x="4"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x01"><bounds x="8"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="12" y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x10"><bounds x="16" y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+	</group>
+
+	<group name="mem_switch">
+		<bounds x="0" y="0" width="6" height="6.4" />
+
+		<bezel element="black"><bounds x="2.5" y="2" width="1" height="2.5" /></bezel>
+		<bezel element="text_r1"><bounds x="0" y="0" width="6" height="1.8" /></bezel>
+		<bezel element="text_r2"><bounds x="0" y="4.6" width="6" height="1.8" /></bezel>
+		<bezel element="reset" inputtag="IN.4" inputmask="0x02"><bounds x="2.345" y="1.9" width="1.31" height="2.7" /></bezel>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout, Boris 2.5">
+		<bounds left="-5" right="104" top="-2" bottom="93" />
+		<group ref="display"><bounds x="0" y="0" width="88" height="19" /></group>
+		<bezel element="black"><bounds x="-6" y="23" width="111" height="1.5" /></bezel>
+
+		<param name="basecolor" value="brown" />
+		<group ref="buttons_base"><bounds x="0" y="30" width="88" height="60.92" /></group>
+		<group ref="buttons_boris"><bounds x="0" y="30" width="88" height="60.92" /></group>
+		<group ref="buttons_click"><bounds x="0" y="30" width="88" height="60.92" /></group>
+		<group ref="mem_switch"><bounds x="87" y="28" width="18" height="19.2" /></group>
+	</view>
+
+	<view name="Internal Layout, No Overlay">
+		<bounds left="-5" right="104" top="-2" bottom="93" />
+		<group ref="display"><bounds x="0" y="0" width="88" height="19" /></group>
+		<bezel element="black"><bounds x="-6" y="23" width="111" height="1.5" /></bezel>
+
+		<param name="basecolor" value="brown" />
+		<group ref="buttons_base"><bounds x="0" y="30" width="88" height="60.92" /></group>
+		<group ref="buttons_click"><bounds x="0" y="30" width="88" height="60.92" /></group>
+		<group ref="mem_switch"><bounds x="87" y="28" width="18" height="19.2" /></group>
+	</view>
+
+</mamelayout>

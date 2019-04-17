@@ -45,6 +45,8 @@ public:
 	// construction/destruction
 	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto int_callback() { return m_int_callback.bind(); }
+
 	// non-static internal members
 	void sample_trigger();
 	void process_delayed_command();
@@ -57,6 +59,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -65,7 +68,9 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
-	required_device<cpu_device> m_maincpu;
+	devcb_write_line m_int_callback;
+
+	required_address_space m_memory_space;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<cdi68070_device> m_scc;
 	required_device<cdda_device> m_cdda;

@@ -207,9 +207,9 @@ void unichamp_state::machine_reset()
 	//The cart ROMS are self mapped to 0x1000
 	//upon boot the EXEC ROM puts 0x0800 on the bus for the CPU to use as first INT vector
 
-	m_maincpu->set_input_line_vector(CP1610_RESET,     0x0800);
-	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x0804);//not used anyway
-	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x0804);//not used anyway
+	m_maincpu->set_input_line_vector(CP1610_RESET,     0x0800); // CP1610
+	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x0804); // CP1610 - not used anyway
+	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x0804); // CP1610 - not used anyway
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(cp1610_cpu_device::CP1610_R7, 0x0800);

@@ -700,7 +700,7 @@ READ16_MEMBER( deco32_state::ioprot_r )
 	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 
-	return m_ioprot->read_data( deco146_addr, mem_mask, cs );
+	return m_ioprot->read_data( deco146_addr, cs );
 }
 
 WRITE16_MEMBER( deco32_state::ioprot_w )

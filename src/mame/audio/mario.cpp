@@ -661,9 +661,9 @@ void mario_state::mario_audio(machine_config &config)
 	m_discrete->set_intf(mario_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 1);
 #else
-	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-	snd_nl.set_constructor(netlist_mario);
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(netlist_mario)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, m_audio_snd0, "SOUND0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_audio_snd1, "SOUND1.IN", 0);
