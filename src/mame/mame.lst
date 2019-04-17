@@ -9969,6 +9969,7 @@ cmi2x                           // Fairlight CMI IIx
 
 @source:cmmb.cpp
 cmmb162                         //
+cmmb103
 
 @source:cms.cpp
 cms6502                         // CMS 6502 Development System
@@ -31229,7 +31230,7 @@ pbactiont                       // (c) 1985 Tehkan (Tecfri license)
 ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
-cadd810							// CompuAdd 810
+cadd810                         // CompuAdd 810
 compc1                          // 1984 Commodore PC-1
 comport                         // Compaq Portable
 dgone                           // 1984 Data General/One
