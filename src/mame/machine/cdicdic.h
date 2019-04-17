@@ -45,6 +45,10 @@ public:
 	// construction/destruction
 	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_clock2(uint32_t clock) { m_clock2 = clock; }
+	void set_clock2(const XTAL &xtal) { set_clock2(xtal.value()); }
+	uint32_t clock2() const { return m_clock2; }
+
 	auto intreq_callback() { return m_intreq_callback.bind(); }
 
 	// non-static internal members
@@ -69,6 +73,10 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
+	int is_valid_sample_buf(uint16_t addr) const;
+	double sample_buf_freq(uint16_t addr) const;
+	int sample_buf_size(uint16_t addr) const;
+
 	devcb_write_line m_intreq_callback;
 
 	required_address_space m_memory_space;
@@ -76,6 +84,8 @@ private:
 	required_device<scc68070_device> m_scc;
 	required_device<cdda_device> m_cdda;
 	optional_device<cdrom_image_device> m_cdrom_dev;
+
+	uint32_t m_clock2;
 
 	// internal state
 	uint16_t m_command;           // CDIC Command Register            (0x303c00)

@@ -106,9 +106,9 @@ const int32_t cdicdic_device::s_cdic_adpcm_filter_coef[5][2] =
 //  INLINES
 //**************************************************************************
 
-static inline int CDIC_IS_VALID_SAMPLE_BUF(uint16_t *cdram, uint16_t addr)
+int cdicdic_device::is_valid_sample_buf(uint16_t addr) const
 {
-	uint8_t *cdram8 = ((uint8_t*)cdram) + addr + 8;
+	const uint8_t *cdram8 = ((uint8_t*)m_ram.get()) + addr + 8;
 	if(cdram8[2] != 0xff)
 	{
 		return 1;
@@ -116,29 +116,29 @@ static inline int CDIC_IS_VALID_SAMPLE_BUF(uint16_t *cdram, uint16_t addr)
 	return 0;
 }
 
-static inline double CDIC_SAMPLE_BUF_FREQ(uint16_t *cdram, uint16_t addr)
+double cdicdic_device::sample_buf_freq(uint16_t addr) const
 {
-	uint8_t *cdram8 = ((uint8_t*)cdram) + addr + 8;
+	const uint8_t *cdram8 = ((uint8_t*)m_ram.get()) + addr + 8;
 	switch(cdram8[2] & 0x3f)
 	{
 		case 0:
 		case 1:
 		case 16:
 		case 17:
-			return 37800.0f;
+			return clock2() / 512.0f;
 
 		case 4:
 		case 5:
-			return 18900.0f;
+			return clock2() / 1024.0f;
 
 		default:
-			return 18900.0f;
+			return clock2() / 1024.0f;
 	}
 }
 
-static inline int CDIC_SAMPLE_BUF_SIZE(uint16_t *cdram, uint16_t addr)
+int cdicdic_device::sample_buf_size(uint16_t addr) const
 {
-	uint8_t *cdram8 = ((uint8_t*)cdram) + addr + 8;
+	const uint8_t *cdram8 = ((uint8_t*)m_ram.get()) + addr + 8;
 	switch(cdram8[2] & 0x3f)
 	{
 		case 0:
@@ -440,44 +440,44 @@ void cdicdic_device::decode_audio_sector(const uint8_t *xa, int32_t triggered)
 	{
 		case 0:
 			channels = 1;
-			m_audio_sample_freq = 37800.0f; //18900.0f;
+			m_audio_sample_freq = clock2() / 512.0f; // / 1024.0f;
 			bits = 4;
 			m_audio_sample_size = 4;
 			break;
 
 		case 1:
-			channels=2;
-			m_audio_sample_freq=37800.0f;
-			bits=4;
-			m_audio_sample_size=2;
+			channels = 2;
+			m_audio_sample_freq = clock2() / 512.0f;
+			bits = 4;
+			m_audio_sample_size = 2;
 			break;
 
 		case 4:
-			channels=1;
-			m_audio_sample_freq=18900.0f;   ///2.0f;
-			bits=4;
-			m_audio_sample_size=4;
+			channels = 1;
+			m_audio_sample_freq = clock2() / 1024.0f;   ///2.0f;
+			bits = 4;
+			m_audio_sample_size = 4;
 			break;
 
 		case 5:
-			channels=2;
-			m_audio_sample_freq=18900.0f;   //37800.0f/2.0f;
-			bits=4;
-			m_audio_sample_size=2;
+			channels = 2;
+			m_audio_sample_freq = clock2() / 1024.0f;   //37800.0f/2.0f;
+			bits = 4;
+			m_audio_sample_size = 2;
 			break;
 
 		case 16:
-			channels=1;
-			m_audio_sample_freq=37800.0f;
-			bits=8;
-			m_audio_sample_size=2;
+			channels = 1;
+			m_audio_sample_freq = clock2() / 512.0f;
+			bits = 8;
+			m_audio_sample_size = 2;
 			break;
 
 		case 17:
-			channels=2;
-			m_audio_sample_freq=37800.0f;
-			bits=8;
-			m_audio_sample_size=1;
+			channels = 2;
+			m_audio_sample_freq = clock2() / 512.0f;
+			bits = 8;
+			m_audio_sample_size = 1;
 			break;
 
 		default:
@@ -572,7 +572,7 @@ void cdicdic_device::sample_trigger()
 		m_decode_delay = 0;
 	}
 
-	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram.get(), m_decode_addr & 0x3ffe))
+	if(is_valid_sample_buf(m_decode_addr & 0x3ffe))
 	{
 		verboselog(*this, 0, "Hit audio_sample_trigger, with m_decode_addr == %04x, calling decode_audio_sector\n", m_decode_addr );
 
@@ -586,7 +586,7 @@ void cdicdic_device::sample_trigger()
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
 		verboselog(*this, 0, "%s", "Data is valid, setting up a new callback\n" );
-		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram.get(), m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram.get(), m_decode_addr & 0x3ffe));
+		m_decode_period = attotime::from_hz(sample_buf_freq(m_decode_addr & 0x3ffe)) * (18*28*2*sample_buf_size(m_decode_addr & 0x3ffe));
 		m_audio_sample_timer->adjust(m_decode_period);
 		//dmadac_enable(&dmadac[0], 2, 0);
 	}
@@ -1163,6 +1163,7 @@ cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, d
 	, m_scc(*this, ":maincpu")
 	, m_cdda(*this, ":cdda")
 	, m_cdrom_dev(*this, ":cdrom")
+	, m_clock2(clock)
 {
 }
 
