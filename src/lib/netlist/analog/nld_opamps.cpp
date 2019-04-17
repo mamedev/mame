@@ -116,7 +116,7 @@ namespace netlist
 		{
 			m_type = static_cast<int>(m_model.m_TYPE);
 			if (m_type < 1 || m_type > 3)
-				log().fatal(MF_1_UNKNOWN_OPAMP_TYPE, m_type);
+				log().fatal(MF_UNKNOWN_OPAMP_TYPE(m_type));
 
 			if (m_type == 1)
 			{

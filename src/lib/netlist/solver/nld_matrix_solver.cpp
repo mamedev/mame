@@ -127,8 +127,7 @@ namespace devices
 						}
 						break;
 					case detail::terminal_type::OUTPUT:
-						log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
-								p->name());
+						log().fatal(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
 						break;
 				}
 			}
@@ -438,7 +437,7 @@ namespace devices
 			// reschedule ....
 			if (this_resched > 1 && !m_Q_sync.net().is_queued())
 			{
-				log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
+				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
 				m_Q_sync.net().toggle_and_push_to_queue(m_params.m_nr_recalc_delay);
 			}
 		}
@@ -554,7 +553,7 @@ namespace devices
 			else // if (ot<0)
 			{
 				m_rails_temp[k]->add(term, ot, true);
-				log().fatal(MF_1_FOUND_TERM_WITH_MISSING_OTHERNET, term->name());
+				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
 	}

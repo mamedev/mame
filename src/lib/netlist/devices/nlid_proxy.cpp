@@ -106,7 +106,7 @@ namespace netlist
 		}
 		//FIXME: Use power terminals and change info to warning or error
 		if (!f)
-			log().info(MI_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
+			log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(out_proxied->device().name()));
 		else
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 	}

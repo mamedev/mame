@@ -1379,7 +1379,7 @@ namespace netlist
 				if (d.first == name)
 				{
 					dev.release();
-					log().fatal(MF_1_DUPLICATE_NAME_DEVICE_LIST, name);
+					log().fatal(MF_DUPLICATE_NAME_DEVICE_LIST(name));
 				}
 			//m_devices.push_back(std::move(dev));
 			m_devices.insert(m_devices.end(), { name, std::move(dev) });
@@ -1561,7 +1561,7 @@ namespace netlist
 			bool err = false;
 			auto vald = plib::pstonum_ne<T>(p, err);
 			if (err)
-				device.state().log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, p);
+				device.state().log().fatal(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
 			m_param = vald;
 		}
 		else

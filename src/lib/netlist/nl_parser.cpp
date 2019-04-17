@@ -68,7 +68,7 @@ bool parser_t::parse(const pstring &nlname)
 		{
 			require_token(m_tok_param_left);
 			if (!in_nl)
-				error (MF_0_UNEXPECTED_NETLIST_END);
+				error (MF_UNEXPECTED_NETLIST_END());
 			else
 			{
 				in_nl = false;
@@ -78,7 +78,7 @@ bool parser_t::parse(const pstring &nlname)
 		else if (token.is(m_tok_NETLIST_START))
 		{
 			if (in_nl)
-				error (MF_0_UNEXPECTED_NETLIST_START);
+				error (MF_UNEXPECTED_NETLIST_START());
 			require_token(m_tok_param_left);
 			token_t name = get_token();
 			require_token(m_tok_param_right);

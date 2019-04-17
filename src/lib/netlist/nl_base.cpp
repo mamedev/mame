@@ -227,7 +227,7 @@ detail::terminal_type detail::core_terminal_t::type() const
 		return terminal_type::OUTPUT;
 	else
 	{
-		state().log().fatal(MF_1_UNKNOWN_TYPE_FOR_OBJECT, name());
+		state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
 		return terminal_type::TERMINAL; // please compiler
 	}
 }
@@ -543,7 +543,7 @@ core_device_t *netlist_state_t::get_single_device(const pstring &classname, bool
 		if (cc(d.second.get()))
 		{
 			if (ret != nullptr)
-				m_log.fatal(MF_1_MORE_THAN_ONE_1_DEVICE_FOUND, classname);
+				m_log.fatal(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 			else
 				ret = d.second.get();
 		}
@@ -648,7 +648,7 @@ void device_t::connect(const pstring &t1, const pstring &t2)
 void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	if (!setup().connect(t1, t2))
-		log().fatal(MF_2_ERROR_CONNECTING_1_TO_2, t1.name(), t2.name());
+		log().fatal(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
 }
 
 
@@ -769,8 +769,7 @@ void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 {
 	for (auto &t : m_core_terms)
 		if (t == &terminal)
-			state().log().fatal(MF_2_NET_1_DUPLICATE_TERMINAL_2, name(),
-					t->name());
+			state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
 
 	terminal.set_net(this);
 
@@ -785,8 +784,7 @@ void detail::net_t::remove_terminal(detail::core_terminal_t &terminal)
 		plib::container::remove(m_core_terms, &terminal);
 	}
 	else
-		state().log().fatal(MF_2_REMOVE_TERMINAL_1_FROM_NET_2, terminal.name(),
-				this->name());
+		state().log().fatal(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
 }
 
 void detail::net_t::move_connections(detail::net_t &dest_net)
@@ -970,7 +968,7 @@ param_t::param_type_t param_t::param_type() const
 		return POINTER;
 	else
 	{
-		state().log().fatal(MF_1_UNKNOWN_PARAM_TYPE, name());
+		state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
 		return POINTER; /* Please compiler */
 	}
 }
@@ -1012,7 +1010,7 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
 
 void param_model_t::changed()
 {
-	state().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
+	state().log().fatal(MF_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME(name()));
 }
 
 const pstring param_model_t::value_str(const pstring &entity)
