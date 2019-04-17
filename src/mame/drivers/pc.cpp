@@ -703,7 +703,7 @@ ROM_END
 
 /**************************************************************** Kaypro PC ***
 
-Links:  https://www.youtube.com/watch?v=2YAEOhYEZbc , 
+Links:  https://www.youtube.com/watch?v=2YAEOhYEZbc ,
 
 ******************************************************************************/
 
@@ -1297,6 +1297,6 @@ COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state,
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
 COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
 COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
-COMP( 198?, hyo88t,			ibm5150, 0, 	 pccga,			 pccga,	   pc_state, empty_init, 	"Hyosung",						   "Topstar 88T",			MACHINE_NOT_WORKING )
-COMP( 198?, kyoxt,			ibm5150, 0,		 pccga,			 pccga,	   pc_state, empty_init,	"Kyocera",						   "XT",					MACHINE_NOT_WORKING )
-COMP( 198?, kaypropc,		ibm5150, 0,		 pccga,			 pccga,	   pc_state, empty_init,	"Kaypro Corporation",			   "PC",					MACHINE_NOT_WORKING )
+COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
+COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
+COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
