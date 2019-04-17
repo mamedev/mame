@@ -27,13 +27,13 @@
 
 
 // uCOM-43 products: 2000x8 ROM, 96x4 RAM, supports full instruction set
-DEFINE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device,  "upd546",  "NEC uPD546") // 42-pin PMOS, 35 pins for I/O
-DEFINE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device,  "upd553",  "NEC uPD553") // 42-pin PMOS, 35 pins for I/O, high voltage
-DEFINE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device, "upd557l", "NEC uPD557L") // 28-pin PMOS, 21 pins for I/O
-DEFINE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device,  "upd650",  "NEC uPD650") // 42-pin CMOS, 35 pins for I/O
+DEFINE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device,  "upd546",  "NEC uPD546") // 42-pin PMOS, 35 pins for I/O, max rated 440kHz
+DEFINE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device,  "upd553",  "NEC uPD553") // 42-pin PMOS, 35 pins for I/O, high voltage, max rated 440kHz
+DEFINE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device, "upd557l", "NEC uPD557L") // 28-pin PMOS, 21 pins for I/O, max rated 180kHz
+DEFINE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device,  "upd650",  "NEC uPD650") // 42-pin CMOS, 35 pins for I/O, max rated 440kHz
 
 // uCOM-44 products: 1000x8 ROM, 64x4 RAM, 1-level stack, does not support external interrupt
-DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42-pin PMOS, 35 pins for I/O, high voltage
+DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42-pin PMOS, 35 pins for I/O, high voltage, max rated 440kHz
 
 // uCOM-45 products: 1000x8 or 640x8 ROM, 32x4 RAM, 1-level stack
 //..

@@ -1207,7 +1207,7 @@ READ8_MEMBER(mdallas_state::read_in)
 /* physical button layout and labels is like this:
 
     <  ON>  [YES]   [NO]   [NEXT]
-    [W]     [N]     [S]    [E]
+    [<W]    [^N]    [Sv]   [E>]
     [7]     [8]     [9]    [STATUS]
     [4]     [5]     [6]    [ASSETS]
     [1]     [2]     [3]    [START]
