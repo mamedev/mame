@@ -582,6 +582,7 @@ MACHINES["S3C24XX"] = true
 MACHINES["S3C44B0"] = true
 MACHINES["SAA1043"] = true
 MACHINES["SATURN"] = true
+MACHINES["SCC68070"] = true
 --MACHINES["SCSI"] = true
 MACHINES["SCC2698B"] = true
 MACHINES["SCUDSP"] = true
@@ -1385,8 +1386,6 @@ files {
 	MAME_DIR .. "src/mame/video/neogeo_spr.h",
 	MAME_DIR .. "src/mame/drivers/cdi.cpp",
 	MAME_DIR .. "src/mame/includes/cdi.h",
-	MAME_DIR .. "src/mame/machine/cdi070.cpp",
-	MAME_DIR .. "src/mame/machine/cdi070.h",
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
 	MAME_DIR .. "src/mame/machine/cdislave.cpp",

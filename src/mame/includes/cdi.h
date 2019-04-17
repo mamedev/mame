@@ -4,7 +4,7 @@
 #ifndef MAME_INCLUDES_CDI_H
 #define MAME_INCLUDES_CDI_H
 
-#include "machine/cdi070.h"
+#include "machine/scc68070.h"
 #include "machine/cdislave.h"
 #include "machine/cdicdic.h"
 #include "sound/dmadac.h"
@@ -27,7 +27,6 @@ public:
 		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
-		, m_scc(*this, "scc68070")
 		, m_cdic(*this, "cdic")
 		, m_cdda(*this, "cdda")
 		, m_mcd212(*this, "mcd212")
@@ -71,7 +70,7 @@ public:
 		INV_CADDYSWITCH_IN = (1 << 7)
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<scc68070_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_planea;
 	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
@@ -79,7 +78,6 @@ public:
 	optional_device<cdislave_device> m_slave_hle;
 	optional_device<cpu_device> m_servo;
 	optional_device<cpu_device> m_slave;
-	required_device<cdi68070_device> m_scc;
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;

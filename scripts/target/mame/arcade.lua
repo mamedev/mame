@@ -573,6 +573,7 @@ MACHINES["S3520CF"] = true
 MACHINES["S3C24XX"] = true
 --MACHINES["S3C44B0"] = true
 MACHINES["SATURN"] = true
+MACHINES["SCC68070"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
 --MACHINES["SECFLASH"] = true
@@ -4586,8 +4587,6 @@ files {
 	MAME_DIR .. "src/mame/includes/cdi.h",
 	MAME_DIR .. "src/mame/video/mcd212.cpp",
 	MAME_DIR .. "src/mame/video/mcd212.h",
-	MAME_DIR .. "src/mame/machine/cdi070.cpp",
-	MAME_DIR .. "src/mame/machine/cdi070.h",
 	MAME_DIR .. "src/mame/machine/cdislave.cpp",
 	MAME_DIR .. "src/mame/machine/cdislave.h",
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",

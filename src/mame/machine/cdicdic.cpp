@@ -23,7 +23,6 @@ TODO:
 
 #include "emu.h"
 #include "machine/cdicdic.h"
-#include "includes/cdi.h"
 
 #include "cdrom.h"
 #include "romload.h"
@@ -38,7 +37,7 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CDICDIC")
+DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CD-i CDIC")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -1161,7 +1160,7 @@ cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, d
 	, m_int_callback(*this)
 	, m_memory_space(*this, ":maincpu", AS_PROGRAM)
 	, m_dmadac(*this, ":dac%u", 1U)
-	, m_scc(*this, ":scc68070")
+	, m_scc(*this, ":maincpu")
 	, m_cdda(*this, ":cdda")
 	, m_cdrom_dev(*this, ":cdrom")
 {

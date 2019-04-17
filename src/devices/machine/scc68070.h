@@ -3,7 +3,7 @@
 /******************************************************************************
 
 
-    CD-i-specific SCC68070 SoC peripheral emulation
+    SCC68070 SoC peripheral emulation
     -------------------
 
     written by Ryan Holtz
@@ -21,10 +21,12 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef MAME_MACHINE_CDI070_H
-#define MAME_MACHINE_CDI070_H
+#ifndef MAME_MACHINE_SCC68070_H
+#define MAME_MACHINE_SCC68070_H
 
 #pragma once
+
+#include "cpu/m68000/m68000.h"
 
 
 #define ISR_MST     0x80    // Master
@@ -126,21 +128,12 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cdi68070_device
+// ======================> scc68070_device
 
-class cdi68070_device : public device_t
+class scc68070_device : public scc68070_base_device
 {
 public:
-	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
-
-	// construction/destruction
-	template <typename T> cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: cdi68070_device(mconfig, tag, owner, clock)
-	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-	}
-
-	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto iack2_callback() { return m_iack2_callback.bind(); }
 	auto iack4_callback() { return m_iack4_callback.bind(); }
@@ -164,9 +157,6 @@ public:
 	void quizard_rx(uint8_t data);
 
 	void mcu_frame();
-
-	DECLARE_READ16_MEMBER(periphs_r);
-	DECLARE_WRITE16_MEMBER(periphs_w);
 
 	TIMER_CALLBACK_MEMBER( timer0_callback );
 	TIMER_CALLBACK_MEMBER( rx_callback );
@@ -273,18 +263,25 @@ public:
 
 	dma_regs_t& dma() { return m_dma; }
 
-	uint8_t iack_r(offs_t offset);
-
 protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 2); }
+
 private:
-	required_device<cpu_device> m_maincpu;
+	void internal_map(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	void update_ipl();
+	uint8_t iack_r(offs_t offset);
+
+	DECLARE_READ16_MEMBER(periphs_r);
+	DECLARE_WRITE16_MEMBER(periphs_w);
 
 	void uart_rx_check();
 	void uart_tx_check();
@@ -332,6 +329,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(CDI_68070, cdi68070_device)
+DECLARE_DEVICE_TYPE(SCC68070, scc68070_device)
 
-#endif // MAME_MACHINE_CDI070_H
+#endif // MAME_MACHINE_SCC68070_H

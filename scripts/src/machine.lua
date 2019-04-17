@@ -2543,6 +2543,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/scc68070.h,MACHINES["SCC68070"] = true
+---------------------------------------------------
+if (MACHINES["SCC68070"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scc68070.cpp",
+		MAME_DIR .. "src/devices/machine/scc68070.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
 ---------------------------------------------------
 

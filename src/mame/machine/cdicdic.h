@@ -27,7 +27,7 @@ TODO:
 #pragma once
 
 #include "imagedev/chd_cd.h"
-#include "machine/cdi070.h"
+#include "machine/scc68070.h"
 #include "sound/cdda.h"
 #include "sound/dmadac.h"
 #include "cdrom.h"
@@ -72,7 +72,7 @@ private:
 
 	required_address_space m_memory_space;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
-	required_device<cdi68070_device> m_scc;
+	required_device<scc68070_device> m_scc;
 	required_device<cdda_device> m_cdda;
 	optional_device<cdrom_image_device> m_cdrom_dev;
 

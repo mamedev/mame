@@ -2087,7 +2087,7 @@ std::unique_ptr<util::disasm_interface> m68040_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
 }
 
-std::unique_ptr<util::disasm_interface> scc68070_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> scc68070_base_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
@@ -2417,7 +2417,6 @@ DEFINE_DEVICE_TYPE(M68030,      m68030_device,      "m68030",       "Motorola MC
 DEFINE_DEVICE_TYPE(M68EC040,    m68ec040_device,    "m68ec040",     "Motorola MC68EC040")
 DEFINE_DEVICE_TYPE(M68LC040,    m68lc040_device,    "m68lc040",     "Motorola MC68LC040")
 DEFINE_DEVICE_TYPE(M68040,      m68040_device,      "m68040",       "Motorola MC68040")
-DEFINE_DEVICE_TYPE(SCC68070,    scc68070_device,    "scc68070",     "Philips SCC68070")
 DEFINE_DEVICE_TYPE(FSCPU32,     fscpu32_device,     "fscpu32",      "Freescale CPU32 Core")
 DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
 
@@ -2608,12 +2607,13 @@ void m68lc040_device::device_start()
 }
 
 
-scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, tag, owner, clock, SCC68070, 16,32)
+scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, address_map_constructor internal_map)
+	: m68000_base_device(mconfig, tag, owner, clock, type, 16,32, internal_map)
 {
 }
 
-void scc68070_device::device_start()
+void scc68070_base_device::device_start()
 {
 	init_cpu_scc68070();
 }
