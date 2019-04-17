@@ -164,7 +164,9 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		m_cpu_device = downcast<netlist_mame_cpu_device *>(&static_cast<netlist_mame_device::netlist_mame_t &>(exec()).parent());
+		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&exec());
+		if (nl != nullptr)
+			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
 	}
 
 	ATTR_COLD void reset() override
@@ -212,7 +214,9 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		m_cpu_device = downcast<netlist_mame_cpu_device *>(&static_cast<netlist_mame_device::netlist_mame_t &>(exec()).parent());
+		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&exec());
+		if (nl != nullptr)
+			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
 	}
 
 	ATTR_COLD void reset() override

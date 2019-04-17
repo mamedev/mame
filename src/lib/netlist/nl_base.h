@@ -1448,7 +1448,7 @@ namespace netlist
 
 		COPYASSIGNMOVE(netlist_t, delete)
 
-		~netlist_t() noexcept = default;
+		virtual ~netlist_t() noexcept = default;
 
 		/* run functions */
 
