@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int_callback() { return m_int_callback.bind(); }
+	auto intreq_callback() { return m_intreq_callback.bind(); }
 
 	// non-static internal members
 	void sample_trigger();
@@ -56,6 +56,7 @@ public:
 	DECLARE_READ16_MEMBER( ram_r );
 	DECLARE_WRITE16_MEMBER( ram_w );
 
+	uint8_t intack_r();
 
 protected:
 	// device-level overrides
@@ -68,7 +69,7 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
-	devcb_write_line m_int_callback;
+	devcb_write_line m_intreq_callback;
 
 	required_address_space m_memory_space;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
