@@ -157,7 +157,7 @@ namespace netlist
 
 				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
 				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
-				
+
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");
 				connect("DP.A", "DN.K");

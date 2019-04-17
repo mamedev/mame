@@ -62,11 +62,11 @@ namespace plib
 	template <typename T>
 	struct constants
 	{
-		static constexpr T zero()	noexcept { return static_cast<T>(0); }
-		static constexpr T one()	noexcept { return static_cast<T>(1); }
-		static constexpr T two()	noexcept { return static_cast<T>(2); }
+		static constexpr T zero()   noexcept { return static_cast<T>(0); }
+		static constexpr T one()    noexcept { return static_cast<T>(1); }
+		static constexpr T two()    noexcept { return static_cast<T>(2); }
 		static constexpr T sqrt2()  noexcept { return static_cast<T>(1.414213562373095048801688724209); }
-		static constexpr T pi()  	noexcept { return static_cast<T>(3.14159265358979323846264338327950); }
+		static constexpr T pi()     noexcept { return static_cast<T>(3.14159265358979323846264338327950); }
 
 		/*!
 		 * \brief Electric constant of vacuum

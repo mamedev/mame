@@ -24,7 +24,7 @@
 
 #include <cmath>
 
-#define BODY_CONNECTED_TO_SOURCE	(1)
+#define BODY_CONNECTED_TO_SOURCE    (1)
 
 namespace netlist
 {
@@ -70,13 +70,13 @@ namespace analog
 	 * |     |Cj    | Zero-bias bulk junction bottom capacitance per square meter of junction area|F/m²|0|0.0002|*
 	 * |     |Mj    | Bulk junction bottom grading coefficient                              |-|0.5|0.5|*
 	 * |     |Cjsw  | Zero-bias bulk junction sidewall capacitance per meter of junction perimeter|F/m|0|1p|*
-	 * |     |Mjsw  | Bulk junction sidewall grading coefficient                            |-|.50 level 1 	.33 level 2,3||
+	 * |     |Mjsw  | Bulk junction sidewall grading coefficient                            |-|.50 level 1  .33 level 2,3||
 	 * |     |Js    | Bulk junction saturation current per square-meter of junction area|A/m|0|0.00000001|
 	 * |  Y  |Tox   | Oxide thickness                                                       |m|0.0000001|0.0000001|
 	 * |  Y  |Nsub  | Substrate doping                                                      |1/cm³|0|4000000000000000|
 	 * |     |Nss   | Surface state density                                                 |1/cm²|0|10000000000|
 	 * |     |Nfs   | Fast surface state                                                    |1/cm²|0|10000000000|*
-	 * |     |TPG   | Type of gate material:  +1 opp. to substrate -1 same as substrate 	0 Al gate|-|1|
+	 * |     |TPG   | Type of gate material:  +1 opp. to substrate -1 same as substrate     0 Al gate|-|1|
 	 * |     |Xj    | Metallurgical junction depth                                          |m|0|1µ|*
 	 * |  Y  |Ld    | Lateral diffusion                                                     |m|0|0.8µ|
 	 * |  Y  |Uo    | Surface mobility                                                      |cm²/V/s|600|700|
@@ -124,25 +124,25 @@ namespace analog
 		, m_CAPMOD(*this, "CAPMOD")
 		{}
 
-		value_t m_VTO;		//!< Threshold voltage [V]
-		value_t m_N;		//!< Bulk diode emission coefficient
-		value_t m_ISS;		//!< Body diode saturation current
-		value_t m_ISD;		//!< Body diode saturation current
-		value_t m_LD;		//!< Lateral diffusion [m]
-		value_t m_L;		//!< Length scaling
-		value_t m_W;   		//!< Width scaling
-		value_t m_TOX; 		//!< Oxide thickness
-		value_t m_KP;  		//!< Transconductance parameter [A/V²]
-		value_t m_UO;  		//!< Surface mobility [cm²/V/s]
-		value_t m_PHI; 		//!< Surface inversion potential [V]
-		value_t m_NSUB;		//!< Substrate doping [1/cm³]
-		value_t m_GAMMA;	//!< Bulk threshold parameter [V^½]
-		value_t m_LAMBDA;	//!< Channel-length modulation [1/V]
-		value_t m_RD;  		//!< Drain ohmic resistance
-		value_t m_RS;		//!< Source ohmic resistance
-		value_t m_CGSO;		//!< Gate-source overlap capacitance per meter channel width
-		value_t m_CGDO;		//!< Gate-drain overlap capacitance per meter channel width
-		value_t m_CGBO;		//!< Gate-bulk overlap capacitance per meter channel width
+		value_t m_VTO;      //!< Threshold voltage [V]
+		value_t m_N;        //!< Bulk diode emission coefficient
+		value_t m_ISS;      //!< Body diode saturation current
+		value_t m_ISD;      //!< Body diode saturation current
+		value_t m_LD;       //!< Lateral diffusion [m]
+		value_t m_L;        //!< Length scaling
+		value_t m_W;        //!< Width scaling
+		value_t m_TOX;      //!< Oxide thickness
+		value_t m_KP;       //!< Transconductance parameter [A/V²]
+		value_t m_UO;       //!< Surface mobility [cm²/V/s]
+		value_t m_PHI;      //!< Surface inversion potential [V]
+		value_t m_NSUB;     //!< Substrate doping [1/cm³]
+		value_t m_GAMMA;    //!< Bulk threshold parameter [V^½]
+		value_t m_LAMBDA;   //!< Channel-length modulation [1/V]
+		value_t m_RD;       //!< Drain ohmic resistance
+		value_t m_RS;       //!< Source ohmic resistance
+		value_t m_CGSO;     //!< Gate-source overlap capacitance per meter channel width
+		value_t m_CGDO;     //!< Gate-drain overlap capacitance per meter channel width
+		value_t m_CGBO;     //!< Gate-bulk overlap capacitance per meter channel width
 		value_base_t<int> m_CAPMOD; //!< Capacitance model (0=no model 2=Meyer)
 	};
 
@@ -229,11 +229,11 @@ namespace analog
 			/*
 			 * From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
 			 *
-			 *		VTO, KP, LAMBDA, PHI and GAMMA. These parameters are computed
-			 *		if the process parameters(NSUB, TOX,...) are given, but
-			 *		user-specified values always override.
+			 *      VTO, KP, LAMBDA, PHI and GAMMA. These parameters are computed
+			 *      if the process parameters(NSUB, TOX,...) are given, but
+			 *      user-specified values always override.
 			 *
-			 *	But couldn't find a formula for lambda anywhere
+			 *  But couldn't find a formula for lambda anywhere
 			 *
 			 */
 
@@ -403,7 +403,7 @@ namespace analog
 			else
 			{
 				const nl_double Vdsat = Vctrl;
-			    const nl_double Vds = Vgs - Vgd;
+				const nl_double Vds = Vgs - Vgd;
 				// saturation
 				if (Vdsat <= Vds)
 				{
@@ -481,32 +481,32 @@ namespace analog
 		if (Vctrl <= 0.0)
 		{
 			// cutoff region
-		    Ids = 0.0;
-		    gm  = 0.0;
-		    gds = 0.0;
-		    gmb = 0.0;
+			Ids = 0.0;
+			gm  = 0.0;
+			gds = 0.0;
+			gmb = 0.0;
 		}
 		else
 		{
-		    const nl_double beta = m_beta * (1.0 + m_lambda * absVds);
-		    if (Vctrl <= absVds)
-		    {
-			    // saturation region
-		    	Ids = beta * Vctrl * Vctrl / 2.0;
-		    	gm  = beta * Vctrl;
-		    	gds = m_lambda * m_beta * Vctrl * Vctrl / 2.0;
-		    }
-		    else
-		    {
-			    // linear region
-		    	Ids = beta * absVds * (Vctrl - absVds / 2);
-		    	gm  = beta * absVds;
-		    	gds = beta * (Vctrl - absVds) + m_lambda * m_beta * absVds * (Vctrl - absVds / 2.0);
-		    }
+			const nl_double beta = m_beta * (1.0 + m_lambda * absVds);
+			if (Vctrl <= absVds)
+			{
+				// saturation region
+				Ids = beta * Vctrl * Vctrl / 2.0;
+				gm  = beta * Vctrl;
+				gds = m_lambda * m_beta * Vctrl * Vctrl / 2.0;
+			}
+			else
+			{
+				// linear region
+				Ids = beta * absVds * (Vctrl - absVds / 2);
+				gm  = beta * absVds;
+				gds = beta * (Vctrl - absVds) + m_lambda * m_beta * absVds * (Vctrl - absVds / 2.0);
+			}
 
 			// backgate transconductance
 			const nl_double bgtc = (phi_m_Vbulk != 0.0) ? (m_gamma / phi_m_Vbulk / 2.0) : 0.0;
-		    gmb = gm * bgtc;
+			gmb = gm * bgtc;
 		}
 
 		// FIXME: these are needed to compute capacitance
@@ -581,7 +581,7 @@ namespace analog
 					   gGS + gGB,    gGG,      IG       );     // G
 		//                 D          G
 		m_DG.set_mat(     gDD,       gDG,    +ID,              // D
-					      gGD,       0.0,    0.0        );     // G
+						  gGD,       0.0,    0.0        );     // G
 		//                 S          D
 		m_SD.set_mat(     0.0,    gSD + gBD,  0.0,             // S
 					   gDS + gDB,    0.0,     0.0);            // D

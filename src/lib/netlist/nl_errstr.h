@@ -12,13 +12,13 @@
 #include "plib/pfmtlog.h"
 
 #define PERRMSG(name, str) \
-	struct name	\
+	struct name \
 	{ \
 		operator pstring() const { return str; } \
 	};
 
 #define PERRMSGV(name, narg, str) \
-	struct name	\
+	struct name \
 	{ \
 		template<typename... Args> name(Args&&... args) \
 		: m_m(plib::pfmt(str)(std::forward<Args>(args)...)) \
@@ -29,30 +29,30 @@
 
 // nl_base.cpp
 
-PERRMSGV(MF_DUPLICATE_NAME_DEVICE_LIST,			1, "Error adding {1} to device list. Duplicate name.")
-PERRMSGV(MF_UNKNOWN_TYPE_FOR_OBJECT,			1, "Unknown type for object {1},")
-PERRMSGV(MF_NET_1_DUPLICATE_TERMINAL_2, 		2, "net {1}: duplicate terminal {2}")
-PERRMSGV(MF_REMOVE_TERMINAL_1_FROM_NET_2,		2, "Can not remove terminal {1} from net {2}.")
-PERRMSGV(MF_UNKNOWN_PARAM_TYPE,					1, "Can not determine param_type for {1}")
-PERRMSGV(MF_ERROR_CONNECTING_1_TO_2,			2, "Error connecting {1} to {2}")
-PERRMSGV(MF_NO_SOLVER,							0, "No solver found for this netlist although analog elements are present")
-PERRMSGV(MF_HND_VAL_NOT_SUPPORTED,				1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
+PERRMSGV(MF_DUPLICATE_NAME_DEVICE_LIST,         1, "Error adding {1} to device list. Duplicate name.")
+PERRMSGV(MF_UNKNOWN_TYPE_FOR_OBJECT,            1, "Unknown type for object {1},")
+PERRMSGV(MF_NET_1_DUPLICATE_TERMINAL_2,         2, "net {1}: duplicate terminal {2}")
+PERRMSGV(MF_REMOVE_TERMINAL_1_FROM_NET_2,       2, "Can not remove terminal {1} from net {2}.")
+PERRMSGV(MF_UNKNOWN_PARAM_TYPE,                 1, "Can not determine param_type for {1}")
+PERRMSGV(MF_ERROR_CONNECTING_1_TO_2,            2, "Error connecting {1} to {2}")
+PERRMSGV(MF_NO_SOLVER,                          0, "No solver found for this netlist although analog elements are present")
+PERRMSGV(MF_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
 
 // nl_factory.cpp
 
-PERRMSGV(MF_FACTORY_ALREADY_CONTAINS_1,			1, "factory already contains {1}")
-PERRMSGV(MF_CLASS_1_NOT_FOUND,					1, "Class <{1}> not found!")
+PERRMSGV(MF_FACTORY_ALREADY_CONTAINS_1,         1, "factory already contains {1}")
+PERRMSGV(MF_CLASS_1_NOT_FOUND,                  1, "Class <{1}> not found!")
 
 // nld_opamps.cpp
 
-PERRMSGV(MF_UNKNOWN_OPAMP_TYPE,					1, "Unknown opamp type: {1}")
+PERRMSGV(MF_UNKNOWN_OPAMP_TYPE,                 1, "Unknown opamp type: {1}")
 
 // nld_matrix_solver.cpp
 
-PERRMSGV(MF_UNHANDLED_ELEMENT_1_FOUND,			1, "setup_base:unhandled element <{1}> found")
-PERRMSGV(MF_FOUND_TERM_WITH_MISSING_OTHERNET,	1, "found term with missing othernet {1}")
+PERRMSGV(MF_UNHANDLED_ELEMENT_1_FOUND,          1, "setup_base:unhandled element <{1}> found")
+PERRMSGV(MF_FOUND_TERM_WITH_MISSING_OTHERNET,   1, "found term with missing othernet {1}")
 
-PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,		1, "NEWTON_LOOPS exceeded on net {1}... reschedule")
+PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,     1, "NEWTON_LOOPS exceeded on net {1}... reschedule")
 
 // nld_solver.cpp
 
@@ -116,11 +116,11 @@ PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in s
 
 // nld_mm5837.cpp
 
-PERRMSGV(MW_FREQUENCY_OUTSIDE_OF_SPECS_1,		1, "MM5837: Frequency outside of specs: {1}")
+PERRMSGV(MW_FREQUENCY_OUTSIDE_OF_SPECS_1,       1, "MM5837: Frequency outside of specs: {1}")
 
 // nlid_proxy.cpp
 
-PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_1, 	1, "D/A Proxy: Found no valid combination of power terminals on device {1}")
+PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_1,     1, "D/A Proxy: Found no valid combination of power terminals on device {1}")
 
 
 #endif /* NL_ERRSTR_H_ */
