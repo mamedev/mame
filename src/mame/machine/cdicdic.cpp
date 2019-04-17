@@ -30,6 +30,13 @@ TODO:
 #include "sound/cdda.h"
 
 
+/*----------- debug defines -----------*/
+
+#define VERBOSE_LEVEL   (1)
+
+#define ENABLE_VERBOSE_LOG (0)
+
+
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CDICDIC")
 

@@ -23,7 +23,13 @@ TODO:
 
 #include "emu.h"
 #include "machine/cdislave.h"
-#include "includes/cdi.h"
+
+
+/*----------- debug defines -----------*/
+
+#define VERBOSE_LEVEL   (1)
+
+#define ENABLE_VERBOSE_LOG (0)
 
 
 // device type definition

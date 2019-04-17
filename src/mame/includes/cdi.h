@@ -14,9 +14,6 @@
 
 /*----------- driver state -----------*/
 
-#define CLOCK_A XTAL(30'000'000)
-#define CLOCK_B XTAL(19'660'800)
-
 class cdi_state : public driver_device
 {
 public:
@@ -136,13 +133,5 @@ public:
 	void cdimono2_slave_mem(address_map &map);
 	void cdi070_cpuspace(address_map &map);
 };
-
-/*----------- debug defines -----------*/
-
-#define VERBOSE_LEVEL   (1)
-
-#define ENABLE_VERBOSE_LOG (0)
-
-#define ENABLE_UART_PRINTING (0)
 
 #endif // MAME_INCLUDES_CDI_H

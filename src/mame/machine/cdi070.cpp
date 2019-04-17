@@ -23,9 +23,16 @@ TODO:
 
 #include "emu.h"
 #include "machine/cdi070.h"
-#include "includes/cdi.h"
 
 #include "cpu/m68000/m68000.h"
+
+/*----------- debug defines -----------*/
+
+#define VERBOSE_LEVEL   (1)
+
+#define ENABLE_VERBOSE_LOG (0)
+
+#define ENABLE_UART_PRINTING (0)
 
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_68070, cdi68070_device, "cdi68070", "CDI68070")
@@ -409,8 +416,9 @@ void cdi68070_device::set_timer_callback(int channel)
 	{
 		case 0:
 		{
+			// Timer clock period is 96/CLKOUT
 			uint32_t compare = 0x10000 - m_timers.timer0;
-			attotime period = attotime::from_hz(CLOCK_A/192) * compare;
+			attotime period = m_maincpu->cycles_to_attotime(96 * compare);
 			m_timers.timer0_timer->adjust(period);
 			break;
 		}
