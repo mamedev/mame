@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+Test layout to show the lamps for Akka Arrh
+-->
+
+<mamelayout version="2">
+
+	<element name="background">
+	</element>
+
+	<element name="lamp" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+	</element>
+
+	<view name="Default">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="Lamps">
+		<backdrop element="background">
+			<bounds x="0" y="0" width="760" height="570" />
+		</backdrop>
+		<screen index="0">
+			<bounds left="60" top="45" right="700" bottom="525" />
+		</screen>
+		<bezel name="lamp6" element="lamp">
+			<bounds x="40" y="5" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp7" element="lamp">
+			<bounds x="180" y="5" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp8" element="lamp">
+			<bounds x="320" y="5" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp9" element="lamp">
+			<bounds x="460" y="5" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp10" element="lamp">
+			<bounds x="600" y="5" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp2" element="lamp">
+			<bounds x="20" y="100" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp3" element="lamp">
+			<bounds x="20" y="200" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp11" element="lamp">
+			<bounds x="20" y="300" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp12" element="lamp">
+			<bounds x="20" y="400" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp14" element="lamp">
+			<bounds x="720" y="100" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp13" element="lamp">
+			<bounds x="720" y="200" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp5" element="lamp">
+			<bounds x="720" y="300" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp15" element="lamp">
+			<bounds x="720" y="400" width="20" height="75" />
+		</bezel>
+		<bezel name="lamp4" element="lamp">
+			<bounds x="320" y="545" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp1" element="lamp">
+			<bounds x="40" y="545" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp0" element="lamp">
+			<bounds x="600" y="545" width="120" height="25" />
+		</bezel>
+	</view>
+</mamelayout>

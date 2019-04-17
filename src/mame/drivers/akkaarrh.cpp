@@ -21,6 +21,7 @@
 #include "sound/pokey.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "akkaarrh.lh"
 
 
 class akkaarrh_state : public driver_device
@@ -35,23 +36,27 @@ public:
 		m_palette(*this, "palette"),
 		m_palette_ram(*this, "paletteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void akkaarrh(machine_config &config);
-	
+
 private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_WRITE8_MEMBER(output0_w);
+	DECLARE_WRITE8_MEMBER(output1_w);
+	DECLARE_WRITE8_MEMBER(output2_w);
+	DECLARE_WRITE8_MEMBER(output3_w);
 	DECLARE_WRITE8_MEMBER(video_mirror_w);
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
@@ -65,6 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_palette_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	output_finder<16> m_lamps;
 
 	tilemap_t * m_tilemap[4];
 	uint8_t m_video_mirror;
@@ -91,6 +97,8 @@ void akkaarrh_state::video_start()
 	m_tilemap[1]->set_flip(TILEMAP_FLIPX);
 	m_tilemap[2]->set_flip(TILEMAP_FLIPY);
 	m_tilemap[3]->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+
+	m_lamps.resolve();
 }
 
 uint32_t akkaarrh_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -110,7 +118,7 @@ uint32_t akkaarrh_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{   0, 127, 120, 239 },
 			{ 128, 255, 120, 239 }
 		};
-		
+
 		for (uint32_t i = 0 ; i < 4; ++i)
 		{
 			rectangle clip = cliprect;
@@ -128,7 +136,7 @@ uint32_t akkaarrh_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int color = m_spriteram[offs] & 0xf;
 		int x = m_spriteram[offs + 3];
 		int y = 240 - m_spriteram[offs + 2];
-	
+
 		gfx->transpen(bitmap, cliprect, code, color, 0, 0, x, y, 0);
 	}
 
@@ -153,7 +161,7 @@ TILE_GET_INFO_MEMBER(akkaarrh_state::get_tile_info)
 WRITE8_MEMBER(akkaarrh_state::videoram_w)
 {
 	m_videoram[offset] = data;
-	
+
 	int tile = offset & 0x3ff;
 	m_tilemap[0]->mark_tile_dirty(tile);
 	m_tilemap[1]->mark_tile_dirty(tile);
@@ -185,9 +193,38 @@ WRITE8_MEMBER(akkaarrh_state::irq_ack_w)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(akkaarrh_state::unknown_w)
+WRITE8_MEMBER(akkaarrh_state::output0_w)
 {
-	// Might be lamps?
+	m_lamps[0] = !BIT(data, 3); // player 2
+	m_lamps[1] = !BIT(data, 2); // player 1
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER(akkaarrh_state::output1_w)
+{
+	m_lamps[2] = BIT(data, 7); // left 0
+	m_lamps[3] = BIT(data, 6); // left 1
+	m_lamps[4] = BIT(data, 0); // bottom
+}
+
+WRITE8_MEMBER(akkaarrh_state::output2_w)
+{
+	m_lamps[5] = BIT(data, 7); // right 2
+	m_lamps[6] = BIT(data, 6); // top 0
+	m_lamps[7] = BIT(data, 5); // top 1
+	m_lamps[8] = BIT(data, 4); // top 2
+	m_lamps[9] = BIT(data, 3); // top 3
+	m_lamps[10] = BIT(data, 2); // top 4
+	m_lamps[11] = BIT(data, 1); // left 2
+	m_lamps[12] = BIT(data, 0); // left 3
+}
+
+WRITE8_MEMBER(akkaarrh_state::output3_w)
+{
+	m_lamps[13] = BIT(data, 2); // right 1
+	m_lamps[14] = BIT(data, 1); // right 0
+	m_lamps[15] = BIT(data, 0); // right 3
 }
 
 
@@ -241,7 +278,10 @@ void akkaarrh_state::main_map(address_map &map)
 	map(0x7082, 0x7082).portr("7082");
 	map(0x7083, 0x7083).portr("7083");
 	map(0x7087, 0x7087).r(FUNC(akkaarrh_state::earom_read));
-	map(0x70c0, 0x70c3).w(FUNC(akkaarrh_state::unknown_w));
+	map(0x70c0, 0x70c0).w(FUNC(akkaarrh_state::output0_w));
+	map(0x70c1, 0x70c1).w(FUNC(akkaarrh_state::output1_w));
+	map(0x70c2, 0x70c2).w(FUNC(akkaarrh_state::output2_w));
+	map(0x70c3, 0x70c3).w(FUNC(akkaarrh_state::output3_w));
 	map(0x70c7, 0x70c7).w(FUNC(akkaarrh_state::earom_control_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -349,6 +389,8 @@ void akkaarrh_state::akkaarrh(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(akkaarrh_state::screen_update));
 	m_screen->set_palette(m_palette);
+
+	config.set_default_layout(layout_akkaarrh);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
