@@ -4,7 +4,15 @@
 <!--
     Known cartridges   
 
-	(TODO)
+Dumped|Name       |Notes
+______|___________|______
+ XXX  |4 in 1     |No controller
+ XXX  |Whac-A-Mole|Hammer-shaped IR motion controller
+ XXX  |Tennis     |Racquet-shaped IR motion controller
+      |Paintball  |Gun controller
+      |Skateboard |Skateboard-shaped motion controller
+      |Basketball |Ball-shaped motion controller
+      |Dodgeball  |Motion controller
 -->
 
 <softwarelist name="tvgogo" description="Toyquest TV Go Go cartridges">
