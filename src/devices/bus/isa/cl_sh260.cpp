@@ -68,8 +68,7 @@ void isa16_jc1310_device::device_add_mconfig(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &isa16_jc1310_device::i8031_map);
 	mcu.set_addrmap(AS_IO, &isa16_jc1310_device::ext_map);
 
-	WD37C65C(config, m_fdc, 16_MHz_XTAL); // WD37C65B-PL
-	//m_fdc->set_clock2(9.6_MHz_XTAL);
+	WD37C65C(config, m_fdc, 16_MHz_XTAL, 9.6_MHz_XTAL); // WD37C65B-PL
 }
 
 ROM_START(ev346)

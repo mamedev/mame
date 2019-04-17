@@ -518,7 +518,20 @@ class wd37c65c_device : public upd765_family_device {
 public:
 	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename X>
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, X &&clock2)
+		: wd37c65c_device(mconfig, tag, owner, clock)
+	{
+		set_clock2(std::forward<X>(clock2));
+	}
+
+	void set_clock2(uint32_t clock) { m_clock2 = clock; }
+	void set_clock2(const XTAL &xtal) { set_clock2(xtal.value()); }
+
 	virtual void map(address_map &map) override;
+
+private:
+	uint32_t m_clock2;
 };
 
 class mcs3201_device : public upd765_family_device {

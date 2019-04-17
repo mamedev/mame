@@ -2966,12 +2966,16 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 	select_multiplexed = false;
 }
 
-wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, WD37C65C, tag, owner, clock)
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	upd765_family_device(mconfig, WD37C65C, tag, owner, clock),
+	m_clock2(0)
 {
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 	select_multiplexed = false;
+
+	(void)m_clock2; // TODO
 }
 
 mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
