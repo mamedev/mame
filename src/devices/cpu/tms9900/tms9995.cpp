@@ -170,7 +170,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		PC_debug(0),
 		m_iaq(false),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
-		m_setaddress_config("setaddress", ENDIANNESS_BIG, 16, 16),  // data = address
+		m_setaddress_config("setaddress", ENDIANNESS_BIG, 8, 16),  // see tms9900.cpp
 		m_io_config("cru", ENDIANNESS_LITTLE, 8, 16, 1),
 		m_prgspace(nullptr),
 		m_setaddr(nullptr),
@@ -438,6 +438,12 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 	m_icount = temp;
 }
 
+/*
+    The setaddress space is used to implement a split-phase memory access
+    where the address bus is first set, then the CPU samples the READY line,
+    (when low, enters wait states,) then the CPU reads the address bus. See
+    tms9900.cpp for more information.
+*/
 device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
 	if (has_configured_map(AS_SETADDRESS))
@@ -1851,9 +1857,9 @@ void tms9995_device::mem_read()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & 0xfffe);
 			if (m_setaddr)
-				m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, address);
+				m_setaddr->write_byte(address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1861,14 +1867,14 @@ void tms9995_device::mem_read()
 			// Sample the value on the data bus (high byte)
 			if (m_word_access || !m_byteop) address &= 0xfffe;
 			value = m_prgspace->read_byte(address);
-			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & ~1, value);
+			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & 0xfffe, value);
 			m_current_value = (value << 8) & 0xff00;
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
 			if (m_setaddr)
-				m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, m_address | 1);
+				m_setaddr->write_byte(m_address | 1, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1985,7 +1991,7 @@ void tms9995_device::mem_write()
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
 			if (m_setaddr)
-				m_setaddr->write_word(TMS99xx_BUS_WRITE, address);
+				m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -1999,7 +2005,7 @@ void tms9995_device::mem_write()
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
 			if (m_setaddr)
-				m_setaddr->write_word(TMS99xx_BUS_WRITE, m_address | 1);
+				m_setaddr->write_byte(m_address | 1, TMS99xx_BUS_WRITE);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;

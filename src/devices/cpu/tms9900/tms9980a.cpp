@@ -109,7 +109,7 @@ void tms9980a_device::resolve_lines()
 uint16_t tms9980a_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	int addr = (WP+(reg<<1)) & 0xfffe & m_prgaddr_mask;
+	int addr = (WP+(reg<<1)) & m_prgaddr_mask;
 	uint16_t value = (m_prgspace->read_byte(addr) << 8) | (m_prgspace->read_byte(addr+1) & 0xff);
 	m_icount = temp;
 	return value;
@@ -118,7 +118,7 @@ uint16_t tms9980a_device::read_workspace_register_debug(int reg)
 void tms9980a_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
-	int addr = (WP+(reg<<1)) & 0xfffe & m_prgaddr_mask;
+	int addr = (WP+(reg<<1)) & m_prgaddr_mask;
 	m_prgspace->write_byte(addr, data>>8);
 	m_prgspace->write_byte(addr+1, data & 0xff);
 	m_icount = temp;
@@ -195,19 +195,19 @@ void tms9980a_device::mem_read()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method more than once
 		if (m_setaddr)
-			m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, m_address & m_prgaddr_mask & ~1);
-		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
+			m_setaddr->write_byte(m_address & m_prgaddr_mask, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", m_address & m_prgaddr_mask);
 		m_check_ready = true;
 		break;
 	case 2:
 		// Sample the value on the data bus (high byte)
-		value = m_prgspace->read_byte(m_address & m_prgaddr_mask & ~1);
-		LOGMASKED(LOG_MEM, "Memory read high byte %04x -> %02x\n", m_address & m_prgaddr_mask & ~1, value);
+		value = m_prgspace->read_byte(m_address & m_prgaddr_mask);
+		LOGMASKED(LOG_MEM, "Memory read high byte %04x -> %02x\n", m_address & m_prgaddr_mask, value);
 		m_current_value = (value << 8) & 0xff00;
 		break;
 	case 3:
 		if (m_setaddr)
-			m_setaddr->write_word((TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0))<<1, (m_address & m_prgaddr_mask) | 1);
+			m_setaddr->write_byte((m_address & m_prgaddr_mask) | 1, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		break;
 	case 4:
@@ -229,10 +229,10 @@ void tms9980a_device::mem_write()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method once more
 		if (m_setaddr)
-			m_setaddr->write_word(TMS99xx_BUS_WRITE, m_address & m_prgaddr_mask & ~1);
-		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
-		m_prgspace->write_byte(m_address & 0x3ffe & ~1, (m_current_value >> 8)&0xff);
-		LOGMASKED(LOG_MEM, "Memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask & ~1, (m_current_value >> 8)&0xff);
+			m_setaddr->write_byte(m_address & m_prgaddr_mask, TMS99xx_BUS_WRITE);
+		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", m_address & m_prgaddr_mask);
+		m_prgspace->write_byte(m_address & 0x3ffe, (m_current_value >> 8)&0xff);
+		LOGMASKED(LOG_MEM, "Memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask, (m_current_value >> 8)&0xff);
 		m_check_ready = true;
 		break;
 	case 2:
@@ -240,7 +240,7 @@ void tms9980a_device::mem_write()
 		break;
 	case 3:
 		if (m_setaddr)
-			m_setaddr->write_word(TMS99xx_BUS_WRITE, (m_address & m_prgaddr_mask) | 1);
+			m_setaddr->write_byte((m_address & m_prgaddr_mask) | 1, TMS99xx_BUS_WRITE);
 		LOGMASKED(LOG_ADDRESSBUS, "Set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		m_prgspace->write_byte((m_address & m_prgaddr_mask) | 1, m_current_value & 0xff);
 		LOGMASKED(LOG_MEM, "Memory write low byte %04x <- %02x\n", (m_address & m_prgaddr_mask) | 1,  m_current_value & 0xff);
@@ -268,7 +268,7 @@ void tms9980a_device::acquire_instruction()
 		decode(m_current_value);
 		LOGMASKED(LOG_OP, "===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC);
 		debugger_instruction_hook(PC);
-		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
+		PC = (PC + 2) & m_prgaddr_mask;
 	}
 	// IAQ will be cleared in the main loop
 }
