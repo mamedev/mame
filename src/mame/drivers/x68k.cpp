@@ -1663,6 +1663,7 @@ void x68k_state::x68000(machine_config &config)
 	x68000_base(config);
 
 	VINAS(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->vdisp_cb().set(m_mfpdev, FUNC(mc68901_device::i4_w));
 	m_crtc->vdisp_cb().append(m_mfpdev, FUNC(mc68901_device::tai_w));
@@ -1695,6 +1696,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	m_scsictrl->drq_cb().set(FUNC(x68ksupr_state::scsi_drq));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->vdisp_cb().set(m_mfpdev, FUNC(mc68901_device::i4_w));
 	m_crtc->vdisp_cb().append(m_mfpdev, FUNC(mc68901_device::tai_w));
@@ -1714,7 +1716,7 @@ void x68ksupr_state::x68ksupr(machine_config &config)
 
 void x68ksupr_state::x68kxvi(machine_config &config)
 {
-	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.333_MHz_XTAL / 2); /* 16 MHz (nominally) */
+	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.33_MHz_XTAL / 2); /* 16 MHz (nominally) */
 	x68ksupr_base(config);
 }
 
@@ -1726,6 +1728,8 @@ void x68030_state::x68030(machine_config &config)
 	m_hd63450->set_clock(50_MHz_XTAL / 4);
 	m_scc->set_clock(20_MHz_XTAL / 4);
 	m_scsictrl->set_clock(20_MHz_XTAL / 4);
+
+	m_crtc->set_clock_50m(50.35_MHz_XTAL);
 }
 
 ROM_START( x68000 )
