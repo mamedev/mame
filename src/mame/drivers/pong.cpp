@@ -115,10 +115,10 @@ TODO: Volleyball...
  *
  */
 
-#define MASTER_CLOCK_BREAKOUT    (14318000 / 2)
+#define MASTER_CLOCK_BREAKOUT    (14318000)
 
 #define V_TOTAL_BREAKOUT         (0xFC)       // 252
-#define H_TOTAL_BREAKOUT         (448)    // 448
+#define H_TOTAL_BREAKOUT         (448*2)    // 448
 
 enum input_changed_enum
 {
@@ -540,12 +540,13 @@ void breakout_state::breakout(machine_config &config)
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
-	m_video->set_monitor_clock(MASTER_CLOCK_BREAKOUT*2);
-	m_video->set_horz_params((H_TOTAL_BREAKOUT-104)*2,(H_TOTAL_BREAKOUT-72)*2,(H_TOTAL_BREAKOUT-8)*2,  (H_TOTAL_BREAKOUT)*2);
+	m_video->set_monitor_clock(MASTER_CLOCK_BREAKOUT);
+	m_video->set_horz_params((H_TOTAL_BREAKOUT-208),(H_TOTAL_BREAKOUT-144),(H_TOTAL_BREAKOUT-16),  (H_TOTAL_BREAKOUT));
 	m_video->set_vert_params(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1.0);
 	m_video->set_gain(1.5);
+	m_video->set_horz_scale(2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
