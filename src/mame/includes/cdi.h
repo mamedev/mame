@@ -118,7 +118,7 @@ public:
 
 	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
 
-	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_lcd(int y);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void cdimono1(machine_config &config);
 	void cdimono2(machine_config &config);

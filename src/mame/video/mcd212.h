@@ -119,20 +119,33 @@ class mcd212_device : public device_t,
 						public device_video_interface
 {
 public:
+	typedef device_delegate<void (int)> scanline_callback_delegate;
+
 	// construction/destruction
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int1_callback() { return m_int1_callback.bind(); }
 	auto int2_callback() { return m_int2_callback.bind(); }
 
+	template <typename Object> void set_scanline_callback(Object &&cb) { m_scanline_callback = std::forward<Object>(cb); }
+	void set_scanline_callback(scanline_callback_delegate callback) { m_scanline_callback = callback; }
+	template <class FunctionClass> void set_scanline_callback(const char *devname, void (FunctionClass::*callback)(int), const char *name)
+	{
+		set_scanline_callback(scanline_callback_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_scanline_callback(void (FunctionClass::*callback)(int), const char *name)
+	{
+		set_scanline_callback(scanline_callback_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	// device members
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
 	TIMER_CALLBACK_MEMBER( perform_scan );
 
-	void ab_init();
-
 	bitmap_rgb32& get_bitmap() { return m_bitmap; }
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct channel_t
 	{
@@ -208,7 +221,10 @@ private:
 	devcb_write_line m_int1_callback;
 	devcb_write_line m_int2_callback;
 
-	required_device<screen_device> m_lcd;
+	scanline_callback_delegate m_scanline_callback;
+
+	required_shared_ptr<uint16_t> m_planea;
+	required_shared_ptr<uint16_t> m_planeb;
 
 	// internal state
 	channel_t m_channel[2];
@@ -245,7 +261,7 @@ private:
 	void draw_cursor(uint32_t *scanline, int y);
 	void draw_scanline(int y);
 
-	void draw_lcd(int y);
+	void ab_init();
 };
 
 // device type definition
