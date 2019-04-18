@@ -1223,7 +1223,7 @@ void cdicdic_device::device_reset()
 	m_x_buffer = 0;
 	m_dma_control = 0;
 	m_z_buffer = 0;
-	m_interrupt_vector = 0;
+	m_interrupt_vector = 0x0f;
 	m_data_buffer = 0;
 
 	m_audio_sample_freq = 0;
@@ -1260,5 +1260,5 @@ READ16_MEMBER( cdicdic_device::ram_r )
 
 uint8_t cdicdic_device::intack_r()
 {
-	return 0x80;
+	return m_interrupt_vector & 0xff;
 }
