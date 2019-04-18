@@ -64,14 +64,24 @@ void tekram_eisa_scsi_device::device_start()
 void tekram_eisa_scsi_device::mpu_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
+	map(0x10040, 0x1005f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0xff00);
 	//map(0x10080, 0x10085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
 }
 
 void tekram_dc320b_device::mpu_map(address_map &map)
 {
-	map(0x00000, 0x01fff).ram();
+	map(0x00000, 0x03fff).ram();
+	map(0x08000, 0x0801f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
 	//map(0x08080, 0x08085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
+	map(0xf0000, 0xfffff).rom().region("firmware", 0);
+}
+
+void tekram_dc820_device::mpu_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0x10000, 0x1001f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
+	//map(0x10080, 0x10085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
 }
 
@@ -114,7 +124,7 @@ void tekram_dc320b_device::device_add_mconfig(machine_config &config)
 
 void tekram_dc320e_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_mpu, 25'000'000); // verified for DC-320, but not DC-320E
+	I80186(config, m_mpu, 32'000'000); // clock guessed to be same as DC-820B due to identical firmware
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc320e_device::mpu_map);
 
 	//EEPROM_93C46_16BIT(config, m_eeprom);

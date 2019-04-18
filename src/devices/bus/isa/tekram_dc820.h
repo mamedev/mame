@@ -64,6 +64,9 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void mpu_map(address_map &map);
 };
 
 class tekram_dc820b_device : public tekram_eisa_scsi_device
