@@ -310,8 +310,14 @@ void tmspoker_state::tmspoker_palette(palette_device &palette) const
 
 INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
 {
-	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE); //_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
-	m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);  // MZ: do we need this?
+	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE);
+	// MZ: The TMS9980A uses level-triggered interrupts, so this
+	// interrupt must somehow be cleared later. Clearing the line
+	// immediately is not effective, since the interrupt is not latched
+	// and will be lost.
+	// In addition, the TMS99xx processors do not offer an interrupt
+	// acknowledge output, so this is possibly done by using a CRU port.
+	// Needs further investigation of the ROM contents.
 }
 
 
@@ -340,6 +346,16 @@ void tmspoker_state::machine_reset()
 * Memory Map Information *
 *************************/
 //59a
+
+// MZ: The driver locks up in this loop until it gets an interrupt on level 2.
+//     This is obviously missing.
+//
+//     0982:     CLR  @>2040               04E0 2040
+//     0986:     MOV  @>2040,@>2040        C820 2040 2040
+//     098C:     JEQ  >0986                13FC
+//     098E:     RT                        045B
+//
+
 void tmspoker_state::tmspoker_map(address_map &map)
 {
 	map.global_mask(0x3fff);
