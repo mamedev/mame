@@ -28,58 +28,77 @@ Test layout to show the lamps for Akka Arrh
 
 	<view name="Lamps">
 		<backdrop element="background">
-			<bounds x="0" y="0" width="760" height="570" />
+			<bounds x="0" y="0" width="760" height="630" />
 		</backdrop>
 		<screen index="0">
 			<bounds left="60" top="45" right="700" bottom="525" />
 		</screen>
-		<bezel name="lamp6" element="lamp">
+
+		<!-- top lamps -->
+		<bezel name="lamp16" element="lamp">
 			<bounds x="40" y="5" width="120" height="25" />
 		</bezel>
-		<bezel name="lamp7" element="lamp">
+		<bezel name="lamp15" element="lamp">
 			<bounds x="180" y="5" width="120" height="25" />
 		</bezel>
-		<bezel name="lamp8" element="lamp">
+		<bezel name="lamp14" element="lamp">
 			<bounds x="320" y="5" width="120" height="25" />
 		</bezel>
-		<bezel name="lamp9" element="lamp">
+		<bezel name="lamp13" element="lamp">
 			<bounds x="460" y="5" width="120" height="25" />
 		</bezel>
-		<bezel name="lamp10" element="lamp">
+		<bezel name="lamp12" element="lamp">
 			<bounds x="600" y="5" width="120" height="25" />
 		</bezel>
-		<bezel name="lamp2" element="lamp">
+
+		<!-- left lamps -->
+		<bezel name="lamp9" element="lamp">
 			<bounds x="20" y="100" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp3" element="lamp">
+		<bezel name="lamp8" element="lamp">
 			<bounds x="20" y="200" width="20" height="75" />
 		</bezel>
 		<bezel name="lamp11" element="lamp">
 			<bounds x="20" y="300" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp12" element="lamp">
+		<bezel name="lamp10" element="lamp">
 			<bounds x="20" y="400" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp14" element="lamp">
+
+		<!-- right lamps -->
+		<bezel name="lamp19" element="lamp">
 			<bounds x="720" y="100" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp13" element="lamp">
+		<bezel name="lamp20" element="lamp">
 			<bounds x="720" y="200" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp5" element="lamp">
+		<bezel name="lamp17" element="lamp">
 			<bounds x="720" y="300" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp15" element="lamp">
+		<bezel name="lamp18" element="lamp">
 			<bounds x="720" y="400" width="20" height="75" />
 		</bezel>
-		<bezel name="lamp4" element="lamp">
-			<bounds x="320" y="545" width="120" height="25" />
-		</bezel>
+
+		<!-- bottom lamps -->
 		<bezel name="lamp1" element="lamp">
 			<bounds x="40" y="545" width="120" height="25" />
 		</bezel>
+		<bezel name="lamp25" element="lamp">
+			<bounds x="180" y="545" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp2" element="lamp">
+			<bounds x="320" y="545" width="120" height="25" />
+		</bezel>
+		<bezel name="lamp24" element="lamp">
+			<bounds x="460" y="545" width="120" height="25" />
+		</bezel>
 		<bezel name="lamp0" element="lamp">
 			<bounds x="600" y="545" width="120" height="25" />
+		</bezel>
+
+		<!-- second row bottom -->
+		<bezel name="lamp3" element="lamp">
+			<bounds x="320" y="590" width="120" height="25" />
 		</bezel>
 	</view>
 </mamelayout>

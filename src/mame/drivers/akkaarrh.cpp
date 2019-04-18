@@ -70,7 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_palette_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	output_finder<16> m_lamps;
+	output_finder<26> m_lamps;
 
 	tilemap_t * m_tilemap[4];
 	uint8_t m_video_mirror;
@@ -195,36 +195,59 @@ WRITE8_MEMBER(akkaarrh_state::irq_ack_w)
 
 WRITE8_MEMBER(akkaarrh_state::output0_w)
 {
-	m_lamps[0] = !BIT(data, 3); // player 2
-	m_lamps[1] = !BIT(data, 2); // player 1
+	// 765----- unknown (always 0?)
+	// ---4---- unknown (1 in attract mode, 0 when playing)
+	// ----3--- player 2 lamp
+	// -----2-- player 1 lamp
+	// ------1- coin counter 2
+	// -------0 coin counter 1
+
+	m_lamps[0] = !BIT(data, 3);
+	m_lamps[1] = !BIT(data, 2);
+
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
 WRITE8_MEMBER(akkaarrh_state::output1_w)
 {
-	m_lamps[2] = BIT(data, 7); // left 0
-	m_lamps[3] = BIT(data, 6); // left 1
-	m_lamps[4] = BIT(data, 0); // bottom
+	// 7------- lamp 1 left bezel (top)
+	// -6------ lamp 2 left bezel
+	// --543--- unknown (1 in attract mode, 0 when playing)
+	// -----2-- unknown (always 0?)
+	// ------1- shooting lamp? toggles when shooting and not zoomed in
+	// -------0 bottom lamp
+
+	for (int i = 0; i < 8; i++)
+		m_lamps[2 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(akkaarrh_state::output2_w)
 {
-	m_lamps[5] = BIT(data, 7); // right 2
-	m_lamps[6] = BIT(data, 6); // top 0
-	m_lamps[7] = BIT(data, 5); // top 1
-	m_lamps[8] = BIT(data, 4); // top 2
-	m_lamps[9] = BIT(data, 3); // top 3
-	m_lamps[10] = BIT(data, 2); // top 4
-	m_lamps[11] = BIT(data, 1); // left 2
-	m_lamps[12] = BIT(data, 0); // left 3
+	// 7------- lamp 3 right bezel
+	// -6------ lamp 1 top bezel (left)
+	// --5----- lamp 2 top bezel
+	// ---4---- lamp 3 top bezel (middle)
+	// ----3--- lamp 4 top bezel
+	// -----2-- lamp 5 top bezel (right)
+	// ------1- lamp 3 left bezel
+	// -------0 lamp 4 left bezel (bottom)
+
+	for (int i = 0; i < 8; i++)
+		m_lamps[10 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(akkaarrh_state::output3_w)
 {
-	m_lamps[13] = BIT(data, 2); // right 1
-	m_lamps[14] = BIT(data, 1); // right 0
-	m_lamps[15] = BIT(data, 0); // right 3
+	// 7------- lamp zoomed in
+	// -6------ lamp warning
+	// --543--- unknown (1 in attract mode, 0 when playing)
+	// -----2-- lamp 2 right bezel
+	// ------1- lamp 1 right bezel (top)
+	// -------0 lamp 4 right bezel (bottom)
+
+	for (int i = 0; i < 8; i++)
+		m_lamps[18 + i] = BIT(data, i);
 }
 
 
