@@ -77,8 +77,8 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 
 void cdi_state::cdimono1_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("planea");
-	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
+	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 	map(0x00300000, 0x00303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 #if ENABLE_UART_PRINTING
 	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
@@ -96,8 +96,8 @@ void cdi_state::cdimono1_mem(address_map &map)
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("planea");
-	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
+	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 #if ENABLE_UART_PRINTING
 	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
@@ -115,10 +115,10 @@ void cdi_state::cdimono2_mem(address_map &map)
 
 void cdi_state::cdi910_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("planea");
+	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
 	map(0x00180000, 0x001fffff).rom().region("maincpu", 0); // boot vectors point here
 
-	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 #if ENABLE_UART_PRINTING
 	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
@@ -828,8 +828,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
-	m_mcd212->int1_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->int2_callback().set(m_maincpu, FUNC(scc68070_device::int2_w));
+	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -884,8 +883,7 @@ void cdi_state::cdimono2(machine_config &config)
 
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
-	m_mcd212->int1_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->int2_callback().set(m_maincpu, FUNC(scc68070_device::int2_w));
+	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -930,7 +928,7 @@ void cdi_state::cdimono2(machine_config &config)
 	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 }
 
 void cdi_state::cdi910(machine_config &config)
@@ -940,8 +938,7 @@ void cdi_state::cdi910(machine_config &config)
 
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
-	m_mcd212->int1_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->int2_callback().set(m_maincpu, FUNC(scc68070_device::int2_w));
+	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -986,7 +983,7 @@ void cdi_state::cdi910(machine_config &config)
 	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 }
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)

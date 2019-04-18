@@ -3,7 +3,7 @@
 /******************************************************************************
 
 
-    CD-i MCD212 video emulation
+    CD-i MCD212 Video Decoder and System Controller emulation
     -------------------
 
     written by Ryan Holtz
@@ -30,7 +30,7 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(MCD212, mcd212_device, "mcd212", "MCD212 Video")
+DEFINE_DEVICE_TYPE(MCD212, mcd212_device, "mcd212", "MCD212 VDSC")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -546,11 +546,7 @@ void mcd212_device::process_ica(int channel)
 				verboselog(*this, 11, "%08x: %08x: ICA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
 				m_channel[1].csrr |= 1 << (2 - channel);
 				if(m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
-					m_int1_callback(ASSERT_LINE);
-#if 0
-				if(m_channel[1].csrr & MCD212_CSR2R_IT2)
-					m_int2_callback(ASSERT_LINE);
-#endif
+					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
 				verboselog(*this, 6, "%08x: %08x: ICA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );
@@ -621,11 +617,7 @@ void mcd212_device::process_dca(int channel)
 				verboselog(*this, 11, "%08x: %08x: DCA %d: INTERRUPT\n", addr * 2 + channel * 0x200000, cmd, channel );
 				m_channel[1].csrr |= 1 << (2 - channel);
 				if(m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
-					m_int1_callback(ASSERT_LINE);
-#if 0
-				if(m_channel[1].csrr & MCD212_CSR2R_IT2)
-					m_int2_callback(ASSERT_LINE);
-#endif
+					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
 				verboselog(*this, 6, "%08x: %08x: DCA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );
@@ -1250,18 +1242,16 @@ READ16_MEMBER( mcd212_device::regs_r )
 			if(ACCESSING_BITS_0_7)
 			{
 				verboselog(*this, 12, "mcd212_r: Status Register %d: %02x & %04x\n", channel + 1, m_channel[1 - (offset / 8)].csrr, mem_mask);
-				if(channel == 0)
+				if(channel == 0 || machine().side_effects_disabled())
 				{
-					return m_channel[0].csrr;
+					return m_channel[channel].csrr;
 				}
-				else if (!machine().side_effects_disabled())
+				else
 				{
 					uint8_t old_csr = m_channel[1].csrr;
 					m_channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
-					if (old_csr & MCD212_CSR2R_IT1)
-						m_int1_callback(CLEAR_LINE);
-					if (old_csr & MCD212_CSR2R_IT2)
-						m_int2_callback(CLEAR_LINE);
+					if (old_csr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
+						m_int_callback(CLEAR_LINE);
 					return old_csr;
 				}
 			}
@@ -1416,8 +1406,7 @@ void mcd212_device::device_reset()
 	memset(m_region_flag_0, 0, 768);
 	memset(m_region_flag_1, 0, 768);
 
-	m_int1_callback(CLEAR_LINE);
-	m_int2_callback(CLEAR_LINE);
+	m_int_callback(CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -1427,10 +1416,9 @@ void mcd212_device::device_reset()
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCD212, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_int1_callback(*this)
-	, m_int2_callback(*this)
-	, m_planea(*this, "^planea")
-	, m_planeb(*this, "^planeb")
+	, m_int_callback(*this)
+	, m_planea(*this, "planea")
+	, m_planeb(*this, "planeb")
 {
 }
 
@@ -1442,8 +1430,7 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 
 void mcd212_device::device_resolve_objects()
 {
-	m_int1_callback.resolve_safe();
-	m_int2_callback.resolve_safe();
+	m_int_callback.resolve_safe();
 	m_scanline_callback.bind_relative_to(*owner());
 }
 

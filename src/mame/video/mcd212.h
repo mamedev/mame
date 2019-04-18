@@ -124,8 +124,7 @@ public:
 	// construction/destruction
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int1_callback() { return m_int1_callback.bind(); }
-	auto int2_callback() { return m_int2_callback.bind(); }
+	auto int_callback() { return m_int_callback.bind(); }
 
 	template <typename Object> void set_scanline_callback(Object &&cb) { m_scanline_callback = std::forward<Object>(cb); }
 	void set_scanline_callback(scanline_callback_delegate callback) { m_scanline_callback = callback; }
@@ -218,8 +217,7 @@ protected:
 
 private:
 	// interrupt callbacks
-	devcb_write_line m_int1_callback;
-	devcb_write_line m_int2_callback;
+	devcb_write_line m_int_callback;
 
 	scanline_callback_delegate m_scanline_callback;
 

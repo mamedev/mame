@@ -20,8 +20,7 @@ public:
 	cdi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_planea(*this, "planea")
-		, m_planeb(*this, "planeb")
+		, m_planea(*this, "mcd212:planea")
 		, m_input1(*this, "INPUT1")
 		, m_input2(*this, "INPUT2")
 		, m_slave_hle(*this, "slave_hle")
@@ -72,7 +71,6 @@ public:
 
 	required_device<scc68070_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_planea;
-	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
 	optional_ioport m_input2;
 	optional_device<cdislave_device> m_slave_hle;
