@@ -398,6 +398,32 @@ namespace netlist
 
 	namespace detail {
 
+		template <typename C, typename T>
+		struct property_store_t
+		{
+			static void add(const C *obj, const T &aname)
+			{
+				store().insert({obj, aname});
+			}
+
+			static const T get(const C *obj)
+			{
+				return store().find(obj)->second;
+			}
+
+			static void remove(const C *obj)
+			{
+				store().erase(store().find(obj));
+			}
+
+			static std::unordered_map<const C *, T> &store()
+			{
+				static std::unordered_map<const C *, T> lstore;
+				return lstore;
+			}
+
+		};
+
 		// -----------------------------------------------------------------------------
 		// object_t
 		// -----------------------------------------------------------------------------
@@ -417,35 +443,32 @@ namespace netlist
 			 *
 			 *  Every class derived from the object_t class must have a name.
 			 */
-			explicit object_t(const pstring &aname /*!< string containing name of the object */);
+			explicit object_t(const pstring &aname /*!< string containing name of the object */)
+			{
+				props::add(this, aname);
+			}
 
 			COPYASSIGNMOVE(object_t, delete)
 			/*! return name of the object
 			 *
 			 *  \returns name of the object.
 			 */
-			pstring name() const;
+			pstring name() const
+			{
+				return props::get(this);
+			}
 
-	#if 0
-			void * operator new (size_t size, void *ptr) { plib::unused_var(size); return ptr; }
-			void operator delete (void *ptr, void *) { plib::unused_var(ptr); }
-			void * operator new (size_t size) = delete;
-			void operator delete (void * mem) = delete;
-	#endif
 		protected:
+
+			using props = property_store_t<object_t, pstring>;
+
 			// only childs should be destructible
 			~object_t() noexcept
 			{
-				name_hash().erase(name_hash().find(this));
+				props::remove(this);
 			}
 
 		private:
-			//pstring m_name;
-			static std::unordered_map<const object_t *, pstring> &name_hash()
-			{
-				static std::unordered_map<const object_t *, pstring> lhash;
-				return lhash;
-			}
 		};
 
 		struct netlist_ref
@@ -1405,7 +1428,7 @@ namespace netlist
 		}
 
 		/* sole use is to manage lifetime of family objects */
-		std::vector<std::pair<pstring, plib::unique_ptr<logic_family_desc_t>>> m_family_cache;
+		std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>> m_family_cache;
 
 		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
 		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }

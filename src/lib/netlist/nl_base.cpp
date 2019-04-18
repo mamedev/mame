@@ -25,39 +25,6 @@
 
 namespace netlist
 {
-namespace detail
-{
-
-	//static plib::mempool *pool()
-	//{
-	//  static plib::mempool s_pool(655360, 32);
-	//  return &s_pool;
-	//}
-
-#if 0
-	void * object_t::operator new (size_t size)
-	{
-		void *ret = nullptr;
-		if ((USE_MEMPOOL))
-			ret = pool()->alloc(size);
-		else
-			ret = ::operator new(size);
-		return ret;
-	}
-	void object_t::operator delete (void * mem)
-	{
-		if (mem)
-		{
-			//if ((USE_MEMPOOL))
-			//  pool()->free(mem);
-			//else
-				::operator delete(mem);
-		}
-	}
-#endif
-
-} // namespace detail
-
 
 // ----------------------------------------------------------------------------------------
 // logic_family_ttl_t
@@ -186,22 +153,6 @@ void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 
 detail::netlist_ref::netlist_ref(netlist_state_t &nl)
 : m_netlist(nl.exec()) { }
-
-// ----------------------------------------------------------------------------------------
-// object_t
-// ----------------------------------------------------------------------------------------
-
-detail::object_t::object_t(const pstring &aname)
-//  : m_name(aname)
-{
-	name_hash().insert({this, aname});
-}
-
-pstring detail::object_t::name() const
-{
-	return name_hash().find(this)->second;
-	//return m_name;
-}
 
 // ----------------------------------------------------------------------------------------
 // device_object_t

@@ -964,9 +964,9 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	if (m_models.value_str(model, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
-	for (auto & e : m_nlstate.m_family_cache)
-		if (e.first == model)
-			return e.second.get();
+	auto it = m_nlstate.m_family_cache.find(model);
+	if (it != m_nlstate.m_family_cache.end())
+		return it->second.get();
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
@@ -980,7 +980,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto retp = ret.get();
 
-	m_nlstate.m_family_cache.emplace_back(model, std::move(ret));
+	m_nlstate.m_family_cache.emplace(model, std::move(ret));
 
 	return retp;
 }
