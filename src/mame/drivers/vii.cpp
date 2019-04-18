@@ -81,7 +81,7 @@
         "SunPlus PA7801" ( known as Sunplus SPG110? )
 		- see spg110.cpp instead
 
-        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob) 
+        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob)
 		- see sunplus_gcm394.cpp instead
 
     Status:
@@ -100,12 +100,11 @@
         jak_wall, jak_sdoo:
             Game seems unhappy with NVRAM, clears contents on each boot.
         jak_pooh:
-            In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
-            and the game usually softlocks when you find a friend (with or without DRC)
+            In the 'Light Tag' minigame (select the rock) the game usually softlocks when you find a friend (with or without DRC)
         jak_disf:
-            shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
+            Shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
         jak_nick:
-            channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
+            Channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
 
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
@@ -122,7 +121,7 @@
         Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
         WWE : press UP, BT1, BT2 together during startup logos
 
-        Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKKeys) for test mode, hold UP,
+        Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKeys) for test mode, hold UP,
         press A, press DOWN during startup
 
     TODO:

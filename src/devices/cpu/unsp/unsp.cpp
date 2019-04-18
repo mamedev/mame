@@ -226,6 +226,8 @@ void unsp_device::log_regs()
 
 void unsp_device::log_write(uint32_t addr, uint32_t data)
 {
+	if (m_log_ops == 0)
+		return;
 	addr |= 0x80000000;
 	fwrite(&addr, sizeof(uint32_t), 1, m_log_file);
 	fwrite(&data, sizeof(uint32_t), 1, m_log_file);
