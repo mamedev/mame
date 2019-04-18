@@ -78,6 +78,7 @@ NETLIST_START(rebound_schematics)
 	 PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	 PARAM(Solver.ACCURACY, 1e-9)
 	 PARAM(NETLIST.USE_DEACTIVATE, 1)
+	 HINT(F9.s2, NO_DEACTIVATE)
 
 	 ANALOG_INPUT(V5, 5)
 
