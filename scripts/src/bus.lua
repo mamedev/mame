@@ -1326,6 +1326,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/ultra14f.h",
 		MAME_DIR .. "src/devices/bus/isa/ultra24f.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ultra24f.h",
+		MAME_DIR .. "src/devices/bus/isa/tekram_dc820.cpp",
+		MAME_DIR .. "src/devices/bus/isa/tekram_dc820.h",
 	}
 end
 
