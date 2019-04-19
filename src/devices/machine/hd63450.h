@@ -20,8 +20,8 @@ public:
 
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
-	auto dma_error() { return m_dma_error.bind(); }
 	template<int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
 	template<int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
 
@@ -47,11 +47,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq3_w);
+	uint8_t iack();
 
 	void single_transfer(int x);
 	void set_timer(int channel, const attotime &tm);
-	int get_vector(int channel);
-	int get_error_vector(int channel);
 
 protected:
 	// device-level overrides
@@ -81,8 +80,8 @@ private:
 		uint8_t gcr;  // [3f]  General Control Register (R/W)
 	};
 
+	devcb_write_line m_irq_callback;
 	devcb_write8 m_dma_end;
-	devcb_write8 m_dma_error;
 	devcb_read8 m_dma_read[4];
 	devcb_write8 m_dma_write[4];
 
@@ -97,6 +96,8 @@ private:
 	required_device<cpu_device> m_cpu;
 	bool m_drq_state[4];
 
+	int8_t m_irq_channel;
+
 	// tell if a channel is in use
 	bool dma_in_progress(int channel) const { return (m_reg[channel].csr & 0x08) != 0; }
 
@@ -105,6 +106,11 @@ private:
 	void dma_transfer_halt(int channel);
 	void dma_transfer_continue(int channel);
 	void dma_transfer_start(int channel);
+	void set_error(int channel, uint8_t code);
+
+	// interrupt helpers
+	void set_irq(int channel);
+	void clear_irq(int channel);
 };
 
 DECLARE_DEVICE_TYPE(HD63450, hd63450_device)
