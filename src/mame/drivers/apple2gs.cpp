@@ -2262,7 +2262,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			}
 			else
 			{
-				m_sndglu_dummy_read = m_doc->read(space, m_sndglu_addr);
+				m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
 			}
 
 			if (m_sndglu_ctrl & 0x20)    // auto-increment
@@ -2591,7 +2591,7 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			}
 			else
 			{
-				m_doc->write(space, m_sndglu_addr, data);
+				m_doc->write(m_sndglu_addr, data);
 			}
 
 			if (m_sndglu_ctrl & 0x20)    // auto-increment

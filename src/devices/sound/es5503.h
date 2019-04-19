@@ -23,8 +23,8 @@ public:
 	auto irq_func() { return m_irq_func.bind(); }
 	auto adc_func() { return m_adc_func.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	uint8_t get_channel_strobe() { return m_channel_strobe; }
 
