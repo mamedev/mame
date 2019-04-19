@@ -1155,8 +1155,14 @@
   - Added technical and game notes.
   - Promoted the game to working.
 
+  Royal Card (German, set 4):
+  - Verified the GFX dump as a mix of Royal Card
+    & Jolly Card graphics, with faulty address.
+	Used GFX set from parent, that matches 100%.
+  - Removed the imperfect graphics flag.
 
-  
+
+
   *** TO DO ***
 
   - Figure out the royalcdc & jokercrd encryption.
@@ -5941,13 +5947,17 @@ ROM_START( royalcrdc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "roj.ic12", 0x8000, 0x8000, CRC(16923d58) SHA1(e865b91246ae5a21bdc9787e6e6e22be5182cabb) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "gfx1", 0 )  // borrowed from parent set, that matches 100%.
+	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(c46d804f) SHA1(b089821c7dae6714b49401d787f8bed859815763) )
+	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+
+	ROM_REGION( 0x10000, "gfxbad", 0 )  // faulty gfx set with bad addressing and mix of royal card & jolly card tiles. 
 	ROM_LOAD( "roj.ic26", 0x0000, 0x8000, BAD_DUMP CRC(3883cdcb) SHA1(b71a786822fe8fcb2c6fcdc463facb2738ec8c01) )
 	ROM_IGNORE(                   0x8000)
 	ROM_LOAD( "roj.ic25", 0x8000, 0x8000, CRC(c5b787e8) SHA1(be88aa901c1f96d171af45c3602e0ce72b8fff34) )
 	ROM_IGNORE(                   0x8000)
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM
 	ROM_LOAD( "royalcrdc_nvram.bin", 0x0000, 0x0800, CRC(eacb0c7b) SHA1(513816623aa3843dd5d0416fc012060c7a9f6c71) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -8434,7 +8444,7 @@ GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  funworld_state, empty_ini
 GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German, set 2)",                      0,                       layout_jollycrd )
 GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German/Polish, set 3)",               0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German, set 4)",                      MACHINE_IMPERFECT_GRAPHICS, layout_jollycrd )
+GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German, set 4)",                      0,                       layout_jollycrd )
 GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German, set 5)",                      0,                       layout_royalcrd )
 GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (German, set 6)",                      0,                       layout_jollycrd )
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
