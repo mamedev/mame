@@ -141,14 +141,14 @@
 			<feature name="dipswitch" value="SW0135" /> <!-- ('.'.'') -->
 			<feature name="battery" value="[empty]" />
 			<dataarea name="rom" size="4194304">
-				<rom name="u1.ic1" size="524288" crc="1553d1c6" sha1="18f00cbf8278ed709ec02cc2e5808ef4d0c479c1" offset="000000" />
-				<rom name="u2.ic2" size="524288" crc="eff61056" sha1="e4693a6ea0b4498a13a1bf00e8064139f02e03ad" offset="0x80000" />
-				<rom name="u3.ic2" size="524288" crc="218a0656" sha1="6a0cd97ab525a9d1dd10263bdd022427eddfeefe" offset="0x100000" />
-				<rom name="u4.ic2" size="524288" crc="1c39dbd1" sha1="57331a3a680852251a0780559238c2cc3c1d1ad0" offset="0x180000" />
-				<rom name="u5.ic2" size="524288" crc="6cbe0e12" sha1="830b81eb6db6487612f13999a671e98b9f782236" offset="0x200000" />
-				<rom name="u6.ic2" size="524288" crc="70ee204d" sha1="4b476e494faf041439b4cb1916654eb231f6f49e" offset="0x280000" />
-				<rom name="u7.ic2" size="524288" crc="63e613df" sha1="b40b7a72ece079452a1417f526a00473da7d3b7f" offset="0x300000" />
-				<rom name="u8.ic2" size="524288" crc="7ecb16f0" sha1="9668cb5addd612fd34f3740155adfe3b64e4fec1" offset="0x380000" />
+				<rom loadflag="load16_byte" name="u1.ic1" size="524288" crc="1553d1c6" sha1="18f00cbf8278ed709ec02cc2e5808ef4d0c479c1" offset="0x000001" />
+				<rom loadflag="load16_byte" name="u2.ic2" size="524288" crc="eff61056" sha1="e4693a6ea0b4498a13a1bf00e8064139f02e03ad" offset="0x000000" />
+				<rom loadflag="load16_byte" name="u3.ic2" size="524288" crc="218a0656" sha1="6a0cd97ab525a9d1dd10263bdd022427eddfeefe" offset="0x100001" />
+				<rom loadflag="load16_byte" name="u4.ic2" size="524288" crc="1c39dbd1" sha1="57331a3a680852251a0780559238c2cc3c1d1ad0" offset="0x100000" />
+				<rom loadflag="load16_byte" name="u5.ic2" size="524288" crc="6cbe0e12" sha1="830b81eb6db6487612f13999a671e98b9f782236" offset="0x200001" />
+				<rom loadflag="load16_byte" name="u6.ic2" size="524288" crc="70ee204d" sha1="4b476e494faf041439b4cb1916654eb231f6f49e" offset="0x200000" />
+				<rom loadflag="load16_byte" name="u7.ic2" size="524288" crc="63e613df" sha1="b40b7a72ece079452a1417f526a00473da7d3b7f" offset="0x300001" />
+				<rom loadflag="load16_byte" name="u8.ic2" size="524288" crc="7ecb16f0" sha1="9668cb5addd612fd34f3740155adfe3b64e4fec1" offset="0x300000" />
 			</dataarea>
 		</part>
 	</software>
