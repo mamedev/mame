@@ -93,7 +93,7 @@ void hd63450_device::device_reset()
 		m_reg[x].ocr = 0;
 		m_reg[x].scr = 0;
 		m_reg[x].ccr = 0;
-		m_reg[x].csr &= 0xfe;
+		m_reg[x].csr &= 0x01;
 		m_reg[x].cer = 0;
 		m_reg[x].gcr = 0;
 
