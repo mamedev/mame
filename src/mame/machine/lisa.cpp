@@ -203,14 +203,7 @@ void lisa_state::COPS_send_data_if_possible()
 //        printf("COPsim: sending %02x to VIA\n", m_fifo_data[m_fifo_head]);
 
 		uint8_t data = m_fifo_data[m_fifo_head];/* output data */
-		m_via0->write_pa0((data>>0)&1);
-		m_via0->write_pa1((data>>1)&1);
-		m_via0->write_pa2((data>>2)&1);
-		m_via0->write_pa3((data>>3)&1);
-		m_via0->write_pa4((data>>4)&1);
-		m_via0->write_pa5((data>>5)&1);
-		m_via0->write_pa6((data>>6)&1);
-		m_via0->write_pa7((data>>7)&1);
+		m_via0->write_pa(data);
 
 		if (m_fifo_head == m_mouse_data_offset)
 			m_mouse_data_offset = -1;    /* we just phased out the mouse data in buffer */

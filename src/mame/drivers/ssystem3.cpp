@@ -202,14 +202,7 @@ WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 	uint8_t d = ssystem3_via_read_b(space, 0, mem_mask) & ~0x40;
 	if (data & 0x80) d |= 0x40;
 	//  d&=~0x8f;
-	m_via6522_0->write_pb0((d >> 0) & 1);
-	m_via6522_0->write_pb1((d >> 1) & 1);
-	m_via6522_0->write_pb2((d >> 2) & 1);
-	m_via6522_0->write_pb3((d >> 3) & 1);
-	m_via6522_0->write_pb4((d >> 4) & 1);
-	m_via6522_0->write_pb5((d >> 5) & 1);
-	m_via6522_0->write_pb6((d >> 6) & 1);
-	m_via6522_0->write_pb7((d >> 7) & 1);
+	m_via6522_0->write_pb(d);
 }
 
 void ssystem3_state::init_ssystem3()
