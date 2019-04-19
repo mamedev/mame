@@ -651,7 +651,7 @@ void esq5505_state::eps(machine_config &config)
 {
 	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
-	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_cpu_space_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
