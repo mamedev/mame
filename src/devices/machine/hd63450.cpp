@@ -206,6 +206,10 @@ WRITE16_MEMBER(hd63450_device::write)
 				dma_transfer_halt(channel);
 			if (data & 0x0040)  // continure operation
 				dma_transfer_continue(channel);
+			if ((data & 0x0008) == 0)
+				clear_irq(channel);
+			else if ((m_reg[channel].csr & 0xf2) != 0)
+				set_irq(channel);
 			LOG("DMA#%i: Channel Control write : %02x\n",channel,m_reg[channel].ccr);
 		}
 		break;
