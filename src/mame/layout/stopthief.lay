@@ -4,14 +4,15 @@
 <!-- define elements -->
 
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="white2"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 
 	<element name="text_off">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
 		<text string="OFF"><color red="0.1" green="0.6" blue="0.35" /></text>
 	</element>
 	<element name="text_on">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
 		<text string="ON"><color red="0.8" green="0.2" blue="0.1" /></text>
 	</element>
 
@@ -69,23 +70,23 @@
 
 	<element name="red_magenta1">
 		<rect><bounds x="0" y="0" width="1" height="0.6" /><color red="0.8" green="0.12" blue="0.22" /></rect>
-		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.8" green="0.18" blue="0.58" /></rect>
+		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.8" green="0.18" blue="0.5" /></rect>
 		<text string="5"><bounds x="0" y="0" width="1" height="1" /><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 	<element name="red_magenta2">
 		<rect><bounds x="0" y="0" width="1" height="0.6" /><color red="0.8" green="0.12" blue="0.22" /></rect>
-		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.8" green="0.18" blue="0.58" /></rect>
+		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.8" green="0.18" blue="0.5" /></rect>
 		<text string="6"><bounds x="0" y="0" width="1" height="1" /><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 
 	<element name="magenta_purple1">
-		<rect><bounds x="0" y="0" width="1" height="0.6" /><color red="0.7" green="0.2" blue="0.5" /></rect>
-		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.5" green="0.15" blue="0.7" /></rect>
+		<rect><bounds x="0" y="0" width="1" height="0.6" /><color red="0.7" green="0.2" blue="0.6" /></rect>
+		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.5" green="0.15" blue="0.75" /></rect>
 		<text string="7"><bounds x="0" y="0" width="1" height="1" /><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 	<element name="magenta_purple2">
-		<rect><bounds x="0" y="0" width="1" height="0.6" /><color red="0.7" green="0.2" blue="0.5" /></rect>
-		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.5" green="0.15" blue="0.7" /></rect>
+		<rect><bounds x="0" y="0" width="1" height="0.6" /><color red="0.7" green="0.2" blue="0.6" /></rect>
+		<rect><bounds x="0" y="0.5" width="1" height="0.5" /><color red="0.5" green="0.15" blue="0.75" /></rect>
 		<text string="8"><bounds x="0" y="0" width="1" height="1" /><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 
@@ -141,12 +142,12 @@
 
 		<bezel element="yellow_orange1"><bounds x="9" y="70" width="25" height="26" /></bezel>
 		<bezel element="yellow_orange2"><bounds x="37.5" y="70" width="25" height="26" /></bezel>
-		<bezel element="white"><bounds x="66" y="70" width="25" height="26" /></bezel>
+		<bezel element="white2"><bounds x="66" y="70" width="25" height="26" /></bezel>
 		<bezel element="text_off"><bounds x="67" y="77.5" width="23" height="11" /></bezel>
 
 		<bezel element="orange_red1"><bounds x="9" y="99.5" width="25" height="26" /></bezel>
 		<bezel element="orange_red2"><bounds x="37.5" y="99.5" width="25" height="26" /></bezel>
-		<bezel element="white"><bounds x="66" y="99.5" width="25" height="26" /></bezel>
+		<bezel element="white2"><bounds x="66" y="99.5" width="25" height="26" /></bezel>
 		<bezel element="text_on"><bounds x="67" y="107" width="23" height="11" /></bezel>
 
 		<bezel element="red_magenta1"><bounds x="9" y="129" width="25" height="26" /></bezel>

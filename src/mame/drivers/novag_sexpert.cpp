@@ -6,7 +6,7 @@
 * novag_sexpert.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:
-- led handling is correct?
+- led handling is correct? The core issue is probably led strobe timing.
 
 *******************************************************************************
 
