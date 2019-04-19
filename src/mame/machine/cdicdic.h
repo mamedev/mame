@@ -73,6 +73,42 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
+	enum
+	{
+		CDIC_SECTOR_SYNC        = 0,
+
+		CDIC_SECTOR_HEADER      = 12,
+
+		CDIC_SECTOR_MODE        = 15,
+
+		CDIC_SECTOR_FILE1       = 16,
+		CDIC_SECTOR_CHAN1       = 17,
+		CDIC_SECTOR_SUBMODE1    = 18,
+		CDIC_SECTOR_CODING1     = 19,
+
+		CDIC_SECTOR_FILE2       = 20,
+		CDIC_SECTOR_CHAN2       = 21,
+		CDIC_SECTOR_SUBMODE2    = 22,
+		CDIC_SECTOR_CODING2     = 23,
+
+		CDIC_SECTOR_DATA        = 24,
+
+		CDIC_SECTOR_SIZE        = 2352,
+
+		CDIC_SECTOR_DATASIZE    = 2048,
+		CDIC_SECTOR_AUDIOSIZE   = 2304,
+		CDIC_SECTOR_VIDEOSIZE   = 2324,
+
+		CDIC_SUBMODE_EOF        = 0x80,
+		CDIC_SUBMODE_RT         = 0x40,
+		CDIC_SUBMODE_FORM       = 0x20,
+		CDIC_SUBMODE_TRIG       = 0x10,
+		CDIC_SUBMODE_DATA       = 0x08,
+		CDIC_SUBMODE_AUDIO      = 0x04,
+		CDIC_SUBMODE_VIDEO      = 0x02,
+		CDIC_SUBMODE_EOR        = 0x01
+	};
+
 	int is_valid_sample_buf(uint16_t addr) const;
 	double sample_buf_freq(uint16_t addr) const;
 	int sample_buf_size(uint16_t addr) const;
