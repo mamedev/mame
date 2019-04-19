@@ -54,14 +54,17 @@ WRITE8_MEMBER(harriet_state::zpram_w)
 void harriet_state::harriet_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("monitor", 0);
-	map(0x040000, 0x040fff).rw(FUNC(harriet_state::zpram_r), FUNC(harriet_state::zpram_w)).umask16(0x00ff);
-	map(0x040000, 0x040fff).rw("timekpr", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);
+	map(0x040000, 0x040fff).rw(FUNC(harriet_state::zpram_r), FUNC(harriet_state::zpram_w)).umask16(0xff00);
+	map(0x040000, 0x040fff).rw("timekpr", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 	map(0x7f0000, 0x7fffff).ram();
 	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xf30000, 0xf301ff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xf40000, 0xf4003f).rw("scsia:7:wdc", FUNC(wd33c93_device::dir_r), FUNC(wd33c93_device::dir_w)).umask16(0x00ff);
 	//map(0xf60000, 0xf60007).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write)).umask16(0x00ff);
+	map(0xf60006, 0xf60007).nopr();
+	map(0xfa0000, 0xfa0001).nopr();
+	map(0xfb0000, 0xfb0001).noprw();
 }
 
 static INPUT_PORTS_START( harriet )
