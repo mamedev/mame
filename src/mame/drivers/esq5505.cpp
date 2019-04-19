@@ -194,7 +194,6 @@ public:
 	void init_sq1();
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	void cpu_space_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
@@ -240,6 +239,9 @@ private:
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
 
+	void cpu_space_map(address_map &map);
+	void eps_cpu_space_map(address_map &map);
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
 
@@ -254,8 +256,13 @@ FLOPPY_FORMATS_END
 void esq5505_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
 	map(0xfffff7, 0xfffff7).r(m_duart, FUNC(mc68681_device::get_irq_vector));
+}
+
+void esq5505_state::eps_cpu_space_map(address_map &map)
+{
+	cpu_space_map(map);
+	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
 }
 
 void esq5505_state::machine_start()
@@ -644,6 +651,7 @@ void esq5505_state::eps(machine_config &config)
 {
 	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_cpu_space_map);
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
