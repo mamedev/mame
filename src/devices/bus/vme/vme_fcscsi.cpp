@@ -242,7 +242,7 @@ void vme_fcscsi1_card_device::update_irq_to_maincpu() {
 void vme_fcscsi1_card_device::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
+	map(0xfffff5, 0xfffff5).r(FUNC(vme_fcscsi1_card_device::dma_iack));
 }
 
 FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
@@ -427,6 +427,14 @@ WRITE_LINE_MEMBER(vme_fcscsi1_card_device::dma_irq)
 	}
 
 	update_irq_to_maincpu();
+}
+
+uint8_t vme_fcscsi1_card_device::dma_iack()
+{
+	if (B41)
+		return m_dmac->iack();
+	else
+		return m68000_base_device::autovector(2);
 }
 
 WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)

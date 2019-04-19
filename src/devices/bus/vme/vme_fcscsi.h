@@ -36,6 +36,7 @@ protected:
 private:
 	//dmac
 	DECLARE_WRITE_LINE_MEMBER(dma_irq);
+	uint8_t dma_iack();
 
 	//fdc
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
