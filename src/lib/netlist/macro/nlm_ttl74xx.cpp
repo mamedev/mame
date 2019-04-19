@@ -30,18 +30,18 @@ static NETLIST_START(TTL_7400_DIP)
 	TTL_7400_GATE(s3)
 	TTL_7400_GATE(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| B4   */ s4.B,
 		s1.Q,  /*    Y1 |3           12| A4   */ s4.A,
 		s2.A,  /*    A2 |4    7400   11| Y4   */ s4.Q,
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -68,18 +68,18 @@ static NETLIST_START(TTL_7402_DIP)
 	TTL_7402_GATE(s3)
 	TTL_7402_GATE(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.Q,  /*    Y1 |1     ++    14| VCC  */ VCC.I,
+		s1.Q,  /*    Y1 |1     ++    14| VCC  */ s1.VCC,
 		s1.A,  /*    A1 |2           13| Y4   */ s4.Q,
 		s1.B,  /*    B1 |3           12| B4   */ s4.B,
 		s2.Q,  /*    Y2 |4    7402   11| A4   */ s4.A,
 		s2.A,  /*    A2 |5           10| Y3   */ s3.Q,
 		s2.B,  /*    B2 |6            9| B3   */ s3.B,
-		GND.I, /*   GND |7            8| A3   */ s3.A
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| A3   */ s3.A
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -106,18 +106,18 @@ static NETLIST_START(TTL_7404_DIP)
 	TTL_7404_GATE(s5)
 	TTL_7404_GATE(s6)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC, s5.VCC, s6.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND, s5.GND, s6.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.Q,  /*    Y1 |2           13| A6   */ s6.A,
 		s2.A,  /*    A2 |3           12| Y6   */ s6.Q,
 		s2.Q,  /*    Y2 |4    7404   11| A5   */ s5.A,
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
-		GND.I, /*   GND |7            8| Y4   */ s4.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y4   */ s4.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -145,18 +145,18 @@ static NETLIST_START(TTL_7408_DIP)
 	TTL_7408_GATE(s3)
 	TTL_7408_GATE(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| B4   */ s4.B,
 		s1.Q,  /*    Y1 |3           12| A4   */ s4.A,
 		s2.A,  /*    A2 |4    7400   11| Y4   */ s4.Q,
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -182,18 +182,18 @@ static NETLIST_START(TTL_7410_DIP)
 	TTL_7410_GATE(s2)
 	TTL_7410_GATE(s3)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| C1   */ s1.C,
 		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
 		s2.B,  /*    B2 |4    7410   11| C3   */ s3.C,
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -219,17 +219,17 @@ static NETLIST_START(TTL_7411_DIP)
 	TTL_7411_GATE(s2)
 	TTL_7411_GATE(s3)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| C1   */ s1.C,
 		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
 		s2.B,  /*    B2 |4    7411   11| C3   */ s3.C,
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
 			   /*       +--------------+      */
 	)
 NETLIST_END()
@@ -314,18 +314,18 @@ static NETLIST_START(TTL_7416_DIP)
 	TTL_7416_GATE(s5)
 	TTL_7416_GATE(s6)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC, s5.VCC, s6.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND, s5.GND, s6.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.Q,  /*    Y1 |2           13| A6   */ s6.A,
 		s2.A,  /*    A2 |3           12| Y6   */ s6.Q,
 		s2.Q,  /*    Y2 |4    7416   11| A5   */ s5.A,
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
-		GND.I, /*   GND |7            8| Y4   */ s4.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y4   */ s4.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -351,19 +351,19 @@ static NETLIST_START(TTL_7420_DIP)
 	TTL_7420_GATE(s1)
 	TTL_7420_GATE(s2)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC)
+	NET_C(s1.GND, s2.GND)
 	DUMMY_INPUT(NC)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| D2   */ s2.D,
 		NC.I,  /*    NC |3           12| C2   */ s2.C,
 		s1.C,  /*    C1 |4    7420   11| NC   */ NC.I,
 		s1.D,  /*    D1 |5           10| B2   */ s2.B,
 		s1.Q,  /*    Y1 |6            9| A2   */ s2.A,
-		GND.I, /*   GND |7            8| Y2   */ s2.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y2   */ s2.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -393,19 +393,19 @@ static NETLIST_START(TTL_7425_DIP)
 	TTL_7425_GATE(s1)
 	TTL_7425_GATE(s2)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC)
+	NET_C(s1.GND, s2.GND)
 	DUMMY_INPUT(X)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| D2   */ s2.D,
-			X.I,  /*    X1 |3           12| C2   */ s2.C,
+		X.I,   /*    X1 |3           12| C2   */ s2.C,
 		s1.C,  /*    C1 |4    7425   11| X2   */  X.I,
 		s1.D,  /*    D1 |5           10| B2   */ s2.B,
 		s1.Q,  /*    Y1 |6            9| A2   */ s2.A,
-		GND.I, /*   GND |7            8| Y2   */ s2.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y2   */ s2.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -432,17 +432,17 @@ static NETLIST_START(TTL_7427_DIP)
 	TTL_7427_GATE(s2)
 	TTL_7427_GATE(s3)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| C1   */ s1.C,
 		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
 		s2.B,  /*    B2 |4    7427   11| C3   */ s3.C,
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
 			   /*       +--------------+      */
 	)
 NETLIST_END()
@@ -471,18 +471,16 @@ NETLIST_END()
 static NETLIST_START(TTL_7430_DIP)
 	TTL_7430_GATE(s1)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
 	DUMMY_INPUT(NC)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*     A |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*     A |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*     B |2           13| NC   */ NC.I,
 		s1.C,  /*     C |3           12| H    */ s1.H,
 		s1.D,  /*     D |4    7430   11| G    */ s1.G,
 		s1.E,  /*     E |5           10| NC   */ NC.I,
 		s1.F,  /*     F |6            9| NC   */ NC.I,
-		GND.I, /*   GND |7            8| Y    */ s1.Q
+		s1.GND,/*   GND |7            8| Y    */ s1.Q
 			   /*       +--------------+      */
 	)
 NETLIST_END()
@@ -511,18 +509,18 @@ static NETLIST_START(TTL_7432_DIP)
 	TTL_7432_GATE(s3)
 	TTL_7432_GATE(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| B4   */ s4.B,
 		s1.Q,  /*    Y1 |3           12| A4   */ s4.A,
 		s2.A,  /*    A2 |4    7400   11| Y4   */ s4.Q,
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -553,18 +551,18 @@ static NETLIST_START(TTL_7437_DIP)
 	TTL_7437_GATE(s3)
 	TTL_7437_GATE(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| B4   */ s4.B,
 		s1.Q,  /*    Y1 |3           12| A4   */ s4.A,
 		s2.A,  /*    A2 |4    7400   11| Y4   */ s4.Q,
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -591,17 +589,17 @@ static NETLIST_START(TTL_7486_DIP)
 	TTL_7486_GATE(s3)
 	TTL_7486_GATE(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.A,  /*    A1 |1     ++    14| VCC  */ s1.VCC,
 		s1.B,  /*    B1 |2           13| B4   */ s4.B,
 		s1.Q,  /*    Y1 |3           12| A4   */ s4.A,
 		s2.A,  /*    A2 |4    7486   11| Y4   */ s4.Q,
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
-		GND.I, /*   GND |7            8| Y3   */ s3.Q
+		s1.GND,/*   GND |7            8| Y3   */ s3.Q
 			   /*       +--------------+      */
 	)
 NETLIST_END()
@@ -642,18 +640,18 @@ static NETLIST_START(TTL_74155_DIP)
 	NET_C(s1.A, s2.A)
 	NET_C(s1.B, s2.B)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC)
+	NET_C(s1.GND, s2.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.C,  /*    C1 |1     ++    16| VCC  */ VCC.I,
+		s1.C,  /*    C1 |1     ++    16| VCC  */ s1.VCC,
 		s1.G,  /*    G1 |2           15| B4   */ s2.C,
 		s1.B,  /*     B |3           14| B4   */ s2.G,
 		s1.3,  /*   1Y3 |4   74155   13| A4   */ s2.A,
 		s2.2,  /*   1Y2 |5           12| Y4   */ s2.3,
 		s2.1,  /*   1Y1 |6           11| B3   */ s2.2,
 		s2.0,  /*   1Y0 |7           10| A3   */ s2.1,
-		GND.I, /*   GND |8            9| Y3   */ s2.0
+		s1.GND,/*   GND |8            9| Y3   */ s2.0
 			   /*       +--------------+      */
 	)
 NETLIST_END()
@@ -665,18 +663,18 @@ static NETLIST_START(TTL_74156_DIP)
 	NET_C(s1.A, s2.A)
 	NET_C(s1.B, s2.B)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC)
+	NET_C(s1.GND, s2.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.C,  /*    C1 |1     ++    16| VCC  */ VCC.I,
+		s1.C,  /*    C1 |1     ++    16| VCC  */ s1.VCC,
 		s1.G,  /*    G1 |2           15| B4   */ s2.C,
 		s1.B,  /*     B |3           14| B4   */ s2.G,
 		s1.3,  /*   1Y3 |4   74156   13| A4   */ s2.A,
 		s2.2,  /*   1Y2 |5           12| Y4   */ s2.3,
 		s2.1,  /*   1Y1 |6           11| B3   */ s2.2,
 		s2.0,  /*   1Y0 |7           10| A3   */ s2.1,
-		GND.I, /*   GND |8            9| Y3   */ s2.0
+		s1.GND,/*   GND |8            9| Y3   */ s2.0
 			   /*       +--------------+      */
 	)
 NETLIST_END()
@@ -704,18 +702,18 @@ static NETLIST_START(TTL_74260_DIP)
 	TTL_74260_GATE(s1)
 	TTL_74260_GATE(s2)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC)
+	NET_C(s1.GND, s2.GND)
 
 	DIPPINS(   /*       +--------------+      */
-		s1.C,  /*    C1 |1     ++    14| VCC  */ VCC.I,
+		s1.C,  /*    C1 |1     ++    14| VCC  */ s1.VCC,
 		s1.D,  /*    D1 |2           13| B1   */ s1.B,
 		s1.E,  /*    E1 |3           12| A1   */ s1.A,
 		s2.E,  /*    E2 |4   74260   11| D2   */ s2.D,
 		s1.Q,  /*    Y1 |5           10| C2   */ s2.C,
 		s2.Q,  /*    Y2 |6            9| B2   */ s2.B,
-		GND.I, /*   GND |7            8| A2   */ s2.A
-				/*       +--------------+      */
+		s1.GND,/*   GND |7            8| A2   */ s2.A
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -751,18 +749,18 @@ static NETLIST_START(TTL_74279_DIP)
 	TTL_74279B(s3)
 	TTL_74279A(s4)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
+	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 
 	DIPPINS(    /*     +--------------+     */
-		s1.R,   /*  1R |1     ++    16| VCC */ VCC.I,
+		s1.R,   /*  1R |1     ++    16| VCC */ s1.VCC,
 		s1.S1,  /* 1S1 |2           15| 4S  */ s4.S,
 		s1.S2,  /* 1S2 |3           14| 4R  */ s4.R,
 		s1.Q,   /*  1Q |4    74279  13| 4Q  */ s4.Q,
 		s2.R,   /*  2R |5           12| 3S2 */ s3.S2,
 		s2.S,   /*  2S |6           11| 3S1 */ s3.S1,
 		s2.Q,   /*  2Q |7           10| 3R  */ s3.R,
-		GND.I,  /* GND |8            9| 3Q  */ s3.Q
+		s1.GND, /* GND |8            9| 3Q  */ s3.Q
 				/*     +--------------+     */
 	)
 NETLIST_END()
@@ -807,18 +805,15 @@ NETLIST_END()
 static NETLIST_START(DM9312_DIP)
 	DM9312_TT(s)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
-
-DIPPINS(        /*     +--------------+     */
-		s.D0,   /*  D0 |1     ++    16| VCC */ VCC.I,
+	DIPPINS(    /*     +--------------+     */
+		s.D0,   /*  D0 |1     ++    16| VCC */ s.VCC,
 		s.D1,   /*  D1 |2           15| Y   */ s.Y,
 		s.D2,   /*  D2 |3           14| YQ  */ s.YQ,
 		s.D3,   /*  D3 |4    9312   13| C   */ s.C,
 		s.D4,   /*  D4 |5           12| B   */ s.B,
 		s.D5,   /*  D5 |6           11| A   */ s.A,
 		s.D6,   /*  D6 |7           10| G   */ s.G, //Strobe
-		GND.I,  /* GND |8            9| D7  */ s.D7
+		s.GND,  /* GND |8            9| D7  */ s.D7
 				/*     +--------------+     */
 	)
 NETLIST_END()
@@ -839,7 +834,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7400_NAND, 2, 1, "+A,+B")
+	TRUTHTABLE_START(TTL_7400_NAND, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,X|1|22")
 		TT_LINE("X,0|1|22")
@@ -855,7 +850,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7402_NOR, 2, 1, "+A,+B")
+	TRUTHTABLE_START(TTL_7402_NOR, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,0|1|22")
 		TT_LINE("X,1|0|15")
@@ -870,7 +865,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7404_INVERT, 1, 1, "+A")
+	TRUTHTABLE_START(TTL_7404_INVERT, 1, 1, "+A,@VCC,@GND")
 		TT_HEAD(" A | Q ")
 		TT_LINE(" 0 | 1 |22")
 		TT_LINE(" 1 | 0 |15")
@@ -885,7 +880,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7408_AND, 2, 1, "+A,+B")
+	TRUTHTABLE_START(TTL_7408_AND, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,X|0|15")
 		TT_LINE("X,0|0|15")
@@ -893,7 +888,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7410_NAND, 3, 1, "+A,+B,+C")
+	TRUTHTABLE_START(TTL_7410_NAND, 3, 1, "+A,+B,+C,@VCC,@GND")
 		TT_HEAD("A,B,C|Q ")
 		TT_LINE("0,X,X|1|22")
 		TT_LINE("X,0,X|1|22")
@@ -911,7 +906,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7411_AND, 3, 1, "+A,+B,+C")
+	TRUTHTABLE_START(TTL_7411_AND, 3, 1, "+A,+B,+C,@VCC,@GND")
 		TT_HEAD("A,B,C|Q ")
 		TT_LINE("0,X,X|0|15")
 		TT_LINE("X,0,X|0|15")
@@ -947,7 +942,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7420_NAND, 4, 1, "+A,+B,+C,+D")
+	TRUTHTABLE_START(TTL_7420_NAND, 4, 1, "+A,+B,+C,+D,@VCC,@GND")
 		TT_HEAD("A,B,C,D|Q ")
 		TT_LINE("0,X,X,X|1|22")
 		TT_LINE("X,0,X,X|1|22")
@@ -967,7 +962,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7425_NOR, 4, 1, "+A,+B,+C,+D")
+	TRUTHTABLE_START(TTL_7425_NOR, 4, 1, "+A,+B,+C,+D,@VCC,@GND")
 		TT_HEAD("A,B,C,D|Q ")
 		TT_LINE("1,X,X,X|0|15")
 		TT_LINE("X,1,X,X|0|15")
@@ -986,7 +981,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7427_NOR, 3, 1, "+A,+B,+C")
+	TRUTHTABLE_START(TTL_7427_NOR, 3, 1, "+A,+B,+C,@VCC,@GND")
 		TT_HEAD("A,B,C|Q ")
 		TT_LINE("1,X,X|0|15")
 		TT_LINE("X,1,X|0|15")
@@ -1009,7 +1004,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7430_NAND, 8, 1, "+A,+B,+C,+D,+E,+F,+G,+H")
+	TRUTHTABLE_START(TTL_7430_NAND, 8, 1, "+A,+B,+C,+D,+E,+F,+G,+H,@VCC,@GND")
 		TT_HEAD("A,B,C,D,E,F,G,H|Q ")
 		TT_LINE("0,X,X,X,X,X,X,X|1|22")
 		TT_LINE("X,0,X,X,X,X,X,X|1|22")
@@ -1031,7 +1026,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7432_OR, 2, 1, "+A,+B")
+	TRUTHTABLE_START(TTL_7432_OR, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("1,X|1|22")
 		TT_LINE("X,1|1|22")
@@ -1068,7 +1063,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7486_XOR, 2, 1, "+A,+B")
+	TRUTHTABLE_START(TTL_7486_XOR, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,0|0|15")
 		TT_LINE("0,1|1|22")
@@ -1132,8 +1127,8 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_74260_NOR, 5, 1, "+A,+B,+C,+D,+E")
-		TT_HEAD("A,B,C,D,E|Q ")
+	TRUTHTABLE_START(TTL_74260_NOR, 5, 1, "+A,+B,+C,+D,+E,@VCC,@GND")
+		TT_HEAD("A,B,C,D,E|Q")
 		TT_LINE("0,0,0,0,0|1|10")
 		TT_LINE("X,X,X,X,1|0|12")
 		TT_LINE("X,X,X,1,X|0|12")
@@ -1163,7 +1158,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(DM9312_TT, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7")
+	TRUTHTABLE_START(DM9312_TT, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
 		TT_HEAD(" C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ")
 		TT_LINE(" X, X, X, 1, X, X, X, X, X, X, X, X| 0, 1|33,19")
 		TT_LINE(" 0, 0, 0, 0, 0, X, X, X, X, X, X, X| 0, 1|33,28")

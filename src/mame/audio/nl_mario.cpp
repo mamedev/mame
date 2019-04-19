@@ -224,7 +224,9 @@ NETLIST_START(mario)
 	/* Dynamic timestepping avoids excessive newton loops on startup */
 	PARAM(Solver.DYNAMIC_LTE, 5e-2)
 	PARAM(Solver.DYNAMIC_TS,  1)
+
 	ANALOG_INPUT(V5, 5)
+	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!
 
 	TTL_INPUT(SOUND0, 1)
 	INCLUDE(nl_mario_snd0)

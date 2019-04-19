@@ -18,8 +18,8 @@
 
 namespace netlist
 {
-	namespace devices
-	{
+namespace devices
+{
 	// -----------------------------------------------------------------------------
 	// netlistparams
 	// -----------------------------------------------------------------------------
@@ -420,7 +420,36 @@ namespace netlist
 		state_var<netlist_sig_t> m_last_state;
 	};
 
-	} //namespace devices
+	// -----------------------------------------------------------------------------
+	// power pins - not a device, but a helper
+	// -----------------------------------------------------------------------------
+
+	class nld_power_pins
+	{
+	public:
+		nld_power_pins(device_t &owner, const char *sVCC = "VCC", const char *sGND = "GND")
+		{
+			if (owner.setup().is_validation())
+			{
+				m_GND = plib::make_unique<analog_input_t>(owner, sGND);
+				m_VCC = plib::make_unique<analog_input_t>(owner, sVCC);
+			}
+			else
+			{
+				owner.create_and_register_subdevice("_RVG", m_RVG);
+				owner.register_subalias(sVCC, "_RVG.1");
+				owner.register_subalias(sGND, "_RVG.2");
+			}
+		}
+
+		NETLIB_SUBXX(analog, R) m_RVG; // dummy resistor between VCC and GND
+
+	private:
+		plib::unique_ptr<analog_input_t> m_VCC; // only used during validation
+		plib::unique_ptr<analog_input_t> m_GND; // only used during validation
+	};
+
+} //namespace devices
 } // namespace netlist
 
 #endif /* NLD_SYSTEM_H_ */

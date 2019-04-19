@@ -81,7 +81,7 @@ protected:
 			m_parent.logerror("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			throw emu_fatalerror(1, "netlist ERROR: %s\n", ls.c_str());
+			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 		}
 	}
 
@@ -117,7 +117,7 @@ protected:
 			osd_printf_error("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			throw emu_fatalerror(1, "netlist ERROR: %s\n", ls.c_str());
+			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 		}
 	}
 
@@ -1018,6 +1018,8 @@ void netlist_mame_device::device_validity_check(validity_checker &valid) const
 	{
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		netlist::netlist_t lnetlist("netlist", plib::make_unique<netlist_validate_callbacks_t>());
+		// enable validation mode
+		lnetlist.nlstate().setup().enable_validation();
 		common_dev_start(&lnetlist);
 	}
 	catch (memregion_not_set &err)

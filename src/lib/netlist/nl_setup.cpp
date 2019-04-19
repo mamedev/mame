@@ -194,7 +194,7 @@ namespace netlist
 	void nlparse_t::register_link_fqn(const pstring &sin, const pstring &sout)
 	{
 		link_t temp = link_t(sin, sout);
-		log().debug("link {1} <== {2}\n", sin, sout);
+		log().debug("link {1} <== {2}", sin, sout);
 		m_links.push_back(temp);
 	}
 
@@ -230,6 +230,7 @@ setup_t::setup_t(netlist_state_t &nlstate)
 	, m_nlstate(nlstate)
 	, m_netlist_params(nullptr)
 	, m_proxy_cnt(0)
+	, m_validation(false)
 {
 }
 
@@ -296,17 +297,13 @@ void setup_t::remove_connections(const pstring &pin)
 		log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
 }
 
-
-
 void setup_t::register_param_t(const pstring &name, param_t &param)
 {
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(name));
 }
 
-
-
-const pstring setup_t::resolve_alias(const pstring &name) const
+pstring setup_t::resolve_alias(const pstring &name) const
 {
 	pstring temp = name;
 	pstring ret;
@@ -322,7 +319,31 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
-std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname)
+pstring setup_t::de_alias(const pstring &alias) const
+{
+	pstring temp = alias;
+	pstring ret;
+
+	/* FIXME: Detect endless loop */
+	do {
+		ret = temp;
+		temp = "";
+		for (auto &e : m_alias)
+		{
+			// FIXME: this will resolve first one found
+			if (e.second == ret)
+			{
+				temp = e.first;
+				break;
+			}
+		}
+	} while (temp != "" && temp != ret);
+
+	log().debug("{1}==>{2}\n", alias, ret);
+	return ret;
+}
+
+std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname) const
 {
 	std::vector<pstring> terms;
 	for (auto & t : m_terminals)
@@ -358,7 +379,7 @@ std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devna
 	return terms;
 }
 
-detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
+detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required) const
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
@@ -379,7 +400,7 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 }
 
 detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
-		detail::terminal_type atype, bool required)
+		detail::terminal_type atype, bool required) const
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
@@ -746,7 +767,7 @@ void setup_t::resolve_inputs()
 	if (tries == 0)
 	{
 		for (auto & link : m_links)
-			log().warning(MF_CONNECTING_1_TO_2(link.first, link.second));
+			log().warning(MF_CONNECTING_1_TO_2(setup().de_alias(link.first), setup().de_alias(link.second)));
 
 		log().fatal(MF_LINK_TRIES_EXCEEDED(NL_MAX_LINK_RESOLVE_LOOPS));
 	}
@@ -757,7 +778,7 @@ void setup_t::resolve_inputs()
 
 	delete_empty_nets();
 
-	pstring errstr("");
+	bool err(false);
 
 	log().verbose("looking for terminals not connected ...");
 	for (auto & i : m_terminals)
@@ -766,7 +787,10 @@ void setup_t::resolve_inputs()
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().info(MI_DUMMY_1_WITHOUT_CONNECTIONS(term->name()));
 		else if (!term->has_net())
-			errstr += plib::pfmt("Found terminal {1} without a net\n")(term->name());
+		{
+			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
+			err = true;
+		}
 		else if (term->net().num_cons() == 0)
 		{
 			if (term->is_logic_input())
@@ -779,9 +803,8 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(term->name()));
 		}
 	}
-	//FIXME: error string handling
-	if (errstr != "")
-		log().fatal("{1}", errstr);
+	if (err)
+		log().fatal(MF_TERMINALS_WITHOUT_NET());
 
 }
 

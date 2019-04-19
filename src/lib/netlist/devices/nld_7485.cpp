@@ -7,6 +7,7 @@
 
 #include "nld_7485.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -23,6 +24,7 @@ namespace netlist
 		, m_LTOUT(*this, "LTOUT")
 		, m_EQOUT(*this, "EQOUT")
 		, m_GTOUT(*this, "GTOUT")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -39,6 +41,7 @@ namespace netlist
 		logic_output_t m_LTOUT;
 		logic_output_t m_EQOUT;
 		logic_output_t m_GTOUT;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(7485_dip, 7485)
@@ -52,6 +55,7 @@ namespace netlist
 			register_subalias("5", m_GTOUT);
 			register_subalias("6", m_EQOUT);
 			register_subalias("7", m_LTOUT);
+			register_subalias("8", "GND");
 
 			register_subalias("9",  m_B[0]);
 			register_subalias("10", m_A[0]);
@@ -60,6 +64,7 @@ namespace netlist
 			register_subalias("13", m_A[2]);
 			register_subalias("14", m_B[2]);
 			register_subalias("15", m_A[3]);
+			register_subalias("16", "VCC");
 
 		}
 	};
@@ -101,7 +106,7 @@ namespace netlist
 			update_outputs(1, 1, 0);
 	}
 
-	NETLIB_DEVICE_IMPL(7485, "TTL_7485", "+A0,+A1,+A2,+A3,+B0,+B1,+B2,+B3,+LTIN,+EQIN,+GTIN")
+	NETLIB_DEVICE_IMPL(7485, "TTL_7485", "+A0,+A1,+A2,+A3,+B0,+B1,+B2,+B3,+LTIN,+EQIN,+GTIN,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7485_dip, "TTL_7485_DIP", "")
 
 	} //namespace devices

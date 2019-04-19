@@ -7,6 +7,7 @@
 
 #include "nld_82S115.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -22,6 +23,7 @@ namespace netlist
 		, m_O(*this, {{"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"}})
 		, m_last_O(*this, "m_last_O", 0)
 		, m_ROM(*this, "ROM")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -38,6 +40,7 @@ namespace netlist
 		state_var<unsigned> m_last_O;
 
 		param_rom_t<uint8_t, 9, 8> m_ROM; // 4096 bits, 512x8
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(82S115_dip, 82S115)
@@ -70,6 +73,9 @@ namespace netlist
 			register_subalias("15",    m_O[5]);
 			register_subalias("16",    m_O[6]);
 			register_subalias("17",    m_O[7]);
+
+			register_subalias("12", "GND");
+			register_subalias("24", "VCC");
 		}
 	};
 
@@ -106,7 +112,7 @@ namespace netlist
 			m_O[i].push((o >> i) & 1, NLTIME_FROM_NS(40)); // FIXME: Timing
 	}
 
-	NETLIB_DEVICE_IMPL(82S115,     "PROM_82S115",     "+CE1Q,+CE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+STROBE")
+	NETLIB_DEVICE_IMPL(82S115,     "PROM_82S115",     "+CE1Q,+CE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+STROBE,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(82S115_dip, "PROM_82S115_DIP", "")
 
 	} //namespace devices

@@ -7,6 +7,7 @@
 
 #include "nld_74107.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -25,6 +26,7 @@ namespace netlist
 		, m_J(*this, "J")
 		, m_K(*this, "K")
 		, m_clrQ(*this, "CLRQ")
+		, m_power_pins(*this)
 		{
 			m_delay[0] = delay_107A[0];
 			m_delay[1] = delay_107A[1];
@@ -50,6 +52,7 @@ namespace netlist
 		logic_input_t m_K;
 		logic_input_t m_clrQ;
 
+		nld_power_pins m_power_pins;
 		void newstate(const netlist_sig_t state)
 		{
 			m_Q.push(state, m_delay[state]);
@@ -81,7 +84,7 @@ namespace netlist
 			register_subalias("5", m_2.m_Q);
 			register_subalias("6", m_2.m_QQ);
 
-			// register_subalias("7", ); ==> GND
+			register_subalias("7", "1.GND");
 
 			register_subalias("8", m_2.m_J);
 			register_subalias("9", m_2.m_clk);
@@ -91,7 +94,10 @@ namespace netlist
 			register_subalias("12", m_1.m_clk);
 			register_subalias("13", m_1.m_clrQ);
 
-			// register_subalias("14", ); ==> VCC
+			 register_subalias("14", "1.VCC" );
+
+			 connect("1.GND", "2.GND");
+			 connect("1.VCC", "2.VCC");
 
 		}
 		//NETLIB_RESETI();
@@ -139,8 +145,8 @@ namespace netlist
 			m_clk.activate_hl();
 	}
 
-	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ")
-	NETLIB_DEVICE_IMPL(74107A,      "TTL_74107A",   "+CLK,+J,+K,+CLRQ")
+	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74107A,      "TTL_74107A",   "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74107_dip,   "TTL_74107_DIP", "")
 
 	} //namespace devices

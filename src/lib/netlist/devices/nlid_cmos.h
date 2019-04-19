@@ -13,8 +13,9 @@
 
 namespace netlist
 {
-	namespace devices
-	{
+namespace devices
+{
+	// FIXME: this needs to be removed
 	NETLIB_OBJECT(vdd_vss)
 	{
 		NETLIB_CONSTRUCTOR(vdd_vss)
@@ -34,7 +35,7 @@ namespace netlist
 		analog_input_t m_vss;
 	};
 
-	} //namespace devices
+} //namespace devices
 } // namespace netlist
 
 #endif /* NLID_CMOS_H_ */

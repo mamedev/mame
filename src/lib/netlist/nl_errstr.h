@@ -110,6 +110,9 @@ PERRMSGV(MI_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS, 1, "Found logic output {1} witho
 PERRMSGV(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS,  1, "Found logic input {1} without connections")
 PERRMSGV(MW_TERMINAL_1_WITHOUT_CONNECTIONS,     1, "Found terminal {1} without connections")
 
+PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,	            1, "Found terminal {1} without a net")
+PERRMSGV(MF_TERMINALS_WITHOUT_NET,	            0, "Found terminals without a net")
+
 PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Will be removed")
 
 PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in sources collection")
@@ -121,6 +124,7 @@ PERRMSGV(MW_FREQUENCY_OUTSIDE_OF_SPECS_1,       1, "MM5837: Frequency outside of
 // nlid_proxy.cpp
 
 PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_1,     1, "D/A Proxy: Found no valid combination of power terminals on device {1}")
+PERRMSGV(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE, 5, "D/A Proxy: Found multiple power terminals on device {1}: {2} {3} {4} {5}")
 
 
 #endif /* NL_ERRSTR_H_ */

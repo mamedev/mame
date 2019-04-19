@@ -257,8 +257,8 @@ namespace netlist
 		double fixed_V() const { return m_fixed_V; }
 		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }
 		double high_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_high_thresh_PCNT; }
-		double low_V(const double VN, const double VP) const { plib::unused_var(VP); return VN + m_low_VO; }
-		double high_V(const double VN, const double VP) const { plib::unused_var(VN);  return VP - m_high_VO; }
+		double low_offset_V() const { return m_low_VO; }
+		double high_offset_V() const { return m_high_VO; }
 		double R_low() const { return m_R_low; }
 		double R_high() const { return m_R_high; }
 

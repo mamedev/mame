@@ -369,16 +369,18 @@ namespace netlist
 		const factory::list_t &factory() const { return m_factory; }
 
 		/* helper - also used by nltool */
-		const pstring resolve_alias(const pstring &name) const;
+		pstring resolve_alias(const pstring &name) const;
+		pstring de_alias(const pstring &alias) const;
 
 		/* needed by nltool */
-		std::vector<pstring> get_terminals_for_device_name(const pstring &devname);
+		std::vector<pstring> get_terminals_for_device_name(const pstring &devname) const;
 
 		log_type &log();
 		const log_type &log() const;
 
 		/* needed by proxy */
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true) const;
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true) const;
 
 		/* core net handling */
 
@@ -388,9 +390,11 @@ namespace netlist
 
 		void prepare_to_run();
 
-	private:
+		/* validation */
 
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
+		void enable_validation() { m_validation = true; }
+		bool is_validation() const { return m_validation; }
+	private:
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 
@@ -413,6 +417,7 @@ namespace netlist
 		std::unordered_map<pstring, param_ref_t>    m_params;
 
 		unsigned m_proxy_cnt;
+		bool m_validation;
 	};
 
 	// ----------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 
 #include "nld_7474.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -24,6 +25,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -40,6 +42,8 @@ namespace netlist
 		logic_output_t m_QQ;
 
 		state_var<netlist_sig_t> m_nextD;
+
+		nld_power_pins m_power_pins;
 
 		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 		{
@@ -62,7 +66,7 @@ namespace netlist
 			register_subalias("4", "1.PREQ");
 			register_subalias("5", "1.Q");
 			register_subalias("6", "1.QQ");
-			// register_subalias("7", ); ==> GND
+			register_subalias("7", "1.GND");
 
 			register_subalias("8", "2.QQ");
 			register_subalias("9", "2.Q");
@@ -70,7 +74,10 @@ namespace netlist
 			register_subalias("11", "2.CLK");
 			register_subalias("12", "2.D");
 			register_subalias("13", "2.CLRQ");
-			// register_subalias("14", ); ==> VCC
+			register_subalias("14", "1.VCC");
+
+			connect("1.GND", "2.GND");
+			connect("1.VCC", "2.VCC");
 		}
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
@@ -119,7 +126,7 @@ namespace netlist
 	{
 	}
 
-	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ")
+	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7474_dip, "TTL_7474_DIP", "")
 
 	} //namespace devices

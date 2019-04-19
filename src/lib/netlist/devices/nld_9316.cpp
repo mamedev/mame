@@ -7,6 +7,7 @@
 
 #include "nld_9316.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -33,6 +34,7 @@ namespace netlist
 		, m_abcd(*this, "m_abcd", 0)
 		, m_loadq(*this, "m_loadq", 0)
 		, m_ent(*this, "m_ent", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -103,6 +105,7 @@ namespace netlist
 		state_var_u8 m_abcd;
 		state_var_sig m_loadq;
 		state_var_sig m_ent;
+		nld_power_pins m_power_pins;
 
 		void update_outputs_all(unsigned cnt, netlist_time out_delay) noexcept
 		{
@@ -124,7 +127,7 @@ namespace netlist
 			register_subalias("5", "C");
 			register_subalias("6", "D");
 			register_subalias("7", "ENP");
-			// register_subalias("8", "); -. GND
+			register_subalias("8", "GND");
 
 			register_subalias("9", "LOADQ");
 			register_subalias("10", "ENT");
@@ -133,12 +136,12 @@ namespace netlist
 			register_subalias("13", "QB");
 			register_subalias("14", "QA");
 			register_subalias("15", "RC");
-			// register_subalias("16", ); -. VCC
+			register_subalias("16", "VCC");
 		}
 	};
 
 
-	NETLIB_DEVICE_IMPL(9316,     "TTL_9316",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D")
+	NETLIB_DEVICE_IMPL(9316,     "TTL_9316",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(9316_dip, "TTL_9316_DIP", "")
 
 	} //namespace devices
