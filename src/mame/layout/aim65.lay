@@ -64,12 +64,33 @@
 		</group>
 	</view>
 
-	<view name="Terminal Below">
+	<view name="Printer Below">
 		<group ref="displays">
 			<bounds x="0" y="0" width="241" height="16" />
 		</group>
 		<screen index="0">
 			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
+	</view>
+
+	<view name="Terminal Below">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
+		<screen index="1">
+			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
+	</view>
+
+	<view name="Printer and Terminal">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
+		<screen index="0">
+			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
+		<screen index="1">
+			<bounds x="250" y="0" width="241" height="196.75" />
 		</screen>
 	</view>
 

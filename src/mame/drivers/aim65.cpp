@@ -7,9 +7,7 @@ Rewrite in progress, Dirk Best, 2007-07-31
 Updated by Robbbert 2019-04-14
 
 ToDo:
-    - Printer. Tried to implement this but it was not working, currently disabled.
     - Implement punchtape reader/writer
-    - Front panel Reset switch (switch S1)
     - Front panel Run/Step switch (switch S2)
 
 
@@ -161,6 +159,12 @@ INPUT_CHANGED_MEMBER(aim65_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
+void aim65_state::aim65_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(0x20, 0x02, 0x05));
+	palette.set_pen_color(1, rgb_t(0xc0, 0x00, 0x00));
+}
+
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -220,6 +224,17 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	DL1416T(config, m_ds[4], u32(0));
 	m_ds[4]->update().set(FUNC(aim65_state::update_ds<5>));
 
+	// pseudo-"screen" for the thermal printer. Index 0.
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(aim65_state::screen_update));
+	screen.set_size(160, 200);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, m_palette, FUNC(aim65_state::aim65_palette), 2);
+
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.1);
@@ -233,6 +248,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 
 	VIA6522(config, m_via0, AIM65_CLOCK);
 	m_via0->readpb_handler().set([this] () { return aim65_state::z32_pb_r(); });
+	m_via0->writepa_handler().set([this] (u8 data) { aim65_state::z32_pa_w(data); });
 	m_via0->writepb_handler().set([this] (u8 data) { aim65_state::z32_pb_w(data); });
 	// in CA1 printer ready?
 	// out CA2 cass control (H=in)
@@ -240,7 +256,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	// out CB1 printer start
 	//m_via0->cb1_handler().set(FUNC(aim65_state::z32_cb1_w));
 	// out CB2 turn printer on
-	//m_via0->cb2_handler().set(FUNC(aim65_state::z32_cb2_w));
+	m_via0->cb2_handler().set([this] (bool state) { aim65_state::z32_cb2_w(state); });
 	m_via0->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	VIA6522(config, m_via1, AIM65_CLOCK);
@@ -255,8 +271,8 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
-	/* TTY interface */
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	// Screen for TTY interface. Index 1.
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	//m_rs232->rxd_handler().set(m_via0, FUNC(via6522_device::write_pb6));  // function disabled in 6522via.cpp
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(serial_term));
 

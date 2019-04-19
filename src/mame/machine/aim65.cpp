@@ -137,6 +137,14 @@ void aim65_state::machine_start()
 	save_item(NAME(m_pb_save));
 	save_item(NAME(m_kb_en));
 	save_item(NAME(m_ca2));
+	save_item(NAME(m_cb2));
+	save_item(NAME(m_printer_x));
+	save_item(NAME(m_printer_y));
+	save_item(NAME(m_printer_flag));
+	save_item(NAME(m_printer_level));
+	m_print_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aim65_state::printer_timer),this));
+	m_printerRAM = make_unique_clear<uint16_t[]>(64*100);
+	save_pointer(NAME(m_printerRAM), 64*100);
 }
 
 
@@ -163,7 +171,7 @@ void aim65_state::z32_pb_w( u8 data )
     d5 = cass2 motor
     d4 = cass1 motor
     d2 = tty out
-    d0/1 = printer data (not emulated)
+    d0/1 = printer data
 
     There seems to be a mistake in the code. When the cassettes should both be stopped, it turns them on instead.
 */
@@ -190,6 +198,11 @@ void aim65_state::z32_pb_w( u8 data )
 
 	if (!m_kb_en)
 		m_rs232->write_txd(BIT(data, 2));
+
+	// 4 left-most characters for the thermal printer
+	data &= 0x03;
+	if ((m_printer_flag == 1) && (!m_cb2))
+		m_printerRAM[(m_printer_y * 100) + m_printer_x ] |= (data << 8);
 }
 
 
@@ -227,193 +240,100 @@ u8 aim65_state::z32_pb_r ()
  Printer
 ******************************************************************************/
 
-#ifdef UNUSED_FUNCTION
 /*
-
-2012-01-24 Printer code removed [Robbbert]
-
-From here to the end is not compiled. It is the remnants of the old printer
-code. Have a look at version 0.114 or 0.115 for the original working code.
-
-I've left it here for the idly curious.
-
 The system sends out the pattern of dots to the 'dot-matrix' print-head.
 
-This is why we can't simply replace it with a Centronics-like 'Printer'
-device - the output will be gibberish.
-*/
-
-
-
-/*
   aim65 thermal printer (20 characters)
   10 heat elements (place on 1 line, space between 2 characters(about 14dots))
   (pa0..pa7,pb0,pb1 1 heat element on)
 
-  cb2 0 motor, heat elements on
-  cb1 output start!?
-  ca1 input
+  cb2 0 motor, heat elements on. Enables printer. Also indicates that a new line is coming.
+  cb1 0 input - printer is requesting data, driven by "start" line
+  ca1 ^ input - changes polarity on each line, driven by s1 and s2
 
   normally printer 5x7 characters
   (horizontal movement limits not known, normally 2 dots between characters)
 
-  3 dots space between lines?
+  3 dots space between lines
 */
 
-
-/* Part of aim65_pb_w
-
-    data &= 0x03;
-
-    if (m_flag_b == 0)
-    {
-        printerRAM[(m_printer_y * 20) + m_printer_x ] |= (data << 8);
-        m_flag_b = 1;
-    }
-*/
-
-
-/* Items for driver state
-
-    emu_timer *m_print_timer;
-    int m_printer_x;
-    int m_printer_y;
-    bool m_printer_dir;
-    bool m_flag_a;
-    bool m_flag_b;
-    bool m_printer_level;
-    uint16_t *m_printerRAM;
-*/
-
-
-/* Other items from H file
-
-VIDEO_UPDATE( aim65 );
-*/
-
-
-/* From 6522 config
-DRIVER_MEMBER(aim65_state, aim65_pa_w), // out port A
-DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
-*/
-
-
-/* From Machine Config
-    MCFG_VIDEO_START_OVERRIDE(aim65_state,aim65)
-    MCFG_VIDEO_UPDATE(aim65)
-*/
-
-
-TIMER_CALLBACK_MEMBER(aim65_state::aim65_printer_timer)
+// to get printer to pass the test at start.
+TIMER_CALLBACK_MEMBER(aim65_state::printer_timer)
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-
-	via_0->write_cb1(m_printer_level);
-	via_0->write_cb1(!m_printer_level);
-	m_printer_level ^= 1;
-
-	if (m_printer_dir)
-	{
-		if (m_printer_x > 0)
-			m_printer_x--;
-		else
-		{
-			m_printer_dir = 0;
-			m_printer_x++;
-			m_printer_y++;
-		}
-	}
-	else
-	{
-		if (m_printer_x < 9)
-			m_printer_x++;
-		else
-		{
-			m_printer_dir = 1;
-			m_printer_x--;
-			m_printer_y++;
-		}
-	}
-
-	if (m_printer_y > 500) m_printer_y = 0;
-
-	m_flag_a=0;
-	m_flag_b=0;
+		m_via0->write_cb1(m_printer_level);
+		m_via0->write_ca1(m_printer_level);
+		m_printer_level ^= 1;
 }
 
-
-WRITE8_MEMBER( aim65_state::aim65_printer_on )
+// CB2 - enable, & new-line
+void aim65_state::z32_cb2_w( bool state )
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	if (!data)
+	m_cb2 = state;
+	if (!state)
 	{
-		m_printer_x=0;
+		m_printer_x = 0;
 		m_printer_y++;
-		if (m_printer_y > 500) m_printer_y = 0;
-		m_flag_a = m_flag_b=0;
-		via_0->write_cb1(0);
-		m_print_timer->adjust(attotime::zero, 0, attotime::from_usec(10));
+		m_printer_y &= 63;
+		for (u8 i = 0; i < 100; i++)
+			m_printerRAM[m_printer_y*100+i] = 0;
+		m_printer_flag = 0;
+		m_via0->write_cb1(1);
+		m_print_timer->adjust(attotime::zero, 0, attotime::from_msec(1));
 		m_printer_level = 1;
 	}
 	else
 		m_print_timer->reset();
 }
 
-
-WRITE8_MEMBER( aim65_state::aim65_pa_w )
+// new pixels spread among multiple thermal heads
+void aim65_state::z32_pa_w( u8 data )
 {
-// All bits are for printer data (not emulated)
-	if (m_flag_a == 0)
+	if (m_printer_flag == 1)
+		m_printerRAM[m_printer_y * 100 + m_printer_x] |= data;
+
+	m_printer_flag++;
+	if (m_printer_flag > 2)
 	{
-		m_printerRAM[(m_printer_y * 20) + m_printer_x] |= data;
-		m_flag_a = 1;
+		m_printer_flag = 0;
+		m_printer_x++;
+	}
+	// toggle ca1 each 10 bytes
+	if ((m_printer_x % 10) == 0)
+	{
+		m_via0->write_ca1(m_printer_level);
+		m_printer_level ^= 1;
+	}
+	// take cb1 low after a complete line of characters
+	if (m_printer_x == 100)
+	{
+		m_printer_x = 0;
+		m_via0->write_cb1(0);
 	}
 }
 
-VIDEO_START_MEMBER(aim65_state,aim65)
-{
-	m_print_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aim65_state::aim65_printer_timer),this));
-	m_printerRAM = std::make_unique<uint16_t[]>((600 * 10 * 2) / 2);
-	memset(m_printerRAM, 0, videoram_size);
-	VIDEO_START_CALL_MEMBER(generic);
-	m_printer_x = 0;
-	m_printer_y = 0;
-	m_printer_dir = 0;
-	m_flag_a = 0;
-	m_flag_b = 0;
-	m_printer_level = 0;
-}
 
-SCREEN_UPDATE( aim65 )
+// Display printer output
+uint32_t aim65_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	aim65_state *state = screen.machine().driver_data<aim65_state>();
-	/* Display printer output */
-	bool dir = 1;
-	uint8_t b,x,pen;
-	uint16_t y;
+	uint16_t data;
 
-	for (y = 0; y<500; y++)
+	for (u8 y = 0; y<cliprect.max_y; y++)
 	{
-		for(x = 0; x< 10; x++)
+		u16 sy = m_printer_y*10 - cliprect.max_y + 10 + y;
+		if (sy > 0xfe80) // wrap-around correctly
+			sy += 0x280;
+		for(u8 x = 0; x < 10; x++)
 		{
-			if (dir == 1)
-				data = state->m_printerRAM[y * 10  + x];
+			if (!BIT(sy, 0))
+				data = m_printerRAM[sy * 10 + x];
 			else
-				data = state->m_printerRAM[(y * 10) + (9 - x)];
+				data = m_printerRAM[sy * 10 + (9 - x)];
 
-
-			for (b = 0; b<10; b++)
-			{
-				pen = screen.m_palette->pen(BIT(data, 0) ? 2 : 0);
-				plot_pixel(bitmap,700 - ((b * 10) + x), y, pen);
-				data >>= 1;
-			}
+			for (u8 b = 0; b < 10; b++)
+				bitmap.pix16(y, 120 - (b * 12) - ((x > 4) ? x+1 : x)) = BIT(data, b);
 		}
-
-		dir ^= 1;
 	}
+
 	return 0;
 }
 
-
-#endif
