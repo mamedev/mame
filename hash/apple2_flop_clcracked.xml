@@ -1574,19 +1574,6 @@
 		</part>
 	</software>
 
-	<software name="cltrcy">
-		<description>Computer Literacy: Introduction (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Control Data Corporation</publisher>
-		<!-- No compatibility data known at this time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="computer literacy (4am crack).dsk" size="143360" crc="e3749f2d" sha1="c3ec1163d6ffdc7aded1d51e3cf6ddffb77ece3f" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="colorme">
 		<description>Color Me (cleanly cracked)</description>
 		<year>1985</year>
@@ -3829,7 +3816,6 @@
 		</part>
 	</software>
 
-	<!-- TODO: Name disks -->
 	<software name="ancleg">
 		<description>Ancient Legends (cleanly cracked)</description>
 		<year>2016</year>
@@ -3843,13 +3829,15 @@
 		versions and source code can be found at
 		https://github.com/badvision/lawless-legends/tree/master/Example%20Content/Ancient%20Legends
 		-->
-		
+
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="ancient legends (4am crack) disk 1.dsk" size="143360" crc="fd9324b6" sha1="5634ee8133d79afcfce0da0357eb7b96d0eeaee3" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="ancient legends (4am crack) disk 2.dsk" size="143360" crc="608ddf64" sha1="151dd35d349ad613dc87b36f9fd036fe82cf23d1" offset="0x0000" />
 			</dataarea>
@@ -4081,9 +4069,12 @@
 	<software name="a2tstdsk">
 		<description>Apple II Test Disk (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Unknown</publisher>
+		<publisher>Shawnee Mission Unified School District</publisher>
 		<info name="release" value="2017-09-17"/>
 		<!-- No compatibility data known at this time. -->
+		<!-- Bill Sandburg appears to have been employed by Shanee Mission USD
+		as head of telecommunications from basic research. This is backed up by
+		the "Property of A.V. Repair USD 512"	text. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -4312,7 +4303,6 @@
 		</part>
 	</software>
 
-	<!-- TODO: Add disk labels -->
 	<software name="agrizzly">
 		<description>Audubon Grizzly Bears - Wildlife Adventures (cleanly cracked)</description>
 		<year>1988</year>
@@ -4321,26 +4311,31 @@
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="audubon grizzly bears - wildlife adventures (4am crack) disk 1.dsk" size="143360" crc="02e17ba5" sha1="913dd41930cab53eb44aae343383b5edc652fbd9" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="audubon grizzly bears - wildlife adventures (4am crack) disk 2.dsk" size="143360" crc="ccf99317" sha1="5f886607450e982340c751fc5bca514de75eae29" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="audubon grizzly bears - wildlife adventures (4am crack) disk 3.dsk" size="143360" crc="82aaabf9" sha1="952991d41e2560a01a5ded62c8342f0d470683a3" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="audubon grizzly bears - wildlife adventures (4am crack) disk 4.dsk" size="143360" crc="6c69e3c4" sha1="bf49acd2757e7218fa569259a36c4cdeea0706c4" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="audubon grizzly bears - wildlife adventures (4am crack) disk 5.dsk" size="143360" crc="58c81bd5" sha1="f2e0915e3d8dd6fd724edbc85805d23e412757c2" offset="0x0000" />
 			</dataarea>
@@ -4380,7 +4375,6 @@
 		</part>
 	</software>
 
-	<!-- TODO: Disk labels -->
 	<software name="backtime">
 		<description>Back in Time (cleanly cracked)</description>
 		<year>1984</year>
@@ -4389,11 +4383,13 @@
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="back in time (4am crack) side a.dsk" size="143360" crc="eb9d7df4" sha1="dd7d399fb1da45e6d97e10d9b069a41b3eb7175a" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="back in time (4am crack) side b.dsk" size="143360" crc="be2036bc" sha1="6703bcc67070d2f39993d6bb73e77e28095234a8" offset="0x0000" />
 			</dataarea>
@@ -6309,10 +6305,9 @@
 			</part>
 		</software>
 
-		<!-- TODO: Get date and publisher -->
 		<software name="commnwin">
 			<description>Communicate and Win (cleanly cracked)</description>
-			<year>9999</year>
+			<year>????</year>
 			<publisher>Phoenix Software</publisher>
 			<info name="release" value="2018-10-07"/>
 			<!-- No compatibility data known at this time. -->
@@ -6338,13 +6333,14 @@
 			</part>
 		</software>
 
-		<!-- TODO: Get date and publisher -->
-		<software name="bolopestbugb">
+		<software name="bolocomp">
 			<description>Compilation - Bolo, Pest Patrol, Bug Battle (cleanly cracked)</description>
-			<year>9999</year>
-			<publisher>UNREAD</publisher>
+			<year>????</year>
+			<publisher>None</publisher>
 			<info name="release" value="2017-06-28"/>
 			<!-- No compatibility data known at this time. -->
+			<!-- This is a homemade compilation disk of several file-cracked games,
+			to which someone has added new copy protection. -->
 
 			<part name="flop1" interface="floppy_5_25">
 				<dataarea name="flop" size="143360">
@@ -6353,13 +6349,14 @@
 			</part>
 		</software>
 
-		<!-- TODO: Get date and publisher -->
-		<software name="cngthfdpokr">
+		<software name="cngocomp">
 			<description>Compilation - Congo, Thief, Draw Poker (cleanly cracked)</description>
-			<year>9999</year>
-			<publisher>UNREAD</publisher>
+			<year>????</year>
+			<publisher>None</publisher>
 			<info name="release" value="2017-06-28"/>
 			<!-- No compatibility data known at this time. -->
+			<!-- This is a homemade compilation disk of several file-cracked games,
+			to which someone has added new copy protection. -->
 
 			<part name="flop1" interface="floppy_5_25">
 				<dataarea name="flop" size="143360">
@@ -6459,30 +6456,33 @@
 			</part>
 		</software>
 
-		<!-- TODO: Disk titles, confirm disks are all present -->
 		<software name="csplv131">
-			<description>Compu-Spell v1.3.1 (cleanly cracked)</description>
+			<description>Compu-Spell (version 1.3.1) (cleanly cracked)</description>
 			<year>1980</year>
 			<publisher>Edu-Ware</publisher>
 			<info name="release" value="2017-10-24"/>
 			<!-- No compatibility data known at this time. -->
 
 			<part name="flop1" interface="floppy_5_25">
+				<feature name="part_id" value="Program Disk"/>
 				<dataarea name="flop" size="143360">
 					<rom name="compu-spell v1.3.1 (4am crack).dsk" size="143360" crc="933815e7" sha1="74858d4676b00a091187d2108b93fb1ad6e2ba27" offset="0x0000" />
 				</dataarea>
 			</part>
 			<part name="flop2" interface="floppy_5_25">
+				<feature name="part_id" value="Level 4 Data Disk"/>
 				<dataarea name="flop" size="143360">
 					<rom name="compu-spell v1.3.1 (4am crack) data disk level 4.dsk" size="143360" crc="84444312" sha1="efece161219f9716d5fbdbba2bc5a8acc0e0a4a9" offset="0x0000" />
 				</dataarea>
 			</part>
 			<part name="flop3" interface="floppy_5_25">
+				<feature name="part_id" value="Level 5 Data Disk"/>
 				<dataarea name="flop" size="143360">
 					<rom name="compu-spell v1.3.1 (4am crack) data disk level 5.dsk" size="143360" crc="4e349711" sha1="b63c50ce2371c771e3dfe0cb334499ac4918f5d5" offset="0x0000" />
 				</dataarea>
 			</part>
 			<part name="flop4" interface="floppy_5_25">
+				<feature name="part_id" value="Level 99 Data Disk"/>
 				<dataarea name="flop" size="143360">
 					<rom name="compu-spell v1.3.1 (4am crack) data disk level 99.dsk" size="143360" crc="3444018b" sha1="8d85367213be85059be405ea5cb4b8e80ba165cd" offset="0x0000" />
 				</dataarea>
@@ -6719,11 +6719,10 @@
 			</part>
 		</software>
 
-		<!-- TODO: Get date and publisher -->
 		<software name="complitr">
-			<description>Computer Literacy (cleanly cracked)</description>
-			<year>9999</year>
-			<publisher>UNREAD</publisher>
+			<description>Computer Literacy: Introduction (cleanly cracked)</description>
+			<year>1982</year>
+			<publisher>Control Data Corporation</publisher>
 			<info name="release" value="2014-08-05"/>
 			<!-- No compatibility data known at this time. -->
 
