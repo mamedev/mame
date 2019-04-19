@@ -46,30 +46,13 @@ TODO:
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
 #define CLOCK_A 30_MHz_XTAL
 
-/*----------- debug defines -----------*/
+#define LOG_SERVO       (1 << 0)
+#define LOG_SLAVE       (1 << 1)
 
-#define VERBOSE_LEVEL   (1)
-
-#define ENABLE_VERBOSE_LOG (0)
+#define VERBOSE         (0)
+#include "logmacro.h"
 
 #define ENABLE_UART_PRINTING (0)
-
-#if ENABLE_VERBOSE_LOG
-static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror("%s: %s", device.machine().describe_context(), buf );
-	}
-}
-#else
-#define verboselog(x,y,z, ...)
-#endif
 
 /*************************
 *      Memory maps       *
@@ -363,100 +346,100 @@ READ8_MEMBER( cdi_state::servo_io_r )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SERVO Port A Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port A Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
 			ret = 0x08;
-			verboselog(*this, 1, "SERVO Port B Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port B Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
 			ret |= INV_CADDYSWITCH_IN;
-			verboselog(*this, 1, "SERVO Port C Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port C Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SERVO Port D Input read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port D Input read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SERVO Port A DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port A DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SERVO Port B DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port B DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SERVO Port C DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port C DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SERVO SPI Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SERVO SPI Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SERVO SPI Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SERVO SCC Baud Rate read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Baud Rate read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SERVO SCC Control 1 read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 1 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SERVO SCC Control 2 read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 2 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SERVO SCC Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SERVO SCC Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SERVO Timer Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SERVO Timer Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SERVO Input Capture Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SERVO Input Capture Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SERVO Output Compare Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SERVO Output Compare Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SERVO Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::COUNT_LO:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SERVO Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Count Lo read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SERVO Alternate Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SERVO Alternate Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Lo read (%02x)\n", ret);
 			break;
 		}
 		default:
-			verboselog(*this, 0, "Unknown SERVO I/O read (%02x)\n", offset);
+			logerror("Unknown SERVO I/O read (%02x)\n", offset);
 			break;
 	}
 
@@ -469,82 +452,82 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SERVO Port A Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port A Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			verboselog(*this, 1, "SERVO Port B Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port B Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			verboselog(*this, 1, "SERVO Port C Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port C Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SERVO Port D Input write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port D Input write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SERVO Port A DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port A DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SERVO Port B DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port B DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SERVO Port C DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port C DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SERVO SPI Control write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SERVO SPI Status write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SERVO SPI Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SERVO SCC Baud Rate write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Baud Rate write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SERVO SCC Control 1 write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 1 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SERVO SCC Control 2 write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 2 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SERVO SCC Status write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SERVO SCC Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SERVO Timer Control write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SERVO Timer Status write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SERVO Input Capture Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SERVO Input Capture Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SERVO Output Compare Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SERVO Output Compare Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
-			verboselog(*this, 1, "SERVO Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_LO:
-			verboselog(*this, 1, "SERVO Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Count Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
-			verboselog(*this, 1, "SERVO Alternate Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
-			verboselog(*this, 1, "SERVO Alternate Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Lo write (%02x)\n", data);
 			break;
 		default:
-			verboselog(*this, 0, "Unknown SERVO I/O write (%02x = %02x)\n", offset, data);
+			logerror("Unknown SERVO I/O write (%02x = %02x)\n", offset, data);
 			break;
 	}
 
@@ -563,98 +546,98 @@ READ8_MEMBER( cdi_state::slave_io_r )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SLAVE Port A Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			verboselog(*this, 1, "SLAVE Port B Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			verboselog(*this, 1, "SLAVE Port C Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SLAVE Port D Input read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port D Input read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SLAVE Port A DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SLAVE Port B DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SLAVE Port C DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SLAVE SPI Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SLAVE SPI Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SLAVE SPI Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SLAVE SCC Baud Rate read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Baud Rate read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SLAVE SCC Control 1 read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 1 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SLAVE SCC Control 2 read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 2 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SLAVE SCC Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SLAVE SCC Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SLAVE Timer Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SLAVE Timer Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SLAVE Input Capture Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SLAVE Input Capture Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SLAVE Output Compare Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SLAVE Output Compare Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SLAVE Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::COUNT_LO:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SLAVE Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Lo read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SLAVE Alternate Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SLAVE Alternate Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Lo read (%02x)\n", ret);
 			break;
 		}
 		default:
-			verboselog(*this, 0, "Unknown SLAVE I/O read (%02x)\n", offset);
+			logerror("Unknown SLAVE I/O read (%02x)\n", offset);
 			break;
 	}
 
@@ -666,82 +649,82 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SLAVE Port A Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			verboselog(*this, 1, "SLAVE Port B Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			verboselog(*this, 1, "SLAVE Port C Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SLAVE Port D Input write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port D Input write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SLAVE Port A DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SLAVE Port B DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SLAVE Port C DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SLAVE SPI Control write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SLAVE SPI Status write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SLAVE SPI Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SLAVE SCC Baud Rate write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Baud Rate write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SLAVE SCC Control 1 write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 1 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SLAVE SCC Control 2 write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 2 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SLAVE SCC Status write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SLAVE SCC Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SLAVE Timer Control write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SLAVE Timer Status write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SLAVE Input Capture Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SLAVE Input Capture Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SLAVE Output Compare Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SLAVE Output Compare Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
-			verboselog(*this, 1, "SLAVE Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_LO:
-			verboselog(*this, 1, "SLAVE Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
-			verboselog(*this, 1, "SLAVE Alternate Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
-			verboselog(*this, 1, "SLAVE Alternate Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Lo write (%02x)\n", data);
 			break;
 		default:
-			verboselog(*this, 0, "Unknown SLAVE I/O write (%02x = %02x)\n", offset, data);
+			logerror("Unknown SLAVE I/O write (%02x = %02x)\n", offset, data);
 			break;
 	}
 
