@@ -18,7 +18,7 @@ For 512, 256 or 128KB ROMs, just a simple split is needed.
 
 Armed-F
 Dragon Spirit
-F1 Triple Battle
+F1 Triple Battle (reverse-engineered to be ID=100)
 Power League IV
 Violent Soldier
 Xevious
@@ -543,7 +543,7 @@ Parasol Stars
 		<publisher>bootleg (TourVision) / Human</publisher>
 		<info name="alt_title" value="F1トリプルバトル"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0xff"/>
+			<feature name="id" value="0x64"/> <!-- ID = 100. It was not actually read from the cart, but reversed-engineered -->
 			<dataarea name="rom" size="393216">
 				<rom name="f1 triple battle (japan).pce" size="393216" crc="13bf0409" sha1="0a219b433529b3214f42734c2a144d238cb3c99c" />
 			</dataarea>
