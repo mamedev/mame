@@ -40,7 +40,7 @@
 #define LOG_REJECTS     (1 << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
 
-#define VERBOSE (0)//(LOG_UNKNOWN | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
+#define VERBOSE 		(0)//(LOG_UNKNOWN | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device, "newport_video", "SGI Newport graphics board")
@@ -50,6 +50,7 @@ newport_video_device::newport_video_device(const machine_config &mconfig, const 
 	: device_t(mconfig, NEWPORT_VIDEO, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_hpc3(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
 {
 }
 
@@ -398,6 +399,8 @@ void newport_video_device::cmap0_write(uint32_t data)
 		break;
 	case 0x02:
 		m_cmap0.m_palette[m_cmap0.m_palette_idx] = data >> 8;
+		if (m_cmap0.m_palette_idx < 0x2000)
+			m_palette->set_pen_color(m_cmap0.m_palette_idx, rgb_t((uint8_t)(data >> 24), (uint8_t)(data >> 16), (uint8_t)(data >> 8)));
 		LOGMASKED(LOG_CMAP0, "CMAP0 Palette Entry %04x Write: %08x\n", m_cmap0.m_palette_idx, data >> 8);
 		break;
 	default:
@@ -2733,4 +2736,9 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 	{
 		do_rex3_command();
 	}
+}
+
+void newport_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, "palette").set_entries(0x2000);
 }
