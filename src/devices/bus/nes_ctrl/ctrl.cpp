@@ -103,6 +103,7 @@ device_nes_control_port_interface::~device_nes_control_port_interface()
 
 nes_control_port_device::nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NES_CONTROL_PORT, tag, owner, clock),
+	device_video_interface(mconfig, *this), // required by the Zapper light gun emulation
 	device_slot_interface(mconfig, *this),
 	m_device(nullptr)
 {

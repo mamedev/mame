@@ -28,6 +28,7 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "joypad.h"
 
 //**************************************************************************
@@ -174,7 +175,7 @@ static void arcstick_daisy(device_slot_interface &device)
 void nes_arcstick_device::device_add_mconfig(machine_config &config)
 {
 	// expansion port to allow daisy chaining
-	NES_CONTROL_PORT(config, "subexp", arcstick_daisy, nullptr);
+	NES_CONTROL_PORT(config, m_daisychain, arcstick_daisy, nullptr);
 }
 
 
@@ -233,6 +234,13 @@ nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const ch
 void nes_joypad_device::device_start()
 {
 	save_item(NAME(m_latch));
+}
+
+
+void nes_arcstick_device::device_start()
+{
+	nes_joypad_device::device_start();
+	m_daisychain->set_screen(m_port->screen().tag());
 }
 
 

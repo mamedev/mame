@@ -20,6 +20,7 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "hori.h"
 #include "joypad.h"
 
@@ -61,16 +62,16 @@ static void hori_adapter(device_slot_interface &device)
 
 void nes_horitwin_device::device_add_mconfig(machine_config &config)
 {
-	NES_CONTROL_PORT(config, "port1", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port2", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port1, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port2, hori_adapter, "joypad");
 }
 
 void nes_hori4p_device::device_add_mconfig(machine_config &config)
 {
-	NES_CONTROL_PORT(config, "port1", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port2", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port3", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port4", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port1, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port2, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port3, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port4, hori_adapter, "joypad");
 }
 
 
@@ -99,6 +100,26 @@ nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *
 	m_port4(*this, "port4"),
 	m_cfg(*this, "CONFIG")
 {
+}
+
+
+//-------------------------------------------------
+//  device_start
+//-------------------------------------------------
+
+void nes_horitwin_device::device_start()
+{
+	m_port1->set_screen(m_port->screen().tag());
+	m_port2->set_screen(m_port->screen().tag());
+}
+
+
+void nes_hori4p_device::device_start()
+{
+	m_port1->set_screen(m_port->screen().tag());
+	m_port2->set_screen(m_port->screen().tag());
+	m_port3->set_screen(m_port->screen().tag());
+	m_port4->set_screen(m_port->screen().tag());
 }
 
 

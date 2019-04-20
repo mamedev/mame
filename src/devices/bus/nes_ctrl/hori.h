@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override { }
+	virtual void device_start() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -52,7 +52,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override { }
+	virtual void device_start() override;
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
