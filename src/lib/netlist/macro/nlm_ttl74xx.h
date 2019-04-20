@@ -18,7 +18,7 @@
 
 #define TTL_7400_NAND(name, cA, cB)                                            \
 		NET_REGISTER_DEV(TTL_7400_NAND, name)                                  \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
@@ -32,7 +32,7 @@
 
 #define TTL_7402_NOR(name, cI1, cI2)                                           \
 		NET_REGISTER_DEV(TTL_7402_NOR, name)                                   \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)
@@ -45,7 +45,7 @@
 
 #define TTL_7404_INVERT(name, cA)                                              \
 		NET_REGISTER_DEV(TTL_7404_INVERT, name)                                \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cA)
 
@@ -57,7 +57,7 @@
 
 #define TTL_7408_AND(name, cA, cB)                                 \
 		NET_REGISTER_DEV(TTL_7408_AND, name)                                   \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
@@ -70,7 +70,7 @@
 
 #define TTL_7410_NAND(name, cI1, cI2, cI3)                                     \
 		NET_REGISTER_DEV(TTL_7410_NAND, name)                                  \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)                                              \
@@ -85,7 +85,7 @@
 
 #define TTL_7411_AND(name, cI1, cI2, cI3)                                      \
 		NET_REGISTER_DEV(TTL_7411_AND, name)                                   \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)                                              \
@@ -120,7 +120,7 @@
 
 #define TTL_7420_NAND(name, cI1, cI2, cI3, cI4)                                \
 		NET_REGISTER_DEV(TTL_7420_NAND, name)                                  \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)                                              \
@@ -136,7 +136,7 @@
 
 #define TTL_7425_NOR(name, cI1, cI2, cI3, cI4)                                 \
 		NET_REGISTER_DEV(TTL_7425_NOR, name)                                   \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)                                              \
@@ -152,7 +152,7 @@
 
 #define TTL_7427_NOR(name, cI1, cI2, cI3)                                      \
 		NET_REGISTER_DEV(TTL_7427_NOR, name)                                   \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)                                              \
@@ -167,7 +167,7 @@
 
 #define TTL_7430_NAND(name, cI1, cI2, cI3, cI4, cI5, cI6, cI7, cI8)\
 		NET_REGISTER_DEV(TTL_7430_NAND, name)                                  \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)                                              \
@@ -187,7 +187,7 @@
 
 #define TTL_7432_OR(name, cI1, cI2)                                            \
 		NET_REGISTER_DEV(TTL_7432_OR, name)                                    \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cI1)                                              \
 		NET_CONNECT(name, B, cI2)
@@ -200,7 +200,7 @@
 
 #define TTL_7437_NAND(name, cA, cB)                                            \
 		NET_REGISTER_DEV(TTL_7437_NAND, name)                                  \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
@@ -214,7 +214,7 @@
 
 #define TTL_7486_XOR(name, cA, cB)                                             \
 		NET_REGISTER_DEV(TTL_7486_XOR, name)                                   \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
@@ -233,7 +233,7 @@
 
 #define TTL_74260_NOR(name, cA, cB, cC, cD, cE)                                \
 		NET_REGISTER_DEV(TTL_74260_NOR, name)                                  \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)                                               \
@@ -249,7 +249,7 @@
 
 #define DM9312(name, cA, cB, cC, cSTROBE, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7)     \
 		NET_REGISTER_DEV(DM9312_TT, name)                                      \
-		NET_CONNECT(name, VCC, VCC)										       \
+		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A,  cA)                                              \
 		NET_CONNECT(name, B,  cB)                                              \

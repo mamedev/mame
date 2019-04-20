@@ -110,8 +110,8 @@ PERRMSGV(MI_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS, 1, "Found logic output {1} witho
 PERRMSGV(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS,  1, "Found logic input {1} without connections")
 PERRMSGV(MW_TERMINAL_1_WITHOUT_CONNECTIONS,     1, "Found terminal {1} without connections")
 
-PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,	            1, "Found terminal {1} without a net")
-PERRMSGV(MF_TERMINALS_WITHOUT_NET,	            0, "Found terminals without a net")
+PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,             1, "Found terminal {1} without a net")
+PERRMSGV(MF_TERMINALS_WITHOUT_NET,              0, "Found terminals without a net")
 
 PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Will be removed")
 

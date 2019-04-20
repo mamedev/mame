@@ -105,7 +105,7 @@ namespace netlist
 			register_subalias("13", m_D.m_OUT);
 			register_subalias("14", m_D.m_RC);
 			register_subalias("15", m_D.m_IN);
-			register_subalias("8", "VSS");
+			register_subalias("16", "VSS");
 		}
 	};
 

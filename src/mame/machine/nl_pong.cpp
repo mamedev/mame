@@ -23,7 +23,7 @@ NETLIST_START(pong_fast)
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
-	ALIAS(VCC, V5)			// we need VCC for TTL chips
+	ALIAS(VCC, V5)          // we need VCC for TTL chips
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)

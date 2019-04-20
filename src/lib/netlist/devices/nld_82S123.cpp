@@ -46,7 +46,7 @@ namespace netlist
 			register_subalias("5",     m_O[4]);
 			register_subalias("6",     m_O[5]);
 			register_subalias("7",     m_O[6]);
-			register_subalias("8", 	   "GND");
+			register_subalias("8",     "GND");
 
 			register_subalias("9",     m_O[7]);
 			register_subalias("10",    m_A[0]);
