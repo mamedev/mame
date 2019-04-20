@@ -1173,6 +1173,8 @@
   - Promoted the game to working.
   - Added technical and game notes.
 
+  - I2C bus inclusion only for Saloon/Nevada instead of all games.
+
 
 
   *** TO DO ***
@@ -3600,11 +3602,6 @@ void funworld_state::fw1stpal(machine_config &config)
 	ay8910.port_a_write_callback().set(FUNC(funworld_state::funworld_lamp_a_w));
 	ay8910.port_b_write_callback().set(FUNC(funworld_state::funworld_lamp_b_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 2.5);  /* analyzed to avoid clips */
-	
-	/* Serial Memory */
-	i2cmem_device &m_i2cmem(I2CMEM(config, "i2cmem", 0));
-	m_i2cmem.set_data_size(256);
-	m_i2cmem.set_e0(1);
 }
 
 
@@ -3685,6 +3682,11 @@ void funworld_state::saloon(machine_config &config)
 
 	config.device_remove("pia0");
 	config.device_remove("pia1");
+
+	/* Serial Memory */
+	i2cmem_device &m_i2cmem(I2CMEM(config, "i2cmem", 0));
+	m_i2cmem.set_data_size(256);
+	m_i2cmem.set_e0(1);
 }
 
 
