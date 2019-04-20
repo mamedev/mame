@@ -614,7 +614,7 @@ const uint8_t m68000_base_device::m68ki_ea_idx_cycle_table[64] =
     CPU STATE DESCRIPTION
 ***************************************************************************/
 
-#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
+#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 | CPU_TYPE_SCC070 )
 #define MASK_24BIT_SPACE            (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
 #define MASK_32BIT_SPACE            (CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
 #define MASK_010_OR_LATER           (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 )
@@ -687,7 +687,7 @@ void m68000_base_device::m68k_cause_bus_error()
 
 	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
-	if (!CPU_TYPE_IS_010_PLUS())
+	if (CPU_TYPE_IS_000())
 	{
 		/* Note: This is implemented for 68000 only! */
 		m68ki_stack_frame_buserr(sr);
@@ -696,6 +696,11 @@ void m68000_base_device::m68k_cause_bus_error()
 	{
 		/* only the 68010 throws this unique type-1000 frame */
 		m68ki_stack_frame_1000(m_ppc, sr, EXCEPTION_BUS_ERROR);
+	}
+	else if (CPU_TYPE_IS_070())
+	{
+		/* only the 68070 throws this unique type-1111 frame */
+		m68ki_stack_frame_1111(m_ppc, sr, EXCEPTION_BUS_ERROR);
 	}
 	else if (m_mmu_tmp_buserror_address == m_ppc)
 	{
@@ -1955,8 +1960,28 @@ void m68000_base_device::init_cpu_m68lc040(void)
 
 void m68000_base_device::init_cpu_scc68070(void)
 {
-	init_cpu_m68010();
+	init_cpu_common();
 	m_cpu_type         = CPU_TYPE_SCC070;
+
+	// TODO: most of this is subtly different
+	init16(*m_program, *m_oprogram);
+	m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m_jump_table       = m68ki_instruction_jump_table[1];
+	m_cyc_instruction  = m68ki_cycles[1];
+	m_cyc_exception    = m68ki_exception_cycle_table[1];
+	m_cyc_bcc_notake_b = -4;
+	m_cyc_bcc_notake_w = 0;
+	m_cyc_dbcc_f_noexp = 0;
+	m_cyc_dbcc_f_exp   = 6;
+	m_cyc_scc_r_true   = 0;
+	m_cyc_movem_w      = 2;
+	m_cyc_movem_l      = 3;
+	m_cyc_shift        = 1;
+	m_cyc_reset        = 130;
+	m_has_pmmu         = 0;
+	m_has_fpu          = 0;
+
+	define_state();
 }
 
 

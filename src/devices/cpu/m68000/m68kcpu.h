@@ -228,9 +228,11 @@ inline uint32_t CPU_TYPE_IS_EC020_LESS() const  { return ((m_cpu_type) & (CPU_TY
 
 inline uint32_t CPU_TYPE_IS_010() const         { return ((m_cpu_type) == CPU_TYPE_010); }
 inline uint32_t CPU_TYPE_IS_010_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
-inline uint32_t CPU_TYPE_IS_010_LESS() const    { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010)); }
+inline uint32_t CPU_TYPE_IS_010_LESS() const    { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_SCC070)); }
 
 inline uint32_t CPU_TYPE_IS_000() const         { return ((m_cpu_type) == CPU_TYPE_000 || (m_cpu_type) == CPU_TYPE_008); }
+
+inline uint32_t CPU_TYPE_IS_070() const         { return ((m_cpu_type) == CPU_TYPE_SCC070); }
 
 
 /* Initiates trace checking before each instruction (t1) */
@@ -1133,7 +1135,7 @@ inline void m68ki_stack_frame_3word(uint32_t pc, uint32_t sr)
 inline void m68ki_stack_frame_0000(uint32_t pc, uint32_t sr, uint32_t vector)
 {
 	/* Stack a 3-word frame if we are 68000 */
-	if(m_cpu_type == CPU_TYPE_000 || m_cpu_type == CPU_TYPE_008)
+	if(CPU_TYPE_IS_000())
 	{
 		m68ki_stack_frame_3word(pc, sr);
 		return;
@@ -1225,6 +1227,48 @@ inline void m68ki_stack_frame_1000(uint32_t pc, uint32_t sr, uint32_t vector)
 
 	/* 1000, VECTOR OFFSET */
 	m68ki_push_16(0x8000 | (vector<<2));
+
+	/* PROGRAM COUNTER */
+	m68ki_push_32(pc);
+
+	/* STATUS REGISTER */
+	m68ki_push_16(sr);
+}
+
+/* Format 15 stack frame (68070).
+ * 68070 only.  This is the 17 word bus/address error frame.
+ */
+inline void m68ki_stack_frame_1111(uint32_t pc, uint32_t sr, uint32_t vector)
+{
+	/* INTERNAL INFORMATION */
+	m68ki_fake_push_16();
+
+	/* INSTRUCTION INPUT BUFFER */
+	m68ki_push_16(0);
+
+	/* INSTRUCTION REGISTER */
+	m68ki_push_16(m_ir);
+
+	/* DATA INPUT BUFFER */
+	m68ki_push_32(0);
+
+	/* FAULT ADDRESS */
+	m68ki_push_32(0);
+
+	/* DATA OUTPUT BUFFER */
+	m68ki_push_32(0);
+
+	/* INTERNAL INFORMATION */
+	m68ki_fake_push_32();
+
+	/* CURRENT MOVE MULTIPLE MASK */
+	m68ki_push_16(0);
+
+	/* SPECIAL STATUS WORD */
+	m68ki_push_16(0);
+
+	/* 1111, VECTOR OFFSET */
+	m68ki_push_16(0xf000 | (vector<<2));
 
 	/* PROGRAM COUNTER */
 	m68ki_push_32(pc);
@@ -1550,7 +1594,7 @@ inline void m68ki_exception_address_error()
 
 	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
-	if (!CPU_TYPE_IS_010_PLUS())
+	if (CPU_TYPE_IS_000())
 	{
 		/* Note: This is implemented for 68000 only! */
 		m68ki_stack_frame_buserr(sr);
@@ -1559,6 +1603,11 @@ inline void m68ki_exception_address_error()
 	{
 		/* only the 68010 throws this unique type-1000 frame */
 		m68ki_stack_frame_1000(m_ppc, sr, EXCEPTION_BUS_ERROR);
+	}
+	else if (CPU_TYPE_IS_070())
+	{
+		/* only the 68070 throws this unique type-1111 frame */
+		m68ki_stack_frame_1111(m_ppc, sr, EXCEPTION_BUS_ERROR);
 	}
 	else if (m_mmu_tmp_buserror_address == m_ppc)
 	{

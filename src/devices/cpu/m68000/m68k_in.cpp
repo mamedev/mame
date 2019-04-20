@@ -3153,7 +3153,7 @@ M68KMAKE_OP(bkpt, 0, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		(void)m_cpu_space->read_dword((m_ir & 7) << 2, 0xffffffff);
+		(void)m_cpu_space->read_word((m_ir & 7) << 2, 0xffff);
 	}
 	else if(CPU_TYPE_IS_010_PLUS())
 	{
@@ -6513,7 +6513,7 @@ M68KMAKE_OP(move, 16, toc, .)
 
 M68KMAKE_OP(move, 16, frs, d)
 {
-	if(CPU_TYPE_IS_000() || m_s_flag) /* NS990408 */
+	if(CPU_TYPE_IS_000() || CPU_TYPE_IS_070() || m_s_flag) /* NS990408 */
 	{
 		DY() = MASK_OUT_BELOW_16(DY()) | m68ki_get_sr();
 		return;
@@ -6524,7 +6524,7 @@ M68KMAKE_OP(move, 16, frs, d)
 
 M68KMAKE_OP(move, 16, frs, .)
 {
-	if(CPU_TYPE_IS_000() || m_s_flag) /* NS990408 */
+	if(CPU_TYPE_IS_000() || CPU_TYPE_IS_070() || m_s_flag) /* NS990408 */
 	{
 		uint32_t ea = M68KMAKE_GET_EA_AY_16;
 		m68ki_write_16(ea, m68ki_get_sr());
@@ -9011,7 +9011,7 @@ M68KMAKE_OP(rte, 32, ., .)
 			return;
 		}
 
-		if(CPU_TYPE_IS_010())
+		if(CPU_TYPE_IS_010() || CPU_TYPE_IS_070())
 		{
 			format_word = m68ki_read_16(REG_A()[7]+6) >> 12;
 			if(format_word == 0)
