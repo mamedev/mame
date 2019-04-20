@@ -349,11 +349,16 @@
   When numbers start to fill the screen, press RESET (key F3) again to start the game.
 
 
-  * (multi) Joker Card (Vesely).
+  * Joker Card 300 (Ver.A267BC, encrypted).
   * Multi Win (Fun World)
 
-  These sets seems to run in the same modified hardware.
-  They are encrypted, and have a second program rom with unknown code/purposes.
+  These sets seems to run in the same modified hardware. They are highly encrypted.
+
+  Joker Card has a title nag at boot. You can wait to finish nearly one minute,
+  or simply press SERVICE 2 (key 0), then START (key 1) to enter the game.
+
+  Joker Card has a weird way of play. The more you bet, the more cards burns to
+  get better chances. You're not betting really. Just buying removed cards.
 
 
   * Mongolfier New
@@ -1161,11 +1166,18 @@
 	Used GFX set from parent, that matches 100%.
   - Removed the imperfect graphics flag.
 
+  Joker Card 300 (Ver.A267BC, encrypted):
+  - Redumped the faulty graphics ROM thanks to a special
+    custom device constructed with forensics technics.
+  - Removed the imperfect graphics flag.
+  - Promoted the game to working.
+  - Added technical and game notes.
+
 
 
   *** TO DO ***
 
-  - Figure out the royalcdc & jokercrd encryption.
+  - Figure out the royalcdc encryption.
   - Figure out the remaining PIA connections for almost all games.
   - Reverse-engineering the boot code of Jolly Card Professional 2.0,
      and Royal Card Professional 2.0 to get the proper codes to boot.
@@ -6919,6 +6931,11 @@ ROM_END
   Unfortunatelly, the graphics ROM vesely_zg_1.ic10 has address 8 line (leg 25) shorted.
   Seems that the protection diode was blown due to a bad handling.
 
+  With forensics technics, a special device was constructed to process the faulty ROM
+  and try to read the contents. Fortunatelly after all these efforts, we got
+  a perfect and complete dump.
+
+
   Specs:
 
   1x Custom Fun World CPU, based on 6502 family. Silkscreened "Fun World Elektronik".
@@ -6965,6 +6982,7 @@ ROM_END
   ic41.bin   1ST AND 2ND HALF IDENTICAL
   ic37.bin   1ST AND 2ND HALF IDENTICAL
   ic10.bin   BADADDR    xxxxxx-xxxxxxxx
+
 */
 
 ROM_START( jokercrd )
@@ -6976,7 +6994,7 @@ ROM_START( jokercrd )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "vesely_zg_2.ic11", 0x0000, 0x8000, CRC(21d05a57) SHA1(156c18ec31b08e4c4af6f73b49cb5d5c68d1670f) )
-	ROM_LOAD( "vesely_zg_1.ic10", 0x8000, 0x8000, BAD_DUMP CRC(2bbd27ad) SHA1(37d37899398d95beac5f3cbffc4277c97aca1a23) )  // address 8 line is bad.
+	ROM_LOAD( "vesely_zg_1.ic10", 0x8000, 0x8000, CRC(f315587a) SHA1(6f24dd24ae4c48f2ee1db96d5cbff863734048de) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "ic13.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
@@ -8481,7 +8499,7 @@ GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, empty_ini
 GAME(  1992, multiwin,  0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 0 )
 GAME(  1993, powercrd,  0,        powercrd, funworld,  powercrd_state, empty_init,    ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,  0,        megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 0 )
-GAME(  1993, jokercrd,  0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",  "Joker Card 300 (Ver.A267BC, encrypted)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME(  1993, jokercrd,  0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",  "Joker Card 300 (Ver.A267BC, encrypted)",          0 )
 GAME(  1991, royalcrdf, royalcrd, royalcrdf,royalcrdf, royalcrdf_state,driver_init,   ROT0, "Evona Electronic","Royal Card (Evona, Polish, encrypted)",           0 )
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      0 )
 GAME(  198?, nevadafw,  0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",       "Nevada (French, encrypted)",                      0 )
