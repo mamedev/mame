@@ -703,6 +703,7 @@
 		<description>Anti-M (version 1.0)</description>
 		<year>2019</year>
 		<publisher>4AM</publisher>
+		<info name="usage" value="Defective disk image format, but is worked around by MAME's detection." />
 		<info name="release" value="2019-03-11"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -716,6 +717,7 @@
 		<description>Anti-M (version 1.1)</description>
 		<year>2019</year>
 		<publisher>4AM</publisher>
+		<info name="usage" value="Defective disk image format, but is worked around by MAME's detection." />
 		<info name="release" value="2019-03-16"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -725,15 +727,29 @@
 		</part>
 	</software>
 
-	<software name="antim12">
+	<software name="antim12" supported="no">
 		<description>Anti-M (version 1.2)</description>
 		<year>2019</year>
 		<publisher>4AM</publisher>
+		<info name="usage" value="Defective disk image format can't be properly detected in MAME due to non-ProDOS bootloader." />
 		<info name="release" value="2019-03-24"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="anti-m-v1.2-2019-03-24.po" size="143360" crc="ca093aac" sha1="ea4e414fc5f56f877f8b84bad40a8a288c005dc6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antim13">
+		<description>Anti-M (version 1.3)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-04-12"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.3-2019-04-12.dsk" size="143360" crc="50a6e8dc" sha1="ebf0ac03e0a1bb9da51403140dc0613a08e2efd3" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6445,6 +6461,20 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="zorro.dsk" size="143360" crc="ec9a6f7a" sha1="8667f1c0d8feb4061e89d09a959b0b3138e49a98" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avdemuf">
+		<description>Advanced Demuffin (version 1.5)</description>
+		<year>2014</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2014-08-21"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="advanced demuffin 1.5.dsk" size="143360" crc="ee5b1224" sha1="cc1991407cbdf37de68d33c2b39acdc973254207" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
