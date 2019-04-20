@@ -3926,6 +3926,11 @@ ROM_END
  **************************************************************************************************************************
     Golden Axe: The Revenge of Death Adder (Export)
     protected via a custom V25 with encrypted code
+    Sega Game ID codes:
+     Game: 833-8932-03 GOLDEN AXE II AC EXP
+ROM board: 833-8933-02
+Sub board: 834-8529-02
+A/D board: 837-7968
 */
 ROM_START( ga2 )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -3965,7 +3970,7 @@ ROM_END
      Game: 833-8932-02 GOLDEN AXE II AC USA
 ROM board: 833-8933-01
 Sub board: 834-8529-02
-
+A/D board: 837-7968
 */
 ROM_START( ga2u )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4001,6 +4006,8 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe: The Revenge of Death Adder (Japan)
     protected via a custom V25 with encrypted code
+Sub board: 834-8529-02
+A/D board: 837-7968
 */
 ROM_START( ga2j )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
