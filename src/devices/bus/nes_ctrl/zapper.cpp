@@ -54,6 +54,8 @@ nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *
 	m_lighty(*this, "ZAPPER_Y"),
 	m_trigger(*this, "ZAPPER_T")
 {
+	// Explicitly configure the screen to avoid possible conflict with other slot devices.
+	set_screen(*this, ":screen");
 }
 
 
