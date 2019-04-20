@@ -48,9 +48,9 @@ DEFINE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device, "newport_video", "SGI Ne
 
 newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NEWPORT_VIDEO, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_hpc3(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, "palette")
 {
 }
 
@@ -400,7 +400,7 @@ void newport_video_device::cmap0_write(uint32_t data)
 	case 0x02:
 		m_cmap0.m_palette[m_cmap0.m_palette_idx] = data >> 8;
 		if (m_cmap0.m_palette_idx < 0x2000)
-			m_palette->set_pen_color(m_cmap0.m_palette_idx, rgb_t((uint8_t)(data >> 24), (uint8_t)(data >> 16), (uint8_t)(data >> 8)));
+			set_pen_color(m_cmap0.m_palette_idx, rgb_t((uint8_t)(data >> 24), (uint8_t)(data >> 16), (uint8_t)(data >> 8)));
 		LOGMASKED(LOG_CMAP0, "CMAP0 Palette Entry %04x Write: %08x\n", m_cmap0.m_palette_idx, data >> 8);
 		break;
 	default:
@@ -2736,9 +2736,4 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 	{
 		do_rex3_command();
 	}
-}
-
-void newport_video_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, "palette").set_entries(0x2000);
 }
