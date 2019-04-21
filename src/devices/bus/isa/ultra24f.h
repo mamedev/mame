@@ -12,6 +12,7 @@
 #pragma once
 
 #include "isa.h"
+#include "machine/i82355.h"
 #include "machine/upd765.h"
 
 class ultra24f_device : public device_t, public device_isa16_card_interface
@@ -27,10 +28,14 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	u8 bmic_r(offs_t offset);
+	void bmic_w(offs_t offset, u8 data);
+
 	void uscpu_map(address_map &map);
 	void scsic_config(device_t *device);
 
 	required_device<cpu_device> m_uscpu;
+	required_device<i82355_device> m_bmic;
 	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u16> m_bios16;
 };

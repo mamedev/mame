@@ -34,7 +34,7 @@
 #include "aha174x.h"
 
 #include "machine/aic6250.h"
-//#include "machine/i82355.h"
+#include "machine/i82355.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_hd.h"
 
@@ -68,6 +68,7 @@ void aha174x_device::device_start()
 
 void aha174x_device::hpc_map(address_map &map)
 {
+	map(0x4000, 0x4002).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w));
 	map(0x5000, 0x500f).m("scsi:7:scsic", FUNC(aic6251a_device::map));
 	map(0x8000, 0xffff).rom().region("mcode", 0);
 }
@@ -88,6 +89,8 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1740_device::hpc_map);
 
+	I82355(config, "bmic", 0);
+
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", aha174x_scsi_devices, nullptr);
@@ -104,6 +107,8 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 {
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1742a_device::hpc_map);
+
+	I82355(config, "bmic", 0);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
