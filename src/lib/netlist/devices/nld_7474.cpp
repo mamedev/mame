@@ -57,34 +57,34 @@ namespace netlist
 	NETLIB_OBJECT(7474_dip)
 	{
 		NETLIB_CONSTRUCTOR(7474_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1", "1.CLRQ");
-			register_subalias("2", "1.D");
-			register_subalias("3", "1.CLK");
-			register_subalias("4", "1.PREQ");
-			register_subalias("5", "1.Q");
-			register_subalias("6", "1.QQ");
-			register_subalias("7", "1.GND");
+			register_subalias("1", "A.CLRQ");
+			register_subalias("2", "A.D");
+			register_subalias("3", "A.CLK");
+			register_subalias("4", "A.PREQ");
+			register_subalias("5", "A.Q");
+			register_subalias("6", "A.QQ");
+			register_subalias("7", "A.GND");
 
-			register_subalias("8", "2.QQ");
-			register_subalias("9", "2.Q");
-			register_subalias("10", "2.PREQ");
-			register_subalias("11", "2.CLK");
-			register_subalias("12", "2.D");
-			register_subalias("13", "2.CLRQ");
-			register_subalias("14", "1.VCC");
+			register_subalias("8", "B.QQ");
+			register_subalias("9", "B.Q");
+			register_subalias("10", "B.PREQ");
+			register_subalias("11", "B.CLK");
+			register_subalias("12", "B.D");
+			register_subalias("13", "B.CLRQ");
+			register_subalias("14", "A.VCC");
 
-			connect("1.GND", "2.GND");
-			connect("1.VCC", "2.VCC");
+			connect("A.GND", "B.GND");
+			connect("A.VCC", "B.VCC");
 		}
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
 	private:
-		NETLIB_SUB(7474) m_1;
-		NETLIB_SUB(7474) m_2;
+		NETLIB_SUB(7474) m_A;
+		NETLIB_SUB(7474) m_B;
 	};
 
 	NETLIB_HANDLER(7474, clk)

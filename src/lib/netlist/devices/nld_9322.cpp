@@ -41,10 +41,10 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(9322)
 		, m_SELECT(*this, "SELECT")
 		, m_STROBE(*this, "STROBE")
-		, m_1(*this, "1")
-		, m_2(*this, "2")
-		, m_3(*this, "3")
-		, m_4(*this, "4")
+		, m_1(*this, "A")
+		, m_2(*this, "B")
+		, m_3(*this, "C")
+		, m_4(*this, "D")
 		{
 			register_subalias("A1", m_1.m_A);
 			register_subalias("B1", m_1.m_B);
@@ -59,15 +59,15 @@ namespace netlist
 			register_subalias("B4", m_4.m_B);
 			register_subalias("Y4", m_4.m_Y);
 
-			connect("1.VCC", "2.VCC");
-			connect("1.VCC", "3.VCC");
-			connect("1.VCC", "4.VCC");
-			connect("1.GND", "2.GND");
-			connect("1.GND", "3.GND");
-			connect("1.GND", "4.GND");
+			connect("A.VCC", "B.VCC");
+			connect("A.VCC", "C.VCC");
+			connect("A.VCC", "D.VCC");
+			connect("A.GND", "B.GND");
+			connect("A.GND", "C.GND");
+			connect("A.GND", "D.GND");
 
-			register_subalias("GND", "1.GND");
-			register_subalias("VCC", "1.VCC");
+			register_subalias("GND", "A.GND");
+			register_subalias("VCC", "B.VCC");
 
 		}
 

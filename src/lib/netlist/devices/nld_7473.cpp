@@ -55,57 +55,63 @@ namespace netlist
 	NETLIB_OBJECT(7473_dip)
 	{
 		NETLIB_CONSTRUCTOR(7473_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1", m_1.m_CLK);
-			register_subalias("2", m_1.m_CLRQ);
-			register_subalias("3", m_1.m_K);
-			register_subalias("4", "VCC");
-			register_subalias("5", m_2.m_CLK);
-			register_subalias("6", m_2.m_CLRQ);
-			register_subalias("7", m_2.m_J);
+			register_subalias("1", m_A.m_CLK);
+			register_subalias("2", m_A.m_CLRQ);
+			register_subalias("3", m_A.m_K);
+			register_subalias("4", "A.VCC");
+			register_subalias("5", m_B.m_CLK);
+			register_subalias("6", m_B.m_CLRQ);
+			register_subalias("7", m_B.m_J);
 
-			register_subalias("8", m_2.m_QQ);
-			register_subalias("9", m_2.m_Q);
-			register_subalias("10", m_2.m_K);
-			register_subalias("11", "GND");
-			register_subalias("12", m_2.m_Q);
-			register_subalias("13", m_1.m_QQ);
-			register_subalias("14", m_1.m_J);
+			register_subalias("8", m_B.m_QQ);
+			register_subalias("9", m_B.m_Q);
+			register_subalias("10", m_B.m_K);
+			register_subalias("11", "A.GND");
+			register_subalias("12", m_B.m_Q);
+			register_subalias("13", m_A.m_QQ);
+			register_subalias("14", m_A.m_J);
+
+			connect("A.GND", "B.GND");
+			connect("A.VCC", "B.VCC");
 		}
 
 	private:
-		NETLIB_SUB(7473) m_1;
-		NETLIB_SUB(7473) m_2;
+		NETLIB_SUB(7473) m_A;
+		NETLIB_SUB(7473) m_B;
 	};
 
 	NETLIB_OBJECT(7473A_dip)
 	{
 		NETLIB_CONSTRUCTOR(7473A_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1", m_1.m_CLK);
-			register_subalias("2", m_1.m_CLRQ);
-			register_subalias("3", m_1.m_K);
-			//register_subalias("4", ); ==> VCC
-			register_subalias("5", m_2.m_CLK);
-			register_subalias("6", m_2.m_CLRQ);
-			register_subalias("7", m_2.m_J);
+			register_subalias("1", m_A.m_CLK);
+			register_subalias("2", m_A.m_CLRQ);
+			register_subalias("3", m_A.m_K);
+			register_subalias("4", "A.VCC");
+			register_subalias("5", m_B.m_CLK);
+			register_subalias("6", m_B.m_CLRQ);
+			register_subalias("7", m_B.m_J);
 
-			register_subalias("8", m_2.m_QQ);
-			register_subalias("9", m_2.m_Q);
-			register_subalias("10", m_2.m_K);
-			//register_subalias("11", ); ==> VCC
-			register_subalias("12", m_2.m_Q);
-			register_subalias("13", m_1.m_QQ);
-			register_subalias("14", m_1.m_J);
+			register_subalias("8", m_B.m_QQ);
+			register_subalias("9", m_B.m_Q);
+			register_subalias("10", m_B.m_K);
+			register_subalias("11", "A.GND");
+			register_subalias("12", m_B.m_Q);
+			register_subalias("13", m_A.m_QQ);
+			register_subalias("14", m_A.m_J);
+
+			connect("A.GND", "B.GND");
+			connect("A.VCC", "B.VCC");
 		}
 
 	private:
-		NETLIB_SUB(7473A) m_1;
-		NETLIB_SUB(7473A) m_2;
+		NETLIB_SUB(7473A) m_A;
+		NETLIB_SUB(7473A) m_B;
 	};
 
 	NETLIB_RESET(7473)

@@ -1265,10 +1265,10 @@ NETLIST_START(rebound_schematics)
 	 * Inputs not used
 	 * -----------------------------------------------------------------------*/
 
-	NET_C(V5, A1.s3.A, A1.s3.B, B5.s6.A)
-	NET_C(V5, B3.2.CLK, B3.2.CLRQ, B3.2.J, B3.2.K)
-	NET_C(V5, F3.2.CLK, F3.2.CLRQ, F3.2.J, F3.2.K)
-	NET_C(V5, F9.s1.A, F9.s5.A, F9.s6.A)
+	NET_C(V5, A1.C.A, A1.C.B, B5.F.A)
+	NET_C(V5, B3.B.CLK, B3.B.CLRQ, B3.B.J, B3.B.K)
+	NET_C(V5, F3.B.CLK, F3.B.CLRQ, F3.B.J, F3.B.K)
+	NET_C(V5, F9.A.A, F9.E.A, F9.F.A)
 
 	/* -----------------------------------------------------------------------
 	 * Power terminals
