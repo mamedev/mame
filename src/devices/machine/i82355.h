@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /**********************************************************************
 
-    Intel 82355 Bus Master Interface Chip (BMIC)
+    Intel 82355 Bus Master Interface Controller (BMIC)
 
 **********************************************************************/
 
