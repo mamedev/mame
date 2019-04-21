@@ -282,11 +282,13 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 		}
 	}
 	/* pause */
-	int start_pause_samples = millisec_to_samplecount(1);
+	if (data_size > 0)
+	{
+		int start_pause_samples = millisec_to_samplecount(1);
 
-	tzx_output_wave(buffer, start_pause_samples);
-	size += start_pause_samples;
-
+		tzx_output_wave(buffer, start_pause_samples);
+		size += start_pause_samples;
+	}
 	if (pause > 0)
 	{
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
