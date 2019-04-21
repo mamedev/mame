@@ -653,6 +653,7 @@ namespace netlist
 			void push_to_queue(netlist_time delay) NL_NOEXCEPT;
 			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
+			template <bool KEEP_STATS>
 			void update_devs() NL_NOEXCEPT;
 
 			netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
@@ -741,7 +742,7 @@ namespace netlist
 			plib::linkedlist_t<core_terminal_t> m_list_active;
 			std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
-			template <typename T>
+			template <bool KEEP_STATS, typename T>
 			void process(const T mask, netlist_sig_t sig);
 		};
 	} // namespace detail
@@ -1166,7 +1167,8 @@ namespace netlist
 			{
 				if (++m_active_outputs == 1)
 				{
-					m_stat_inc_active.inc();
+					if (m_stats/*NL_KEEP_STATISTICS*/)
+						m_stats->m_stat_inc_active.inc();
 					inc_active();
 				}
 			}
@@ -1189,9 +1191,15 @@ namespace netlist
 		void set_default_delegate(detail::core_terminal_t &term);
 
 		/* stats */
-		nperftime_t<NL_KEEP_STATISTICS>  m_stat_total_time;
-		nperfcount_t<NL_KEEP_STATISTICS> m_stat_call_count;
-		nperfcount_t<NL_KEEP_STATISTICS> m_stat_inc_active;
+		struct stats_t
+		{
+			// NL_KEEP_STATISTICS
+			nperftime_t<true>  m_stat_total_time;
+			nperfcount_t<true> m_stat_call_count;
+			nperfcount_t<true> m_stat_inc_active;
+		};
+
+		plib::unique_ptr<stats_t> m_stats;
 
 		virtual void update() NL_NOEXCEPT { }
 		virtual void reset() { }
@@ -1288,7 +1296,8 @@ namespace netlist
 	 * solvers will update inputs after parallel processing.
 	 */
 	class detail::queue_t :
-			public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
+			//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
+			public timed_queue<pqentry_t<net_t *, netlist_time>, false, true>,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
@@ -1488,9 +1497,25 @@ namespace netlist
 		void process_queue(const netlist_time delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
 
+		const detail::queue_t &queuex() const NL_NOEXCEPT { return m_queue; }
+#if 0
 		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
 		detail::queue_t &queue() NL_NOEXCEPT { return m_queue; }
+#else
+		void qpush(detail::queue_t::entry_t && e) noexcept
+		{
+			if (!m_stats)
+				m_queue.push_nostats(std::move(e));
+			else
+				m_queue.push(std::move(e));
+		}
+		template <class R>
+		void qremove(const R &elem) noexcept
+		{
+			m_queue.remove(elem);
+		}
 
+#endif
 		/* Control functions */
 
 		void stop();
@@ -1519,7 +1544,14 @@ namespace netlist
 
 		void print_stats() const;
 
+		bool stats_enabled() const { return m_stats; }
+		void enable_stats(bool val) { m_stats = val; }
+
 	private:
+
+		template <bool KEEP_STATS>
+		void process_queue_stats(const netlist_time delta) NL_NOEXCEPT;
+
 		plib::unique_ptr<netlist_state_t>   m_state;
 		devices::NETLIB_NAME(solver) *      m_solver;
 
@@ -1530,10 +1562,11 @@ namespace netlist
 
 		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
+		bool								m_stats;
 
 		// performance
-		nperftime_t<NL_KEEP_STATISTICS>     m_stat_mainloop;
-		nperfcount_t<NL_KEEP_STATISTICS>    m_perf_out_processed;
+		nperftime_t<true>     				m_stat_mainloop;
+		nperfcount_t<true>    				m_perf_out_processed;
 };
 
 	// -----------------------------------------------------------------------------
@@ -1653,15 +1686,15 @@ namespace netlist
 		if ((num_cons() != 0))
 		{
 			auto &lexec(exec());
-			auto &q(lexec.queue());
+			//auto &q(lexec.queue());
 			auto nst(lexec.time() + delay);
 
 			if (is_queued())
-				q.remove(this);
+				lexec.qremove(this);
 			m_in_queue = (!m_list_active.empty()) ?
 				queue_status::QUEUED : queue_status::DELAYED_DUE_TO_INACTIVE;    /* queued ? */
 			if (m_in_queue == queue_status::QUEUED)
-				q.push(queue_t::entry_t(nst, this));
+				lexec.qpush(queue_t::entry_t(nst, this));
 			else
 				update_inputs();
 			m_next_scheduled_time = nst;
@@ -1679,7 +1712,7 @@ namespace netlist
 				if (m_next_scheduled_time > exec().time())
 				{
 					m_in_queue = queue_status::QUEUED;     /* pending */
-					exec().queue().push({m_next_scheduled_time, this});
+					exec().qpush({m_next_scheduled_time, this});
 				}
 				else
 				{

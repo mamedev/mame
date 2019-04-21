@@ -1012,6 +1012,18 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 {
 	auto &lsetup = lnetlist->nlstate().setup();
 
+	// Override log statistics
+	pstring p = plib::util::environment("NL_STATS", "");
+	if (p != "")
+	{
+		bool err=false;
+		bool v = plib::pstonum_ne<bool>(p, err);
+		if (err)
+			lsetup.log().warning("NL_STATS: invalid value {1}", p);
+		else
+			lnetlist->enable_stats(v);
+	}
+
 	// register additional devices
 
 	nl_register_devices(lsetup);
@@ -1308,11 +1320,11 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 {
 	unsigned startpc = pc;
 	int relpc = pc - m_dev->genPC();
-	if (relpc >= 0 && relpc < m_dev->netlist().queue().size())
+	if (relpc >= 0 && relpc < m_dev->netlist().queuex().size())
 	{
-		int dpc = m_dev->netlist().queue().size() - relpc - 1;
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].m_object->name().c_str(),
-				m_dev->netlist().queue()[dpc].m_exec_time.as_double());
+		int dpc = m_dev->netlist().queuex().size() - relpc - 1;
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queuex()[dpc].m_object->name().c_str(),
+				m_dev->netlist().queuex()[dpc].m_exec_time.as_double());
 	}
 
 	pc+=1;

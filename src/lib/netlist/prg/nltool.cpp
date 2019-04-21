@@ -39,6 +39,7 @@ public:
 
 		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
+		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
@@ -75,6 +76,7 @@ public:
 	plib::option_str    opt_name;
 	plib::option_group  opt_grp3;
 	plib::option_num<double> opt_ttr;
+	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
@@ -351,6 +353,7 @@ void tool_app_t::run()
 		auto t_guard(t.guard());
 		//plib::perftime_t<plib::exact_ticks> t;
 
+		nt.enable_stats(opt_stats());
 		nt.init();
 
 		if (!opt_verb())

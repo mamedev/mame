@@ -107,9 +107,8 @@ const logic_family_desc_t *family_CD4XXX()
 // ----------------------------------------------------------------------------------------
 
 detail::queue_t::queue_t(netlist_state_t &nl)
-	: timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>(512)
+	: timed_queue<pqentry_t<net_t *, netlist_time>, false, true>(512)
 	, netlist_ref(nl)
-//  , plib::state_manager_t::callback_t()
 	, m_qsize(0)
 	, m_times(512)
 	, m_net_ids(512)
@@ -193,6 +192,7 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
 	, m_queue(*m_state)
+	, m_stats(false)
 {
 	devices::initialize_factory(nlstate().setup().factory());
 	NETLIST_NAME(base)(nlstate().setup());
@@ -363,14 +363,23 @@ void netlist_state_t::reset()
 #endif
 }
 
-
 void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 {
-	auto sm_guard(m_stat_mainloop.guard());
+	if (!m_stats)
+		process_queue_stats<false>(delta);
+	else
+	{
+		auto sm_guard(m_stat_mainloop.guard());
+		process_queue_stats<true>(delta);
+	}
+}
+
+template <bool KEEP_STATS>
+void netlist_t::process_queue_stats(const netlist_time delta) NL_NOEXCEPT
+{
 	netlist_time stop(m_time + delta);
 
-	m_queue.push(detail::queue_t::entry_t(stop, nullptr));
-
+	qpush(detail::queue_t::entry_t(stop, nullptr));
 
 	if (m_mainclock == nullptr)
 	{
@@ -378,8 +387,8 @@ void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 		m_time = e.m_exec_time;
 		while (e.m_object != nullptr)
 		{
-			e.m_object->update_devs();
-			m_perf_out_processed.inc();
+			e.m_object->template update_devs<KEEP_STATS>();
+			if (KEEP_STATS) m_perf_out_processed.inc();
 			e = m_queue.pop();
 			m_time = e.m_exec_time;
 		}
@@ -396,7 +405,7 @@ void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 			{
 				m_time = mc_time;
 				mc_net.toggle_new_Q();
-				mc_net.update_devs();
+				mc_net.update_devs<KEEP_STATS>();
 				mc_time += inc;
 			}
 
@@ -404,8 +413,8 @@ void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 			m_time = e.m_exec_time;
 			if (e.m_object != nullptr)
 			{
-				e.m_object->update_devs();
-				m_perf_out_processed.inc();
+				e.m_object->template update_devs<KEEP_STATS>();
+				if (KEEP_STATS) m_perf_out_processed.inc();
 			}
 			else
 				break;
@@ -416,33 +425,34 @@ void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 
 void netlist_t::print_stats() const
 {
-	if (nperftime_t<NL_KEEP_STATISTICS>::enabled)
+	if (m_stats)
 	{
 		std::vector<size_t> index;
 		for (size_t i=0; i < m_state->m_devices.size(); i++)
 			index.push_back(i);
 
 		std::sort(index.begin(), index.end(),
-				[&](size_t i1, size_t i2) { return m_state->m_devices[i1].second->m_stat_total_time.total() < m_state->m_devices[i2].second->m_stat_total_time.total(); });
+				[&](size_t i1, size_t i2) { return m_state->m_devices[i1].second->m_stats->m_stat_total_time.total() < m_state->m_devices[i2].second->m_stats->m_stat_total_time.total(); });
 
-		nperftime_t<NL_KEEP_STATISTICS>::type total_time(0);
-		nperftime_t<NL_KEEP_STATISTICS>::ctype total_count(0);
+		nperftime_t<true>::type total_time(0);
+		nperftime_t<true>::ctype total_count(0);
 
 		for (auto & j : index)
 		{
 			auto entry = m_state->m_devices[j].second.get();
+			auto stats = m_state->m_devices[j].second.get()->m_stats.get();
 			log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
-					entry->m_stat_call_count(), entry->m_stat_total_time.count(),
-					entry->m_stat_total_time.total(), entry->m_stat_inc_active());
-			total_time += entry->m_stat_total_time.total();
-			total_count += entry->m_stat_total_time.count();
+					stats->m_stat_call_count(), stats->m_stat_total_time.count(),
+					stats->m_stat_total_time.total(), stats->m_stat_inc_active());
+			total_time += stats->m_stat_total_time.total();
+			total_count += stats->m_stat_total_time.count();
 		}
 
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
 			total_time, total_time / static_cast<decltype(total_time)>(total_count));
 
-		nperftime_t<NL_KEEP_STATISTICS> overhead;
-		nperftime_t<NL_KEEP_STATISTICS> test;
+		nperftime_t<true> overhead;
+		nperftime_t<true> test;
 		{
 			auto overhead_guard(overhead.guard());
 			for (int j=0; j<100000;j++)
@@ -451,9 +461,9 @@ void netlist_t::print_stats() const
 			}
 		}
 
-		nperftime_t<NL_KEEP_STATISTICS>::type total_overhead = overhead()
-				* static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(total_count)
-				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(200000);
+		nperftime_t<true>::type total_overhead = overhead()
+				* static_cast<nperftime_t<true>::type>(total_count)
+				/ static_cast<nperftime_t<true>::type>(200000);
 
 		log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
 		log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
@@ -467,8 +477,8 @@ void netlist_t::print_stats() const
 		log().verbose("");
 		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 		log().verbose("Total overhead {1:15}", total_overhead);
-		nperftime_t<NL_KEEP_STATISTICS>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(m_queue.m_prof_call());
+		nperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
+				/ static_cast<nperftime_t<true>::type>(m_queue.m_prof_call());
 		log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
 		log().verbose("");
 
@@ -476,12 +486,13 @@ void netlist_t::print_stats() const
 		for (auto &entry : m_state->m_devices)
 		{
 			auto ep = entry.second.get();
+			auto stats = ep->m_stats.get();
 			// Factor of 3 offers best performace increase
-			if (ep->m_stat_inc_active() > 3 * ep->m_stat_total_time.count()
-				&& ep->m_stat_inc_active() > trigger)
+			if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
+				&& stats->m_stat_inc_active() > trigger)
 				log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
-					static_cast<double>(ep->m_stat_inc_active()) / static_cast<double>(ep->m_stat_total_time.count()),
-					ep->m_stat_inc_active(), ep->m_stat_total_time.count());
+					static_cast<double>(stats->m_stat_inc_active()) / static_cast<double>(stats->m_stat_total_time.count()),
+					stats->m_stat_inc_active(), stats->m_stat_total_time.count());
 		}
 	}
 }
@@ -516,6 +527,8 @@ core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
+	if (exec().stats_enabled())
+		m_stats = plib::make_unique<stats_t>();
 }
 
 core_device_t::core_device_t(core_device_t &owner, const pstring &name)
@@ -529,6 +542,8 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
 	state().add_dev(this->name(), pool_owned_ptr<core_device_t>(this, false));
+	if (exec().stats_enabled())
+		m_stats = plib::make_unique<stats_t>();
 }
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)
@@ -650,26 +665,39 @@ void detail::net_t::rebuild_list()
 		}
 }
 
-template <typename T>
+template <bool KEEP_STATS, typename T>
 void detail::net_t::process(const T mask, netlist_sig_t sig)
 {
 	m_cur_Q = sig;
 
-	for (auto & p : m_list_active)
+	if (KEEP_STATS)
 	{
-		p.set_copied_input(sig);
-
-		p.device().m_stat_call_count.inc();
-		if ((p.terminal_state() & mask))
+		for (auto & p : m_list_active)
 		{
-			auto g(p.device().m_stat_total_time.guard());
-			//p.device().m_stat_total_time.start();
-			p.m_delegate();
-			//p.device().m_stat_total_time.stop();
+			p.set_copied_input(sig);
+			auto *stats = p.device().m_stats.get();
+			stats->m_stat_call_count.inc();
+			if ((p.terminal_state() & mask))
+			{
+				auto g(stats->m_stat_total_time.guard());
+				//p.device().m_stat_total_time.start();
+				p.m_delegate();
+				//p.device().m_stat_total_time.stop();
+			}
+		}
+	}
+	else
+	{
+		for (auto & p : m_list_active)
+		{
+			p.set_copied_input(sig);
+			if ((p.terminal_state() & mask))
+				p.m_delegate();
 		}
 	}
 }
 
+template <bool KEEP_STATS>
 void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
@@ -684,7 +712,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 	{
 		case core_terminal_t::STATE_INP_HL:
 		case core_terminal_t::STATE_INP_LH:
-			process(mask | core_terminal_t::STATE_INP_ACTIVE, new_Q);
+			process<KEEP_STATS>(mask | core_terminal_t::STATE_INP_ACTIVE, new_Q);
 			break;
 		default:
 			/* do nothing */

@@ -128,6 +128,19 @@ namespace netlist
 			m_prof_call.inc();
 		}
 
+		void push_nostats(T && e) noexcept
+		{
+			/* Lock */
+			lock_guard_type lck(m_lock);
+			T * i(m_end-1);
+			for (; QueueOp::less(*(i), e); --i)
+			{
+				*(i+1) = *(i);
+			}
+			*(i+1) = std::move(e);
+			++m_end;
+		}
+
 		T pop() noexcept       { return *(--m_end); }
 		const T &top() const noexcept { return *(m_end-1); }
 
