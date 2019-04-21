@@ -94,7 +94,7 @@ static void tekram_scsi_devices(device_slot_interface &device)
 void tekram_eisa_scsi_device::scsic_config(device_t *device)
 {
 	device->set_clock(40_MHz_XTAL);
-	device->irq_handler_cb().set(m_mpu, FUNC(i80186_cpu_device::int3_w));
+	downcast<ncr53cf94_device &>(*device).irq_handler_cb().set(m_mpu, FUNC(i80186_cpu_device::int3_w));
 }
 
 void tekram_eisa_scsi_device::scsi_add(machine_config &config)
