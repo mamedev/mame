@@ -11,7 +11,7 @@
 
 #include "machine/hpc3.h"
 
-#define ENABLE_NEWVIEW_LOG      (0)
+#define ENABLE_NEWVIEW_LOG      (1)
 
 class newport_video_device : public device_t, public device_palette_interface
 {
@@ -190,6 +190,8 @@ private:
 	void write_pixel(uint8_t color, bool shade);
 	void write_pixel(int16_t x, int16_t y, uint8_t color);
 	void store_pixel(uint8_t *dest_buf, uint8_t src);
+
+	uint8_t get_shade_color(int16_t x, int16_t y);
 
 	void do_v_iline(uint8_t color, bool skip_last, bool shade);
 	void do_h_iline(uint8_t color, bool skip_last, bool shade);
