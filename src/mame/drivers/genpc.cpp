@@ -198,8 +198,8 @@ ROM_START(pc)
 	ROM_SYSTEM_BIOS(40, "fday17", "Faraday 5 slot PC") // use pcherc
 	ROMX_LOAD( "fdaypc17.rom", 0x00000, 0x2000, CRC(26bb29ac) SHA1(5a58680b9193f4323db3e7894f853dc82d17f4ee),ROM_BIOS(40))
 
-	
-		
+
+
 ROM_END
 
 #define rom_pcmda    rom_pc

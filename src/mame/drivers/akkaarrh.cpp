@@ -2,15 +2,15 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-	Atari Akka Arrh hardware
+    Atari Akka Arrh hardware
 
-	driver by Aaron Giles
+    driver by Aaron Giles
 
-	Games supported:
-		* Akka Arrh (1982)
+    Games supported:
+        * Akka Arrh (1982)
 
-	Known issues:
-		* none at this time
+    Known issues:
+        * none at this time
 
 ***************************************************************************/
 
@@ -280,7 +280,7 @@ WRITE8_MEMBER(akkaarrh_state::earom_control_w)
 
 /*************************************
  *
- *	CPU memory map
+ *  CPU memory map
  *
  *************************************/
 
@@ -313,7 +313,7 @@ void akkaarrh_state::main_map(address_map &map)
 
 /*************************************
  *
- *	Port definitions
+ *  Port definitions
  *
  *************************************/
 
@@ -332,8 +332,8 @@ static INPUT_PORTS_START( akkaarrh )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested; if 0, writes 240 to $FD
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// resets game
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // tested; if 0, writes 240 to $FD
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // resets game
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -353,7 +353,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *	Graphics definitions
+ *  Graphics definitions
  *
  *************************************/
 
@@ -388,7 +388,7 @@ GFXDECODE_END
 
 /*************************************
  *
- *	Machine driver
+ *  Machine driver
  *
  *************************************/
 
@@ -429,7 +429,7 @@ void akkaarrh_state::akkaarrh(machine_config &config)
 
 /*************************************
  *
- *	ROM definitions
+ *  ROM definitions
  *
  *************************************/
 
@@ -461,7 +461,7 @@ ROM_END
 
 /*************************************
  *
- *	Game drivers
+ *  Game drivers
  *
  *************************************/
 

@@ -116,11 +116,11 @@ TODO: Volleyball...
  */
 
 //#define MASTER_CLOCK_BREAKOUT    (14318000)
-static const int NS_PER_CLOCK 			= static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 14318000 + 0.5);
+static const int NS_PER_CLOCK           = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 14318000 + 0.5);
 static const int MASTER_CLOCK_BREAKOUT  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK + 0.5);
 
-static const int V_TOTAL_BREAKOUT		= (0xFC);       // 252
-static const int H_TOTAL_BREAKOUT		= (448*2);    	// 448
+static const int V_TOTAL_BREAKOUT       = (0xFC);       // 252
+static const int H_TOTAL_BREAKOUT       = (448*2);      // 448
 
 enum input_changed_enum
 {

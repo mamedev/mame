@@ -185,7 +185,7 @@ uint32_t eurogael_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	// the code to write / clear tilemaps for fb and tx layers has been specifically modified to avoid writing to the last 4 bytes
 	// and the game instead writes scroll values there instead, there is no code to copy from there, so it looks like these are the scroll regs
-	
+
 	// each of the 3 layer has its own PCB, all PCBs look identical, so why does handling differ slightly?
 
 	int fg_scrollx = ((m_fgvideoram[0xffc]) | (m_fgvideoram[0xffd]<<8)) + 33;

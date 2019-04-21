@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-    Known cartridges   
+    Known cartridges
 
 Dumped|Name       |Notes
 ______|___________|______
@@ -26,7 +26,7 @@ ______|___________|______
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tennis" supported="no">
 		<description>Tennis</description>
 		<year>2005</year>
@@ -37,7 +37,7 @@ ______|___________|______
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="whacmole" supported="no">
 		<description>Whac-A-Mole</description>
 		<year>2005</year>
@@ -47,6 +47,6 @@ ______|___________|______
 				<rom name="whac-a-mole.bin" size="0x400000" crc="62625c62" sha1="846045308e242aff347f93fab1e9b2e8ef46386f" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>

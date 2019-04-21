@@ -161,10 +161,10 @@
 #define EXCEPTION_TLBSTORE_FILL 17
 #define EXCEPTION_COUNT         18
 
-#define FCR31_FLAGS     2	// FLAGS start bit
-#define FCR31_ENABLE    7	// Enable start bit
-#define FCR31_CAUSE     12	// Cause start bit
-#define FPE_DIV0        3	// Divide by zero bit index
+#define FCR31_FLAGS     2   // FLAGS start bit
+#define FCR31_ENABLE    7   // Enable start bit
+#define FCR31_CAUSE     12  // Cause start bit
+#define FPE_DIV0        3   // Divide by zero bit index
 
 
 /***************************************************************************

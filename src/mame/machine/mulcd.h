@@ -23,7 +23,7 @@ public:
 	u8 control_read() { return m_lcd->control_read(); }
 	void data_write(u8 data) { m_lcd->data_write(data); }
 	void control_write(u8 data) { m_lcd->control_write(data); }
-	
+
 
 protected:
 	virtual void device_start() override;

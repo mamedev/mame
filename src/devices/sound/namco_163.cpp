@@ -70,51 +70,51 @@ WRITE_LINE_MEMBER(namco_163_sound_device::disable_w)
 /********************************************************************************/
 
 /*
-	Register Map (in RAM)
+    Register Map (in RAM)
 
-	40	ffff ffff	Channel 0 Frequency bits 0 - 7
-	41	pppp pppp	Channel 0 Phase bits 0 - 7
-	42	ffff ffff	Channel 0 Frequency bits 8 - 15
-	43	pppp pppp	Channel 0 Phase bits 8 - 15
-	44	---- --ff	Channel 0 Frequency bits 16 - 17
-		llll ll--	Channel 0 Waveform Length (256 - (l * 4)) 4 bit samples
-	45	pppp pppp	Channel 0 Phase bits 16 - 23
-	46	oooo oooo	Channel 0 Waveform Offset at 4 bit samples
-	47	---- cccc	Channel 0 Volume
+    40  ffff ffff   Channel 0 Frequency bits 0 - 7
+    41  pppp pppp   Channel 0 Phase bits 0 - 7
+    42  ffff ffff   Channel 0 Frequency bits 8 - 15
+    43  pppp pppp   Channel 0 Phase bits 8 - 15
+    44  ---- --ff   Channel 0 Frequency bits 16 - 17
+        llll ll--   Channel 0 Waveform Length (256 - (l * 4)) 4 bit samples
+    45  pppp pppp   Channel 0 Phase bits 16 - 23
+    46  oooo oooo   Channel 0 Waveform Offset at 4 bit samples
+    47  ---- cccc   Channel 0 Volume
 
-	48	ffff ffff	Channel 1 Frequency bits 0 - 7
-	49	pppp pppp	Channel 1 Phase bits 0 - 7
-	4a	ffff ffff	Channel 1 Frequency bits 8 - 15
-	4b	pppp pppp	Channel 1 Phase bits 8 - 15
-	4c	---- --ff	Channel 1 Frequency bits 16 - 17
-		llll ll--	Channel 1 Waveform Length (256 - (l * 4)) 4 bit samples
-	4d	pppp pppp	Channel 1 Phase bits 16 - 23
-	4e	oooo oooo	Channel 1 Waveform Offset at 4 bit samples
-	4f	---- cccc	Channel 1 Volume
+    48  ffff ffff   Channel 1 Frequency bits 0 - 7
+    49  pppp pppp   Channel 1 Phase bits 0 - 7
+    4a  ffff ffff   Channel 1 Frequency bits 8 - 15
+    4b  pppp pppp   Channel 1 Phase bits 8 - 15
+    4c  ---- --ff   Channel 1 Frequency bits 16 - 17
+        llll ll--   Channel 1 Waveform Length (256 - (l * 4)) 4 bit samples
+    4d  pppp pppp   Channel 1 Phase bits 16 - 23
+    4e  oooo oooo   Channel 1 Waveform Offset at 4 bit samples
+    4f  ---- cccc   Channel 1 Volume
 
-	.
-	.
-	.
+    .
+    .
+    .
 
-	78	ffff ffff	Channel 7 Frequency bits 0 - 7
-	79	pppp pppp	Channel 7 Phase bits 0 - 7
-	7a	ffff ffff	Channel 7 Frequency bits 8 - 15
-	7b	pppp pppp	Channel 7 Phase bits 8 - 15
-	7c	---- --ff	Channel 7 Frequency bits 16 - 17
-		llll ll--	Channel 7 Waveform Length (256 - (l * 4)) 4 bit samples
-	7d	pppp pppp	Channel 7 Phase bits 16 - 23
-	7e	oooo oooo	Channel 7 Waveform Offset at 4 bit samples
-	7f	---- cccc	Channel 7 Volume
-		-ccc ----	Enable channels
-		-000 ----	Enable channel 7 only
-		-001 ----	Enable channel 7, 6
-		-010 ----	Enable channel 7, 6, 5
+    78  ffff ffff   Channel 7 Frequency bits 0 - 7
+    79  pppp pppp   Channel 7 Phase bits 0 - 7
+    7a  ffff ffff   Channel 7 Frequency bits 8 - 15
+    7b  pppp pppp   Channel 7 Phase bits 8 - 15
+    7c  ---- --ff   Channel 7 Frequency bits 16 - 17
+        llll ll--   Channel 7 Waveform Length (256 - (l * 4)) 4 bit samples
+    7d  pppp pppp   Channel 7 Phase bits 16 - 23
+    7e  oooo oooo   Channel 7 Waveform Offset at 4 bit samples
+    7f  ---- cccc   Channel 7 Volume
+        -ccc ----   Enable channels
+        -000 ----   Enable channel 7 only
+        -001 ----   Enable channel 7, 6
+        -010 ----   Enable channel 7, 6, 5
 
-		.
-		.
-		.
+        .
+        .
+        .
 
-		-111 ----	Enable all channels
+        -111 ----   Enable all channels
 */
 
 void namco_163_sound_device::addr_w(u8 data)

@@ -1977,7 +1977,7 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 					if (IS_SINGLE(op)) { /* DIV.S */
 						if (FTVALW_FR0 == 0 && (COP1_FCR31 & (1 << (FCR31_ENABLE + FPE_DIV0)))) {
 							COP1_FCR31 |= (1 << (FCR31_FLAGS + FPE_DIV0));  // Set flag
-							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));	// Set cause
+							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));  // Set cause
 							generate_exception(EXCEPTION_FPE, 1);
 							//machine().debug_break();
 						}
@@ -1988,7 +1988,7 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 					else {               /* DIV.D */
 						if (FTVALL_FR0 == 0ull && (COP1_FCR31 & (1 << (FCR31_ENABLE + FPE_DIV0)))) {
 							COP1_FCR31 |= (1 << (FCR31_FLAGS + FPE_DIV0));  // Set flag
-							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));	// Set cause
+							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));  // Set cause
 							generate_exception(EXCEPTION_FPE, 1);
 							//machine().debug_break();
 						}

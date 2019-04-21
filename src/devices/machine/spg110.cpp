@@ -57,12 +57,12 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 	io->adc_in<0>().set(FUNC(spg110_device::adc_r<0>));
 	io->adc_in<1>().set(FUNC(spg110_device::adc_r<1>));
 	io->chip_select().set(FUNC(spg110_device::cs_w));
-//	io->pal_read_callback().set(FUNC(spg110_device::get_pal_r));
-//	io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
-//	io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
-//	io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
-//	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
-//	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
+//  io->pal_read_callback().set(FUNC(spg110_device::get_pal_r));
+//  io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
+//  io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
+//  io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
+//  io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
+//  io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
 }
 
 READ16_MEMBER(spg110_device::space_r)

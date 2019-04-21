@@ -36,7 +36,7 @@ public:
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
-	
+
 	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
 	auto chip_select() { return m_chip_sel.bind(); }

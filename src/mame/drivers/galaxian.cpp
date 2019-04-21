@@ -12225,8 +12225,8 @@ MOON WAR II  RA20 5D(--36)  1981   STERN
 NOTE: A PCB with ROMs at 2F & 2H specifically labeled as "RXA22" was dumped and verified to match the moonwara set below,
       it is unknown if the data is different then the ROMs labeled as "RA22" as shown above. However, according to these
       notes in the input code:
-	     Player 1 Dial: P1 dial works normally, P2 dial is reversed, both share same port
-	     Player 2 Dial: doesn't actually work due to bug in game code
+         Player 1 Dial: P1 dial works normally, P2 dial is reversed, both share same port
+         Player 2 Dial: doesn't actually work due to bug in game code
       It would seem to indicate the code is different becuase for moonwar the issue was corrected.
 */
 ROM_START( moonwar )

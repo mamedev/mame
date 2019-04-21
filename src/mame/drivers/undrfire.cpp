@@ -76,7 +76,7 @@
 
     Chase Bombers proto sports lots of gfx bugs;
 
-	Chase Bombers PCB has TC0360PRI but not hooked up
+    Chase Bombers PCB has TC0360PRI but not hooked up
 
     Gun calibration
     ---------------

@@ -10,20 +10,20 @@
         "SunPlus QL8041" ( also known as Sunplus SPG240 & PAC300 )
 
             All GameKeyReady units
-			    Disney Princess (GKR)
-				Wheel of Fortune (GKR)
-				JAKKS WWE (GKR)
-				Fantastic 4 (GKR)
-				Justice League (GKR)
-				Dora the Explorer Nursery Rhyme (GKR)
-				Dora the Explorer Play Park (GKR)
-				Spiderman 5-in-1 (GKR)
-				etc.
+                Disney Princess (GKR)
+                Wheel of Fortune (GKR)
+                JAKKS WWE (GKR)
+                Fantastic 4 (GKR)
+                Justice League (GKR)
+                Dora the Explorer Nursery Rhyme (GKR)
+                Dora the Explorer Play Park (GKR)
+                Spiderman 5-in-1 (GKR)
+                etc.
 
             (other non GKR JAKKS games)
             X-Men (Wolverine pad)
             Avatar: The Last Airbender
-			Superman in Super Villain Showdown
+            Superman in Super Villain Showdown
 
             (other games)
             Mattel Classic Sports
@@ -37,32 +37,32 @@
         "SunPlus QU7074-P69A"
 
             The Batman
-			Star Wars (non-gamekey, which model? falcon? - check)
-			Dream Life
+            Star Wars (non-gamekey, which model? falcon? - check)
+            Dream Life
 
-		"SunPlus QL8167b" (is the scrambling built into the CPU, or external?)
+        "SunPlus QL8167b" (is the scrambling built into the CPU, or external?)
 
-			Lexibook Zeus IG900 20-in-1
+            Lexibook Zeus IG900 20-in-1
 
-		"SunPlus QL8139C"
+        "SunPlus QL8139C"
 
-			Radica Cricket
-			V Smile Baby (Sweden) - see vsmileb.cpp
+            Radica Cricket
+            V Smile Baby (Sweden) - see vsmileb.cpp
 
         ---
 
-		Very likely the same
+        Very likely the same
 
-		"Sunplus QL8167" (these might have ROM scrambling if that is a 8167 feature)
+        "Sunplus QL8167" (these might have ROM scrambling if that is a 8167 feature)
 
-			Disney Princess Magical Adventure
-			Go Diego Go
-			Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
-			Marvel Heroes (Spider-man)
-			Spiderman 3 (Movie - black)
+            Disney Princess Magical Adventure
+            Go Diego Go
+            Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
+            Marvel Heroes (Spider-man)
+            Spiderman 3 (Movie - black)
 
 
-		---
+        ---
 
         It is unknown if the following are close to this architecture or not (no dumps yet)
 
@@ -79,10 +79,10 @@
         These are definitely different but still unSP based
 
         "SunPlus PA7801" ( known as Sunplus SPG110? )
-		- see spg110.cpp instead
+        - see spg110.cpp instead
 
         "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob)
-		- see sunplus_gcm394.cpp instead
+        - see sunplus_gcm394.cpp instead
 
     Status:
 

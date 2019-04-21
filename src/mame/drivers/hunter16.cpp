@@ -30,7 +30,7 @@ public:
 
 	void hunter16(machine_config &config);
 	void hunter1680(machine_config &config);
-		
+
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -38,12 +38,12 @@ protected:
 	void io_16_map(address_map &map);
 	void io_1680_map(address_map &map);
 
-	required_device<cpu_device>	m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<hd61830_device> m_lcdc;
 	optional_device<mc6845_device> m_cga;
-		
+
 private:
 	void palette_init_hunter16(palette_device &palette);
 };
@@ -59,7 +59,7 @@ void hunter16_state::io_16_map(address_map &map)
 {
 	map(0x430, 0x430).w(m_lcdc, FUNC(hd61830_device::data_w));
 	map(0x431, 0x431).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
-//	map(0x43e, 0x43e).r(m_lcdc, FUNC(hd61830_device::data_r));
+//  map(0x43e, 0x43e).r(m_lcdc, FUNC(hd61830_device::data_r));
 }
 
 void hunter16_state::io_1680_map(address_map &map)
@@ -103,7 +103,7 @@ void hunter16_state::hunter1680(machine_config &config)
 	MC6845(config, m_cga, 16_MHz_XTAL / 2);   // Chips 82C426 CGA, exact clock unknown
 	m_cga->set_screen("screen");
 	m_cga->set_show_border_area(false);
-	
+
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 400);

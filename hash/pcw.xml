@@ -341,7 +341,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_3"><!-- 2 Locoscript files only: read.me and contents.doc --> 
+		<part name="flop3" interface="floppy_3"><!-- 2 Locoscript files only: read.me and contents.doc -->
 			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
 				<rom name="loco3upgradec.dsk" size="195584" crc="acbb82a2" sha1="09f1e2f9afb202bc929db263dcff80287236d680" offset="0" status="baddump" />
 			</dataarea>

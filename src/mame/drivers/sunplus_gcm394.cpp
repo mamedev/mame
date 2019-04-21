@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
+    SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
 
-	Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
+    Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
-		Smart Fit Park
-		SpongeBob SquarePants Bikini Bottom 500
-		Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
-		(Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
+        Smart Fit Park
+        SpongeBob SquarePants Bikini Bottom 500
+        Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
+        (Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
 
-	as these use newer opcodes in the FExx range they probably need a derived unSP type too
+    as these use newer opcodes in the FExx range they probably need a derived unSP type too
 */
 
 #include "emu.h"
@@ -150,9 +150,9 @@ Length: 27.78 mm
 Voltage: 3V
 Pinout:
 
-		  A25  A24
-			|  |
-	  +--------------------------+
+          A25  A24
+            |  |
+      +--------------------------+
 A21 --|==   #  # `.__.'        ==|-- A20
 A18 --|==                      ==|-- A19
 A17 --|==                      ==|-- A8
@@ -175,7 +175,7 @@ GND --|==  |                |  ==|-- A22
 Q10 --|==                      ==|-- Q12
  Q3 --|==                      ==|-- Q4
 Q11 --|==                      ==|-- VCC
-	  +--------------------------+
+      +--------------------------+
 
 
 The only interesting string in this ROM is SPF2ALP,

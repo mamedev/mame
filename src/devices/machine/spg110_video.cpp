@@ -114,10 +114,10 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		return;
 	}
 
-//	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
-//	{
-//		return;
-//	}
+//  if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+//  {
+//      return;
+//  }
 
 	uint8_t bpp = attr & 0x03;
 
@@ -197,11 +197,11 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	const uint32_t h = 8 << ((attr2 & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	const uint32_t w = 8 << ((attr2 & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-//	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
-//	{
-//		x = (160 + x) - w / 2;
-//		y = (120 - y) - (h / 2) + 8;
-//	}
+//  if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
+//  {
+//      x = (160 + x) - w / 2;
+//      y = (120 - y) - (h / 2) + 8;
+//  }
 
 	y = 0x1ff - y - 128 + 1;
 	x = x - 128 + 32;
@@ -242,7 +242,7 @@ void spg110_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanl
 {
 	//if (!(m_video_regs[0x42] & SPRITE_ENABLE_MASK))
 	//{
-	//	return;
+	//  return;
 	//}
 
 	for (uint32_t n = 0; n < 256; n++)

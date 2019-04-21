@@ -164,9 +164,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- the Spanish carts do not have a part number on the cartridge, PCB or box -->
-	
+
 	<!--
 	1.  "Cuéntame Al Oído"               La Oreja De Van Gogh
 	2.  "La Última Noche"                Luis Miguel
@@ -188,7 +188,7 @@
 				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!--
 	1.  "Héroe"               Enrique Iglesias
@@ -211,6 +211,6 @@
 				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

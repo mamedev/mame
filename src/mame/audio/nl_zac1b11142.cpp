@@ -279,7 +279,7 @@ NETLIST_END()
 
 NETLIST_START(zac1b11142_schematics_speech)
 
-	CS(I_SP, 0)	// Fed through stream ...
+	CS(I_SP, 0) // Fed through stream ...
 
 	LM3900(U5D4)
 	CAP(C31, CAP_U(0.22))
@@ -314,7 +314,7 @@ NETLIST_END()
 
 NETLIST_START(zac1b11142_schematics_dac)
 
-	CS(I_DAC, 0)	// Fed through stream ...
+	CS(I_DAC, 0)    // Fed through stream ...
 
 	QBJT_EB(T4, "2N4401")
 

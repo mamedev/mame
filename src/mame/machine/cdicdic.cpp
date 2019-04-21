@@ -28,16 +28,16 @@ TODO:
 #include "romload.h"
 #include "sound/cdda.h"
 
-#define LOG_DECODES		(1 << 0)
-#define LOG_SAMPLES		(1 << 1)
-#define LOG_COMMANDS	(1 << 2)
-#define LOG_SECTORS		(1 << 3)
-#define LOG_IRQS		(1 << 4)
-#define LOG_READS		(1 << 5)
-#define LOG_WRITES		(1 << 6)
-#define LOG_UNKNOWNS	(1 << 7)
+#define LOG_DECODES     (1 << 0)
+#define LOG_SAMPLES     (1 << 1)
+#define LOG_COMMANDS    (1 << 2)
+#define LOG_SECTORS     (1 << 3)
+#define LOG_IRQS        (1 << 4)
+#define LOG_READS       (1 << 5)
+#define LOG_WRITES      (1 << 6)
+#define LOG_UNKNOWNS    (1 << 7)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 // device type definition

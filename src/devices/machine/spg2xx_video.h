@@ -27,7 +27,7 @@ public:
 
 	auto sprlimit_read_callback() { return m_sprlimit_read_cb.bind(); };
 	auto rowscrolloffset_read_callback() { return m_rowscrolloffset_read_cb.bind(); };
-	
+
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 protected:

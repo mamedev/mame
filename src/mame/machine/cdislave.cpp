@@ -24,13 +24,13 @@ TODO:
 #include "emu.h"
 #include "machine/cdislave.h"
 
-#define LOG_IRQS		(1 << 0)
-#define LOG_COMMANDS	(1 << 1)
-#define LOG_READS		(1 << 2)
-#define LOG_WRITES		(1 << 3)
-#define LOG_UNKNOWNS	(1 << 4)
+#define LOG_IRQS        (1 << 0)
+#define LOG_COMMANDS    (1 << 1)
+#define LOG_READS       (1 << 2)
+#define LOG_WRITES      (1 << 3)
+#define LOG_UNKNOWNS    (1 << 4)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 // device type definition

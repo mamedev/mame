@@ -274,7 +274,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), tc0480scp_charlayout, (u8 *)&m_ram[0x7000], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));	//e000
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), tc0480scp_charlayout, (u8 *)&m_ram[0x7000], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));  //e000
 	m_gfxdecode->gfx(m_gfxnum)->set_colorbase(m_col_base);
 
 	save_item(NAME(m_ram));

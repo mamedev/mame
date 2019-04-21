@@ -651,11 +651,11 @@ ROM_START( eurogael )
 	ROM_LOAD( "r2_fu4a01.ic17",      0x060000, 0x10000, CRC(1bcdd99d) SHA1(e37a8308eff79b04ce3da75fec2fffe4021c70d3) )  // fg layer
 	ROM_LOAD( "r2_fu4a02.ic16",      0x040000, 0x10000, CRC(e625de0c) SHA1(ca5a00ea27a5107d2957a1637b260d5aa1ff5563) )
 	ROM_LOAD( "r2_fu4a03.ic15",      0x020000, 0x10000, CRC(995df90d) SHA1(121874c807001bf65a9cec90dd30212f1889a398) )
-	ROM_LOAD( "r2_fu4a04.ic14",      0x000000, 0x10000, CRC(44031f34) SHA1(0b417c6cc1ed029394bcdce80e81262d776105b7) )		
+	ROM_LOAD( "r2_fu4a04.ic14",      0x000000, 0x10000, CRC(44031f34) SHA1(0b417c6cc1ed029394bcdce80e81262d776105b7) )
 	ROM_LOAD( "r3_fu4b01.ic17",      0x070000, 0x10000, CRC(adc7feda) SHA1(ff82e973599f13c76ecaf3c027a2967468cd9e72) )  // bg layer
 	ROM_LOAD( "r3_fu4b02.ic16",      0x050000, 0x10000, CRC(1e5c0fda) SHA1(74163098810ff079467bad77796898426acbfac5) )
 	ROM_LOAD( "r3_fu4b03.ic15",      0x030000, 0x10000, CRC(cc9dab0b) SHA1(7e5735e57b45de1b344455fa5a047ae17933de27) )
-	ROM_LOAD( "r3_fu4b04.ic14",      0x010000, 0x10000, CRC(d54704d2) SHA1(7d4ec0120c3516a88abbe687e8916b44bffb7bcd) )		
+	ROM_LOAD( "r3_fu4b04.ic14",      0x010000, 0x10000, CRC(d54704d2) SHA1(7d4ec0120c3516a88abbe687e8916b44bffb7bcd) )
 
 	ROM_REGION( 0x080000, "spritegfx", ROMREGION_INVERT )
 	ROM_LOAD( "r4_fu504.bin",  0x000000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
@@ -695,10 +695,10 @@ void wc90b_state::init_wc90b()
 		for (int i = 0; i < len; i++)
 		{
 			int j = bitswap<19>(i, 18, 17, // above bitplane separation limit, no swap, keep value
-				                   16, 15, 14, 13, // above tile bank limit, no swap, keep value
-				                   10, 9, 8, 7, 6, 5, 4, 3,
-				                   12, 11,
-				                   2, 1, 0); // 8x8x1 tile data, no swap, keep value
+								   16, 15, 14, 13, // above tile bank limit, no swap, keep value
+								   10, 9, 8, 7, 6, 5, 4, 3,
+								   12, 11,
+								   2, 1, 0); // 8x8x1 tile data, no swap, keep value
 			buffer[j] = src[i];
 		}
 
