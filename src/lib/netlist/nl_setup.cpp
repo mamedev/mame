@@ -840,7 +840,7 @@ const log_type &setup_t::log() const
 // Models
 // ----------------------------------------------------------------------------------------
 
-void models_t::register_model(pstring model_in)
+void models_t::register_model(const pstring &model_in)
 {
 	auto pos = model_in.find(" ");
 	if (pos == pstring::npos)
@@ -906,7 +906,7 @@ pstring models_t::model_string(model_map_t &map)
 	return ret + ")";
 }
 
-pstring models_t::value_str(pstring model, pstring entity)
+pstring models_t::value_str(const pstring &model, const pstring &entity)
 {
 	model_map_t &map = m_cache[model];
 
@@ -925,7 +925,7 @@ pstring models_t::value_str(pstring model, pstring entity)
 	return ret;
 }
 
-nl_double models_t::value(pstring model, pstring entity)
+nl_double models_t::value(const pstring &model, const pstring &entity)
 {
 	model_map_t &map = m_cache[model];
 

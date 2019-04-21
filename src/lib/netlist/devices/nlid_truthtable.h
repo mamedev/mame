@@ -10,9 +10,9 @@
 #ifndef NLID_TRUTHTABLE_H_
 #define NLID_TRUTHTABLE_H_
 
+#include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
-#include "netlist/devices/nlid_system.h"
 #include "plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \

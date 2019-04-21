@@ -649,6 +649,7 @@ void detail::net_t::rebuild_list()
 			term->set_copied_input(m_cur_Q);
 		}
 }
+
 template <typename T>
 void detail::net_t::process(const T mask, netlist_sig_t sig)
 {

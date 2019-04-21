@@ -210,14 +210,14 @@ namespace netlist
 	class models_t
 	{
 	public:
-		void register_model(pstring model_in);
+		void register_model(const pstring &model_in);
 		/* model / family related */
 
-		pstring value_str(pstring model, pstring entity);
+		pstring value_str(const pstring &model, const pstring &entity);
 
-		nl_double value(pstring model, pstring entity);
+		nl_double value(const pstring &model, const pstring &entity);
 
-		pstring type(pstring model) { return value_str(model, "COREMODEL"); }
+		pstring type(const pstring &model) { return value_str(model, "COREMODEL"); }
 
 	private:
 		using model_map_t = std::unordered_map<pstring, pstring>;

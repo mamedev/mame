@@ -431,7 +431,6 @@ void tool_app_t::run()
 void tool_app_t::validate()
 {
 	std::vector<input_t> inps;
-	netlist::netlist_time ttr;
 	netlist_tool_t nt(*this, "netlist");
 
 	if (!opt_verb())

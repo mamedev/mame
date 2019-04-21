@@ -52,6 +52,12 @@ namespace plib {
 				//::operator delete(m_data_allocated);
 				delete [] m_data_allocated;
 			}
+
+			block(const block &) = delete;
+			block(block &&) = delete;
+			block &operator =(const block &) = delete;
+			block &operator =(block &&) = delete;
+
 			std::size_t m_num_alloc;
 			std::size_t m_free;
 			std::size_t m_cur;
