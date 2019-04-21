@@ -26,6 +26,7 @@
   * Jack Potten's Poker (set 8, Australian),          198?, Bootleg.
   * Jack Potten's Poker (set 9, 'just 4 fun'),        198?, Bootleg.
   * Jack Potten's Poker (set 10, ICP-1 PCB),          198?, Bootleg.
+  * Jack Potten's Poker (set 11, German, W.W.),       198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
@@ -10333,10 +10334,6 @@ ROM_START( caspokera )
 	ROM_LOAD( "054.bin",    0x1000, 0x0800, BAD_DUMP CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )  // text chars
 	ROM_IGNORE(                     0x0800)  // identical halves, discarding the 2nd half
 
-	ROM_REGION( 0x1800, "gfx_alt", 0 )  // char rom from the pcb. seems that is not from this game.
-	ROM_FILL(                 0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
-	ROM_LOAD( "pok4_ww.bin",  0x1000, 0x0800, CRC(5cafb3a9) SHA1(efec24d4dd1f83f40a1b7ec66bc6bf36c4b1e541) )  // text chars
-
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "b.poker_051_16.bin",  0x0000, 0x0800, CRC(598c9a21) SHA1(901c15529e0a72f750a0e64e220d27be45a2a628) )  // cards deck gfx, bitplane 1
 	ROM_CONTINUE(                    0x0000, 0x0800)  // Discarding 1nd half (empty)
@@ -10383,6 +10380,31 @@ ROM_START( bonuspkr )
 
 	ROM_REGION( 0x0100, "proms2", 0 )
 	ROM_LOAD( "74s387.a",  0x0000, 0x0100, CRC(6cc491b9) SHA1(0a97518d11bfc9eb2b8a70ed6c75882209e1abd7) )  // decode?
+ROM_END
+
+
+/*
+  Unknown Potten's Poker.
+  German bootleg (W.W.).
+  Set 11.
+*/
+ROM_START( potnpkrj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pok5.a11",  0x5000, 0x1000, CRC(60140393) SHA1(f24a4435fe44d14053e28c7cb144ae00f66d74cb) )
+	ROM_LOAD( "pok6.a13",  0x6000, 0x1000, CRC(58161c72) SHA1(c5607a843ca1b4bde9999f265acae835ab9832fc) )
+	ROM_LOAD( "pok7.a14",  0x7000, 0x1000, CRC(38d92f95) SHA1(9523ef5fae57ad7cdd3fe52667a9670fdca8aa75) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "pok4_ww.a7",  0x1000, 0x0800, CRC(5cafb3a9) SHA1(efec24d4dd1f83f40a1b7ec66bc6bf36c4b1e541) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "7.a2",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "8.a4",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "9.a5",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.d7",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
 ROM_END
 
 
@@ -11573,6 +11595,7 @@ GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 8, Australian)",    0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrh,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 9, 'just 4 fun')",  0,                layout_goldnpkr )
 GAMEL( 198?, potnpkri,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 10, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
+GAME(  198?, potnpkrj,  pottnpkr, goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 11, German, W.W.)", MACHINE_NOT_WORKING )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
