@@ -470,7 +470,6 @@ void cgc7900_state::cgc7900(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cgc7900_state::cgc7900_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cgc7900_state::cpu_space_map);
 
-
 	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
 	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);
 	kbmcu.set_disable();

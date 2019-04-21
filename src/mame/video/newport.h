@@ -11,7 +11,7 @@
 
 #include "machine/hpc3.h"
 
-#define ENABLE_NEWVIEW_LOG      (1)
+#define ENABLE_NEWVIEW_LOG      (0)
 
 class newport_video_device : public device_t, public device_palette_interface
 {
