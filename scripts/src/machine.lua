@@ -1222,7 +1222,7 @@ end
 --@src/devices/machine/i82355.h,MACHINES["I82355"] = true
 ---------------------------------------------------
 
-if (MACHINES["I8214"]~=null) then
+if (MACHINES["I82355"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i82355.cpp",
 		MAME_DIR .. "src/devices/machine/i82355.h",
