@@ -1342,6 +1342,8 @@ namespace netlist
 			return dynamic_cast<C *>(p) != nullptr;
 		}
 
+		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
+
 		template<class C>
 		C *get_single_device(const pstring &classname) const
 		{
@@ -1374,8 +1376,6 @@ namespace netlist
 			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + pstring(".") + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
-		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
-
 		detail::net_t *find_net(const pstring &name) const;
 		std::size_t find_net_id(const detail::net_t *net) const;
 
@@ -1393,6 +1393,14 @@ namespace netlist
 					tmp.push_back(dev);
 			}
 			return tmp;
+		}
+
+		core_device_t *find_device(const pstring &name)
+		{
+			for (auto & d : m_devices)
+				if (d.first == name)
+					return d.second.get();
+			return nullptr;
 		}
 
 		template <typename T>
@@ -1601,7 +1609,7 @@ namespace netlist
 		if (f != nullptr)
 			f->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		else
-			device.state().log().warning("Rom {1} not found", str());
+			device.state().log().warning(MW_ROM_NOT_FOUND(str()));
 	}
 
 	inline void logic_input_t::inactivate() NL_NOEXCEPT

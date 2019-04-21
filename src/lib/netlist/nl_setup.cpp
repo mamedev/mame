@@ -733,7 +733,6 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	}
 	else
 		ret = false;
-		//netlist().error("Connecting {1} to {2} not supported!\n", t1.name(), t2.name());
 	return ret;
 }
 
@@ -1097,12 +1096,15 @@ void setup_t::prepare_to_run()
 		auto f = m_params.find(p.first);
 		if (f == m_params.end())
 		{
-			if (plib::endsWith(p.first, pstring(".HINT_NO_DEACTIVATE")))
+			if (plib::endsWith(p.first, sHINT_NO_DEACTIVATE))
 			{
 				// FIXME: get device name, check for device
+				auto *dev = m_nlstate.find_device(plib::replace_all(p.first, sHINT_NO_DEACTIVATE, ""));
+				if (dev == nullptr)
+					log().warning(MW_DEVICE_NOT_FOUND_FOR_HINT(p.first));
 			}
 			else
-				log().warning("Unknown parameter: {}", p.first);
+				log().warning(MW_UNKNOWN_PARAMETER(p.first));
 		}
 	}
 
@@ -1112,7 +1114,7 @@ void setup_t::prepare_to_run()
 	{
 		if (use_deactivate)
 		{
-			auto p = m_param_values.find(d.second->name() + ".HINT_NO_DEACTIVATE");
+			auto p = m_param_values.find(d.second->name() + sHINT_NO_DEACTIVATE);
 			if (p != m_param_values.end())
 			{
 				//FIXME: check for errors ...
@@ -1134,11 +1136,19 @@ void setup_t::prepare_to_run()
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{
-			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
-				t->name(), t->m_N.net().name(), t->m_P.net().name()));
+			// We are not interested in power terminals - This is intended behaviour
+			if (!plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
+				log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
+					t->name(), t->m_N.net().name(), t->m_P.net().name()));
 			t->m_N.net().remove_terminal(t->m_N);
 			t->m_P.net().remove_terminal(t->m_P);
 			m_nlstate.remove_dev(t);
+		}
+		else
+		{
+			if (plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
+				log().info(MI_POWER_TERMINALS_1_CONNECTED_ANALOG_2_3(
+					t->name(), t->m_N.net().name(), t->m_P.net().name()));
 		}
 	}
 

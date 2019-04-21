@@ -146,6 +146,8 @@ protected:
 
 	netlist::netlist_time m_div;
 
+	plib::unique_ptr<netlist::netlist_t> base_validity_check(validity_checker &valid) const;
+
 private:
 	void save_state();
 
@@ -267,6 +269,7 @@ public:
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 protected:
 	// netlist_mame_device
@@ -302,6 +305,8 @@ public:
 
 	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) { }
 	virtual void pre_parse_action(netlist::netlist_state_t &nlstate) { }
+	virtual void validity_helper(validity_checker &valid,
+		netlist::netlist_state_t &nlstate) const { }
 
 	inline netlist_mame_device &nl_owner() const { return *m_owner; }
 
@@ -352,6 +357,8 @@ public:
 	inline DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
 	inline DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
 
+	virtual void validity_helper(validity_checker &valid,
+		netlist::netlist_state_t &nlstate) const override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -454,6 +461,8 @@ public:
 	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
 	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
 
+	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -493,6 +502,8 @@ public:
 	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
 	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
 
+	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -518,6 +529,8 @@ public:
 	uint8_t* ptr() const { return m_data; }
 
 	void set_params(const char *param_name);
+
+	virtual void validity_helper(validity_checker &valid, netlist::netlist_state_t &nlstate) const override;
 
 protected:
 	// device-level overrides

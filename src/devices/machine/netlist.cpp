@@ -21,6 +21,7 @@
 
 #include "debugger.h"
 #include "romload.h"
+#include "emuopts.h"
 
 #include <cmath>
 #include <memory>
@@ -680,9 +681,18 @@ void netlist_mame_analog_input_device::device_start()
 		// disable automatic scaling for ioports
 		m_auto_port = false;
 	}
-
 }
 
+void netlist_mame_analog_input_device::validity_helper(validity_checker &valid,
+	netlist::netlist_state_t &nlstate) const
+{
+	netlist::param_t *p = nlstate.setup().find_param(pstring(m_param_name));
+	auto *param = dynamic_cast<netlist::param_double_t *>(p);
+	if (param == nullptr)
+	{
+		osd_printf_warning("device %s wrong parameter type for %s\n", basetag(), m_param_name);
+	}
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_analog_output_device
@@ -790,6 +800,17 @@ void netlist_mame_int_input_device::device_start()
 	}
 }
 
+void netlist_mame_int_input_device::validity_helper(validity_checker &valid,
+	netlist::netlist_state_t &nlstate) const
+{
+	netlist::param_t *p = nlstate.setup().find_param(pstring(m_param_name));
+	auto *param = dynamic_cast<netlist::param_int_t *>(p);
+	if (param == nullptr)
+	{
+		osd_printf_warning("device %s wrong parameter type for %s\n", basetag(), m_param_name);
+	}
+}
+
 // ----------------------------------------------------------------------------------------
 // netlist_mame_logic_input_device
 // ----------------------------------------------------------------------------------------
@@ -818,6 +839,17 @@ void netlist_mame_logic_input_device::device_start()
 	if (m_param == nullptr)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name);
+	}
+}
+
+void netlist_mame_logic_input_device::validity_helper(validity_checker &valid,
+	netlist::netlist_state_t &nlstate) const
+{
+	netlist::param_t *p = nlstate.setup().find_param(pstring(m_param_name));
+	auto *param = dynamic_cast<netlist::param_logic_t *>(p);
+	if (param == nullptr)
+	{
+		osd_printf_warning("device %s wrong parameter type for %s\n", basetag(), m_param_name);
 	}
 }
 
@@ -861,6 +893,17 @@ void netlist_mame_ram_pointer_device::device_start()
 	}
 
 	m_data = (*m_param)();
+}
+
+void netlist_mame_ram_pointer_device::validity_helper(validity_checker &valid,
+	netlist::netlist_state_t &nlstate) const
+{
+	netlist::param_t *p = nlstate.setup().find_param(pstring(m_param_name));
+	auto *param = dynamic_cast<netlist::param_ptr_t *>(p);
+	if (param == nullptr)
+	{
+		osd_printf_warning("device %s wrong parameter type for %s\n", basetag(), m_param_name);
+	}
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1005,22 +1048,27 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 #endif
 }
 
-
-
-void netlist_mame_device::device_validity_check(validity_checker &valid) const
+plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
 {
-#if 1
-
-	//rom_exists(mconfig().root_device());
-	LOGDEVCALLS("device_validity_check %s\n", this->mconfig().gamedrv().name);
-
 	try
 	{
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
-		netlist::netlist_t lnetlist("netlist", plib::make_unique<netlist_validate_callbacks_t>());
+		auto lnetlist = plib::make_unique<netlist::netlist_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
-		lnetlist.nlstate().setup().enable_validation();
-		common_dev_start(&lnetlist);
+		lnetlist->nlstate().setup().enable_validation();
+		common_dev_start(lnetlist.get());
+
+		for (device_t &d : subdevices())
+		{
+			netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(&d);
+			if( sdev != nullptr )
+			{
+				LOGDEVCALLS("Validity check on subdevice %s/%s\n", d.name(), d.shortname());
+				sdev->validity_helper(valid, lnetlist->nlstate());
+			}
+		}
+
+		return lnetlist;
 	}
 	catch (memregion_not_set &err)
 	{
@@ -1034,7 +1082,14 @@ void netlist_mame_device::device_validity_check(validity_checker &valid) const
 	{
 		osd_printf_error("%s\n", err.what());
 	}
-#endif
+	return plib::unique_ptr<netlist::netlist_t>(nullptr);
+}
+
+void netlist_mame_device::device_validity_check(validity_checker &valid) const
+{
+	base_validity_check(valid);
+	//rom_exists(mconfig().root_device());
+	LOGDEVCALLS("device_validity_check %s\n", this->mconfig().gamedrv().name);
 }
 
 
@@ -1043,6 +1098,11 @@ void netlist_mame_device::device_start()
 	LOGDEVCALLS("device_start entry\n");
 
 	m_netlist = netlist::pool().make_poolptr<netlist_mame_t>(*this, "netlist");
+	if (!machine().options().verbose())
+	{
+		m_netlist->nlstate().log().verbose.set_enabled(false);
+		m_netlist->nlstate().log().debug.set_enabled(false);
+	}
 
 	common_dev_start(m_netlist.get());
 
@@ -1271,6 +1331,33 @@ netlist_mame_sound_device::netlist_mame_sound_device(const machine_config &mconf
 {
 }
 
+void netlist_mame_sound_device::device_validity_check(validity_checker &valid) const
+{
+	LOGDEVCALLS("sound device_validity check\n");
+	auto lnetlist = base_validity_check(valid);
+	if (lnetlist)
+	{
+		/*Ok - do some more checks */
+		std::vector<nld_sound_out *> outdevs = lnetlist->nlstate().get_device_list<nld_sound_out>();
+		if (outdevs.size() == 0)
+			osd_printf_error("No output devices\n");
+		else
+		{
+			for (auto &outdev : outdevs)
+			{
+				int chan = outdev->m_channel();
+				if (chan < 0 || chan >= outdevs.size())
+					osd_printf_error("illegal channel number %d\n", chan);
+			}
+		}
+		std::vector<nld_sound_in *> indevs = lnetlist->nlstate().get_device_list<nld_sound_in>();
+		if (indevs.size() > 1)
+			osd_printf_error("A maximum of one input device is allowed but found %d!\n", (int)indevs.size());
+	}
+
+}
+
+
 void netlist_mame_sound_device::device_start()
 {
 	netlist_mame_device::device_start();
@@ -1326,7 +1413,6 @@ void netlist_mame_sound_device::nl_register_devices(netlist::setup_t &lsetup) co
 	lsetup.factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN");
 	lsetup.factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-");
 }
-
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {

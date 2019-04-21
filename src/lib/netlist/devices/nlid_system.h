@@ -436,7 +436,7 @@ namespace devices
 			}
 			else
 			{
-				owner.create_and_register_subdevice("_RVG", m_RVG);
+				owner.create_and_register_subdevice(sPowerDevRes, m_RVG);
 				owner.register_subalias(sVCC, "_RVG.1");
 				owner.register_subalias(sGND, "_RVG.2");
 			}

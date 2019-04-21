@@ -592,7 +592,6 @@ namespace devices
 			}
 			if (new_solver_timestep < m_params.m_min_timestep)
 			{
-				//log().warning("Dynamic timestep below min timestep. Consider decreasing MIN_TIMESTEP: {1} us", new_solver_timestep*1.0e6);
 				new_solver_timestep = m_params.m_min_timestep;
 			}
 		}

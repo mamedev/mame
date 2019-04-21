@@ -281,7 +281,7 @@ namespace analog
 
 			m_vto = m_model.m_VTO;
 			if(m_vto != 0.0)
-				log().info("Threshold voltage not specified for {1}", m_model.name());
+				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
 
 			/* FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
 			 * specify VTO so skip this here.
