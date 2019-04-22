@@ -270,9 +270,9 @@ void sam6883_device::update_memory(void)
 			{
 				// full 64k RAM
 				m_space_0000.point(m_banks[0], 0x0000, m_banks[0].m_memory_size);
-				m_space_8000.point(m_banks[0], 0x8000);
-				m_space_A000.point(m_banks[0], 0xA000);
-				m_space_C000.point(m_banks[0], 0xC000);
+				m_space_8000.point(m_banks[0], 0x8000 & (m_banks[0].m_memory_size - 1));
+				m_space_A000.point(m_banks[0], 0xA000 & (m_banks[0].m_memory_size - 1));
+				m_space_C000.point(m_banks[0], 0xC000 & (m_banks[0].m_memory_size - 1));
 				m_counter_mask = 0xFFFF;
 				setup_rom = false;
 			}
