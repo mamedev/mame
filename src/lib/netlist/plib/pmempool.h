@@ -168,7 +168,6 @@ namespace plib {
 			{
 				b->m_num_alloc--;
 				//printf("Freeing in block %p %lu\n", b, b->m_num_alloc);
-				sinfo().erase(it);
 				if (b->m_num_alloc == 0)
 				{
 					mempool *mp = b->m_mempool;
@@ -179,6 +178,7 @@ namespace plib {
 					mp->m_blocks.erase(itb);
 					plib::pdelete(b);
 				}
+				sinfo().erase(it);
 			}
 		}
 
@@ -189,7 +189,16 @@ namespace plib {
 		owned_pool_ptr<T> make_poolptr(Args&&... args)
 		{
 			auto *mem = this->allocate(alignof(T), sizeof(T));
-			return owned_pool_ptr<T>(new (mem) T(std::forward<Args>(args)...), true, arena_deleter<mempool, T>(this));
+			try
+			{
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return owned_pool_ptr<T>(mema, true, arena_deleter<mempool, T>(this));
+			}
+			catch (std::exception &e)
+			{
+				this->deallocate(mem);
+				throw e;
+			}
 		}
 
 	};
