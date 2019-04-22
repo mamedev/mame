@@ -125,6 +125,8 @@ public:
 
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
+	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED; }
+
 private:
 	static const u8 sm530_mnemonic[0x100];
 };
