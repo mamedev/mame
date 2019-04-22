@@ -955,7 +955,11 @@ nl_double models_t::value(const pstring &model, const pstring &entity)
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
 	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_double>(tmp), factor);
-	return plib::pstonum<nl_double>(tmp) * factor;
+	bool err(false);
+	nl_double val = plib::pstonum_ne<nl_double>(tmp, err);
+	if (err)
+		throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
+	return val * factor;
 }
 
 class logic_family_std_proxy_t : public logic_family_desc_t
@@ -1118,8 +1122,9 @@ void setup_t::prepare_to_run()
 			if (p != m_param_values.end())
 			{
 				//FIXME: check for errors ...
-				auto v = plib::pstonum<double>(p->second);
-				if (std::abs(v - std::floor(v)) > 1e-6 )
+				bool err(false);
+				auto v = plib::pstonum_ne<double>(p->second, err);
+				if (err || std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
 				d.second->set_hint_deactivate(v == 0.0);
 			}

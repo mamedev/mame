@@ -9,7 +9,7 @@
 #define PUTIL_H_
 
 #include "pstring.h"
-
+#include "pexception.h"
 #include <algorithm>
 #include <initializer_list>
 #include <vector>
@@ -124,6 +124,80 @@ namespace plib
 			const std::string &token,
 			const std::size_t maxsplit);
 
+	// ----------------------------------------------------------------------------------------
+	// number conversions
+	// ----------------------------------------------------------------------------------------
+
+	template <typename T, typename E = void>
+	struct pstonum_helper;
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value
+		&& std::is_signed<T>::value>::type>
+	{
+		template <typename S>
+		long long operator()(const S &arg, std::size_t *idx)
+		{
+			return std::stoll(arg, idx);
+		}
+	};
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value
+		&& !std::is_signed<T>::value>::type>
+	{
+		template <typename S>
+		unsigned long long operator()(const S &arg, std::size_t *idx)
+		{
+			return std::stoull(arg, idx);
+		}
+	};
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
+	{
+		template <typename S>
+		long double operator()(const S &arg, std::size_t *idx)
+		{
+			return std::stold(arg, idx);
+		}
+	};
+
+	template<typename T, typename S>
+	T pstonum(const S &arg)
+	{
+		decltype(arg.c_str()) cstr = arg.c_str();
+		std::size_t idx(0);
+		auto ret = pstonum_helper<T>()(cstr, &idx);
+		using ret_type = decltype(ret);
+		if (ret >= static_cast<ret_type>(std::numeric_limits<T>::lowest())
+			&& ret <= static_cast<ret_type>(std::numeric_limits<T>::max()))
+			//&& (ret == T(0) || std::abs(ret) >= std::numeric_limits<T>::min() ))
+		{
+			if (cstr[idx] != 0)
+				throw pexception(pstring("Continuation after numeric value ends: ") + cstr);
+		}
+		else
+		{
+			throw pexception(pstring("Out of range: ") + cstr);
+		}
+		return static_cast<T>(ret);
+	}
+
+	template<typename R, typename T>
+	R pstonum_ne(const T &str, bool &err) noexcept
+	{
+		try
+		{
+			err = false;
+			return pstonum<R>(str);
+		}
+		catch (...)
+		{
+			err = true;
+			return R(0);
+		}
+	}
 
 	//============================================================
 	//  penum - strongly typed enumeration
