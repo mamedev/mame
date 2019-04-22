@@ -1302,6 +1302,7 @@ namespace netlist
 			public plib::state_manager_t::callback_t
 	{
 	public:
+		using base_queue = timed_queue<pqentry_t<net_t *, netlist_time>, false, true>;
 		using entry_t = pqentry_t<net_t *, netlist_time>;
 		explicit queue_t(netlist_state_t &nl);
 		virtual ~queue_t() noexcept = default;
@@ -1501,21 +1502,23 @@ namespace netlist
 #if 0
 		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
 		detail::queue_t &queue() NL_NOEXCEPT { return m_queue; }
-#else
+#endif
+
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
-			if (!m_stats)
-				m_queue.push_nostats(std::move(e));
-			else
-				m_queue.push(std::move(e));
+			switch (m_stats)
+			{
+				case false: m_queue.push_nostats(std::move(e)); break;
+				case true:  m_queue.push(std::move(e)); break;
+			}
 		}
+
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
 			m_queue.remove(elem);
 		}
 
-#endif
 		/* Control functions */
 
 		void stop();

@@ -13,7 +13,7 @@
  * RDTSCP.
  */
 #ifndef PHAS_RDTSCP
-#define PHAS_RDTSCP (1)
+#define PHAS_RDTSCP (0)
 #endif
 
 /*
