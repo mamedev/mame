@@ -197,7 +197,7 @@ namespace plib {
 			catch (std::exception &e)
 			{
 				this->deallocate(mem);
-				throw e;
+				throw;
 			}
 		}
 

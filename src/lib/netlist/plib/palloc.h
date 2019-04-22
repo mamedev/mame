@@ -320,7 +320,7 @@ namespace plib {
 			catch (std::exception &e)
 			{
 				deallocate(mem);
-				throw e;
+				throw;
 			}
 		}
 

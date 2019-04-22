@@ -166,7 +166,7 @@ namespace plib
 				//ss.imbue(std::locale("C"));
 				ss.imbue(std::locale::classic());
 				ss << arg;
-				long double x;
+				long double x(0.0);
 				*idx = (ss >> x) ? static_cast<std::size_t>(ss.tellg()) : 0;
 				//printf("%s, %f, %ld\n", arg, (double)x, *idx);
 				return x;
