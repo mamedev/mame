@@ -1506,11 +1506,19 @@ namespace netlist
 
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
+			#if 0
+			// clang treats -Wswitch-bool as error
 			switch (m_stats)
 			{
 				case false: m_queue.push_nostats(std::move(e)); break;
 				case true:  m_queue.push(std::move(e)); break;
 			}
+			#else
+				if (!m_stats)
+					m_queue.push_nostats(std::move(e));
+				else
+					m_queue.push(std::move(e));
+			#endif
 		}
 
 		template <class R>
