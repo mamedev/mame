@@ -96,7 +96,9 @@ TODO: Volleyball...
  * http://www.youtube.com/watch?v=pDrRnJOCKZc
  */
 
-#define MASTER_CLOCK    7159000
+static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 7159000 + 0.5);
+static const int MASTER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_PONG + 0.5);
+
 #define V_TOTAL_PONG    (0x105+1)       // 262
 #define H_TOTAL_PONG    (0x1C6+1)       // 454
 
@@ -116,8 +118,8 @@ TODO: Volleyball...
  */
 
 //#define MASTER_CLOCK_BREAKOUT    (14318000)
-static const int NS_PER_CLOCK           = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 14318000 + 0.5);
-static const int MASTER_CLOCK_BREAKOUT  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK + 0.5);
+static const int NS_PER_CLOCK_BREAKOUT           = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 14318000 + 0.5);
+static const int MASTER_CLOCK_BREAKOUT  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_BREAKOUT + 0.5);
 
 static const int V_TOTAL_BREAKOUT       = (0xFC);       // 252
 static const int H_TOTAL_BREAKOUT       = (448*2);      // 448
@@ -489,11 +491,12 @@ void pong_state::pong(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
 	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
 	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.11);
+	m_video->set_horz_scale(4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -591,7 +594,7 @@ void pong_state::pongd(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
 	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG);
 	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
 	m_video->set_fieldcount(1);
@@ -630,7 +633,7 @@ void rebound_state::rebound(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
 	//m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
 	m_video->set_horz_params(H_TOTAL_PONG-51,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
 	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
