@@ -191,6 +191,8 @@ private:
 	void write_pixel(int16_t x, int16_t y, uint8_t color);
 	void store_pixel(uint8_t *dest_buf, uint8_t src);
 
+	void iterate_shade();
+
 	uint8_t get_shade_color(int16_t x, int16_t y);
 
 	void do_v_iline(uint8_t color, bool skip_last, bool shade);
