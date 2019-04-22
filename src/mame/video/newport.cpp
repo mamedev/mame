@@ -1548,11 +1548,13 @@ uint8_t newport_video_device::get_shade_color(int16_t x, int16_t y)
 
 void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 {
-	int16_t x1 = m_rex3.m_x_start_i;
+	const int16_t x1 = m_rex3.m_x_start_i;
 	int16_t y1 = m_rex3.m_y_start_i;
-	int16_t y2 = m_rex3.m_y_end_i;
+	const int16_t y2 = m_rex3.m_y_end_i;
 
-	int16_t incy = (y2 < y1) ? -1 : 1;
+	const int16_t incy = (y2 < y1) ? -1 : 1;
+
+	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
 
 	do
 	{
@@ -1569,9 +1571,9 @@ void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 			m_rex3.m_color_green += m_rex3.m_slope_green;
 			m_rex3.m_color_blue += m_rex3.m_slope_blue;
 		}
-	} while (y1 != y2);
+	} while (y1 != y2 && !iterate_one);
 
-	if (!skip_last)
+	if (!skip_last && !iterate_one)
 	{
 		if (shade)
 		{
@@ -1593,10 +1595,12 @@ void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
 {
 	int16_t x1 = m_rex3.m_x_start_i;
-	int16_t y1 = m_rex3.m_y_start_i;
-	int16_t x2 = m_rex3.m_x_end_i;
+	const int16_t y1 = m_rex3.m_y_start_i;
+	const int16_t x2 = m_rex3.m_x_end_i;
 
-	int16_t incx = (x2 < x1) ? -1 : 1;
+	const int16_t incx = (x2 < x1) ? -1 : 1;
+
+	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
 
 	do
 	{
@@ -1613,9 +1617,9 @@ void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
 			m_rex3.m_color_green += m_rex3.m_slope_green;
 			m_rex3.m_color_blue += m_rex3.m_slope_blue;
 		}
-	} while (x1 != x2);
+	} while (x1 != x2 && !iterate_one);
 
-	if (!skip_last)
+	if (!skip_last && !iterate_one)
 	{
 		if (shade)
 		{
@@ -1647,6 +1651,8 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 	int16_t dx = abs(x2 - x1);
 	int16_t dy = abs(y2 - y1);
 
+	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
+
 	if (dy > dx)
 	{
 		int16_t t = y2;
@@ -1674,6 +1680,8 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 		x1 = x2;
 		x2 = t;
 	}
+
+    int16_t length_limit = x1 + (BIT(m_rex3.m_draw_mode0, 15) ? 32 : 0);
 
 	int horiz = dy << 1;
 	int diago = (dy - dx) << 1;
@@ -1710,13 +1718,13 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 				m_rex3.m_color_green += m_rex3.m_slope_green;
 				m_rex3.m_color_blue += m_rex3.m_slope_blue;
 			}
-		} while (x1 != x2);
+		} while (x1 != x2 && x1 != length_limit && !iterate_one);
 
-		if (!skip_last)
+		if (!skip_last && !iterate_one)
 		{
 			if (shade)
 			{
-				write_pixel(y1, x1, get_shade_color(x1, y1));
+				write_pixel(y1, x1, get_shade_color(y1, x1));
 				m_rex3.m_color_red += m_rex3.m_slope_red;
 				m_rex3.m_color_green += m_rex3.m_slope_green;
 				m_rex3.m_color_blue += m_rex3.m_slope_blue;
@@ -1753,9 +1761,9 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 				m_rex3.m_color_green += m_rex3.m_slope_green;
 				m_rex3.m_color_blue += m_rex3.m_slope_blue;
 			}
-		} while (x1 != x2);
+		} while (x1 != x2 && x1 != length_limit && !iterate_one);
 
-		if (!skip_last)
+		if (!skip_last && !iterate_one)
 		{
 			if (shade)
 			{
@@ -1898,6 +1906,7 @@ void newport_video_device::do_rex3_command()
 	case 0x00000122: // StopOnX, DoSetup, Span, Draw
 	case 0x00022102: // LSOpaque, EnLSPattern, StopOnX, Span, Draw
 	case 0x00080122: // LROnly, StopOnX, DoSetup, Span, Draw
+	case 0x00089102: // LROnly, Length32, EnZPattern, StopOnX, Span, Draw
 	case 0x000c0122: // LROnly, Shade, StopOnX, DoSetup, Span, Draw
 	case 0x000c9102: // LROnly, Shade, Length32, EnZPattern, StopOnX, Span, Draw
 	{
@@ -1909,6 +1918,9 @@ void newport_video_device::do_rex3_command()
 
 		end_x += dx;
 		end_y += dy;
+
+        if (BIT(mode0, 15) && abs(end_x - start_x) >= 32)
+            end_x = start_x + 31 * dx;
 
 		bool shade = BIT(mode0, 18);
 
@@ -1967,7 +1979,28 @@ void newport_video_device::do_rex3_command()
 		{
 			for (; start_x != end_x; start_x += dx)
 			{
-				write_pixel(start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move, m_rgbci[(start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000)]);
+                const uint32_t src_addr = (start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000);
+                uint8_t src = 0;
+                switch (mode1 & 7)
+                {
+                case 1: // RGB/CI planes
+                    src = m_rgbci[src_addr];
+                    break;
+                case 2: // RGBA planes (not yet implemented)
+                    break;
+                case 4: // Overlay planes
+                    src = m_olay[src_addr];
+                    break;
+                case 5: // Popup planes
+                    src = m_pup[src_addr] >> 2;
+                    break;
+                case 6: // CID planes
+                    src = m_cid[src_addr];
+                    break;
+                default:
+                    break;
+                }
+                write_pixel(start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move, src);
 			}
 			start_x = m_rex3.m_x_save;
 		}
@@ -1979,6 +2012,7 @@ void newport_video_device::do_rex3_command()
 	case 0x0000032a: // StopOnX, StopOnY, DoSetup, I_Line, Draw
 	case 0x00000b2a: // SkipLast, StopOnX, StopOnY, DoSetup, I_Line, Draw
 	case 0x0000232e: // EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
+	case 0x0000930e: // Length32, EnZPattern, StopOnX, StopOnY, F_Line, Draw
 	case 0x0004232e: // Shade, EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
 	case 0x00442332: // EndFilter, Shade, EnLSPattern, StopOnX, StopOnY, DoSetp, A_Line, Draw
 	{
@@ -1986,7 +2020,7 @@ void newport_video_device::do_rex3_command()
 		const bool shade = BIT(mode0, 18);
 
 		LOGMASKED(LOG_COMMANDS, "%cLine: %04x, %04x to %04x, %04x = %08x\n", (mode0 & 0x1c) == 3 ? 'F' : 'I',
-			start_x, start_y, end_x, end_y, m_cmap0.m_palette[m_rex3.m_color_i]);
+			start_x, start_y, end_x, end_y, m_rex3.m_color_i);
 		if (start_x == end_x && start_y == end_y)
 		{
 			write_pixel(m_rex3.m_color_i, shade);
