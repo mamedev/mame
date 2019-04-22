@@ -11027,7 +11027,8 @@ gatedoom1                       // MAC (c) 1990 Data East Corporation (US)
 ds348                           // Sigtron Daruma
 
 @source:daryde.cpp
-pandart                         //
+cricket                         // (c) 1995 Daryde S.L.
+pandart                         // (c) 1999 Daryde S.L.
 
 @source:dassault.cpp
 dassault                        // MAJ (c) 1991 Data East Corporation (US)
