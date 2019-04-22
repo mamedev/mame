@@ -165,16 +165,16 @@ MC6847_GET_CHARROM_MEMBER( dragon200e_state::char_rom_r )
 }
 
 void dragon_cart(device_slot_interface &device)
-	{
-		device.option_add("dragon_fdc", DRAGON_FDC);
-		device.option_add("premier_fdc", PREMIER_FDC);
-		device.option_add("sdtandy_fdc", SDTANDY_FDC);
-		device.option_add("jcbsnd", DRAGON_JCBSND);
-		device.option_add("ssc", COCO_SSC);
-		device.option_add("orch90", COCO_ORCH90);
-		device.option_add("gmc", COCO_PAK_GMC);
-		device.option_add("pak", COCO_PAK);
-	}
+{
+	device.option_add("dragon_fdc", DRAGON_FDC);
+	device.option_add("premier_fdc", PREMIER_FDC);
+	device.option_add("sdtandy_fdc", SDTANDY_FDC);
+	device.option_add("jcbsnd", DRAGON_JCBSND);
+	device.option_add("ssc", COCO_SSC);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("gmc", COCO_PAK_GMC);
+	device.option_add("pak", COCO_PAK);
+}
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
 	FLOPPY_VDK_FORMAT,
