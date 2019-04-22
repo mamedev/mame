@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <initializer_list>
 #include <vector>
+#include <sstream>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -128,11 +129,11 @@ namespace plib
 	// number conversions
 	// ----------------------------------------------------------------------------------------
 
-	template <typename T, typename E = void>
+	template <typename T, bool CLOCALE, typename E = void>
 	struct pstonum_helper;
 
-	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value
+	template<typename T, bool CLOCALE>
+	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_integral<T>::value
 		&& std::is_signed<T>::value>::type>
 	{
 		template <typename S>
@@ -142,8 +143,8 @@ namespace plib
 		}
 	};
 
-	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value
+	template<typename T, bool CLOCALE>
+	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_integral<T>::value
 		&& !std::is_signed<T>::value>::type>
 	{
 		template <typename S>
@@ -153,22 +154,34 @@ namespace plib
 		}
 	};
 
-	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
+	template<typename T, bool CLOCALE>
+	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_floating_point<T>::value>::type>
 	{
 		template <typename S>
 		long double operator()(const S &arg, std::size_t *idx)
 		{
-			return std::stold(arg, idx);
+			if (CLOCALE)
+			{
+				std::stringstream  ss;
+				//ss.imbue(std::locale("C"));
+				ss.imbue(std::locale::classic());
+				ss << arg;
+				long double x;
+				*idx = (ss >> x) ? static_cast<std::size_t>(ss.tellg()) : 0;
+				//printf("%s, %f, %ld\n", arg, (double)x, *idx);
+				return x;
+			}
+			else
+				return std::stold(arg, idx);
 		}
 	};
 
-	template<typename T, typename S>
+	template<typename T, bool CLOCALE, typename S>
 	T pstonum(const S &arg)
 	{
 		decltype(arg.c_str()) cstr = arg.c_str();
 		std::size_t idx(0);
-		auto ret = pstonum_helper<T>()(cstr, &idx);
+		auto ret = pstonum_helper<T, CLOCALE>()(cstr, &idx);
 		using ret_type = decltype(ret);
 		if (ret >= static_cast<ret_type>(std::numeric_limits<T>::lowest())
 			&& ret <= static_cast<ret_type>(std::numeric_limits<T>::max()))
@@ -184,13 +197,13 @@ namespace plib
 		return static_cast<T>(ret);
 	}
 
-	template<typename R, typename T>
+	template<typename R, bool CLOCALE, typename T>
 	R pstonum_ne(const T &str, bool &err) noexcept
 	{
 		try
 		{
 			err = false;
-			return pstonum<R>(str);
+			return pstonum<R, CLOCALE>(str);
 		}
 		catch (...)
 		{

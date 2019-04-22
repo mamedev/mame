@@ -1626,7 +1626,7 @@ namespace netlist
 		if (found)
 		{
 			bool err = false;
-			auto vald = plib::pstonum_ne<T>(p, err);
+			auto vald = plib::pstonum_ne<T, true>(p, err);
 			if (err)
 				device.state().log().fatal(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
 			m_param = vald;

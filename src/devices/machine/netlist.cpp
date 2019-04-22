@@ -1017,7 +1017,7 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 	if (p != "")
 	{
 		bool err=false;
-		bool v = plib::pstonum_ne<bool>(p, err);
+		bool v = plib::pstonum_ne<bool, true>(p, err);
 		if (err)
 			lsetup.log().warning("NL_STATS: invalid value {1}", p);
 		else
