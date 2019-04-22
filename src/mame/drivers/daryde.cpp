@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Daryde Panther Darts.
+    Skeleton driver for Daryde darts machines.
 
 *******************************************************************************/
 
@@ -99,4 +99,45 @@ ROM_START(pandart)
 	ROM_LOAD("palce16v8h.ic1", 0x000, 0x117, NO_DUMP) // protected
 ROM_END
 
+/* Daryde Cricket PCB
+ __________________________________________________
+ |    ___________________  ___________________     |
+ |    |_CN13 (12 pins)__|  |___CN (12 pins)__|     | 
+ |                            ___               __ |
+ |                _______    |H606016   ____    |C||
+ |__              |74LS273N             |XTAL   |N||
+ ||CN       _____________                          |
+ |__        | DS1225Y-150|     ____________     __ |
+ ||C|       |____________|     |           |    | ||
+ ||N|       _____________      |Z8018010VSC|    |C||
+ ||6|       |IC3 27C040  |     |Z180 MPU   |    |N||
+ ||_|       |____________|     |___________|    |9||
+ |__     _______  _______   _______             |_||
+ ||C|   TDG2083AP |74LS273N |PALCE16B8             |
+ ||N|    _______  _______   _______             __ |
+ ||5|   |74LS273N |74LS273N |PALCE16B8          |C||
+ ||_|             _______   _______             |N||
+ |__              |74HCT244N|74HC244N           |8||
+ ||CN             _______   _______             |_||
+ ||7|             |74HC244N |74HC244N              |
+ ||_|  ______ _____ _____  _____       _____       |
+ |     |CN14 ||JP1| |CN11| |CN2 |      |CN10|      |
+ |_________________________________________________|
+
+XTAL = 18.432MHz
+JP1 (4 bridges):
+ 2: VDD
+ 1: GND
+ 2: VDD
+ 1: GND */
+ROM_START(cricket)
+	ROM_REGION(0x80000, "program", 0)
+	ROM_LOAD("daryde_cricket_red_1.0.ic3", 0x00000, 0x80000, CRC(6abaa50e) SHA1(f128ed9cd9926684bd77ec708a5d3edf2736e39c)) // AM27C040
+
+	ROM_REGION(0x22e, "pal", 0)
+	ROM_LOAD("a_palce16v8h.ic4", 0x000, 0x117, NO_DUMP)
+	ROM_LOAD("b_palce16v8h.ic5", 0x117, 0x117, NO_DUMP)
+ROM_END
+
+GAME(1995, cricket, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Cricket",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1999, pandart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Panther Darts", MACHINE_IS_SKELETON_MECHANICAL)
