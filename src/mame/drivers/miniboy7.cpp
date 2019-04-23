@@ -171,10 +171,11 @@ public:
 	void miniboy7(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
-	DECLARE_WRITE8_MEMBER(ay_pb_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
+	void ay_pa_w(uint8_t data);
+	void ay_pb_w(uint8_t data);
+	uint8_t pia_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	uint8_t lamp_latch_r();
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -199,6 +200,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<5> m_lamps;
 
+	uint8_t m_ay_pa;
 	uint8_t m_ay_pb;
 	int m_gpri;
 };
@@ -298,43 +300,52 @@ void miniboy7_state::machine_start()
 {
 	m_lamps.resolve();
 
+	save_item(NAME(m_ay_pa));
 	save_item(NAME(m_ay_pb));
 	save_item(NAME(m_gpri));
 }
 
 void miniboy7_state::machine_reset()
 {
+	m_ay_pa = 0;
 	m_ay_pb = 0;
 	m_gpri = 0;
 }
 
-WRITE8_MEMBER(miniboy7_state::ay_pa_w)
+void miniboy7_state::ay_pa_w(uint8_t data)
 {
 /*  ---x xxxx    lamps
     --x- ----    coins lockout
     -x-- ----    coins meter
     x--- ----    unused
 */
-	data = data ^ 0xff;
 
-/*  Lamps temporarily disabled due to some sort of additional data
-    that adds an unwanted and odd blinking effect.
-    Maybe it's some kind of multiplexion.
+	m_ay_pa = data;
+}
+
+uint8_t miniboy7_state::lamp_latch_r()
+{
+	if (machine().side_effects_disabled())
+		return 0xff;
+
+	uint8_t data = m_ay_pa ^ 0xff;
 
 	m_lamps[0] = BIT(data, 4);    // [----x]
 	m_lamps[1] = BIT(data, 3);    // [---x-]
 	m_lamps[2] = BIT(data, 2);    // [--x--]
 	m_lamps[3] = BIT(data, 1);    // [-x---]
 	m_lamps[4] = BIT(data, 0);    // [x----]
-*/
+
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 
 //  popmessage("Out Lamps: %02x", data);
 //  logerror("Out Lamps: %02x\n", data);
 
+	// Value is unused
+	return 0xff;
 }
 
-WRITE8_MEMBER(miniboy7_state::ay_pb_w)
+void miniboy7_state::ay_pb_w(uint8_t data)
 {
 	// ---- xxxx    unused
 	// -xxx ----    HCD
@@ -343,7 +354,7 @@ WRITE8_MEMBER(miniboy7_state::ay_pb_w)
 	m_ay_pb = data;
 }
 
-READ8_MEMBER(miniboy7_state::pia_pb_r)
+uint8_t miniboy7_state::pia_pb_r()
 {
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }
@@ -369,7 +380,7 @@ void miniboy7_state::miniboy7_map(address_map &map)
 	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x3000, 0x3001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // FIXME
 	map(0x3080, 0x3083).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x3800, 0x3800).nopr(); // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
+	map(0x3800, 0x3800).r(FUNC(miniboy7_state::lamp_latch_r));
 	map(0x4000, 0xffff).rom();
 }
 
