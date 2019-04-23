@@ -1506,6 +1506,7 @@ namespace netlist
 
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
+#if (USE_QUEUE_STATS)
 			#if 0
 			// clang treats -Wswitch-bool as error
 			switch (m_stats)
@@ -1519,12 +1520,22 @@ namespace netlist
 				else
 					m_queue.push(std::move(e));
 			#endif
+#else
+			m_queue.push_nostats(std::move(e));
+#endif
 		}
 
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-			m_queue.remove(elem);
+#if (USE_QUEUE_STATS)
+			if (!m_stats)
+				m_queue.remove_nostats(elem);
+			else
+				m_queue.remove(elem);
+#else
+			m_queue.remove_nostats(elem);
+#endif
 		}
 
 		/* Control functions */

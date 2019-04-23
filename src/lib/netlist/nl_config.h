@@ -28,7 +28,20 @@
  * Your mileage may vary.
  *
  */
+#ifndef USE_MEMPOOL
 #define USE_MEMPOOL                 (1)
+#endif
+
+/*! Enable queue statistics.
+ *
+ * Queue statistics come at a performance cost. Although
+ * the cost is low, we disable them here since they are
+ * only needed during development.
+ *
+ */
+#ifndef USE_QUEUE_STATS
+#define USE_QUEUE_STATS             (0)
+#endif
 
 /*! Store input values in logic_terminal_t.
  *
@@ -40,7 +53,9 @@
  * the default approach. It is up to 5% slower.
  *
  */
+#ifndef USE_COPY_INSTEAD_OF_REFERENCE
 #define USE_COPY_INSTEAD_OF_REFERENCE (0)
+#endif
 
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device
@@ -51,14 +66,18 @@
 #define USE_TRUTHTABLE_7448 (0)
 
 // How many times do we try to resolve links (connections)
+#ifndef NL_MAX_LINK_RESOLVE_LOOPS
 #define NL_MAX_LINK_RESOLVE_LOOPS   (100)
+#endif
 
 //============================================================
 //  DEBUGGING
 //============================================================
 
+#ifndef NL_DEBUG
 #define NL_DEBUG                    (false)
 //#define NL_DEBUG                    (true)
+#endif
 
 //============================================================
 //  General Macros
