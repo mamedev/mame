@@ -4760,6 +4760,25 @@ ROM_START( powyakex )
 	DISK_IMAGE_READONLY( "802jab02", 0, SHA1(460cc9f0b2514ec1da06b0a1d7b52fe43220d181) )
 ROM_END
 
+ROM_START( pcnfrk2m )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:install:eeprom", 0 )
+	ROM_LOAD( "ge912ka.u1",   0x000000, 0x000224, BAD_DUMP CRC(b3d5ca9a) SHA1(3dd9034e1a3a78a03bef975186b7ac6b01e3131a) )
+
+	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gn912ka.u1",   0x000000, 0x001014, BAD_DUMP CRC(c6af0c1a) SHA1(042d23bcfabc2a7fb6d7a038978805968e229395) )
+
+	ROM_REGION( 0x000008, "cassette:install:id", 0 )
+	ROM_LOAD( "ge912ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gn912ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "912kaa02", 0, BAD_DUMP SHA1(176425d4be6809ede0333dd617056c7e8e3aa13a) )
+ROM_END
+
 ROM_START( pcnfrk3m )
 	SYS573_BIOS_A
 
@@ -4991,6 +5010,7 @@ GAME( 1999, dsfdcta,   dsfdct,   dsfdcta,    ddr,       ksys573_state, init_ddr,
 GAME( 1999, drmn2m,    sys573,   drmn2m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 1999, drmn2mpu,  drmn2m,   drmn2m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 1999, stepchmp,  sys573,   salarymc,   hyperbbc,  ksys573_state, init_salarymc, ROT0,  "Konami", "Step Champ (GQ930 VER. JA)", MACHINE_NO_SOUND )
+GAME( 2000, pcnfrk2m,  sys573,   drmn2m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 2nd Mix (GE912 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,   sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Freaks (G*874 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,       dncfrks,  dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax (G*874 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gunmania,  sys573,   gunmania,   gunmania,  ksys573_state, empty_init,    ROT0,  "Konami", "GunMania (GL906 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
