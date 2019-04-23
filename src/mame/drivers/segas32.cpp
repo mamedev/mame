@@ -4006,6 +4006,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe: The Revenge of Death Adder (Japan)
     protected via a custom V25 with encrypted code
+ROM board: 833-8933
 Sub board: 834-8529-02
 A/D board: 837-7968
 */
