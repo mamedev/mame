@@ -15,19 +15,6 @@
 #include "netlist/nl_setup.h"
 #include "plib/putil.h"
 
-#define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \
-	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>              \
-	{                                                                          \
-	public:                                                                    \
-		template <class C>                                                     \
-		NETLIB_NAME(cname)(C &owner, const pstring &name)                      \
-		: nld_truthtable_t<nIN, nOUT>(owner, name, family_TTL(), &m_ttbl, m_desc) { }   \
-	private:                                                                   \
-		static truthtable_t m_ttbl;                                            \
-		static std::vector<pstring> m_desc;                                    \
-	}
-
-
 namespace netlist
 {
 namespace devices

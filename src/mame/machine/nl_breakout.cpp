@@ -287,9 +287,6 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("J3", 7402)
 	DM9312_DIP(J4)
 	CHIP("J5", 7448)
-#if USE_TRUTHTABLE_7448
-	PARAM(J5.USE_DEACTIVATE, 0) // only use this if compiled with 7448 as a truthtable
-#endif
 	CHIP("J6", 9310)
 	CHIP("J7", 7420)
 	CHIP("J8", 74279)
@@ -1715,7 +1712,7 @@ CIRCUIT_LAYOUT( breakout )
 			   E1.14, E2.14, E3.14, E4.14, E5.14, E6.14, E7.14, E8.14, E9.14,
 					  F2.14,        F4.14, F5.14, F6.16, F7.16, F8.14, F9.14,
 			   H1.14, H2.14, H3.14, H4.14, H5.16, H6.16, H7.14, H8.14, H9.14,
-			   J1.16, J2.14, J3.14, J4.16,        J6.16, J7.14, J8.16, J9.14,
+			   J1.16, J2.14, J3.14, J4.16, J5.16, J6.16, J7.14, J8.16, J9.14,
 			   K1.16, K2.14, K3.14, K4.14, K5.16, K6.16, K7.14, K8.14, K9.14,
 			   L1.16, L2.14, L3.16, L4.14, L5.16, L6.16, L7.14, L8.16, L9.14,
 			   M1.16, M2.5,  M3.14, M4.14, M5.16, M6.16,        M8.14, M9.14,
@@ -1727,7 +1724,7 @@ CIRCUIT_LAYOUT( breakout )
 			   E1.7,  E2.7,  E3.7,  E4.7,  E5.7,  E6.7,  E7.7,  E8.7,  E9.7,
 					  F2.7,         F4.7,  F5.7,  F6.8,  F7.8,  F8.7,  F9.7,
 			   H1.7,  H2.7,  H3.7,  H4.7,  H5.8,  H6.8,  H7.7,  H8.7,  H9.7,
-			   J1.8,  J2.7,  J3.7,  J4.8,         J6.8,  J7.7,  J8.8,  J9.7,
+			   J1.8,  J2.7,  J3.7,  J4.8,  J5.8,  J6.8,  J7.7,  J8.8,  J9.7,
 			   K1.8,  K2.7,  K3.7,  K4.7,  K5.8,  K6.8,  K7.7,  K8.7,  K9.7,
 			   L1.8,  L2.7,  L3.8,  L4.7,  L5.8,  L6.8,  L7.7,  L8.8,  L9.7,
 			   M1.8,  M2.12, M3.7,  M4.7,  M5.8,  M6.8,         M8.7,  M9.7,
@@ -1747,7 +1744,11 @@ CIRCUIT_LAYOUT( breakout )
 	HINT(H2.A, NO_DEACTIVATE)
 	HINT(H3.A, NO_DEACTIVATE)
 	HINT(J3.D, NO_DEACTIVATE)
-	HINT(J5, NO_DEACTIVATE)
+#if (USE_TRUTHTABLE_7448)
+	HINT(J5.s, NO_DEACTIVATE)    // 7448 needs to be disabled in all cases
+#else
+	HINT(J5, NO_DEACTIVATE)    // 7448 needs to be disabled in all cases
+#endif
 	HINT(J6, NO_DEACTIVATE)
 	HINT(J8.A, NO_DEACTIVATE)
 	HINT(J8.C, NO_DEACTIVATE)
