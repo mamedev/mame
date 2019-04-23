@@ -27,6 +27,7 @@
   * Jack Potten's Poker (set 9, 'just 4 fun'),        198?, Bootleg.
   * Jack Potten's Poker (set 10, ICP-1 PCB),          198?, Bootleg.
   * Jack Potten's Poker (set 11, German, W.W.),       198?, Bootleg.
+  * Jack Potten's Poker (set 12, no Double-Up),       198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
@@ -5151,6 +5152,65 @@ ROM_START( potnpkri )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "prom.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump OK */
 ROM_END
+
+/*
+  Unknown Potten's Poker.
+  German bootleg (W.W.).
+  Set 11.
+
+  Need to BET in each hand.
+*/
+ROM_START( potnpkrj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pok5.a11",  0x5000, 0x1000, CRC(60140393) SHA1(f24a4435fe44d14053e28c7cb144ae00f66d74cb) )
+	ROM_LOAD( "pok6.a13",  0x6000, 0x1000, CRC(58161c72) SHA1(c5607a843ca1b4bde9999f265acae835ab9832fc) )
+	ROM_LOAD( "pok7.a14",  0x7000, 0x1000, CRC(38d92f95) SHA1(9523ef5fae57ad7cdd3fe52667a9670fdca8aa75) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "pok4_ww.a7",  0x1000, 0x0800, CRC(5cafb3a9) SHA1(efec24d4dd1f83f40a1b7ec66bc6bf36c4b1e541) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "7.a2",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "8.a4",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "9.a5",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	ROM_LOAD( "potnpkrj_nvram.bin", 0x0000, 0x0800, CRC(7c5206ce) SHA1(fc6e9b8d21184b8220b8835696d7eb2d071f5475) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.d7",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+ROM_END
+
+/*
+  Unknown Potten's Poker.
+  English bootleg with Bonanza's graphics.
+  Set 12.
+
+  No Double-Up.
+  Need to BET in each hand.
+*/
+ROM_START( potnpkrk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "07.a13",   0x6000, 0x1000, CRC(cdb86a7d) SHA1(d1c20aa6484bbaa794bfba993f21ae0bc199db7a) )
+	ROM_LOAD( "08.a15",   0x7000, 0x1000, CRC(cb4502f4) SHA1(abe0916f01a1b3742e99e0da5f1b5c6a0e7e7dbd) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "8.a7",   0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "4.a2",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "6.a4",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "7.a5",   0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	ROM_LOAD( "potnpkrk_nvram.bin", 0x0000, 0x0800, CRC(87970f3f) SHA1(3130594c83407e13f2b08027188b333f29dce568) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129n.d7",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+ROM_END
+
 
 ROM_START( goodluck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10383,36 +10443,6 @@ ROM_START( bonuspkr )
 ROM_END
 
 
-/*
-  Unknown Potten's Poker.
-  German bootleg (W.W.).
-  Set 11.
-
-  Need to BET in each hand.
-*/
-ROM_START( potnpkrj )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pok5.a11",  0x5000, 0x1000, CRC(60140393) SHA1(f24a4435fe44d14053e28c7cb144ae00f66d74cb) )
-	ROM_LOAD( "pok6.a13",  0x6000, 0x1000, CRC(58161c72) SHA1(c5607a843ca1b4bde9999f265acae835ab9832fc) )
-	ROM_LOAD( "pok7.a14",  0x7000, 0x1000, CRC(38d92f95) SHA1(9523ef5fae57ad7cdd3fe52667a9670fdca8aa75) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(                0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "pok4_ww.a7",  0x1000, 0x0800, CRC(5cafb3a9) SHA1(efec24d4dd1f83f40a1b7ec66bc6bf36c4b1e541) )  // text chars
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "7.a2",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane 1
-	ROM_LOAD( "8.a4",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane 2
-	ROM_LOAD( "9.a5",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane 3
-
-	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
-	ROM_LOAD( "potnpkrj_nvram.bin", 0x0000, 0x0800, CRC(7c5206ce) SHA1(fc6e9b8d21184b8220b8835696d7eb2d071f5475) )
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24s10.d7",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
-ROM_END
-
-
 ROM_START( royale )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "royalex.bin",    0x4000, 0x4000, CRC(ef370617) SHA1(0fc5679e9787aeea3bc592b36efcaa20e859f912) )
@@ -11601,6 +11631,7 @@ GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init
 GAMEL( 198?, potnpkrh,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 9, 'just 4 fun')",  0,                layout_goldnpkr )
 GAMEL( 198?, potnpkri,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 10, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAMEL( 198?, potnpkrj,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 11, German, W.W.)", 0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrk,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 12, no Double-Up)", 0,                layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
