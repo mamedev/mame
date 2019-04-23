@@ -310,19 +310,23 @@ void miniboy7_state::machine_reset()
 
 WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 {
-	// ---x xxxx    lamps
-	// --x- ----    coins lockout
-	// -x-- ----    coins meter
-	// x--- ----    unused
-
+/*  ---x xxxx    lamps
+    --x- ----    coins lockout
+    -x-- ----    coins meter
+    x--- ----    unused
+*/
 	data = data ^ 0xff;
 
-//    m_lamps[0] = BIT(data, 0);    // [----x]
-//    m_lamps[1] = BIT(data, 1);    // [---x-]
-//    m_lamps[2] = BIT(data, 2);    // [--x--]
-//    m_lamps[3] = BIT(data, 3);    // [-x---]
-//    m_lamps[4] = BIT(data, 4);    // [x----]
+/*  Lamps temporarily disabled due to some sort of additional data
+    that adds an unwanted and odd blinking effect.
+    Maybe it's some kind of multiplexion.
 
+	m_lamps[0] = BIT(data, 4);    // [----x]
+	m_lamps[1] = BIT(data, 3);    // [---x-]
+	m_lamps[2] = BIT(data, 2);    // [--x--]
+	m_lamps[3] = BIT(data, 1);    // [-x---]
+	m_lamps[4] = BIT(data, 0);    // [x----]
+*/
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 
 //  popmessage("Out Lamps: %02x", data);
@@ -372,33 +376,6 @@ void miniboy7_state::miniboy7_map(address_map &map)
 /*
 
 'maincpu' (E190): unmapped program memory byte read from 3800
-'maincpu' (E190): unmapped program memory byte read from 3800
-'maincpu' (E190): unmapped program memory byte read from 3800
-'maincpu' (E190): unmapped program memory byte read from 3800
-
-'maincpu' (CF41): unmapped program memory byte read from 3081
-'maincpu' (CF41): unmapped program memory byte write to 3081 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3083
-'maincpu' (CF41): unmapped program memory byte write to 3083 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3080
-'maincpu' (CF41): unmapped program memory byte write to 3080 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3082
-'maincpu' (CF41): unmapped program memory byte write to 3082 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3081
-'maincpu' (CF41): unmapped program memory byte write to 3081 = 3F
-'maincpu' (CF41): unmapped program memory byte read from 3083
-'maincpu' (CF41): unmapped program memory byte write to 3083 = 34
-
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0E
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0F
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 07
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0E
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0F
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
 
   ... CRTC init (snap) --> $CF2D: JSR $CF76
 
@@ -411,11 +388,6 @@ void miniboy7_state::miniboy7_map(address_map &map)
 'maincpu' (E1C2): unmapped program memory byte read from 3000
 'maincpu' (E1CA): unmapped program memory byte write to 3001 = 1F
 
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
 'maincpu' (E189): unmapped program memory byte read from 3800
 
 */
