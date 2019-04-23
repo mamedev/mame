@@ -358,7 +358,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 				gfx = 0xff;
 
 			// or use character rom?
-			else if ((code < 128) || (code < 192 && BIT(m_control, 4)) || (code > 192 && BIT(m_control, 3)))
+			else if ((code < 128) || (code < 192 && BIT(m_control, 4)) || (code >= 192 && BIT(m_control, 3)))
 				gfx = m_char_rom->base()[(code << 3) | ra];
 
 			// or the programmable characters?

@@ -617,6 +617,24 @@ distributor of the Colour Genie EG2000 computers.
 		</part>
 	</software>
 
+	<software name="labyfear" supported="yes">
+		<description>Labyrinth of Fear</description>
+		<year>1983</year>
+		<publisher>Algray Software</publisher>
+		<info name="author" value="Paul Barsby" />
+		<info name="usage" value="Type SYSTEM and load with L, switch to part 2 once loading the first finishes" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="4563">
+				<rom name="labyrinth_fear_part1.cas" size="4563" crc="92e3a0f6" sha1="72167fca3b9c6e4560b0eb398a46743fb041c2d3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cgenie_cass">
+			<dataarea name="cass" size="9368">
+				<rom name="labyrinth_fear_part2.cas" size="9368" crc="0887f599" sha1="ff1abfee3a0454553355c91f0712bfd6560884f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Missing: Länder-Quiz, Klaus Weber -->
 
 	<software name="lunarlan" supported="yes">
