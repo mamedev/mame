@@ -163,12 +163,19 @@ namespace plib
 			if (CLOCALE)
 			{
 				std::stringstream  ss;
-				//ss.imbue(std::locale("C"));
 				ss.imbue(std::locale::classic());
 				ss << arg;
+				long int len(ss.tellp());
 				long double x(0.0);
-				*idx = (ss >> x) ? static_cast<std::size_t>(ss.tellg()) : 0;
-				//printf("%s, %f, %ld\n", arg, (double)x, *idx);
+				long int pos(0);
+				if (ss >> x)
+				{
+					pos = static_cast<long int>(ss.tellg());
+					if (pos == -1)
+						pos = len;
+				}
+				*idx = static_cast<std::size_t>(pos);
+				//printf("%s, %f, %lu %ld\n", arg, (double)x, *idx, (long int) ss.tellg());
 				return x;
 			}
 			else
