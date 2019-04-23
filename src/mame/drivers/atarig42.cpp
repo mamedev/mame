@@ -92,7 +92,7 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 		m_asic65->reset_line((~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
-		m_rle->control_write(space, 0, (data >> 11) & 7);
+		m_rle->control_write((data >> 11) & 7);
 	}
 
 	/* lower byte */
@@ -113,7 +113,7 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 WRITE16_MEMBER(atarig42_state::mo_command_w)
 {
 	COMBINE_DATA(m_mo_command);
-	m_rle->command_write(space, offset, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+	m_rle->command_write((data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 

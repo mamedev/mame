@@ -103,7 +103,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		m_rle->control_write(space, offset, (data >> 27) & 7);
+		m_rle->control_write((data >> 27) & 7);
 	}
 
 	/* lower byte */
@@ -116,7 +116,7 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		m_rle->command_write(space, offset, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		m_rle->command_write(((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
