@@ -571,7 +571,7 @@ private:
 	DECLARE_READ8_MEMBER(mcu_port5_r);
 	DECLARE_WRITE8_MEMBER(mcu_port6_w);
 	DECLARE_READ8_MEMBER(mcu_port6_r);
-	template <int Channel> u16 mcu_adc_r(offs_t offset);
+	template <int Channel> u16 mcu_adc_r();
 	DECLARE_WRITE8_MEMBER(alpine_mcu_port4_w);
 	DECLARE_READ16_MEMBER(mcu130_speedup_r);
 	DECLARE_READ16_MEMBER(mcu141_speedup_r);
