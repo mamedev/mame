@@ -194,7 +194,7 @@ namespace plib {
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
 				return owned_pool_ptr<T>(mema, true, arena_deleter<mempool, T>(this));
 			}
-			catch (std::exception &e)
+			catch (...)
 			{
 				this->deallocate(mem);
 				throw;

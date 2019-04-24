@@ -317,7 +317,7 @@ namespace plib {
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
 				return owned_pool_ptr<T>(mema, true, arena_deleter<aligned_arena, T>(*this));
 			}
-			catch (std::exception &e)
+			catch (...)
 			{
 				deallocate(mem);
 				throw;

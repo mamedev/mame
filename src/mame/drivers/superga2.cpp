@@ -34,7 +34,6 @@
 
 
 #define A2_CPU_TAG "maincpu"
-#define A2_SPEAKER_TAG "speaker"
 #define A2_VIDEO_TAG "a2video"
 
 class superga2_state : public driver_device
@@ -47,7 +46,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_video(*this, A2_VIDEO_TAG),
 		m_a2common(*this, "a2common"),
-		m_speaker(*this, A2_SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_softlatch(*this, "softlatch")
 	{ }
 
@@ -273,7 +272,7 @@ void superga2_state::kuzmich(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
