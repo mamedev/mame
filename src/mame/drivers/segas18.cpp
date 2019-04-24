@@ -3022,6 +3022,9 @@ ROM_END
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197B
     ROM Board: 171-5873B
+   Main board: 837-8777-01
+      Game BD: 833-8775-01 WALLY
+    ROM Board: 834-8776-01
 */
 ROM_START( wwallyj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197B
