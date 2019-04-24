@@ -347,14 +347,31 @@ uint8_t miniboy7_state::lamp_latch_r()
 
 void miniboy7_state::ay_pb_w(uint8_t data)
 {
-	// ---- xxxx    unused
-	// -xxx ----    HCD
-	// x--- ----    DSW2 select
-
+/*  ---- xxxx    unused
+    -xxx ----    HCD
+    x--- ----    DSW2 select
+*/
 	m_ay_pb = data;
 }
 
 uint8_t miniboy7_state::pia_pb_r()
+/*
+  PIA PB0-3 are connected to regular inputs.
+  AY8910, PortB-D7, is the selector of a 74LS157 that multiplexes the PIA PB4-7 input lines
+  to read the 8 DIP switches bank lines. See the following diagram.
+
+                   74LS157
+              .-------V-------.
+  AY8910 PB7 -|01 SEL    B0 03|- DSW2-8
+             -|          B1 06|- DSW2-7
+     PIA PB7 -|04 Y0     B3 13|- DSW2-6
+     PIA PB6 -|07 Y1     B2 10|- DSW2-5
+     PIA PB5 -|12 Y3     A0 02|- DSW2-4
+     PIA PB4 -|09 Y2     A1 05|- DSW2-3
+             -|          A3 14|- DSW2-2
+             -|          A2 11|- DSW2-1
+              '---------------'
+*/
 {
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }
