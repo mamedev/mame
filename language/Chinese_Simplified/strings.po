@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2018-04-28 19:01+0800\n"
+"PO-Revision-Date: 2019-03-18 13:40+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -46,7 +46,7 @@ msgstr "已停用"
 
 #: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
-msgstr "覆叠图"
+msgstr "复叠图"
 
 #: src/frontend/mame/ui/videoopt.cpp:216
 msgid "Bezels"
@@ -167,7 +167,7 @@ msgstr "游戏结束"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:83
 msgid "HowTo"
-msgstr "说明"
+msgstr "说明图"
 
 #: src/frontend/mame/ui/dirmenu.cpp:60 src/frontend/mame/ui/selmenu.cpp:80
 msgid "Logos"
@@ -1474,7 +1474,7 @@ msgstr "汇出 XML 格式列表 （同 -listxml）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:657
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr "汇出 TXT 格式列表 （同 -listfull，但不包含装置）"
+msgstr "汇出 TXT 格式列表 （同 -listxml，但不包含装置）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:658
 msgid "Export list in TXT format (like -listfull)"
@@ -1521,7 +1521,7 @@ msgstr "年代\t%1$s\n"
 #: src/frontend/mame/ui/selgame.cpp:1038
 #, c-format
 msgid "Manufacturer\t%1$-.100s\n"
-msgstr "製造商\t%1$-.100s\n"
+msgstr "制造商\t%1$-.100s\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1042
 #, c-format
@@ -1590,11 +1590,11 @@ msgstr "声音\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1079
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "撷取\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1081
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "撷取\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1084
 msgid "Camera\tUnimplemented\n"
@@ -1630,27 +1630,27 @@ msgstr "键盘\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1104
 msgid "Mouse\tUnimplemented\n"
-msgstr "滑鼠\t无法执行\n"
+msgstr "鼠标\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1106
 msgid "Mouse\tImperfect\n"
-msgstr "滑鼠\t不完美\n"
+msgstr "鼠标\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1109
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "媒体\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1111
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "媒体\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 msgid "Disk\tUnimplemented\n"
-msgstr "磁碟\t无法执行\n"
+msgstr "磁盘\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1116
 msgid "Disk\tImperfect\n"
-msgstr "磁碟\t不完美\n"
+msgstr "磁盘\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1119
 msgid "Printer\tUnimplemented\n"
@@ -1662,43 +1662,43 @@ msgstr "打印机\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1124
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "磁带\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1126
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "磁带\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1129
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "打孔带\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1131
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "打孔带\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1134
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "磁鼓\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1136
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "磁鼓\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1139
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1141
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "通讯\t无法执行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1146
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "通讯\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "LAN\tUnimplemented\n"
@@ -1758,11 +1758,11 @@ msgstr "支援檯面型筐体\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 msgid "Driver is BIOS\tYes\n"
-msgstr "驱动程式为 BIOS\t是\n"
+msgstr "驱动程序为 BIOS\t是\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 msgid "Driver is BIOS\tNo\n"
-msgstr "驱动程式为 BIOS\t否\n"
+msgstr "驱动程序为 BIOS\t否\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1168
 msgid "Support Save\tYes\n"
@@ -1864,7 +1864,7 @@ msgstr "放大右侧面版的图片"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr "显示滑鼠指标"
+msgstr "显示鼠标指标"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
@@ -1972,7 +1972,7 @@ msgstr "使用背景图"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Overlays"
-msgstr "使用覆叠图"
+msgstr "使用复叠图"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Bezels"
@@ -2016,7 +2016,7 @@ msgstr "投币锁定"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Mouse"
-msgstr "滑鼠"
+msgstr "鼠标"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Joystick"
@@ -2032,7 +2032,7 @@ msgstr "多重键盘"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Multi-mouse"
-msgstr "多重滑鼠"
+msgstr "多鼠标"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Steadykey"
@@ -2100,11 +2100,11 @@ msgstr "分配指向装置"
 
 #: src/frontend/mame/ui/submenu.cpp:97
 msgid "Mouse Device Assignment"
-msgstr "分配滑鼠装置"
+msgstr "分配鼠标装置"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Video Mode"
-msgstr "视讯模式"
+msgstr "视频模式"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Number Of Screens"
@@ -2207,7 +2207,7 @@ msgstr "  %2$s %5$d.%6$03d kHz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:89
 msgid "* Video:\n"
-msgstr "* 視訊：\n"
+msgstr "* 视频：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:94
 #, c-format
@@ -2316,7 +2316,7 @@ msgstr "* 媒体选项：\n"
 #: src/frontend/mame/ui/devopt.cpp:261
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
-msgstr "  %1$s    [標籤： %2$s]\n"
+msgstr "  %1$s    [标籤： %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:267
 msgid "* Slot Options:\n"
@@ -2324,7 +2324,7 @@ msgstr "* 插槽选项：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:274
 msgid "[None]\n"
-msgstr "[無]\n"
+msgstr "[无]\n"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
@@ -2386,7 +2386,7 @@ msgstr "声音"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "capture hardware"
-msgstr ""
+msgstr "撷取硬体"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
@@ -2406,15 +2406,15 @@ msgstr "键盘"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "mouse"
-msgstr "滑鼠"
+msgstr "鼠标"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "media"
-msgstr ""
+msgstr "媒体"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "disk"
-msgstr "磁碟"
+msgstr "磁盘"
 
 #: src/frontend/mame/ui/info.cpp:44
 msgid "printer"
@@ -2422,23 +2422,23 @@ msgstr "印表机"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgid "magnetic tape"
-msgstr ""
+msgstr "磁带"
 
 #: src/frontend/mame/ui/info.cpp:46
 msgid "punch tape"
-msgstr ""
+msgstr "打孔带"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgid "magnetic drum"
-msgstr ""
+msgstr "磁鼓"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgid "solid state storage"
-msgstr ""
+msgstr "固态储存"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgid "communications"
-msgstr ""
+msgstr "通讯"
 
 #: src/frontend/mame/ui/info.cpp:50
 msgid "LAN"
@@ -2898,15 +2898,15 @@ msgstr "此变更仅当选定 \"开始新搜寻\" 时生效"
 
 #: plugins/cheatfind/init.lua:504
 msgid "Pause Mode"
-msgstr ""
+msgstr "暂停模式"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manually pause & unpause the game when needed with the pause hotkey"
-msgstr ""
+msgstr "当需要暂停热键时手动暂停及取消暂停游戏"
 
 #: plugins/cheatfind/init.lua:536
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "全部插槽已清除且目前状态已储存至插槽 1"
 
 #: plugins/cheatfind/init.lua:551
 msgid "Start new search"
@@ -2915,11 +2915,11 @@ msgstr "开始新搜寻"
 #: plugins/cheatfind/init.lua:564
 #, lua-format
 msgid "Memory State saved to Slot %d"
-msgstr ""
+msgstr "记忆体状态已储存至插槽 %d"
 
 #: plugins/cheatfind/init.lua:583
 msgid "Save Current Memory State to Slot "
-msgstr ""
+msgstr "储存现有的记忆体状态至插槽"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -2928,15 +2928,15 @@ msgstr "总计发现 %d 符合"
 
 #: plugins/cheatfind/init.lua:655
 msgid "Perform Compare  :  "
-msgstr ""
+msgstr "进行比较 ："
 
 #: plugins/cheatfind/init.lua:672
 msgid "Left less than right"
-msgstr ""
+msgstr "左值少于右值"
 
 #: plugins/cheatfind/init.lua:674
 msgid "Left greater than right"
-msgstr ""
+msgstr "左值多于右值"
 
 #: plugins/cheatfind/init.lua:676
 msgid "Left equal to right"
@@ -2944,7 +2944,7 @@ msgstr "左值等于右值"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left not equal to right"
-msgstr ""
+msgstr "左值不等于右值"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left equal to right with bitmask"
@@ -2956,11 +2956,11 @@ msgstr "位元遮罩下左值不等于右值"
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left less than value"
-msgstr "左值小于原值"
+msgstr "左值少于原值"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left greater than value"
-msgstr "左值大于原值"
+msgstr "左值多于原值"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left equal to value"
@@ -2976,7 +2976,7 @@ msgstr "值"
 
 #: plugins/cheatfind/init.lua:714
 msgid "Difference"
-msgstr ""
+msgstr "差异"
 
 #: plugins/cheatfind/init.lua:719
 msgid "Any"
@@ -2984,95 +2984,97 @@ msgstr "任意"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Data Format"
-msgstr "数据格式"
+msgstr "资料格式"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "测试/写入塞入值"
 
 #: plugins/cheatfind/init.lua:738
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"如果你想塞入插槽 1 的值（如你开始某事但忘了），用这个"
 
 #: plugins/cheatfind/init.lua:740
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"如果你想塞入最后的插槽值（如你开始时忘了某项但终于找到了），用这个"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Use this if you want to poke 0x00"
-msgstr ""
+msgstr "如果你想塞入 0x00 ，用这个"
 
 #: plugins/cheatfind/init.lua:744
 msgid "Use this if you want to poke 0x01"
-msgstr ""
+msgstr "如果你想塞入 0x01 ，用这个"
 
 #: plugins/cheatfind/init.lua:746
 msgid "Use this if you want to poke 0x02"
-msgstr ""
+msgstr "如果你想塞入 0x02 ，用这个"
 
 #: plugins/cheatfind/init.lua:748
 msgid "Use this if you want to poke 0x03"
-msgstr ""
+msgstr "如果你想塞入 0x03 ，用这个"
 
 #: plugins/cheatfind/init.lua:750
 msgid "Use this if you want to poke 0x04"
-msgstr ""
+msgstr "如果你想塞入 0x04 ，用这个"
 
 #: plugins/cheatfind/init.lua:752
 msgid "Use this if you want to poke 0x05"
-msgstr ""
+msgstr "如果你想塞入 0x05 ，用这个"
 
 #: plugins/cheatfind/init.lua:754
 msgid "Use this if you want to poke 0x06"
-msgstr ""
+msgstr "如果你想塞入 0x06 ，用这个"
 
 #: plugins/cheatfind/init.lua:756
 msgid "Use this if you want to poke 0x07"
-msgstr ""
+msgstr "如果你想塞入 0x07 ，用这个"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Use this if you want to poke 0x08"
-msgstr ""
+msgstr "如果你想塞入 0x08 ，用这个"
 
 #: plugins/cheatfind/init.lua:760
 msgid "Use this if you want to poke 0x09"
-msgstr ""
+msgstr "如果你想塞入 0x09 ，用这个"
 
 #: plugins/cheatfind/init.lua:762
 msgid "Use this if you want to poke 0x63 (Decimal 99)"
-msgstr ""
+msgstr "如果你想塞入 0x63 （十进位的 99），用这个"
 
 #: plugins/cheatfind/init.lua:764
 msgid "Use this if you want to poke 0x99 (BCD 99)"
-msgstr ""
+msgstr "如果你想塞入 0x99 （二进位的 99），用这个"
 
 #: plugins/cheatfind/init.lua:766
 msgid "Use this if you want to poke 0xFF (Decimal 255)"
-msgstr ""
+msgstr "如果你想塞入 0xFF （十进位的 255），用这个"
 
 #: plugins/cheatfind/init.lua:768
 msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-msgstr ""
+msgstr "如果你想塞入 0x3E7 （十进位的 999），用这个"
 
 #: plugins/cheatfind/init.lua:770
 msgid "Use this if you want to poke 0x999 (BCD 999)"
-msgstr ""
+msgstr "如果你想塞入 0x999 （二进位的 999），用这个"
 
 #: plugins/cheatfind/init.lua:772
 msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-msgstr ""
+msgstr "如果你想塞入 0x270F （十进位的 9999），用这个"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-msgstr ""
+msgstr "如果你想塞入 0x9999 （二进位的 9999），用这个"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-msgstr ""
+msgstr "如果你想塞入 0xFFFF （十进位的 65535），用这个"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Undo last search -- #"
@@ -3089,7 +3091,7 @@ msgstr "所有"
 #: plugins/cheatfind/init.lua:934
 #, lua-format
 msgid "Test Cheat %08X:%02X"
-msgstr ""
+msgstr "测试作弊码 %08X:%02X"
 
 #: plugins/cheatfind/init.lua:974
 msgid "Cheat engine not available"
