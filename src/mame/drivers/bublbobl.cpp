@@ -1787,6 +1787,32 @@ ROM_START( sboblboble ) // identical to sboblbobld but for the first program ROM
 
 ROM_END
 
+ROM_START( sboblboblf ) // single layer PCB '8001 AX'
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "a2.bin",   0x00000, 0x08000, CRC(524cdc4f) SHA1(f778e53f664e911a5b992a4f85bcad1097eaa36f) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "a4.bin",   0x10000, 0x08000, CRC(13118eb1) SHA1(5a5da40c2cc82420f70bc58ffa32de1088c6c82f) )
+	ROM_LOAD( "a3.bin",   0x18000, 0x08000, CRC(94c75591) SHA1(7698bc4b7d20e554a73a489cd3a15ae61b350e37) )
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x10000, "subcpu", 0 )
+	ROM_LOAD( "a5.bin",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a1.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION (0x80000, "gfx1", ROMREGION_INVERT) // TODO: fix ROM loading, this only has 0x50000 of GFX data instead of 0x60000 like other bootlegs
+	ROM_LOAD ("a11.bin", 0x00000, 0x10000, CRC(9034c8ab) SHA1(d80475c4508249e2347adc422e1efd87dc7cc916))
+	ROM_LOAD ("a10.bin", 0x10000, 0x10000, CRC(d370f499) SHA1(94ce157ff1a53fabf08abe5467531b94a56666a5))
+	ROM_LOAD ("a9.bin",  0x20000, 0x08000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9))
+	ROM_LOAD ("a8.bin",  0x40000, 0x10000, CRC(7f7377c1) SHA1(b1397969f96272df58d46a5e03c6c9756b723580))
+	ROM_LOAD ("a7.bin",  0x50000, 0x10000, CRC(42494016) SHA1(280c757b4330fa9a139cd4ecd98ec6df2b172311))
+	ROM_LOAD ("a6.bin",  0x60000, 0x08000, CRC(56709271) SHA1(2b4ee1a3aaa423b9ee1c58b5bb002660db619b9d))
+
+	ROM_REGION( 0x0100, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+ROM_END
+
 ROM_START( bub68705 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Program roms match Bubble Bobble (older) */
 	ROM_LOAD( "2.bin",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
@@ -2081,6 +2107,7 @@ GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_co
 GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobld, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboble, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 5)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblf, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 6)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong GFX ROM loading
 GAME( 1986, sboblboblc, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
 GAME( 1986, bub68705,   bublbobl, bub68705,  bublbobl,   bub68705_state, init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
 
