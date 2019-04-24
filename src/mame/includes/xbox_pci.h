@@ -58,7 +58,18 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
  * LPC Bus
  */
 
-class mcpx_isalpc_device : public pci_device {
+class lpcbus_host_interface {
+public:
+	virtual void set_virtual_line(int line, int state) = 0;
+};
+
+class lpcbus_device_interface {
+public:
+	virtual void map_extra(address_space *memory_space, address_space *io_space) = 0;
+	virtual void set_host(int index, lpcbus_host_interface *host) = 0;
+};
+
+class mcpx_isalpc_device : public pci_device, public lpcbus_host_interface {
 public:
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -68,6 +79,8 @@ public:
 
 	uint32_t acknowledge();
 	void debug_generate_irq(int irq, int state);
+
+	virtual void set_virtual_line(int line, int state) override;
 
 	DECLARE_READ32_MEMBER(acpi_r);
 	DECLARE_WRITE32_MEMBER(acpi_w);
@@ -100,6 +113,8 @@ private:
 	required_device<pic8259_device> pic8259_1;
 	required_device<pic8259_device> pic8259_2;
 	required_device<pit8254_device> pit8254;
+
+	lpcbus_device_interface *lpcdevices[16];
 };
 
 DECLARE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device)
