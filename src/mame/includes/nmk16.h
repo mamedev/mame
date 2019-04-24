@@ -54,6 +54,7 @@ public:
 	void twinactn(machine_config &config);
 	void firehawk(machine_config &config);
 	void gunnail(machine_config &config);
+	void gunnailb(machine_config &config);
 	void hachamf(machine_config &config);
 	void redhawki(machine_config &config);
 	void bjtwin(machine_config &config);
@@ -90,6 +91,7 @@ public:
 	void init_banked_audiocpu();
 	void init_grdnstrm();
 	void init_grdnstrmau();
+	void init_gunnailb();
 	void init_spec2k();
 	void init_redfoxwp2a();
 	void init_grdnstrmg();
@@ -236,6 +238,9 @@ protected:
 	void firehawk_map(address_map &map);
 	void firehawk_sound_cpu(address_map &map);
 	void gunnail_map(address_map &map);
+	void gunnailb_map(address_map &map);
+	void gunnailb_sound_map(address_map &map);
+	void gunnailb_sound_io_map(address_map &map);
 	void hachamf_map(address_map &map);
 	void macross2_map(address_map &map);
 	void macross2_sound_io_map(address_map &map);
