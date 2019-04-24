@@ -1677,6 +1677,8 @@ private:
 	uint8_t m_processor_name_string[48];
 	offs_t m_msr_top_mem;
 	uint64_t m_msr_sys_cfg;
+	offs_t m_msr_smm_base;
+	uint64_t m_msr_smm_mask;
 	uint64_t m_msr_mtrrfix[11];
 	uint8_t m_memory_ranges_1m[1024 / 4];
 	cpucache<17, 9, Cache2Way, CacheLineBytes64> cache; // 512 sets, 2 ways (cachelines per set), 64 bytes per cacheline

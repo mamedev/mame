@@ -4708,6 +4708,8 @@ void athlonxp_device::device_start()
 	save_item(NAME(m_processor_name_string));
 	save_item(NAME(m_msr_top_mem));
 	save_item(NAME(m_msr_sys_cfg));
+	save_item(NAME(m_msr_smm_base));
+	save_item(NAME(m_msr_smm_mask));
 	save_item(NAME(m_msr_mtrrfix));
 	save_item(NAME(m_memory_ranges_1m));
 }
@@ -4761,6 +4763,8 @@ void athlonxp_device::device_reset()
 		m_memory_ranges_1m[n] = 0;
 	m_msr_top_mem = 1024 * 1024;
 	m_msr_sys_cfg = 0;
+	m_msr_smm_base = 0x30000;
+	m_msr_smm_mask = 0;
 
 	m_cpuid_max_input_value_eax = 0x01;
 	m_cpu_version = REG32(EDX);
