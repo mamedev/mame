@@ -4,6 +4,7 @@
 #define MAME_MACHINE_NFORCEPC_H
 
 #pragma once
+#include "machine/8042kbdc.h"
 
 // NVIDIA Corporation nForce CPU bridge
 
@@ -162,5 +163,88 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device)
+
+// ITE IT8703F-A SuperIO
+
+class it8703f_device : public device_t, public lpcbus_device_interface
+{
+public:
+	it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
+	virtual void set_host(int index, lpcbus_host_interface *host) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	auto pin_reset() { return pin_reset_callback.bind(); }
+	auto pin_gatea20() { return pin_gatea20_callback.bind(); }
+
+	// keyboard
+	DECLARE_WRITE_LINE_MEMBER(irq_keyboard_w);
+	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
+	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
+
+	void map_keyboard(address_map &map);
+	void unmap_keyboard(address_map &map);
+
+	DECLARE_READ8_MEMBER(read_it8703f);
+	DECLARE_WRITE8_MEMBER(write_it8703f);
+	// keyboard
+	DECLARE_READ8_MEMBER(at_keybc_r);
+	DECLARE_WRITE8_MEMBER(at_keybc_w);
+	DECLARE_READ8_MEMBER(keybc_status_r);
+	DECLARE_WRITE8_MEMBER(keybc_command_w);
+
+protected:
+	virtual void device_start() override;
+
+private:
+	enum OperatingMode
+	{
+		Run = 0,
+		Configuration = 1
+	} mode;
+	enum LogicalDevice
+	{
+		FDC = 0,
+		Parallel,
+		Serial1,
+		Serial2,
+		Keyboard = 5,
+		ConsumerIR,
+		Gpio1,
+		Gpio2,
+		Gpio34,
+		ACPI,
+		Gpio567 = 12
+	};
+	int config_key_step;
+	int config_index;
+	int logical_device;
+	uint8_t global_configuration_registers[0x30];
+	uint8_t configuration_registers[13][0x100];
+	devcb_write_line pin_reset_callback;
+	devcb_write_line pin_gatea20_callback;
+	required_device<kbdc8042_device> m_kbdc;
+	bool enabled_logical[13];
+
+	lpcbus_host_interface *lpchost;
+	int lpcindex;
+	address_space *memspace;
+	address_space *iospace;
+
+	void internal_memory_map(address_map &map);
+	void internal_io_map(address_map &map);
+	uint16_t get_base_address(int logical, int index);
+	void map_keyboard_addresses();
+	void unmap_keyboard_addresses();
+	void write_global_configuration_register(int index, int data);
+	void write_logical_configuration_register(int index, int data);
+	void write_keyboard_configuration_register(int index, int data);
+	uint16_t read_global_configuration_register(int index);
+	uint16_t read_logical_configuration_register(int index);
+	uint16_t read_keyboard_configuration_register(int index);
+};
+
+DECLARE_DEVICE_TYPE(IT8703F, it8703f_device)
+
 
 #endif
