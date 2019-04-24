@@ -7,10 +7,13 @@
 *************************************************************************/
 
 #include "cpu/mcs48/mcs48.h"
+#include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
@@ -247,24 +250,33 @@ public:
 	carnival_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vicdual_state(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
-		m_psg(*this, "psg")
+		m_psg(*this, "psg"),
+		m_pit(*this, "pit"),
+		m_dac(*this, "dac%u", 0),
+		m_vref(*this, "vref%u", 0)
 	{ }
 
 	void carnival(machine_config &config);
-	void carnival_audio(machine_config &config);
+	void carnivalb(machine_config &config);
 	void carnivalh(machine_config &config);
+
+	void carnivala_audio(machine_config &config);
+	void carnivalb_audio(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
-	optional_device<i8039_device> m_audiocpu;
+	required_device<i8035_device> m_audiocpu;
 	optional_device<ay8910_device> m_psg;
+	optional_device<pit8253_device> m_pit;
+	optional_device_array<dac_bit_interface, 3> m_dac;
+	optional_device_array<voltage_regulator_device, 3> m_vref;
 
 	void carnival_io_map(address_map &map);
 	void mboard_map(address_map &map);
 
-	int m_psgData;
-	int m_psgBus;
+	int m_musicData;
+	int m_musicBus;
 
 	DECLARE_WRITE8_MEMBER(carnival_io_w);
 
@@ -272,9 +284,11 @@ protected:
 	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
 	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
-	DECLARE_WRITE8_MEMBER( carnival_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnival_music_port_2_w );
-	void carnival_psg_latch(address_space &space);
+	DECLARE_WRITE8_MEMBER( carnivala_music_port_1_w );
+	DECLARE_WRITE8_MEMBER( carnivala_music_port_2_w );
+	void carnival_psg_latch();
+	DECLARE_WRITE8_MEMBER( carnivalb_music_port_1_w );
+	DECLARE_WRITE8_MEMBER( carnivalb_music_port_2_w );
 };
 
 class headonsa_state : public vicdual_state
