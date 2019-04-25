@@ -1300,7 +1300,7 @@ ROM_END
    with only the program ROMs on it.  This set is a combination of dumps from those two boards, so there
    is a small chance they could be mismatched.
 
-Sound ROMs for Moonwar:
+Sound ROMs for Moon War:
 
 MOON WAR       MOON WAR
 RVO  1C        RVO  2C

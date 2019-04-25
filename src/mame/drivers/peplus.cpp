@@ -13786,7 +13786,7 @@ Double Bonus Poker   P323A     99.10%
 	ROM_LOAD( "mxo-cg2440.u80",  0x18000, 0x8000, CRC(9849096b) SHA1(65604ac2a2a27d4e458f6878aacf86f63f5f7c58) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2440.u43", 0x0000, 0x0200, BAD_DUMP CRC(37e8619f) SHA1(303ab25ef0483f2c5023d1765bb0cf9984c45f63) )
+	ROM_LOAD( "capx2440.u43", 0x0000, 0x0200, CRC(00261579) SHA1(71ee1f3de47d1e796cf4b637b2db02e97f47bb8b) )
 ROM_END
 
 ROM_START( pexm003p ) /* Superboard : Multi-Poker (XM00003P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
@@ -14877,7 +14877,7 @@ GAMEL( 1995, pekoc825,  0,        peplus, peplus_poker,  peplus_state, init_pepl
 /* Superboard : Multi-Poker */
 GAMEL( 1995, pexm001p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00001P+XMP00003) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pexm002p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
-GAMEL( 1995, pexm002pa, pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAPX2440 needs a redumped */
+GAMEL( 1995, pexm002pa, pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pexm003p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00003P+XMP00024) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pexm004p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00004P+XMP00002) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pexm005p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
