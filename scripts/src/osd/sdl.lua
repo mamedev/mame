@@ -170,7 +170,11 @@ newoption {
 }
 
 if not _OPTIONS["NO_USE_XINPUT"] then
-	_OPTIONS["NO_USE_XINPUT"] = "1"
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" then
+		_OPTIONS["NO_USE_XINPUT"] = "1"
+	else
+		_OPTIONS["NO_USE_XINPUT"] = "0"
+	end
 end
 
 newoption {
