@@ -75,6 +75,7 @@
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
 #include "formats/sdf_dsk.h"
+#include "formats/os9_dsk.h"
 
 
 /***************************************************************************
