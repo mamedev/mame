@@ -4463,4 +4463,244 @@
 		</part>
 	</software>
 
+	<software name="msadvent">
+		<description>Microsoft Adventure</description>
+		<year>1980</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="2019-04-12"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple II with 32K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234771">
+				<rom name="Microsoft Adventure.woz" size="234771" crc="6e623593" sha1="d52f0a3b95a386875cb3691f5471e8c14440ccb8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcinvadr">
+		<description>Micro Invaders</description>
+		<year>1979</year>
+		<publisher>Programma Software</publisher>
+		<info name="release" value="2019-04-13"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple II with 32K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="Micro Invaders.woz" size="234781" crc="28ae8795" sha1="f18c23182c56da29e657f0f53f16f65a3a64e33d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blballmb">
+		<description>Blister Ball and Mad Bomber</description>
+		<year>1981</year>
+		<publisher>Creative Computing Software</publisher>
+		<info name="release" value="2019-04-16"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="Blisterball and Mad Bomber.woz" size="234789" crc="464e6b8d" sha1="f4ac813e979ea5c0e9b476a57063b37c25713d46" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstypetr">
+		<description>Typing Tutor</description>
+		<year>1979</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="2019-04-16"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="Typing Tutor.woz" size="234810" crc="58306c14" sha1="b056c2772643d89336a6ee9894b5dfbd411f53f1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spwarior">
+		<description>Space Warrior</description>
+		<year>1981</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-04-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 32K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="61721">
+				<rom name="Space Warrior.woz" size="61721" crc="e0b4e0ed" sha1="96cd4e7ba3e49c48d29987fec219f452eb33b413" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmcrown">
+		<description>The Crimson Crown</description>
+		<year>1985</year>
+		<publisher>Polarware</publisher>
+		<info name="release" value="2019-04-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234766">
+				<rom name="The Crimson Crown side A.woz" size="234766" crc="3ba098cb" sha1="039acb376d74b1079469af9b49ec0220d03f5318" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234766">
+				<rom name="The Crimson Crown side B.woz" size="234766" crc="d158deed" sha1="e02ca1c7af89f56efe1d6767c40963161dfbe926" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zyhearts">
+		<description>Zykron Hearts</description>
+		<year>1986</year>
+		<publisher> Zykron Company</publisher>
+		<info name="release" value="2019-04-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="246767">
+				<rom name="Zykron Hearts.woz" size="246767" crc="5e55409f" sha1="342f513e287128acb67e0b839d815b143b43990c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grush82">
+		<description>Gold Rush (1982) (Sentient Software)</description>
+		<year>1982</year>
+		<publisher>Sentient Software</publisher>
+		<info name="release" value="2019-04-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="208162">
+				<rom name="Gold Rush.woz" size="208162" crc="e8ee2a66" sha1="68b196839e56d49a451adf216591754fb45618a4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prshcomp">
+		<description>The Print Shop Companion (Version 1.2)</description>
+		<year>1985</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-04-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+		<!-- This is the final version produced for the Apple II. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="The Print Shop Companion v1.2 side A.woz" size="234794" crc="e8af250e" sha1="875f61ac89ec48ed450fb646e5eafd9a24233c4d" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="The Print Shop Companion v1.2 side B.woz" size="234794" crc="a06b52a9" sha1="1c6f461fbd4c78dd48480c334f0d5f1df2cf591e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saadland">
+		<description>Adventureland (Version 2.0/416)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-04-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234839">
+				<rom name="S.A.G.A. 1 - Adventureland side A.woz" size="234839" crc="cb8da55c" sha1="3e2f79d3c52d6e97510aac3ced977c60eb6b5360" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot Disk"/>
+			<dataarea name="flop" size="234839">
+				<rom name="S.A.G.A. 1 - Adventureland side B (boot).woz" size="234839" crc="83cb42a3" sha1="a50127f7650549b4e73bb5a2e718ceefc456a232" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sapiradv">
+		<description>Pirate Adventure (Version 2.1/408)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-04-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234855">
+				<rom name="S.A.G.A. 2 - Pirate Adventure side A.woz" size="234855" crc="e1d89cb0" sha1="a1d672605f4b3bb4585f13824fc521b0681b3d89" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot Disk"/>
+			<dataarea name="flop" size="234855">
+				<rom name="S.A.G.A. 2 - Pirate Adventure side B (boot).woz" size="234855" crc="36443115" sha1="bbe23e9d3f21b389f41be4795d34b2c9c1c87208" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samisimp">
+		<description>Mission Impossible (Version 2.1/306)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-04-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234836">
+				<rom name="S.A.G.A. 3 - Mission Impossible side A.woz" size="234836" crc="6e0da536" sha1="dda47d2b1916803174a7b8d1dad23e0b428ff0d7" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot Disk"/>
+			<dataarea name="flop" size="234836">
+				<rom name="S.A.G.A. 3 - Mission Impossible side B (boot).woz" size="234836" crc="b4c1cd26" sha1="4f68d858f02ebff83c115e06485ce78a7f47d8b9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="savoodoo">
+		<description>Voodoo Castle (Version 2.1/119)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-04-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234840">
+				<rom name="S.A.G.A. 4 - Voodoo Castle side A.woz" size="234840" crc="9922794b" sha1="a0ba732d20ae0f01f8a7237256c5e14fce74c9c6" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot Disk"/>
+			<dataarea name="flop" size="234840">
+				<rom name="S.A.G.A. 4 - Voodoo Castle side B (boot).woz" size="234840" crc="00149d2f" sha1="ec747fef709fa8a01cf6bb0f0d8bff042015b528" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
