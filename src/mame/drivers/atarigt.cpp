@@ -1313,7 +1313,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	if (pc == 0x25834 || pc == 0x25860)
 		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A3) - 2);
 
-	m_playfield_tilemap->write32(space, offset, data, mem_mask);
+	m_playfield_tilemap->write32(offset, data, mem_mask);
 }
 
 void atarigt_state::init_tmek()
