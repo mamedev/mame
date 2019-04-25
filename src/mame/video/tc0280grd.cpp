@@ -23,17 +23,19 @@ control registers:
 #include "emu.h"
 #include "tc0280grd.h"
 
+#include <algorithm>
+
 #define TC0280GRD_RAM_SIZE 0x2000
 
 DEFINE_DEVICE_TYPE(TC0280GRD, tc0280grd_device, "tc0280grd", "Taito TC0280GRD / TC0430GRW")
 
-tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0280GRD, tag, owner, clock),
-	m_ram(nullptr),
-	//m_ctrl[8](0),
-	m_base_color(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, TC0280GRD, tag, owner, clock)
+	, m_ram(nullptr)
+	, m_base_color(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
+	std::fill(std::begin(m_ctrl), std::end(m_ctrl), 0);
 }
 
 //-------------------------------------------------
@@ -45,10 +47,10 @@ void tc0280grd_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0280grd_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap->set_transparent_pen(0);
 
-	m_ram = make_unique_clear<uint16_t[]>(TC0280GRD_RAM_SIZE / 2);
+	m_ram = make_unique_clear<u16[]>(TC0280GRD_RAM_SIZE / 2);
 
 	save_pointer(NAME(m_ram), TC0280GRD_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
@@ -60,9 +62,7 @@ void tc0280grd_device::device_start()
 
 void tc0280grd_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_ctrl[i] = 0;
 }
 
@@ -70,7 +70,7 @@ void tc0280grd_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
+TILE_GET_INFO_MEMBER(tc0280grd_device::get_tile_info)
 {
 	int attr = m_ram[tile_index];
 	SET_TILE_INFO_MEMBER(m_gfxnum,
@@ -79,38 +79,38 @@ TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
 			0);
 }
 
-READ16_MEMBER( tc0280grd_device::tc0280grd_word_r )
+u16 tc0280grd_device::tc0280grd_word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0280grd_word_w )
+void tc0280grd_device::tc0280grd_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0280grd_ctrl_word_w )
+void tc0280grd_device::tc0280grd_ctrl_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset]);
 }
 
-READ16_MEMBER( tc0280grd_device::tc0430grw_word_r )
+u16 tc0280grd_device::tc0430grw_word_r(offs_t offset)
 {
-	return tc0280grd_word_r(space, offset, mem_mask);
+	return tc0280grd_word_r(offset);
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0430grw_word_w )
+void tc0280grd_device::tc0430grw_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	tc0280grd_word_w(space, offset, data, mem_mask);
+	tc0280grd_word_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0430grw_ctrl_word_w )
+void tc0280grd_device::tc0430grw_ctrl_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	tc0280grd_ctrl_word_w(space, offset, data, mem_mask);
+	tc0280grd_ctrl_word_w(offset, data, mem_mask);
 }
 
-void tc0280grd_device::tc0280grd_tilemap_update( int base_color )
+void tc0280grd_device::tc0280grd_tilemap_update(int base_color)
 {
 	if (m_base_color != base_color)
 	{
@@ -119,35 +119,32 @@ void tc0280grd_device::tc0280grd_tilemap_update( int base_color )
 	}
 }
 
-void tc0280grd_device::tc0430grw_tilemap_update( int base_color )
+void tc0280grd_device::tc0430grw_tilemap_update(int base_color)
 {
 	tc0280grd_tilemap_update(base_color);
 }
 
-void tc0280grd_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority, int xmultiply )
+void tc0280grd_device::zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, u32 priority, int xmultiply)
 {
-	uint32_t startx, starty;
-	int incxx, incxy, incyx, incyy;
-
 	/* 24-bit signed */
-	startx = ((m_ctrl[0] & 0xff) << 16) + m_ctrl[1];
+	u32 startx = ((m_ctrl[0] & 0xff) << 16) + m_ctrl[1];
 
 	if (startx & 0x800000)
 		startx -= 0x1000000;
 
-	incxx = (int16_t)m_ctrl[2];
+	int incxx = (s16)m_ctrl[2];
 	incxx *= xmultiply;
-	incyx = (int16_t)m_ctrl[3];
+	int incyx = (s16)m_ctrl[3];
 
 	/* 24-bit signed */
-	starty = ((m_ctrl[4] & 0xff) << 16) + m_ctrl[5];
+	u32 starty = ((m_ctrl[4] & 0xff) << 16) + m_ctrl[5];
 
 	if (starty & 0x800000)
 		starty -= 0x1000000;
 
-	incxy = (int16_t)m_ctrl[6];
+	int incxy = (s16)m_ctrl[6];
 	incxy *= xmultiply;
-	incyy = (int16_t)m_ctrl[7];
+	int incyy = (s16)m_ctrl[7];
 
 	startx -= xoffset * incxx + yoffset * incyx;
 	starty -= xoffset * incxy + yoffset * incyy;
@@ -158,12 +155,12 @@ void tc0280grd_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 			0, priority);
 }
 
-void tc0280grd_device::tc0280grd_zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority )
+void tc0280grd_device::tc0280grd_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, u32 priority)
 {
 	zoom_draw(screen, bitmap, cliprect, xoffset, yoffset, priority, 2);
 }
 
-void tc0280grd_device::tc0430grw_zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority )
+void tc0280grd_device::tc0430grw_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, u32 priority)
 {
 	zoom_draw(screen, bitmap, cliprect, xoffset, yoffset, priority, 1);
 }
