@@ -1408,10 +1408,23 @@ void mips1_device_base::handle_cop1(u32 const op)
 				if (f32_lt(float32_t{ u32(m_f[FSREG >> 1]) }, float32_t{ 0 }))
 					set_cop1_reg(FDREG >> 1, f32_mul(float32_t{ u32(m_f[FSREG >> 1]) }, i32_to_f32(-1)).v);
 				else
-					set_cop1_reg(FDREG >> 1, m_f[FSREG >> 1]);
+					set_cop1_reg(FDREG >> 1, u32(m_f[FSREG >> 1]));
 				break;
 			case 0x06: // MOV.S
-				m_f[FDREG >> 1] = m_f[FSREG >> 1];
+				if (FDREG & 1)
+					if (FSREG & 1)
+						// move high half to high half
+						m_f[FDREG >> 1] = (m_f[FSREG >> 1] & ~0xffffffffULL) | u32(m_f[FDREG >> 1]);
+					else
+						// move low half to high half
+						m_f[FDREG >> 1] = (m_f[FSREG >> 1] << 32) | u32(m_f[FDREG >> 1]);
+				else
+					if (FSREG & 1)
+						// move high half to low half
+						m_f[FDREG >> 1] = (m_f[FDREG >> 1] & ~0xffffffffULL) | (m_f[FSREG >> 1] >> 32);
+					else
+						// move low half to low half
+						m_f[FDREG >> 1] = (m_f[FDREG >> 1] & ~0xffffffffULL) | u32(m_f[FSREG >> 1]);
 				break;
 			case 0x07: // NEG.S
 				set_cop1_reg(FDREG >> 1, f32_mul(float32_t{ u32(m_f[FSREG >> 1]) }, i32_to_f32(-1)).v);
@@ -1802,7 +1815,7 @@ void mips1_device_base::handle_cop1(u32 const op)
 	}
 }
 
-void mips1_device_base::set_cop1_reg(unsigned const reg, u64 const data)
+template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T const data)
 {
 	// translate softfloat exception flags to cause register
 	if (softfloat_exceptionFlags)
@@ -1829,7 +1842,10 @@ void mips1_device_base::set_cop1_reg(unsigned const reg, u64 const data)
 		m_fcr31 |= ((m_fcr31 & FCR31_CM) >> 10);
 	}
 
-	m_f[reg] = data;
+	if (sizeof(T) == 4)
+		m_f[reg] = (m_f[reg] & ~0xffffffffULL) | data;
+	else
+		m_f[reg] = data;
 }
 
 bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &address)
