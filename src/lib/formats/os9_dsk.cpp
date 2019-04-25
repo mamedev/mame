@@ -44,7 +44,7 @@ int os9_format::identify(io_generic *io, uint32_t form_factor)
 	int type = find_size(io, form_factor);
 
 	if (type != -1)
-		return 90;
+		return 75;
 	return 0;
 }
 
@@ -73,7 +73,6 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
                 if(os9_tracks == f.track_count) {
                     if( os9_heads == f.head_count ) {
                         if(os9_sectors == f.sector_count ) {
-                            fprintf(stderr, "Success: %d\n", i);
                             return i;
                         }
                     }
@@ -85,40 +84,30 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-// #define GAP1 22
-// #define GAP2 32
-// #define GAP3 24
-
-#define GAP1 18
-#define GAP2 28
-#define GAP3 20
-
-//		1500, 18, 35, 1, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-
 const os9_format::format os9_format::formats[] = {
 	{   //  5"25 160K double density
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 18, 35, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, GAP1, GAP2, GAP3
+		2000, 18, 35, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
 	{   //  5"25 160K double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 18, 35, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, GAP1, GAP2, GAP3
+		2000, 18, 35, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
 	{   //  5"25 160K double density
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 18, 40, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, GAP1, GAP2, GAP3
+		2000, 18, 40, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
 	{   //  5"25 160K double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 18, 40, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, GAP1, GAP2, GAP3
+		2000, 18, 40, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
 	{   //  5"25 160K double density
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 18, 80, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, GAP1, GAP2, GAP3
+		2000, 18, 80, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
 	{   //  5"25 160K double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 18, 80, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, GAP1, GAP2, GAP3
+		2000, 18, 80, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
 	{}
 };
