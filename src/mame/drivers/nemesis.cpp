@@ -2940,7 +2940,7 @@ void nemesis_state::bubsys_init()
 	*/
 	
 	const uint8_t *src = memregion("maincpu")->base();
-	memcpy(m_bubsys_shared_ram, src, 0x2000);
+	memcpy(m_bubsys_shared_ram, src, 0x1e0);
 
 	/*
 		The MCU sets this flag once the boot program is copied.  The 68000 will reset
