@@ -74,6 +74,7 @@ public:
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto smi() { return m_smi_callback.bind(); }
 	auto interrupt_output() { return m_interrupt_output.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
@@ -107,13 +108,17 @@ protected:
 private:
 	void internal_io_map(address_map &map);
 	void lpc_io(address_map &map);
+	void update_smi_line();
 
+	devcb_write_line m_smi_callback;
 	devcb_write_line m_interrupt_output;
 	devcb_write8 m_boot_state_hook;
 	required_device<pic8259_device> pic8259_1;
 	required_device<pic8259_device> pic8259_2;
 	required_device<pit8254_device> pit8254;
 
+	uint16_t m_global_smi_control;
+	uint8_t m_smi_command_port;
 	lpcbus_device_interface *lpcdevices[16];
 };
 

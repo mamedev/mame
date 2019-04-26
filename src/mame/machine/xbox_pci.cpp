@@ -115,17 +115,21 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_ISALPC, tag, owner, clock),
+	m_smi_callback(*this),
 	m_interrupt_output(*this),
 	m_boot_state_hook(*this),
 	pic8259_1(*this, "pic8259_1"),
 	pic8259_2(*this, "pic8259_2"),
-	pit8254(*this, "pit8254")
+	pit8254(*this, "pit8254"),
+	m_global_smi_control(0),
+	m_smi_command_port(0)
 {
 }
 
 void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
+	m_smi_callback.resolve_safe();
 	m_interrupt_output.resolve_safe();
 	m_boot_state_hook.resolve_safe();
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
@@ -189,9 +193,21 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	*/
 }
 
+void mcpx_isalpc_device::update_smi_line()
+{
+	if (m_global_smi_control)
+		m_smi_callback(1);
+	else
+		m_smi_callback(0);
+}
+
 READ32_MEMBER(mcpx_isalpc_device::acpi_r)
 {
 	logerror("Acpi read from %04X mask %08X\n", bank_infos[0].adr + offset * 4, mem_mask);
+	if ((offset == 0xa) && ACCESSING_BITS_0_15)
+		return m_global_smi_control;
+	if ((offset == 0xb) && ACCESSING_BITS_16_23)
+		return m_smi_command_port << 16;
 	return 0;
 }
 
@@ -199,11 +215,20 @@ WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 {
 	// Seen using word registers at the following offsets
 	// 0x00 0x02 0x04 0x08 0x20 0x22 0x28 0xa0 0xa2 0xc0-0xd8
+	if ((offset == 0xa) && ACCESSING_BITS_0_15)
+	{
+		// Global SMI Control
+		m_global_smi_control = m_global_smi_control & (~data & 0xffff);
+		update_smi_line();
+	}
 	if ((offset == 0xb) && ACCESSING_BITS_16_23)
 	{
 		// SMI Command Port
 		// write to byte 0x2e must generate a SMI interrupt
-		logerror("Generate software SMI with value %02X\n", (data >> 16) & 0xff);
+		m_smi_command_port = (data >> 16) & 0xff;
+		m_global_smi_control |= 0x200;
+		update_smi_line();
+		logerror("Generate software SMI with value %02X\n", m_smi_command_port);
 	}
 	logerror("Acpi write %08X to %04X mask %08X\n", data, bank_infos[0].adr + offset * 4, mem_mask);
 }

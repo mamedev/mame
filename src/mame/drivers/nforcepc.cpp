@@ -698,6 +698,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &nforcepc_state::nforce_map);
 	maincpu.set_addrmap(AS_IO, &nforcepc_state::nforce_map_io);
 	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
+	//maincpu.smiact().set("pci:01.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, ":pci", 0);
 	CRUSH11(config, ":pci:00.0", 0, "maincpu"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
@@ -705,6 +706,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
 	10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)*/
 	mcpx_isalpc_device &isa(MCPX_ISALPC(config, ":pci:01.0", 0, 0x10430c11)); // 10de:01b2 NVIDIA Corporation nForce ISA Bridge (LPC bus)
+	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
 	it8703f_device &ite(IT8703F(config, ":pci:01.0:0", 0));
