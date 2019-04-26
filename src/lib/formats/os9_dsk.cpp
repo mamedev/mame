@@ -26,31 +26,31 @@ os9_format::os9_format() : wd177x_format(formats)
 
 const char *os9_format::name() const
 {
-	return "os9";
+    return "os9";
 }
 
 const char *os9_format::description() const
 {
-	return "OS-9 floppy disk image";
+    return "OS-9 floppy disk image";
 }
 
 const char *os9_format::extensions() const
 {
-	return "dsk,os9";
+    return "dsk,os9";
 }
 
 int os9_format::identify(io_generic *io, uint32_t form_factor)
 {
-	int type = find_size(io, form_factor);
+    int type = find_size(io, form_factor);
 
-	if (type != -1)
-		return 90;
-	return 0;
+    if (type != -1)
+        return 75;
+    return 0;
 }
 
 int os9_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	uint64_t size = io_generic_size(io);
+    uint64_t size = io_generic_size(io);
 
     uint8_t os9_header[0x20];
     io_generic_read(io, os9_header, 0, 0x20);
@@ -73,7 +73,6 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
                 if(os9_tracks == f.track_count) {
                     if( os9_heads == f.head_count ) {
                         if(os9_sectors == f.sector_count ) {
-                            fprintf(stderr, "Success: %d\n", i);
                             return i;
                         }
                     }
@@ -82,37 +81,35 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
         }
     }
 
-	return -1;
+    return -1;
 }
 
-//		1500, 18, 35, 1, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-
 const os9_format::format os9_format::formats[] = {
-	{   //  5"25 160K double density
-		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		4000, 18, 35, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-	},
-	{   //  5"25 160K double density
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		4000, 18, 35, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-	},
-	{   //  5"25 160K double density
-		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		4000, 18, 40, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-	},
-	{   //  5"25 160K double density
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		4000, 18, 40, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-	},
-	{   //  5"25 160K double density
-		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		4000, 18, 80, 1, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-	},
-	{   //  5"25 160K double density
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		4000, 18, 80, 2, 256, {}, 1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 22, 32, 24
-	},
-	{}
+    {   //  5"25 160K double density
+        floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+        2000, 18, 35, 1, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+    },
+    {   //  5"25 160K double density
+        floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+        2000, 18, 35, 2, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+    },
+    {   //  5"25 160K double density
+        floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+        2000, 18, 40, 1, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+    },
+    {   //  5"25 160K double density
+        floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+        2000, 18, 40, 2, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+    },
+    {   //  5"25 160K double density
+        floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+        2000, 18, 80, 1, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+    },
+    {   //  5"25 160K double density
+        floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+        2000, 18, 80, 2, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+    },
+    {}
 };
 
 const floppy_format_type FLOPPY_OS9_FORMAT = &floppy_image_format_creator<os9_format>;

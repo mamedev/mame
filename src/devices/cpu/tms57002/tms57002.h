@@ -12,16 +12,17 @@
 
 #pragma once
 
-class tms57002_device : public cpu_device, public device_sound_interface {
+class tms57002_device : public cpu_device, public device_sound_interface
+{
 public:
-	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto dready_callback() { return m_dready_callback.bind(); }
 	auto pc0_callback() { return m_pc0_callback.bind(); }
 	auto empty_callback() { return m_empty_callback.bind(); }
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	u8 data_r();
+	void data_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(pload_w);
 	DECLARE_WRITE_LINE_MEMBER(cload_w);
@@ -37,9 +38,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	virtual space_config_vector memory_space_config() const override;
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual u32 execute_min_cycles() const override;
+	virtual u32 execute_max_cycles() const override;
+	virtual u32 execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -99,19 +100,19 @@ private:
 	enum { INC_CA = 1, INC_ID = 2 };
 
 	struct icd {
-		unsigned short op;
-		short next;
-		unsigned char param;
+		u16 op;
+		s16 next;
+		u8 param;
 	};
 
 	struct hcd {
-		unsigned int st1;
-		short ipc;
-		short next;
+		u32 st1;
+		s16 ipc;
+		s16 next;
 	};
 
 	struct cd {
-		short hashbase[256];
+		s16 hashbase[256];
 		hcd hashnode[HBS];
 		icd inst[IBS];
 		int hused, iused;
@@ -120,30 +121,30 @@ private:
 	struct cstate {
 		int branch;
 		int inc;
-		short hnode;
-		short ipc;
+		s16 hnode;
+		s16 ipc;
 	};
 
 	// macc_read and macc_write are used by non-pipelined instructions
-	int64_t macc, macc_read, macc_write;
+	s64 macc, macc_read, macc_write;
 
-	uint32_t cmem[256];
-	uint32_t dmem0[256];
-	uint32_t dmem1[32];
+	u32 cmem[256];
+	u32 dmem0[256];
+	u32 dmem1[32];
 
-	uint32_t si[4], so[4];
+	u32 si[4], so[4];
 
-	uint32_t st0, st1, sti;
-	uint32_t aacc, xoa, xba, xwr, xrd, txrd, creg;
+	u32 st0, st1, sti;
+	u32 aacc, xoa, xba, xwr, xrd, txrd, creg;
 
-	uint8_t pc, hpc, ca, id, ba0, ba1, rptc, rptc_next, sa;
+	u8 pc, hpc, ca, id, ba0, ba1, rptc, rptc_next, sa;
 
-	uint32_t xm_adr;
+	u32 xm_adr;
 
-	uint8_t host[4], hidx, allow_update;
+	u8 host[4], hidx, allow_update;
 
-	uint32_t update[16];
-	uint8_t update_counter_head, update_counter_tail;
+	u32 update[16];
+	u8 update_counter_head, update_counter_tail;
 
 	cd cache;
 
@@ -157,21 +158,21 @@ private:
 	int icount;
 	int unsupported_inst_warning;
 
-	void decode_error(uint32_t opcode);
-	void decode_cat1(uint32_t opcode, unsigned short *op, cstate *cs);
-	void decode_cat2_pre(uint32_t opcode, unsigned short *op, cstate *cs);
-	void decode_cat3(uint32_t opcode, unsigned short *op, cstate *cs);
-	void decode_cat2_post(uint32_t opcode, unsigned short *op, cstate *cs);
+	void decode_error(u32 opcode);
+	void decode_cat1(u32 opcode, u16 *op, cstate *cs);
+	void decode_cat2_pre(u32 opcode, u16 *op, cstate *cs);
+	void decode_cat3(u32 opcode, u16 *op, cstate *cs);
+	void decode_cat2_post(u32 opcode, u16 *op, cstate *cs);
 
-	inline int xmode(uint32_t opcode, char type, cstate *cs);
-	inline int sfao(uint32_t st1);
-	inline int dbp(uint32_t st1);
-	inline int crm(uint32_t st1);
-	inline int sfai(uint32_t st1);
-	inline int sfmo(uint32_t st1);
-	inline int rnd(uint32_t st1);
-	inline int movm(uint32_t st1);
-	inline int sfma(uint32_t st1);
+	inline int xmode(u32 opcode, char type, cstate *cs);
+	inline int sfao(u32 st1);
+	inline int dbp(u32 st1);
+	inline int crm(u32 st1);
+	inline int sfai(u32 st1);
+	inline int sfmo(u32 st1);
+	inline int rnd(u32 st1);
+	inline int movm(u32 st1);
+	inline int sfma(u32 st1);
 
 	void update_dready();
 	void update_pc0();
@@ -180,29 +181,29 @@ private:
 	void xm_init();
 	void xm_step_read();
 	void xm_step_write();
-	int64_t macc_to_output_0(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_1(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_2(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_3(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_0s(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_1s(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_2s(int64_t rounding, uint64_t rmask);
-	int64_t macc_to_output_3s(int64_t rounding, uint64_t rmask);
-	int64_t check_macc_overflow_0();
-	int64_t check_macc_overflow_1();
-	int64_t check_macc_overflow_2();
-	int64_t check_macc_overflow_3();
-	int64_t check_macc_overflow_0s();
-	int64_t check_macc_overflow_1s();
-	int64_t check_macc_overflow_2s();
-	int64_t check_macc_overflow_3s();
+	s64 macc_to_output_0(s64 rounding, u64 rmask);
+	s64 macc_to_output_1(s64 rounding, u64 rmask);
+	s64 macc_to_output_2(s64 rounding, u64 rmask);
+	s64 macc_to_output_3(s64 rounding, u64 rmask);
+	s64 macc_to_output_0s(s64 rounding, u64 rmask);
+	s64 macc_to_output_1s(s64 rounding, u64 rmask);
+	s64 macc_to_output_2s(s64 rounding, u64 rmask);
+	s64 macc_to_output_3s(s64 rounding, u64 rmask);
+	s64 check_macc_overflow_0();
+	s64 check_macc_overflow_1();
+	s64 check_macc_overflow_2();
+	s64 check_macc_overflow_3();
+	s64 check_macc_overflow_0s();
+	s64 check_macc_overflow_1s();
+	s64 check_macc_overflow_2s();
+	s64 check_macc_overflow_3s();
 	void cache_flush();
-	void add_one(cstate *cs, unsigned short op, uint8_t param);
-	void decode_one(uint32_t opcode, cstate *cs, void (tms57002_device::*dec)(uint32_t opcode, unsigned short *op, cstate *cs));
-	short get_hash(unsigned char adr, uint32_t st1, short *pnode);
-	short get_hashnode(unsigned char adr, uint32_t st1, short pnode);
+	void add_one(cstate *cs, u16 op, u8 param);
+	void decode_one(u32 opcode, cstate *cs, void (tms57002_device::*dec)(u32 opcode, u16 *op, cstate *cs));
+	s16 get_hash(u8 adr, u32 st1, s16 *pnode);
+	s16 get_hashnode(u8 adr, u32 st1, s16 pnode);
 	int decode_get_pc();
-	uint32_t get_cmem(uint8_t addr);
+	u32 get_cmem(u8 addr);
 
 #define CINTRPDECL
 #include "../../emu/cpu/tms57002/tms57002.hxx"

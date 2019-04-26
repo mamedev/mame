@@ -2730,8 +2730,8 @@ ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it's a 4 P
 	ROM_LOAD( "ic33.3h",  0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples, identical */
-	ROM_LOAD( "ic28.lower.2n.bin",  0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
-	ROM_LOAD( "ic28.lower.2n.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
+	ROM_LOAD( "ic28.lower.2n",  0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
+	ROM_LOAD( "ic28.upper.2n",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 ROM_END
 
 ROM_START( loht )

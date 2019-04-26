@@ -71,8 +71,6 @@ public:
 	DECLARE_READ32_MEMBER(type3_sync_r);
 	DECLARE_WRITE32_MEMBER(type4_prot_w);
 	DECLARE_WRITE32_MEMBER(type1_cablamps_w);
-	DECLARE_READ16_MEMBER(tms57002_data_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
 	DECLARE_READ16_MEMBER(K055550_word_r);

@@ -1627,14 +1627,14 @@ tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, d
 //  write: Main memory writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(tilemap_device::write8)
+void tilemap_device::write8(offs_t offset, u8 data)
 {
 	m_basemem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tilemap_device::write16)
+void tilemap_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_basemem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
@@ -1643,7 +1643,7 @@ WRITE16_MEMBER(tilemap_device::write16)
 		mark_tile_dirty(offset + 1);
 }
 
-WRITE32_MEMBER(tilemap_device::write32)
+void tilemap_device::write32(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_basemem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;
@@ -1664,14 +1664,14 @@ WRITE32_MEMBER(tilemap_device::write32)
 //  write_entry_ext: Extension memory writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(tilemap_device::write8_ext)
+void tilemap_device::write8_ext(offs_t offset, u8 data)
 {
 	m_extmem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tilemap_device::write16_ext)
+void tilemap_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_extmem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
@@ -1680,7 +1680,7 @@ WRITE16_MEMBER(tilemap_device::write16_ext)
 		mark_tile_dirty(offset + 1);
 }
 
-WRITE32_MEMBER(tilemap_device::write32_ext)
+void tilemap_device::write32_ext(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_extmem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;

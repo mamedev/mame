@@ -16171,6 +16171,7 @@ jngolady                        // (c) 1984
 luckygrl                        // (c) 1984 Wing?
 macha                           // (c) 1983 Logitec
 roylcrdn                        // (c) 1985
+roylcrdna                       // (c) 1982
 
 @source:jankenmn.cpp
 jankenmn                        // (c) 1985 Sunwise
@@ -30121,6 +30122,7 @@ bubsys                          //
 citybomb                        // GX787 (c) 1987 (World)
 citybombj                       // GX787 (c) 1987 (Japan)
 gradius                         // GX456 (c) 1985
+gradiusb						// Bubble System
 gwarrior                        // GX578 (c) 1985
 hcrash                          // GX790 (c) 1987
 hcrashc                         // GX790 (c) 1987
