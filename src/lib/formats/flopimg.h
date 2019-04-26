@@ -157,9 +157,6 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 #define INTERLEAVE(range)       "I" #range
 #define FIRST_SECTOR_ID(range)  "F" #range
 
-/* Max number of excess tracks to be discarded from disk image to fit floppy drive */
-#define DUMP_THRESHOLD 2
-
 /***************************************************************************
 
     Prototypes
@@ -590,6 +587,9 @@ protected:
 
 	uint8_t sbyte_mfm_r(const uint8_t *bitstream, int &pos, int track_size);
 	uint8_t sbyte_gcr5_r(const uint8_t *bitstream, int &pos, int track_size);
+
+	//! Max number of excess tracks to be discarded from disk image to fit floppy drive
+	enum { DUMP_THRESHOLD = 2 };
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
