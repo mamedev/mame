@@ -430,8 +430,10 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 			m_msr_mtrrfix[2] = data;
 			if (m_msr_smm_mask & 1)
 			{
-				// data = 0x1818181818181818; // when smm is implemented
-				data = 0; // when smm is not active
+				if (m_smm)
+					data = 0x1818181818181818; // when smm is active
+				else
+					data = 0; // when smm is not active
 			}
 			parse_mtrrfix(data, 0xa0000, 16);
 			break;
@@ -469,13 +471,16 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 			break;
 		case 0xC0010111: // SMM_BASE
 			m_msr_smm_base = (offs_t)data;
+			m_smbase = m_msr_smm_base;
 			break;
 		case 0xC0010113: // SMM_MASK
 			m_msr_smm_mask = data;
 			if (m_msr_smm_mask & 1)
 			{
-				// data = 0x1818181818181818; // when smm is implemented
-				data = 0; // when smm is not active
+				if (m_smm)
+					data = 0x1818181818181818; // when smm is active
+				else
+					data = 0; // when smm is not active
 			}
 			else
 				data = m_msr_mtrrfix[2];

@@ -166,14 +166,14 @@ enum
 enum
 {
 	/* mmx registers aliased to x87 ones */
-	MMX_MM0=X87_ST0,
-	MMX_MM1=X87_ST1,
-	MMX_MM2=X87_ST2,
-	MMX_MM3=X87_ST3,
-	MMX_MM4=X87_ST4,
-	MMX_MM5=X87_ST5,
-	MMX_MM6=X87_ST6,
-	MMX_MM7=X87_ST7
+	MMX_MM0 = X87_ST0,
+	MMX_MM1 = X87_ST1,
+	MMX_MM2 = X87_ST2,
+	MMX_MM3 = X87_ST3,
+	MMX_MM4 = X87_ST4,
+	MMX_MM5 = X87_ST5,
+	MMX_MM6 = X87_ST6,
+	MMX_MM7 = X87_ST7
 };
 
 enum smram
@@ -247,32 +247,38 @@ enum smram_intel_p5
 };
 
 /* Protected mode exceptions */
-#define FAULT_UD 6   // Invalid Opcode
-#define FAULT_NM 7   // Coprocessor not available
-#define FAULT_DF 8   // Double Fault
-#define FAULT_TS 10  // Invalid TSS
-#define FAULT_NP 11  // Segment or Gate not present
-#define FAULT_SS 12  // Stack fault
-#define FAULT_GP 13  // General Protection Fault
-#define FAULT_PF 14  // Page Fault
-#define FAULT_MF 16  // Match (Coprocessor) Fault
+enum pm_faults
+{
+	FAULT_UD = 6,  // Invalid Opcode
+	FAULT_NM = 7,  // Coprocessor not available
+	FAULT_DF = 8,  // Double Fault
+	FAULT_TS = 10, // Invalid TSS
+	FAULT_NP = 11, // Segment or Gate not present
+	FAULT_SS = 12, // Stack fault
+	FAULT_GP = 13, // General Protection Fault
+	FAULT_PF = 14, // Page Fault
+	FAULT_MF = 16  // Match (Coprocessor) Fault
+};
 
 /* MXCSR Control and Status Register */
-#define MXCSR_IE  (1<<0)  // Invalid Operation Flag
-#define MXCSR_DE  (1<<1)  // Denormal Flag
-#define MXCSR_ZE  (1<<2)  // Divide-by-Zero Flag
-#define MXCSR_OE  (1<<3)  // Overflow Flag
-#define MXCSR_UE  (1<<4)  // Underflow Flag
-#define MXCSR_PE  (1<<5)  // Precision Flag
-#define MXCSR_DAZ (1<<6)  // Denormals Are Zeros
-#define MXCSR_IM  (1<<7)  // Invalid Operation Mask
-#define MXCSR_DM  (1<<8)  // Denormal Operation Mask
-#define MXCSR_ZM  (1<<9)  // Divide-by-Zero Mask
-#define MXCSR_OM  (1<<10) // Overflow Mask
-#define MXCSR_UM  (1<<11) // Underflow Mask
-#define MXCSR_PM  (1<<12) // Precision Mask
-#define MXCSR_RC  (3<<13) // Rounding Control
-#define MXCSR_FZ  (1<<15) // Flush to Zero
+enum mxcsr_bits
+{
+	MXCSR_IE  = 1 << 0,  // Invalid Operation Flag
+	MXCSR_DE  = 1 << 1,  // Denormal Flag
+	MXCSR_ZE  = 1 << 2,  // Divide-by-Zero Flag
+	MXCSR_OE  = 1 << 3,  // Overflow Flag
+	MXCSR_UE  = 1 << 4,  // Underflow Flag
+	MXCSR_PE  = 1 << 5,  // Precision Flag
+	MXCSR_DAZ = 1 << 6,  // Denormals Are Zeros
+	MXCSR_IM  = 1 << 7,  // Invalid Operation Mask
+	MXCSR_DM  = 1 << 8,  // Denormal Operation Mask
+	MXCSR_ZM  = 1 << 9,  // Divide-by-Zero Mask
+	MXCSR_OM  = 1 << 10, // Overflow Mask
+	MXCSR_UM  = 1 << 11, // Underflow Mask
+	MXCSR_PM  = 1 << 12, // Precision Mask
+	MXCSR_RC  = 3 << 13, // Rounding Control
+	MXCSR_FZ  = 1 << 15  // Flush to Zero
+};
 
 union MMX_REG {
 	uint32_t d[2];
@@ -281,7 +287,7 @@ union MMX_REG {
 	int16_t  s[4];
 	uint8_t  b[8];
 	int8_t   c[8];
-	float  f[2];
+	float    f[2];
 	uint64_t q;
 	int64_t  l;
 };
