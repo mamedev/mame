@@ -758,6 +758,8 @@ symbolics.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp
+talkingbb.cpp
+talkingfb.cpp
 tamag1.cpp
 tandy1t.cpp
 tandy2k.cpp

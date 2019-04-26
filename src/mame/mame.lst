@@ -37326,6 +37326,12 @@ taitotz                         //
 @source:taitowlf.cpp
 pf2012                          // E59 (c) 1997 Taito
 
+@source:talkingbb.cpp
+talkingbb
+
+@source:talkingfb.cpp
+talkingfb
+
 @source:tamag1.cpp
 tama                            // Bandai
 
