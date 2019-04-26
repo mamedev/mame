@@ -53,6 +53,7 @@
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
 #include "formats/sdf_dsk.h"
+#include "formats/os9_dsk.h"
 
 
 /***************************************************************************
@@ -118,7 +119,8 @@ FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_DMK_FORMAT,
 	FLOPPY_JVC_FORMAT,
 	FLOPPY_VDK_FORMAT,
-	FLOPPY_SDF_FORMAT
+	FLOPPY_SDF_FORMAT,
+	FLOPPY_OS9_FORMAT
 FLOPPY_FORMATS_END
 
 static void coco_fdc_floppies(device_slot_interface &device)

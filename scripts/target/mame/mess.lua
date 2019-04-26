@@ -931,6 +931,7 @@ FORMATS["IQ151_DSK"] = true
 FORMATS["ITT3030_DSK"] = true
 FORMATS["JFD_DSK"] = true
 FORMATS["JVC_DSK"] = true
+FORMATS["OS9_DSK"] = true
 FORMATS["KAYPRO_DSK"] = true
 FORMATS["KC85_DSK"] = true
 FORMATS["KC_CAS"] = true
