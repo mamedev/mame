@@ -25,6 +25,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "machine/intelfsh.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
@@ -70,6 +71,7 @@ void crush11_host_device::config_map(address_map &map)
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, CRUSH11, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
+	, biosrom(*this, finder_base::DUMMY_TAG)
 	, ram_size(0)
 {
 }
@@ -103,10 +105,13 @@ void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
+	memory_space->install_device(0, 0xffffffff, *this, &crush11_host_device::bios_map);
+}
 
-	uint32_t mask = m_region->bytes() - 1;
-	memory_space->install_rom(0x000c0000, 0x000fffff, m_region->base() + (0x000c0000 & mask));
-	memory_space->install_rom(0xfffc0000, 0xffffffff, m_region->base() + (0x000c0000 & mask));
+void crush11_host_device::bios_map(address_map &map)
+{
+	map(0x000c0000, 0x000fffff).rw(biosrom, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0xfffc0000, 0xffffffff).rw(biosrom, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 }
 
 READ8_MEMBER(crush11_host_device::unknown_r)
@@ -701,7 +706,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	//maincpu.smiact().set("pci:01.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, ":pci", 0);
-	CRUSH11(config, ":pci:00.0", 0, "maincpu"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
+	CRUSH11(config, ":pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
 	CRUSH11_MEMORY(config, ":pci:00.1", 0, 2); /* 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
 	10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
 	10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)*/
@@ -720,6 +725,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	AS99127F(config, ":pci:01.1:12d", 0);
 	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
 	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
+	SST_49LF020(config, "bios", 0);
 	/*10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
@@ -736,7 +742,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 }
 
 ROM_START(nforcepc)
-	ROM_REGION32_LE(0x40000, ":pci:00.0", 0) /* PC bios */
+	ROM_REGION32_LE(0x40000, "bios", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "a7n266c", "a7n266c") // Motherboard dump. Chip: SST49LF020 Package: PLCC32 Label had 3 lines of text: "A7NC3" "1001.D" "GSQ98"
 	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(f4f0e4fc) SHA1(87f11545db178914623e41fb51e328da479a2efc), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D downloaded from Asus website
