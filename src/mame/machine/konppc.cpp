@@ -384,12 +384,12 @@ READ32_MEMBER( konppc_device::K033906_0_r )
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
-		return m_k033906[0]->read(space, offset, mem_mask);
+		return m_k033906[0]->read(offset);
 }
 
 WRITE32_MEMBER( konppc_device::K033906_0_w )
 {
-	m_k033906[0]->write(space, offset, data, mem_mask);
+	m_k033906[0]->write(offset, data);
 }
 
 READ32_MEMBER( konppc_device::K033906_1_r )
@@ -397,12 +397,12 @@ READ32_MEMBER( konppc_device::K033906_1_r )
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
-		return m_k033906[1]->read(space, offset, mem_mask);
+		return m_k033906[1]->read(offset);
 }
 
 WRITE32_MEMBER( konppc_device::K033906_1_w)
 {
-	m_k033906[1]->write(space, offset, data, mem_mask);
+	m_k033906[1]->write(offset, data);
 }
 
 /*****************************************************************************/
