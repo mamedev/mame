@@ -26,9 +26,9 @@ public:
 
 	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( set_reg );
+	u32 read(offs_t offset);
+	void write(offs_t offset, u32 data);
+	DECLARE_WRITE_LINE_MEMBER(set_reg);
 
 protected:
 	// device-level overrides
@@ -47,8 +47,8 @@ private:
 
 	required_device<voodoo_device> m_voodoo;
 
-	uint32_t       m_reg[256];
-	uint32_t       m_ram[32768];
+	std::unique_ptr<u32[]> m_reg;
+	std::unique_ptr<u32[]> m_ram;
 };
 
 DECLARE_DEVICE_TYPE(K033906, k033906_device)
