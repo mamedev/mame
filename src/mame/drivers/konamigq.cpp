@@ -119,8 +119,6 @@ private:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(pcmram_w);
 	DECLARE_READ8_MEMBER(pcmram_r);
-	DECLARE_READ16_MEMBER(tms57002_data_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
 	DECLARE_MACHINE_START(konamigq);
@@ -201,17 +199,6 @@ INTERRUPT_GEN_MEMBER(konamigq_state::tms_sync)
 		m_dasp->sync_w(1);
 }
 
-READ16_MEMBER(konamigq_state::tms57002_data_word_r)
-{
-	return m_dasp->data_r(space, 0);
-}
-
-WRITE16_MEMBER(konamigq_state::tms57002_data_word_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_dasp->data_w(space, 0, data);
-}
-
 READ16_MEMBER(konamigq_state::tms57002_status_word_r)
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
@@ -241,7 +228,7 @@ void konamigq_state::konamigq_sound_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x2004ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
 	map(0x200000, 0x2004ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300001).rw(FUNC(konamigq_state::tms57002_data_word_r), FUNC(konamigq_state::tms57002_data_word_w));
+	map(0x300001, 0x300001).rw(m_dasp, FUNC(tms57002_device::data_r), FUNC(tms57002_device::data_w));
 	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
 	map(0x500000, 0x500001).rw(FUNC(konamigq_state::tms57002_status_word_r), FUNC(konamigq_state::tms57002_control_word_w));
 	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
