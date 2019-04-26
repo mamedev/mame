@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    57002dsm.c
+    57002dsm.cpp
 
     TMS57002 "DASP" emulator.
 
@@ -15,18 +15,20 @@ tms57002_disassembler::tms57002_disassembler()
 {
 }
 
-std::string tms57002_disassembler::get_memadr(uint32_t opcode, char type)
+std::string tms57002_disassembler::get_memadr(u32 opcode, char type)
 {
 	std::string buf;
 
-	if(((opcode & 0x400) && (type == 'c')) || (!(opcode & 0x400) && (type == 'd'))) {
-		if(opcode & 0x100)
+	if (((opcode & 0x400) && (type == 'c')) || (!(opcode & 0x400) && (type == 'd')))
+	{
+		if (opcode & 0x100)
 			buf = util::string_format("%c(%02x)", type, opcode & 0xff);
-		else if(opcode & 0x80)
+		else if (opcode & 0x80)
 			buf = util::string_format("%c*+", type);
 		else
 			buf = util::string_format("%c*", type);
-	} else if(opcode & 0x200)
+	}
+	else if (opcode & 0x200)
 		buf = util::string_format("%c*+", type);
 	else
 		buf = util::string_format("%c*", type);
@@ -41,10 +43,12 @@ u32 tms57002_disassembler::opcode_alignment() const
 offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	std::streampos original_pos = stream.tellp();
-	uint32_t opcode = opcodes.r32(pc);
-	uint8_t fa = opcode >> 18;
-	if(fa == 0x3f) {
-		switch((opcode >> 11) & 0x7f) { // category 3
+	u32 opcode = opcodes.r32(pc);
+	u8 fa = opcode >> 18;
+	if (fa == 0x3f)
+	{
+		switch ((opcode >> 11) & 0x7f) // category 3
+		{
 
 #define DASM3
 #include "cpu/tms57002/tms57002.hxx"
@@ -54,8 +58,11 @@ offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			util::stream_format(stream, "unk c3 %02x", (opcode >> 11) & 0x7f);
 			break;
 		}
-	} else {
-		switch(fa) { // category 1
+	}
+	else
+	{
+		switch (fa) // category 1
+		{
 		case 0x00:
 			break;
 
@@ -72,7 +79,8 @@ offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		if (!next_is_nop && stream.tellp() != original_pos)
 			stream << " ; ";
 
-		switch((opcode >> 11) & 0x7f) { // category 2
+		switch ((opcode >> 11) & 0x7f) // category 2
+		{
 		case 0x00:
 			if (stream.tellp() == original_pos)
 				util::stream_format(stream, "nop");

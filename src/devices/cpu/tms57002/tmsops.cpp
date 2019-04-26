@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    tms57002.c
+    tmsops.cpp
 
     TMS57002 "DASP" emulator.
 
