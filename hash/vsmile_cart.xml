@@ -41,9 +41,9 @@ Addons (w/ yellow Smartridges)
 |        | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |
 |        |          (DK)     | V.Smile Tegnestudie                                                        |
 |   XX   | 80-067021(SE)     | V.Smile Tecknarstudio                                                      |
-|        | 80-067022(SP)     | V.Smile Estudio de Arte ORG                                                |
+|        | 80-067022(SP)     | V.Smile Estudio de Arte (orange)                                           |
 |        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |
-|        | 80-067057(SP)     | V.Smile Estudio de Arte PINK                                               |
+|        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
 +========+===================+============================================================================+
 |        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
@@ -124,7 +124,7 @@ Game cartridges
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version)                                                                                                        |
 |   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version, ALT)                                                                                                   |
-|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                                                                                 |
+|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                                                                                      |
 |        |          (IT)     | Avventura nel parco dell'alfabeto                                                                                                                        |
 |        | 80-092002(NL)     | Alfabet Pretpark                                                                                                                                         |
 |        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                                                                                        |
@@ -144,8 +144,8 @@ Game cartridges
 |   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)  80-092924(GE) on label                                                                |
 |   XX   | 80-092045(FR)     | Apprenti' Pilote                                                                                                                                         |
 +========+===================+==========================================================================================================================================================+
-|        | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                                                                          |
-|        |          (IT)     | Winnie the Pooh - e la caccia al miele                                                                                                                   |
+|   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                                                                          |
+|   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                                                                                     |
 |        | 80-092062(NL)     | Winnie de Poeh - De winderwereld van Poeh                                                                                                                |
 |        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                                                                          |
 |   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                                                                                     |
@@ -164,7 +164,7 @@ Game cartridges
 |        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                                                                            |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventures                                                                                                               |
-|        |          (IT)     | Topolino - Le Magiche Avventure di Topolino                                                                                                              |
+|   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                                                                              |
 |        | 80-092082(NL)     | Mickey Mouse - De wonderwereld van Mickey                                                                                                                |
 |        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventures                                                                                                               |
 |   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                                                                                       |
@@ -177,7 +177,7 @@ Game cartridges
 |        |          (FI)     | Mickey                                                                                                                                                   |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                                                                                    |
-|   XX   |          (IT)     | Il Re Leone - La Grande Avventura di Simba                                                                                                               |
+|   XX   | 80-092101(IT)     | Il Re Leone - La Grande Avventura di Simba                                                                                                               |
 |        | 80-092102(NL)     | Leeuwenkoning - De wonderwereld van Simba                                                                                                                |
 |        | 80-092103(UK)     | The Lion King - Simba's Big Adventure                                                                                                                    |
 |   XX   | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer (Rev.2 dumped)                                                                                          |
@@ -192,7 +192,7 @@ Game cartridges
 |        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                                                                            |
 |   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                                                                                |
 |        | 80-092122(NL)     | De Kleine Zeemeermin - De Wunderwereld von Ariel                                                                                                         |
-|        | 80-092123(UK)     | The Little Mermaid - Ariel's Majestic Journey                                                                                                            |
+|   XX   | 80-092123(UK)     | The Little Mermaid - Ariel's Majestic Journey                                                                                                            |
 |   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                                                                                                |
 |   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                                                                           |
 |        | 80-092126(PT)     |                                                                                                                                                          |
@@ -204,6 +204,7 @@ Game cartridges
 +========+===================+==========================================================================================================================================================+
 |        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                                                                                   |
 |   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (ALT)                                                                                                             |
+|   XX   | 80-092141(IT)     | Spider-Man & Friends - Missioni Segrete                                                                                                                  |
 |        | 80-092142(NL)     | Spider-Man en Vrienden! - Geheime Missies (white Webs)                                                                                                   |
 |        | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (Yellow webs)                                                                                                  |
 |        | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                                                                             |
@@ -218,9 +219,9 @@ Game cartridges
 |   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                                                                                                             |
 |        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                                                                                                       |
 |   XX   | 80-092160-301(US) | Scooby-Doo! - Funland Frenzy (ALT 2)                                                                                                                     |
-|   XX   |          (IT)     | Scooby-Doo! - Avventura a Funland                                                                                                                        |
+|   XX   | 80-092161(IT)     | Scooby-Doo! - Avventura a Funland                                                                                                                        |
 |        | 80-092162(NL)     | Scooby-Doo griezelen in het pretpark                                                                                                                     |
-|        | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                                                                                                             |
+|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                                                                                                             |
 |        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy                                                                                                                             |
 |        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Yellow, only Scooby on label might be motion version)                                                                      |
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                                                                                |
@@ -240,7 +241,7 @@ Game cartridges
 |   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB, green sticker: "522 ○○○○")                                                                            |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                                                                                 |
-|        |          (IT)     | Aladdin - Il magico mondo di Aladdin                                                                                                                     |
+|   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                                                                                     |
 |        | 80-092202(NL)     | Aladdin - De Wunderwereld van Aladdin                                                                                                                    |
 |        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                                                                                 |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                                                                                       |
@@ -249,8 +250,8 @@ Game cartridges
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                                                                                                    |
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody! (ALT)                                                                                                              |
-|        |          (IT)     | Toy Story 2 - Operazione: Salvataggio di Woody!  gpz06503                                                                                                |
-|        | 80-092223(UK)     | Toy Story 2 - Operation Rescue Woody!                                                                                                                    |
+|        |          (IT)     | Toy Story 2 - Operazione: Salvataggio di Woody! (GPZ06503)                                                                                               |
+|   XX   | 80-092223(UK)     | Toy Story 2 - Operation Rescue Woody!                                                                                                                    |
 |   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                                                                                                   |
 |        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                                                                                       |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                                                                                         |
@@ -261,15 +262,15 @@ Game cartridges
 |        |          (FI)     | Toy Story 2                                                                                                                                              |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                                                                                   |
-|   XX   |          (IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                                                                                  |
+|   XX   | 80-092241(IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                                                                                  |
 |        | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester                                                                                                            |
-|        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester | 2007                                                                                                     |
-|        | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                                                                                                   |
-|        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes | 2007                                                                                                            |
-|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes | 2008                                                                                                            |
-|   XX   | 80-092244(GE)     | Cinderella - Lernen im Maerchenland | 2005                                                                                                               |
-|   XX   | 80-092244-104(GE) | Cinderella - Lernen im Maerchenland | 2007                                                                                                               |
-|        | 80-092244-204(GE) | Cinderella - Lernen im Maerchenland | 2007                                                                                                               |
+|        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester (2007)                                                                                                     |
+|   XX   | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                                                                                                   |
+|        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes (2007)                                                                                                            |
+|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (2008)                                                                                                            |
+|   XX   | 80-092244(GE)     | Cinderella - Lernen im Maerchenland (2005)                                                                                                               |
+|   XX   | 80-092244-104(GE) | Cinderella - Lernen im Maerchenland (2007)                                                                                                               |
+|        | 80-092244-204(GE) | Cinderella - Lernen im Maerchenland (2007)                                                                                                               |
 |   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                                                                              |
 |        | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                                                                              |
 |        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                                                                              |
@@ -290,7 +291,7 @@ Game cartridges
 |        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                                                                                        |
 |   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT 2)                                                                                                      |
 |        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                                                                                         |
-|        | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure                                                                                                              |
+|   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                                                                                 |
 |        | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                                                                                        |
 |        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                                                                                         |
 |   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                                                                                         |
@@ -301,7 +302,7 @@ Game cartridges
 |        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                                                                                   |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                                                                                         |
-|        | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                                                                                         |
+|   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                                                                                         |
 |        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (Yellow Label)                                                                                                          |
 |   XX   | 80-092304(GE)     | Bob der Baumeister - Bobs Spannender Arbeitstag                                                                                                          |
 |        | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag                                                                                                          |
@@ -321,7 +322,7 @@ Game cartridges
 |        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (ALT)                                                                                                         |
 |        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen  (need pic, even the manual has -123 on cover)                                                    |
 |        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen                                                                                                   |
-|        | 80-092343(UK)     | Thomas and Friends: Engines Working Together                                                                                                             |
+|   XX   | 80-092343(UK)     | Thomas and Friends: Engines Working Together                                                                                                             |
 |        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (ALT)                                                                                                       |
 |        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (ALT)                                                                                                       |
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                                                                                       |
@@ -371,11 +372,12 @@ Game cartridges
 |   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label, green sticker: "735 ○○○○")                           |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                                                                          |
-|        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492?? gpz06629)                                                                                        |
+|        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                                                                                       |
 |        | 80-092482(NL)     | The Batman - De Redding van Gotham City                                                                                                                  |
-|        | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                                                                          |
+|   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                                                                          |
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                                                                                     |
 |        | 80-092485(FR)     | The Batman - Panique a Gotham City                                                                                                                       |
+|        | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                                                                                      |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                                                                              |
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                                                                                      |
@@ -387,14 +389,14 @@ Game cartridges
 |   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                                                                             |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092520(US)     | Spider-Man & Friends Doc Ock's Challenge                                                                                                                 |
-|        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.smile pocket bundle only?)                                                                                        |
+|        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.Smile pocket bundle only?)                                                                                        |
 |        | 80-092523(UK)     | Spider-Man & Friends Doc Ock's Challenge                                                                                                                 |
 |   XX   | 80-092524(GE)     | Spider-Man & Freunde Wettkampf im Space Labor                                                                                                            |
 |        | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                                                                             |
 |   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label, green sticker: "624 ○○○○")                                             |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                                                                              |
-|        | 80-092543(UK)     | Noddy - Detective for a Day                                                                                                                              |
+|   XX   | 80-092543(UK)     | Noddy - Detective for a Day                                                                                                                              |
 |        | 80-092543-103(UK) | Noddy - Detective for a Day (ALT)                                                                                                                        |
 |        | 80-092544(GE)     | Noddy - Detektiv fuer einen Tag (need pic to confirm, manual cover says -104)                                                                            |
 |   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (ALT)                                                                                                                    |
@@ -403,7 +405,7 @@ Game cartridges
 |        | 80-092546(PT)     | Noddy - Detective por um dia (92556 on cart)                                                                                                             |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                                                                                    |
-|        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic.. wtf)                                                                                                   |
+|        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic... wtf)                                                                                                  |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092580(US)     | Backyardigans - Viking Voyage                                                                                                                            |
 |        | 80-092580-201(US) | Backyardigans - Viking Voyage (ALT)                                                                                                                      |
@@ -411,7 +413,7 @@ Game cartridges
 |   XX   | 80-092585(FR)     | Les Melodilous - Les explorateurs vikings                                                                                                                |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092600(US)     | Shrek - Dragon's Tale                                                                                                                                    |
-|        | 80-092602(NL)     | Shrek - Het verhaal van draakje                                                                                                                          |
+|   XX   | 80-092602(NL)     | Shrek - Het verhaal van Draakje                                                                                                                          |
 |   XX   | 80-092604(GE)     | Shrek - Die Geschichte des Drachen                                                                                                                       |
 |   XX   | 80-092605(FR)     | Shrek - Le Rhume de Dragonne                                                                                                                             |
 |        | 80-092607(SP)     | Shrek - El Cuento de la Dragona                                                                                                                          |
@@ -431,7 +433,7 @@ Game cartridges
 |   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (ALT)                                                                                                               |
 |        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                                                                                        |
 |        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                                                                                     |
-|        | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                                                                                     |
+|   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                                                                                     |
 |   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                                                                                       |
 |   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                                                                                      |
 |        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                                                                                    |
@@ -470,13 +472,13 @@ Game cartridges
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure (ALT)                                                                                                     |
 |        |          (IT)     | Shrek Terzo L'Advventura Do Artu in un Giorno di Scuola                                                                                                  |
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                                                                              |
-|        | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                                                                           |
+|   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                                                                           |
 |   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                                                                               |
 |        | 80-092865(FR)     | Shrek Troisieme - L'aventure d'Arthur                                                                                                                    |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                                                                                       |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                                                                                         |
-|   XX   |          (IT)     | Ratatouille - Le nuove Ricette di Remy                                                                                                                   |
+|   XX   | 80-092881(IT)     | Ratatouille - Le nuove Ricette di Remy                                                                                                                   |
 |        | 80-092882(NL)     | Ratatouille - Remy's Nieuwe Recepten                                                                                                                     |
 |        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                                                                                                         |
 |   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                                                                                         |
@@ -524,8 +526,22 @@ Game cartridges
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
-	<software name="aladding" supported="yes">
-		<description>Disneys Aladdin - Aladdins Welt der Wunder (Ger)</description>
+	<software name="aladdini" supported="yes">
+		<description>Disney Aladdin - Il magico mondo di Aladdin (Italy)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092201(IT)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Aladdin - Il magico mondo di Aladdin (Italy).bin" size="8388608" crc="4ea0f59a" sha1="0810f65d356b421ac384578daaa7af9406807299" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladding" cloneof="aladdini" supported="yes">
+		<description>Disneys Aladdin - Aladdins Welt der Wunder (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092204(GE)" />
@@ -536,13 +552,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
+				<rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="aladdins" cloneof="aladding" supported="yes">
-		<description>Disney Aladdin - El Maravilloso Mundo de Aladdin (Spa)</description>
+	<software name="aladdins" cloneof="aladdini" supported="yes">
+		<description>Disney Aladdin - El Maravilloso Mundo de Aladdin (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092207(SP)" />
@@ -553,13 +569,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092207 - Aladdin - El Maravilloso Mundo de Aladdin (SP).bin" size="8388608" crc="5e01645f" sha1="de4d420a7bfb9a33fbd739a5111e331b7ba6c85a" offset="0" />
+				<rom name="80-092207 - Aladdin - El Maravilloso Mundo de Aladdin (SP).bin" size="8388608" crc="5e01645f" sha1="de4d420a7bfb9a33fbd739a5111e331b7ba6c85a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="redhoodg" supported="yes">
-		<description>Entdecke die Welt von Rotkäppchen (Ger)</description>
+		<description>Entdecke die Welt von Rotkäppchen (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092024(GE)" />
@@ -570,12 +586,27 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" offset="0" />
+				<rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alphaprk" supported="yes">
+	<software name="alphaprkr101" supported="yes">
+		<description>Alphabet Park Adventure (USA, Rev. 101)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092000-101(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile92000-2.bin" size="8388608" crc="e432b85e" sha1="b11e6eb1c20f9db01df28e7169590ddfb95fee43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprk" cloneof="alphaprkr101" supported="yes">
 		<description>Alphabet Park Adventure (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -587,12 +618,12 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92000.u1" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" offset="0" />
+				<rom name="92000.u1" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alphaprka" cloneof="alphaprk" supported="yes">
+	<software name="alphaprka" cloneof="alphaprkr101" supported="yes">
 		<description>Alphabet Park Adventure (USA, alt)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -604,28 +635,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92000.bin" size="8388608" crc="e491b4fc" sha1="511d7807df753e8d89547040af2019629f056371" offset="0" />
+				<rom name="vsmile92000.bin" size="8388608" crc="e491b4fc" sha1="511d7807df753e8d89547040af2019629f056371" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alphaprk1" cloneof="alphaprk" supported="yes">
-		<description>Alphabet Park Adventure (USA, alt, Rev. 101)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-092000-101(US)" />
-		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
-			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92000-2.bin" size="8388608" crc="e432b85e" sha1="b11e6eb1c20f9db01df28e7169590ddfb95fee43" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alphaprkg" cloneof="alphaprk" supported="yes">
-		<description>Abenteuer im ABC Park (Ger)</description>
+	<software name="alphaprkg" cloneof="alphaprkr101" supported="yes">
+		<description>Abenteuer im ABC Park (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092004(GE)" />
@@ -636,13 +652,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92004.u1" size="8388608" crc="e8808803" sha1="8b88c9d5886b3eba670f5cd2921d73642b2cad89" offset="0" />
+				<rom name="92004.u1" size="8388608" crc="e8808803" sha1="8b88c9d5886b3eba670f5cd2921d73642b2cad89" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alphaprkf" cloneof="alphaprk" supported="yes">
-		<description>ABC Land Aventure (Fra)</description>
+	<software name="alphaprkf" cloneof="alphaprkr101" supported="yes">
+		<description>ABC Land Aventure (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092005(FR)" />
@@ -653,13 +669,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92005.u1" size="8388608" crc="fe2650d7" sha1="cf07b676ce11f9db6b00ab1fecf8ae6720965cab" offset="0" />
+				<rom name="92005.u1" size="8388608" crc="fe2650d7" sha1="cf07b676ce11f9db6b00ab1fecf8ae6720965cab" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alphaprks" cloneof="alphaprk" supported="yes">
-		<description>Aventuras en el Parque Alfabeto (Spa)</description>
+	<software name="alphaprks" cloneof="alphaprkr101" supported="yes">
+		<description>Aventuras en el Parque Alfabeto (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092007(SP)" />
@@ -670,13 +686,27 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092007 - Aventuras en el Parque Alfabeto (SP).bin" size="8388608" crc="7bced0b3" sha1="e8de93a1527c52efa69c4b3cf67ca4f4b05954b4" offset="0" />
+				<rom name="80-092007 - Aventuras en el Parque Alfabeto (SP).bin" size="8388608" crc="7bced0b3" sha1="e8de93a1527c52efa69c4b3cf67ca4f4b05954b4" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arielg" supported="yes">
-		<description>Disneys Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Ger, Rev. 3?)</description>
+	<software name="arieluk" supported="yes">
+		<description>Disney's The Little Mermaid - Ariel's Majestic Journey (UK)</description>
+		<year>2004</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092123(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Little Mermaid, The - Ariel's Majestic Journey (Europe).bin" size="8388608" crc="1fdb3332" sha1="1385c8bd7a3f30c8a823f3593828a1d30af5204a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arielgr3" cloneof="arieluk" supported="yes">
+		<description>Disneys Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Germany, Rev. 3?)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092124(GE)" />
@@ -687,13 +717,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92124(3).u1" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" offset="0" />
+				<rom name="92124(3).u1" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arielg1" cloneof="arielg" supported="yes">
-		<description>Disneys Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
+	<software name="arielg" cloneof="arieluk" supported="yes">
+		<description>Disneys Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Germany)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092124(GE)" />
@@ -704,13 +734,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92124.u1" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
+				<rom name="92124.u1" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arielf" cloneof="arielg" supported="yes">
-		<description>Disney La Petite Sirene - Ariel devient une princesse (Fra)</description>
+	<software name="arielf" cloneof="arieluk" supported="yes">
+		<description>Disney La Petite Sirene - Ariel devient une princesse (France)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092125(FR)" />
@@ -721,13 +751,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92125.u1" size="8388608" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" offset="0" />
+				<rom name="92125.u1" size="8388608" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ariels" cloneof="arielg" supported="yes">
-		<description>Disney La Sirenita - El Viaje Fantástico de Ariel (Spa)</description>
+	<software name="ariels" cloneof="arieluk" supported="yes">
+		<description>Disney La Sirenita - El Viaje Fantástico de Ariel (Spain)</description>
 		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092127(SP)" />
@@ -738,13 +768,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092127 - La Sirenita - El Viaje Fantastico de Ariel (SP).bin" size="8388608" crc="785f8c6b" sha1="abba1985e7f5bc3708fe6f34e8e7e4e5b0327f9d" offset="0" />
+				<rom name="80-092127 - La Sirenita - El Viaje Fantastico de Ariel (SP).bin" size="8388608" crc="785f8c6b" sha1="abba1985e7f5bc3708fe6f34e8e7e4e5b0327f9d" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arieldk" cloneof="arielg" supported="yes">
-		<description>Disney Den Lille Havfrue - Ariels majestætiske rejse! (Den)</description>
+	<software name="arieldk" cloneof="arieluk" supported="yes">
+		<description>Disney Den Lille Havfrue - Ariels majestætiske rejse! (Denmark)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092133(DK)" />
@@ -755,13 +785,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92133.u1" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" offset="0" />
+				<rom name="92133.u1" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arielsw" cloneof="arielg" supported="yes">
-		<description>Disneys Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Swe)</description>
+	<software name="arielsw" cloneof="arieluk" supported="yes">
+		<description>Disneys Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092134(SE)" />
@@ -772,25 +802,39 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" offset="0" />
+				<rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arieli" cloneof="arielg" supported="yes">
-		<description>Disney La sirenetta - Ariel e la crociera magica (Ita)</description>
+	<software name="arieli" cloneof="arieluk" supported="yes">
+		<description>Disney La sirenetta - Ariel e la crociera magica (Italy)</description>
 		<year>2005</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="La Sirenetta - Ariel e la Crociera Magica (Italy).bin" size="8388608" crc="280b335b" sha1="256ea4f5725dcfd51be08ea6c135ad71701cc296" offset="0" />
+				<rom name="La Sirenetta - Ariel e la Crociera Magica (Italy).bin" size="8388608" crc="280b335b" sha1="256ea4f5725dcfd51be08ea6c135ad71701cc296" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmanuk" supported="yes">
+		<description>The Batman - Gotham City Rescue (UK)</description>
+		<year>2005</year> <!-- (s05) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092483(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Batman - Gotham City Rescue (Europe).bin" size="8388608" crc="fde620e9" sha1="81d014800f06bb964f23919fa16f9d14c8189c7d" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="barneyg" supported="yes">
-		<description>Barney - Erlebnis-Reise (Ger)</description>
+		<description>Barney - Erlebnis-Reise (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092384(GE)" />
@@ -801,7 +845,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92384.u1" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" offset="0" />
+				<rom name="92384.u1" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" />
 			</dataarea>
 		</part>
 	</software>
@@ -818,7 +862,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92400.bin" size="8388608" crc="031c6a38" sha1="0b8e2b17a146d903dd2708c06562787e47d7ec4e" offset="0" />
+				<rom name="vsmile92400.bin" size="8388608" crc="031c6a38" sha1="0b8e2b17a146d903dd2708c06562787e47d7ec4e" />
 			</dataarea>
 		</part>
 	</software>
@@ -835,13 +879,28 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92300.u1" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" offset="0" />
+				<rom name="92300.u1" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="bobbdayuk" cloneof="bobbday" supported="no">
+		<description>Bob The Builder - Bob's Busy Day (UK)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092303(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Bob The Builder - Bob's Busy Day (Europe).bin" size="8388608" crc="15f334a6" sha1="9f03e7547cdd5cd67f74947fb8a086907c6d2337" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bobbdayg" cloneof="bobbday" supported="yes">
-		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092304(GE)" />
@@ -852,13 +911,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92304.u1" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
+				<rom name="92304.u1" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bobbdaydk" cloneof="bobbday" supported="yes">
-		<description>Byggemand Bob - Bobs travle dag (Den)</description>
+		<description>Byggemand Bob - Bobs travle dag (Denmark)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092313(DK)" />
@@ -869,13 +928,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92313.u1" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" offset="0" />
+				<rom name="92313.u1" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bobbdaysw" cloneof="bobbday" supported="yes">
-		<description>Byggare Bob - Bobs stressiga dag (Swe)</description>
+		<description>Byggare Bob - Bobs stressiga dag (Sweden)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092314(SE)" />
@@ -886,13 +945,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92314-100.u1" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" offset="0" />
+				<rom name="92314-100.u1" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="carebears" supported="yes"> <!-- Will be cloneof="carebear" when dumped -->
-		<description>Osos Amorosos - Una Lección de Amor (Spa)</description>
+		<description>Osos Amorosos - Una Lección de Amor (Spain)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092187(SP)" />
@@ -903,12 +962,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092187 - Osos Amorosos - Una Leccion de Amor (SP).bin" size="8388608" crc="c7d88dcf" sha1="d697798ba94d133d393377192ce36ae5233c99f5" offset="0" />
+				<rom name="80-092187 - Osos Amorosos - Una Leccion de Amor (SP).bin" size="8388608" crc="c7d88dcf" sha1="d697798ba94d133d393377192ce36ae5233c99f5" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="carsr2" supported="yes">
+	<!-- No inputs -->
+	<software name="carsr201" supported="no">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, Rev. 201)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -918,12 +978,12 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92660.bin" size="8388608" crc="35ff7474" sha1="2c401f64cf510e40a0def1b47de0031d548e0fe9" offset="0" />
+				<rom name="vsmile92660.bin" size="8388608" crc="35ff7474" sha1="2c401f64cf510e40a0def1b47de0031d548e0fe9" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cars" cloneof="carsr2" supported="yes">
+	<software name="cars" cloneof="carsr201" supported="yes">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -935,13 +995,27 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" offset="0" />
+				<rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="carsg" cloneof="carsr2" supported="yes">
-		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Ger)</description>
+	<software name="carsuk" cloneof="carsr201" supported="yes">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (UK)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092663(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars - Rev it up in Radiator Springs (Europe).bin" size="8388608" crc="fbcf207a" sha1="c25ac103c07a13a369f8d47a8bb5f14c752a6f53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsg" cloneof="carsr201" supported="yes">
+		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092664(GE)" />
@@ -952,13 +1026,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92664(2).u1" size="8388608" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" offset="0" />
+				<rom name="92664(2).u1" size="8388608" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="carsf" cloneof="carsr2" supported="yes">
-		<description>Disney/Pixar Cars - Quatre Roues (Fra)</description>
+	<software name="carsf" cloneof="carsr201" supported="yes">
+		<description>Disney/Pixar Cars - Quatre Roues (France)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092665(FR)" />
@@ -969,13 +1043,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" offset="0" />
+				<rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="carsdk" cloneof="carsr2" supported="yes">
-		<description>Disney/Pixar Biler - Ræs i Kølerkildekøbing (Den)</description>
+	<software name="carsdk" cloneof="carsr201" supported="yes">
+		<description>Disney/Pixar Biler - Ræs i Kølerkildekøbing (Denmark)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092673(DK)" />
@@ -986,13 +1060,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92673.u1" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" offset="0" />
+				<rom name="92673.u1" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="carssw" cloneof="carsr2" supported="yes">
-		<description>Disney/Pixar Bilar - Kör ikapp i Kylarköping (Swe)</description>
+	<software name="carssw" cloneof="carsr201" supported="yes">
+		<description>Disney/Pixar Bilar - Kör ikapp i Kylarköping (Sweden)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092674(SE)" />
@@ -1004,7 +1078,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
+				<rom name="C92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" />
 			</dataarea>
 		</part>
 	</software>
@@ -1021,7 +1095,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92240.u1" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" offset="0" />
+				<rom name="92240.u1" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" />
 			</dataarea>
 		</part>
 	</software>
@@ -1034,26 +1108,39 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" offset="0" />
+				<rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cinderlai" cloneof="cinderla" supported="yes">
-		<description>Disney Cenerentola - I desideri magici di Cenerentola (Ita)</description>
+		<description>Disney Cenerentola - I desideri magici di Cenerentola (Italy)</description>
 		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="52-92251(IT)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy).bin" size="8388608" crc="cb28ac0d" sha1="e938504a40a4f47cd4b09489f515c0a6545a1800" offset="0" />
+				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy).bin" size="8388608" crc="cb28ac0d" sha1="e938504a40a4f47cd4b09489f515c0a6545a1800" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlauk" cloneof="cinderla" supported="yes">
+		<description>Disney's Cinderella - Cinderella's Magic Wishes (UK)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092243(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cinderella - Cinderella's Magic Wishes (Europe).bin" size="8388608" crc="34bf1ab1" sha1="293ca8314bcc6ceb187998728cfedece3ff07908" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cinderlaf" cloneof="cinderla" supported="yes">
-		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (Fra)</description>
+		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (France)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092245(FR)" />
@@ -1064,13 +1151,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92245.u1" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" offset="0" />
+				<rom name="92245.u1" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cinderlasr2" cloneof="cinderla" supported="yes">
-		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spa, Rev. 222)</description>
+	<software name="cinderlasr222" cloneof="cinderla" supported="yes">
+		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spain, Rev. 222)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092247-222(SP)" />
@@ -1081,13 +1168,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092247-222 - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="41be74d6" sha1="bfac64f8a8d9535fd5bea113319c4f8de0242c09" offset="0" />
+				<rom name="80-092247-222 - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="41be74d6" sha1="bfac64f8a8d9535fd5bea113319c4f8de0242c09" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cinderladk" cloneof="cinderla" supported="yes">
-		<description>Disney Princess Cinderella - Askepots magiske ønsker (Den)</description>
+		<description>Disney Princess Cinderella - Askepots magiske ønsker (Denmark)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092253(DK)" />
@@ -1098,13 +1185,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092253.u1" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" offset="0" />
+				<rom name="092253.u1" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cinderlag" cloneof="cinderla" supported="yes">
-		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 104)</description>
+	<software name="cinderlagr104" cloneof="cinderla" supported="yes">
+		<description>Disney Princess Cinderella - Lernen im Märchenland (Germany, Rev. 104)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092244-104(GE)" />
@@ -1115,13 +1202,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92244-1.u1" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" offset="0" />
+				<rom name="92244-1.u1" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cinderlag1" cloneof="cinderla" supported="yes">
-		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
+	<software name="cinderlag" cloneof="cinderla" supported="yes">
+		<description>Disney Princess Cinderella - Lernen im Märchenland (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092244(GE)" />
@@ -1132,13 +1219,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92244.u1" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+				<rom name="92244.u1" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cinderlasw" cloneof="cinderla" supported="yes">
-		<description>Disney Princess Cinderella - Askungens magiska önskningar (Swe)</description>
+		<description>Disney Princess Cinderella - Askungens magiska önskningar (Sweden)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092254(SE)" />
@@ -1149,12 +1236,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92254.u1" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" offset="0" />
+				<rom name="92254.u1" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dorar2" supported="yes">
+	<!-- No inputs -->
+	<software name="dorar201" supported="no">
 		<description>Nickelodeon Dora the Explorer - Dora's Fix-it Adventure (USA, Rev. 201)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1164,12 +1252,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92280.bin" size="8388608" crc="034cf357" sha1="9c96af008b161f1bdc4ae9f33da161950dc47011" offset="0" />
+				<rom name="vsmile92280.bin" size="8388608" crc="034cf357" sha1="9c96af008b161f1bdc4ae9f33da161950dc47011" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dora" cloneof="dorar2" supported="yes">
+	<!-- Same ROM as "80-092283(UK)" -->
+	<software name="dora" cloneof="dorar201" supported="yes">
 		<description>Nick Jr Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1181,13 +1270,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" offset="0" />
+				<rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="doraf" cloneof="dorar2" supported="yes">
-		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (Fra)</description>
+	<software name="doraf" cloneof="dorar201" supported="yes">
+		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (France)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092285(FR)" />
@@ -1198,13 +1287,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92285.u1" size="8388608" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" offset="0" />
+				<rom name="92285.u1" size="8388608" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dorasr2" cloneof="dorar2" supported="yes">
-		<description>Nick Jr. Dora La Exploradora - La Aventura arregla-todo de Dora (Spa, Rev. 222)</description>
+	<!-- No inputs -->
+	<software name="dorasr222" cloneof="dorar201" supported="no">
+		<description>Nick Jr. Dora La Exploradora - La Aventura arregla-todo de Dora (Spain, Rev. 222)</description>
 		<year>2007</year> <!-- 2009 on cart -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092287-222(SP)" />
@@ -1215,13 +1305,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092287-222 - Dora La Exploradora - La Aventura arregla-todo de Dora (SP).bin" size="8388608" crc="e46b6ffa" sha1="115b2e6f62ba251f5676c3e4756a5299b008372f" offset="0" />
+				<rom name="80-092287-222 - Dora La Exploradora - La Aventura arregla-todo de Dora (SP).bin" size="8388608" crc="e46b6ffa" sha1="115b2e6f62ba251f5676c3e4756a5299b008372f" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dorag" cloneof="dorar2" supported="yes">
-		<description>Nick Jr Dora - Doras Reparatur-Abenteuer (Ger, Rev. 104)</description>
+	<software name="doragr104" cloneof="dorar201" supported="yes">
+		<description>Nick Jr Dora - Doras Reparatur-Abenteuer (Germany, Rev. 104)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092284-104(GE)" />
@@ -1232,13 +1322,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092284-1.u1" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" offset="0" />
+				<rom name="092284-1.u1" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="elmo" supported="yes">
-		<description>Elmos großes Abenteuer (Ger)</description>
+		<description>Elmos großes Abenteuer (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092264(GE)" />
@@ -1249,13 +1339,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92264.u1" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" offset="0" />
+				<rom name="92264.u1" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="elmof" cloneof="elmo" supported="yes">
-		<description>Le Monde d'Elmo - Les Grandes Découvertes D'Elmo (Fra)</description>
+		<description>Le Monde d'Elmo - Les Grandes Découvertes D'Elmo (France)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092265(FR)" />
@@ -1266,13 +1356,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92265.u1" size="8388608" crc="def351e7" sha1="95d005b6e2bf36add42916025558744ccffc8863" offset="0" />
+				<rom name="92265.u1" size="8388608" crc="def351e7" sha1="95d005b6e2bf36add42916025558744ccffc8863" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="elmos" cloneof="elmo" supported="yes">
-		<description>Mundo Elmo - Grandes descubrimientos de Elmo (Spa)</description>
+		<description>El Mundo de Elmo - Grandes descubrimientos de Elmo (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092267(SP)" />
@@ -1283,7 +1373,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092267 - Mundo Elmo - Grandes descubrimientos de Elmo (SP).bin" size="8388608" crc="9cbc133f" sha1="407dfedaf9a42b09633330a7e646529b39b2c673" offset="0" />
+				<rom name="80-092267 - Mundo Elmo - Grandes descubrimientos de Elmo (SP).bin" size="8388608" crc="9cbc133f" sha1="407dfedaf9a42b09633330a7e646529b39b2c673" />
 			</dataarea>
 		</part>
 	</software>
@@ -1300,13 +1390,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92420.u1" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" offset="0" />
+				<rom name="92420.u1" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="findnemonl" cloneof="findnemo" supported="yes">
-		<description>Disney/Pixar Finding Nemo - De Wonderwereld Van Nemo (NL)</description>
+		<description>Disney/Pixar Finding Nemo - De Wonderwereld Van Nemo (Netherlands)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092422(NL)" />
@@ -1317,13 +1407,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92422.u1" size="8388608" crc="1fd88d60" sha1="6274134d0441e55c81268af331176ac3cc2e9cb5" offset="0" />
+				<rom name="92422.u1" size="8388608" crc="1fd88d60" sha1="6274134d0441e55c81268af331176ac3cc2e9cb5" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="findnemos" cloneof="findnemo" supported="yes">
-		<description>Disney/Pixar Buscando a Nemo - Los Descubrimientos de Nemo (Spa)</description>
+		<description>Disney/Pixar Buscando a Nemo - Los Descubrimientos de Nemo (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092427(SP)" />
@@ -1334,13 +1424,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="M29DW323DB, M29DW323DB" /> <!-- Two M29DW323DB chips -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092427 - Buscando a Nemo - Los Descubrimientos de Nemo (SP).bin" size="8388608" crc="3ffa61f1" sha1="3f48b05018d46addd3de664fc7354eba76594e61" offset="0" />
+				<rom name="80-092427 - Buscando a Nemo - Los Descubrimientos de Nemo (SP).bin" size="8388608" crc="3ffa61f1" sha1="3f48b05018d46addd3de664fc7354eba76594e61" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="fred" supported="yes">
-		<description>Freds Zahlen Rallye (Ger)</description>
+		<description>Freds Zahlen Rallye (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092044(GE)" />
@@ -1351,13 +1441,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92044.u1" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
+				<rom name="92044.u1" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="fredf" cloneof="fred" supported="yes">
-		<description>Apprenti' pilote (Fra)</description>
+		<description>Apprenti' pilote (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092045(FR)" />
@@ -1368,13 +1458,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92045.u1" size="8388608" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" offset="0" />
+				<rom name="92045.u1" size="8388608" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="godiego" supported="yes">
-		<description>Nick Jr. Go Diego Go! - Save the Animal Familes! (US, Rev. 2?)</description>
+	<!-- No inputs -->
+	<software name="godiegor2" supported="no">
+		<description>Nick Jr. Go Diego Go! - Save the Animal Familes! (USA, Rev. 2?)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092900(US)" />
@@ -1383,14 +1474,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
-				<rom name="vsmile92900-2.bin" size="0x800000" crc="c819f626" sha1="8571d37c531018c332ef87e2e4374954f4128357" offset="0" />
+				<rom name="vsmile92900-2.bin" size="0x800000" crc="c819f626" sha1="8571d37c531018c332ef87e2e4374954f4128357" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Controls not working -->
+	<!-- No inputs -->
 	<software name="gyms" supported="no">
-		<description>Gimnasio Interactivo V.Smile (Spa)</description>
+		<description>Gimnasio Interactivo V.Smile (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091327(SP)" />
@@ -1401,15 +1492,16 @@ Game cartridges
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
-				<rom name="52-91327 - V.Smile Gimnasio Interactivo (Spain).bin" size="0x800000" crc="a203eaf7" sha1="bb7c7ecf6b208cd8b81daba58748345d3109268a" offset="0" />
+				<rom name="52-91327 - V.Smile Gimnasio Interactivo (Spain).bin" size="0x800000" crc="a203eaf7" sha1="bb7c7ecf6b208cd8b81daba58748345d3109268a" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ltleinstn" supported="yes">
-		<description>Disney's Little Einsteins (US, Rev. 5?)</description>
+	<!-- No inputs -->
+	<software name="ltleinstnr5" supported="no">
+		<description>Disney's Little Einsteins (USA, Rev. 5?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092980(US)" />
@@ -1418,13 +1510,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
-				<rom name="vsmile92980-5.bin" size="0x800000" crc="79c12011" sha1="651d6fe028e53032583186835432ad0fa7c3486a" offset="0" />
+				<rom name="vsmile92980-5.bin" size="0x800000" crc="79c12011" sha1="651d6fe028e53032583186835432ad0fa7c3486a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ltleinstng" cloneof="ltleinstn" supported="yes">
-		<description>Disney's Kleine Einsteins (Ger, Rev. 3?)</description>
+	<software name="ltleinstngr3" cloneof="ltleinstnr5" supported="yes">
+		<description>Disney's Kleine Einsteins (Germany, Rev. 3?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092984(GE)" />
@@ -1435,7 +1527,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" offset="0" />
+				<rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" />
 			</dataarea>
 		</part>
 	</software>
@@ -1469,13 +1561,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92100.u1" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" offset="0" />
+				<rom name="92100.u1" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lionkingg" cloneof="lionking" supported="yes">
-		<description>Der Koenig der Loewen - Simbas großes Abenteuer (Ger, Rev. 2?)</description>
+	<software name="lionkinggr2" cloneof="lionking" supported="yes">
+		<description>Der Koenig der Loewen - Simbas großes Abenteuer (Germany, Rev. 2?)</description>
 		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092104(GE)" />
@@ -1486,13 +1578,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92104(2).u1" size="8388608" crc="f2394e3a" sha1="e39e05400279a1328832c873f811ce432be59d13" offset="0" />
+				<rom name="92104(2).u1" size="8388608" crc="f2394e3a" sha1="e39e05400279a1328832c873f811ce432be59d13" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lionkingf" cloneof="lionking" supported="yes">
-		<description>Le Roi Lion - Simba Découvre la Jungle (Fra)</description>
+		<description>Le Roi Lion - Simba Découvre la Jungle (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092105(FR)" />
@@ -1503,13 +1595,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92105.u1" size="8388608" crc="d756c029" sha1="9fbb3a031498682b05c5950e6e07fd5e83a308ad" offset="0" />
+				<rom name="92105.u1" size="8388608" crc="d756c029" sha1="9fbb3a031498682b05c5950e6e07fd5e83a308ad" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lionkings" cloneof="lionking" supported="yes">
-		<description>Disney El Rey León - La Gran Aventura de Simba (Spa)</description>
+		<description>Disney El Rey León - La Gran Aventura de Simba (Spain)</description>
 		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092107(SP)" />
@@ -1520,13 +1612,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092107 - El Rey Leon - La Gran Aventura de Simba (SP).bin" size="8388608" crc="eefc51d2" sha1="294164e8df7cc5510e0dd9ea658976054fcf9e7e" offset="0" />
+				<rom name="80-092107 - El Rey Leon - La Gran Aventura de Simba (SP).bin" size="8388608" crc="eefc51d2" sha1="294164e8df7cc5510e0dd9ea658976054fcf9e7e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lionkingdk" cloneof="lionking" supported="yes">
-		<description>Disney Løvernes Konge - Simbas store eventyr (Den)</description>
+		<description>Disney Løvernes Konge - Simbas store eventyr (Denmark)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092113(DK)" />
@@ -1537,13 +1629,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92113.u1" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" offset="0" />
+				<rom name="92113.u1" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lionkingsw" cloneof="lionking" supported="yes">
-		<description>Disney Lejonkungen - Simbas stora äventyr (Swe)</description>
+		<description>Disney Lejonkungen - Simbas stora äventyr (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092114(SE)" />
@@ -1554,20 +1646,20 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92114.u1" size="8388608" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" offset="0" />
+				<rom name="92114.u1" size="8388608" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lionkingi" cloneof="lionking" supported="yes">
-		<description>Disney Il re leone - La grande avventura di Simba (Ita)</description>
+		<description>Disney Il re leone - La grande avventura di Simba (Italy)</description>
 		<year>2005</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092113(DK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Re Leone, Il - La Grande Avventura di Simba (Italy).bin" size="8388608" crc="6f807218" sha1="2783734d1596021f0aadf1b20d7398d2f73abb04" offset="0" />
+				<rom name="Re Leone, Il - La Grande Avventura di Simba (Italy).bin" size="8388608" crc="6f807218" sha1="2783734d1596021f0aadf1b20d7398d2f73abb04" />
 			</dataarea>
 		</part>
 	</software>
@@ -1580,13 +1672,13 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Kung Fu Panda - Path of the Panda (Europe).bin" size="8388608" crc="0a56ba7b" sha1="04afc9bb216154c91fa3ef92b6bbcc88a9a2a43e" offset="0" />
+				<rom name="Kung Fu Panda - Path of the Panda (Europe).bin" size="8388608" crc="0a56ba7b" sha1="04afc9bb216154c91fa3ef92b6bbcc88a9a2a43e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="kungfupg" cloneof="kungfupuk" supported="yes">
-		<description>Kung Fu Panda - Der Weg des Panda (Ger)</description>
+		<description>Kung Fu Panda - Der Weg des Panda (Germany)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="52-092964(GER)" />
@@ -1597,13 +1689,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92964-3.bin" size="8388608" crc="4ef9f7c0" sha1="d60265406e1f1b1f4b86364b3281058feb1a6e1d" offset="0" />
+				<rom name="92964-3.bin" size="8388608" crc="4ef9f7c0" sha1="d60265406e1f1b1f4b86364b3281058feb1a6e1d" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mannyg" supported="yes">
-		<description>Meister Manny's Werkzeugkiste (Ger)</description>
+		<description>Meister Manny's Werkzeugkiste (Germany)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090024(GE)" />
@@ -1614,13 +1706,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
+				<rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="melodil">
-		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (Fra)</description>
+		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (France)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092585(FR)" />
@@ -1631,27 +1723,41 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" offset="0" />
+				<rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mickymag" supported="yes">
 		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092080(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="52-092080(us).bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" offset="0" />
+				<rom name="52-092080(us).bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymagi" cloneof="mickymag" supported="yes">
+		<description>Disney Topolino - Le Magiche Avventure di Topolino (Italy)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092081(IT)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Topolino - Le Magiche Avventure di Topolino (Italy).bin" size="8388608" crc="cc2f661d" sha1="20cfd75031ff42d1f446e478edc6ccc78e8df66f" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mickymagg" cloneof="mickymag" supported="yes">
-		<description>Disneys Micky - Mickys magisches Abenteuer (Ger)</description>
-		<year>2004?</year>
+		<description>Disneys Micky - Mickys magisches Abenteuer (Germany)</description>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092084(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1661,13 +1767,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" offset="0" />
+				<rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mickymags" cloneof="mickymag" supported="yes">
-		<description>Disney Mickey - La Aventura Mágica de Mickey (Spa)</description>
+		<description>Disney Mickey - La Aventura Mágica de Mickey (Spain)</description>
 		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092087(SP)" />
@@ -1678,13 +1784,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092087 - Mickey - La Aventura Magica de Mickey (SP).bin" size="8388608" crc="85e30a67" sha1="4059485db625955c2a9aad1769f5e21da1c24c62" offset="0" />
+				<rom name="80-092087 - Mickey - La Aventura Magica de Mickey (SP).bin" size="8388608" crc="85e30a67" sha1="4059485db625955c2a9aad1769f5e21da1c24c62" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mickymagsw" cloneof="mickymag" supported="yes">
-		<description>Disneys Musse Pigg - Musses magiska äventyr (Swe)</description>
+		<description>Disneys Musse Pigg - Musses magiska äventyr (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092094(SE)" />
@@ -1695,13 +1801,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92094.u1" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" offset="0" />
+				<rom name="92094.u1" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mickeychg" supported="yes">
-		<description>Micky Maus Wunderhaus (Ger, Rev. 3?)</description>
+	<software name="mickeychgr3" supported="yes">
+		<description>Micky Maus Wunderhaus (Germany, Rev. 3?)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092944(GE)" />
@@ -1712,13 +1818,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" offset="0" />
+				<rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mickeychs" supported="yes">
-		<description>Disney La Casa de Mickey Mouse (Spa)</description>
+	<!-- No inputs -->
+	<software name="mickeychs" cloneof="mickeychgr3" supported="no">
+		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092947(SP)" />
@@ -1729,13 +1836,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092947 - La Casa de Mickey Mouse (SP).bin" size="8388608" crc="f0288f80" sha1="6a2fc76c71dc3b2a537a6125d0946b6997c286a7" offset="0" />
+				<rom name="80-092947 - La Casa de Mickey Mouse (SP).bin" size="8388608" crc="f0288f80" sha1="6a2fc76c71dc3b2a537a6125d0946b6997c286a7" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mickeychnl" cloneof="mickeychg" supported="yes">
-		<description>Mickey Mouse Clubhouse (NL)</description>
+	<software name="mickeychnl" cloneof="mickeychgr3" supported="yes">
+		<description>Mickey Mouse Clubhouse (Netherlands)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092942(NL)" />
@@ -1746,13 +1853,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92942.u1" size="8388608" crc="56083a88" sha1="615590ad3fe7c2195dc20a9f8504f5ed8224df20" offset="0" />
+				<rom name="92942.u1" size="8388608" crc="56083a88" sha1="615590ad3fe7c2195dc20a9f8504f5ed8224df20" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mickeychsw" cloneof="mickeychg" supported="yes">
-		<description>Mickey Mouse Clubhouse (Swe)</description>
+	<software name="mickeychsw" cloneof="mickeychgr3" supported="yes">
+		<description>Mickey Mouse Clubhouse (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092954(SE)" />
@@ -1763,13 +1870,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92954.u1" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" offset="0" />
+				<rom name="92954.u1" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="monstalng" supported="yes">
-		<description>DreamWorks Monsters vs Aliens (Ger)</description>
+		<description>DreamWorks Monsters vs Aliens (Germany)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090164(GE)" />
@@ -1780,13 +1887,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
+				<rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="monstalns" cloneof="monstalng" supported="yes">
-		<description>DreamWorks Monstruos contra Alienígenas (Spa)</description>
+	<!-- No inputs -->
+	<software name="monstalns" cloneof="monstalng" supported="no">
+		<description>DreamWorks Monstruos contra Alienígenas (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090167(SP)" />
@@ -1797,13 +1905,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-090167 - Monstruos contra Alienigenas (SP).bin" size="8388608" crc="c0ddc952" sha1="61491dc841934cc9468b7e9c8ceaa25353a398b8" offset="0" />
+				<rom name="80-090167 - Monstruos contra Alienigenas (SP).bin" size="8388608" crc="c0ddc952" sha1="61491dc841934cc9468b7e9c8ceaa25353a398b8" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mypuppyg" supported="yes">
-		<description>Mein erster Hund (Ger)</description>
+		<description>Mein erster Hund (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090144(GE)" />
@@ -1814,13 +1922,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="90144 OK.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
+				<rom name="90144 OK.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mypuppysw" cloneof="mypuppyg" supported="yes">
-		<description>Min hundvalp (Swe)</description>
+		<description>Min hundvalp (Sweden)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090154(SE)" />
@@ -1831,7 +1939,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
+				<rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" />
 			</dataarea>
 		</part>
 	</software>
@@ -1848,13 +1956,27 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92540.bin" size="8388608" crc="0510eb62" sha1="bdd30453f89a619f1539647ffc27bb2ac3f6b267" offset="0" />
+				<rom name="vsmile92540.bin" size="8388608" crc="0510eb62" sha1="bdd30453f89a619f1539647ffc27bb2ac3f6b267" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="noddyg" cloneof="noddy" supported="yes">
-		<description>Noddy - Detektiv für einen Tag (Ger, Rev. 104)</description>
+	<software name="noddyuk" cloneof="noddy" supported="yes">
+		<description>Noddy - Detective for a Day (UK)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092543(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Noddy - Detective for a Day (Europe).bin" size="8388608" crc="24a04b1d" sha1="f11c2a4bc5c5eb50ca0231e5e9e1c0da17ef1be7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noddygr104" cloneof="noddy" supported="yes">
+		<description>Noddy - Detektiv für einen Tag (Germany, Rev. 104)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092544-104(GE)" />
@@ -1865,13 +1987,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92544-3.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" offset="0" />
+				<rom name="92544-3.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="noddyf" cloneof="noddy" supported="yes">
-		<description>Oui-Oui - Détective d'un Jour (Fra)</description>
+		<description>Oui-Oui - Détective d'un Jour (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092545(FR)" />
@@ -1882,12 +2004,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92545.u1" size="8388608" crc="f4825273" sha1="8ef2852687e0a6820b97268e6613450ab164c90d" offset="0" />
+				<rom name="92545.u1" size="8388608" crc="f4825273" sha1="8ef2852687e0a6820b97268e6613450ab164c90d" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pcpalis" supported="yes">
+	<!-- No inputs -->
+	<software name="pcpalisr3" supported="no">
 		<description>V.Smile PC Pal Island (USA, Rev. 3?)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1897,13 +2020,13 @@ Game cartridges
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile36800-3.bin" size="8388608" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" offset="0" />
+				<rom name="vsmile36800-3.bin" size="8388608" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="upg" supported="yes">
-		<description>Disney/Pixar Oben (Ger, Rev. 004)</description>
+	<software name="upgr004" supported="yes">
+		<description>Disney/Pixar Oben (Germany, Rev. 004)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090004-004(GE)" />
@@ -1914,12 +2037,12 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
+				<rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="upuk" cloneof="upg" supported="yes">
+	<software name="upukr3" cloneof="upgr004" supported="yes">
 		<description>Disney/Pixar Up (UK, Rev. 003)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -1927,14 +2050,14 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Up (Europe).bin" size="8388608" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" offset="0" />
+				<rom name="Up (Europe).bin" size="8388608" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Controls not working, shows a "Please, connect the controller" message on screen. -->
-	<software name="ups" cloneof="upg" supported="no">
-		<description>Disney/Pixar Up (Spa, Rev. 022)</description>
+	<!-- No inputs, shows a "Please, connect the controller" message on screen. -->
+	<software name="upsr022" cloneof="upgr004" supported="no">
+		<description>Disney/Pixar Up (Spain, Rev. 022)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090007-022(UK)" />
@@ -1945,7 +2068,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="52-090007-022 - UP (Spain).bin" size="8388608" crc="772929e7" sha1="bf3adb9d3ff28dcc762db6019f492445a3ca0226" offset="0" />
+				<rom name="52-090007-022 - UP (Spain).bin" size="8388608" crc="772929e7" sha1="bf3adb9d3ff28dcc762db6019f492445a3ca0226" />
 			</dataarea>
 		</part>
 	</software>
@@ -1962,13 +2085,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" offset="0" />
+				<rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ratatg" supported="yes">
-		<description>Disney/Pixar Ratatouille - Remys neue Rezepte (Ger)</description>
+		<description>Disney/Pixar Ratatouille - Remys neue Rezepte (Germany)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092884(GE)" />
@@ -1979,13 +2102,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
+				<rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ratats" cloneof="ratatg" supported="yes">
-		<description>Disney/Pixar Ratatouille - Las recetas del Remy (Spa)</description>
+	<!-- No inputs -->
+	<software name="ratats" cloneof="ratatg" supported="no">
+		<description>Disney/Pixar Ratatouille - Las recetas del Remy (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092887(SP)" />
@@ -1996,26 +2120,27 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092887 - Ratatouille - Las recetas del Remy (SP).bin" size="8388608" crc="23a058bf" sha1="4e78a949f84c7aa4db38ca48eae76c5f05f0d8fe" offset="0" />
+				<rom name="80-092887 - Ratatouille - Las recetas del Remy (SP).bin" size="8388608" crc="23a058bf" sha1="4e78a949f84c7aa4db38ca48eae76c5f05f0d8fe" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ratati" cloneof="ratatg" supported="yes">
-		<description>Disney/Pixar Ratatouille - Le nuove ricette di Remy (Ita)</description>
+		<description>Disney/Pixar Ratatouille - Le nuove ricette di Remy (Italy)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Ratatouille - Le Nuove Ricette di Remy (Italy).bin" size="8388608" crc="438550fb" sha1="1edc845aecac91eb640185895d3f7a3cdf462159" offset="0" />
+				<rom name="Ratatouille - Le Nuove Ricette di Remy (Italy).bin" size="8388608" crc="438550fb" sha1="1edc845aecac91eb640185895d3f7a3cdf462159" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydor3" supported="yes">
+	<!-- No inputs -->
+	<software name="scoobydor301" supported="no">
 		<description>Scooby-Doo! - Funland Frenzy (USA, Rev. 301)</description>
-		<year>200?</year>
+		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092160-301(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2023,12 +2148,12 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92160.bin" size="8388608" crc="5d190acf" sha1="68b69330c7d60db82e39f8f0423ea135ad90c783" offset="0" />
+				<rom name="vsmile92160.bin" size="8388608" crc="5d190acf" sha1="68b69330c7d60db82e39f8f0423ea135ad90c783" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydo" cloneof="scoobydor3" supported="yes">
+	<software name="scoobydo" cloneof="scoobydor301" supported="yes">
 		<description>Scooby-Doo! - Funland Frenzy (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2040,30 +2165,54 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" offset="0" />
+				<rom name="92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydof" cloneof="scoobydor3" supported="yes">
-		<description>Scooby-Doo - Panique à Funland (Fra)</description>
+	<software name="scoobydoi" cloneof="scoobydor301" supported="yes">
+		<description>Scooby-Doo! - Avventura a Funland (Italy)</description>
 		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-092165(FR)" />
+		<publisher>VTech / Giochi Preziosi</publisher>
+		<info name="serial" value="80-092161(IT)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="706714" />
-			<feature name="pcb_model" value="706714-1" />
-			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" offset="0" />
+				<rom name="Scooby-Doo! - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydog" cloneof="scoobydor3" supported="yes">
-		<description>Scooby-Doo! - Im Lernpark (Ger)</description>
+	<!-- No inputs -->
+	<software name="scoobydouk" cloneof="scoobydor301" supported="no">
+		<description>Scooby-Doo! - Funland Frenzy (UK)</description>
+		<year>2007</year> <!-- (s07) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092163(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Scooby-Doo! - Funland Frenzy (Europe).bin" size="8388608" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="scoobydoukr1" cloneof="scoobydor301" supported="no">
+		<description>Scooby-Doo! - Funland Frenzy (UK, Rev. 1?)</description>
+		<year>2008</year> <!-- (s08) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092163(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Scooby-Doo! - Funland Frenzy (Europe) (Rev 1).bin" size="8388608" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydog" cloneof="scoobydor301" supported="yes">
+		<description>Scooby-Doo! - Im Lernpark (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092164(GE)" />
@@ -2074,14 +2223,31 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" offset="0" />
+				<rom name="92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydof" cloneof="scoobydor301" supported="yes">
+		<description>Scooby-Doo - Panique à Funland (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092165(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- Does not boot, just shows a black screen -->
-	<software name="scoobydos" cloneof="scoobydor3" supported="no">
-		<description>Scooby-Doo - Misterio en el Parque (Spa)</description>
+	<software name="scoobydos" cloneof="scoobydor301" supported="no">
+		<description>Scooby-Doo - Misterio en el Parque (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092167(SP)" />
@@ -2092,13 +2258,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092167 - Scooby-Doo - Misterio en el Parque (SP).bin" size="8388608" crc="5e77e160" sha1="51c472ea72939f01ed1f5b212f2de4056315ab88" offset="0" />
+				<rom name="80-092167 - Scooby-Doo - Misterio en el Parque (SP).bin" size="8388608" crc="5e77e160" sha1="51c472ea72939f01ed1f5b212f2de4056315ab88" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydodk" cloneof="scoobydor3" supported="yes">
-		<description>Scooby-Doo! - Sjov i forlystelsesparken (Den)</description>
+	<software name="scoobydodk" cloneof="scoobydor301" supported="yes">
+		<description>Scooby-Doo! - Sjov i forlystelsesparken (Denmark)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092173(DK)" />
@@ -2109,13 +2275,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" offset="0" />
+				<rom name="092173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydosw" cloneof="scoobydor3" supported="yes">
-		<description>Scooby-Doo! - Tivoli-tokerier (Swe)</description>
+	<software name="scoobydosw" cloneof="scoobydor301" supported="yes">
+		<description>Scooby-Doo! - Tivoli-tokerier (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092174(SE)" />
@@ -2126,25 +2292,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="scoobydoi" cloneof="scoobydor3" supported="yes">
-		<description>Scooby-Doo! - Avventura a Funland (Ita)</description>
-		<year>200?</year>
-		<publisher>VTech / Giochi Preziosi</publisher>
-		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo! - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" offset="0" />
+				<rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="erniebrt" supported="yes">
-		<description>Ernies &amp; Berts Fantastisches Abenteuer (Ger)</description>
+		<description>Ernies &amp; Berts Fantastisches Abenteuer (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092464(GE)" />
@@ -2155,13 +2309,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" offset="0" />
+				<rom name="92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="erniebrts" cloneof="erniebrt" supported="yes">
-		<description>Barrio Sésamo - El Mundo Fantástico de Epi y Blas (Spa)</description>
+		<description>Barrio Sésamo - El Mundo Fantástico de Epi y Blas (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092467(SP)" />
@@ -2172,7 +2326,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092467 - Barrio Sesamo - El Mundo Fantastico de Epi y Blas (SP).bin" size="8388608" crc="619e1530" sha1="f1294726ff035c0c67a9e6845302c11f3ba2ee91" offset="0" />
+				<rom name="80-092467 - Barrio Sesamo - El Mundo Fantastico de Epi y Blas (SP).bin" size="8388608" crc="619e1530" sha1="f1294726ff035c0c67a9e6845302c11f3ba2ee91" />
 			</dataarea>
 		</part>
 	</software>
@@ -2189,12 +2343,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" offset="0" />
+				<rom name="92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="shrek3a" cloneof="shrek3" supported="yes">
+	<!-- No inputs -->
+	<software name="shrek3a" cloneof="shrek3" supported="no">
 		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA, alt)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2206,13 +2361,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92860.bin" size="8388608" crc="48b6565b" sha1="25f935bb7fceec387f9cab05251275c0fb1899e0" offset="0" />
+				<rom name="vsmile92860.bin" size="8388608" crc="48b6565b" sha1="25f935bb7fceec387f9cab05251275c0fb1899e0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shrek3g" cloneof="shrek3" supported="yes">
-		<description>DreamWorks Shrek der Dritte - Ein Spannender Schultag (Ger)</description>
+		<description>DreamWorks Shrek der Dritte - Ein Spannender Schultag (Germany)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092864(GE)" />
@@ -2223,13 +2378,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92864(2).u1" size="8388608" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" offset="0" />
+				<rom name="92864(2).u1" size="8388608" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shrek3nl" cloneof="shrek3" supported="yes">
-		<description>Shrek De Derde - Arthurs Schooldag Avontuur (NL)</description>
+		<description>Shrek De Derde - Arthurs Schooldag Avontuur (Netherlands)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092862(NL)" />
@@ -2240,13 +2395,42 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92862.u1" size="8388608" crc="db0e8bc3" sha1="474008f7d6dd9a69fb6db55af3d18020990e1fe5" offset="0" />
+				<rom name="92862.u1" size="8388608" crc="db0e8bc3" sha1="474008f7d6dd9a69fb6db55af3d18020990e1fe5" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="shrekg" supported="yes">
-		<description>DreamWorks Shrek - Die Geschichte des Drachen (Ger)</description>
+	<!-- No inputs -->
+	<software name="shrek3uk" cloneof="shrek3" supported="no">
+		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (UK)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092863(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Shrek the Third - Arthur's School Day Adventure (Europe).bin" size="8388608" crc="7f06555c" sha1="b1082ab883cdb3caf5f87831cbe1a8623b41e88e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shreknl" supported="yes">
+		<description>DreamWorks Shrek - Het Verhaal Van Draakje (Netherlands)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092602(NL)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Shrek - Het Verhaal Van Draakje (Netherlands).bin" size="8388608" crc="7936a0d8" sha1="fcd9006d528dbf739eb411fbf673fa61fec09019" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekg" cloneof="shreknl" supported="yes">
+		<description>DreamWorks Shrek - Die Geschichte des Drachen (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092604(GE)" />
@@ -2257,13 +2441,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
+				<rom name="092604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="shrekf" cloneof="shrekg" supported="yes">
-		<description>DreamWorks Shrek - Le Rhume de Dragonne (Fra)</description>
+	<software name="shrekf" cloneof="shreknl" supported="yes">
+		<description>DreamWorks Shrek - Le Rhume de Dragonne (France)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092605(FR)" />
@@ -2274,7 +2458,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092605.u1" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" offset="0" />
+				<rom name="092605.u1" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" />
 			</dataarea>
 		</part>
 	</software>
@@ -2291,13 +2475,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92820.bin" size="8388608" crc="e96f49df" sha1="e06eb8657d179a80ad23e832b46c6e85235b66c8" offset="0" />
+				<rom name="vsmile92820.bin" size="8388608" crc="e96f49df" sha1="e06eb8657d179a80ad23e832b46c6e85235b66c8" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="soccerchg" cloneof="soccerch" supported="yes">
-		<description>V.Smile Fußball Schule (Ger)</description>
+		<description>V.Smile Fußball Schule (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092824(GE)" />
@@ -2308,13 +2492,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
+				<rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spiderdocg" supported="yes">
-		<description>Spider-Man &amp; Freunde - Wettkampf im Space-Labor (Ger)</description>
+		<description>Spider-Man &amp; Freunde - Wettkampf im Space-Labor (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092524(GE)" />
@@ -2325,13 +2509,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" offset="0" />
+				<rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spiderdocs" cloneof="spiderdocg" supported="yes">
-		<description>Spider-Man y Amigos - La Aventura Del Doctor Octopus (Spa)</description>
+		<description>Spider-Man y Amigos - La Aventura Del Doctor Octopus (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092527(SP)" />
@@ -2342,12 +2526,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092527 - Spider-Man y Amigos - La Aventura Del Doctor Octopus (SP).bin" size="8388608" crc="65a86a62" sha1="a5f40505e1adc6bb7485570cdecbba5f8bf5931b" offset="0" />
+				<rom name="80-092527 - Spider-Man y Amigos - La Aventura Del Doctor Octopus (SP).bin" size="8388608" crc="65a86a62" sha1="a5f40505e1adc6bb7485570cdecbba5f8bf5931b" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spidermisr1" supported="yes">
+	<!-- No inputs -->
+	<software name="spidermisr101" supported="no">
 		<description>Marvel Spider-Man &amp; Friends - Secret Missions (USA, Rev. 101)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2359,13 +2544,27 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92140.bin" size="8388608" crc="5cf2c76a" sha1="99b3cc9e9b6ae8459db7054555a81853e732806a" offset="0" />
+				<rom name="vsmile92140.bin" size="8388608" crc="5cf2c76a" sha1="99b3cc9e9b6ae8459db7054555a81853e732806a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spidermisf" cloneof="spidermisr1" supported="yes">
-		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (Fra)</description>
+	<software name="spidermisi" cloneof="spidermisr101" supported="yes">
+		<description>Spider-Man &amp; Friends - Missioni Segrete (Italy)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092141(IT)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Spider-Man and Friends - Missioni Segrete (Italy).bin" size="8388608" crc="15af0018" sha1="f29ac0ac8ba68ecc515ead523e246f416e706e0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermisf" cloneof="spidermisr101" supported="yes">
+		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092145(FR)" />
@@ -2376,13 +2575,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" offset="0" />
+				<rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spidermiss" cloneof="spidermisr1" supported="yes">
-		<description>Spider-Man y Amigos - Misiones Secretas (Spa)</description>
+	<software name="spidermiss" cloneof="spidermisr101" supported="yes">
+		<description>Spider-Man y Amigos - Misiones Secretas (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092147(SP)" />
@@ -2393,7 +2592,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092147 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="8388608" crc="ffda1d3d" sha1="12c52915d758d50ae221a4dafe1a8f2892219089" offset="0" />
+				<rom name="80-092147 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="8388608" crc="ffda1d3d" sha1="12c52915d758d50ae221a4dafe1a8f2892219089" />
 			</dataarea>
 		</part>
 	</software>
@@ -2410,13 +2609,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" offset="0" />
+				<rom name="92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spongebg" cloneof="spongeb" supported="yes">
-		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
+	<software name="spongebgr1" cloneof="spongeb" supported="yes">
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Germany, Rev. 1)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092444(GE)" />
@@ -2427,13 +2626,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92444.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
+				<rom name="92444.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebg1" cloneof="spongeb" supported="yes">
-		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092444(GE)" />
@@ -2444,13 +2643,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />  <!-- sldh -->
+				<rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebs" cloneof="spongeb" supported="yes">
-		<description>Nickelodeon Bob Esponja - Un día en la vida de una esponja (Spa)</description>
+		<description>Nickelodeon Bob Esponja - Un día en la vida de una esponja (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092447(SP)" />
@@ -2461,14 +2660,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092447 - Bob Esponja - Un dia en la vida de una esponja (SP).bin" size="8388608" crc="176d5a11" sha1="e334d4d3b6d75a0a4e1dff9aab7a990de1a2879e" offset="0" />  <!-- sldh -->
+				<rom name="80-092447 - Bob Esponja - Un dia en la vida de una esponja (SP).bin" size="8388608" crc="176d5a11" sha1="e334d4d3b6d75a0a4e1dff9aab7a990de1a2879e" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="superman" supported="yes">
 		<description>Superman - The Greatest Hero (USA)</description>
-		<year>200?</year>
+		<year>2006</year> <!-- (s06) -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092640(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2478,13 +2677,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92640.bin" size="8388608" crc="993b0a69" sha1="c1865247da17d5e6d276d1b8144c48ef774bb5d3" offset="0" />
+				<rom name="vsmile92640.bin" size="8388608" crc="993b0a69" sha1="c1865247da17d5e6d276d1b8144c48ef774bb5d3" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="supermang" cloneof="superman" supported="yes">
-		<description>Superman - Der Superheld (Ger)</description>
+		<description>Superman - Der Superheld (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092644(GE)" />
@@ -2495,16 +2694,16 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
+				<rom name="92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="supermannl" cloneof="superman" supported="yes">
-		<description>Superman - De Grootste Held (NL)</description>
+		<description>Superman - De Grootste Held (Netherlands)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092644(NL)" />
+		<info name="serial" value="80-092642(NL)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
@@ -2512,13 +2711,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092642.u1" size="8388608" crc="b7f1a750" sha1="c6e60ef2333250c9e0e41d3a7d04fe4178d9be8a" offset="0" />
+				<rom name="092642.u1" size="8388608" crc="b7f1a750" sha1="c6e60ef2333250c9e0e41d3a7d04fe4178d9be8a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="supermanf" cloneof="superman" supported="yes">
-		<description>Superman - À la rescousse ! (Fra)</description>
+		<description>Superman - À la rescousse ! (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092645(FR)" />
@@ -2529,7 +2728,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" offset="0" />
+				<rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" />
 			</dataarea>
 		</part>
 	</software>
@@ -2544,13 +2743,42 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92340.bin" size="8388608" crc="ff0d3dca" sha1="23a9a05289a9fc858bb7b91a6efad8c1ed54bced" offset="0" />
+				<rom name="vsmile92340.bin" size="8388608" crc="ff0d3dca" sha1="23a9a05289a9fc858bb7b91a6efad8c1ed54bced" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="thomasg" cloneof="thomas" supported="yes">
-		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger, Rev. 104)</description>
+	<software name="thomasuk" cloneof="thomas" supported="yes">
+		<description>Thomas &amp; Friends - Engines Working Together (UK)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092343(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Thomas and Friends - Engines Working Together (Europe).bin" size="8388608" crc="4a96f7ab" sha1="d350bc5477149c284b1d4dc4ae562fb411e06a5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="thomasukr1" cloneof="thomas" supported="no">
+		<description>Thomas &amp; Friends - Engines Working Together (UK, Rev. 1?)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092343(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Thomas and Friends - Engines Working Together (Europe) (Rev 1).bin" size="8388608" crc="0d0002f7" sha1="f1124d4e6590d58cf2b4a70e92435b2b4687ae7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasgr104" cloneof="thomas" supported="yes">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany, Rev. 104)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092344-104(GE)" />
@@ -2561,13 +2789,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="092344-1.u1" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" offset="0" />
+				<rom name="092344-1.u1" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="thomasg1" cloneof="thomas" supported="yes">
-		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger)</description>
+	<software name="thomasg" cloneof="thomas" supported="yes">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092344(GE)" />
@@ -2578,13 +2806,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
+				<rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="thomasf" cloneof="thomas" supported="yes">
-		<description>Thomas et ses Amis - Les locomotives s'entraident (Fra)</description>
+		<description>Thomas et ses Amis - Les locomotives s'entraident (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092345(FR)" />
@@ -2595,13 +2823,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92345.u1" size="8388608" crc="281a7d69" sha1="479a9f9c27a08316ef605d39d3fa2fc1b09bd4ff" offset="0" />
+				<rom name="92345.u1" size="8388608" crc="281a7d69" sha1="479a9f9c27a08316ef605d39d3fa2fc1b09bd4ff" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="thomassw" cloneof="thomas" supported="yes">
-		<description>Thomas &amp; Friends - Tågen hjälps åt (Swe)</description>
+		<description>Thomas &amp; Friends - Tågen hjälps åt (Sweden)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092354(SE)" /> <!-- 494096(SE) on cart -->
@@ -2612,13 +2840,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92354.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" offset="0" />
+				<rom name="92354.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tingelng" supported="yes">
-		<description>Tingeling (Swe)</description>
+		<description>Tingeling (Sweden)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090274(SE)" />
@@ -2629,7 +2857,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="90274.u1" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" offset="0" />
+				<rom name="90274.u1" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" />
 			</dataarea>
 		</part>
 	</software>
@@ -2642,12 +2870,12 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
+				<rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="toystor2a" supported="yes">
+	<software name="toystor2a" cloneof="toystor2" supported="yes">
 		<description>Disney/Pixar Toy Story 2 - Operation: Rescue Woody! (USA, alt)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -2658,14 +2886,28 @@ Game cartridges
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92220.bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" offset="0" />
+				<rom name="vsmile92220.bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2uk" cloneof="toystor2" supported="yes">
+		<description>Disney/Pixar Toy Story 2 - Operation-Rescue Woody! (UK)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092223(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Toy Story 2 - Operation-Rescue Woody! (Europe).bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="toystor2g" cloneof="toystor2" supported="yes">
-		<description>Disney/Pixar Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
-		<year>2006?</year>
+		<description>Disney/Pixar Toy Story 2 - Woodys Spannende Rettung (Germany)</description>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092224(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2675,13 +2917,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92224-105.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
+				<rom name="92224-105.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="toystor2s" cloneof="toystor2" supported="yes">
-		<description>Disney/Pixar Toy Story 2 - El Rescate De Woody (Spa)</description>
+		<description>Disney/Pixar Toy Story 2 - El Rescate De Woody (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092227(SP)" />
@@ -2692,14 +2934,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092227 - Toy Story 2 - El Rescate De Woody (SP).bin" size="8388608" crc="83924979" sha1="3aa17cdc3977644a6a4441d3e03b9aeb3e9c96ff" offset="0" />
+				<rom name="80-092227 - Toy Story 2 - El Rescate De Woody (SP).bin" size="8388608" crc="83924979" sha1="3aa17cdc3977644a6a4441d3e03b9aeb3e9c96ff" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="toystor2sw" cloneof="toystor2" supported="yes">
-		<description>Disney/Pixar Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
-		<year>2005?</year>
+		<description>Disney/Pixar Toy Story 2 - Operation: Rädda Woody! (Sweden)</description>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092234(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2709,13 +2951,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" offset="0" />
+				<rom name="92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="walleg" supported="yes">
-		<description>Disney/Pixar Wall-E (Ger)</description>
+		<description>Disney/Pixar Wall-E (Germany)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092844(GE)" />
@@ -2726,13 +2968,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+				<rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="walles" cloneof="walleg" supported="yes">
-		<description>Disney/Pixar Wall-E (Spa)</description>
+	<!-- No inputs -->
+	<software name="walles" cloneof="walleg" supported="no">
+		<description>Disney/Pixar Wall-E (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092847(SP)" />
@@ -2743,13 +2986,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092847 - Wall-E (SP).bin" size="8388608" crc="ac1e10fb" sha1="3701ed1b4f37303d476fd21b46c4fa4e1a432e74" offset="0" />
+				<rom name="80-092847 - Wall-E (SP).bin" size="8388608" crc="ac1e10fb" sha1="3701ed1b4f37303d476fd21b46c4fa4e1a432e74" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wallesw" cloneof="walleg" supported="yes">
-		<description>Disney/Pixar Wall-E (Swe)</description>
+		<description>Disney/Pixar Wall-E (Sweden)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092854(SE)" />
@@ -2760,7 +3003,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" offset="0" />
+				<rom name="92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" />
 			</dataarea>
 		</part>
 	</software>
@@ -2769,6 +3012,7 @@ Game cartridges
 		<description>Disneys Winnie the Pooh - The Honey Hunt (USA)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-092060(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="92060" />
@@ -2781,8 +3025,22 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="poohi" cloneof="pooh" supported="yes">
+		<description>Winnie the Pooh e la caccia al miele (Italy)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092061(IT)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Winnie the Pooh e la caccia al miele (Italy).bin" size="8388608" crc="980520c0" sha1="09d9d6be5f17406ca3f600c432d5066226508802" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohg" cloneof="pooh" supported="yes">
-		<description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
+		<description>Disneys Winnie Puuh - Die Honigjagd (Germany)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092064(GE)" />
@@ -2793,13 +3051,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
+				<rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="poohg1" cloneof="pooh" supported="yes">
-		<description>My Friends Tigger &amp; Pooh - Die Honigjagd (Ger, Rev. 104)</description>
+	<software name="poohgr204" cloneof="pooh" supported="yes">
+		<description>My Friends Tigger &amp; Pooh - Die Honigjagd (Germany, Rev. 204)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092064-104(GE)" />
@@ -2810,13 +3068,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92064-204(2).u1" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" offset="0" />
+				<rom name="92064-204(2).u1" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poohf" cloneof="pooh" supported="yes">
-		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra)</description>
+		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (France)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092065(FR)" />
@@ -2827,13 +3085,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" offset="0" />
+				<rom name="92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="poohfa" cloneof="pooh" supported="yes">
-		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra, Rev. 2)</description>
+	<software name="poohfr2" cloneof="pooh" supported="yes">
+		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (France, Rev. 2)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092065-2(FR)" />
@@ -2844,13 +3102,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92065-2.u1" size="8388608" crc="07403b58" sha1="1b9625a173d552888a92d032e91504441fca6229" offset="0" />
+				<rom name="92065-2.u1" size="8388608" crc="07403b58" sha1="1b9625a173d552888a92d032e91504441fca6229" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poohs" cloneof="pooh" supported="yes">
-		<description>Disney Winnie the Pooh - En Busca de la Miel (Spa)</description>
+		<description>Disney Winnie the Pooh - En Busca de la Miel (Spain)</description>
 		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092067(SP)" />
@@ -2861,15 +3119,16 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092067 - Winnie the Pooh - En Busca de la Miel (SP).bin" size="8388608" crc="251057ad" sha1="9bfba8782969916bffef451908ea9bc0ec58515b" offset="0" />
+				<rom name="80-092067 - Winnie the Pooh - En Busca de la Miel (SP).bin" size="8388608" crc="251057ad" sha1="9bfba8782969916bffef451908ea9bc0ec58515b" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- No inputs -->
 	<!-- Cart labeled as "Disney My Friends Tigger and Pooh - En Busca de la Miel",
 	         but game on screen title is "Disney Winnie the Pooh - En Busca de la Miel". -->
-	<software name="poohsr1" cloneof="pooh" supported="yes">
-		<description>Disney Winnie the Pooh - En Busca de la Miel (Spa, Rev. 122)</description>
+	<software name="poohsr122" cloneof="pooh" supported="no">
+		<description>Disney Winnie the Pooh - En Busca de la Miel (Spain, Rev. 122)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092067-122(SP)" />
@@ -2880,13 +3139,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092067-122 - My Friends Tigger and Pooh - En Busca de la Miel (SP).bin" size="8388608" crc="836353ed" sha1="7d8f5d5f743d40441b714e47a26a611d7fca7f03" offset="0" />
+				<rom name="80-092067-122 - My Friends Tigger and Pooh - En Busca de la Miel (SP).bin" size="8388608" crc="836353ed" sha1="7d8f5d5f743d40441b714e47a26a611d7fca7f03" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poohdk" cloneof="pooh" supported="yes">
-		<description>Disney Peter Plys - Honningjagten (Den)</description>
+		<description>Disney Peter Plys - Honningjagten (Denmark)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092073(DK)" />
@@ -2897,13 +3156,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" offset="0" />
+				<rom name="92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poohsw" cloneof="pooh" supported="yes">
-		<description>Disney Nalle Puh - Honungsjakten (Swe)</description>
+		<description>Disney Nalle Puh - Honungsjakten (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092074(SE)" />
@@ -2915,13 +3174,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" offset="0" />
+				<rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lerntanz" supported="yes">
-		<description>V.Smile - Lern- und Tanzmatte (Ger)</description>
+		<description>V.Smile - Lern- und Tanzmatte (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091324(GE)" />
@@ -2932,11 +3191,12 @@ Game cartridges
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" offset="0" />
+				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- Crashes MAME -->
 	<software name="techart" supported="no">
 		<description>V.Smile Art Studio (USA)</description>
 		<year>200?</year>
@@ -2950,7 +3210,7 @@ Game cartridges
 			<feature name="u2" value="U2" /> <!-- SRAM -->
 			<feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="4194304">
-				<rom name="vsmile67000.bin" size="4194304" crc="3bbfb917" sha1="62eff99609f4958f7059408f588aaed4ba6fc2be" offset="0" />
+				<rom name="vsmile67000.bin" size="4194304" crc="3bbfb917" sha1="62eff99609f4958f7059408f588aaed4ba6fc2be" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
@@ -2958,7 +3218,7 @@ Game cartridges
 	</software>
 
 	<software name="techartg" cloneof="techart" supported="no">
-		<description>V.Smile Zeichenatelier (Ger)</description>
+		<description>V.Smile Zeichenatelier (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067004(GER)" />
@@ -2970,7 +3230,7 @@ Game cartridges
 			<feature name="u2" value="U2" /> <!-- SRAM -->
 			<feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="4194304">
-				<rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
+				<rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
@@ -2978,7 +3238,7 @@ Game cartridges
 	</software>
 
 	<software name="techartsw" cloneof="techart" supported="yes">
-		<description>V.Smile Tecknarstudio (Swe)</description>
+		<description>V.Smile Tecknarstudio (Sweden)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067021(SE)" />
@@ -2990,7 +3250,7 @@ Game cartridges
 			<feature name="u2" value="U2" /> <!-- SRAM -->
 			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="4194304">
-				<rom name="52-67021.u3" size="4194304" crc="27449e15" sha1="5c13865dffb04c98c69f3422c965d76a9aa36c33" offset="0" />
+				<rom name="52-67021.u3" size="4194304" crc="27449e15" sha1="5c13865dffb04c98c69f3422c965d76a9aa36c33" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
@@ -2998,7 +3258,7 @@ Game cartridges
 	</software>
 
 	<software name="wkwheels" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
-		<description>Conducción Divertida (Spa)</description>
+		<description>Conducción Divertida (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092507(SP)" />
@@ -3009,14 +3269,14 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092507 - Conduccion Divertida (SP).bin" size="8388608" crc="c52ff5d8" sha1="ce48bb9ea53cbdfa243170217908cc1f4352e4f0" offset="0" />
+				<rom name="80-092507 - Conduccion Divertida (SP).bin" size="8388608" crc="c52ff5d8" sha1="ce48bb9ea53cbdfa243170217908cc1f4352e4f0" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zayzaear1" supported="yes">
+	<software name="zayzaear101" supported="yes">
 		<description>Zayzoo: An Earth Adventure (USA, Rev. 101)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -3028,12 +3288,12 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92360-201(4).u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" offset="0" />
+				<rom name="92360-201(4).u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zayzaea" cloneof="zayzaear1" supported="yes">
+	<software name="zayzaea" cloneof="zayzaear101" supported="yes">
 		<description>Zayzoo - My Alien Classmate (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -3041,13 +3301,13 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
+				<rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zayzaeag" cloneof="zayzaear1" supported="yes">
-		<description>Zayzoos Lernall (Ger)</description>
+	<software name="zayzaeag" cloneof="zayzaear101" supported="yes">
+		<description>Zayzoos Lernall (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092364(GE)" />
@@ -3058,13 +3318,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
+				<rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- Found also with the same ROM as "80-092360-101(US)" -->
-	<software name="zayzaeauk" cloneof="zayzaear1" supported="yes">
+	<software name="zayzaeaukr103" cloneof="zayzaear101" supported="yes">
 		<description>Zayzoo: An Earth Adventure (UK, Rev. 103)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -3072,13 +3332,13 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="8388608" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" offset="0" />
+				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="8388608" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zayzaeaf" cloneof="zayzaear1" supported="yes">
-		<description>Zézou - Notre Ami Venu d'Ailleurs (Fra)</description>
+	<software name="zayzaeaf" cloneof="zayzaear101" supported="yes">
+		<description>Zézou - Notre Ami Venu d'Ailleurs (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092365(FR)" />
@@ -3089,13 +3349,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" offset="0" />
+				<rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zayzaeas" cloneof="zayzaear1" supported="yes">
-		<description>Zayzoo - Mi Amiga del Espacio (Spa)</description>
+	<software name="zayzaeas" cloneof="zayzaear101" supported="yes">
+		<description>Zayzoo - Mi Amiga del Espacio (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092367(SP)" />
@@ -3106,13 +3366,13 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092367 - Zayzoo - Mi Amiga del Espacio (SP).bin" size="8388608" crc="ce601e55" sha1="8b628101b605f4688b580a9e7511c3bfa6f7d5bc" offset="0" />
+				<rom name="80-092367 - Zayzoo - Mi Amiga del Espacio (SP).bin" size="8388608" crc="ce601e55" sha1="8b628101b605f4688b580a9e7511c3bfa6f7d5bc" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="schreib" supported="no">
-		<description>V.Smile Schreibspaß (Ger)</description>
+		<description>V.Smile Schreibspaß (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091444(GE)" />
@@ -3123,7 +3383,7 @@ Game cartridges
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" offset="0" />
+				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" />
 			</dataarea>
 		</part>
 	</software>
