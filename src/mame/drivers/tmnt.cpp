@@ -588,7 +588,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x204000, 0x207fff).ram(); /* main RAM */
 	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
 	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
@@ -988,7 +988,7 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
 	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
 	map(0x500200, 0x500201).portr("P1/COINS");
 	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
