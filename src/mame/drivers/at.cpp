@@ -119,6 +119,7 @@ public:
 	void comportii(machine_config &config);
 	void comportiii(machine_config &config);
 	void comslt286(machine_config &config);
+	void dsys200(machine_config &config);
 	void ibm5162(machine_config &config);
 	void neat(machine_config &config);
 	void at386l(machine_config &config);
@@ -1424,6 +1425,16 @@ ROM_START( comslt286 )
 	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-odd.bin", 0x10001, 0x8000, CRC(4a0febac) SHA1(7da5ac4bc50f25063a1d1e382b8cff9b297976f8))
 ROM_END
 
+// Dell System 200 - complains about "memory overlap at 400000" but seems to work otherwise
+ROM_START( dsys200 )
+	ROM_REGION( 0x20000, "bios", 0 )
+   	ROM_LOAD16_BYTE( "version_ 3.10_a12_even.bin", 0x10000, 0x8000, CRC(5aa81939) SHA1(d9029d3708c49e72f57ae2a340429c28ec39acab))
+	ROM_LOAD16_BYTE( "version_3.10_a12_odd.bin", 0x10001, 0x8000, CRC(942416cb) SHA1(b321704471e159030af82556ff25ac46c27a807e))
+
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "20575_b47-00.bin", 0x000, 0x0800, CRC(148187db) SHA1(0d7542dd0b2bc3d6724ae3618a8543cb84a30e92) )
+ROM_END
+
 // Ericsson WS286
 ROM_START(ews286 ) // Computer is brown/yellow-ish with Ericsson logo
 	ROM_REGION(0x20000,"bios", 0)
@@ -1485,6 +1496,7 @@ COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
 COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
 COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
+COMP( 1988, dsys200,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Dell Computer Corporation",    "System 200", MACHINE_NOT_WORKING )
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
