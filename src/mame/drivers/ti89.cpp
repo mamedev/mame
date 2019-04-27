@@ -143,23 +143,9 @@ READ16_MEMBER ( ti68k_state::ti68k_io2_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::flash_w )
+READ16_MEMBER ( ti68k_state::rom_r )
 {
-	// verification if it is flash memory
-	if (m_flash_mem)
-		m_flash->write(offset, data);
-}
-
-READ16_MEMBER ( ti68k_state::flash_r )
-{
-	if (m_flash_mem)
-	{
-		return m_flash->read(offset);
-	}
-	else
-	{
-		return m_rom_base[offset];
-	}
+	return m_rom_base[offset];
 }
 
 
@@ -208,7 +194,7 @@ void ti68k_state::ti89_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
-	map(0x200000, 0x3fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x200000, 0x3fffff).rw(m_flash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0x400000, 0x5fffff).noprw();
 	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
 	map(0x700000, 0x7fffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
@@ -220,7 +206,7 @@ void ti68k_state::ti92p_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
 	map(0x200000, 0x3fffff).noprw();
-	map(0x400000, 0x5fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x400000, 0x5fffff).rw(m_flash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
 	map(0x700000, 0x7fffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
@@ -230,7 +216,7 @@ void ti68k_state::v200_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
-	map(0x200000, 0x5fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x200000, 0x5fffff).rw(m_flash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
 	map(0x700000, 0x70ffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
@@ -242,7 +228,7 @@ void ti68k_state::ti89t_mem(address_map &map)
 	map(0x000000, 0x0fffff).ram().mirror(0x200000).share("nvram");
 	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
 	map(0x700000, 0x70ffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
-	map(0x800000, 0xbfffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x800000, 0xbfffff).rw(m_flash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0xc00000, 0xffffff).noprw();
 }
 
@@ -432,13 +418,10 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	int i;
-
-	m_flash_mem = !((m_rom_base[0x32] & 0x0f) != 0);
-
-	if (m_flash_mem)
+	if (m_flash.found())
 	{
 		uint32_t base = ((((m_rom_base[0x82]) << 16) | m_rom_base[0x83]) & 0xffff)>>1;
+		int i;
 
 		if (m_rom_base[base] >= 8)
 			m_hw_version = ((m_rom_base[base + 0x0b]) << 16) | m_rom_base[base + 0x0c];
@@ -461,15 +444,15 @@ void ti68k_state::machine_start()
 
 		if (m_initial_pc > 0x400000)
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x5fffff, read16_delegate(FUNC(ti68k_state::flash_r), this),write16_delegate(FUNC(ti68k_state::flash_w), this));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16_delegate(FUNC(ti68k_state::rom_r), this));
 		}
 		else
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x3fffff, read16_delegate(FUNC(ti68k_state::flash_r), this), write16_delegate(FUNC(ti68k_state::flash_w), this));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16_delegate(FUNC(ti68k_state::rom_r), this));
 		}
 	}
 
-	logerror("HW=v%x, PC=%06x, Type=%s\n", m_hw_version, m_initial_pc, (m_flash_mem) ? "Flash" : "ROM");
+	logerror("HW=v%x, PC=%06x, Type=%s\n", m_hw_version, m_initial_pc, m_flash.found() ? "Flash" : "ROM");
 }
 
 
@@ -549,6 +532,8 @@ void ti68k_state::ti92(machine_config &config)
 	ti89(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti92_mem);
 
+	config.device_remove("flash");
+
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_visarea(0, 240-1, 0, 128-1);
 }
@@ -556,17 +541,23 @@ void ti68k_state::ti92(machine_config &config)
 
 void ti68k_state::ti92p(machine_config &config)
 {
-	ti92(config);
+	ti89(config);
 	m_maincpu->set_clock(XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti92p_mem);
+
+	/* video hardware */
+	subdevice<screen_device>("screen")->set_visarea(0, 240-1, 0, 128-1);
 }
 
 
 void ti68k_state::v200(machine_config &config)
 {
-	ti92(config);
+	ti89(config);
 	m_maincpu->set_clock(XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::v200_mem);
+
+	/* video hardware */
+	subdevice<screen_device>("screen")->set_visarea(0, 240-1, 0, 128-1);
 }
 
 

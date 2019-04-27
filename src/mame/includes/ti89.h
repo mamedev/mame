@@ -49,7 +49,7 @@ private:
 	enum { HW1=1, HW2, HW3, HW4 };
 
 	required_device<cpu_device> m_maincpu;
-	required_device<sharp_unk128mbit_device> m_flash;
+	optional_device<sharp_unk128mbit_device> m_flash;
 	required_region_ptr<uint16_t> m_rom_base;
 	required_ioport m_io_bit0;
 	required_ioport m_io_bit1;
@@ -62,7 +62,6 @@ private:
 
 	// HW specifications
 	uint8_t m_hw_version;
-	bool m_flash_mem;
 	uint32_t m_initial_pc;
 
 	// keyboard
@@ -93,8 +92,7 @@ private:
 	DECLARE_READ16_MEMBER( ti68k_io_r );
 	DECLARE_WRITE16_MEMBER( ti68k_io2_w );
 	DECLARE_READ16_MEMBER( ti68k_io2_r );
-	DECLARE_WRITE16_MEMBER( flash_w );
-	DECLARE_READ16_MEMBER( flash_r );
+	DECLARE_READ16_MEMBER( rom_r );
 	void ti68k_palette(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
