@@ -979,6 +979,18 @@ ROM_START( at )
 	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_even_sa027343.bin", 0x10000, 0x8000, CRC(d4a18444) SHA1(d95242104fc9b51cf26de72ef5b6c52d99ccce30), ROM_SKIP(1) | ROM_BIOS(15) )
 	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_odd_sa027343.bin", 0x10001, 0x8000, CRC(7ac3db56) SHA1(4340140450c4f8b4f6a19eae50a5dc5449edfdf6), ROM_SKIP(1) | ROM_BIOS(15) )
 	// ROM_LOAD("magitronic_b233_ami_1986_keyboard_bios_plus_a025352.bin", 0x0000, 0x1000), CRC(84fd28fd) SHA1(43da0f49e52c921844e60b6f3d22f2a316d865cc) )
+	ROM_SYSTEM_BIOS(16, "ls103s", "LS-103S") // Headland Chipset
+	ROMX_LOAD( "ami_lm103-s_lo.bin", 0x10000, 0x8000, CRC(a24be20b) SHA1(ffc5faf6d773154bf2f037556d2e381e81a28a58), ROM_SKIP(1) | ROM_BIOS(16) )
+	ROMX_LOAD( "ami_lm103-s_hi.bin", 0x10001, 0x8000, CRC(7b63e60c) SHA1(da78b95b12051b6d4701a412fdc5e7874595c188), ROM_SKIP(1) | ROM_BIOS(16) )
+	ROM_SYSTEM_BIOS(17, "ev1806", "Everex EV-1806") // continuous beeps (RAM not detected?)
+	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_even_u62.bin", 0x18000, 0x4000, CRC(7364e49b) SHA1(e8f5f41514005da0e36792e009cf3eae51c19c20), ROM_SKIP(1) | ROM_BIOS(17) )
+	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_odd_u61.bin", 0x18001, 0x4000, CRC(05c87bf7) SHA1(8c2243d9ee3d2af1517dc1134a22a7d1ed11262f), ROM_SKIP(1) | ROM_BIOS(17) )
+	ROM_SYSTEM_BIOS(18, "ev1815303", "Everex EV-1815 V3.03")
+	ROMX_LOAD( "award_v3.03_ev1815_even.bin", 0x18000, 0x4000, CRC(dd64bdd6) SHA1(b3108b692d2aa03701ac894602e9418ae0779702), ROM_SKIP(1) | ROM_BIOS(18) )
+	ROMX_LOAD( "award_v3.03_ev1815_odd.bin", 0x18001, 0x4000, CRC(29f023fb) SHA1(873561bb7087483c0c763ef9cd32c1adf0f7cb5e), ROM_SKIP(1) | ROM_BIOS(18) )
+	ROM_SYSTEM_BIOS(19, "ev1815303gs", "Everex EV-1815 V3.03GS")
+	ROMX_LOAD( "award_v3.03gs_ev1815_even.bin", 0x10000, 0x8000, CRC(59489ec2) SHA1(b3c13ba53d4c4ee75a15703236a748121102ce84), ROM_SKIP(1) | ROM_BIOS(19) )
+	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(19) )
 ROM_END
 
 
@@ -1088,6 +1100,15 @@ ROM_START( at386 )
 	ROMX_LOAD("at386.bin",  0x10000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "amicg", "AMI CG")
 	ROMX_LOAD("amicg.1",        0x10000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "ecs386-32", "ECS-386/32") // Elitegroup ECS-386/32 mainboard
+	ROMX_LOAD("ami_ecs-386_32_lo.bin", 0x10000, 0x8000, CRC(e119d6a4) SHA1(bcc6164173b44832b8ebfa1883e22efc167e2cd4), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("ami_ecs-386_32_hi.bin", 0x10001, 0x8000, CRC(e3072bf8) SHA1(74eec72e190f682cfd5ae5425ebdc854e0ba7bc9), ROM_SKIP(1) | ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "afu340", "Abit FU340") // Abit FU340 mainboard
+	ROMX_LOAD("ami_abit_fu340.bin", 0x10000, 0x10000,CRC(9ea90d90) SHA1(091bdae7b1e36ac5168823d80d5907af2a95e583), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "ecsum386", "Elitegroup UM386 V1.1") // Elitegroup UM386 mainboard Rev 1.1
+	ROMX_LOAD("ami_um386_rev1.1.bin", 0x10000, 0x10000,CRC(81fe4297) SHA1(efb2ba2be6f08cb487ee1b867a2456ed6b5975ad), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "smih0107", "SMIH0107") // keyboard not working
+	ROMX_LOAD( "ami_smih0107.bin", 0x10000, 0x10000, CRC(970bb0c0) SHA1(4a958887485f7239d25fa7b0c98569b97ce93800), ROM_BIOS(6) )
 ROM_END
 
 
@@ -1158,6 +1179,8 @@ ROM_START( at486 )
 
 	ROM_SYSTEM_BIOS(21, "qdi", "QDI PX486DX33/50P3")
 	ROMX_LOAD("qdi_px486.u23", 0x10000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(21))
+	ROM_SYSTEM_BIOS(22, "a433cc", "J-Bond A433C-C/A450C-C")
+	ROMX_LOAD("ami_j-bond_a433c-c.bin", 0x10000, 0x10000, CRC(66031e98) SHA1(d2d1a26837d3ca943a6ef09ec3e6fbfaaa62cc46), ROM_BIOS(22))
 ROM_END
 
 
@@ -1421,7 +1444,7 @@ ROM_END
 // Compaq SLT/286 - complains about "102 - System board failure"
 ROM_START( comslt286 )
    ROM_REGION(0x20000,"bios", 0)
-   	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_ j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
+   	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
 	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-odd.bin", 0x10001, 0x8000, CRC(4a0febac) SHA1(7da5ac4bc50f25063a1d1e382b8cff9b297976f8))
 ROM_END
 
