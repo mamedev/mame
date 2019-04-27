@@ -1395,6 +1395,8 @@ void nes_vt_state::nes_vt(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_ddr(machine_config &config)
@@ -1403,6 +1405,8 @@ void nes_vt_state::nes_vt_ddr(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, majesco_control_port1_devices, "ddr");
 	NES_CONTROL_PORT(config, m_ctrl2, majesco_control_port2_devices, nullptr);
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_hum(machine_config &config)
