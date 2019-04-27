@@ -8,7 +8,7 @@
 #include "machine/i8255.h"
 #include "emupal.h"
 
-typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
+typedef device_delegate<u16 (u16)> igs017_igs031_palette_scramble_delegate;
 
 class igs017_igs031_device : public device_t,
 							public device_gfx_interface,
@@ -16,53 +16,50 @@ class igs017_igs031_device : public device_t,
 							public device_memory_interface
 {
 public:
-	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	template <typename T> void set_i8255_tag(T &&tag) { m_i8255.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(std::forward<T>(args)...); }
 
 	void set_text_reverse_bits()
 	{
-		m_revbits = 1;
+		m_revbits = true;
 	}
 
-	uint16_t palette_callback_straight(uint16_t bgr);
+	u16 palette_callback_straight(u16 bgr) const;
 
 	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
 	void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	int get_nmi_enable() { return m_nmi_enable; }
-	int get_irq_enable() { return m_irq_enable; }
+	bool get_nmi_enable() { return m_nmi_enable; }
+	bool get_irq_enable() { return m_irq_enable; }
 
+	void palram_w(offs_t offset, u8 data);
+	u8 i8255_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(palram_w);
-	DECLARE_READ8_MEMBER(i8255_r);
-
-	DECLARE_WRITE8_MEMBER(video_disable_w);
-
+	void video_disable_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_WRITE8_MEMBER(fg_w);
-	DECLARE_WRITE8_MEMBER(bg_w);
-
-	void space_w(int offset, uint8_t data);
-	uint8_t space_r(int offset);
+	void fg_w(offs_t offset, u8 data);
+	void bg_w(offs_t offset, u8 data);
 
 	void expand_sprites();
-	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void nmi_enable_w(u8 data);
+	void irq_enable_w(u8 data);
 	virtual void video_start();
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -73,27 +70,27 @@ protected:
 private:
 	address_space_config        m_space_config;
 
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_fg_videoram;
-	required_shared_ptr<uint8_t> m_bg_videoram;
-	required_shared_ptr<uint8_t> m_palram;
+	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_fg_videoram;
+	required_shared_ptr<u8> m_bg_videoram;
+	required_shared_ptr<u8> m_palram;
 	optional_device<i8255_device> m_i8255;
 	required_device<palette_device> m_palette;
 
 	// the gfx roms were often hooked up with the bits backwards, allow us to handle it here to save doing it in every driver.
-	int m_revbits;
+	bool m_revbits;
 
-	int m_toggle;
+	u8 m_toggle;
 	int m_debug_addr;
 	int m_debug_width;
-	uint8_t m_video_disable;
+	bool m_video_disable;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	std::unique_ptr<uint8_t[]> m_sprites_gfx;
-	int m_sprites_gfx_size;
+	std::unique_ptr<u8[]> m_sprites_gfx;
+	u32 m_sprites_gfx_size;
 
-	int m_nmi_enable;
-	int m_irq_enable;
+	bool m_nmi_enable;
+	bool m_irq_enable;
 };
 
 DECLARE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device)
