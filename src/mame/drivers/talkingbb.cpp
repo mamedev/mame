@@ -25,6 +25,7 @@ TODO:
 - Buttons are unresponsive at initial game setup, you need to hold the yes/no button
   until it responds. The keypad reading routine is at $1A5D, it gets skipped for several
   seconds at a time. Once in-game, everything is fine though. BTANB or different cause?
+- get rid of savestate workaround once outputs support savestates
 
 *******************************************************************************
 
@@ -132,6 +133,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void device_post_load() override;
 
 private:
 	// devices/pointers
@@ -146,8 +148,10 @@ private:
 
 	u8 m_bank;
 	u8 m_led_select;
+	u8 m_led_cache[12];
 
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display) { m_out_led[param] = 0; }
+	void set_led(int i, int value) { m_led_cache[i] = m_out_led[i] = value; }
+	TIMER_DEVICE_CALLBACK_MEMBER(delay_display) { set_led(param, 0); }
 
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -165,10 +169,18 @@ void talkingbb_state::machine_start()
 	// zerofill
 	m_bank = 0;
 	m_led_select = 0;
+	memset(m_led_cache, 0, sizeof(m_led_cache));
 
 	// register for savestates
 	save_item(NAME(m_bank));
 	save_item(NAME(m_led_select));
+	save_item(NAME(m_led_cache));
+}
+
+void talkingbb_state::device_post_load()
+{
+	for (int i = 0; i < 4; i++)
+		m_out_led[i] = m_led_cache[i];
 }
 
 
@@ -212,7 +224,7 @@ WRITE8_MEMBER(talkingbb_state::input_w)
 		if (prev & ~cur)
 			m_delay_display[i]->adjust(attotime::from_msec(50), i);
 		else if (cur)
-			m_out_led[i] = 1;
+			set_led(i, 1);
 	}
 
 	m_led_select = data;
@@ -254,7 +266,7 @@ void talkingbb_state::main_map(address_map &map)
 
 void talkingbb_state::main_io(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x8000).mirror(0x7fff).rw(FUNC(talkingbb_state::input_r), FUNC(talkingbb_state::input_w));
 }
 
