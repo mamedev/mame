@@ -521,7 +521,7 @@ void ti68k_state::ti89(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti68k_state::ti68k_palette), 2);
 
-	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
+	SHARP_LH28F160S3(config, m_flash);
 
 	TIMER(config, "ti68k_timer").configure_periodic(FUNC(ti68k_state::ti68k_timer_callback), attotime::from_hz(1<<14));
 }
@@ -556,6 +556,8 @@ void ti68k_state::v200(machine_config &config)
 	m_maincpu->set_clock(XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::v200_mem);
 
+	SHARP_LH28F320BF(config.replace(), m_flash);
+
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_visarea(0, 240-1, 0, 128-1);
 }
@@ -566,6 +568,8 @@ void ti68k_state::ti89t(machine_config &config)
 	ti89(config);
 	m_maincpu->set_clock(XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti68k_state::ti89t_mem);
+
+	SHARP_LH28F320BF(config.replace(), m_flash);
 }
 
 

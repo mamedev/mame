@@ -49,7 +49,7 @@ private:
 	enum { HW1=1, HW2, HW3, HW4 };
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<sharp_unk128mbit_device> m_flash;
+	optional_device<intelfsh16_device> m_flash;
 	required_region_ptr<uint16_t> m_rom_base;
 	required_ioport m_io_bit0;
 	required_ioport m_io_bit1;
