@@ -94,7 +94,7 @@ void xmen_state::main_map(address_map &map)
 	map(0x10a004, 0x10a005).portr("EEPROM");
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 	map(0x110000, 0x113fff).ram();     /* main RAM */
-	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::lsb_r), FUNC(k052109_device::lsb_w));
+	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask16(0x00ff);
 	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 }
 

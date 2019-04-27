@@ -473,7 +473,7 @@ READ8_MEMBER(konmedal_state::shuri_video_r)
 {
 	if (!(m_control & 0x10))
 	{
-		return m_k052109->read(space, offset+0x2000);
+		return m_k052109->read(offset+0x2000);
 	}
 
 	uint8_t *ROM = memregion("k052109")->base();
@@ -482,7 +482,7 @@ READ8_MEMBER(konmedal_state::shuri_video_r)
 
 WRITE8_MEMBER(konmedal_state::shuri_video_w)
 {
-	m_k052109->write(space, offset+0x2000, data);
+	m_k052109->write(offset+0x2000, data);
 }
 
 READ8_MEMBER(konmedal_state::shuri_irq_r)

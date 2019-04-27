@@ -47,12 +47,12 @@ K053246_CB_MEMBER(simpsons_state::sprite_callback)
 
 READ8_MEMBER(simpsons_state::simpsons_k052109_r)
 {
-	return m_k052109->read(space, offset + 0x2000);
+	return m_k052109->read(offset + 0x2000);
 }
 
 WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
 {
-	m_k052109->write(space, offset + 0x2000, data);
+	m_k052109->write(offset + 0x2000, data);
 }
 
 READ8_MEMBER(simpsons_state::simpsons_k053247_r)
