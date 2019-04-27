@@ -63,9 +63,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -74,7 +74,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
