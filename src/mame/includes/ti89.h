@@ -22,6 +22,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_flash(*this, "flash")
 		, m_rom_base(*this, "flash")
+		, m_ram_base(*this, "nvram")
 		, m_io_bit0(*this, "BIT0")
 		, m_io_bit1(*this, "BIT1")
 		, m_io_bit2(*this, "BIT2")
@@ -51,6 +52,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<intelfsh16_device> m_flash;
 	required_region_ptr<uint16_t> m_rom_base;
+	required_shared_ptr<uint16_t> m_ram_base;
 	required_ioport m_io_bit0;
 	required_ioport m_io_bit1;
 	required_ioport m_io_bit2;
@@ -62,7 +64,7 @@ private:
 
 	// HW specifications
 	uint8_t m_hw_version;
-	uint32_t m_initial_pc;
+	bool m_ram_enabled;
 
 	// keyboard
 	uint16_t m_kb_mask;
@@ -93,6 +95,7 @@ private:
 	DECLARE_WRITE16_MEMBER( ti68k_io2_w );
 	DECLARE_READ16_MEMBER( ti68k_io2_r );
 	DECLARE_READ16_MEMBER( rom_r );
+	uint16_t reset_overlay_r(offs_t offset);
 	void ti68k_palette(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
