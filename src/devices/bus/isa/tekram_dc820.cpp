@@ -17,7 +17,6 @@
 #include "tekram_dc820.h"
 
 #include "cpu/i86/i186.h"
-//#include "machine/eepromser.h"
 #include "machine/i82355.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
@@ -32,6 +31,7 @@ tekram_eisa_scsi_device::tekram_eisa_scsi_device(const machine_config &mconfig, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_mpu(*this, "mpu")
+	, m_eeprom(*this, "eeprom")
 	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
 {
@@ -61,20 +61,71 @@ void tekram_eisa_scsi_device::device_start()
 {
 }
 
+u8 tekram_eisa_scsi_device::status_r()
+{
+	return m_eeprom->do_read() << 3;
+}
+
+void tekram_eisa_scsi_device::mask_w(u8 data)
+{
+	logerror("%s: Mask register(?) = %02X\n", machine().describe_context(), data);
+}
+
+u8 tekram_eisa_scsi_device::unknown_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%s: Unknown read (reset something?)\n", machine().describe_context());
+	return 0;
+}
+
+void tekram_eisa_scsi_device::eeprom_w(u8 data)
+{
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->cs_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 5));
+}
+
 void tekram_eisa_scsi_device::mpu_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
 	map(0x10040, 0x1005f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0xff00);
+	map(0x10069, 0x10069).r(FUNC(tekram_eisa_scsi_device::status_r));
+	map(0x1006c, 0x1006c).w(FUNC(tekram_eisa_scsi_device::mask_w));
+	map(0x1006d, 0x1006d).w(FUNC(tekram_eisa_scsi_device::eeprom_w));
+	map(0x1006f, 0x1006f).r(FUNC(tekram_eisa_scsi_device::unknown_r));
 	map(0x10080, 0x10085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
+}
+
+void tekram_dc320b_device::eeprom_w(u8 data)
+{
+	m_eeprom->di_write(BIT(data, 1));
+	m_eeprom->cs_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 5));
+}
+
+u8 tekram_dc320b_device::eeprom_r()
+{
+	return m_eeprom->do_read() << 4;
 }
 
 void tekram_dc320b_device::mpu_map(address_map &map)
 {
 	map(0x00000, 0x03fff).ram();
 	map(0x08000, 0x0801f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
+	map(0x08001, 0x08001).r(FUNC(tekram_dc320b_device::unknown_r));
 	map(0x08080, 0x08085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
+	map(0x0810a, 0x0810a).w(FUNC(tekram_dc320b_device::eeprom_w));
+	map(0x0810c, 0x0810c).w(FUNC(tekram_dc320b_device::mask_w));
+	map(0x08180, 0x08180).r(FUNC(tekram_dc320b_device::eeprom_r));
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
+}
+
+void tekram_dc820_device::eeprom_w(u8 data)
+{
+	m_eeprom->di_write(BIT(data, 1));
+	m_eeprom->cs_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 5));
 }
 
 void tekram_dc820_device::mpu_map(address_map &map)
@@ -82,6 +133,10 @@ void tekram_dc820_device::mpu_map(address_map &map)
 	map(0x00000, 0x0ffff).ram();
 	map(0x10000, 0x1001f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
 	map(0x10080, 0x10085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
+	map(0x1010b, 0x1010b).w(FUNC(tekram_dc820_device::eeprom_w));
+	map(0x1010d, 0x1010d).w(FUNC(tekram_dc820_device::mask_w));
+	map(0x10200, 0x10200).r(FUNC(tekram_dc820_device::unknown_r));
+	map(0x10283, 0x10283).r(FUNC(tekram_dc820_device::status_r));
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
 }
 
@@ -116,7 +171,7 @@ void tekram_dc320b_device::device_add_mconfig(machine_config &config)
 	I80186(config, m_mpu, 25'000'000); // verified for DC-320, but not DC-320B
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc320b_device::mpu_map);
 
-	//EEPROM_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	i82355_device &bmic(I82355(config, "bmic", 0));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
@@ -131,7 +186,7 @@ void tekram_dc320e_device::device_add_mconfig(machine_config &config)
 	I80186(config, m_mpu, 32'000'000); // clock guessed to be same as DC-820B due to identical firmware
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc320e_device::mpu_map);
 
-	//EEPROM_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	i82355_device &bmic(I82355(config, "bmic", 0));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
@@ -146,7 +201,7 @@ void tekram_dc820_device::device_add_mconfig(machine_config &config)
 	I80186(config, m_mpu, 32_MHz_XTAL); // N80C186-16
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc820_device::mpu_map);
 
-	//EEPROM_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	i82355_device &bmic(I82355(config, "bmic", 0));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
@@ -161,7 +216,7 @@ void tekram_dc820b_device::device_add_mconfig(machine_config &config)
 	I80186(config, m_mpu, 32_MHz_XTAL); // N80186-16
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc820b_device::mpu_map);
 
-	//EEPROM_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	i82355_device &bmic(I82355(config, "bmic", 0));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));

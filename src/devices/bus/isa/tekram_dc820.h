@@ -12,6 +12,7 @@
 #pragma once
 
 #include "isa.h"
+#include "machine/eepromser.h"
 #include "machine/upd765.h"
 
 class tekram_eisa_scsi_device : public device_t, public device_isa16_card_interface
@@ -24,11 +25,17 @@ protected:
 
 	virtual void device_start() override;
 
+	u8 status_r();
+	void mask_w(u8 data);
+	u8 unknown_r();
+	void eeprom_w(u8 data);
+
 	void mpu_map(address_map &map);
 	void scsic_config(device_t *device);
 	void scsi_add(machine_config &config);
 
 	required_device<cpu_device> m_mpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u8> m_bios;
 };
@@ -43,6 +50,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	void eeprom_w(u8 data);
+	u8 eeprom_r();
+
 	void mpu_map(address_map &map);
 };
 
@@ -66,6 +76,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	void eeprom_w(u8 data);
+
 	void mpu_map(address_map &map);
 };
 
