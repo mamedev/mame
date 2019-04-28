@@ -1101,8 +1101,8 @@ Midway, 1994
 PCB Layout
 ----------
 
-5770-14365-02 (C) 1994 NINTENDO (for Cruisin USA)
-5770-14365-05 WILLIAMS ELECTRONICS GAMES INC.
+5770-14365-02 (C) 1994 NINTENDO (for Cruis'n USA)
+5770-14365-05 WILLIAMS ELECTRONICS GAMES INC. (for Cruis'n World and Off Road Challenge)
 |-------------------------------------------------------------------------------|
 |  SOUND.U5  SOUND.U9   BATTERY  MAX691  GAME.U26  GAME.U27  GAME.U28  GAME.U29 |
 |  SOUND.U4  SOUND.U8                    GAME.U22  GAME.U23  GAME.U24  GAME.U25 |
@@ -1145,8 +1145,8 @@ Notes:
 					- labelled 'World Cruis'n 25" U904' for Cruis'n World
                     - labelled 'Offroad 25" U904' for Off Road Challenge
       PAL1      - GAL20V8
-					- labelled 'A-19668' for all three games      
-	  PAL2      - PALC22V10
+                    - labelled 'A-19668' for all three games      
+      PAL2      - PALC22V10
                     - labelled 'A-19669' for Cruis'n USA; does not enable linking regardless of version
                     - labelled 'A-19993' for Cruis'n USA; enables linking. Intended for L4.1. May work in L4.0 but not in any version earlier than that.
                     - labelled 'A-19669.1 U38' for Cruis'n World
@@ -1168,12 +1168,12 @@ Notes:
                     - labelled 'A-21167 U111' for Cruis'n World
                     - labelled 'A-21173 U111' for Off Road Challenge
       P3		- 7-pin connector for speakers
-	  P4		- 5-pin power connector
-	  P5-P7		- Not used
-	  P8		- 20-pin ribbon connector to wheel board
-	  P9		- 12-pin connector for volume control and gears
-	  P10       - Ribbon connector for DB25 serial ports/cabinet linking
-	  P11		- 13-pin connector for analog inputs; gas, brake and steering
+      P4		- 5-pin power connector
+      P5-P7		- Not used
+      P8		- 20-pin ribbon connector to wheel board
+      P9		- 12-pin connector for volume control and gears
+      P10		- Ribbon connector for DB25 serial ports/cabinet linking
+      P11		- 13-pin connector for analog inputs; gas, brake and steering
       VSync     - 57.7090Hz  \
       HSync     - 24.807kHz  / measured via EL4583
       ROMs      - All ROMs 27C040 or 27C801
