@@ -411,7 +411,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 		m_cass->output( BIT(data, 2) ? -1.0 : +1.0);
 
 	if ( (BIT(data, 7)) != (BIT(m_0a, 7)) )
-		m_crtc->set_clock(BIT(data, 7) ? 1008000 : 2016000);
+		m_crtc->set_unscaled_clock(BIT(data, 7) ? 1008000 : 2016000);
 
 	m_0a = data;
 

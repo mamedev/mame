@@ -1320,11 +1320,11 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 {
 	unsigned startpc = pc;
 	int relpc = pc - m_dev->genPC();
-	if (relpc >= 0 && relpc < m_dev->netlist().queuex().size())
+	if (relpc >= 0 && relpc < m_dev->netlist().queue().size())
 	{
-		int dpc = m_dev->netlist().queuex().size() - relpc - 1;
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queuex()[dpc].m_object->name().c_str(),
-				m_dev->netlist().queuex()[dpc].m_exec_time.as_double());
+		int dpc = m_dev->netlist().queue().size() - relpc - 1;
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].m_object->name().c_str(),
+				m_dev->netlist().queue()[dpc].m_exec_time.as_double());
 	}
 
 	pc+=1;

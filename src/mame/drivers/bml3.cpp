@@ -240,7 +240,7 @@ void bml3_state::m6845_change_clock(u8 setting)
 		case 0x88: m6845_clock = C80_CLOCK; break; //640 x 200, interlace
 	}
 
-	m_crtc->set_clock(m6845_clock);
+	m_crtc->set_unscaled_clock(m6845_clock);
 }
 
 WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )

@@ -551,9 +551,9 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
 		if(m_screen_type == 1) // raster
-			m_crtc->set_clock( (m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
+			m_crtc->set_unscaled_clock( (m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
 		else // lcd
-			m_crtc->set_clock( (m_x_width) ? LCD_CLOCK*2 : LCD_CLOCK);
+			m_crtc->set_unscaled_clock( (m_x_width) ? LCD_CLOCK*2 : LCD_CLOCK);
 	}
 }
 

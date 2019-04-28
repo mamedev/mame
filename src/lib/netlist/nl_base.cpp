@@ -254,6 +254,25 @@ void netlist_state_t::rebuild_lists()
 }
 
 
+void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
+{
+#define ENTRY(x) { #x, PSTRINGIFY(x) }
+	defs.push_back(ENTRY(PHAS_RDTSCP));
+	defs.push_back(ENTRY(PUSE_ACCURATE_STATS));
+	defs.push_back(ENTRY(PHAS_INT128));
+	defs.push_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
+	defs.push_back(ENTRY(NVCCBUILD));
+	defs.push_back(ENTRY(USE_MEMPOOL));
+	defs.push_back(ENTRY(USE_QUEUE_STATS));
+	defs.push_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
+	defs.push_back(ENTRY(USE_TRUTHTABLE_7448));
+	defs.push_back(ENTRY(NL_DEBUG));
+	defs.push_back(ENTRY(HAS_OPENMP));
+	defs.push_back(ENTRY(USE_OPENMP));
+
+#undef ENTRY
+}
+
 void netlist_t::reset()
 {
 	log().debug("Searching for mainclock\n");
@@ -451,36 +470,40 @@ void netlist_t::print_stats() const
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
 			total_time, total_time / static_cast<decltype(total_time)>(total_count));
 
-		nperftime_t<true> overhead;
-		nperftime_t<true> test;
-		{
-			auto overhead_guard(overhead.guard());
-			for (int j=0; j<100000;j++)
-			{
-				auto test_guard(test.guard());
-			}
-		}
-
-		nperftime_t<true>::type total_overhead = overhead()
-				* static_cast<nperftime_t<true>::type>(total_count)
-				/ static_cast<nperftime_t<true>::type>(200000);
-
-		log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
-		log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
-		log().verbose("Queue Removes  {1:15}", m_queue.m_prof_remove());
-		log().verbose("Queue Retimes  {1:15}", m_queue.m_prof_retime());
-
 		log().verbose("Total loop     {1:15}", m_stat_mainloop());
+		log().verbose("Total time     {1:15}", total_time);
+
 		/* Only one serialization should be counted in total time */
 		/* But two are contained in m_stat_mainloop */
-		log().verbose("Total devices  {1:15}", total_time);
-		log().verbose("");
-		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
-		log().verbose("Total overhead {1:15}", total_overhead);
-		nperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-				/ static_cast<nperftime_t<true>::type>(m_queue.m_prof_call());
-		log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
-		log().verbose("");
+		if (!!USE_QUEUE_STATS)
+		{
+			nperftime_t<true> overhead;
+			nperftime_t<true> test;
+			{
+				auto overhead_guard(overhead.guard());
+				for (int j=0; j<100000;j++)
+				{
+					auto test_guard(test.guard());
+				}
+			}
+
+			nperftime_t<true>::type total_overhead = overhead()
+					* static_cast<nperftime_t<true>::type>(total_count)
+					/ static_cast<nperftime_t<true>::type>(200000);
+
+			log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
+			log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
+			log().verbose("Queue Removes  {1:15}", m_queue.m_prof_remove());
+			log().verbose("Queue Retimes  {1:15}", m_queue.m_prof_retime());
+			log().verbose("");
+
+			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
+			log().verbose("Total overhead {1:15}", total_overhead);
+			nperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
+					/ static_cast<nperftime_t<true>::type>(m_queue.m_prof_call());
+			log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
+			log().verbose("");
+		}
 
 		auto trigger = total_count * 200 / 1000000; // 200 ppm
 		for (auto &entry : m_state->m_devices)

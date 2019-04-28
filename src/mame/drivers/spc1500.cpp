@@ -390,7 +390,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_centronics->write_strobe(BIT(data, 7));
 	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
 	m_p5bit = BIT(data, 5);
-	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
+	m_vdg->set_unscaled_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 }
 
 READ8_MEMBER( spc1500_state::portb_r)

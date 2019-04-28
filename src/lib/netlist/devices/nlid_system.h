@@ -30,6 +30,7 @@ namespace devices
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
 		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
 		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
+		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -37,8 +38,10 @@ namespace devices
 		//NETLIB_UPDATE_PARAMI() { }
 	public:
 		param_logic_t m_use_deactivate;
-		param_int_t   m_startup_strategy;
-		param_int_t   m_mos_capmodel;
+		param_num_t<unsigned>   m_startup_strategy;
+		param_num_t<unsigned>   m_mos_capmodel;
+		//! How many times do we try to resolve links (connections)
+		param_num_t<unsigned>   m_max_link_loops;
 	};
 
 	// -----------------------------------------------------------------------------
