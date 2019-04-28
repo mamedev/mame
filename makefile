@@ -214,6 +214,7 @@ GENIEOS := darwin
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
+GENIEOS := haiku
 endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
