@@ -2140,7 +2140,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	PLS100(config, PLA1_TAG);
 	PLS100(config, PLA2_TAG);
 
-	m_crtc->device_t::set_clock(XTAL(16'000'000)/16);
+	m_crtc->set_clock(XTAL(16'000'000)/16);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
 	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row), this);
