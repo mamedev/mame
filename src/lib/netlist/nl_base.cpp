@@ -254,6 +254,25 @@ void netlist_state_t::rebuild_lists()
 }
 
 
+void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
+{
+#define ENTRY(x) { #x, PSTRINGIFY(x) }
+	defs.push_back(ENTRY(PHAS_RDTSCP));
+	defs.push_back(ENTRY(PUSE_ACCURATE_STATS));
+	defs.push_back(ENTRY(PHAS_INT128));
+	defs.push_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
+	defs.push_back(ENTRY(NVCCBUILD));
+	defs.push_back(ENTRY(USE_MEMPOOL));
+	defs.push_back(ENTRY(USE_QUEUE_STATS));
+	defs.push_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
+	defs.push_back(ENTRY(USE_TRUTHTABLE_7448));
+	defs.push_back(ENTRY(NL_DEBUG));
+	defs.push_back(ENTRY(HAS_OPENMP));
+	defs.push_back(ENTRY(USE_OPENMP));
+
+#undef ENTRY
+}
+
 void netlist_t::reset()
 {
 	log().debug("Searching for mainclock\n");
