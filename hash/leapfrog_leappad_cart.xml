@@ -750,7 +750,7 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" offset="0" />
+				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" />
 			</dataarea>
 		</part>
 	</software>
