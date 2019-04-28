@@ -334,8 +334,8 @@ u8 m24_state::ctrlport_b_r()
 	// Bit 1 = SW4 (8087 present)
 	// Bit 2 = ~RI1
 	// Bit 3 = ~DSR1
-	// Bit 4 = OUT2 (8253)
-	// Bit 5 = SPKR
+	// Bit 4 = SPKR
+	// Bit 5 = OUT2 (8253)
 	// Bit 6 = IOCHK
 	// Bit 7 = MBMERR (MRD parity check)
 
