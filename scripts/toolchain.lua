@@ -41,6 +41,7 @@ newoption {
 		{ "solaris",       "Solaris"                },
 		{ "steamlink",     "Steam Link"             },
 		{ "ci20",          "Creator-Ci20"           },
+		{ "haiku",         "Haiku"                  },
 	},
 }
 
@@ -252,6 +253,10 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
 		end
 
+		if "haiku" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-haiku")
+		end
+
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
@@ -341,6 +346,10 @@ function toolchain(_buildDir, _subDir)
 
 		if "ci20" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
+		end
+
+		if "haiku" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-haiku")
 		end
 	elseif _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 

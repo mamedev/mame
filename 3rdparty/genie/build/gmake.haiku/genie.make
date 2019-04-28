@@ -42,7 +42,7 @@ endif
 
 ifeq ($(config),release)
   OBJDIR         = obj/Release
-  TARGETDIR      = ../../bin/bsd
+  TARGETDIR      = ../../bin/haiku
   override TARGET         = $(TARGETDIR)/genie
   DEFINES       += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_POSIX -DLUA_USE_DLOPEN
   INCLUDES      += -I../../src/host/lua-5.3.0/src
@@ -124,7 +124,7 @@ endif
 
 ifeq ($(config),debug)
   OBJDIR         = obj/Debug
-  TARGETDIR      = ../../bin/bsd
+  TARGETDIR      = ../../bin/haiku
   override TARGET         = $(TARGETDIR)/genie
   DEFINES       += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_POSIX -DLUA_USE_DLOPEN
   INCLUDES      += -I../../src/host/lua-5.3.0/src
