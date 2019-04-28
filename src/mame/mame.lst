@@ -2403,6 +2403,8 @@ pc40iii                         // Commodore PC 40-III
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
+comslt286						// Compaq SLT/286
+dsys200							// Dell System 200
 pcd2                            // Siemens PCD-2
 ct386sx                         //
 ec1842                          //
