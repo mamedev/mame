@@ -1149,19 +1149,19 @@ Notes:
 	  PAL2      - PALC22V10
                     - labelled 'A-19669' for Cruis'n USA; does not enable linking regardless of version
                     - labelled 'A-19993' for Cruis'n USA; enables linking. Intended for L4.1. May work in L4.0 but not in any version earlier than that.
-					- labelled 'A-19669.1 U38' for Cruis'n World
+                    - labelled 'A-19669.1 U38' for Cruis'n World
                     - labelled 'A-21883 U38' for Off Road Challenge
       PAL3      - TIBPAL20L8
                     - labelled 'A-19670' for Cruis'n USA
-					- labelled 'A-21164 U43' for Cruis'n World
+                    - labelled 'A-21164 U43' for Cruis'n World
                     - labelled 'A-21170 U43' for Off Road Challenge
       PAL4      - TIBPAL22V10
                     - labelled 'A-19671' for Cruis'n USA
-					- labelled 'A-21611' for Cruis'n World
+                    - labelled 'A-21611' for Cruis'n World
                     - labelled 'A-21171 U54' for Off Road Challenge
       PAL5      - TIBPAL22V10
                     - labelled 'A-19672' for Cruis'n USA
-					- labelled 'A-19672.1 U114' for Cruis'n World
+                    - labelled 'A-19672.1 U114' for Cruis'n World
                     - labelled 'A-21884 U114' for Off Road Challenge
       PAL6      - TIBPAL22V10
                     - labelled 'A-19673' for Cruis'n USA
