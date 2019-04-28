@@ -85,13 +85,11 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 
 void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	switch (id)
 	{
 		case TIMER_IRQ_OFF:
 			/* clear the interrupt */
-			scanline_int_ack_w(space, 0, 0);
+			scanline_int_ack_w();
 			break;
 		case TIMER_IRQ_ON:
 			/* generate the interrupt */
