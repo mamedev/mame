@@ -149,18 +149,19 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
    D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
    D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
  */
-	m_crtc->set_hpixels_per_column((data & 0x40) ? 7 : 8);
+	unsigned dots = (data & 0x40) ? 7 : 8;
+	m_crtc->set_hpixels_per_column(dots);
 	m_video_control = data;
 
 	switch (data & 0x18)
 	{
-		case 0x00: m_crtc->set_clock(XTAL(14'000'000));
+		case 0x00: m_crtc->set_unscaled_clock(XTAL(14'000'000) / dots);
 					break;
-		case 0x08: m_crtc->set_clock(XTAL(3'579'545));
+		case 0x08: m_crtc->set_unscaled_clock(XTAL(3'579'545) / dots);
 					break;
-		case 0x10: m_crtc->set_clock(XTAL(14'000'000) / 2);
+		case 0x10: m_crtc->set_unscaled_clock(XTAL(14'000'000) / dots / 2);
 					break;
-		case 0x18: m_crtc->set_clock(XTAL(3'579'545) / 2);
+		case 0x18: m_crtc->set_unscaled_clock(XTAL(3'579'545) / dots / 2);
 					break;
 	}
 }
