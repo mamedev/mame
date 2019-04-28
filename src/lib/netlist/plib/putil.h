@@ -8,12 +8,12 @@
 #ifndef PUTIL_H_
 #define PUTIL_H_
 
-#include "pstring.h"
 #include "pexception.h"
+#include "pstring.h"
 #include <algorithm>
 #include <initializer_list>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -166,7 +166,7 @@ namespace plib
 				ss.imbue(std::locale::classic());
 				ss << arg;
 				long int len(ss.tellp());
-				long double x(0.0);
+				auto x(constants<long double>::zero());
 				long int pos(0);
 				if (ss >> x)
 				{

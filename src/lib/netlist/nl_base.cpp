@@ -470,32 +470,33 @@ void netlist_t::print_stats() const
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
 			total_time, total_time / static_cast<decltype(total_time)>(total_count));
 
-		nperftime_t<true> overhead;
-		nperftime_t<true> test;
-		{
-			auto overhead_guard(overhead.guard());
-			for (int j=0; j<100000;j++)
-			{
-				auto test_guard(test.guard());
-			}
-		}
-
-		nperftime_t<true>::type total_overhead = overhead()
-				* static_cast<nperftime_t<true>::type>(total_count)
-				/ static_cast<nperftime_t<true>::type>(200000);
-
-		log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
-		log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
-		log().verbose("Queue Removes  {1:15}", m_queue.m_prof_remove());
-		log().verbose("Queue Retimes  {1:15}", m_queue.m_prof_retime());
-
 		log().verbose("Total loop     {1:15}", m_stat_mainloop());
+		log().verbose("Total time     {1:15}", total_time);
+
 		/* Only one serialization should be counted in total time */
 		/* But two are contained in m_stat_mainloop */
-		log().verbose("Total devices  {1:15}", total_time);
-		log().verbose("");
-		if (USE_QUEUE_STATS)
+		if (!!USE_QUEUE_STATS)
 		{
+			nperftime_t<true> overhead;
+			nperftime_t<true> test;
+			{
+				auto overhead_guard(overhead.guard());
+				for (int j=0; j<100000;j++)
+				{
+					auto test_guard(test.guard());
+				}
+			}
+
+			nperftime_t<true>::type total_overhead = overhead()
+					* static_cast<nperftime_t<true>::type>(total_count)
+					/ static_cast<nperftime_t<true>::type>(200000);
+
+			log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
+			log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
+			log().verbose("Queue Removes  {1:15}", m_queue.m_prof_remove());
+			log().verbose("Queue Retimes  {1:15}", m_queue.m_prof_retime());
+			log().verbose("");
+
 			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 			log().verbose("Total overhead {1:15}", total_overhead);
 			nperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
