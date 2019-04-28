@@ -285,6 +285,7 @@ SOUNDS["DAVE"] = true
 --SOUNDS["LC7535"] = true
 SOUNDS["UPD934G"] = true
 SOUNDS["IOPSPU"] = true
+SOUNDS["SWP00"] = true
 SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
 
