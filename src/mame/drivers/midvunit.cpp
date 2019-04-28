@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    Driver for Midway V-Unit games
+    Williams/Midway V-Unit system
 
-    driver by Aaron Giles
+    driver originally by Aaron Giles
 
     Games supported:
         * Cruis'n USA (1994)        [3 sets]
@@ -12,18 +12,20 @@
         * War Gods (1996)           [3 sets]
         * Off Road Challenge (1997) [5 sets]
 
-    Known bugs:
-        * textures for automatic/manual selection get overwritten in Cruis'n World
-        * rendering needs to be looked at a little more closely to fix some holes
+    Todo:
+        * Cruis'n World's neutral gear texture corruption
+        * Both games will eventually freeze in attract
         * in Cruis'n World attract mode, right side of sky looks like it has wrapped
-        * Off Road Challenge has polygon sorting issues, among other problems
-        * Issues for the Wargods sets:
-           Sound D/RAM      ERROR EE (during boot diag)
-           Listen for Tone  ERROR E1 (during boot diag)
-           All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
+        * Cruis'n USA's ending plays at double speed (protection related?)
+        * Get the linking feature to actually work (controlled by a mix of security pals and bus transceivers?)
 
 Known to exist but not dumped:
-    Off Road Challenge v1.00 (Mon 07-28-97)
+	*Cruis'n USA L2.0
+	*Cruis'n USA L1.2
+	*Cruis'n World L2.6 (update to the Hyperdrive kit L2.5)
+	*Cruis'n World L1.0
+    *Off Road Challenge v1.00 (Mon 07-28-97)
+	
 
 **************************************************************************/
 
@@ -35,9 +37,7 @@ Known to exist but not dumped:
 #include "includes/midvunit.h"
 #include "crusnusa.lh"
 
-
 #define CPU_CLOCK       50000000
-
 
 /*************************************
  *
@@ -60,7 +60,6 @@ void midvunit_state::machine_start()
 	m_optional_drivers.resolve();
 }
 
-
 void midvunit_state::machine_reset()
 {
 	m_dcs->reset_w(1);
@@ -69,7 +68,6 @@ void midvunit_state::machine_reset()
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
 }
-
 
 MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 {
@@ -81,8 +79,6 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 
 	m_ata->reset();
 }
-
-
 
 /*************************************
  *
@@ -111,7 +107,6 @@ READ32_MEMBER(midvunit_state::port0_r)
 	return (val << 16) | val;
 }
 
-
 /*************************************
  *
  *  ADC input ports
@@ -136,8 +131,6 @@ WRITE32_MEMBER( midvunit_state::adc_w )
 		logerror("adc_w without enabling writes!\n");
 }
 
-
-
 /*************************************
  *
  *  CMOS access
@@ -149,20 +142,16 @@ WRITE32_MEMBER(midvunit_state::midvunit_cmos_protect_w)
 	m_cmos_protected = ((data & 0xc00) != 0xc00);
 }
 
-
 WRITE32_MEMBER(midvunit_state::midvunit_cmos_w)
 {
 	if (!m_cmos_protected)
 		COMBINE_DATA(m_nvram + offset);
 }
 
-
 READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 {
 	return m_nvram[offset];
 }
-
-
 
 /*************************************
  *
@@ -189,7 +178,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 		logerror("midvunit_control_w: old=%04X new=%04X diff=%04X\n", olddata, m_control_data, olddata ^ m_control_data);
 }
 
-
 WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 {
 	uint16_t olddata = m_control_data;
@@ -209,14 +197,11 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 		logerror("crusnwld_control_w: old=%04X new=%04X diff=%04X\n", olddata, m_control_data, olddata ^ m_control_data);
 }
 
-
 WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
 {
 	logerror("Sound W = %02X\n", data);
 	m_dcs->data_w(data & 0xff);
 }
-
-
 
 /*************************************
  *
@@ -242,7 +227,6 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 
 	return m_tms32031_control[offset];
 }
-
 
 WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 {
@@ -270,8 +254,6 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
-
-
 /*************************************
  *
  *  Serial number access
@@ -284,12 +266,10 @@ READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 	return in1 | in1 << 16;
 }
 
-
 READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
 	return m_midway_serial_pic->read() << 16;
 }
-
 
 WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 {
@@ -300,7 +280,6 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 	}
 	m_midway_serial_pic->write(data >> 16);
 }
-
 
 /*************************************
  *
@@ -318,7 +297,6 @@ static const uint32_t bit_data[0x10] =
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636
 };
 
-
 READ32_MEMBER(midvunit_state::bit_data_r)
 {
 	int bit = (bit_data[m_bit_index / 32] >> (31 - (m_bit_index % 32))) & 1;
@@ -326,13 +304,10 @@ READ32_MEMBER(midvunit_state::bit_data_r)
 	return bit ? m_nvram[offset] : ~m_nvram[offset];
 }
 
-
 WRITE32_MEMBER(midvunit_state::bit_reset_w)
 {
 	m_bit_index = 0;
 }
-
-
 
 /*************************************
  *
@@ -346,12 +321,10 @@ READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 	return in1 | in1 << 16;
 }
 
-
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
 	return m_midway_serial_pic2->read() << 16;
 }
-
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
@@ -385,7 +358,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 		m_wheel_board_u8_latch |= BIT(data, 2) << 4; // WA2; C for U9
 		m_wheel_board_u8_latch |= BIT(data, 3) << 3; // WA3; G2B for U9
 	}
-
 	if (!BIT(data, 9))
 	{
 		logerror("Wheel board (U13 74HC245; DCS) = %02X\n", data & 0xFF);
@@ -483,10 +455,8 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 			}
 		}
 	}
-
 	m_wheel_board_last = data;
 }
-
 
 DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
 {
@@ -498,7 +468,6 @@ DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
 	}
 	return 0;
 }
-
 
 /*************************************
  *
@@ -530,7 +499,6 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 	return result;
 }
 
-
 WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
 	uint32_t olddata = m_midvplus_misc[offset];
@@ -558,8 +526,6 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 		logerror("%06X:midvplus_misc_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
-
-
 /*************************************
  *
  *  War Gods RAM grossness
@@ -575,8 +541,6 @@ WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
 
 	m_lastval = data;
 }
-
-
 
 /*************************************
  *
@@ -615,7 +579,6 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0xc00000, 0xffffff).rom().region("user1", 0);
 }
 
-
 void midvunit_state::midvplus_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("ram_base");
@@ -639,8 +602,6 @@ void midvunit_state::midvplus_map(address_map &map)
 	map(0xa00000, 0xbfffff).rw(FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
 	map(0xc00000, 0xcfffff).ram();
 }
-
-
 
 /*************************************
  *
@@ -686,7 +647,6 @@ static INPUT_PORTS_START( midvunit )
 	PORT_START("BRAKE")     /* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( crusnusa )
 	PORT_INCLUDE( midvunit )
@@ -796,7 +756,6 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( crusnwld )
 	PORT_INCLUDE( midvunit )
 
@@ -882,7 +841,6 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( offroadc )
 	PORT_INCLUDE( midvunit )
 
@@ -933,7 +891,6 @@ static INPUT_PORTS_START( offroadc )
 	PORT_DIPSETTING(      0x7000, "Denmark 1" )
 	PORT_DIPSETTING(      0x6800, "Hungary 1" )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( wargods )
 	PORT_START("DIPS")
@@ -1048,7 +1005,6 @@ static INPUT_PORTS_START( wargodsa ) /* For Medium Res only versions */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
 /*************************************
  *
  *  Machine drivers
@@ -1077,7 +1033,6 @@ void midvunit_state::midvcommon(machine_config &config)
 	m_screen->set_palette(m_palette);
 }
 
-
 void midvunit_state::midvunit(machine_config &config)
 {
 	midvcommon(config);
@@ -1091,7 +1046,6 @@ void midvunit_state::midvunit(machine_config &config)
 	/* sound hardware */
 	DCS_AUDIO_2K(config, "dcs", 0);
 }
-
 
 void midvunit_state::crusnwld(machine_config &config)
 {
@@ -1134,8 +1088,6 @@ void midvunit_state::midvplus(machine_config &config)
 	m_dcs->set_polling_offset(0x3839);
 }
 
-
-
 /*************************************
  *
  *  ROM definitions
@@ -1143,14 +1095,14 @@ void midvunit_state::midvplus(machine_config &config)
  *************************************/
 
 /*
-Cruis'n USA & Offroad Challenge (Midway V-Unit)
+Cruis'n USA, Cruis'n World and Off Road Challenge
 Midway, 1994
 
 PCB Layout
 ----------
 
 5770-14365-02 (C) 1994 NINTENDO (for Cruisin USA)
-5770-14365-05 WILLIAMS ELECTRONICS GAMES INC. (for Offroad Challenge)
+5770-14365-05 WILLIAMS ELECTRONICS GAMES INC.
 |-------------------------------------------------------------------------------|
 |  SOUND.U5  SOUND.U9   BATTERY  MAX691  GAME.U26  GAME.U27  GAME.U28  GAME.U29 |
 |  SOUND.U4  SOUND.U8                    GAME.U22  GAME.U23  GAME.U24  GAME.U25 |
@@ -1190,25 +1142,38 @@ Notes:
       ADC0844   - National Semiconductor ADC0844 8-Bit Microprocessor Compatible A/D Converter with Multiplexer Option
       PIC16C57  - Microchip PIC16C57
                     - not populated for Cruis'n USA
-                    - labelled 'Offroad 25" U904' for Offroad Challenge
-      PAL1      - GAL20V8 labelled 'A-19668'
-      PAL2      - PALC22V10
-                    - labelled 'A-19669' for Cruis'n USA rev 2.1
-                    - labelled 'A-19993' for Cruis'n USA rev 4.1 (might work with other revs too, but not 2.x)
-                    - labelled 'A-21883 U38' for Offroad Challenge
+					- labelled 'World Cruis'n 25" U904' for Cruis'n World
+                    - labelled 'Offroad 25" U904' for Off Road Challenge
+      PAL1      - GAL20V8
+					- labelled 'A-19668' for all three games      
+	  PAL2      - PALC22V10
+                    - labelled 'A-19669' for Cruis'n USA; does not enable linking regardless of version
+                    - labelled 'A-19993' for Cruis'n USA; enables linking. Intended for L4.1. May work in L4.0 but not in any version earlier than that.
+					- labelled 'A-19669.1 U38' for Cruis'n World
+                    - labelled 'A-21883 U38' for Off Road Challenge
       PAL3      - TIBPAL20L8
                     - labelled 'A-19670' for Cruis'n USA
-                    - labelled 'A-21170 U43' for Offroad Challenge
+					- labelled 'A-21164 U43' for Cruis'n World
+                    - labelled 'A-21170 U43' for Off Road Challenge
       PAL4      - TIBPAL22V10
                     - labelled 'A-19671' for Cruis'n USA
-                    - labelled 'A-21171 U54' for Offroad Challenge
+					- labelled 'A-21611' for Cruis'n World
+                    - labelled 'A-21171 U54' for Off Road Challenge
       PAL5      - TIBPAL22V10
                     - labelled 'A-19672' for Cruis'n USA
-                    - labelled 'A-21884 U114' for Offroad Challenge
+					- labelled 'A-19672.1 U114' for Cruis'n World
+                    - labelled 'A-21884 U114' for Off Road Challenge
       PAL6      - TIBPAL22V10
                     - labelled 'A-19673' for Cruis'n USA
-                    - no label for Offroad Challenge
-      P3 - P11  - various connectors for controls
+                    - labelled 'A-21167 U111' for Cruis'n World
+                    - labelled 'A-21173 U111' for Off Road Challenge
+      P3		- 7-pin connector for speakers
+	  P4		- 5-pin power connector
+	  P5-P7		- Not used
+	  P8		- 20-pin ribbon connector to wheel board
+	  P9		- 12-pin connector for volume control and gears
+	  P10       - Ribbon connector for DB25 serial ports/cabinet linking
+	  P11		- 13-pin connector for analog inputs; gas, brake and steering
       VSync     - 57.7090Hz  \
       HSync     - 24.807kHz  / measured via EL4583
       ROMs      - All ROMs 27C040 or 27C801
@@ -1250,14 +1215,13 @@ ROM_START( crusnusa ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
 
 	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
-	ROM_LOAD("a-19993.u38.bin",  0x0000, 0x02dd, BAD_DUMP CRC(b6323e94) SHA1(a84e04db8838b35ad9d30416b86aba65a29dcd87) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19670.u43.bin",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
-	ROM_LOAD("a-19668.u52.bin",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
-	ROM_LOAD("a-19671.u54.bin",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19673.u111.bin", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19672.u114.bin", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19993.u38",  0x0000, 0x02dd, BAD_DUMP CRC(b6323e94) SHA1(a84e04db8838b35ad9d30416b86aba65a29dcd87) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1291,8 +1255,15 @@ ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_LOAD32_BYTE( "cusa.u27",     0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
 	ROM_LOAD32_BYTE( "cusa.u28",     0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19993.u38",  0x0000, 0x02dd, BAD_DUMP CRC(b6323e94) SHA1(a84e04db8838b35ad9d30416b86aba65a29dcd87) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1326,41 +1297,17 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_LOAD32_BYTE( "cusa.u27",     0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
 	ROM_LOAD32_BYTE( "cusa.u28",     0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
-
-ROM_START( crusnwld ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 */
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
-	ROM_LOAD16_BYTE( "cwld.u3",  0x200000, 0x80000, CRC(be9a5ff0) SHA1(98d69dbfa6aa8462cdd46772e991ee418b79c653) )
-	ROM_LOAD16_BYTE( "cwld.u4",  0x400000, 0x80000, CRC(69f02d84) SHA1(0fb4ff750de78505f241ae6cd18fccf3ddf4223f) )
-	ROM_LOAD16_BYTE( "cwld.u5",  0x600000, 0x80000, CRC(9d0b9071) SHA1(05edf9073399a942a9d0b969274a7ebf4ca677da) )
-	ROM_LOAD16_BYTE( "cwld.u6",  0x800000, 0x80000, CRC(df28f492) SHA1(c61f3870f59458b7bb5efbf93d697e3fa44a7830) )
-	ROM_LOAD16_BYTE( "cwld.u7",  0xa00000, 0x80000, CRC(0128913e) SHA1(c11bc115877310c17f9b57f72b29d19b0ad71afa) )
-	ROM_LOAD16_BYTE( "cwld.u8",  0xc00000, 0x80000, CRC(5127c08e) SHA1(4f0eae73817270fa156829100b66f0ff88fa422c) )
-	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
-
-	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "crusnw25.u10", 0x0000000, 0x100000, CRC(fd776872) SHA1(90df230b58b1c60d1ca7545ef177e5df30b4ea9d) ) /* Labeled 2.5 Cruis'n World Automatic U10 */
-	ROM_LOAD32_BYTE( "crusnw25.u11", 0x0000001, 0x100000, CRC(0c99a405) SHA1(14251187f00c198fbaa39817f8c95d1dbec80ec0) ) /* Labeled 2.5 Cruis'n World Automatic U11 */
-	ROM_LOAD32_BYTE( "crusnw25.u12", 0x0000002, 0x100000, CRC(3ba9fad8) SHA1(ac8d0dd4df3c1f1c28d93d615d7e24aed4a4a9b5) ) /* Labeled 2.5 Cruis'n World Automatic U12 */
-	ROM_LOAD32_BYTE( "crusnw25.u13", 0x0000003, 0x100000, CRC(21a79c9a) SHA1(e33f768c2309613e4936416ee5250d3b1690d11d) ) /* Labeled 2.5 Cruis'n World Automatic U13 */
-	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
-	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
-	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
-	ROM_LOAD32_BYTE( "cwld.u17",     0x0400003, 0x100000, CRC(d6278c0c) SHA1(3e152d755d69903718a84d4154e442a31026f3d8) )
-	ROM_LOAD32_BYTE( "cwld.u18",     0x0800000, 0x100000, CRC(e2dc2733) SHA1(c277643548c03d831a3b091f1a311accac9d106b) )
-	ROM_LOAD32_BYTE( "cwld.u19",     0x0800001, 0x100000, CRC(5223a070) SHA1(90ce48b2308fa9e7cb636c4732b20b8e177aa9b1) )
-	ROM_LOAD32_BYTE( "cwld.u20",     0x0800002, 0x100000, CRC(db535625) SHA1(599ccd6bcfb155eb68ac131de4af524510ab35b7) )
-	ROM_LOAD32_BYTE( "cwld.u21",     0x0800003, 0x100000, CRC(92a080e8) SHA1(e5e0faf820b5870a81f121b6ad4c37a9081724e4) )
-	ROM_LOAD32_BYTE( "cwld.u22",     0x0c00000, 0x100000, CRC(77c56318) SHA1(52344038942c83f3ce82f3169a345ceb86e43dcb) )
-	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
-	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
-	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
-ROM_END
-
-
-ROM_START( crusnwld24 ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
+ROM_START( crusnwld ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
 	ROM_LOAD16_BYTE( "cwld.u3",  0x200000, 0x80000, CRC(be9a5ff0) SHA1(98d69dbfa6aa8462cdd46772e991ee418b79c653) )
@@ -1388,8 +1335,53 @@ ROM_START( crusnwld24 ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+ROM_START( crusnwld25 ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 Conversion kit for Hyperdrive*/
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
+	ROM_LOAD16_BYTE( "cwld.u3",  0x200000, 0x80000, CRC(be9a5ff0) SHA1(98d69dbfa6aa8462cdd46772e991ee418b79c653) )
+	ROM_LOAD16_BYTE( "cwld.u4",  0x400000, 0x80000, CRC(69f02d84) SHA1(0fb4ff750de78505f241ae6cd18fccf3ddf4223f) )
+	ROM_LOAD16_BYTE( "cwld.u5",  0x600000, 0x80000, CRC(9d0b9071) SHA1(05edf9073399a942a9d0b969274a7ebf4ca677da) )
+	ROM_LOAD16_BYTE( "cwld.u6",  0x800000, 0x80000, CRC(df28f492) SHA1(c61f3870f59458b7bb5efbf93d697e3fa44a7830) )
+	ROM_LOAD16_BYTE( "cwld.u7",  0xa00000, 0x80000, CRC(0128913e) SHA1(c11bc115877310c17f9b57f72b29d19b0ad71afa) )
+	ROM_LOAD16_BYTE( "cwld.u8",  0xc00000, 0x80000, CRC(5127c08e) SHA1(4f0eae73817270fa156829100b66f0ff88fa422c) )
+	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "crusnw25.u10", 0x0000000, 0x100000, CRC(fd776872) SHA1(90df230b58b1c60d1ca7545ef177e5df30b4ea9d) ) /* Labeled 2.5 Cruis'n World Automatic U10 */
+	ROM_LOAD32_BYTE( "crusnw25.u11", 0x0000001, 0x100000, CRC(0c99a405) SHA1(14251187f00c198fbaa39817f8c95d1dbec80ec0) ) /* Labeled 2.5 Cruis'n World Automatic U11 */
+	ROM_LOAD32_BYTE( "crusnw25.u12", 0x0000002, 0x100000, CRC(3ba9fad8) SHA1(ac8d0dd4df3c1f1c28d93d615d7e24aed4a4a9b5) ) /* Labeled 2.5 Cruis'n World Automatic U12 */
+	ROM_LOAD32_BYTE( "crusnw25.u13", 0x0000003, 0x100000, CRC(21a79c9a) SHA1(e33f768c2309613e4936416ee5250d3b1690d11d) ) /* Labeled 2.5 Cruis'n World Automatic U13 */
+	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
+	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
+	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
+	ROM_LOAD32_BYTE( "cwld.u17",     0x0400003, 0x100000, CRC(d6278c0c) SHA1(3e152d755d69903718a84d4154e442a31026f3d8) )
+	ROM_LOAD32_BYTE( "cwld.u18",     0x0800000, 0x100000, CRC(e2dc2733) SHA1(c277643548c03d831a3b091f1a311accac9d106b) )
+	ROM_LOAD32_BYTE( "cwld.u19",     0x0800001, 0x100000, CRC(5223a070) SHA1(90ce48b2308fa9e7cb636c4732b20b8e177aa9b1) )
+	ROM_LOAD32_BYTE( "cwld.u20",     0x0800002, 0x100000, CRC(db535625) SHA1(599ccd6bcfb155eb68ac131de4af524510ab35b7) )
+	ROM_LOAD32_BYTE( "cwld.u21",     0x0800003, 0x100000, CRC(92a080e8) SHA1(e5e0faf820b5870a81f121b6ad4c37a9081724e4) )
+	ROM_LOAD32_BYTE( "cwld.u22",     0x0c00000, 0x100000, CRC(77c56318) SHA1(52344038942c83f3ce82f3169a345ceb86e43dcb) )
+	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
+	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
+	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+ROM_END
 
 ROM_START( crusnwld23 ) /* Version 2.3, Fri Jan 09 1998 - 10:25:49 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1403,10 +1395,10 @@ ROM_START( crusnwld23 ) /* Version 2.3, Fri Jan 09 1998 - 10:25:49 */
 	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "cwld_l23.u10", 0x0000000, 0x100000, CRC(956e0642) SHA1(c023d41159bac9b468d6fc411005f66b15b9dff6) )
-	ROM_LOAD32_BYTE( "cwld_l23.u11", 0x0000001, 0x100000, CRC(b4ed2929) SHA1(22afc3c7bcc57b7b24b4156376df0b7fb8f0c9fb) )
-	ROM_LOAD32_BYTE( "cwld_l23.u12", 0x0000002, 0x100000, CRC(cd12528e) SHA1(685e2280448be2cd90a875cca9ef2ab3d2f8d3e1) )
-	ROM_LOAD32_BYTE( "cwld_l23.u13", 0x0000003, 0x100000, CRC(b096d211) SHA1(a2663b58e2f21bcfcba5317ff0ae91dd21a399f5) )
+	ROM_LOAD32_BYTE( "crusnw23.u10", 0x0000000, 0x100000, CRC(956e0642) SHA1(c023d41159bac9b468d6fc411005f66b15b9dff6) )
+	ROM_LOAD32_BYTE( "crusnw23.u11", 0x0000001, 0x100000, CRC(b4ed2929) SHA1(22afc3c7bcc57b7b24b4156376df0b7fb8f0c9fb) )
+	ROM_LOAD32_BYTE( "crusnw23.u12", 0x0000002, 0x100000, CRC(cd12528e) SHA1(685e2280448be2cd90a875cca9ef2ab3d2f8d3e1) )
+	ROM_LOAD32_BYTE( "crusnw23.u13", 0x0000003, 0x100000, CRC(b096d211) SHA1(a2663b58e2f21bcfcba5317ff0ae91dd21a399f5) )
 	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
 	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
 	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
@@ -1419,8 +1411,15 @@ ROM_START( crusnwld23 ) /* Version 2.3, Fri Jan 09 1998 - 10:25:49 */
 	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( crusnwld20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1434,10 +1433,10 @@ ROM_START( crusnwld20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "u10_v20.u10",  0x0000000, 0x100000, CRC(2a04da6d) SHA1(0aab4f3dc4853de11234245ac14baa14cb3867f3) )
-	ROM_LOAD32_BYTE( "u11_v20.u11",  0x0000001, 0x100000, CRC(26a8ad51) SHA1(522ef3499ba83fa808d7cdae71759e056df353bf) )
-	ROM_LOAD32_BYTE( "u12_v20.u12",  0x0000002, 0x100000, CRC(236caec0) SHA1(f53df733943a52f94878bb1b7d6c877722b3fd82) )
-	ROM_LOAD32_BYTE( "u13_v20.u13",  0x0000003, 0x100000, CRC(7e056e53) SHA1(62b593e093d06a8c0cca56e34f567f795bfc41fc) )
+	ROM_LOAD32_BYTE( "crusnw20.u10",  0x0000000, 0x100000, CRC(2a04da6d) SHA1(0aab4f3dc4853de11234245ac14baa14cb3867f3) )
+	ROM_LOAD32_BYTE( "crusnw20.u11",  0x0000001, 0x100000, CRC(26a8ad51) SHA1(522ef3499ba83fa808d7cdae71759e056df353bf) )
+	ROM_LOAD32_BYTE( "crusnw20.u12",  0x0000002, 0x100000, CRC(236caec0) SHA1(f53df733943a52f94878bb1b7d6c877722b3fd82) )
+	ROM_LOAD32_BYTE( "crusnw20.u13",  0x0000003, 0x100000, CRC(7e056e53) SHA1(62b593e093d06a8c0cca56e34f567f795bfc41fc) )
 	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
 	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
 	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
@@ -1450,8 +1449,15 @@ ROM_START( crusnwld20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( crusnwld19 ) /* Version 1.9, Sat Mar 08 1997 - 14:48:17 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1481,8 +1487,15 @@ ROM_START( crusnwld19 ) /* Version 1.9, Sat Mar 08 1997 - 14:48:17 */
 	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( crusnwld17 ) /* Version 1.7, Fri Jan 24 1997 - 16:23:59 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1512,8 +1525,15 @@ ROM_START( crusnwld17 ) /* Version 1.7, Fri Jan 24 1997 - 16:23:59 */
 	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( crusnwld13 ) /* Version 1.3, Mon Nov 25 1996 - 23:22:45 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1527,10 +1547,10 @@ ROM_START( crusnwld13 ) /* Version 1.3, Mon Nov 25 1996 - 23:22:45 */
 	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "cwld_l13.u10", 0x0000000, 0x100000, CRC(d361d17d) SHA1(7f42baec5492c4040e030e6233e500eb54bd9cba) )
-	ROM_LOAD32_BYTE( "cwld_l13.u11", 0x0000001, 0x100000, CRC(b0c0a462) SHA1(22ae081c3eb9f298aea73e99a0124becd540f0df) )
-	ROM_LOAD32_BYTE( "cwld_l13.u12", 0x0000002, 0x100000, CRC(5e7c566b) SHA1(81e6f21309bd3ba8589bc591a9ba5729f301539e) )
-	ROM_LOAD32_BYTE( "cwld_l13.u13", 0x0000003, 0x100000, CRC(46886e9c) SHA1(a2400f42fef9838fd8a347e8a249ba977d9fbcfe) )
+	ROM_LOAD32_BYTE( "crusnw13.u10", 0x0000000, 0x100000, CRC(d361d17d) SHA1(7f42baec5492c4040e030e6233e500eb54bd9cba) )
+	ROM_LOAD32_BYTE( "crusnw13.u11", 0x0000001, 0x100000, CRC(b0c0a462) SHA1(22ae081c3eb9f298aea73e99a0124becd540f0df) )
+	ROM_LOAD32_BYTE( "crusnw13.u12", 0x0000002, 0x100000, CRC(5e7c566b) SHA1(81e6f21309bd3ba8589bc591a9ba5729f301539e) )
+	ROM_LOAD32_BYTE( "crusnw13.u13", 0x0000003, 0x100000, CRC(46886e9c) SHA1(a2400f42fef9838fd8a347e8a249ba977d9fbcfe) )
 	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
 	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
 	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
@@ -1543,8 +1563,15 @@ ROM_START( crusnwld13 ) /* Version 1.3, Mon Nov 25 1996 - 23:22:45 */
 	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( offroadc ) /* Version 1.63, Tue 03-03-98 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1574,8 +1601,15 @@ ROM_START( offroadc ) /* Version 1.63, Tue 03-03-98 */
 	ROM_LOAD32_BYTE( "offroadc.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
 	ROM_LOAD32_BYTE( "offroadc.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
 	ROM_LOAD32_BYTE( "offroadc.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-21883.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21170.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21171.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( offroadc5 ) /* Version 1.50, Tue 10-21-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1605,8 +1639,15 @@ ROM_START( offroadc5 ) /* Version 1.50, Tue 10-21-97 */
 	ROM_LOAD32_BYTE( "offroadc.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
 	ROM_LOAD32_BYTE( "offroadc.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
 	ROM_LOAD32_BYTE( "offroadc.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-21883.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21170.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21171.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( offroadc4 ) /* Version 1.40, Mon 10-06-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1636,8 +1677,15 @@ ROM_START( offroadc4 ) /* Version 1.40, Mon 10-06-97 */
 	ROM_LOAD32_BYTE( "offroadc.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
 	ROM_LOAD32_BYTE( "offroadc.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
 	ROM_LOAD32_BYTE( "offroadc.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-21883.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21170.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21171.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( offroadc3 ) /* Version 1.30, Mon 09-15-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1667,8 +1715,15 @@ ROM_START( offroadc3 ) /* Version 1.30, Mon 09-15-97 */
 	ROM_LOAD32_BYTE( "offroadc.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
 	ROM_LOAD32_BYTE( "offroadc.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
 	ROM_LOAD32_BYTE( "offroadc.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-21883.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21170.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21171.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 ROM_START( offroadc1 ) /* Version 1.10, Mon 08-18-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1698,14 +1753,21 @@ ROM_START( offroadc1 ) /* Version 1.10, Mon 08-18-97 */
 	ROM_LOAD32_BYTE( "offroadc.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
 	ROM_LOAD32_BYTE( "offroadc.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
 	ROM_LOAD32_BYTE( "offroadc.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+	
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-21883.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21170.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-21171.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
-
 
 /*
 War Gods
 Midway, 1996
 
-This game runs on hardware that appears to be similar to Cruisin' USA but using
+This game runs on hardware that appears to be similar to Cruis'n USA but using
 a 420M 2.5" IDE hard drive. Only about 100M of the hard drive is used.
 There are only 2 ROMs located at U12 and U41.
 
@@ -1780,8 +1842,6 @@ ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	DISK_IMAGE( "wargods_12-11-1995", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
 ROM_END
 
-
-
 /*************************************
  *
  *  Driver init
@@ -1794,7 +1854,6 @@ READ32_MEMBER(midvunit_state::generic_speedup_r)
 	return m_generic_speedup[offset];
 }
 
-
 void midvunit_state::init_crusnusa_common(offs_t speedup)
 {
 	m_adc_shift = 24;
@@ -1806,7 +1865,6 @@ void midvunit_state::init_crusnusa_common(offs_t speedup)
 void midvunit_state::init_crusnusa()  { init_crusnusa_common(0xc93e); }
 void midvunit_state::init_crusnu40()  { init_crusnusa_common(0xc957); }
 void midvunit_state::init_crusnu21()  { init_crusnusa_common(0xc051); }
-
 
 void midvunit_state::init_crusnwld_common(offs_t speedup)
 {
@@ -1850,7 +1908,6 @@ void midvunit_state::init_offroadc()
 	m_generic_speedup = m_ram_base + 0x195aa;
 }
 
-
 void midvunit_state::init_wargods()
 {
 	uint8_t default_nvram[256];
@@ -1871,31 +1928,29 @@ void midvunit_state::init_wargods()
 	m_generic_speedup = m_ram_base + 0x2f4c;
 }
 
-
-
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, init_crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, init_crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld25, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5, Kit version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 
-GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
-GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
