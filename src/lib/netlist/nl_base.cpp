@@ -494,12 +494,15 @@ void netlist_t::print_stats() const
 		/* But two are contained in m_stat_mainloop */
 		log().verbose("Total devices  {1:15}", total_time);
 		log().verbose("");
-		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
-		log().verbose("Total overhead {1:15}", total_overhead);
-		nperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-				/ static_cast<nperftime_t<true>::type>(m_queue.m_prof_call());
-		log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
-		log().verbose("");
+		if (USE_QUEUE_STATS)
+		{
+			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
+			log().verbose("Total overhead {1:15}", total_overhead);
+			nperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
+					/ static_cast<nperftime_t<true>::type>(m_queue.m_prof_call());
+			log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
+			log().verbose("");
+		}
 
 		auto trigger = total_count * 200 / 1000000; // 200 ppm
 		for (auto &entry : m_state->m_devices)

@@ -1730,6 +1730,11 @@ CIRCUIT_LAYOUT( breakout )
 			   M1.8,  M2.12, M3.7,  M4.7,  M5.8,  M6.8,         M8.7,  M9.7,
 			   N1.8,  N2.12, N3.7,  N4.7,  N5.8,  N6.8,  N7.7,         N9.8 )
 
+#if (SLOW_BUT_ACCURATE)
+	NET_C(VCC, F1.16)
+	NET_C(GND, F1.8)
+#endif
+
 #if 1
 	// 163% -- manually optimized
 	HINT(B6.C, NO_DEACTIVATE)
