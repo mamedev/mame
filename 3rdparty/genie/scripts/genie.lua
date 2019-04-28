@@ -86,6 +86,11 @@
 			buildoptions { "-mmacosx-version-min=10.4" }
 			linkoptions  { "-mmacosx-version-min=10.4" }
 
+		configuration "haiku"
+			targetdir   "../bin/haiku"
+			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
+			links       { "root" }
+
 
 --
 -- A more thorough cleanup.

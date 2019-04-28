@@ -57,6 +57,7 @@
 			{ "macosx",   "Apple Mac OS X" },
 			{ "solaris",  "Solaris" },
 			{ "windows",  "Microsoft Windows" },
+			{ "haiku",    "Haiku" },
 		}
 	}
 

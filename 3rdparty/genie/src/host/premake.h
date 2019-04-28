@@ -27,6 +27,9 @@
 #elif defined(__OS2__)
 #define PLATFORM_OS2      (1)
 #define PLATFORM_STRING   "os2"
+#elif defined(__HAIKU__)
+#define PLATFORM_HAIKU      (1)
+#define PLATFORM_STRING   "haiku"
 #else
 #define PLATFORM_WINDOWS  (1)
 #define PLATFORM_STRING   "windows"

@@ -66,6 +66,9 @@
 			if os.is("macosx") then
 				formats = { "lib%s.dylib", "%s.dylib" }
 				path = os.getenv("DYLD_LIBRARY_PATH")
+			elseif os.is("haiku") then
+				formats = { "lib%s.so", "%s.so" }
+				path = os.getenv("LIBRARY_PATH")
 			else
 				formats = { "lib%s.so", "%s.so" }
 				path = os.getenv("LD_LIBRARY_PATH") or ""
