@@ -672,7 +672,9 @@ WRITE32_MEMBER(model2b_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0) ||
+		(strcmp(machine().system().name, "powsled") == 0) ||
+		(strcmp(machine().system().name, "powsledr") == 0))
 	{
 		m_copro_adsp->external_iop_write(offset, data);
 	}
@@ -6699,6 +6701,60 @@ ROM_START( desert ) /* Desert Tank, Model 2, Sega Game ID# 833-11002, ROM board 
 	MODEL2_CPU_BOARD
 ROM_END
 
+ROM_START( powsled ) /* Power Sled Revision A, Model 2B */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-19470a.15", 0x000000, 0x080000, CRC(8f28cc09) SHA1(2b2baa9d7b4a8fc691a826eb7f47119cb59501b3) )
+	ROM_LOAD32_WORD("epr-19471a.16", 0x000002, 0x080000, CRC(01a013e3) SHA1(726d0407f61756969e194008a5fc13f3467cbf24) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("epr-19468.11", 0x0000000, 0x400000, CRC(56fae4e2) SHA1(795db62467eb1cb5b375e05bf168573baacfd657) )
+	ROM_LOAD32_WORD("epr-19469.12", 0x0000002, 0x400000, CRC(5579c922) SHA1(d2bd10adf959e4e648f2f51a1a0463e077fa9c60) )
+
+	ROM_REGION( 0x1000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("epr-19455.17", 0x000000, 0x400000, CRC(165ee345) SHA1(2cfd3da4f90fcae8a6d2802976ed0ea5abc7df2f) )
+	ROM_LOAD32_WORD("epr-19456.21", 0x000002, 0x400000, CRC(c3b2e2c5) SHA1(6dcd173726395fd0f115196470063bfb7c6891b8) )
+
+	ROM_REGION( 0x800000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("epr-19458.27", 0x000000, 0x400000, CRC(f24acca2) SHA1(7fd7da64e247e62aa6542e1ad1a9ea9527ac9e73) )
+	ROM_LOAD32_WORD("epr-19457.25", 0x000002, 0x400000, CRC(79d7e6fa) SHA1(906986145c23fc87ea7205d7722302104665e2bb) )
+
+	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19466.31", 0x000000, 0x020000, CRC(c42892a5) SHA1(8ef761f6da3febcdf29b2d9b1bdf60ee24530f3d) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("epr-19459.32", 0x000000, 0x400000, CRC(a424743f) SHA1(3fd370c1b3f82a8785f1985587a39d3826b46392) )
+ROM_END
+
+ROM_START( powsledr ) /* Power Sled Relay Revision A, Model 2B, ROM board ID# 834-12970 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-19472a.15", 0x000000, 0x080000, CRC(7a947eb7) SHA1(01a9fcd5055235367e4699da0037ae701c524074) )
+	ROM_LOAD32_WORD("epr-19473a.16", 0x000002, 0x080000, CRC(165d77ae) SHA1(129cd1b8b5d2a2f4e59300166c739ef48699d444) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("epr-19468.11", 0x0000000, 0x400000, CRC(56fae4e2) SHA1(795db62467eb1cb5b375e05bf168573baacfd657) )
+	ROM_LOAD32_WORD("epr-19469.12", 0x0000002, 0x400000, CRC(5579c922) SHA1(d2bd10adf959e4e648f2f51a1a0463e077fa9c60) )
+
+	ROM_REGION( 0x1000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("epr-19455.17", 0x000000, 0x400000, CRC(165ee345) SHA1(2cfd3da4f90fcae8a6d2802976ed0ea5abc7df2f) )
+	ROM_LOAD32_WORD("epr-19456.21", 0x000002, 0x400000, CRC(c3b2e2c5) SHA1(6dcd173726395fd0f115196470063bfb7c6891b8) )
+
+	ROM_REGION( 0x800000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("epr-19458.27", 0x000000, 0x400000, CRC(f24acca2) SHA1(7fd7da64e247e62aa6542e1ad1a9ea9527ac9e73) )
+	ROM_LOAD32_WORD("epr-19457.25", 0x000002, 0x400000, CRC(79d7e6fa) SHA1(906986145c23fc87ea7205d7722302104665e2bb) )
+
+	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19467.31", 0x000000, 0x020000, CRC(5e8b9763) SHA1(54c3671c74bb16c8b447e9cae9c49b6d05b27a3e) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("epr-19460.32", 0x000000, 0x400000, CRC(456967cc) SHA1(b81ae04f6cffc2db41f946c10cb80edcdba5779a) )
+	ROM_LOAD16_WORD_SWAP("epr-19461.34", 0x400000, 0x400000, CRC(7b91d65b) SHA1(3768f134fc9e54966e683cc4b9616d704cb9c49d) )
+ROM_END
+
+
 void model2_state::init_pltkids()
 {
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -6828,6 +6884,8 @@ GAME( 1996, lastbrnxu, lastbrnx, model2b,      vf2,       model2b_state, empty_i
 GAME( 1996, lastbrnxj, lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,       0,        model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, sgt24h,    0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, powsled,   0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, powsledr,  powsled,  model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Power Sled Relay (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,    0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, dynabb97,  0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrevb,  overrev,  indy500,      overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
