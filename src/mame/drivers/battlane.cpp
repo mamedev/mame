@@ -5,7 +5,8 @@
     Battle Lane Vol. 5
     1986 Taito
 
-    2x6809
+    This is a Technos game, though it was distributed by Taito and uses
+    some DECO custom ICs.
 
     Driver provided by Paul Leaman (paul@vortexcomputing.demon.co.uk)
 
