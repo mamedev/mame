@@ -77,11 +77,11 @@ f300 ff00 040fpu1  l .          234f:0
 
 
 c100 f1f8 abcd     b .          01:6 234fc:4
-	uint32_t* r_dst = &DX();
-	uint32_t src = DY();
-	uint32_t dst = *r_dst;
-	uint32_t res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
-	uint32_t corf = 0;
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 9)
 		corf = 6;
@@ -102,11 +102,11 @@ c100 f1f8 abcd     b .          01:6 234fc:4
 
 
 cf08 fff8 abcd     b .          01:18 234fc:16
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 9)
 		corf = 6;
@@ -127,11 +127,11 @@ cf08 fff8 abcd     b .          01:18 234fc:16
 
 
 c10f f1ff abcd     b .          01:18 234fc:16
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 9)
 		corf = 6;
@@ -152,11 +152,11 @@ c10f f1ff abcd     b .          01:18 234fc:16
 
 
 cf0f ffff abcd     b .          01:18 234fc:16
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 9)
 		corf = 6;
@@ -177,11 +177,11 @@ cf0f ffff abcd     b .          01:18 234fc:16
 
 
 c108 f1f8 abcd     b .          01:18 234fc:16
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 9)
 		corf = 6;
@@ -202,10 +202,10 @@ c108 f1f8 abcd     b .          01:18 234fc:16
 
 
 d000 f1f8 add      b .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_8(DY());
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -216,10 +216,10 @@ d000 f1f8 add      b .          01:4 234fc:2
 
 
 d000 f1c0 add      b A+-DXWLdxI 01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_8;
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_8;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -230,10 +230,10 @@ d000 f1c0 add      b A+-DXWLdxI 01:4 234fc:2
 
 
 d040 f1f8 add      w .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(DY());
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -244,10 +244,10 @@ d040 f1f8 add      w .          01:4 234fc:2
 
 
 d048 f1f8 add      w .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(AY());
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(AY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -258,10 +258,10 @@ d048 f1f8 add      w .          01:4 234fc:2
 
 
 d040 f1c0 add      w A+-DXWLdxI 01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_16;
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -272,10 +272,10 @@ d040 f1c0 add      w A+-DXWLdxI 01:4 234fc:2
 
 
 d080 f1f8 add      l .          01:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = DY();
-	uint32_t dst = *r_dst;
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -286,10 +286,10 @@ d080 f1f8 add      l .          01:6 234fc:2
 
 
 d088 f1f8 add      l .          01:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = AY();
-	uint32_t dst = *r_dst;
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = AY();
+	u32 dst = *r_dst;
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -300,10 +300,10 @@ d088 f1f8 add      l .          01:6 234fc:2
 
 
 d080 f1c0 add      l A+-DXWLdxI 01:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_32;
-	uint32_t dst = *r_dst;
-	uint32_t res = src + dst;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = *r_dst;
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -314,10 +314,10 @@ d080 f1c0 add      l A+-DXWLdxI 01:6 234fc:2
 
 
 d100 f1c0 add      b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = MASK_OUT_ABOVE_8(DX());
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = MASK_OUT_ABOVE_8(DX());
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -328,10 +328,10 @@ d100 f1c0 add      b A+-DXWL    01:8 234fc:4
 
 
 d140 f1c0 add      w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = MASK_OUT_ABOVE_16(DX());
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = src + dst;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = MASK_OUT_ABOVE_16(DX());
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -342,10 +342,10 @@ d140 f1c0 add      w A+-DXWL    01:8 234fc:4
 
 
 d180 f1c0 add      l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t src = DX();
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = src + dst;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 src = DX();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -356,48 +356,48 @@ d180 f1c0 add      l A+-DXWL    01:12 234fc:4
 
 
 d0c0 f1f8 adda     w .          01:8 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(DY()));
 
 
 d0c8 f1f8 adda     w .          01:8 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(AY()));
 
 
 d0c0 f1c0 adda     w A+-DXWLdxI 01:8 234fc:2
-	uint32_t* r_dst = &AX();
-	uint32_t src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	u32* r_dst = &AX();
+	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + src);
 
 
 d1c0 f1f8 adda     l .          01:6 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + DY());
 
 
 d1c8 f1f8 adda     l .          01:6 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + AY());
 
 
 d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
-	uint32_t* r_dst = &AX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_32;
+	u32* r_dst = &AX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + src);
 
 
 0600 fff8 addi     b .          01:8 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = OPER_I_8();
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DY();
+	u32 src = OPER_I_8();
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -408,10 +408,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 0600 ffc0 addi     b A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_8();
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst;
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -422,10 +422,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 0640 fff8 addi     w .          01:8 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = OPER_I_16();
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DY();
+	u32 src = OPER_I_16();
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -436,10 +436,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 0640 ffc0 addi     w A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = src + dst;
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -450,10 +450,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 0680 fff8 addi     l .          0:16 1:14 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = OPER_I_32();
-	uint32_t dst = *r_dst;
-	uint32_t res = src + dst;
+	u32* r_dst = &DY();
+	u32 src = OPER_I_32();
+	u32 dst = *r_dst;
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -464,10 +464,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 0680 ffc0 addi     l A+-DXWL    01:20 234fc:4
-	uint32_t src = OPER_I_32();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = src + dst;
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -478,10 +478,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 5000 f1f8 addq     b .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -492,10 +492,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 5000 f1c0 addq     b A+-DXWL    01:8 234fc:4
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst;
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -506,10 +506,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 5040 f1f8 addq     w .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src + dst;
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -520,16 +520,16 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 5048 f1f8 addq     w .          01:4 234fc:2
-	uint32_t* r_dst = &AY();
+	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((m_ir >> 9) - 1) & 7) + 1);
 
 
 5040 f1c0 addq     w A+-DXWL    01:8 234fc:4
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = src + dst;
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -540,10 +540,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 5080 f1f8 addq     l .          01:8 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t dst = *r_dst;
-	uint32_t res = src + dst;
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = *r_dst;
+	u32 res = src + dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -554,16 +554,16 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 5088 f1f8 addq     l .          01:8 234fc:2
-	uint32_t* r_dst = &AY();
+	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((m_ir >> 9) - 1) & 7) + 1);
 
 
 5080 f1c0 addq     l A+-DXWL    01:12 234fc:4
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = src + dst;
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst;
 
 
 	m_n_flag = NFLAG_32(res);
@@ -575,10 +575,10 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 
 
 d100 f1f8 addx     b .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_8(DY());
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src + dst + XFLAG_1();
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -591,10 +591,10 @@ d100 f1f8 addx     b .          01:4 234fc:2
 
 
 d140 f1f8 addx     w .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(DY());
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src + dst + XFLAG_1();
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -607,10 +607,10 @@ d140 f1f8 addx     w .          01:4 234fc:2
 
 
 d180 f1f8 addx     l .          0:8 1:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = DY();
-	uint32_t dst = *r_dst;
-	uint32_t res = src + dst + XFLAG_1();
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -623,10 +623,10 @@ d180 f1f8 addx     l .          0:8 1:6 234fc:2
 
 
 df08 fff8 addx     b .          01:18 234fc:12
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst + XFLAG_1();
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -639,10 +639,10 @@ df08 fff8 addx     b .          01:18 234fc:12
 
 
 d10f f1ff addx     b .          01:18 234fc:12
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst + XFLAG_1();
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -655,10 +655,10 @@ d10f f1ff addx     b .          01:18 234fc:12
 
 
 df0f ffff addx     b .          01:18 234fc:12
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst + XFLAG_1();
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -671,10 +671,10 @@ df0f ffff addx     b .          01:18 234fc:12
 
 
 d108 f1f8 addx     b .          01:18 234fc:12
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = src + dst + XFLAG_1();
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_v_flag = VFLAG_ADD_8(src, dst, res);
@@ -687,10 +687,10 @@ d108 f1f8 addx     b .          01:18 234fc:12
 
 
 d148 f1f8 addx     w .          01:18 234fc:12
-	uint32_t src = OPER_AY_PD_16();
-	uint32_t ea  = EA_AX_PD_16();
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = src + dst + XFLAG_1();
+	u32 src = OPER_AY_PD_16();
+	u32 ea  = EA_AX_PD_16();
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_16(res);
 	m_v_flag = VFLAG_ADD_16(src, dst, res);
@@ -703,10 +703,10 @@ d148 f1f8 addx     w .          01:18 234fc:12
 
 
 d188 f1f8 addx     l .          01:30 234fc:12
-	uint32_t src = OPER_AY_PD_32();
-	uint32_t ea  = EA_AX_PD_32();
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = src + dst + XFLAG_1();
+	u32 src = OPER_AY_PD_32();
+	u32 ea  = EA_AX_PD_32();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst + XFLAG_1();
 
 	m_n_flag = NFLAG_32(res);
 	m_v_flag = VFLAG_ADD_32(src, dst, res);
@@ -767,8 +767,8 @@ c080 f1c0 and      l A+-DXWLdxI 01:6 234fc:2
 
 
 c100 f1c0 and      b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = DX() & m68ki_read_8(ea);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = DX() & m68ki_read_8(ea);
 
 	m_n_flag = NFLAG_8(res);
 	m_c_flag = CFLAG_CLEAR;
@@ -779,8 +779,8 @@ c100 f1c0 and      b A+-DXWL    01:8 234fc:4
 
 
 c140 f1c0 and      w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = DX() & m68ki_read_16(ea);
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = DX() & m68ki_read_16(ea);
 
 	m_n_flag = NFLAG_16(res);
 	m_c_flag = CFLAG_CLEAR;
@@ -791,8 +791,8 @@ c140 f1c0 and      w A+-DXWL    01:8 234fc:4
 
 
 c180 f1c0 and      l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = DX() & m68ki_read_32(ea);
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = DX() & m68ki_read_32(ea);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -811,9 +811,9 @@ c180 f1c0 and      l A+-DXWL    01:12 234fc:4
 
 
 0200 ffc0 andi     b A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_8();
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = src & m68ki_read_8(ea);
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = src & m68ki_read_8(ea);
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -832,9 +832,9 @@ c180 f1c0 and      l A+-DXWL    01:12 234fc:4
 
 
 0240 ffc0 andi     w A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = src & m68ki_read_16(ea);
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = src & m68ki_read_16(ea);
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -853,9 +853,9 @@ c180 f1c0 and      l A+-DXWL    01:12 234fc:4
 
 
 0280 ffc0 andi     l A+-DXWL    01:20 234fc:4
-	uint32_t src = OPER_I_32();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = src & m68ki_read_32(ea);
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = src & m68ki_read_32(ea);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -872,7 +872,7 @@ c180 f1c0 and      l A+-DXWL    01:12 234fc:4
 027c ffff andi     w .          0:20p 1:16p 234fc:12p
 	if(m_s_flag)
 	{
-		uint32_t src = OPER_I_16();
+		u32 src = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr(m68ki_get_sr() & src);
 		return;
@@ -881,10 +881,10 @@ c180 f1c0 and      l A+-DXWL    01:12 234fc:4
 
 
 e000 f1f8 asr      b .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -901,10 +901,10 @@ e000 f1f8 asr      b .          01234fc:6
 
 
 e040 f1f8 asr      w .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -921,10 +921,10 @@ e040 f1f8 asr      w .          01234fc:6
 
 
 e080 f1f8 asr      l .          01:8 234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = *r_dst;
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -941,10 +941,10 @@ e080 f1f8 asr      l .          01:8 234fc:6
 
 
 e020 f1f8 asr      b .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 	{
@@ -991,10 +991,10 @@ e020 f1f8 asr      b .          01234fc:6
 
 
 e060 f1f8 asr      w .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 	{
@@ -1041,10 +1041,10 @@ e060 f1f8 asr      w .          01234fc:6
 
 
 e0a0 f1f8 asr      l .          01:8 234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = *r_dst;
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
 
 	if(shift != 0)
 	{
@@ -1091,9 +1091,9 @@ e0a0 f1f8 asr      l .          01:8 234fc:6
 
 
 e0c0 ffc0 asr      w A+-DXWL    01:8 234fc:5
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = src >> 1;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = src >> 1;
 
 	if(GET_MSB_16(src))
 		res |= 0x8000;
@@ -1107,10 +1107,10 @@ e0c0 ffc0 asr      w A+-DXWL    01:8 234fc:5
 
 
 e100 f1f8 asl      b .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_8(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -1125,10 +1125,10 @@ e100 f1f8 asl      b .          01:6 234fc:8
 
 
 e140 f1f8 asl      w .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_16(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -1143,10 +1143,10 @@ e140 f1f8 asl      w .          01:6 234fc:8
 
 
 e180 f1f8 asl      l .          01234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = *r_dst;
-	uint32_t res = MASK_OUT_ABOVE_32(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -1161,10 +1161,10 @@ e180 f1f8 asl      l .          01234fc:8
 
 
 e120 f1f8 asl      b .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_8(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
 	{
@@ -1196,10 +1196,10 @@ e120 f1f8 asl      b .          01:6 234fc:8
 
 
 e160 f1f8 asl      w .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_16(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
 	{
@@ -1231,10 +1231,10 @@ e160 f1f8 asl      w .          01:6 234fc:8
 
 
 e1a0 f1f8 asl      l .          01234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = *r_dst;
-	uint32_t res = MASK_OUT_ABOVE_32(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
 	{
@@ -1266,9 +1266,9 @@ e1a0 f1f8 asl      l .          01234fc:8
 
 
 e1c0 ffc0 asl      w A+-DXWL    01:8 234fc:6
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = MASK_OUT_ABOVE_16(src << 1);
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
 
@@ -1292,7 +1292,7 @@ e1c0 ffc0 asl      w A+-DXWL    01:8 234fc:6
 6000 f0ff bcc      w .          01:10 234fc:6
 	if(M68KMAKE_CC)
 	{
-		uint32_t offset = OPER_I_16();
+		u32 offset = OPER_I_16();
 		m_pc -= 2;
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_16(offset);
@@ -1307,7 +1307,7 @@ e1c0 ffc0 asl      w A+-DXWL    01:8 234fc:6
 	{
 		if(M68KMAKE_CC)
 		{
-			uint32_t offset = OPER_I_32();
+			u32 offset = OPER_I_32();
 			m_pc -= 4;
 			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 			m68ki_branch_32(offset);
@@ -1329,68 +1329,68 @@ e1c0 ffc0 asl      w A+-DXWL    01:8 234fc:6
 
 
 0140 f1f8 bchg     l .          01:8 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t mask = 1 << (DX() & 0x1f);
+	u32* r_dst = &DY();
+	u32 mask = 1 << (DX() & 0x1f);
 
 	m_not_z_flag = *r_dst & mask;
 	*r_dst ^= mask;
 
 
 0140 f1c0 bchg     b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
-	uint32_t mask = 1 << (DX() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 mask = 1 << (DX() & 7);
 
 	m_not_z_flag = src & mask;
 	m68ki_write_8(ea, src ^ mask);
 
 
 0840 fff8 bchg     l .          01:12 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t mask = 1 << (OPER_I_8() & 0x1f);
+	u32* r_dst = &DY();
+	u32 mask = 1 << (OPER_I_8() & 0x1f);
 
 	m_not_z_flag = *r_dst & mask;
 	*r_dst ^= mask;
 
 
 0840 ffc0 bchg     b A+-DXWL    01:12 234fc:4
-	uint32_t mask = 1 << (OPER_I_8() & 7);
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
+	u32 mask = 1 << (OPER_I_8() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
 
 	m_not_z_flag = src & mask;
 	m68ki_write_8(ea, src ^ mask);
 
 
 0180 f1f8 bclr     l .          01:10 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t mask = 1 << (DX() & 0x1f);
+	u32* r_dst = &DY();
+	u32 mask = 1 << (DX() & 0x1f);
 
 	m_not_z_flag = *r_dst & mask;
 	*r_dst &= ~mask;
 
 
 0180 f1c0 bclr     b A+-DXWL    0:8 1:10 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
-	uint32_t mask = 1 << (DX() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 mask = 1 << (DX() & 7);
 
 	m_not_z_flag = src & mask;
 	m68ki_write_8(ea, src & ~mask);
 
 
 0880 fff8 bclr     l .          01:14 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t mask = 1 << (OPER_I_8() & 0x1f);
+	u32* r_dst = &DY();
+	u32 mask = 1 << (OPER_I_8() & 0x1f);
 
 	m_not_z_flag = *r_dst & mask;
 	*r_dst &= ~mask;
 
 
 0880 ffc0 bclr     b A+-DXWL    01:12 234fc:4
-	uint32_t mask = 1 << (OPER_I_8() & 7);
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
+	u32 mask = 1 << (OPER_I_8() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
 
 	m_not_z_flag = src & mask;
 	m68ki_write_8(ea, src & ~mask);
@@ -1399,11 +1399,11 @@ e1c0 ffc0 asl      w A+-DXWL    01:8 234fc:6
 eac0 fff8 bfchg    l .          234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t* data = &DY();
-		uint64_t mask;
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32* data = &DY();
+		u64 mask;
 
 
 		if(BIT_B(word2))
@@ -1432,15 +1432,15 @@ eac0 fff8 bfchg    l .          234fc:12
 eac0 ffc0 bfchg    l ADXWL      234fc:20
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t mask_base;
-		uint32_t data_long;
-		uint32_t mask_long;
-		uint32_t data_byte = 0;
-		uint32_t mask_byte = 0;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 mask_base;
+		u32 data_long;
+		u32 mask_long;
+		u32 data_byte = 0;
+		u32 mask_byte = 0;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 
 		if(BIT_B(word2))
@@ -1484,11 +1484,11 @@ eac0 ffc0 bfchg    l ADXWL      234fc:20
 ecc0 fff8 bfclr    l .          234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t* data = &DY();
-		uint64_t mask;
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32* data = &DY();
+		u64 mask;
 
 
 		if(BIT_B(word2))
@@ -1519,15 +1519,15 @@ ecc0 fff8 bfclr    l .          234fc:12
 ecc0 ffc0 bfclr    l ADXWL      234fc:20
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t mask_base;
-		uint32_t data_long;
-		uint32_t mask_long;
-		uint32_t data_byte = 0;
-		uint32_t mask_byte = 0;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 mask_base;
+		u32 data_long;
+		u32 mask_long;
+		u32 data_byte = 0;
+		u32 mask_byte = 0;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 
 		if(BIT_B(word2))
@@ -1571,10 +1571,10 @@ ecc0 ffc0 bfclr    l ADXWL      234fc:20
 ebc0 fff8 bfexts   l .          234fc:8
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint64_t data = DY();
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u64 data = DY();
 
 
 		if(BIT_B(word2))
@@ -1603,11 +1603,11 @@ ebc0 fff8 bfexts   l .          234fc:8
 ebc0 ffc0 bfexts   l ADXWLdx    234fc:15
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t data;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 data;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 
 		if(BIT_B(word2))
@@ -1653,10 +1653,10 @@ ebc0 ffc0 bfexts   l ADXWLdx    234fc:15
 e9c0 fff8 bfextu   l .          234fc:8
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint64_t data = DY();
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u64 data = DY();
 
 
 		if(BIT_B(word2))
@@ -1685,11 +1685,11 @@ e9c0 fff8 bfextu   l .          234fc:8
 e9c0 ffc0 bfextu   l ADXWLdx    234fc:15
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t data;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 data;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 
 		if(BIT_B(word2))
@@ -1734,11 +1734,11 @@ e9c0 ffc0 bfextu   l ADXWLdx    234fc:15
 edc0 fff8 bfffo    l .          234fc:18
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint64_t data = DY();
-		uint32_t bit;
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u64 data = DY();
+		u32 bit;
 
 
 		if(BIT_B(word2))
@@ -1770,13 +1770,13 @@ edc0 fff8 bfffo    l .          234fc:18
 edc0 ffc0 bfffo    l ADXWLdx    234fc:28
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		int32_t local_offset;
-		uint32_t width = word2;
-		uint32_t data;
-		uint32_t bit;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		s32 local_offset;
+		u32 width = word2;
+		u32 data;
+		u32 bit;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 
 		if(BIT_B(word2))
@@ -1820,12 +1820,12 @@ edc0 ffc0 bfffo    l ADXWLdx    234fc:28
 efc0 fff8 bfins    l .          234fc:10
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t* data = &DY();
-		uint64_t mask;
-		uint64_t insert = REG_D()[(word2>>12)&7];
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32* data = &DY();
+		u64 mask;
+		u64 insert = REG_D()[(word2>>12)&7];
 
 
 		if(BIT_B(word2))
@@ -1860,18 +1860,18 @@ efc0 fff8 bfins    l .          234fc:10
 efc0 ffc0 bfins    l ADXWL      234fc:17
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t insert_base = REG_D()[(word2>>12)&7];
-		uint32_t insert_long;
-		uint32_t insert_byte;
-		uint32_t mask_base;
-		uint32_t data_long;
-		uint32_t mask_long;
-		uint32_t data_byte = 0;
-		uint32_t mask_byte = 0;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 insert_base = REG_D()[(word2>>12)&7];
+		u32 insert_long;
+		u32 insert_byte;
+		u32 mask_base;
+		u32 data_long;
+		u32 mask_long;
+		u32 data_byte = 0;
+		u32 mask_byte = 0;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 
 		if(BIT_B(word2))
@@ -1934,11 +1934,11 @@ efc0 ffc0 bfins    l ADXWL      234fc:17
 eec0 fff8 bfset    l .          234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t* data = &DY();
-		uint64_t mask;
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32* data = &DY();
+		u64 mask;
 
 
 		if(BIT_B(word2))
@@ -1969,15 +1969,15 @@ eec0 fff8 bfset    l .          234fc:12
 eec0 ffc0 bfset    l ADXWL      234fc:20
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t mask_base;
-		uint32_t data_long;
-		uint32_t mask_long;
-		uint32_t data_byte = 0;
-		uint32_t mask_byte = 0;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 mask_base;
+		u32 data_long;
+		u32 mask_long;
+		u32 data_byte = 0;
+		u32 mask_byte = 0;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D()[offset&7]);
@@ -2020,11 +2020,11 @@ eec0 ffc0 bfset    l ADXWL      234fc:20
 e8c0 fff8 bftst    l .          234fc:6
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t* data = &DY();
-		uint64_t mask;
+		u32 word2 = OPER_I_16();
+		u32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32* data = &DY();
+		u64 mask;
 
 
 		if(BIT_B(word2))
@@ -2053,15 +2053,15 @@ e8c0 fff8 bftst    l .          234fc:6
 e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t offset = (word2>>6)&31;
-		uint32_t width = word2;
-		uint32_t mask_base;
-		uint32_t data_long;
-		uint32_t mask_long;
-		uint32_t data_byte = 0;
-		uint32_t mask_byte = 0;
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
+		u32 word2 = OPER_I_16();
+		s32 offset = (word2>>6)&31;
+		u32 width = word2;
+		u32 mask_base;
+		u32 data_long;
+		u32 mask_long;
+		u32 data_byte = 0;
+		u32 mask_byte = 0;
+		u32 ea = M68KMAKE_GET_EA_AY_8;
 
 		if(BIT_B(word2))
 			offset = MAKE_INT_32(REG_D()[offset&7]);
@@ -2119,7 +2119,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 6000 ffff bra      w .          01234fc:10
-	uint32_t offset = OPER_I_16();
+	u32 offset = OPER_I_16();
 	m_pc -= 2;
 	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 	m68ki_branch_16(offset);
@@ -2130,7 +2130,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 60ff ffff bra      l .          01234fc:10
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t offset = OPER_I_32();
+		u32 offset = OPER_I_32();
 		m_pc -= 4;
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_32(offset);
@@ -2148,34 +2148,34 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 01c0 f1f8 bset     l .          01:8 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t mask = 1 << (DX() & 0x1f);
+	u32* r_dst = &DY();
+	u32 mask = 1 << (DX() & 0x1f);
 
 	m_not_z_flag = *r_dst & mask;
 	*r_dst |= mask;
 
 
 01c0 f1c0 bset     b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
-	uint32_t mask = 1 << (DX() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 mask = 1 << (DX() & 7);
 
 	m_not_z_flag = src & mask;
 	m68ki_write_8(ea, src | mask);
 
 
 08c0 fff8 bset     l .          01:12 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t mask = 1 << (OPER_I_8() & 0x1f);
+	u32* r_dst = &DY();
+	u32 mask = 1 << (OPER_I_8() & 0x1f);
 
 	m_not_z_flag = *r_dst & mask;
 	*r_dst |= mask;
 
 
 08c0 ffc0 bset     b A+-DXWL    01:12 234fc:4
-	uint32_t mask = 1 << (OPER_I_8() & 7);
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
+	u32 mask = 1 << (OPER_I_8() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
 
 	m_not_z_flag = src & mask;
 	m68ki_write_8(ea, src | mask);
@@ -2188,7 +2188,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 6100 ffff bsr      w .          01:18 234fc:7
-	uint32_t offset = OPER_I_16();
+	u32 offset = OPER_I_16();
 	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32(m_pc);
 	m_pc -= 2;
@@ -2198,7 +2198,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 61ff ffff bsr      l .          01:18 234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t offset = OPER_I_32();
+		u32 offset = OPER_I_32();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_push_32(m_pc);
 		m_pc -= 4;
@@ -2226,7 +2226,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 0800 ffc0 btst     b A+-DXWLdx  01:8 234fc:4
-	uint32_t bit = OPER_I_8() & 7;
+	u32 bit = OPER_I_8() & 7;
 
 	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << bit);
 
@@ -2235,7 +2235,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	/* note: watch out for pcrelative modes */
 	if(CPU_TYPE_IS_020_VARIANT())
 	{
-		uint32_t ea = M68KMAKE_GET_EA_AY_32;
+		u32 ea = M68KMAKE_GET_EA_AY_32;
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_pc += 2;
@@ -2250,11 +2250,11 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 0ac0 ffc0 cas      b A+-DXWL    234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
-		uint32_t dest = m68ki_read_8(ea);
-		uint32_t* compare = &REG_D()[word2 & 7];
-		uint32_t res = dest - MASK_OUT_ABOVE_8(*compare);
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_8;
+		u32 dest = m68ki_read_8(ea);
+		u32* compare = &REG_D()[word2 & 7];
+		u32 res = dest - MASK_OUT_ABOVE_8(*compare);
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_n_flag = NFLAG_8(res);
@@ -2277,11 +2277,11 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 0cc0 ffc0 cas      w A+-DXWL    234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t ea = M68KMAKE_GET_EA_AY_16;
-		uint32_t dest = m68ki_read_16(ea);
-		uint32_t* compare = &REG_D()[word2 & 7];
-		uint32_t res = dest - MASK_OUT_ABOVE_16(*compare);
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_16;
+		u32 dest = m68ki_read_16(ea);
+		u32* compare = &REG_D()[word2 & 7];
+		u32 res = dest - MASK_OUT_ABOVE_16(*compare);
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_n_flag = NFLAG_16(res);
@@ -2304,11 +2304,11 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 0ec0 ffc0 cas      l A+-DXWL    234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint32_t ea = M68KMAKE_GET_EA_AY_32;
-		uint32_t dest = m68ki_read_32(ea);
-		uint32_t* compare = &REG_D()[word2 & 7];
-		uint32_t res = dest - *compare;
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_32;
+		u32 dest = m68ki_read_32(ea);
+		u32* compare = &REG_D()[word2 & 7];
+		u32 res = dest - *compare;
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_n_flag = NFLAG_32(res);
@@ -2331,15 +2331,15 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 0cfc ffff cas2     w .          234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_32();
-		uint32_t* compare1 = &REG_D()[(word2 >> 16) & 7];
-		uint32_t ea1 = REG_DA()[(word2 >> 28) & 15];
-		uint32_t dest1 = m68ki_read_16(ea1);
-		uint32_t res1 = dest1 - MASK_OUT_ABOVE_16(*compare1);
-		uint32_t* compare2 = &REG_D()[word2 & 7];
-		uint32_t ea2 = REG_DA()[(word2 >> 12) & 15];
-		uint32_t dest2 = m68ki_read_16(ea2);
-		uint32_t res2;
+		u32 word2 = OPER_I_32();
+		u32* compare1 = &REG_D()[(word2 >> 16) & 7];
+		u32 ea1 = REG_DA()[(word2 >> 28) & 15];
+		u32 dest1 = m68ki_read_16(ea1);
+		u32 res1 = dest1 - MASK_OUT_ABOVE_16(*compare1);
+		u32* compare2 = &REG_D()[word2 & 7];
+		u32 ea2 = REG_DA()[(word2 >> 12) & 15];
+		u32 dest2 = m68ki_read_16(ea2);
+		u32 res2;
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_n_flag = NFLAG_16(res1);
@@ -2374,15 +2374,15 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 0efc ffff cas2     l .          234fc:12
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_32();
-		uint32_t* compare1 = &REG_D()[(word2 >> 16) & 7];
-		uint32_t ea1 = REG_DA()[(word2 >> 28) & 15];
-		uint32_t dest1 = m68ki_read_32(ea1);
-		uint32_t res1 = dest1 - *compare1;
-		uint32_t* compare2 = &REG_D()[word2 & 7];
-		uint32_t ea2 = REG_DA()[(word2 >> 12) & 15];
-		uint32_t dest2 = m68ki_read_32(ea2);
-		uint32_t res2;
+		u32 word2 = OPER_I_32();
+		u32* compare1 = &REG_D()[(word2 >> 16) & 7];
+		u32 ea1 = REG_DA()[(word2 >> 28) & 15];
+		u32 dest1 = m68ki_read_32(ea1);
+		u32 res1 = dest1 - *compare1;
+		u32* compare2 = &REG_D()[word2 & 7];
+		u32 ea2 = REG_DA()[(word2 >> 12) & 15];
+		u32 dest2 = m68ki_read_32(ea2);
+		u32 res2;
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_n_flag = NFLAG_32(res1);
@@ -2415,8 +2415,8 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 4180 f1f8 chk      w .          0:10 1234fc:8
-	int32_t src = MAKE_INT_16(DX());
-	int32_t bound = MAKE_INT_16(DY());
+	s32 src = MAKE_INT_16(DX());
+	s32 bound = MAKE_INT_16(DY());
 
 	m_not_z_flag = ZFLAG_16(src); /* Undocumented */
 	m_v_flag = VFLAG_CLEAR;   /* Undocumented */
@@ -2431,8 +2431,8 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 4180 f1c0 chk      w A+-DXWLdxI 0:10 1234fc:8
-	int32_t src = MAKE_INT_16(DX());
-	int32_t bound = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	s32 src = MAKE_INT_16(DX());
+	s32 bound = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
 	m_not_z_flag = ZFLAG_16(src); /* Undocumented */
 	m_v_flag = VFLAG_CLEAR;   /* Undocumented */
@@ -2449,8 +2449,8 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 4100 f1f8 chk      l .          234fc:8
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		int32_t src = MAKE_INT_32(DX());
-		int32_t bound = MAKE_INT_32(DY());
+		s32 src = MAKE_INT_32(DX());
+		s32 bound = MAKE_INT_32(DY());
 
 		m_not_z_flag = ZFLAG_32(src); /* Undocumented */
 		m_v_flag = VFLAG_CLEAR;   /* Undocumented */
@@ -2470,8 +2470,8 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 4100 f1c0 chk      l A+-DXWLdxI 234fc:8
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		int32_t src = MAKE_INT_32(DX());
-		int32_t bound = MAKE_INT_32(M68KMAKE_GET_OPER_AY_32);
+		s32 src = MAKE_INT_32(DX());
+		s32 bound = MAKE_INT_32(M68KMAKE_GET_OPER_AY_32);
 
 		m_not_z_flag = ZFLAG_32(src); /* Undocumented */
 		m_v_flag = VFLAG_CLEAR;   /* Undocumented */
@@ -2491,23 +2491,23 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 00fa ffff chk2cmp2 b .          234fc:23
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t compare = (int32_t)REG_DA()[(word2 >> 12) & 15];
+		u32 word2 = OPER_I_16();
+		s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
 		if(!BIT_F(word2))
 			compare &= 0xff;
 
-		uint32_t ea = EA_PCDI_8();
-		int32_t lower_bound = m68ki_read_pcrel_8(ea);
-		int32_t upper_bound = m68ki_read_pcrel_8(ea + 1);
+		u32 ea = EA_PCDI_8();
+		s32 lower_bound = m68ki_read_pcrel_8(ea);
+		s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x80)
 		{
-			lower_bound = (int32_t)(int8_t)lower_bound;
-			upper_bound = (int32_t)(int8_t)upper_bound;
+			lower_bound = (s32)(s8)lower_bound;
+			upper_bound = (s32)(s8)upper_bound;
 
 			if(!BIT_F(word2))
-				compare = (int32_t)(int8_t)compare;
+				compare = (s32)(s8)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2523,23 +2523,23 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 00fb ffff chk2cmp2 b .          234fc:23
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t compare = (int32_t)REG_DA()[(word2 >> 12) & 15];
+		u32 word2 = OPER_I_16();
+		s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
 		if(!BIT_F(word2))
 			compare &= 0xff;
 
-		uint32_t ea = EA_PCIX_8();
-		int32_t lower_bound = m68ki_read_pcrel_8(ea);
-		int32_t upper_bound = m68ki_read_pcrel_8(ea + 1);
+		u32 ea = EA_PCIX_8();
+		s32 lower_bound = m68ki_read_pcrel_8(ea);
+		s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x80)
 		{
-			lower_bound = (int32_t)(int8_t)lower_bound;
-			upper_bound = (int32_t)(int8_t)upper_bound;
+			lower_bound = (s32)(s8)lower_bound;
+			upper_bound = (s32)(s8)upper_bound;
 
 			if(!BIT_F(word2))
-				compare = (int32_t)(int8_t)compare;
+				compare = (s32)(s8)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2555,23 +2555,23 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 00c0 ffc0 chk2cmp2 b ADXWL      234fc:18
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t compare = (int32_t)REG_DA()[(word2 >> 12) & 15];
+		u32 word2 = OPER_I_16();
+		s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
 		if(!BIT_F(word2))
 			compare &= 0xff;
 
-		uint32_t ea = M68KMAKE_GET_EA_AY_8;
-		int32_t lower_bound = m68ki_read_8(ea);
-		int32_t upper_bound = m68ki_read_8(ea + 1);
+		u32 ea = M68KMAKE_GET_EA_AY_8;
+		s32 lower_bound = m68ki_read_8(ea);
+		s32 upper_bound = m68ki_read_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x80)
 		{
-			lower_bound = (int32_t)(int8_t)lower_bound;
-			upper_bound = (int32_t)(int8_t)upper_bound;
+			lower_bound = (s32)(s8)lower_bound;
+			upper_bound = (s32)(s8)upper_bound;
 
 			if(!BIT_F(word2))
-				compare = (int32_t)(int8_t)compare;
+				compare = (s32)(s8)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2587,23 +2587,23 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 02fa ffff chk2cmp2 w .          234fc:23
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t compare = (int32_t)REG_DA()[(word2 >> 12) & 15];
+		u32 word2 = OPER_I_16();
+		s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
 		if(!BIT_F(word2))
 			compare &= 0xffff;
 
-		uint32_t ea = EA_PCDI_16();
-		int32_t lower_bound = m68ki_read_pcrel_16(ea);
-		int32_t upper_bound = m68ki_read_pcrel_16(ea + 2);
+		u32 ea = EA_PCDI_16();
+		s32 lower_bound = m68ki_read_pcrel_16(ea);
+		s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x8000)
 		{
-			lower_bound = (int32_t)(int16_t)lower_bound;
-			upper_bound = (int32_t)(int16_t)upper_bound;
+			lower_bound = (s32)(s16)lower_bound;
+			upper_bound = (s32)(s16)upper_bound;
 
 			if(!BIT_F(word2))
-				compare = (int32_t)(int16_t)compare;
+				compare = (s32)(s16)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2619,23 +2619,23 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 02fb ffff chk2cmp2 w .          234fc:23
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t compare = (int32_t)REG_DA()[(word2 >> 12) & 15];
+		u32 word2 = OPER_I_16();
+		s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
 		if(!BIT_F(word2))
 			compare &= 0xffff;
 
-		uint32_t ea = EA_PCIX_16();
-		int32_t lower_bound = m68ki_read_pcrel_16(ea);
-		int32_t upper_bound = m68ki_read_pcrel_16(ea + 2);
+		u32 ea = EA_PCIX_16();
+		s32 lower_bound = m68ki_read_pcrel_16(ea);
+		s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x8000)
 		{
-			lower_bound = (int32_t)(int16_t)lower_bound;
-			upper_bound = (int32_t)(int16_t)upper_bound;
+			lower_bound = (s32)(s16)lower_bound;
+			upper_bound = (s32)(s16)upper_bound;
 
 			if(!BIT_F(word2))
-				compare = (int32_t)(int16_t)compare;
+				compare = (s32)(s16)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2651,23 +2651,23 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 02c0 ffc0 chk2cmp2 w ADXWL      234fc:18
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int32_t compare = (int32_t)REG_DA()[(word2 >> 12) & 15];
+		u32 word2 = OPER_I_16();
+		s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
 		if(!BIT_F(word2))
 			compare &= 0xffff;
 
-		uint32_t ea = M68KMAKE_GET_EA_AY_16;
-		int32_t lower_bound = m68ki_read_16(ea);
-		int32_t upper_bound = m68ki_read_16(ea + 2);
+		u32 ea = M68KMAKE_GET_EA_AY_16;
+		s32 lower_bound = m68ki_read_16(ea);
+		s32 upper_bound = m68ki_read_16(ea + 2);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x8000)
 		{
-			lower_bound = (int32_t)(int16_t)lower_bound;
-			upper_bound = (int32_t)(int16_t)upper_bound;
+			lower_bound = (s32)(s16)lower_bound;
+			upper_bound = (s32)(s16)upper_bound;
 
 			if(!BIT_F(word2))
-				compare = (int32_t)(int16_t)compare;
+				compare = (s32)(s16)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2683,18 +2683,18 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 04fa ffff chk2cmp2 l .          234fc:23
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int64_t compare = REG_DA()[(word2 >> 12) & 15];
-		uint32_t ea = EA_PCDI_32();
-		int64_t lower_bound = m68ki_read_pcrel_32(ea);
-		int64_t upper_bound = m68ki_read_pcrel_32(ea + 4);
+		u32 word2 = OPER_I_16();
+		s64 compare = REG_DA()[(word2 >> 12) & 15];
+		u32 ea = EA_PCDI_32();
+		s64 lower_bound = m68ki_read_pcrel_32(ea);
+		s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x80000000)
 		{
-			lower_bound = (int64_t)(int32_t)lower_bound;
-			upper_bound = (int64_t)(int32_t)upper_bound;
-			compare = (int64_t)(int32_t)compare;
+			lower_bound = (s64)(s32)lower_bound;
+			upper_bound = (s64)(s32)upper_bound;
+			compare = (s64)(s32)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2710,18 +2710,18 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 04fb ffff chk2cmp2 l .          234fc:23
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int64_t compare = REG_DA()[(word2 >> 12) & 15];
-		uint32_t ea = EA_PCIX_32();
-		int64_t lower_bound = m68ki_read_pcrel_32(ea);
-		int64_t upper_bound = m68ki_read_pcrel_32(ea + 4);
+		u32 word2 = OPER_I_16();
+		s64 compare = REG_DA()[(word2 >> 12) & 15];
+		u32 ea = EA_PCIX_32();
+		s64 lower_bound = m68ki_read_pcrel_32(ea);
+		s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x80000000)
 		{
-			lower_bound = (int64_t)(int32_t)lower_bound;
-			upper_bound = (int64_t)(int32_t)upper_bound;
-			compare = (int64_t)(int32_t)compare;
+			lower_bound = (s64)(s32)lower_bound;
+			upper_bound = (s64)(s32)upper_bound;
+			compare = (s64)(s32)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2737,18 +2737,18 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 04c0 ffc0 chk2cmp2 l ADXWL      234fc:18
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		int64_t compare = REG_DA()[(word2 >> 12) & 15];
-		uint32_t ea = M68KMAKE_GET_EA_AY_32;
-		int64_t lower_bound = m68ki_read_32(ea);
-		int64_t upper_bound = m68ki_read_32(ea + 4);
+		u32 word2 = OPER_I_16();
+		s64 compare = REG_DA()[(word2 >> 12) & 15];
+		u32 ea = M68KMAKE_GET_EA_AY_32;
+		s64 lower_bound = m68ki_read_32(ea);
+		s64 upper_bound = m68ki_read_32(ea + 4);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
 		if (lower_bound & 0x80000000)
 		{
-			lower_bound = (int64_t)(int32_t)lower_bound;
-			upper_bound = (int64_t)(int32_t)upper_bound;
-			compare = (int64_t)(int32_t)compare;
+			lower_bound = (s64)(s32)lower_bound;
+			upper_bound = (s64)(s32)upper_bound;
+			compare = (s64)(s32)compare;
 		}
 
 		m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
@@ -2771,7 +2771,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 4200 ffc0 clr      b A+-DXWL    0:8 1234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
 
 	if(CPU_TYPE_IS_000())
 	{
@@ -2796,7 +2796,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 4240 ffc0 clr      w A+-DXWL    0:8 1234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
 
 	if(CPU_TYPE_IS_000())
 	{
@@ -2821,7 +2821,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 4280 ffc0 clr      l A+-DXWL    0:12 1:6 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
 
 	if(CPU_TYPE_IS_000())
 	{
@@ -2837,9 +2837,9 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 
 
 b000 f1f8 cmp      b .          01:4 234fc:2
-	uint32_t src = MASK_OUT_ABOVE_8(DY());
-	uint32_t dst = MASK_OUT_ABOVE_8(DX());
-	uint32_t res = dst - src;
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(DX());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -2848,9 +2848,9 @@ b000 f1f8 cmp      b .          01:4 234fc:2
 
 
 b000 f1c0 cmp      b A+-DXWLdxI 01:4 234fc:2
-	uint32_t src = M68KMAKE_GET_OPER_AY_8;
-	uint32_t dst = MASK_OUT_ABOVE_8(DX());
-	uint32_t res = dst - src;
+	u32 src = M68KMAKE_GET_OPER_AY_8;
+	u32 dst = MASK_OUT_ABOVE_8(DX());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -2859,9 +2859,9 @@ b000 f1c0 cmp      b A+-DXWLdxI 01:4 234fc:2
 
 
 b040 f1f8 cmp      w .          01:4 234fc:2
-	uint32_t src = MASK_OUT_ABOVE_16(DY());
-	uint32_t dst = MASK_OUT_ABOVE_16(DX());
-	uint32_t res = dst - src;
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(DX());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -2870,9 +2870,9 @@ b040 f1f8 cmp      w .          01:4 234fc:2
 
 
 b048 f1f8 cmp      w .          01:4 234fc:2
-	uint32_t src = MASK_OUT_ABOVE_16(AY());
-	uint32_t dst = MASK_OUT_ABOVE_16(DX());
-	uint32_t res = dst - src;
+	u32 src = MASK_OUT_ABOVE_16(AY());
+	u32 dst = MASK_OUT_ABOVE_16(DX());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -2881,9 +2881,9 @@ b048 f1f8 cmp      w .          01:4 234fc:2
 
 
 b040 f1c0 cmp      w A+-DXWLdxI 01:4 234fc:2
-	uint32_t src = M68KMAKE_GET_OPER_AY_16;
-	uint32_t dst = MASK_OUT_ABOVE_16(DX());
-	uint32_t res = dst - src;
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+	u32 dst = MASK_OUT_ABOVE_16(DX());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -2892,9 +2892,9 @@ b040 f1c0 cmp      w A+-DXWLdxI 01:4 234fc:2
 
 
 b080 f1f8 cmp      l .          01:6 234fc:2
-	uint32_t src = DY();
-	uint32_t dst = DX();
-	uint32_t res = dst - src;
+	u32 src = DY();
+	u32 dst = DX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2903,9 +2903,9 @@ b080 f1f8 cmp      l .          01:6 234fc:2
 
 
 b088 f1f8 cmp      l .          01:6 234fc:2
-	uint32_t src = AY();
-	uint32_t dst = DX();
-	uint32_t res = dst - src;
+	u32 src = AY();
+	u32 dst = DX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2914,9 +2914,9 @@ b088 f1f8 cmp      l .          01:6 234fc:2
 
 
 b080 f1c0 cmp      l A+-DXWLdxI 01:6 234fc:2
-	uint32_t src = M68KMAKE_GET_OPER_AY_32;
-	uint32_t dst = DX();
-	uint32_t res = dst - src;
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = DX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2925,9 +2925,9 @@ b080 f1c0 cmp      l A+-DXWLdxI 01:6 234fc:2
 
 
 b0c0 f1f8 cmpa     w .          01:6 234fc:4
-	uint32_t src = MAKE_INT_16(DY());
-	uint32_t dst = AX();
-	uint32_t res = dst - src;
+	u32 src = MAKE_INT_16(DY());
+	u32 dst = AX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2936,9 +2936,9 @@ b0c0 f1f8 cmpa     w .          01:6 234fc:4
 
 
 b0c8 f1f8 cmpa     w .          01:6 234fc:4
-	uint32_t src = MAKE_INT_16(AY());
-	uint32_t dst = AX();
-	uint32_t res = dst - src;
+	u32 src = MAKE_INT_16(AY());
+	u32 dst = AX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2947,9 +2947,9 @@ b0c8 f1f8 cmpa     w .          01:6 234fc:4
 
 
 b0c0 f1c0 cmpa     w A+-DXWLdxI 01:6 234fc:4
-	uint32_t src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
-	uint32_t dst = AX();
-	uint32_t res = dst - src;
+	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	u32 dst = AX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2958,9 +2958,9 @@ b0c0 f1c0 cmpa     w A+-DXWLdxI 01:6 234fc:4
 
 
 b1c0 f1f8 cmpa     l .          01:6 234fc:4
-	uint32_t src = DY();
-	uint32_t dst = AX();
-	uint32_t res = dst - src;
+	u32 src = DY();
+	u32 dst = AX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2969,9 +2969,9 @@ b1c0 f1f8 cmpa     l .          01:6 234fc:4
 
 
 b1c8 f1f8 cmpa     l .          01:6 234fc:4
-	uint32_t src = AY();
-	uint32_t dst = AX();
-	uint32_t res = dst - src;
+	u32 src = AY();
+	u32 dst = AX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2980,9 +2980,9 @@ b1c8 f1f8 cmpa     l .          01:6 234fc:4
 
 
 b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
-	uint32_t src = M68KMAKE_GET_OPER_AY_32;
-	uint32_t dst = AX();
-	uint32_t res = dst - src;
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = AX();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -2991,9 +2991,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 0c00 fff8 cmpi     b .          01:8 234fc:2
-	uint32_t src = OPER_I_8();
-	uint32_t dst = MASK_OUT_ABOVE_8(DY());
-	uint32_t res = dst - src;
+	u32 src = OPER_I_8();
+	u32 dst = MASK_OUT_ABOVE_8(DY());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3002,9 +3002,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 0c00 ffc0 cmpi     b A+-DXWL    01:8 234fc:2
-	uint32_t src = OPER_I_8();
-	uint32_t dst = M68KMAKE_GET_OPER_AY_8;
-	uint32_t res = dst - src;
+	u32 src = OPER_I_8();
+	u32 dst = M68KMAKE_GET_OPER_AY_8;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3015,9 +3015,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 0c3a ffff cmpi     b .          234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_I_8();
-		uint32_t dst = OPER_PCDI_8();
-		uint32_t res = dst - src;
+		u32 src = OPER_I_8();
+		u32 dst = OPER_PCDI_8();
+		u32 res = dst - src;
 
 		m_n_flag = NFLAG_8(res);
 		m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3031,9 +3031,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 0c3b ffff cmpi     b .          234fc:9
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_I_8();
-		uint32_t dst = OPER_PCIX_8();
-		uint32_t res = dst - src;
+		u32 src = OPER_I_8();
+		u32 dst = OPER_PCIX_8();
+		u32 res = dst - src;
 
 		m_n_flag = NFLAG_8(res);
 		m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3045,9 +3045,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 0c40 fff8 cmpi     w .          01:8 234fc:2
-	uint32_t src = OPER_I_16();
-	uint32_t dst = MASK_OUT_ABOVE_16(DY());
-	uint32_t res = dst - src;
+	u32 src = OPER_I_16();
+	u32 dst = MASK_OUT_ABOVE_16(DY());
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -3056,9 +3056,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 0c40 ffc0 cmpi     w A+-DXWL    01:8 234fc:2
-	uint32_t src = OPER_I_16();
-	uint32_t dst = M68KMAKE_GET_OPER_AY_16;
-	uint32_t res = dst - src;
+	u32 src = OPER_I_16();
+	u32 dst = M68KMAKE_GET_OPER_AY_16;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -3069,9 +3069,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 0c7a ffff cmpi     w .          234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_I_16();
-		uint32_t dst = OPER_PCDI_16();
-		uint32_t res = dst - src;
+		u32 src = OPER_I_16();
+		u32 dst = OPER_PCDI_16();
+		u32 res = dst - src;
 
 		m_n_flag = NFLAG_16(res);
 		m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -3085,9 +3085,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 0c7b ffff cmpi     w .          234fc:9
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_I_16();
-		uint32_t dst = OPER_PCIX_16();
-		uint32_t res = dst - src;
+		u32 src = OPER_I_16();
+		u32 dst = OPER_PCIX_16();
+		u32 res = dst - src;
 
 		m_n_flag = NFLAG_16(res);
 		m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -3099,9 +3099,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 0c80 fff8 cmpi     l .          0:14 1:12 234fc:2
-	uint32_t src = OPER_I_32();
-	uint32_t dst = DY();
-	uint32_t res = dst - src;
+	u32 src = OPER_I_32();
+	u32 dst = DY();
+	u32 res = dst - src;
 
 	if (!m_cmpild_instr_callback.isnull())
 		(m_cmpild_instr_callback)(*m_program, m_ir & 7, src, 0xffffffff);
@@ -3113,9 +3113,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 0c80 ffc0 cmpi     l A+-DXWL    01:12 234fc:2
-	uint32_t src = OPER_I_32();
-	uint32_t dst = M68KMAKE_GET_OPER_AY_32;
-	uint32_t res = dst - src;
+	u32 src = OPER_I_32();
+	u32 dst = M68KMAKE_GET_OPER_AY_32;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -3126,9 +3126,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 0cba ffff cmpi     l .          234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_I_32();
-		uint32_t dst = OPER_PCDI_32();
-		uint32_t res = dst - src;
+		u32 src = OPER_I_32();
+		u32 dst = OPER_PCDI_32();
+		u32 res = dst - src;
 
 		m_n_flag = NFLAG_32(res);
 		m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -3142,9 +3142,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 0cbb ffff cmpi     l .          234fc:9
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_I_32();
-		uint32_t dst = OPER_PCIX_32();
-		uint32_t res = dst - src;
+		u32 src = OPER_I_32();
+		u32 dst = OPER_PCIX_32();
+		u32 res = dst - src;
 
 		m_n_flag = NFLAG_32(res);
 		m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -3156,9 +3156,9 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
 
 
 bf08 fff8 cmpm     b .          01:12 234fc:9
-	uint32_t src = OPER_AY_PI_8();
-	uint32_t dst = OPER_A7_PI_8();
-	uint32_t res = dst - src;
+	u32 src = OPER_AY_PI_8();
+	u32 dst = OPER_A7_PI_8();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3167,9 +3167,9 @@ bf08 fff8 cmpm     b .          01:12 234fc:9
 
 
 b10f f1ff cmpm     b .          01:12 234fc:9
-	uint32_t src = OPER_A7_PI_8();
-	uint32_t dst = OPER_AX_PI_8();
-	uint32_t res = dst - src;
+	u32 src = OPER_A7_PI_8();
+	u32 dst = OPER_AX_PI_8();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3178,9 +3178,9 @@ b10f f1ff cmpm     b .          01:12 234fc:9
 
 
 bf0f ffff cmpm     b .          01:12 234fc:9
-	uint32_t src = OPER_A7_PI_8();
-	uint32_t dst = OPER_A7_PI_8();
-	uint32_t res = dst - src;
+	u32 src = OPER_A7_PI_8();
+	u32 dst = OPER_A7_PI_8();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3189,9 +3189,9 @@ bf0f ffff cmpm     b .          01:12 234fc:9
 
 
 b108 f1f8 cmpm     b .          01:12 234fc:9
-	uint32_t src = OPER_AY_PI_8();
-	uint32_t dst = OPER_AX_PI_8();
-	uint32_t res = dst - src;
+	u32 src = OPER_AY_PI_8();
+	u32 dst = OPER_AX_PI_8();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -3200,9 +3200,9 @@ b108 f1f8 cmpm     b .          01:12 234fc:9
 
 
 b148 f1f8 cmpm     w .          01:12 234fc:9
-	uint32_t src = OPER_AY_PI_16();
-	uint32_t dst = OPER_AX_PI_16();
-	uint32_t res = dst - src;
+	u32 src = OPER_AY_PI_16();
+	u32 dst = OPER_AX_PI_16();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -3211,9 +3211,9 @@ b148 f1f8 cmpm     w .          01:12 234fc:9
 
 
 b188 f1f8 cmpm     l .          01:20 234fc:9
-	uint32_t src = OPER_AY_PI_32();
-	uint32_t dst = OPER_AX_PI_32();
-	uint32_t res = dst - src;
+	u32 src = OPER_AY_PI_32();
+	u32 dst = OPER_AX_PI_32();
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -3285,13 +3285,13 @@ f278 fff8 ftrapcc  l .          23:4
 
 
 51c8 fff8 dbf      w .          01:12 2:6 34fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t res = MASK_OUT_ABOVE_16(*r_dst - 1);
+	u32* r_dst = &DY();
+	u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 	if(res != 0xffff)
 	{
-		uint32_t offset = OPER_I_16();
+		u32 offset = OPER_I_16();
 		m_pc -= 2;
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_16(offset);
@@ -3305,13 +3305,13 @@ f278 fff8 ftrapcc  l .          23:4
 50c8 f0f8 dbcc     w .          01:12 234fc:6
 	if(M68KMAKE_NOT_CC)
 	{
-		uint32_t* r_dst = &DY();
-		uint32_t res = MASK_OUT_ABOVE_16(*r_dst - 1);
+		u32* r_dst = &DY();
+		u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
 		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 		if(res != 0xffff)
 		{
-			uint32_t offset = OPER_I_16();
+			u32 offset = OPER_I_16();
 			m_pc -= 2;
 			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 			m68ki_branch_16(offset);
@@ -3326,15 +3326,15 @@ f278 fff8 ftrapcc  l .          23:4
 
 
 81c0 f1f8 divs     w .          0:158 1:122 234fc:56
-	uint32_t* r_dst = &DX();
-	int32_t src = MAKE_INT_16(DY());
-	int32_t quotient;
-	int32_t remainder;
+	u32* r_dst = &DX();
+	s32 src = MAKE_INT_16(DY());
+	s32 quotient;
+	s32 remainder;
 
 	if(src != 0)
 	{
 		m_c_flag = CFLAG_CLEAR;
-		if((uint32_t)*r_dst == 0x80000000 && src == -1)
+		if((u32)*r_dst == 0x80000000 && src == -1)
 		{
 			m_not_z_flag = 0;
 			m_n_flag = NFLAG_CLEAR;
@@ -3361,15 +3361,15 @@ f278 fff8 ftrapcc  l .          23:4
 
 
 81c0 f1c0 divs     w A+-DXWLdxI 0:158 1:122 234fc:56
-	uint32_t* r_dst = &DX();
-	int32_t src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
-	int32_t quotient;
-	int32_t remainder;
+	u32* r_dst = &DX();
+	s32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	s32 quotient;
+	s32 remainder;
 
 	if(src != 0)
 	{
 		m_c_flag = CFLAG_CLEAR;
-		if((uint32_t)*r_dst == 0x80000000 && src == -1)
+		if((u32)*r_dst == 0x80000000 && src == -1)
 		{
 			m_not_z_flag = 0;
 			m_n_flag = NFLAG_CLEAR;
@@ -3396,14 +3396,14 @@ f278 fff8 ftrapcc  l .          23:4
 
 
 80c0 f1f8 divu     w .          0:140 1:108 234fc:44
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(DY());
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
 
 	if(src != 0)
 	{
 		m_c_flag = CFLAG_CLEAR;
-		uint32_t quotient = *r_dst / src;
-		uint32_t remainder = *r_dst % src;
+		u32 quotient = *r_dst / src;
+		u32 remainder = *r_dst % src;
 
 		if(quotient < 0x10000)
 		{
@@ -3420,14 +3420,14 @@ f278 fff8 ftrapcc  l .          23:4
 
 
 80c0 f1c0 divu     w A+-DXWLdxI 0:140 1:108 234fc:44
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_16;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_16;
 
 	if(src != 0)
 	{
 		m_c_flag = CFLAG_CLEAR;
-		uint32_t quotient = *r_dst / src;
-		uint32_t remainder = *r_dst % src;
+		u32 quotient = *r_dst / src;
+		u32 remainder = *r_dst % src;
 
 		if(quotient < 0x10000)
 		{
@@ -3446,11 +3446,11 @@ f278 fff8 ftrapcc  l .          23:4
 4c40 fff8 divl     l .          234fc:84
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint64_t divisor   = DY();
-		uint64_t dividend  = 0;
-		uint64_t quotient  = 0;
-		uint64_t remainder = 0;
+		u32 word2 = OPER_I_16();
+		u64 divisor   = DY();
+		u64 dividend  = 0;
+		u64 quotient  = 0;
+		u64 remainder = 0;
 
 		if(divisor != 0)
 		{
@@ -3462,9 +3462,9 @@ f278 fff8 ftrapcc  l .          23:4
 
 				if(BIT_B(word2))       /* signed */
 				{
-					quotient  = (uint64_t)((int64_t)dividend / (int64_t)((int32_t)divisor));
-					remainder = (uint64_t)((int64_t)dividend % (int64_t)((int32_t)divisor));
-					if((int64_t)quotient != (int64_t)((int32_t)quotient))
+					quotient  = (u64)((s64)dividend / (s64)((s32)divisor));
+					remainder = (u64)((s64)dividend % (s64)((s32)divisor));
+					if((s64)quotient != (s64)((s32)quotient))
 					{
 						m_v_flag = VFLAG_SET;
 						return;
@@ -3486,8 +3486,8 @@ f278 fff8 ftrapcc  l .          23:4
 				dividend = REG_D()[(word2 >> 12) & 7];
 				if(BIT_B(word2))       /* signed */
 				{
-					quotient  = (uint64_t)((int64_t)((int32_t)dividend) / (int64_t)((int32_t)divisor));
-					remainder = (uint64_t)((int64_t)((int32_t)dividend) % (int64_t)((int32_t)divisor));
+					quotient  = (u64)((s64)((s32)dividend) / (s64)((s32)divisor));
+					remainder = (u64)((s64)((s32)dividend) % (s64)((s32)divisor));
 				}
 				else                    /* unsigned */
 				{
@@ -3514,11 +3514,11 @@ f278 fff8 ftrapcc  l .          23:4
 4c40 ffc0 divl     l A+-DXWLdxI 234fc:84
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint64_t divisor = M68KMAKE_GET_OPER_AY_32;
-		uint64_t dividend  = 0;
-		uint64_t quotient  = 0;
-		uint64_t remainder = 0;
+		u32 word2 = OPER_I_16();
+		u64 divisor = M68KMAKE_GET_OPER_AY_32;
+		u64 dividend  = 0;
+		u64 quotient  = 0;
+		u64 remainder = 0;
 
 		if(divisor != 0)
 		{
@@ -3530,9 +3530,9 @@ f278 fff8 ftrapcc  l .          23:4
 
 				if(BIT_B(word2))       /* signed */
 				{
-					quotient  = (uint64_t)((int64_t)dividend / (int64_t)((int32_t)divisor));
-					remainder = (uint64_t)((int64_t)dividend % (int64_t)((int32_t)divisor));
-					if((int64_t)quotient != (int64_t)((int32_t)quotient))
+					quotient  = (u64)((s64)dividend / (s64)((s32)divisor));
+					remainder = (u64)((s64)dividend % (s64)((s32)divisor));
+					if((s64)quotient != (s64)((s32)quotient))
 					{
 						m_v_flag = VFLAG_SET;
 						return;
@@ -3554,8 +3554,8 @@ f278 fff8 ftrapcc  l .          23:4
 				dividend = REG_D()[(word2 >> 12) & 7];
 				if(BIT_B(word2))       /* signed */
 				{
-					quotient  = (uint64_t)((int64_t)((int32_t)dividend) / (int64_t)((int32_t)divisor));
-					remainder = (uint64_t)((int64_t)((int32_t)dividend) % (int64_t)((int32_t)divisor));
+					quotient  = (u64)((s64)((s32)dividend) / (s64)((s32)divisor));
+					remainder = (u64)((s64)((s32)dividend) % (s64)((s32)divisor));
 				}
 				else                    /* unsigned */
 				{
@@ -3580,7 +3580,7 @@ f278 fff8 ftrapcc  l .          23:4
 
 
 b100 f1f8 eor      b .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8(DY() ^= MASK_OUT_ABOVE_8(DX()));
+	u32 res = MASK_OUT_ABOVE_8(DY() ^= MASK_OUT_ABOVE_8(DX()));
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -3589,8 +3589,8 @@ b100 f1f8 eor      b .          01:4 234fc:2
 
 
 b100 f1c0 eor      b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = MASK_OUT_ABOVE_8(DX() ^ m68ki_read_8(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(DX() ^ m68ki_read_8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -3601,7 +3601,7 @@ b100 f1c0 eor      b A+-DXWL    01:8 234fc:4
 
 
 b140 f1f8 eor      w .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16(DY() ^= MASK_OUT_ABOVE_16(DX()));
+	u32 res = MASK_OUT_ABOVE_16(DY() ^= MASK_OUT_ABOVE_16(DX()));
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -3610,8 +3610,8 @@ b140 f1f8 eor      w .          01:4 234fc:2
 
 
 b140 f1c0 eor      w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = MASK_OUT_ABOVE_16(DX() ^ m68ki_read_16(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(DX() ^ m68ki_read_16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -3622,7 +3622,7 @@ b140 f1c0 eor      w A+-DXWL    01:8 234fc:4
 
 
 b180 f1f8 eor      l .          0:8 1:6 234fc:2
-	uint32_t res = DY() ^= DX();
+	u32 res = DY() ^= DX();
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -3631,8 +3631,8 @@ b180 f1f8 eor      l .          0:8 1:6 234fc:2
 
 
 b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = DX() ^ m68ki_read_32(ea);
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = DX() ^ m68ki_read_32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3643,7 +3643,7 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 0a00 fff8 eori     b .          01:8 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8(DY() ^= OPER_I_8());
+	u32 res = MASK_OUT_ABOVE_8(DY() ^= OPER_I_8());
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -3652,9 +3652,9 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 0a00 ffc0 eori     b A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_8();
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = src ^ m68ki_read_8(ea);
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = src ^ m68ki_read_8(ea);
 
 	m68ki_write_8(ea, res);
 
@@ -3665,7 +3665,7 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 0a40 fff8 eori     w .          01:8 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16(DY() ^= OPER_I_16());
+	u32 res = MASK_OUT_ABOVE_16(DY() ^= OPER_I_16());
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -3674,9 +3674,9 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 0a40 ffc0 eori     w A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = src ^ m68ki_read_16(ea);
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = src ^ m68ki_read_16(ea);
 
 	m68ki_write_16(ea, res);
 
@@ -3687,7 +3687,7 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 0a80 fff8 eori     l .          0:16 1:14 234fc:2
-	uint32_t res = DY() ^= OPER_I_32();
+	u32 res = DY() ^= OPER_I_32();
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -3696,9 +3696,9 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 0a80 ffc0 eori     l A+-DXWL    01:20 234fc:4
-	uint32_t src = OPER_I_32();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = src ^ m68ki_read_32(ea);
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = src ^ m68ki_read_32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -3715,7 +3715,7 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 0a7c ffff eori     w .          0:20p 1:16p 234fc:12p
 	if(m_s_flag)
 	{
-		uint32_t src = OPER_I_16();
+		u32 src = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr(m68ki_get_sr() ^ src);
 		return;
@@ -3724,31 +3724,31 @@ b180 f1c0 eor      l A+-DXWL    01:12 234fc:4
 
 
 c140 f1f8 exg      l .          01:6 234fc:2
-	uint32_t* reg_a = &DX();
-	uint32_t* reg_b = &DY();
-	uint32_t tmp = *reg_a;
+	u32* reg_a = &DX();
+	u32* reg_b = &DY();
+	u32 tmp = *reg_a;
 	*reg_a = *reg_b;
 	*reg_b = tmp;
 
 
 c148 f1f8 exg      l .          01:6 234fc:2
-	uint32_t* reg_a = &AX();
-	uint32_t* reg_b = &AY();
-	uint32_t tmp = *reg_a;
+	u32* reg_a = &AX();
+	u32* reg_b = &AY();
+	u32 tmp = *reg_a;
 	*reg_a = *reg_b;
 	*reg_b = tmp;
 
 
 c188 f1f8 exg      l .          01:6 234fc:2
-	uint32_t* reg_a = &DX();
-	uint32_t* reg_b = &AY();
-	uint32_t tmp = *reg_a;
+	u32* reg_a = &DX();
+	u32* reg_b = &AY();
+	u32 tmp = *reg_a;
 	*reg_a = *reg_b;
 	*reg_b = tmp;
 
 
 4880 fff8 ext      w .          01234fc:4
-	uint32_t* r_dst = &DY();
+	u32* r_dst = &DY();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | MASK_OUT_ABOVE_8(*r_dst) | (GET_MSB_8(*r_dst) ? 0xff00 : 0);
 
@@ -3759,7 +3759,7 @@ c188 f1f8 exg      l .          01:6 234fc:2
 
 
 48c0 fff8 ext      l .          01234fc:4
-	uint32_t* r_dst = &DY();
+	u32* r_dst = &DY();
 
 	*r_dst = MASK_OUT_ABOVE_16(*r_dst) | (GET_MSB_16(*r_dst) ? 0xffff0000 : 0);
 
@@ -3772,7 +3772,7 @@ c188 f1f8 exg      l .          01:6 234fc:2
 49c0 fff8 extb     l .          234fc:4
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t* r_dst = &DY();
+		u32* r_dst = &DY();
 
 		*r_dst = MASK_OUT_ABOVE_8(*r_dst) | (GET_MSB_8(*r_dst) ? 0xffffff00 : 0);
 
@@ -3797,7 +3797,7 @@ c188 f1f8 exg      l .          01:6 234fc:2
 
 
 4e80 ffc0 jsr      l ADXWLdx    01:12 234fc:0
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32(m_pc);
 	m68ki_jump(ea);
@@ -3814,7 +3814,7 @@ c188 f1f8 exg      l .          01:6 234fc:2
 
 
 4e50 fff8 link     w .          01:16 234fc:5
-	uint32_t* r_dst = &AY();
+	u32* r_dst = &AY();
 
 	m68ki_push_32(*r_dst);
 	*r_dst = REG_A()[7];
@@ -3835,7 +3835,7 @@ c188 f1f8 exg      l .          01:6 234fc:2
 4808 fff8 link     l .          234fc:6
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t* r_dst = &AY();
+		u32* r_dst = &AY();
 
 		m68ki_push_32(*r_dst);
 		*r_dst = REG_A()[7];
@@ -3846,10 +3846,10 @@ c188 f1f8 exg      l .          01:6 234fc:2
 
 
 e008 f1f8 lsr      b .          01:6 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -3863,10 +3863,10 @@ e008 f1f8 lsr      b .          01:6 234fc:4
 
 
 e048 f1f8 lsr      w .          01:6 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -3880,10 +3880,10 @@ e048 f1f8 lsr      w .          01:6 234fc:4
 
 
 e088 f1f8 lsr      l .          01:8 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = *r_dst;
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -3897,10 +3897,10 @@ e088 f1f8 lsr      l .          01:8 234fc:4
 
 
 e028 f1f8 lsr      b .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 	{
@@ -3932,10 +3932,10 @@ e028 f1f8 lsr      b .          01234fc:6
 
 
 e068 f1f8 lsr      w .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
 
 	if(shift != 0)
 	{
@@ -3967,10 +3967,10 @@ e068 f1f8 lsr      w .          01234fc:6
 
 
 e0a8 f1f8 lsr      l .          01:8 234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = *r_dst;
-	uint32_t res = src >> shift;
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
 
 	if(shift != 0)
 	{
@@ -4001,9 +4001,9 @@ e0a8 f1f8 lsr      l .          01:8 234fc:6
 
 
 e2c0 ffc0 lsr      w A+-DXWL    01:8 234fc:5
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = src >> 1;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = src >> 1;
 
 	m68ki_write_16(ea, res);
 
@@ -4014,10 +4014,10 @@ e2c0 ffc0 lsr      w A+-DXWL    01:8 234fc:5
 
 
 e108 f1f8 lsl      b .          01:6 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_8(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -4031,10 +4031,10 @@ e108 f1f8 lsl      b .          01:6 234fc:4
 
 
 e148 f1f8 lsl      w .          01:6 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_16(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -4048,10 +4048,10 @@ e148 f1f8 lsl      w .          01:6 234fc:4
 
 
 e188 f1f8 lsl      l .          01:8 234fc:4
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = *r_dst;
-	uint32_t res = MASK_OUT_ABOVE_32(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -4065,10 +4065,10 @@ e188 f1f8 lsl      l .          01:8 234fc:4
 
 
 e128 f1f8 lsl      b .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_8(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
 	{
@@ -4100,10 +4100,10 @@ e128 f1f8 lsl      b .          01234fc:6
 
 
 e168 f1f8 lsl      w .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_16(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
 	{
@@ -4135,10 +4135,10 @@ e168 f1f8 lsl      w .          01234fc:6
 
 
 e1a8 f1f8 lsl      l .          01:8 234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t shift = DX() & 0x3f;
-	uint32_t src = *r_dst;
-	uint32_t res = MASK_OUT_ABOVE_32(src << shift);
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
 	{
@@ -4169,9 +4169,9 @@ e1a8 f1f8 lsl      l .          01:8 234fc:6
 
 
 e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = MASK_OUT_ABOVE_16(src << 1);
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = MASK_OUT_ABOVE_16(src << 1);
 
 	m68ki_write_16(ea, res);
 
@@ -4182,8 +4182,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1000 f1f8 move     b .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -4194,8 +4194,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1000 f1c0 move     b A+-DXWLdxI 01:4 234fc:2
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t* r_dst = &DX();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -4206,8 +4206,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1080 f1f8 move     b .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AX_AI_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_AI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4218,8 +4218,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1080 f1c0 move     b A+-DXWLdxI 01:8 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AX_AI_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_AI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4230,8 +4230,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1ec0 fff8 move     b .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_A7_PI_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_A7_PI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4242,8 +4242,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 10c0 f1f8 move     b .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AX_PI_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_PI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4254,8 +4254,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1ec0 ffc0 move     b A+-DXWLdxI 01:8 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_A7_PI_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_A7_PI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4266,8 +4266,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 10c0 f1c0 move     b A+-DXWLdxI 01:8 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AX_PI_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_PI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4278,8 +4278,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1f00 fff8 move     b .          01:8 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_A7_PD_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_A7_PD_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4290,8 +4290,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1100 f1f8 move     b .          01:8 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AX_PD_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_PD_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4302,8 +4302,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1f00 ffc0 move     b A+-DXWLdxI 01:8 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_A7_PD_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_A7_PD_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4314,8 +4314,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1100 f1c0 move     b A+-DXWLdxI 01:8 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AX_PD_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_PD_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4326,8 +4326,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1140 f1f8 move     b .          01:12 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AX_DI_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_DI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4338,8 +4338,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1140 f1c0 move     b A+-DXWLdxI 01:12 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AX_DI_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_DI_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4350,8 +4350,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1180 f1f8 move     b .          01:14 234fc:7
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AX_IX_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_IX_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4362,8 +4362,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 1180 f1c0 move     b A+-DXWLdxI 01:14 234fc:7
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AX_IX_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_IX_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4374,8 +4374,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 11c0 fff8 move     b .          01:12 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AW_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AW_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4386,8 +4386,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 11c0 ffc0 move     b A+-DXWLdxI 01:12 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AW_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AW_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4398,8 +4398,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 13c0 fff8 move     b .          01:16 234fc:6
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
-	uint32_t ea = EA_AL_8();
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AL_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4410,8 +4410,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 13c0 ffc0 move     b A+-DXWLdxI 01:16 234fc:6
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
-	uint32_t ea = EA_AL_8();
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AL_8();
 
 	m68ki_write_8(ea, res);
 
@@ -4422,8 +4422,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3000 f1f8 move     w .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -4434,8 +4434,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3008 f1f8 move     w .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -4446,8 +4446,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3000 f1c0 move     w A+-DXWLdxI 01:4 234fc:2
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t* r_dst = &DX();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -4458,8 +4458,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3080 f1f8 move     w .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AX_AI_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_AI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4470,8 +4470,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3088 f1f8 move     w .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AX_AI_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_AI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4482,8 +4482,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3080 f1c0 move     w A+-DXWLdxI 01:8 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AX_AI_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_AI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4494,8 +4494,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 30c0 f1f8 move     w .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AX_PI_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_PI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4506,8 +4506,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 30c8 f1f8 move     w .          01:8 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AX_PI_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_PI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4518,8 +4518,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 30c0 f1c0 move     w A+-DXWLdxI 01:8 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AX_PI_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_PI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4530,8 +4530,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3100 f1f8 move     w .          01:8 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AX_PD_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_PD_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4542,8 +4542,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3108 f1f8 move     w .          01:8 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AX_PD_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_PD_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4554,8 +4554,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3100 f1c0 move     w A+-DXWLdxI 01:8 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AX_PD_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_PD_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4566,8 +4566,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3140 f1f8 move     w .          01:12 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AX_DI_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_DI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4578,8 +4578,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3148 f1f8 move     w .          01:12 234fc:5
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AX_DI_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_DI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4590,8 +4590,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3140 f1c0 move     w A+-DXWLdxI 01:12 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AX_DI_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_DI_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4602,8 +4602,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3180 f1f8 move     w .          01:14 234fc:7
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AX_IX_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_IX_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4614,8 +4614,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3188 f1f8 move     w .          01:14 234fc:7
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AX_IX_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_IX_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4626,8 +4626,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 3180 f1c0 move     w A+-DXWLdxI 01:14 234fc:7
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AX_IX_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_IX_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4638,8 +4638,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 31c0 fff8 move     w .          01:12 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AW_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AW_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4650,8 +4650,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 31c8 fff8 move     w .          01:12 234fc:4
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AW_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AW_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4662,8 +4662,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 31c0 ffc0 move     w A+-DXWLdxI 01:12 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AW_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AW_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4674,8 +4674,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 33c0 fff8 move     w .          01:16 234fc:6
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
-	uint32_t ea = EA_AL_16();
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AL_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4686,8 +4686,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 33c8 fff8 move     w .          01:16 234fc:6
-	uint32_t res = MASK_OUT_ABOVE_16(AY());
-	uint32_t ea = EA_AL_16();
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AL_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4698,8 +4698,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 33c0 ffc0 move     w A+-DXWLdxI 01:16 234fc:6
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
-	uint32_t ea = EA_AL_16();
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AL_16();
 
 	m68ki_write_16(ea, res);
 
@@ -4710,8 +4710,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2000 f1f8 move     l .          01:4 234fc:2
-	uint32_t res = DY();
-	uint32_t* r_dst = &DX();
+	u32 res = DY();
+	u32* r_dst = &DX();
 
 	*r_dst = res;
 
@@ -4722,8 +4722,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2008 f1f8 move     l .          01:4 234fc:2
-	uint32_t res = AY();
-	uint32_t* r_dst = &DX();
+	u32 res = AY();
+	u32* r_dst = &DX();
 
 	*r_dst = res;
 
@@ -4734,8 +4734,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2000 f1c0 move     l A+-DXWLdxI 01:4 234fc:2
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t* r_dst = &DX();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32* r_dst = &DX();
 
 	*r_dst = res;
 
@@ -4746,8 +4746,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2080 f1f8 move     l .          01:12 234fc:4
-	uint32_t res = DY();
-	uint32_t ea = EA_AX_AI_32();
+	u32 res = DY();
+	u32 ea = EA_AX_AI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4758,8 +4758,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2088 f1f8 move     l .          01:12 234fc:4
-	uint32_t res = AY();
-	uint32_t ea = EA_AX_AI_32();
+	u32 res = AY();
+	u32 ea = EA_AX_AI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4770,8 +4770,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2080 f1c0 move     l A+-DXWLdxI 01:12 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AX_AI_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_AI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4782,8 +4782,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 20c0 f1f8 move     l .          01:12 234fc:4
-	uint32_t res = DY();
-	uint32_t ea = EA_AX_PI_32();
+	u32 res = DY();
+	u32 ea = EA_AX_PI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4794,8 +4794,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 20c8 f1f8 move     l .          01:12 234fc:4
-	uint32_t res = AY();
-	uint32_t ea = EA_AX_PI_32();
+	u32 res = AY();
+	u32 ea = EA_AX_PI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4806,8 +4806,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 20c0 f1c0 move     l A+-DXWLdxI 01:12 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AX_PI_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_PI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4818,8 +4818,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2100 f1f8 move     l .          0:12 1:14 234fc:5
-	uint32_t res = DY();
-	uint32_t ea = EA_AX_PD_32();
+	u32 res = DY();
+	u32 ea = EA_AX_PD_32();
 
 	m68ki_write_16(ea+2, res & 0xFFFF );
 	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
@@ -4831,8 +4831,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2108 f1f8 move     l .          0:12 1:14 234fc:5
-	uint32_t res = AY();
-	uint32_t ea = EA_AX_PD_32();
+	u32 res = AY();
+	u32 ea = EA_AX_PD_32();
 
 	m68ki_write_16(ea+2, res & 0xFFFF );
 	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
@@ -4844,8 +4844,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2100 f1c0 move     l A+-DXWLdxI 0:12 1:14 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AX_PD_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_PD_32();
 
 	m68ki_write_16(ea+2, res & 0xFFFF );
 	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
@@ -4857,8 +4857,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2140 f1f8 move     l .          01:16 234fc:5
-	uint32_t res = DY();
-	uint32_t ea = EA_AX_DI_32();
+	u32 res = DY();
+	u32 ea = EA_AX_DI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4869,8 +4869,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2148 f1f8 move     l .          01:16 234fc:5
-	uint32_t res = AY();
-	uint32_t ea = EA_AX_DI_32();
+	u32 res = AY();
+	u32 ea = EA_AX_DI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4881,8 +4881,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2140 f1c0 move     l A+-DXWLdxI 01:16 234fc:5
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AX_DI_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_DI_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4893,8 +4893,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2180 f1f8 move     l .          01:18 234fc:7
-	uint32_t res = DY();
-	uint32_t ea = EA_AX_IX_32();
+	u32 res = DY();
+	u32 ea = EA_AX_IX_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4905,8 +4905,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2188 f1f8 move     l .          01:18 234fc:7
-	uint32_t res = AY();
-	uint32_t ea = EA_AX_IX_32();
+	u32 res = AY();
+	u32 ea = EA_AX_IX_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4917,8 +4917,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 2180 f1c0 move     l A+-DXWLdxI 01:18 234fc:7
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AX_IX_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_IX_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4929,8 +4929,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 21c0 fff8 move     l .          01:16 234fc:4
-	uint32_t res = DY();
-	uint32_t ea = EA_AW_32();
+	u32 res = DY();
+	u32 ea = EA_AW_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4941,8 +4941,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 21c8 fff8 move     l .          01:16 234fc:4
-	uint32_t res = AY();
-	uint32_t ea = EA_AW_32();
+	u32 res = AY();
+	u32 ea = EA_AW_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4953,8 +4953,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 21c0 ffc0 move     l A+-DXWLdxI 01:16 234fc:4
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AW_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AW_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4965,8 +4965,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 23c0 fff8 move     l .          01:20 234fc:6
-	uint32_t res = DY();
-	uint32_t ea = EA_AL_32();
+	u32 res = DY();
+	u32 ea = EA_AL_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4977,8 +4977,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 23c8 fff8 move     l .          01:20 234fc:6
-	uint32_t res = AY();
-	uint32_t ea = EA_AL_32();
+	u32 res = AY();
+	u32 ea = EA_AL_32();
 
 	m68ki_write_32(ea, res);
 
@@ -4989,8 +4989,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 23c0 ffc0 move     l A+-DXWLdxI 01:20 234fc:6
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
-	uint32_t ea = EA_AL_32();
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AL_32();
 
 	m68ki_write_32(ea, res);
 
@@ -5062,7 +5062,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 40c0 ffc0 move     w A+-DXWL    0:8 1234fc:8p
 	if(CPU_TYPE_IS_000() || CPU_TYPE_IS_070() || m_s_flag) /* NS990408 */
 	{
-		uint32_t ea = M68KMAKE_GET_EA_AY_16;
+		u32 ea = M68KMAKE_GET_EA_AY_16;
 		m68ki_write_16(ea, m68ki_get_sr());
 		return;
 	}
@@ -5081,7 +5081,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 46c0 ffc0 move     w A+-DXWLdxI 01:12p 234fc:8p
 	if(m_s_flag)
 	{
-		uint32_t new_sr = M68KMAKE_GET_OPER_AY_16;
+		u32 new_sr = M68KMAKE_GET_OPER_AY_16;
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr(new_sr);
 		return;
@@ -5113,7 +5113,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 	{
 		if(m_s_flag)
 		{
-			uint32_t word2 = OPER_I_16();
+			u32 word2 = OPER_I_16();
 
 			m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
 			switch (word2 & 0xfff)
@@ -5325,7 +5325,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 	{
 		if(m_s_flag)
 		{
-			uint32_t word2 = OPER_I_16();
+			u32 word2 = OPER_I_16();
 
 			m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
 			switch (word2 & 0xfff)
@@ -5573,10 +5573,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 48a0 fff8 movem    w .          01:8 234fc:4
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = AY();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5591,10 +5591,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4880 ffc0 movem    w ADXWL      01:8 234fc:4
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5608,10 +5608,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 48e0 fff8 movem    l .          01:8 234fc:4
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = AY();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5627,10 +5627,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 48c0 ffc0 movem    l ADXWL      01:8 234fc:4
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5644,10 +5644,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4c98 fff8 movem    w .          01:12 234fc:8
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = AY();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5662,10 +5662,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4cba ffff movem    w .          01:16 234fc:9
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = EA_PCDI_16();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCDI_16();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5679,10 +5679,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4cbb ffff movem    w .          01:18 234fc:11
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = EA_PCIX_16();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCIX_16();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5696,10 +5696,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4c80 ffc0 movem    w ADXWL      01:12 234fc:8
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5713,10 +5713,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4cd8 fff8 movem    l .          01:12 234fc:8
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = AY();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5731,10 +5731,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4cfa ffff movem    l .          01:16 234fc:9
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = EA_PCDI_32();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCDI_32();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5748,10 +5748,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4cfb ffff movem    l .          01:18 234fc:11
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = EA_PCIX_32();
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCIX_32();
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5765,10 +5765,10 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 4cc0 ffc0 movem    l ADXWL      01:12 234fc:8
-	uint32_t i = 0;
-	uint32_t register_list = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t count = 0;
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 count = 0;
 
 	for(; i < 16; i++)
 		if(register_list & (1 << i))
@@ -5782,16 +5782,16 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 0188 f1f8 movep    w .          01:16 234fc:11
-	uint32_t ea = EA_AY_DI_16();
-	uint32_t src = DX();
+	u32 ea = EA_AY_DI_16();
+	u32 src = DX();
 
 	m68ki_write_8(ea, MASK_OUT_ABOVE_8(src >> 8));
 	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
 
 
 01c8 f1f8 movep    l .          01:24 234fc:17
-	uint32_t ea = EA_AY_DI_32();
-	uint32_t src = DX();
+	u32 ea = EA_AY_DI_32();
+	u32 src = DX();
 
 	m68ki_write_8(ea, MASK_OUT_ABOVE_8(src >> 24));
 	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src >> 16));
@@ -5800,14 +5800,14 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 0108 f1f8 movep    w .          01:16 234fc:12
-	uint32_t ea = EA_AY_DI_16();
-	uint32_t* r_dst = &DX();
+	u32 ea = EA_AY_DI_16();
+	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((m68ki_read_8(ea) << 8) + m68ki_read_8(ea + 2));
 
 
 0148 f1f8 movep    l .          01:24 234fc:18
-	uint32_t ea = EA_AY_DI_32();
+	u32 ea = EA_AY_DI_32();
 
 	DX() = (m68ki_read_8(ea) << 24) + (m68ki_read_8(ea + 2) << 16)
 		+ (m68ki_read_8(ea + 4) << 8) + m68ki_read_8(ea + 6);
@@ -5818,8 +5818,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 	{
 		if(m_s_flag)
 		{
-			uint32_t word2 = OPER_I_16();
-			uint32_t ea = M68KMAKE_GET_EA_AY_8;
+			u32 word2 = OPER_I_16();
+			u32 ea = M68KMAKE_GET_EA_AY_8;
 
 			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 			if(BIT_B(word2))           /* Register to memory */
@@ -5851,8 +5851,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 	{
 		if(m_s_flag)
 		{
-			uint32_t word2 = OPER_I_16();
-			uint32_t ea = M68KMAKE_GET_EA_AY_16;
+			u32 word2 = OPER_I_16();
+			u32 ea = M68KMAKE_GET_EA_AY_16;
 
 			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 			if(BIT_B(word2))           /* Register to memory */
@@ -5884,8 +5884,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 	{
 		if(m_s_flag)
 		{
-			uint32_t word2 = OPER_I_16();
-			uint32_t ea = M68KMAKE_GET_EA_AY_32;
+			u32 word2 = OPER_I_16();
+			u32 ea = M68KMAKE_GET_EA_AY_32;
 
 			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 			if(BIT_B(word2))           /* Register to memory */
@@ -5908,7 +5908,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 7000 f100 moveq    l .          01:4 234fc:2
-	uint32_t res = DX() = MAKE_INT_8(MASK_OUT_ABOVE_8(m_ir));
+	u32 res = DX() = MAKE_INT_8(MASK_OUT_ABOVE_8(m_ir));
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -5917,7 +5917,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 234fc:5
 
 
 f620 fff8 move16   l .          4f:4 c:4p
-	uint16_t w2 = OPER_I_16();
+	u16 w2 = OPER_I_16();
 	int ax = m_ir & 7;
 	int ay = (w2 >> 12) & 7;
 	m68ki_write_32(REG_A()[ay],    m68ki_read_32(REG_A()[ax]));
@@ -5930,8 +5930,8 @@ f620 fff8 move16   l .          4f:4 c:4p
 
 
 c1c0 f1f8 muls     w .          0:54 1:32 234fc:27
-	uint32_t* r_dst = &DX();
-	uint32_t res = MASK_OUT_ABOVE_32(MAKE_INT_16(DY()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	u32* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_32(MAKE_INT_16(DY()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -5942,8 +5942,8 @@ c1c0 f1f8 muls     w .          0:54 1:32 234fc:27
 
 
 c1c0 f1c0 muls     w A+-DXWLdxI 0:54 1:32 234fc:27
-	uint32_t* r_dst = &DX();
-	uint32_t res = MASK_OUT_ABOVE_32(MAKE_INT_16(M68KMAKE_GET_OPER_AY_16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	u32* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_32(MAKE_INT_16(M68KMAKE_GET_OPER_AY_16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -5954,8 +5954,8 @@ c1c0 f1c0 muls     w A+-DXWLdxI 0:54 1:32 234fc:27
 
 
 c0c0 f1f8 mulu     w .          0:54 1:30 234fc:27
-	uint32_t* r_dst = &DX();
-	uint32_t res = MASK_OUT_ABOVE_16(DY()) * MASK_OUT_ABOVE_16(*r_dst);
+	u32* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_16(DY()) * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -5966,8 +5966,8 @@ c0c0 f1f8 mulu     w .          0:54 1:30 234fc:27
 
 
 c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
-	uint32_t* r_dst = &DX();
-	uint32_t res = M68KMAKE_GET_OPER_AY_16 * MASK_OUT_ABOVE_16(*r_dst);
+	u32* r_dst = &DX();
+	u32 res = M68KMAKE_GET_OPER_AY_16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -5980,21 +5980,21 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 4c00 fff8 mull     l .          234fc:43
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint64_t src = DY();
-		uint64_t dst = REG_D()[(word2 >> 12) & 7];
-		uint64_t res;
+		u32 word2 = OPER_I_16();
+		u64 src = DY();
+		u64 dst = REG_D()[(word2 >> 12) & 7];
+		u64 res;
 
 		m_c_flag = CFLAG_CLEAR;
 
 		if(BIT_B(word2))               /* signed */
 		{
-			res = (int64_t)((int32_t)src) * (int64_t)((int32_t)dst);
+			res = (s64)((s32)src) * (s64)((s32)dst);
 			if(!BIT_A(word2))
 			{
 				m_not_z_flag = MASK_OUT_ABOVE_32(res);
 				m_n_flag = NFLAG_32(res);
-				m_v_flag = ((int64_t)res != (int32_t)res)<<7;
+				m_v_flag = ((s64)res != (s32)res)<<7;
 				REG_D()[(word2 >> 12) & 7] = m_not_z_flag;
 				return;
 			}
@@ -6028,21 +6028,21 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 4c00 ffc0 mull     l A+-DXWLdxI 234fc:43
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t word2 = OPER_I_16();
-		uint64_t src = M68KMAKE_GET_OPER_AY_32;
-		uint64_t dst = REG_D()[(word2 >> 12) & 7];
-		uint64_t res;
+		u32 word2 = OPER_I_16();
+		u64 src = M68KMAKE_GET_OPER_AY_32;
+		u64 dst = REG_D()[(word2 >> 12) & 7];
+		u64 res;
 
 		m_c_flag = CFLAG_CLEAR;
 
 		if(BIT_B(word2))               /* signed */
 		{
-			res = (int64_t)((int32_t)src) * (int64_t)((int32_t)dst);
+			res = (s64)((s32)src) * (s64)((s32)dst);
 			if(!BIT_A(word2))
 			{
 				m_not_z_flag = MASK_OUT_ABOVE_32(res);
 				m_n_flag = NFLAG_32(res);
-				m_v_flag = ((int64_t)res != (int32_t)res)<<7;
+				m_v_flag = ((s64)res != (s32)res)<<7;
 				REG_D()[(word2 >> 12) & 7] = m_not_z_flag;
 				return;
 			}
@@ -6074,9 +6074,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4800 fff8 nbcd     b .          01234fc:6
-	uint32_t* r_dst = &DY();
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = -dst - XFLAG_1();
+	u32* r_dst = &DY();
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = -dst - XFLAG_1();
 
 	if(res != 0)
 	{
@@ -6105,9 +6105,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4800 ffc0 nbcd     b A+-DXWL    01:8 234fc:6
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = -dst - XFLAG_1();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = -dst - XFLAG_1();
 
 	if(res != 0)
 	{
@@ -6136,8 +6136,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4400 fff8 neg      b .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = 0 - MASK_OUT_ABOVE_8(*r_dst);
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_8(*r_dst);
 
 	m_n_flag = NFLAG_8(res);
 	m_c_flag = m_x_flag = CFLAG_8(res);
@@ -6148,9 +6148,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4400 ffc0 neg      b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
-	uint32_t res = 0 - src;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 res = 0 - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_c_flag = m_x_flag = CFLAG_8(res);
@@ -6161,8 +6161,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4440 fff8 neg      w .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = 0 - MASK_OUT_ABOVE_16(*r_dst);
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_16(*r_dst);
 
 	m_n_flag = NFLAG_16(res);
 	m_c_flag = m_x_flag = CFLAG_16(res);
@@ -6173,9 +6173,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4440 ffc0 neg      w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = 0 - src;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = 0 - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_c_flag = m_x_flag = CFLAG_16(res);
@@ -6186,8 +6186,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4480 fff8 neg      l .          01:6 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = 0 - *r_dst;
+	u32* r_dst = &DY();
+	u32 res = 0 - *r_dst;
 
 	m_n_flag = NFLAG_32(res);
 	m_c_flag = m_x_flag = CFLAG_SUB_32(*r_dst, 0, res);
@@ -6198,9 +6198,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4480 ffc0 neg      l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t src = m68ki_read_32(ea);
-	uint32_t res = 0 - src;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 src = m68ki_read_32(ea);
+	u32 res = 0 - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_c_flag = m_x_flag = CFLAG_SUB_32(src, 0, res);
@@ -6211,8 +6211,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4000 fff8 negx     b .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = 0 - MASK_OUT_ABOVE_8(*r_dst) - XFLAG_1();
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_8(*r_dst) - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -6225,9 +6225,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4000 ffc0 negx     b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = m68ki_read_8(ea);
-	uint32_t res = 0 - src - XFLAG_1();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 res = 0 - src - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -6240,8 +6240,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4040 fff8 negx     w .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = 0 - MASK_OUT_ABOVE_16(*r_dst) - XFLAG_1();
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_16(*r_dst) - XFLAG_1();
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -6254,9 +6254,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4040 ffc0 negx     w A+-DXWL    01:8 234fc:4
-	uint32_t ea  = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = 0 - MASK_OUT_ABOVE_16(src) - XFLAG_1();
+	u32 ea  = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = 0 - MASK_OUT_ABOVE_16(src) - XFLAG_1();
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -6269,8 +6269,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4080 fff8 negx     l .          01:6 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = 0 - MASK_OUT_ABOVE_32(*r_dst) - XFLAG_1();
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_32(*r_dst) - XFLAG_1();
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(*r_dst, 0, res);
@@ -6283,9 +6283,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4080 ffc0 negx     l A+-DXWL    01:12 234fc:4
-	uint32_t ea  = M68KMAKE_GET_EA_AY_32;
-	uint32_t src = m68ki_read_32(ea);
-	uint32_t res = 0 - MASK_OUT_ABOVE_32(src) - XFLAG_1();
+	u32 ea  = M68KMAKE_GET_EA_AY_32;
+	u32 src = m68ki_read_32(ea);
+	u32 res = 0 - MASK_OUT_ABOVE_32(src) - XFLAG_1();
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(src, 0, res);
@@ -6302,8 +6302,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4600 fff8 not      b .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = MASK_OUT_ABOVE_8(~*r_dst);
+	u32* r_dst = &DY();
+	u32 res = MASK_OUT_ABOVE_8(~*r_dst);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -6314,8 +6314,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4600 ffc0 not      b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = MASK_OUT_ABOVE_8(~m68ki_read_8(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(~m68ki_read_8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -6326,8 +6326,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4640 fff8 not      w .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = MASK_OUT_ABOVE_16(~*r_dst);
+	u32* r_dst = &DY();
+	u32 res = MASK_OUT_ABOVE_16(~*r_dst);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -6338,8 +6338,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4640 ffc0 not      w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = MASK_OUT_ABOVE_16(~m68ki_read_16(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(~m68ki_read_16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -6350,8 +6350,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4680 fff8 not      l .          01:6 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t res = *r_dst = MASK_OUT_ABOVE_32(~*r_dst);
+	u32* r_dst = &DY();
+	u32 res = *r_dst = MASK_OUT_ABOVE_32(~*r_dst);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -6360,8 +6360,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4680 ffc0 not      l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = MASK_OUT_ABOVE_32(~m68ki_read_32(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = MASK_OUT_ABOVE_32(~m68ki_read_32(ea));
 
 	m68ki_write_32(ea, res);
 
@@ -6372,7 +6372,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8000 f1f8 or       b .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8((DX() |= MASK_OUT_ABOVE_8(DY())));
+	u32 res = MASK_OUT_ABOVE_8((DX() |= MASK_OUT_ABOVE_8(DY())));
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -6381,7 +6381,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8000 f1c0 or       b A+-DXWLdxI 01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8((DX() |= M68KMAKE_GET_OPER_AY_8));
+	u32 res = MASK_OUT_ABOVE_8((DX() |= M68KMAKE_GET_OPER_AY_8));
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -6390,7 +6390,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8040 f1f8 or       w .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16((DX() |= MASK_OUT_ABOVE_16(DY())));
+	u32 res = MASK_OUT_ABOVE_16((DX() |= MASK_OUT_ABOVE_16(DY())));
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -6399,7 +6399,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8040 f1c0 or       w A+-DXWLdxI 01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16((DX() |= M68KMAKE_GET_OPER_AY_16));
+	u32 res = MASK_OUT_ABOVE_16((DX() |= M68KMAKE_GET_OPER_AY_16));
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -6408,7 +6408,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8080 f1f8 or       l .          01:6 234fc:2
-	uint32_t res = DX() |= DY();
+	u32 res = DX() |= DY();
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -6417,7 +6417,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8080 f1c0 or       l A+-DXWLdxI 01:6 234fc:2
-	uint32_t res = DX() |= M68KMAKE_GET_OPER_AY_32;
+	u32 res = DX() |= M68KMAKE_GET_OPER_AY_32;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -6426,8 +6426,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8100 f1c0 or       b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = MASK_OUT_ABOVE_8(DX() | m68ki_read_8(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(DX() | m68ki_read_8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -6438,8 +6438,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8140 f1c0 or       w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = MASK_OUT_ABOVE_16(DX() | m68ki_read_16(ea));
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(DX() | m68ki_read_16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -6450,8 +6450,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 8180 f1c0 or       l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = DX() | m68ki_read_32(ea);
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = DX() | m68ki_read_32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -6462,7 +6462,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 0000 fff8 ori      b .          01:8 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8((DY() |= OPER_I_8()));
+	u32 res = MASK_OUT_ABOVE_8((DY() |= OPER_I_8()));
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -6471,9 +6471,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 0000 ffc0 ori      b A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_8();
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t res = MASK_OUT_ABOVE_8(src | m68ki_read_8(ea));
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(src | m68ki_read_8(ea));
 
 	m68ki_write_8(ea, res);
 
@@ -6484,7 +6484,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 0040 fff8 ori      w .          01:8 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16(DY() |= OPER_I_16());
+	u32 res = MASK_OUT_ABOVE_16(DY() |= OPER_I_16());
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -6493,9 +6493,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 0040 ffc0 ori      w A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t res = MASK_OUT_ABOVE_16(src | m68ki_read_16(ea));
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(src | m68ki_read_16(ea));
 
 	m68ki_write_16(ea, res);
 
@@ -6506,7 +6506,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 0080 fff8 ori      l .          0:16 1:14 234fc:2
-	uint32_t res = DY() |= OPER_I_32();
+	u32 res = DY() |= OPER_I_32();
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -6515,9 +6515,9 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 0080 ffc0 ori      l A+-DXWL    01:20 234fc:4
-	uint32_t src = OPER_I_32();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t res = src | m68ki_read_32(ea);
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = src | m68ki_read_32(ea);
 
 	m68ki_write_32(ea, res);
 
@@ -6534,7 +6534,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 007c ffff ori      w .          0:20p 1:16p 234fc:12p
 	if(m_s_flag)
 	{
-		uint32_t src = OPER_I_16();
+		u32 src = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr(m68ki_get_sr() | src);
 		return;
@@ -6546,8 +6546,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: DX() and DY() are reversed in Motorola's docs */
-		uint32_t src = DY() + OPER_I_16();
-		uint32_t* r_dst = &DX();
+		u32 src = DY() + OPER_I_16();
+		u32* r_dst = &DX();
 
 		*r_dst = MASK_OUT_BELOW_8(*r_dst) | ((src >> 4) & 0x00f0) | (src & 0x000f);
 		return;
@@ -6559,8 +6559,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: AX and AY are reversed in Motorola's docs */
-		uint32_t ea_src = EA_AY_PD_8();
-		uint32_t src = m68ki_read_8(ea_src);
+		u32 ea_src = EA_AY_PD_8();
+		u32 src = m68ki_read_8(ea_src);
 		ea_src = EA_AY_PD_8();
 		src = ((src << 8) | m68ki_read_8(ea_src)) + OPER_I_16();
 
@@ -6574,8 +6574,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: AX and AY are reversed in Motorola's docs */
-		uint32_t ea_src = EA_A7_PD_8();
-		uint32_t src = m68ki_read_8(ea_src);
+		u32 ea_src = EA_A7_PD_8();
+		u32 src = m68ki_read_8(ea_src);
 		ea_src = EA_A7_PD_8();
 		src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
 
@@ -6588,8 +6588,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 8f4f ffff pack     w .          234fc:13
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t ea_src = EA_A7_PD_8();
-		uint32_t src = m68ki_read_8(ea_src);
+		u32 ea_src = EA_A7_PD_8();
+		u32 src = m68ki_read_8(ea_src);
 		ea_src = EA_A7_PD_8();
 		src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
 
@@ -6603,8 +6603,8 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: AX and AY are reversed in Motorola's docs */
-		uint32_t ea_src = EA_AY_PD_8();
-		uint32_t src = m68ki_read_8(ea_src);
+		u32 ea_src = EA_AY_PD_8();
+		u32 src = m68ki_read_8(ea_src);
 		ea_src = EA_AY_PD_8();
 		src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
 
@@ -6615,7 +6615,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 1:30 234fc:27
 
 
 4840 ffc0 pea      l ADXWLdx    01:6 234fc:5
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
 
 	m68ki_push_32(ea);
 
@@ -6674,11 +6674,11 @@ f548 ffd8 ptest    l .          4:8p
 
 
 e018 f1f8 ror      b .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t shift = orig_shift & 7;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = ROR_8(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROR_8(src, shift);
 
 	if(orig_shift != 0)
 		m_icount -= orig_shift<<m_cyc_shift;
@@ -6692,10 +6692,10 @@ e018 f1f8 ror      b .          01:6 234fc:8
 
 
 e058 f1f8 ror      w .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = ROR_16(src, shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROR_16(src, shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -6709,10 +6709,10 @@ e058 f1f8 ror      w .          01:6 234fc:8
 
 
 e098 f1f8 ror      l .          01234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint64_t src = *r_dst;
-	uint32_t res = ROR_32(src, shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src = *r_dst;
+	u32 res = ROR_32(src, shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -6726,11 +6726,11 @@ e098 f1f8 ror      l .          01234fc:8
 
 
 e038 f1f8 ror      b .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
-	uint32_t shift = orig_shift & 7;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = ROR_8(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROR_8(src, shift);
 
 	if(orig_shift != 0)
 	{
@@ -6751,11 +6751,11 @@ e038 f1f8 ror      b .          01:6 234fc:8
 
 
 e078 f1f8 ror      w .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
-	uint32_t shift = orig_shift & 15;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = ROR_16(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 15;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROR_16(src, shift);
 
 	if(orig_shift != 0)
 	{
@@ -6776,11 +6776,11 @@ e078 f1f8 ror      w .          01:6 234fc:8
 
 
 e0b8 f1f8 ror      l .          01234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
-	uint32_t shift = orig_shift & 31;
-	uint64_t src = *r_dst;
-	uint32_t res = ROR_32(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 31;
+	u64 src = *r_dst;
+	u32 res = ROR_32(src, shift);
 
 	if(orig_shift != 0)
 	{
@@ -6801,9 +6801,9 @@ e0b8 f1f8 ror      l .          01234fc:8
 
 
 e6c0 ffc0 ror      w A+-DXWL    01:8 234fc:7
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = ROR_16(src, 1);
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = ROR_16(src, 1);
 
 	m68ki_write_16(ea, res);
 
@@ -6814,11 +6814,11 @@ e6c0 ffc0 ror      w A+-DXWL    01:8 234fc:7
 
 
 e118 f1f8 rol      b .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t shift = orig_shift & 7;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = ROL_8(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROL_8(src, shift);
 
 	if(orig_shift != 0)
 		m_icount -= orig_shift<<m_cyc_shift;
@@ -6832,10 +6832,10 @@ e118 f1f8 rol      b .          01:6 234fc:8
 
 
 e158 f1f8 rol      w .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = ROL_16(src, shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROL_16(src, shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -6849,10 +6849,10 @@ e158 f1f8 rol      w .          01:6 234fc:8
 
 
 e198 f1f8 rol      l .          01234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint64_t src = *r_dst;
-	uint32_t res = ROL_32(src, shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src = *r_dst;
+	u32 res = ROL_32(src, shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -6866,11 +6866,11 @@ e198 f1f8 rol      l .          01234fc:8
 
 
 e138 f1f8 rol      b .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
-	uint32_t shift = orig_shift & 7;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = ROL_8(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROL_8(src, shift);
 
 	if(orig_shift != 0)
 	{
@@ -6899,11 +6899,11 @@ e138 f1f8 rol      b .          01:6 234fc:8
 
 
 e178 f1f8 rol      w .          01:6 234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
-	uint32_t shift = orig_shift & 15;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = MASK_OUT_ABOVE_16(ROL_16(src, shift));
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 15;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, shift));
 
 	if(orig_shift != 0)
 	{
@@ -6932,11 +6932,11 @@ e178 f1f8 rol      w .          01:6 234fc:8
 
 
 e1b8 f1f8 rol      l .          01234fc:8
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
-	uint32_t shift = orig_shift & 31;
-	uint64_t src = *r_dst;
-	uint32_t res = ROL_32(src, shift);
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 31;
+	u64 src = *r_dst;
+	u32 res = ROL_32(src, shift);
 
 	if(orig_shift != 0)
 	{
@@ -6958,9 +6958,9 @@ e1b8 f1f8 rol      l .          01234fc:8
 
 
 e7c0 ffc0 rol      w A+-DXWL    01:8 234fc:7
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
 
 	m68ki_write_16(ea, res);
 
@@ -6971,10 +6971,10 @@ e7c0 ffc0 rol      w A+-DXWL    01:8 234fc:7
 
 
 e010 f1f8 roxr     b .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = ROR_9(src | (XFLAG_1() << 8), shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROR_9(src | (XFLAG_1() << 8), shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -6990,10 +6990,10 @@ e010 f1f8 roxr     b .          01:6 234fc:12
 
 
 e050 f1f8 roxr     w .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = ROR_17(src | (XFLAG_1() << 16), shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROR_17(src | (XFLAG_1() << 16), shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -7009,10 +7009,10 @@ e050 f1f8 roxr     w .          01:6 234fc:12
 
 
 e090 f1f8 roxr     l .          01:8 234fc:12
-	uint32_t*  r_dst = &DY();
-	uint32_t   shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint64_t src   = *r_dst;
-	uint64_t res   = src | (((uint64_t)XFLAG_1()) << 32);
+	u32*  r_dst = &DY();
+	u32   shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src   = *r_dst;
+	u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -7030,14 +7030,14 @@ e090 f1f8 roxr     l .          01:8 234fc:12
 
 
 e030 f1f8 roxr     b .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
 
 	if(orig_shift != 0)
 	{
-		uint32_t shift = orig_shift % 9;
-		uint32_t src   = MASK_OUT_ABOVE_8(*r_dst);
-		uint32_t res   = ROR_9(src | (XFLAG_1() << 8), shift);
+		u32 shift = orig_shift % 9;
+		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
+		u32 res   = ROR_9(src | (XFLAG_1() << 8), shift);
 
 		m_icount -= orig_shift<<m_cyc_shift;
 
@@ -7058,14 +7058,14 @@ e030 f1f8 roxr     b .          01:6 234fc:12
 
 
 e070 f1f8 roxr     w .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
 
 	if(orig_shift != 0)
 	{
-		uint32_t shift = orig_shift % 17;
-		uint32_t src   = MASK_OUT_ABOVE_16(*r_dst);
-		uint32_t res   = ROR_17(src | (XFLAG_1() << 16), shift);
+		u32 shift = orig_shift % 17;
+		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
+		u32 res   = ROR_17(src | (XFLAG_1() << 16), shift);
 
 		m_icount -= orig_shift<<m_cyc_shift;
 
@@ -7086,14 +7086,14 @@ e070 f1f8 roxr     w .          01:6 234fc:12
 
 
 e0b0 f1f8 roxr     l .          01:8 234fc:12
-	uint32_t*  r_dst = &DY();
-	uint32_t   orig_shift = DX() & 0x3f;
+	u32*  r_dst = &DY();
+	u32   orig_shift = DX() & 0x3f;
 
 	if(orig_shift != 0)
 	{
-		uint32_t   shift = orig_shift % 33;
-		uint64_t src   = *r_dst;
-		uint64_t res   = src | (((uint64_t)XFLAG_1()) << 32);
+		u32   shift = orig_shift % 33;
+		u64 src   = *r_dst;
+		u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 		res = ROR_33_64(res, shift);
 
@@ -7116,9 +7116,9 @@ e0b0 f1f8 roxr     l .          01:8 234fc:12
 
 
 e4c0 ffc0 roxr     w A+-DXWL    01:8 234fc:5
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = ROR_17(src | (XFLAG_1() << 16), 1);
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = ROR_17(src | (XFLAG_1() << 16), 1);
 
 	m_c_flag = m_x_flag = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
@@ -7131,10 +7131,10 @@ e4c0 ffc0 roxr     w A+-DXWL    01:8 234fc:5
 
 
 e110 f1f8 roxl     b .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = ROL_9(src | (XFLAG_1() << 8), shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROL_9(src | (XFLAG_1() << 8), shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -7150,10 +7150,10 @@ e110 f1f8 roxl     b .          01:6 234fc:12
 
 
 e150 f1f8 roxl     w .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t src = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = ROL_17(src | (XFLAG_1() << 16), shift);
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROL_17(src | (XFLAG_1() << 16), shift);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -7169,10 +7169,10 @@ e150 f1f8 roxl     w .          01:6 234fc:12
 
 
 e190 f1f8 roxl     l .          01:8 234fc:12
-	uint32_t*  r_dst = &DY();
-	uint32_t   shift = (((m_ir >> 9) - 1) & 7) + 1;
-	uint64_t src   = *r_dst;
-	uint64_t res   = src | (((uint64_t)XFLAG_1()) << 32);
+	u32*  r_dst = &DY();
+	u32   shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src   = *r_dst;
+	u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 	if(shift != 0)
 		m_icount -= shift<<m_cyc_shift;
@@ -7190,15 +7190,15 @@ e190 f1f8 roxl     l .          01:8 234fc:12
 
 
 e130 f1f8 roxl     b .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
 
 
 	if(orig_shift != 0)
 	{
-		uint32_t shift = orig_shift % 9;
-		uint32_t src   = MASK_OUT_ABOVE_8(*r_dst);
-		uint32_t res   = ROL_9(src | (XFLAG_1() << 8), shift);
+		u32 shift = orig_shift % 9;
+		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
+		u32 res   = ROL_9(src | (XFLAG_1() << 8), shift);
 
 		m_icount -= orig_shift<<m_cyc_shift;
 
@@ -7219,14 +7219,14 @@ e130 f1f8 roxl     b .          01:6 234fc:12
 
 
 e170 f1f8 roxl     w .          01:6 234fc:12
-	uint32_t* r_dst = &DY();
-	uint32_t orig_shift = DX() & 0x3f;
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
 
 	if(orig_shift != 0)
 	{
-		uint32_t shift = orig_shift % 17;
-		uint32_t src   = MASK_OUT_ABOVE_16(*r_dst);
-		uint32_t res   = ROL_17(src | (XFLAG_1() << 16), shift);
+		u32 shift = orig_shift % 17;
+		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
+		u32 res   = ROL_17(src | (XFLAG_1() << 16), shift);
 
 		m_icount -= orig_shift<<m_cyc_shift;
 
@@ -7247,14 +7247,14 @@ e170 f1f8 roxl     w .          01:6 234fc:12
 
 
 e1b0 f1f8 roxl     l .          01:8 234fc:12
-	uint32_t*  r_dst = &DY();
-	uint32_t   orig_shift = DX() & 0x3f;
+	u32*  r_dst = &DY();
+	u32   orig_shift = DX() & 0x3f;
 
 	if(orig_shift != 0)
 	{
-		uint32_t   shift = orig_shift % 33;
-		uint64_t src   = *r_dst;
-		uint64_t res   = src | (((uint64_t)XFLAG_1()) << 32);
+		u32   shift = orig_shift % 33;
+		u64 src   = *r_dst;
+		u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 		res = ROL_33_64(res, shift);
 
@@ -7277,9 +7277,9 @@ e1b0 f1f8 roxl     l .          01:8 234fc:12
 
 
 e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = m68ki_read_16(ea);
-	uint32_t res = ROL_17(src | (XFLAG_1() << 16), 1);
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = ROL_17(src | (XFLAG_1() << 16), 1);
 
 	m_c_flag = m_x_flag = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
@@ -7294,7 +7294,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4e74 ffff rtd      l .          1:16 234fc:10
 	if(CPU_TYPE_IS_010_PLUS())
 	{
-		uint32_t new_pc = m68ki_pull_32();
+		u32 new_pc = m68ki_pull_32();
 
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + MAKE_INT_16(OPER_I_16()));
@@ -7307,9 +7307,9 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4e73 ffff rte      l .          0234fc:20p 1:24p
 	if(m_s_flag)
 	{
-		uint32_t new_sr;
-		uint32_t new_pc;
-		uint32_t format_word;
+		u32 new_sr;
+		u32 new_pc;
+		u32 format_word;
 
 		if (!m_rte_instr_callback.isnull())
 			(m_rte_instr_callback)(1);
@@ -7489,11 +7489,11 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 8100 f1f8 sbcd     b .          01:6 234fc:4
-	uint32_t* r_dst = &DX();
-	uint32_t src = DY();
-	uint32_t dst = *r_dst;
-	uint32_t res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
-	uint32_t corf = 0;
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 0xf)
 		corf = 6;
@@ -7519,11 +7519,11 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 8f08 fff8 sbcd     b .          01:18 234fc:16
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 0xf)
 		corf = 6;
@@ -7549,11 +7549,11 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 810f f1ff sbcd     b .          01:18 234fc:16
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 0xf)
 		corf = 6;
@@ -7579,11 +7579,11 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 8f0f ffff sbcd     b .          01:18 234fc:16
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 0xf)
 		corf = 6;
@@ -7609,11 +7609,11 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 8108 f1f8 sbcd     b .          01:18 234fc:16
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
-	uint32_t corf = 0;
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
 
 	if(res > 0xf)
 		corf = 6;
@@ -7671,7 +7671,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4e72 ffff stop     . .          01:4p 234fc:8p
 	if(m_s_flag)
 	{
-		uint32_t new_sr = OPER_I_16();
+		u32 new_sr = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m_stopped |= STOP_LEVEL_STOP;
 		m68ki_set_sr(new_sr);
@@ -7682,10 +7682,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9000 f1f8 sub      b .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_8(DY());
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -7696,10 +7696,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9000 f1c0 sub      b A+-DXWLdxI 01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_8;
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_8;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -7710,10 +7710,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9040 f1f8 sub      w .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(DY());
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -7724,10 +7724,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9048 f1f8 sub      w .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(AY());
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(AY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -7738,10 +7738,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9040 f1c0 sub      w A+-DXWLdxI 01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_16;
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -7752,10 +7752,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9080 f1f8 sub      l .          01:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = DY();
-	uint32_t dst = *r_dst;
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
@@ -7766,10 +7766,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9088 f1f8 sub      l .          01:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = AY();
-	uint32_t dst = *r_dst;
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = AY();
+	u32 dst = *r_dst;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
@@ -7780,10 +7780,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9080 f1c0 sub      l A+-DXWLdxI 01:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_32;
-	uint32_t dst = *r_dst;
-	uint32_t res = dst - src;
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = *r_dst;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
@@ -7794,10 +7794,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9100 f1c0 sub      b A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t src = MASK_OUT_ABOVE_8(DX());
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = MASK_OUT_ABOVE_8(DX());
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -7808,10 +7808,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9140 f1c0 sub      w A+-DXWL    01:8 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t src = MASK_OUT_ABOVE_16(DX());
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = dst - src;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = MASK_OUT_ABOVE_16(DX());
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -7822,10 +7822,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9180 f1c0 sub      l A+-DXWL    01:12 234fc:4
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t src = DX();
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = dst - src;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 src = DX();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -7836,48 +7836,48 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 90c0 f1f8 suba     w .          01:8 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(DY()));
 
 
 90c8 f1f8 suba     w .          01:8 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(AY()));
 
 
 90c0 f1c0 suba     w A+-DXWLdxI 01:8 234fc:2
-	uint32_t* r_dst = &AX();
-	uint32_t src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	u32* r_dst = &AX();
+	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - src);
 
 
 91c0 f1f8 suba     l .          01:6 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - DY());
 
 
 91c8 f1f8 suba     l .          01:6 234fc:2
-	uint32_t* r_dst = &AX();
+	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - AY());
 
 
 91c0 f1c0 suba     l A+-DXWLdxI 01:6 234fc:2
-	uint32_t* r_dst = &AX();
-	uint32_t src = M68KMAKE_GET_OPER_AY_32;
+	u32* r_dst = &AX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - src);
 
 
 0400 fff8 subi     b .          01:8 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = OPER_I_8();
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DY();
+	u32 src = OPER_I_8();
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -7888,10 +7888,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 0400 ffc0 subi     b A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_8();
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src;
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -7902,10 +7902,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 0440 fff8 subi     w .          01:8 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = OPER_I_16();
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DY();
+	u32 src = OPER_I_16();
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -7916,10 +7916,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 0440 ffc0 subi     w A+-DXWL    01:12 234fc:4
-	uint32_t src = OPER_I_16();
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = dst - src;
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -7930,10 +7930,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 0480 fff8 subi     l .          0:16 1:14 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = OPER_I_32();
-	uint32_t dst = *r_dst;
-	uint32_t res = dst - src;
+	u32* r_dst = &DY();
+	u32 src = OPER_I_32();
+	u32 dst = *r_dst;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -7944,10 +7944,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 0480 ffc0 subi     l A+-DXWL    01:20 234fc:4
-	uint32_t src = OPER_I_32();
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = dst - src;
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -7958,10 +7958,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 5100 f1f8 subq     b .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -7972,10 +7972,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 5100 f1c0 subq     b A+-DXWL    01:8 234fc:4
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src;
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = MASK_OUT_ABOVE_8(res);
@@ -7986,10 +7986,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 5140 f1f8 subq     w .          01:4 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = dst - src;
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -8000,16 +8000,16 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 5148 f1f8 subq     w .          0:8 1:4 234fc:2
-	uint32_t* r_dst = &AY();
+	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - ((((m_ir >> 9) - 1) & 7) + 1));
 
 
 5140 f1c0 subq     w A+-DXWL    01:8 234fc:4
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t ea = M68KMAKE_GET_EA_AY_16;
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = dst - src;
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = MASK_OUT_ABOVE_16(res);
@@ -8020,10 +8020,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 5180 f1f8 subq     l .          01:8 234fc:2
-	uint32_t* r_dst = &DY();
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t dst = *r_dst;
-	uint32_t res = dst - src;
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = *r_dst;
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -8034,16 +8034,16 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 5188 f1f8 subq     l .          01:8 234fc:2
-	uint32_t* r_dst = &AY();
+	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - ((((m_ir >> 9) - 1) & 7) + 1));
 
 
 5180 f1c0 subq     l A+-DXWL    01:12 234fc:4
-	uint32_t src = (((m_ir >> 9) - 1) & 7) + 1;
-	uint32_t ea = M68KMAKE_GET_EA_AY_32;
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = dst - src;
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -8054,10 +8054,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9100 f1f8 subx     b .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_8(DY());
-	uint32_t dst = MASK_OUT_ABOVE_8(*r_dst);
-	uint32_t res = dst - src - XFLAG_1();
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -8070,10 +8070,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9140 f1f8 subx     w .          01:4 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = MASK_OUT_ABOVE_16(DY());
-	uint32_t dst = MASK_OUT_ABOVE_16(*r_dst);
-	uint32_t res = dst - src - XFLAG_1();
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -8086,10 +8086,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9180 f1f8 subx     l .          0:8 1:6 234fc:2
-	uint32_t* r_dst = &DX();
-	uint32_t src = DY();
-	uint32_t dst = *r_dst;
-	uint32_t res = dst - src - XFLAG_1();
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
@@ -8102,10 +8102,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9f08 fff8 subx     b .          01:18 234fc:12
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src - XFLAG_1();
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -8118,10 +8118,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 910f f1ff subx     b .          01:18 234fc:12
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src - XFLAG_1();
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -8134,10 +8134,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9f0f ffff subx     b .          01:18 234fc:12
-	uint32_t src = OPER_A7_PD_8();
-	uint32_t ea  = EA_A7_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src - XFLAG_1();
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -8150,10 +8150,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9108 f1f8 subx     b .          01:18 234fc:12
-	uint32_t src = OPER_AY_PD_8();
-	uint32_t ea  = EA_AX_PD_8();
-	uint32_t dst = m68ki_read_8(ea);
-	uint32_t res = dst - src - XFLAG_1();
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_8(res);
 	m_x_flag = m_c_flag = CFLAG_8(res);
@@ -8166,10 +8166,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9148 f1f8 subx     w .          01:18 234fc:12
-	uint32_t src = OPER_AY_PD_16();
-	uint32_t ea  = EA_AX_PD_16();
-	uint32_t dst = m68ki_read_16(ea);
-	uint32_t res = dst - src - XFLAG_1();
+	u32 src = OPER_AY_PD_16();
+	u32 ea  = EA_AX_PD_16();
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_16(res);
 	m_x_flag = m_c_flag = CFLAG_16(res);
@@ -8182,10 +8182,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 9188 f1f8 subx     l .          01:30 234fc:12
-	uint32_t src = OPER_AY_PD_32();
-	uint32_t ea  = EA_AX_PD_32();
-	uint32_t dst = m68ki_read_32(ea);
-	uint32_t res = dst - src - XFLAG_1();
+	u32 src = OPER_AY_PD_32();
+	u32 ea  = EA_AX_PD_32();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src - XFLAG_1();
 
 	m_n_flag = NFLAG_32(res);
 	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
@@ -8198,7 +8198,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4840 fff8 swap     l .          01234fc:4
-	uint32_t* r_dst = &DY();
+	u32* r_dst = &DY();
 
 	m_not_z_flag = MASK_OUT_ABOVE_32(*r_dst<<16);
 	*r_dst = (*r_dst>>16) | m_not_z_flag;
@@ -8210,7 +8210,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4ac0 fff8 tas      b .          01234fc:4
-	uint32_t* r_dst = &DY();
+	u32* r_dst = &DY();
 
 	m_not_z_flag = MASK_OUT_ABOVE_8(*r_dst);
 	m_n_flag = NFLAG_8(*r_dst);
@@ -8220,8 +8220,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4ac0 ffc0 tas      b A+-DXWL    01:14 234fc:12
-	uint32_t ea = M68KMAKE_GET_EA_AY_8;
-	uint32_t dst = m68ki_read_8(ea);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
 
 	m_not_z_flag = dst;
 	m_n_flag = NFLAG_8(dst);
@@ -8344,7 +8344,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4a00 fff8 tst      b .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_8(DY());
+	u32 res = MASK_OUT_ABOVE_8(DY());
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -8353,7 +8353,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4a00 ffc0 tst      b A+-DXWL    01:4 234fc:2
-	uint32_t res = M68KMAKE_GET_OPER_AY_8;
+	u32 res = M68KMAKE_GET_OPER_AY_8;
 
 	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
@@ -8364,7 +8364,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a3a ffff tst      b .          234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_PCDI_8();
+		u32 res = OPER_PCDI_8();
 
 		m_n_flag = NFLAG_8(res);
 		m_not_z_flag = res;
@@ -8378,7 +8378,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a3b ffff tst      b .          234fc:9
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_PCIX_8();
+		u32 res = OPER_PCIX_8();
 
 		m_n_flag = NFLAG_8(res);
 		m_not_z_flag = res;
@@ -8392,7 +8392,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a3c ffff tst      b .          234fc:6
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_I_8();
+		u32 res = OPER_I_8();
 
 		m_n_flag = NFLAG_8(res);
 		m_not_z_flag = res;
@@ -8404,7 +8404,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4a40 fff8 tst      w .          01:4 234fc:2
-	uint32_t res = MASK_OUT_ABOVE_16(DY());
+	u32 res = MASK_OUT_ABOVE_16(DY());
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -8415,7 +8415,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a48 fff8 tst      w .          234fc:2
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = MAKE_INT_16(AY());
+		u32 res = MAKE_INT_16(AY());
 
 		m_n_flag = NFLAG_16(res);
 		m_not_z_flag = res;
@@ -8427,7 +8427,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4a40 ffc0 tst      w A+-DXWL    01:4 234fc:2
-	uint32_t res = M68KMAKE_GET_OPER_AY_16;
+	u32 res = M68KMAKE_GET_OPER_AY_16;
 
 	m_n_flag = NFLAG_16(res);
 	m_not_z_flag = res;
@@ -8438,7 +8438,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a7a ffff tst      w .          234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_PCDI_16();
+		u32 res = OPER_PCDI_16();
 
 		m_n_flag = NFLAG_16(res);
 		m_not_z_flag = res;
@@ -8452,7 +8452,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a7b ffff tst      w .          234fc:9
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_PCIX_16();
+		u32 res = OPER_PCIX_16();
 
 		m_n_flag = NFLAG_16(res);
 		m_not_z_flag = res;
@@ -8466,7 +8466,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a7c ffff tst      w .          234fc:6
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_I_16();
+		u32 res = OPER_I_16();
 
 		m_n_flag = NFLAG_16(res);
 		m_not_z_flag = res;
@@ -8478,7 +8478,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4a80 fff8 tst      l .          01:4 234fc:2
-	uint32_t res = DY();
+	u32 res = DY();
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -8489,7 +8489,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4a88 fff8 tst      l .          234fc:2
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = AY();
+		u32 res = AY();
 
 		m_n_flag = NFLAG_32(res);
 		m_not_z_flag = res;
@@ -8501,7 +8501,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4a80 ffc0 tst      l A+-DXWL    01:4 234fc:2
-	uint32_t res = M68KMAKE_GET_OPER_AY_32;
+	u32 res = M68KMAKE_GET_OPER_AY_32;
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = res;
@@ -8512,7 +8512,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4aba ffff tst      l .          234fc:7
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_PCDI_32();
+		u32 res = OPER_PCDI_32();
 
 		m_n_flag = NFLAG_32(res);
 		m_not_z_flag = res;
@@ -8526,7 +8526,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4abb ffff tst      l .          234fc:9
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_PCIX_32();
+		u32 res = OPER_PCIX_32();
 
 		m_n_flag = NFLAG_32(res);
 		m_not_z_flag = res;
@@ -8540,7 +8540,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 4abc ffff tst      l .          234fc:6
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t res = OPER_I_32();
+		u32 res = OPER_I_32();
 
 		m_n_flag = NFLAG_32(res);
 		m_not_z_flag = res;
@@ -8556,7 +8556,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 
 
 4e58 fff8 unlk     l .          01:12 234fc:6
-	uint32_t* r_dst = &AY();
+	u32* r_dst = &AY();
 
 	REG_A()[7] = *r_dst;
 	*r_dst = m68ki_pull_32();
@@ -8566,8 +8566,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: DX() and DY() are reversed in Motorola's docs */
-		uint32_t src = DY();
-		uint32_t* r_dst = &DX();
+		u32 src = DY();
+		u32* r_dst = &DX();
 
 		*r_dst = MASK_OUT_BELOW_16(*r_dst) | (((((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16()) & 0xffff);
 		return;
@@ -8579,8 +8579,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: AX and AY are reversed in Motorola's docs */
-		uint32_t src = OPER_AY_PD_8();
-		uint32_t ea_dst;
+		u32 src = OPER_AY_PD_8();
+		u32 ea_dst;
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
 		ea_dst = EA_A7_PD_8();
@@ -8596,8 +8596,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: AX and AY are reversed in Motorola's docs */
-		uint32_t src = OPER_A7_PD_8();
-		uint32_t ea_dst;
+		u32 src = OPER_A7_PD_8();
+		u32 ea_dst;
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
 		ea_dst = EA_AX_PD_8();
@@ -8612,8 +8612,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 8f8f ffff unpk     w .          234fc:13
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
-		uint32_t src = OPER_A7_PD_8();
-		uint32_t ea_dst;
+		u32 src = OPER_A7_PD_8();
+		u32 ea_dst;
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
 		ea_dst = EA_A7_PD_8();
@@ -8629,8 +8629,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 	if(CPU_TYPE_IS_EC020_PLUS())
 	{
 		/* Note: AX and AY are reversed in Motorola's docs */
-		uint32_t src = OPER_AY_PD_8();
-		uint32_t ea_dst;
+		u32 src = OPER_AY_PD_8();
+		u32 ea_dst;
 
 		src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
 		ea_dst = EA_AX_PD_8();
@@ -8645,9 +8645,9 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 234fc:5
 f400 ff20 cinv     l .          4:16
 	if(CPU_TYPE_IS_040_PLUS())
 	{
-		uint16_t ir = m_ir;
-		uint8_t cache = (ir >> 6) & 3;
-    //  uint8_t scope = (ir >> 3) & 3;
+		u16 ir = m_ir;
+		u8 cache = (ir >> 6) & 3;
+    //  u8 scope = (ir >> 3) & 3;
     //  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
 		switch (cache)
 		{
