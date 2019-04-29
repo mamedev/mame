@@ -36243,6 +36243,9 @@ starfirea                       // Exidy [1979?]
 spcship                         //
 whtforce                        //
 
+@source:starrider.cpp           //
+starridr
+
 @source:starshp1.cpp
 starshp1                        // 007513-007531    1977/07 [6502]
 starshpp                        // 007513-007531    1977/07 [6502]
