@@ -255,7 +255,7 @@ d048 f1f8 add      w .          071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-d040 f1c0 add      w A+-DXWLdxI 01:4 234fc:2
+d040 f1c0 add      w A+-DXWLdxI 071:4 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -297,7 +297,7 @@ d088 f1f8 add      l .          071:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-d080 f1c0 add      l A+-DXWLdxI 01:6 234fc:2
+d080 f1c0 add      l A+-DXWLdxI 071:6 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = *r_dst;
@@ -311,7 +311,7 @@ d080 f1c0 add      l A+-DXWLdxI 01:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-d100 f1c0 add      b A+-DXWL    01:8 234fc:4
+d100 f1c0 add      b A+-DXWL    071:8 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = MASK_OUT_ABOVE_8(DX());
 	u32 dst = m68ki_read_8(ea);
@@ -325,7 +325,7 @@ d100 f1c0 add      b A+-DXWL    01:8 234fc:4
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-d140 f1c0 add      w A+-DXWL    01:8 234fc:4
+d140 f1c0 add      w A+-DXWL    071:8 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = MASK_OUT_ABOVE_16(DX());
 	u32 dst = m68ki_read_16(ea);
@@ -339,7 +339,7 @@ d140 f1c0 add      w A+-DXWL    01:8 234fc:4
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-d180 f1c0 add      l A+-DXWL    01:12 234fc:4
+d180 f1c0 add      l A+-DXWL    071:12 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 src = DX();
 	u32 dst = m68ki_read_32(ea);
@@ -365,7 +365,7 @@ d0c8 f1f8 adda     w .          071:8 234fc:2
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(AY()));
 
 
-d0c0 f1c0 adda     w A+-DXWLdxI 01:8 234fc:2
+d0c0 f1c0 adda     w A+-DXWLdxI 071:8 234fc:2
 	u32* r_dst = &AX();
 	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
@@ -384,7 +384,7 @@ d1c8 f1f8 adda     l .          071:6 234fc:2
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + AY());
 
 
-d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
+d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	u32* r_dst = &AX();
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 
@@ -405,7 +405,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 01:6 234fc:2
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-0600 ffc0 addi     b A+-DXWL    01:12 234fc:4
+0600 ffc0 addi     b A+-DXWL    071:12 234fc:4
 	u32 src = OPER_I_8();
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
@@ -724,7 +724,7 @@ c000 f1f8 and      b .          071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c000 f1c0 and      b A+-DXWLdxI 01:4 234fc:2
+c000 f1c0 and      b A+-DXWLdxI 071:4 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_8(DX() &= (M68KMAKE_GET_OPER_AY_8 | 0xffffff00));
 
 	m_n_flag = NFLAG_8(m_not_z_flag);
@@ -740,7 +740,7 @@ c040 f1f8 and      w .          071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c040 f1c0 and      w A+-DXWLdxI 01:4 234fc:2
+c040 f1c0 and      w A+-DXWLdxI 071:4 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (M68KMAKE_GET_OPER_AY_16 | 0xffff0000));
 
 	m_n_flag = NFLAG_16(m_not_z_flag);
@@ -756,7 +756,7 @@ c080 f1f8 and      l .          071:6 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c080 f1c0 and      l A+-DXWLdxI 01:6 234fc:2
+c080 f1c0 and      l A+-DXWLdxI 071:6 234fc:2
 	m_not_z_flag = DX() &= M68KMAKE_GET_OPER_AY_32;
 
 	m_n_flag = NFLAG_32(m_not_z_flag);
@@ -2014,7 +2014,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = DY() & (1 << (DX() & 0x1f));
 
 
-0100 f1c0 btst     b A+-DXWLdxI 01234fc:4
+0100 f1c0 btst     b A+-DXWLdxI 071234fc:4
 	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << (DX() & 7));
 
 
@@ -2022,7 +2022,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = DY() & (1 << (OPER_I_8() & 0x1f));
 
 
-0800 ffc0 btst     b A+-DXWLdx  01:8 234fc:4
+0800 ffc0 btst     b A+-DXWLdx  071:8 234fc:4
 	u32 bit = OPER_I_8() & 7;
 
 	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << bit);
@@ -2461,7 +2461,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4200 ffc0 clr      b A+-DXWL    07:8
+4200 ffc0 clr      b A+-DXWL    0:8
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 
 	m68ki_read_8(ea);   /* the 68000 does a dummy read, the value is discarded */
@@ -2473,7 +2473,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4200 ffc0 clr      b A+-DXWL    1234fc:4
+4200 ffc0 clr      b A+-DXWL    71234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 
 	m68ki_write_8(ea, 0);
@@ -2493,7 +2493,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4240 ffc0 clr      w A+-DXWL    07:8
+4240 ffc0 clr      w A+-DXWL    0:8
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 
 	m68ki_read_16(ea);  /* the 68000 does a dummy read, the value is discarded */
@@ -2506,7 +2506,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4240 ffc0 clr      w A+-DXWL    1234fc:4
+4240 ffc0 clr      w A+-DXWL    71234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 
 	m68ki_write_16(ea, 0);
@@ -2526,7 +2526,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4280 ffc0 clr      l A+-DXWL    07:12
+4280 ffc0 clr      l A+-DXWL    0:12
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 
 	m68ki_read_32(ea);  /* the 68000 does a dummy read, the value is discarded */
@@ -2538,7 +2538,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4280 ffc0 clr      l A+-DXWL    1:6 234fc:4
+4280 ffc0 clr      l A+-DXWL    71:6 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 
 	m68ki_write_32(ea, 0);
@@ -2593,7 +2593,7 @@ b048 f1f8 cmp      w .          071:4 234fc:2
 	m_c_flag = CFLAG_16(res);
 
 
-b040 f1c0 cmp      w A+-DXWLdxI 01:4 234fc:2
+b040 f1c0 cmp      w A+-DXWLdxI 071:4 234fc:2
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 	u32 dst = MASK_OUT_ABOVE_16(DX());
 	u32 res = dst - src;
@@ -2626,7 +2626,7 @@ b088 f1f8 cmp      l .          071:6 234fc:2
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b080 f1c0 cmp      l A+-DXWLdxI 01:6 234fc:2
+b080 f1c0 cmp      l A+-DXWLdxI 071:6 234fc:2
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = DX();
 	u32 res = dst - src;
@@ -2659,7 +2659,7 @@ b0c8 f1f8 cmpa     w .          071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b0c0 f1c0 cmpa     w A+-DXWLdxI 01:6 234fc:4
+b0c0 f1c0 cmpa     w A+-DXWLdxI 071:6 234fc:4
 	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2692,7 +2692,7 @@ b1c8 f1f8 cmpa     l .          071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 234fc:4
+b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -3784,7 +3784,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1080 f1c0 move     b A+-DXWLdxI 01:8 234fc:4
+1080 f1c0 move     b A+-DXWLdxI 071:8 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AX_AI_8();
 
