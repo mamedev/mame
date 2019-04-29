@@ -119,7 +119,7 @@ Clock measurements:
      Z8400A PS: 3.375MHz (27MHz/8)
         YM3812: 3.375MHz (27MHz/8)
    OKI MSM6295: 1.25MHz, pin 7 is hard-wired to GROUND (5MHz/4)
-         VSYNC:  56.05Hz
+         VSYNC: 56.05Hz
         H-SYNC: 15.06KHz
 
 */
