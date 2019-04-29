@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
- Williams Start Rider
+ Williams Star Rider
 
  One of the more sophisticated LaserDisc games.  The "video expander"
  allows part of the LaserDisc backdrop to be enlarged and panned
@@ -136,7 +136,7 @@
  16k*8 PROM for the high-priority text layer.  The board is laid out to
  allow for a second bank of 48 16k*8 PROMs (possibly intented to be
  selected with A15).  There are provisions for in-circuit programming,
- but the lines are disabled using jumpers during nromal operation.
+ but the lines are disabled using jumpers during normal operation.
 
  +------+-----+-----+-----+-----+
  | PP4  |  0  |  0  |  1  |  1  |
@@ -176,6 +176,14 @@
  There's space for a 64-pin DIL connector exposing the CPU address, data
  and control signals, and providing in-circut ROM programming capability,
  but it isn't populated.
+
+
+ TODO:
+ * Everything
+ * Map the banked CPU ROM
+ * Video DMA etc.
+ * Need a dump of the clock state machine PROM at VGG U114 (82S123 32*8)
+ * Need dumps of colour mapping PROMs at VGG U10 and U11 (82S137 1204*4)
 
  */
 
@@ -855,6 +863,13 @@ ROM_START(starridr)
 	ROM_REGION(0x4000, "text", 0)
 	ROM_LOAD("rom_25.u46", 0x0000, 0x2000, CRC(2812097e) SHA1(793ed5ec8b1d1689e856fc2008f46faf963f5045))
 	ROM_RELOAD(0x2000, 0x2000)
+
+	ROM_REGION(0x20, "clkgen", 0)
+	ROM_LOAD("u114.82s123", 0x00, 0x20, NO_DUMP)
+
+	ROM_REGION(0x400, "color", 0)
+	ROMX_LOAD("u10.82s137", 0x000, 0x400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
+	ROMX_LOAD("u11.82s137", 0x000, 0x400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
 ROM_END
 
 } // anonymous namespace
