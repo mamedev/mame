@@ -8831,6 +8831,83 @@ ROM_END
 
 /***************************************************************************
 
+  Tronica Space Rescue (model MG-9)
+  * PCB label MG-9 080492
+  * Sharp SM510 label 0015 224B TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class trsrescue_state : public hh_sm510_state
+{
+public:
+	trsrescue_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trsrescue(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( trsrescue )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void trsrescue_state::trsrescue(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1533, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( trsrescue )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0015_224b", 0x0000, 0x1000, CRC(f58a3832) SHA1(2d843b3520de66463e628cea9344a04015d1f5f1) )
+
+	ROM_REGION( 178600, "svg", 0)
+	ROM_LOAD( "trsrescue.svg", 0, 178600, CRC(2fa7b2d9) SHA1(5d1fc88db3129c9126f0c05ea55fb5f117e02871) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tronica Thief in Garden (model TG-18)
   * Sharp SM510 label 0019 238E TRONICA (no decap)
   * lcd screen with custom segments, 1-bit sound
@@ -9163,5 +9240,6 @@ CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state, 
 CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE )
 
 // misc
+CONS( 1982, trsrescue,   0,          0, trsrescue,   trsrescue,   trsrescue_state,   empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
