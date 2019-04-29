@@ -70,7 +70,6 @@ void ms9540_state::machine_reset()
 {
 	uint8_t* ROM = memregion("9540")->base();
 	memcpy(m_p_base, ROM, 8);
-	m_maincpu->reset();
 }
 
 void ms9540_state::kbd_put(u8 data)

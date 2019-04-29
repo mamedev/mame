@@ -1453,9 +1453,6 @@ void x68k_state::machine_reset()
 	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
 	m_fdc.select_drive = 0;
-
-	// reset CPU
-	m_maincpu->reset();
 }
 
 void x68k_state::machine_start()

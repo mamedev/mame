@@ -228,8 +228,6 @@ void dim68k_state::machine_reset()
 	u8* ROM = memregion("bootrom")->base();
 
 	memcpy((u8*)m_ram.target(), ROM, 0x2000);
-
-	m_maincpu->reset();
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.

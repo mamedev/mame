@@ -607,8 +607,6 @@ void sun2_state::machine_reset()
 	m_buserror = 0;
 	memset(m_segmap, 0, sizeof(m_segmap));
 	memset(m_pagemap, 0, sizeof(m_pagemap));
-
-	m_maincpu->reset();
 }
 
 void sun2_state::sun2vme(machine_config &config)

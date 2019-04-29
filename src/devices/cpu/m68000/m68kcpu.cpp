@@ -837,8 +837,13 @@ void m68000_base_device::execute_run()
 {
 	m_initial_cycles = m_icount;
 
-	/* eat up any reset cycles */
 	if (m_reset_cycles) {
+		/* Read the initial stack pointer and program counter */
+		REG_SP() = m68ki_read_imm_32();
+		m_pc = m68ki_read_imm_32();
+		m68ki_jump(m_pc);
+
+		/* eat up any reset cycles */
 		int rc = m_reset_cycles;
 		m_reset_cycles = 0;
 		m_icount -= rc;
@@ -1117,12 +1122,7 @@ void m68000_base_device::device_reset()
 	/* Set to arbitrary number since our first fetch is from 0 */
 	m_pref_addr = 0x1000;
 
-	/* Read the initial stack pointer and program counter */
 	m68ki_jump(0);
-	REG_SP() = m68ki_read_imm_32();
-	m_pc = m68ki_read_imm_32();
-	m68ki_jump(m_pc);
-
 	m_run_mode = RUN_MODE_NORMAL;
 
 	m_reset_cycles = m_cyc_exception[EXCEPTION_RESET];

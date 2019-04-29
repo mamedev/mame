@@ -290,7 +290,6 @@ void model2_state::reset_model2_scsp()
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base(), 16);
-	m_audiocpu->reset();
 }
 
 void model2_tgp_state::machine_reset()

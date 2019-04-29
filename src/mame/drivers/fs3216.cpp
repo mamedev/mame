@@ -134,9 +134,6 @@ void fs3216_state::machine_reset()
 {
 	m_from_reset = true;
 
-	// FIXME: fix the 68000 so that it doesn't read vectors during device_reset
-	m_maincpu->reset();
-
 	floppy_control_w(0);
 	floppy_select_w(0, 0);
 }

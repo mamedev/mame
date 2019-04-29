@@ -109,8 +109,6 @@ void sun1_state::machine_reset()
 	uint8_t* user1 = memregion("user1")->base();
 
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x4000);
-
-	m_maincpu->reset();
 }
 
 

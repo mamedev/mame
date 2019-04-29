@@ -998,7 +998,6 @@ void sun3_state::machine_start()
 
 void sun3_state::machine_reset()
 {
-	m_maincpu->reset();
 	m_enable = 0;
 	m_buserr = 0;
 	m_diag = 1;

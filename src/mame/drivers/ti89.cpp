@@ -475,7 +475,6 @@ void ti68k_state::machine_start()
 void ti68k_state::machine_reset()
 {
 	m_ram_enabled = false;
-	m_maincpu->reset();
 
 	m_kb_mask = 0xff;
 	m_on_key = 0;

@@ -600,9 +600,6 @@ void r9751_state::machine_reset()
 	uint32_t *ram = m_main_ram;
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
-	m_pdc->reset();
 }
 
 /******************************************************************************

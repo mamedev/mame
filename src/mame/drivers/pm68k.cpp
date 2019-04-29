@@ -55,7 +55,6 @@ void pm68k_state::machine_reset()
 {
 	uint8_t* ROM = memregion("roms")->base();
 	memcpy(m_p_base, ROM, 8);
-	m_maincpu->reset();
 }
 
 void pm68k_state::pm68k(machine_config &config)

@@ -9859,7 +9859,6 @@ void isgsm_state::machine_reset()
 			m_sprites->set_bank(i, i);
 
 	membank(ISGSM_MAIN_BANK)->set_base(memregion("bios")->base());
-	m_maincpu->reset();
 }
 
 
