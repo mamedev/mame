@@ -374,7 +374,7 @@ void xexex_state::main_map(address_map &map)
 #if XE_DEBUG
 	map(0x0c0000, 0x0c003f).r(m_k056832, FUNC(k056832_device::word_r));
 	map(0x0c2000, 0x0c2007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
-	map(0x0ca000, 0x0ca01f).r(m_k054338, FUNC(k054338_device::word_r));
+	map(0x0ca000, 0x0ca01f).r(m_k054338, FUNC(k054338_device::register_r));
 	map(0x0cc000, 0x0cc01f).r(m_k053251, FUNC(k053251_device::lsb_r));
 	map(0x0d8000, 0x0d8007).r(m_k056832, FUNC(k056832_device::b_word_r));
 #endif
