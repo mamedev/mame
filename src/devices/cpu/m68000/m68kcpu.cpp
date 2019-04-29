@@ -78,7 +78,7 @@ const u32 m68000_base_device::m68ki_shift_32_table[65] =
 /* Number of clock cycles to use for exception processing.
  * I used 4 for any vectors that are undocumented for processing times.
  */
-const u8 m68000_base_device::m68ki_exception_cycle_table[7][256] =
+const u8 m68000_base_device::m68ki_exception_cycle_table[NUM_CPU_TYPES][256] =
 {
 	{ /* 000 */
 			40, /*  0: Reset - Initial Stack Pointer                      */
@@ -129,6 +129,79 @@ const u8 m68000_base_device::m68ki_exception_cycle_table[7][256] =
 			34, /* 45: TRAP #13                                           */
 			34, /* 46: TRAP #14                                           */
 			34, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+	},
+	{ /* 070 - not even pretending to be correct */
+			40, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+		126, /*  2: Bus Error                             (unemulated) */
+		126, /*  3: Address Error                         (unemulated) */
+			38, /*  4: Illegal Instruction                                */
+			44, /*  5: Divide by Zero                                     */
+			44, /*  6: CHK                                                */
+			34, /*  7: TRAPV                                              */
+			38, /*  8: Privilege Violation                                */
+			38, /*  9: Trace                                              */
+			4, /* 10: 1010                                               */
+			4, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			44, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			46, /* 24: Spurious Interrupt                                 */
+			46, /* 25: Level 1 Interrupt Autovector                       */
+			46, /* 26: Level 2 Interrupt Autovector                       */
+			46, /* 27: Level 3 Interrupt Autovector                       */
+			46, /* 28: Level 4 Interrupt Autovector                       */
+			46, /* 29: Level 5 Interrupt Autovector                       */
+			46, /* 30: Level 6 Interrupt Autovector                       */
+			46, /* 31: Level 7 Interrupt Autovector                       */
+			38, /* 32: TRAP #0                                            */
+			38, /* 33: TRAP #1                                            */
+			38, /* 34: TRAP #2                                            */
+			38, /* 35: TRAP #3                                            */
+			38, /* 36: TRAP #4                                            */
+			38, /* 37: TRAP #5                                            */
+			38, /* 38: TRAP #6                                            */
+			38, /* 39: TRAP #7                                            */
+			38, /* 40: TRAP #8                                            */
+			38, /* 41: TRAP #9                                            */
+			38, /* 42: TRAP #10                                           */
+			38, /* 43: TRAP #11                                           */
+			38, /* 44: TRAP #12                                           */
+			38, /* 45: TRAP #13                                           */
+			38, /* 46: TRAP #14                                           */
+			38, /* 47: TRAP #15                                           */
 			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
 			4, /* 49: FP Inexact Result                     (unemulated) */
 			4, /* 50: FP Divide by Zero                     (unemulated) */
@@ -1722,9 +1795,9 @@ void m68000_base_device::init_cpu_m68010(void)
 
 	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[1];
-	m_cyc_instruction  = m68ki_cycles[1];
-	m_cyc_exception    = m68ki_exception_cycle_table[1];
+	m_state_table      = m68ki_instruction_state_table[2];
+	m_cyc_instruction  = m68ki_cycles[2];
+	m_cyc_exception    = m68ki_exception_cycle_table[2];
 	m_cyc_bcc_notake_b = -4;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1748,9 +1821,9 @@ void m68000_base_device::init_cpu_m68020(void)
 
 	init32(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[2];
-	m_cyc_instruction  = m68ki_cycles[2];
-	m_cyc_exception    = m68ki_exception_cycle_table[2];
+	m_state_table      = m68ki_instruction_state_table[3];
+	m_cyc_instruction  = m68ki_cycles[3];
+	m_cyc_exception    = m68ki_exception_cycle_table[3];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1804,9 +1877,9 @@ void m68000_base_device::init_cpu_m68ec020(void)
 
 	init32(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[2];
-	m_cyc_instruction  = m68ki_cycles[2];
-	m_cyc_exception    = m68ki_exception_cycle_table[2];
+	m_state_table      = m68ki_instruction_state_table[3];
+	m_cyc_instruction  = m68ki_cycles[3];
+	m_cyc_exception    = m68ki_exception_cycle_table[3];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1832,9 +1905,9 @@ void m68000_base_device::init_cpu_m68030(void)
 
 	init32mmu(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[3];
-	m_cyc_instruction  = m68ki_cycles[3];
-	m_cyc_exception    = m68ki_exception_cycle_table[3];
+	m_state_table      = m68ki_instruction_state_table[4];
+	m_cyc_instruction  = m68ki_cycles[4];
+	m_cyc_exception    = m68ki_exception_cycle_table[4];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1861,9 +1934,9 @@ void m68000_base_device::init_cpu_m68ec030(void)
 
 	init32(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[3];
-	m_cyc_instruction  = m68ki_cycles[3];
-	m_cyc_exception    = m68ki_exception_cycle_table[3];
+	m_state_table      = m68ki_instruction_state_table[4];
+	m_cyc_instruction  = m68ki_cycles[4];
+	m_cyc_exception    = m68ki_exception_cycle_table[4];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1890,9 +1963,9 @@ void m68000_base_device::init_cpu_m68040(void)
 
 	init32mmu(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[4];
-	m_cyc_instruction  = m68ki_cycles[4];
-	m_cyc_exception    = m68ki_exception_cycle_table[4];
+	m_state_table      = m68ki_instruction_state_table[5];
+	m_cyc_instruction  = m68ki_cycles[5];
+	m_cyc_exception    = m68ki_exception_cycle_table[5];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1918,9 +1991,9 @@ void m68000_base_device::init_cpu_m68ec040(void)
 
 	init32(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[4];
-	m_cyc_instruction  = m68ki_cycles[4];
-	m_cyc_exception    = m68ki_exception_cycle_table[4];
+	m_state_table      = m68ki_instruction_state_table[5];
+	m_cyc_instruction  = m68ki_cycles[5];
+	m_cyc_exception    = m68ki_exception_cycle_table[5];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1946,9 +2019,9 @@ void m68000_base_device::init_cpu_m68lc040(void)
 
 	init32mmu(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[4];
-	m_cyc_instruction  = m68ki_cycles[4];
-	m_cyc_exception    = m68ki_exception_cycle_table[4];
+	m_state_table      = m68ki_instruction_state_table[5];
+	m_cyc_instruction  = m68ki_cycles[5];
+	m_cyc_exception    = m68ki_exception_cycle_table[5];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -1973,7 +2046,7 @@ void m68000_base_device::init_cpu_scc68070(void)
 	// TODO: most of this is subtly different
 	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_jump_table       = m68ki_instruction_jump_table[1];
+	m_state_table      = m68ki_instruction_state_table[1];
 	m_cyc_instruction  = m68ki_cycles[1];
 	m_cyc_exception    = m68ki_exception_cycle_table[1];
 	m_cyc_bcc_notake_b = -4;
@@ -2001,9 +2074,9 @@ void m68000_base_device::init_cpu_fscpu32(void)
 
 	init32(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[5];
-	m_cyc_instruction  = m68ki_cycles[5];
-	m_cyc_exception    = m68ki_exception_cycle_table[5];
+	m_state_table      = m68ki_instruction_state_table[6];
+	m_cyc_instruction  = m68ki_cycles[6];
+	m_cyc_exception    = m68ki_exception_cycle_table[6];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;
@@ -2028,9 +2101,9 @@ void m68000_base_device::init_cpu_coldfire(void)
 
 	init32(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m_state_table      = m68ki_instruction_state_table[6];
-	m_cyc_instruction  = m68ki_cycles[6];
-	m_cyc_exception    = m68ki_exception_cycle_table[6];
+	m_state_table      = m68ki_instruction_state_table[7];
+	m_cyc_instruction  = m68ki_cycles[7];
+	m_cyc_exception    = m68ki_exception_cycle_table[7];
 	m_cyc_bcc_notake_b = -2;
 	m_cyc_bcc_notake_w = 0;
 	m_cyc_dbcc_f_noexp = 0;

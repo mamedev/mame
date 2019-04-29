@@ -107,7 +107,7 @@ public:
 	void autovectors_map(address_map &map);
 
 protected:
-	static constexpr int NUM_CPU_TYPES = 7;
+	static constexpr int NUM_CPU_TYPES = 8;
 
 	typedef void (m68000_base_device::*opcode_handler_ptr)();
 	static u16 m68ki_instruction_state_table[NUM_CPU_TYPES][0x10000]; /* opcode handler state numbers */

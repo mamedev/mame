@@ -467,7 +467,7 @@ void m68k_cause_bus_error();
 static const u8    m68ki_shift_8_table[65];
 static const u16   m68ki_shift_16_table[65];
 static const u32   m68ki_shift_32_table[65];
-static const u8    m68ki_exception_cycle_table[7][256];
+static const u8    m68ki_exception_cycle_table[8][256];
 static const u8    m68ki_ea_idx_cycle_table[64];
 
 /* ======================================================================== */
