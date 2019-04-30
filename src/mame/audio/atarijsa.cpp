@@ -271,7 +271,7 @@ void atari_jsa_base_device::device_reset()
 
 WRITE8_MEMBER( atari_jsa_base_device::main_command_w )
 {
-	m_soundcomm->main_command_w(space, offset, data);
+	m_soundcomm->main_command_w(data);
 }
 
 
@@ -281,7 +281,7 @@ WRITE8_MEMBER( atari_jsa_base_device::main_command_w )
 
 READ8_MEMBER( atari_jsa_base_device::main_response_r )
 {
-	return m_soundcomm->main_response_r(space, offset);
+	return m_soundcomm->main_response_r();
 }
 
 
@@ -291,7 +291,7 @@ READ8_MEMBER( atari_jsa_base_device::main_response_r )
 
 WRITE16_MEMBER( atari_jsa_base_device::sound_reset_w )
 {
-	m_soundcomm->sound_reset_w(space, offset, data);
+	m_soundcomm->sound_reset_w();
 }
 
 
