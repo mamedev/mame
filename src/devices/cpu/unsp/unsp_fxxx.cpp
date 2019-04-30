@@ -191,7 +191,7 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 }
 
 
-inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
+void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 {
 	// FIR_MOV   1 1 1 1   - - - 1   0 1 0 0   0 1 0 f
 	// Fraction  1 1 1 1   - - - 1   0 1 0 0   0 1 1 f
@@ -293,7 +293,7 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 }
 
 
-inline void unsp_device::execute_fxxx_101_group(uint16_t op)
+void unsp_device::execute_fxxx_101_group(uint16_t op)
 {
 	//                           |   | |
 	// INT SET   1 1 1 1   - - - 1   0 1 0 0   0 0 F I
