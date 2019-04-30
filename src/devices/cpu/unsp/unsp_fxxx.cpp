@@ -40,14 +40,14 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	else if (((op & 0xf1f8) == 0xf030) && m_iso >= 12)
 	{
 		int r = op & 0x7;
-		logerror("%s = fr", regs[r]);
+		logerror("%s = fr\n", regs[r]);
 		unimplemented_opcode(op);
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf038) && m_iso >= 12)
 	{
 		int r = op & 0x7;
-		logerror("fr = %s", regs[r]);
+		logerror("fr = %s\n", regs[r]);
 		unimplemented_opcode(op);
 		return;
 	}
@@ -96,19 +96,19 @@ inline void unsp_device::execute_fxxx_001_group(uint16_t op)
 
 		if (d)
 		{
-			logerror("%s ds:[$04x],%d", bitops[bitop], offset);
+			logerror("%s ds:[$04x],%d\n", bitops[bitop], offset);
 			unimplemented_opcode(op);
 		}
 		else
 		{
-			logerror("%s [$04x],%d", bitops[bitop], offset);
+			logerror("%s [$04x],%d\n", bitops[bitop], offset);
 			unimplemented_opcode(op);
 		}
 
 		return;
 	}
 
-	logerror("<DUNNO>");
+	logerror("<DUNNO>\n");
 	unimplemented_opcode(op);
 	return;
 }
@@ -131,7 +131,7 @@ inline void unsp_device::execute_fxxx_010_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 0*  1 0*s s   s r r r    (1* = sign bit, 0* = sign bit 0* = upper size bit)
 
 	// MULS us with upper size bit not set
-	logerror("MULS us");
+	logerror("MULS us\n");
 	unimplemented_opcode(op);
 	return;
 }
@@ -142,7 +142,7 @@ inline void unsp_device::execute_fxxx_011_group(uint16_t op)
 	// JMPR    1 1 1 1   1 1 1 0   1 1 - -   - - - -
 	if (((op & 0xffc0) == 0xfec0) && m_iso >= 12)
 	{
-		logerror("goto mr");
+		logerror("goto mr\n");
 		unimplemented_opcode(op);
 		return;
 	}
@@ -151,7 +151,7 @@ inline void unsp_device::execute_fxxx_011_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 0*  1 1*s s   s r r r    (1* = sign bit, 0* = sign bit 1* = upper size bit)
 
 	// MULS us with upper size bit set
-	logerror("MULS us");
+	logerror("MULS us\n");
 	unimplemented_opcode(op);
 
 	return;
@@ -185,7 +185,7 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 		return;
 	}
 
-	logerror("<DUNNO>");
+	logerror("<DUNNO>\n");
 	unimplemented_opcode(op);
 	return;
 }
@@ -205,42 +205,42 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	switch (op)
 	{
 	case 0xf146: case 0xf346: case 0xf546: case 0xf746: case 0xf946: case 0xfb46: case 0xfd46: case 0xff46:
-		logerror("fraction off");
+		logerror("fraction off\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf147: case 0xf347: case 0xf547: case 0xf747: case 0xf947: case 0xfb47: case 0xfd47: case 0xff47:
-		logerror("fraction on");
+		logerror("fraction on\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf14a: case 0xf34a: case 0xf54a: case 0xf74a: case 0xf94a: case 0xfb4a: case 0xfd4a: case 0xff4a:
-		logerror("secbank off");
+		logerror("secbank off\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf14b: case 0xf34b: case 0xf54b: case 0xf74b: case 0xf94b: case 0xfb4b: case 0xfd4b: case 0xff4b:
-		logerror("secbank on");
+		logerror("secbank on\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf14d: case 0xf34d: case 0xf54d: case 0xf74d: case 0xf94d: case 0xfb4d: case 0xfd4d: case 0xff4d:
-		logerror("irqnest off");
+		logerror("irqnest off\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf14f: case 0xf34f: case 0xf54f: case 0xf74f: case 0xf94f: case 0xfb4f: case 0xfd4f: case 0xff4f:
-		logerror("irqnest on");
+		logerror("irqnest on\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
-		logerror("fir_mov on");
+		logerror("fir_mov on\n");
 		unimplemented_opcode(op);
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("fir_mov off");
+		logerror("fir_mov off\n");
 		unimplemented_opcode(op);
 		return;
 
@@ -264,7 +264,7 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16a: case 0xf36a: case 0xf56a: case 0xf76a: case 0xf96a: case 0xfb6a: case 0xfd6a: case 0xff6a:
 	case 0xf172: case 0xf372: case 0xf572: case 0xf772: case 0xf972: case 0xfb72: case 0xfd72: case 0xff72:
 	case 0xf17a: case 0xf37a: case 0xf57a: case 0xf77a: case 0xf97a: case 0xfb7a: case 0xfd7a: case 0xff7a:
-		logerror("divs mr, r2");
+		logerror("divs mr, r2\n");
 		unimplemented_opcode(op);
 		return;
 
@@ -272,7 +272,7 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16b: case 0xf36b: case 0xf56b: case 0xf76b: case 0xf96b: case 0xfb6b: case 0xfd6b: case 0xff6b:
 	case 0xf173: case 0xf373: case 0xf573: case 0xf773: case 0xf973: case 0xfb73: case 0xfd73: case 0xff73:
 	case 0xf17b: case 0xf37b: case 0xf57b: case 0xf77b: case 0xf97b: case 0xfb7b: case 0xfd7b: case 0xff7b:
-		logerror("divq mr, r2");
+		logerror("divq mr, r2\n");
 		unimplemented_opcode(op);
 		return;
 
@@ -282,7 +282,7 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
 		//unimplemented_opcode(op);
 		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
-		logerror("r2 = exp r4");
+		logerror("r2 = exp r4 (with r2 = %04 r4 = %04x)\n", m_core->m_r[REG_R2], m_core->m_r[REG_R4]);
 		m_core->m_r[REG_R2] = 0x0001; // WRONG!!
 		return;
 

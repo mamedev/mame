@@ -12,7 +12,7 @@
 void unsp_device::execute_exxx_group(uint16_t op)
 {
 	// several exxx opcodes have already been decoded as jumps by the time we get here
-	//logerror("<DUNNO>");
+	//logerror("<DUNNO>\n");
 	unimplemented_opcode(op);
 	return;
 }
@@ -34,7 +34,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t bitop = (op & 0x0030) >> 4;
 		uint8_t rd =    (op & 0x0e00) >> 9;
 		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s %s,%s", bitops[bitop], regs[rd], regs[rs]);
+		logerror("%s %s,%s\n", bitops[bitop], regs[rd], regs[rs]);
 		unimplemented_opcode(op);
 		return;
 	}
@@ -71,7 +71,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t bitop =  (op & 0x0030) >> 4;
 		uint8_t rd =     (op & 0x0e00) >> 9;
 		uint8_t offset = (op & 0x000f) >> 0;
-		logerror("%s [%s],%d", bitops[bitop], regs[rd], offset);
+		logerror("%s [%s],%d\n", bitops[bitop], regs[rd], offset);
 		unimplemented_opcode(op);
 		return;
 	}
@@ -81,7 +81,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t bitop =  (op & 0x0030) >> 4;
 		uint8_t rd =     (op & 0x0e00) >> 9;
 		uint8_t offset = (op & 0x000f) >> 0;
-		logerror("%s ds:[%s],%d", bitops[bitop], regs[rd], offset);
+		logerror("%s ds:[%s],%d\n", bitops[bitop], regs[rd], offset);
 		unimplemented_opcode(op);
 		return;
 	}
@@ -91,7 +91,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t bitop = (op & 0x0030) >> 4;
 		uint8_t rd =    (op & 0x0e00) >> 9;
 		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s [%s],%s", bitops[bitop], regs[rd], regs[rs]);
+		logerror("%s [%s],%s\n", bitops[bitop], regs[rd], regs[rs]);
 		unimplemented_opcode(op);
 		return;
 	}
@@ -101,7 +101,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t bitop = (op & 0x0030) >> 4;
 		uint8_t rd =    (op & 0x0e00) >> 9;
 		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s ds:[%s],%s", bitops[bitop], regs[rd], regs[rs]);
+		logerror("%s ds:[%s],%s\n", bitops[bitop], regs[rd], regs[rs]);
 		unimplemented_opcode(op);
 		return;
 	}
@@ -112,8 +112,25 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		/*
 		print_mul(stream, op); // MUL uu or MUL su (invalid?)
 		*/
-		logerror("MUL uu or su");
-		unimplemented_opcode(op);
+
+		if (op & 0x0100)
+		{
+			logerror("MUL su\n");
+			fatalerror("UNSP: unknown opcode MUL su (invalid?) (%04x) at %04x\n", op, UNSP_LPC);
+			return;
+		}
+		else
+		{
+			uint32_t lres = 0;
+			const uint16_t opa = (op >> 9) & 7;
+			const uint16_t opb = op & 7;
+
+			m_core->m_icount -= 12; // unknown
+			lres = m_core->m_r[opa] * m_core->m_r[opb];
+			m_core->m_r[REG_R4] = lres >> 16;
+			m_core->m_r[REG_R3] = (uint16_t)lres;
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf080) == 0xe080))
@@ -123,7 +140,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		// MULS uu or MULS su (invalid?)
 		print_muls(stream, op);
 		*/
-		logerror("MULS uu or su");
+		logerror("MULS uu or su\n");
 		unimplemented_opcode(op);
 		return;
 	}
@@ -133,12 +150,12 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t rd =    (op & 0x0e00) >> 9;
 		uint8_t shift = (op & 0x0070) >> 4;
 		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s = %s %s %s", regs[rd], regs[rd], lsft[shift], regs[rs]);
+		logerror("%s = %s %s %s\n", regs[rd], regs[rd], lsft[shift], regs[rs]);
 		unimplemented_opcode(op);
 		return;
 	}
 
-	logerror("<DUNNO>");
+	logerror("<DUNNO>\n");
 	unimplemented_opcode(op);
 	return;
 }

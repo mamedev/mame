@@ -50,6 +50,14 @@ void sunplus_gcm394_base_device::map(address_map &map)
 {
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w));
+	
+	map(0x007300, 0x0073ff).ram();
+
+	map(0x007c00, 0x007cff).ram();
+	map(0x007d00, 0x007dff).ram();
+	map(0x007e00, 0x007eff).ram();
+	map(0x007f00, 0x007fff).ram();
+
 }
 
 void sunplus_gcm394_base_device::device_start()
