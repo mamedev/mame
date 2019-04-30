@@ -2403,8 +2403,8 @@ pc40iii                         // Commodore PC 40-III
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
-comslt286						// Compaq SLT/286
-dsys200							// Dell System 200
+comslt286                       // Compaq SLT/286
+dsys200                         // Dell System 200
 pcd2                            // Siemens PCD-2
 ct386sx                         //
 ec1842                          //
@@ -18596,6 +18596,7 @@ vs10yardu                       // (c) 1983/1984
 battroad                        // (c) 1984
 horizon                         // (c) 1985
 kidniki                         // (c) 1986 + Data East USA license
+kidnikib                        // bootleg
 kidnikiu                        // (c) 1986 + Data East USA license
 kungfub                         // bootleg
 kungfub2                        // bootleg
@@ -30127,7 +30128,7 @@ bubsys                          //
 citybomb                        // GX787 (c) 1987 (World)
 citybombj                       // GX787 (c) 1987 (Japan)
 gradius                         // GX456 (c) 1985
-gradiusb						// Bubble System
+gradiusb                        // Bubble System
 gwarrior                        // GX578 (c) 1985
 hcrash                          // GX790 (c) 1987
 hcrashc                         // GX790 (c) 1987
