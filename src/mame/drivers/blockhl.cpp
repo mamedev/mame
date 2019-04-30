@@ -155,12 +155,12 @@ READ8_MEMBER( blockhl_state::k052109_051960_r )
 		if (offset >= 0x3800 && offset < 0x3808)
 			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
 			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER( blockhl_state::k052109_051960_w )
@@ -168,7 +168,7 @@ WRITE8_MEMBER( blockhl_state::k052109_051960_w )
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
 		m_k051960->k051960_w(offset - 0x3c00, data);
 }

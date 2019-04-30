@@ -71,7 +71,7 @@ address lines), and then reading it from the 051962.
 052109 memory layout:
 0000-07ff: layer FIX tilemap (attributes)
 0800-0fff: layer A tilemap (attributes)
-1000-1fff: layer B tilemap (attributes)
+1000-17ff: layer B tilemap (attributes)
 180c-1833: A y scroll
 1a00-1bff: A x scroll
 1c00     : ?
@@ -293,7 +293,7 @@ void k052109_device::vblank_callback(screen_device &screen, bool state)
 		m_irq_handler(ASSERT_LINE);
 }
 
-READ8_MEMBER( k052109_device::read )
+u8 k052109_device::read(offs_t offset)
 {
 	if (m_rmrd_line == CLEAR_LINE)
 	{
@@ -342,7 +342,7 @@ READ8_MEMBER( k052109_device::read )
 	}
 }
 
-WRITE8_MEMBER( k052109_device::write )
+void k052109_device::write(offs_t offset, u8 data)
 {
 	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
 	{
@@ -470,28 +470,17 @@ WRITE8_MEMBER( k052109_device::write )
 	}
 }
 
-READ16_MEMBER( k052109_device::word_r )
+u16 k052109_device::word_r(offs_t offset)
 {
-	return read(space, offset + 0x2000) | (read(space, offset) << 8);
+	return read(offset + 0x2000) | (read(offset) << 8);
 }
 
-WRITE16_MEMBER( k052109_device::word_w )
+void k052109_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
-		write(space, offset, (data >> 8) & 0xff);
+		write(offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		write(space, offset + 0x2000, data & 0xff);
-}
-
-READ16_MEMBER( k052109_device::lsb_r )
-{
-	return read(space, offset);
-}
-
-WRITE16_MEMBER( k052109_device::lsb_w )
-{
-	if(ACCESSING_BITS_0_7)
-		write(space, offset, data & 0xff);
+		write(offset + 0x2000, data & 0xff);
 }
 
 void k052109_device::set_rmrd_line( int state )

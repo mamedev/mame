@@ -134,7 +134,7 @@ WRITE8_MEMBER(vendetta_state::eeprom_w)
 
 READ8_MEMBER(vendetta_state::K052109_r)
 {
-	return m_k052109->read(space, offset + 0x2000);
+	return m_k052109->read(offset + 0x2000);
 }
 
 WRITE8_MEMBER(vendetta_state::K052109_w)
@@ -144,8 +144,8 @@ WRITE8_MEMBER(vendetta_state::K052109_w)
 	// *  Tilemap mask ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
 	if ((offset == 0x1d80) || (offset == 0x1e00) || (offset == 0x1f00))
-		m_k052109->write(space, offset, data);
-	m_k052109->write(space, offset + 0x2000, data);
+		m_k052109->write(offset, data);
+	m_k052109->write(offset + 0x2000, data);
 }
 
 

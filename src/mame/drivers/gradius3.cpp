@@ -38,17 +38,17 @@
 
 READ16_MEMBER(gradius3_state::k052109_halfword_r)
 {
-	return m_k052109->read(space, offset);
+	return m_k052109->read(offset);
 }
 
 WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset, data & 0xff);
+		m_k052109->write(offset, data & 0xff);
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset, (data >> 8) & 0xff);
+		m_k052109->write(offset, (data >> 8) & 0xff);
 //      logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
 }
 

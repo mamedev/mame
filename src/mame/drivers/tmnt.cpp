@@ -76,7 +76,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return m_k052109->word_r(space, offset, mem_mask);
+	return m_k052109->word_r(offset);
 }
 
 WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
@@ -84,7 +84,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	m_k052109->word_w(space, offset, data, mem_mask);
+	m_k052109->word_w(offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
@@ -92,9 +92,9 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		m_k052109->write(space, offset, (data >> 8) & 0xff);
+		m_k052109->write(offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset + 0x2000, data & 0xff);
+		m_k052109->write(offset + 0x2000, data & 0xff);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
