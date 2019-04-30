@@ -175,9 +175,9 @@ void asterix_state::main_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 	map(0x180000, 0x1807ff).rw(m_k053244, FUNC(k05324x_device::k053245_word_r), FUNC(k05324x_device::k053245_word_w));
 	map(0x180800, 0x180fff).ram();                             // extra RAM, or mirror for the above?
-	map(0x200000, 0x20000f).rw(m_k053244, FUNC(k05324x_device::k053244_word_r), FUNC(k05324x_device::k053244_word_w));
+	map(0x200000, 0x20000f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
 	map(0x280000, 0x280fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));
+	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);
 	map(0x380000, 0x380001).portr("IN0");
 	map(0x380002, 0x380003).portr("IN1");
 	map(0x380100, 0x380101).w(FUNC(asterix_state::control2_w));
