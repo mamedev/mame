@@ -118,7 +118,7 @@ inline void unsp_device::execute_fxxx_010_group(uint16_t op)
 	//                         |   | |
 	// JMPF    1 1 1 1   1 1 1 0   1 0 a a   a a a a    (+imm16)
 
-	if (((op & 0xffc0) == 0xfe80) && m_iso >= 12)
+	if ((op & 0xffc0) == 0xfe80) // apparently 1.2 and above, but jak_capb needs it and otherwise seems 1.0 / 1.1?
 	{
 		m_core->m_icount -= 5;
 		m_core->m_r[REG_PC] = read16(UNSP_LPC);

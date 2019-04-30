@@ -100,7 +100,7 @@ offs_t unsp_disassembler::disassemble_fxxx_010_group(std::ostream& stream, offs_
 	//                         |   | |
 	// JMPF    1 1 1 1   1 1 1 0   1 0 a a   a a a a    (+imm16)
 
-	if (((op & 0xffc0) == 0xfe80) && m_iso >= 12)
+	if ((op & 0xffc0) == 0xfe80) // apparently 1.2 and above, but jak_capb needs it and otherwise seems 1.0 / 1.1?
 	{
 		len = 2;
 		uint8_t opimm = op & 0x3f;
