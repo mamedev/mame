@@ -39,9 +39,9 @@ READ8_MEMBER(_88games_state::bankedram_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -50,7 +50,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 	if (m_videobank)
 		m_ram[offset] = data;
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 WRITE8_MEMBER(_88games_state::k88games_5f84_w)
