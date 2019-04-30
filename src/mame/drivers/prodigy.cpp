@@ -659,8 +659,8 @@ void prodigy_state::prodigy(machine_config &config)
 	m_via->cb1_handler().set(FUNC(prodigy_state::via_cb1_w));
 	m_via->cb2_handler().set(FUNC(prodigy_state::via_cb2_w));
 
-	NETLIST_CPU(config, m_bcd, XTAL(2'000'000) * 30);
-	m_bcd->set_constructor(netlist_prodigy);
+	NETLIST_CPU(config, m_bcd, XTAL(2'000'000) * 30)
+		.set_source(netlist_prodigy);
 
 	NETLIST_LOGIC_INPUT(config, m_cb1); m_cb1->set_params("cb1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_cb2); m_cb2->set_params("cb2.IN", 0);

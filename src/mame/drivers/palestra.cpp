@@ -71,11 +71,12 @@ static INPUT_PORTS_START(palestra)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(palestra_state::palestra)
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_palestra);
+void palestra_state::palestra(machine_config &config)
+{
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK)
+		.set_source(netlist_palestra);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
@@ -85,7 +86,7 @@ MACHINE_CONFIG_START(palestra_state::palestra)
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( palestra ) /* dummy to satisfy game entry*/

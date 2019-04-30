@@ -20,6 +20,7 @@
 #include "netlist/plib/palloc.h"
 
 #include "debugger.h"
+#include "romload.h"
 
 #include <cmath>
 #include <memory>
@@ -53,7 +54,7 @@ class netlist_mame_device::netlist_mame_callbacks_t : public netlist::callbacks_
 {
 public:
 
-	netlist_mame_callbacks_t(netlist_mame_device &parent)
+	netlist_mame_callbacks_t(const netlist_mame_device &parent)
 		: netlist::callbacks_t()
 		, m_parent(parent)
 	{
@@ -67,11 +68,11 @@ protected:
 		case plib::plog_level::DEBUG:
 			m_parent.logerror("netlist DEBUG: %s\n", ls.c_str());
 			break;
-		case plib::plog_level::INFO:
-			m_parent.logerror("netlist INFO: %s\n", ls.c_str());
-			break;
 		case plib::plog_level::VERBOSE:
 			m_parent.logerror("netlist VERBOSE: %s\n", ls.c_str());
+			break;
+		case plib::plog_level::INFO:
+			m_parent.logerror("netlist INFO: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::WARNING:
 			m_parent.logerror("netlist WARNING: %s\n", ls.c_str());
@@ -80,13 +81,47 @@ protected:
 			m_parent.logerror("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			emu_fatalerror error("netlist ERROR: %s\n", ls.c_str());
-			throw error;
+			throw emu_fatalerror(1, "netlist ERROR: %s\n", ls.c_str());
 		}
 	}
 
 private:
-	netlist_mame_device &m_parent;
+	const netlist_mame_device &m_parent;
+};
+
+class netlist_validate_callbacks_t : public netlist::callbacks_t
+{
+public:
+
+	netlist_validate_callbacks_t()
+		: netlist::callbacks_t()
+	{
+	}
+
+protected:
+	void vlog(const plib::plog_level &l, const pstring &ls) const override
+	{
+		switch (l)
+		{
+		case plib::plog_level::DEBUG:
+			break;
+		case plib::plog_level::VERBOSE:
+			break;
+		case plib::plog_level::INFO:
+			osd_printf_verbose("netlist INFO: %s\n", ls.c_str());
+			break;
+		case plib::plog_level::WARNING:
+			osd_printf_warning("netlist WARNING: %s\n", ls.c_str());
+			break;
+		case plib::plog_level::ERROR:
+			osd_printf_error("netlist ERROR: %s\n", ls.c_str());
+			break;
+		case plib::plog_level::FATAL:
+			throw emu_fatalerror(1, "netlist ERROR: %s\n", ls.c_str());
+		}
+	}
+
+private:
 };
 
 
@@ -100,8 +135,14 @@ public:
 	{
 	}
 
+	netlist_mame_t(netlist_mame_device &parent, const pstring &aname, plib::unique_ptr<netlist::callbacks_t> cbs)
+		: netlist::netlist_t(aname, std::move(cbs))
+		, m_parent(parent)
+	{
+	}
+
 	running_machine &machine() { return m_parent.machine(); }
-	netlist_mame_device &parent() { return m_parent; }
+	netlist_mame_device &parent() const { return m_parent; }
 
 private:
 	netlist_mame_device &m_parent;
@@ -123,7 +164,9 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		m_cpu_device = downcast<netlist_mame_cpu_device *>(&static_cast<netlist_mame_device::netlist_mame_t &>(exec()).parent());
+		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&exec());
+		if (nl != nullptr)
+			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
 	}
 
 	ATTR_COLD void reset() override
@@ -171,7 +214,9 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		m_cpu_device = downcast<netlist_mame_cpu_device *>(&static_cast<netlist_mame_device::netlist_mame_t &>(exec()).parent());
+		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&exec());
+		if (nl != nullptr)
+			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
 	}
 
 	ATTR_COLD void reset() override
@@ -211,9 +256,33 @@ private:
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
 
+/*! Specific exception if memregion is not available.
+ *  The exception is thrown if the memregions are not available.
+ *  This may be the case in device_validity_check and needs
+ *  to be ignored.
+ */
+class memregion_not_set : public netlist::nl_exception
+{
+public:
+	/*! Constructor.
+	 *  Allows a descriptive text to be assed to the exception
+	 */
+	explicit memregion_not_set(const pstring &text //!< text to be passed
+			)
+	: netlist::nl_exception(text) { }
+
+	template<typename... Args>
+	explicit memregion_not_set(const pstring &fmt //!< format to be used
+		, Args&&... args //!< arguments to be passed
+		)
+	: netlist::nl_exception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
+};
+
 class netlist_source_memregion_t : public netlist::source_t
 {
 public:
+
+
 	netlist_source_memregion_t(device_t &dev, pstring name)
 	: netlist::source_t(), m_dev(dev), m_name(name)
 	{
@@ -228,12 +297,12 @@ private:
 class netlist_data_memregions_t : public netlist::source_t
 {
 public:
-	netlist_data_memregions_t(device_t &dev);
+	netlist_data_memregions_t(const device_t &dev);
 
 	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 private:
-	device_t &m_dev;
+	const device_t &m_dev;
 };
 
 
@@ -243,29 +312,58 @@ private:
 
 plib::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).machine().root_device().memregion(m_name.c_str());
-	memory_region *mem = m_dev.machine().root_device().memregion(m_name.c_str());
-	return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+	if (m_dev.has_running_machine())
+	{
+		memory_region *mem = m_dev.memregion(m_name.c_str());
+		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+	}
+	else
+		throw memregion_not_set("memregion unavailable for {1} in source {2}", name, m_name);
+		//return plib::unique_ptr<plib::pimemstream>(nullptr);
 }
 
-netlist_data_memregions_t::netlist_data_memregions_t(device_t &dev)
+netlist_data_memregions_t::netlist_data_memregions_t(const device_t &dev)
 	: netlist::source_t(netlist::source_t::DATA), m_dev(dev)
 {
+}
+
+static bool rom_exists(device_t &root, pstring name)
+{
+	// iterate, starting with the driver's ROMs and continuing with device ROMs
+	for (device_t &device : device_iterator(root))
+	{
+		// scan the ROM entries for this device
+		for (tiny_rom_entry const *romp = device.rom_region(); romp && !ROMENTRY_ISEND(romp); ++romp)
+		{
+			if (ROMENTRY_ISREGION(romp)) // if this is a region, check for rom
+			{
+				char const *const basetag = romp->name;
+				if (name == pstring(":") + basetag)
+					return true;
+			}
+		}
+	}
+	return false;
 }
 
 plib::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
-	memory_region *mem = m_dev.memregion(name.c_str());
-	if (mem != nullptr)
+	if (m_dev.has_running_machine())
 	{
-		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		memory_region *mem = m_dev.memregion(name.c_str());
+		if (mem != nullptr)
+			return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		else
+			return plib::unique_ptr<plib::pistream>(nullptr);
 	}
 	else
 	{
-		// This should be the last data provider being called - last resort
-		fatalerror("data named %s not found in device rom regions\n", name.c_str());
-		return plib::unique_ptr<plib::pistream>(nullptr);
+		/* validation */
+		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
+			return plib::make_unique<plib::pimemstream>();
+		else
+			return plib::unique_ptr<plib::pistream>(nullptr);
 	}
 }
 
@@ -467,6 +565,8 @@ private:
 
 netlist::setup_t &netlist_mame_device::setup()
 {
+	if (!m_netlist)
+		throw device_missing_dependencies();
 	return m_netlist->nlstate().setup();
 }
 
@@ -548,6 +648,14 @@ void netlist_mame_sub_interface::set_mult_offset(const double mult, const double
 	m_offset = offset;
 }
 
+netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *param_name)
+	: device_t(mconfig, NETLIST_ANALOG_INPUT, tag, owner, 0)
+	, netlist_mame_sub_interface(*owner)
+	, m_param(nullptr)
+	, m_auto_port(true)
+	, m_param_name(param_name)
+{
+}
 
 netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NETLIST_ANALOG_INPUT, tag, owner, clock)
@@ -587,21 +695,19 @@ netlist_mame_analog_output_device::netlist_mame_analog_output_device(const machi
 {
 }
 
-void netlist_mame_analog_output_device::set_params(const char *in_name, output_delegate &&adelegate)
-{
-	m_in = in_name;
-	m_delegate = std::move(adelegate);
-}
-
 void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
 {
 	const pstring pin(m_in);
 	pstring dname = pstring("OUT_") + pin;
 	pstring dfqn = nlstate.setup().build_fqn(dname);
-	m_delegate.bind_relative_to(owner()->machine().root_device());
+
+	/* ignore if no running machine -> called within device_validity_check context */
+	if (owner()->has_running_machine())
+		m_delegate.bind_relative_to(owner()->machine().root_device());
 
 	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
-	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
+	//static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
+	dev->register_callback(std::move(m_delegate));
 	nlstate.add_dev(dfqn, std::move(dev));
 	nlstate.setup().register_link(dname + ".IN", pin);
 }
@@ -635,10 +741,12 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 	pstring dname = "OUT_" + pin;
 	pstring dfqn = nlstate.setup().build_fqn(dname);
 
-	m_delegate.bind_relative_to(owner()->machine().root_device());
+	/* ignore if no running machine -> called within device_validity_check context */
+	if (owner()->has_running_machine())
+		m_delegate.bind_relative_to(owner()->machine().root_device());
 
 	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
-	static_cast<NETLIB_NAME(logic_callback) *>(dev.get())->register_callback(std::move(m_delegate));
+	dev->register_callback(std::move(m_delegate));
 	nlstate.add_dev(dfqn, std::move(dev));
 	nlstate.setup().register_link(dname + ".IN", pin);
 }
@@ -723,6 +831,15 @@ netlist_mame_ram_pointer_device::netlist_mame_ram_pointer_device(const machine_c
 	, netlist_mame_sub_interface(*owner)
 	, m_param(nullptr)
 	, m_param_name("")
+	, m_data(nullptr)
+{
+}
+
+netlist_mame_ram_pointer_device::netlist_mame_ram_pointer_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *pname)
+	: device_t(mconfig, NETLIST_RAM_POINTER, tag, owner, 0)
+	, netlist_mame_sub_interface(*owner)
+	, m_param(nullptr)
+	, m_param_name(pname)
 	, m_data(nullptr)
 {
 }
@@ -845,25 +962,16 @@ netlist_mame_device::~netlist_mame_device()
 void netlist_mame_device::device_config_complete()
 {
 	LOGDEVCALLS("device_config_complete %s\n", this->mconfig().gamedrv().name);
+
 }
 
-void netlist_mame_device::device_validity_check(validity_checker &valid) const
+void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 {
-	LOGDEVCALLS("device_validity_check %s\n", this->mconfig().gamedrv().name);
-}
-
-
-void netlist_mame_device::device_start()
-{
-	LOGDEVCALLS("device_start entry\n");
-
-	//printf("clock is %d\n", clock());
-
-	m_netlist = netlist::pool().make_poolptr<netlist_mame_t>(*this, "netlist");
+	auto &lsetup = lnetlist->nlstate().setup();
 
 	// register additional devices
 
-	nl_register_devices();
+	nl_register_devices(lsetup);
 
 	/* let sub-devices add sources and do stuff prior to parsing */
 	for (device_t &d : subdevices())
@@ -872,15 +980,17 @@ void netlist_mame_device::device_start()
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Preparse subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->pre_parse_action(m_netlist->nlstate());
+			sdev->pre_parse_action(lnetlist->nlstate());
 		}
 	}
 
-	/* add default data provider for roms */
-	setup().register_source(plib::make_unique<netlist_data_memregions_t>(*this));
+	/* add default data provider for roms - if not in validity check*/
+	//if (has_running_machine())
+		lsetup.register_source(plib::make_unique<netlist_data_memregions_t>(*this));
 
-	m_setup_func(setup());
+	m_setup_func(lsetup);
 
+#if 1
 	/* let sub-devices tweak the netlist */
 	for (device_t &d : subdevices())
 	{
@@ -888,15 +998,55 @@ void netlist_mame_device::device_start()
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Found subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->custom_netlist_additions(m_netlist->nlstate());
+			sdev->custom_netlist_additions(lnetlist->nlstate());
 		}
 	}
+	lsetup.prepare_to_run();
+#endif
+}
 
-	setup().prepare_to_run();
 
-	netlist().nlstate().save(*this, m_rem, this->name(), "m_rem");
-	netlist().nlstate().save(*this, m_div, this->name(), "m_div");
-	netlist().nlstate().save(*this, m_old, this->name(), "m_old");
+
+void netlist_mame_device::device_validity_check(validity_checker &valid) const
+{
+#if 1
+
+	//rom_exists(mconfig().root_device());
+	LOGDEVCALLS("device_validity_check %s\n", this->mconfig().gamedrv().name);
+
+	try
+	{
+		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
+		netlist::netlist_t lnetlist("netlist", plib::make_unique<netlist_validate_callbacks_t>());
+		common_dev_start(&lnetlist);
+	}
+	catch (memregion_not_set &err)
+	{
+		osd_printf_verbose("%s\n", err.what());
+	}
+	catch (emu_fatalerror &err)
+	{
+		osd_printf_error("%s\n", err.string());
+	}
+	catch (std::exception &err)
+	{
+		osd_printf_error("%s\n", err.what());
+	}
+#endif
+}
+
+
+void netlist_mame_device::device_start()
+{
+	LOGDEVCALLS("device_start entry\n");
+
+	m_netlist = netlist::pool().make_poolptr<netlist_mame_t>(*this, "netlist");
+
+	common_dev_start(m_netlist.get());
+
+	m_netlist->nlstate().save(*this, m_rem, this->name(), "m_rem");
+	m_netlist->nlstate().save(*this, m_div, this->name(), "m_div");
+	m_netlist->nlstate().save(*this, m_old, this->name(), "m_old");
 
 	save_state();
 
@@ -1042,9 +1192,9 @@ void netlist_mame_cpu_device::device_start()
 }
 
 
-void netlist_mame_cpu_device::nl_register_devices()
+void netlist_mame_cpu_device::nl_register_devices(netlist::setup_t &lsetup) const
 {
-	setup().factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
+	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
 }
 
 ATTR_COLD uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const
@@ -1169,10 +1319,10 @@ void netlist_mame_sound_device::device_start()
 
 }
 
-void netlist_mame_sound_device::nl_register_devices()
+void netlist_mame_sound_device::nl_register_devices(netlist::setup_t &lsetup) const
 {
-	setup().factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN");
-	setup().factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-");
+	lsetup.factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN");
+	lsetup.factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-");
 }
 
 

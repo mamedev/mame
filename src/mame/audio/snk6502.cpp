@@ -995,7 +995,10 @@ WRITE8_MEMBER(sasuke_sound_device::sound_w)
 			m_samples->start(3, 3);
 
 		if (BIT(data & ~m_last_port1, 7))
+		{
+			m_custom->reset_offset(0); // TODO: why is this the only game that needs this when unmuting?
 			m_custom->unmute_channel(0);
+		}
 		else if (BIT(~data & m_last_port1, 7))
 			m_custom->mute_channel(0);
 

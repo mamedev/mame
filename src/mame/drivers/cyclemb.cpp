@@ -404,7 +404,7 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 #if 0
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
@@ -418,7 +418,7 @@ READ8_MEMBER(cyclemb_state::mcu_status_r)
 
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
@@ -561,7 +561,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 		m_mcu[0].txd = data;
 
 		m_mcu[1].rst = 0;
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 
 		if(m_mcu[0].txd == 0x41)
 			m_mcu[0].state = 1;
@@ -627,7 +627,7 @@ READ8_MEMBER(cyclemb_state::skydest_i8741_1_r)
 	if(m_mcu[1].rst == 1)
 		return 0x40;
 
-	return m_soundlatch->read(space,0);
+	return m_soundlatch->read();
 }
 
 WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
@@ -639,7 +639,7 @@ WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
 			m_mcu[1].rst = 1;
 	}
 	//else
-	//  m_soundlatch->clear_w(space, 0, 0);
+	//  m_soundlatch->clear_w();
 }
 
 

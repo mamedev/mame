@@ -4,6 +4,10 @@
     Sharp pocket computers
     PC1401/PC1403
     PeT mess@utanet.at May 2000
+
+    pc1403 and pc1403h can be convinced to work if you hit Enter once or twice
+    as soon as it is started.
+
 ******************************************************************************/
 
 #include "emu.h"

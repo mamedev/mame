@@ -115,7 +115,7 @@ private:
 
 WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -527,12 +527,12 @@ void dmndrby_state::dmndrby_palette(palette_device &palette) const
 /*Main Z80 is IM 0,HW-latched irqs. */
 INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 }
 
 INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* Z80 - RST 08h */
 }
 
 void dmndrby_state::dderby(machine_config &config)

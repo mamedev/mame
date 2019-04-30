@@ -56,10 +56,10 @@ private:
 	void mmu_init_w(u16 data);
 
 	u16 irq_r();
-	IRQ_CALLBACK_MEMBER(intack);
+	u8 intack_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
+	u8 ctc_r(offs_t offset);
+	void ctc_w(offs_t offset, u8 data);
 	u16 earom_recall_r();
 	u16 earom_store_r();
 
@@ -78,6 +78,7 @@ private:
 
 	void main_map(address_map &map);
 	void clb_map(address_map &map);
+	void fc7_map(address_map &map);
 	void wdcpu_prog_map(address_map &map);
 	void wdcpu_bank_map(address_map &map);
 
@@ -220,20 +221,20 @@ u16 fs3216_state::irq_r()
 	return 0xfff8;
 }
 
-IRQ_CALLBACK_MEMBER(fs3216_state::intack)
+u8 fs3216_state::intack_r(offs_t offset)
 {
-	// FIXME: not all levels are vectored this way
-	return m_vecprom[irqline];
+	// FIXME: all interrupts are vectored, but not all levels go through this PROM
+	return m_vecprom[offset];
 }
 
-READ8_MEMBER(fs3216_state::ctc_r)
+u8 fs3216_state::ctc_r(offs_t offset)
 {
-	return m_ctc->read(space, offset >> 1);
+	return m_ctc->read(offset >> 1);
 }
 
-WRITE8_MEMBER(fs3216_state::ctc_w)
+void fs3216_state::ctc_w(offs_t offset, u8 data)
 {
-	m_ctc->write(space, offset >> 1, data);
+	m_ctc->write(offset >> 1, data);
 }
 
 u16 fs3216_state::earom_recall_r()
@@ -443,6 +444,11 @@ void fs3216_state::clb_map(address_map &map)
 	map(0x7f7400, 0x7f75ff).rw(m_earom, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 }
 
+void fs3216_state::fc7_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).r(FUNC(fs3216_state::intack_r)).umask16(0x00ff);
+}
+
 void fs3216_state::wdcpu_prog_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rom().region("wdcpu", 0);
@@ -463,8 +469,8 @@ void fs3216_state::fs3216(machine_config &config)
 {
 	M68000(config, m_maincpu, 44.2368_MHz_XTAL / 8); // 5.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fs3216_state::main_map);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &fs3216_state::fc7_map);
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(fs3216_state::mmu_reset_w), this));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(fs3216_state::intack));
 
 	ADDRESS_MAP_BANK(config, m_clb);
 	m_clb->set_addrmap(0, &fs3216_state::clb_map);

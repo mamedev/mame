@@ -395,7 +395,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "machine/scc68070.h"
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "video/ramdac.h"
@@ -417,14 +417,6 @@ public:
 		m_magicram(*this, "magicram"),
 		m_magicramb(*this, "magicramb"),
 		m_pcab_vregs(*this, "pcab_vregs"),
-		m_scc68070_ext_irqc_regs(*this, "scc_xirqc_regs"),
-		m_scc68070_iic_regs(*this, "scc_iic_regs"),
-		m_scc68070_uart_regs(*this, "scc_uart_regs"),
-		m_scc68070_timer_regs(*this, "scc_timer_regs"),
-		m_scc68070_int_irqc_regs(*this, "scc_iirqc_regs"),
-		m_scc68070_dma_ch1_regs(*this, "scc_dma1_regs"),
-		m_scc68070_dma_ch2_regs(*this, "scc_dma2_regs"),
-		m_scc68070_mmu_regs(*this, "scc_mmu_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
@@ -435,36 +427,13 @@ public:
 	void init_magicard();
 
 private:
+	//u16 m_vector;
 	required_shared_ptr<uint16_t> m_magicram;
 	required_shared_ptr<uint16_t> m_magicramb;
 	required_shared_ptr<uint16_t> m_pcab_vregs;
-	required_shared_ptr<uint16_t> m_scc68070_ext_irqc_regs;
-	required_shared_ptr<uint16_t> m_scc68070_iic_regs;
-	required_shared_ptr<uint16_t> m_scc68070_uart_regs;
-	required_shared_ptr<uint16_t> m_scc68070_timer_regs;
-	required_shared_ptr<uint16_t> m_scc68070_int_irqc_regs;
-	required_shared_ptr<uint16_t> m_scc68070_dma_ch1_regs;
-	required_shared_ptr<uint16_t> m_scc68070_dma_ch2_regs;
-	required_shared_ptr<uint16_t> m_scc68070_mmu_regs;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ16_MEMBER(philips_66470_r);
 	DECLARE_WRITE16_MEMBER(philips_66470_w);
-	DECLARE_READ16_MEMBER(scc68070_ext_irqc_r);
-	DECLARE_WRITE16_MEMBER(scc68070_ext_irqc_w);
-	DECLARE_READ16_MEMBER(scc68070_iic_r);
-	DECLARE_WRITE16_MEMBER(scc68070_iic_w);
-	DECLARE_READ16_MEMBER(scc68070_uart_r);
-	DECLARE_WRITE16_MEMBER(scc68070_uart_w);
-	DECLARE_READ16_MEMBER(scc68070_timer_r);
-	DECLARE_WRITE16_MEMBER(scc68070_timer_w);
-	DECLARE_READ16_MEMBER(scc68070_int_irqc_r);
-	DECLARE_WRITE16_MEMBER(scc68070_int_irqc_w);
-	DECLARE_READ16_MEMBER(scc68070_dma_ch1_r);
-	DECLARE_WRITE16_MEMBER(scc68070_dma_ch1_w);
-	DECLARE_READ16_MEMBER(scc68070_dma_ch2_r);
-	DECLARE_WRITE16_MEMBER(scc68070_dma_ch2_w);
-	DECLARE_READ16_MEMBER(scc68070_mmu_r);
-	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -475,7 +444,6 @@ private:
 	void hotslots_mem(address_map &map);
 	void magicard_mem(address_map &map);
 	void ramdac_map(address_map &map);
-	void scc68070_mem(address_map &map);
 };
 
 
@@ -780,147 +748,14 @@ WRITE16_MEMBER(magicard_state::philips_66470_w)
 //  }
 }
 
-/* scc68070 specific stuff (to be moved) */
-
-READ16_MEMBER(magicard_state::scc68070_ext_irqc_r)
-{
-	return m_scc68070_ext_irqc_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_ext_irqc_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_ext_irqc_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_iic_r)
-{
-	//printf("%04x\n",offset*2);
-
-	switch(offset)
-	{
-		case 0x04/2: return m_scc68070_iic_regs[offset] & 0xef; //iic status register, bit 4 = pending irq
-	}
-
-	return m_scc68070_iic_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_iic_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_iic_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_uart_r)
-{
-	//printf("%02x\n",offset*2);
-
-	switch(offset)
-	{
-		case 0x02/2: return machine().rand(); //uart mode register
-	}
-
-	return m_scc68070_uart_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_uart_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_uart_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_timer_r)
-{
-	return m_scc68070_timer_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_timer_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_timer_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_int_irqc_r)
-{
-	return m_scc68070_int_irqc_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_int_irqc_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_int_irqc_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_dma_ch1_r)
-{
-	return m_scc68070_dma_ch1_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_dma_ch1_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_dma_ch1_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_dma_ch2_r)
-{
-	return m_scc68070_dma_ch2_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_dma_ch2_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_dma_ch2_regs[offset] = data;
-}
-
-READ16_MEMBER(magicard_state::scc68070_mmu_r)
-{
-	return m_scc68070_mmu_regs[offset];
-}
-
-WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
-{
-	data &= mem_mask;
-
-	m_scc68070_mmu_regs[offset] = data;
-
-	switch(offset)
-	{
-		case 0x0000/2:
-			if(data & 0x80) //throw an error if the (unemulated) MMU is enabled
-				fatalerror("SCC68070: MMU enable bit active\n");
-			break;
-	}
-}
-
 
 /*************************
 *      Memory Maps       *
 *************************/
 
-void magicard_state::scc68070_mem(address_map &map)
-{
-	map(0x80001000, 0x8000100f).rw(FUNC(magicard_state::scc68070_ext_irqc_r), FUNC(magicard_state::scc68070_ext_irqc_w)).share("scc_xirqc_regs"); //lir
-	map(0x80002000, 0x8000200f).rw(FUNC(magicard_state::scc68070_iic_r), FUNC(magicard_state::scc68070_iic_w)).share("scc_iic_regs"); //i2c
-	map(0x80002010, 0x8000201f).rw(FUNC(magicard_state::scc68070_uart_r), FUNC(magicard_state::scc68070_uart_w)).share("scc_uart_regs");
-	map(0x80002020, 0x8000202f).rw(FUNC(magicard_state::scc68070_timer_r), FUNC(magicard_state::scc68070_timer_w)).share("scc_timer_regs");
-	map(0x80002040, 0x8000204f).rw(FUNC(magicard_state::scc68070_int_irqc_r), FUNC(magicard_state::scc68070_int_irqc_w)).share("scc_iirqc_regs");
-	map(0x80004000, 0x8000403f).rw(FUNC(magicard_state::scc68070_dma_ch1_r), FUNC(magicard_state::scc68070_dma_ch1_w)).share("scc_dma1_regs");
-	map(0x80004040, 0x8000407f).rw(FUNC(magicard_state::scc68070_dma_ch2_r), FUNC(magicard_state::scc68070_dma_ch2_w)).share("scc_dma2_regs");
-	map(0x80008000, 0x8000807f).rw(FUNC(magicard_state::scc68070_mmu_r), FUNC(magicard_state::scc68070_mmu_w)).share("scc_mmu_regs");
-}
-
 void magicard_state::magicard_mem(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	scc68070_mem(map);
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	/* 001ffc00-001ffdff System I/O */
@@ -939,7 +774,6 @@ void magicard_state::magicard_mem(address_map &map)
 void magicard_state::hotslots_mem(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	scc68070_mem(map);
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
@@ -968,12 +802,12 @@ void magicard_state::machine_reset()
 	memcpy (dst, src, 0x80000);
 	memcpy (dst + 0x40000 * 1, src, 0x80000);
 	memcpy (dst + 0x40000 * 2, src, 0x80000);
-	memcpy (dst + 0x40000 * 3, src, 0x80000);
+	memcpy (dst + 0x40000 * 3, src, 0x7fc00);
 	dst = m_magicramb;
 	memcpy (dst, src, 0x80000);
 	memcpy (dst + 0x40000 * 1, src, 0x80000);
 	memcpy (dst + 0x40000 * 2, src, 0x80000);
-	memcpy (dst + 0x40000 * 3, src, 0x80000);
+	memcpy (dst + 0x40000 * 3, src, 0x7fc00);
 	m_maincpu->reset();
 }
 
@@ -982,13 +816,20 @@ void magicard_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
+
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
 INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 {
-	if(machine().input().code_pressed(KEYCODE_Z)) //vblank?
-		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xe4 / 4);
-	if(machine().input().code_pressed(KEYCODE_X)) //uart irq
-		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xf0 / 4);
+#if 0
+	if(machine().input().code_pressed(KEYCODE_Z)) { //vblank?
+		m_vector = 0xe4;
+		device.execute().set_input_line(1, HOLD_LINE);
+	}
+	if(machine().input().code_pressed(KEYCODE_X)) { //uart irq
+		m_vector = 0xf0;
+		device.execute().set_input_line(1, HOLD_LINE);
+	}
+#endif
 }
 
 void magicard_state::ramdac_map(address_map &map)
@@ -999,7 +840,7 @@ void magicard_state::ramdac_map(address_map &map)
 
 void magicard_state::magicard(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_A / 2);    /* SCC-68070 CCA84 datasheet */
+	SCC68070(config, m_maincpu, CLOCK_A);    /* SCC-68070 CCA84 datasheet */
 	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::magicard_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(magicard_state::magicard_irq)); /* no interrupts? (it erases the vectors..) */
 

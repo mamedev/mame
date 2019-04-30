@@ -657,7 +657,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 {
-	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
+	/* direct irq line connection, IPL1 is vblank, IPL2 is some sort of scanline interrupt. */
 	if (param == 0)
 		m_scancalls = 0;
 
@@ -673,7 +673,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 	if (m_scanline1 == param || (m_scanline1 < param && !m_scancalls))
 	{
 		m_cps_b_regs[0x10/2] = 0;
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 		m_screen->update_partial(param);
 		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
@@ -683,7 +683,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 	if(m_scanline2 == param || (m_scanline2 < param && !m_scancalls))
 	{
 		m_cps_b_regs[0x12 / 2] = 0;
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 		m_screen->update_partial(param);
 		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
@@ -693,7 +693,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 	{
 		m_cps_b_regs[0x10 / 2] = m_scanline1;
 		m_cps_b_regs[0x12 / 2] = m_scanline2;
-		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 		cps2_objram_latch();
 	}
 //  popmessage("Raster calls = %i", m_scancalls);
@@ -1301,6 +1301,8 @@ void cps2_state::cps2(machine_config &config)
 	M68000(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
+	m_maincpu->disable_interrupt_mixer();
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, XTAL(8'000'000));

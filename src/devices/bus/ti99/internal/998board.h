@@ -541,7 +541,7 @@ public:
 	// Memory space
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	uint8_t setoffset(offs_t offset);
+	void setaddress(offs_t offset, uint8_t busctrl);
 
 	// Memory space for debugger access
 	uint8_t debugger_read(offs_t offset);

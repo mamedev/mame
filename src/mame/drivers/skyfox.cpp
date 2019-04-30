@@ -42,7 +42,7 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 		break;
 
 	case 1:
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 		break;
 
 	default:

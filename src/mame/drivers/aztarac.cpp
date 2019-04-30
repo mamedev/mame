@@ -18,9 +18,7 @@
 #include "emu.h"
 #include "includes/aztarac.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -32,15 +30,15 @@
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(aztarac_state::irq_callback)
-{
-	return 0xc;
-}
-
-
 void aztarac_state::machine_start()
 {
 	save_item(NAME(m_sound_status));
+}
+
+void aztarac_state::machine_reset()
+{
+	m_nvram->recall(1);
+	m_nvram->recall(0);
 }
 
 
@@ -51,9 +49,10 @@ void aztarac_state::machine_start()
  *
  *************************************/
 
-READ16_MEMBER(aztarac_state::nvram_r)
+void aztarac_state::nvram_store_w(uint16_t data)
 {
-	return m_nvram[offset] | 0xfff0;
+	m_nvram->store(1);
+	m_nvram->store(0);
 }
 
 
@@ -81,14 +80,16 @@ READ16_MEMBER(aztarac_state::joystick_r)
 void aztarac_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00bfff).rom();
-	map(0x022000, 0x0220ff).r(FUNC(aztarac_state::nvram_r)).writeonly().share("nvram");
+	map(0x021000, 0x021001).w(FUNC(aztarac_state::nvram_store_w));
+	map(0x022000, 0x0221ff).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x027000, 0x027001).r(FUNC(aztarac_state::joystick_r));
 	map(0x027004, 0x027005).portr("INPUTS");
 	map(0x027008, 0x027009).rw(FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
 	map(0x02700c, 0x02700d).portr("DIAL");
 	map(0x02700e, 0x02700f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xff8000, 0xffafff).ram().share("vectorram");
-	map(0xffb000, 0xffb001).w(FUNC(aztarac_state::ubr_w));
+	map(0xffb000, 0xffb001).nopr();
+	map(0xffb001, 0xffb001).w(FUNC(aztarac_state::ubr_w));
 	map(0xffe000, 0xffffff).ram();
 }
 
@@ -149,44 +150,43 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(aztarac_state::aztarac)
-
+void aztarac_state::aztarac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aztarac_state,  irq4_line_hold)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(aztarac_state, irq_callback)
+	m68000_device &maincpu(M68000(config, m_maincpu, 16_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &aztarac_state::main_map);
+	maincpu.set_cpu_space(AS_PROGRAM);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(aztarac_state, snd_timed_irq,  100)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aztarac_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(aztarac_state::snd_timed_irq), attotime::from_hz(100));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	X2212(config, m_nvram);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	VECTOR(config, m_vector, 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
-
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(40);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(0, 1024-1, 0, 768-1);
+	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay1", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay2", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	AY8910(config, "ay3", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay3", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	AY8910(config, "ay4", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
-MACHINE_CONFIG_END
+	AY8910(config, "ay4", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+}
 
 
 

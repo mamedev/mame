@@ -110,7 +110,7 @@ uint8_t pofo_hpc102_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool b
 
 		if (!(offset & 0x08))
 		{
-			data = m_uart->ins8250_r(machine().dummy_space(), offset & 0x07);
+			data = m_uart->ins8250_r(offset & 0x07);
 		}
 	}
 
@@ -133,7 +133,7 @@ void pofo_hpc102_device::nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom
 
 		if (!(offset & 0x08))
 		{
-			m_uart->ins8250_w(machine().dummy_space(), offset & 0x07, data);
+			m_uart->ins8250_w(offset & 0x07, data);
 		}
 	}
 }

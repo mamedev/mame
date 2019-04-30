@@ -4,7 +4,7 @@
 #ifndef MAME_INCLUDES_CDI_H
 #define MAME_INCLUDES_CDI_H
 
-#include "machine/cdi070.h"
+#include "machine/scc68070.h"
 #include "machine/cdislave.h"
 #include "machine/cdicdic.h"
 #include "sound/dmadac.h"
@@ -14,23 +14,18 @@
 
 /*----------- driver state -----------*/
 
-#define CLOCK_A XTAL(30'000'000)
-#define CLOCK_B XTAL(19'660'800)
-
 class cdi_state : public driver_device
 {
 public:
 	cdi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_planea(*this, "planea")
-		, m_planeb(*this, "planeb")
+		, m_planea(*this, "mcd212:planea")
 		, m_input1(*this, "INPUT1")
 		, m_input2(*this, "INPUT2")
 		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
-		, m_scc(*this, "scc68070")
 		, m_cdic(*this, "cdic")
 		, m_cdda(*this, "cdda")
 		, m_mcd212(*this, "mcd212")
@@ -74,15 +69,13 @@ public:
 		INV_CADDYSWITCH_IN = (1 << 7)
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<scc68070_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_planea;
-	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
 	optional_ioport m_input2;
 	optional_device<cdislave_device> m_slave_hle;
 	optional_device<cpu_device> m_servo;
 	optional_device<cpu_device> m_slave;
-	required_device<cdi68070_device> m_scc;
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;
@@ -118,7 +111,7 @@ public:
 
 	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
 
-	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_lcd(int y);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void cdimono1(machine_config &config);
 	void cdimono2(machine_config &config);
@@ -134,14 +127,7 @@ public:
 	void cdimono2_mem(address_map &map);
 	void cdimono2_servo_mem(address_map &map);
 	void cdimono2_slave_mem(address_map &map);
+	void cdi070_cpuspace(address_map &map);
 };
-
-/*----------- debug defines -----------*/
-
-#define VERBOSE_LEVEL   (1)
-
-#define ENABLE_VERBOSE_LOG (0)
-
-#define ENABLE_UART_PRINTING (0)
 
 #endif // MAME_INCLUDES_CDI_H

@@ -48,7 +48,7 @@
 int leland_state::dial_compute_value(int new_val, int indx)
 {
 	int delta = new_val - (int)m_dial_last_input[indx];
-	uint8_t result = m_dial_last_result[indx] & 0x80;
+	u8 result = m_dial_last_result[indx] & 0x80;
 
 	m_dial_last_input[indx] = new_val;
 
@@ -81,18 +81,18 @@ int leland_state::dial_compute_value(int new_val, int indx)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::cerberus_dial_1_r)
+u8 leland_state::cerberus_dial_1_r()
 {
-	int original = ioport("IN0")->read();
-	int modified = dial_compute_value(ioport("AN0")->read(), 0);
+	int original = m_io_in[0]->read();
+	int modified = dial_compute_value(m_io_an[0]->read(), 0);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
 
 
-READ8_MEMBER(leland_state::cerberus_dial_2_r)
+u8 leland_state::cerberus_dial_2_r()
 {
-	int original = ioport("IN2")->read();
-	int modified = dial_compute_value(ioport("AN1")->read(), 1);
+	int original = m_io_in[2]->read();
+	int modified = dial_compute_value(m_io_an[1]->read(), 1);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
 
@@ -105,7 +105,7 @@ READ8_MEMBER(leland_state::cerberus_dial_2_r)
  *************************************/
 
 
-WRITE8_MEMBER(leland_state::alleymas_joystick_kludge)
+void leland_state::alleymas_joystick_kludge(u8 data)
 {
 	/* catch the case where they clear this memory location at PC $1827 and change */
 	/* the value written to be a 1 */
@@ -135,8 +135,8 @@ WRITE8_MEMBER(leland_state::alleymas_joystick_kludge)
 
 void leland_state::update_dangerz_xy()
 {
-	uint8_t newy = ioport("AN0")->read();
-	uint8_t newx = ioport("AN1")->read();
+	u8 newy = m_io_an[0]->read();
+	u8 newx = m_io_an[1]->read();
 	int deltay = newy - m_dial_last_input[0];
 	int deltax = newx - m_dial_last_input[1];
 
@@ -157,21 +157,21 @@ void leland_state::update_dangerz_xy()
 }
 
 
-READ8_MEMBER(leland_state::dangerz_input_y_r)
+u8 leland_state::dangerz_input_y_r()
 {
 	update_dangerz_xy();
 	return m_dangerz_y & 0xff;
 }
 
 
-READ8_MEMBER(leland_state::dangerz_input_x_r)
+u8 leland_state::dangerz_input_x_r()
 {
 	update_dangerz_xy();
 	return m_dangerz_x & 0xff;
 }
 
 
-READ8_MEMBER(leland_state::dangerz_input_upper_r)
+u8 leland_state::dangerz_input_upper_r()
 {
 	update_dangerz_xy();
 	return ((m_dangerz_y >> 2) & 0xc0) | ((m_dangerz_x >> 8) & 0x03);
@@ -185,31 +185,31 @@ READ8_MEMBER(leland_state::dangerz_input_upper_r)
  *
  *************************************/
 
-static const uint8_t redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0, 0x30, 0x70 };
+static const u8 redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0, 0x30, 0x70 };
 
-READ8_MEMBER(redline_state::redline_pedal_1_r)
+u8 redline_state::redline_pedal_1_r()
 {
-	ioport_value const pedal = ioport("IN0")->read();
+	ioport_value const pedal = m_io_in[0]->read();
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
-READ8_MEMBER(redline_state::redline_pedal_2_r)
+u8 redline_state::redline_pedal_2_r()
 {
-	ioport_value const pedal = ioport("IN2")->read();
+	ioport_value const pedal = m_io_in[2]->read();
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
-READ8_MEMBER(redline_state::redline_wheel_1_r)
+u8 redline_state::redline_wheel_1_r()
 {
-	return dial_compute_value(ioport("AN0")->read(), 0);
+	return dial_compute_value(m_io_an[0]->read(), 0);
 }
 
 
-READ8_MEMBER(redline_state::redline_wheel_2_r)
+u8 redline_state::redline_wheel_2_r()
 {
-	return dial_compute_value(ioport("AN1")->read(), 1);
+	return dial_compute_value(m_io_an[1]->read(), 1);
 }
 
 
@@ -220,21 +220,21 @@ READ8_MEMBER(redline_state::redline_wheel_2_r)
  *
  *************************************/
 
-READ8_MEMBER(redline_state::offroad_wheel_1_r)
+u8 redline_state::offroad_wheel_1_r()
 {
-	return dial_compute_value(ioport("AN3")->read(), 0);
+	return dial_compute_value(m_io_an[3]->read(), 0);
 }
 
 
-READ8_MEMBER(redline_state::offroad_wheel_2_r)
+u8 redline_state::offroad_wheel_2_r()
 {
-	return dial_compute_value(ioport("AN4")->read(), 1);
+	return dial_compute_value(m_io_an[4]->read(), 1);
 }
 
 
-READ8_MEMBER(redline_state::offroad_wheel_3_r)
+u8 redline_state::offroad_wheel_3_r()
 {
-	return dial_compute_value(ioport("AN5")->read(), 2);
+	return dial_compute_value(m_io_an[5]->read(), 2);
 }
 
 
@@ -245,9 +245,9 @@ READ8_MEMBER(redline_state::offroad_wheel_3_r)
  *
  *************************************/
 
-READ8_MEMBER(ataxx_state::ataxx_trackball_r)
+u8 ataxx_state::ataxx_trackball_r(offs_t offset)
 {
-	return dial_compute_value(m_track_axes[offset]->read(), offset);
+	return dial_compute_value(m_io_an[offset]->read(), offset);
 }
 
 
@@ -258,7 +258,7 @@ READ8_MEMBER(ataxx_state::ataxx_trackball_r)
  *
  *************************************/
 
-READ8_MEMBER(ataxx_state::indyheat_analog_r)
+u8 ataxx_state::indyheat_analog_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -279,14 +279,12 @@ READ8_MEMBER(ataxx_state::indyheat_analog_r)
 }
 
 
-WRITE8_MEMBER(ataxx_state::indyheat_analog_w)
+void ataxx_state::indyheat_analog_w(offs_t offset, u8 data)
 {
-	static const char *const tracknames[] = { "AN3", "AN4", "AN5" };
-
 	switch (offset)
 	{
 		case 3:
-			m_analog_result = ioport(tracknames[data])->read();
+			m_analog_result = m_io_an[3 + data]->read();
 			break;
 
 		case 0:
@@ -332,9 +330,7 @@ void leland_state::machine_reset()
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* reset globals */
-	m_gfx_control = 0x00;
-	address_space &space = generic_space();
-	leland_sound_port_w(space, 0, 0xff);
+	sound_port_w(0);
 	m_wcol_enable = 0;
 
 	m_dangerz_x = 512;
@@ -366,7 +362,7 @@ void ataxx_state::machine_start()
 {
 	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	/* set the odd data banks */
-	m_extra_tram = std::make_unique<uint8_t[]>(ATAXX_EXTRA_TRAM_SIZE);
+	m_extra_tram = std::make_unique<u8[]>(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::ataxx_interrupt_callback),this));
@@ -448,7 +444,7 @@ TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
 INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
 {
 	/* check for coins here */
-	if ((ioport("IN1")->read() & 0x0e) != 0x0e)
+	if ((m_io_in[1]->read() & 0x0e) != 0x0e)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -460,7 +456,7 @@ INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
+void leland_state::leland_master_alt_bankswitch_w(u8 data)
 {
 	/* update any bankswitching */
 	if (LOG_BANKSWITCHING_M)
@@ -471,12 +467,12 @@ WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
 }
 
 
-WRITE8_MEMBER(redline_state::redline_master_alt_bankswitch_w)
+void redline_state::redline_master_alt_bankswitch_w(u8 data)
 {
-	leland_master_alt_bankswitch_w(space, offset, data, mem_mask);
+	leland_master_alt_bankswitch_w(data);
 
 	/* sound control is in the rest */
-	m_sound->leland_80186_control_w(space, offset, data, mem_mask);
+	m_sound->leland_80186_control_w(data);
 }
 
 
@@ -490,7 +486,7 @@ void leland_state::cerberus_bankswitch()
 /* bankswitching for Mayhem 2002, Power Play, World Series Baseball, and Alley Master */
 void leland_state::mayhem_bankswitch()
 {
-	uint8_t *address;
+	u8 *address;
 
 	m_battery_ram_enable = ((m_sound_port_bank & 0x24) == 0);
 
@@ -505,7 +501,7 @@ void leland_state::mayhem_bankswitch()
 /* bankswitching for Danger Zone */
 void leland_state::dangerz_bankswitch()
 {
-	uint8_t *address;
+	u8 *address;
 
 	m_battery_ram_enable = ((m_top_board_bank & 0x80) != 0);
 
@@ -520,7 +516,7 @@ void leland_state::dangerz_bankswitch()
 /* bankswitching for Baseball the Season II, Super Baseball, and Strike Zone */
 void leland_state::basebal2_bankswitch()
 {
-	uint8_t *address;
+	u8 *address;
 
 	m_battery_ram_enable = (m_top_board_bank & 0x80);
 
@@ -538,8 +534,8 @@ void leland_state::basebal2_bankswitch()
 /* bankswitching for Red Line Racer */
 void leland_state::redline_bankswitch()
 {
-	static const uint32_t bank_list[] = { 0x10000, 0x18000, 0x02000, 0x02000 };
-	uint8_t *address;
+	static const u32 bank_list[] = { 0x10000, 0x18000, 0x02000, 0x02000 };
+	u8 *address;
 
 	m_battery_ram_enable = ((m_alternate_bank & 3) == 1);
 
@@ -554,8 +550,8 @@ void leland_state::redline_bankswitch()
 /* bankswitching for Viper, Quarterback, Team Quarterback, and All American Football */
 void leland_state::viper_bankswitch()
 {
-	static const uint32_t bank_list[] = { 0x02000, 0x10000, 0x18000, 0x02000 };
-	uint8_t *address;
+	static const u32 bank_list[] = { 0x02000, 0x10000, 0x18000, 0x02000 };
+	u8 *address;
 
 	m_battery_ram_enable = ((m_alternate_bank & 0x04) != 0);
 
@@ -575,8 +571,8 @@ void leland_state::viper_bankswitch()
 /* bankswitching for Super Offroad, Super Offroad Track Pack, and Pig Out */
 void leland_state::offroad_bankswitch()
 {
-	static const uint32_t bank_list[] = { 0x02000, 0x02000, 0x10000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000 };
-	uint8_t *address;
+	static const u32 bank_list[] = { 0x02000, 0x02000, 0x10000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000 };
+	u8 *address;
 
 	m_battery_ram_enable = ((m_alternate_bank & 7) == 1);
 
@@ -596,12 +592,12 @@ void leland_state::offroad_bankswitch()
 /* bankswitching for Ataxx, WSF, Indy Heat, and Brute Force */
 void ataxx_state::ataxx_bankswitch()
 {
-	static const uint32_t bank_list[] =
+	static const u32 bank_list[] =
 	{
 		0x02000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000, 0x40000, 0x48000,
 		0x50000, 0x58000, 0x60000, 0x68000, 0x70000, 0x78000, 0x80000, 0x88000
 	};
-	uint8_t *address;
+	u8 *address;
 
 	m_battery_ram_enable = ((m_master_bank & 0x30) == 0x10);
 
@@ -632,11 +628,11 @@ void ataxx_state::ataxx_bankswitch()
  *
  *************************************/
 
-void leland_state::leland_init_eeprom(uint8_t default_val, const uint16_t *data, uint8_t serial_offset, uint8_t serial_type)
+void leland_state::leland_init_eeprom(u8 default_val, const u16 *data, u8 serial_offset, u8 serial_type)
 {
-	uint8_t xorval = (serial_type == SERIAL_TYPE_ADD_XOR || serial_type == SERIAL_TYPE_ENCRYPT_XOR) ? 0xff : 0x00;
-	uint8_t eeprom_data[64*2];
-	uint32_t serial;
+	u8 xorval = (serial_type == SERIAL_TYPE_ADD_XOR || serial_type == SERIAL_TYPE_ENCRYPT_XOR) ? 0xff : 0x00;
+	u8 eeprom_data[64*2];
+	u32 serial;
 
 	/*
 	    NOTE: This code is just illustrative, and explains how to generate the
@@ -743,12 +739,12 @@ void leland_state::leland_init_eeprom(uint8_t default_val, const uint16_t *data,
  *
  *************************************/
 
-void leland_state::ataxx_init_eeprom(const uint16_t *data)
+void leland_state::ataxx_init_eeprom(const u16 *data)
 {
-	uint8_t eeprom_data[128*2];
-	uint8_t serial_offset = 0;
-	uint8_t default_val = 0;
-	uint32_t serial;
+	u8 eeprom_data[128*2];
+	u8 serial_offset = 0;
+	u8 default_val = 0;
+	u32 serial;
 
 	/*
 	    NOTE: This code is just illustrative, and explains how to generate the
@@ -817,21 +813,21 @@ void leland_state::ataxx_init_eeprom(const uint16_t *data)
  *
  *************************************/
 
-READ8_MEMBER(ataxx_state::ataxx_eeprom_r)
+u8 ataxx_state::eeprom_r()
 {
-	int port = ioport("IN2")->read();
+	int port = m_io_in[2]->read();
 	if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
 	return port;
 }
 
 
-WRITE8_MEMBER(ataxx_state::ataxx_eeprom_w)
+void ataxx_state::eeprom_w(u8 data)
 {
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	m_eeprom->di_write ((data & 0x10) >> 4);
-	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write ((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write (BIT(data, 4));
+	m_eeprom->clk_write(BIT(data, 5));
+	m_eeprom->cs_write (BIT(data, 6));
 }
 
 
@@ -842,7 +838,7 @@ WRITE8_MEMBER(ataxx_state::ataxx_eeprom_w)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_battery_ram_w)
+void leland_state::leland_battery_ram_w(offs_t offset, u8 data)
 {
 	if (m_battery_ram_enable)
 	{
@@ -854,7 +850,7 @@ WRITE8_MEMBER(leland_state::leland_battery_ram_w)
 }
 
 
-WRITE8_MEMBER(ataxx_state::ataxx_battery_ram_w)
+void ataxx_state::ataxx_battery_ram_w(offs_t offset, u8 data)
 {
 	if (m_battery_ram_enable)
 	{
@@ -909,7 +905,7 @@ WRITE8_MEMBER(ataxx_state::ataxx_battery_ram_w)
 
         for (i = 16, b = 0x70, r = 0x08; i < 128; i++, b--, r += 0x10)
         {
-            uint8_t a = original_data[i] ^ 0xff;
+            u8 a = original_data[i] ^ 0xff;
             a = (a >> 3) | (a << 5);
             a = (((a ^ r) + 1 + b) ^ b) - b;
             encrypted_data[i] = a;
@@ -1018,7 +1014,7 @@ void leland_state::keycard_w(int data)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::leland_master_analog_key_r)
+u8 leland_state::master_analog_key_r(offs_t offset)
 {
 	int result = 0;
 
@@ -1045,17 +1041,15 @@ READ8_MEMBER(leland_state::leland_master_analog_key_r)
 
 
 
-WRITE8_MEMBER(leland_state::leland_master_analog_key_w)
+void leland_state::master_analog_key_w(offs_t offset, u8 data)
 {
-	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
-
 	switch (offset)
 	{
 		case 0x00:  /* FD = analog port trigger */
 			break;
 
 		case 0x01:  /* FE = analog port select/bankswitch */
-			m_analog_result = ioport(portnames[data & 15])->read();
+			m_analog_result = m_io_an[data & 15]->read();
 
 			/* update top board banking for some games */
 			if (LOG_BANKSWITCHING_M)
@@ -1079,18 +1073,18 @@ WRITE8_MEMBER(leland_state::leland_master_analog_key_w)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::leland_master_input_r)
+u8 leland_state::leland_master_input_r(offs_t offset)
 {
 	int result = 0xff;
 
 	switch (offset)
 	{
 		case 0x00:  /* /GIN0 */
-			result = ioport("IN0")->read();
+			result = m_io_in[0]->read();
 			break;
 
 		case 0x01:  /* /GIN1 */
-			result = ioport("IN1")->read();
+			result = m_io_in[1]->read();
 			if (m_slave->state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
@@ -1110,11 +1104,11 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 			break;
 
 		case 0x10:  /* /GIN0 */
-			result = ioport("IN2")->read();
+			result = m_io_in[2]->read();
 			break;
 
 		case 0x11:  /* /GIN1 */
-			result = ioport("IN3")->read();
+			result = m_io_in[3]->read();
 			if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
 			break;
 
@@ -1126,21 +1120,21 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 }
 
 
-WRITE8_MEMBER(leland_state::leland_master_output_w)
+void leland_state::leland_master_output_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
 		case 0x09:  /* /MCONT */
-			m_slave->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			m_wcol_enable = (data & 0x02);
-			m_slave->set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			m_slave->set_input_line(0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+			m_wcol_enable = BIT(data, 1);
+			m_slave->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(0, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			m_eeprom->di_write ((data & 0x10) >> 4);
-			m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->cs_write ((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->di_write (BIT(data, 4));
+			m_eeprom->clk_write(BIT(data, 5));
+			m_eeprom->cs_write (BIT(data, 6));
 			break;
 
 		case 0x0a:  /* /OGIA */
@@ -1156,7 +1150,7 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 		case 0x0d:  /* /BKXH */
 		case 0x0e:  /* /BKYL */
 		case 0x0f:  /* /BKYH */
-			leland_scroll_w(space, offset - 0x0c, data);
+			scroll_w(offset - 0x0c, data);
 			break;
 
 		default:
@@ -1166,18 +1160,18 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 }
 
 
-READ8_MEMBER(ataxx_state::ataxx_master_input_r)
+u8 ataxx_state::ataxx_master_input_r(offs_t offset)
 {
 	int result = 0xff;
 
 	switch (offset)
 	{
 		case 0x06:  /* /GIN0 */
-			result = ioport("IN0")->read();
+			result = m_io_in[0]->read();
 			break;
 
 		case 0x07:  /* /SLVBLK */
-			result = ioport("IN1")->read();
+			result = m_io_in[1]->read();
 			if (m_slave->state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
@@ -1190,7 +1184,7 @@ READ8_MEMBER(ataxx_state::ataxx_master_input_r)
 }
 
 
-WRITE8_MEMBER(ataxx_state::ataxx_master_output_w)
+void ataxx_state::ataxx_master_output_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1198,7 +1192,7 @@ WRITE8_MEMBER(ataxx_state::ataxx_master_output_w)
 		case 0x01:  /* /BKXH */
 		case 0x02:  /* /BKYL */
 		case 0x03:  /* /BKYH */
-			leland_scroll_w(space, offset, data);
+			scroll_w(offset, data);
 			break;
 
 		case 0x04:  /* /MBNK */
@@ -1233,14 +1227,14 @@ WRITE8_MEMBER(ataxx_state::ataxx_master_output_w)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_gated_paletteram_w)
+void leland_state::gated_paletteram_w(offs_t offset, u8 data)
 {
 	if (m_wcol_enable)
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 }
 
 
-READ8_MEMBER(leland_state::leland_gated_paletteram_r)
+u8 leland_state::gated_paletteram_r(offs_t offset)
 {
 	if (m_wcol_enable)
 		return m_palette->basemem().read8(offset);
@@ -1248,12 +1242,12 @@ READ8_MEMBER(leland_state::leland_gated_paletteram_r)
 }
 
 
-WRITE8_MEMBER(ataxx_state::ataxx_paletteram_and_misc_w)
+void ataxx_state::paletteram_and_misc_w(offs_t offset, u8 data)
 {
 	if (m_wcol_enable)
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 	else if (offset == 0x7f8 || offset == 0x7f9)
-		leland_master_video_addr_w(space, offset - 0x7f8, data);
+		master_video_addr_w(offset - 0x7f8, data);
 	else if (offset == 0x7fc)
 	{
 		m_xrom1_addr = (m_xrom1_addr & 0xff00) | (data & 0x00ff);
@@ -1279,7 +1273,7 @@ WRITE8_MEMBER(ataxx_state::ataxx_paletteram_and_misc_w)
 }
 
 
-READ8_MEMBER(ataxx_state::ataxx_paletteram_and_misc_r)
+u8 ataxx_state::paletteram_and_misc_r(offs_t offset)
 {
 	if (m_wcol_enable)
 		return m_palette->basemem().read8(offset);
@@ -1307,16 +1301,16 @@ READ8_MEMBER(ataxx_state::ataxx_paletteram_and_misc_r)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::leland_sound_port_r)
+u8 leland_state::sound_port_r()
 {
 	return m_gfx_control;
 }
 
 
-WRITE8_MEMBER(leland_state::leland_sound_port_w)
+void leland_state::sound_port_w(u8 data)
 {
 	/* update the graphics banking */
-	leland_gfx_port_w(space, 0, data);
+	gfx_port_w(data);
 
 	/* set the new value */
 	m_gfx_control = data;
@@ -1338,7 +1332,7 @@ WRITE8_MEMBER(leland_state::leland_sound_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_slave_small_banksw_w)
+void leland_state::slave_small_banksw_w(u8 data)
 {
 	int bankaddress = 0x10000 + 0xc000 * (data & 1);
 
@@ -1353,7 +1347,7 @@ WRITE8_MEMBER(leland_state::leland_slave_small_banksw_w)
 }
 
 
-WRITE8_MEMBER(leland_state::leland_slave_large_banksw_w)
+void leland_state::slave_large_banksw_w(u8 data)
 {
 	int bankaddress = 0x10000 + 0x8000 * (data & 15);
 
@@ -1368,7 +1362,7 @@ WRITE8_MEMBER(leland_state::leland_slave_large_banksw_w)
 }
 
 
-WRITE8_MEMBER(leland_state::ataxx_slave_banksw_w)
+void leland_state::ataxx_slave_banksw_w(u8 data)
 {
 	int bankaddress, bank = data & 15;
 
@@ -1399,7 +1393,7 @@ WRITE8_MEMBER(leland_state::ataxx_slave_banksw_w)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::leland_raster_r)
+u8 leland_state::raster_r()
 {
 	return m_screen->vpos();
 }
@@ -1413,12 +1407,12 @@ READ8_MEMBER(leland_state::leland_raster_r)
  *************************************/
 
 /* also called by Ataxx */
-void leland_state::leland_rotate_memory(const char *cpuname)
+void leland_state::rotate_memory(const char *cpuname)
 {
 	int startaddr = 0x10000;
 	int banks = (memregion(cpuname)->bytes() - startaddr) / 0x8000;
-	uint8_t *ram = memregion(cpuname)->base();
-	uint8_t temp[0x2000];
+	u8 *ram = memregion(cpuname)->base();
+	u8 temp[0x2000];
 	int i;
 
 	for (i = 0; i < banks; i++)

@@ -105,6 +105,7 @@
 
 #include "emu.h"
 #include "998board.h"
+#include "cpu/tms9900/tms99com.h"
 
 #define LOG_DETAIL      (1U<<1)     // More detail
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -366,13 +367,9 @@ void mainboard8_device::cruwrite(offs_t offset, uint8_t data)
 
 // =============== Memory bus access ==================
 
-WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
+void mainboard8_device::setaddress(offs_t offset, uint8_t busctrl)
 {
-	m_dbin_level = (line_state)state;
-}
-
-uint8_t mainboard8_device::setoffset(offs_t offset)
-{
+	m_dbin_level = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
 	// No data is waiting on the data bus
@@ -410,8 +407,6 @@ uint8_t mainboard8_device::setoffset(offs_t offset)
 	// AMIGO is the one to control the READY line to the CPU
 	// MOFETTA does not contribute to READY
 	m_ready(m_amigo->cpury_out());
-
-	return 0;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::reset_console )

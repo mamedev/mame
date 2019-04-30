@@ -70,6 +70,7 @@
 
 #include "emu.h"
 #include "datamux.h"
+#include "cpu/tms9900/tms99com.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_READY       (1U<<2)   // READY line
@@ -77,7 +78,7 @@
 #define LOG_ADDRESS     (1U<<4)   // Address register
 #define LOG_WAITCOUNT   (1U<<5)   // Wait state counter
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_ADDRESS )
 
 #include "logmacro.h"
 
@@ -97,6 +98,9 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	m_ram16b(*owner, TI99_EXPRAM_TAG),
 	m_padram(*owner, TI99_PADRAM_TAG),
 	m_cpu(*owner, "maincpu"),
+	m_grom0(*owner, TI99_GROM0_TAG),
+	m_grom1(*owner, TI99_GROM1_TAG),
+	m_grom2(*owner, TI99_GROM2_TAG),
 	m_ready(*this),
 	m_addr_buf(0),
 	m_dbin(CLEAR_LINE),
@@ -129,10 +133,9 @@ void datamux_device::read_all(uint16_t addr, uint8_t *value)
 		{
 			if (m_console_groms_present)
 			{
-				for (int i=0; i < 3; i++)
-				{
-					m_grom[i]->readz(value);
-				}
+				m_grom0->readz(value);
+				m_grom1->readz(value);
+				m_grom2->readz(value);
 			}
 			// GROMport (GROMs)
 			m_gromport->readz(addr, value);
@@ -163,8 +166,9 @@ void datamux_device::write_all(uint16_t addr, uint8_t value)
 	{
 		if (m_console_groms_present)
 		{
-			for (int i=0; i < 3; i++)
-				m_grom[i]->write(value);
+			m_grom0->write(value);
+			m_grom1->write(value);
+			m_grom2->write(value);
 		}
 		// GROMport
 		m_gromport->write(addr, value);
@@ -211,8 +215,11 @@ void datamux_device::setaddress_all(uint16_t addr)
 	if (isgrom) m_grom_idle = false;
 
 	if (m_console_groms_present)
-		for (int i=0; i < 3; i++)
-			m_grom[i]->set_lines((line_state)m_dbin, a14, gsq);
+	{
+		m_grom0->set_lines((line_state)m_dbin, a14, gsq);
+		m_grom1->set_lines((line_state)m_dbin, a14, gsq);
+		m_grom2->set_lines((line_state)m_dbin, a14, gsq);
+	}
 
 	// GROMport (GROMs)
 	m_gromport->set_gromlines((line_state)m_dbin, a14, gsq);
@@ -427,21 +434,22 @@ void datamux_device::write(offs_t offset, uint16_t data)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-uint8_t datamux_device::setoffset(offs_t offset)
+void datamux_device::setaddress(offs_t offset, uint16_t busctrl)
 {
-	m_addr_buf = offset;
+	m_addr_buf = offset << 1;
 	m_waitcount = 0;
+	m_dbin = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "Set address %04x\n", m_addr_buf);
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{
-		return 0; // console ROM
+		return; // console ROM
 	}
 
 	if ((m_addr_buf & 0xfc00) == 0x8000)
 	{
-		return 0; // console RAM
+		return; // console RAM
 	}
 
 	// Initialize counter
@@ -468,8 +476,6 @@ uint8_t datamux_device::setoffset(offs_t offset)
 		ready_join();
 	}
 	else m_waitcount = 0;
-
-	return 0;
 }
 
 /*
@@ -541,12 +547,6 @@ void datamux_device::ready_join()
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( datamux_device::dbin_in )
-{
-	m_dbin = (line_state)state;
-	LOGMASKED(LOG_ADDRESS, "Data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
-}
-
 WRITE_LINE_MEMBER( datamux_device::ready_line )
 {
 	if (state != m_sysready) LOGMASKED(LOG_READY, "READY line from PBox = %d\n", state);
@@ -564,8 +564,10 @@ WRITE_LINE_MEMBER( datamux_device::gromclk_in )
 	// Propagate to the GROMs
 	if (m_console_groms_present)
 	{
-		for (int i=0; i < 3; i++) m_grom[i]->gclock_in(state);
-		m_grom_idle = m_grom[0]->idle();
+		m_grom0->gclock_in(state);
+		m_grom1->gclock_in(state);
+		m_grom2->gclock_in(state);
+		m_grom_idle = m_grom0->idle();
 	}
 	m_gromport->gclock_in(state);
 
@@ -615,14 +617,6 @@ void datamux_device::device_reset(void)
 
 	m_dbin = CLEAR_LINE;
 }
-
-void datamux_device::device_config_complete()
-{
-	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(TI99_GROM0_TAG));
-	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(TI99_GROM1_TAG));
-	m_grom[2] = downcast<tmc0430_device*>(owner()->subdevice(TI99_GROM2_TAG));
-}
-
 
 INPUT_PORTS_START( datamux )
 	PORT_START( "RAM" ) /* config */

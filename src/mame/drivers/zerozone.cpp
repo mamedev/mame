@@ -44,8 +44,8 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_soundlatch->write(space, offset, data >> 8);
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_soundlatch->write(data >> 8);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	}
 }
 

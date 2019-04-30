@@ -605,12 +605,12 @@ void abc1600_state::update_drdy2()
 
 READ8_MEMBER( abc1600_state::dart_r )
 {
-	return m_dart->ba_cd_r(space, A2_A1 ^ 0x03);
+	return m_dart->ba_cd_r(A2_A1 ^ 0x03);
 }
 
 WRITE8_MEMBER( abc1600_state::dart_w )
 {
-	m_dart->ba_cd_w(space, A2_A1 ^ 0x03, data);
+	m_dart->ba_cd_w(A2_A1 ^ 0x03, data);
 }
 
 //-------------------------------------------------
@@ -804,34 +804,13 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( abc1600_int_ack )
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER( abc1600_state::abc1600_int_ack )
+void abc1600_state::cpu_space_map(address_map &map)
 {
-	int data = 0;
-
-	switch (irqline)
-	{
-	case M68K_IRQ_2:
-		data = m_cio->intack_r();
-		break;
-
-	case M68K_IRQ_5:
-		data = m_dart->m1_r();
-		break;
-
-	case M68K_IRQ_7:
-		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-
-		data = M68K_INT_ACK_AUTOVECTOR;
-		break;
-	}
-
-	return data;
+	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
+	map(0xffff5, 0xffff5).lr8("cio int", [this]() -> u8 { return m_cio->intack_r(); });
+	map(0xffffb, 0xffffb).lr8("dart int", [this]() -> u8 { return m_dart->m1_r(); });
+	map(0xfffff, 0xfffff).lr8("nmi int", [this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); });
 }
-
 
 void abc1600_state::machine_start()
 {
@@ -873,7 +852,7 @@ void abc1600_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc1600 )
+//  machine_config( abc1600 )
 //-------------------------------------------------
 
 void abc1600_state::abc1600(machine_config &config)
@@ -881,7 +860,7 @@ void abc1600_state::abc1600(machine_config &config)
 	// basic machine hardware
 	M68008(config, m_maincpu, 64_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc1600_state::abc1600_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(abc1600_state::abc1600_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
 
 	// video hardware
 	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);

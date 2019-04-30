@@ -21,11 +21,13 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
+#include "machine/bankdev.h"
 #include "machine/upd765.h"
 #include "machine/ncr5380n.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 #include "screen.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -35,6 +37,8 @@ public:
 	k2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_1m_bank(*this, "bank1m")
+		, m_mainram(*this, "mainram")
 	{ }
 
 	void k2000(machine_config &config);
@@ -44,9 +48,39 @@ private:
 	virtual void machine_reset() override;
 
 	void k2000_map(address_map &map);
+	void bank_map_1m(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_1m_bank;
+	required_shared_ptr<uint16_t> m_mainram;
+
+	DECLARE_READ16_MEMBER(lcd_r);
+	DECLARE_WRITE16_MEMBER(lcd_w);
+	DECLARE_WRITE16_MEMBER(ctrl_w);
+
+	void k2000_palette(palette_device &palette) const;
 };
+
+// LCD controller is byte-wide, data at 0, status/control at 1.
+READ16_MEMBER(k2000_state::lcd_r)
+{
+	return 0x0b0b;
+}
+WRITE16_MEMBER(k2000_state::lcd_w)
+{
+	if (offset == 0)
+	{
+		printf("%c", data & 0x7f);
+	}
+}
+
+WRITE16_MEMBER(k2000_state::ctrl_w)
+{
+	data &= 0xff;
+	logerror("%02x to ctrl_w\n", data);
+	// bit 4: 0=program ROM at 0, work RAM at 100000, 1=work RAM at 0, program ROM at 100000.
+	m_1m_bank->set_bank((data >> 4) & 1);
+}
 
 void k2000_state::machine_start()
 {
@@ -54,6 +88,7 @@ void k2000_state::machine_start()
 
 void k2000_state::machine_reset()
 {
+	m_1m_bank->set_bank(0);
 }
 
 void k2000_state::k2000_map(address_map &map)
@@ -62,9 +97,17 @@ void k2000_state::k2000_map(address_map &map)
 	// word writes to 000090 region - unknown
 	// word writes to 000180 region - unknown
 	// word writes to 000240 region - unknown
+	map(0x000000, 0x1fffff).m(m_1m_bank, FUNC(address_map_bank_device::amap16));
+	map(0x700000, 0x700003).rw(FUNC(k2000_state::lcd_r), FUNC(k2000_state::lcd_w));
+	map(0x7e0000, 0x7e0001).w(FUNC(k2000_state::ctrl_w));
+}
+
+void k2000_state::bank_map_1m(address_map &map)
+{
 	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
-	map(0x100000, 0x11ffff).ram(); // is this area banked between RAM (write of 0x20 to 7e0001) vs setup/SU ROM (write of 0x30 to 7e0001) ?
-	// byte writes to 7e0000-7e0001 - unknown, possibly banking or status?
+	map(0x100000, 0x1fffff).ram().share("mainram");
+	map(0x200000, 0x2fffff).ram().share("mainram");
+	map(0x300000, 0x3fffff).rom().region("maincpu", 0);
 }
 
 void k2000_state::k2000(machine_config &config)
@@ -72,9 +115,13 @@ void k2000_state::k2000(machine_config &config)
 	TMP68301(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &k2000_state::k2000_map);
 
+	ADDRESS_MAP_BANK(config, "bank1m").set_map(&k2000_state::bank_map_1m).set_options(ENDIANNESS_BIG, 16, 24, 0x200000);
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 }
+
+
 
 static INPUT_PORTS_START( k2000 )
 INPUT_PORTS_END

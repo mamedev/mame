@@ -13,7 +13,7 @@
 
 #define ENABLE_NEWVIEW_LOG      (0)
 
-class newport_video_device : public device_t
+class newport_video_device : public device_t, public device_palette_interface
 {
 public:
 	template <typename T, typename U>
@@ -34,7 +34,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
-	// device-level overrides
+	virtual uint32_t palette_entries() const override { return 0x2000; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -191,6 +191,8 @@ private:
 	void write_pixel(int16_t x, int16_t y, uint8_t color);
 	void store_pixel(uint8_t *dest_buf, uint8_t src);
 
+	uint8_t get_shade_color(int16_t x, int16_t y);
+
 	void do_v_iline(uint8_t color, bool skip_last, bool shade);
 	void do_h_iline(uint8_t color, bool skip_last, bool shade);
 	void do_iline(uint8_t color, bool skip_last, bool shade);
@@ -200,6 +202,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hpc3_device> m_hpc3;
+
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;

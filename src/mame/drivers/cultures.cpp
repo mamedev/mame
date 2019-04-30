@@ -404,7 +404,8 @@ void cultures_state::machine_reset()
 
 
 
-MACHINE_CONFIG_START(cultures_state::cultures)
+void cultures_state::cultures(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MCLK/2); /* 8.000 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cultures_state::cultures_map);
@@ -423,8 +424,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cultures);
-	MCFG_PALETTE_ADD("palette", 0x3000/2)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 0x3000/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	okim6295_device &oki(OKIM6295(config, "oki", MCLK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.30);
 	oki.set_addrmap(0, &cultures_state::oki_map);
-MACHINE_CONFIG_END
+}
 
 /*
 

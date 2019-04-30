@@ -9,12 +9,9 @@
     Sound ASIC: Yamaha XS725A0/SWP30
     RAM: 1 MSM51008 (1 meg * 1 bit = 128KBytes)
 
-    MU80 CPU: Hitachi H8/3002 (HD6413D02F16), strapped for mode 4, with a 12 MHz oscillator
-    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG" effects processor
-
     I/O ports from service manual:
 
-    Port 1 (MU100) / Port B (MU80)
+    Port 1
         0 - LCD data, SW data, LED 1
         1 - LCD data, SW data, LED 2
         2 - LCD data, SW data, LED 3
@@ -50,20 +47,11 @@
         6 - NC
         7 - (in) Plug detection for A/D input
 
-    Port A (MU100):
+    Port A:
         5 - (in) Off Line Detection
         6 - (out) Signal for rotary encoder (REB)
         7 - (out) Signal for rotary encoder (REA)
 
-    Port A (MU80):
-        0 -
-        1 - LCD control RS
-        2 -
-        3 - (same as sws on MU100) LED,SW Strobe data latch
-        4 - (same as swd on MU100) SW data read control
-        5 - LCD control E
-        6 - LCD control RW
-        7 -
 
     Port F:
         0 - (out) (sws) LED,SW Strobe data latch
@@ -131,15 +119,11 @@
 
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/h8/h83002.h"
-#include "cpu/h8/h83003.h"
 #include "cpu/h8/h8s2655.h"
-#include "video/hd44780.h"
+#include "machine/mulcd.h"
 #include "sound/swp30.h"
-#include "sound/meg.h"
 
 #include "debugger.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -165,52 +149,18 @@ static INPUT_PORTS_START( mu100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vl70 )
-	PORT_START("B0")
-	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Play")      PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Effect")    PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Midi/WX")   PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Enter")     PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Exit")      PORT_CODE(KEYCODE_BACKSPACE)
-
-	PORT_START("B1")
-	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Edit")      PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mode")      PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part -")    PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Select <")  PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part +")    PORT_CODE(KEYCODE_CLOSEBRACE)
-
-	PORT_START("B2")
-	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Util")      PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Breath")    PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Value -")   PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Select >")  PORT_CODE(KEYCODE_STOP)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Value +")   PORT_CODE(KEYCODE_EQUALS)
-INPUT_PORTS_END
-
 class mu100_state : public driver_device
 {
 public:
 	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_mu80cpu(*this, "mu80cpu")
-		, m_vl70cpu(*this, "vl70cpu")
 		, m_swp30(*this, "swp30")
-		, m_meg(*this, "meg")
 		, m_lcd(*this, "lcd")
 		, m_ioport_p7(*this, "P7")
 		, m_ioport_p8(*this, "P8")
-		, m_ioport_b0(*this, "B0")
-		, m_ioport_b1(*this, "B1")
-		, m_ioport_b2(*this, "B2")
 	{ }
 
-	void vl70(machine_config &config);
-	void mu80(machine_config &config);
 	void mu100(machine_config &config);
 
 	void regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask);
@@ -314,28 +264,20 @@ private:
 		PA_LCD_RW     = 0x40
 	};
 
-	optional_device<h8s2655_device> m_maincpu;
-	optional_device<h83002_device> m_mu80cpu;
-	optional_device<h83003_device> m_vl70cpu;
-	optional_device<swp30_device> m_swp30;
-	optional_device<meg_device> m_meg;
-	required_device<hd44780_device> m_lcd;
-	optional_ioport m_ioport_p7;
-	optional_ioport m_ioport_p8;
-	optional_ioport m_ioport_b0;
-	optional_ioport m_ioport_b1;
-	optional_ioport m_ioport_b2;
+	required_device<h8s2655_device> m_maincpu;
+	required_device<swp30_device> m_swp30;
+	required_device<mulcd_device> m_lcd;
+	required_ioport m_ioport_p7;
+	required_ioport m_ioport_p8;
 
 	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
-	u8 cur_ic32, cur_leds;
-	float contrast;
+	u8 cur_ic32;
 
 	u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
-	u16 adc_breath_r();
 
 	void p1_w(u16 data);
 	u16 p1_r();
@@ -348,29 +290,12 @@ private:
 	u16 pa_r();
 	void pb_w(u16 data);
 	u16 pb_r();
-	void pa_w_mu80(u16 data);
-	u16 pa_r_mu80();
-	void pb_w_mu80(u16 data);
-	u16 pb_r_mu80();
-	void p6_w_vl70(u16 data);
-	u16 p6_r_vl70();
-	void pa_w_vl70(u16 data);
-	u16 pa_r_vl70();
-	void pb_w_vl70(u16 data);
-	void pc_w_vl70(u16 data);
-	u16 pc_r_vl70();
 	void pf_w(u16 data);
 	void pg_w(u16 data);
 
-	float lightlevel(const u8 *src, const u8 *render);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
-	void mu80_iomap(address_map &map);
-	void mu80_map(address_map &map);
-	void vl70_iomap(address_map &map);
-	void vl70_map(address_map &map);
 	void swp30_map(address_map &map);
 };
 
@@ -540,74 +465,9 @@ void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
 	}
 }
 
-#include "../drivers/ymmu100.hxx"
-
 void mu100_state::machine_start()
 {
 	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pc = cur_pf = cur_pg = cur_ic32 = 0xff;
-	cur_leds = 0x00;
-	contrast = 1.0;
-}
-
-float mu100_state::lightlevel(const u8 *src, const u8 *render)
-{
-	u8 l = *src;
-	if(l == 0)
-		return 1.0;
-	int slot = (src[1] << 8) | src[2];
-	if(slot >= 0xff00)
-		return (255-l)/255.0;
-
-	int bit = slot & 7;
-	int adr = (slot >> 3);
-	if(render[adr] & (1 << bit))
-		return 1-(1-(255-l)/255.0f)*contrast;
-	return 0.95f;
-}
-
-u32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	const u8 *render = m_lcd->render();
-	const u8 *src = ymmu100_bkg + 15;
-
-	for(int y=0; y<241; y++) {
-		u32 *pix = reinterpret_cast<u32 *>(bitmap.raw_pixptr(y));
-		for(int x=0; x<800; x++) {
-			float light = lightlevel(src, render);
-			u32 col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
-			*pix++ = col;
-			src += 3;
-		}
-		for(int x=800; x<900; x++)
-			*pix++ = 0;
-	}
-
-	for(int i=0; i<6; i++)
-		if(cur_leds & (1 << i)) {
-			int x = 830 + 40*(i & 1);
-			int y = 55 + 65*(i >> 1);
-			for(int yy=-9; yy <= 9; yy++) {
-				int dx = int(sqrt((float)(99-yy*yy)));
-				u32 *pix = reinterpret_cast<u32 *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
-				for(int xx=0; xx<2*dx+1; xx++)
-					*pix++ = 0x00ff00;
-			}
-		}
-	return 0;
-}
-
-void mu100_state::mu80_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).rom().region("mu80cpu", 0);
-	map(0x200000, 0x20ffff).ram(); // 64K work RAM
-	map(0x440000, 0x44001f).m(m_meg, FUNC(meg_device::map));
-}
-
-void mu100_state::vl70_map(address_map &map)
-{
-	map(0x000000, 0x1fffff).rom().region("vl70cpu", 0);
-	map(0x200000, 0x20ffff).ram(); // 64K work RAM
-	map(0x600000, 0x60001f).m(m_meg, FUNC(meg_device::map));
 }
 
 void mu100_state::mu100_map(address_map &map)
@@ -645,12 +505,6 @@ u16 mu100_state::adc_midisw_r()
 u16 mu100_state::adc_battery_r()
 {
 	return 0x200;
-}
-
-// Breath controller
-u16 mu100_state::adc_breath_r()
-{
-	return 0x000;
 }
 
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
@@ -704,7 +558,7 @@ void mu100_state::p2_w(u16 data)
 				m_lcd->control_write(cur_p1);
 		}
 	}
-	contrast = (8 - ((cur_p2 >> 3) & 7))/8.0;
+	m_lcd->set_contrast((8 - ((cur_p2 >> 3) & 7))/8.0);
 	cur_p2 = data;
 }
 
@@ -748,7 +602,7 @@ void mu100_state::pf_w(u16 data)
 {
 	if(!(cur_pf & 0x01) && (data & 0x01)) {
 		cur_ic32 = cur_p1;
-		cur_leds = (cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2);
+		m_lcd->set_leds((cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2));
 	}
 	cur_pf = data;
 }
@@ -757,154 +611,6 @@ void mu100_state::pg_w(u16 data)
 {
 	cur_pg = data;
 	logerror("pbsel3 %d\n", data & 1);
-}
-
-void mu100_state::pb_w_mu80(u16 data)
-{
-	cur_pb = data;
-}
-
-u16 mu100_state::pb_r_mu80()
-{
-	if((cur_pa & PA_LCD_ENABLE)) {
-		if(cur_pa & PA_LCD_RW)
-		{
-			if(cur_pa & PA_LCD_RS)
-				return m_lcd->data_read();
-			else
-				return m_lcd->control_read();
-		} else
-			return 0x00;
-	}
-
-	if(!(cur_pa & 0x10)) {
-		u8 val = 0xff;
-		if(!(cur_ic32 & 0x20))
-			val &= m_ioport_p7->read();
-		if(!(cur_ic32 & 0x40))
-			val &= m_ioport_p8->read();
-		return val;
-	}
-
-	return cur_pa;
-}
-
-void mu100_state::pa_w_mu80(u16 data)
-{
-	data ^= PA_LCD_ENABLE;
-	if(!(cur_pa & PA_LCD_ENABLE) && (data & PA_LCD_ENABLE)) {
-	if(!(cur_pa & PA_LCD_RW)) {
-		if(cur_pa & PA_LCD_RS)
-			m_lcd->data_write(cur_pb);
-		else
-			m_lcd->control_write(cur_pb);
-		}
-	}
-
-	if(!(cur_pa & 0x08) && (data & 0x08))
-		cur_ic32 = cur_pb;
-
-	cur_pa = data;
-}
-
-u16 mu100_state::pa_r_mu80()
-{
-	return cur_pa;
-}
-
-void mu100_state::p6_w_vl70(u16 data)
-{
-	if(!(cur_p6 & P6_LCD_ENABLE) && (data & P6_LCD_ENABLE)) {
-	if(!(cur_p6 & P6_LCD_RW)) {
-		if(cur_p6 & P6_LCD_RS)
-			m_lcd->data_write(cur_pa);
-		else
-			m_lcd->control_write(cur_pa);
-		}
-	}
-
-//  if(!(cur_pa9 & 0x08) && (data & 0x08))
-//      cur_ic32 = cur_pa;
-
-	cur_p6 = data;
-}
-
-void mu100_state::pb_w_vl70(u16 data)
-{
-	cur_leds = bitswap<6>((data >> 2) ^ 0x3f, 5, 3, 1, 4, 2, 0);
-}
-
-void mu100_state::pc_w_vl70(u16 data)
-{
-	cur_pc = data;
-}
-
-u16 mu100_state::pc_r_vl70()
-{
-	u8 r = 0xff;
-	if(!(cur_pc & 0x01))
-		r &= m_ioport_b0->read();
-	if(!(cur_pc & 0x02))
-		r &= m_ioport_b1->read();
-	if(!(cur_pc & 0x80))
-		r &= m_ioport_b2->read();
-	return r;
-}
-
-u16 mu100_state::p6_r_vl70()
-{
-	return cur_p6;
-}
-
-void mu100_state::pa_w_vl70(u16 data)
-{
-	cur_pa = data;
-}
-
-u16 mu100_state::pa_r_vl70()
-{
-	if((cur_p6 & P6_LCD_ENABLE)) {
-		if(cur_p6 & P6_LCD_RW)
-		{
-			if(cur_p6 & P6_LCD_RS)
-				return m_lcd->data_read();
-			else
-				return m_lcd->control_read();
-		} else
-			return 0x00;
-	}
-
-	return cur_pa;
-}
-
-void mu100_state::mu80_iomap(address_map &map)
-{
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r_mu80), FUNC(mu100_state::pa_w_mu80));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu100_state::pb_r_mu80), FUNC(mu100_state::pb_w_mu80));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
-	map(h8_device::ADC_3, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_zero_r)); // inputmod from the gate array
-}
-
-void mu100_state::vl70_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r_vl70), FUNC(mu100_state::p6_w_vl70));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r_vl70), FUNC(mu100_state::pa_w_vl70));
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(mu100_state::pb_w_vl70));
-	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(mu100_state::pc_r_vl70), FUNC(mu100_state::pc_w_vl70));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_breath_r));
-	map(h8_device::ADC_1, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_midisw_r));
-	map(h8_device::ADC_3, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_battery_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_zero_r));
 }
 
 void mu100_state::mu100_iomap(address_map &map)
@@ -940,15 +646,7 @@ void mu100_state::mu100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
 	m_maincpu->set_addrmap(AS_IO, &mu100_state::mu100_iomap);
 
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
+	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -971,80 +669,6 @@ void mu100_state::mu100(machine_config &config)
 	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
-void mu100_state::mu80(machine_config &config)
-{
-	H83002(config, m_mu80cpu, 12_MHz_XTAL);
-	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu100_state::mu80_map);
-	m_mu80cpu->set_addrmap(AS_IO, &mu100_state::mu80_iomap);
-
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	// In truth, dual swp-20
-	SWP30(config, m_swp30);
-	m_swp30->set_addrmap(0, &mu100_state::swp30_map);
-	m_swp30->add_route(0, "lspeaker", 1.0);
-	m_swp30->add_route(1, "rspeaker", 1.0);
-
-	MEG(config, m_meg);
-
-	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
-	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("mu80cpu:sci1", FUNC(h8_sci_device::rx_w));
-
-	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
-	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("mu80cpu:sci0", FUNC(h8_sci_device::rx_w));
-
-	auto &mdout(MIDI_PORT(config, "mdout"));
-	midiout_slot(mdout);
-	m_mu80cpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
-}
-
-void mu100_state::vl70(machine_config &config)
-{
-	H83003(config, m_vl70cpu, 10_MHz_XTAL);
-	m_vl70cpu->set_addrmap(AS_PROGRAM, &mu100_state::vl70_map);
-	m_vl70cpu->set_addrmap(AS_IO, &mu100_state::vl70_iomap);
-
-	HD44780(config, m_lcd);
-	m_lcd->set_lcd_size(4, 20);
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate, asynchronous updating anyway */
-	screen.set_screen_update(FUNC(mu100_state::screen_update));
-	screen.set_size(900, 241);
-	screen.set_visarea(0, 899, 0, 240);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	MEG(config, m_meg);
-
-	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
-	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("vl70cpu:sci1", FUNC(h8_sci_device::rx_w));
-
-	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
-	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("vl70cpu:sci0", FUNC(h8_sci_device::rx_w));
-
-	auto &mdout(MIDI_PORT(config, "mdout"));
-	midiout_slot(mdout);
-	m_vl70cpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
-}
-
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
@@ -1062,10 +686,6 @@ ROM_START( mu100 )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
 // Identical to the mu100
@@ -1083,33 +703,7 @@ ROM_START( mu100r )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
-ROM_END
-
-ROM_START( mu80 )
-	ROM_REGION( 0x80000, "mu80cpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "yamaha_mu80.bin", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
-
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
-ROM_END
-
-ROM_START( vl70 )
-	ROM_REGION( 0x200000, "vl70cpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "vl70m_v111_27c160.bin", 0x000000, 0x200000, CRC(efdba9f0) SHA1(cfa9fb7d2a991e4752393c9677e4ddcbe10866c7) )
-
-	ROM_REGION( 0x1000, "lcd", 0)
-	// Hand made, 3 characters unused
-	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
 CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
 CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
-CONS( 1994, mu80,   mu100, 0, mu80,  mu100, mu100_state,  empty_init, "Yamaha", "MU80",                   MACHINE_NOT_WORKING )
-CONS( 1996, vl70,   mu100, 0, vl70,  vl70,  mu100_state,  empty_init, "Yamaha", "VL70-m",                 MACHINE_NOT_WORKING )

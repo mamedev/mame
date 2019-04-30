@@ -22,7 +22,7 @@ void bublbobl_state::common_sreset(int state)
 		if (m_ym2203 != nullptr) m_ym2203->reset(); // ym2203, if present, is reset
 		if (m_ym3526 != nullptr) m_ym3526->reset(); // ym3526, if present, is reset
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // if a sound irq is active, it is cleared. is this necessary? if the above two devices de-assert /IRQ on reset (as a device_line write) properly, it shouldn't be...
-		m_sound_to_main->acknowledge_w(m_audiocpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // sound->main semaphore is cleared
+		m_sound_to_main->acknowledge_w(); // sound->main semaphore is cleared
 		m_soundnmi->in_w<0>(0); // sound nmi enable is unset
 	}
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state); // soundcpu is reset
@@ -222,7 +222,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	if ((m_port1_out & 0x40) && (~data & 0x40))
 	{
 		// logerror("triggering IRQ on main CPU\n");
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
@@ -473,7 +473,7 @@ WRITE8_MEMBER(bub68705_state::port_b_w)
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
 
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 

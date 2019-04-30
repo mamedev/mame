@@ -126,7 +126,7 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
 {
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
-	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((logical >> ps) << (ps - 8));
+	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
 	uint32_t atc_data = (physical >> ps) << (ps - 8);
 
 

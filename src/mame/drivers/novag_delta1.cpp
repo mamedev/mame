@@ -59,6 +59,10 @@ void delta1_state::machine_start()
 	// zerofill/register for savestates
 	m_blink = false;
 	save_item(NAME(m_blink));
+
+	// game reads from uninitialized RAM while it's thinking
+	for (int i = 0; i < 0x100; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x2000, machine().rand());
 }
 
 
@@ -70,7 +74,7 @@ void delta1_state::machine_start()
 
 WRITE8_MEMBER(delta1_state::mux_w)
 {
-	// IO00-02: MC14028B A-C (IO03: GND)
+	// IO00-02: MC14028B A-C (D to GND)
 	// MC14028B Q3-Q7: input mux
 	// MC14028B Q4-Q7: digit select through 75492
 	u16 sel = 1 << (~data & 7);
@@ -86,7 +90,8 @@ WRITE8_MEMBER(delta1_state::mux_w)
 READ8_MEMBER(delta1_state::input_r)
 {
 	// IO04-07: multiplexed inputs
-	return read_inputs(5) << 4 | m_led_select;
+	// IO03: GND
+	return read_inputs(5) << 4 | m_led_select | 8;
 }
 
 WRITE8_MEMBER(delta1_state::digit_w)
@@ -125,7 +130,7 @@ void delta1_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( delta1 )
 	PORT_START("IN.0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Time Set")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Time Set")
 	PORT_BIT(0x0d, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.1")

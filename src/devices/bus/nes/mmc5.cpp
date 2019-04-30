@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "mmc5.h"
 
+#include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -44,9 +45,9 @@ nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *ta
 	: nes_nrom_device(mconfig, NES_EXROM, tag, owner, clock), m_irq_count(0)
 	, m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0)
 	, m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0)
-	, m_split_chr(0), m_ex1_bank(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
+	, m_split_chr(0), m_ex1_bank(0), m_ex1_attrib(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
 	, m_ppu(*this, ":ppu") // FIXME: this dependency should not exist
-	, m_sound(*this, ":maincpu:nesapu") // FIXME: this is a hack, it should have extra channels, not pass to the existing APU!!!
+	, m_sound(*this, "mmc5snd") // FIXME: this is a hack, it should be separated device, similar not same as NES APU!!!
 {
 }
 
@@ -69,9 +70,10 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_floodattr));
 	save_item(NAME(m_prg_mode));
 	save_item(NAME(m_chr_mode));
-	save_item(NAME(m_wram_base));
 	save_item(NAME(m_wram_protect_1));
 	save_item(NAME(m_wram_protect_2));
+	save_item(NAME(m_exram_control));
+	save_item(NAME(m_wram_base));
 	save_item(NAME(m_vrom_bank));
 	save_item(NAME(m_last_chr));
 	save_item(NAME(m_ex1_chr));
@@ -79,6 +81,7 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_prg_regs));
 	save_item(NAME(m_prg_ram_mapped));
 	save_item(NAME(m_ex1_bank));
+	save_item(NAME(m_ex1_attrib));
 	save_item(NAME(m_high_chr));
 	save_item(NAME(m_split_scr));
 	save_item(NAME(m_split_rev));
@@ -122,6 +125,7 @@ void nes_exrom_device::pcb_reset()
 	m_ex1_chr = 0;
 	m_split_chr = 0;
 	m_ex1_bank = 0;
+	m_ex1_attrib = 0;
 	m_vcount = 0;
 
 	for (auto & elem : m_vrom_bank)
@@ -165,70 +169,70 @@ void nes_exrom_device::update_prg()
 
 	switch (m_prg_mode)
 	{
-		case 0: // 32k banks
-			bank3 = m_prg_regs[3] >> 2;
-			prg32(bank3);
-			break;
+	case 0: // 32k banks
+		bank3 = m_prg_regs[3] >> 2;
+		prg32(bank3);
+		break;
 
-		case 1: // 16k banks
-			bank1 = m_prg_regs[1] >> 1;
-			bank3 = m_prg_regs[3] >> 1;
+	case 1: // 16k banks
+		bank1 = m_prg_regs[1] >> 1;
+		bank3 = m_prg_regs[3] >> 1;
 
-			if (m_prg_ram_mapped[1])
-			{
-				m_ram_hi_banks[0] = ((bank1 << 1) & 0x07);
-				m_ram_hi_banks[1] = ((bank1 << 1) & 0x07) | 1;
-			}
-			else
-				prg16_89ab(bank1);
+		if (m_prg_ram_mapped[1])
+		{
+			m_ram_hi_banks[0] = ((bank1 << 1) & 0x07);
+			m_ram_hi_banks[1] = ((bank1 << 1) & 0x07) | 1;
+		}
+		else
+			prg16_89ab(bank1);
 
-			prg16_cdef(bank3);
-			break;
+		prg16_cdef(bank3);
+		break;
 
-		case 2: // 16k-8k banks
-			bank1 = m_prg_regs[1] >> 1;
-			bank2 = m_prg_regs[2];
-			bank3 = m_prg_regs[3];
+	case 2: // 16k-8k banks
+		bank1 = m_prg_regs[1] >> 1;
+		bank2 = m_prg_regs[2];
+		bank3 = m_prg_regs[3];
 
-			if (m_prg_ram_mapped[1])
-			{
-				m_ram_hi_banks[0] = ((bank1 << 1) & 0x07);
-				m_ram_hi_banks[1] = ((bank1 << 1) & 0x07) | 1;
-			}
-			else
-				prg16_89ab(bank1);
+		if (m_prg_ram_mapped[1])
+		{
+			m_ram_hi_banks[0] = ((bank1 << 1) & 0x07);
+			m_ram_hi_banks[1] = ((bank1 << 1) & 0x07) | 1;
+		}
+		else
+			prg16_89ab(bank1);
 
-			if (m_prg_ram_mapped[2])
-				m_ram_hi_banks[2] = (bank2 & 0x07);
-			else
-				prg8_cd(bank2);
+		if (m_prg_ram_mapped[2])
+			m_ram_hi_banks[2] = (bank2 & 0x07);
+		else
+			prg8_cd(bank2);
 
-			prg8_ef(bank3);
-			break;
+		prg8_ef(bank3);
+		break;
 
-		case 3: // 8k banks
-			bank0 = m_prg_regs[0];
-			bank1 = m_prg_regs[1];
-			bank2 = m_prg_regs[2];
-			bank3 = m_prg_regs[3];
+	case 3: // 8k banks
+		bank0 = m_prg_regs[0];
+		bank1 = m_prg_regs[1];
+		bank2 = m_prg_regs[2];
+		bank3 = m_prg_regs[3];
 
-			if (m_prg_ram_mapped[0])
-				m_ram_hi_banks[0] = (bank0 & 0x07);
-			else
-				prg8_89(bank0);
+		if (m_prg_ram_mapped[0])
+			m_ram_hi_banks[0] = (bank0 & 0x07);
+		else
+			prg8_89(bank0);
 
-			if (m_prg_ram_mapped[1])
-				m_ram_hi_banks[1] = (bank1 & 0x07);
-			else
-				prg8_ab(bank1);
+		if (m_prg_ram_mapped[1])
+			m_ram_hi_banks[1] = (bank1 & 0x07);
+		else
+			prg8_ab(bank1);
 
-			if (m_prg_ram_mapped[2])
-				m_ram_hi_banks[2] = (bank2 & 0x07);
-			else
-				prg8_cd(bank2);
+		if (m_prg_ram_mapped[2])
+			m_ram_hi_banks[2] = (bank2 & 0x07);
+		else
+			prg8_cd(bank2);
 
-			prg8_ef(bank3);
-			break;
+		prg8_ef(bank3);
+		break;
 	}
 }
 
@@ -256,20 +260,20 @@ void nes_exrom_device::set_mirror(int page, int src)
 {
 	switch (src)
 	{
-		case 0:
-			set_nt_page(page, CIRAM, 0, 1);
-			break;
-		case 1:
-			set_nt_page(page, CIRAM, 1, 1);
-			break;
-		case 2:
-			set_nt_page(page, EXRAM, 0, 1);
-			break;
-		case 3:
-			set_nt_page(page, MMC5FILL, 0, 0);
-			break;
-		default:
-			fatalerror("This should never happen\n");
+	case 0:
+		set_nt_page(page, CIRAM, 0, 1);
+		break;
+	case 1:
+		set_nt_page(page, CIRAM, 1, 1);
+		break;
+	case 2:
+		set_nt_page(page, EXRAM, 0, 1);
+		break;
+	case 3:
+		set_nt_page(page, MMC5FILL, 0, 0);
+		break;
+	default:
+		fatalerror("This should never happen\n");
 	}
 }
 
@@ -293,49 +297,50 @@ uint8_t nes_exrom_device::nt_r(offs_t offset)
 
 	switch (m_nt_src[page])
 	{
-		case MMC5FILL:
+	case MMC5FILL:
+		if ((offset & 0x3ff) >= 0x3c0)
+			return m_floodattr;
+		return m_floodtile;
+
+	case EXRAM:
+		// to investigate: can split screen affect this too?
+		if (!BIT(m_exram_control, 1))
+			return m_exram[offset & 0x3ff];
+		else
+			return 0x00;
+
+	case CIRAM:
+	default:
+		// Uchuu Keibitai SDF uses extensively split screen for its intro,
+		// but it does not work yet
+		if (m_split_scr && !(m_exram_control & 0x02) && in_split())
+		{
+			int tile = m_ppu->get_tilenum();
+
 			if ((offset & 0x3ff) >= 0x3c0)
-				return m_floodattr;
-			return m_floodtile;
-
-		case EXRAM:
-			// to investigate: can split screen affect this too?
-			if (!BIT(m_exram_control, 1))
-				return m_exram[offset & 0x3ff];
+			{
+				int pos = (((m_split_yst + m_vcount) & ~0x1f) | (tile & 0x1f)) >> 2;
+				return m_exram[0x3c0 | pos];
+			}
 			else
-				return 0x00;
-
-		case CIRAM:
-		default:
-			// Uchuu Keibitai SDF uses extensively split screen for its intro,
-			// but it does not work yet
-			if (m_split_scr && !(m_exram_control & 0x02) && in_split())
 			{
-				int tile = m_ppu->get_tilenum();
-
-				if ((offset & 0x3ff) >= 0x3c0)
-				{
-					int pos = (((m_split_yst + m_vcount) & ~0x1f) | (tile & 0x1f)) >> 2;
-					return m_exram[0x3c0 | pos];
-				}
-				else
-				{
-					int pos = (((m_split_yst + m_vcount) & 0xf8) << 2) | (tile & 0x1f);
-					return m_exram[pos];
-				}
+				int pos = (((m_split_yst + m_vcount) & 0xf8) << 2) | (tile & 0x1f);
+				return m_exram[pos];
 			}
+		}
 
-			if (m_exram_control == 1)
+		if (m_exram_control == 1)
+		{
+			if ((offset & 0x3ff) >= 0x3c0)
+				return m_ex1_attrib;
+			else if (!machine().side_effects_disabled())    // in this case, we write Ex1 CHR bank, but then access NT normally!
 			{
-				if ((offset & 0x3ff) >= 0x3c0)
-					return m_mmc5_attrib[(m_exram[offset & 0x3ff] >> 6) & 0x03];
-				else    // in this case, we write Ex1 CHR bank, but then access NT normally!
-				{
-					m_ex1_chr = 1;
-					m_ex1_bank = (m_exram[offset & 0x3ff] & 0x3f) | (m_high_chr << 6);
-				}
+				m_ex1_chr = 1;
+				m_ex1_bank = (m_exram[offset & 0x3ff] & 0x3f) | (m_high_chr << 6);
+				m_ex1_attrib = m_mmc5_attrib[(m_exram[offset & 0x3ff] >> 6) & 0x03];
 			}
-			return m_nt_access[page][offset & 0x3ff];
+		}
+		return m_nt_access[page][offset & 0x3ff];
 	}
 }
 
@@ -348,14 +353,14 @@ void nes_exrom_device::nt_w(offs_t offset, uint8_t data)
 
 	switch (m_nt_src[page])
 	{
-		case EXRAM:
-			m_exram[offset & 0x3ff] = data;
-			break;
+	case EXRAM:
+		m_exram[offset & 0x3ff] = data;
+		break;
 
-		case CIRAM:
-		default:
-			m_nt_access[page][offset & 0x3ff] = data;
-			break;
+	case CIRAM:
+	default:
+		m_nt_access[page][offset & 0x3ff] = data;
+		break;
 	}
 }
 
@@ -365,21 +370,21 @@ inline uint8_t nes_exrom_device::base_chr_r(int bank, uint32_t offset)
 
 	switch (m_chr_mode)
 	{
-		case 0:
-			if (bank < 8)
-				helper = ((m_vrom_bank[bank | 7] & 0xff) * 0x2000) + (offset & 0x1fff);
-			else
-				helper = ((m_vrom_bank[bank | 3] & 0xff) * 0x2000) + (offset & 0xfff);
-			break;
-		case 1:
-			helper = ((m_vrom_bank[bank | 3] & 0xff) * 0x1000) + (offset & 0xfff);
-			break;
-		case 2:
-			helper = (m_vrom_bank[bank | 1] * 0x800) + (offset & 0x7ff);
-			break;
-		case 3:
-			helper = (m_vrom_bank[bank] * 0x400) + (offset & 0x3ff);
-			break;
+	case 0:
+		if (bank < 8)
+			helper = ((m_vrom_bank[bank | 7] & 0xff) * 0x2000) + (offset & 0x1fff);
+		else
+			helper = ((m_vrom_bank[bank | 3] & 0xff) * 0x2000) + (offset & 0x1fff);
+		break;
+	case 1:
+		helper = ((m_vrom_bank[bank | 3] & 0xff) * 0x1000) + (offset & 0xfff);
+		break;
+	case 2:
+		helper = (m_vrom_bank[bank | 1] * 0x800) + (offset & 0x7ff);
+		break;
+	case 3:
+		helper = (m_vrom_bank[bank] * 0x400) + (offset & 0x3ff);
+		break;
 	}
 
 	return m_vrom[helper & (m_vrom_size - 1)];
@@ -442,20 +447,25 @@ uint8_t nes_exrom_device::read_l(offs_t offset)
 
 	switch (offset)
 	{
-		case 0x1204:
-			value = m_irq_status;
+	case 0x1204:
+		value = m_irq_status;
+		if (!machine().side_effects_disabled())
+		{
 			m_irq_status &= ~0x80;
 			set_irq_line(CLEAR_LINE);
-			return value;
+		}
+		return value;
 
-		case 0x1205:
-			return (m_mult1 * m_mult2) & 0xff;
-		case 0x1206:
-			return ((m_mult1 * m_mult2) & 0xff00) >> 8;
+	case 0x1205:
+		return (m_mult1 * m_mult2) & 0xff;
 
-		default:
+	case 0x1206:
+		return ((m_mult1 * m_mult2) & 0xff00) >> 8;
+
+	default:
+		if (!machine().side_effects_disabled())
 			logerror("MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
-			return get_open_bus();
+		return get_open_bus();
 	}
 }
 
@@ -489,128 +499,130 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
-		case 0x1100:
-			m_prg_mode = data & 0x03;
-			update_prg();
-			//LOG_MMC(("MMC5 rom bank mode: %02x\n", data));
-			break;
+	case 0x1100:
+		m_prg_mode = data & 0x03;
+		update_prg();
+		//LOG_MMC(("MMC5 rom bank mode: %02x\n", data));
+		break;
 
-		case 0x1101:
-			m_chr_mode = data & 0x03;
-			m_ex1_chr = 0;
-			m_split_chr = 0;
-			//LOG_MMC(("MMC5 vrom bank mode: %02x\n", data));
-			break;
+	case 0x1101:
+		m_chr_mode = data & 0x03;
+		m_ex1_chr = 0;
+		m_split_chr = 0;
+		//LOG_MMC(("MMC5 vrom bank mode: %02x\n", data));
+		break;
 
-		case 0x1102:
-			m_wram_protect_1 = data & 0x03;
-			LOG_MMC(("MMC5 vram protect 1: %02x\n", data));
-			break;
-		case 0x1103:
-			m_wram_protect_2 = data & 0x03;
-			LOG_MMC(("MMC5 vram protect 2: %02x\n", data));
-			break;
+	case 0x1102:
+		m_wram_protect_1 = data & 0x03;
+		LOG_MMC(("MMC5 vram protect 1: %02x\n", data));
+		break;
 
-		case 0x1104: // Extra VRAM (EXRAM)
-			m_exram_control = data & 0x03;
-			LOG_MMC(("MMC5 exram control: %02x\n", data));
-			break;
+	case 0x1103:
+		m_wram_protect_2 = data & 0x03;
+		LOG_MMC(("MMC5 vram protect 2: %02x\n", data));
+		break;
 
-		case 0x1105:
-			set_mirror(0, (data & 0x03) >> 0);
-			set_mirror(1, (data & 0x0c) >> 2);
-			set_mirror(2, (data & 0x30) >> 4);
-			set_mirror(3, (data & 0xc0) >> 6);
-			break;
+	case 0x1104: // Extra VRAM (EXRAM)
+		m_exram_control = data & 0x03;
+		LOG_MMC(("MMC5 exram control: %02x\n", data));
+		break;
 
-		case 0x1106:
-			m_floodtile = data;
-			break;
+	case 0x1105:
+		set_mirror(0, (data & 0x03) >> 0);
+		set_mirror(1, (data & 0x0c) >> 2);
+		set_mirror(2, (data & 0x30) >> 4);
+		set_mirror(3, (data & 0xc0) >> 6);
+		break;
 
-		case 0x1107:
-			m_floodattr = m_mmc5_attrib[data & 3];
-			break;
+	case 0x1106:
+		m_floodtile = data;
+		break;
 
-		case 0x1113:
-			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
-			m_wram_base = data & 0x07;
-			break;
+	case 0x1107:
+		m_floodattr = m_mmc5_attrib[data & 3];
+		break;
 
+	case 0x1113:
+		LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
+		m_wram_base = data & 0x07;
+		break;
 
-		case 0x1114:
-		case 0x1115:
-		case 0x1116:
-		case 0x1117:
-			m_prg_regs[offset & 3] = data & 0x7f;
-			m_prg_ram_mapped[offset & 3] = !BIT(data, 7);   // m_prg_ram_mapped[3] is not used, in fact!
-			update_prg();
-			break;
+	case 0x1114:
+	case 0x1115:
+	case 0x1116:
+	case 0x1117:
+		m_prg_regs[offset & 3] = data & 0x7f;
+		m_prg_ram_mapped[offset & 3] = !BIT(data, 7);   // m_prg_ram_mapped[3] is not used, in fact!
+		update_prg();
+		break;
 
-		case 0x1120:
-		case 0x1121:
-		case 0x1122:
-		case 0x1123:
-		case 0x1124:
-		case 0x1125:
-		case 0x1126:
-		case 0x1127:
-			m_vrom_bank[offset & 0x07] = data | (m_high_chr << 8);
-			m_last_chr = LAST_CHR_REG_A;
-			m_ex1_chr = 0;
-			m_split_chr = 0;
-			break;
+	case 0x1120:
+	case 0x1121:
+	case 0x1122:
+	case 0x1123:
+	case 0x1124:
+	case 0x1125:
+	case 0x1126:
+	case 0x1127:
+		m_vrom_bank[offset & 0x07] = data | (m_high_chr << 8);
+		m_last_chr = LAST_CHR_REG_A;
+		m_ex1_chr = 0;
+		m_split_chr = 0;
+		break;
 
-		case 0x1128:
-		case 0x1129:
-		case 0x112a:
-		case 0x112b:
-			m_vrom_bank[offset & 0x0f] = data | (m_high_chr << 8);
-			m_last_chr = LAST_CHR_REG_B;
-			m_ex1_chr = 0;
-			m_split_chr = 0;
-			break;
+	case 0x1128:
+	case 0x1129:
+	case 0x112a:
+	case 0x112b:
+		m_vrom_bank[offset & 0x0f] = data | (m_high_chr << 8);
+		m_last_chr = LAST_CHR_REG_B;
+		m_ex1_chr = 0;
+		m_split_chr = 0;
+		break;
 
-		case 0x1130:
-			m_high_chr = data & 0x03;
-			m_ex1_chr = 0;
-			m_split_chr = 0;
-			break;
+	case 0x1130:
+		m_high_chr = data & 0x03;
+		m_ex1_chr = 0;
+		m_split_chr = 0;
+		break;
 
+	case 0x1200:
+		// in EX2 and EX3 modes, no split screen
+		m_split_scr = BIT(data, 7);
+		m_split_rev = BIT(data, 6);
+		m_split_ctrl = data & 0x1f;
+		break;
 
-		case 0x1200:
-			// in EX2 and EX3 modes, no split screen
-			m_split_scr = BIT(data, 7);
-			m_split_rev = BIT(data, 6);
-			m_split_ctrl = data & 0x1f;
-			break;
+	case 0x1201:
+		m_split_yst = (data >= 240) ? data - 16 : data;
+		break;
 
-		case 0x1201:
-			m_split_yst = (data >= 240) ? data - 16 : data;
-			break;
+	case 0x1202:
+		m_split_bank = data;
+		m_split_chr = 1;
+		break;
 
-		case 0x1202:
-			m_split_bank = data;
-			m_split_chr = 1;
-			break;
+	case 0x1203:
+		m_irq_count = data;
+		LOG_MMC(("MMC5 irq scanline: %d\n", m_irq_count));
+		break;
 
-		case 0x1203:
-			m_irq_count = data;
-			LOG_MMC(("MMC5 irq scanline: %d\n", m_irq_count));
-			break;
-		case 0x1204:
-			m_irq_enable = data & 0x80;
-			LOG_MMC(("MMC5 irq enable: %02x\n", data));
-			break;
-		case 0x1205:
-			m_mult1 = data;
-			break;
-		case 0x1206:
-			m_mult2 = data;
-			break;
+	case 0x1204:
+		m_irq_enable = data & 0x80;
+		LOG_MMC(("MMC5 irq enable: %02x\n", data));
+		break;
 
-		default:
-			logerror("MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
-			break;
+	case 0x1205:
+		m_mult1 = data;
+		break;
+
+	case 0x1206:
+		m_mult2 = data;
+		break;
+
+	default:
+		logerror("MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
+		break;
 	}
 }
 
@@ -676,4 +688,17 @@ void nes_exrom_device::write_h(offs_t offset, uint8_t data)
 		m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.size() - 1)] = data;
 	else if (!m_prgram.empty())
 		m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.size() - 1)] = data;
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void nes_exrom_device::device_add_mconfig(machine_config &config)
+{
+	// additional sound hardware
+	SPEAKER(config, "addon").front_center();
+
+	// TODO: temporary; will be separated device
+	NES_APU(config, m_sound, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.90);
 }

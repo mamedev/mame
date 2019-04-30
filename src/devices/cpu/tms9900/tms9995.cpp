@@ -151,7 +151,7 @@ enum
 
 #include "logmacro.h"
 
-constexpr int tms9995_device::AS_SETOFFSET;
+constexpr int tms9995_device::AS_SETADDRESS;
 
 /****************************************************************************
     Constructor
@@ -168,17 +168,16 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		m_state_any(0),
 		PC(0),
 		PC_debug(0),
+		m_iaq(false),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
-		m_setoffset_config("setoffset", ENDIANNESS_BIG, 8, 16),
+		m_setaddress_config("setaddress", ENDIANNESS_BIG, 8, 16),  // see tms9900.cpp
 		m_io_config("cru", ENDIANNESS_LITTLE, 8, 16, 1),
 		m_prgspace(nullptr),
-		m_sospace(nullptr),
+		m_setaddr(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
-		m_iaq_line(*this),
 		m_clock_out_line(*this),
-		m_holda_line(*this),
-		m_dbin_line(*this)
+		m_holda_line(*this)
 {
 	m_check_overflow = false;
 }
@@ -198,15 +197,13 @@ void tms9995_device::device_start()
 	// TODO: Restore save state suport
 
 	m_prgspace = &space(AS_PROGRAM);
-	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
+	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
 	m_external_operation.resolve();
-	m_iaq_line.resolve();
 	m_clock_out_line.resolve();
 	m_holda_line.resolve();
-	m_dbin_line.resolve();
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -441,12 +438,18 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 	m_icount = temp;
 }
 
+/*
+    The setaddress space is used to implement a split-phase memory access
+    where the address bus is first set, then the CPU samples the READY line,
+    (when low, enters wait states,) then the CPU reads the address bus. See
+    tms9900.cpp for more information.
+*/
 device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
-	if (has_configured_map(AS_SETOFFSET))
+	if (has_configured_map(AS_SETADDRESS))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM,   &m_program_config),
-			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_SETADDRESS, &m_setaddress_config),
 			std::make_pair(AS_IO,        &m_io_config)
 		};
 	else
@@ -1561,7 +1564,7 @@ void tms9995_device::prefetch_and_decode()
 		// Save these values; they have been computed during the current instruction execution
 		m_address_copy = m_address;
 		m_value_copy = m_current_value;
-		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
+		m_iaq = true;
 		m_address = PC;
 		LOGMASKED(LOG_DETAIL, "** Prefetching new instruction at %04x **\n", PC);
 	}
@@ -1575,7 +1578,7 @@ void tms9995_device::prefetch_and_decode()
 		m_address = m_address_copy;     // restore m_address
 		m_current_value = m_value_copy; // restore m_current_value
 		PC = (PC + 2) & 0xfffe;     // advance PC
-		if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
+		m_iaq = false;
 		LOGMASKED(LOG_DETAIL, "++ Prefetch done ++\n");
 	}
 }
@@ -1845,7 +1848,6 @@ void tms9995_device::mem_read()
 		case 1:
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
-			if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
 			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
@@ -1855,9 +1857,9 @@ void tms9995_device::mem_read()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
-			if (m_sospace)
-				m_sospace->read_byte(address);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & 0xfffe);
+			if (m_setaddr)
+				m_setaddr->write_byte(address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1865,14 +1867,14 @@ void tms9995_device::mem_read()
 			// Sample the value on the data bus (high byte)
 			if (m_word_access || !m_byteop) address &= 0xfffe;
 			value = m_prgspace->read_byte(address);
-			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & ~1, value);
+			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & 0xfffe, value);
 			m_current_value = (value << 8) & 0xff00;
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_sospace)
-				m_sospace->read_byte(m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_byte(m_address | 1, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1979,8 +1981,6 @@ void tms9995_device::mem_write()
 		case 1:
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
-			if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-
 			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
@@ -1990,8 +1990,8 @@ void tms9995_device::mem_write()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
-			if (m_sospace)
-				m_sospace->read_byte(address);
+			if (m_setaddr)
+				m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -2004,8 +2004,8 @@ void tms9995_device::mem_write()
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_sospace)
-				m_sospace->read_byte(m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_byte(m_address | 1, TMS99xx_BUS_WRITE);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -3477,14 +3477,22 @@ void tms9995_device::alu_int()
 }
 
 /**************************************************************************/
+/*
+    The minimum number of cycles applies to a command like SETO R0 with
+    R0 in on-chip RAM.
+*/
 uint32_t tms9995_device::execute_min_cycles() const
 {
-	return 2;
+	return 3;
 }
 
+/*
+    The maximum number of cycles applies to a STCR command with the destination
+    operand off-chip and 16 bits of transfer.
+*/
 uint32_t tms9995_device::execute_max_cycles() const
 {
-	return 44;
+	return 47;
 }
 
 uint32_t tms9995_device::execute_input_lines() const

@@ -33,10 +33,6 @@ public:
 	static constexpr unsigned TOTAL_HORZ                 = 342;
 	static constexpr unsigned TOTAL_VERT_NTSC            = 262;
 
-	template <class Object> devcb_base &set_readmem_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hold_callback(Object &&cb) { return m_hold_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
-
 	// Delay(2) + ColorBurst(14) + Delay(8) + LeftBorder(13)
 	static constexpr unsigned HORZ_DISPLAY_START         = 2 + 14 + 8 + 13;
 	// RightBorder(15) + Delay(8) + HorizSync(26)

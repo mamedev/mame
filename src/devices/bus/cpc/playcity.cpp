@@ -87,12 +87,12 @@ void cpc_playcity_device::device_reset()
 
 READ8_MEMBER(cpc_playcity_device::ctc_r)
 {
-	return m_ctc->read(space,offset);
+	return m_ctc->read(offset);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ctc_w)
 {
-	m_ctc->write(space,offset,data);
+	m_ctc->write(offset,data);
 	if(offset == 0)
 		update_ymz_clock();
 }

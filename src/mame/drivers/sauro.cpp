@@ -141,13 +141,13 @@ void sauro_state::machine_start()
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
 	data |= 0x80;
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 }
 
 READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
-	int ret = m_soundlatch->read(space, offset);
-	m_soundlatch->clear_w(space, offset, 0);
+	int ret = m_soundlatch->read();
+	m_soundlatch->clear_w();
 	return ret;
 }
 

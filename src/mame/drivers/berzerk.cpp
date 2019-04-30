@@ -235,7 +235,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 
 	/* set the IRQ line if enabled */
 	if (m_irq_enabled)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc); // Z80
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -1293,8 +1293,8 @@ ROM_END
 /*
    The original / prototype version of moon war runs on Frenzy Hardware.
 
-   The more common version of Moon War runs on modified Super Cobra (scobra.c) hardware and is often called
-   'Moon War 2' because it is the second version, and many of the PCBs are labeled as such.
+   The more common version of Moon War runs on modified Super Cobra (galaxian.cpp) hardware and is often called
+   'Moon War II' because it is the second version, and the ROMs as well as many of the PCBs are labeled as such.
 
    So far only 2 original boards of this have been found, one with only the sound ROMs on it, and the other
    with only the program ROMs on it.  This set is a combination of dumps from those two boards, so there

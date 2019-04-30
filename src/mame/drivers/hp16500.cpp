@@ -218,7 +218,7 @@ WRITE16_MEMBER(hp16500_state::maskval_w)
 
 WRITE_LINE_MEMBER(hp16500_state::irq_2)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_2, state);
 }
 
 void hp16500_state::hp1650_map(address_map &map)

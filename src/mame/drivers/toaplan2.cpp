@@ -522,16 +522,16 @@ void toaplan2_state::init_enmadaio()
   Toaplan games
 ***************************************************************************/
 
-IRQ_CALLBACK_MEMBER(toaplan2_state::fixeightbl_irq_ack)
+void toaplan2_state::cpu_space_fixeightbl_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff5, 0xfffff5).lr8("irq 2", [this]() { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); return m68000_device::autovector(2); });
 }
 
-IRQ_CALLBACK_MEMBER(toaplan2_state::pipibibsbl_irq_ack)
+void toaplan2_state::cpu_space_pipibibsbl_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff9, 0xfffff9).lr8("irq 4", [this]() { m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); return m68000_device::autovector(4); });
 }
 
 
@@ -771,14 +771,14 @@ READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 // these two latches are always written together, via a single move.l instruction
 WRITE8_MEMBER(toaplan2_state::batrider_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 {
-	m_soundlatch2->write(space, offset, data & 0xff);
+	m_soundlatch2->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -3549,7 +3549,7 @@ void toaplan2_state::pipibibsbl(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibi_bootleg_68k_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(toaplan2_state::pipibibsbl_irq_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_pipibibsbl_map);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
@@ -3667,7 +3667,7 @@ void toaplan2_state::fixeightbl(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));         /* 10MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeightbl_68k_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(toaplan2_state::fixeightbl_irq_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_fixeightbl_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

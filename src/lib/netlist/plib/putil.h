@@ -62,9 +62,40 @@ namespace plib
 	template <typename T>
 	struct constants
 	{
-		static constexpr T zero() noexcept { return static_cast<T>(0); }
-		static constexpr T one()  noexcept { return static_cast<T>(1); }
-		static constexpr T two()  noexcept { return static_cast<T>(2); }
+		static constexpr T zero()   noexcept { return static_cast<T>(0); }
+		static constexpr T one()    noexcept { return static_cast<T>(1); }
+		static constexpr T two()    noexcept { return static_cast<T>(2); }
+		static constexpr T sqrt2()  noexcept { return static_cast<T>(1.414213562373095048801688724209); }
+		static constexpr T pi()     noexcept { return static_cast<T>(3.14159265358979323846264338327950); }
+
+		/*!
+		 * \brief Electric constant of vacuum
+		 */
+		static constexpr T eps_0() noexcept { return static_cast<T>(8.854187817e-12); }
+		/*!
+		 * \brief Relative permittivity of Silicon dioxide
+		 */
+		static constexpr T eps_SiO2() noexcept { return static_cast<T>(3.9); }
+		/*!
+		 * \brief Relative permittivity of Silicon
+		 */
+		static constexpr T eps_Si() noexcept { return static_cast<T>(11.7); }
+		/*!
+		 * \brief Boltzmann constant
+		 */
+		static constexpr T k_b() noexcept { return static_cast<T>(1.38064852e-23); }
+		/*!
+		 * \brief room temperature (gives VT = 0.02585 at T=300)
+		 */
+		static constexpr T T0() noexcept { return static_cast<T>(300); }
+		/*!
+		 * \brief Elementary charge
+		 */
+		static constexpr T Q_e() noexcept { return static_cast<T>(1.6021765314e-19); }
+		/*!
+		 * \brief Intrinsic carrier concentration in 1/m^3 of Silicon
+		 */
+		static constexpr T NiSi() noexcept { return static_cast<T>(1.45e16); }
 
 		template <typename V>
 		static constexpr const T cast(V &&v) noexcept { return static_cast<T>(v); }

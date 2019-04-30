@@ -181,7 +181,7 @@ INPUT_PORTS_END
 void gaelco2_state::maniacsq(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(26'000'000) / 2);     /* 13 MHz? */
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);     /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco2_state::maniacsq_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco2_state::irq6_line_hold));
 
@@ -206,8 +206,8 @@ void gaelco2_state::maniacsq(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(30'000'000) / 30));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -489,8 +489,9 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco")); /* unused? ROMs contain no sound data */
-	gaelco.set_snd_data_tag("gfx1");
+	/* unused? ROMs contain no sound data */
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(24'000'000) / 24)); // TODO : Correct OSC?
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -745,8 +746,8 @@ void gaelco2_state::play2000(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x080000, 0 * 0x080000, 0 * 0x080000, 0 * 0x080000);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -851,8 +852,8 @@ void bang_state::bang(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_cg1v_device &gaelco(GAELCO_CG1V(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_cg1v_device &gaelco(GAELCO_CG1V(config, "gaelco", XTAL(30'000'000) / 30));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 2 * 0x0200000, 3 * 0x0200000);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -1090,8 +1091,8 @@ void gaelco2_state::alighunt(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(30'000'000) / 30));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 2 * 0x0400000, 3 * 0x0400000);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -1406,8 +1407,8 @@ void gaelco2_state::touchgo(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(40'000'000) / 40));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
 	gaelco.add_route(0, "rspeaker", 1.0);
 	gaelco.add_route(1, "lspeaker", 1.0);
@@ -1704,8 +1705,8 @@ void gaelco2_state::snowboar(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_cg1v_device &gaelco(GAELCO_CG1V(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_cg1v_device &gaelco(GAELCO_CG1V(config, "gaelco", XTAL(34'000'000) / 34));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -1748,8 +1749,8 @@ void gaelco2_state::maniacsqs(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(30'000'000) / 30));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -2004,8 +2005,8 @@ void wrally2_state::wrally2(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco"));
-	gaelco.set_snd_data_tag("gfx1");
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
+	gaelco.set_device_rom_tag("gfx1");
 	gaelco.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 0, 0);
 	gaelco.add_route(0, "lspeaker", 1.0);
 	gaelco.add_route(1, "rspeaker", 1.0);
@@ -2329,5 +2330,8 @@ GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, i
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_NOT_WORKING ) // bad dump
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
-// Gym exercise bike
-GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays
+// Gym equipment
+GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING )
+// Pro Reclimber Tele
+// Pro Stepper Tele
+// there are other devices in Cardioline series that don't use displays

@@ -513,7 +513,7 @@ WRITE8_MEMBER( cybertnk_state::sound_cmd_w )
 	}
 	else if (offset == 1)
 	{
-		m_soundlatch->write(space, offset, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 	}
 }
 

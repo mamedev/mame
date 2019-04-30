@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2018-04-28 18:50+0800\n"
+"PO-Revision-Date: 2019-03-18 06:50+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -1590,11 +1590,11 @@ msgstr "聲音\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1079
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "擷取\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1081
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "擷取\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1084
 msgid "Camera\tUnimplemented\n"
@@ -1638,11 +1638,11 @@ msgstr "滑鼠\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1109
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "媒體\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1111
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "媒體\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 msgid "Disk\tUnimplemented\n"
@@ -1662,43 +1662,43 @@ msgstr "印表機\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1124
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "磁帶\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1126
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "磁帶\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1129
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "打孔帶\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1131
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "打孔帶\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1134
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "磁鼓\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1136
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "磁鼓\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1139
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1141
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "通訊\t無法執行\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1146
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "通訊\t不完美\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "LAN\tUnimplemented\n"
@@ -2386,7 +2386,7 @@ msgstr "聲音"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "capture hardware"
-msgstr ""
+msgstr "擷取硬體"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
@@ -2410,7 +2410,7 @@ msgstr "滑鼠"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "media"
-msgstr ""
+msgstr "媒體"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "disk"
@@ -2422,23 +2422,23 @@ msgstr "印表機"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgid "magnetic tape"
-msgstr ""
+msgstr "磁帶"
 
 #: src/frontend/mame/ui/info.cpp:46
 msgid "punch tape"
-msgstr ""
+msgstr "打孔帶"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgid "magnetic drum"
-msgstr ""
+msgstr "磁鼓"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgid "solid state storage"
-msgstr ""
+msgstr "固態儲存"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgid "communications"
-msgstr ""
+msgstr "通訊"
 
 #: src/frontend/mame/ui/info.cpp:50
 msgid "LAN"
@@ -2898,15 +2898,15 @@ msgstr "此變更僅當選定 \"開始新搜尋\" 時生效"
 
 #: plugins/cheatfind/init.lua:504
 msgid "Pause Mode"
-msgstr ""
+msgstr "暫停模式"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manually pause & unpause the game when needed with the pause hotkey"
-msgstr ""
+msgstr "當需要暫停熱鍵時手動暫停及取消暫停遊戲"
 
 #: plugins/cheatfind/init.lua:536
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "全部插槽已清除且目前狀態已儲存至插槽 1"
 
 #: plugins/cheatfind/init.lua:551
 msgid "Start new search"
@@ -2915,11 +2915,11 @@ msgstr "開始新搜尋"
 #: plugins/cheatfind/init.lua:564
 #, lua-format
 msgid "Memory State saved to Slot %d"
-msgstr ""
+msgstr "記憶體狀態已儲存至插槽 %d"
 
 #: plugins/cheatfind/init.lua:583
 msgid "Save Current Memory State to Slot "
-msgstr ""
+msgstr "儲存現有的記憶體狀態至插槽"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -2928,15 +2928,15 @@ msgstr "總計發現 %d 符合"
 
 #: plugins/cheatfind/init.lua:655
 msgid "Perform Compare  :  "
-msgstr ""
+msgstr "進行比較 ："
 
 #: plugins/cheatfind/init.lua:672
 msgid "Left less than right"
-msgstr ""
+msgstr "左值少於右值"
 
 #: plugins/cheatfind/init.lua:674
 msgid "Left greater than right"
-msgstr ""
+msgstr "左值多於右值"
 
 #: plugins/cheatfind/init.lua:676
 msgid "Left equal to right"
@@ -2944,7 +2944,7 @@ msgstr "左值等於右值"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left not equal to right"
-msgstr ""
+msgstr "左值不等於右值"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left equal to right with bitmask"
@@ -2956,11 +2956,11 @@ msgstr "位元遮罩下左值不等於右值"
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left less than value"
-msgstr "左值小於原值"
+msgstr "左值少於原值"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left greater than value"
-msgstr "左值大於原值"
+msgstr "左值多於原值"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left equal to value"
@@ -2976,7 +2976,7 @@ msgstr "值"
 
 #: plugins/cheatfind/init.lua:714
 msgid "Difference"
-msgstr ""
+msgstr "差異"
 
 #: plugins/cheatfind/init.lua:719
 msgid "Any"
@@ -2988,91 +2988,93 @@ msgstr "資料格式"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "測試/寫入塞入值"
 
 #: plugins/cheatfind/init.lua:738
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
 
 #: plugins/cheatfind/init.lua:740
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Use this if you want to poke 0x00"
-msgstr ""
+msgstr "如果你想塞入 0x00 ，用這個"
 
 #: plugins/cheatfind/init.lua:744
 msgid "Use this if you want to poke 0x01"
-msgstr ""
+msgstr "如果你想塞入 0x01 ，用這個"
 
 #: plugins/cheatfind/init.lua:746
 msgid "Use this if you want to poke 0x02"
-msgstr ""
+msgstr "如果你想塞入 0x02 ，用這個"
 
 #: plugins/cheatfind/init.lua:748
 msgid "Use this if you want to poke 0x03"
-msgstr ""
+msgstr "如果你想塞入 0x03 ，用這個"
 
 #: plugins/cheatfind/init.lua:750
 msgid "Use this if you want to poke 0x04"
-msgstr ""
+msgstr "如果你想塞入 0x04 ，用這個"
 
 #: plugins/cheatfind/init.lua:752
 msgid "Use this if you want to poke 0x05"
-msgstr ""
+msgstr "如果你想塞入 0x05 ，用這個"
 
 #: plugins/cheatfind/init.lua:754
 msgid "Use this if you want to poke 0x06"
-msgstr ""
+msgstr "如果你想塞入 0x06 ，用這個"
 
 #: plugins/cheatfind/init.lua:756
 msgid "Use this if you want to poke 0x07"
-msgstr ""
+msgstr "如果你想塞入 0x07 ，用這個"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Use this if you want to poke 0x08"
-msgstr ""
+msgstr "如果你想塞入 0x08 ，用這個"
 
 #: plugins/cheatfind/init.lua:760
 msgid "Use this if you want to poke 0x09"
-msgstr ""
+msgstr "如果你想塞入 0x09 ，用這個"
 
 #: plugins/cheatfind/init.lua:762
 msgid "Use this if you want to poke 0x63 (Decimal 99)"
-msgstr ""
+msgstr "如果你想塞入 0x63 （十進位的 99），用這個"
 
 #: plugins/cheatfind/init.lua:764
 msgid "Use this if you want to poke 0x99 (BCD 99)"
-msgstr ""
+msgstr "如果你想塞入 0x99 （二進位的 99），用這個"
 
 #: plugins/cheatfind/init.lua:766
 msgid "Use this if you want to poke 0xFF (Decimal 255)"
-msgstr ""
+msgstr "如果你想塞入 0xFF （十進位的 255），用這個"
 
 #: plugins/cheatfind/init.lua:768
 msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-msgstr ""
+msgstr "如果你想塞入 0x3E7 （十進位的 999），用這個"
 
 #: plugins/cheatfind/init.lua:770
 msgid "Use this if you want to poke 0x999 (BCD 999)"
-msgstr ""
+msgstr "如果你想塞入 0x999 （二進位的 999），用這個"
 
 #: plugins/cheatfind/init.lua:772
 msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-msgstr ""
+msgstr "如果你想塞入 0x270F （十進位的 9999），用這個"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-msgstr ""
+msgstr "如果你想塞入 0x9999 （二進位的 9999），用這個"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-msgstr ""
+msgstr "如果你想塞入 0xFFFF （十進位的 65535），用這個"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Undo last search -- #"
@@ -3089,7 +3091,7 @@ msgstr "所有"
 #: plugins/cheatfind/init.lua:934
 #, lua-format
 msgid "Test Cheat %08X:%02X"
-msgstr ""
+msgstr "測試作弊碼 %08X:%02X"
 
 #: plugins/cheatfind/init.lua:974
 msgid "Cheat engine not available"

@@ -102,7 +102,7 @@ WRITE16_MEMBER( cps_state::fcrash_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -111,7 +111,7 @@ WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_soundlatch->write(space, 0, data  >> 8);
+		m_soundlatch->write(data >> 8);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); /* boost the interleave or some voices get dropped */
 	}
@@ -1722,7 +1722,7 @@ void cps_state::fcrash(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::fcrash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, 24000000/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sound_map);
@@ -1786,7 +1786,7 @@ void cps_state::kodb(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::fcrash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::kodb_sound_map);
@@ -1827,7 +1827,7 @@ void cps_state::mtwinsb(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::mtwinsb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);
@@ -1919,7 +1919,7 @@ void cps_state::knightsb(machine_config &config)
 	M68000(config, m_maincpu, 24000000 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::knightsb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, 29821000 / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::knightsb_z80map);
@@ -2300,7 +2300,7 @@ void cps_state::dinopic(machine_config &config)
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::dinopic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
 
@@ -2489,7 +2489,7 @@ void cps_state::sgyxz(machine_config &config)
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);
@@ -2612,7 +2612,7 @@ void cps_state::punipic(machine_config &config)
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::punipic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
 
@@ -2804,7 +2804,7 @@ void cps_state::sf2m1(machine_config &config)
 	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::sf2m1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);
@@ -3179,7 +3179,7 @@ void cps_state::slampic(machine_config &config)
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::slampic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
 
@@ -3278,7 +3278,7 @@ void cps_state::varthb(machine_config &config)
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::varthb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cps_state::cps1_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sgyxz_sound_map);

@@ -35,7 +35,7 @@ public:
 	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data);
-	uint8_t setoffset(offs_t offset);
+	void setaddress(offs_t offset, uint16_t busctrl);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -50,7 +50,6 @@ protected:
 	void device_start() override;
 	void device_stop() override;
 	void device_reset() override;
-	void device_config_complete() override;
 	ioport_constructor device_input_ports() const override;
 
 private:
@@ -79,7 +78,9 @@ private:
 	uint16_t* m_consolerom;
 
 	// Console GROMs
-	tmc0430_device* m_grom[3];
+	required_device<tmc0430_device> m_grom0;
+	required_device<tmc0430_device> m_grom1;
+	required_device<tmc0430_device> m_grom2;
 
 	// Common read routine
 	void read_all(uint16_t addr, uint8_t *target);

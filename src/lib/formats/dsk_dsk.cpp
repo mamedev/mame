@@ -365,7 +365,22 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	int img_tracks, img_heads;
 	image->get_maximal_geometry(img_tracks, img_heads);
-	if (tracks > img_tracks || heads > img_heads)
+	if (tracks > img_tracks)
+	{
+		if (tracks - img_tracks > DUMP_THRESHOLD)
+		{
+			osd_printf_error("dsk: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", tracks, img_tracks);
+			return false;
+		}
+		else
+		{
+			// Some dumps has a few excess tracks to be safe,
+			// lets be nice and just skip those tracks
+			osd_printf_warning("dsk: Floppy disk has a slight excess of tracks for this drive that will be discarded (floppy tracks=%d, drive tracks=%d).\n", tracks, img_tracks);
+			tracks = img_tracks;
+		}
+	}
+	if (heads > img_heads)
 		return false;
 
 	uint64_t track_offsets[84*2];

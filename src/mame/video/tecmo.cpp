@@ -165,7 +165,7 @@ uint32_t tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
 
-	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
+	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode->gfx(1),cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
 
 	return 0;
 }

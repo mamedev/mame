@@ -123,7 +123,7 @@ public:
 
 	uint8_t readm(offs_t offset);
 	void writem(offs_t offset, uint8_t data);
-	uint8_t setoffset(offs_t offset);
+	void setaddress(offs_t offset, uint8_t busctrl);
 
 	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
 

@@ -42,7 +42,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
 
 WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 {
-	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(ironhors_state::filter_w)
@@ -436,7 +436,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
-	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read();
 }
 
 void ironhors_state::farwest(machine_config &config)

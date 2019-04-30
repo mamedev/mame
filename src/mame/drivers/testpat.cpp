@@ -102,27 +102,11 @@ static INPUT_PORTS_START(tp1985)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(tp1983_state::tp1983)
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_tp1983);
+void tp1983_state::tp1983(machine_config &config)
+{
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1983);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_composite_monochrome, "fixfreq")
-
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK);
-	m_video->set_horz_params(H_TOTAL_PONG-64,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_vert_params(V_TOTAL_PONG-19,V_TOTAL_PONG-16,V_TOTAL_PONG-12,V_TOTAL_PONG);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(1);
-	m_video->set_gain(0.36);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(tp1985_state::tp1985)
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_tp1985);
-
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", tp1985_state, video_out_cb, "")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
@@ -132,7 +116,23 @@ MACHINE_CONFIG_START(tp1985_state::tp1985)
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);
-MACHINE_CONFIG_END
+}
+
+void tp1985_state::tp1985(machine_config &config)
+{
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1985);
+
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(tp1985_state::video_out_cb), "");
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL_PONG-64,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-19,V_TOTAL_PONG-16,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(1);
+	m_video->set_gain(0.36);
+}
 
 
 ROM_START( tp1983 ) /* dummy to satisfy game entry*/

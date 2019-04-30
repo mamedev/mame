@@ -3,7 +3,7 @@
 
 <softwarelist name="arb" description="ARB Modules">
 
-<!-- AVE Micro Systems Auto Response Board (ARB) chess program modules -->
+<!-- AVE Micro Systems Auto Response Board (ARB) game modules -->
 
 	<software name="sargon25">
 		<description>Sargon 2.5</description>
@@ -11,10 +11,25 @@
 		<publisher>AVE Micro Systems</publisher>
 		<part name="cart" interface="arb">
 			<dataarea name="rom" size="0x8000">
-				<rom name="4000-4800_ea_8332a161-1" size="0x1000" crc="00460848" sha1="ac4fe2232028bd42506a24457882296e7d3a8f54" offset="0x4000" />
-				<rom size="0x1000" offset="0x6000" loadflag="reload" />
-				<rom name="5000-5800_ea_8332a160-1" size="0x1000" crc="aac1dff2" sha1="9a7fc6dc98e53120e511d266304ad07f248f415a" offset="0x5000" />
-				<rom size="0x1000" offset="0x7000" loadflag="reload" />
+				<rom name="4000-4800_ea_8332a161-1" offset="0x4000" size="0x1000" crc="00460848" sha1="ac4fe2232028bd42506a24457882296e7d3a8f54" />
+				<rom                                offset="0x6000" size="0x1000" loadflag="reload" />
+				<rom name="5000-5800_ea_8332a160-1" offset="0x5000" size="0x1000" crc="aac1dff2" sha1="9a7fc6dc98e53120e511d266304ad07f248f415a" />
+				<rom                                offset="0x7000" size="0x1000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gms40">
+		<description>Grand Master Series 4.0</description>
+		<year>1984</year>
+		<publisher>AVE Micro Systems</publisher>
+		<part name="cart" interface="arb">
+			<feature name="ram" value="1" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="1.bin" offset="0x2000" size="0x1000" crc="26e57f38" sha1="b37364dd567018e5aebaecbcc47af3bd43e36032" />
+				<rom              offset="0x3000" size="0x1000" loadflag="reload" />
+				<rom name="2.bin" offset="0x4000" size="0x2000" crc="3b1b26a2" sha1="0b59f6c344c9996a06e63e61e91a195b0eb1dd32" />
+				<rom name="3.bin" offset="0x6000" size="0x2000" crc="b90f7f80" sha1="71ffd2d56e1f44e7c4e1d13364e43fc6ac1a4f99" />
 			</dataarea>
 		</part>
 	</software>

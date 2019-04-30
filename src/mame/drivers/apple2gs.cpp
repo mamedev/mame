@@ -2262,7 +2262,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			}
 			else
 			{
-				m_sndglu_dummy_read = m_doc->read(space, m_sndglu_addr);
+				m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
 			}
 
 			if (m_sndglu_ctrl & 0x20)    // auto-increment
@@ -2591,7 +2591,7 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			}
 			else
 			{
-				m_doc->write(space, m_sndglu_addr, data);
+				m_doc->write(m_sndglu_addr, data);
 			}
 
 			if (m_sndglu_ctrl & 0x20)    // auto-increment
@@ -4042,7 +4042,7 @@ READ8_MEMBER(apple2gs_state::doc_adc_read)
 
 int apple2gs_state::apple2_fdc_has_35()
 {
-	return (floppy_get_count(machine())); // - apple525_get_count(machine)) > 0;
+	return device_type_iterator<sonydriv_floppy_image_device>(*this).count(); // - apple525_get_count(machine)) > 0;
 }
 
 int apple2gs_state::apple2_fdc_has_525()

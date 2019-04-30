@@ -408,8 +408,8 @@ void polepos_state::machine_start()
 void polepos_state::machine_reset()
 {
 	/* set the interrupt vectors (this shouldn't be needed) */
-	m_subcpu->set_input_line_vector(0, Z8000_NVI);
-	m_subcpu2->set_input_line_vector(0, Z8000_NVI);
+	m_subcpu->set_input_line_vector(0, Z8000_NVI); // Z8002
+	m_subcpu2->set_input_line_vector(0, Z8000_NVI); // Z8002
 }
 
 
@@ -951,7 +951,7 @@ void polepos_state::polepos(machine_config &config)
 WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
 {
 	if (m_soundlatch.found()) // topracern also uses this; no idea what it should do there
-		m_soundlatch->write(space, 0, data | 0xfc);
+		m_soundlatch->write(data | 0xfc);
 }
 
 void polepos_state::topracern_io(address_map &map)

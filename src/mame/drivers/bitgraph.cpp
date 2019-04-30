@@ -324,7 +324,7 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 	}
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	}
 	else
 	{

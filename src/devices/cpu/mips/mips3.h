@@ -201,6 +201,7 @@ enum {
 	MIPS3_PAGEMASK,
 	MIPS3_WIRED,
 	MIPS3_BADVADDR,
+	MIPS3_LLADDR,
 	MIPS3_R0H,
 	MIPS3_R1H,
 	MIPS3_R2H,
@@ -237,6 +238,9 @@ enum {
 
 #define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
+
+/* COP1 CCR register */
+#define COP1_FCR31              (m_core->ccr[1][31])
 
 /***************************************************************************
 INTERRUPT CONSTANTS
@@ -591,6 +595,7 @@ public:
 	void func_printf_exception();
 	void func_printf_debug();
 	void func_printf_probe();
+	void func_debug_break();
 	void func_unimplemented();
 private:
 	/* internal compiler state */

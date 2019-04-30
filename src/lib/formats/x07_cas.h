@@ -7,12 +7,13 @@
     Format code for Canon X-07 cassette images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_X07_CAS_H
+#define MAME_FORMATS_X07_CAS_H
 
-#ifndef X07_CAS_H
-#define X07_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(x07_cassette_formats);
 
-#endif /* X07_CAS_H */
+#endif // MAME_FORMATS_X07_CAS_H

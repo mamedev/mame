@@ -7,10 +7,10 @@
 
 *******************************************************************************
 
-Fidelity Chess Challenger 7 (BCC)
+Fidelity Chess Challenger 7 (CC7, BCC)
 ------------------------
-model CC7 is an older version
-RE information from netlist by Berger
+It was Fidelity's most sold chess computer. model CC7 is an older version.
+CC7 known serial numbers range from 1979 to 1980. BCC from 1980 to 1983.
 
 Zilog Z80A, 3.579MHz from XTAL
 Z80 IRQ/NMI unused, no timer IC.
@@ -18,6 +18,8 @@ This is a cost-reduced design from CC10, no special I/O chips.
 
 Backgammon Challenger (BKC) is the same PCB, with the speaker connection going
 to the display panel instead.
+
+RE information from netlist by Berger (a BCC model)
 
 Memory map:
 -----------
@@ -225,6 +227,11 @@ ROM_START( cc7 ) // model BCC
 	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
 ROM_END
 
+ROM_START( cc7o ) // model CC7, PCB label 510-380
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "101-32016", 0x0000, 0x1000, CRC(b9076c52) SHA1(09b17ac6cd6a1c5c62aea3649f3367bcf4405598) ) // 2332
+ROM_END
+
 
 ROM_START( backgamc ) // model BKC, PCB label P-380A-5
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -241,5 +248,6 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, cc7,      0,      0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cc7o,     cc7,    0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model CC7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 2nd revision of model CC7?
 
 CONS( 1979, backgamc, 0,      0, bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

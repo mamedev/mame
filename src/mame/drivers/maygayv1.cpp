@@ -250,6 +250,7 @@ private:
 	void sound_data(address_map &map);
 	void sound_io(address_map &map);
 	void sound_prg(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -824,10 +825,15 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+void maygayv1_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffa, 0xfffffb).lr16("duart irq", [this]() -> u16 { return m_duart68681->get_irq_vector(); });
+}
+
 WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(5, state, m_duart68681->get_irq_vector());
-//  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, state);
 }
 
 
@@ -882,6 +888,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maygayv1_state::main_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &maygayv1_state::cpu_space_map);
 
 	I8052(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &maygayv1_state::sound_prg);

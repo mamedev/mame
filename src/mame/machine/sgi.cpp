@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "sgi.h"
+#include "ioc2.h"
 
 #define LOG_UNKNOWN     (1 << 0)
 #define LOG_READS       (1 << 1)
@@ -276,7 +277,9 @@ void sgi_mc_device::dma_tick()
 				m_dma_run &= ~(1 << 6);
 				if (BIT(m_dma_control, 4))
 				{
-					m_hpc3->raise_local_irq(3, 1 << 4);
+					logerror("Pixel DMA IRQ\n");
+					m_dma_int_cause |= (1 << 3);
+					m_hpc3->raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 				}
 			}
 			else
@@ -577,14 +580,14 @@ WRITE32_MEMBER( sgi_mc_device::write )
 	case 0x0160/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Interrupt Cause Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_int_cause = data;
+		if (m_dma_int_cause == 0 && m_hpc3)
+		{
+			m_hpc3->lower_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
+		}
 		break;
 	case 0x0168/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_control = data;
-		if (!BIT(m_dma_control, 4) && m_hpc3)
-		{
-			m_hpc3->lower_local_irq(3, 1 << 4);
-		}
 		break;
 	case 0x0180/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA TLB Entry 0 High Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);

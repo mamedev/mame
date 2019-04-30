@@ -111,24 +111,24 @@ private:
 
 	required_memory_bank m_audiobank;
 
-	uint8_t m_sprite_irq;
-	uint8_t m_unknown_irq;
-	uint8_t m_vblank_irq;
-	uint8_t m_latch_full[2];
+	u8 m_sprite_irq;
+	u8 m_unknown_irq;
+	u8 m_vblank_irq;
+	bool m_latch_full[2];
 
-	DECLARE_READ16_MEMBER(irq_cause_r);
-	DECLARE_WRITE16_MEMBER(irq_cause_w);
-	DECLARE_WRITE16_MEMBER(coincounter_w);
-	template<int Latch> DECLARE_READ8_MEMBER(soundlatch_r);
-	template<int Latch> DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(latchstatus_word_r);
-	DECLARE_WRITE16_MEMBER(latchstatus_word_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(latchstatus_r);
+	u8 irq_cause_r();
+	void irq_cause_w(u8 data);
+	void coincounter_w(u8 data);
+	template<unsigned Latch> u8 soundlatch_r();
+	template<unsigned Latch> void soundlatch_w(u8 data);
+	u8 latchstatus_68k_r();
+	void latchstatus_68k_w(u8 data);
+	void bankswitch_w(u8 data);
+	u8 latchstatus_r();
 
 	virtual void machine_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -139,18 +139,17 @@ private:
 };
 
 
-
-uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	screen.priority().fill(0, cliprect);
 
-	m_view2->kaneko16_prepare(bitmap, cliprect);
+	m_view2->prepare(bitmap, cliprect);
 
 	for ( int l = 0; l < 4; l++ )
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,l);
+		m_view2->render_tilemap(screen,bitmap,cliprect,l);
 	}
 
 	// copy sprite bitmap to screen
@@ -158,13 +157,11 @@ uint32_t sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
 	{
-		m_view2->render_tilemap_chip(screen,bitmap,cliprect,h);
+		m_view2->render_tilemap(screen,bitmap,cliprect,h);
 	}
 
 	return 0;
 }
-
-
 
 
 void sandscrp_state::machine_start()
@@ -188,7 +185,6 @@ void sandscrp_state::update_irq_state()
 }
 
 
-
 /* Called once/frame to generate the VBLANK interrupt */
 INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
 {
@@ -209,7 +205,7 @@ WRITE_LINE_MEMBER(sandscrp_state::screen_vblank)
 }
 
 /* Reads the cause of the interrupt */
-READ16_MEMBER(sandscrp_state::irq_cause_r)
+u8 sandscrp_state::irq_cause_r()
 {
 	return  ( m_sprite_irq  ?  0x08  : 0 ) |
 			( m_unknown_irq ?  0x10  : 0 ) |
@@ -218,100 +214,89 @@ READ16_MEMBER(sandscrp_state::irq_cause_r)
 
 
 /* Clear the cause of the interrupt */
-WRITE16_MEMBER(sandscrp_state::irq_cause_w)
+void sandscrp_state::irq_cause_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-//      m_sprite_flipx  =   data & 1;
-//      m_sprite_flipy  =   data & 1;
+//  m_sprite_flipx  =   data & 1;
+//  m_sprite_flipy  =   data & 1;
 
-		if (data & 0x08)    m_sprite_irq  = 0;
-		if (data & 0x10)    m_unknown_irq = 0;
-		if (data & 0x20)    m_vblank_irq  = 0;
-	}
+	if (BIT(data, 3))    m_sprite_irq  = 0;
+	if (BIT(data, 4))    m_unknown_irq = 0;
+	if (BIT(data, 5))    m_vblank_irq  = 0;
 
 	update_irq_state();
 }
 
 
-
 /***************************************************************************
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE16_MEMBER(sandscrp_state::coincounter_w)
+void sandscrp_state::coincounter_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0,   data  & 0x0001);
-		machine().bookkeeping().coin_counter_w(1,   data  & 0x0002);
-	}
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 
-READ16_MEMBER(sandscrp_state::latchstatus_word_r)
+u8 sandscrp_state::latchstatus_68k_r()
 {
 	return  (m_latch_full[0] ? 0x80 : 0) |
 			(m_latch_full[1] ? 0x40 : 0) ;
 }
 
-WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
+void sandscrp_state::latchstatus_68k_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_latch_full[0] = data & 0x80;
-		m_latch_full[1] = data & 0x40;
-	}
+	m_latch_full[0] = BIT(data, 7);
+	m_latch_full[1] = BIT(data, 6);
 }
 
-template<int Latch>
-READ8_MEMBER(sandscrp_state::soundlatch_r)
+template<unsigned Latch>
+u8 sandscrp_state::soundlatch_r()
 {
-	m_latch_full[Latch] = 0;
-	return m_soundlatch[Latch]->read(space,0);
+	m_latch_full[Latch] = false;
+	return m_soundlatch[Latch]->read();
 }
 
-template<int Latch>
-WRITE8_MEMBER(sandscrp_state::soundlatch_w)
+template<unsigned Latch>
+void sandscrp_state::soundlatch_w(u8 data)
 {
-	m_latch_full[Latch] = 1;
-	m_soundlatch[Latch]->write(space,0,data);
+	m_latch_full[Latch] = true;
+	m_soundlatch[Latch]->write(data);
 }
 
 void sandscrp_state::sandscrp_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
-	map(0x100000, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
+	map(0x100001, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
 
-	map(0x700000, 0x70ffff).ram();     // RAM
 	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
-	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
-	map(0x400000, 0x403fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
+	map(0x400000, 0x403fff).m(m_view2, FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
 	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xa00000, 0xa00001).w(FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
+	map(0x700000, 0x70ffff).ram();     // RAM
+	map(0x800001, 0x800001).r(FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
+	map(0xa00001, 0xa00001).w(FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
 	map(0xb00000, 0xb00001).portr("P1");
 	map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("UNK");
-	map(0xec0000, 0xec0001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x800000, 0x800001).r(FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
 	map(0xe00001, 0xe00001).rw(FUNC(sandscrp_state::soundlatch_r<1>), FUNC(sandscrp_state::soundlatch_w<0>));   // From/To Sound CPU
-	map(0xe40000, 0xe40001).rw(FUNC(sandscrp_state::latchstatus_word_r), FUNC(sandscrp_state::latchstatus_word_w)); //
+	map(0xe40001, 0xe40001).rw(FUNC(sandscrp_state::latchstatus_68k_r), FUNC(sandscrp_state::latchstatus_68k_w)); //
+	map(0xec0000, 0xec0001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 }
-
 
 
 /***************************************************************************
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE8_MEMBER(sandscrp_state::bankswitch_w)
+void sandscrp_state::bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry(data & 7);
 }
 
-READ8_MEMBER(sandscrp_state::latchstatus_r)
+u8 sandscrp_state::latchstatus_r()
 {
 	return  (m_latch_full[1] ? 0x80 : 0) |    // swapped!?
 			(m_latch_full[0] ? 0x40 : 0) ;
@@ -461,7 +446,6 @@ static GFXDECODE_START( gfx_sandscrp )
 GFXDECODE_END
 
 
-
 /***************************************************************************
                                 Sand Scorpion
 ***************************************************************************/
@@ -470,7 +454,7 @@ GFXDECODE_END
 void sandscrp_state::sandscrp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);    /* TMP68HC000N-12 */
+	M68000(config, m_maincpu, 12_MHz_XTAL);    /* TMP68HC000N-12 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(sandscrp_state::interrupt));
 

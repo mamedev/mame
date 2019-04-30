@@ -5,14 +5,18 @@
 
 Applied Concepts Boris (electronic chess computer)
 
-- MK3850N-3 CPU @ 2 MHz, MK3853N memory interface
-- 256 bytes RAM(2*2112), AMI 2KB ROM + AMI 1KB(?*) ROM *: less than 512 bytes used
+- MK3850N-3 CPU @ 2 MHz from XTAL, MK3853N memory interface
+- 256 bytes RAM(2*2112), 2*AMI 2KB ROM (2nd ROM only half used)
 - 8-digit 16seg led panel
 
 When it was first released, it was in kit form. An extensive assembly manual with
 schematics was included. It was later distributed by Chafitz in pre-assembled form.
 There's also an updated revision, identifiable by the startup message "Boris awaits
 your move"(same as Boris Master) instead of "Boris plays black".
+
+Boris Master included a battery, RESET was renamed to MEMORY. 2 known versions:
+one with C10617/C10617 ROMs(same as Boris rev. 01), and one with a single 4KB
+ROM labeled 007-7027-00.
 
 ******************************************************************************/
 
@@ -40,10 +44,11 @@ public:
 
 	void boris(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -55,6 +60,7 @@ private:
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	void update_reset(ioport_value state);
 	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
 
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -81,13 +87,18 @@ void boris_state::machine_start()
 	save_item(NAME(m_4042));
 }
 
-INPUT_CHANGED_MEMBER(boris_state::reset_switch)
+void boris_state::machine_reset()
+{
+	update_reset(ioport("RESET")->read());
+}
+
+void boris_state::update_reset(ioport_value state)
 {
 	// reset switch is tied to MK3850 RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// clear display
-	if (newval)
+	if (state)
 	{
 		for (int i = 0; i < 8; i++)
 			m_delay_display[i]->adjust(attotime::zero, i);
@@ -207,7 +218,7 @@ static INPUT_PORTS_START( boris )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, nullptr) PORT_NAME("Reset Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, nullptr) PORT_NAME("Reset Switch")
 INPUT_PORTS_END
 
 
@@ -219,7 +230,7 @@ INPUT_PORTS_END
 void boris_state::boris(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2_MHz_XTAL); // MK3850, 2MHz XTAL according to schematics
+	F8(config, m_maincpu, 2_MHz_XTAL); // MK3850
 	m_maincpu->set_addrmap(AS_PROGRAM, &boris_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &boris_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
@@ -242,8 +253,14 @@ void boris_state::boris(machine_config &config)
 
 ROM_START( boris )
 	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD("007-7020-01_c10617", 0x0000, 0x0800, CRC(dadf1693) SHA1(ffaef7a78f07dfcec9cc6e4034d665d188748225) )
+	ROM_LOAD("007-7021-01_c10618", 0x0800, 0x0800, CRC(89b10faa) SHA1(b86cf42f93051b29f398691270e9a860b2978043) ) // identical halves
+ROM_END
+
+ROM_START( borisa )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("007-7020-00_c10502", 0x0000, 0x0800, CRC(18182870) SHA1(cb717a4b5269b04b0d7ae61aaf4a8f6a019626a5) )
-	ROM_LOAD("007-7021-00_c10503", 0x0800, 0x0400, CRC(49b77505) SHA1(474b665ee2955497f6d70878d817f1783ba1a835) )
+	ROM_LOAD("007-7021-00_c10503", 0x0800, 0x0800, CRC(4185d183) SHA1(43155493593d6f52a0f6906d4414f4eff3098c5f) ) // identical halves, less than 512 bytes used
 ROM_END
 
 } // anonymous namespace
@@ -254,5 +271,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, boris, 0,      0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT CMP MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1978, boris,  0,      0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris awaits your move"
+COMP( 1978, borisa, boris,  0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris plays black"

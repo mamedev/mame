@@ -106,8 +106,9 @@ void f3851_device::device_resolve_objects()
 void f3853_device::device_start()
 {
 	// lookup table for 3851/3853 lfsr timer
+	m_value_to_cycle[0xff] = 0xff;
 	uint8_t reg = 0xfe; // Known to get 0xfe after 255 cycles
-	for(int i = reg; i >= 0; i--)
+	for (int i = reg; i >= 0; i--)
 	{
 		m_value_to_cycle[reg] = i;
 		reg = reg << 1 | (BIT(reg,7) ^ BIT(reg,5) ^ BIT(reg,4) ^ BIT(reg,3) ^ 1);
@@ -189,25 +190,27 @@ IRQ_CALLBACK_MEMBER(f3853_device::int_acknowledge)
 
 void f3853_device::timer_start(uint8_t value)
 {
-	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value] * m_prescaler) : attotime::never;
+	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_prescaler * m_value_to_cycle[value]) : attotime::never;
 
 	m_timer->adjust(period);
 }
 
 TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 {
-	if(m_timer_int_enable)
+	if (m_timer_int_enable)
 	{
 		m_request_flipflop = true;
 		set_interrupt_request_line();
 	}
-	timer_start(0xfe);
+
+	// next timeout after 255 timer counts (prescaler doesn't reset)
+	m_timer->adjust(attotime::from_hz(clock()) * (m_prescaler * 0xff));
 }
 
 
 WRITE_LINE_MEMBER(f3853_device::ext_int_w)
 {
-	if(m_external_interrupt_line && !state && m_external_int_enable)
+	if (m_external_interrupt_line && !state && m_external_int_enable)
 	{
 		m_request_flipflop = true;
 	}
@@ -356,8 +359,8 @@ WRITE8_MEMBER(f3856_device::write)
 	case 2:
 	{
 		// timer prescaler
-		static const u8 prescaler[8] = { 32, 128, 8, 2 };
-		m_prescaler = prescaler[data >> 5 & 7];
+		static const u8 prescaler[4] = { 32, 128, 8, 2 };
+		m_prescaler = prescaler[data >> 2 & 3];
 
 		// start/stop timer
 		bool prev = m_timer_start;

@@ -20,7 +20,7 @@
 	</software>
 
 	<software name="aniarts" cloneof="aniart" supported="no">
-		<description>Estudio de Arte Animal (SP)</description>
+		<description>Estudio de Arte Animal (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -160,7 +160,7 @@
 	</software>
 
 	<software name="toystors" cloneof="toystor" supported="no">
-		<description>Disney/Pixar Toy Story - ¡Al 100 y más allá! (SP)</description>
+		<description>Disney/Pixar Toy Story - ¡Al 100 y más allá! (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -215,4 +215,3 @@
 		</part>
 	</software>
 </softwarelist>
-

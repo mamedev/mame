@@ -72,7 +72,7 @@
 NETLIST_START(rebound_schematics)
 	 SOLVER(Solver, 48000)
 	 PARAM(Solver.DYNAMIC_TS, 1)
-	 PARAM(Solver.LTE, 1e-2)
+	 PARAM(Solver.DYNAMIC_LTE, 1e-3)
 	 PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
 
 	 PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/eeprompar.h"
+#include "machine/namcomcu.h"
 #include "machine/timer.h"
 #include "machine/msm6242.h"
 #include "sound/c140.h"
@@ -56,7 +57,6 @@ public:
 	void init_emeraldj();
 	void init_swcourtb();
 
-	void namcona1_mcu_io_map(address_map &map);
 	void namcona1_mcu_map(address_map &map);
 
 protected:
@@ -78,7 +78,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(port7_w);
 	DECLARE_READ8_MEMBER(port8_r);
 	DECLARE_WRITE8_MEMBER(port8_w);
-	DECLARE_READ8_MEMBER(portana_r);
+	template <int Bit> uint16_t portana_r();
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(gfxram_r);
@@ -120,7 +120,7 @@ protected:
 	int m_gametype;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<m37710_cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

@@ -7,9 +7,10 @@
     CPC DSK disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_DSK_DSK_H
+#define MAME_FORMATS_DSK_DSK_H
 
-#ifndef CPCDSK_DSK_H
-#define CPCDSK_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -29,4 +30,4 @@ public:
 
 extern const floppy_format_type FLOPPY_DSK_FORMAT;
 
-#endif /* CPCDSK_DSK_H */
+#endif // MAME_FORMATS_DSK_DSK_H

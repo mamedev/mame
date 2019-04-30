@@ -135,7 +135,7 @@
   Dev notes:
 
   Again, this driver was written based on a couple of ROM dumps and a
-  lot of reverse engineering, with no harware available, but guessing
+  lot of reverse engineering, with no hardware available, but guessing
   that this firmware and hardware are similar to others well known
   roulettes like Lucky Ball, Lucky Roulette, Corona, Re900, etc...
 

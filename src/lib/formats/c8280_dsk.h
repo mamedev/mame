@@ -7,13 +7,15 @@
     Commodore 8280 disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_C8280_DSK_H
+#define MAME_FORMATS_C8280_DSK_H
 
-#ifndef C8280_DSK_H_
-#define C8280_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class c8280_format : public wd177x_format {
+class c8280_format : public wd177x_format
+{
 public:
 	c8280_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_C8280_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_C8280_DSK_H

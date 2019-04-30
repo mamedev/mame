@@ -134,8 +134,7 @@ void segattl_state::video_start()
 void segattl_state::segattl(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_segattl);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_segattl);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

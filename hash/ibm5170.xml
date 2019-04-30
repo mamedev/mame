@@ -8744,6 +8744,29 @@
 		</part>
 	</software>
 
+	<software name="colonize">
+		<description>Sid Meier's Colonization</description>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<info name="developer" value="Microprose" />
+		<info name="version" value="2.25 - 15 Sept 94" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3d8870fe" sha1="05e48f9484e17216f372226327b637867f04f23f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="e7b9f904" sha1="5a24d1a62607f477ff41de5686f7fb6e19f3c6e9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="8e1d0f15" sha1="a37fe28e8662fa6855eef9347d83ed3fcafc0b06" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="corncob">
 		<description>Corncob Deluxe</description>
 		<year>1992</year>
@@ -9536,6 +9559,19 @@
 		</part>
 	</software>
 
+	<software name="krustyfh">
+		<description>Krusty's Fun House</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
+		<info name="developer" value="Audiogenic Software" />
+		<info name="ported by" value="Denton Designs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Krusty's Fun House [Acclaim] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4a41461f" sha1="21e1ef6a7806d3620366baf1b84fa43e71c13617" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kyrandia">
 		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One</description>
 		<year>1992</year>
@@ -9697,6 +9733,32 @@
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Freddy Pharkas Frontier Pharmacist [Sierra On-Line] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="fac2e0cd" sha1="397aeea0ec5cfde3b8a1064cecc6e11c646ceea2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ISBN: 98-89973-26-7 -->
+	<software name="gilispa" supported="no">
+		<description>Gilis presentask (Swe)</description>
+		<year>1995</year>
+		<publisher>Gili Soft</publisher>
+		<info name="usage" value="Install from Windows 3.1 with: SETUP"/>
+		<!-- Dumped with a KryoFlux. From broken disk so reads as "Bad". -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4229062">
+				<rom name="gilis presentask - diskett 1.mfm" size="4229062" crc="517acdd2" sha1="260a905ffec0770d906b0717eecd2681d6717876" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4227419">
+				<rom name="gilis presentask - diskett 2.mfm" size="4227419" crc="5d6167dd" sha1="3c13d298f68d0b5c98f3da64fa72df2c52658040" offset="0"/>
+			</dataarea>
+		</part>
+		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "4227928">
+				<rom name="gilis presentask - diskett 3.mfm" size="4227928" crc="87cb316c" sha1="561cf3024b3835e4893aa6a52a745f4ebe998392" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10818,6 +10880,23 @@
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Micro Machines 2 [Codemasters] [1995] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="242de9de" sha1="64b552300f3cdb5d5ff73f7e6ca71bda34fa5d32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mjflight">
+		<description>Michael Jordan in Flight</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Pacific Gameworks, ZCT Systems Group" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Michael Jordan in Flight [Electronic Arts] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="a9de8087" sha1="dbba3b92d0a56f5a5afa3c86f539cbb1cafe3f6c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Michael Jordan in Flight [Electronic Arts] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c8002fd1" sha1="7bc70f93d506a5e3408945fc9a32de285a9877ce" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -465,7 +465,7 @@ void geneve_mapper_device::set_extra_waitstates(bool wait)
 
 /*
     Read a byte via the data bus. The decoding has already been done in the
-    SETOFFSET method, and we re-use the values stored there to quickly
+    SETADDRESS method, and we re-use the values stored there to quickly
     access the appropriate component.
 */
 uint8_t geneve_mapper_device::readm(offs_t offset)
@@ -907,11 +907,13 @@ void geneve_mapper_device::write_to_pfm(offs_t offset, uint8_t data)
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-uint8_t geneve_mapper_device::setoffset(offs_t offset)
+void geneve_mapper_device::setaddress(offs_t address, uint8_t busctrl)
 {
-	LOGMASKED(LOG_DETAIL, "setoffset = %04x\n", offset);
+	LOGMASKED(LOG_DETAIL, "setaddress = %04x\n", address);
 	m_debug_no_ws = false;
-	m_decoded.offset = offset;
+	m_decoded.offset = address;
+
+	m_read_mode = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	decode_logical(m_read_mode, &m_decoded);
 	if (m_decoded.function == MUNDEF)
@@ -928,7 +930,6 @@ uint8_t geneve_mapper_device::setoffset(offs_t offset)
 		m_peribox->memen_in(ASSERT_LINE);
 		m_peribox->setaddress_dbin(m_decoded.physaddr, m_read_mode);
 	}
-	return 0;
 }
 
 /*
@@ -994,15 +995,6 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 			m_ready_asserted = false;
 		}
 	}
-}
-
-/*
-    We need the DBIN line for the setoffset operation.
-*/
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
-{
-	m_read_mode = (state==ASSERT_LINE);
-	LOGMASKED(LOG_DETAIL, "dbin = %02x\n", m_read_mode? 1:0);
 }
 
 /*

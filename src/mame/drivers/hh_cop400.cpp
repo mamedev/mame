@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle
+// copyright-holders:hap
+// thanks-to:Sean Riddle
 /***************************************************************************
 
   National Semiconductor COP400 MCU handhelds or other simple devices,
@@ -1206,7 +1207,7 @@ READ8_MEMBER(mdallas_state::read_in)
 /* physical button layout and labels is like this:
 
     <  ON>  [YES]   [NO]   [NEXT]
-    [W]     [N]     [S]    [E]
+    [<W]    [^N]    [Sv]   [E>]
     [7]     [8]     [9]    [STATUS]
     [4]     [5]     [6]    [ASSETS]
     [1]     [2]     [3]    [START]

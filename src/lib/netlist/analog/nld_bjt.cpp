@@ -9,12 +9,14 @@
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
+
 #include <cmath>
 
 namespace netlist
 {
 namespace analog
 {
+	using constants = plib::constants<nl_double>;
 
 	class diode
 	{
@@ -47,7 +49,7 @@ namespace analog
 	// nld_Q - Base classes
 	// -----------------------------------------------------------------------------
 
-	/*! Class representing the bjt model paramers.
+	/*! Class representing the bjt model parameters.
 	 *
 	 *  This is the model representation of the bjt model. Typically, SPICE uses
 	 *  the following parameters. A "Y" in the first column indicates that the
@@ -69,7 +71,7 @@ namespace analog
 	 * |     | ISC  | leakage saturation current                                            | A     |        0 |               8 |      |
 	 * |     | NC   | leakage emission coefficient                                          | -     |        2 |             1.5 |      |
 	 * |     | RB   | zero bias base resistance                                             |       |        0 |             100 |   *  |
-	 * |     | IRB  | current where base resistance falls halfway to its min value          | A     |  infinte |             0.1 |   *  |
+	 * |     | IRB  | current where base resistance falls halfway to its min value          | A     | infinite |             0.1 |   *  |
 	 * |     | RBM  | minimum base resistance at high currents                              |       |       RB |              10 |   *  |
 	 * |     | RE   | emitter resistance                                                    |       |        0 |               1 |   *  |
 	 * |     | RC   | collector resistance                                                  |       |        0 |              10 |   *  |
@@ -124,7 +126,7 @@ namespace analog
 
 	// Have a common start for transistors
 
-	NETLIB_OBJECT(Q)
+	NETLIB_OBJECT(QBJT)
 	{
 	public:
 		enum q_type {
@@ -132,8 +134,8 @@ namespace analog
 			BJT_PNP
 		};
 
-		NETLIB_CONSTRUCTOR(Q)
-		, m_model(*this, "MODEL", "NPN")
+		NETLIB_CONSTRUCTOR_EX(QBJT, pstring model = "NPN")
+		, m_model(*this, "MODEL", model)
 		, m_qtype(BJT_NPN)
 		{
 		}
@@ -152,20 +154,6 @@ namespace analog
 	private:
 		q_type m_qtype;
 	};
-
-	NETLIB_OBJECT_DERIVED(QBJT, Q)
-	{
-	public:
-		NETLIB_CONSTRUCTOR_DERIVED(QBJT, Q)
-			{ }
-
-	protected:
-
-	private:
-	};
-
-
-
 
 	// -----------------------------------------------------------------------------
 	// nld_QBJT_switch
@@ -269,6 +257,7 @@ namespace analog
 				connect("B", "m_CJC.1");
 				connect("C", "m_CJC.2");
 			}
+
 		}
 
 	protected:
@@ -279,8 +268,8 @@ namespace analog
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
-		generic_diode m_gD_BC;
-		generic_diode m_gD_BE;
+		generic_diode<diode_e::BIPOLAR> m_gD_BC;
+		generic_diode<diode_e::BIPOLAR> m_gD_BE;
 
 		nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 		nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
@@ -298,7 +287,7 @@ namespace analog
 	// nld_Q
 	// ----------------------------------------------------------------------------------------
 
-	NETLIB_UPDATE(Q)
+	NETLIB_UPDATE(QBJT)
 	{
 	//    netlist().solver()->schedule1();
 	}
@@ -310,7 +299,7 @@ namespace analog
 
 	NETLIB_RESET(QBJT_switch)
 	{
-		NETLIB_NAME(Q)::reset();
+		NETLIB_NAME(QBJT)::reset();
 
 		m_state_on = 0;
 
@@ -339,7 +328,7 @@ namespace analog
 		nl_double NF = m_model.m_NF;
 		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
-		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
 		nl_double alpha = BF / (1.0 + BF);
 
@@ -396,7 +385,7 @@ namespace analog
 
 	NETLIB_RESET(QBJT_EB)
 	{
-		NETLIB_NAME(Q)::reset();
+		NETLIB_NAME(QBJT)::reset();
 		if (m_CJE)
 		{
 			m_CJE->reset();
@@ -426,6 +415,8 @@ namespace analog
 		const nl_double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
 		const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
+		// "Circuit Design", page 174
+
 		m_D_EB.set_mat(      gee, gec - gee,  -Ie,
 					   gce - gee, gee - gec,   Ie);
 		m_D_CB.set_mat(      gcc, gce - gcc,  -Ic,
@@ -444,13 +435,13 @@ namespace analog
 		nl_double NR = m_model.m_NR;
 		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
-		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
 		m_alpha_f = BF / (1.0 + BF);
 		m_alpha_r = BR / (1.0 + BR);
 
-		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin());
-		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin());
+		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin(), constants::T0());
+		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin(), constants::T0());
 	}
 
 } // namespace analog

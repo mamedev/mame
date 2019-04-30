@@ -7,12 +7,13 @@
     Format code for KIM-1 cassette files.
 
 *********************************************************************/
+#ifndef MAME_FORMATS_KIM1_CAS_H
+#define MAME_FORMATS_KIM1_CAS_H
 
-#ifndef __KIM1_CAS_H
-#define __KIM1_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(kim1_cassette_formats);
 
-#endif /* __KIM1_CAS_H */
+#endif // MAME_FORMATS_KIM1_CAS_H

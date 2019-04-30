@@ -1131,28 +1131,9 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 		}
 	}
 
-	// Check if we have to adjust the unitmask and addresses
 	nunitmask = 0xffffffffffffffffU >> (64 - m_config.data_width());
 	if (unitmask)
 		nunitmask &= unitmask;
-	if ((addrstart & default_lowbits_mask) || ((~addrend) & default_lowbits_mask)) {
-		if ((addrstart ^ addrend) & ~default_lowbits_mask)
-			fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start or end is unaligned while the range spans more than one slot (granularity = %d).\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, default_lowbits_mask + 1);
-		offs_t lowbyte = m_config.addr2byte(addrstart & default_lowbits_mask);
-		offs_t highbyte = m_config.addr2byte((addrend & default_lowbits_mask) + 1);
-		if (m_config.endianness() == ENDIANNESS_LITTLE) {
-			u64 hmask = 0xffffffffffffffffU >> (64 - 8*highbyte);
-			nunitmask = (nunitmask << (8*lowbyte)) & hmask;
-		} else {
-			u64 hmask = 0xffffffffffffffffU >> ((64 - m_config.data_width()) + 8*lowbyte);
-			nunitmask = (nunitmask << (m_config.data_width() - 8*highbyte)) & hmask;
-		}
-
-		addrstart &= ~default_lowbits_mask;
-		addrend |= default_lowbits_mask;
-		if(changing_bits < default_lowbits_mask)
-			changing_bits = default_lowbits_mask;
-	}
 
 	nstart = addrstart;
 	nend = addrend;

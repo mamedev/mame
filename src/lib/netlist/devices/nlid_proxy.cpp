@@ -58,9 +58,9 @@ namespace netlist
 		if (supply_V == 0.0) supply_V = 5.0;
 
 		if (m_I.Q_Analog() > logic_family()->high_thresh_V(0.0, supply_V))
-			out().push(1, NLTIME_FROM_NS(1));
+			out().push(1, netlist_time::quantum());
 		else if (m_I.Q_Analog() < logic_family()->low_thresh_V(0.0, supply_V))
-			out().push(0, NLTIME_FROM_NS(1));
+			out().push(0, netlist_time::quantum());
 		else
 		{
 			// do nothing
@@ -104,9 +104,9 @@ namespace netlist
 				f = true;
 			}
 		}
-		//FIXME: Use power terminals!
+		//FIXME: Use power terminals and change info to warning or error
 		if (!f)
-			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
+			log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(out_proxied->device().name()));
 		else
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 	}

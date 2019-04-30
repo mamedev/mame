@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Jonathan Gevaryahu, Sean Riddle
-// thanks-to:David Viens, Kevin Horton
+// copyright-holders:hap, Jonathan Gevaryahu
+// thanks-to:Sean Riddle, David Viens, Kevin Horton
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
@@ -419,13 +419,15 @@ K28 modules:
 #include "snspellsp.lh"
 #include "tntell.lh" // keyboard overlay
 
+namespace {
+
 // The master clock is a single stage RC oscillator into TMS5100 RCOSC:
 // In an early 1979 Speak & Spell, C is 68pf, R is a 50kohm trimpot which is set to around 33.6kohm
 // (measured in-circuit). CPUCLK is this osc freq /2, ROMCLK is this osc freq /4.
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
 // which is 640kHz for 8KHz according to the TMS5100 documentation.
 
-#define MASTER_CLOCK 640_kHz_XTAL
+#define MASTER_CLOCK 640000
 
 
 class tispeak_state : public hh_tms1k_state
@@ -504,7 +506,6 @@ private:
 
 	u8 m_overlay;
 };
-
 
 void tispeak_state::machine_start()
 {
@@ -1878,6 +1879,8 @@ ROM_START( k28m2 )
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
 	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
 ROM_END
+
+} // anonymous namespace
 
 
 

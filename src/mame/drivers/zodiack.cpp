@@ -129,7 +129,7 @@ INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 
 WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

@@ -162,7 +162,6 @@ OSC3: 48.384MHz
 
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"
-#include "machine/namcomcu.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 
@@ -316,20 +315,6 @@ void namcofl_state::namcoc75_am(address_map &map)
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
 	map(0x004000, 0x00bfff).ram().w(FUNC(namcofl_state::mcu_shared_w)).share("shareram");
 	map(0x200000, 0x27ffff).rom().region("c75data", 0);
-}
-
-void namcofl_state::namcoc75_io(address_map &map)
-{
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcofl_state::port6_r), FUNC(namcofl_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).r(FUNC(namcofl_state::port7_r));
-	map(M37710_ADC7_L, M37710_ADC7_L).r(FUNC(namcofl_state::dac7_r));
-	map(M37710_ADC6_L, M37710_ADC6_L).r(FUNC(namcofl_state::dac6_r));
-	map(M37710_ADC5_L, M37710_ADC5_L).r(FUNC(namcofl_state::dac5_r));
-	map(M37710_ADC4_L, M37710_ADC4_L).r(FUNC(namcofl_state::dac4_r));
-	map(M37710_ADC3_L, M37710_ADC3_L).r(FUNC(namcofl_state::dac3_r));
-	map(M37710_ADC2_L, M37710_ADC2_L).r(FUNC(namcofl_state::dac2_r));
-	map(M37710_ADC1_L, M37710_ADC1_L).r(FUNC(namcofl_state::dac1_r));
-	map(M37710_ADC0_L, M37710_ADC0_L).r(FUNC(namcofl_state::dac0_r));
 }
 
 
@@ -560,7 +545,17 @@ void namcofl_state::namcofl(machine_config &config)
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);
-	m_mcu->set_addrmap(AS_IO, &namcofl_state::namcoc75_io);
+	m_mcu->p6_in_cb().set(FUNC(namcofl_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcofl_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namcofl_state::port7_r));
+	m_mcu->an7_cb().set(FUNC(namcofl_state::dac7_r));
+	m_mcu->an6_cb().set(FUNC(namcofl_state::dac6_r));
+	m_mcu->an5_cb().set(FUNC(namcofl_state::dac5_r));
+	m_mcu->an4_cb().set(FUNC(namcofl_state::dac4_r));
+	m_mcu->an3_cb().set(FUNC(namcofl_state::dac3_r));
+	m_mcu->an2_cb().set(FUNC(namcofl_state::dac2_r));
+	m_mcu->an1_cb().set(FUNC(namcofl_state::dac1_r));
+	m_mcu->an0_cb().set(FUNC(namcofl_state::dac0_r));
 	/* TODO: irq generation for these */
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcofl_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcofl_state::mcu_irq2_cb), attotime::from_hz(60));

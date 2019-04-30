@@ -560,7 +560,8 @@ static const z80_daisy_config a5105_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(a5105_state::a5105)
+void a5105_state::a5105(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(15'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a5105_state::a5105_mem);
@@ -568,12 +569,12 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	m_maincpu->set_daisy_config(a5105_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0, 40*8-1, 0, 25*8-1);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_a5105);
 	PALETTE(config, m_palette, FUNC(a5105_state::a5105_palette), 16);
 
@@ -606,7 +607,7 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( a5105 )

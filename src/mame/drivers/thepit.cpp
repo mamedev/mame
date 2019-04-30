@@ -254,6 +254,14 @@ void thepit_state::intrepid_main_map(address_map &map)
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
+void thepit_state::dockmanb_main_map(address_map &map)
+{
+	intrepid_main_map(map);
+
+	map(0x8800, 0x8bff).ram().w(FUNC(thepit_state::colorram_w)).share("colorram"); // moved here from 0x9400-0x97ff
+	map(0x8c00, 0x8fff).unmaprw();
+	map(0x9400, 0x97ff).unmaprw();
+}
 
 void thepit_state::audio_map(address_map &map)
 {
@@ -789,6 +797,12 @@ void thepit_state::intrepid(machine_config &config)
 	m_gfxdecode->set_info(gfx_intrepid);
 }
 
+void thepit_state::dockmanb(machine_config &config)
+{
+	intrepid(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::dockmanb_main_map);
+}
 
 void thepit_state::suprmous(machine_config &config)
 {
@@ -1109,6 +1123,46 @@ ROM_START( dockman )
 	ROM_LOAD( "mb7051.3",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) )
 ROM_END
 
+ROM_START( dockmanb ) // on original HT-01A and HT-01B PCBs, Taito license made for 'Seevend' cabinets
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dm1.38",       0x0000, 0x1000, CRC(e8078549) SHA1(b8c812980a8ddce32822d402d4a426433588fb20) )
+	ROM_LOAD( "dm2.39",       0x1000, 0x1000, CRC(f38fd1f7) SHA1(bcac489863a8cc0a5eed47d039d25d76d68d7c0b) )
+	ROM_LOAD( "dm3.40",       0x2000, 0x1000, CRC(759b3937) SHA1(3e6b119ec43813000f058e0f318f275d7693d7da) )
+	ROM_LOAD( "dm4.41",       0x3000, 0x1000, CRC(23af1cba) SHA1(4149367cc5198f4c38fe9665db7aed070cb8f95f) ) // only one identical to parent
+	ROM_LOAD( "dm5.33",       0x4000, 0x1000, CRC(04ef6324) SHA1(e461af0f5407fc57ab76f1c91b1e212336ec872d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // identical to parent
+	ROM_LOAD( "dm7.30",       0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
+	ROM_LOAD( "dm6.31",       0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars and sprites, identical to parent
+	ROM_LOAD( "dm8.ic9",        0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) )
+	ROM_LOAD( "dm9.ic8",        0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // identical to parent
+	ROM_LOAD( "colprom.ic4",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) ) // Signetic 82S123
+ROM_END
+
+ROM_START( dockmanc ) // on original HT-01A and HT-01B PCBs, Taito license made for 'Seevend' cabinets
+	ROM_REGION( 0x10000, "maincpu", 0 ) // ROMs 2 to 5 with hand-written labels 'Dockman II', title screen still shows 'Dockman'
+	ROM_LOAD( "dm1.38",          0x0000, 0x1000, CRC(e8078549) SHA1(b8c812980a8ddce32822d402d4a426433588fb20) ) // same as dockmanb
+	ROM_LOAD( "dockman-ii-2.39", 0x1000, 0x1000, CRC(3e3ecb55) SHA1(bd768f855bb4677d489adaa0bce2ba25752047c4) )
+	ROM_LOAD( "dockman-ii-3.39", 0x2000, 0x1000, CRC(5f84a2c0) SHA1(08e85f19fbf8042aa447568123450f2b783063dd) )
+	ROM_LOAD( "dockman-ii-4.41", 0x3000, 0x1000, CRC(5bcec819) SHA1(e6b864d8e96c514f5d0c0a36d1490b3032ae9e32) )
+	ROM_LOAD( "dockman-ii-5.33", 0x4000, 0x1000, CRC(ae03f9ae) SHA1(a191bf4495c7153bcc3e4e0d98d01c9e52dc046b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // identical to parent
+	ROM_LOAD( "dm7.30",       0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
+	ROM_LOAD( "dm6.31",       0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars and sprites
+	ROM_LOAD( "dm8.ic9",        0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) ) // identical to parent
+	ROM_LOAD( "dm9.ic8",        0x1000, 0x1000, BAD_DUMP CRC(e8572572) SHA1(89e6dcdc1a67c0abbc39746f209f59815b5b8e9c) ) // BADADDR            xxxxxxxxxxx-
+
+	ROM_REGION( 0x0020, "proms", 0 ) // identical to parent
+	ROM_LOAD( "colprom.ic4",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) ) // Harris 7603
+ROM_END
+
 ROM_START( portman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pe1",          0x0000, 0x1000, CRC(a5cf6083) SHA1(0daa5ff2931c56241fdeb4c48511b9508440554f) )
@@ -1317,7 +1371,9 @@ GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, 
 GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
 GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
 GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
 

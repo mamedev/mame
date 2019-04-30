@@ -6,12 +6,13 @@
 
        Format code for orao cassette files
 */
+#ifndef MAME_FORMATS_ORAO_CAS_H
+#define MAME_FORMATS_ORAO_CAS_H
 
-#ifndef ORAO_CAS_H
-#define ORAO_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(orao_cassette_formats);
 
-#endif /* ORAO_CAS_H */
+#endif // MAME_FORMATS_ORAO_CAS_H

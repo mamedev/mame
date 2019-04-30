@@ -16,68 +16,6 @@ namespace netlist
 {
 	namespace analog
 	{
-// ----------------------------------------------------------------------------------------
-// generic_diode
-// ----------------------------------------------------------------------------------------
-
-generic_diode::generic_diode(device_t &dev, const pstring &name)
-	: m_Vd(dev, name + ".m_Vd", 0.7)
-	, m_Id(dev, name + ".m_Id", 0.0)
-	, m_G(dev,  name + ".m_G", 1e-15)
-	, m_Vt(0.0)
-	, m_Vmin(0.0)
-	, m_Is(0.0)
-	, m_logIs(0.0)
-	, m_n(0.0)
-	, m_gmin(1e-15)
-	, m_VtInv(0.0)
-	, m_Vcrit(0.0)
-{
-	set_param(1e-15, 1, 1e-15);
-}
-
-void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
-{
-	static constexpr double csqrt2 = 1.414213562373095048801688724209; //std::sqrt(2.0);
-	m_Is = Is;
-	m_logIs = std::log(Is);
-	m_n = n;
-	m_gmin = gmin;
-
-	m_Vt = 0.0258 * m_n;
-	m_Vmin = -5.0 * m_Vt;
-
-	m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
-	m_VtInv = 1.0 / m_Vt;
-}
-
-void generic_diode::update_diode(const nl_double nVd)
-{
-	if (nVd < m_Vmin)
-	{
-		m_Vd = nVd;
-		m_G = m_gmin;
-		m_Id = - m_Is;
-	}
-	else if (nVd < m_Vcrit)
-	{
-		m_Vd = nVd;
-		//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
-		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
-		m_Id = IseVDVt - m_Is;
-		m_G = IseVDVt * m_VtInv + m_gmin;
-	}
-	else
-	{
-		const double a = std::max((nVd - m_Vd) * m_VtInv, plib::constants<nl_double>::cast(-0.99));
-		m_Vd = m_Vd + std::log1p(a) * m_Vt;
-		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
-		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
-		m_Id = IseVDVt - m_Is;
-		m_G = IseVDVt * m_VtInv + m_gmin;
-	}
-}
 
 // ----------------------------------------------------------------------------------------
 // nld_twoterm
@@ -116,22 +54,6 @@ NETLIB_RESET(R_base)
 {
 	NETLIB_NAME(twoterm)::reset();
 	set_R(1.0 / exec().gmin());
-}
-
-// ----------------------------------------------------------------------------------------
-// nld_R
-// ----------------------------------------------------------------------------------------
-
-NETLIB_UPDATE_PARAM(R)
-{
-	solve_now();
-	set_R(std::max(m_R(), exec().gmin()));
-}
-
-NETLIB_RESET(R)
-{
-	NETLIB_NAME(twoterm)::reset();
-	set_R(std::max(m_R(), exec().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -193,40 +115,14 @@ NETLIB_UPDATE_PARAM(POT2)
 }
 
 // ----------------------------------------------------------------------------------------
-// nld_C
-// ----------------------------------------------------------------------------------------
-
-NETLIB_RESET(C)
-{
-	// FIXME: Startup conditions
-	set_G_V_I(exec().gmin(), 0.0, -5.0 / exec().gmin());
-	//set(exec().gmin(), 0.0, 0.0);
-}
-
-NETLIB_UPDATE_PARAM(C)
-{
-	m_GParallel = exec().gmin();
-}
-
-NETLIB_TIMESTEP(C)
-{
-	/* Gpar should support convergence */
-	const nl_double G = m_C() / step +  m_GParallel;
-	const nl_double I = -G * deltaV();
-	set_mat( G, -G, -I,
-			-G,  G,  I);
-	//set(G, 0.0, I);
-}
-
-// ----------------------------------------------------------------------------------------
 // nld_L
 // ----------------------------------------------------------------------------------------
 
 NETLIB_RESET(L)
 {
-	m_GParallel = exec().gmin();
+	m_gmin = exec().gmin();
 	m_I = 0.0;
-	m_G = m_GParallel;
+	m_G = m_gmin;
 	set_mat( m_G, -m_G, -m_I,
 			-m_G,  m_G,  m_I);
 	//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
@@ -240,7 +136,7 @@ NETLIB_TIMESTEP(L)
 {
 	/* Gpar should support convergence */
 	m_I += m_I + m_G * deltaV();
-	m_G = step / m_L() + m_GParallel;
+	m_G = step / m_L() + m_gmin;
 	set_mat( m_G, -m_G, -m_I,
 			-m_G,  m_G,  m_I);
 	//set(m_G, 0.0, m_I);
@@ -255,7 +151,7 @@ NETLIB_RESET(D)
 	nl_double Is = m_model.m_IS;
 	nl_double n = m_model.m_N;
 
-	m_D.set_param(Is, n, exec().gmin());
+	m_D.set_param(Is, n, exec().gmin(), constants::T0());
 	set_G_V_I(m_D.G(), 0.0, m_D.Ieq());
 }
 
@@ -264,7 +160,7 @@ NETLIB_UPDATE_PARAM(D)
 	nl_double Is = m_model.m_IS;
 	nl_double n = m_model.m_N;
 
-	m_D.set_param(Is, n, exec().gmin());
+	m_D.set_param(Is, n, exec().gmin(), constants::T0());
 }
 
 NETLIB_UPDATE_TERMINALS(D)

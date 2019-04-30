@@ -300,7 +300,7 @@ void bladestl_state::machine_reset()
 	for (i = 0; i < 4 ; i++)
 		m_last_track[i] = 0;
 
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w();
 }
 
 void bladestl_state::bladestl(machine_config &config)

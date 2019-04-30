@@ -135,7 +135,6 @@ Region byte at offset 0x031:
 
 #include "emu.h"
 #include "includes/slapshot.h"
-#include "audio/taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -187,7 +186,7 @@ READ16_MEMBER(slapshot_state::service_input_r)
 	}
 }
 
-WRITE8_MEMBER(slapshot_state::coin_control_w)
+void slapshot_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -199,32 +198,10 @@ WRITE8_MEMBER(slapshot_state::coin_control_w)
                 SOUND
 *****************************************************/
 
-WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
+void slapshot_state::sound_bankswitch_w(u8 data)
 {
 	membank("z80bank")->set_entry(data & 3);
 }
-
-WRITE16_MEMBER(slapshot_state::msb_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, (data >> 8) & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, (data >> 8) & 0xff);
-
-#ifdef MAME_DEBUG
-	if (data & 0xff)
-		popmessage("taito_msb_sound_w to low byte: %04x",data);
-#endif
-}
-
-READ16_MEMBER(slapshot_state::msb_sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff) << 8);
-	else
-		return 0;
-}
-
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -236,14 +213,15 @@ void slapshot_state::slapshot_map(address_map &map)
 	map(0x500000, 0x50ffff).ram(); /* main RAM */
 	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
 	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
-	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));    /* tilemaps */
-	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));    /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0xc00020, 0xc0002f).r(FUNC(slapshot_state::service_input_r));  /* service mirror */
-	map(0xd00000, 0xd00003).rw(FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xd00000, 0xd00000).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0xd00002, 0xd00002).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 void slapshot_state::opwolf3_map(address_map &map)
@@ -252,14 +230,15 @@ void slapshot_state::opwolf3_map(address_map &map)
 	map(0x500000, 0x50ffff).ram(); /* main RAM */
 	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
 	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
-	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));    /* tilemaps */
-	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));    /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0xc00020, 0xc0002f).r(FUNC(slapshot_state::service_input_r));   /* service mirror */
-	map(0xd00000, 0xd00003).rw(FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xd00000, 0xd00000).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0xd00002, 0xd00002).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xe00000, 0xe0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0xff00);
 //  map(0xe80000, 0xe80001) // gun recoil here?
 }
@@ -412,7 +391,7 @@ static const gfx_layout tilelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout slapshot_charlayout =
+static const gfx_layout charlayout =
 {
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
@@ -424,8 +403,8 @@ static const gfx_layout slapshot_charlayout =
 };
 
 static GFXDECODE_START( gfx_slapshot )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,  0, 256 ) /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, slapshot_charlayout, 4096, 256 )    /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,    0, 256 ) /* sprite parts */
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout, 4096, 256 )    /* sprites & playfield */
 GFXDECODE_END
 
 
@@ -475,7 +454,7 @@ void slapshot_state::slapshot(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
@@ -543,7 +522,7 @@ void slapshot_state::opwolf3(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);

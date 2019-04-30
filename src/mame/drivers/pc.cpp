@@ -45,6 +45,7 @@ public:
 	void ataripc1(machine_config &config);
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
+	void kaypropc(machine_config &config);
 	void epc(machine_config &config);
 	void m15(machine_config &config);
 	void bondwell(machine_config &config);
@@ -65,6 +66,10 @@ public:
 	void comport(machine_config &config);
 	void mpc1600(machine_config &config);
 	void ittxtra(machine_config &config);
+	void cadd810(machine_config &config);
+	void juko16(machine_config &config);
+	void hyo88t(machine_config &config);
+	void kyoxt(machine_config &config);
 
 	void init_bondwell();
 
@@ -696,6 +701,16 @@ ROM_START( kaypro16 )
 	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
 ROM_END
 
+/**************************************************************** Kaypro PC ***
+
+Links:  https://www.youtube.com/watch?v=2YAEOhYEZbc ,
+
+******************************************************************************/
+
+ROM_START( kaypropc )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("kpb203n.rom", 0xe000, 0x2000, CRC(49ea41e9) SHA1(14db6b8f302833f64f6e740a293d12f76e71f78f))
+ROM_END
 
 /******************************************************************** MK-88 ***
 
@@ -1159,6 +1174,90 @@ ROM_START( zdsupers )
 	ROMX_LOAD("z184m v2.9e.10d", 0x8000, 0x8000, CRC(de2f200b) SHA1(ad5ce601669a82351e412fc6c1c70c47779a1e55), ROM_BIOS(1))
 ROM_END
 
+/************************************************************** CompuAdd 810 **
+
+http://mkgraham.dx.am/810.html
+https://smg.photobucket.com/user/zzm113/library?page=1
+
+System has an AT style enhanced keyboard, despite changing that, the emulated 810
+emits a steady beep and waits for F1 to be pressed.
+
+******************************************************************************/
+
+MACHINE_CONFIG_START(pc_state::cadd810)
+	pccga(config);
+	config.device_remove("kbd");
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+MACHINE_CONFIG_END
+
+ROM_START( cadd810 )
+	ROM_REGION(0x10000,"bios", 0) // continuous beep, complains about missing keyboard
+	ROM_LOAD("compuadd810.bin",0xc000, 0x4000, CRC(39dc8f28) SHA1(c0d50186db30c924fad7d42d4aefb7ae8dd32c7d))
+	ROM_REGION(0x2000,"ide", 0)
+	ROM_LOAD("wd_ide_bios_rev_2.0.bin",0x0000,0x2000, NO_DUMP) //missing: dump of hd controller
+ROM_END
+
+/****************************** JUKO NEST true 16 bit variants (8086 and V30 ***
+
+https://www.vogons.org/viewtopic.php?f=46&t=60077
+https://sites.google.com/site/misterzeropage/
+http://www.vcfed.org/forum/showthread.php?67127-Juko-nest-n3
+
+******************************************************************************/
+
+MACHINE_CONFIG_START(pc_state::juko16)
+	/* basic machine hardware */
+	MCFG_CPU_PC(pc16, pc16, V30, 4772720)
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+
+	/* keyboard */
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+MACHINE_CONFIG_END
+
+ROM_START( juko16 )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "v107", "v1.07")
+	ROMX_LOAD("c22.bin", 0xc000, 0x2000, BAD_DUMP CRC(e947237b) SHA1(65e84675752a4deb0d0712e2aba8c0735959b43a),ROM_BIOS(0))
+	ROMX_LOAD("c24.bin", 0xe000, 0x2000, BAD_DUMP CRC(1d3246e4) SHA1(4ff875d15b1231a2464dfe08e480c637fa0c4613),ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v201", "v2.01")
+	ROMX_LOAD("juko_nest_odd.bin", 0xc000, 0x2000, CRC(2bfa545f) SHA1(1cdaf90323cbed3224b4b8863bf27e709be6a73a),ROM_BIOS(1))
+	ROMX_LOAD("juko_nest_even.bin", 0xe000, 0x2000, CRC(2bfa545f) SHA1(1cdaf90323cbed3224b4b8863bf27e709be6a73a),ROM_BIOS(1))
+ROM_END
+
+
+/****************************************************** Hyosung Topstar 88T ***
+
+http://minuszerodegrees.net/xt_clone_bios/xt_clone_bios.htm
+
+******************************************************************************/
+
+ROM_START( hyo88t )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "hyosung_topstar_88t_v3.0.bin", 0xc000, 0x4000, CRC(2429046b) SHA1(e2a8e1ffdd4c6ff84791f486df3204811fa5f589))
+ROM_END
+
+/*************************************************************** Kyocera XT ***
+
+http://www.hampa.ch/pce/download.html
+
+******************************************************************************/
+
+ROM_START( kyoxt )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "kyocera.rom", 0xc000, 0x4000, CRC(cd732ac6) SHA1(7258fc18565135870e31962e4bd528a06d1ee0e0))
+ROM_END
+
 
 /***************************************************************************
 
@@ -1196,3 +1295,8 @@ COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state,
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
+COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
+COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
+COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
+COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
+COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )

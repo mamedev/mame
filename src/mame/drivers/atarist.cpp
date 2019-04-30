@@ -1213,6 +1213,16 @@ void st_state::ikbd_map(address_map &map)
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( cpu_space_map )
+//-------------------------------------------------
+
+void st_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffd, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
+}
+
+//-------------------------------------------------
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
@@ -1787,21 +1797,6 @@ WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( atarist_int_ack )
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(st_state::atarist_int_ack)
-{
-	if (irqline == M68K_IRQ_6)
-	{
-		return m_mfp->get_vector();
-	}
-
-	return M68K_INT_ACK_AUTOVECTOR;
-}
-
-
-//-------------------------------------------------
 //  configure_memory -
 //-------------------------------------------------
 
@@ -1998,7 +1993,7 @@ void st_state::common(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, Y2/4);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(st_state::atarist_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
 
 	keyboard(config);
 
@@ -2074,7 +2069,7 @@ void st_state::keyboard(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( st )
+//  machine_config( st )
 //-------------------------------------------------
 
 void st_state::st(machine_config &config)
@@ -2106,7 +2101,7 @@ void st_state::st(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( megast )
+//  machine_config( megast )
 //-------------------------------------------------
 
 void megast_state::megast(machine_config &config)
@@ -2141,7 +2136,7 @@ void megast_state::megast(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ste )
+//  machine_config( ste )
 //-------------------------------------------------
 
 void ste_state::ste(machine_config &config)
@@ -2181,7 +2176,7 @@ void ste_state::ste(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( megaste )
+//  machine_config( megaste )
 //-------------------------------------------------
 
 void megaste_state::megaste(machine_config &config)
@@ -2198,7 +2193,7 @@ void megaste_state::megaste(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( stbook )
+//  machine_config( stbook )
 //-------------------------------------------------
 #if 0
 void stbook_state::stbook(machine_config &config)
@@ -2206,7 +2201,6 @@ void stbook_state::stbook(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, U517/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(st_state::atarist_int_ack));
 
 	//MCFG_DEVICE_ADD(COP888_TAG, COP888, Y700)
 
@@ -2282,7 +2276,7 @@ void stbook_state::stbook(machine_config &config)
 #endif
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( tt030 )
+//  machine_config( tt030 )
 //-------------------------------------------------
 
 void ste_state::tt030(machine_config &config)
@@ -2292,7 +2286,7 @@ void ste_state::tt030(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( falcon )
+//  machine_config( falcon )
 //-------------------------------------------------
 
 void ste_state::falcon(machine_config &config)
@@ -2302,7 +2296,7 @@ void ste_state::falcon(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( falcon40 )
+//  machine_config( falcon40 )
 //-------------------------------------------------
 
 void ste_state::falcon40(machine_config &config)

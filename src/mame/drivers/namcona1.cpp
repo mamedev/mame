@@ -169,7 +169,6 @@ Notes:
 #include "emu.h"
 #include "includes/namcona1.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/namcomcu.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    XTAL(50'113'000)
@@ -736,22 +735,10 @@ void namcona1_state::machine_reset()
 // bit 2 => port 5
 // bit 3 => port 6
 // bit 7 => port 7
-READ8_MEMBER(namcona1_state::portana_r)
+template <int Bit>
+uint16_t namcona1_state::portana_r()
 {
-	static const uint8_t bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	uint8_t port = m_io_p3->read();
-
-	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
-}
-
-void namcona1_state::namcona1_mcu_io_map(address_map &map)
-{
-	map(M37710_PORT4, M37710_PORT4).rw(FUNC(namcona1_state::port4_r), FUNC(namcona1_state::port4_w));
-	map(M37710_PORT5, M37710_PORT5).rw(FUNC(namcona1_state::port5_r), FUNC(namcona1_state::port5_w));
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcona1_state::port6_r), FUNC(namcona1_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).rw(FUNC(namcona1_state::port7_r), FUNC(namcona1_state::port7_w));
-	map(M37710_PORT8, M37710_PORT8).rw(FUNC(namcona1_state::port8_r), FUNC(namcona1_state::port8_w));
-	map(0x10, 0x1f).r(FUNC(namcona1_state::portana_r));
+	return BIT(m_io_p3->read(), Bit) ? 0xffff : 0x0000;
 }
 
 
@@ -957,7 +944,24 @@ void namcona1_state::c69(machine_config &config)
 {
 	NAMCO_C69(config, m_mcu, MASTER_CLOCK/4);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &namcona1_state::namcona1_mcu_io_map);
+	m_mcu->p4_in_cb().set(FUNC(namcona1_state::port4_r));
+	m_mcu->p4_out_cb().set(FUNC(namcona1_state::port4_w));
+	m_mcu->p5_in_cb().set(FUNC(namcona1_state::port5_r));
+	m_mcu->p5_out_cb().set(FUNC(namcona1_state::port5_w));
+	m_mcu->p6_in_cb().set(FUNC(namcona1_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcona1_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namcona1_state::port7_r));
+	m_mcu->p7_out_cb().set(FUNC(namcona1_state::port7_w));
+	m_mcu->p8_in_cb().set(FUNC(namcona1_state::port8_r));
+	m_mcu->p8_out_cb().set(FUNC(namcona1_state::port8_w));
+	m_mcu->an0_cb().set(FUNC(namcona1_state::portana_r<6>));
+	m_mcu->an1_cb().set(FUNC(namcona1_state::portana_r<5>));
+	m_mcu->an2_cb().set(FUNC(namcona1_state::portana_r<4>));
+	m_mcu->an3_cb().set(FUNC(namcona1_state::portana_r<0>));
+	m_mcu->an4_cb().set(FUNC(namcona1_state::portana_r<1>));
+	m_mcu->an5_cb().set(FUNC(namcona1_state::portana_r<2>));
+	m_mcu->an6_cb().set(FUNC(namcona1_state::portana_r<3>));
+	m_mcu->an7_cb().set(FUNC(namcona1_state::portana_r<7>));
 }
 
 /* cropped at sides */
@@ -1002,8 +1006,25 @@ void namcona1_state::namcona1(machine_config &config)
 void namcona2_state::c70(machine_config &config)
 {
 	NAMCO_C70(config, m_mcu, MASTER_CLOCK/4);
-	m_mcu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &namcona1_state::namcona1_mcu_io_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcona2_state::namcona1_mcu_map);
+	m_mcu->p4_in_cb().set(FUNC(namcona2_state::port4_r));
+	m_mcu->p4_out_cb().set(FUNC(namcona2_state::port4_w));
+	m_mcu->p5_in_cb().set(FUNC(namcona2_state::port5_r));
+	m_mcu->p5_out_cb().set(FUNC(namcona2_state::port5_w));
+	m_mcu->p6_in_cb().set(FUNC(namcona2_state::port6_r));
+	m_mcu->p6_out_cb().set(FUNC(namcona2_state::port6_w));
+	m_mcu->p7_in_cb().set(FUNC(namcona2_state::port7_r));
+	m_mcu->p7_out_cb().set(FUNC(namcona2_state::port7_w));
+	m_mcu->p8_in_cb().set(FUNC(namcona2_state::port8_r));
+	m_mcu->p8_out_cb().set(FUNC(namcona2_state::port8_w));
+	m_mcu->an0_cb().set(FUNC(namcona2_state::portana_r<6>));
+	m_mcu->an1_cb().set(FUNC(namcona2_state::portana_r<5>));
+	m_mcu->an2_cb().set(FUNC(namcona2_state::portana_r<4>));
+	m_mcu->an3_cb().set(FUNC(namcona2_state::portana_r<0>));
+	m_mcu->an4_cb().set(FUNC(namcona2_state::portana_r<1>));
+	m_mcu->an5_cb().set(FUNC(namcona2_state::portana_r<2>));
+	m_mcu->an6_cb().set(FUNC(namcona2_state::portana_r<3>));
+	m_mcu->an7_cb().set(FUNC(namcona2_state::portana_r<7>));
 }
 
 void namcona2_state::namcona2(machine_config &config)

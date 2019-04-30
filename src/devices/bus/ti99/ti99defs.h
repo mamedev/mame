@@ -56,7 +56,7 @@
 #define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value)
 
 /*
-    For almost all applications of setoffset, we also need the data bus
+    For almost all applications of setaddress, we also need the data bus
     direction. This line is called DBIN on the TI CPUs, but as we do not assume
     that this is a general rule, we use new macros here which contain the
     DBIN setting.

@@ -197,7 +197,7 @@ public:
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
-	uint8_t get_irq_vector() { m_read_vector = true; return IVR; }
+	uint8_t get_irq_vector();
 
 protected:
 	virtual void device_start() override;

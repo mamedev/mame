@@ -300,16 +300,16 @@ void px4_state::gapnit_interrupt()
 	if (m_ier & m_isr & INT0_7508)
 	{
 		m_isr &= ~INT0_7508;
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
 	}
 	else if (m_ier & m_isr & INT1_ART)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf2);
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf2); // Z80
 	else if (m_ier & m_isr & INT2_ICF)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf4);
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf4); // Z80
 	else if (m_ier & m_isr & INT3_OVF)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf6);
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf6); // Z80
 	else if (m_ier & m_isr & INT4_EXT)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf8);
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf8); // Z80
 	else
 		m_z80->set_input_line(0, CLEAR_LINE);
 }

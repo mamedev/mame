@@ -90,7 +90,7 @@
 	</software>
 
 	<software name="crokis" supported="no">
-		<description>El gran día de Croki (Spa)</description>
+		<description>El gran día de Croki (Spain)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11074"/>
@@ -120,7 +120,7 @@
 	</software>
 
 	<software name="princess" supported="no">
-		<description>Disney Princesas - Las Princesas Disney (Spa)</description>
+		<description>Disney Princesas - Las Princesas Disney (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11436"/>
@@ -135,7 +135,7 @@
 	</software>
 
 	<software name="schools" supported="no">
-		<description>Mi Primer Día de Escuela (Spa)</description>
+		<description>Mi Primer Día de Escuela (Spain)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12049"/>

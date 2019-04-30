@@ -60,7 +60,7 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 
 WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 #if 0

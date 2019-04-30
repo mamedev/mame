@@ -47,18 +47,18 @@ rgb_t nova2001_state::BBGGRRII(u32 raw)
 
 WRITE8_MEMBER(nova2001_state::paletteram_w)
 {
-	m_palette->write8(space, offset, data);
+	m_palette->write8(offset, data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		m_palette->write8(space, 0x200 + offset * 16 + 1, data);
+		m_palette->write8(0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (int i = 0; i < 16; i++)
 			{
-				m_palette->write8(space, 0x200 + offset + i * 16, data);
+				m_palette->write8(0x200 + offset + i * 16, data);
 			}
 		}
 	}

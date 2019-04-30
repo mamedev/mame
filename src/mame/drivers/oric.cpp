@@ -123,7 +123,7 @@ protected:
 	bool m_ext_irq;
 
 	virtual void update_irq();
-	void update_psg(address_space &space);
+	void update_psg();
 	void update_keyboard();
 	void machine_start_common();
 };
@@ -303,13 +303,13 @@ void oric_state::update_keyboard()
 	m_via->write_pb3((m_kbd_row[m_via_b & 7]->read() | m_psg_a) != 0xff);
 }
 
-void oric_state::update_psg(address_space &space)
+void oric_state::update_psg()
 {
 	if(m_via_ca2)
 		if(m_via_cb2)
 			m_psg->address_w(m_via_a);
 		else
-			m_via->write_pa(space, 0, m_psg->data_r());
+			m_via->write_pa(m_psg->data_r());
 	else if(m_via_cb2)
 		m_psg->data_w(m_via_a);
 }
@@ -328,7 +328,7 @@ WRITE8_MEMBER(oric_state::via_a_w)
 {
 	m_via_a = data;
 	m_cent_data_out->write(m_via_a);
-	update_psg(space);
+	update_psg();
 }
 
 WRITE8_MEMBER(oric_state::via_b_w)
@@ -344,13 +344,13 @@ WRITE8_MEMBER(oric_state::via_b_w)
 WRITE_LINE_MEMBER(oric_state::via_ca2_w)
 {
 	m_via_ca2 = state;
-	update_psg(m_maincpu->space(AS_PROGRAM));
+	update_psg();
 }
 
 WRITE_LINE_MEMBER(oric_state::via_cb2_w)
 {
 	m_via_cb2 = state;
-	update_psg(m_maincpu->space(AS_PROGRAM));
+	update_psg();
 }
 
 WRITE_LINE_MEMBER(oric_state::via_irq_w)
@@ -465,7 +465,7 @@ WRITE8_MEMBER(telestrat_state::via2_b_w)
 	if(!(m_via2_b & 0x80))
 		port &= m_joy2->read();
 
-	m_via2->write_pb(space, 0, port);
+	m_via2->write_pb(port);
 }
 
 WRITE_LINE_MEMBER(telestrat_state::via2_ca2_w)

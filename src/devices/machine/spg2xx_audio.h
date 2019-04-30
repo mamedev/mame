@@ -24,7 +24,7 @@ public:
 	auto write_irq_callback() { return m_irq_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(audio_r);
-	DECLARE_WRITE16_MEMBER(audio_w);
+	virtual DECLARE_WRITE16_MEMBER(audio_w);
 	DECLARE_READ16_MEMBER(audio_ctrl_r);
 	DECLARE_WRITE16_MEMBER(audio_ctrl_w);
 	DECLARE_READ16_MEMBER(audio_phase_r);
@@ -52,8 +52,8 @@ protected:
 	uint16_t get_wave_addr_high(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_WADDR_HIGH_MASK; }
 	uint16_t get_loop_addr_high(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_LADDR_HIGH_MASK) >> AUDIO_LADDR_HIGH_SHIFT; }
 	uint16_t get_tone_mode(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_TONE_MODE_MASK) >> AUDIO_TONE_MODE_SHIFT; }
-	uint16_t get_16bit_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_16M_MASK) ? 1 : 0; }
-	uint16_t get_adpcm_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_ADPCM_MASK) ? 1 : 0; }
+	virtual uint16_t get_16bit_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_16M_MASK) ? 1 : 0; }
+	virtual uint16_t get_adpcm_bit(const offs_t channel) const { return (m_audio_regs[(channel << 4) | AUDIO_MODE] & AUDIO_ADPCM_MASK) ? 1 : 0; }
 
 	// Audio Pan getters
 	uint16_t get_volume(const offs_t channel) const { return m_audio_regs[(channel << 4) | AUDIO_PAN_VOL] & AUDIO_VOLUME_MASK; }
@@ -103,7 +103,7 @@ protected:
 	uint16_t get_phase_time_step(const offs_t channel) const { return (m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_CTRL] & AUDIO_PHASE_TIME_STEP_MASK) >> AUDIO_PHASE_TIME_STEP_SHIFT; }
 
 	// Audio combined getters
-	uint32_t get_phase(const offs_t channel) const { return ((uint32_t)get_phase_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_PHASE]; }
+	virtual uint32_t get_phase(const offs_t channel) const { return ((uint32_t)get_phase_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_PHASE]; }
 	uint32_t get_phase_accum(const offs_t channel) const { return ((uint32_t)get_phase_accum_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_PHASE_ACCUM]; }
 	uint32_t get_target_phase(const offs_t channel) const { return ((uint32_t)get_target_phase_high(channel) << 16) | m_audio_phase_regs[(channel << 4) | AUDIO_TARGET_PHASE]; }
 
@@ -367,6 +367,21 @@ private:
 
 };
 
+class spg110_audio_device : public spg2xx_audio_device
+{
+public:
+	spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_WRITE16_MEMBER(audio_w) override;
+
+	// these either come from somewhere else on spg110 or are hardcoded
+	virtual uint16_t get_16bit_bit(const offs_t channel) const override { return 1; }
+	virtual uint16_t get_adpcm_bit(const offs_t channel) const override { return 0; }
+
+	virtual uint32_t get_phase(const offs_t channel) const override { return m_audio_regs[(channel << 4) | 0xe]; }
+};
+
 DECLARE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device)
+DECLARE_DEVICE_TYPE(SPG110_AUDIO, spg110_audio_device)
 
 #endif // MAME_MACHINE_SPG2XX_AUDIO_H

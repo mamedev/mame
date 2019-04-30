@@ -273,11 +273,11 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 {
 	if (!BIT(m_beast_p0, 1) && BIT(data, 1))
 	{
-		m_slavelatch->write(space, 0, m_beast_p1);
+		m_slavelatch->write(m_beast_p1);
 	}
 
 	if (BIT(data, 0) == 0)
-		m_beastlatch->acknowledge_w(space, 0, data);
+		m_beastlatch->acknowledge_w();
 
 	m_beast_p0 = data;
 }
@@ -285,7 +285,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 READ8_MEMBER(djboy_state::beast_p1_r)
 {
 	if (BIT(m_beast_p0, 0) == 0)
-		return m_beastlatch->read(space, 0);
+		return m_beastlatch->read();
 	else
 		return 0; // ?
 }
@@ -441,11 +441,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::djboy_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 
 	/* Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this */
 	if(scanline == 64)
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 void djboy_state::machine_start()

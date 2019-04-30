@@ -126,7 +126,6 @@ private:
 	void cruwrite(offs_t offset, uint8_t data);
 	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// Connections from outside towards the CPU (callbacks)
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
@@ -164,7 +163,7 @@ private:
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	void memmap_setoffset(address_map &map);
+	void memmap_setaddress(address_map &map);
 
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
@@ -235,10 +234,10 @@ void ti99_4x_state::memmap(address_map &map)
 	map(0x0000, 0xffff).rw(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::read), FUNC(bus::ti99::internal::datamux_device::write));
 }
 
-void ti99_4x_state::memmap_setoffset(address_map &map)
+void ti99_4x_state::memmap_setaddress(address_map &map)
 {
 	map.global_mask(0xffff);
-	map(0x0000, 0xffff).r(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::setoffset));
+	map(0x0000, 0xffff).w(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::setaddress));
 }
 
 /*
@@ -655,14 +654,6 @@ WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 }
 
 /*
-   Data bus in (DBIN) line from the CPU.
-*/
-WRITE_LINE_MEMBER( ti99_4x_state::dbin_line )
-{
-	m_datamux->dbin_in(state);
-}
-
-/*
     GROMCLK from VDP, propagating to datamux
 */
 WRITE_LINE_MEMBER( ti99_4x_state::gromclk_in )
@@ -847,11 +838,10 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	TMS9900(config, m_cpu, 3000000);
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4x_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_4x_state::crumap);
-	m_cpu->set_addrmap(tms99xx_device::AS_SETOFFSET, &ti99_4x_state::memmap_setoffset);
+	m_cpu->set_addrmap(tms99xx_device::AS_SETADDRESS, &ti99_4x_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(ti99_4x_state::external_operation));
 	m_cpu->intlevel_cb().set(FUNC(ti99_4x_state::interrupt_level));
 	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
 	// Programmable system interface (driven by CLKOUT)
 	TMS9901(config, m_tms9901, 0);

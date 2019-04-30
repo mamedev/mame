@@ -80,7 +80,7 @@ WRITE8_MEMBER(speedspn_state::rombank_w)
 
 WRITE8_MEMBER(speedspn_state::sound_w)
 {
-	m_soundlatch->write(space, 1, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

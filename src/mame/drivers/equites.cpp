@@ -444,7 +444,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 7: // c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			m_soundlatch->clear_w(space, 0, 0);
+			m_soundlatch->clear_w();
 			break;
 	}
 }
@@ -652,7 +652,7 @@ void equites_state::equites_map(address_map &map)
 	map(0x180000, 0x180001).portr("IN1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w",
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
+													 m_mainlatch->write_a3(space, offset >> 14, data, mem_mask);
 												 });
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::equites_scrollreg_w));
@@ -678,7 +678,7 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::equites_bgcolor_w));
 	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w",
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
+													 m_mainlatch->write_a3(space, offset >> 14, data, mem_mask);
 												 });
 	map(0x100000, 0x100001).w(FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));

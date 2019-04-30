@@ -436,7 +436,6 @@ void spbactn_state::spbactn(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800/2);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(8,10,4);
@@ -490,7 +489,6 @@ void spbactn_state::spbactnp(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800/2);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(12,14,8);

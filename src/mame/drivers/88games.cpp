@@ -69,7 +69,7 @@ WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 
 WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 

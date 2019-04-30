@@ -15,16 +15,19 @@
 #include "emu.h"
 #include "ti_fdc.h"
 #include "formats/ti99_dsk.h"
+#include "machine/rescap.h"
 
 #define LOG_WARN        (1U<<1)    // Warnings
 #define LOG_CONFIG      (1U<<2)
 #define LOG_RW          (1U<<3)
-#define LOG_CRU         (1U<<4)
-#define LOG_READY       (1U<<5)
-#define LOG_SIGNALS     (1U<<6)
-#define LOG_DATA        (1U<<7)
-#define LOG_MOTOR       (1U<<8)
-#define LOG_ADDRESS     (1U<<9)
+#define LOG_PORTS       (1U<<4)    // too noisy in RW
+#define LOG_CRU         (1U<<5)
+#define LOG_READY       (1U<<6)
+#define LOG_SIGNALS     (1U<<7)
+#define LOG_DRQ         (1U<<8)    // too noisy in SIGNALS
+#define LOG_DATA        (1U<<9)
+#define LOG_MOTOR       (1U<<10)
+#define LOG_ADDRESS     (1U<<11)
 
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
@@ -36,7 +39,6 @@ namespace bus { namespace ti99 { namespace peb {
 // ----------------------------------
 #define FDC_TAG "fd1771"
 #define MOTOR_TIMER 1
-#define NONE -1
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
@@ -46,17 +48,15 @@ ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, dev
 	m_address(0),
 	m_DRQ(0),
 	m_IRQ(0),
-	m_crulatch(*this, "crulatch"),
+	m_HLD(0),
 	m_DVENA(0),
 	m_inDsrArea(false),
-	m_WAITena(false),
 	m_WDsel(false),
-	m_DSEL(0),
-	m_SIDSEL(0),
-	m_motor_on_timer(nullptr),
 	m_fd1771(*this, FDC_TAG),
+	m_crulatch(*this, "crulatch"),
+	m_motormf(*this, "motormf"),
 	m_dsrrom(nullptr),
-	m_current(NONE)
+	m_sel_floppy(0)
 {
 }
 
@@ -66,15 +66,13 @@ ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, dev
 void ti_fdc_device::operate_ready_line()
 {
 	// This is the wait state logic
-	LOGMASKED(LOG_SIGNALS, "address=%04x, DRQ=%d, INTRQ=%d, MOTOR=%d\n", m_address & 0xffff, m_DRQ, m_IRQ, m_DVENA);
 	line_state nready = (m_WDsel &&             // Are we accessing 5ffx (even addr)?
-			m_WAITena &&                        // and the wait state generation is active (SBO 2)
+			m_crulatch->q2_r() &&               // and the wait state generation is active (SBO 2)
 			(m_DRQ==CLEAR_LINE) &&              // and we are waiting for a byte
 			(m_IRQ==CLEAR_LINE) &&              // and there is no interrupt yet
 			(m_DVENA==ASSERT_LINE)              // and the motor is turning?
 			)? ASSERT_LINE : CLEAR_LINE;        // In that case, clear READY and thus trigger wait states
-
-	LOGMASKED(LOG_READY, "READY line = %d\n", (nready==CLEAR_LINE)? 1:0);
+	LOGMASKED(LOG_READY, "Address=%04x, DRQ=%d, INTRQ=%d, MOTOR=%d -> READY=%d\n", m_address & 0xffff, m_DRQ, m_IRQ, m_DVENA, (nready==CLEAR_LINE)? 1:0);
 	m_slot->set_ready((nready==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -91,15 +89,15 @@ WRITE_LINE_MEMBER( ti_fdc_device::fdc_irq_w )
 WRITE_LINE_MEMBER( ti_fdc_device::fdc_drq_w )
 {
 	m_DRQ = state? ASSERT_LINE : CLEAR_LINE;
-	LOGMASKED(LOG_SIGNALS, "DRQ callback = %d\n", m_DRQ);
+	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", m_DRQ);
 	operate_ready_line();
 }
 
-// bool ti_fdc_device::dvena_r()
-// {
-//  LOGMASKED(LOG_SIGNALS, "reading DVENA = %d\n", m_DVENA);
-//  return (m_DVENA==ASSERT_LINE);
-// }
+WRITE_LINE_MEMBER( ti_fdc_device::fdc_hld_w )
+{
+	m_HLD = state? ASSERT_LINE : CLEAR_LINE;
+	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", m_HLD);
+}
 
 SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 {
@@ -111,7 +109,7 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 
 	if (!m_inDsrArea || !m_selected) return;
 
-	LOGMASKED(LOG_ADDRESS, "set address = %04x\n", offset & 0xffff);
+	LOGMASKED(LOG_ADDRESS, "Set address = %04x\n", offset & 0xffff);
 
 	// Is the WD chip on the card being selected?
 	m_WDsel = m_inDsrArea && ((m_address & 0x1ff1)==0x1ff0);
@@ -150,18 +148,21 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 		if (m_WDsel && ((m_address & 9)==0))
 		{
 			if (!machine().side_effects_disabled()) reply = m_fd1771->read((offset >> 1)&0x03);
+			LOGMASKED(LOG_PORTS, "%04x -> %02x\n", offset & 0xffff, reply);
 		}
 		else
 		{
 			reply = m_dsrrom[m_address & 0x1fff];
+			LOGMASKED(LOG_RW, "%04x -> %02x\n", offset & 0xffff, reply);
 		}
 		*value = reply;
-		LOGMASKED(LOG_RW, "%04x -> %02x\n", offset & 0xffff, *value);
 	}
 }
 
 void ti_fdc_device::write(offs_t offset, uint8_t data)
 {
+	// As this is a memory-mapped access we must prevent the debugger
+	// from messing with the operation
 	if (machine().side_effects_disabled()) return;
 
 	if (m_inDsrArea && m_selected)
@@ -175,12 +176,17 @@ void ti_fdc_device::write(offs_t offset, uint8_t data)
 		// flags may be reset by the read operation.
 
 		// Note that incoming/outgoing data are inverted for FD1771
-		LOGMASKED(LOG_RW, "%04x <- %02x\n", offset & 0xffff, ~data & 0xff);
-		if (m_WDsel && ((m_address & 9)==8))
+		if (m_WDsel)
 		{
-			// As this is a memory-mapped access we must prevent the debugger
-			// from messing with the operation
-			if (!machine().side_effects_disabled()) m_fd1771->write((offset >> 1)&0x03, data);
+			if ((m_address & 9)==8)
+			{
+				m_fd1771->write((offset >> 1)&0x03, data);
+				LOGMASKED(LOG_PORTS, "%04x <- %02x\n", offset & 0xffff, ~data & 0xff);
+			}
+			else
+			{
+				LOGMASKED(LOG_RW, "%04x <- %02x (ignored)\n", m_address & 0xffff, ~data & 0xff);
+			}
 		}
 	}
 }
@@ -190,30 +196,31 @@ void ti_fdc_device::write(offs_t offset, uint8_t data)
 
        7     6     5     4      3     2     1     0
     +-----+-----+-----+------+-----+-----+-----+-----+
-    | Side|  1  |  0  |DVENA*| DSK3| DSK2| DSK1| HLD |
+    | Side|  1  |  0  |DVENA*| D3C*| D2C*| D1C*| HLD |
     +-----+-----+-----+------+-----+-----+-----+-----+
 
-    We have only 8 bits for query; within this implementation this means
-    we only use the base address (offset 0).
+    See schematics for the meaning of the bits.
 */
 READ8Z_MEMBER(ti_fdc_device::crureadz)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		uint8_t reply = 0;
 		if ((offset & 0x0070) == 0)
 		{
-			// Selected drive
-			reply |= ((m_DSEL)<<1);
-			// The DVENA state is returned as inverted
-			if (m_DVENA==CLEAR_LINE) reply |= 0x10;
-			// Always 1
-			reply |= 0x40;
-			// Selected side
-			if (m_SIDSEL==ASSERT_LINE) reply |= 0x80;
+			switch ((offset >> 1) & 0x07)
+			{
+			case 0: *value = (m_HLD==ASSERT_LINE)? 1:0; break;
+			case 1: *value = (m_crulatch->q4_r()==ASSERT_LINE && m_DVENA==ASSERT_LINE)? 1:0; break;
+			case 2: *value = (m_crulatch->q5_r()==ASSERT_LINE && m_DVENA==ASSERT_LINE)? 1:0; break;
+			case 3: *value = (m_crulatch->q6_r()==ASSERT_LINE && m_DVENA==ASSERT_LINE)? 1:0; break;
+			case 4: *value = (m_DVENA==CLEAR_LINE)? 1:0; break;
+			case 5: *value = 0; break;
+			case 6: *value = 1; break;
+			case 7: *value = (m_crulatch->q7_r()==ASSERT_LINE)? 1:0; break;
+			}
 		}
-		*value = BIT(reply, (offset >> 1) & 0x07);
-		LOGMASKED(LOG_CRU, "Read CRU = %02x\n", *value);
+		else *value = 0;
+		LOGMASKED(LOG_CRU, "Read CRU %04x = %02x\n", offset, *value);
 	}
 }
 
@@ -230,14 +237,28 @@ WRITE_LINE_MEMBER(ti_fdc_device::dskpgena_w)
 	LOGMASKED(LOG_CRU, "Map DSR (bit 0) = %d\n", m_selected);
 }
 
+/*
+    Trigger the motor monoflop.
+*/
 WRITE_LINE_MEMBER(ti_fdc_device::kaclk_w)
 {
-	// Activate motor
-	if (state)
-	{   // On rising edge, set motor_running for 4.23s
-		LOGMASKED(LOG_CRU, "trigger motor (bit 1)\n");
-		set_floppy_motors_running(true);
-	}
+	m_motormf->b_w(state);
+}
+
+WRITE_LINE_MEMBER(ti_fdc_device::dvena_w)
+{
+	m_DVENA = state;
+	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");
+
+	// The monoflop is connected to the READY line
+	m_fd1771->set_force_ready(state==ASSERT_LINE);
+
+	// Set all motors
+	for (auto & elem : m_floppy)
+		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
+
+	// The motor-on line also connects to the wait state logic
+	operate_ready_line();
 }
 
 WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
@@ -247,124 +268,83 @@ WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
 	// 1: TMS9900 is stopped until IRQ or DRQ are set
 	// OR the motor stops rotating - rotates for 4.23s after write
 	// to CRU bit 1
-	m_WAITena = state;
-	LOGMASKED(LOG_CRU, "arm wait state logic (bit 2) = %d\n", state);
+	LOGMASKED(LOG_CRU, "Arm wait state logic (bit 2) = %d\n", state);
 }
 
 WRITE_LINE_MEMBER(ti_fdc_device::hlt_w)
 {
 	// Load disk heads (HLT pin) (bit 3). Not implemented.
-	LOGMASKED(LOG_CRU, "set head load (bit 3) = %d\n", state);
-}
-
-WRITE_LINE_MEMBER(ti_fdc_device::dsel_w)
-{
-	m_DSEL = m_crulatch->q4_r() | (m_crulatch->q5_r() << 1) | (m_crulatch->q6_r() << 2);
-	set_drive();
+	LOGMASKED(LOG_CRU, "Set head load (bit 3) = %d\n", state);
 }
 
 WRITE_LINE_MEMBER(ti_fdc_device::sidsel_w)
 {
 	// Select side of disk (bit 7)
-	m_SIDSEL = state ? ASSERT_LINE : CLEAR_LINE;
-	LOGMASKED(LOG_CRU, "set side (bit 7) = %d\n", state);
-	if (m_current != NONE) m_floppy[m_current]->ss_w(state);
-}
-
-void ti_fdc_device::set_drive()
-{
-	int dsel = m_DSEL;
-
-	// If the selected floppy drive is not attached, remove that line
-	if (m_floppy[2] == nullptr) dsel &= 0x03;  // 011
-	if (m_floppy[1] == nullptr) dsel &= 0x05;  // 101
-	if (m_floppy[0] == nullptr) dsel &= 0x06;  // 110
-
-	switch (dsel)
-	{
-	case 0:
-		m_current = NONE;
-		LOGMASKED(LOG_CRU, "all drives deselected\n");
-		break;
-	case 1:
-		m_current = 0;
-		break;
-	case 2:
-		m_current = 1;
-		break;
-	case 3:
-		// The schematics do not reveal any countermeasures against multiple selection
-		// so we assume that the highest value wins.
-		m_current = 1;
-		LOGMASKED(LOG_WARN, "Warning - multiple drives selected\n");
-		break;
-	case 4:
-		m_current = 2;
-		break;
-	default:
-		m_current = 2;
-		LOGMASKED(LOG_WARN, "Warning - multiple drives selected\n");
-		break;
-	}
-	LOGMASKED(LOG_CRU, "new DSEL = %d\n", m_DSEL);
-
-	m_fd1771->set_floppy((m_current == NONE)? nullptr : m_floppy[m_current]);
+	LOGMASKED(LOG_CRU, "Set side (bit 7) = %d\n", state);
+	if (m_sel_floppy != 0) m_floppy[m_sel_floppy-1]->ss_w(state);
 }
 
 /*
-    Monoflop has gone back to the OFF state.
+    Drive selects
 */
-void ti_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER(ti_fdc_device::dsel1_w)
 {
-	set_floppy_motors_running(false);
+	select_drive(1, state);
 }
 
-/*
-    All floppy motors are operated by the same line.
-*/
-void ti_fdc_device::set_floppy_motors_running(bool run)
+WRITE_LINE_MEMBER(ti_fdc_device::dsel2_w)
 {
-	if (run)
+	select_drive(2, state);
+}
+
+WRITE_LINE_MEMBER(ti_fdc_device::dsel3_w)
+{
+	select_drive(3, state);
+}
+
+void ti_fdc_device::select_drive(int n, int state)
+{
+	if (state == CLEAR_LINE)
 	{
-		if (m_DVENA==CLEAR_LINE) LOGMASKED(LOG_MOTOR, "Motor START\n");
-		m_DVENA = ASSERT_LINE;
-		m_motor_on_timer->adjust(attotime::from_msec(4230));
+		LOGMASKED(LOG_CRU, "Unselect drive DSK%d\n", n);
+
+		// Only when no bit is set, unselect all drives.
+		if ((m_crulatch->q4_r() == 0) && (m_crulatch->q5_r() == 0)
+			&& (m_crulatch->q6_r() == 0))
+		{
+			m_fd1771->set_floppy(nullptr);
+			m_sel_floppy = 0;
+		}
 	}
 	else
 	{
-		if (m_DVENA==ASSERT_LINE) LOGMASKED(LOG_MOTOR, "Motor STOP\n");
-		m_DVENA = CLEAR_LINE;
+		LOGMASKED(LOG_CRU, "Select drive DSK%d\n", n);
+		if (m_sel_floppy != 0 && m_sel_floppy != n)
+		{
+			LOGMASKED(LOG_WARN, "Warning: DSK%d selected while DSK%d not yet unselected\n", n, m_sel_floppy);
+		}
+
+		if (m_floppy[n-1] != nullptr)
+		{
+			m_sel_floppy = n;
+			m_fd1771->set_floppy(m_floppy[n-1]);
+			m_floppy[n-1]->ss_w(m_crulatch->q7_r());
+		}
 	}
-
-	// The monoflop is connected to the READY line
-	m_fd1771->set_force_ready(run);
-
-	// Set all motors
-	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
-
-	// The motor-on line also connects to the wait state logic
-	operate_ready_line();
 }
 
 void ti_fdc_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
-	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
-	// In case we implement a callback after all:
-	// m_fd1771->setup_ready_cb(wd_fdc_device::rline_cb(&ti_fdc_device::dvena_r, this));
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_DRQ));
 	save_item(NAME(m_IRQ));
 	save_item(NAME(m_DVENA));
 	save_item(NAME(m_inDsrArea));
-	save_item(NAME(m_WAITena));
 	save_item(NAME(m_WDsel));
-	save_item(NAME(m_DSEL));
-	save_item(NAME(m_SIDSEL));
-	save_item(NAME(m_current));
+	save_item(NAME(m_sel_floppy));
 }
 
 void ti_fdc_device::device_reset()
@@ -384,8 +364,6 @@ void ti_fdc_device::device_reset()
 	m_DVENA = CLEAR_LINE;
 	m_fd1771->set_force_ready(false);
 
-	m_DSEL = 0;
-	m_WAITena = false;
 	m_selected = false;
 	m_inDsrArea = false;
 	m_WDsel = false;
@@ -398,8 +376,7 @@ void ti_fdc_device::device_reset()
 			LOGMASKED(LOG_CONFIG, "No floppy attached to connector %d\n", i);
 	}
 
-	m_current = 0;
-	m_fd1771->set_floppy(m_floppy[m_current]);
+	m_sel_floppy = 0;
 }
 
 void ti_fdc_device::device_config_complete()
@@ -433,6 +410,7 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	FD1771(config, m_fd1771, 1_MHz_XTAL);
 	m_fd1771->intrq_wr_callback().set(FUNC(ti_fdc_device::fdc_irq_w));
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
+	m_fd1771->hld_wr_callback().set(FUNC(ti_fdc_device::fdc_hld_w));
 
 	FLOPPY_CONNECTOR(config, "0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
@@ -443,10 +421,17 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	m_crulatch->q_out_cb<1>().set(FUNC(ti_fdc_device::kaclk_w));
 	m_crulatch->q_out_cb<2>().set(FUNC(ti_fdc_device::waiten_w));
 	m_crulatch->q_out_cb<3>().set(FUNC(ti_fdc_device::hlt_w));
-	m_crulatch->q_out_cb<4>().set(FUNC(ti_fdc_device::dsel_w));
-	m_crulatch->q_out_cb<5>().set(FUNC(ti_fdc_device::dsel_w));
-	m_crulatch->q_out_cb<6>().set(FUNC(ti_fdc_device::dsel_w));
+	m_crulatch->q_out_cb<4>().set(FUNC(ti_fdc_device::dsel1_w));
+	m_crulatch->q_out_cb<5>().set(FUNC(ti_fdc_device::dsel2_w));
+	m_crulatch->q_out_cb<6>().set(FUNC(ti_fdc_device::dsel3_w));
 	m_crulatch->q_out_cb<7>().set(FUNC(ti_fdc_device::sidsel_w));
+
+	TTL74123(config, m_motormf, 0);
+	m_motormf->out_cb().set(FUNC(ti_fdc_device::dvena_w));
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
+	m_motormf->set_resistor_value(RES_K(200));
+	m_motormf->set_capacitor_value(CAP_U(47));
+	m_motormf->set_clear_pin_value(1);
 }
 
 const tiny_rom_entry *ti_fdc_device::device_rom_region() const

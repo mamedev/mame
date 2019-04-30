@@ -5,12 +5,13 @@
     kc_cas.h
 
 *********************************************************************/
+#ifndef MAME_FORMATS_KC_CAS_H
+#define MAME_FORMATS_KC_CAS_H
 
-#ifndef KC_CAS_H
-#define KC_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(kc_cassette_formats);
 
-#endif /* KC_CAS_H */
+#endif // MAME_FORMATS_KC_CAS_H

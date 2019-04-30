@@ -326,12 +326,15 @@ ROM_START(wy50)
 	ROM_LOAD("2201_b.u16", 0x0000, 0x1000, CRC(ee318814) SHA1(0ac64b60ff978e607a087e9e6f4d547811c015c5)) // 2716
 ROM_END
 
-ROM_START(wy75) // 8031, green, 101-key detached keyboard, EAROM labeled "MODE 1"
+ROM_START(wy75) // 8031, green, 101-key detached keyboard
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("wy75_4001r.bin", 0x0000, 0x2000, CRC(d1e660e0) SHA1(81960e7780b86b9fe338b20d7bd50f7e991020a4))
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("wy75_4101a.bin", 0x0000, 0x1000, CRC(96d377db) SHA1(9e059cf067d84267f4e1d92b0509f137fb2ceb19))
+
+	ROM_REGION16_LE(0xc8, "earom", 0)
+	ROM_LOAD("default.bin", 0x00, 0xc8, CRC(0efeff07) SHA1(304e07ef87a4b107700273321a1d4e34a56d6821))
 ROM_END
 
 COMP(1984, wy50, 0, 0, wy50, wy50, wy50_state, empty_init, "Wyse Technology", "WY-50 (Rev. E)", MACHINE_IS_SKELETON)

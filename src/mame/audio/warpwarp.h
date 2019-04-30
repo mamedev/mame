@@ -18,9 +18,9 @@ public:
 	};
 
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( music1_w );
-	DECLARE_WRITE8_MEMBER( music2_w );
+	void sound_w(u8 data);
+	void music1_w(u8 data);
+	void music2_w(u8 data);
 
 protected:
 	// device-level overrides

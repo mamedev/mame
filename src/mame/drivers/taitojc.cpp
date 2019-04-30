@@ -521,9 +521,15 @@ WRITE16_MEMBER(taitojc_state::main_to_dsp_7ff_w)
 	}
 }
 
+void taitojc_state::cpu_space_map(address_map &map)
+{
+	map(0xfffffff0, 0xffffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffff4, 0xfffffff5).lr16("vblank irq", []() -> u16 { return 0x82; });
+}
+
 INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 {
-	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
+	device.execute().set_input_line(2, HOLD_LINE); // where does it come from?
 }
 
 WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
@@ -1083,6 +1089,7 @@ void taitojc_state::taitojc(machine_config &config)
 	M68040(config, m_maincpu, XTAL(10'000'000)*2); // 20MHz, clock source = CY7C991
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitojc_state::taitojc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitojc_state::taitojc_vblank));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &taitojc_state::cpu_space_map);
 
 	mc68hc11_cpu_device &sub(MC68HC11(config, "sub", XTAL(16'000'000)/2)); // 8MHz, MC68HC11M0
 	sub.set_addrmap(AS_PROGRAM, &taitojc_state::hc11_pgm_map);

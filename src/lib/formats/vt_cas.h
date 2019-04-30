@@ -7,13 +7,14 @@
     Format code for VTech cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_VT_CAS_H
+#define MAME_FORMATS_VT_CAS_H
 
-#ifndef VT_CAS_H
-#define VT_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(vtech1_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(vtech2_cassette_formats);
 
-#endif /* VT_CAS_H */
+#endif // MAME_FORMATS_VT_CAS_H

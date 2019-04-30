@@ -160,7 +160,7 @@ namespace devices
 		}
 		else
 		{
-			log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
+			log().fatal(MF_UNKNOWN_SOLVER_TYPE(m_method()));
 			return pool_owned_ptr<matrix_solver_t>();
 		}
 	}
@@ -358,7 +358,7 @@ namespace devices
 	#endif
 	#endif
 				default:
-					log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
+					log().info(MI_NO_SPECIFIC_SOLVER(net_count));
 					if (net_count <= 8)
 					{
 						ms = create_solver<double, -8>(net_count, sname);
@@ -383,7 +383,7 @@ namespace devices
 					}
 					else
 					{
-						log().fatal(MF_1_NETGROUP_SIZE_EXCEEDED_1, 128);
+						log().fatal(MF_NETGROUP_SIZE_EXCEEDED_1(128));
 						return; /* tease compilers */
 					}
 					break;

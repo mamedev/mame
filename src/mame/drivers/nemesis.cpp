@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
 WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
 {
 	if (state)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 

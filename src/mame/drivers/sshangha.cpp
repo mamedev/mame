@@ -125,7 +125,7 @@ READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
 	int real_address = 0x3f4000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco146->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -134,7 +134,7 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_d_146_w )
 	int real_address = 0x3f4000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
@@ -142,7 +142,7 @@ READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
 	int real_address = 0x3e0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco146->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -151,7 +151,7 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
 	int real_address = 0x3e0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 /*
@@ -184,7 +184,7 @@ WRITE16_MEMBER(sshangha_state::palette_w)
 	case 0x600: offset = (offset & 0x1ff) | 0x400; break;
 	}
 
-	m_palette->write16(space, offset, data, mem_mask);
+	m_palette->write16(offset, data, mem_mask);
 }
 
 READ16_MEMBER(sshangha_state::palette_r)
@@ -196,7 +196,7 @@ READ16_MEMBER(sshangha_state::palette_r)
 	case 0x400: offset = (offset & 0x1ff) | 0x000; break;
 	case 0x600: offset = (offset & 0x1ff) | 0x400; break;
 	}
-	return m_palette->read16(space, offset, mem_mask);
+	return m_palette->read16(offset);
 }
 
 void sshangha_state::sshangha_map(address_map &map)
@@ -434,7 +434,6 @@ void sshangha_state::sshangha(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000);
 
 	DECO16IC(config, m_tilegen, 0);
-	m_tilegen->set_split(0);
 	m_tilegen->set_pf1_size(DECO_64x32);
 	m_tilegen->set_pf2_size(DECO_64x32);
 	m_tilegen->set_pf1_trans_mask(0x0f);

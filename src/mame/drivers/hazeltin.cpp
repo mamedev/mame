@@ -693,7 +693,8 @@ static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(hazl1500_state::hazl1500)
+void hazl1500_state::hazl1500(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(18'000'000)/9); // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	m_maincpu->set_addrmap(AS_PROGRAM, &hazl1500_state::hazl1500_mem);
@@ -722,43 +723,42 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	AY51013(config, m_uart);
 	m_uart->write_dav_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
-	MCFG_NETLIST_SETUP(hazelvid)
+	NETLIST_CPU(config, NETLIST_TAG, VIDEOBRD_CLOCK).set_source(NETLIST_NAME(hazelvid));
 
 	// First 1K
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u22", "u22")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u23", "u23")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u24", "u24")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u25", "u25")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u26", "u26")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u27", "u27")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u28", "u28")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u29", "u29")
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u22", "u22.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u23", "u23.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u24", "u24.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u25", "u25.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u26", "u26.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u27", "u27.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u28", "u28.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u29", "u29.m_RAM");
 
 	// Second 1K
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u9",  "u9")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u10", "u10")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u11", "u11")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u12", "u12")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u13", "u13")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u14", "u14")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u15", "u15")
-	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u16", "u16")
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u9",  "u9.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u10", "u10.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u11", "u11.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u12", "u12.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u13", "u13.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u14", "u14.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u15", "u15.m_RAM");
+	NETLIST_RAM_POINTER(config, NETLIST_TAG ":u16", "u16.m_RAM");
 
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_iowq", "cpu_iowq.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_ba4", "cpu_ba4.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db0", "cpu_db0.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db1", "cpu_db1.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db2", "cpu_db2.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db3", "cpu_db3.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db4", "cpu_db4.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db5", "cpu_db5.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db6", "cpu_db6.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db7", "cpu_db7.IN", 0)
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_iowq", "cpu_iowq.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_ba4", "cpu_ba4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db0", "cpu_db0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db1", "cpu_db1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db2", "cpu_db2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db3", "cpu_db3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db4", "cpu_db4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db5", "cpu_db5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db6", "cpu_db6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db7", "cpu_db7.IN", 0);
 
-	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "video_out", "video_out", hazl1500_state, video_out_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "vblank", "vblank", hazl1500_state, vblank_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":video_out", 0).set_params("video_out", FUNC(hazl1500_state::video_out_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":vblank", 0).set_params("vblank", FUNC(hazl1500_state::vblank_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":tvinterq", 0).set_params("tvinterq", FUNC(hazl1500_state::tvinterq_cb), "");
 
 	/* keyboard controller */
 	AY3600(config, m_kbdc, 0);
@@ -774,7 +774,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	m_kbdc->shift().set(FUNC(hazl1500_state::ay3600_shift_r));
 	m_kbdc->control().set(FUNC(hazl1500_state::ay3600_control_r));
 	m_kbdc->data_ready().set(FUNC(hazl1500_state::ay3600_data_ready_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( hazl1500 )

@@ -61,6 +61,7 @@ Updates:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/k054321.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
@@ -170,16 +171,16 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 
 WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 {
-	m_k053260->main_write(space, offset, data);
+	m_k053260->main_write(offset, data);
 
 	if (offset)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
 WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
@@ -440,7 +441,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (m_last == 0 && (data & 0x20) != 0)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 		m_last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -577,7 +578,7 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
 	/* I think this is more than just a trigger */
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 void tmnt_state::blswhstl_main_map(address_map &map)
@@ -658,9 +659,7 @@ void tmnt_state::prmrsocr_main_map(address_map &map)
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
 	map(0x120000, 0x120001).portr("P1/COINS");
 	map(0x120002, 0x120003).portr("P2/EEPROM");
-	map(0x12100d, 0x12100d).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x12100f, 0x12100f).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x121015, 0x121015).r("soundlatch3", FUNC(generic_latch_8_device::read));
+	map(0x121000, 0x12101f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x122000, 0x122001).w(FUNC(tmnt_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
 	map(0x123000, 0x123001).w(FUNC(tmnt_state::prmrsocr_sound_irq_w));
 	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
@@ -1080,9 +1079,7 @@ void tmnt_state::prmrsocr_audio_map(address_map &map)
 	map(0xe000, 0xe12f).lrw8("k054539_rw",
 		[this](offs_t offset) { return m_k054539->read(((offset & 0x100) << 1) | (offset & 0xff)); },
 		[this](offs_t offset, u8 data) { m_k054539->write(((offset & 0x100) << 1) | (offset & 0xff), data); });
-	map(0xf000, 0xf000).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0xf002, 0xf002).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf003, 0xf003).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf003).m("k054321", FUNC(k054321_device::sound_map));
 	map(0xf800, 0xf800).w(FUNC(tmnt_state::prmrsocr_audio_bankswitch_w));
 }
 
@@ -2373,9 +2370,7 @@ void tmnt_state::prmrsocr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, "soundlatch3");
+	K054321(config, "k054321", "lspeaker", "rspeaker");
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);

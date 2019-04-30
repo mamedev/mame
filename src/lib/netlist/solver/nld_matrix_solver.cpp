@@ -19,7 +19,7 @@ namespace devices
 		: m_railstart(0)
 		, m_last_V(0.0)
 		, m_DD_n_m_1(0.0)
-		, m_h_n_m_1(1e-9)
+		, m_h_n_m_1(1e-12)
 	{
 	}
 
@@ -127,8 +127,7 @@ namespace devices
 						}
 						break;
 					case detail::terminal_type::OUTPUT:
-						log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
-								p->name());
+						log().fatal(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
 						break;
 				}
 			}
@@ -438,7 +437,7 @@ namespace devices
 			// reschedule ....
 			if (this_resched > 1 && !m_Q_sync.net().is_queued())
 			{
-				log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
+				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
 				m_Q_sync.net().toggle_and_push_to_queue(m_params.m_nr_recalc_delay);
 			}
 		}
@@ -554,7 +553,7 @@ namespace devices
 			else // if (ot<0)
 			{
 				m_rails_temp[k]->add(term, ot, true);
-				log().fatal(MF_1_FOUND_TERM_WITH_MISSING_OTHERNET, term->name());
+				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
 	}
@@ -570,9 +569,12 @@ namespace devices
 				analog_net_t *n = m_nets[k];
 				terms_for_net_t *t = m_terms[k].get();
 
-				const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
+				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
+				// avoid floating point exceptions
+				const nl_double DD_n = std::max(-1e100, std::min(1e100,(n->Q_Analog() - t->m_last_V)));
 				const nl_double hn = cur_ts;
 
+				//printf("%g %g %g %g\n", DD_n, hn, t->m_DD_n_m_1, t->m_h_n_m_1);
 				nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
 				nl_double new_net_timestep;
 

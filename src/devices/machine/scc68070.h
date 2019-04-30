@@ -3,7 +3,7 @@
 /******************************************************************************
 
 
-    CD-i-specific SCC68070 SoC peripheral emulation
+    SCC68070 SoC peripheral emulation
     -------------------
 
     written by Ryan Holtz
@@ -21,10 +21,12 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef MAME_MACHINE_CDI070_H
-#define MAME_MACHINE_CDI070_H
+#ifndef MAME_MACHINE_SCC68070_H
+#define MAME_MACHINE_SCC68070_H
 
 #pragma once
+
+#include "cpu/m68000/m68000.h"
 
 
 #define ISR_MST     0x80    // Master
@@ -126,21 +128,24 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cdi68070_device
+// ======================> scc68070_device
 
-class cdi68070_device : public device_t
+class scc68070_device : public scc68070_base_device
 {
 public:
-	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// construction/destruction
-	template <typename T> cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: cdi68070_device(mconfig, tag, owner, clock)
-	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-	}
+	auto iack2_callback() { return m_iack2_callback.bind(); }
+	auto iack4_callback() { return m_iack4_callback.bind(); }
+	auto iack5_callback() { return m_iack5_callback.bind(); }
+	auto iack7_callback() { return m_iack7_callback.bind(); }
 
-	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	DECLARE_WRITE_LINE_MEMBER(in2_w);
+	DECLARE_WRITE_LINE_MEMBER(in4_w);
+	DECLARE_WRITE_LINE_MEMBER(in5_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(int1_w);
+	DECLARE_WRITE_LINE_MEMBER(int2_w);
 
 	// external callbacks
 	void uart_rx(uint8_t data);
@@ -152,9 +157,6 @@ public:
 	void quizard_rx(uint8_t data);
 
 	void mcu_frame();
-
-	DECLARE_READ16_MEMBER(periphs_r);
-	DECLARE_WRITE16_MEMBER(periphs_w);
 
 	TIMER_CALLBACK_MEMBER( timer0_callback );
 	TIMER_CALLBACK_MEMBER( rx_callback );
@@ -261,19 +263,35 @@ public:
 
 	dma_regs_t& dma() { return m_dma; }
 
-	uint16_t get_lir() { return m_lir; }
-
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 2); }
+
 private:
-	required_device<cpu_device> m_maincpu;
+	void internal_map(address_map &map);
+	void cpu_space_map(address_map &map);
+
+	void update_ipl();
+	uint8_t iack_r(offs_t offset);
+
+	DECLARE_READ16_MEMBER(periphs_r);
+	DECLARE_WRITE16_MEMBER(periphs_w);
 
 	void uart_rx_check();
 	void uart_tx_check();
 	void set_timer_callback(int channel);
+
+	// callbacks
+	devcb_read8 m_iack2_callback;
+	devcb_read8 m_iack4_callback;
+	devcb_read8 m_iack5_callback;
+	devcb_read8 m_iack7_callback;
 
 	// internal state
 	uint16_t m_seeds[10];
@@ -282,9 +300,21 @@ private:
 	uint16_t m_mcu_value;
 	uint8_t m_mcu_ack;
 
+	uint8_t m_ipl;
+	int m_in2_line;
+	int m_in4_line;
+	int m_in5_line;
+	int m_nmi_line;
+	int m_int1_line;
+	int m_int2_line;
+
 	uint16_t m_lir;
 	uint8_t m_picr1;
 	uint8_t m_picr2;
+	bool m_timer_int;
+	bool m_i2c_int;
+	bool m_uart_rx_int;
+	bool m_uart_tx_int;
 
 	i2c_regs_t m_i2c;
 	uart_regs_t m_uart;
@@ -299,6 +329,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(CDI_68070, cdi68070_device)
+DECLARE_DEVICE_TYPE(SCC68070, scc68070_device)
 
-#endif // MAME_MACHINE_CDI070_H
+#endif // MAME_MACHINE_SCC68070_H

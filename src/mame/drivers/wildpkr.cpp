@@ -224,7 +224,8 @@ private:
 	DECLARE_WRITE16_MEMBER(clock_start_w);
 	DECLARE_WRITE16_MEMBER(clock_rate_w);
 	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
-	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
+	u16 tabpkr_irq_ack(offs_t offset);
+	void cpu_space_map(address_map &map);
 	void hd63484_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void tabpkr_map(address_map &map);
@@ -451,13 +452,19 @@ void wildpkr_state::ramdac_map(address_map &map)
 }
 
 
-IRQ_CALLBACK_MEMBER(wildpkr_state::tabpkr_irq_ack)
+void wildpkr_state::cpu_space_map(address_map &map)
 {
-	m_maincpu->set_input_line(irqline, CLEAR_LINE);
-	if (irqline == M68K_IRQ_2)
+	map(0xfffff2, 0xffffff).r(FUNC(wildpkr_state::tabpkr_irq_ack));
+}
+
+u16 wildpkr_state::tabpkr_irq_ack(offs_t offset)
+{
+	m_maincpu->set_input_line(offset+1, CLEAR_LINE);
+
+	if (offset+1 == 2)
 		return m_duart->get_irq_vector();
 	else
-		return M68K_INT_ACK_AUTOVECTOR;
+		return m68000_device::autovector(offset+1);
 }
 
 
@@ -501,7 +508,7 @@ void wildpkr_state::tabpkr(machine_config &config)
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wildpkr_state::tabpkr_map);
 	m_maincpu->set_periodic_int(FUNC(wildpkr_state::irq3_line_assert), attotime::from_hz(60*256));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(wildpkr_state::tabpkr_irq_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &wildpkr_state::cpu_space_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // DS1220Y
 

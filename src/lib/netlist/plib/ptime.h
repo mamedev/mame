@@ -10,6 +10,7 @@
 #include "pconfig.h"
 #include "ptypes.h"
 
+#include <cmath> // std::floor
 #include <cstdint>
 
 // ----------------------------------------------------------------------------------------
@@ -112,7 +113,7 @@ namespace plib
 		static constexpr ptime from_sec(const internal_type s) noexcept   { return ptime(s,  UINT64_C(         1)); }
 		static constexpr ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
 		static constexpr ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
-		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>( t * static_cast<double>(RES)), RES); }
+		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>(std::floor(t * static_cast<double>(RES) + 0.5)), RES); }
 
 		static constexpr ptime zero() noexcept { return ptime(0, RES); }
 		static constexpr ptime quantum() noexcept { return ptime(1, RES); }

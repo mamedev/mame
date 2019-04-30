@@ -100,14 +100,7 @@ void ec65_state::kbd_put(u8 data)
 {
 	if (data)
 	{
-		m_via_0->write_pa0(BIT(data, 0));
-		m_via_0->write_pa1(BIT(data, 1));
-		m_via_0->write_pa2(BIT(data, 2));
-		m_via_0->write_pa3(BIT(data, 3));
-		m_via_0->write_pa4(BIT(data, 4));
-		m_via_0->write_pa5(BIT(data, 5));
-		m_via_0->write_pa6(BIT(data, 6));
-		m_via_0->write_pa7(BIT(data, 7));
+		m_via_0->write_pa(data);
 		m_via_0->write_ca1(1);
 		m_via_0->write_ca1(0);
 	}
@@ -115,14 +108,7 @@ void ec65_state::kbd_put(u8 data)
 
 void ec65_state::machine_reset()
 {
-	m_via_1->write_pb0(1);
-	m_via_1->write_pb1(1);
-	m_via_1->write_pb2(1);
-	m_via_1->write_pb3(1);
-	m_via_1->write_pb4(1);
-	m_via_1->write_pb5(1);
-	m_via_1->write_pb6(1);
-	m_via_1->write_pb7(1);
+	m_via_1->write_pb(0xff);
 }
 
 MC6845_UPDATE_ROW( ec65_state::crtc_update_row )

@@ -962,8 +962,8 @@ void mazerbla_state::machine_reset()
 
 	if (m_soundlatch.found())
 	{
-		m_soundlatch->clear_w(machine().dummy_space(), 0, 0);
-		m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+		m_soundlatch->clear_w();
+		m_soundlatch->acknowledge_w();
 	}
 
 	for (i = 0; i < 4; i++)

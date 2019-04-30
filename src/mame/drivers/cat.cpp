@@ -355,10 +355,11 @@ public:
 
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
-	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
 	void cat(machine_config &config);
 	void cat_mem(address_map &map);
+	void cpu_space_map(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -915,10 +916,10 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	m_6ms_counter++;
 }
 
-IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
+void cat_state::cpu_space_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff3, 0xfffff3).lr8("interrupt 1", [this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); });
 }
 
 MACHINE_START_MEMBER(cat_state,cat)
@@ -983,12 +984,10 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitma
  */
 WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 {
-	int irqvector = m_duart->get_irq_vector();
-
 #ifdef DEBUG_DUART_IRQ_HANDLER
 	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, irqvector);
 #endif
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
+	m_maincpu->set_input_line(M68K_IRQ_1, state);
 }
 
 WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
@@ -1059,7 +1058,7 @@ void cat_state::cat(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(19'968'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cat_state::cat_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(cat_state::cat_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cat_state::cpu_space_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)

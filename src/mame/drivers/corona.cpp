@@ -526,14 +526,14 @@ uint32_t corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER(corona_state::sound_latch_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(corona_state::sound_latch_r)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 

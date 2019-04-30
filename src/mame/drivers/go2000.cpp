@@ -85,7 +85,7 @@ private:
 
 WRITE16_MEMBER(go2000_state::sound_cmd_w)
 {
-	m_soundlatch->write(space, offset, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 

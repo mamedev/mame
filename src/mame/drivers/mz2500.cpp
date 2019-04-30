@@ -1778,7 +1778,7 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 {
 	/* TODO: doesn't work yet */
 //  if(m_irq_mask[3] && state & 1)
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]); // Z80
 }
 
 

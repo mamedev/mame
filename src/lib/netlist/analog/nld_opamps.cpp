@@ -115,6 +115,8 @@ namespace netlist
 		, m_VREF(*this, "VREF")
 		{
 			m_type = static_cast<int>(m_model.m_TYPE);
+			if (m_type < 1 || m_type > 3)
+				log().fatal(MF_UNKNOWN_OPAMP_TYPE(m_type));
 
 			if (m_type == 1)
 			{
@@ -127,46 +129,50 @@ namespace netlist
 				connect("RP1.1", "G1.OP");
 
 			}
-			else if (m_type == 3)
+			if (m_type == 2 || m_type == 3)
 			{
 				create_and_register_subdevice("CP1", m_CP);
 				create_and_register_subdevice("EBUF", m_EBUF);
-				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
-				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
-
-				//m_DP->m_model.setTo("D(IS=1e-15 N=1)");
-				//m_DN->m_model.setTo("D(IS=1e-15 N=1)");
 
 				register_subalias("PLUS", "G1.IP");
 				register_subalias("MINUS", "G1.IN");
-				register_subalias("OUT", "EBUF.OP");
-
-				connect("EBUF.ON", "VREF");
 
 				connect("G1.ON", "VREF");
 				connect("RP1.2", "VREF");
 				connect("CP1.2", "VREF");
+				connect("EBUF.ON", "VREF");
 				connect("EBUF.IN", "VREF");
 
 				connect("RP1.1", "G1.OP");
 				connect("CP1.1", "RP1.1");
 
+				connect("EBUF.IP", "RP1.1");
+			}
+			if (m_type == 2)
+			{
+				register_subalias("OUT", "EBUF.OP");
+			}
+			if (m_type == 3)
+			{
+
+				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
+
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");
 				connect("DP.A", "DN.K");
 				connect("DN.K", "RP1.1");
-				connect("EBUF.IP", "RP1.1");
+
+				register_subalias("OUT", "EBUF.OP");
 			}
-			else
-				log().fatal(MF_1_UNKNOWN_OPAMP_TYPE, m_type);
 
 		}
 
 		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-		NETLIB_UPDATE_PARAMI()
+		NETLIB_RESETI()
 		{
 		}
+		NETLIB_UPDATE_PARAMI();
 
 	private:
 
@@ -194,14 +200,14 @@ namespace netlist
 		const double cVt = 0.0258 * 1.0; // * m_n;
 		const double cId = m_model.m_DAB; // 3 mA
 		const double cVd = cVt * std::log(cId / 1e-15 + 1.0);
+
 		m_VH.push(m_VCC() - m_model.m_VLH - cVd);
 		m_VL.push(m_GND() + m_model.m_VLL + cVd);
 		m_VREF.push((m_VCC() + m_GND()) / 2.0);
 	}
 
-	NETLIB_RESET(opamp)
+	NETLIB_UPDATE_PARAM(opamp)
 	{
-		m_G1.reset();
 		m_G1.m_RI.setTo(m_model.m_RI);
 
 		if (m_type == 1)
@@ -211,27 +217,30 @@ namespace netlist
 			m_RP.set_R(RO);
 			m_G1.m_G.setTo(G);
 		}
-		else if (m_type == 3)
+		if (m_type == 3 || m_type == 2)
 		{
-			m_EBUF->reset();
-			m_DP->reset();
-			m_DN->reset();
-			m_CP->reset();
-			m_RP.reset();
-
-			m_EBUF->m_G.setTo(1.0);
-			m_EBUF->m_RO.setTo(m_model.m_RO);
-
 			double CP = m_model.m_DAB / m_model.m_SLEW;
-			double RP = 0.5 / 3.1459 / CP / m_model.m_FPF;
+			double RP = 0.5 / constants::pi() / CP / m_model.m_FPF;
 			double G = m_model.m_UGF / m_model.m_FPF / RP;
 
-			//printf("Min Freq %s: %f\n", name().c_str(), 1.0 / (CP*RP / (G*RP)));
+			//printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
+			if (m_model.m_SLEW / (4.0 * constants::pi() * 0.0258) < m_model.m_UGF)
+				log().warning("Opamp <{1}> parameters fail convergence criteria", this->name());
 
 			m_CP->m_C.setTo(CP);
 			m_RP.set_R(RP);
 			m_G1.m_G.setTo(G);
 
+		}
+		if (m_type == 2)
+		{
+			m_EBUF->m_G.setTo(1.0);
+			m_EBUF->m_RO.setTo(m_model.m_RO);
+		}
+		if (m_type == 3)
+		{
+			m_EBUF->m_G.setTo(1.0);
+			m_EBUF->m_RO.setTo(m_model.m_RO);
 		}
 	}
 

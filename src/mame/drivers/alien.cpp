@@ -136,27 +136,27 @@ void alien_state::machine_reset()
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(alien_state::alien)
+void alien_state::alien(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
-	MCFG_DEVICE_PROGRAM_MAP(alien_map)
-	MCFG_CPU_FORCE_NO_DRC()
+	SH4LE(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
+	m_maincpu->set_force_no_drc(true);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(alien_state, screen_update)
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(alien_state::screen_update));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea_full();
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-MACHINE_CONFIG_END
+}
 
 void alien_state::init_dkbanans()
 {

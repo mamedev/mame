@@ -92,6 +92,7 @@
 
 #include "netlist/analog/nld_bjt.h"
 #include "netlist/analog/nld_fourterm.h"
+#include "netlist/analog/nld_mosfet.h"
 #include "netlist/analog/nld_opamps.h"
 #include "netlist/analog/nld_switches.h"
 #include "netlist/analog/nld_twoterm.h"

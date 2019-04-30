@@ -9,20 +9,21 @@
         die markings show
         "SunPlus QL8041" ( also known as Sunplus SPG240 & PAC300 )
 
-            (all GameKeyReady units?)
-            Disney Princess (GKR)
-            Wheel of Fortune (GKR)
-            JAKKS WWE (GKR)
-            Fantastic 4 (GKR)
-            Justice League (GKR)
-            Dora the Explorer Nursery Rhyme (GKR)
-            Dora the Explorer Play Park (GKR)
-            Spiderman 5-in-1 (GKR)
-            etc.
+            All GameKeyReady units
+                Disney Princess (GKR)
+                Wheel of Fortune (GKR)
+                JAKKS WWE (GKR)
+                Fantastic 4 (GKR)
+                Justice League (GKR)
+                Dora the Explorer Nursery Rhyme (GKR)
+                Dora the Explorer Play Park (GKR)
+                Spiderman 5-in-1 (GKR)
+                etc.
 
             (other non GKR JAKKS games)
             X-Men (Wolverine pad)
             Avatar: The Last Airbender
+            Superman in Super Villain Showdown
 
             (other games)
             Mattel Classic Sports
@@ -36,6 +37,30 @@
         "SunPlus QU7074-P69A"
 
             The Batman
+            Star Wars (non-gamekey, which model? falcon? - check)
+            Dream Life
+
+        "SunPlus QL8167b" (is the scrambling built into the CPU, or external?)
+
+            Lexibook Zeus IG900 20-in-1
+
+        "SunPlus QL8139C"
+
+            Radica Cricket
+            V Smile Baby (Sweden) - see vsmileb.cpp
+
+        ---
+
+        Very likely the same
+
+        "Sunplus QL8167" (these might have ROM scrambling if that is a 8167 feature)
+
+            Disney Princess Magical Adventure
+            Go Diego Go
+            Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
+            Marvel Heroes (Spider-man)
+            Spiderman 3 (Movie - black)
+
 
         ---
 
@@ -49,27 +74,15 @@
 
             Mission Paintball
 
-        "Sunplus QL8167"
-
-            Disney Princess Magical Adventure
-            Go Diego Go
-            Shrek - Over the Hedge (this unit shows a 'GameKey Unlock More Games' on startup, but has no port, not even on the internal PCB)
-            Marvel Heroes (Spider-man)
-            Spiderman 3 (Movie - black)
-
         ---
 
-        These are definitely different
+        These are definitely different but still unSP based
 
-        "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
+        "SunPlus PA7801" ( known as Sunplus SPG110? )
+        - see spg110.cpp instead
 
-            Classic Arcade Pinball
-            EA Sports (NHL95 + Madden 95)
-            Spiderman 5-in-1 (original release)
-
-        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc.)
-
-            Smart Fit Park
+        "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob)
+        - see sunplus_gcm394.cpp instead
 
     Status:
 
@@ -87,12 +100,11 @@
         jak_wall, jak_sdoo:
             Game seems unhappy with NVRAM, clears contents on each boot.
         jak_pooh:
-            In the 'Light Tag' minigame (select the rock) you can't move left with the DRC (ok with -nodrc)
-            and the game usually softlocks when you find a friend (with or without DRC)
+            In the 'Light Tag' minigame (select the rock) the game usually softlocks when you find a friend (with or without DRC)
         jak_disf:
-            shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
+            Shows corrupt logo on first boot with no valid nvram (possibly hardware does too, or layer disable?)
         jak_nick:
-            channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
+            Channel chasers (first game) title screen background should be blue, not the current pattern (possible layer disable?)
 
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
@@ -109,7 +121,7 @@
         Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
         WWE : press UP, BT1, BT2 together during startup logos
 
-        Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKKeys) for test mode, hold UP,
+        Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKeys) for test mode, hold UP,
         press A, press DOWN during startup
 
     TODO:
@@ -332,6 +344,28 @@ private:
 	optional_ioport_array<6> m_portc_in;
 
 };
+
+class tvgogo_state : public spg2xx_game_state
+{
+public:
+	tvgogo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spg2xx_game_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+		, m_cart_region(nullptr)
+	{ }
+
+	void tvgogo(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tvgogo_cart);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+};
+
 
 class dreamlif_state : public spg2xx_game_state
 {
@@ -1416,17 +1450,170 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tvgogo )
+	PORT_START("P1")
+	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P3")
+	PORT_DIPNAME( 0x0001, 0x0001, "P3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 
 READ16_MEMBER(dreamlif_state::portb_r)
 {
-	// some kind of EEPROM device?
+	// some kind of EEPROM device?  has a HT93LC66A
 	logerror("%s: portb_r\n", machine().describe_context());
 	return 0x0000;
 }
 
 WRITE16_MEMBER(dreamlif_state::portb_w)
 {
-	// some kind of EEPROM device?
+	// some kind of EEPROM device? see above
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
@@ -1569,6 +1756,42 @@ DEVICE_IMAGE_LOAD_MEMBER(icanguit_state, icanguit_cart)
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void tvgogo_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
+		m_bank->set_entry(0);
+	}
+}
+
+void tvgogo_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+}
+
+
+DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state, tvgogo_cart)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size > 0x800000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
@@ -1767,6 +1990,24 @@ void icanguit_state::icanpian(machine_config &config)
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
+}
+
+void tvgogo_state::tvgogo(machine_config &config)
+{
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+
+	spg2xx_base(config);
+
+	m_spg->porta_in().set_ioport("P1");
+	m_spg->portb_in().set_ioport("P2");
+	m_spg->portc_in().set_ioport("P3");
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tvgogo_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(device_image_load_delegate(&tvgogo_state::device_image_load_tvgogo_cart, this));
+	m_cart->set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");
 }
 
 
@@ -2170,10 +2411,6 @@ ROM_START( dreamlif )
 	ROM_LOAD16_WORD_SWAP( "dreamlife.bin", 0x000000, 0x800000, CRC(632e0237) SHA1(a8586e8a626d75cf7782f13cfd9f1b938af23d56) )
 ROM_END
 
-ROM_START( smartfp )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428) )
-ROM_END
 
 
 
@@ -2186,6 +2423,13 @@ ROM_START( icanpian )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM, requires a cartridge
 ROM_END
+
+
+ROM_START( tvgogo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// no internal ROM? (Camera might have an MCU tho)
+ROM_END
+
 
 /*
 Wireless Air 60
@@ -2214,88 +2458,6 @@ ROM_START( wlsair60 )
 	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
-
-/*
-Wireless Hunting Video Game System
-(info provided with dump)
-
-System: Wireless Hunting Video Game System
-Publisher: Hamy / Kids Station Toys Inc
-Year: 2011
-ROM: FDI MSP55LV100G
-RAM: Micron Technology 48LC8M16A2
-
-Games:
-
-Secret Mission
-Predator
-Delta Force
-Toy Land
-Dream Forest
-Trophy Season
-Freedom Force
-Be Careful
-Net Power
-Open Training
-Super Archer
-Ultimate Frisbee
-UFO Shooting
-Happy Darts
-Balloon Shoot
-Avatair
-Angry Pirate
-Penguin War
-Ghost Shooter
-Duck Hunt
-
-
-ROM Board:
-
-Package: SO44
-Spacing: 1.27 mm
-Width: 16.14 mm
-Length: 27.78 mm
-Voltage: 3V
-Pinout:
-
-          A25  A24
-            |  |
-      +--------------------------+
-A21 --|==   #  # `.__.'        ==|-- A20
-A18 --|==                      ==|-- A19
-A17 --|==                      ==|-- A8
- A7 --|==                      ==|-- A9
- A6 --|==                  o   ==|-- A10
- A5 --|==  +----------------+  ==|-- A11
- A4 --|==  |                |  ==|-- A12
- A3 --|==  |  MSP55LV100G   |  ==|-- A13
- A2 --|==  |  0834 M02H     |  ==|-- A14
- A1 --|==  |  JAPAN         |  ==|-- A15
- A0 --|==  |                |  ==|-- A16
-#CE --|==  |                |  ==|-- A23
-GND --|==  |                |  ==|-- A22
-#OE --|==  |                |  ==|-- Q15
- Q0 --|==  |                |  ==|-- Q7
- Q8 --|==  |                |  ==|-- Q14
- Q1 --|==  +----------------+  ==|-- Q6
- Q9 --|==                      ==|-- Q13
- Q2 --|==       M55L100G       ==|-- Q5
-Q10 --|==                      ==|-- Q12
- Q3 --|==                      ==|-- Q4
-Q11 --|==                      ==|-- VCC
-      +--------------------------+
-
-
-The only interesting string in this ROM is SPF2ALP,
-which is also found in the Wireless Air 60 ROM.
-
-*/
-
-ROM_START( wrlshunt )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
-ROM_END
-
 
 void spg2xx_game_state::init_crc()
 {
@@ -2411,19 +2573,16 @@ CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_
 CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
 
+// Toyquest games
+CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "TV Go Go",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 // could be later model VT based instead? even after decrypting (simple word xor) the vectors have a different format and are at a different location to the SunPlus titles
 CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,       0,        lexizeus, lexizeus, spg2xx_game_state, init_zeus, "Lexibook",          "Zeus IG900 20-in-1 (US?)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
-
-// valid looking code, but extended periperhal area (twice the size?) makes use of unemulated opcode 0xfe00 ?
-CONS( 2011, wrlshunt,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Hamy / Kids Station Toys Inc",                      "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-// extended opcodes different internal map?
-CONS( 2009, smartfp,   0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // NAND dumps w/ internal bootstrap. Almost certainly do not fit in this driver, as the SPG2xx can only address up to 4Mwords. These are 'GeneralPlus' instead?
 CONS( 2010, wlsair60,  0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

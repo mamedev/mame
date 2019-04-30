@@ -101,7 +101,7 @@ protected:
 	{
 		type(config, m_maincpu, std::forward<Clock>(clock));
 		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
-		m_maincpu->set_irq_acknowledge_callback(FUNC(x68k_state::int_ack));
+		m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x68k_state::cpu_space_map);
 	}
 
 	required_device<m68000_base_device> m_maincpu;
@@ -229,7 +229,7 @@ protected:
 	} m_mdctrl;
 	uint8_t m_ppi_port[3];
 	int m_current_vector[8];
-	uint8_t m_current_irq_line;
+	//uint8_t m_current_irq_line;
 	int m_led_state;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
@@ -270,9 +270,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 
 	//dmac
-	void dma_irq(int channel);
+	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
 
 	int read_mouse();
 	void set_adpcm();
@@ -317,10 +316,13 @@ protected:
 	DECLARE_WRITE16_MEMBER(tvram_write);
 	DECLARE_READ16_MEMBER(gvram_read);
 	DECLARE_WRITE16_MEMBER(gvram_write);
-	IRQ_CALLBACK_MEMBER(int_ack);
+
+	template <int Line> uint8_t int_ack();
+	uint8_t mfp_ack();
 
 	void x68k_base_map(address_map &map);
 	void x68k_map(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
 	void draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);

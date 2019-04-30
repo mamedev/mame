@@ -68,6 +68,7 @@ public:
 	void vipclub(machine_config &config);
 	void ojousan(machine_config &config);
 	void seiha(machine_config &config);
+	void bikkuri(machine_config &config);
 
 	void init_kyuhito();
 	void init_idhimitu();
@@ -145,6 +146,8 @@ private:
 	void postload();
 
 	void barline_io_map(address_map &map);
+	void bikkuri_map(address_map &map);
+	void bikkuri_io_map(address_map &map);
 	void crystalg_io_map(address_map &map);
 	void iemoto_io_map(address_map &map);
 	void kaguya_io_map(address_map &map);

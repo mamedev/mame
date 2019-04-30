@@ -7,14 +7,17 @@
     Floppy disk image abstraction code
 
 *********************************************************************/
+#ifndef MAME_FORMATS_FLOPIMG_H
+#define MAME_FORMATS_FLOPIMG_H
 
-#ifndef FLOPIMG_H
-#define FLOPIMG_H
+#pragma once
 
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "opresolv.h"
 #include "coretmpl.h"
+
+#include <vector>
 
 #ifndef LOG_FORMATS
 #define LOG_FORMATS if (0) printf
@@ -154,6 +157,8 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 #define INTERLEAVE(range)       "I" #range
 #define FIRST_SECTOR_ID(range)  "F" #range
 
+/* Max number of excess tracks to be discarded from disk image to fit floppy drive */
+#define DUMP_THRESHOLD 2
 
 /***************************************************************************
 
@@ -170,8 +175,7 @@ floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct Flo
 void floppy_close(floppy_image_legacy *floppy);
 
 /* useful for identifying a floppy image */
-floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension,
-	const struct FloppyFormat *formats, int *identified_format);
+floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *formats, int *identified_format);
 
 /* functions useful within format constructors */
 void *floppy_tag(floppy_image_legacy *floppy);
@@ -292,7 +296,8 @@ protected:
 	//! Optional, you can always do things by hand, but useful nevertheless.
 	//! A vector of these structures describes one track.
 
-	struct desc_e {
+	struct desc_e
+	{
 		int type,   //!< An opcode
 			p1,     //!< first param
 			p2;     //!< second param
@@ -361,7 +366,8 @@ protected:
 	};
 
 	//! Sector data description
-	struct desc_s {
+	struct desc_s
+	{
 		int size;          //!< Sector size, int bytes
 		const uint8_t *data; //!< Sector data
 		uint8_t sector_id;   //!< Sector ID
@@ -489,14 +495,16 @@ protected:
 	void generate_bitstream_from_track(int track, int head, int cell_size, uint8_t *trackbuf, int &track_size, floppy_image *image, int subtrack = 0);
 
 	//! Defines a standard sector for extracting.
-	struct desc_xs {
+	struct desc_xs
+	{
 		int track,  //!< Track for this sector
 			head,   //!< Head for this sector
 			size;   //!< Size of this sector
 		const uint8_t *data; //!< Data within this sector
 	};
 
-	struct desc_pc_sector {
+	struct desc_pc_sector
+	{
 		uint8_t track, head, sector, size;
 		int actual_size;
 		uint8_t *data;
@@ -588,7 +596,8 @@ private:
 	enum { MAX_CRC_COUNT = 64 };
 
 	//! Holds data used internally for generating CRCs.
-	struct gen_crc_info {
+	struct gen_crc_info
+	{
 		int type, //!< Type of CRC
 			start, //!< Start position
 			end, //!< End position
@@ -772,7 +781,8 @@ private:
 
 	uint32_t form_factor, variant;
 
-	struct track_info {
+	struct track_info
+	{
 		std::vector<uint32_t> cell_data;
 		uint32_t write_splice;
 
@@ -784,4 +794,4 @@ private:
 	std::vector<std::vector<track_info> > track_array;
 };
 
-#endif /* FLOPIMG_H */
+#endif // MAME_FORMATS_FLOPIMG_H

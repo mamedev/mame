@@ -29,6 +29,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
 		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
+		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -37,6 +38,7 @@ namespace netlist
 	public:
 		param_logic_t m_use_deactivate;
 		param_int_t   m_startup_strategy;
+		param_int_t   m_mos_capmodel;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -92,9 +94,17 @@ namespace netlist
 
 			connect(m_feedback, m_Q);
 		}
-		NETLIB_UPDATEI();
 		//NETLIB_RESETI();
-		NETLIB_UPDATE_PARAMI();
+
+		NETLIB_UPDATE_PARAMI()
+		{
+			m_inc = netlist_time::from_double(1.0 / (m_freq() * 2.0));
+		}
+
+		NETLIB_UPDATEI()
+		{
+			m_Q.push(!m_feedback(), m_inc);
+		}
 
 	private:
 		logic_input_t m_feedback;
@@ -102,6 +112,42 @@ namespace netlist
 
 		param_double_t m_freq;
 		netlist_time m_inc;
+	};
+
+	// -----------------------------------------------------------------------------
+	// varclock
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(varclock)
+	{
+		NETLIB_CONSTRUCTOR(varclock)
+		, m_feedback(*this, "FB")
+		, m_Q(*this, "Q")
+		, m_func(*this,"FUNC", "")
+		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_funcparam({0.0})
+		{
+			if (m_func() != "")
+				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
+			connect(m_feedback, m_Q);
+		}
+		//NETLIB_RESETI();
+		//NETLIB_UPDATE_PARAMI()
+
+		NETLIB_UPDATEI()
+		{
+			m_funcparam[0] = exec().time().as_double();
+			const netlist_time m_inc = netlist_time::from_double(m_compiled.evaluate(m_funcparam));
+			m_Q.push(!m_feedback(), m_inc);
+		}
+
+	private:
+		logic_input_t m_feedback;
+		logic_output_t m_Q;
+
+		param_str_t m_func;
+		plib::pfunction m_compiled;
+		std::vector<double> m_funcparam;
 	};
 
 	// -----------------------------------------------------------------------------

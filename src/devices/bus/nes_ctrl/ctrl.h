@@ -43,8 +43,6 @@ protected:
 	nes_control_port_device *m_port;
 };
 
-#define NESCTRL_BRIGHTPIXEL_CB(name)  bool name(int x, int y)
-
 
 // ======================> nes_control_port_device
 
@@ -65,24 +63,10 @@ public:
 	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_control_port_device();
 
-	typedef device_delegate<bool (int x, int y)> nesctrl_brightpixel_delegate;
-
-	void set_brightpixel_callback(nesctrl_brightpixel_delegate callback) { m_brightpixel_cb = callback; }
-	template <class FunctionClass> void set_brightpixel_callback(const char *devname, bool (FunctionClass::*callback)(int, int), const char *name)
-	{
-		set_brightpixel_callback(nesctrl_brightpixel_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_brightpixel_callback(bool (FunctionClass::*callback)(int, int), const char *name)
-	{
-		set_brightpixel_callback(nesctrl_brightpixel_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
 	uint8_t read_bit0();
 	uint8_t read_bit34();
 	uint8_t read_exp(offs_t offset);
 	void write(uint8_t data);
-
-	nesctrl_brightpixel_delegate m_brightpixel_cb;
 
 protected:
 	// device-level overrides

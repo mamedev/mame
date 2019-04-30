@@ -22,7 +22,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="ti74_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="finance.bin" size="0x8000" crc="36afa310" sha1="a051c393f35f11ef51dc8c4e785e6fec0eb4d774" offset="0" />
+				<rom name="finance.bin" size="0x8000" crc="36afa310" sha1="a051c393f35f11ef51dc8c4e785e6fec0eb4d774" />
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="ti74_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="mathematics.bin" size="0x8000" crc="afb0821f" sha1="9fc3b054df0fdc93eab3e7824f28d4f733f97547" offset="0" />
+				<rom name="mathematics.bin" size="0x8000" crc="afb0821f" sha1="9fc3b054df0fdc93eab3e7824f28d4f733f97547" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 		<info name="usage" value="Load with RUN &quot;PASCAL&quot;" />
 		<part name="cart" interface="ti74_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="pascal.bin" size="0x8000" crc="e4135cff" sha1="eab92188fb19545f677ede926c2c0b6af26b7e25" offset="0" />
+				<rom name="pascal.bin" size="0x8000" crc="e4135cff" sha1="eab92188fb19545f677ede926c2c0b6af26b7e25" />
 			</dataarea>
 		</part>
 	</software>

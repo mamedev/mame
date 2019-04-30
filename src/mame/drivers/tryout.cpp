@@ -35,7 +35,7 @@ WRITE8_MEMBER(tryout_state::nmi_ack_w)
 
 WRITE8_MEMBER(tryout_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

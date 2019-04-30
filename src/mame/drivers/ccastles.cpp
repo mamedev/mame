@@ -458,7 +458,7 @@ void ccastles_state::ccastles(machine_config &config)
 	PALETTE(config, m_palette).set_entries(32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1); /* will be adjusted later */
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 24, 256); // potentially adjusted later
 	m_screen->set_screen_update(FUNC(ccastles_state::screen_update_ccastles));
 	m_screen->set_palette(m_palette);
 

@@ -112,6 +112,8 @@
   * Witch Jack (Export, 6T/12T ver 0.87-89),          1992-1996, Video Klein.
   * Witch Jackpot (Export, 6T/12T ver 0.25),          1992-1996, Video Klein.
   * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
+  * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
+  * Casino Poker (Ver PM86-35-1, German),             1986, PM / Beck Elektronik.
   * Royale (set 1),                                   198?, Unknown.
   * Royale (set 2),                                   198?, Unknown.
   * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
@@ -126,7 +128,6 @@
   * Genie (ICP-1, set 1),                             198?, Video Fun Games Ltd.
   * Genie (ICP-1, set 2),                             198?, Unknown.
   * Silver Game,                                      1983, Unknown.
-  * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
   * Super Double (French),                            198?, Karateco.
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
@@ -514,15 +515,14 @@
 
   - CPU:            1x M6502.
   - Video:          1x MC6845.
-  - RAM:            4x uPD2114LC
+  - RAM:            2x SCM21C14E, 4x uPD2114LC
   - I/O             2x 6821 PIAs.
   - prg ROMs:       3x 2732 (32Kb) or similar.
   - gfx ROMs:       4x 2716 (16Kb) or similar.
   - sound:          (discrete).
-  - battery backup: 2x S8423
 
 
-  PCB Layout (pmpoker): (XX) = unreadable.
+  PCB Layout (pmpoker):
    _______________________________________________________________________________
   |   _________                                                                   |
   |  |         |               -- DIP SW x8 --                                    |
@@ -530,10 +530,10 @@
   |  |   055   |  | 74LS32  | |1|2|3|4|5|6|7|8| | HCF4011 || HCF4096 | | LM339N | |
   |  |_________|  |_________| |_|_|_|_|_|_|_|_| |_________||_________| |________| |
   |       _________     _________   _________   _________                         |
-  |      | 74LS138 |   | S-8423  | | 74LS08N | | 74LS(XX)|                        |
+  |      | 74LS138 |   | 21C14E  | | 74LS08N | | 74LS42  |                        |
   |      |_________|   |_________| |_________| |_________|                        |
   |  _______________    _________   ____________________                      ____|
-  | |               |  | S-8423  | |                    |                    |
+  | |               |  | 21C14E  | |                    |                    |
   | |     2732      |  |_________| |       6502P        |                    |
   | |_______________|   _________  |____________________|                    |
   |  _______________   |  7432   |  ____________________                     |____
@@ -557,7 +557,7 @@
   |      | 74LS245 |   | 2114-LC |             | 74LS174 |                    ____|
   |      |_________|   |_________|             |_________|                    ____|
   |  ________________   _________   _________   _________                     ____|
-  | |                | | 2114-LC | | 74LS08H | | TI (XX) | <-- socketed.      ____|
+  | |                | | 2114-LC | | 74LS08H | |TBP24SA10| <-- socketed.      ____|
   | |      2716      | |_________| |_________| |_________|       PROM         ____|
   | |________________|              _________   _________                     ____|
   |  ________________              | 74LS04P | | 74LS174 |                    ____|
@@ -1342,6 +1342,7 @@ public:
 	void init_vkdlswwr();
 	void init_vkdlswwv();
 	void init_bchancep();
+	void init_bonuspkr();
 
 	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
@@ -4085,6 +4086,69 @@ static INPUT_PORTS_START( bsuertev )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( bonuspkr )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("IN0-3 02")   PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "Pair of Aces" )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -10199,8 +10263,128 @@ ROM_START( pmpoker )
 	ROM_LOAD( "1-3.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10n.7d",      0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_LOAD( "tbp24sa10.bin",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump confirmed OK */
 ROM_END
+
+/***************************************************************
+
+  Casino Poker
+  1987, PM / Beck Elektronik
+
+  1x Xtal 10.000 MHz.
+  1x UM6502A
+  2x UM6521A
+  1x UM6845
+
+  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
+
+  Bipolar PROM was faulty, but a clone appeared with the
+  same GFX set, so assume the BP is the same.
+
+  Discrete sound circuitry was traced, being identical to the Golden Poker one.
+  Only difference is the PC617 replaced by one PC817.
+
+  The sound is ugly and seems that was programmed that way.
+
+***************************************************************/
+ROM_START( caspoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "234.bin",    0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
+	ROM_LOAD( "235.bin",    0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
+	ROM_LOAD( "236.bin",    0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
+	ROM_LOAD( "237.bin",    0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "054.bin",    0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "051.bin",    0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_LOAD( "052.bin",    0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_LOAD( "053.bin",    0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise settings parameters are incorrect */
+	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
+
+	ROM_REGION( 0x0100, "proms", 0 )    /* from other games */
+	ROM_LOAD( "24sa10.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Casino Poker.
+  Ver. PM86-35-1.
+  COPYRIGHT PM 1985,1986
+
+  COPYRIGHT 1985,1986 BECK COMPUTER,
+  D-6330 WETZLAR / *DG* / PM86-35-1 / 08.12.86
+*/
+ROM_START( caspokera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "215b_neu.bin",    0x5000, 0x1000, CRC(54b789e3) SHA1(96f1fa8ee3cdde338f5748bfe39b8d8fd6bafd0a) )
+	ROM_LOAD( "216b_neu.bin",    0x6000, 0x1000, CRC(be7793f2) SHA1(e29dd20591d39f404e5a3bec44701aab71102846) )
+	ROM_LOAD( "217b_neu.bin",    0x7000, 0x1000, CRC(9344ac66) SHA1(8735e18652e36a5fb534ebf259a195bc2b58fdf4) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // borrowed from parent set.
+	ROM_FILL(               0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "054.bin",    0x1000, 0x0800, BAD_DUMP CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )  // text chars
+	ROM_IGNORE(                     0x0800)  // identical halves, discarding the 2nd half
+
+	ROM_REGION( 0x1800, "gfx_alt", 0 )  // char rom from the pcb. seems that is not from this game.
+	ROM_FILL(                 0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "pok4_ww.bin",  0x1000, 0x0800, CRC(5cafb3a9) SHA1(efec24d4dd1f83f40a1b7ec66bc6bf36c4b1e541) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "b.poker_051_16.bin",  0x0000, 0x0800, CRC(598c9a21) SHA1(901c15529e0a72f750a0e64e220d27be45a2a628) )  // cards deck gfx, bitplane 1
+	ROM_CONTINUE(                    0x0000, 0x0800)  // Discarding 1nd half (empty)
+	ROM_LOAD( "b.poker_052_16.bin",  0x0800, 0x0800, CRC(42aa83fe) SHA1(e7d87a37993774ac1bee824ba4750b92d637ec85) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "b.poker_053_16.bin",  0x1000, 0x0800, CRC(b8765304) SHA1(afdab2de3b3140e90241f3adf4069ccce95a54fd) )  // cards deck gfx, bitplane 3
+	ROM_CONTINUE(                    0x1000, 0x0800)  // Discarding 1nd half (empty)
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	ROM_LOAD( "caspokera_nvram.bin", 0x0000, 0x0800, CRC(b0c63467) SHA1(0a031686821ce7da43816076ea498389310b98c6) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump confirmed OK
+ROM_END
+
+
+/*
+  Bonus Poker.
+  Copyright 1984 Galanthis Inc.
+  For amusement only.
+
+  From inside another rom:
+  Copyright (C) 1983
+  Zenitone Limited.
+  Malcom Mailer.
+  S/N 24165483.
+*/
+ROM_START( bonuspkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5000_bonus_12000.bin",  0x5000, 0x1000, CRC(eb93b60b) SHA1(6d6dcc0899caf1cb2179264c311bb41050834aa4) )
+	ROM_LOAD( "5_6000.bin",            0x6000, 0x1000, CRC(9f444112) SHA1(cae3a092898b4cc12a4f3eac955d8c8590a7b1fd) )
+	ROM_LOAD( "hn462732g.bin",         0x7000, 0x1000, CRC(6fd3bf27) SHA1(8f9a53cd20dd6198dd0ed329ac0b9b3d9a62a323) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                    0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "poke_5.4_x.bin",  0x1000, 0x0800, CRC(ca9182b1) SHA1(4c440eb53a46c4f751cf8807cbe3187ad9dbc214) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "bp_c1.bin",  0x0000, 0x0800, CRC(89a8c5f9) SHA1(e3aab20b2a962778a221ab96c691c37fad5b6877) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "bp_c2.bin",  0x0800, 0x0800, CRC(b59a8a11) SHA1(d378ac2615ec9990903d1ad9c63f785cb65f41ab) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "bp_c3.bin",  0x1000, 0x0800, CRC(cb4e8cb9) SHA1(c99f685f2f2ef4d360b48449e9520b40df58b3ae) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "74s387.b",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "74s387.a",  0x0000, 0x0100, CRC(6cc491b9) SHA1(0a97518d11bfc9eb2b8a70ed6c75882209e1abd7) )  // decode?
+ROM_END
+
 
 ROM_START( royale )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10235,6 +10419,7 @@ ROM_START( royalea )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
+
 
 ROM_START( sloco93 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10400,6 +10585,7 @@ ROM_START( poker91 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+
 /****************************************************
 
   Genie (Video Fun Games Ltd.)
@@ -10507,54 +10693,6 @@ ROM_START( silverga )
 	ROM_LOAD( "s287",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-/***************************************************************
-
-  Casino Poker
-  1987, PM / Beck Elektronik
-
-  1x Xtal 10.000 MHz.
-  1x UM6502A
-  2x UM6521A
-  1x UM6845
-
-  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
-
-  Bipolar PROM 24sa10 is filled with 0x09, so has at least
-  fixed bits 0 and 3 along the whole data. Needs a redump
-  using a supported EEPROM programmer.
-
-  Discrete sound circuitry was traced, being identical to the Golden Poker one.
-  Only difference is the PC617 replaced by one PC817.
-
-  The sound is ugly and seems that was programmed that way.
-
-***************************************************************/
-ROM_START( caspoker )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "234.bin",    0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
-	ROM_LOAD( "235.bin",    0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
-	ROM_LOAD( "236.bin",    0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
-	ROM_LOAD( "237.bin",    0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "054.bin",    0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "051.bin",    0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-	ROM_LOAD( "052.bin",    0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-	ROM_LOAD( "053.bin",    0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise settings parameters are incorrect */
-	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
-
-	ROM_REGION( 0x0100, "proms", 0 )    /* from other games */
-	ROM_LOAD( "24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
 
 /****************************************************
 
@@ -11375,6 +11513,43 @@ void goldnpkr_state::init_bchancep()
 }
 
 
+/*
+  Bonus Poker protection.
+
+  Code checks for a ROM offset value (at $FFC8) and XOR it with the next value.
+  if the result is 0, the code continues. If not 0, just jump to a previous
+  subroutine, getting an infinite loop...
+
+  7B7A: A9 FF    lda #$ff         ; Set the offset pointer to $30/$31...
+  7B7C: 85 31    sta $31
+  7B7E: A9 19    lda #$19
+  7B80: 0A       asl a
+  7B81: 0A       asl a
+  7B82: 0A       asl a
+  7B83: 85 30    sta $30
+  7B85: A0 01    ldy #$01         ; load Y with 1.
+  7B87: B1 30    lda ($30), y     ; load A with the content of $FFC8,y (0xAA).
+  7B89: 88       dey              ; decrement Y...
+  7B8A: 51 30    eor ($30), y     ; XOR against the content of $FFC8,y (now 0x55).
+  7B8C: F0 03    beq $7b91        ; if 0, jumps to $7B91 (where the game execution continues).
+
+  7B8E: 4C 4C E0 jmp $e04c        ; jumps to an infinite loop.
+
+  7B91: A2 1D    ldx #$1d         ; the game continue executing...
+
+*/
+
+void goldnpkr_state::init_bonuspkr()
+{
+//  NOPing the DEY, so the XOR is against the same value
+//  instead of the next offset one.
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x7b89] = 0xea;
+}
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -11495,8 +11670,10 @@ GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init
 
 /*************************************** OTHER SETS ***************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
 GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
+GAMEL( 1987, caspoker,  0,        goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  0,                layout_pmpoker  )
+GAMEL( 1986, caspokera, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86-35-1, German)",    0,                layout_pmpoker  )
 GAMEL( 198?, royale,    0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 1)",                          0,                layout_goldnpkr )
 GAMEL( 198?, royalea,   royale,   goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 2)",                          0,                layout_goldnpkr )
 GAME(  1993, sloco93,   0,        witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
@@ -11511,7 +11688,7 @@ GAME(  1991, poker91,   0,        witchcrd, poker91,  goldnpkr_state, empty_init
 GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init,    ROT0,   "Video Fun Games Ltd.",     "Genie (ICP-1, set 1)",                    0 )
 GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAME(  1987, caspoker,  0,        goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  MACHINE_IMPERFECT_COLORS )
+GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.

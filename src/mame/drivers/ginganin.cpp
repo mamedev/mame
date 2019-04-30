@@ -76,16 +76,16 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 */
 
 
-void ginganin_state::ginganin_map(address_map &map)
+void ginganin_state::main_map(address_map &map)
 {
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	map(0x000000, 0x01ffff).rom();
 	map(0x020000, 0x023fff).ram();
-	map(0x030000, 0x0307ff).ram().w(FUNC(ginganin_state::ginganin_txtram16_w)).share("txtram");
+	map(0x030000, 0x0307ff).ram().w(FUNC(ginganin_state::txtram_w)).share("txtram");
 	map(0x040000, 0x0407ff).ram().share("spriteram");
 	map(0x050000, 0x0507ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x060000, 0x06000f).ram().w(FUNC(ginganin_state::ginganin_vregs16_w)).share("vregs");
-	map(0x068000, 0x06bfff).ram().w(FUNC(ginganin_state::ginganin_fgram16_w)).share("fgram");
+	map(0x060000, 0x06000f).ram().w(FUNC(ginganin_state::vregs_w)).share("vregs");
+	map(0x068000, 0x06bfff).ram().w(FUNC(ginganin_state::fgram_w)).share("fgram");
 	map(0x070000, 0x070001).portr("P1_P2");
 	map(0x070002, 0x070003).portr("DSW");
 }
@@ -104,7 +104,7 @@ void ginganin_state::sound_map(address_map &map)
 	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2001).w("ymsnd", FUNC(y8950_device::write));
 	map(0x2800, 0x2801).w("psg", FUNC(ym2149_device::address_data_w));
-	map(0x4000, 0xffff).rom();
+	map(0x4000, 0xffff).rom().region("audiocpu", 0x4000);
 }
 
 
@@ -189,41 +189,33 @@ INPUT_PORTS_END
 */
 
 
-#define layout16x16(_name_,_romsize_) \
-static const gfx_layout _name_ =\
-{\
-	16,16,\
-	(_romsize_)*8/(16*16*4),\
-	4,\
-	{0, 1, 2, 3},\
-	{0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4,\
-		0*4+32*16,1*4+32*16,2*4+32*16,3*4+32*16,4*4+32*16,5*4+32*16,6*4+32*16,7*4+32*16},\
-	{0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,\
-		8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32},\
-	16*16*4\
+static const gfx_layout layout16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
+	16*16*4
 };
 
-#define layout8x8(_name_,_romsize_) \
-static const gfx_layout _name_ =\
-{\
-	8,8,\
-	(_romsize_)*8/(8*8*4),\
-	4,\
-	{0, 1, 2, 3},\
-	{0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4}, \
-	{0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32},\
-	8*8*4\
+static const gfx_layout layout8x8 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4
 };
-
-layout16x16(tilelayout,  0x20000)
-layout8x8  (txtlayout,   0x04000)
-layout16x16(spritelayout,0x50000)
 
 static GFXDECODE_START( gfx_ginganin )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  256*3, 16 ) /* [0] bg */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  256*2, 16 ) /* [1] fg */
-	GFXDECODE_ENTRY( "gfx3", 0, txtlayout,   256*0, 16 ) /* [2] txt */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 256*1, 16 ) /* [3] sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 256*3, 16 ) /* [0] bg */
+	GFXDECODE_ENTRY( "gfx2", 0, layout16x16, 256*2, 16 ) /* [1] fg */
+	GFXDECODE_ENTRY( "gfx3", 0, layout8x8,   256*0, 16 ) /* [2] txt */
+	GFXDECODE_ENTRY( "gfx4", 0, layout16x16, 256*1, 16 ) /* [3] sprites */
 GFXDECODE_END
 
 
@@ -249,12 +241,11 @@ void ginganin_state::ginganin(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ginganin_state::ginganin_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ginganin_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ginganin_state::irq1_line_hold)); /* ? (vectors 1-7 contain the same address) */
 
 	MC6809(config, m_audiocpu, SOUND_CLOCK); // MBL68B09?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ginganin_state::sound_map);
-
 
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", SOUND_CLOCK/2));
 	ptm.set_external_clocks(0, 0, 0);
@@ -266,7 +257,7 @@ void ginganin_state::ginganin(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 0 + 16 , 255 - 16);
-	screen.set_screen_update(FUNC(ginganin_state::screen_update_ginganin));
+	screen.set_screen_update(FUNC(ginganin_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ginganin);
@@ -316,7 +307,7 @@ ROM_START( ginganin )
 	ROM_LOAD( "gn_08.bin", 0x020000, 0x10000, CRC(f7c73c18) SHA1(102700e2217bcd1532af56ee6a00ad608c8217db) )
 	ROM_LOAD( "gn_09.bin", 0x030000, 0x10000, CRC(a5e07c3b) SHA1(cdda02cd847330575612cb33d1bb38a5d50a3e6d) )
 
-	ROM_REGION( 0x08000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x08000, "bgrom", 0 )    /* background tilemaps */
 	ROM_LOAD( "gn_11.bin", 0x00000, 0x08000, CRC(f0d0e605) SHA1(0c541e8e036573be1d99ecb71fdb4568ca8cc269) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )   /* samples */
@@ -351,7 +342,7 @@ ROM_START( ginganina )
 	ROM_LOAD( "gn_08.bin", 0x020000, 0x10000, CRC(f7c73c18) SHA1(102700e2217bcd1532af56ee6a00ad608c8217db) )
 	ROM_LOAD( "gn_09.bin", 0x030000, 0x10000, CRC(a5e07c3b) SHA1(cdda02cd847330575612cb33d1bb38a5d50a3e6d) )
 
-	ROM_REGION( 0x08000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x08000, "bgrom", 0 )    /* background tilemaps */
 	ROM_LOAD( "gn_11.bin", 0x00000, 0x08000, CRC(f0d0e605) SHA1(0c541e8e036573be1d99ecb71fdb4568ca8cc269) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )   /* samples */
@@ -360,19 +351,13 @@ ROM_START( ginganina )
 ROM_END
 
 
-
 void ginganin_state::init_ginganin()
 {
 	/* main cpu patches */
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	u16 *rom = (u16 *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;
-
-
-	/* sound cpu patches */
-	/* let's clear the RAM: ROM starts at 0x4000 */
-	memset(memregion("audiocpu")->base(), 0, 0x800);
 }
 
 

@@ -158,7 +158,7 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 	int vpos = m_screen->vpos();
 	uint16_t counter = vpos_to_vysnc_chain_counter(vpos);
 	uint8_t vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector);
+	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // Z80
 
 	/* set up for next interrupt */
 	if (counter == INT_TRIGGER_COUNT_1)
