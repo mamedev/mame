@@ -224,15 +224,15 @@ void kongambl_state::kongambl_map(address_map &map)
 	map(0x300000, 0x307fff).ram(); // backup RAM 24H
 
 	// override konami chips with custom areas until that code is removed
-	map(0x400000, 0x401fff).rom().region("gfx1", 0);
+	map(0x400000, 0x401fff).rom().region("k056832", 0);
 	map(0x420000, 0x43ffff).ram().share("vram");
-	//AM_RANGE(0x480000, 0x48003f) AM_RAM // vregs
+	//map(0x480000, 0x48003f).ram(); // vregs
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-//  AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
-//  AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
-	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::long_w));
+//  map(0x400000, 0x401fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+//  map(0x420000, 0x43ffff).rw(m_k056832, FUNC(k056832_device::unpaged_ram_word_r), FUNC(k056832_device::unpaged_ram_word_w));
+	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));
 
 
 
@@ -243,10 +243,10 @@ void kongambl_state::kongambl_map(address_map &map)
 	map(0x4b0000, 0x4b001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask32(0xff00ff00);
 
 	map(0x4c0000, 0x4c0007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
-	//AM_RANGE(0x4c4000, 0x4c4003) AM_WRITENOP
-	//AM_RANGE(0x4c4004, 0x4c4007) AM_WRITENOP
-	//AM_RANGE(0x4c801c, 0x4c801f) AM_WRITENOP
-	//AM_RANGE(0x4cc01c, 0x4cc01f) AM_WRITENOP
+	//map(0x4c4000, 0x4c4003).nopw();
+	//map(0x4c4004, 0x4c4007).nopw();
+	//map(0x4c801c, 0x4c801f).nopw();
+	//map(0x4cc01c, 0x4cc01f).nopw();
 
 	map(0x4cc000, 0x4cc00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 
@@ -254,9 +254,9 @@ void kongambl_state::kongambl_map(address_map &map)
 
 	map(0x500000, 0x5007ff).ram();
 	map(0x500380, 0x500383).r(FUNC(kongambl_state::test_r));
-//  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
-//  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
-//  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
+//  map(0x500400, 0x500403).noprw(); //dual port?
+//  map(0x500420, 0x500423).noprw(); //dual port?
+//  map(0x500500, 0x500503).noprw(); // reads sound ROM in here, polled from m68k?
 	map(0x580000, 0x580007).r(FUNC(kongambl_state::test_r));
 
 	map(0x600000, 0x60000f).r(FUNC(kongambl_state::test_r));
@@ -265,7 +265,7 @@ void kongambl_state::kongambl_map(address_map &map)
 	map(0x700004, 0x700007).portr("IN1");
 	map(0x700008, 0x70000b).portr("IN3");
 	map(0x780000, 0x780003).w(FUNC(kongambl_state::eeprom_w));
-	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
+	//map(0x780004, 0x780007).nopw();
 }
 
 void kongambl_state::kongamaud_map(address_map &map)
@@ -612,7 +612,7 @@ static const gfx_layout charlayout8_tasman =
 };
 
 static GFXDECODE_START( gfx_tasman )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
+	GFXDECODE_ENTRY( "k056832", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
 
@@ -685,7 +685,7 @@ void kongambl_state::kongambl(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_8TASMAN, 0, 0);
+	m_k056832->set_config(K056832_BPP_8TASMAN, 0, 0);
 	m_k056832->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -703,7 +703,7 @@ ROM_START( kingtut )
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "n12prog_ifu.41", 0x00000, 0x08000, CRC(dbb8a7e8) SHA1(9662b34e9332385d20e17ee1c92fd91935d4c3b2) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
 	ROM_LOAD16_BYTE( "kit11_l1_vrm.21", 0x000000, 0x80000, CRC(431eb89f) SHA1(377c96f615b4b76314aeecad4e868edb66c72f33) )
 	ROM_LOAD16_BYTE( "kit11_h1_vrm.23", 0x000001, 0x80000, CRC(7aa2f1bc) SHA1(d8aead9dedcc83d3dc574122103aaa2074011197) )
 
@@ -728,7 +728,7 @@ ROM_START( moneybnk )
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "n12prog_ifu.41", 0x00000, 0x08000, CRC(dbb8a7e8) SHA1(9662b34e9332385d20e17ee1c92fd91935d4c3b2) ) // some kind of bios? same on both games
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
 	ROM_LOAD16_BYTE( "mob11_l1_vrm.21", 0x000000, 0x80000, CRC(926fbd3b) SHA1(4f85ea63faff1508d5abf0ca0ebd16e802f8f45c) )
 	ROM_LOAD16_BYTE( "mob11_h1_vrm.23", 0x000001, 0x80000, CRC(a119feaa) SHA1(567e319dfddb9ec04b9302af782e9baccab4f5a6) )
 
@@ -753,7 +753,7 @@ ROM_START( dragsphr )
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "u41_c06chex", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
 	ROM_LOAD16_BYTE( "u21.bin", 0x00000, 0x080000, CRC(83fc3afe) SHA1(09cc89567b985685ed206b273915157fc46212f9) )
 	ROM_LOAD16_BYTE( "u23.bin", 0x00001, 0x080000, CRC(a29a777f) SHA1(1ca37e468f31246cbcbd2e1799e5a0137d19d0b9) )
 
@@ -778,7 +778,7 @@ ROM_START( ivorytsk )
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "u41_c06chex", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
 	ROM_LOAD16_BYTE( "u21_ba6dhex", 0x00000, 0x080000, CRC(d14efb82) SHA1(420bf5d807d59e6d17ee113125046b979e1d12f4) )
 	ROM_LOAD16_BYTE( "u23_9297hex", 0x00001, 0x080000, CRC(5e36ff5f) SHA1(9be65015217affc1e28d9ce855cd22f9cb147258) )
 
@@ -803,7 +803,7 @@ ROM_START( vikingt )
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "u41.bin", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
 	ROM_LOAD16_BYTE( "u21.bin", 0x00000, 0x080000, CRC(789d7c41) SHA1(a04b7e8c894e08e9210c630fabd878b8389ee82c) )
 	ROM_LOAD16_BYTE( "u23.bin", 0x00001, 0x080000, CRC(56ba968e) SHA1(100edc40748067683172480fc2b7d48f4dc89da7) )
 

@@ -41,10 +41,8 @@ public:
 
 	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb = k056832_cb_delegate(std::forward<T>(args)...); }
 
-	template <typename T>
-	void set_config(T &&gfx_reg, int bpp, int big, int djmain_hack)
+	void set_config(int bpp, int big, int djmain_hack)
 	{
-		m_rombase.set_tag(std::forward<T>(gfx_reg));
 		m_bpp = bpp;
 		m_big = big;
 		m_djmain_hack = djmain_hack;
@@ -52,32 +50,34 @@ public:
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
 
-	DECLARE_READ16_MEMBER( ram_word_r );
-	DECLARE_WRITE16_MEMBER( ram_word_w );
-	DECLARE_READ16_MEMBER( ram_half_word_r );
-	DECLARE_WRITE16_MEMBER( ram_half_word_w );
-	DECLARE_READ16_MEMBER( k_5bpp_rom_word_r );
-	DECLARE_READ32_MEMBER( k_5bpp_rom_long_r );
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
-	DECLARE_READ16_MEMBER( rom_word_r );
-	DECLARE_READ8_MEMBER( konmedal_rom_r );
-	DECLARE_READ16_MEMBER( piratesh_rom_r );
-	DECLARE_READ16_MEMBER( mw_rom_word_r );
-	DECLARE_READ16_MEMBER( bishi_rom_word_r );
-	DECLARE_READ16_MEMBER( old_rom_word_r );
-	DECLARE_READ16_MEMBER( rom_word_8000_r );
-	DECLARE_WRITE16_MEMBER( word_w ); // "VRAM" registers
-	DECLARE_WRITE16_MEMBER( b_word_w );
-	DECLARE_READ8_MEMBER( ram_code_lo_r );
-	DECLARE_READ8_MEMBER( ram_code_hi_r );
-	DECLARE_READ8_MEMBER( ram_attr_lo_r );
-	DECLARE_READ8_MEMBER( ram_attr_hi_r );
-	DECLARE_WRITE8_MEMBER( ram_code_lo_w );
-	DECLARE_WRITE8_MEMBER( ram_code_hi_w );
-	DECLARE_WRITE8_MEMBER( ram_attr_lo_w );
-	DECLARE_WRITE8_MEMBER( ram_attr_hi_w );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( b_w );
+	u16 ram_word_r(offs_t offset);
+	void ram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ram_half_word_r(offs_t offset);
+	void ram_half_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 unpaged_ram_word_r(offs_t offset);
+	void unpaged_ram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 k_5bpp_rom_word_r(offs_t offset, u16 mem_mask = ~0);
+	u32 k_5bpp_rom_long_r(offs_t offset, u32 mem_mask = ~0);
+	u32 k_6bpp_rom_long_r(offs_t offset, u32 mem_mask = ~0);
+	u16 rom_word_r(offs_t offset);
+	u8 konmedal_rom_r(offs_t offset);
+	u16 piratesh_rom_r(offs_t offset);
+	u16 mw_rom_word_r(offs_t offset);
+	u16 bishi_rom_word_r(offs_t offset);
+	u16 old_rom_word_r(offs_t offset);
+	u16 rom_word_8000_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0); // "VRAM" registers
+	void b_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 ram_code_lo_r(offs_t offset);
+	u8 ram_code_hi_r(offs_t offset);
+	u8 ram_attr_lo_r(offs_t offset);
+	u8 ram_attr_hi_r(offs_t offset);
+	void ram_code_lo_w(offs_t offset, u8 data);
+	void ram_code_hi_w(offs_t offset, u8 data);
+	void ram_attr_lo_w(offs_t offset, u8 data);
+	void ram_attr_hi_w(offs_t offset, u8 data);
+	void write(offs_t offset, u8 data);
+	void b_w(offs_t offset, u8 data);
 	void mark_plane_dirty(int num);
 	void mark_all_tilemaps_dirty();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
@@ -97,17 +97,8 @@ public:
 
 	int get_gfx_num() const { return m_gfx_num; }
 
-	DECLARE_READ32_MEMBER( ram_long_r );
-	DECLARE_READ32_MEMBER( rom_long_r );
-	DECLARE_WRITE32_MEMBER( ram_long_w );
-	DECLARE_READ32_MEMBER( unpaged_ram_long_r );
-	DECLARE_WRITE32_MEMBER( unpaged_ram_long_w );
-	DECLARE_WRITE32_MEMBER( long_w );
-	DECLARE_WRITE32_MEMBER( b_long_w );
-
-	DECLARE_READ16_MEMBER( word_r );        // VACSET
-	DECLARE_READ16_MEMBER( b_word_r );      // VSCCS  (board dependent)
-	DECLARE_READ32_MEMBER( long_r );        // VACSET
+	u16 word_r(offs_t offset);        // VACSET
+	u16 b_word_r(offs_t offset);      // VSCCS  (board dependent)
 
 
 protected:
