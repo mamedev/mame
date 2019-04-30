@@ -651,7 +651,7 @@ void force68k_state::fccpu6vb(machine_config &config)
 /* ROM definitions */
 ROM_START (fccpu1)
 	ROM_REGION (0x1000000, "maincpu", 0)
-	ROM_DEFAULT_BIOS("forcemon-1.0l")
+	ROM_DEFAULT_BIOS("forcebug-1.1")
 
 	ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
 	ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(0))
