@@ -282,7 +282,7 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
 		//unimplemented_opcode(op);
 		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
-		logerror("r2 = exp r4 (with r2 = %04 r4 = %04x)\n", m_core->m_r[REG_R2], m_core->m_r[REG_R4]);
+		logerror("r2 = exp r4 (with r2 = %04x r4 = %04x)\n", m_core->m_r[REG_R2], m_core->m_r[REG_R4]);
 		m_core->m_r[REG_R2] = 0x0001; // WRONG!!
 		return;
 
