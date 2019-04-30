@@ -274,7 +274,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram();
 	map(0x280000, 0x281fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
-	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
+	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_w)); // SPRITES
 	map(0x300060, 0x30006f).r(m_k055673, FUNC(k055673_device::k055673_ps_rom_word_r)); // SPRITES
 	map(0x308000, 0x30803f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x320000, 0x32001f).rw("k053252a", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC 1
@@ -345,7 +345,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback), this);
-	m_k055673->set_config("gfx2", K055673_LAYOUT_PS, -60, 24);
+	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette(m_palette);
 
 	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
@@ -369,7 +369,7 @@ ROM_START( giclassvr )
 	ROM_LOAD( "gsgu_760_ad04.25q", 0x080000, 0x080000, CRC(71a45742) SHA1(fbddd54f5fb236662f7cc7e9b350723bc5404f72) )
 	ROM_LOAD( "gsgu_760_ad05.25r", 0x000000, 0x080000, CRC(44221eec) SHA1(966452e606e828b536ed11cbdd626a2fe3165199) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k055673", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34j", 0x000000, 0x080000, CRC(6d33c720) SHA1(35da3e1f0133a76480d2078fae89ea87b841ffc7) )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
