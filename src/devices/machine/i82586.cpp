@@ -38,6 +38,7 @@
 #define LOG_FILTER  (1U << 2)
 #define LOG_CONFIG  (1U << 3)
 
+#define VERBOSE LOG_GENERAL
 //#define VERBOSE (LOG_GENERAL | LOG_FRAMES | LOG_FILTER | LOG_CONFIG)
 
 #include "logmacro.h"
@@ -119,6 +120,7 @@ i82586_base_device::i82586_base_device(const machine_config &mconfig, device_typ
 	, m_cna(false)
 	, m_rnr(false)
 	, m_initialised(false)
+	, m_reset(false)
 	, m_irq_assert(1)
 	, m_cu_state(CU_IDLE)
 	, m_ru_state(RU_IDLE)
@@ -171,6 +173,7 @@ void i82586_base_device::device_start()
 	save_item(NAME(m_cna));
 	save_item(NAME(m_rnr));
 	save_item(NAME(m_initialised));
+	save_item(NAME(m_reset));
 
 	save_item(NAME(m_cu_state));
 	save_item(NAME(m_ru_state));
@@ -230,6 +233,17 @@ WRITE_LINE_MEMBER(i82586_base_device::ca)
 		else
 			process_scb();
 	}
+}
+
+WRITE_LINE_MEMBER(i82586_base_device::reset_w)
+{
+	LOG("reset %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
+
+	// reset is active high
+	if (state && !m_reset)
+		device_reset();
+
+	m_reset = state;
 }
 
 int i82586_base_device::recv_start_cb(u8 *buf, int length)
@@ -776,6 +790,12 @@ void i82586_device::device_reset()
 
 void i82586_device::initialise()
 {
+	if (m_reset)
+	{
+		LOG("initialise blocked by reset\n");
+		return;
+	}
+
 	// read iscp address from scp
 	u32 iscp_address = m_space->read_dword(m_scp_address + 8);
 	LOG("initialise iscp address 0x%08x\n", iscp_address);

@@ -28,7 +28,6 @@ protected:
 
 private:
 	void lcc_ca_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(lcc_reset_w);
 	u16 status_r();
 
 	void mem_map(address_map &map);

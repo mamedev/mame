@@ -402,11 +402,7 @@ void isa16_3c505_device::acr_w(u8 data)
 	if ((data ^ m_acr) & ACR_LED2)
 		m_led[1] = !!(data & ACR_LED2);
 
-	if (!(m_acr & ACR_R586) && (data & ACR_R586))
-	{
-		LOGMASKED(LOG_REG, "i82586 reset\n");
-		m_net->reset();
-	}
+	m_net->reset_w((data & ACR_R586) ? 1 : 0);
 
 	if ((data ^ m_acr) & ACR_FLSH)
 	{

@@ -32,12 +32,6 @@ void np600a3_device::lcc_ca_w(u16 data)
 	m_lcc->ca(1);
 }
 
-WRITE_LINE_MEMBER(np600a3_device::lcc_reset_w)
-{
-	if (!state)
-		m_lcc->reset();
-}
-
 u16 np600a3_device::status_r()
 {
 	return 0;
@@ -69,7 +63,7 @@ void np600a3_device::device_add_mconfig(machine_config &config)
 	m_npcpu->set_addrmap(AS_IO, &np600a3_device::io_map);
 
 	ls259_device &bitlatch(LS259(config, "bitlatch")); // U28
-	bitlatch.q_out_cb<4>().set(FUNC(np600a3_device::lcc_reset_w));
+	bitlatch.q_out_cb<4>().set(m_lcc, FUNC(i82586_device::reset_w)).invert();
 
 	I82586(config, m_lcc, 20_MHz_XTAL);
 	m_lcc->set_addrmap(0, &np600a3_device::lcc_map);
