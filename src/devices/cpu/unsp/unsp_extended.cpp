@@ -18,7 +18,7 @@ void unsp_device::execute_extended_group(uint16_t op)
 }
 
 void unsp_20_device::execute_extended_group(uint16_t op)
-{	
+{
 	uint16_t ximm = read16(UNSP_LPC);
 	add_lpc(1);
 
@@ -33,16 +33,16 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		ra |= (op & 0x0100) >> 5;
 
 		logerror("(Ext) %s = %s %s %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                             , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-		                                             	 , aluops[aluop]
-			                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+														 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+														 , aluops[aluop]
+														 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 
 		unimplemented_opcode(op, ximm);
 		return;
 	}
 	case 0x02:
 	{
-		// Ext Push/Pop 
+		// Ext Push/Pop
 		if (op & 0x8000)
 		{
 			uint8_t rb =   (op & 0x000f) >> 0;
@@ -73,7 +73,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		}
 		return;
 	}
-	case 0x04:	case 0x14:
+	case 0x04:  case 0x14:
 	{
 		uint16_t ximm_2 = read16(UNSP_LPC);
 		add_lpc(1);
@@ -85,9 +85,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		ra |= (op & 0x0100) >> 5;
 
 		logerror("(Ext) %s = %s %s %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                               , aluops[aluop]
-			                                               , ximm_2);
+														   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+														   , aluops[aluop]
+														   , ximm_2);
 
 		unimplemented_opcode(op, ximm, ximm_2);
 		return;
@@ -106,9 +106,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		ra |= (op & 0x0100) >> 5;
 
 		logerror("(Ext) %s = %s %s [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                                 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                                 , aluops[aluop]
-			                                                 , ximm_2);
+															 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+															 , aluops[aluop]
+															 , ximm_2);
 
 		unimplemented_opcode(op, ximm, ximm_2);
 		return;
@@ -127,9 +127,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		ra |= (op & 0x0100) >> 5;
 
 		logerror("(Ext) [0x4x] = %s %s %s", ximm_2
-														  	 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                                 , aluops[aluop]
-			                                                 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+															 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+															 , aluops[aluop]
+															 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 
 		unimplemented_opcode(op, ximm, ximm_2);
 		return;
@@ -148,7 +148,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		unimplemented_opcode(op, ximm);
 		return;
 	}
-	case 0x0a: case 0x0b: 
+	case 0x0a: case 0x0b:
 	{
 		// Ext DS_Indirect Rx=Rx op ds:[Ry@]
 		uint8_t aluop = (op & 0xf000) >> 12;
@@ -161,7 +161,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		unimplemented_opcode(op, ximm);
 		return;
 	}
-	case 0x18: case 0x19: case 0x1a: case 0x1b: 
+	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	{
 		// Ext IM6 Rx=Rx op IM6
 		uint8_t aluop = (op & 0xf000) >> 12;
@@ -173,7 +173,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		return;
 	}
 
-	case 0x0c: case 0x0d: case 0x0e: case 0x0f: 
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	{
 		// Ext Base+Disp6 Rx=Rx op [BP+IM6]
 		uint8_t aluop = (op & 0xf000) >> 12;

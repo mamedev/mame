@@ -10,9 +10,9 @@
 
     Ported to MAME framework by Ryan Holtz
 
-	Notes:
+    Notes:
 
-	R3 and R4 together are 'MR' with R4 being the upper part of the 32-bit reg
+    R3 and R4 together are 'MR' with R4 being the upper part of the 32-bit reg
 
 *****************************************************************************/
 

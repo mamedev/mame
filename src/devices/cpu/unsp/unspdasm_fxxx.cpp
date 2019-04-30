@@ -17,8 +17,8 @@ offs_t unsp_disassembler::disassemble_fxxx_000_group(std::ostream& stream, offs_
 {
 	//                          |   | |
 	// DS16     1 1 1 1   1 1 1 0   0 0 i i   i i i i
-	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r 
-	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r 
+	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r
+	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r
 	uint32_t len = 1;
 
 	if (((op & 0xffc0) == 0xfe00) && m_iso >= 12)
@@ -129,7 +129,7 @@ offs_t unsp_disassembler::disassemble_fxxx_011_group(std::ostream& stream, offs_
 
 	// signed * unsigned  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 0*  1 1*s s   s r r r    (1* = sign bit, 0* = sign bit 1* = upper size bit)
-	
+
 	// MULS us with upper size bit set
 	print_muls(stream, op);
 
@@ -156,16 +156,16 @@ offs_t unsp_disassembler::disassemble_fxxx_100_group(std::ostream& stream, offs_
 
 offs_t unsp_12_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm)
 {
-	// IRQ       1 1 1 1   - - - 1   0 1 0 0   1 0 0 I    
-	// FIRQ      1 1 1 1   - - - 1   0 1 0 0   1 1 F 0    
-	// FIR_MOV   1 1 1 1   - - - 1   0 1 0 0   0 1 0 f    
-	// Fraction  1 1 1 1   - - - 1   0 1 0 0   0 1 1 f    
-	// SECBANK   1 1 1 1   - - - 1   0 1 0 0   1 0 1 S    
-	// NESTMODE  1 1 1 1   - - - 1   0 1 0 0   1 1 N 1    
-	// CALLR     1 1 1 1   - - - 1   0 1 1 -   - 0 0 1    
-	// DIVS      1 1 1 1   - - - 1   0 1 1 -   - 0 1 0    
-	// DIVQ      1 1 1 1   - - - 1   0 1 1 -   - 0 1 1    
-	// EXP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 0    
+	// IRQ       1 1 1 1   - - - 1   0 1 0 0   1 0 0 I
+	// FIRQ      1 1 1 1   - - - 1   0 1 0 0   1 1 F 0
+	// FIR_MOV   1 1 1 1   - - - 1   0 1 0 0   0 1 0 f
+	// Fraction  1 1 1 1   - - - 1   0 1 0 0   0 1 1 f
+	// SECBANK   1 1 1 1   - - - 1   0 1 0 0   1 0 1 S
+	// NESTMODE  1 1 1 1   - - - 1   0 1 0 0   1 1 N 1
+	// CALLR     1 1 1 1   - - - 1   0 1 1 -   - 0 0 1
+	// DIVS      1 1 1 1   - - - 1   0 1 1 -   - 0 1 0
+	// DIVQ      1 1 1 1   - - - 1   0 1 1 -   - 0 1 1
+	// EXP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 0
 
 	uint32_t len = 1;
 
@@ -241,10 +241,10 @@ offs_t unsp_12_disassembler::disassemble_fxxx_101_group(std::ostream& stream, of
 offs_t unsp_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm)
 {
 	//                           |   | |
-	// INT SET   1 1 1 1   - - - 1   0 1 0 0   0 0 F I    
-	// BREAK     1 1 1 1   - - - 1   0 1 1 -   - 0 0 0    
-	// NOP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 1    
-	 
+	// INT SET   1 1 1 1   - - - 1   0 1 0 0   0 0 F I
+	// BREAK     1 1 1 1   - - - 1   0 1 1 -   - 0 0 0
+	// NOP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 1
+
 	uint32_t len = 1;
 
 	switch (op)
@@ -305,12 +305,12 @@ offs_t unsp_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_
 }
 
 offs_t unsp_disassembler::disassemble_fxxx_110_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm)
-{	
+{
 	uint32_t len = 1;
 	//                         |   | |
 	// signed * signed  (size 16,1,2,3,4,5,6,7)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
-	
+
 	// MULS ss with upper size bit not set
 	print_muls(stream, op);
 	return UNSP_DASM_OK;
@@ -328,7 +328,7 @@ offs_t unsp_disassembler::disassemble_fxxx_111_group(std::ostream& stream, offs_
 
 	// signed * signed  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)
-	
+
 	// MULS ss with upper size bit set.
 	print_muls(stream, op);
 	return UNSP_DASM_OK;
@@ -364,7 +364,7 @@ offs_t unsp_disassembler::disassemble_fxxx_group(std::ostream &stream, offs_t pc
 
 	case 0x7:
 		return disassemble_fxxx_111_group(stream, pc, op, ximm, opcodes);
-	
+
 	}
 
 	return UNSP_DASM_OK;

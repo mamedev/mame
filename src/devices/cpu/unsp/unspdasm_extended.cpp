@@ -22,7 +22,7 @@ offs_t unsp_disassembler::disassemble_extended_group(std::ostream& stream, offs_
 }
 
 offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm,const data_buffer &opcodes)
-{	
+{
 	uint32_t len = 2;
 
 	switch ((ximm & 0x01f0) >> 4)
@@ -36,14 +36,14 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		ra |= (op & 0x0100) >> 5;
 
 		util::stream_format(stream, "(Ext) %s = %s %s %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                             , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-		                                             	 , aluops[aluop]
-			                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+														 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+														 , aluops[aluop]
+														 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 		return UNSP_DASM_OK;
 	}
 	case 0x02:
 	{
-		// Ext Push/Pop 
+		// Ext Push/Pop
 		if (op & 0x8000)
 		{
 			uint8_t rb =   (op & 0x000f) >> 0;
@@ -70,7 +70,7 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		}
 		return UNSP_DASM_OK;
 	}
-	case 0x04:	case 0x14:
+	case 0x04:  case 0x14:
 	{
 		// Ra=Rb op IMM16
 		len = 3;
@@ -81,9 +81,9 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		ra |= (op & 0x0100) >> 5;
 
 		util::stream_format(stream, "(Ext) %s = %s %s %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                               , aluops[aluop]
-			                                               , imm16_2);
+														   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+														   , aluops[aluop]
+														   , imm16_2);
 		return UNSP_DASM_OK;
 	}
 
@@ -99,9 +99,9 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		ra |= (op & 0x0100) >> 5;
 
 		util::stream_format(stream, "(Ext) %s = %s %s [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                                 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                                 , aluops[aluop]
-			                                                 , imm16_2);
+															 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+															 , aluops[aluop]
+															 , imm16_2);
 		return UNSP_DASM_OK;
 	}
 
@@ -117,9 +117,9 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		ra |= (op & 0x0100) >> 5;
 
 		util::stream_format(stream, "(Ext) [0x4x] = %s %s %s", imm16_2
-														  	 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-			                                                 , aluops[aluop]
-			                                                 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+															 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+															 , aluops[aluop]
+															 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 		return UNSP_DASM_OK;
 	}
 
@@ -137,7 +137,7 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 
 		return UNSP_DASM_OK;
 	}
-	case 0x0a: case 0x0b: 
+	case 0x0a: case 0x0b:
 	{
 		// Ext DS_Indirect Rx=Rx op ds:[Ry@]
 
@@ -151,7 +151,7 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 
 		return UNSP_DASM_OK;
 	}
-	case 0x18: case 0x19: case 0x1a: case 0x1b: 
+	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	{
 		// Ext IM6 Rx=Rx op IM6
 
@@ -163,7 +163,7 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		return UNSP_DASM_OK;
 	}
 
-	case 0x0c: case 0x0d: case 0x0e: case 0x0f: 
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	{
 		// Ext Base+Disp6 Rx=Rx op [BP+IM6]
 

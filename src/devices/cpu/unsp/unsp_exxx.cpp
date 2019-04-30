@@ -21,7 +21,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 {
 	// several exxx opcodes have already been decoded as jumps by the time we get here
 
-	//   Register BITOP  BITOP Rd,Rs             1 1 1 0   r r r 0   0 0 b b   0 r r r 
+	//   Register BITOP  BITOP Rd,Rs             1 1 1 0   r r r 0   0 0 b b   0 r r r
 	//   Register BITOP  BITOP Rd,offset         1 1 1 0   r r r 0   0 1 b b   o o o o
 	//   Memory BITOP    BITOP [Rd], offset      1 1 1 0   r r r 1   1 0 b b   o o o o
 	//   Memory BITOP    BITOP ds:[Rd], offset   1 1 1 0   r r r 1   1 1 b b   o o o o
@@ -77,7 +77,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 	}
 	else if (((op & 0xf1c0) == 0xe1c0))
 	{
-		// Memory BITOP    BITOP ds:[Rd], offset 
+		// Memory BITOP    BITOP ds:[Rd], offset
 		uint8_t bitop =  (op & 0x0030) >> 4;
 		uint8_t rd =     (op & 0x0e00) >> 9;
 		uint8_t offset = (op & 0x000f) >> 0;

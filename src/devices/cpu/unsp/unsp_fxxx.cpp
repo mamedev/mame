@@ -13,11 +13,11 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 {
 	//                          |   | |
 	// DS16     1 1 1 1   1 1 1 0   0 0 i i   i i i i
-	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r 
-	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r 
+	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r
+	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r
 
 	if (((op & 0xffc0) == 0xfe00) && m_iso >= 12)
-	{   
+	{
 		// ds = imm6
 		int imm = op & 0x003f;
 		set_ds(imm);
@@ -31,7 +31,7 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf028) && m_iso >= 12)
-	{  
+	{
 		// ds = rx
 		int r = op & 0x7;
 		set_ds(m_core->m_r[r]);
@@ -149,7 +149,7 @@ inline void unsp_device::execute_fxxx_011_group(uint16_t op)
 
 	// signed * unsigned  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 0*  1 1*s s   s r r r    (1* = sign bit, 0* = sign bit 1* = upper size bit)
-	
+
 	// MULS us with upper size bit set
 	logerror("MULS us");
 	unimplemented_opcode(op);
@@ -193,14 +193,14 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 
 inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 {
-	// FIR_MOV   1 1 1 1   - - - 1   0 1 0 0   0 1 0 f    
-	// Fraction  1 1 1 1   - - - 1   0 1 0 0   0 1 1 f    
-	// SECBANK   1 1 1 1   - - - 1   0 1 0 0   1 0 1 S    
-	// NESTMODE  1 1 1 1   - - - 1   0 1 0 0   1 1 N 1    
-	// CALLR     1 1 1 1   - - - 1   0 1 1 -   - 0 0 1    
-	// DIVS      1 1 1 1   - - - 1   0 1 1 -   - 0 1 0    
-	// DIVQ      1 1 1 1   - - - 1   0 1 1 -   - 0 1 1    
-	// EXP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 0    
+	// FIR_MOV   1 1 1 1   - - - 1   0 1 0 0   0 1 0 f
+	// Fraction  1 1 1 1   - - - 1   0 1 0 0   0 1 1 f
+	// SECBANK   1 1 1 1   - - - 1   0 1 0 0   1 0 1 S
+	// NESTMODE  1 1 1 1   - - - 1   0 1 0 0   1 1 N 1
+	// CALLR     1 1 1 1   - - - 1   0 1 1 -   - 0 0 1
+	// DIVS      1 1 1 1   - - - 1   0 1 1 -   - 0 1 0
+	// DIVQ      1 1 1 1   - - - 1   0 1 1 -   - 0 1 1
+	// EXP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 0
 
 	switch (op)
 	{
@@ -281,7 +281,7 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf174: case 0xf374: case 0xf574: case 0xf774: case 0xf974: case 0xfb74: case 0xfd74: case 0xff74:
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
 		//unimplemented_opcode(op);
-		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent 
+		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
 		logerror("r2 = exp r4");
 		m_core->m_r[REG_R2] = 0x0001; // WRONG!!
 		return;
@@ -296,15 +296,15 @@ inline void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 inline void unsp_device::execute_fxxx_101_group(uint16_t op)
 {
 	//                           |   | |
-	// INT SET   1 1 1 1   - - - 1   0 1 0 0   0 0 F I    
-	// BREAK     1 1 1 1   - - - 1   0 1 1 -   - 0 0 0    
-	// NOP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 1    
+	// INT SET   1 1 1 1   - - - 1   0 1 0 0   0 0 F I
+	// BREAK     1 1 1 1   - - - 1   0 1 1 -   - 0 0 0
+	// NOP       1 1 1 1   - - - 1   0 1 1 -   - 1 0 1
 
-	// IRQ       1 1 1 1   - - - 1   0 1 0 0   1 0 0 I    
-	// FIRQ      1 1 1 1   - - - 1   0 1 0 0   1 1 F 0    
+	// IRQ       1 1 1 1   - - - 1   0 1 0 0   1 0 0 I
+	// FIRQ      1 1 1 1   - - - 1   0 1 0 0   1 1 F 0
 
 	m_core->m_icount -= 2;
- 
+
 	switch (op)
 	{
 	case 0xf140: case 0xf340: case 0xf540: case 0xf740: case 0xf940: case 0xfb40: case 0xfd40: case 0xff40:
@@ -368,12 +368,12 @@ inline void unsp_device::execute_fxxx_101_group(uint16_t op)
 
 
 inline void unsp_device::execute_fxxx_110_group(uint16_t op)
-{	
+{
 	//uint32_t len = 1;
 	//                         |   | |
 	// signed * signed  (size 16,1,2,3,4,5,6,7)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
-	
+
 	// MULS ss with upper size bit not set
 	unimplemented_opcode(op);
 	//return;
@@ -391,7 +391,7 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 
 	// signed * signed  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)
-	
+
 	// MULS ss with upper size bit set.
 	unimplemented_opcode(op);
 	//return;
@@ -424,7 +424,7 @@ void unsp_device::execute_fxxx_group(uint16_t op)
 
 	case 0x7:
 		return execute_fxxx_111_group(op);
-	
+
 	}
 
 	return;
