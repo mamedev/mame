@@ -420,7 +420,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[0]->voodoo_w(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -437,7 +437,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[1]->voodoo_w(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -449,7 +449,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
 	}
 	else
 	{
-		return m_voodoo[0]->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[0]->voodoo_r(offset);
 	}
 }
 
@@ -461,7 +461,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
 	}
 	else
 	{
-		return m_voodoo[1]->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[1]->voodoo_r(offset);
 	}
 }
 
@@ -478,7 +478,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[0]->voodoo_w(offset, data, mem_mask);
 	}
 }
 
@@ -495,7 +495,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[1]->voodoo_w(offset, data, mem_mask);
 	}
 }
 
