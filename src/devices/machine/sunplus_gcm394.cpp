@@ -57,7 +57,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 		break;
 
 	case 0xabf:
-		logerror("%s:possible DMA operation @ 0x%04x (trigger %04x) with params %04x %04x %04x %04x %04x %04x %04x \n", machine().describe_context(), offset + 0x7000, data, m_dma_params[0], m_dma_params[1], m_dma_params[2], m_dma_params[3], m_dma_params[4], m_dma_params[5], m_dma_params[6]);
+		logerror("%s:possible DMA operation @ 0x%04x (trigger %04x) with params unk:%04x unk:%04x source:%04x length:%04x unk:%04x unk:%04x unk:%04x\n", machine().describe_context(), offset + 0x7000, data, m_dma_params[0], m_dma_params[1], m_dma_params[2], m_dma_params[3], m_dma_params[4], m_dma_params[5], m_dma_params[6]);
 		break;
 
 	default:
