@@ -299,9 +299,10 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
-#ifndef __LIBRETRO__
+//#ifndef __LIBRETRO__
 	REGISTER_MODULE(m_mod_man, OUTPUT_CONSOLE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_NETWORK);
+#ifndef __LIBRETRO__
 	REGISTER_MODULE(m_mod_man, OUTPUT_WIN32);
 #else
 	//FIXME LIBRETRO OUTPUT
