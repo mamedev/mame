@@ -39,6 +39,7 @@ protected:
 	required_device<screen_device> m_screen;
 
 	uint16_t m_78fb;
+	uint16_t m_dma_params[7];
 
 private:
 	DECLARE_READ16_MEMBER(unk_r);

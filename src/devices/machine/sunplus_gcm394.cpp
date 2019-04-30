@@ -30,7 +30,6 @@ READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
 		m_78fb ^= 0x0100; // status flag for something?
 		return m_78fb;
 
-
 	case 0xabf:
 		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
 		return 0x0001;
@@ -43,7 +42,28 @@ READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unk_w @ 0x%04x (data 0x%04x)\n", machine().describe_context(), offset + 0x7000, data);
+
+	switch (offset)
+	{
+
+	case 0xa80:
+	case 0xa81:
+	case 0xa82:
+	case 0xa83:
+	case 0xa84:
+	case 0xa85:
+	case 0xa86:
+		m_dma_params[offset - 0xa80] = data;
+		break;
+
+	case 0xabf:
+		logerror("%s:possible DMA operation @ 0x%04x (trigger %04x) with params %04x %04x %04x %04x %04x %04x %04x \n", machine().describe_context(), offset + 0x7000, data, m_dma_params[0], m_dma_params[1], m_dma_params[2], m_dma_params[3], m_dma_params[4], m_dma_params[5], m_dma_params[6]);
+		break;
+
+	default:
+		logerror("%s:sunplus_gcm394_base_device::unk_w @ 0x%04x (data 0x%04x)\n", machine().describe_context(), offset + 0x7000, data);
+		break;
+	}
 }
 
 void sunplus_gcm394_base_device::map(address_map &map)
@@ -71,6 +91,11 @@ void sunplus_gcm394_base_device::device_start()
 void sunplus_gcm394_base_device::device_reset()
 {
 	m_78fb = 0x0000;
+
+	for (int i = 0; i < 7; i++)
+	{
+		m_dma_params[i] = 0x0000;
+	}
 }
 
 void sunplus_gcm394_device::device_add_mconfig(machine_config &config)
