@@ -52,6 +52,10 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w));
 	
 	map(0x007300, 0x0073ff).ram();
+	map(0x007400, 0x0074ff).ram();
+	map(0x007500, 0x0075ff).ram();
+	map(0x007600, 0x0076ff).ram();
+	map(0x007700, 0x0077ff).ram();
 
 	map(0x007c00, 0x007cff).ram();
 	map(0x007d00, 0x007dff).ram();
