@@ -1670,9 +1670,7 @@ if (CPUS["M680X0"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.hxx",
-		--MAME_DIR .. "src/devices/cpu/m68000/m68kmake.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
-		--MAME_DIR .. "src/devices/cpu/m68000/m68k_in.cpp",
 	}
 end
 
