@@ -675,9 +675,7 @@ void sun2_state::sun2vme(machine_config &config)
 
 	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
 	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
-	bwtwo.set_size(1152,900);
-	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
-	bwtwo.set_refresh_hz(72);
+	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
 
 	I82586(config, m_edlc, 16_MHz_XTAL / 2);
 	m_edlc->set_addrmap(0, &sun2_state::sun2_mem);
@@ -732,9 +730,8 @@ void sun2_state::sun2mbus(machine_config &config)
 
 	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
 	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
-	bwtwo.set_size(1152,900);
-	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
-	bwtwo.set_refresh_hz(72);
+	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
+	//bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1024, 1061, 0, 1024);
 
 	am9513a_device &timer(AM9513A(config, "timer", 39.3216_MHz_XTAL / 8));
 	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
