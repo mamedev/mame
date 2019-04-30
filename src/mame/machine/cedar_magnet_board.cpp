@@ -17,7 +17,7 @@ void cedar_magnet_board_interface::write_cpu_bus(int offset, u8 data)
 	ap.write_byte(offset, data);
 }
 
-uint8_t cedar_magnet_board_interface::read_cpu_bus(int offset)
+u8 cedar_magnet_board_interface::read_cpu_bus(int offset)
 {
 	address_space &ap = m_cpu->space(AS_PROGRAM);
 	return ap.read_byte(offset);
