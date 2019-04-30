@@ -8766,7 +8766,7 @@ void m68000_base_device::x4180_chk_w_071234fc()
 
 
 }
-void m68000_base_device::x4190_chk_w_ai_01234fc()
+void m68000_base_device::x4190_chk_w_ai_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AY_AI_16());
@@ -8782,7 +8782,7 @@ void m68000_base_device::x4190_chk_w_ai_01234fc()
 
 
 }
-void m68000_base_device::x4198_chk_w_pi_01234fc()
+void m68000_base_device::x4198_chk_w_pi_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AY_PI_16());
@@ -8798,7 +8798,7 @@ void m68000_base_device::x4198_chk_w_pi_01234fc()
 
 
 }
-void m68000_base_device::x41a0_chk_w_pd_01234fc()
+void m68000_base_device::x41a0_chk_w_pd_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AY_PD_16());
@@ -8814,7 +8814,7 @@ void m68000_base_device::x41a0_chk_w_pd_01234fc()
 
 
 }
-void m68000_base_device::x41a8_chk_w_di_01234fc()
+void m68000_base_device::x41a8_chk_w_di_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AY_DI_16());
@@ -8830,7 +8830,7 @@ void m68000_base_device::x41a8_chk_w_di_01234fc()
 
 
 }
-void m68000_base_device::x41b0_chk_w_ix_01234fc()
+void m68000_base_device::x41b0_chk_w_ix_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AY_IX_16());
@@ -8846,7 +8846,7 @@ void m68000_base_device::x41b0_chk_w_ix_01234fc()
 
 
 }
-void m68000_base_device::x41b8_chk_w_aw_01234fc()
+void m68000_base_device::x41b8_chk_w_aw_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AW_16());
@@ -8862,7 +8862,7 @@ void m68000_base_device::x41b8_chk_w_aw_01234fc()
 
 
 }
-void m68000_base_device::x41b9_chk_w_al_01234fc()
+void m68000_base_device::x41b9_chk_w_al_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_AL_16());
@@ -8878,7 +8878,7 @@ void m68000_base_device::x41b9_chk_w_al_01234fc()
 
 
 }
-void m68000_base_device::x41ba_chk_w_pcdi_01234fc()
+void m68000_base_device::x41ba_chk_w_pcdi_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_PCDI_16());
@@ -8894,7 +8894,7 @@ void m68000_base_device::x41ba_chk_w_pcdi_01234fc()
 
 
 }
-void m68000_base_device::x41bb_chk_w_pcix_01234fc()
+void m68000_base_device::x41bb_chk_w_pcix_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_PCIX_16());
@@ -8910,7 +8910,7 @@ void m68000_base_device::x41bb_chk_w_pcix_01234fc()
 
 
 }
-void m68000_base_device::x41bc_chk_w_i_01234fc()
+void m68000_base_device::x41bc_chk_w_i_071234fc()
 {
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(OPER_I_16());
@@ -12034,7 +12034,7 @@ void m68000_base_device::x81c0_divs_w_071234fc()
 	}
 
 }
-void m68000_base_device::x81d0_divs_w_ai_01234fc()
+void m68000_base_device::x81d0_divs_w_ai_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AY_AI_16());
@@ -12066,7 +12066,7 @@ void m68000_base_device::x81d0_divs_w_ai_01234fc()
 
 
 }
-void m68000_base_device::x81d8_divs_w_pi_01234fc()
+void m68000_base_device::x81d8_divs_w_pi_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AY_PI_16());
@@ -12098,7 +12098,7 @@ void m68000_base_device::x81d8_divs_w_pi_01234fc()
 
 
 }
-void m68000_base_device::x81e0_divs_w_pd_01234fc()
+void m68000_base_device::x81e0_divs_w_pd_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AY_PD_16());
@@ -12130,7 +12130,7 @@ void m68000_base_device::x81e0_divs_w_pd_01234fc()
 
 
 }
-void m68000_base_device::x81e8_divs_w_di_01234fc()
+void m68000_base_device::x81e8_divs_w_di_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AY_DI_16());
@@ -12162,7 +12162,7 @@ void m68000_base_device::x81e8_divs_w_di_01234fc()
 
 
 }
-void m68000_base_device::x81f0_divs_w_ix_01234fc()
+void m68000_base_device::x81f0_divs_w_ix_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AY_IX_16());
@@ -12194,7 +12194,7 @@ void m68000_base_device::x81f0_divs_w_ix_01234fc()
 
 
 }
-void m68000_base_device::x81f8_divs_w_aw_01234fc()
+void m68000_base_device::x81f8_divs_w_aw_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AW_16());
@@ -12226,7 +12226,7 @@ void m68000_base_device::x81f8_divs_w_aw_01234fc()
 
 
 }
-void m68000_base_device::x81f9_divs_w_al_01234fc()
+void m68000_base_device::x81f9_divs_w_al_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_AL_16());
@@ -12258,7 +12258,7 @@ void m68000_base_device::x81f9_divs_w_al_01234fc()
 
 
 }
-void m68000_base_device::x81fa_divs_w_pcdi_01234fc()
+void m68000_base_device::x81fa_divs_w_pcdi_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_PCDI_16());
@@ -12290,7 +12290,7 @@ void m68000_base_device::x81fa_divs_w_pcdi_01234fc()
 
 
 }
-void m68000_base_device::x81fb_divs_w_pcix_01234fc()
+void m68000_base_device::x81fb_divs_w_pcix_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_PCIX_16());
@@ -12322,7 +12322,7 @@ void m68000_base_device::x81fb_divs_w_pcix_01234fc()
 
 
 }
-void m68000_base_device::x81fc_divs_w_i_01234fc()
+void m68000_base_device::x81fc_divs_w_i_071234fc()
 {
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(OPER_I_16());
@@ -12377,7 +12377,7 @@ void m68000_base_device::x80c0_divu_w_071234fc()
 
 
 }
-void m68000_base_device::x80d0_divu_w_ai_01234fc()
+void m68000_base_device::x80d0_divu_w_ai_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AY_AI_16();
@@ -12400,7 +12400,7 @@ void m68000_base_device::x80d0_divu_w_ai_01234fc()
 
 
 }
-void m68000_base_device::x80d8_divu_w_pi_01234fc()
+void m68000_base_device::x80d8_divu_w_pi_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AY_PI_16();
@@ -12423,7 +12423,7 @@ void m68000_base_device::x80d8_divu_w_pi_01234fc()
 
 
 }
-void m68000_base_device::x80e0_divu_w_pd_01234fc()
+void m68000_base_device::x80e0_divu_w_pd_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AY_PD_16();
@@ -12446,7 +12446,7 @@ void m68000_base_device::x80e0_divu_w_pd_01234fc()
 
 
 }
-void m68000_base_device::x80e8_divu_w_di_01234fc()
+void m68000_base_device::x80e8_divu_w_di_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AY_DI_16();
@@ -12469,7 +12469,7 @@ void m68000_base_device::x80e8_divu_w_di_01234fc()
 
 
 }
-void m68000_base_device::x80f0_divu_w_ix_01234fc()
+void m68000_base_device::x80f0_divu_w_ix_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AY_IX_16();
@@ -12492,7 +12492,7 @@ void m68000_base_device::x80f0_divu_w_ix_01234fc()
 
 
 }
-void m68000_base_device::x80f8_divu_w_aw_01234fc()
+void m68000_base_device::x80f8_divu_w_aw_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AW_16();
@@ -12515,7 +12515,7 @@ void m68000_base_device::x80f8_divu_w_aw_01234fc()
 
 
 }
-void m68000_base_device::x80f9_divu_w_al_01234fc()
+void m68000_base_device::x80f9_divu_w_al_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_AL_16();
@@ -12538,7 +12538,7 @@ void m68000_base_device::x80f9_divu_w_al_01234fc()
 
 
 }
-void m68000_base_device::x80fa_divu_w_pcdi_01234fc()
+void m68000_base_device::x80fa_divu_w_pcdi_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_PCDI_16();
@@ -12561,7 +12561,7 @@ void m68000_base_device::x80fa_divu_w_pcdi_01234fc()
 
 
 }
-void m68000_base_device::x80fb_divu_w_pcix_01234fc()
+void m68000_base_device::x80fb_divu_w_pcix_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_PCIX_16();
@@ -12584,7 +12584,7 @@ void m68000_base_device::x80fb_divu_w_pcix_01234fc()
 
 
 }
-void m68000_base_device::x80fc_divu_w_i_01234fc()
+void m68000_base_device::x80fc_divu_w_i_071234fc()
 {
 	u32* r_dst = &DX();
 	u32 src = OPER_I_16();
@@ -31463,11 +31463,11 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x4128_chk_l_di_234fc,
 	&m68000_base_device::x4130_chk_l_ix_234fc,
 	&m68000_base_device::x4180_chk_w_071234fc,
-	&m68000_base_device::x4190_chk_w_ai_01234fc,
-	&m68000_base_device::x4198_chk_w_pi_01234fc,
-	&m68000_base_device::x41a0_chk_w_pd_01234fc,
-	&m68000_base_device::x41a8_chk_w_di_01234fc,
-	&m68000_base_device::x41b0_chk_w_ix_01234fc,
+	&m68000_base_device::x4190_chk_w_ai_071234fc,
+	&m68000_base_device::x4198_chk_w_pi_071234fc,
+	&m68000_base_device::x41a0_chk_w_pd_071234fc,
+	&m68000_base_device::x41a8_chk_w_di_071234fc,
+	&m68000_base_device::x41b0_chk_w_ix_071234fc,
 	&m68000_base_device::x41d0_lea_l_ai_071234fc,
 	&m68000_base_device::x41e8_lea_l_di_071234fc,
 	&m68000_base_device::x41f0_lea_l_ix_071234fc,
@@ -31530,11 +31530,11 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x80a8_or_l_di_071234fc,
 	&m68000_base_device::x80b0_or_l_ix_071234fc,
 	&m68000_base_device::x80c0_divu_w_071234fc,
-	&m68000_base_device::x80d0_divu_w_ai_01234fc,
-	&m68000_base_device::x80d8_divu_w_pi_01234fc,
-	&m68000_base_device::x80e0_divu_w_pd_01234fc,
-	&m68000_base_device::x80e8_divu_w_di_01234fc,
-	&m68000_base_device::x80f0_divu_w_ix_01234fc,
+	&m68000_base_device::x80d0_divu_w_ai_071234fc,
+	&m68000_base_device::x80d8_divu_w_pi_071234fc,
+	&m68000_base_device::x80e0_divu_w_pd_071234fc,
+	&m68000_base_device::x80e8_divu_w_di_071234fc,
+	&m68000_base_device::x80f0_divu_w_ix_071234fc,
 	&m68000_base_device::x8100_sbcd_b_071234fc,
 	&m68000_base_device::x8108_sbcd_b_071234fc,
 	&m68000_base_device::x8110_or_b_ai_071234fc,
@@ -31557,11 +31557,11 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x81a8_or_l_di_071234fc,
 	&m68000_base_device::x81b0_or_l_ix_071234fc,
 	&m68000_base_device::x81c0_divs_w_071234fc,
-	&m68000_base_device::x81d0_divs_w_ai_01234fc,
-	&m68000_base_device::x81d8_divs_w_pi_01234fc,
-	&m68000_base_device::x81e0_divs_w_pd_01234fc,
-	&m68000_base_device::x81e8_divs_w_di_01234fc,
-	&m68000_base_device::x81f0_divs_w_ix_01234fc,
+	&m68000_base_device::x81d0_divs_w_ai_071234fc,
+	&m68000_base_device::x81d8_divs_w_pi_071234fc,
+	&m68000_base_device::x81e0_divs_w_pd_071234fc,
+	&m68000_base_device::x81e8_divs_w_di_071234fc,
+	&m68000_base_device::x81f0_divs_w_ix_071234fc,
 	&m68000_base_device::x9000_sub_b_071234fc,
 	&m68000_base_device::x9010_sub_b_ai_071234fc,
 	&m68000_base_device::x9018_sub_b_pi_071234fc,
@@ -31966,11 +31966,11 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x413a_chk_l_pcdi_234fc,
 	&m68000_base_device::x413b_chk_l_pcix_234fc,
 	&m68000_base_device::x413c_chk_l_i_234fc,
-	&m68000_base_device::x41b8_chk_w_aw_01234fc,
-	&m68000_base_device::x41b9_chk_w_al_01234fc,
-	&m68000_base_device::x41ba_chk_w_pcdi_01234fc,
-	&m68000_base_device::x41bb_chk_w_pcix_01234fc,
-	&m68000_base_device::x41bc_chk_w_i_01234fc,
+	&m68000_base_device::x41b8_chk_w_aw_071234fc,
+	&m68000_base_device::x41b9_chk_w_al_071234fc,
+	&m68000_base_device::x41ba_chk_w_pcdi_071234fc,
+	&m68000_base_device::x41bb_chk_w_pcix_071234fc,
+	&m68000_base_device::x41bc_chk_w_i_071234fc,
 	&m68000_base_device::x41f8_lea_l_aw_071234fc,
 	&m68000_base_device::x41f9_lea_l_al_071234fc,
 	&m68000_base_device::x41fa_lea_l_pcdi_071234fc,
@@ -32008,11 +32008,11 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x80ba_or_l_pcdi_071234fc,
 	&m68000_base_device::x80bb_or_l_pcix_071234fc,
 	&m68000_base_device::x80bc_or_l_i_071234fc,
-	&m68000_base_device::x80f8_divu_w_aw_01234fc,
-	&m68000_base_device::x80f9_divu_w_al_01234fc,
-	&m68000_base_device::x80fa_divu_w_pcdi_01234fc,
-	&m68000_base_device::x80fb_divu_w_pcix_01234fc,
-	&m68000_base_device::x80fc_divu_w_i_01234fc,
+	&m68000_base_device::x80f8_divu_w_aw_071234fc,
+	&m68000_base_device::x80f9_divu_w_al_071234fc,
+	&m68000_base_device::x80fa_divu_w_pcdi_071234fc,
+	&m68000_base_device::x80fb_divu_w_pcix_071234fc,
+	&m68000_base_device::x80fc_divu_w_i_071234fc,
 	&m68000_base_device::x810f_sbcd_b_071234fc,
 	&m68000_base_device::x811f_or_b_pi7_071234fc,
 	&m68000_base_device::x8127_or_b_pd7_071234fc,
@@ -32024,11 +32024,11 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x818f_unpk_w_234fc,
 	&m68000_base_device::x81b8_or_l_aw_071234fc,
 	&m68000_base_device::x81b9_or_l_al_071234fc,
-	&m68000_base_device::x81f8_divs_w_aw_01234fc,
-	&m68000_base_device::x81f9_divs_w_al_01234fc,
-	&m68000_base_device::x81fa_divs_w_pcdi_01234fc,
-	&m68000_base_device::x81fb_divs_w_pcix_01234fc,
-	&m68000_base_device::x81fc_divs_w_i_01234fc,
+	&m68000_base_device::x81f8_divs_w_aw_071234fc,
+	&m68000_base_device::x81f9_divs_w_al_071234fc,
+	&m68000_base_device::x81fa_divs_w_pcdi_071234fc,
+	&m68000_base_device::x81fb_divs_w_pcix_071234fc,
+	&m68000_base_device::x81fc_divs_w_i_071234fc,
 	&m68000_base_device::x901f_sub_b_pi7_071234fc,
 	&m68000_base_device::x9027_sub_b_pd7_071234fc,
 	&m68000_base_device::x9038_sub_b_aw_071234fc,
@@ -33520,11 +33520,11 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x4128, 0xf1f8, {255, 255, 255,  13,  13,  13,  13,   8}},
 	{ 0x4130, 0xf1f8, {255, 255, 255,  15,  15,  15,  15,   8}},
 	{ 0x4180, 0xf1f8, { 10,  10,   8,   8,   8,   8,   8,   8}},
-	{ 0x4190, 0xf1f8, { 14, 255,  12,  12,  12,  12,  12,   8}},
-	{ 0x4198, 0xf1f8, { 14, 255,  12,  12,  12,  12,  12,   8}},
-	{ 0x41a0, 0xf1f8, { 16, 255,  14,  13,  13,  13,  13,   8}},
-	{ 0x41a8, 0xf1f8, { 18, 255,  16,  13,  13,  13,  13,   8}},
-	{ 0x41b0, 0xf1f8, { 20, 255,  18,  15,  15,  15,  15,   8}},
+	{ 0x4190, 0xf1f8, { 14,  14,  12,  12,  12,  12,  12,   8}},
+	{ 0x4198, 0xf1f8, { 14,  14,  12,  12,  12,  12,  12,   8}},
+	{ 0x41a0, 0xf1f8, { 16,  16,  14,  13,  13,  13,  13,   8}},
+	{ 0x41a8, 0xf1f8, { 18,  18,  16,  13,  13,  13,  13,   8}},
+	{ 0x41b0, 0xf1f8, { 20,  20,  18,  15,  15,  15,  15,   8}},
 	{ 0x41d0, 0xf1f8, {  4,   4,   4,   6,   6,   6,   6,   2}},
 	{ 0x41e8, 0xf1f8, {  8,   8,   8,   7,   7,   7,   7,   2}},
 	{ 0x41f0, 0xf1f8, { 12,  12,  12,   9,   9,   9,   9,   2}},
@@ -33587,11 +33587,11 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x80a8, 0xf1f8, { 18,  18,  18,   7,   7,   7,   7,   2}},
 	{ 0x80b0, 0xf1f8, { 20,  20,  20,   9,   9,   9,   9,   2}},
 	{ 0x80c0, 0xf1f8, {140, 140, 108,  44,  44,  44,  44,  44}},
-	{ 0x80d0, 0xf1f8, {144, 255, 112,  48,  48,  48,  48,  44}},
-	{ 0x80d8, 0xf1f8, {144, 255, 112,  48,  48,  48,  48,  44}},
-	{ 0x80e0, 0xf1f8, {146, 255, 114,  49,  49,  49,  49,  44}},
-	{ 0x80e8, 0xf1f8, {148, 255, 116,  49,  49,  49,  49,  44}},
-	{ 0x80f0, 0xf1f8, {150, 255, 118,  51,  51,  51,  51,  44}},
+	{ 0x80d0, 0xf1f8, {144, 144, 112,  48,  48,  48,  48,  44}},
+	{ 0x80d8, 0xf1f8, {144, 144, 112,  48,  48,  48,  48,  44}},
+	{ 0x80e0, 0xf1f8, {146, 146, 114,  49,  49,  49,  49,  44}},
+	{ 0x80e8, 0xf1f8, {148, 148, 116,  49,  49,  49,  49,  44}},
+	{ 0x80f0, 0xf1f8, {150, 150, 118,  51,  51,  51,  51,  44}},
 	{ 0x8100, 0xf1f8, {  6,   6,   6,   4,   4,   4,   4,   4}},
 	{ 0x8108, 0xf1f8, { 18,  18,  18,  16,  16,  16,  16,  16}},
 	{ 0x8110, 0xf1f8, { 12,  12,  12,   8,   8,   8,   8,   4}},
@@ -33614,11 +33614,11 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x81a8, 0xf1f8, { 24,  24,  24,   9,   9,   9,   9,   4}},
 	{ 0x81b0, 0xf1f8, { 26,  26,  26,  11,  11,  11,  11,   4}},
 	{ 0x81c0, 0xf1f8, {158, 158, 122,  56,  56,  56,  56,  56}},
-	{ 0x81d0, 0xf1f8, {162, 255, 126,  60,  60,  60,  60,  56}},
-	{ 0x81d8, 0xf1f8, {162, 255, 126,  60,  60,  60,  60,  56}},
-	{ 0x81e0, 0xf1f8, {164, 255, 128,  61,  61,  61,  61,  56}},
-	{ 0x81e8, 0xf1f8, {166, 255, 130,  61,  61,  61,  61,  56}},
-	{ 0x81f0, 0xf1f8, {168, 255, 132,  63,  63,  63,  63,  56}},
+	{ 0x81d0, 0xf1f8, {162, 162, 126,  60,  60,  60,  60,  56}},
+	{ 0x81d8, 0xf1f8, {162, 162, 126,  60,  60,  60,  60,  56}},
+	{ 0x81e0, 0xf1f8, {164, 164, 128,  61,  61,  61,  61,  56}},
+	{ 0x81e8, 0xf1f8, {166, 166, 130,  61,  61,  61,  61,  56}},
+	{ 0x81f0, 0xf1f8, {168, 168, 132,  63,  63,  63,  63,  56}},
 	{ 0x9000, 0xf1f8, {  4,   4,   4,   2,   2,   2,   2,   2}},
 	{ 0x9010, 0xf1f8, {  8,   8,   8,   6,   6,   6,   6,   2}},
 	{ 0x9018, 0xf1f8, {  8,   8,   8,   6,   6,   6,   6,   2}},
@@ -34023,11 +34023,11 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x413a, 0xf1ff, {255, 255, 255,  13,  13,  13,  13,   8}},
 	{ 0x413b, 0xf1ff, {255, 255, 255,  15,  15,  15,  15,   8}},
 	{ 0x413c, 0xf1ff, {255, 255, 255,  12,  12,  12,  12,   8}},
-	{ 0x41b8, 0xf1ff, { 18, 255,  16,  12,  12,  12,  12,   8}},
-	{ 0x41b9, 0xf1ff, { 22, 255,  20,  12,  12,  12,  12,   8}},
-	{ 0x41ba, 0xf1ff, { 18, 255,  16,  13,  13,  13,  13,   8}},
-	{ 0x41bb, 0xf1ff, { 20, 255,  18,  15,  15,  15,  15,   8}},
-	{ 0x41bc, 0xf1ff, { 14, 255,  12,  10,  10,  10,  10,   8}},
+	{ 0x41b8, 0xf1ff, { 18,  18,  16,  12,  12,  12,  12,   8}},
+	{ 0x41b9, 0xf1ff, { 22,  22,  20,  12,  12,  12,  12,   8}},
+	{ 0x41ba, 0xf1ff, { 18,  18,  16,  13,  13,  13,  13,   8}},
+	{ 0x41bb, 0xf1ff, { 20,  20,  18,  15,  15,  15,  15,   8}},
+	{ 0x41bc, 0xf1ff, { 14,  14,  12,  10,  10,  10,  10,   8}},
 	{ 0x41f8, 0xf1ff, {  8,   8,   8,   6,   6,   6,   6,   2}},
 	{ 0x41f9, 0xf1ff, { 12,  12,  12,   6,   6,   6,   6,   2}},
 	{ 0x41fa, 0xf1ff, {  8,   8,   8,   7,   7,   7,   7,   2}},
@@ -34065,11 +34065,11 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x80ba, 0xf1ff, { 18,  18,  18,   7,   7,   7,   7,   2}},
 	{ 0x80bb, 0xf1ff, { 20,  20,  20,   9,   9,   9,   9,   2}},
 	{ 0x80bc, 0xf1ff, { 16,  16,  14,   6,   6,   6,   6,   2}},
-	{ 0x80f8, 0xf1ff, {148, 255, 116,  48,  48,  48,  48,  44}},
-	{ 0x80f9, 0xf1ff, {152, 255, 120,  48,  48,  48,  48,  44}},
-	{ 0x80fa, 0xf1ff, {148, 255, 116,  49,  49,  49,  49,  44}},
-	{ 0x80fb, 0xf1ff, {150, 255, 118,  51,  51,  51,  51,  44}},
-	{ 0x80fc, 0xf1ff, {144, 255, 112,  46,  46,  46,  46,  44}},
+	{ 0x80f8, 0xf1ff, {148, 148, 116,  48,  48,  48,  48,  44}},
+	{ 0x80f9, 0xf1ff, {152, 152, 120,  48,  48,  48,  48,  44}},
+	{ 0x80fa, 0xf1ff, {148, 148, 116,  49,  49,  49,  49,  44}},
+	{ 0x80fb, 0xf1ff, {150, 150, 118,  51,  51,  51,  51,  44}},
+	{ 0x80fc, 0xf1ff, {144, 144, 112,  46,  46,  46,  46,  44}},
 	{ 0x810f, 0xf1ff, { 18,  18,  18,  16,  16,  16,  16,  16}},
 	{ 0x811f, 0xf1ff, { 12,  12,  12,   8,   8,   8,   8,   4}},
 	{ 0x8127, 0xf1ff, { 14,  14,  14,   9,   9,   9,   9,   4}},
@@ -34081,11 +34081,11 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x818f, 0xf1ff, {255, 255, 255,  13,  13,  13,  13,  13}},
 	{ 0x81b8, 0xf1ff, { 24,  24,  24,   8,   8,   8,   8,   4}},
 	{ 0x81b9, 0xf1ff, { 28,  28,  28,   8,   8,   8,   8,   4}},
-	{ 0x81f8, 0xf1ff, {166, 255, 130,  60,  60,  60,  60,  56}},
-	{ 0x81f9, 0xf1ff, {170, 255, 134,  60,  60,  60,  60,  56}},
-	{ 0x81fa, 0xf1ff, {166, 255, 130,  61,  61,  61,  61,  56}},
-	{ 0x81fb, 0xf1ff, {168, 255, 132,  63,  63,  63,  63,  56}},
-	{ 0x81fc, 0xf1ff, {162, 255, 126,  58,  58,  58,  58,  56}},
+	{ 0x81f8, 0xf1ff, {166, 166, 130,  60,  60,  60,  60,  56}},
+	{ 0x81f9, 0xf1ff, {170, 170, 134,  60,  60,  60,  60,  56}},
+	{ 0x81fa, 0xf1ff, {166, 166, 130,  61,  61,  61,  61,  56}},
+	{ 0x81fb, 0xf1ff, {168, 168, 132,  63,  63,  63,  63,  56}},
+	{ 0x81fc, 0xf1ff, {162, 162, 126,  58,  58,  58,  58,  56}},
 	{ 0x901f, 0xf1ff, {  8,   8,   8,   6,   6,   6,   6,   2}},
 	{ 0x9027, 0xf1ff, { 10,  10,  10,   7,   7,   7,   7,   2}},
 	{ 0x9038, 0xf1ff, { 12,  12,  12,   6,   6,   6,   6,   2}},

@@ -2,7 +2,7 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert, Karl Stenerud
 
-# To regerenerate m68kops.* run m68kmame.py m68k_in.lst m68kops.h m68kops.cpp
+# To regerenerate m68kops.* run m68kmake.py m68k_in.lst m68kops.h m68kops.cpp
 
 from __future__ import print_function
 import sys

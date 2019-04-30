@@ -30,6 +30,7 @@
 # CPU coverage is a series of blocks with structure (cpu codes):base cycles[p]
 # CPU codes are:
 #   0: 68000/68008
+#   7: 68070
 #   1: 68010
 #   2: 68020
 #   3: 68030
@@ -2191,7 +2192,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	}
 
 
-4180 f1c0 chk      w A+-DXWLdxI 0:10 1234fc:8
+4180 f1c0 chk      w A+-DXWLdxI 07:10 1234fc:8
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
@@ -3013,7 +3014,7 @@ f278 fff8 ftrapcc  l .          23:4
 		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
 	}
 
-81c0 f1c0 divs     w A+-DXWLdxI 0:158 1:122 234fc:56
+81c0 f1c0 divs     w A+-DXWLdxI 07:158 1:122 234fc:56
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 	s32 quotient;
@@ -3064,7 +3065,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-80c0 f1c0 divu     w A+-DXWLdxI 0:140 1:108 234fc:44
+80c0 f1c0 divu     w A+-DXWLdxI 07:140 1:108 234fc:44
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 
