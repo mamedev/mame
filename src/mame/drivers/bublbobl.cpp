@@ -1801,8 +1801,8 @@ ROM_START( sboblboblf ) // single layer PCB '8001 AX'
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a1.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-// the following ROMs match the sboblbobl set, but are missing 0x10000 of GFX data. However the PCB has no empty sockets and the ROM sizes are verified,
-// plus the game seems to work fine, at least in the first levels. TODO: play the whole game and verify if the missing data comes into play somewhere.
+// The following ROMs match the sboblbobl set, but are missing 0x10000 of GFX data. However the PCB has no empty sockets and the ROM sizes are verified.
+// The missing data is for the final boss. Did the bootleggers decide noone would ever get there and cut it out to spare some dollars? Doesn't make much sense.
 	ROM_REGION (0x80000, "gfx1", ROMREGION_INVERT)
 	ROM_LOAD ("a11.bin", 0x00000, 0x10000, CRC(76f2b367) SHA1(3e357a5642c8747df77a995057cecdf96f3130ab)) // 27512
 	ROM_LOAD ("a10.bin", 0x10000, 0x10000, CRC(d370f499) SHA1(94ce157ff1a53fabf08abe5467531b94a56666a5)) // 27512
