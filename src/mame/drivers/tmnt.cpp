@@ -547,7 +547,7 @@ void tmnt_state::punkshot_main_map(address_map &map)
 	map(0x0a0006, 0x0a0007).portr("P1/P2");
 	map(0x0a0020, 0x0a0021).w(FUNC(tmnt_state::punkshot_0a0020_w));
 	map(0x0a0040, 0x0a0043).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0a0080, 0x0a0081).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::punkshot_k052109_word_noA12_w));
 	map(0x110000, 0x110007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
@@ -571,7 +571,7 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 	map(0x0a0028, 0x0a0029).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0b0000, 0x0b3fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x0c0000, 0x0c001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
-	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 }
 
@@ -599,7 +599,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x700400, 0x700401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x780600, 0x780603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x780604, 0x780605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 }
 
 WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
@@ -608,7 +608,7 @@ WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_k053251->write(space, offset, (data >> 8) & 0xff);
+		m_k053251->write(offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
 		and got marked as dirty in the write above... how was the original hardware working?!? */
@@ -633,7 +633,7 @@ void tmnt_state::glfgreat_main_map(address_map &map)
 	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
 	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1/P2");
 	map(0x120002, 0x120003).portr("P3/P4");
 	map(0x120004, 0x120005).portr("COINS/DSW3");
@@ -656,7 +656,7 @@ void tmnt_state::prmrsocr_main_map(address_map &map)
 	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
 	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1/COINS");
 	map(0x120002, 0x120003).portr("P2/EEPROM");
 	map(0x121000, 0x12101f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
@@ -925,7 +925,7 @@ void tmnt_state::tmnt2_main_map(address_map &map)
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
 
@@ -950,7 +950,7 @@ void tmnt_state::ssriders_main_map(address_map &map)
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
 
@@ -959,7 +959,7 @@ void tmnt_state::sunsetbl_main_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x104000, 0x107fff).ram(); /* main RAM */
 	map(0x14c000, 0x14cfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x184000, 0x18ffff).ram();
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
@@ -986,7 +986,7 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* main RAM */
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
 	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));

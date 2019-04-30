@@ -184,7 +184,7 @@ void asterix_state::main_map(address_map &map)
 	map(0x380200, 0x380203).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x380300, 0x380301).w(FUNC(asterix_state::sound_irq_w));
 	map(0x380400, 0x380401).w(FUNC(asterix_state::asterix_spritebank_w));
-	map(0x380500, 0x38051f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x380500, 0x38051f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x380600, 0x380601).noprw();                             // Watchdog
 	map(0x380700, 0x380707).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x380800, 0x380803).w(FUNC(asterix_state::protection_w));

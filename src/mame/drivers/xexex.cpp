@@ -354,7 +354,7 @@ void xexex_state::main_map(address_map &map)
 	map(0x0c6000, 0x0c7fff).rw(m_k053250, FUNC(k053250_device::ram_r), FUNC(k053250_device::ram_w));    // K053250 "road" RAM
 	map(0x0c8000, 0x0c800f).rw(m_k053250, FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
-	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));               // priority encoder
+	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
@@ -375,7 +375,7 @@ void xexex_state::main_map(address_map &map)
 	map(0x0c0000, 0x0c003f).r(m_k056832, FUNC(k056832_device::word_r));
 	map(0x0c2000, 0x0c2007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
 	map(0x0ca000, 0x0ca01f).r(m_k054338, FUNC(k054338_device::word_r));
-	map(0x0cc000, 0x0cc01f).r(m_k053251, FUNC(k053251_device::lsb_r));
+	map(0x0cc000, 0x0cc01f).r(m_k053251, FUNC(k053251_device::read)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).r(m_k056832, FUNC(k056832_device::b_word_r));
 #endif
 

@@ -88,7 +88,7 @@ void xmen_state::main_map(address_map &map)
 	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w));
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x10a002, 0x10a003).portr("P1_P3");
 	map(0x10a004, 0x10a005).portr("EEPROM");
@@ -122,7 +122,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w)); /* sprites */
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x10a002, 0x10a003).portr("P1_P3");
 	map(0x10a004, 0x10a005).portr("EEPROM");

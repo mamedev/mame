@@ -131,7 +131,7 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
 	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::dbz_sound_cause_nmi));
 	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 251 #1
-	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::lsb_w));   // 251 #2
+	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);   // 251 #2
 
 	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
 	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
