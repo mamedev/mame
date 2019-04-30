@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-    SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
+	SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
 
-    Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
+	Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
-        Smart Fit Park
-        SpongeBob SquarePants Bikini Bottom 500
-        Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
-        (Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
+		Smart Fit Park
+		SpongeBob SquarePants Bikini Bottom 500
+		Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
+		(Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
 
-    as these use newer opcodes in the FExx range they probably need a derived unSP type too
+	as these use newer opcodes in the FExx range they probably need a derived unSP type too
 */
 
 #include "emu.h"
@@ -57,7 +57,7 @@ void gcm394_game_state::base(machine_config &config)
 {
 	GCM394(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 
-	UNSP_NEWER(config, m_maincpu, XTAL(27'000'000));
+	UNSP_12(config, m_maincpu, XTAL(27'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -99,8 +99,11 @@ void gcm394_game_state::machine_reset()
 
 void gcm394_game_state::mem_map_4m(address_map &map)
 {
-	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x000000, 0x01ffff).bankr("cartbank");
 	map(0x000000, 0x007fff).m(m_spg, FUNC(sunplus_gcm394_device::map));
+
+	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
+	map(0x020000, 0x3fffff).bankr("cartbank");
 }
 
 static INPUT_PORTS_START( gcm394 )
@@ -150,9 +153,9 @@ Length: 27.78 mm
 Voltage: 3V
 Pinout:
 
-          A25  A24
-            |  |
-      +--------------------------+
+		  A25  A24
+			|  |
+	  +--------------------------+
 A21 --|==   #  # `.__.'        ==|-- A20
 A18 --|==                      ==|-- A19
 A17 --|==                      ==|-- A8
@@ -175,7 +178,7 @@ GND --|==  |                |  ==|-- A22
 Q10 --|==                      ==|-- Q12
  Q3 --|==                      ==|-- Q4
 Q11 --|==                      ==|-- VCC
-      +--------------------------+
+	  +--------------------------+
 
 
 The only interesting string in this ROM is SPF2ALP,

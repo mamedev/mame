@@ -18,8 +18,27 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 
 READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
 {
+	switch (offset)
+	{
+
+	case 0x80f:
+		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
+		return 0x0002;
+
+	case 0x8fb:
+		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
+		m_78fb ^= 0x0100; // status flag for something?
+		return m_78fb;
+
+
+	case 0xabf:
+		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
+		return 0x0001;
+
+	}
+
 	logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
-	return 0x00;
+	return 0x0000;
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
@@ -39,6 +58,7 @@ void sunplus_gcm394_base_device::device_start()
 
 void sunplus_gcm394_base_device::device_reset()
 {
+	m_78fb = 0x0000;
 }
 
 void sunplus_gcm394_device::device_add_mconfig(machine_config &config)
