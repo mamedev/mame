@@ -1624,7 +1624,7 @@ void xe5f0_roxl_w_ix_071234fc();
 void xe5f8_roxl_w_aw_071234fc();
 void xe5f9_roxl_w_al_071234fc();
 void x4e74_rtd_l_1234fc();
-void x4e73_rte_l_07();
+void x4e73_rte_l_0();
 void x4e73_rte_l_71();
 void x4e73_rte_l_234fc();
 void x06c0_rtm_l_234fc();

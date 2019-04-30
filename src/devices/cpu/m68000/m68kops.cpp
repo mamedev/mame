@@ -26498,7 +26498,7 @@ void m68000_base_device::x4e74_rtd_l_1234fc()
 
 
 }
-void m68000_base_device::x4e73_rte_l_07()
+void m68000_base_device::x4e73_rte_l_0()
 {
 	if(m_s_flag) {
 		u32 new_sr;
@@ -33088,7 +33088,7 @@ const m68000_base_device::opcode_handler_ptr m68000_base_device::m68k_handler_ta
 	&m68000_base_device::x4e70_reset_071234fc,
 	&m68000_base_device::x4e71_nop_071234fc,
 	&m68000_base_device::x4e72_stop_071234fc,
-	&m68000_base_device::x4e73_rte_l_07,
+	&m68000_base_device::x4e73_rte_l_0,
 	&m68000_base_device::x4e73_rte_l_71,
 	&m68000_base_device::x4e73_rte_l_234fc,
 	&m68000_base_device::x4e74_rtd_l_1234fc,
@@ -35145,7 +35145,7 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x4e70, 0xffff, {  0,   0,   0,   0,   0,   0,   0,   0}},
 	{ 0x4e71, 0xffff, {  4,   4,   4,   2,   2,   2,   2,   2}},
 	{ 0x4e72, 0xffff, {  4,   4,   4,   8,   8,   8,   8,   8}},
-	{ 0x4e73, 0xffff, { 20,  20, 255, 255, 255, 255, 255, 255}},
+	{ 0x4e73, 0xffff, { 20, 255, 255, 255, 255, 255, 255, 255}},
 	{ 0x4e73, 0xffff, {255,  24,  24, 255, 255, 255, 255, 255}},
 	{ 0x4e73, 0xffff, {255, 255, 255,  20,  20,  20,  20,  20}},
 	{ 0x4e74, 0xffff, {255, 255,  16,  10,  10,  10,  10,  10}},

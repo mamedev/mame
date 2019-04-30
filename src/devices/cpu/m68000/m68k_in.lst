@@ -6844,7 +6844,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_jump(new_pc);
 
 
-4e73 ffff rte      l .          07:20p
+4e73 ffff rte      l .          0:20p
 	if(m_s_flag) {
 		u32 new_sr;
 		u32 new_pc;
