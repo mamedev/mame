@@ -117,7 +117,7 @@ protected:
 	inline std::string get_ea_mode_str_16(u16 instruction) { return get_ea_mode_str(instruction, 1); }
 	inline std::string get_ea_mode_str_32(u16 instruction) { return get_ea_mode_str(instruction, 2); }
 
-	std::string fc_to_string(uint16_t modes);
+	std::string fc_to_string(u16 modes);
 
 	inline std::pair<bool, std::string> limit_cpu_types(u32 allowed);
 

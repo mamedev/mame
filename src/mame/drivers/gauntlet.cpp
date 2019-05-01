@@ -148,13 +148,11 @@ void gauntlet_state::update_interrupts()
 
 void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 {
-	address_space &space = m_audiocpu->space(AS_PROGRAM);
-
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		m_soundcomm->sound_irq_gen(*m_audiocpu);
 	else
-		m_soundcomm->sound_irq_ack_r(space, 0);
+		m_soundcomm->sound_irq_ack_w();
 }
 
 

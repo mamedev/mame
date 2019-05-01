@@ -46,10 +46,10 @@ public:
 	  structure (e.g. TILE_FLIPX)
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 rom_r(offs_t offset);
+	void ctrl_w(offs_t offset, u8 data);
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint32_t priority);
 	void wraparound_enable(int status);
 

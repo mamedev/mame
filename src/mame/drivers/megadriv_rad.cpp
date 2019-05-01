@@ -130,7 +130,6 @@ MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
 {
 	m_bank = 0;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	m_maincpu->reset();
 }
 
 void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)

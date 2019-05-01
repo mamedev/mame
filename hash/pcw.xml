@@ -199,6 +199,17 @@
 		</part>
 	</software>
 
+	<software name="cpmplswe" cloneof="cpmplus"><!-- Adds swedish keyboard and localized error messages for some system applications -->
+		<description>CP/M Plus v1.4 (Swe) work copy</description>
+		<year>1985</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3"><!-- The image is a dump of a work copy with some files deleted and some added/customized -->
+			<dataarea name="flop" size="194816">
+				<rom name="cpm104swe.dsk" size="194816" crc="61af15ef" sha1="a388e96b206fa0b02c802504aa919267cc2d48a2" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="loco3">
 		<description>LocoScript Installation Program v3.00a (English)</description>
 		<year>1993</year>

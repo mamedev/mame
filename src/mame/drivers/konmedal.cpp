@@ -122,16 +122,16 @@ READ8_MEMBER(konmedal_state::vram_r)
 	{
 		if (offset & 1)
 		{
-			return m_k056832->ram_code_hi_r(space, offset>>1);
+			return m_k056832->ram_code_hi_r(offset>>1);
 		}
 		else
 		{
-			return m_k056832->ram_code_lo_r(space, offset>>1);
+			return m_k056832->ram_code_lo_r(offset>>1);
 		}
 	}
 	else if (m_control == 0)    // ROM readback
 	{
-		return m_k056832->konmedal_rom_r(space, offset);
+		return m_k056832->konmedal_rom_r(offset);
 	}
 
 	return 0;
@@ -144,11 +144,11 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 
 	if (offset & 1)
 	{
-		m_k056832->ram_code_hi_w(space, offset>>1, data);
+		m_k056832->ram_code_hi_w(offset>>1, data);
 		return;
 	}
 
-	m_k056832->ram_code_lo_w(space, offset>>1, data);
+	m_k056832->ram_code_lo_w(offset>>1, data);
 }
 
 READ8_MEMBER(konmedal_state::magic_r)
@@ -401,7 +401,7 @@ void konmedal_state::tsukande(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
@@ -434,14 +434,13 @@ void konmedal_state::ddboy(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(0, "mono", 1.0);
-	m_oki->add_route(1, "mono", 1.0);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	K051649(config, "k051649", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
@@ -473,7 +472,7 @@ READ8_MEMBER(konmedal_state::shuri_video_r)
 {
 	if (!(m_control & 0x10))
 	{
-		return m_k052109->read(space, offset+0x2000);
+		return m_k052109->read(offset+0x2000);
 	}
 
 	uint8_t *ROM = memregion("k052109")->base();
@@ -482,7 +481,7 @@ READ8_MEMBER(konmedal_state::shuri_video_r)
 
 WRITE8_MEMBER(konmedal_state::shuri_video_w)
 {
-	m_k052109->write(space, offset+0x2000, data);
+	m_k052109->write(offset+0x2000, data);
 }
 
 READ8_MEMBER(konmedal_state::shuri_irq_r)
@@ -576,7 +575,7 @@ ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "441-d02.4g",   0x000000, 0x020000, CRC(6ed17227) SHA1(4e3f5219cbf6f42c60df38a99f3009fe49f78fc1) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "441-a03.4l",   0x000002, 0x020000, CRC(8adf3304) SHA1(1c8312c76cd626978ff5b3896fb5a5b34be72988) )
 	ROM_LOAD32_BYTE( "441-a04.4m",   0x000003, 0x020000, CRC(038e0c67) SHA1(2b8640bfad7026a2d86fb6498aff4d7a9cb0b700) )
 	ROM_LOAD32_BYTE( "441-a05.4p",   0x000000, 0x020000, CRC(937c4740) SHA1(155c869b9321d62df115435d7c855f9be4278e45) )
@@ -601,7 +600,7 @@ ROM_START( ddboy )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "342_c02.27c010.4d", 0x000000, 0x020000, CRC(dc33af9f) SHA1(db22f3b28e3aba69f70fd2581c77755373b582d0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
 	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) )
 	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )
@@ -626,7 +625,7 @@ ROM_START( ddboya )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "342-f02-4g-=p=.bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
 	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) )
 	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )

@@ -57,7 +57,7 @@ void gcm394_game_state::base(machine_config &config)
 {
 	GCM394(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 
-	UNSP_NEWER(config, m_maincpu, XTAL(27'000'000));
+	UNSP_12(config, m_maincpu, XTAL(27'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -99,8 +99,11 @@ void gcm394_game_state::machine_reset()
 
 void gcm394_game_state::mem_map_4m(address_map &map)
 {
-	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x000000, 0x01ffff).bankr("cartbank");
 	map(0x000000, 0x007fff).m(m_spg, FUNC(sunplus_gcm394_device::map));
+
+	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
+	map(0x020000, 0x3fffff).bankr("cartbank");
 }
 
 static INPUT_PORTS_START( gcm394 )

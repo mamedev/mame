@@ -29,16 +29,12 @@ public:
 		m_dy = y_offset;
 	}
 
-	DECLARE_READ16_MEMBER( k053245_word_r );
-	DECLARE_WRITE16_MEMBER( k053245_word_w );
-	DECLARE_READ8_MEMBER( k053245_r );
-	DECLARE_WRITE8_MEMBER( k053245_w );
-	DECLARE_READ8_MEMBER( k053244_r );
-	DECLARE_WRITE8_MEMBER( k053244_w );
-	DECLARE_READ16_MEMBER( k053244_lsb_r );
-	DECLARE_WRITE16_MEMBER( k053244_lsb_w );
-	DECLARE_READ16_MEMBER( k053244_word_r );
-	DECLARE_WRITE16_MEMBER( k053244_word_w );
+	u16 k053245_word_r(offs_t offset);
+	void k053245_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 k053245_r(offs_t offset);
+	void k053245_w(offs_t offset, u8 data);
+	u8 k053244_r(offs_t offset);
+	void k053244_w(offs_t offset, u8 data);
 	void bankselect(int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void clear_buffer();

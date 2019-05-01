@@ -1154,10 +1154,10 @@ ROM_END
 //
 ROM_START( hangon2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-6851a__,needs_verification.ic22", 0x000000, 0x8000, CRC(1e4d2217) SHA1(197d8939b7c9eea0496aecac55cce3dec51be042) ) // as per the manual
-	ROM_LOAD16_BYTE( "epr-6849a__,needs_verification.ic8",  0x000001, 0x8000, CRC(3793e50e) SHA1(ffcad02696ca6d67f6bd5001a0d4aa41e23e21bd) ) // as per the manual
-	ROM_LOAD16_BYTE( "epr-6850a__,needs_verification.ic20", 0x010000, 0x8000, CRC(5d715e3b) SHA1(88554d05e157b1276ba56b80d808fddedc9d71c5) ) // as per the manual
-	ROM_LOAD16_BYTE( "epr-6848a__,needs_verification.ic6",  0x010001, 0x8000, CRC(f1439a30) SHA1(5d496f80c2fda29eb71c29a050f17ecef4543052) ) // as per the manual
+	ROM_LOAD16_BYTE( "epr-6851a.ic22", 0x000000, 0x8000, CRC(1e4d2217) SHA1(197d8939b7c9eea0496aecac55cce3dec51be042) )
+	ROM_LOAD16_BYTE( "epr-6849a.ic8",  0x000001, 0x8000, CRC(3793e50e) SHA1(ffcad02696ca6d67f6bd5001a0d4aa41e23e21bd) )
+	ROM_LOAD16_BYTE( "epr-6850a.ic20", 0x010000, 0x8000, CRC(5d715e3b) SHA1(88554d05e157b1276ba56b80d808fddedc9d71c5) )
+	ROM_LOAD16_BYTE( "epr-6848a.ic6",  0x010001, 0x8000, CRC(f1439a30) SHA1(5d496f80c2fda29eb71c29a050f17ecef4543052) )
 
 	ROM_REGION( 0x40000, "subcpu", 0 ) // second 68000 CPU
 	ROM_LOAD16_BYTE( "epr-6838.ic63", 0x0000, 0x8000, CRC(2747b794) SHA1(06d296837f03f5dfb2d9d7e3001070b81391247f) )

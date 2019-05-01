@@ -975,7 +975,12 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		// skip bytes
 		else if(pending_skip) {
-			if(sscanf(curarg, "%d", &opts->skip) != 1)
+			int result;
+			if(curarg[0] == '0' && curarg[1] == 'x')
+				result = sscanf(&curarg[2], "%x", &opts->skip);
+			else
+				result = sscanf(curarg, "%d", &opts->skip);
+			if(result != 1)
 				goto usage;
 			pending_skip = false;
 		}

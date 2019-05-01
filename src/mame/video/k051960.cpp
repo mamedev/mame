@@ -266,7 +266,7 @@ int k051960_device::k051960_fetchromdata( int byte )
 	return m_sprite_rom[addr];
 }
 
-READ8_MEMBER( k051960_device::k051960_r )
+u8 k051960_device::k051960_r(offs_t offset)
 {
 	if (m_readroms)
 	{
@@ -278,14 +278,14 @@ READ8_MEMBER( k051960_device::k051960_r )
 		return m_ram[offset];
 }
 
-WRITE8_MEMBER( k051960_device::k051960_w )
+void k051960_device::k051960_w(offs_t offset, u8 data)
 {
 	m_ram[offset] = data;
 }
 
 
 /* should this be split by k051960? */
-READ8_MEMBER( k051960_device::k051937_r )
+u8 k051960_device::k051937_r(offs_t offset)
 {
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
@@ -296,7 +296,7 @@ READ8_MEMBER( k051960_device::k051937_r )
 	return 0;
 }
 
-WRITE8_MEMBER( k051960_device::k051937_w )
+void k051960_device::k051937_w(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{

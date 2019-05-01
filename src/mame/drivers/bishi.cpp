@@ -141,7 +141,7 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 	if (m_cur_control2 & 0x1000)
 		ouroffs += 4;
 
-	return m_k056832->bishi_rom_word_r(space, ouroffs, mem_mask);
+	return m_k056832->bishi_rom_word_r(ouroffs);
 }
 
 void bishi_state::main_map(address_map &map)
@@ -467,7 +467,7 @@ void bishi_state::bishi(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
+	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K054338(config, m_k054338, 0);
@@ -490,7 +490,7 @@ void bishi_state::dobouchn(machine_config &config)
 	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 //  m_k056832->set_tile_callback(FUNC(bishi_state::dobouchn_tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
+	m_k056832->set_config(K056832_BPP_8, 1, 0);
 }
 
 // ROM definitions
@@ -501,7 +501,7 @@ ROM_START( bishi )
 	ROM_LOAD16_WORD_SWAP( "575jaa05.12e", 0x000000, 0x80000, CRC(7d354567) SHA1(7fc11585693c91c0ef7a8e00df4f2f01b356210f) )
 	ROM_LOAD16_WORD_SWAP( "575jaa06.15e", 0x080000, 0x80000, CRC(9b2f7fbb) SHA1(26c828085c44a9c4d4e713e8fcc0bc8fc973d107) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD16_BYTE( "575jaa07.14n", 0x000000, 0x080000, CRC(37bbf387) SHA1(dcf7b151b865d251f3122611b6339dd84eb1f990) )
 	ROM_LOAD16_BYTE( "575jaa08.17n", 0x000001, 0x080000, CRC(47ecd559) SHA1(7baac23557d40cccc21b93f181606563924244b0) )
 	ROM_LOAD16_BYTE( "575jaa09.19n", 0x100000, 0x080000, CRC(c1db6e68) SHA1(e951661e3b39a83db21aed484764e032adcf3c2a) )
@@ -522,7 +522,7 @@ ROM_START( sbishi )
 	ROM_LOAD16_WORD_SWAP( "675jaa05.12e", 0x000000, 0x80000, CRC(28a09c01) SHA1(627f6c9b9e88434ff3198c778ae5c57d9cda82c5) )
 	ROM_LOAD16_WORD_SWAP( "675jaa06.15e", 0x080000, 0x80000, CRC(e4998b33) SHA1(3012f7661542b38b1a113c5c10e2729c6a37e709) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD16_BYTE( "675jaa07.14n", 0x000000, 0x080000, CRC(6fe7c658) SHA1(a786a417053a5fc62f967bdd564e8d3bdc89f958) )
 	ROM_LOAD16_BYTE( "675jaa08.17n", 0x000001, 0x080000, CRC(c230afc9) SHA1(f23c64ed08e77960beb0f8db2605622a3887e5f8) )
 	ROM_LOAD16_BYTE( "675jaa09.19n", 0x100000, 0x080000, CRC(63fe85a5) SHA1(e5ef1f3fc634264260d5fc3a669646abf1601b23) )
@@ -543,7 +543,7 @@ ROM_START( sbishik )
 	ROM_LOAD16_WORD_SWAP( "kab05.12e", 0x000000, 0x80000, CRC(749063ca) SHA1(ef551132410248ef0b858fb8bcf6f8dd1115ad71) )
 	ROM_LOAD16_WORD_SWAP( "kab06.15e", 0x080000, 0x80000, CRC(089e0f37) SHA1(9cd64ebfab716bbaf0ba420ad8168a33601699a9) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD16_BYTE( "675kaa07.14n", 0x000000, 0x080000, CRC(1177c1f8) SHA1(42c6f3c3a6bd0adb7d927386fd99f1497e5df30c) )
 	ROM_LOAD16_BYTE( "675kaa08.17n", 0x000001, 0x080000, CRC(7117e9cd) SHA1(5a9b4b7427edcc10725d5936869927874fef6463) )
 	ROM_LOAD16_BYTE( "675kaa09.19n", 0x100000, 0x080000, CRC(8d49c765) SHA1(7921f8f3671fbbc3d5ea529234268a1e23ea622c) )
@@ -565,7 +565,7 @@ ROM_START( sbishika )
 	ROM_LOAD16_WORD_SWAP( "675kaa05.12e", 0x000000, 0x80000, CRC(23600e1d) SHA1(b3224c84e41e3077425a60232bb91775107f37a8) )
 	ROM_LOAD16_WORD_SWAP( "675kaa06.15e", 0x080000, 0x80000, CRC(bd1091f5) SHA1(29872abc49fe8209d0f414ca40a34fc494ff9b96) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD16_BYTE( "675kaa07.14n", 0x000000, 0x080000, CRC(1177c1f8) SHA1(42c6f3c3a6bd0adb7d927386fd99f1497e5df30c) )
 	ROM_LOAD16_BYTE( "675kaa08.17n", 0x000001, 0x080000, CRC(7117e9cd) SHA1(5a9b4b7427edcc10725d5936869927874fef6463) )
 	ROM_LOAD16_BYTE( "675kaa09.19n", 0x100000, 0x080000, CRC(8d49c765) SHA1(7921f8f3671fbbc3d5ea529234268a1e23ea622c) )
@@ -585,7 +585,7 @@ ROM_START( dobouchn )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "640-a05-2n.bin", 0x000000, 0x080000, CRC(7643dbc6) SHA1(3b55a782f04a741088b93954279b35c1c90af622) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	// makes GFX ROM test to pass
 	// must return 0xf0c3 and 0xee9e, check snippets at 0x2e1c and 0x2e42
 	// TODO: might require a different K056832_rom_r callback instead

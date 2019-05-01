@@ -75,28 +75,8 @@
 #endif
 
 //============================================================
-//  General Macros
+// Time resolution
 //============================================================
-
-#if defined(OPENMP)
-#define HAS_OPENMP ( OPENMP >= 200805 )
-#elif defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
-#else
-#define HAS_OPENMP (0)
-#endif
-
-//============================================================
-//  General
-//============================================================
-
-/* The following adds about 10% to 20% performance for analog
- * netlists like kidniki.
- */
-
-#if !defined(USE_OPENMP)
-#define USE_OPENMP              (0)
-#endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
 
@@ -112,15 +92,5 @@ static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
 //#define nl_double float
 using nl_double = double;
-
-//============================================================
-//  WARNINGS
-//============================================================
-
-#if (USE_OPENMP)
-#if (!(HAS_OPENMP))
-#error To use openmp compile and link with "-fopenmp"
-#endif
-#endif
 
 #endif /* NLCONFIG_H_ */

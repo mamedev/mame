@@ -473,10 +473,11 @@ void netlist_t::print_stats() const
 		log().verbose("Total loop     {1:15}", m_stat_mainloop());
 		log().verbose("Total time     {1:15}", total_time);
 
-		/* Only one serialization should be counted in total time */
-		/* But two are contained in m_stat_mainloop */
-		if (!!USE_QUEUE_STATS)
+		// FIXME: clang complains about unreachable code without
+		if (USE_QUEUE_STATS || (!USE_QUEUE_STATS && m_stats))
 		{
+			/* Only one serialization should be counted in total time */
+			/* But two are contained in m_stat_mainloop */
 			nperftime_t<true> overhead;
 			nperftime_t<true> test;
 			{

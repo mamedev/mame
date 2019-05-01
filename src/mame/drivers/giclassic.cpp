@@ -138,10 +138,10 @@ READ16_MEMBER(giclassic_state::vrom_r)
 {
 	if (m_control & 8)
 	{
-		return m_k056832->piratesh_rom_r(space, offset + 0x1000);
+		return m_k056832->piratesh_rom_r(offset + 0x1000);
 	}
 
-	return m_k056832->piratesh_rom_r(space, offset);
+	return m_k056832->piratesh_rom_r(offset);
 }
 
 void giclassic_state::satellite_main(address_map &map)
@@ -316,7 +316,7 @@ void giclassic_state::giclassic(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 1, 0);
+	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette(m_palette);
 }
 
@@ -340,7 +340,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(giclassicsvr_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 0, 0);
+	m_k056832->set_config(K056832_BPP_4PIRATESH, 0, 0);
 	m_k056832->set_palette(m_palette);
 
 	K055673(config, m_k055673, 0);
@@ -356,7 +356,7 @@ ROM_START( giclasex )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
 	ROM_LOAD16_WORD_SWAP( "gsgu760ae01.12t", 0x000000, 0x080000, CRC(f0f9c118) SHA1(1753d53946bc0703d329e4a09c452713b260da75) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD( "gsgu760ae03.14c", 0x000000, 0x080000, CRC(1663d327) SHA1(98c1a9653d38f4918f78b3a11af0c29c658201f5) )
 	ROM_LOAD( "gsgu760ae02.14e", 0x080000, 0x080000, CRC(2b9fe163) SHA1(f60190a9689a70d6c5bb14fb46b7ac2267cf0969) )
 ROM_END
@@ -365,7 +365,7 @@ ROM_START( giclassvr )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
 	ROM_LOAD16_WORD_SWAP( "gsgu_760_fd01.34e.bin", 0x000000, 0x080000, CRC(da89c1d7) SHA1(551d050a9b6e54fbf98e966eb37924b644037893) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD( "gsgu_760_ad04.25q", 0x080000, 0x080000, CRC(71a45742) SHA1(fbddd54f5fb236662f7cc7e9b350723bc5404f72) )
 	ROM_LOAD( "gsgu_760_ad05.25r", 0x000000, 0x080000, CRC(44221eec) SHA1(966452e606e828b536ed11cbdd626a2fe3165199) )
 

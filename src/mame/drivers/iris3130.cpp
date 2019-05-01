@@ -495,8 +495,6 @@ void sgi_ip2_state::init_sgi_ip2()
 	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
 	uint32_t *dst = m_mainram;
 	memcpy(dst, src, 8);
-
-	m_maincpu->reset();
 }
 
 /***************************************************************************
