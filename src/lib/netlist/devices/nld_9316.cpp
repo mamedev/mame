@@ -68,7 +68,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(clk)
 		{
-			auto cnt = (m_loadq ? m_cnt + 1 : m_abcd) & MAXCNT;
+			auto cnt = (m_loadq ? (m_cnt + 1) & MAXCNT: m_abcd);
 			m_RC.push(m_ent && (cnt == MAXCNT), NLTIME_FROM_NS(27));
 			update_outputs_all(cnt, NLTIME_FROM_NS(20));
 			m_cnt = cnt;
@@ -76,7 +76,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(abcd)
 		{
-			m_abcd = static_cast<uint8_t>((m_ABCD[0]() << 0) | (m_ABCD[1]() << 1) | (m_ABCD[2]() << 2) | (m_ABCD[3]() << 3));
+			m_abcd = static_cast<unsigned>((m_ABCD[0]() << 0) | (m_ABCD[1]() << 1) | (m_ABCD[2]() << 2) | (m_ABCD[3]() << 3));
 		}
 
 		logic_input_t m_CLK;
@@ -93,14 +93,14 @@ namespace netlist
 		object_array_t<logic_output_t, 4> m_Q;
 
 		/* counter state */
-		state_var<uint8_t> m_cnt;
+		state_var<unsigned> m_cnt;
 		/* cached pins */
-		state_var_u8 m_abcd;
+		state_var<unsigned> m_abcd;
 		state_var_sig m_loadq;
 		state_var_sig m_ent;
 		nld_power_pins m_power_pins;
 
-		void update_outputs_all(uint8_t cnt, netlist_time out_delay) noexcept
+		void update_outputs_all(unsigned cnt, netlist_time out_delay) noexcept
 		{
 			m_Q[0].push((cnt >> 0) & 1, out_delay);
 			m_Q[1].push((cnt >> 1) & 1, out_delay);
