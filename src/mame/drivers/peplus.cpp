@@ -6794,7 +6794,7 @@ PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( pepp0550a) /* Normal board : Joker Poker (Two Pair or Better) (PP0550) - PSR Verified */
+ROM_START( pepp0550a ) /* Normal board : Joker Poker (Two Pair or Better) (PP0550) - PSR Verified */
 /*
                                        w/J     w/oJ
 PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
