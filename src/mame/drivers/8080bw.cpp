@@ -960,7 +960,7 @@ void _8080bw_state::invrvnge(machine_config &config)
 	// CPU E-pin connects to AY clock pin
 	ay8910_device &psg(AY8910(config, "psg", XTAL(4'000'000)/2));
 	psg.port_a_read_callback().set([this] () { return m_sound_data >> 1; });
-	psg.port_b_read_callback().set([] () { return 0xff; });
+	psg.port_b_read_callback().set_constant(0xff);
 	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// CPU E-pin also connects to a 4040 divider. The Q8 output goes to the CPU's NMI pin.
