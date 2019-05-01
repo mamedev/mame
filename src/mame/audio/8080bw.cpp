@@ -1000,12 +1000,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_1_w)
+WRITE8_MEMBER(_8080bw_state::invrvnge_port03_w)
 {
-	// probably latch+irq to audiocpu
+	m_sound_data = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
+WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
 {
 	/*
 	    00 - normal play
@@ -1020,6 +1020,18 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
 		// no sound-related writes?
 }
 
+// The timer frequency controls the speed of the sounds
+TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
+{
+	// This is to prevent an instant NMI and crash before the CPU can set up its environment
+	m_timer_state++;
+	if (m_timer_state < 0x1000)
+		return;
+
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(m_timer_state, 0) ? ASSERT_LINE : CLEAR_LINE );
+	if (m_timer_state == 0xf000)
+		m_timer_state = 0x8000;
+}
 
 
 /****************************************************/
