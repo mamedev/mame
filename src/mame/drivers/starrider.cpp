@@ -90,6 +90,10 @@
 
  /FXXX+EXXX (active low)   111xxxxx xxxxxxxx      0xe000-0xefff
 
+ U5.6    /R5          x000 100xxxxx xxxxxxxx  0x0:0x8000-0x9fff
+
+ U23.3 (active low)        1x1xxxxx xxxxxxxx      0xa000-0xffff
+                           11xxxxxx xxxxxxxx
  U23.11 (active low)       101xxxxx xxxxxxxx      0xa000-0xbfff
                            110xxxxx xxxxxxxx      0xc000-0xdfff
 
@@ -110,6 +114,11 @@
  U19.6                     11001001 0xxxxxxx      0xc900-0xc97f
  U19.7                     11001001 1xxxxxxx      0xc980-0xc9ff
 
+ U28.15  /R1          x000 00xxxxxx xxxxxxxx  0x0:0x0000-0x3fff
+ U28.14  /R2          x100 00xxxxxx xxxxxxxx  0x4:0x0000-0x3fff
+ U28.13  /R3          x000 01xxxxxx xxxxxxxx  0x0:0x4000-0x7fff
+ U28.12  /R4          x100 01xxxxxx xxxxxxxx  0x4:0x4000-0x7fff
+
  D-9924 VGG:
  -----------
 
@@ -117,6 +126,17 @@
  * U97 2148 Palette luminance (high nybble of odd bytes)
  * U98 2148 Palette red (low nybble of even bytes)
  * U99 2148 Palette green (high nybble of even bytes)
+
+ U2.3    /B/G 9            xxxxx xx01 xxxxxxxx xxxxxxxx
+ U2.6    /CS TOP           xxxxx xxxx 11xxxxxx xxxxxxxx
+ U2.11 (active low)        xxxxx xx11 xxxxxxxx xxxxxxxx
+
+ U14.6 (active low)        1111x xxxx xxxxxxxx xxxxxxxx
+
+ U18.8 (active low)        xxxxx xx10 xxxxxxxx xxxxxxxx (CPU access)
+
+ U46.3   /1E               11110 xxxx xxxxxxxx xxxxxxxx
+ U46.8   /1F               11111 xxxx xxxxxxxx xxxxxxxx
 
  U33.8 (active low)        11001011 xxxxxxxx      0xcb00-0xcbff
 
@@ -193,6 +213,7 @@
 #include "machine/2812fifo.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 
@@ -209,6 +230,7 @@ public:
 		, m_main_cpu(*this, "cpu.u46")
 		, m_main_pia1(*this, "cpu.u10")
 		, m_main_pia2(*this, "cpu.u20")
+		, m_main_banks(*this, "cpu.page")
 		, m_main_nvram(*this, "cpu.u9")
 		, m_main_mem_prot(*this, "MEMPROT")
 		, m_main_led(*this, "cpu.u3")
@@ -272,12 +294,14 @@ private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sound_fifo_flag);
 
 	void main_memory(address_map &map);
+	void main_banks(address_map &map);
 	void pif_memory(address_map &map);
 	void sound_memory(address_map &map);
 
 	required_device<cpu_device> m_main_cpu;
 	required_device<pia6821_device> m_main_pia1;
 	required_device<pia6821_device> m_main_pia2;
+	required_device<address_map_bank_device> m_main_banks;
 	required_shared_ptr<u8> m_main_nvram;
 	required_ioport m_main_mem_prot;
 	output_finder<> m_main_led;
@@ -335,6 +359,12 @@ void sr_state::starrider(machine_config &config)
 	// IRQA and IRQB are unused
 
 	NVRAM(config, "cpu.u9", nvram_device::DEFAULT_ALL_0);
+
+	ADDRESS_MAP_BANK(config, m_main_banks, 24_MHz_XTAL / 2 / 12 /* ? */);
+	m_main_banks->set_map(&sr_state::main_banks);
+	m_main_banks->set_data_width(8);
+	m_main_banks->set_addr_width(20);
+	m_main_banks->set_stride(0x1'0000);
 
 	INPUT_MERGER_ANY_HIGH(config, "main.irq").output_handler().set_inputline(m_main_cpu, M6809_IRQ_LINE);
 
@@ -452,6 +482,7 @@ void sr_state::cpu_page_w(u8 data)
 {
 	// 4 bits latched by U43 (74LS173)
 	m_main_page = data & 0x0f;
+	m_main_banks->set_bank(m_main_page);
 }
 
 u8 sr_state::cpu_led_r(address_space &space)
@@ -479,7 +510,7 @@ u8 sr_state::cpu_wd_r(address_space &space)
 void sr_state::cpu_wd_w(u8 data)
 {
 	// U22 (74LS161) parallel load zero
-	if ((data & 0x3e) == 0x2a)
+	if ((data & 0x3e) == 0x14)
 		/* TODO: watchdog reset */;
 }
 
@@ -492,7 +523,7 @@ u8 sr_state::cpu_nvram_r(address_space &space, offs_t offset)
 void sr_state::cpu_nvram_w(offs_t offset, u8 data)
 {
 	// memory protect switch prevents writes to the first quarter of NVRAM
-	if ((offset & 0x300) || !BIT(m_main_mem_prot->read(), 0))
+	if ((offset & 0x300) || BIT(m_main_mem_prot->read(), 0))
 		m_main_nvram[offset] = data & 0x0f;
 }
 
@@ -692,6 +723,7 @@ template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_flag)
 
 void sr_state::main_memory(address_map &map)
 {
+	map(0x0000, 0x9fff).rw(m_main_banks, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xa000, 0xbfff).ram(); // U51/U44/U36/U25 (6116)
 	map(0xc000, 0xc7ff).ram().w(m_vgg_palette, FUNC(palette_device::write8)).share("vgg.color"); // U96/U97/U98/U99 (2148)
 
@@ -714,6 +746,19 @@ void sr_state::main_memory(address_map &map)
 	map(0xd000, 0xd7ff).ram(); // U14 (6116)
 	//map(0xd800, 0xdfff).ram() U7 (6116) unpopulated
 	map(0xe000, 0xffff).rom().region("fixed", 0x0000);
+}
+
+void sr_state::main_banks(address_map &map)
+{
+	// page 0x0/0x8 read
+	map(0x0'0000, 0x0'3fff).mirror(0x8'0000).rom().region("banked", 0x0'0000); // /R1 -> U8
+	map(0x0'4000, 0x0'7fff).mirror(0x8'0000).rom().region("banked", 0x0'8000); // /R3 -> U26
+	map(0x0'8000, 0x0'9fff).mirror(0x8'0000).rom().region("banked", 0x1'0000); // /R5 -> U45
+
+	// page 0x4/0xc read
+	map(0x4'0000, 0x4'3fff).mirror(0x8'0000).rom().region("banked", 0x0'4000); // /R2 -> U15
+	map(0x4'4000, 0x4'7fff).mirror(0x8'0000).rom().region("banked", 0x0'c000); // /R4 -> U37
+	// nothing in 0x4'8000-0x4'9fff
 }
 
 void sr_state::pif_memory(address_map &map)

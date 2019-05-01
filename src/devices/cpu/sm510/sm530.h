@@ -37,7 +37,7 @@ protected:
 	using sm510_base_device::do_branch;
 	virtual void do_branch(u8 pu, u8 pl); // does not have Pm
 	virtual void reset_vector() override { do_branch(0xf, 0); }
-	virtual void wakeup_vector() override { reset_vector(); }
+	virtual void wakeup_vector() override { do_branch(0, 0); }
 
 	// opcode handlers
 	virtual void op_lb() override;
