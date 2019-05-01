@@ -1579,7 +1579,6 @@ genieclean:
 clean: genieclean
 	@echo Cleaning...
 	-@rm -rf $(BUILDDIR)
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 	-@rm -rf 3rdparty/bgfx/.build
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
@@ -1713,7 +1712,6 @@ CPPCHECK_PARAMS += -Isrc/lib/util
 CPPCHECK_PARAMS += -Isrc/mame
 CPPCHECK_PARAMS += -Isrc/osd/modules/render
 CPPCHECK_PARAMS += -Isrc/osd/windows
-CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
 CPPCHECK_PARAMS += -I3rdparty
 ifndef USE_SYSTEM_LIB_LUA
 CPPCHECK_PARAMS += -I3rdparty/lua/src
