@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard, Berger
 /******************************************************************************
-*
+
 * fidel_chesster.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 These were made after Hegener & Glaser took over Fidelity(design phase started

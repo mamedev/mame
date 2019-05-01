@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
-*
+
 * fidel_eag68k.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity 68000-based Elite Avant Garde driver

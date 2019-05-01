@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
-*
+
 * novag_delta1.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)

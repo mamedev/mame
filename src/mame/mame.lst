@@ -9773,9 +9773,6 @@ chessmst                        //
 chessmsta                       //
 chessmstdm                      //
 
-@source:chesstrv.cpp
-chesstrv                        //
-
 @source:chexx.cpp
 chexx83                         // 1983 ICE
 faceoffh                        // 1983 SoftLogic / Entertainment Enterprises
@@ -21779,16 +21776,8 @@ mjsenpu
 @source:mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
 
-@source:mk1.cpp
-ccmk1                           // Chess Champion MK I
-cmpchess
-cncchess
-
 @source:mk14.cpp
 mk14                            //
-
-@source:mk2.cpp
-ccmk2                           // Chess Champion MK II
 
 @source:mk85.cpp
 mk85                            //
@@ -30797,6 +30786,14 @@ ccdelta1                        //
 diablo68                        //
 scorpio68                       //
 
+@source:novag_mk1.cpp
+ccmk1                           // Chess Champion MK I
+cmpchess
+cncchess
+
+@source:novag_mk2.cpp
+ccmk2                           // Chess Champion MK II
+
 @source:novag_presto.cpp
 nocto                           //
 npresto                         //
@@ -34205,6 +34202,12 @@ sbuggera                        // (c) 1981 Game-A-Tron
 @source:sc2.cpp
 sc2                             //
 sc2a                            //
+
+@source:scisys_chesstrv.cpp
+chesstrv                        //
+
+@source:scisys_cp2000.cpp
+cp2000                          //
 
 @source:scm_500.cpp
 scm_500                         //
