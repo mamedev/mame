@@ -699,7 +699,7 @@ READ8_MEMBER(bbc_state::via_system_portb_r)
 
 WRITE8_MEMBER(bbc_state::via_system_portb_w)
 {
-	m_latch->write_nibble_d3(space, 0, data);
+	m_latch->write_nibble_d3(data);
 
 	/* Master only */
 	if (m_rtc)

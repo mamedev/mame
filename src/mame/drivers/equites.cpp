@@ -650,10 +650,7 @@ void equites_state::equites_map(address_map &map)
 	map(0x100000, 0x100001).r(FUNC(equites_state::equites_spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(FUNC(equites_state::mcu_ram_r), FUNC(equites_state::mcu_ram_w)).umask16(0x00ff);
 	map(0x180000, 0x180001).portr("IN1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_a3(space, offset >> 14, data, mem_mask);
-												 });
+	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); });
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::equites_scrollreg_w));
 	map(0x380000, 0x380000).w(FUNC(equites_state::equites_bgcolor_w));
@@ -676,10 +673,7 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x080000, 0x080001).portr("IN0");
 	map(0x0c0000, 0x0c0001).portr("IN1");
 	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::equites_bgcolor_w));
-	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_a3(space, offset >> 14, data, mem_mask);
-												 });
+	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); });
 	map(0x100000, 0x100001).w(FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).w(FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
