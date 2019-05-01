@@ -195,12 +195,13 @@ CRT-351
 |              |=============J2=============||=============J1===============||
 +----------------------------------------------------------------------------+
 
-J1 80-pin connector to J1 connector on the CRT-350 mainboard
+J1 80-pin connector to J1 connector on the CRT-350 mainboard 
 J2 80-pin connector to J2 connector on the CRT-350 mainboard
 J3 65-pin single row connector for wire harness
 J4 40-pin dual row connector for printer
 J5 16-pin dual row connector for unknown
-J7 17-pin single row connector for unknown (some kind of jumper block)
+J6 17-pin single row connector for unknown (some kind of jumper block)
+J7 6-pin single row connector for hopper
 JPR3 is a 3 pin jumper: Pins 1&2 = Printer, pins 2&3= Hopper
 
 
@@ -352,12 +353,13 @@ CRT-351
 |              |=============J2=============||=============J1===============||
 +----------------------------------------------------------------------------+
 
-J1 80-pin connector to J1 connector on the CRT-350 mainboard
+J1 80-pin connector to J1 connector on the CRT-350 mainboard 
 J2 80-pin connector to J2 connector on the CRT-350 mainboard
 J3 65-pin single row connector for wire harness
 J4 40-pin dual row connector for printer
 J5 16-pin dual row connector for unknown
-J7 17-pin single row connector for unknown (some kind of jumper block)
+J6 17-pin single row connector for unknown (some kind of jumper block)
+J7 6-pin single row connector for hopper
 JPR3 is a 3 pin jumper: Pins 1&2 = Printer, pins 2&3= Hopper
 
 

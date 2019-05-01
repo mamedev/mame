@@ -159,8 +159,12 @@ uint16_t ti68k_state::reset_overlay_r(offs_t offset)
 		if (offset == 3 && !machine().side_effects_disabled())
 			m_ram_enabled = true;
 
+		// FIXME: this reset vector happens to work for all Flash systems, but may not be loaded
+		// first. It is algorithmically located by the preceding initialization code which looks
+		// for the string of four CC bytes preceding it. This code has not been enabled since it
+		// also contains a "Certificate Memory" self-test which fails.
 		if (m_flash.found())
-			return m_flash->read(offset + 0x12088/2); // why this offset?
+			return m_flash->read(offset + 0x12088/2);
 		else
 			return m_rom_base[offset];
 	}
