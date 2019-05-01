@@ -1689,17 +1689,21 @@ namespace netlist
 		if ((num_cons() != 0))
 		{
 			auto &lexec(exec());
-			//auto &q(lexec.queue());
-			auto nst(lexec.time() + delay);
+			const auto nst(lexec.time() + delay);
 
 			if (is_queued())
 				lexec.qremove(this);
-			m_in_queue = (!m_list_active.empty()) ?
-				queue_status::QUEUED : queue_status::DELAYED_DUE_TO_INACTIVE;    /* queued ? */
-			if (m_in_queue == queue_status::QUEUED)
+
+			if (!m_list_active.empty())
+			{
+				m_in_queue = queue_status::QUEUED;
 				lexec.qpush(queue_t::entry_t(nst, this));
+			}
 			else
+			{
+				m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
 				update_inputs();
+			}
 			m_next_scheduled_time = nst;
 		}
 	}
