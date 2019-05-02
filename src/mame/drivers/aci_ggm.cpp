@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:bataais
 /******************************************************************************
 
 Applied Concepts Great Game Machine (GGM), electronic board game computer.

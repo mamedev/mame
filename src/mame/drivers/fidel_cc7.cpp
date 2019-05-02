@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
-*
+
 * fidel_cc7.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************

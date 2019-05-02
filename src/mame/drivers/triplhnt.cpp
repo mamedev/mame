@@ -71,7 +71,7 @@ READ8_MEMBER(triplhnt_state::input_port_4_r)
 
 READ8_MEMBER(triplhnt_state::misc_r)
 {
-	m_latch->write_a0(space, offset, 0);
+	m_latch->write_a0(offset);
 	return ioport("VBLANK")->read() | m_hit_code;
 }
 

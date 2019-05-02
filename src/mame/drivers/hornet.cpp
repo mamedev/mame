@@ -556,7 +556,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x01 = ADDO (ADC DO)
 			*/
 			r = 0xf0;
-			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
+			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 			break;
 
 		case 4: /* I/O port 4 - DIP switches */
@@ -607,10 +607,10 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
-			m_adc12138->cs_w(space, 0, (data >> 3) & 0x1);
-			m_adc12138->conv_w(space, 0, (data >> 2) & 0x1);
-			m_adc12138->di_w(space, 0, (data >> 1) & 0x1);
-			m_adc12138->sclk_w(space, 0, data & 0x1);
+			m_adc12138->cs_w((data >> 3) & 0x1);
+			m_adc12138->conv_w((data >> 2) & 0x1);
+			m_adc12138->di_w((data >> 1) & 0x1);
+			m_adc12138->sclk_w(data & 0x1);
 
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			osd_printf_debug("System register 1 = %02X\n", data);

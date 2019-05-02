@@ -75,10 +75,13 @@
 		NET_CONNECT(name, K, cK)                                               \
 		NET_CONNECT(name, CLRQ, cCLRQ)
 
+#if (!USE_TRUTHTABLE_74107)
 #define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                   \
 		TTL_74107A(name, cCLK, cJ, cK, cCLRQ)
 
 #define TTL_74107_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74107_DIP, name)
+
+#endif
 
 #endif /* NLD_74107_H_ */

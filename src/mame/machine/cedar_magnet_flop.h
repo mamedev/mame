@@ -16,13 +16,13 @@ public:
 	// construction/destruction
 	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(port60_r);
-	DECLARE_READ8_MEMBER(port61_r);
-	DECLARE_READ8_MEMBER(port63_r);
+	u8 port60_r();
+	u8 port61_r();
+	u8 port63_r();
 
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(port62_w);
-	DECLARE_WRITE8_MEMBER(port63_w);
+	void port60_w(u8 data);
+	void port62_w(u8 data);
+	void port63_w(u8 data);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -33,13 +33,14 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t m_flopdat;
-	uint8_t m_flopcmd;
-	uint8_t m_flopsec;
-	uint8_t m_flopstat;
-	uint8_t m_floptrk;
+	required_region_ptr<u8> m_disk;
+	u8 m_flopdat;
+	u8 m_flopcmd;
+	u8 m_flopsec;
+	u8 m_flopstat;
+	u8 m_floptrk;
 
-	uint8_t m_curtrack;
+	u8 m_curtrack;
 	int m_secoffs;
 
 };

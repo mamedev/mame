@@ -140,7 +140,6 @@ cgenie.cpp
 channelf.cpp
 chaos.cpp
 chessmst.cpp
-chesstrv.cpp
 cit101.cpp
 cit220.cpp
 cking_master.cpp
@@ -471,9 +470,7 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
-mk1.cpp
 mk14.cpp
-mk2.cpp
 mk85.cpp
 mk90.cpp
 mkit09.cpp
@@ -534,6 +531,8 @@ notetaker.cpp
 novag_cforte.cpp
 novag_delta1.cpp
 novag_diablo.cpp
+novag_mk1.cpp
+novag_mk2.cpp
 novag_presto.cpp
 novag_scon.cpp
 novag_sexpert.cpp
@@ -690,6 +689,8 @@ savia84.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp
+scisys_chesstrv.cpp
+scisys_cp2000.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp

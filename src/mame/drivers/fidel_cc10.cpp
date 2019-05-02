@@ -2,7 +2,7 @@
 // copyright-holders:Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
-*
+
 * fidel_cc10.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 TODO:

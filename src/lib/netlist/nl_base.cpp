@@ -270,6 +270,9 @@ void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &
 	defs.push_back(ENTRY(HAS_OPENMP));
 	defs.push_back(ENTRY(USE_OPENMP));
 
+	defs.push_back(ENTRY(PPMF_TYPE));
+	defs.push_back(ENTRY(PHAS_PMF_INTERNAL));
+
 #undef ENTRY
 }
 
@@ -474,7 +477,8 @@ void netlist_t::print_stats() const
 		log().verbose("Total time     {1:15}", total_time);
 
 		// FIXME: clang complains about unreachable code without
-		if (USE_QUEUE_STATS || (!USE_QUEUE_STATS && m_stats))
+		const auto dummy = USE_QUEUE_STATS;
+		if (dummy)
 		{
 			/* Only one serialization should be counted in total time */
 			/* But two are contained in m_stat_mainloop */
@@ -704,9 +708,7 @@ void detail::net_t::process(const T mask, netlist_sig_t sig)
 			if ((p.terminal_state() & mask))
 			{
 				auto g(stats->m_stat_total_time.guard());
-				//p.device().m_stat_total_time.start();
 				p.m_delegate();
-				//p.device().m_stat_total_time.stop();
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
-*
+
 * ave_arb.cpp, subdriver of machine/chessbase.cpp
 
 AVE Micro Systems ARB chess computer driver, in some regions redistributed

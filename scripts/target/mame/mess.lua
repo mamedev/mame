@@ -1856,6 +1856,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
 	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
+	MAME_DIR .. "src/mame/drivers/scisys_cp2000.cpp",
 
 	MAME_DIR .. "src/mame/machine/fidelbase.cpp",
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
@@ -2763,8 +2764,8 @@ files {
 
 createMESSProjects(_target, _subtarget, "novag")
 files {
-	MAME_DIR .. "src/mame/drivers/mk1.cpp",
-	MAME_DIR .. "src/mame/drivers/mk2.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_mk1.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_mk2.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",
 	MAME_DIR .. "src/mame/includes/ssystem3.h",
 	MAME_DIR .. "src/mame/video/ssystem3.cpp",
@@ -3825,7 +3826,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/candela.cpp",
 	MAME_DIR .. "src/mame/drivers/cardinal.cpp",
 	MAME_DIR .. "src/mame/drivers/chaos.cpp",
-	MAME_DIR .. "src/mame/drivers/chesstrv.cpp",
+	MAME_DIR .. "src/mame/drivers/scisys_chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/cit101.cpp",

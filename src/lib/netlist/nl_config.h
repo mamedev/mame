@@ -65,6 +65,15 @@
 
 #define USE_TRUTHTABLE_7448 (0)
 
+/*
+ * FIXME: The truthtable implementation of 74107 (JK-Flipflop)
+ *        is included for educational purposes to demonstrate how
+ *        to implement state holding devices as truthtables.
+ *        It will completely nuke performance for pong.
+ */
+
+#define USE_TRUTHTABLE_74107 (0)
+
 //============================================================
 //  DEBUGGING
 //============================================================

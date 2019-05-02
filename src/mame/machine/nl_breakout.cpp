@@ -7,11 +7,12 @@
  *      - Start2 works (Couriersud)
  *      - Added discrete paddle potentiometers (Couriersud)
  *      - Changes made to run in MAME (Couriersud)
+ *      - Added bonus game dip switch (Couriersud)
+ *      - Added discrete startup latch
  *      - Original version imported from DICE
  *
  * TODO:
- *      - implement discrete startup latch
- *      - implement bonus game dip switch
+ *      - lamp triacs?
  *
  * The MAME team has asked for and received written confirmation from the
  * author of DICE to use, modify and redistribute code under:
@@ -1572,7 +1573,7 @@ CIRCUIT_LAYOUT( breakout )
 	RES(R51, RES_K(3.9))
 	RES(R52, RES_K(3.9))
 
-#if (SLOW_BUT_ACCURATE)
+#if (0 && SLOW_BUT_ACCURATE)
 	DIODE(CR6, "1N914")
 	NET_C(E2.11, CR6.K)
 
@@ -1584,15 +1585,11 @@ CIRCUIT_LAYOUT( breakout )
 	PARAM(CR6.ROFF, 1)
 	NET_C(R41.1, R42.1, R43.1, R51.1, R52.1)
 #endif
-#if 1
+
 	CONNECTION("R51", 2, PLAYFIELD)
 	CONNECTION("R43", 2, BSYNC)
 	CONNECTION("R52", 2, SCORE)
-#else
-	CONNECTION("R51", 2, "V5", Q)
-	CONNECTION("R43", 2, "V5", Q)
-	CONNECTION("R52", 2, "V5", Q)
-#endif
+
 	NET_C(R41.2, B9.3)
 	NET_C(R42.2, V5)
 
