@@ -9,7 +9,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="badroad.rka" size="4105" crc="7126d777" sha1="1c3f93c76bec063e5ca05a6b30e85837e2501b6c" offset="0" />
+				<rom name="badroad.rka" size="4105" crc="7126d777" sha1="1c3f93c76bec063e5ca05a6b30e85837e2501b6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3361">
-				<rom name="battlesh.rka" size="3361" crc="967781b6" sha1="e3ba8383e096b4f1c54ddc169024a584de2acbad" offset="0" />
+				<rom name="battlesh.rka" size="3361" crc="967781b6" sha1="e3ba8383e096b4f1c54ddc169024a584de2acbad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="23001">
-				<rom name="bdashall.rka" size="23001" crc="a2420cb3" sha1="7a557eb2037861edde18895ca0b9402bf7be6e76" offset="0" />
+				<rom name="bdashall.rka" size="23001" crc="a2420cb3" sha1="7a557eb2037861edde18895ca0b9402bf7be6e76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="15497">
-				<rom name="bdashfrm.rka" size="15497" crc="3dd7b313" sha1="c137ae1c18558b5bf5b380ce4be6426547e78c76" offset="0" />
+				<rom name="bdashfrm.rka" size="15497" crc="3dd7b313" sha1="c137ae1c18558b5bf5b380ce4be6426547e78c76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="15497">
-				<rom name="bdashsmr.rka" size="15497" crc="0760b44c" sha1="0b0fd32267d59f6e51eccc95c628c4c46682a475" offset="0" />
+				<rom name="bdashsmr.rka" size="15497" crc="0760b44c" sha1="0b0fd32267d59f6e51eccc95c628c4c46682a475"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="16393">
-				<rom name="bldrdash.rka" size="16393" crc="0407c111" sha1="7aa3f00f24571d993d0aa8cb9335b25eec5929db" offset="0" />
+				<rom name="bldrdash.rka" size="16393" crc="0407c111" sha1="7aa3f00f24571d993d0aa8cb9335b25eec5929db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4617">
-				<rom name="bombard.rka" size="4617" crc="84d17a6a" sha1="4ccf63f7411a162841473301cd3f6f04f6c4c66b" offset="0" />
+				<rom name="bombard.rka" size="4617" crc="84d17a6a" sha1="4ccf63f7411a162841473301cd3f6f04f6c4c66b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="box.rka" size="4105" crc="a0486df5" sha1="452f93b72b3df614b7c83cb1a0c721df7e3f60bf" offset="0" />
+				<rom name="box.rka" size="4105" crc="a0486df5" sha1="452f93b72b3df614b7c83cb1a0c721df7e3f60bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2825">
-				<rom name="buck_rog.rka" size="2825" crc="35f6e7f6" sha1="9b0ac115a4786005e6251db01fc2b058cba27c01" offset="0" />
+				<rom name="buck_rog.rka" size="2825" crc="35f6e7f6" sha1="9b0ac115a4786005e6251db01fc2b058cba27c01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="28938">
-				<rom name="chess.rka" size="28938" crc="47dd5fd9" sha1="25861b791a610ee109a3b8906b82476c8f093e5f" offset="0" />
+				<rom name="chess.rka" size="28938" crc="47dd5fd9" sha1="25861b791a610ee109a3b8906b82476c8f093e5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="970">
-				<rom name="chudov.rka" size="970" crc="69c629b4" sha1="0b43950247b7a28216cb2cbf3251555c17fefa28" offset="0" />
+				<rom name="chudov.rka" size="970" crc="69c629b4" sha1="0b43950247b7a28216cb2cbf3251555c17fefa28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="7689">
-				<rom name="cirk.rka" size="7689" crc="ad2f3340" sha1="90e1d0211e3821f8979faa96c2e2fa2d0de0b249" offset="0" />
+				<rom name="cirk.rka" size="7689" crc="ad2f3340" sha1="90e1d0211e3821f8979faa96c2e2fa2d0de0b249"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="19897">
-				<rom name="crocet.rka" size="19897" crc="7f01b26f" sha1="24cefc7df457bd149d360c93de6e6a76496b1f3b" offset="0" />
+				<rom name="crocet.rka" size="19897" crc="7f01b26f" sha1="24cefc7df457bd149d360c93de6e6a76496b1f3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -152,7 +152,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="11369">
-				<rom name="crossfir.rka" size="11369" crc="c30f872c" sha1="8219d45c3d5b49eb28e72958fe4b14437715db2e" offset="0" />
+				<rom name="crossfir.rka" size="11369" crc="c30f872c" sha1="8219d45c3d5b49eb28e72958fe4b14437715db2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="10506">
-				<rom name="descent.rka" size="10506" crc="97215e71" sha1="9563efb3ebb582d3c4deaf04b944133c28e1bb19" offset="0" />
+				<rom name="descent.rka" size="10506" crc="97215e71" sha1="9563efb3ebb582d3c4deaf04b944133c28e1bb19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -174,7 +174,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="17289">
-				<rom name="digger.rka" size="17289" crc="b5631421" sha1="c2ff2a6fcc3abbde206a0c30ec1a755ec9ec188b" offset="0" />
+				<rom name="digger.rka" size="17289" crc="b5631421" sha1="c2ff2a6fcc3abbde206a0c30ec1a755ec9ec188b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3021">
-				<rom name="engl.rka" size="3021" crc="1f6f47c5" sha1="badec2b38316cff4cf797445df4e496f45f91161" offset="0" />
+				<rom name="engl.rka" size="3021" crc="1f6f47c5" sha1="badec2b38316cff4cf797445df4e496f45f91161"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,7 +196,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3194">
-				<rom name="football.rka" size="3194" crc="4f77e321" sha1="dd4cc6d515b441537a52111b74ba04ec4470bbef" offset="0" />
+				<rom name="football.rka" size="3194" crc="4f77e321" sha1="dd4cc6d515b441537a52111b74ba04ec4470bbef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2941">
-				<rom name="foxhunt.rka" size="2941" crc="3630da50" sha1="e2c1fddc643975a28cc2e09131c54ff9b41c1fcb" offset="0" />
+				<rom name="foxhunt.rka" size="2941" crc="3630da50" sha1="e2c1fddc643975a28cc2e09131c54ff9b41c1fcb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,7 +218,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="froggi15.rka" size="4105" crc="82451761" sha1="045ea8786ff9187bbbeb660c49302527d8615aae" offset="0" />
+				<rom name="froggi15.rka" size="4105" crc="82451761" sha1="045ea8786ff9187bbbeb660c49302527d8615aae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="29355">
-				<rom name="gonki.rka" size="29355" crc="5c5b3803" sha1="cbd66ce65e14ec35ff3443adeb1edf6c0770a17f" offset="0" />
+				<rom name="gonki.rka" size="29355" crc="5c5b3803" sha1="cbd66ce65e14ec35ff3443adeb1edf6c0770a17f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +240,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4438">
-				<rom name="gorodki.rka" size="4438" crc="93aba42b" sha1="4cbf9160fbb28b7b492c1490ab0d918f350d18e0" offset="0" />
+				<rom name="gorodki.rka" size="4438" crc="93aba42b" sha1="4cbf9160fbb28b7b492c1490ab0d918f350d18e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -251,7 +251,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="13145">
-				<rom name="klad.rka" size="13145" crc="9b3586b6" sha1="79ce2eec3ed572ecc752b99ff1b2aead84ca977a" offset="0" />
+				<rom name="klad.rka" size="13145" crc="9b3586b6" sha1="79ce2eec3ed572ecc752b99ff1b2aead84ca977a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5196">
-				<rom name="kolobok.rka" size="5196" crc="dd900dad" sha1="7242564b7da2b195f6d18b8ba479f95f2f8df92b" offset="0" />
+				<rom name="kolobok.rka" size="5196" crc="dd900dad" sha1="7242564b7da2b195f6d18b8ba479f95f2f8df92b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +273,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="16076">
-				<rom name="kommutat.rka" size="16076" crc="0b1fb2b6" sha1="4983ff56e32441b5d5383fcc954e584931b43989" offset="0" />
+				<rom name="kommutat.rka" size="16076" crc="0b1fb2b6" sha1="4983ff56e32441b5d5383fcc954e584931b43989"/>
 			</dataarea>
 		</part>
 	</software>
@@ -284,7 +284,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3170">
-				<rom name="landmine.rka" size="3170" crc="38a1c993" sha1="07cded088f5e528296053f1b43cff47d5e5e6964" offset="0" />
+				<rom name="landmine.rka" size="3170" crc="38a1c993" sha1="07cded088f5e528296053f1b43cff47d5e5e6964"/>
 			</dataarea>
 		</part>
 	</software>
@@ -295,7 +295,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="7977">
-				<rom name="lestn.rka" size="7977" crc="6a23b4ac" sha1="89514d18a7f6a16a5bff471517625e63ce9f9d02" offset="0" />
+				<rom name="lestn.rka" size="7977" crc="6a23b4ac" sha1="89514d18a7f6a16a5bff471517625e63ce9f9d02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -306,7 +306,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1791">
-				<rom name="lestnica.rka" size="1791" crc="aea86cfe" sha1="2575d3ffbdca68649e3a5d466884d2d748cc2f40" offset="0" />
+				<rom name="lestnica.rka" size="1791" crc="aea86cfe" sha1="2575d3ffbdca68649e3a5d466884d2d748cc2f40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -317,7 +317,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3290">
-				<rom name="life.rka" size="3290" crc="1587f724" sha1="506a0b1272820117a18fad26c55f311b9c0ed85e" offset="0" />
+				<rom name="life.rka" size="3290" crc="1587f724" sha1="506a0b1272820117a18fad26c55f311b9c0ed85e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -328,7 +328,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1546">
-				<rom name="life1.rka" size="1546" crc="8ebebe53" sha1="27769ab12988f83c9f475f82720069bd8fc64227" offset="0" />
+				<rom name="life1.rka" size="1546" crc="8ebebe53" sha1="27769ab12988f83c9f475f82720069bd8fc64227"/>
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +339,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="6239">
-				<rom name="liqsky.rka" size="6239" crc="e9db15ac" sha1="6c854529c3c234dd44ecabbf1f26ceba97510180" offset="0" />
+				<rom name="liqsky.rka" size="6239" crc="e9db15ac" sha1="6c854529c3c234dd44ecabbf1f26ceba97510180"/>
 			</dataarea>
 		</part>
 	</software>
@@ -350,7 +350,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="12569">
-				<rom name="loderun.rka" size="12569" crc="cb5a8c2b" sha1="0873b6eba458bc1714d376fe16fa598d370c02ae" offset="0" />
+				<rom name="loderun.rka" size="12569" crc="cb5a8c2b" sha1="0873b6eba458bc1714d376fe16fa598d370c02ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -361,7 +361,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5249">
-				<rom name="lrunner.rka" size="5249" crc="473ea733" sha1="f0b60280bebd1efc82f4b2710c33aa45d42b14a0" offset="0" />
+				<rom name="lrunner.rka" size="5249" crc="473ea733" sha1="f0b60280bebd1efc82f4b2710c33aa45d42b14a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -372,7 +372,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3497">
-				<rom name="marafon.rka" size="3497" crc="6b284c47" sha1="4562f23b50ad4b1c35502117a0cc9ad316b24ac2" offset="0" />
+				<rom name="marafon.rka" size="3497" crc="6b284c47" sha1="4562f23b50ad4b1c35502117a0cc9ad316b24ac2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,7 +383,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5642">
-				<rom name="mars.rka" size="5642" crc="7b4d6f94" sha1="ddc1f942052b8815850151c765688f2a2002f5e4" offset="0" />
+				<rom name="mars.rka" size="5642" crc="7b4d6f94" sha1="ddc1f942052b8815850151c765688f2a2002f5e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -394,7 +394,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2570">
-				<rom name="mars_alt.rka" size="2570" crc="7a1c6fdf" sha1="852d954c47bf5aa1289c4475ce67b8156d51f8d2" offset="0" />
+				<rom name="mars_alt.rka" size="2570" crc="7a1c6fdf" sha1="852d954c47bf5aa1289c4475ce67b8156d51f8d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2313">
-				<rom name="marsh2.rka" size="2313" crc="5eaeeb16" sha1="ea6c54ce730e83d57d3c74e406128cff8f01c29c" offset="0" />
+				<rom name="marsh2.rka" size="2313" crc="5eaeeb16" sha1="ea6c54ce730e83d57d3c74e406128cff8f01c29c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -416,7 +416,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3081">
-				<rom name="mesh.rka" size="3081" crc="5aaa5c6a" sha1="ea885314ee224f6eec6f9c7754d17446e7d7fe76" offset="0" />
+				<rom name="mesh.rka" size="3081" crc="5aaa5c6a" sha1="ea885314ee224f6eec6f9c7754d17446e7d7fe76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -427,7 +427,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="mirage.rka" size="4105" crc="11246976" sha1="80230c38b2a7c904ca4fc2518833766116313b5f" offset="0" />
+				<rom name="mirage.rka" size="4105" crc="11246976" sha1="80230c38b2a7c904ca4fc2518833766116313b5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -438,7 +438,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1033">
-				<rom name="mus1.rka" size="1033" crc="4bbd4043" sha1="7b330c642370abaf51250faa11a393c2e530f1b4" offset="0" />
+				<rom name="mus1.rka" size="1033" crc="4bbd4043" sha1="7b330c642370abaf51250faa11a393c2e530f1b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -449,7 +449,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1289">
-				<rom name="mus2.rka" size="1289" crc="022539f9" sha1="bb53ecf365174f0f736756995eed827f569353b7" offset="0" />
+				<rom name="mus2.rka" size="1289" crc="022539f9" sha1="bb53ecf365174f0f736756995eed827f569353b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -460,7 +460,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2057">
-				<rom name="mus3.rka" size="2057" crc="5f717fac" sha1="c523391f14a69f2de9a8b5e3388c99fffe5cc8eb" offset="0" />
+				<rom name="mus3.rka" size="2057" crc="5f717fac" sha1="c523391f14a69f2de9a8b5e3388c99fffe5cc8eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -471,7 +471,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1033">
-				<rom name="mus4.rka" size="1033" crc="be892d73" sha1="db673924ce75125e544ffb51330dc289f93375e3" offset="0" />
+				<rom name="mus4.rka" size="1033" crc="be892d73" sha1="db673924ce75125e544ffb51330dc289f93375e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -482,7 +482,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1546">
-				<rom name="mus5.rka" size="1546" crc="41782166" sha1="c998a6e09990715359487d0b2cc2b15d3afc7b03" offset="0" />
+				<rom name="mus5.rka" size="1546" crc="41782166" sha1="c998a6e09990715359487d0b2cc2b15d3afc7b03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -493,7 +493,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1546">
-				<rom name="mus6.rka" size="1546" crc="a9cf92f3" sha1="ce827b5355f1c478dddfd467fe7be2060526ff99" offset="0" />
+				<rom name="mus6.rka" size="1546" crc="a9cf92f3" sha1="ce827b5355f1c478dddfd467fe7be2060526ff99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -504,7 +504,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2313">
-				<rom name="mus7.rka" size="2313" crc="b40d6b04" sha1="e89531a0654d6d51775ebd679cb547a00df07903" offset="0" />
+				<rom name="mus7.rka" size="2313" crc="b40d6b04" sha1="e89531a0654d6d51775ebd679cb547a00df07903"/>
 			</dataarea>
 		</part>
 	</software>
@@ -515,7 +515,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2707">
-				<rom name="musicbox.rka" size="2707" crc="056b77c4" sha1="3cd020bca79d41ce6ba9ade62345bcae734def67" offset="0" />
+				<rom name="musicbox.rka" size="2707" crc="056b77c4" sha1="3cd020bca79d41ce6ba9ade62345bcae734def67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -526,7 +526,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4169">
-				<rom name="nesushka.rka" size="4169" crc="5bd4dbca" sha1="e9af41bdabf833adf9d78b124892450e8d141007" offset="0" />
+				<rom name="nesushka.rka" size="4169" crc="5bd4dbca" sha1="e9af41bdabf833adf9d78b124892450e8d141007"/>
 			</dataarea>
 		</part>
 	</software>
@@ -537,7 +537,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5119">
-				<rom name="nim.rka" size="5119" crc="97f25dc3" sha1="7703f156b2395127c8f0071bb326b2a8d0d788ff" offset="0" />
+				<rom name="nim.rka" size="5119" crc="97f25dc3" sha1="7703f156b2395127c8f0071bb326b2a8d0d788ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -548,7 +548,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4552">
-				<rom name="pacman.rka" size="4552" crc="0c35b94c" sha1="b09ebbcb1eca2363d59b55dbfd72a15cc6a443d7" offset="0" />
+				<rom name="pacman.rka" size="4552" crc="0c35b94c" sha1="b09ebbcb1eca2363d59b55dbfd72a15cc6a443d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -559,7 +559,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4552">
-				<rom name="pacman2.rka" size="4552" crc="c29688f0" sha1="e0a0ed69e8c0d58325ac10c5cf1e24a6ae168f3d" offset="0" />
+				<rom name="pacman2.rka" size="4552" crc="c29688f0" sha1="e0a0ed69e8c0d58325ac10c5cf1e24a6ae168f3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -570,7 +570,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="6736">
-				<rom name="panika.rka" size="6736" crc="a386c142" sha1="7f0e4c8e3dc30e57cef12455fc666f8d1ab14db8" offset="0" />
+				<rom name="panika.rka" size="6736" crc="a386c142" sha1="7f0e4c8e3dc30e57cef12455fc666f8d1ab14db8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -581,7 +581,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5914">
-				<rom name="pentis.rka" size="5914" crc="937cd247" sha1="515d2bdf95fff61ef6572cda92d9c3a0602ef0ab" offset="0" />
+				<rom name="pentis.rka" size="5914" crc="937cd247" sha1="515d2bdf95fff61ef6572cda92d9c3a0602ef0ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -592,7 +592,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4505">
-				<rom name="pif.rka" size="4505" crc="c40ae07c" sha1="d44f147c440267f8afff5ce9896326ca572683de" offset="0" />
+				<rom name="pif.rka" size="4505" crc="c40ae07c" sha1="d44f147c440267f8afff5ce9896326ca572683de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -603,7 +603,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1763">
-				<rom name="pingpong.rka" size="1763" crc="61c4398b" sha1="9e93e16e6de416e2a9cae080b6d5de78727e9956" offset="0" />
+				<rom name="pingpong.rka" size="1763" crc="61c4398b" sha1="9e93e16e6de416e2a9cae080b6d5de78727e9956"/>
 			</dataarea>
 		</part>
 	</software>
@@ -614,7 +614,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="17401">
-				<rom name="planeta.rka" size="17401" crc="848ca8ac" sha1="ade878341dac66391e894fa4f9beee3d56b8c8bb" offset="0" />
+				<rom name="planeta.rka" size="17401" crc="848ca8ac" sha1="ade878341dac66391e894fa4f9beee3d56b8c8bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -625,7 +625,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="12809">
-				<rom name="pogonia.rka" size="12809" crc="4b1854c1" sha1="cdd6d2d30197d24b931fff21c3fc0eb63737b418" offset="0" />
+				<rom name="pogonia.rka" size="12809" crc="4b1854c1" sha1="cdd6d2d30197d24b931fff21c3fc0eb63737b418"/>
 			</dataarea>
 		</part>
 	</software>
@@ -636,7 +636,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1453">
-				<rom name="pvo87.rka" size="1453" crc="fa1327db" sha1="54bbeb7e612e6012ff923905fe7a6cac71609dbe" offset="0" />
+				<rom name="pvo87.rka" size="1453" crc="fa1327db" sha1="54bbeb7e612e6012ff923905fe7a6cac71609dbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -647,7 +647,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="ralli.rka" size="4105" crc="5633d9d5" sha1="4fe4ddf7b0f73bf9a7470afdc6c2faf91b8016c0" offset="0" />
+				<rom name="ralli.rka" size="4105" crc="5633d9d5" sha1="4fe4ddf7b0f73bf9a7470afdc6c2faf91b8016c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -658,7 +658,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5577">
-				<rom name="ralslal.rka" size="5577" crc="763d25d2" sha1="544cb7d2665e5a27c9b279a9247dd5bb67e00651" offset="0" />
+				<rom name="ralslal.rka" size="5577" crc="763d25d2" sha1="544cb7d2665e5a27c9b279a9247dd5bb67e00651"/>
 			</dataarea>
 		</part>
 	</software>
@@ -669,7 +669,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5851">
-				<rom name="redflwr.rka" size="5851" crc="6774fdb3" sha1="d97fd18071f076e17d961b058a4f31d09957503c" offset="0" />
+				<rom name="redflwr.rka" size="5851" crc="6774fdb3" sha1="d97fd18071f076e17d961b058a4f31d09957503c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -680,7 +680,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="11417">
-				<rom name="rein.rka" size="11417" crc="aee962f9" sha1="bbc1feb0eb82a33e9d2536a09a2043bec7a46791" offset="0" />
+				<rom name="rein.rka" size="11417" crc="aee962f9" sha1="bbc1feb0eb82a33e9d2536a09a2043bec7a46791"/>
 			</dataarea>
 		</part>
 	</software>
@@ -691,7 +691,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="12297">
-				<rom name="rikoshet.rka" size="12297" crc="4283ed5d" sha1="f38424510b0bb9d34e9418e29fbf1cc1629f520f" offset="0" />
+				<rom name="rikoshet.rka" size="12297" crc="4283ed5d" sha1="f38424510b0bb9d34e9418e29fbf1cc1629f520f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +702,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="9481">
-				<rom name="rise.rka" size="9481" crc="ea70a438" sha1="f67718c2e339333b34fd1d1197bb7eaf52de17dd" offset="0" />
+				<rom name="rise.rka" size="9481" crc="ea70a438" sha1="f67718c2e339333b34fd1d1197bb7eaf52de17dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -713,7 +713,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3353">
-				<rom name="saboteur.rka" size="3353" crc="7b76172b" sha1="99e1dee796a3930a7589a18f69157ab93db091a1" offset="0" />
+				<rom name="saboteur.rka" size="3353" crc="7b76172b" sha1="99e1dee796a3930a7589a18f69157ab93db091a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -724,7 +724,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3001">
-				<rom name="sad.rka" size="3001" crc="35ce6b48" sha1="7510aa2d6fadf916bc0132895cc921e4f55c18be" offset="0" />
+				<rom name="sad.rka" size="3001" crc="35ce6b48" sha1="7510aa2d6fadf916bc0132895cc921e4f55c18be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -735,7 +735,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="15305">
-				<rom name="shahty.rka" size="15305" crc="533db960" sha1="0aafc73037ee3043b8f9914dde0c6748e490f532" offset="0" />
+				<rom name="shahty.rka" size="15305" crc="533db960" sha1="0aafc73037ee3043b8f9914dde0c6748e490f532"/>
 			</dataarea>
 		</part>
 	</software>
@@ -746,7 +746,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="9737">
-				<rom name="shashki.rka" size="9737" crc="a5f99284" sha1="ad781ce86cc085d5e43a6ba0f91c712e10304fed" offset="0" />
+				<rom name="shashki.rka" size="9737" crc="a5f99284" sha1="ad781ce86cc085d5e43a6ba0f91c712e10304fed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -757,7 +757,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="9257">
-				<rom name="shmel.rka" size="9257" crc="7b3a884c" sha1="ed76b4d11e3b13077bab3294e586f7be7ddf7a4c" offset="0" />
+				<rom name="shmel.rka" size="9257" crc="7b3a884c" sha1="ed76b4d11e3b13077bab3294e586f7be7ddf7a4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -768,7 +768,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5434">
-				<rom name="shturm.rka" size="5434" crc="94df098a" sha1="57ba78240d1d0f8228261041071fe129131bb645" offset="0" />
+				<rom name="shturm.rka" size="5434" crc="94df098a" sha1="57ba78240d1d0f8228261041071fe129131bb645"/>
 			</dataarea>
 		</part>
 	</software>
@@ -779,7 +779,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4505">
-				<rom name="skachki.rka" size="4505" crc="1a61d798" sha1="a26a2ddecfeb12cc180bec1938414a2636ea2de0" offset="0" />
+				<rom name="skachki.rka" size="4505" crc="1a61d798" sha1="a26a2ddecfeb12cc180bec1938414a2636ea2de0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -790,7 +790,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2377">
-				<rom name="skaloed.rka" size="2377" crc="e1937741" sha1="3c8a5b4334a8a8016fe03295856a0ddf7fc9f2e0" offset="0" />
+				<rom name="skaloed.rka" size="2377" crc="e1937741" sha1="3c8a5b4334a8a8016fe03295856a0ddf7fc9f2e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -801,7 +801,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4262">
-				<rom name="slams.rka" size="4262" crc="c6802ae0" sha1="eaafff202e848cbbd0a696ecf65d8bd7336f802b" offset="0" />
+				<rom name="slams.rka" size="4262" crc="c6802ae0" sha1="eaafff202e848cbbd0a696ecf65d8bd7336f802b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -812,7 +812,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4617">
-				<rom name="snake.rka" size="4617" crc="2209aa3e" sha1="c918a429861121fef1c13386adc05e118ab4e1ba" offset="0" />
+				<rom name="snake.rka" size="4617" crc="2209aa3e" sha1="c918a429861121fef1c13386adc05e118ab4e1ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -823,7 +823,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="sos.rka" size="4105" crc="5e08d1c3" sha1="c6746f59e0e93490dcde6e63083ff4429763d2f9" offset="0" />
+				<rom name="sos.rka" size="4105" crc="5e08d1c3" sha1="c6746f59e0e93490dcde6e63083ff4429763d2f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -834,7 +834,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1280">
-				<rom name="spbattle.rka" size="1280" crc="9e6dae70" sha1="0962f912c8a3fcc5061cebe1de9cf3cab6aa200e" offset="0" />
+				<rom name="spbattle.rka" size="1280" crc="9e6dae70" sha1="0962f912c8a3fcc5061cebe1de9cf3cab6aa200e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -845,7 +845,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5529">
-				<rom name="spinsect.rka" size="5529" crc="170f7b36" sha1="d7bcfa04168ff65f757ede48aaadedd510c3deb2" offset="0" />
+				<rom name="spinsect.rka" size="5529" crc="170f7b36" sha1="d7bcfa04168ff65f757ede48aaadedd510c3deb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -856,7 +856,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="6729">
-				<rom name="spysdem.rka" size="6729" crc="3c862f3f" sha1="469ea963a0303137569b7f441ceea87bf6daac4c" offset="0" />
+				<rom name="spysdem.rka" size="6729" crc="3c862f3f" sha1="469ea963a0303137569b7f441ceea87bf6daac4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -867,7 +867,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3871">
-				<rom name="stakan.rka" size="3871" crc="37be2ea3" sha1="d41851532fa0f0c784b8ef489df536988a4dfd7c" offset="0" />
+				<rom name="stakan.rka" size="3871" crc="37be2ea3" sha1="d41851532fa0f0c784b8ef489df536988a4dfd7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -878,7 +878,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4527">
-				<rom name="stelbi.rka" size="4527" crc="94688ecf" sha1="46d1ade0cbbe8192b05c442b9fd15275304e09c9" offset="0" />
+				<rom name="stelbi.rka" size="4527" crc="94688ecf" sha1="46d1ade0cbbe8192b05c442b9fd15275304e09c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -889,7 +889,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="11945">
-				<rom name="stena.rka" size="11945" crc="2e097fea" sha1="f64ca7a4f8ac31249319d64a8db0678776bf0e88" offset="0" />
+				<rom name="stena.rka" size="11945" crc="2e097fea" sha1="f64ca7a4f8ac31249319d64a8db0678776bf0e88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -900,7 +900,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2361">
-				<rom name="stonefld.rka" size="2361" crc="4956a5f8" sha1="075fa56956d196a5dbb6bfdfc2ec3b8bb9c81872" offset="0" />
+				<rom name="stonefld.rka" size="2361" crc="4956a5f8" sha1="075fa56956d196a5dbb6bfdfc2ec3b8bb9c81872"/>
 			</dataarea>
 		</part>
 	</software>
@@ -911,7 +911,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5282">
-				<rom name="tarelki.rka" size="5282" crc="32422ee1" sha1="4b2909218d9571ae4ea442fb2304b23ffaf4ad6f" offset="0" />
+				<rom name="tarelki.rka" size="5282" crc="32422ee1" sha1="4b2909218d9571ae4ea442fb2304b23ffaf4ad6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -922,7 +922,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2377">
-				<rom name="tennis.rka" size="2377" crc="b3444451" sha1="ced24cf9e7fdbd2c7e449373239c54e0a803bb62" offset="0" />
+				<rom name="tennis.rka" size="2377" crc="b3444451" sha1="ced24cf9e7fdbd2c7e449373239c54e0a803bb62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -933,7 +933,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2313">
-				<rom name="tetris.rka" size="2313" crc="492f274a" sha1="616a9a33720a2e25ef0212b6facd7ffc95238295" offset="0" />
+				<rom name="tetris.rka" size="2313" crc="492f274a" sha1="616a9a33720a2e25ef0212b6facd7ffc95238295"/>
 			</dataarea>
 		</part>
 	</software>
@@ -944,7 +944,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4362">
-				<rom name="torpatt.rka" size="4362" crc="ef59fea8" sha1="519a60e4e0f91222d42283865a29956ab8757fe4" offset="0" />
+				<rom name="torpatt.rka" size="4362" crc="ef59fea8" sha1="519a60e4e0f91222d42283865a29956ab8757fe4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -955,7 +955,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="8828">
-				<rom name="trasina.rka" size="8828" crc="c2794fa0" sha1="02921f55d664925e090de62a8da08f6fa9311d92" offset="0" />
+				<rom name="trasina.rka" size="8828" crc="c2794fa0" sha1="02921f55d664925e090de62a8da08f6fa9311d92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -966,7 +966,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1059">
-				<rom name="tulpan.rka" size="1059" crc="f8ece2ce" sha1="92a8efe96333e39f9d556d31a22178441d1734d2" offset="0" />
+				<rom name="tulpan.rka" size="1059" crc="f8ece2ce" sha1="92a8efe96333e39f9d556d31a22178441d1734d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -977,7 +977,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2057">
-				<rom name="udav.rka" size="2057" crc="ecc4fc76" sha1="f913f279847c66ac581aded102ee406853009b7f" offset="0" />
+				<rom name="udav.rka" size="2057" crc="ecc4fc76" sha1="f913f279847c66ac581aded102ee406853009b7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -988,7 +988,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1450">
-				<rom name="utka.rka" size="1450" crc="1277b1bb" sha1="00d0a7f92b7c12bfdc928686ac488d22882e710f" offset="0" />
+				<rom name="utka.rka" size="1450" crc="1277b1bb" sha1="00d0a7f92b7c12bfdc928686ac488d22882e710f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -999,7 +999,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="2361">
-				<rom name="wood.rka" size="2361" crc="9fd36743" sha1="79932e8efbfb8c6abee6dc3b465352470f15e5c2" offset="0" />
+				<rom name="wood.rka" size="2361" crc="9fd36743" sha1="79932e8efbfb8c6abee6dc3b465352470f15e5c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1010,7 +1010,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3937">
-				<rom name="xonixzm.rka" size="3937" crc="d269d551" sha1="3c88e9258a5ae49e77d1249565eb848c326835ca" offset="0" />
+				<rom name="xonixzm.rka" size="3937" crc="d269d551" sha1="3c88e9258a5ae49e77d1249565eb848c326835ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1021,7 +1021,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="7802">
-				<rom name="xtro.rka" size="7802" crc="932aa910" sha1="57da1a34a50dc698068b078f5c2e2eef1f6167b1" offset="0" />
+				<rom name="xtro.rka" size="7802" crc="932aa910" sha1="57da1a34a50dc698068b078f5c2e2eef1f6167b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1035,7 +1035,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="11828">
-				<rom name="basgraph.rka" size="11828" crc="af1ba121" sha1="27c56d0b01d53d34028399932e851638a8b411aa" offset="0" />
+				<rom name="basgraph.rka" size="11828" crc="af1ba121" sha1="27c56d0b01d53d34028399932e851638a8b411aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1046,7 +1046,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="8200">
-				<rom name="basmicr.rka" size="8200" crc="b989b2f8" sha1="9be29bb4255453cb1cb6da05ffe737cc13f18c2c" offset="0" />
+				<rom name="basmicr.rka" size="8200" crc="b989b2f8" sha1="9be29bb4255453cb1cb6da05ffe737cc13f18c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1057,7 +1057,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="17786">
-				<rom name="basmsx.rka" size="17786" crc="e949e6e2" sha1="363e873fc9f55791028551f418ff6f2972cd0a4f" offset="0" />
+				<rom name="basmsx.rka" size="17786" crc="e949e6e2" sha1="363e873fc9f55791028551f418ff6f2972cd0a4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1068,7 +1068,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="7689">
-				<rom name="basrk.rka" size="7689" crc="b29f5db1" sha1="1e009b87fa1c352425bc63b9204ccb530940c98d" offset="0" />
+				<rom name="basrk.rka" size="7689" crc="b29f5db1" sha1="1e009b87fa1c352425bc63b9204ccb530940c98d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1079,7 +1079,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="3747">
-				<rom name="dumpred.rka" size="3747" crc="ef6c7903" sha1="c8cd5ac95a52ffc8c8a2d99f5f879cc56c0011af" offset="0" />
+				<rom name="dumpred.rka" size="3747" crc="ef6c7903" sha1="c8cd5ac95a52ffc8c8a2d99f5f879cc56c0011af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1090,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="5129">
-				<rom name="graphred.rka" size="5129" crc="e5b15e4c" sha1="022b72488aa0c293dc3f1d726e585c2157ce3265" offset="0" />
+				<rom name="graphred.rka" size="5129" crc="e5b15e4c" sha1="022b72488aa0c293dc3f1d726e585c2157ce3265"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1101,7 +1101,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1014">
-				<rom name="poisk.rka" size="1014" crc="763ef592" sha1="67ae4cef6b6c009271952dc2bd78402a330390da" offset="0" />
+				<rom name="poisk.rka" size="1014" crc="763ef592" sha1="67ae4cef6b6c009271952dc2bd78402a330390da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1112,7 +1112,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4901">
-				<rom name="proverka.rka" size="4901" crc="3d008245" sha1="da5e71a74f5723b8f16f2bd0a0efa6ed200dbd1f" offset="0" />
+				<rom name="proverka.rka" size="4901" crc="3d008245" sha1="da5e71a74f5723b8f16f2bd0a0efa6ed200dbd1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1123,7 +1123,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="1402">
-				<rom name="recorder.rka" size="1402" crc="c0b03aa1" sha1="8bd8ff358233700a889fc8351cfa1bd4dacde200" offset="0" />
+				<rom name="recorder.rka" size="1402" crc="c0b03aa1" sha1="8bd8ff358233700a889fc8351cfa1bd4dacde200"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1134,7 +1134,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="redasm.rka" size="4105" crc="b8e49913" sha1="6764edb38820e1a6cc4c30f6ed6f2ba78e0feecc" offset="0" />
+				<rom name="redasm.rka" size="4105" crc="b8e49913" sha1="6764edb38820e1a6cc4c30f6ed6f2ba78e0feecc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1145,7 +1145,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apogee_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="reddssm.rka" size="4105" crc="14802c17" sha1="4efe18cc5f71e6cb45a5e1bd557de009cdbce72e" offset="0" />
+				<rom name="reddssm.rka" size="4105" crc="14802c17" sha1="4efe18cc5f71e6cb45a5e1bd557de009cdbce72e"/>
 			</dataarea>
 		</part>
 	</software>
