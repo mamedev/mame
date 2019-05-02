@@ -2159,7 +2159,7 @@ void segahang_state::init_endurob2()
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1985, hangon,     0,        hangon,   hangon,    segahang_state, init_generic,  ROT0, "Sega", "Hang-On (Rev A)", 0 )
 GAME( 1985, hangon1,    hangon,   hangon,   hangon,    segahang_state, init_generic,  ROT0, "Sega", "Hang-On", 0 )
-GAME( 1985, hangon2,    hangon,   hangon,   hangon2,   segahang_state, init_generic,  ROT0, "Sega", "Hang-On (ride-on)", 0 )
+GAME( 1985, hangon2,    hangon,   hangon,   hangon2,   segahang_state, init_generic,  ROT0, "Sega", "Hang-On (Rev A, ride-on)", 0 )
 
 GAME( 1987, shangonro,  shangon,  shangonro,shangonro, segahang_state, init_generic,  ROT0, "Sega", "Super Hang-On (Hang-On conversion, ride-on, Japan, FD1094 317-0038)", 0 )
 GAME( 1987, shangonho,  shangon,  shangonro,shangupb,  segahang_state, init_generic,  ROT0, "Sega", "Super Hang-On (Hang-On conversion, Japan, FD1094 317-0039)", 0 )
