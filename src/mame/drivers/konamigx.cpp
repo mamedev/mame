@@ -1011,7 +1011,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0xd5a000, 0xd5a003).portr("SYSTEM_DSW");
 	map(0xd5c000, 0xd5c003).portr("INPUTS");
 	map(0xd5e000, 0xd5e003).portr("SERVICE");
-	map(0xd80000, 0xd8001f).w(m_k054338, FUNC(k054338_device::long_w));
+	map(0xd80000, 0xd8001f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0xda0000, 0xda1fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0xda2000, 0xda3fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 }
