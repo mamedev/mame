@@ -179,8 +179,37 @@ protected:
 		// artifacting config
 		void setup_config(device_t *device);
 		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
+        void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+        bool get_pal_artifacting() { return m_palartifacting; }
 
 		// artifacting application
+		template<int xscale>
+		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
+		{
+            if( !m_artifacting || !m_palartifacting )
+                return;
+
+            //if( (mode & (MODE_AS|MODE_GM0)) == MODE_AS )
+            {
+                uint32_t tmpPixel;
+                pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
+                pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
+
+                for( int pixel = 0; pixel < bitmap.width(); ++pixel )
+                {
+                    if( line1[pixel] != line2[pixel] )
+                    {
+                        tmpPixel  = (( ((line1[pixel] & 0xFF0000) >> 16) + ((line2[pixel] & 0xFF0000) >> 16) / 2) << 16);
+                        tmpPixel |= (( ((line1[pixel] & 0xFF00  ) >> 8 ) + ((line2[pixel] & 0xFF00  ) >> 8 ) / 2) << 8 );
+                        tmpPixel |=  ( ( line1[pixel] & 0xFF    )        +  (line2[pixel] & 0xFF    )      ) / 2;
+
+                        line1[pixel] = tmpPixel;
+                        line2[pixel] = tmpPixel;
+                    }
+                }
+            }
+        }
+
 		template<int xscale>
 		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
 		{
@@ -218,6 +247,7 @@ protected:
 		}
 
 	private:
+		bool m_palartifacting;
 		ioport_port *m_config;
 		ioport_value m_artifacting;
 		ioport_value m_saved_artifacting;

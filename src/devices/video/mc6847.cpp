@@ -903,7 +903,14 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
 
 		/* artifacting */
-		m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
+        if( m_artifacter.get_pal_artifacting() )
+        {
+            if( y % 2)
+                m_artifacter.process_artifacts_pal<1>(bitmap, y - 1, base_x, base_y, m_data[y].m_mode[0], palette);
+        }
+        else
+    		m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
+    
 	}
 
 	width = m_data[191].m_sample_count;
@@ -1675,6 +1682,7 @@ ioport_constructor mc6847_base_device::device_input_ports() const
 
 mc6847_base_device::artifacter::artifacter()
 {
+    m_palartifacting = false;
 	m_config = nullptr;
 	m_artifacting = 0;
 	m_saved_artifacting = 0;
@@ -1824,6 +1832,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
 {
+    m_artifacter.set_pal_artifacting(true);
 }
 
 
@@ -1846,6 +1855,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
 {
+    m_artifacter.set_pal_artifacting(true);
 }
 
 
@@ -1868,6 +1878,7 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, pal_round_fontdata8x12, 313.0)
 {
+    m_artifacter.set_pal_artifacting(true);
 }
 
 
