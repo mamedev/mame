@@ -127,6 +127,43 @@
  * U98 2148 Palette red (low nybble of even bytes)
  * U99 2148 Palette green (high nybble of even bytes)
 
+ Master clock patterns:
+ 12MHz  _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+ 6MHz   __--__--__--__--__--__--__--__--__--__--__--__--__--__--__--__--__--__--
+ E      ____________------------____________------------____________------------
+ /RAS   ________----________----________----________----________----________----
+        ----______------______------______------______------______------______--
+ MUX0   __--------____--------____--------____--------____--------____--------__
+ MUX1   __________------------____________------------____________------------__
+ Q      ______------------____________------------____________------------______
+ LATCH  ______________--------________________--------________________--------__
+        __----__----__----__----__----__----__----__----__----__----__----__----
+
+ Video RAM consists of 6 4416 16k*4 DRAMs at U25, U26, U41, U42, U55 and
+ U56.  The CPU and DMA chips have their addressing mangled by the 6349
+ 512*8 PROM at U74 to make the visible area appear linear.
+
+ +-----+--------+--------+--------+--------+
+ | MUX |   0    |   1    |   2    |   3    |
+ +-----+--------+--------+--------+--------+
+ | MA7 | VA7    | (1)    | A1     | (1)    |
+ | MA6 | VA6    | VA13   | A0     | A7     |
+ | MA5 | VA5    | VA12   | PA5    | A6     |
+ | MA4 | VA4    | VA11   | PA4    | A5     |
+ | MA3 | VA3    | VA10   | PA3    | A4     |
+ | MA2 | VA2    | VA9    | PA2    | A3     |
+ | MA1 | VA1    | VA8    | PA1    | A2     |
+ | MA0 | VA0    | (VA13) | PA0    | (A7)   |
+ +-----+--------+--------+--------+--------+
+
+ +-----+-----+-----+-----+-----+
+ | PA6 |  0  |  1  |  0  |  1  |
+ | PA7 |  0  |  0  |  1  |  1  |
+ +-----+-----+-----+-----+-----+
+ |  L  | U26 | U42 | U56 |     |
+ |  U  | U25 | U41 | U55 |     |
+ +-----+-----+-----+-----+-----+
+
  U2.3    /B/G 9            xxxxx xx01 xxxxxxxx xxxxxxxx
  U2.6    /CS TOP           xxxxx xxxx 11xxxxxx xxxxxxxx
  U2.11 (active low)        xxxxx xx11 xxxxxxxx xxxxxxxx
@@ -219,6 +256,9 @@
 
 #include "emupal.h"
 
+#include <algorithm>
+#include <memory>
+
 
 namespace {
 
@@ -236,6 +276,7 @@ public:
 		, m_main_led(*this, "cpu.u3")
 		, m_vgg_pia(*this, "vgg.u7")
 		, m_vgg_palette(*this, "vgg.color")
+		, m_vgg_horz(*this, "horz")
 		, m_pif_cpu(*this, "pif.u4")
 		, m_pif_pia(*this, "pif.u1")
 		, m_sound_cpu(*this, "sound.u5")
@@ -264,6 +305,10 @@ private:
 	void cpu_nvram_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(cpu_pia2_ca2_w);
 
+	static constexpr u16 vgg_drams_map(u16 v, u16 h, u16 p);
+	u16 vgg_drams_map(u16 a) const;
+
+	void vgg_drams_w(offs_t offset, u8 data);
 	void vgg_impg_w(u8 data);
 	void vgg_xlate_w(u8 data);
 	void vgg_disable_w(u8 data);
@@ -308,6 +353,7 @@ private:
 
 	required_device<pia6821_device> m_vgg_pia;
 	required_device<palette_device> m_vgg_palette;
+	required_region_ptr<u8> m_vgg_horz;
 
 	required_device<cpu_device> m_pif_cpu;
 	required_device<pia6821_device> m_pif_pia;
@@ -320,6 +366,7 @@ private:
 
 	u8 m_main_page = 0U;
 
+	std::unique_ptr<u8 []> m_vgg_drams;
 	u8 m_vgg_image_page = 0U;
 	u8 m_vgg_xlate = 0U;
 	u8 m_vgg_expand_disable = 0U;
@@ -337,10 +384,10 @@ private:
 void sr_state::starrider(machine_config &config)
 {
 	// CPU
-	MC6809E(config, m_main_cpu, 24_MHz_XTAL / 2 / 12 /* ? */); // 6809E - clock patterns generated using 82S123 at VGG U114
+	MC6809E(config, m_main_cpu, 24_MHz_XTAL / 2 / 12); // 6809E - clock patterns generated using 82S123 and 74F374 at VGG U114 and U101
 	m_main_cpu->set_addrmap(AS_PROGRAM, &sr_state::main_memory);
 
-	PIA6821(config, m_main_pia1, 24_MHz_XTAL / 2 / 12 /* ? */); // 6820/21
+	PIA6821(config, m_main_pia1, 24_MHz_XTAL / 2 / 12); // 6820/21
 	m_main_pia1->readpa_handler().set_ioport("IN2");
 	// CA1 is the /END SCREEN signal
 	// CA2 is the 4MS signal
@@ -349,7 +396,7 @@ void sr_state::starrider(machine_config &config)
 	m_main_pia1->irqa_handler().set("main.irq", FUNC(input_merger_device::in_w<0>));
 	m_main_pia1->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_main_pia2, 24_MHz_XTAL / 2 / 12 /* ? */); // 6820/21
+	PIA6821(config, m_main_pia2, 24_MHz_XTAL / 2 / 12); // 6820/21
 	m_main_pia2->readpa_handler().set_ioport("IN0");
 	m_main_pia2->readca1_handler().set_constant(0); // grounded
 	m_main_pia2->ca2_handler().set(FUNC(sr_state::cpu_pia2_ca2_w));
@@ -360,7 +407,7 @@ void sr_state::starrider(machine_config &config)
 
 	NVRAM(config, "cpu.u9", nvram_device::DEFAULT_ALL_0);
 
-	ADDRESS_MAP_BANK(config, m_main_banks, 24_MHz_XTAL / 2 / 12 /* ? */);
+	ADDRESS_MAP_BANK(config, m_main_banks, 24_MHz_XTAL / 2 / 12);
 	m_main_banks->set_map(&sr_state::main_banks);
 	m_main_banks->set_data_width(8);
 	m_main_banks->set_addr_width(20);
@@ -369,7 +416,7 @@ void sr_state::starrider(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "main.irq").output_handler().set_inputline(m_main_cpu, M6809_IRQ_LINE);
 
 	// VGG
-	PIA6821(config, m_vgg_pia, 24_MHz_XTAL / 2 / 12 /* ? */); // 6821
+	PIA6821(config, m_vgg_pia, 24_MHz_XTAL / 2 / 12); // 6821
 	// PA0-8 and CA2 are outputs to the expander board
 	// CA1 is the /HALT signal
 	// PB0-7 and CB1-2 are the interface to the PIF board (bidirectional)
@@ -439,8 +486,10 @@ INPUT_CHANGED_MEMBER(sr_state::sound_sw1_changed)
 void sr_state::driver_start()
 {
 	m_main_led.resolve();
+	m_vgg_drams = std::make_unique<u8 []>(16'384 * 4 / 8 * 6);
 
 	save_item(NAME(m_main_page));
+	save_pointer(NAME(m_vgg_drams), 16'384 * 4 / 8 * 6);
 	save_item(NAME(m_vgg_image_page));
 	save_item(NAME(m_vgg_xlate));
 	save_item(NAME(m_vgg_expand_disable));
@@ -452,6 +501,7 @@ void sr_state::driver_start()
 	save_item(NAME(m_sound_pia2_pb_in));
 
 	m_main_page = 0U;
+	std::fill_n(m_vgg_drams.get(), 16'384 * 4 / 8 * 6, 0U);
 	m_vgg_image_page = 0U;
 	m_vgg_xlate = 0U;
 	m_vgg_expand_disable = 0U;
@@ -542,6 +592,31 @@ WRITE_LINE_MEMBER(sr_state::cpu_pia2_ca2_w)
 	}
 }
 
+
+constexpr u16 sr_state::vgg_drams_map(u16 v, u16 h, u16 p)
+{
+	// addressing arranged so video display meets refresh requirements
+	// pixels are striped across U25/U26/U41/U42/U55/U56
+	// 8-bit DRAM row is 6-bit horizontal counter and two lower bits of 8-bit vertical counter
+	// 6-bit DRAM column is upper six bits of 8-bit vertical counter
+	return ((p << 14) & 0xc000) | ((v << 12) & 0x3000) | ((h << 6) & 0x0fc0) | ((v >> 2) & 0x003f);
+}
+
+u16 sr_state::vgg_drams_map(u16 a) const
+{
+	// HORZ PROM U74 (6349) is used to map a 320*256 area at linear column-major addresses
+	// A5 is tied low (only even 32-byte chunks of the 512*8 BPROM are used)
+	u16 const pa(m_vgg_horz[((a >> 7) & 0x01c0) | ((a >> 8) & 0x001f)]);
+	return vgg_drams_map(a & 0x00ff, pa & 0x003f, (pa >> 6) & 0x0003);
+}
+
+
+void sr_state::vgg_drams_w(offs_t offset, u8 data)
+{
+	u16 const addr(vgg_drams_map(offset));
+	if ((offset & 0xc000) != 0xc000)
+		m_vgg_drams[addr] = data;
+}
 
 void sr_state::vgg_impg_w(u8 data)
 {
@@ -759,6 +834,9 @@ void sr_state::main_banks(address_map &map)
 	map(0x4'0000, 0x4'3fff).mirror(0x8'0000).rom().region("banked", 0x0'4000); // /R2 -> U15
 	map(0x4'4000, 0x4'7fff).mirror(0x8'0000).rom().region("banked", 0x0'c000); // /R4 -> U37
 	// nothing in 0x4'8000-0x4'9fff
+
+	// page 0x0-0x7 write
+	map(0x0'0000, 0x0'9fff).mirror(0x7'0000).w(FUNC(sr_state::vgg_drams_w));
 }
 
 void sr_state::pif_memory(address_map &map)
@@ -910,11 +988,14 @@ ROM_START(starridr)
 	ROM_RELOAD(0x2000, 0x2000)
 
 	ROM_REGION(0x20, "clkgen", 0)
-	ROM_LOAD("u114.82s123", 0x00, 0x20, NO_DUMP)
+	ROM_LOAD("u114.82s123", 0x00, 0x20, CRC(27a6d555) SHA1(988d55092d7d0243a867986873dfd12be67280c7))
 
 	ROM_REGION(0x400, "color", 0)
-	ROMX_LOAD("u10.82s137", 0x000, 0x400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
-	ROMX_LOAD("u11.82s137", 0x000, 0x400, NO_DUMP, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
+	ROMX_LOAD("u10.82s137", 0x000, 0x400, CRC(917e35ca) SHA1(676e2d211c81dbbf911f99a672eac1fd29553a2b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
+	ROMX_LOAD("u11.82s137", 0x000, 0x400, CRC(917e35ca) SHA1(676e2d211c81dbbf911f99a672eac1fd29553a2b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
+
+	ROM_REGION(0x200, "horz", 0)
+	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
 ROM_END
 
 } // anonymous namespace
