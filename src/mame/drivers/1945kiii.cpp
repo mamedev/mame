@@ -179,7 +179,7 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 				u8 c = source[x_index];
 				if (c != transparent_color)
 				{
-					if (flicker) // verified from PCB
+					if (flicker) // verified from PCB (reference : https://www.youtube.com/watch?v=ooXyyvpW1O0)
 					{
 						dest[x] = pal | 0xff;
 					}
