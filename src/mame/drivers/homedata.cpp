@@ -66,8 +66,7 @@ TODO:
 - I'm not sure service mode in the newer mahjong games is working as it's supposed to.
   dip switch changes are not reported, and keypresses only work after you insert a coin.
 
-- Sound sfxs don't work in mjikaga. CPU communication issue?
-  Also note that bit 2 of bankswitch_w() and bit 7 of pteacher_blitter_bank_w() might
+- In mjikaga bit 2 of bankswitch_w() and bit 7 of pteacher_blitter_bank_w() might
   have some other function, since the ROMs are smaller.
 
 - wrong gfx in mrokumei at the beginning of a game. It is selecting the wrong gfx bank;
@@ -2187,6 +2186,6 @@ GAME( 1992?,jogakuen,  0,        jogakuen, jogakuen, homedata_state, empty_init,
 GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991?,mjikaga,   0,        mjikaga,  mjikaga,  homedata_state, empty_init,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991?,mjikaga,   0,        mjikaga,  mjikaga,  homedata_state, empty_init,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, init_mirderby, ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
