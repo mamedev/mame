@@ -1045,7 +1045,7 @@ ROM_START( tm7kmn ) /* Minnesota only version */
 	ROM_LOAD( "tm7k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16262-03 U8 SOUND */
 ROM_END
 
-ROM_START( tm7kde ) /* Germany version, 4 languages selectable: English, German, Dutch or Turkish */
+ROM_START( tm7kde ) /* German version, 4 languages selectable: English, German, Dutch or Turkish */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm7k_ballywulfe_v8.04.u51", 0x000000, 0x100000, CRC(906f8c59) SHA1(62f65937f0d0feb119302afad82329aa62dca716) ) /* TOUCHMASTER 7000 U51 BALLYWULFE 8.04 (German 06/21/99) (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_ballywulfe_v8.04.u52", 0x000001, 0x100000, CRC(917d37b3) SHA1(a4f0d236cd1746b9700141a0c29722844c955adc) ) /* TOUCHMASTER 7000 U52 BALLYWULFE 8.04 (German 06/21/99) (orange label) */
