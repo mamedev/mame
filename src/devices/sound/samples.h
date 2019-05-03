@@ -56,6 +56,7 @@ public:
 	// getters
 	bool playing(uint8_t channel) const;
 	uint32_t base_frequency(uint8_t channel) const;
+	uint32_t get_position(uint8_t channel);
 
 	// start/stop helpers
 	void start(uint8_t channel, uint32_t samplenum, bool loop = false);

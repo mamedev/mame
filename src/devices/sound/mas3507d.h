@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "sound/samples.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -16,6 +17,8 @@ public:
 	// construction/destruction
 	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	required_device<samples_device> m_samples;
+
 	int i2c_scl_r();
 	int i2c_sda_r();
 	void i2c_scl_w(bool line);
@@ -24,6 +27,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:

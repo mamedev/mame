@@ -638,3 +638,12 @@ bool samples_device::load_samples()
 	}
 	return ok;
 }
+
+uint32_t samples_device::get_position(uint8_t channel)
+{
+	assert(channel < m_channels);
+
+	// force an update before we start
+	channel_t &chan = m_channel[channel];
+	return chan.pos;
+}

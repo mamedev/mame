@@ -2,6 +2,11 @@
 // copyright-holders:smf
 #include "emu.h"
 #include "k573dio.h"
+#include "includes/k573enc.h"
+
+#define MINIMP3_NO_STDIO
+#define MINIMP3_IMPLEMENTATION
+#include "../../devices/sound/minimp3_ex.h"
 
 /*
   Digital I/O PCB
@@ -87,6 +92,8 @@ void k573dio_device::amap(address_map &map)
 	map(0xb4, 0xb5).rw(FUNC(k573dio_device::ram_r), FUNC(k573dio_device::ram_w));
 	map(0xb6, 0xb7).w(FUNC(k573dio_device::ram_read_adr_high_w));
 	map(0xb8, 0xb9).w(FUNC(k573dio_device::ram_read_adr_low_w));
+	map(0xca, 0xcb).rw(FUNC(k573dio_device::mp3_playback_high_r), FUNC(k573dio_device::mp3_playback_high_w));
+	map(0xcc, 0xcd).rw(FUNC(k573dio_device::mp3_playback_low_r), FUNC(k573dio_device::mp3_playback_low_w));
 	map(0xe0, 0xe1).w(FUNC(k573dio_device::output_1_w));
 	map(0xe2, 0xe3).w(FUNC(k573dio_device::output_0_w));
 	map(0xe4, 0xe5).w(FUNC(k573dio_device::output_3_w));
@@ -112,13 +119,22 @@ k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, d
 void k573dio_device::device_start()
 {
 	output_cb.resolve_safe();
-	ram = std::make_unique<uint16_t[]>(12 * 1024 * 1024 );
-	save_pointer(NAME(ram), 12 * 1024 * 1024 );
+	ram = std::make_unique<uint16_t[]>(12 * 1024 * 1024);
+	save_pointer(NAME(ram), 12 * 1024 * 1024);
+
+	ram_decmask = std::make_unique<uint16_t[]>(12 * 1024 * 1024);
+	save_pointer(NAME(ram_decmask), 12 * 1024 * 1024);
 }
 
 void k573dio_device::device_reset()
 {
 	ram_adr = 0;
+	ram_read_adr = 0;
+	mp3_start_adr = 0;
+	mp3_end_adr = 0;
+	crypto_key1 = 0;
+	crypto_key2 = 0;
+	crypto_counter = 0;
 	memset(output_data, 0, sizeof(output_data));
 }
 
@@ -144,31 +160,31 @@ void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ16_MEMBER(k573dio_device::a00_r)
 {
-	logerror("%s: a00_r (%s)\n", tag(), machine().describe_context());
+	//logerror("%s: a00_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a02_r)
 {
-	logerror("%s: a02_r (%s)\n", tag(), machine().describe_context());
+	//logerror("%s: a02_r (%s)\n", tag(), machine().describe_context());
 	return 0x0001;
 }
 
 READ16_MEMBER(k573dio_device::a04_r)
 {
-	logerror("%s: a04_r (%s)\n", tag(), machine().describe_context());
+	//logerror("%s: a04_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a06_r)
 {
-	logerror("%s: a06_r (%s)\n", tag(), machine().describe_context());
+	//logerror("%s: a06_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
 READ16_MEMBER(k573dio_device::a0a_r)
 {
-	logerror("%s: a0a_r (%s)\n", tag(), machine().describe_context());
+	//logerror("%s: a0a_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
@@ -181,26 +197,31 @@ READ16_MEMBER(k573dio_device::a80_r)
 WRITE16_MEMBER(k573dio_device::mpeg_start_adr_high_w)
 {
 	logerror("FPGA MPEG start address high %04x\n", data);
+	mp3_start_adr = (mp3_start_adr & 0x0000ffff) | (data << 16); // high
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
 {
 	logerror("FPGA MPEG start address low %04x\n", data);
+	mp3_start_adr = (mp3_start_adr & 0xffff0000) | data; // low
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_end_adr_high_w)
 {
 	logerror("FPGA MPEG end address high %04x\n", data);
+	mp3_end_adr = (mp3_end_adr & 0x0000ffff) | (data << 16); // high
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_end_adr_low_w)
 {
 	logerror("FPGA MPEG end address low %04x\n", data);
+	mp3_end_adr = (mp3_end_adr & 0xffff0000) | data; // low
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_key_1_w)
 {
 	logerror("FPGA MPEG key 1/3 %04x\n", data);
+	crypto_key1 = data;
 }
 
 READ16_MEMBER(k573dio_device::mas_i2c_r)
@@ -210,6 +231,7 @@ READ16_MEMBER(k573dio_device::mas_i2c_r)
 
 WRITE16_MEMBER(k573dio_device::mas_i2c_w)
 {
+	//logerror("mas_i2c_w %04x %d %d\n", data, data & 0x2000, data & 0x1000);
 	mas3507d->i2c_scl_w(data & 0x2000);
 	mas3507d->i2c_sda_w(data & 0x1000);
 }
@@ -220,6 +242,117 @@ WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
 				data & 0x8000 ? '#' : '.',
 				data & 0x4000 ? '#' : '.',
 				data & 0x2000 ? '#' : '.');
+
+	if ((data & 0xe000) == 0xe000) {
+		if (mp3_start_adr != cur_mp3_start_adr || mp3_end_adr != cur_mp3_end_adr) {
+			if (mas3507d->m_samples->playing(0)) {
+				mas3507d->m_samples->stop(0);
+			}
+
+
+			if (mas3507d->m_samples->playing(1)) {
+				mas3507d->m_samples->stop(1);
+			}
+
+			//mp3_playback = 0;
+		}
+
+		if (mas3507d->m_samples->playing(0) || mas3507d->m_samples->playing(1)) {
+			return;
+		}
+
+		uint32_t crypto_enc_idx = find_enc_key();
+
+		if (crypto_enc_idx == -1) {
+			return;
+		}
+
+		// Decrypt data from mp3_start_adr to mp3_end_adr
+		uint32_t key_len = enckeys[crypto_enc_idx].keylen;
+		uint32_t scramble_len = enckeys[crypto_enc_idx].keylen;
+		uint8_t *key = enckeys[crypto_enc_idx].key;
+		uint8_t *scramble = enckeys[crypto_enc_idx].scramble;
+		uint8_t counter = crypto_counter;
+		size_t mp3len = 0;
+
+		uint8_t *mp3data = (uint8_t*)calloc(mp3_end_adr - mp3_start_adr, sizeof(uint8_t));
+
+		for (int32_t cur_idx = mp3_start_adr, crypto_idx = 0; cur_idx < mp3_end_adr; cur_idx += 2, crypto_idx++, mp3len += 2) {
+			uint16_t cur_data = ram[cur_idx >> 1];
+
+			if (ram_decmask[cur_idx >> 1] == 0) {
+				uint16_t output_word = 0;
+				for (int cur_bit = 0; cur_bit < 8; cur_bit++) {
+					int even_bit_shift = (cur_bit * 2) & 0xff;
+					int odd_bit_shift = (cur_bit * 2 + 1) & 0xff;
+					int is_even_bit_set = (cur_data & (1 << even_bit_shift)) != 0;
+					int is_odd_bit_set = (cur_data & (1 << odd_bit_shift)) != 0;
+					int is_key_bit_set = (key[crypto_idx % key_len] & (1 << cur_bit)) != 0;
+					int is_scramble_bit_set = (scramble[crypto_idx % scramble_len] & (1 << cur_bit)) != 0;
+					int is_counter_bit_set = (counter & (1 << cur_bit)) != 0;
+					int is_counter_bit_inv_set =  (counter & (1 << ((7 - cur_bit) & 0xff))) != 0;
+
+					if (is_scramble_bit_set == 1) {
+						int t = is_even_bit_set;
+						is_even_bit_set = is_odd_bit_set;
+						is_odd_bit_set = t;
+					}
+
+					if (((is_even_bit_set ^ is_counter_bit_inv_set ^ is_key_bit_set)) == 1) {
+						output_word |= 1 << even_bit_shift;
+					}
+
+					if ((is_odd_bit_set ^ is_counter_bit_set) == 1) {
+						output_word |= 1 << odd_bit_shift;
+					}
+				}
+
+				ram[cur_idx >> 1] = output_word;
+				ram_decmask[cur_idx >> 1] = 1;
+
+				// if (cur_idx - mp3_start_adr < 0x10) {
+				// 	logerror("decrypted: %04x -> %04x\n", cur_data, ram[cur_idx >> 1]);
+				// }
+			}
+
+			mp3data[mp3len] = ram[cur_idx >> 1] >> 8;
+			mp3data[mp3len + 1] = ram[cur_idx >> 1] & 0xff;
+
+			counter += 1;
+		}
+
+		// Decode MP3
+		mp3dec_t dec = {0};
+		mp3dec_file_info_t info = {0};
+		mp3dec_load_buf(&dec, mp3data, mp3len, &info, NULL, NULL);
+
+		free(mp3data);
+
+		logerror("Playing audio with %d samples\n", info.samples);
+
+		if (channel_l_pcm) {
+			free(channel_l_pcm);
+			channel_l_pcm = NULL;
+		}
+
+		if (channel_r_pcm) {
+			free(channel_r_pcm);
+			channel_r_pcm = NULL;
+		}
+
+		channel_l_pcm = (int16_t*)calloc(info.samples / 2, sizeof(int16_t));
+		channel_r_pcm = (int16_t*)calloc(info.samples / 2, sizeof(int16_t));
+		for (size_t i = 0; i < info.samples / 2; i++) {
+			channel_l_pcm[i] = info.buffer[i * 2];
+			channel_r_pcm[i] = info.buffer[i * 2 + 1];
+		}
+
+		mas3507d->m_samples->start_raw(0, channel_l_pcm, info.samples / 2, info.hz);
+		mas3507d->m_samples->start_raw(1, channel_r_pcm, info.samples / 2, info.hz);
+
+		cur_mp3_start_adr = mp3_start_adr;
+		cur_mp3_end_adr = mp3_end_adr;
+	}
 }
 
 WRITE16_MEMBER(k573dio_device::ram_write_adr_high_w)
@@ -236,27 +369,71 @@ WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
 
 READ16_MEMBER(k573dio_device::ram_r)
 {
-	uint16_t res = ram[ram_adr >> 1];
-	ram_adr += 2;
+	uint16_t res = ram[ram_read_adr >> 1];
+	//logerror("ram_r: %04x %04x\n", ram_read_adr, res);
+	ram_read_adr += 2;
 	return res;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_w)
 {
 	ram[ram_adr >> 1] = data;
+
+	if (ram_decmask[ram_adr >> 1] != 0 && ram_adr >= cur_mp3_start_adr && ram_adr <= cur_mp3_end_adr) {
+		// Overwriting memory for a song being played currently, which means it probably shouldn't be playing anymore
+		//logerror("Stopping playback\n");
+
+		if (mas3507d->m_samples->playing(0)) {
+			mas3507d->m_samples->stop(0);
+		}
+
+		if (mas3507d->m_samples->playing(1)) {
+			mas3507d->m_samples->stop(1);
+		}
+
+		//mp3_playback = 0;
+	}
+
+	ram_decmask[ram_adr >> 1] = 0;
+	logerror("ram_w: %04x %04x\n", ram_adr, data);
 	ram_adr += 2;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_high_w)
 {
 	// read and write address are shared
-	ram_adr = (ram_adr & 0x0000ffff) | (data << 16);
+	ram_read_adr = (ram_read_adr & 0x0000ffff) | (data << 16);
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_low_w)
 {
 	// read and write address are shared
-	ram_adr = (ram_adr & 0xffff0000) | data;
+	ram_read_adr = (ram_read_adr & 0xffff0000) | data;
+}
+
+READ16_MEMBER(k573dio_device::mp3_playback_high_r)
+{
+	//logerror("mp3_playback_high_r: %08x (%08x)\n", mp3_playback & 0xffff0000, mp3_playback);
+	return (mp3_playback & 0xffff0000) >> 16;
+}
+
+WRITE16_MEMBER(k573dio_device::mp3_playback_high_w)
+{
+	mp3_playback = (mp3_playback & 0x0000ffff) | (data << 16);
+	//logerror("mp3_playback_low_w: %08x\n", mp3_playback);
+}
+
+READ16_MEMBER(k573dio_device::mp3_playback_low_r)
+{
+	//logerror("mp3_playbac_low_r: %08x (%08x) %08x %08x\n", mp3_playback & 0x0000ffff, mp3_playback, mas3507d->m_samples->get_position(0), mas3507d->m_samples->get_position(1));
+	mp3_playback += 1152;
+	return mp3_playback & 0x0000ffff;
+}
+
+WRITE16_MEMBER(k573dio_device::mp3_playback_low_w)
+{
+	mp3_playback = data;
+	//logerror("mp3_playback_low_w: %08x\n", mp3_playback & 0x0000ffff);
 }
 
 WRITE16_MEMBER(k573dio_device::output_1_w)
@@ -282,11 +459,13 @@ WRITE16_MEMBER(k573dio_device::output_7_w)
 WRITE16_MEMBER(k573dio_device::mpeg_key_2_w)
 {
 	logerror("FPGA MPEG key 2/3 %04x\n", data);
+	crypto_key2 = data;
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_key_3_w)
 {
 	logerror("FPGA MPEG key 3/3 %04x\n", data);
+	crypto_counter = data;
 }
 
 READ16_MEMBER(k573dio_device::digital_id_r)
@@ -301,7 +480,7 @@ WRITE16_MEMBER(k573dio_device::digital_id_w)
 
 READ16_MEMBER(k573dio_device::fpga_status_r)
 {
-	logerror("%s: fpga_status_r (%s)\n", tag(), machine().describe_context());
+	//logerror("%s: fpga_status_r (%s)\n", tag(), machine().describe_context());
 
 	// fpga/digital board status checks
 	// wants & c000 = 8000 (just after program upload?)
@@ -346,4 +525,10 @@ void k573dio_device::output(int offset, uint16_t data)
 			output_cb(4*offset + i, newbit, 0xff);
 	}
 	output_data[offset] = data;
+}
+
+uint32_t k573dio_device::find_enc_key()
+{
+	uint32_t key = (crypto_key1 << 16) | crypto_key2;
+	return k573enc_lookup[key];
 }

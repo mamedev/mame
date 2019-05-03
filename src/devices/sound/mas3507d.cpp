@@ -5,14 +5,23 @@
 //
 
 #include "emu.h"
+#include "speaker.h"
 #include "mas3507d.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "MAS 3507D MPEG decoder")
 
+static const char *const mas3507d_sample_names[] =
+{
+	"*mas3507d",
+	"audio",
+	nullptr
+};
+
 mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_samples(*this, "samples")
 	, i2c_bus_state(), i2c_bus_address(), i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false)
 	, i2c_bus_curbit(0), i2c_bus_curval(0), i2c_subdest(), i2c_command(), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)
 {
@@ -32,6 +41,18 @@ void mas3507d_device::device_reset()
 	i2c_bus_curval = 0;
 }
 
+void mas3507d_device::device_add_mconfig(machine_config &config)
+{
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(mas3507d_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
+
 void mas3507d_device::i2c_scl_w(bool line)
 {
 	if(line == i2c_scli)
@@ -40,14 +61,16 @@ void mas3507d_device::i2c_scl_w(bool line)
 
 	if(i2c_scli) {
 		if(i2c_bus_state == STARTED) {
-			if(i2c_sdai)
+			if(i2c_sdai) {
 				i2c_bus_curval |= 1 << i2c_bus_curbit;
+			}
 			i2c_bus_curbit --;
 			if(i2c_bus_curbit == -1) {
 				if(i2c_bus_address == UNKNOWN) {
 					if(i2c_device_got_address(i2c_bus_curval)) {
 						i2c_bus_state = ACK;
 						i2c_bus_address = VALIDATED;
+						i2c_bus_curval = 0;
 					} else {
 						i2c_bus_state = NAK;
 						i2c_bus_address = WRONG;
@@ -81,6 +104,7 @@ void mas3507d_device::i2c_sda_w(bool line)
 {
 	if(line == i2c_sdai)
 		return;
+
 	i2c_sdai = line;
 
 	if(i2c_scli) {
@@ -89,7 +113,8 @@ void mas3507d_device::i2c_sda_w(bool line)
 			i2c_bus_address = UNKNOWN;
 			i2c_bus_curbit = 7;
 			i2c_bus_curval = 0;
-		} else {
+		}
+		else {
 			i2c_device_got_stop();
 			i2c_bus_state = IDLE;
 			i2c_bus_address = UNKNOWN;
@@ -226,14 +251,138 @@ void mas3507d_device::i2c_device_got_stop()
 	logerror("MAS I2C: got stop\n");
 }
 
+int gain_to_db(int val) {
+	switch(val) {
+		case 0x80000: return 0;
+		case 0x8deb8: return -1;
+		case 0x9a537: return -2;
+		case 0xa5621: return -3;
+		case 0xaf3cd: return -4;
+		case 0xb8053: return -5;
+		case 0xbfd92: return -6;
+		case 0xc6d31: return -7;
+		case 0xcd0ad: return -8;
+		case 0xd2958: return -9;
+		case 0xd785e: return -10;
+		case 0xdbecc: return -11;
+		case 0xdfd91: return -12;
+		case 0xe3583: return -13;
+		case 0xe675f: return -14;
+		case 0xe93cf: return -15;
+		case 0xebb6a: return -16;
+		case 0xedeb6: return -17;
+		case 0xefe2c: return -18;
+		case 0xf1a36: return -19;
+		case 0xf3333: return -20;
+		case 0xf4979: return -21;
+		case 0xf5d52: return -22;
+		case 0xf6f03: return -23;
+		case 0xf7ec8: return -24;
+		case 0xf8cd5: return -25;
+		case 0xf995b: return -26;
+		case 0xfa485: return -27;
+		case 0xfae78: return -28;
+		case 0xfb756: return -29;
+		case 0xfbf3d: return -30;
+		case 0xfc648: return -31;
+		case 0xfcc8e: return -32;
+		case 0xfd227: return -33;
+		case 0xfd723: return -34;
+		case 0xfdb95: return -35;
+		case 0xfdf8b: return -36;
+		case 0xfe312: return -37;
+		case 0xfe638: return -38;
+		case 0xfe905: return -39;
+		case 0xfeb85: return -40;
+		case 0xfedbf: return -41;
+		case 0xfefbb: return -42;
+		case 0xff180: return -43;
+		case 0xff314: return -44;
+		case 0xff47c: return -45;
+		case 0xff5bc: return -46;
+		case 0xff6da: return -47;
+		case 0xff7d9: return -48;
+		case 0xff8bc: return -49;
+		case 0xff986: return -50;
+		case 0xffa3a: return -51;
+		case 0xffadb: return -52;
+		case 0xffb6a: return -53;
+		case 0xffbea: return -54;
+		case 0xffc5c: return -55;
+		case 0xffcc1: return -56;
+		case 0xffd1b: return -57;
+		case 0xffd6c: return -58;
+		case 0xffdb4: return -59;
+		case 0xffdf4: return -60;
+		case 0xffe2d: return -61;
+		case 0xffe60: return -62;
+		case 0xffe8d: return -63;
+		case 0xffeb5: return -64;
+		case 0xffed9: return -65;
+		case 0xffef9: return -66;
+		case 0xfff16: return -67;
+		case 0xfff2f: return -68;
+		case 0xfff46: return -69;
+		case 0xfff5a: return -70;
+		case 0xfff6c: return -71;
+		case 0xfff7c: return -72;
+		case 0xfff8b: return -73;
+		case 0xfff97: return -74;
+		case 0xfffa3: return -75;
+		case 0xfffad: return -76;
+		case 0xfffb6: return -77;
+		case 0xfffbe: return -78;
+		case 0xfffc5: return -79;
+		case 0xfffcc: return -80;
+		case 0xfffd1: return -81;
+		case 0xfffd6: return -82;
+		case 0xfffdb: return -83;
+		case 0xfffdf: return -84;
+		case 0xfffe3: return -85;
+		case 0xfffe6: return -86;
+		case 0xfffe9: return -87;
+		case 0xfffeb: return -88;
+		case 0xfffed: return -89;
+		case 0xfffef: return -90;
+		case 0xffff1: return -91;
+		case 0xffff3: return -92;
+		case 0xffff4: return -93;
+		case 0xffff6: return -94;
+		case 0xffff7: return -95;
+		case 0xffff8: return -96;
+		case 0xffff9: return -97;
+		//case 0xffff9: return -98; // 97 and 98 are the same... really? Straight from the chip datasheet.
+		case 0xffffa: return -99;
+
+		default: return 0;
+	}
+
+	return 0;
+}
+
+float gain_to_percentage(int val) {
+	double db = gain_to_db(val);
+	return 1.0 - powf(10.0, db / 20.0);
+}
+
 void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 {
 	switch(adr | (bank ? 0x10000 : 0)) {
 	case 0x0032f: logerror("MAS3507D: OutputConfig = %05x\n", val); break;
-	case 0x107f8: logerror("MAS3507D: left->left   gain = %05x\n", val); break;
-	case 0x107f9: logerror("MAS3507D: left->right  gain = %05x\n", val); break;
-	case 0x107fa: logerror("MAS3507D: right->left  gain = %05x\n", val); break;
-	case 0x107fb: logerror("MAS3507D: right->right gain = %05x\n", val); break;
+	case 0x107f8:
+		logerror("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
+		m_samples->set_volume(0, gain_to_percentage(val));
+		break;
+	case 0x107f9:
+		logerror("MAS3507D: left->right  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
+		break;
+	case 0x107fa:
+		logerror("MAS3507D: right->left  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
+		break;
+	case 0x107fb:
+		logerror("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
+		m_samples->set_volume(1, gain_to_percentage(val));
+		break;
 	default: logerror("MAS3507D: %d:%04x = %05x\n", bank, adr, val); break;
 	}
 }

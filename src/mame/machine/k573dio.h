@@ -27,6 +27,7 @@ public:
 	DECLARE_READ16_MEMBER(a06_r);
 	DECLARE_READ16_MEMBER(a0a_r);
 	DECLARE_READ16_MEMBER(a80_r);
+
 	DECLARE_WRITE16_MEMBER(mpeg_start_adr_high_w);
 	DECLARE_WRITE16_MEMBER(mpeg_start_adr_low_w);
 	DECLARE_WRITE16_MEMBER(mpeg_end_adr_high_w);
@@ -41,6 +42,10 @@ public:
 	DECLARE_WRITE16_MEMBER(ram_w);
 	DECLARE_WRITE16_MEMBER(ram_read_adr_high_w);
 	DECLARE_WRITE16_MEMBER(ram_read_adr_low_w);
+	DECLARE_READ16_MEMBER(mp3_playback_high_r);
+	DECLARE_WRITE16_MEMBER(mp3_playback_high_w);
+	DECLARE_READ16_MEMBER(mp3_playback_low_r);
+	DECLARE_WRITE16_MEMBER(mp3_playback_low_w);
 	DECLARE_WRITE16_MEMBER(output_0_w);
 	DECLARE_WRITE16_MEMBER(output_1_w);
 	DECLARE_WRITE16_MEMBER(output_7_w);
@@ -66,10 +71,21 @@ private:
 	devcb_write8 output_cb;
 
 	std::unique_ptr<uint16_t[]> ram;
-	uint32_t ram_adr;
+	std::unique_ptr<uint16_t[]> ram_decmask;
+	uint32_t ram_adr, ram_read_adr, mp3_start_adr, mp3_end_adr, cur_mp3_start_adr, cur_mp3_end_adr, mp3_playback;
 	uint8_t output_data[8];
+	int16_t *channel_l_pcm, *channel_r_pcm;
+
+	uint8_t crypto_counter;
+	uint32_t crypto_key1, crypto_key2;
+	bool crypto_init;
+
+	uint16_t ac4_val;
 
 	void output(int offset, uint16_t data);
+	uint32_t find_enc_key();
+
+	FILE *outfile;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
