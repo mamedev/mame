@@ -190,7 +190,7 @@ programmed via the MCchip. The Z85230s are interfaced as DTE (data terminal equi
 signal levels. The four serial ports are routed to four RJ45 telephone connectors on the MVME162LX front panel.*/
 
 /* This gives prompt at the RS232 terminal device (9600) */
-#define BAUDGEN_CLOCK 5_MHz_XTAL // Not verified nor seen on the PCB:s
+#define BAUDGEN_CLOCK 10_MHz_XTAL // Not verified nor seen on the PCB:s
 #define SCC_CLOCK (BAUDGEN_CLOCK) 
 
 class mvme162_state : public driver_device
@@ -304,8 +304,8 @@ void mvme162_state::mvme162(machine_config &config)
 	m_sccterm->out_rtsa_callback().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
-	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc85c30_device::rxa_w));
-	rs232trm.cts_handler().set(m_sccterm, FUNC(scc85c30_device::ctsa_w));
+	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc85230_device::rxa_w));
+	rs232trm.cts_handler().set(m_sccterm, FUNC(scc85230_device::ctsa_w));
 }
 
 /* ROM definitions */
