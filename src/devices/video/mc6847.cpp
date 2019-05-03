@@ -558,6 +558,8 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 	{
 		m_bw_palette[i] = black_and_white(s_palette[i]);
 	}
+
+    m_artifacter.create_luma_table( s_palette );
 }
 
 
@@ -1798,6 +1800,23 @@ mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double fac
 }
 
 
+
+//-------------------------------------------------
+//  artifacter::create_luma_table
+//-------------------------------------------------
+
+void mc6847_base_device::artifacter::create_luma_table( const pixel_t *palette )
+{
+    // Luminance map for PAL color blend. Colors with same luminance value are blendable on a PAL display. 
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[0],2)); /* GREEN */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[1],1)); /* YELLOW */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[2],3)); /* BLUE */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[3],3)); /* RED */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[4],1)); /* BUFF */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[5],2)); /* CYAN */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[6],2)); /* MAGENTA */
+    m_luminance_map.insert(std::pair<uint32_t,uint8_t>(palette[7],2)); /* ORANGE */
+}
 
 //**************************************************************************
 //  VARIATIONS

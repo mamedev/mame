@@ -13,7 +13,7 @@
 #pragma once
 
 #include "screen.h"
-
+#include <map>
 
 //**************************************************************************
 //  MC6847 CONFIGURATION / INTERFACE
@@ -181,6 +181,7 @@ protected:
 		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
         void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
         bool get_pal_artifacting() { return m_palartifacting; }
+        void create_luma_table( const pixel_t *palette );
 
 		// artifacting application
 		template<int xscale>
@@ -194,10 +195,18 @@ protected:
                 uint32_t tmpPixel;
                 pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
                 pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
+                std::map<uint32_t,uint8_t>::const_iterator luma1;
+                std::map<uint32_t,uint8_t>::const_iterator luma2;
 
-                for( int pixel = 0; pixel < bitmap.width(); ++pixel )
+                for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
                 {
-                    if( line1[pixel] != line2[pixel] )
+                    if( line1[pixel] == line2[pixel] )
+                        continue;
+
+                    luma1 = m_luminance_map.find( line1[pixel] );
+                    luma2 = m_luminance_map.find( line2[pixel] );
+
+                    if( luma1 != m_luminance_map.end() && luma2 != m_luminance_map.end() && (luma1->second == luma2->second))
                     {
                         tmpPixel  = (( ((line1[pixel] & 0xFF0000) >> 16) + ((line2[pixel] & 0xFF0000) >> 16) / 2) << 16);
                         tmpPixel |= (( ((line1[pixel] & 0xFF00  ) >> 8 ) + ((line2[pixel] & 0xFF00  ) >> 8 ) / 2) << 8 );
@@ -253,6 +262,9 @@ protected:
 		ioport_value m_saved_artifacting;
 		pixel_t m_saved_c0, m_saved_c1;
 		pixel_t m_expanded_colors[128];
+
+		// PAL color blend emulation values.
+		std::map<uint32_t, unsigned char> m_luminance_map;
 
 		void update_colors(pixel_t c0, pixel_t c1);
 		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);
