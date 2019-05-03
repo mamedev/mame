@@ -83,8 +83,7 @@ public:
 
 private:
 	uint8_t m_keyboard_line;
-	bool m_use_pcg;;
-	uint16_t m_t1latch;
+	bool m_use_pcg;
 	bool m_pb7;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -374,7 +373,7 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 void jr100_state::jr100(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(14'318'181) / 4); // clock divided internally by 4  //actually MB8861
+	M6800(config, m_maincpu, XTAL(14'318'181) / 16);  //actually MB8861
 	m_maincpu->set_addrmap(AS_PROGRAM, &jr100_state::mem_map);
 
 	/* video hardware */
