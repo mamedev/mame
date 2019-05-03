@@ -94,9 +94,9 @@ public:
 	auto out_pb_callback() { return m_out_pb_cb.bind(); }
 	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
+	void address_w(u8 data);
+	void data_w(u8 data);
+	u8 data_r();
 
 	void set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_mf_bits(u8 b0, u8 b1, u8 b2, u8 b3);
@@ -199,33 +199,33 @@ void igs_bitswap_device::device_reset()
 	m_val = m_word = 0;
 }
 
-WRITE8_MEMBER(igs_bitswap_device::address_w)
+void igs_bitswap_device::address_w(u8 data)
 {
 	m_address = data;
 }
 
-WRITE8_MEMBER(igs_bitswap_device::data_w)
+void igs_bitswap_device::data_w(u8 data)
 {
 	switch (m_address)
 	{
 		case 0x00:
 			if (!m_out_pa_cb.isnull())
 			{
-				m_out_pa_cb((offs_t)0, data);
+				m_out_pa_cb(data);
 				return;
 			}
 			break;
 		case 0x01:
 			if (!m_out_pb_cb.isnull())
 			{
-				m_out_pb_cb((offs_t)0, data);
+				m_out_pb_cb(data);
 				return;
 			}
 			break;
 		case 0x02:
 			if (!m_out_pc_cb.isnull())
 			{
-				m_out_pc_cb((offs_t)0, data);
+				m_out_pc_cb(data);
 				return;
 			}
 			break;
@@ -312,21 +312,21 @@ WRITE8_MEMBER(igs_bitswap_device::data_w)
 	logerror("%s: warning, writing to address %02x = %02x\n", machine().describe_context(), m_address, data);
 }
 
-READ8_MEMBER(igs_bitswap_device::data_r)
+u8 igs_bitswap_device::data_r()
 {
 	switch (m_address)
 	{
 		case 0x00:
 			if (!m_in_pa_cb.isnull())
-				return m_in_pa_cb(0);
+				return m_in_pa_cb();
 			break;
 		case 0x01:
 			if (!m_in_pb_cb.isnull())
-				return m_in_pb_cb(0);
+				return m_in_pb_cb();
 			break;
 		case 0x02:
 			if (!m_in_pc_cb.isnull())
-				return m_in_pc_cb(0);
+				return m_in_pc_cb();
 			break;
 
 		case 0x03:  // result
@@ -387,10 +387,10 @@ class igs_incdec_device : public device_t
 public:
 	igs_incdec_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_WRITE8_MEMBER( reset_w );
-	DECLARE_WRITE8_MEMBER( inc_w );
-	DECLARE_WRITE8_MEMBER( dec_w );
-	DECLARE_READ8_MEMBER( val_r );
+	void reset_w(u8 data = 0);
+	void inc_w(u8 data = 0);
+	void dec_w(u8 data = 0);
+	u8 val_r();
 
 protected:
 	virtual void device_start() override;
@@ -400,25 +400,25 @@ private:
 	u8 m_val;
 };
 
-WRITE8_MEMBER(igs_incdec_device::reset_w)
+void igs_incdec_device::reset_w(u8 data)
 {
 	m_val = 0x00;
 	logerror("%s: reset -> %02x\n", machine().describe_context(), m_val);
 }
 
-WRITE8_MEMBER(igs_incdec_device::inc_w)
+void igs_incdec_device::inc_w(u8 data)
 {
 	m_val++;
 	logerror("%s: inc -> %02x\n", machine().describe_context(), m_val);
 }
 
-WRITE8_MEMBER(igs_incdec_device::dec_w)
+void igs_incdec_device::dec_w(u8 data)
 {
 	m_val--;
 	logerror("%s: dec -> %02x\n", machine().describe_context(), m_val);
 }
 
-READ8_MEMBER(igs_incdec_device::val_r)
+u8 igs_incdec_device::val_r()
 {
 	u8 res =   (BIT(m_val, 0) << 7) |
 					(BIT(m_val, 3) << 5) |
@@ -465,7 +465,14 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_igs_bitswap(*this, "igs_bitswap"),
-		m_igs_incdec(*this, "igs_incdec")
+		m_igs_incdec(*this, "igs_incdec"),
+		m_io_coins(*this, "COINS"),
+		m_io_buttons(*this, "BUTTONS"),
+		m_io_player1(*this, "PLAYER1"),
+		m_io_player2(*this, "PLAYER2"),
+		m_io_hopper(*this, "HOPPER"),
+		m_io_key(*this, "KEY%u", 0U),
+		m_io_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void mgcs(machine_config &config);
@@ -513,11 +520,19 @@ private:
 	optional_device<igs_bitswap_device> m_igs_bitswap;
 	optional_device<igs_incdec_device> m_igs_incdec;
 
-	void igs025_to_igs022_callback( void );
+	optional_ioport m_io_coins;
+	optional_ioport m_io_buttons;
+	optional_ioport m_io_player1;
+	optional_ioport m_io_player2;
+	optional_ioport m_io_hopper;
+	optional_ioport_array<5> m_io_key;
+	optional_ioport_array<2> m_io_dsw;
+
+	void igs025_to_igs022_callback(void);
 
 	u8 m_input_select;
 	u8 m_hopper;
-	u16 m_igs_magic[2];
+	u16 m_igs_magic;
 	u8 m_scramble_data;
 
 	u8 m_dsw_select;
@@ -529,41 +544,45 @@ private:
 	// IGS029 protection (mgcs)
 	u32 m_igs029_mgcs_long;
 
-	DECLARE_WRITE8_MEMBER(input_select_w);
+	void input_select_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(iqblocka_keyin_w);
-	DECLARE_WRITE8_MEMBER(iqblockf_keyout_w);
-	DECLARE_WRITE8_MEMBER(iqblocka_remap_addr_w);
-
-	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
-	DECLARE_READ16_MEMBER(mgcs_magic_r);
+	void iqblocka_keyin_w(u8 data);
+	void iqblockf_keyout_w(u8 data);
+	void iqblocka_remap_addr_w(offs_t offset, u8 data);
 
 	u16 mgcs_palette_bitswap(u16 bgr) const;
 	u16 lhzb2a_palette_bitswap(u16 bgr) const;
 	u16 tjsb_palette_bitswap(u16 bgr) const;
 	u16 slqz2_palette_bitswap(u16 bgr) const;
 
-	DECLARE_READ8_MEMBER(sdmg2_keys_r);
-	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
-	DECLARE_READ16_MEMBER(sdmg2_magic_r);
-	DECLARE_READ8_MEMBER(mgdh_keys_r);
-	DECLARE_WRITE16_MEMBER(mgdha_magic_w);
-	DECLARE_READ16_MEMBER(mgdha_magic_r);
+	void magic_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 magic_r();
 
-	DECLARE_WRITE8_MEMBER(tjsb_output_w);
-	DECLARE_READ8_MEMBER(tjsb_input_r);
-	DECLARE_READ8_MEMBER(spkrform_input_r);
+	void mgcs_magic_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mgcs_magic_r();
 
-	DECLARE_WRITE16_MEMBER(lhzb2a_input_select_w);
-	DECLARE_READ16_MEMBER(lhzb2a_input_r);
-	DECLARE_WRITE16_MEMBER(lhzb2a_remap_addr_w);
+	u8 sdmg2_keys_r();
+	void sdmg2_magic_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sdmg2_magic_r();
 
-	DECLARE_WRITE16_MEMBER(lhzb2_magic_w);
-	DECLARE_READ16_MEMBER(lhzb2_magic_r);
+	u8 mgdh_keys_r();
+	void mgdha_magic_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mgdha_magic_r();
 
-	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
-	DECLARE_READ16_MEMBER(slqz2_magic_r);
-	DECLARE_READ8_MEMBER(mgcs_keys_r);
+	void tjsb_output_w(u8 data);
+	u8 tjsb_input_r();
+	u8 spkrform_input_r();
+
+	void lhzb2a_input_select_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 lhzb2a_input_r(offs_t offset);
+	void lhzb2a_remap_addr_w(address_space &space, u16 data);
+
+	void lhzb2_magic_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 lhzb2_magic_r();
+
+	void slqz2_magic_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 slqz2_magic_r();
+	u8 mgcs_keys_r();
 
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
@@ -655,35 +674,34 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 	int length = memregion("maincpu")->bytes();
 	u8 *rom = memregion("maincpu")->base();
 	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(length);
-	int i;
 
 	// decrypt the program ROM
 
 	// XOR layer
-	for (i = 0;i < length;i++)
+	for (int i = 0; i < length; i++)
 	{
-		if(i & 0x2000)
+		if (i & 0x2000)
 		{
-			if((i & mask) == mask)
+			if ((i & mask) == mask)
 				rom[i] ^= 0x01;
 		}
 		else
 		{
-			if(i & 0x0100)
+			if (i & 0x0100)
 			{
-				if((i & mask) == mask)
+				if ((i & mask) == mask)
 					rom[i] ^= 0x01;
 			}
 			else
 			{
-				if(i & 0x0080)
+				if (i & 0x0080)
 				{
-					if((i & mask) == mask)
+					if ((i & mask) == mask)
 						rom[i] ^= 0x01;
 				}
 				else
 				{
-					if((i & mask) != mask)
+					if ((i & mask) != mask)
 						rom[i] ^= 0x01;
 				}
 			}
@@ -693,7 +711,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 	memcpy(tmp.get(),rom,length);
 
 	// address lines swap
-	for (i = 0;i < length;i++)
+	for (int i = 0; i < length; i++)
 	{
 		int addr = (i & ~0xff) | bitswap<8>(i,a7,a6,a5,a4,a3,a2,a1,a0);
 		rom[i] = tmp[addr];
@@ -721,18 +739,17 @@ void igs017_state::tjsb_decrypt_sprites()
 	int length = memregion("igs017_igs031:sprites")->bytes();
 	u8 *rom = memregion("igs017_igs031:sprites")->base();
 	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(length);
-	int i, addr;
 
 	// address lines swap
 	memcpy(tmp.get(), rom, length);
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
-		addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
+		int addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
 		rom[i] = tmp[addr];
 	}
 
 	// data lines swap
-	for (i = 0; i < length; i += 2)
+	for (int i = 0; i < length; i += 2)
 	{
 		u16 data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
@@ -753,28 +770,27 @@ void igs017_state::init_tjsb()
 
 void igs017_state::mgcs_decrypt_program_rom()
 {
-	int i;
 	u16 *src = (u16 *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
 		u16 x = src[i];
 
 		/* bit 0 xor layer */
 
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -782,11 +798,11 @@ void igs017_state::mgcs_decrypt_program_rom()
 
 		/* bit 8 xor layer */
 
-		if( (i & 0x2000/2) || !(i & 0x80/2) )
+		if ((i & 0x2000/2) || !(i & 0x80/2))
 		{
-			if( i & 0x100/2 )
+			if (i & 0x100/2)
 			{
-				if( !(i & 0x20/2) || (i & 0x400/2) )
+				if (!(i & 0x20/2) || (i & 0x400/2))
 				{
 					x ^= 0x0100;
 				}
@@ -806,10 +822,9 @@ void igs017_state::mgcs_decrypt_tiles()
 	int length = memregion("igs017_igs031:tilemaps")->bytes();
 	u8 *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<u8> tmp(length);
-	int i;
 
 	memcpy(&tmp[0],rom,length);
-	for (i = 0;i < length;i++)
+	for (int i = 0; i < length; i++)
 	{
 		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
 		rom[i^1] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
@@ -820,9 +835,8 @@ void igs017_state::mgcs_flip_sprites()
 {
 	int length = memregion("igs017_igs031:sprites")->bytes();
 	u8 *rom = memregion("igs017_igs031:sprites")->base();
-	int i;
 
-	for (i = 0;i < length;i+=2)
+	for (int i = 0; i < length; i+=2)
 	{
 		u16 pixels = (rom[i+1] << 8) | rom[i+0];
 
@@ -866,10 +880,9 @@ void igs017_state::tarzan_decrypt_tiles()
 	int length = memregion("igs017_igs031:tilemaps")->bytes();
 	u8 *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<u8> tmp(length);
-	int i;
 
 	memcpy(&tmp[0],rom,length);
-	for (i = 0;i < length;i++)
+	for (int i = 0; i < length; i++)
 	{
 		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
 		rom[i] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
@@ -880,23 +893,22 @@ void igs017_state::tarzan_decrypt_tiles()
 void igs017_state::tarzan_decrypt_program_rom()
 {
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	int i;
 	int size = 0x40000;
 
-	for(i=0; i<size/2; i++)
+	for(int i=0; i<size/2; i++)
 	{
 		u16 x = ROM[i];
 
-		if((i & 0x10c0) == 0x0000)
+		if ((i & 0x10c0) == 0x0000)
 			x ^= 0x0001;
 
-		if((i & 0x0010) == 0x0010 || (i & 0x0130) == 0x0020)
+		if ((i & 0x0010) == 0x0010 || (i & 0x0130) == 0x0020)
 			x ^= 0x0404;
 
-		if((i & 0x00d0) != 0x0010)
+		if ((i & 0x00d0) != 0x0010)
 			x ^= 0x1010;
 
-		if(((i & 0x0008) == 0x0008)^((i & 0x10c0) == 0x0000))
+		if (((i & 0x0008) == 0x0008)^((i & 0x10c0) == 0x0000))
 			x ^= 0x0100;
 
 		ROM[i] = x;
@@ -906,10 +918,9 @@ void igs017_state::tarzan_decrypt_program_rom()
 void igs017_state::tarzana_decrypt_program_rom()
 {
 	u8 *ROM = memregion("maincpu")->base();
-	int i;
 	int size = 0x80000;
 
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		u8 x = 0;
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
@@ -946,29 +957,29 @@ void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
 		u8 x = ROM[i];
 
 		// this seems ok for opcodes too
-		if ( (i & 0x10) && (i & 0x01) )
+		if ((i & 0x10) && (i & 0x01))
 		{
-			if ( !(!(i & 0x2000) && !(i & 0x100) && !(i & 0x80)) )
+			if (!(!(i & 0x2000) && !(i & 0x100) && !(i & 0x80)))
 				x ^= 0x01;
 		}
 		else
 		{
-			if ( !(i & 0x2000) && !(i & 0x100) && !(i & 0x80) )
+			if (!(i & 0x2000) && !(i & 0x100) && !(i & 0x80))
 				x ^= 0x01;
 		}
 
 		// 2x no xor (opcode)
 		// 3x no xor (opcode)
 		// 60-66 no xor (opcode)
-		if ( !(i & 0x100) || (i & 0x80) || (i & 0x20) )
+		if (!(i & 0x100) || (i & 0x80) || (i & 0x20))
 			x ^= 0x20;
 
 		// 2x needs xor (opcode)
 		// 3x needs xor (opcode)
-		if ( (i & 0x200) || (i & 0x40) || !(i & 0x20) )
+		if ((i & 0x200) || (i & 0x40) || !(i & 0x20))
 			x ^= 0x40;
 
-		if ( (!(i & 0x100) && (i & 0x80)) || (i & 0x20) )
+		if ((!(i & 0x100) && (i & 0x80)) || (i & 0x20))
 			x ^= 0x80;
 
 #else
@@ -1115,13 +1126,11 @@ void igs017_state::lhzb2_decrypt_tiles()
 	int length = memregion("igs017_igs031:tilemaps")->bytes();
 	u8 *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<u8> tmp(length);
-	int i;
 
-	int addr;
 	memcpy(&tmp[0], rom, length);
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
-		addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+		int addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 		rom[i] = tmp[addr];
 	}
 }
@@ -1131,18 +1140,17 @@ void igs017_state::lhzb2_decrypt_sprites()
 	int length = memregion("igs017_igs031:sprites")->bytes();
 	u8 *rom = memregion("igs017_igs031:sprites")->base();
 	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(length);
-	int i, addr;
 
 	// address lines swap
 	memcpy(tmp.get(), rom, length);
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
-		addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
 
 	// data lines swap
-	for (i = 0;i < length;i+=2)
+	for (int i = 0; i < length; i+=2)
 	{
 		u16 data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
@@ -1151,7 +1159,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	}
 }
 
-void igs017_state::igs025_to_igs022_callback( void )
+void igs017_state::igs025_to_igs022_callback(void)
 {
 	m_igs022->IGS022_handle_command();
 }
@@ -1330,10 +1338,9 @@ void igs017_state::slqz2_decrypt_tiles()
 	int length = memregion("igs017_igs031:tilemaps")->bytes();
 	u8 *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<u8> tmp(length);
-	int i;
 
 	memcpy(&tmp[0],rom,length);
-	for (i = 0;i < length;i++)
+	for (int i = 0; i < length; i++)
 	{
 		int addr = (i & ~0xff) | bitswap<8>(i,7,4,5,6,3,2,1,0);
 		rom[i] = tmp[addr];
@@ -1433,12 +1440,12 @@ void igs017_state::spkrform_decrypt_sprites()
 	int length = memregion("igs017_igs031:sprites")->bytes();
 	u8 *rom = memregion("igs017_igs031:sprites")->base();
 	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(length);
-	int i, addr;
 
 	// address lines swap
 	memcpy(tmp.get(), rom, length);
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
+		int addr;
 		if (i & 0x80000)
 			addr = (i & ~0xff) | bitswap<8>(i,7,6,3,4,5,2,1,0);
 		else
@@ -1475,28 +1482,28 @@ void igs017_state::decrypted_opcodes_map(address_map &map)
 	map(0x00000, 0x3ffff).rom().share("decrypted_opcodes");
 }
 
-WRITE8_MEMBER(igs017_state::input_select_w)
+void igs017_state::input_select_w(u8 data)
 {
 	m_input_select = data;
 }
 
-WRITE8_MEMBER(igs017_state::iqblocka_keyin_w)
+void igs017_state::iqblocka_keyin_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80); // key in  (in gambling mode)
 //  popmessage("PORT0 %02X", data);
-	if ( data & ~0x80 )
+	if (data & ~0x80)
 		logerror("%s: warning, unknown bits written in keyin_w = %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(igs017_state::iqblockf_keyout_w)
+void igs017_state::iqblockf_keyout_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x80); // key out (in gambling mode, only iqblockf/genius6)
 //  popmessage("PORT1 %02X", data);
-	if ( data & ~0x80 )
+	if (data & ~0x80)
 		logerror("%s: warning, unknown bits written in keyout_w = %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(igs017_state::iqblocka_remap_addr_w)
+void igs017_state::iqblocka_remap_addr_w(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{
@@ -1504,10 +1511,10 @@ WRITE8_MEMBER(igs017_state::iqblocka_remap_addr_w)
 		if (m_remap_addr != -1)
 		{
 			address_space &prg_space = m_maincpu->space(AS_PROGRAM);
-			prg_space.unmap_write ( m_remap_addr + 0x0, m_remap_addr + 0x0 );
-			prg_space.unmap_write ( m_remap_addr + 0x1, m_remap_addr + 0x1 );
-			prg_space.unmap_write ( m_remap_addr + 0x3, m_remap_addr + 0x3 );
-			prg_space.unmap_read  ( m_remap_addr + 0x5, m_remap_addr + 0x5 );
+			prg_space.unmap_write(m_remap_addr + 0x0, m_remap_addr + 0x0);
+			prg_space.unmap_write(m_remap_addr + 0x1, m_remap_addr + 0x1);
+			prg_space.unmap_write(m_remap_addr + 0x3, m_remap_addr + 0x3);
+			prg_space.unmap_read (m_remap_addr + 0x5, m_remap_addr + 0x5);
 
 			logerror("%s: incdec protection unmapped from %04x\n", machine().describe_context(), m_remap_addr);
 		}
@@ -1520,10 +1527,10 @@ WRITE8_MEMBER(igs017_state::iqblocka_remap_addr_w)
 
 		// Add new memory ranges
 		address_space &prg_space = m_maincpu->space(AS_PROGRAM);
-		prg_space.install_write_handler ( m_remap_addr + 0x0, m_remap_addr + 0x0, write8_delegate(FUNC(igs_incdec_device::reset_w), &(*m_igs_incdec)) );
-		prg_space.install_write_handler ( m_remap_addr + 0x1, m_remap_addr + 0x1, write8_delegate(FUNC(igs_incdec_device::dec_w),   &(*m_igs_incdec)) );
-		prg_space.install_write_handler ( m_remap_addr + 0x3, m_remap_addr + 0x3, write8_delegate(FUNC(igs_incdec_device::inc_w),   &(*m_igs_incdec)) );
-		prg_space.install_read_handler  ( m_remap_addr + 0x5, m_remap_addr + 0x5, read8_delegate (FUNC(igs_incdec_device::val_r),   &(*m_igs_incdec)) );
+		prg_space.install_write_handler(m_remap_addr + 0x0, m_remap_addr + 0x0, write8smo_delegate(FUNC(igs_incdec_device::reset_w), &(*m_igs_incdec)));
+		prg_space.install_write_handler(m_remap_addr + 0x1, m_remap_addr + 0x1, write8smo_delegate(FUNC(igs_incdec_device::dec_w),   &(*m_igs_incdec)));
+		prg_space.install_write_handler(m_remap_addr + 0x3, m_remap_addr + 0x3, write8smo_delegate(FUNC(igs_incdec_device::inc_w),   &(*m_igs_incdec)));
+		prg_space.install_read_handler (m_remap_addr + 0x5, m_remap_addr + 0x5, read8smo_delegate (FUNC(igs_incdec_device::val_r),   &(*m_igs_incdec)));
 
 		logerror("%s: incdec protection remapped at %04x\n", machine().describe_context(), m_remap_addr);
 	}
@@ -1574,7 +1581,7 @@ void igs017_state::mgcs_igs029_run()
 
 //              popmessage("PORT1 %02X", data);
 
-				if ( data & ~0x70 )
+				if (data & ~0x70)
 					logerror("%s: warning, unknown bits written in port %02x = %02x\n", machine().describe_context(), port, data);
 
 				break;
@@ -1584,7 +1591,7 @@ void igs017_state::mgcs_igs029_run()
 
 //              popmessage("PORT3 %02X", data);
 
-				if ( data & ~0x03 )
+				if (data & ~0x03)
 					logerror("%s: warning, unknown bits written in port %02x = %02x\n", machine().describe_context(), port, data);
 
 				break;
@@ -1608,7 +1615,7 @@ void igs017_state::mgcs_igs029_run()
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
-		m_igs029_recv_buf[m_igs029_recv_len++] = min_bets[ (~ioport("DSW2")->read()) & 3 ];
+		m_igs029_recv_buf[m_igs029_recv_len++] = min_bets[ (~m_io_dsw[1]->read()) & 3 ];
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x39)
@@ -1616,8 +1623,8 @@ void igs017_state::mgcs_igs029_run()
 		logerror("READ DSW\n");
 
 		u8 ret;
-		if      (~m_dsw_select & 0x01)  ret = ioport("DSW1")->read();
-		else if (~m_dsw_select & 0x02)  ret = ioport("DSW2")->read();
+		if      (~m_dsw_select & 0x01)  ret = m_io_dsw[0]->read();
+		else if (~m_dsw_select & 0x02)  ret = m_io_dsw[1]->read();
 		else
 		{
 			logerror("%s: warning, reading dsw with dsw_select = %02x\n", machine().describe_context(), m_dsw_select);
@@ -1674,14 +1681,19 @@ void igs017_state::mgcs_igs029_run()
 	m_igs029_send_len = 0;
 }
 
-WRITE16_MEMBER(igs017_state::mgcs_magic_w)
+void igs017_state::magic_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
+	COMBINE_DATA(&m_igs_magic);
+}
 
-	if (offset == 0)
-		return;
+u16 igs017_state::magic_r()
+{
+	return m_igs_magic;
+}
 
-	switch(m_igs_magic[0])
+void igs017_state::mgcs_magic_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	switch (m_igs_magic)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
@@ -1729,7 +1741,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 				}
 			}
 
-			if ( m_input_select & ~0xfd )
+			if (m_input_select & ~0xfd)
 				logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), m_input_select);
 
 			break;
@@ -1738,7 +1750,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_scramble_data = data & 0xff;
-//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
+//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic);
 			}
 			break;
 
@@ -1748,21 +1760,18 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_igs029_send_data = data & 0xff;
-//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
+//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic);
 			}
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
 	}
 }
 
-READ16_MEMBER(igs017_state::mgcs_magic_r)
+u16 igs017_state::mgcs_magic_r()
 {
-	if (offset == 0)
-		return m_igs_magic[0];
-
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
 			return m_input_select | 0x02;
@@ -1770,34 +1779,34 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 		case 0x01:
 		{
 			u16 ret = bitswap<8>( (bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
-			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
+			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic);
 			return ret;
 		}
 
 		case 0x02:
 		{
 			u8 ret = m_igs029_recv_data;
-			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
+			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic);
 			return ret;
 		}
 
 //      case 0x05: ???
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
 	return 0xffff;
 }
 
-READ8_MEMBER(igs017_state::mgcs_keys_r)
+u8 igs017_state::mgcs_keys_r()
 {
-	if (~m_input_select & 0x08) return ioport("KEY0")->read();
-	if (~m_input_select & 0x10) return ioport("KEY1")->read();
-	if (~m_input_select & 0x20) return ioport("KEY2")->read();
-	if (~m_input_select & 0x40) return ioport("KEY3")->read();
-	if (~m_input_select & 0x80) return ioport("KEY4")->read();
+	if (~m_input_select & 0x08) return m_io_key[0]->read();
+	if (~m_input_select & 0x10) return m_io_key[1]->read();
+	if (~m_input_select & 0x20) return m_io_key[2]->read();
+	if (~m_input_select & 0x40) return m_io_key[3]->read();
+	if (~m_input_select & 0x80) return m_io_key[4]->read();
 
 	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
@@ -1807,7 +1816,8 @@ void igs017_state::mgcs_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x300000, 0x303fff).ram();
-	map(0x49c000, 0x49c003).w(FUNC(igs017_state::mgcs_magic_w)).r(FUNC(igs017_state::mgcs_magic_r));
+	map(0x49c000, 0x49c001).rw(FUNC(igs017_state::magic_r), FUNC(igs017_state::magic_w));
+	map(0x49c002, 0x49c003).rw(FUNC(igs017_state::mgcs_magic_r), FUNC(igs017_state::mgcs_magic_w));
 
 	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -1818,28 +1828,23 @@ void igs017_state::mgcs_map(address_map &map)
 
 // sdmg2
 
-READ8_MEMBER(igs017_state::sdmg2_keys_r)
+u8 igs017_state::sdmg2_keys_r()
 {
-	if (~m_input_select & 0x01) return ioport("KEY0")->read();
-	if (~m_input_select & 0x02) return ioport("KEY1")->read();
-	if (~m_input_select & 0x04) return ioport("KEY2")->read();
-	if (~m_input_select & 0x08) return ioport("KEY3")->read();
-	if (~m_input_select & 0x10) return ioport("KEY4")->read();
+	if (~m_input_select & 0x01) return m_io_key[0]->read();
+	if (~m_input_select & 0x02) return m_io_key[1]->read();
+	if (~m_input_select & 0x04) return m_io_key[2]->read();
+	if (~m_input_select & 0x08) return m_io_key[3]->read();
+	if (~m_input_select & 0x10) return m_io_key[4]->read();
 
-	if (m_input_select == 0x1f) return ioport("KEY0")->read();  // in joystick mode
+	if (m_input_select == 0x1f) return m_io_key[0]->read();  // in joystick mode
 
 	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
+void igs017_state::sdmg2_magic_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		// case 0x00: ? 0x80
 
@@ -1861,25 +1866,25 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
 	}
 }
 
-READ16_MEMBER(igs017_state::sdmg2_magic_r)
+u16 igs017_state::sdmg2_magic_r()
 {
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
 		{
 			u16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return ioport("COINS")->read() | hopper_bit;
+			return m_io_coins->read() | hopper_bit;
 		}
 
 		case 0x02:
-			return sdmg2_keys_r(space, 0);
+			return sdmg2_keys_r();
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
@@ -1894,35 +1899,30 @@ void igs017_state::sdmg2_map(address_map &map)
 	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
 	map(0x210001, 0x210001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x300000, 0x300003).w(FUNC(igs017_state::sdmg2_magic_w));
-	map(0x300002, 0x300003).r(FUNC(igs017_state::sdmg2_magic_r));
+	map(0x300000, 0x300001).w(FUNC(igs017_state::magic_w));
+	map(0x300002, 0x300003).rw(FUNC(igs017_state::sdmg2_magic_r), FUNC(igs017_state::sdmg2_magic_w));
 }
 
 
 // mgdh, mgdha
 
-READ8_MEMBER(igs017_state::mgdh_keys_r)
+u8 igs017_state::mgdh_keys_r()
 {
-	if (~m_input_select & 0x04) return ioport("KEY0")->read();
-	if (~m_input_select & 0x08) return ioport("KEY1")->read();
-	if (~m_input_select & 0x10) return ioport("KEY2")->read();
-	if (~m_input_select & 0x20) return ioport("KEY3")->read();
-	if (~m_input_select & 0x40) return ioport("KEY4")->read();
+	if (~m_input_select & 0x04) return m_io_key[0]->read();
+	if (~m_input_select & 0x08) return m_io_key[1]->read();
+	if (~m_input_select & 0x10) return m_io_key[2]->read();
+	if (~m_input_select & 0x20) return m_io_key[3]->read();
+	if (~m_input_select & 0x40) return m_io_key[4]->read();
 
-	if ((m_input_select & 0xfc) == 0xfc)    return ioport("DSW1")->read();
+	if ((m_input_select & 0xfc) == 0xfc)    return m_io_dsw[0]->read();
 
 	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::mgdha_magic_w)
+void igs017_state::mgdha_magic_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
@@ -1931,7 +1931,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 				machine().bookkeeping().coin_counter_w(0, data & 0x80);
 			}
 
-			if ( data & ~0xc0 )
+			if (data & ~0xc0)
 				logerror("%s: warning, unknown bits written to igs_magic 00 = %02x\n", machine().describe_context(), data);
 
 			break;
@@ -1943,7 +1943,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 				m_hopper = data & 0x01;
 			}
 
-			if ( m_input_select & ~0xfd )
+			if (m_input_select & ~0xfd)
 				logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), m_input_select);
 
 			break;
@@ -1968,31 +1968,31 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
             04ac10: warning, writing to igs_magic 06 = ff
             04ac20: warning, writing to igs_magic 07 = 3f
 */
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
 	}
 }
 
-READ16_MEMBER(igs017_state::mgdha_magic_r)
+u16 igs017_state::mgdha_magic_r()
 {
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
-			return mgdh_keys_r(space, 0);
+			return mgdh_keys_r();
 
 		case 0x01:
-			return ioport("BUTTONS")->read();
+			return m_io_buttons->read();
 
 		case 0x02:
-			return bitswap<8>(ioport("DSW2")->read(), 0,1,2,3,4,5,6,7);
+			return bitswap<8>(m_io_dsw[1]->read(), 0,1,2,3,4,5,6,7);
 
 		case 0x03:
 		{
 			u16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return ioport("COINS")->read() | hopper_bit;
+			return m_io_coins->read() | hopper_bit;
 		}
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
@@ -2003,8 +2003,8 @@ void igs017_state::mgdha_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x600000, 0x603fff).ram();
-	map(0x876000, 0x876003).w(FUNC(igs017_state::mgdha_magic_w));
-	map(0x876002, 0x876003).r(FUNC(igs017_state::mgdha_magic_r));
+	map(0x876000, 0x876001).w(FUNC(igs017_state::magic_w));
+	map(0x876002, 0x876003).rw(FUNC(igs017_state::mgdha_magic_r), FUNC(igs017_state::mgdha_magic_w));
 
 	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2014,9 +2014,9 @@ void igs017_state::mgdha_map(address_map &map)
 
 // tjsb
 
-WRITE8_MEMBER(igs017_state::tjsb_output_w)
+void igs017_state::tjsb_output_w(u8 data)
 {
-	switch(m_input_select)
+	switch (m_input_select)
 	{
 		case 0x00:
 			machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in
@@ -2045,17 +2045,17 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 	logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_input_select, data);
 }
 
-READ8_MEMBER(igs017_state::tjsb_input_r)
+u8 igs017_state::tjsb_input_r()
 {
 	switch (m_input_select)
 	{
-		case 0x00:  return ioport("PLAYER1")->read();
-		case 0x01:  return ioport("PLAYER2")->read();
-		case 0x02:  return ioport("COINS")->read();
+		case 0x00:  return m_io_player1->read();
+		case 0x01:  return m_io_player2->read();
+		case 0x02:  return m_io_coins->read();
 		case 0x03:
 		{
 			u8 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
-			return ioport("HOPPER")->read() | hopper_bit;
+			return m_io_hopper->read() | hopper_bit;
 		}
 
 		default:
@@ -2097,16 +2097,16 @@ void igs017_state::spkrform_map(address_map &map)
 	map(0x10000, 0x3ffff).rom();
 }
 
-READ8_MEMBER(igs017_state::spkrform_input_r)
+u8 igs017_state::spkrform_input_r()
 {
 	switch (m_input_select)
 	{
-		case 0x00:  return ioport("PLAYER1")->read();
-		case 0x01:  return ioport("PLAYER2")->read();
-		case 0x02:  return ioport("COINS")->read();
+		case 0x00:  return m_io_player1->read();
+		case 0x01:  return m_io_player2->read();
+		case 0x02:  return m_io_coins->read();
 		case 0x03:
 		{
-			return ioport("BUTTONS")->read();
+			return m_io_buttons->read();
 		}
 
 		default:
@@ -2135,14 +2135,9 @@ void igs017_state::spkrform_io(address_map &map)
 
 // lhzb2
 
-WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
+void igs017_state::lhzb2_magic_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
@@ -2150,7 +2145,7 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 				m_input_select = data & 0xff;
 			}
 
-			if ( m_input_select & ~0x1f )
+			if (m_input_select & ~0x1f)
 				logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), m_input_select);
 			break;
 
@@ -2159,34 +2154,34 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 			{
 				m_oki->set_rom_bank((data >> 7) & 1);
 
-				if ( data & 0x7f )
+				if (data & 0x7f)
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
 			}
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
 	}
 }
 
-READ16_MEMBER(igs017_state::lhzb2_magic_r)
+u16 igs017_state::lhzb2_magic_r()
 {
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x01:
 		{
-			if (~m_input_select & 0x01) return ioport("KEY0")->read();
-			if (~m_input_select & 0x02) return ioport("KEY1")->read();
-			if (~m_input_select & 0x04) return ioport("KEY2")->read();
-			if (~m_input_select & 0x08) return ioport("KEY3")->read();
-			if (~m_input_select & 0x10) return ioport("KEY4")->read();
+			if (~m_input_select & 0x01) return m_io_key[0]->read();
+			if (~m_input_select & 0x02) return m_io_key[1]->read();
+			if (~m_input_select & 0x04) return m_io_key[2]->read();
+			if (~m_input_select & 0x08) return m_io_key[3]->read();
+			if (~m_input_select & 0x10) return m_io_key[4]->read();
 
 			logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 			return 0xffff;
 		}
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
@@ -2197,8 +2192,8 @@ void igs017_state::lhzb2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x500000, 0x503fff).ram();
-	map(0x910000, 0x910003).w(FUNC(igs017_state::lhzb2_magic_w));
-	map(0x910002, 0x910003).r(FUNC(igs017_state::lhzb2_magic_r));
+	map(0x910000, 0x910001).w(FUNC(igs017_state::magic_w));
+	map(0x910002, 0x910003).rw(FUNC(igs017_state::lhzb2_magic_r), FUNC(igs017_state::lhzb2_magic_w));
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2209,17 +2204,17 @@ void igs017_state::lhzb2_map(address_map &map)
 // lhzb2a
 // To do: what devices are on this PCB?
 
-READ16_MEMBER(igs017_state::lhzb2a_input_r)
+u16 igs017_state::lhzb2a_input_r(offs_t offset)
 {
 	switch (offset*2)
 	{
 		case 0x00:  // Keys
 		{
-			if (~m_input_select & 0x01) return ioport("KEY0")->read() << 8;
-			if (~m_input_select & 0x02) return ioport("KEY1")->read() << 8;
-			if (~m_input_select & 0x04) return ioport("KEY2")->read() << 8;
-			if (~m_input_select & 0x08) return ioport("KEY3")->read() << 8;
-			if (~m_input_select & 0x10) return ioport("KEY4")->read() << 8;
+			if (~m_input_select & 0x01) return m_io_key[0]->read() << 8;
+			if (~m_input_select & 0x02) return m_io_key[1]->read() << 8;
+			if (~m_input_select & 0x04) return m_io_key[2]->read() << 8;
+			if (~m_input_select & 0x08) return m_io_key[3]->read() << 8;
+			if (~m_input_select & 0x10) return m_io_key[4]->read() << 8;
 
 			logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 			return 0xffff;
@@ -2228,11 +2223,11 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 		case 0x02:
 		{
 			u16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0002;
-			return (ioport("DSW1")->read() << 8) | ioport("COINS")->read() | hopper_bit;
+			return (m_io_dsw[0]->read() << 8) | m_io_coins->read() | hopper_bit;
 		}
 
 		case 0x04:
-			return ioport("DSW2")->read();
+			return m_io_dsw[1]->read();
 	}
 
 	return 0xffff;
@@ -2246,31 +2241,31 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(igs017_state::lhzb2a_remap_addr_w)
+void igs017_state::lhzb2a_remap_addr_w(address_space &space, u16 data)
 {
 	// Unmap previous address ranges
 	if (m_remap_addr != -1)
 	{
-		space.unmap_write     ( m_remap_addr * 0x10000 + 0x4000, m_remap_addr * 0x10000 + 0x4001 );
-		space.unmap_readwrite ( m_remap_addr * 0x10000 + 0x4002, m_remap_addr * 0x10000 + 0x4003 );
+		space.unmap_write    (m_remap_addr * 0x10000 + 0x4000, m_remap_addr * 0x10000 + 0x4001);
+		space.unmap_readwrite(m_remap_addr * 0x10000 + 0x4002, m_remap_addr * 0x10000 + 0x4003);
 
-		space.unmap_read      ( m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005 );
-		space.unmap_write     ( m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001 );
+		space.unmap_read     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005);
+		space.unmap_write    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001);
 	}
 
 	m_remap_addr = data & 0xff;
 
 	// Add new memory ranges
-	space.install_write_handler     ( m_remap_addr * 0x10000 + 0x4001, m_remap_addr * 0x10000 + 0x4001, write8_delegate(FUNC(igs_bitswap_device::address_w), &(*m_igs_bitswap)) );
-	space.install_readwrite_handler ( m_remap_addr * 0x10000 + 0x4003, m_remap_addr * 0x10000 + 0x4003, read8_delegate (FUNC(igs_bitswap_device::data_r),    &(*m_igs_bitswap)), write8_delegate(FUNC(igs_bitswap_device::data_w), &(*m_igs_bitswap)) );
+	space.install_write_handler    (m_remap_addr * 0x10000 + 0x4001, m_remap_addr * 0x10000 + 0x4001, write8smo_delegate(FUNC(igs_bitswap_device::address_w), &(*m_igs_bitswap)));
+	space.install_readwrite_handler(m_remap_addr * 0x10000 + 0x4003, m_remap_addr * 0x10000 + 0x4003, read8smo_delegate (FUNC(igs_bitswap_device::data_r),    &(*m_igs_bitswap)), write8smo_delegate(FUNC(igs_bitswap_device::data_w), &(*m_igs_bitswap)));
 
-	space.install_read_handler      ( m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16_delegate (FUNC(igs017_state::lhzb2a_input_r),      this) );
-	space.install_write_handler     ( m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16_delegate(FUNC(igs017_state::lhzb2a_remap_addr_w), this) );
+	space.install_read_handler     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16sm_delegate (FUNC(igs017_state::lhzb2a_input_r),      this));
+	space.install_write_handler    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16mo_delegate(FUNC(igs017_state::lhzb2a_remap_addr_w), this));
 
 	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_remap_addr);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
+void igs017_state::lhzb2a_input_select_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2283,7 +2278,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	{
 		m_oki->set_rom_bank((data >> 8) & 1);
 
-		if ( data & 0x0fe00 )
+		if (data & 0xfe00)
 			logerror("%s: warning, unknown bits written in input_select = %04x\n", machine().describe_context(), data);
 	}
 }
@@ -2312,14 +2307,9 @@ void igs017_state::lhzb2a_map(address_map &map)
 
 // slqz2
 
-WRITE16_MEMBER(igs017_state::slqz2_magic_w)
+void igs017_state::slqz2_magic_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
@@ -2330,29 +2320,29 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 //              machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
 				machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
 
-				if ( data & 0x7e )
+				if (data & 0x7e)
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
 			}
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
 	}
 }
 
-READ16_MEMBER(igs017_state::slqz2_magic_r)
+u16 igs017_state::slqz2_magic_r()
 {
-	switch(m_igs_magic[0])
+	switch (m_igs_magic)
 	{
 		case 0x00:
-			return ioport("PLAYER2")->read();
+			return m_io_player2->read();
 		case 0x01:
-			return ioport("PLAYER1")->read();
+			return m_io_player1->read();
 		case 0x02:
-			return ioport("BUTTONS")->read();
+			return m_io_buttons->read();
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
@@ -2363,8 +2353,8 @@ void igs017_state::slqz2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x602000, 0x602003).w(FUNC(igs017_state::slqz2_magic_w));
-	map(0x602002, 0x602003).r(FUNC(igs017_state::slqz2_magic_r));
+	map(0x602000, 0x602001).w(FUNC(igs017_state::magic_w));
+	map(0x602002, 0x602003).rw(FUNC(igs017_state::slqz2_magic_r), FUNC(igs017_state::slqz2_magic_w));
 
 	map(0x900000, 0x90ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -3495,10 +3485,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_igs017_igs031->get_irq_enable())
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
-	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -3588,10 +3578,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_igs017_igs031->get_irq_enable())
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -3600,7 +3590,7 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	MACHINE_RESET_CALL_MEMBER( iqblocka );
 
 	m_scramble_data = 0;
-	memset(m_igs_magic, 0, sizeof(m_igs_magic));
+	m_igs_magic = 0;
 }
 
 void igs017_state::mgcs(machine_config &config)
@@ -3683,7 +3673,7 @@ void igs017_state::lhzb2(machine_config &config)
 MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 {
 	MACHINE_RESET_CALL_MEMBER( mgcs );
-	lhzb2a_remap_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
+	lhzb2a_remap_addr_w(m_maincpu->space(AS_PROGRAM), 0xf0);
 }
 
 void igs017_state::lhzb2a(machine_config &config)
@@ -3807,10 +3797,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_igs017_igs031->get_irq_enable())
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
