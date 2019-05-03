@@ -1670,9 +1670,7 @@ if (CPUS["M680X0"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.hxx",
-		--MAME_DIR .. "src/devices/cpu/m68000/m68kmake.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
-		--MAME_DIR .. "src/devices/cpu/m68000/m68k_in.cpp",
 	}
 end
 
@@ -2161,6 +2159,11 @@ if (CPUS["UNSP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.h",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_extended.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_jumps.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_exxx.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_fxxx.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_other.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unspdefs.h",
 		MAME_DIR .. "src/devices/cpu/unsp/unspdrc.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unspfe.cpp",
@@ -2171,6 +2174,11 @@ end
 if (CPUS["UNSP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_extended.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_jumps.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_exxx.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_fxxx.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_other.cpp")
 end
 
 --------------------------------------------------

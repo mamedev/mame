@@ -11,11 +11,12 @@
 class crush11_host_device : public pci_host_device {
 public:
 	template <typename T>
-	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, const char *bios_device_tag)
 		: crush11_host_device(mconfig, tag, owner, clock)
 	{
 		set_ids_host(0x10de01a4, 0x01, 0x10430c11);
 		set_cpu_tag(std::forward<T>(cpu_tag));
+		biosrom.set_tag(bios_device_tag);
 	}
 	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -23,6 +24,8 @@ public:
 	const char *get_cpu_tag() { return cpu.finder_tag(); }
 	void set_ram_size(uint32_t size) { ram_size = size; }
 	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
+
+	void bios_map(address_map &map);
 
 protected:
 	virtual void device_start() override;
@@ -37,6 +40,7 @@ protected:
 
 private:
 	required_device<device_memory_interface> cpu;
+	required_device<intelfsh8_device> biosrom;
 	uint32_t ram_size;
 
 	DECLARE_READ8_MEMBER(unknown_r);

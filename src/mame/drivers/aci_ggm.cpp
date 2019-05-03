@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:bataais
 /******************************************************************************
 
 Applied Concepts Great Game Machine (GGM), electronic board game computer.
@@ -407,4 +408,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME  PARENT CMP MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1980, ggm,  0,      0, ggm,    ggm,  ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ggm,  0,      0, ggm,    ggm,  ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

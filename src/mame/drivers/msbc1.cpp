@@ -90,8 +90,6 @@ void msbc1_state::machine_reset()
 	uint8_t *rom = memregion(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
 }
 
 void msbc1_state::msbc1(machine_config &config)

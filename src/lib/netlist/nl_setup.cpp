@@ -744,7 +744,7 @@ void setup_t::resolve_inputs()
 	 * We therefore first park connecting inputs and retry
 	 * after all other terminals were connected.
 	 */
-	int tries = NL_MAX_LINK_RESOLVE_LOOPS;
+	unsigned tries = m_netlist_params->m_max_link_loops();
 	while (m_links.size() > 0 && tries >  0)
 	{
 
@@ -768,7 +768,7 @@ void setup_t::resolve_inputs()
 		for (auto & link : m_links)
 			log().warning(MF_CONNECTING_1_TO_2(setup().de_alias(link.first), setup().de_alias(link.second)));
 
-		log().fatal(MF_LINK_TRIES_EXCEEDED(NL_MAX_LINK_RESOLVE_LOOPS));
+		log().fatal(MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
 	}
 
 	log().verbose("deleting empty nets ...");

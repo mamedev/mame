@@ -298,11 +298,11 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint
 
 				if (OPTION_80_COL)
 				{
-					m_crtc->set_clock(XTAL(14'318'181) / 8);
+					m_crtc->set_unscaled_clock(XTAL(14'318'181) / 8);
 				}
 				else
 				{
-					m_crtc->set_clock(XTAL(14'318'181) / 16);
+					m_crtc->set_unscaled_clock(XTAL(14'318'181) / 16);
 				}
 			}
 			break;

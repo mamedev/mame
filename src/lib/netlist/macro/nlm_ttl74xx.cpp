@@ -604,6 +604,34 @@ static NETLIST_START(TTL_7486_DIP)
 	)
 NETLIST_END()
 
+#if (USE_TRUTHTABLE_74107)
+#ifndef __PLIB_PREPROCESSOR__
+#define TTL_74107_TT(name)                                                         \
+		NET_REGISTER_DEV(TTL_74107, name)
+#endif
+
+static NETLIST_START(TTL_74107_DIP)
+	TTL_74107_TT(A)
+	TTL_74107_TT(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(    /*          +--------------+        */
+		A.J,    /*       1J |1     ++    14| VCC    */ A.VCC,
+	    A.QQ,   /*      1QQ |2           13| 1CLRQ  */ A.CLRQ,
+	    A.Q,    /*       1Q |3           12| 1CLK   */ A.CLK,
+	    A.K,    /*       1K |4    74107  11| 2K     */ B.K,
+	    B.Q,    /*       2Q |5           10| 2CLRQ  */ B.CLRQ,
+	    B.QQ,   /*      2QQ |6            9| 2CLK   */ B.CLK,
+	    B.GND,  /*      GND |7            8| 2J     */ B.J
+	            /*          +--------------+        */
+	)
+
+NETLIST_END()
+#endif
+
+
 /*
  * DM74155/DM74156: Dual 2-Line to 4-Line Decoders/Demultiplexers
  *
@@ -1179,6 +1207,53 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
+#if (USE_TRUTHTABLE_74107)
+	/*
+	 *          +-----+-----+-----+---++---+-----+
+	 *          | CLRQ| CLK |  J  | K || Q | QQ  |
+	 *          +=====+=====+=====+===++===+=====+
+	 *          |  0  |  X  |  X  | X || 0 |  1  |
+	 *          |  1  |  *  |  0  | 0 || Q0| Q0Q |
+	 *          |  1  |  *  |  1  | 0 || 1 |  0  |
+	 *          |  1  |  *  |  0  | 1 || 0 |  1  |
+	 *          |  1  |  *  |  1  | 1 || TOGGLE  |
+	 *          +-----+-----+-----+---++---+-----+
+	 */
+	TRUTHTABLE_START(TTL_74107, 6, 4, "+CLK,+J,+K,+CLRQ,@VCC,@GND")
+		TT_HEAD("CLRQ, CLK, _CO,  J, K,_QX | Q, QQ, CO, QX")
+		TT_LINE("  0,   0,    X,  X, X,  X | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  0,   1,    X,  X, X,  X | 0,  1,  1,  0 | 16, 25, 1, 1")
+
+		TT_LINE("  1,   0,    X,  0, 0,  0 | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   1,    X,  0, 0,  0 | 0,  1,  1,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   0,    X,  0, 0,  1 | 1,  0,  0,  1 | 25, 16, 1, 1")
+		TT_LINE("  1,   1,    X,  0, 0,  1 | 1,  0,  1,  1 | 25, 16, 1, 1")
+
+		TT_LINE("  1,   0,    1,  1, 0,  X | 1,  0,  0,  1 | 25, 16, 1, 1")
+		TT_LINE("  1,   0,    0,  1, 0,  0 | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   0,    0,  1, 0,  1 | 1,  0,  0,  1 | 25, 16, 1, 1")
+		TT_LINE("  1,   1,    X,  1, 0,  0 | 0,  1,  1,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   1,    X,  1, 0,  1 | 1,  0,  1,  1 | 25, 16, 1, 1")
+
+		TT_LINE("  1,   0,    1,  0, 1,  X | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   0,    0,  0, 1,  0 | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   0,    0,  0, 1,  1 | 1,  0,  0,  1 | 25, 16, 1, 1")
+		TT_LINE("  1,   1,    X,  0, 1,  0 | 0,  1,  1,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   1,    X,  0, 1,  1 | 1,  0,  1,  1 | 25, 16, 1, 1")
+
+		// Toggle
+		TT_LINE("  1,   0,    0,  1, 1,  0 | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   0,    0,  1, 1,  1 | 1,  0,  0,  1 | 25, 16, 1, 1")
+		TT_LINE("  1,   1,    0,  1, 1,  0 | 0,  1,  1,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   1,    0,  1, 1,  1 | 1,  0,  1,  1 | 25, 16, 1, 1")
+		TT_LINE("  1,   1,    1,  1, 1,  0 | 0,  1,  1,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   1,    1,  1, 1,  1 | 1,  0,  1,  1 | 25, 16, 1, 1")
+
+		TT_LINE("  1,   0,    1,  1, 1,  1 | 0,  1,  0,  0 | 16, 25, 1, 1")
+		TT_LINE("  1,   0,    1,  1, 1,  0 | 1,  0,  0,  1 | 25, 16, 1, 1")
+	TRUTHTABLE_END()
+#endif
+
 	TRUTHTABLE_START(TTL_74155A_GATE, 4, 4, "")
 		TT_HEAD("B,A,G,C|0,1,2,3")
 		TT_LINE("X,X,1,X|1,1,1,1|13,13,13,13")
@@ -1308,6 +1383,9 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
+#if (USE_TRUTHTABLE_74107)
+	LOCAL_LIB_ENTRY(TTL_74107_DIP)
+#endif
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)

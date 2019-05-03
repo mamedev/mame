@@ -2403,6 +2403,8 @@ pc40iii                         // Commodore PC 40-III
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
+comslt286                       // Compaq SLT/286
+dsys200                         // Dell System 200
 pcd2                            // Siemens PCD-2
 ct386sx                         //
 ec1842                          //
@@ -9771,9 +9773,6 @@ chessmst                        //
 chessmsta                       //
 chessmstdm                      //
 
-@source:chesstrv.cpp
-chesstrv                        //
-
 @source:chexx.cpp
 chexx83                         // 1983 ICE
 faceoffh                        // 1983 SoftLogic / Entertainment Enterprises
@@ -12901,6 +12900,7 @@ cc3                             //
 
 @source:fidel_cc10.cpp
 cc10                            //
+cc10a                           //
 checkc4                         //
 
 @source:fidel_cc7.cpp
@@ -15188,6 +15188,7 @@ trobhood                        // Tiger
 trobocop2                       // Tiger
 trobocop3                       // Tiger
 trockteer                       // Tiger
+trsrescue                       // Tronica
 tsddragon                       // Tiger
 tsf2010                         // Tiger
 tsfight2                        // Tiger
@@ -18593,6 +18594,7 @@ vs10yardu                       // (c) 1983/1984
 battroad                        // (c) 1984
 horizon                         // (c) 1985
 kidniki                         // (c) 1986 + Data East USA license
+kidnikib                        // bootleg
 kidnikiu                        // (c) 1986 + Data East USA license
 kungfub                         // bootleg
 kungfub2                        // bootleg
@@ -21774,16 +21776,8 @@ mjsenpu
 @source:mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
 
-@source:mk1.cpp
-ccmk1                           // Chess Champion MK I
-cmpchess
-cncchess
-
 @source:mk14.cpp
 mk14                            //
-
-@source:mk2.cpp
-ccmk2                           // Chess Champion MK II
 
 @source:mk85.cpp
 mk85                            //
@@ -21878,6 +21872,8 @@ overrevb                        // 1997.09 Over Rev (Revision B)
 overrevba                       // 1997.09 Over Rev (Revision A)
 pltkids                         // 1999.03 Pilot Kids (Revision A)
 pltkidsa                        // 1999.03 Pilot Kids
+powsled                         // 1996.?? Power Sled (Revision A)
+powsledr                        // 1996.?? Power Sled Relay (Revision A)
 rascot2                         // 1997.?? Royal Ascot II
 rchase2                         // 1995.06 Rail Chase 2 (Revision A)
 schamp                          // 1996.05 Sonic Championship (USA)
@@ -30122,7 +30118,7 @@ bubsys                          //
 citybomb                        // GX787 (c) 1987 (World)
 citybombj                       // GX787 (c) 1987 (Japan)
 gradius                         // GX456 (c) 1985
-gradiusb						// Bubble System
+gradiusb                        // Bubble System
 gwarrior                        // GX578 (c) 1985
 hcrash                          // GX790 (c) 1987
 hcrashc                         // GX790 (c) 1987
@@ -30789,6 +30785,14 @@ ccdelta1                        //
 @source:novag_diablo.cpp
 diablo68                        //
 scorpio68                       //
+
+@source:novag_mk1.cpp
+ccmk1                           // Chess Champion MK I
+cmpchess
+cncchess
+
+@source:novag_mk2.cpp
+ccmk2                           // Chess Champion MK II
 
 @source:novag_presto.cpp
 nocto                           //
@@ -31755,6 +31759,7 @@ pepp0542a                       // (c) 1987 IGT - International Game Technology
 pepp0542b                       // (c) 1987 IGT - International Game Technology
 pepp0550                        // (c) 1987 IGT - International Game Technology
 pepp0550a                       // (c) 1987 IGT - International Game Technology
+pepp0550b                       // (c) 1987 IGT - International Game Technology
 pepp0555                        // (c) 1987 IGT - International Game Technology
 pepp0559                        // (c) 1987 IGT - International Game Technology
 pepp0562                        // (c) 1987 IGT - International Game Technology
@@ -31873,6 +31878,7 @@ pex0225p                        // (c) 1995 IGT - International Game Technology
 pex0242p                        // (c) 1995 IGT - International Game Technology
 pex0265p                        // (c) 1995 IGT - International Game Technology
 pex0291p                        // (c) 1995 IGT - International Game Technology
+pex0403p                        // (c) 1995 IGT - International Game Technology
 pex0417p                        // (c) 1995 IGT - International Game Technology
 pex0426p                        // (c) 1995 IGT - International Game Technology
 pex0430p                        // (c) 1995 IGT - International Game Technology
@@ -34197,6 +34203,12 @@ sbuggera                        // (c) 1981 Game-A-Tron
 sc2                             //
 sc2a                            //
 
+@source:scisys_chesstrv.cpp
+chesstrv                        //
+
+@source:scisys_cp2000.cpp
+cp2000                          //
+
 @source:scm_500.cpp
 scm_500                         //
 
@@ -36241,6 +36253,9 @@ starfirea                       // Exidy [1979?]
 spcship                         //
 whtforce                        //
 
+@source:starrider.cpp           //
+starridr
+
 @source:starshp1.cpp
 starshp1                        // 007513-007531    1977/07 [6502]
 starshpp                        // 007513-007531    1977/07 [6502]
@@ -37039,7 +37054,8 @@ gekiridnj                       // 1995.11 E11 (c) 1995 Taito Corporation (Japan
 gseeker                         // 1992.?? D40 (c) 1992 Taito Corporation Japan (World)
 gseekerj                        // 1992.12 D40 (c) 1992 Taito Corporation (Japan)
 gseekeru                        // 1992.?? D40 (c) 1992 Taito America Corporation (US)
-gunlock                         // 1994.?? D66 (c) 1993 Taito Corporation Japan (World)
+gunlock                         // 1994.01 D66 (c) 1993 Taito Corporation Japan (World)
+gunlocko                        // 1993.12 D66 (c) 1993 Taito Corporation Japan (World)
 hthero93                        // 1993.03 D49 (c) 1992 Taito Corporation (Japan)
 hthero93u                       // 1993.04 D49 (c) 1992 Taito America Corporation (US)
 hthero94                        // 1994.09 D78 (c) 1994 Taito (US)
@@ -37325,6 +37341,12 @@ taitotz                         //
 
 @source:taitowlf.cpp
 pf2012                          // E59 (c) 1997 Taito
+
+@source:talkingbb.cpp
+talkingbb
+
+@source:talkingfb.cpp
+talkingfb
 
 @source:tamag1.cpp
 tama                            // Bandai

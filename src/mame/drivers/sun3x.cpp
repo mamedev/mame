@@ -569,8 +569,6 @@ void sun3x_state::machine_reset()
 
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x10000);
 
-	m_maincpu->reset();
-
 	memset(m_iommu, 0, sizeof(m_iommu));
 
 	m_enable = 0;

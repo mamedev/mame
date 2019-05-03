@@ -46,14 +46,14 @@ void wswan_state::wswan_mem(address_map &map)
 {
 	map(0x00000, 0x03fff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles
 	map(0x04000, 0x0ffff).noprw();       // nothing
-	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
+	//map(0x10000, 0xeffff)    // cart range, setup at machine_start
 	map(0xf0000, 0xfffff).r(FUNC(wswan_state::bios_r));
 }
 
 void wscolor_state::wscolor_mem(address_map &map)
 {
 	map(0x00000, 0x0ffff).rw("vdp", FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
-	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
+	//map(0x10000, 0xeffff)    // cart range, setup at machine_start
 	map(0xf0000, 0xfffff).r(FUNC(wscolor_state::bios_r));
 }
 
@@ -125,6 +125,7 @@ void wswan_state::wswan(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &wswan_state::wswan_io);
 
 	WSWAN_VIDEO(config, m_vdp, 0);
+	m_vdp->set_screen("screen");
 	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line), this);
 	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb), this);

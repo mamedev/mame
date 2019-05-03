@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
-*
+
 * novag_diablo.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************

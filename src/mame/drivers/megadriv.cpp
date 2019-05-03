@@ -345,7 +345,6 @@ MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 
 MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 {
-	m_maincpu->reset();
 	MACHINE_RESET_CALL_MEMBER( megadriv );
 
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on

@@ -30,6 +30,7 @@ namespace devices
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
 		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
 		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
+		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
 		NETLIB_UPDATEI() { }
@@ -37,8 +38,10 @@ namespace devices
 		//NETLIB_UPDATE_PARAMI() { }
 	public:
 		param_logic_t m_use_deactivate;
-		param_int_t   m_startup_strategy;
-		param_int_t   m_mos_capmodel;
+		param_num_t<unsigned>   m_startup_strategy;
+		param_num_t<unsigned>   m_mos_capmodel;
+		//! How many times do we try to resolve links (connections)
+		param_num_t<unsigned>   m_max_link_loops;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -168,32 +171,33 @@ namespace devices
 			m_inc[0] = netlist_time::from_double(1.0 / (m_freq() * 2.0));
 
 			connect(m_feedback, m_Q);
+
+			netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			std::vector<pstring> pat(plib::psplit(m_pattern(),","));
+			m_off = netlist_time::from_double(m_offset());
+
+			std::array<std::int64_t, 32> pati = { 0 };
+
+			m_size = static_cast<std::uint8_t>(pat.size());
+			netlist_time::mult_type total = 0;
+			for (unsigned i=0; i<m_size; i++)
 			{
-				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
-				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
-				m_off = netlist_time::from_double(m_offset());
-
-				std::array<std::int64_t, 32> pati = { 0 };
-
-				m_size = static_cast<std::uint8_t>(pat.size());
-				netlist_time::mult_type total = 0;
-				for (unsigned i=0; i<m_size; i++)
-				{
-					// FIXME: use pstonum_ne
-					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-					pati[i] = plib::pstonum<std::int64_t, true>(pat[i]);
-					total += pati[i];
-				}
-				netlist_time ttotal = netlist_time::zero();
-				auto sm1 = static_cast<uint8_t>(m_size - 1);
-				for (unsigned i=0; i < sm1; i++)
-				{
-					m_inc[i] = base * pati[i];
-					ttotal += m_inc[i];
-				}
-				m_inc[sm1] = base * total - ttotal;
+				// FIXME: use pstonum_ne
+				//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
+				pati[i] = plib::pstonum<std::int64_t, true>(pat[i]);
+				total += pati[i];
 			}
+			netlist_time ttotal = netlist_time::zero();
+			auto sm1 = static_cast<uint8_t>(m_size - 1);
+			for (unsigned i=0; i < sm1; i++)
+			{
+				m_inc[i] = base * pati[i];
+				ttotal += m_inc[i];
+			}
+			m_inc[sm1] = base * total - ttotal;
+
 		}
+
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI();

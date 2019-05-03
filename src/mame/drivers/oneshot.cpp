@@ -114,6 +114,14 @@ For One Shot One Kill:
  chip appears to be unpopulated for One Shot One Kill.
  The ROM board for One Shot One Kill has 8 additional logic chips along the front edge of the PCB
 
+Clock measurements:
+ SCN68000C8N64: 12MHz
+     Z8400A PS: 3.375MHz (27MHz/8)
+        YM3812: 3.375MHz (27MHz/8)
+   OKI MSM6295: 1.25MHz, pin 7 is hard-wired to GROUND (5MHz/4)
+         VSYNC: 56.05Hz
+        H-SYNC: 15.06KHz
+
 */
 
 #include "emu.h"
@@ -440,15 +448,15 @@ void oneshot_state::machine_reset()
 void oneshot_state::oneshot(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, 12_MHz_XTAL); // 12MHz - verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &oneshot_state::mem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(oneshot_state::irq4_line_hold));
 
-	Z80(config, "audiocpu", 5_MHz_XTAL).set_addrmap(AS_PROGRAM, &oneshot_state::sound_map); // Not verified
+	Z80(config, "audiocpu", 27_MHz_XTAL/8).set_addrmap(AS_PROGRAM, &oneshot_state::sound_map); // 3.375MHz - verified
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(56);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0*16, 20*16-1, 0*16, 15*16-1);
@@ -462,11 +470,11 @@ void oneshot_state::oneshot(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 5_MHz_XTAL/2)); // 2.5MHz or 3MHz (12MHz/4) - clock frequency not verified
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8)); // 3.375MHz - verified
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 5_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // 1.25MHz??? - clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 5_MHz_XTAL/4, okim6295_device::PIN7_LOW); // 1.25MHz - verified, pin 7 is hard-wired to GROUND
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

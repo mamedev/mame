@@ -1457,6 +1457,8 @@ namespace netlist
 		// FIXME: make a postload member and include code there
 		void rebuild_lists(); /* must be called after post_load ! */
 
+		static void compile_defines(std::vector<std::pair<pstring, pstring>> &defs);
+
 	private:
 
 		void reset();
@@ -1498,44 +1500,23 @@ namespace netlist
 		void process_queue(const netlist_time delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
 
-		const detail::queue_t &queuex() const NL_NOEXCEPT { return m_queue; }
-#if 0
 		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
-		detail::queue_t &queue() NL_NOEXCEPT { return m_queue; }
-#endif
 
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
-#if (USE_QUEUE_STATS)
-			#if 0
-			// clang treats -Wswitch-bool as error
-			switch (m_stats)
-			{
-				case false: m_queue.push_nostats(std::move(e)); break;
-				case true:  m_queue.push(std::move(e)); break;
-			}
-			#else
-				if (!m_stats)
-					m_queue.push_nostats(std::move(e));
-				else
-					m_queue.push(std::move(e));
-			#endif
-#else
-			m_queue.push_nostats(std::move(e));
-#endif
+			if (!USE_QUEUE_STATS || !m_stats)
+				m_queue.push_nostats(std::move(e));
+			else
+				m_queue.push(std::move(e));
 		}
 
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-#if (USE_QUEUE_STATS)
-			if (!m_stats)
+			if (!USE_QUEUE_STATS || !m_stats)
 				m_queue.remove_nostats(elem);
 			else
 				m_queue.remove(elem);
-#else
-			m_queue.remove_nostats(elem);
-#endif
 		}
 
 		/* Control functions */

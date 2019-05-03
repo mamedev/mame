@@ -807,6 +807,15 @@ int tool_app_t::execute()
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
 			"Written by Couriersud.\n");
+		if (opt_verb())
+		{
+			std::vector<std::pair<pstring, pstring>> defs;
+			netlist::netlist_state_t::compile_defines(defs);
+			pout("\nCompile defines:\n");
+			for (auto &x : defs)
+				pout("{1:-30} = {2}\n", x.first, x.second);
+
+		}
 		return 0;
 	}
 

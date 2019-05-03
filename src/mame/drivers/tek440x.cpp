@@ -105,8 +105,6 @@ void tek440x_state::machine_reset()
 	uint8_t *RAM = (uint8_t *)m_mainram.target();
 
 	memcpy(RAM, ROM, 256);
-
-	m_maincpu->reset();
 }
 
 

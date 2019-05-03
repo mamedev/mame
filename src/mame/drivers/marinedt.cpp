@@ -9,12 +9,13 @@
 
     TODO:
     - discrete sound
-    - imperfect colors: unused bit 2 of color prom, guesswokred sea gradient, mg16 entirely unused.
+    - imperfect colors: unused bit 2 of color prom, guessworked sea gradient, mg16 entirely unused.
       also unused colors 0x10-0x1f (might be a flashing bank)
     - collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
       HW collision detection isn't perfect even from the reference, presumably needs a trojan run on the real HW.
     - ROM writes (irq mask?)
     - Merge devices with crbaloon/bking/grchamp drivers (PC3259).
+    - Currently defaults to cocktail instead of upright. When upright chosen, screen is upside down. (MT 07311)
 
 *****************************************************************************************************************
 

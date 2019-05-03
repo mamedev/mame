@@ -68,7 +68,7 @@ protected:
 	u8 m_r2l7[0x80];
 
 	offs_t increment_pc(offs_t pc, u8 pclen);
-	offs_t common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, const u8 pclen);
+	offs_t common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params);
 };
 
 class sm510_disassembler : public sm510_common_disassembler
