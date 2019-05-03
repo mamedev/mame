@@ -498,7 +498,7 @@ private:
 		{
 			func_t result;
 			m_builder.build([&result] (auto &&f) { result = [cb = std::move(f)] (address_space &space, offs_t offset, typename T::input_mask_t mem_mask) { return cb(space, offset, mem_mask); }; });
-			return std::move(result);
+			return result;
 		}
 
 	private:
