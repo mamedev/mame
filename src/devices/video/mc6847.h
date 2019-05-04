@@ -190,6 +190,7 @@ protected:
             if( !m_artifacting || !m_palartifacting )
                 return;
 
+            // TODO: Create a map of pairs of colors to resulting colors, and convert spaces to tabs.
             //if( (mode & (MODE_AS|MODE_GM0)) == MODE_AS )
             {
                 uint32_t tmpPixel;
@@ -208,9 +209,15 @@ protected:
 
                     if( luma1 != m_luminance_map.end() && luma2 != m_luminance_map.end() && (luma1->second == luma2->second))
                     {
-                        tmpPixel  = (( ((line1[pixel] & 0xFF0000) >> 16) + ((line2[pixel] & 0xFF0000) >> 16) / 2) << 16);
-                        tmpPixel |= (( ((line1[pixel] & 0xFF00  ) >> 8 ) + ((line2[pixel] & 0xFF00  ) >> 8 ) / 2) << 8 );
-                        tmpPixel |=  ( ( line1[pixel] & 0xFF    )        +  (line2[pixel] & 0xFF    )      ) / 2;
+                        /*tmpPixel  = (((line1[pixel] & 0xFF000000) >> 25) + ((line2[pixel] & 0xFF000000) >> 24)) << 24;
+                        tmpPixel |= (((line1[pixel] & 0x00FF0000) >> 17) + ((line2[pixel] & 0x00FF0000) >> 16)) << 16; 
+                        tmpPixel |= (((line1[pixel] & 0x0000FF00) >>  9) + ((line2[pixel] & 0x0000FF00) >>  8)) <<  8; 
+                        tmpPixel |= (((line1[pixel] & 0x000000FF) >>  1) + ((line2[pixel] & 0x000000FF) >>  0)); */
+
+                        //tmpPixel  = (( ((uint32_t)(line1[pixel] & 0xFF000000) >> 24) + ((uint32_t)(line2[pixel] & 0xFF000000) >> 24) / 2) << 24);
+                        tmpPixel  = (( ((uint32_t)(line1[pixel] & 0xFF0000  ) >> 16) + ((uint32_t)(line2[pixel] & 0xFF0000  ) >> 16) / 2) << 16);
+                        tmpPixel |= (( ((uint32_t)(line1[pixel] & 0xFF00    ) >> 8 ) + ((uint32_t)(line2[pixel] & 0xFF00    ) >> 8 ) / 2) << 8 );
+                        tmpPixel |=  ( ((uint32_t) line1[pixel] & 0xFF      )        +  (uint32_t)(line2[pixel] & 0xFF      )      ) / 2;
 
                         line1[pixel] = tmpPixel;
                         line2[pixel] = tmpPixel;
