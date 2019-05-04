@@ -2422,7 +2422,8 @@ megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
-n8810m55						// Nixdorf 8810 M55
+ncrpc8                          // 1986 NCR PC-8
+n8810m55                        // 1986 Nixdorf 8810 M55
 //nws286                          // 1988 Nokia WS286
 pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
