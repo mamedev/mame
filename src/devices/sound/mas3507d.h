@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <queue>
+
 #include "sound/samples.h"
 
 //**************************************************************************
@@ -17,17 +19,16 @@ public:
 	// construction/destruction
 	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	required_device<samples_device> m_samples;
-
 	int i2c_scl_r();
 	int i2c_sda_r();
 	void i2c_scl_w(bool line);
 	void i2c_sda_w(bool line);
 
+	void set_samples(samples_device *sample) { m_samples = sample; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
@@ -44,15 +45,16 @@ private:
 	void i2c_device_got_stop();
 
 
-	enum { UNDEFINED, CONTROL, DATA, BAD } i2c_subdest;
+	enum { UNDEFINED, CONTROL, DATA_READ, DATA_WRITE, BAD } i2c_subdest;
 	enum { CMD_BAD, CMD_RUN, CMD_READ_CTRL, CMD_WRITE_REG, CMD_WRITE_MEM, CMD_READ_REG, CMD_READ_MEM } i2c_command;
 	int i2c_bytecount;
 	uint32_t i2c_io_bank, i2c_io_adr, i2c_io_count, i2c_io_val;
 
-
 	void mem_write(int bank, uint32_t adr, uint32_t val);
 	void run_program(uint32_t adr);
 	void reg_write(uint32_t adr, uint32_t val);
+
+	samples_device *m_samples;
 };
 
 

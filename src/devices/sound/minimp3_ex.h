@@ -16,7 +16,7 @@ typedef struct
 {
     mp3d_sample_t *buffer;
     size_t samples; /* channels included, byte size = samples*sizeof(int16_t) */
-    int channels, hz, layer, avg_bitrate_kbps;
+    int channels, hz, layer, avg_bitrate_kbps, frame_bytes;
 } mp3dec_file_info_t;
 
 typedef struct
@@ -41,6 +41,7 @@ typedef int (*MP3D_PROGRESS_CB)(void *user_data, size_t file_size, size_t offset
 #ifdef __cplusplus
 extern "C" {
 #endif
+size_t mp3dec_skip_id3v2(const uint8_t *buf, size_t buf_size);
 
 /* decode whole buffer block */
 void mp3dec_load_buf(mp3dec_t *dec, const uint8_t *buf, size_t buf_size, mp3dec_file_info_t *info, MP3D_PROGRESS_CB progress_cb, void *user_data);
@@ -65,7 +66,7 @@ int mp3dec_ex_open(mp3dec_ex_t *dec, const char *file_name, int seek_method);
 
 #ifdef MINIMP3_IMPLEMENTATION
 
-static size_t mp3dec_skip_id3v2(const uint8_t *buf, size_t buf_size)
+size_t mp3dec_skip_id3v2(const uint8_t *buf, size_t buf_size)
 {
     if (buf_size > 10 && !strncmp((char *)buf, "ID3", 3))
     {
@@ -96,8 +97,10 @@ void mp3dec_load_buf(mp3dec_t *dec, const uint8_t *buf, size_t buf_size, mp3dec_
         samples = mp3dec_decode_frame(dec, buf, buf_size, pcm, &frame_info);
         buf      += frame_info.frame_bytes;
         buf_size -= frame_info.frame_bytes;
-        if (samples)
+        if (samples) {
+            info->frame_bytes += frame_info.frame_bytes + id3v2size;
             break;
+        }
     } while (frame_info.frame_bytes);
     if (!samples)
         return;
@@ -129,6 +132,8 @@ void mp3dec_load_buf(mp3dec_t *dec, const uint8_t *buf, size_t buf_size, mp3dec_
         buf_size -= frame_bytes;
         if (samples)
         {
+            info->frame_bytes += frame_info.frame_bytes;
+
             if (info->hz != frame_info.hz || info->layer != frame_info.layer)
                 break;
             if (info->channels && info->channels != frame_info.channels)
@@ -137,6 +142,7 @@ void mp3dec_load_buf(mp3dec_t *dec, const uint8_t *buf, size_t buf_size, mp3dec_
 #else
                 break;
 #endif
+
             info->samples += samples*frame_info.channels;
             avg_bitrate_kbps += frame_info.bitrate_kbps;
             frames++;

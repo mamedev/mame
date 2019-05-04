@@ -5,25 +5,17 @@
 //
 
 #include "emu.h"
-#include "speaker.h"
 #include "mas3507d.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "MAS 3507D MPEG decoder")
 
-static const char *const mas3507d_sample_names[] =
-{
-	"*mas3507d",
-	"audio",
-	nullptr
-};
-
 mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_samples(*this, "samples")
 	, i2c_bus_state(), i2c_bus_address(), i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false)
 	, i2c_bus_curbit(0), i2c_bus_curval(0), i2c_subdest(), i2c_command(), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)
+	, m_samples(nullptr)
 {
 }
 
@@ -41,18 +33,6 @@ void mas3507d_device::device_reset()
 	i2c_bus_curval = 0;
 }
 
-void mas3507d_device::device_add_mconfig(machine_config &config)
-{
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(2);
-	m_samples->set_samples_names(mas3507d_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_samples->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
-}
-
 void mas3507d_device::i2c_scl_w(bool line)
 {
 	if(line == i2c_scli)
@@ -61,9 +41,8 @@ void mas3507d_device::i2c_scl_w(bool line)
 
 	if(i2c_scli) {
 		if(i2c_bus_state == STARTED) {
-			if(i2c_sdai) {
+			if(i2c_sdai)
 				i2c_bus_curval |= 1 << i2c_bus_curbit;
-			}
 			i2c_bus_curbit --;
 			if(i2c_bus_curbit == -1) {
 				if(i2c_bus_address == UNKNOWN) {
@@ -104,7 +83,6 @@ void mas3507d_device::i2c_sda_w(bool line)
 {
 	if(line == i2c_sdai)
 		return;
-
 	i2c_sdai = line;
 
 	if(i2c_scli) {
@@ -113,8 +91,7 @@ void mas3507d_device::i2c_sda_w(bool line)
 			i2c_bus_address = UNKNOWN;
 			i2c_bus_curbit = 7;
 			i2c_bus_curval = 0;
-		}
-		else {
+		} else {
 			i2c_device_got_stop();
 			i2c_bus_state = IDLE;
 			i2c_bus_address = UNKNOWN;
@@ -136,7 +113,12 @@ int mas3507d_device::i2c_sda_r()
 
 bool mas3507d_device::i2c_device_got_address(uint8_t address)
 {
-	i2c_subdest = UNDEFINED;
+	if (address == 0x3b) {
+		i2c_subdest = DATA_READ;
+	} else {
+		i2c_subdest = UNDEFINED;
+	}
+
 	return (address & 0xfe) == 0x3a;
 }
 
@@ -145,19 +127,37 @@ void mas3507d_device::i2c_device_got_byte(uint8_t byte)
 	switch(i2c_subdest) {
 	case UNDEFINED:
 		if(byte == 0x68)
-			i2c_subdest = DATA;
+			i2c_subdest = DATA_WRITE;
 		else if(byte == 0x69)
-			i2c_subdest = DATA;
+			i2c_subdest = DATA_READ;
 		else if(byte == 0x6a)
 			i2c_subdest = CONTROL;
 		else
 			i2c_subdest = BAD;
+
 		i2c_bytecount = 0;
+		i2c_io_val = 0;
+
 		break;
+
 	case BAD:
 		logerror("MAS I2C: Dropping byte %02x\n", byte);
 		break;
-	case DATA:
+
+	case DATA_READ:
+		// Default Read
+		// This should return the current MPEGFrameCount value when called
+
+		// TODO: Figure out how to use this data exactly (chip docs are a little unclear to me)
+		i2c_io_val <<= 8;
+		i2c_io_val |= byte;
+		i2c_bytecount++;
+
+		logerror("MAS I2C: DATA_READ %d %08x\n", i2c_bytecount, i2c_io_val);
+
+		break;
+
+	case DATA_WRITE:
 		if(!i2c_bytecount) {
 			switch(byte >> 4) {
 			case 0: case 1:
@@ -240,6 +240,7 @@ void mas3507d_device::i2c_device_got_byte(uint8_t byte)
 
 		i2c_bytecount++;
 		break;
+
 	case CONTROL:
 		logerror("MAS I2C: Control byte %02x\n", byte);
 		break;
@@ -362,7 +363,12 @@ int gain_to_db(int val) {
 
 float gain_to_percentage(int val) {
 	double db = gain_to_db(val);
-	return 1.0 - powf(10.0, db / 20.0);
+
+	if (db == 0) {
+		return 0; // Special case for muting it seems
+	}
+
+	return powf(10.0, (db + 6) / 20.0);
 }
 
 void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
@@ -371,7 +377,11 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 	case 0x0032f: logerror("MAS3507D: OutputConfig = %05x\n", val); break;
 	case 0x107f8:
 		logerror("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
-		m_samples->set_volume(0, gain_to_percentage(val));
+
+		if (m_samples != nullptr) {
+			m_samples->set_volume(0, gain_to_percentage(val));
+		}
+
 		break;
 	case 0x107f9:
 		logerror("MAS3507D: left->right  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
@@ -381,7 +391,11 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 		break;
 	case 0x107fb:
 		logerror("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
-		m_samples->set_volume(1, gain_to_percentage(val));
+
+		if (m_samples != nullptr) {
+			m_samples->set_volume(1, gain_to_percentage(val));
+		}
+
 		break;
 	default: logerror("MAS3507D: %d:%04x = %05x\n", bank, adr, val); break;
 	}

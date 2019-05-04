@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include "sound/mas3507d.h"
+#include "machine/k573fpga.h"
 #include "machine/ds2401.h"
-
 
 class k573dio_device : public device_t
 {
@@ -16,17 +15,23 @@ public:
 
 	auto output_callback() { return output_cb.bind(); }
 
-	required_device<mas3507d_device> mas3507d;
+	required_device<k573fpga_device> k573fpga;
 	required_device<ds2401_device> digital_id;
 
 	void amap(address_map &map);
+	void set_fake_fpga(bool flag) { is_fake_fpga = flag; }
+	void set_buffer_speed(uint32_t speed) { buffer_speed = speed; }
+	void set_mp3_dynamic_base(uint32_t base) { mp3_dynamic_base = base; }
 
 	DECLARE_READ16_MEMBER(a00_r);
 	DECLARE_READ16_MEMBER(a02_r);
 	DECLARE_READ16_MEMBER(a04_r);
 	DECLARE_READ16_MEMBER(a06_r);
 	DECLARE_READ16_MEMBER(a0a_r);
+	DECLARE_WRITE16_MEMBER(a10_w);
 	DECLARE_READ16_MEMBER(a80_r);
+	DECLARE_READ16_MEMBER(aa8_r);
+	DECLARE_READ16_MEMBER(ac4_r);
 
 	DECLARE_WRITE16_MEMBER(mpeg_start_adr_high_w);
 	DECLARE_WRITE16_MEMBER(mpeg_start_adr_low_w);
@@ -35,6 +40,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mpeg_key_1_w);
 	DECLARE_READ16_MEMBER(mas_i2c_r);
 	DECLARE_WRITE16_MEMBER(mas_i2c_w);
+	DECLARE_READ16_MEMBER(mpeg_ctrl_r);
 	DECLARE_WRITE16_MEMBER(mpeg_ctrl_w);
 	DECLARE_WRITE16_MEMBER(ram_write_adr_high_w);
 	DECLARE_WRITE16_MEMBER(ram_write_adr_low_w);
@@ -59,6 +65,7 @@ public:
 	DECLARE_WRITE16_MEMBER(output_4_w);
 	DECLARE_WRITE16_MEMBER(output_2_w);
 	DECLARE_WRITE16_MEMBER(output_5_w);
+	DECLARE_READ16_MEMBER(mp3_unk_r);
 
 protected:
 	virtual void device_start() override;
@@ -71,21 +78,13 @@ private:
 	devcb_write8 output_cb;
 
 	std::unique_ptr<uint16_t[]> ram;
-	std::unique_ptr<uint16_t[]> ram_decmask;
-	uint32_t ram_adr, ram_read_adr, mp3_start_adr, mp3_end_adr, cur_mp3_start_adr, cur_mp3_end_adr, mp3_playback;
+	uint32_t ram_adr, ram_read_adr;
 	uint8_t output_data[8];
-	int16_t *channel_l_pcm, *channel_r_pcm;
-
-	uint8_t crypto_counter;
-	uint32_t crypto_key1, crypto_key2;
-	bool crypto_init;
-
-	uint16_t ac4_val;
 
 	void output(int offset, uint16_t data);
-	uint32_t find_enc_key();
 
-	FILE *outfile;
+	bool is_fake_fpga;
+	uint32_t buffer_speed, mp3_dynamic_base;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)

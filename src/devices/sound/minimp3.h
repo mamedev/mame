@@ -1670,7 +1670,7 @@ int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, mp3d_s
         i = mp3d_find_frame(mp3, mp3_bytes, &dec->free_format_bytes, &frame_size);
         if (!frame_size || i + frame_size > mp3_bytes)
         {
-            info->frame_bytes = i;
+            info->frame_bytes = 0;
             return 0;
         }
     }
