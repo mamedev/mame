@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "cpu/mips/r4000.h"
 #include "machine/hpc3.h"
 
 #define ENABLE_NEWVIEW_LOG      (0)
@@ -202,7 +203,7 @@ private:
 	uint64_t do_pixel_word_read();
 	void do_rex3_command();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<r4000_base_device> m_maincpu;
 	required_device<hpc3_device> m_hpc3;
 
 	vc2_t  m_vc2;

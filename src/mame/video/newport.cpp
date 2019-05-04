@@ -1836,7 +1836,7 @@ void newport_video_device::do_rex3_command()
 		start_x++;
 		if (start_x > end_x)
 		{
-			start_y++;
+			start_y += dy;
 			start_x = m_rex3.m_x_save;
 		}
 
@@ -1871,7 +1871,7 @@ void newport_video_device::do_rex3_command()
 		}
 		if (start_x > end_x)
 		{
-			start_y++;
+			start_y += dy;
 			start_x = m_rex3.m_x_save;
 		}
 		write_x_start(start_x << 11);
@@ -1900,28 +1900,43 @@ void newport_video_device::do_rex3_command()
 			end_x = start_x;
 
 		end_x += dx;
-		end_y += dy;
 
         if (BIT(mode0, 15) && abs(end_x - start_x) >= 32)
             end_x = start_x + 31 * dx;
 
-		bool shade = BIT(mode0, 18);
+		const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
+		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
+		const uint8_t foreground = m_rex3.m_color_i & 0xff;
+		const uint8_t background = m_rex3.m_color_back & 0xff;
+		const bool shade = BIT(mode0, 18);
 
-		uint32_t color = m_rex3.m_color_i & 0xff;
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, color);
+		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, pattern);
+
+		uint32_t bit = 31;
 		for (; start_x != end_x; start_x += dx)
 		{
+			if (BIT(pattern, bit))
+			{
+                if (shade)
+                {
+                    write_pixel(start_x, start_y, get_shade_color(start_x, start_y));
+                }
+                else
+                {
+                    write_pixel(start_x, start_y, foreground);
+                }
+			}
+			else if (opaque)
+			{
+				write_pixel(start_x, start_y, background);
+			}
+
 			if (shade)
-			{
-				write_pixel(start_x, start_y, get_shade_color(start_x, start_y));
 				iterate_shade();
-			}
-			else
-			{
-				write_pixel(start_x, start_y, color);
-			}
+
+			bit = (bit - 1) & 0x1f;
 		}
-		start_y++;
+		start_y += dy;
 
 		write_x_start(start_x << 11);
 		write_y_start(start_y << 11);
@@ -2028,29 +2043,29 @@ void newport_video_device::do_rex3_command()
 	case 0x00019106: // ZPOpaque, EnLSPattern, StopOnX, Block, Draw
 	case 0x002c9126: // CIClamp, LROnly, Shade, Length32, EnZPattern, StopOnX, DoSetup, Block, Draw
 	{
-		const bool opaque = (mode0 == 0x00019106) || (mode0 == 0x00022106);
+        if (BIT(mode0, 19) && dx < 0) // LROnly
+            break;
+
+		const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
 		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : m_rex3.m_ls_pattern;
 		const uint8_t foreground = m_rex3.m_color_i & 0xff;
 		const uint8_t background = m_rex3.m_color_back & 0xff;
 		const bool shade = BIT(mode0, 18);
 		LOGMASKED(LOG_COMMANDS, "%08x at %04x, %04x color %08x\n", pattern, start_x, start_y, foreground);
+
 		end_x += dx;
-		int16_t end = end_x;
-		if (BIT(mode0, 15))
+
+		if (BIT(mode0, 15) && (end_x - start_x) >= 32)
+			end_x = start_x + dx * 31;
+
+		uint32_t bit = 31;
+		for (; start_x != end_x; start_x += dx)
 		{
-			if ((end_x - start_x) >= 32)
-			{
-				end = start_x + 31;
-			}
-		}
-		for (; start_x != end; start_x += dx)
-		{
-			if (pattern & (1 << (31 - (start_x - m_rex3.m_x_start_i))))
+			if (BIT(pattern, bit))
 			{
                 if (shade)
                 {
                     write_pixel(start_x, start_y, get_shade_color(start_x, start_y));
-                    iterate_shade();
                 }
                 else
                 {
@@ -2061,11 +2076,13 @@ void newport_video_device::do_rex3_command()
 			{
 				write_pixel(start_x, start_y, background);
 			}
+
+			if (shade)
+				iterate_shade();
+
+			bit = (bit - 1) & 0x1f;
 		}
-		if (BIT(m_rex3.m_bres_octant_inc1, 24))
-			start_y--;
-		else
-			start_y++;
+		start_y += dy;
 
 		start_x = m_rex3.m_x_save;
 		write_x_start(start_x << 11);
@@ -2115,12 +2132,14 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 #if ENABLE_NEWVIEW_LOG
 	if (m_newview_log != nullptr)
 	{
+		uint32_t pc = m_maincpu->get_pc();
 		uint32_t offset_lo = (uint32_t)offset;
 		uint32_t data_hi = (uint32_t)(data >> 32);
 		uint32_t data_lo = (uint32_t)data;
 		uint32_t mem_mask_hi = (uint32_t)(mem_mask >> 32);
 		uint32_t mem_mask_lo = (uint32_t)mem_mask;
 
+		fwrite(&pc, sizeof(uint32_t), 1, m_newview_log);
 		fwrite(&offset_lo, sizeof(uint32_t), 1, m_newview_log);
 		fwrite(&data_hi, sizeof(uint32_t), 1, m_newview_log);
 		fwrite(&data_lo, sizeof(uint32_t), 1, m_newview_log);
