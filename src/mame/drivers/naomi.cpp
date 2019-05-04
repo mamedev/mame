@@ -569,8 +569,9 @@ Shootout Pool                                           840-0098C    23844    4 
 \Shootout Pool The Medal (Japan) Version B              840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller (selected by P1 BUTTON1 bit)
 SWP Hopper Board                                        840-0130C    24083   20 (64Mb)   present  317-0339-COM  reused VF4 Evo ROM board with all maskROMs still in place; there is an additional 837-14381 IO board
 Touch de Uno! 2                                         840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
-Virtua Fighter 4 Evolution (World)                      840-0106B    23934   20 (64Mb)   present  317-0339-COM
+Virtua Fighter 4 Evolution (World)                      840-0106C    23934   20 (64Mb)   present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)                 840-0084C    22327A  18 (64Mb)   present  317-0320-COM
+Star Horse 2002 Export (Taiwan)                         840-0112B*   23964    6 (64Mb)   present  317-0347-COM  *no case
 
 
 PFSB 128M Mask ROM board
@@ -11360,7 +11361,6 @@ ROM_END
 // 0042  NAOMI DIMM Firm Update for CF-BOX (GDS-0042)
 /* 0042A */ GAME( 2009, ndcfboxa, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Naomi DIMM Firmware Update for CF-BOX (4.01) (GDS-0042A)", GAME_FLAGS )
 // 00??  Get Bass 2 (GDS-00xx)
-// 00??  Yonin Uchi Mahjong MJ, not sure it was released on GD-ROM, might be satellite CD/DVD, or even not for NAOMI but other hardware.
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
@@ -11423,6 +11423,7 @@ ROM_END
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
 /* CDP-10001C*/ GAME( 2003, wccf116,  naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 Ver.2 (Japan) (CDP-10001C)", GAME_FLAGS )
+// CDP-10002B  Yonin Uchi Mahjong MJ Update Disc Ver.1.008
 /* CDP-10003 */ GAME( 2002, wccf1dup, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 DIMM FIRM Ver.3.03 (CDP-10003)", GAME_FLAGS )
 // CDV-10001 - World Club Champion Football Serie A 2001-2002 Ver.2.11 (Japan) (Sega, 2002)
 /* CDV-10002 */ GAME( 2004, wccf212e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Ver.2.12 (Italy) (CDV-10002)", GAME_FLAGS )
