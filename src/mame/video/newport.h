@@ -188,18 +188,18 @@ private:
 	void write_y_end(int32_t val);
 
 	bool pixel_clip_pass(int16_t x, int16_t y);
-	void write_pixel(uint8_t color, bool shade);
-	void write_pixel(int16_t x, int16_t y, uint8_t color);
-	void store_pixel(uint8_t *dest_buf, uint8_t src);
+	void write_pixel(uint32_t color);
+	void write_pixel(int16_t x, int16_t y, uint32_t color);
+	void store_pixel(uint32_t *dest_buf, uint32_t src);
 
 	void iterate_shade();
 
-	uint8_t get_shade_color(int16_t x, int16_t y);
+	uint32_t get_rgb_color(int16_t x, int16_t y);
 
-	void do_v_iline(uint8_t color, bool skip_last, bool shade);
-	void do_h_iline(uint8_t color, bool skip_last, bool shade);
-	void do_iline(uint8_t color, bool skip_last, bool shade);
-	uint8_t do_pixel_read();
+	void do_v_iline(uint32_t color);
+	void do_h_iline(uint32_t color);
+	void do_iline(uint32_t color);
+	uint32_t do_pixel_read();
 	uint64_t do_pixel_word_read();
 	void do_rex3_command();
 
@@ -210,10 +210,10 @@ private:
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
 	rex3_t m_rex3;
-	std::unique_ptr<uint8_t[]> m_rgbci;
-	std::unique_ptr<uint8_t[]> m_olay;
-	std::unique_ptr<uint8_t[]> m_pup;
-	std::unique_ptr<uint8_t[]> m_cid;
+	std::unique_ptr<uint32_t[]> m_rgbci;
+	std::unique_ptr<uint32_t[]> m_olay;
+	std::unique_ptr<uint32_t[]> m_pup;
+	std::unique_ptr<uint32_t[]> m_cid;
 	cmap_t m_cmap0;
 
 #if ENABLE_NEWVIEW_LOG

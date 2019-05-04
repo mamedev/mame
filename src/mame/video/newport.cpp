@@ -38,7 +38,7 @@
 #define LOG_REX3        (1 << 6)
 #define LOG_COMMANDS    (1 << 7)
 #define LOG_REJECTS     (1 << 8)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
 
 #define VERBOSE         (0)//(LOG_UNKNOWN | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
 #include "logmacro.h"
@@ -61,10 +61,10 @@ newport_video_device::newport_video_device(const machine_config &mconfig, const 
 
 void newport_video_device::device_start()
 {
-	m_rgbci = make_unique_clear<uint8_t[]>((1280+64) * (1024+64));
-	m_olay = make_unique_clear<uint8_t[]>((1280+64) * (1024+64));
-	m_pup = make_unique_clear<uint8_t[]>((1280+64) * (1024+64));
-	m_cid = make_unique_clear<uint8_t[]>((1280+64) * (1024+64));
+	m_rgbci = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
+	m_olay = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
+	m_pup = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
+	m_cid = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 
 	save_pointer(NAME(m_rgbci), (1280+64) * (1024+64));
 	save_pointer(NAME(m_olay), (1280+64) * (1024+64));
@@ -195,6 +195,8 @@ void newport_video_device::device_reset()
 	m_rex3.m_draw_mode0 = 0x00000000;
 	m_rex3.m_draw_mode1 = 0x3002f001;
 	m_rex3.m_dcb_mode = 0x00000780;
+	m_rex3.m_x_window = 0x1000;
+	m_rex3.m_y_window = 0x1000;
 
 	m_xmap0.m_entries = 0x2;
 	m_xmap1.m_entries = 0x2;
@@ -226,10 +228,10 @@ void newport_video_device::start_logging()
 	fwrite(&m_xmap1, sizeof(xmap_t), 1, m_newview_log);
 	fwrite(&m_rex3, sizeof(rex3_t), 1, m_newview_log);
 	fwrite(&m_cmap0, sizeof(cmap_t), 1, m_newview_log);
-	fwrite(&m_rgbci[0], 1, (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_olay[0], 1, (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_pup[0], 1, (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_cid[0], 1, (1280+64)*(1024+64), m_newview_log);
+	fwrite(&m_rgbci[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	fwrite(&m_olay[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	fwrite(&m_pup[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	fwrite(&m_cid[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
 }
 
 void newport_video_device::stop_logging()
@@ -280,8 +282,8 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t *src_ci = &m_rgbci[1344 * y];
-		uint8_t *src_pup = &m_pup[1344 * y];
+		uint32_t *src_ci = &m_rgbci[1344 * y];
+		uint32_t *src_pup = &m_pup[1344 * y];
 		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		m_vc2.m_did_frame_ptr = m_vc2.m_did_entry + (uint16_t)y;
@@ -331,7 +333,7 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 			}
 			else if (*src_pup)
 			{
-				const uint8_t src = (*src_pup >> 2) & 3;
+				const uint32_t src = (*src_pup >> 2) & 3;
 				*dest++ = m_cmap0.m_palette[popup_msb | src];
 			}
 			else
@@ -344,12 +346,12 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 							case 0: // 4bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
-								const uint8_t pix_in = *src_ci;
+								const uint32_t pix_in = *src_ci;
 								*dest++ = m_cmap0.m_palette[ci_msb | ((pix_in >> shift) & 0x0f)];
 								break;
 							}
 							case 1: // 8bpp
-								*dest++ = m_cmap0.m_palette[ci_msb | *src_ci];
+								*dest++ = m_cmap0.m_palette[ci_msb | (uint8_t)*src_ci];
 								break;
 							case 2: // 12bpp (not yet supported)
 							case 3: // 24bpp (not yet supported)
@@ -362,7 +364,7 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 							case 0: // 4bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
-								const uint8_t pix_in = *src_ci >> shift;
+								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
 								const uint8_t r = 0xff * BIT(pix_in, 3);
 								const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
 								const uint8_t b = 0xff * BIT(pix_in, 0);
@@ -371,17 +373,33 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 							}
 							case 1: // 8bpp
 							{
-								const uint8_t pix_in = *src_ci;
+								const uint8_t shift = BIT(table_entry, 0) ? 8 : 0;
+								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
 								const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
 								const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
 								const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
 								*dest++ = (r << 16) | (g << 8) | b;
 								break;
 							}
-							case 2: // 12bpp (not yet supported)
-							case 3: // 24bpp (not yet supported)
-								*dest++ = 0xffffff;
+							case 2: // 12bpp
+							{
+								const uint8_t shift = BIT(table_entry, 0) ? 12 : 0;
+								const uint16_t pix_in = (uint16_t)(*src_ci >> shift);
+								const uint8_t r = 0x11 * ((pix_in >> 0) & 0xf);
+								const uint8_t g = 0x11 * ((pix_in >> 4) & 0xf);
+								const uint8_t b = 0x11 * ((pix_in >> 8) & 0xf);
+								*dest++ = (r << 16) | (g << 8) | b;
 								break;
+							}
+							case 3: // 24bpp
+							{
+								const uint32_t pix_in = (uint32_t)*src_ci;
+								const uint8_t r = (uint8_t)(pix_in >> 0);
+								const uint8_t g = (uint8_t)(pix_in >> 8);
+								const uint8_t b = (uint8_t)(pix_in >> 16);
+								*dest++ = (r << 16) | (g << 8) | b;
+								break;
+							}
 						}
 						break;
 					case 2: // RGB Map1 (not yet supported)
@@ -440,8 +458,8 @@ uint32_t newport_video_device::cmap0_read()
 		LOGMASKED(LOG_CMAP0, "CMAP0 Status Read: %08x\n", 0x8);
 		return 0x8;
 	case 0x06: /* Revision */
-		LOGMASKED(LOG_CMAP0, "CMAP0 Revision Read: CMAP Rev 1, Board Rev 2, 8bpp (000000a1)\n");
-		return 0xa1;
+		LOGMASKED(LOG_CMAP0, "%s: CMAP0 Revision Read: CMAP Rev 1, Board Rev 3, 24bpp (00000002)\n", machine().describe_context());
+		return 0x00000002;
 	default:
 		LOGMASKED(LOG_CMAP0 | LOG_UNKNOWN, "Unknown CMAP0 Register %d Read\n", m_rex3.m_dcb_reg_select);
 		return 0;
@@ -456,8 +474,8 @@ uint32_t newport_video_device::cmap1_read()
 		LOGMASKED(LOG_CMAP1, "CMAP1 Status Read: %08x\n", 0x8);
 		return 0x8;
 	case 0x06: /* Revision */
-		LOGMASKED(LOG_CMAP1, "CMAP1 Revision Read: CMAP Rev 1, Board Rev 2, 8bpp (000000a1)\n");
-		return 0xa1;
+		LOGMASKED(LOG_CMAP1, "%s: CMAP1 Revision Read: CMAP Rev 1, Board Rev 3, 24bpp (00000002)\n", machine().describe_context());
+		return 0x00000002;
 	default:
 		LOGMASKED(LOG_CMAP1 | LOG_UNKNOWN, "Unknown CMAP0 Register %d Read\n", m_rex3.m_dcb_reg_select);
 		return 0;
@@ -472,8 +490,8 @@ uint32_t newport_video_device::xmap0_read()
 		LOGMASKED(LOG_XMAP0, "XMAP0 Config Read: %08x\n", m_xmap0.m_config);
 		return m_xmap0.m_config;
 	case 1:
-		LOGMASKED(LOG_XMAP0, "XMAP0 Revision Read: %08x\n", 0);
-		return 1;
+		LOGMASKED(LOG_XMAP0, "%s: XMAP0 Revision Read: %08x\n", machine().describe_context(), 3);
+		return 3;
 	case 2:
 		LOGMASKED(LOG_XMAP0, "XMAP0 FIFO Availability Read: %08x\n", 0x2);
 		return 0x2;
@@ -569,8 +587,8 @@ uint32_t newport_video_device::xmap1_read()
 		LOGMASKED(LOG_XMAP1, "XMAP1 Config Read: %08x\n", m_xmap1.m_config);
 		return m_xmap1.m_config;
 	case 1:
-		LOGMASKED(LOG_XMAP1, "XMAP1 Revision Read: %08x\n", 0);
-		return 1;
+		LOGMASKED(LOG_XMAP1, "%s: XMAP1 Revision Read: %08x\n", machine().describe_context(), 3);
+		return 3;
 	case 2:
 		LOGMASKED(LOG_XMAP1, "XMAP1 FIFO Availability Read: %08x\n", 0x02);
 		return 0x2;
@@ -1171,7 +1189,7 @@ READ64_MEMBER(newport_video_device::rex3_r)
 		}
 		break;
 	case 0x0230/8:
-		if (m_rex3.m_read_active)
+		if ((m_rex3.m_draw_mode0 & 7) == 5)
 			m_rex3.m_host_dataport = do_pixel_word_read();
 		LOGMASKED(LOG_REX3, "%s: REX3 Host Data Port Read: %08x%08x\n", machine().describe_context(), (uint32_t)(m_rex3.m_host_dataport >> 32),
 			(uint32_t)m_rex3.m_host_dataport);
@@ -1317,10 +1335,12 @@ READ64_MEMBER(newport_video_device::rex3_r)
 	return ret;
 }
 
-void newport_video_device::write_pixel(uint8_t color, bool shade)
+void newport_video_device::write_pixel(uint32_t color)
 {
-	if (shade)
-		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_shade_color(m_rex3.m_x_start_i, m_rex3.m_y_start_i));
+	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
+	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
+	if (shade || rgbmode)
+		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_rgb_color(m_rex3.m_x_start_i, m_rex3.m_y_start_i));
 	else
 		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, color);
 }
@@ -1408,12 +1428,26 @@ bool newport_video_device::pixel_clip_pass(int16_t x, int16_t y)
 	return true;
 }
 
-void newport_video_device::store_pixel(uint8_t *dest_buf, uint8_t src)
+void newport_video_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 {
 	if (BIT(m_rex3.m_draw_mode1, 5))
-		src <<= 4;
+	{
+		switch ((m_rex3.m_draw_mode1 >> 3) & 3)
+		{
+			case 0: // 4bpp
+				src <<= 4;
+				break;
+			case 2: // 12bpp
+				src <<= 12;
+				break;
+			case 1: // 8bpp
+			case 3: // 24bpp
+				// Can't double-buffer
+				break;
+		}
+	}
 
-	const uint8_t dst = *dest_buf;
+	const uint32_t dst = *dest_buf;
 	*dest_buf &= ~m_rex3.m_write_mask;
 
 	switch ((m_rex3.m_draw_mode1 >> 28) & 15)
@@ -1433,14 +1467,16 @@ void newport_video_device::store_pixel(uint8_t *dest_buf, uint8_t src)
 		case 12:    *dest_buf |= ~(src) & m_rex3.m_write_mask;          break;
 		case 13:    *dest_buf |= (~src | dst) & m_rex3.m_write_mask;    break;
 		case 14:    *dest_buf |= ~(src & dst) & m_rex3.m_write_mask;    break;
-		case 15:    *dest_buf |= 0xff & m_rex3.m_write_mask;            break;
+		case 15:    *dest_buf |= 0xffffff & m_rex3.m_write_mask;        break;
 	}
 }
 
-void newport_video_device::write_pixel(int16_t x, int16_t y, uint8_t color)
+void newport_video_device::write_pixel(int16_t x, int16_t y, uint32_t color)
 {
 	if (!pixel_clip_pass(x, y))
+	{
 		return;
+	}
 
 	x += m_rex3.m_x_window;
 	y += m_rex3.m_y_window;
@@ -1467,13 +1503,13 @@ void newport_video_device::write_pixel(int16_t x, int16_t y, uint8_t color)
 	}
 }
 
-uint8_t newport_video_device::get_shade_color(int16_t x, int16_t y)
+uint32_t newport_video_device::get_rgb_color(int16_t x, int16_t y)
 {
 	static const uint8_t s_bayer[4][4] = { { 0, 12, 3, 15 },{ 8, 4, 11, 7 },{ 2, 14, 1, 13 },{ 10, 6, 9, 5 } };
 
-	const uint8_t red = (uint8_t)(m_rex3.m_color_red >> 11);
-	const uint8_t green = (uint8_t)(m_rex3.m_color_green >> 11);
-	const uint8_t blue = (uint8_t)(m_rex3.m_color_blue >> 11);
+	const uint32_t red = (uint8_t)(m_rex3.m_color_red >> 11);
+	const uint32_t green = (uint8_t)(m_rex3.m_color_green >> 11);
+	const uint32_t blue = (uint8_t)(m_rex3.m_color_blue >> 11);
 
 	if (!BIT(m_rex3.m_draw_mode1, 15)) // RGB
 	{
@@ -1502,8 +1538,9 @@ uint8_t newport_video_device::get_shade_color(int16_t x, int16_t y)
 			if (dg > 3) dg = 3;
 			if (db > 1) db = 1;
 
-			return (dr << 3) | (dg << 1) | db;
+			return (db << 3) | (dg << 1) | dr;
 		}
+
 		case 1: // 8bpp
 		{
 			const uint8_t sr = (red >> 1) - (red >> 4);
@@ -1522,10 +1559,33 @@ uint8_t newport_video_device::get_shade_color(int16_t x, int16_t y)
 			if (dg > 7) dg = 7;
 			if (db > 3) db = 3;
 
-			return (dr << 5) | (dg << 2) | db;
+			return (db << 6) | (dg << 3) | dr;
 		}
-		case 2: // 12bpp (not yet supported)
-		case 3: // 24bpp (not yet supported)
+
+		case 2: // 12bpp
+		{
+            const uint32_t sr = red - (red >> 4);
+            const uint32_t sg = green - (green >> 4);
+            const uint32_t sb = blue - (blue >> 4);
+
+            uint32_t dr = (sr >> 4) & 15;
+            uint32_t dg = (sg >> 4) & 15;
+            uint32_t db = (sb >> 4) & 15;
+
+            if ((sr & 0xf) > s_bayer[x & 3][y & 3]) dr++;
+            if ((sg & 0xf) > s_bayer[x & 3][y & 3]) dg++;
+            if ((sb & 0xf) > s_bayer[x & 3][y & 3]) db++;
+
+            if (dr > 15) dr = 15;
+            if (dg > 15) dg = 15;
+            if (db > 15) db = 15;
+
+            return (db << 8) | (dg << 4) | dr;
+		}
+
+		case 3: // 24bpp
+			return (blue << 16) | (green << 8) | red;
+
 		default:
 			return 0;
 		}
@@ -1535,18 +1595,20 @@ uint8_t newport_video_device::get_shade_color(int16_t x, int16_t y)
 		switch ((m_rex3.m_draw_mode1 >> 3) & 3)
 		{
 		case 0: // 4bpp
-			return (BIT(red, 7) << 3) | ((green & 0xc0) >> 5) | BIT(blue, 7);
+			return (BIT(blue, 7) << 3) | ((green & 0xc0) >> 5) | BIT(red, 7);
 		case 1: // 8bpp
-			return (red & 0xe0) | ((green & 0xe0) >> 3) | ((blue & 0xc0) >> 6);
-		case 2: // 12bpp (not yet supported)
-		case 3: // 24bpp (not yet supported)
+			return (blue & 0xc0) | ((green & 0xe0) >> 2) | ((red & 0xe0) >> 5);
+		case 2: // 12bpp
+			return ((blue & 0xf0) << 4) | (green & 0xf0) | ((red & 0xf0) >> 4);
+		case 3: // 24bpp
+			return (blue << 16) | (green << 8) | red;
 		default:
 			return 0;
 		}
 	}
 }
 
-void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
+void newport_video_device::do_v_iline(uint32_t color)
 {
 	const int16_t x1 = m_rex3.m_x_start_i;
 	int16_t y1 = m_rex3.m_y_start_i;
@@ -1555,11 +1617,14 @@ void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 	const int16_t incy = (y2 < y1) ? -1 : 1;
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
+	const bool skip_last = BIT(m_rex3.m_draw_mode0, 11);
+	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
+	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
 	do
 	{
-		if (shade)
-			write_pixel(x1, y1, get_shade_color(x1, y1));
+		if (shade || rgbmode)
+			write_pixel(x1, y1, get_rgb_color(x1, y1));
 		else
 			write_pixel(x1, y1, color);
 
@@ -1571,22 +1636,20 @@ void newport_video_device::do_v_iline(uint8_t color, bool skip_last, bool shade)
 
 	if (!skip_last && !iterate_one)
 	{
-		if (shade)
-		{
-			write_pixel(x1, y1, get_shade_color(x1, y1));
-			iterate_shade();
-		}
+		if (shade || rgbmode)
+			write_pixel(x1, y1, get_rgb_color(x1, y1));
 		else
-		{
 			write_pixel(x1, y1, color);
-		}
+
+		if (shade)
+			iterate_shade();
 	}
 
 	write_x_start(x1 << 11);
 	write_y_start(y1 << 11);
 }
 
-void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
+void newport_video_device::do_h_iline(uint32_t color)
 {
 	int16_t x1 = m_rex3.m_x_start_i;
 	const int16_t y1 = m_rex3.m_y_start_i;
@@ -1595,11 +1658,14 @@ void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
 	const int16_t incx = (x2 < x1) ? -1 : 1;
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
+	const bool skip_last = BIT(m_rex3.m_draw_mode0, 11);
+	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
+	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
 	do
 	{
-		if (shade)
-			write_pixel(x1, y1, get_shade_color(x1, y1));
+		if (shade || rgbmode)
+			write_pixel(x1, y1, get_rgb_color(x1, y1));
 		else
 			write_pixel(x1, y1, color);
 
@@ -1611,22 +1677,20 @@ void newport_video_device::do_h_iline(uint8_t color, bool skip_last, bool shade)
 
 	if (!skip_last && !iterate_one)
 	{
-		if (shade)
-		{
-			write_pixel(x1, y1, get_shade_color(x1, y1));
-			iterate_shade();
-		}
+		if (shade || rgbmode)
+			write_pixel(x1, y1, get_rgb_color(x1, y1));
 		else
-		{
 			write_pixel(x1, y1, color);
-		}
+
+		if (shade)
+			iterate_shade();
 	}
 
 	write_x_start(x1 << 11);
 	write_y_start(y1 << 11);
 }
 
-void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
+void newport_video_device::do_iline(uint32_t color)
 {
 	int16_t x1 = m_rex3.m_x_start_i;
 	int16_t y1 = m_rex3.m_y_start_i;
@@ -1640,6 +1704,9 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 	int16_t dy = abs(y2 - y1);
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
+	const bool skip_last = BIT(m_rex3.m_draw_mode0, 11);
+	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
+	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
 	if (dy > dx)
 	{
@@ -1684,8 +1751,8 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 	{
 		do
 		{
-			if (shade)
-				write_pixel(y1, x1, get_shade_color(x1, y1));
+			if (shade || rgbmode)
+				write_pixel(y1, x1, get_rgb_color(x1, y1));
 			else
 				write_pixel(y1, x1, color);
 
@@ -1706,23 +1773,21 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 
 		if (!skip_last && !iterate_one)
 		{
-			if (shade)
-			{
-				write_pixel(y1, x1, get_shade_color(y1, x1));
-				iterate_shade();
-			}
+			if (shade || rgbmode)
+				write_pixel(y1, x1, get_rgb_color(y1, x1));
 			else
-			{
 				write_pixel(y1, x1, color);
-			}
+
+			if (shade)
+				iterate_shade();
 		}
 	}
 	else
 	{
 		do
 		{
-			if (shade)
-				write_pixel(x1, y1, get_shade_color(x1, y1));
+			if (shade || rgbmode)
+				write_pixel(x1, y1, get_rgb_color(x1, y1));
 			else
 				write_pixel(x1, y1, color);
 
@@ -1743,15 +1808,13 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 
 		if (!skip_last && !iterate_one)
 		{
-			if (shade)
-			{
-				write_pixel(x1, y1, get_shade_color(x1, y1));
-				iterate_shade();
-			}
+			if (shade || rgbmode)
+				write_pixel(x1, y1, get_rgb_color(x1, y1));
 			else
-			{
 				write_pixel(x1, y1, color);
-			}
+
+			if (shade)
+				iterate_shade();
 		}
 	}
 
@@ -1759,13 +1822,13 @@ void newport_video_device::do_iline(uint8_t color, bool skip_last, bool shade)
 	write_y_start(y1 << 11);
 }
 
-uint8_t newport_video_device::do_pixel_read()
+uint32_t newport_video_device::do_pixel_read()
 {
 	if (m_rex3.m_xy_start_i == m_rex3.m_xy_end_i)
 		m_rex3.m_read_active = false;
-	LOGMASKED(LOG_COMMANDS, "Reading from %04x, %04x\n", m_rex3.m_x_start_i, m_rex3.m_y_start_i);
 	m_rex3.m_bres_octant_inc1 = 0;
-	const uint8_t ret = m_rgbci[m_rex3.m_y_start_i * (1280 + 64) + m_rex3.m_x_start_i];
+	const uint32_t ret = m_rgbci[m_rex3.m_y_start_i * (1280 + 64) + m_rex3.m_x_start_i];
+	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, m_rex3.m_x_start_i, m_rex3.m_y_start_i);
 	m_rex3.m_x_start_i++;
 	if (m_rex3.m_x_start_i > m_rex3.m_x_end_i)
 	{
@@ -1783,17 +1846,71 @@ uint64_t newport_video_device::do_pixel_word_read()
 	const uint16_t x_start = (uint16_t)(m_rex3.m_xy_start_i >> 16);
 	const uint16_t x_end = (uint16_t)(m_rex3.m_xy_end_i >> 16);
 	const bool doubleword = BIT(m_rex3.m_draw_mode1, 10);
-	const uint16_t max_width = doubleword ? 8 : 4;
-	uint16_t width = (x_end - x_start) + 1;
-	if (width > max_width)
-		width = max_width;
 
+	uint16_t width = (x_end - x_start) + 1;
 	uint64_t ret = 0;
-	uint64_t shift = 56;
-	for (uint16_t i = 0; i < width; i++)
+	uint64_t shift = 0;
+	switch ((m_rex3.m_draw_mode1 >> 8) & 3)
 	{
-		ret |= (uint64_t)do_pixel_read() << shift;
-		shift -= 8;
+		case 0: // 4bpp
+		{
+			const uint16_t max_width = doubleword ? 16 : 8;
+			if (width > max_width)
+				width = max_width;
+
+			shift = 60;
+			for (uint16_t i = 0; i < width; i++)
+			{
+				ret |= (uint64_t)(do_pixel_read() & 0x0000000f) << shift;
+				shift -= 4;
+			}
+			break;
+		}
+
+		case 1: // 8bpp
+		{
+			const uint16_t max_width = doubleword ? 8 : 4;
+			if (width > max_width)
+				width = max_width;
+
+			shift = 56;
+			for (uint16_t i = 0; i < width; i++)
+			{
+				ret |= (uint64_t)(do_pixel_read() & 0x000000ff) << shift;
+				shift -= 8;
+			}
+			break;
+		}
+
+		case 2: // 12bpp
+		{
+			const uint16_t max_width = doubleword ? 4 : 2;
+			if (width > max_width)
+				width = max_width;
+
+			shift = 48;
+			for (uint16_t i = 0; i < width; i++)
+			{
+				ret |= (uint64_t)(do_pixel_read() & 0x00000fff) << shift;
+				shift -= 16;
+			}
+			break;
+		}
+
+		case 3: // 32bpp
+		{
+			const uint16_t max_width = doubleword ? 2 : 1;
+			if (width > max_width)
+				width = max_width;
+
+			shift = 32;
+			for (uint16_t i = 0; i < width; i++)
+			{
+				ret |= (uint64_t)do_pixel_read() << shift;
+				shift -= 32;
+			}
+			break;
+		}
 	}
 	return ret;
 }
@@ -1830,9 +1947,9 @@ void newport_video_device::do_rex3_command()
 		break;
 	case 0x00000006: // Block, Draw
 	{
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, m_rex3.m_color_i & 0xff);
+		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, m_rex3.m_color_i);
 		m_rex3.m_bres_octant_inc1 = 0;
-		write_pixel(m_rex3.m_color_i & 0xff, false);
+		write_pixel(m_rex3.m_color_i);
 		start_x++;
 		if (start_x > end_x)
 		{
@@ -1845,22 +1962,81 @@ void newport_video_device::do_rex3_command()
 		break;
 	}
 	case 0x00000046: // ColorHost, Block, Draw
+	case 0x00000066: // ColorHost, DoSetup, Block, Draw
 	{
 		m_rex3.m_bres_octant_inc1 = 0;
 		if (BIT(mode1, 7)) // Packed
 		{
 			const bool doubleword = BIT(mode1, 10);
-			uint16_t remaining_length = (end_x - start_x) + 1;
-			uint16_t length = doubleword ? 8 : 4;
-			if (remaining_length < length)
-				length = remaining_length;
 			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> 32), (uint32_t)m_rex3.m_host_dataport);
-			uint64_t shift = 56;
-			for (uint16_t i = 0; i < length; i++)
+
+			uint16_t width = (end_x - start_x) + 1;
+			uint64_t shift = 0;
+			switch ((m_rex3.m_draw_mode1 >> 8) & 3)
 			{
-				write_pixel(start_x, start_y, (uint8_t)(m_rex3.m_host_dataport >> shift));
-				start_x++;
-				shift -= 8;
+				case 0: // 4bpp
+				{
+					const uint16_t max_width = doubleword ? 16 : 8;
+					if (width > max_width)
+						width = max_width;
+
+					shift = 60;
+					for (uint16_t i = 0; i < width; i++)
+					{
+						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+						start_x++;
+						shift -= 4;
+					}
+					break;
+				}
+
+				case 1: // 8bpp
+				{
+					const uint16_t max_width = doubleword ? 8 : 4;
+					if (width > max_width)
+						width = max_width;
+
+					shift = 56;
+					for (uint16_t i = 0; i < width; i++)
+					{
+						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+						start_x++;
+						shift -= 8;
+					}
+					break;
+				}
+
+				case 2: // 12bpp
+				{
+					const uint16_t max_width = doubleword ? 4 : 2;
+					if (width > max_width)
+						width = max_width;
+
+					shift = 48;
+					for (uint16_t i = 0; i < width; i++)
+					{
+						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+						start_x++;
+						shift -= 16;
+					}
+					break;
+				}
+
+				case 3: // 32bpp
+				{
+					const uint16_t max_width = doubleword ? 2 : 1;
+					if (width > max_width)
+						width = max_width;
+
+					shift = 32;
+					for (uint16_t i = 0; i < width; i++)
+					{
+						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+						start_x++;
+						shift -= 32;
+					}
+					break;
+				}
 			}
 		}
 		else
@@ -1906,9 +2082,8 @@ void newport_video_device::do_rex3_command()
 
 		const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
 		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
-		const uint8_t foreground = m_rex3.m_color_i & 0xff;
-		const uint8_t background = m_rex3.m_color_back & 0xff;
 		const bool shade = BIT(mode0, 18);
+		const bool rgbmode = BIT(mode1, 15);
 
 		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, pattern);
 
@@ -1917,18 +2092,14 @@ void newport_video_device::do_rex3_command()
 		{
 			if (BIT(pattern, bit))
 			{
-                if (shade)
-                {
-                    write_pixel(start_x, start_y, get_shade_color(start_x, start_y));
-                }
+                if (shade || rgbmode)
+                    write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
                 else
-                {
-                    write_pixel(start_x, start_y, foreground);
-                }
+                    write_pixel(start_x, start_y, m_rex3.m_color_i);
 			}
 			else if (opaque)
 			{
-				write_pixel(start_x, start_y, background);
+				write_pixel(start_x, start_y, m_rex3.m_color_back);
 			}
 
 			if (shade)
@@ -1947,10 +2118,24 @@ void newport_video_device::do_rex3_command()
 		end_x += dx;
 		end_y += dy;
 
-		uint32_t color = m_rex3.m_color_i & 0xff;
+		uint32_t color = m_rex3.m_color_i;
 		if (BIT(mode1, 17))
 		{
-			color = m_rex3.m_color_vram & 0xff;
+			switch ((mode1 >> 3) & 3)
+			{
+				case 0: // 4bpp
+					color = m_rex3.m_color_vram & 0xf;
+					break;
+				case 1: // 8bpp
+					color = m_rex3.m_color_vram & 0xff;
+					break;
+				case 2: // 12bpp
+					color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+					break;
+				case 3: // 24bpp
+					color = m_rex3.m_color_vram & 0xffffff;
+					break;
+			}
 		}
 		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x, %04x\n", start_x, start_y, end_x, end_y, m_cmap0.m_palette[color], m_rex3.m_x_save);
 		for (; start_y != end_y; start_y += dy)
@@ -1976,7 +2161,7 @@ void newport_video_device::do_rex3_command()
 			for (; start_x != end_x; start_x += dx)
 			{
                 const uint32_t src_addr = (start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000);
-                uint8_t src = 0;
+                uint32_t src = 0;
                 switch (mode1 & 7)
                 {
                 case 1: // RGB/CI planes
@@ -2013,26 +2198,23 @@ void newport_video_device::do_rex3_command()
 	case 0x00200b2e: // CIClamp, SkipLast, StopOnX, StopOnY, DoSetup, F_Line, Draw
 	case 0x00442332: // EndFilter, Shade, EnLSPattern, StopOnX, StopOnY, DoSetp, A_Line, Draw
 	{
-		const bool skip_last = BIT(mode0, 11);
-		const bool shade = BIT(mode0, 18);
-
 		LOGMASKED(LOG_COMMANDS, "%cLine: %04x, %04x to %04x, %04x = %08x\n", (mode0 & 0x1c) == 3 ? 'F' : 'I',
 			start_x, start_y, end_x, end_y, m_rex3.m_color_i);
 		if (start_x == end_x && start_y == end_y)
 		{
-			write_pixel(m_rex3.m_color_i, shade);
+			write_pixel(m_rex3.m_color_i);
 		}
 		else if (start_x == end_x)
 		{
-			do_v_iline(m_rex3.m_color_i, skip_last, shade);
+			do_v_iline(m_rex3.m_color_i);
 		}
 		else if (start_y == end_y)
 		{
-			do_h_iline(m_rex3.m_color_i, skip_last, shade);
+			do_h_iline(m_rex3.m_color_i);
 		}
 		else
 		{
-			do_iline(m_rex3.m_color_i, skip_last, shade);
+			do_iline(m_rex3.m_color_i);
 		}
 		break;
 	}
@@ -2048,10 +2230,9 @@ void newport_video_device::do_rex3_command()
 
 		const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
 		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : m_rex3.m_ls_pattern;
-		const uint8_t foreground = m_rex3.m_color_i & 0xff;
-		const uint8_t background = m_rex3.m_color_back & 0xff;
 		const bool shade = BIT(mode0, 18);
-		LOGMASKED(LOG_COMMANDS, "%08x at %04x, %04x color %08x\n", pattern, start_x, start_y, foreground);
+		const bool rgbmode = BIT(mode1, 15);
+		LOGMASKED(LOG_COMMANDS, "%08x at %04x, %04x color %08x\n", pattern, start_x, start_y, m_rex3.m_color_i);
 
 		end_x += dx;
 
@@ -2063,18 +2244,14 @@ void newport_video_device::do_rex3_command()
 		{
 			if (BIT(pattern, bit))
 			{
-                if (shade)
-                {
-                    write_pixel(start_x, start_y, get_shade_color(start_x, start_y));
-                }
+                if (shade || rgbmode)
+                    write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
                 else
-                {
-                    write_pixel(start_x, start_y, foreground);
-                }
+                    write_pixel(start_x, start_y, m_rex3.m_color_i);
 			}
 			else if (opaque)
 			{
-				write_pixel(start_x, start_y, background);
+				write_pixel(start_x, start_y, m_rex3.m_color_back);
 			}
 
 			if (shade)
@@ -2132,14 +2309,12 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 #if ENABLE_NEWVIEW_LOG
 	if (m_newview_log != nullptr)
 	{
-		uint32_t pc = m_maincpu->get_pc();
 		uint32_t offset_lo = (uint32_t)offset;
 		uint32_t data_hi = (uint32_t)(data >> 32);
 		uint32_t data_lo = (uint32_t)data;
 		uint32_t mem_mask_hi = (uint32_t)(mem_mask >> 32);
 		uint32_t mem_mask_lo = (uint32_t)mem_mask;
 
-		fwrite(&pc, sizeof(uint32_t), 1, m_newview_log);
 		fwrite(&offset_lo, sizeof(uint32_t), 1, m_newview_log);
 		fwrite(&data_hi, sizeof(uint32_t), 1, m_newview_log);
 		fwrite(&data_lo, sizeof(uint32_t), 1, m_newview_log);
@@ -2424,7 +2599,7 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 		if (ACCESSING_BITS_0_31)
 		{
 			LOGMASKED(LOG_REX3, "REX3 VRAM Fastclear Color Write: %08x\n", (uint32_t)data);
-			m_rex3.m_color_vram = (uint32_t)data;
+            m_rex3.m_color_vram = (uint32_t)data;
 		}
 		break;
 	case 0x0020/8:
@@ -2631,7 +2806,6 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", (uint32_t)(data >> 32));
 			m_rex3.m_color_red = (int32_t)((data >> 32) & 0xffffff);
-			m_rex3.m_color_i = (uint32_t)(m_rex3.m_color_red >> 11) & 0x000000ff;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
@@ -2736,7 +2910,9 @@ WRITE64_MEMBER(newport_video_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_i = (uint32_t)data;
-			m_rex3.m_color_red = m_rex3.m_color_i << 11;
+			m_rex3.m_color_red = ((m_rex3.m_color_i >> 0) & 0xff) << 11;
+			m_rex3.m_color_green = ((m_rex3.m_color_i >> 8) & 0xff) << 11;
+			m_rex3.m_color_blue = ((m_rex3.m_color_i >> 16) & 0xff) << 11;
 		}
 		break;
 	case 0x0228/8:
