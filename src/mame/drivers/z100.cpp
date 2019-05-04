@@ -175,6 +175,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
 		m_vrmm(*this, "vrmm"),
+		m_vram_config(*this, "VRAM"),
 		m_floppy(nullptr)
 	{ }
 
@@ -224,6 +225,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_vrmm;
+	required_ioport m_vram_config;
 
 	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_keyb_press;
@@ -280,7 +282,7 @@ MC6845_UPDATE_ROW(z100_state::update_row)
 offs_t z100_state::vram_map(offs_t offset) const
 {
 	return (offset & 0x30000) | (offset & 0x000f) << 4 | (offset & 0x0780) >> 7
-		| ((m_vrmm[(offset & 0xf800) >> 8 | (offset & 0x0070) >> 4] + m_start_addr) & 0xff) << 8;
+		| ((m_vrmm[(offset & 0xf800) >> 8 | (offset & 0x0070) >> 4] + m_start_addr) & (m_vram_config->read() ? 0xff : 0x7f)) << 8;
 }
 
 READ8_MEMBER( z100_state::z100_vram_r )
@@ -614,6 +616,11 @@ INPUT_PORTS_START( z100 )
 	PORT_CONFNAME( 0x01, 0x01, "Video Board" )
 	PORT_CONFSETTING( 0x00, "Monochrome" )
 	PORT_CONFSETTING( 0x01, "Color" )
+
+	PORT_START("VRAM")
+	PORT_DIPNAME( 0x01, 0x01, "Video Memory" ) PORT_DIPLOCATION("J307:1")
+	PORT_DIPSETTING( 0x00, "32K" )
+	PORT_DIPSETTING( 0x01, "64K" )
 INPUT_PORTS_END
 
 READ8_MEMBER( z100_state::get_slave_ack )
