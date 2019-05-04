@@ -1668,7 +1668,7 @@ ROM_START( ews286 ) // Computer is brown/yellow-ish with Ericsson logo
 	ROM_LOAD16_BYTE( "rys_103_1003_r8a_8600_ic-pos_69.bin", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
 ROM_END
 
-//  NCR, probably PC-8
+//  NCR, probably PC-8 - should get a "NGA" extended CGA graphics card once it's emulated
 ROM_START( ncrpc8 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "ncr_35116_u113_vers.4-2.bin", 0x10001, 0x8000, CRC(b1b6a2e2) SHA1(5b2c0a2be59e064076ed757d84f61bf955ceca08))
@@ -1678,7 +1678,7 @@ ROM_START( ncrpc8 )
 	ROM_LOAD ("ncr_keyboard_mcu_35091.bin", 0x0000, 0x800, CRC(632556cc) SHA1(b35f30bd0664fc1c2775a594f248d1e30237900a))
 ROM_END
 
-// Nixdorf 8810 M55 - should get a "NGA" extended CGA graphics card once it's emulated
+// Nixdorf 8810 M55
 ROM_START( n8810m55 )
     ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD16_BYTE( "150-3872_u113_27_4.5.1.bin", 0x10001, 0x8000, CRC(35ff4fba) SHA1(557f0f98c27af76f6fa6990592e7150f5fc1fc02))
