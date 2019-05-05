@@ -281,7 +281,7 @@ protected:
 	   unsupported flipping modes (probably due to the way it's hooked up to the
 	   rest of the chips) which is causing entirely the wrong output.
 
-	-- furthermore video\k053936.c contains an implementation of
+	-- furthermore video\k053936.cpp contains an implementation of
 	   the K053936_zoom_draw named K053936GP_zoom_draw that's only used in konamigx ...
 
 

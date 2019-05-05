@@ -52,14 +52,13 @@ class k053247_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	void set_k053247_callback(k053247_cb_delegate callback) { m_k053247_cb = callback; }
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k053247_cb = k053247_cb_delegate(std::forward<T>(args)...); }
-	template <typename T> void set_config(T &&tag, int bpp, int dx, int dy)
+	void set_config(int bpp, int dx, int dy)
 	{
-		m_gfxrom.set_tag(tag);
 		m_bpp = bpp;
 		m_dx = dx;
 		m_dy = dy;
@@ -67,67 +66,63 @@ public:
 
 	void clear_all();
 
-	DECLARE_READ16_MEMBER( k055673_rom_word_r );
-	DECLARE_READ16_MEMBER( k055673_ps_rom_word_r );
-	DECLARE_READ16_MEMBER( k055673_5bpp_rom_word_r );
+	u16 k055673_rom_word_r(offs_t offset);
+	u16 k055673_ps_rom_word_r(offs_t offset);
+	u16 k055673_5bpp_rom_word_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER( k053247_r );
-	DECLARE_WRITE8_MEMBER( k053247_w );
-	DECLARE_READ16_MEMBER( k053247_word_r );
-	DECLARE_WRITE16_MEMBER( k053247_word_w );
-	DECLARE_WRITE16_MEMBER( k055673_reg_word_w ); // "OBJSET2" registers
+	u8 k053247_r(offs_t offset);
+	void k053247_w(offs_t offset, u8 data);
+	u16 k053247_word_r(offs_t offset);
+	void k053247_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void k055673_reg_word_w(offs_t offset, u16 data, u16 mem_mask = ~0); // "OBJSET2" registers
 
-	void k053247_sprites_draw( bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void k053247_sprites_draw( bitmap_rgb32 &bitmap,const rectangle &cliprect);
-	int k053247_read_register( int regnum);
-	void k053247_set_z_rejection( int zcode); // common to k053246/7
-	void k053247_get_ram( uint16_t **ram);
-	int k053247_get_dx( void );
-	int k053247_get_dy( void );
+	void k053247_sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void k053247_sprites_draw(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	u16 k053247_read_register(offs_t offset);
+	void k053247_set_z_rejection(int zcode); // common to k053246/7
+	void k053247_get_ram(u16 **ram);
+	int k053247_get_dx(void);
+	int k053247_get_dy(void);
 
-	DECLARE_READ8_MEMBER( k053246_r );
-	DECLARE_WRITE8_MEMBER( k053246_w );
-	DECLARE_READ16_MEMBER( k053246_word_r );
-	DECLARE_WRITE16_MEMBER( k053246_word_w );
+	u8 k053246_r(offs_t offset);
+	void k053246_w(offs_t offset, u8 data);
 
-	void k053246_set_objcha_line( int state);
+	void k053246_set_objcha_line(int state);
 	int k053246_is_irq_enabled(void);
-	int k053246_read_register( int regnum);
+	u8 k053246_read_register(offs_t offset);
 
-	DECLARE_READ16_MEMBER( k053246_reg_word_r );    // OBJSET1
-
-	std::unique_ptr<uint16_t[]>    m_ram;
+	std::unique_ptr<u16[]> m_ram;
 
 	gfx_element *m_gfx;
 
-	uint8_t    m_kx46_regs[8];
-	uint16_t   m_kx47_regs[16];
-	int      m_dx, m_dy;
-	uint8_t    m_objcha_line;
-	int      m_z_rejection;
+	u8    m_kx46_regs[8];
+	u16   m_kx47_regs[16];
+	int   m_dx, m_dy;
+	u8    m_objcha_line;
+	int   m_z_rejection;
 
 	k053247_cb_delegate m_k053247_cb;
 
-	required_region_ptr<uint8_t> m_gfxrom;
+	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;
 	int m_bpp;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
 		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf);
+		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	void zdrawgfxzoom32GP(
 			bitmap_ind16 &bitmap, const rectangle &cliprect,
-			uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf);
+			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	template<class _BitmapClass>
 	inline void k053247_draw_single_sprite_gxcore(_BitmapClass &bitmap , rectangle const &cliprect,
-		unsigned char*gx_objzbuf, unsigned char*gx_shdzbuf, int code, unsigned short*gx_spriteram, int offs,
+		u8* gx_objzbuf, u8* gx_shdzbuf, int code, u16* gx_spriteram, int offs,
 		int color, int alpha, int drawmode, int zcode, int pri,
-		int primask, int shadow, unsigned char*drawmode_table, unsigned char*shadowmode_table, int shdmask)
+		int primask, int shadow, u8* drawmode_table, u8* shadowmode_table, int shdmask)
 	{
 		int xa,ya,ox,oy,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
 		int temp, temp4;
@@ -172,7 +167,7 @@ public:
 
 		int objset1 = k053246_read_register(5);
 		// for Escape Kids (GX975)
-		if ( objset1 & 8 ) // Check only "Bit #3 is '1'?"
+		if (objset1 & 8) // Check only "Bit #3 is '1'?"
 		{
 			int screenwidth = screen().width();
 
@@ -201,11 +196,9 @@ public:
 			ywraplim  = 1024 - 512;
 		}
 
-
 		// get "display window" offsets
 		int offx = (short)((m_kx46_regs[0] << 8) | m_kx46_regs[1]);
 		int offy = (short)((m_kx46_regs[2] << 8) | m_kx46_regs[3]);
-
 
 		// apply wrapping and global offsets
 		temp = wrapsize-1;
@@ -220,7 +213,6 @@ public:
 		oy = (-oy - offy) & temp;
 		if (ox >= xwraplim) ox -= wrapsize;
 		if (oy >= ywraplim) oy -= wrapsize;
-
 
 		temp = temp4>>8 & 0x0f;
 		int width = 1 << (temp & 3);
@@ -255,7 +247,7 @@ public:
 		}
 		else /* non-GX */
 		{
-			uint8_t* whichtable = drawmode_table;
+			u8* whichtable = drawmode_table;
 			if (color == -1)
 			{
 				// drop the entire sprite to shadow unconditionally
@@ -300,7 +292,6 @@ public:
 	}
 
 
-
 	template<class _BitmapClass>
 	void k053247_draw_yxloop_gx(_BitmapClass &bitmap, const rectangle &cliprect,
 		int code,
@@ -314,10 +305,10 @@ public:
 		/* gx specifics */
 		int pri,
 		int zcode, int alpha, int drawmode,
-		uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf,
+		u8* gx_objzbuf, u8* gx_shdzbuf,
 		/* non-gx specifics */
 		int primask,
-		uint8_t* whichtable
+		u8* whichtable
 		)
 	{
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
@@ -449,13 +440,13 @@ public:
 
 
 protected:
-	k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	template <class _BitmapClass> void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
+	template <class _BitmapClass> void k053247_sprites_draw_common(_BitmapClass &bitmap, const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(K053247, k053247_device)
@@ -464,7 +455,7 @@ DECLARE_DEVICE_TYPE(K053246, k053247_device)
 class k055673_device : public k053247_device
 {
 public:
-	k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~k055673_device() { }
 
 protected:

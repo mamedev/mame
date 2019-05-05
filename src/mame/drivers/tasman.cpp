@@ -242,7 +242,7 @@ void kongambl_state::kongambl_map(address_map &map)
 
 	map(0x4b0000, 0x4b001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask32(0xff00ff00);
 
-	map(0x4c0000, 0x4c0007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
+	map(0x4c0000, 0x4c0007).w(m_k055673, FUNC(k055673_device::k053246_w));
 	//map(0x4c4000, 0x4c4003).nopw();
 	//map(0x4c4004, 0x4c4007).nopw();
 	//map(0x4c801c, 0x4c801f).nopw();
@@ -676,7 +676,7 @@ void kongambl_state::kongambl(machine_config &config)
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback), this);
-	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -48+1, -23);
+	m_k055673->set_config(K055673_LAYOUT_LE2, -48+1, -23);
 	m_k055673->set_palette(m_palette);
 
 #if CUSTOM_DRAW
@@ -707,7 +707,7 @@ ROM_START( kingtut )
 	ROM_LOAD16_BYTE( "kit11_l1_vrm.21", 0x000000, 0x80000, CRC(431eb89f) SHA1(377c96f615b4b76314aeecad4e868edb66c72f33) )
 	ROM_LOAD16_BYTE( "kit11_h1_vrm.23", 0x000001, 0x80000, CRC(7aa2f1bc) SHA1(d8aead9dedcc83d3dc574122103aaa2074011197) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_REGION( 0x200000, "k055673", 0 ) // 16x16x8 sprites
 	ROM_LOAD64_WORD( "kit11ll1_obj.17", 0x000000, 0x80000, CRC(a19338b8) SHA1(1aa68596e5bf493cb360495f1174dc1323086ad2) )
 	ROM_LOAD64_WORD( "kit11lm1_obj.15", 0x000002, 0x80000, CRC(1aea3f4d) SHA1(52fd1a7ffeeb3acce176ad3812a2ca146e02c324) )
 	ROM_LOAD64_WORD( "kit11hm1_obj.13", 0x000004, 0x80000, CRC(21cc4e40) SHA1(9e3735fc8cd53f7e831dc76697911216bd8bbc70) )
@@ -732,7 +732,7 @@ ROM_START( moneybnk )
 	ROM_LOAD16_BYTE( "mob11_l1_vrm.21", 0x000000, 0x80000, CRC(926fbd3b) SHA1(4f85ea63faff1508d5abf0ca0ebd16e802f8f45c) )
 	ROM_LOAD16_BYTE( "mob11_h1_vrm.23", 0x000001, 0x80000, CRC(a119feaa) SHA1(567e319dfddb9ec04b9302af782e9baccab4f5a6) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_REGION( 0x200000, "k055673", 0 ) // 16x16x8 sprites
 	ROM_LOAD64_WORD( "mob11ll1_obj.17", 0x000000, 0x80000, CRC(5c5959a3) SHA1(1eea6bf4c34aa05f45b2737eb6035f2762277cfb) )
 	ROM_LOAD64_WORD( "mob11lm1_obj.15", 0x000002, 0x80000, CRC(0b0e4e9b) SHA1(cbbbde7470f96e9f93fa848371e19ebfeea7fe4d) )
 	ROM_LOAD64_WORD( "mob11hm1_obj.13", 0x000004, 0x80000, CRC(6f84c287) SHA1(edccefa96d97c6f67a9cd02f70cf61385d70daae) )
@@ -757,7 +757,7 @@ ROM_START( dragsphr )
 	ROM_LOAD16_BYTE( "u21.bin", 0x00000, 0x080000, CRC(83fc3afe) SHA1(09cc89567b985685ed206b273915157fc46212f9) )
 	ROM_LOAD16_BYTE( "u23.bin", 0x00001, 0x080000, CRC(a29a777f) SHA1(1ca37e468f31246cbcbd2e1799e5a0137d19d0b9) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_REGION( 0x200000, "k055673", 0 ) // 16x16x8 sprites
 	ROM_LOAD64_WORD( "u17.bin", 0x000000, 0x080000, CRC(9352f279) SHA1(1795df2331fde6de06b7d910d74a3fde69379943) )
 	ROM_LOAD64_WORD( "u15.bin", 0x000002, 0x080000, CRC(4a7bc71a) SHA1(7b6bfc2b83ea6189a629b64cae295071b52c5fab) )
 	ROM_LOAD64_WORD( "u13.bin", 0x000004, 0x080000, CRC(a4a60822) SHA1(6f49ae6b40185a0b0dc796b32cdbd048bfcbd3de) )
@@ -782,7 +782,7 @@ ROM_START( ivorytsk )
 	ROM_LOAD16_BYTE( "u21_ba6dhex", 0x00000, 0x080000, CRC(d14efb82) SHA1(420bf5d807d59e6d17ee113125046b979e1d12f4) )
 	ROM_LOAD16_BYTE( "u23_9297hex", 0x00001, 0x080000, CRC(5e36ff5f) SHA1(9be65015217affc1e28d9ce855cd22f9cb147258) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_REGION( 0x200000, "k055673", 0 ) // 16x16x8 sprites
 	ROM_LOAD64_WORD( "u17_cof8hex", 0x000000, 0x080000, CRC(1ace8891) SHA1(91115680b50d6e31cdbac81ae439eeacb7a5f812) )
 	ROM_LOAD64_WORD( "u15_8e23hex", 0x000002, 0x080000, CRC(174114cb) SHA1(3f9151e5785482aebfcb6787ddd63d32e0225ad2) )
 	ROM_LOAD64_WORD( "u13_29fbhex", 0x000004, 0x080000, CRC(8f21cbb9) SHA1(a0e82e9f29f9eedabcd79a72db7187180e64a076) )
@@ -807,7 +807,7 @@ ROM_START( vikingt )
 	ROM_LOAD16_BYTE( "u21.bin", 0x00000, 0x080000, CRC(789d7c41) SHA1(a04b7e8c894e08e9210c630fabd878b8389ee82c) )
 	ROM_LOAD16_BYTE( "u23.bin", 0x00001, 0x080000, CRC(56ba968e) SHA1(100edc40748067683172480fc2b7d48f4dc89da7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_REGION( 0x200000, "k055673", 0 ) // 16x16x8 sprites
 	ROM_LOAD64_WORD( "u17.bin", 0x000000, 0x080000, CRC(83e7f568) SHA1(0f82eadb3badb7074338099ff9f4d73216a1d5c7) )
 	ROM_LOAD64_WORD( "u15.bin", 0x000002, 0x080000, CRC(f349b72b) SHA1(d8abc42bbc607e36004a76e45dd88b581db60d09) )
 	ROM_LOAD64_WORD( "u13.bin", 0x000004, 0x080000, CRC(2cbda923) SHA1(888b3ef9fe91843b59b03b9dabc3fd32fb7fac20) )
