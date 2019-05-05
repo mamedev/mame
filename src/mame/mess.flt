@@ -773,6 +773,7 @@ tek405x.cpp
 tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
+telex274.cpp
 terak.cpp
 terco.cpp
 terminal.cpp

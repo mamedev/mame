@@ -37498,6 +37498,9 @@ tek4404                         // (c) 1984 Tektronix
 @source:tekxp33x.cpp
 tekxp330                        //
 
+@source:telex274.cpp
+telex274                        //
+
 @source:tempest.cpp
 tempest                         // 136002           (c) 1980
 tempest1                        // 136002           (c) 1980
