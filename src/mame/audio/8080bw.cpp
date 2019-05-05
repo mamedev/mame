@@ -1024,7 +1024,7 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
 TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
 {
 	m_timer_state ^= 1;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(m_timer_state, 0) ? ASSERT_LINE : CLEAR_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_timer_state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
