@@ -80,7 +80,7 @@ this seems to be the only zoom feature actually used in the games.
 
 DEFINE_DEVICE_TYPE(TC0080VCO, tc0080vco_device, "tc0080vco", "Taito TC0080VCO")
 
-tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0080VCO, tag, owner, clock),
 	m_ram(nullptr),
 	m_bg0_ram_0(nullptr),
@@ -156,7 +156,7 @@ void tc0080vco_device::device_start()
 
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_ram = make_unique_clear<uint16_t[]>(TC0080VCO_RAM_SIZE / 2);
+	m_ram = make_unique_clear<u16[]>(TC0080VCO_RAM_SIZE / 2);
 
 	m_char_ram      = m_ram.get() + 0x00000 / 2;    /* continues at +0x10000 */
 	m_tx_ram_0      = m_ram.get() + 0x01000 / 2;
@@ -175,7 +175,7 @@ void tc0080vco_device::device_start()
 	m_scroll_ram    = m_ram.get() + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(&m_gfxdecode->palette(), charlayout, (uint8_t *)m_char_ram, 0, 1, 512));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(&m_gfxdecode->palette(), charlayout, (u8 *)m_char_ram, 0, 1, 512));
 
 	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 }
@@ -400,9 +400,9 @@ void tc0080vco_device::tilemap_update( )
 
 /* NB: orientation_flipx code in following routine has not been tested */
 
-void tc0080vco_device::bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
+void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	uint16_t zoom = m_scroll_ram[6];
+	u16 zoom = m_scroll_ram[6];
 	int zx, zy;
 
 	zx = (zoom & 0xff00) >> 8;
@@ -410,13 +410,13 @@ void tc0080vco_device::bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bi
 
 	if (zx == 0x3f && zy == 0x7f)       /* normal size */
 	{
-		m_tilemap[0]->draw(screen, bitmap, cliprect, flags, priority);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, flags, priority, pmask);
 	}
 	else        /* zoom + rowscroll = custom draw routine */
 	{
-		uint16_t *dst16, *src16;
-		uint8_t *tsrc;
-		uint16_t scanline[512];
+		u16 *dst16, *src16;
+		u8 *tsrc;
+		u16 scanline[512];
 		bitmap_ind16 &srcbitmap = m_tilemap[0]->pixmap();
 		bitmap_ind8 &flagsbitmap = m_tilemap[0]->flagsmap();
 
@@ -520,7 +520,7 @@ void tc0080vco_device::bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bi
 				}
 			}
 
-			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1 , ROT0, screen.priority(), priority);
+			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? false : true , ROT0, screen.priority(), priority, pmask);
 
 			y_index += zoomy;
 		}
@@ -531,18 +531,18 @@ void tc0080vco_device::bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bi
 #define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE)                   \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != 0)                                                               \
 	{                                                                               \
 		(DEST) = SOURCE;                                                            \
-		(PRIORITY) = privalue;                                                      \
+		(PRIORITY) = ((PRIORITY) & primask) | privalue;                             \
 	}                                                                               \
 }                                                                                   \
 while (0)
-void tc0080vco_device::bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
+void tc0080vco_device::bg1_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	uint8_t layer = 1;
-	uint16_t zoom = m_scroll_ram[6 + layer];
+	u8 layer = 1;
+	u16 zoom = m_scroll_ram[6 + layer];
 	int min_x = cliprect.min_x;
 	int max_x = cliprect.max_x;
 	int min_y = cliprect.min_y;
@@ -554,7 +554,7 @@ void tc0080vco_device::bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bi
 
 	if (zoomx == 0x3f && zoomy == 0x7f)     /* normal size */
 	{
-		m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority);
+		m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority, pmask);
 	}
 	else        /* zoomed */
 	{
@@ -605,26 +605,27 @@ void tc0080vco_device::bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bi
 		{
 			bitmap_ind16 &dest = bitmap;
 			bitmap_ind16 &src = srcbitmap;
-			int32_t startx = sx;
-			int32_t starty = sy;
-			int32_t incxx = zx;
-			int32_t incxy = 0;
-			int32_t incyx = 0;
-			int32_t incyy = zy;
+			s32 startx = sx;
+			s32 starty = sy;
+			s32 incxx = zx;
+			s32 incxy = 0;
+			s32 incyx = 0;
+			s32 incyy = zy;
 			int wraparound = 0;
-			uint32_t privalue = priority;
+			u8 privalue = priority;
+			u8 primask = pmask;
 			bitmap_ind8 &priority = screen.priority();
 
 			if (dest.bpp() == 16)
-				COPYROZBITMAP_CORE(uint16_t, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, uint8_t);
+				COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, u8);
 			else
-				COPYROZBITMAP_CORE(uint32_t, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, uint8_t);
+				COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, u8);
 		}
 	}
 }
 
 
-void tc0080vco_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
+void tc0080vco_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask)
 {
 	int disable = 0x00; /* possibly layer disable bits do exist ?? */
 
@@ -637,39 +638,39 @@ void tc0080vco_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap
 		case 0:
 			if (disable & 0x01)
 				return;
-			bg0_tilemap_draw(screen, bitmap, cliprect, flags, priority);
+			bg0_tilemap_draw(screen, bitmap, cliprect, flags, priority, pmask);
 			break;
 		case 1:
 			if (disable & 0x02)
 				return;
-			bg1_tilemap_draw(screen, bitmap, cliprect, flags, priority);
+			bg1_tilemap_draw(screen, bitmap, cliprect, flags, priority, pmask);
 			break;
 		case 2:
 			if (disable & 0x04)
 				return;
-			m_tilemap[2]->draw(screen, bitmap, cliprect, flags, priority);
+			m_tilemap[2]->draw(screen, bitmap, cliprect, flags, priority, pmask);
 			break;
 	}
 }
 
 /* FIXME: maybe it would be better to provide pointers to these RAM regions
 which can be accessed directly by the drivers... */
-uint16_t tc0080vco_device::cram_0_r(int offset)
+u16 tc0080vco_device::cram_0_r(int offset)
 {
 	return m_chain_ram_0[offset];
 }
 
-uint16_t tc0080vco_device::cram_1_r(int offset)
+u16 tc0080vco_device::cram_1_r(int offset)
 {
 	return m_chain_ram_1[offset];
 }
 
-uint16_t tc0080vco_device::sprram_r(int offset)
+u16 tc0080vco_device::sprram_r(int offset)
 {
 	return m_spriteram[offset];
 }
 
-uint16_t tc0080vco_device::scrram_r(int offset)
+u16 tc0080vco_device::scrram_r(int offset)
 {
 	return m_scroll_ram[offset];
 }
