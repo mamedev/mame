@@ -54,6 +54,8 @@
 
 #include "emu.h"
 
+#include "bus/gio/gio.h"
+
 #include "cpu/mips/r4000.h"
 
 #include "machine/hpc3.h"
@@ -63,8 +65,6 @@
 #include "machine/sgi.h"
 
 #include "sound/cdda.h"
-
-#include "video/newport.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -78,8 +78,11 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
-		, m_newport(*this, "newport")
 		, m_hpc3(*this, "hpc3")
+		, m_gio(*this, "gio")
+		, m_gio_gfx(*this, "gio_gfx")
+		, m_gio_exp0(*this, "gio_exp0")
+		, m_gio_exp1(*this, "gio_exp1")
 	{
 	}
 
@@ -100,12 +103,15 @@ protected:
 
 	static void scsi_devices(device_slot_interface &device);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<r4000_base_device> m_maincpu;
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
-	required_device<newport_video_device> m_newport;
 	required_device<hpc3_device> m_hpc3;
+	optional_device<gio_device> m_gio;
+	optional_device<gio_slot_device> m_gio_gfx;
+	optional_device<gio_slot_device> m_gio_exp0;
+	optional_device<gio_slot_device> m_gio_exp1;
 };
 
 class ip24_state : public ip22_state
@@ -154,7 +160,7 @@ void ip22_state::ip22_map(address_map &map)
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
 	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));     /* 128 MB of main RAM */
-	map(0x1f0f0000, 0x1f0f1fff).rw(m_newport, FUNC(newport_video_device::rex3_r), FUNC(newport_video_device::rex3_w));
+	map(0x1f000000, 0x1f9fffff).rw(m_gio, FUNC(gio_device::read), FUNC(gio_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
@@ -200,17 +206,6 @@ void ip22_state::scsi_devices(device_slot_interface &device)
 
 void ip22_state::ip22_base(machine_config &config)
 {
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(1280+64, 1024+64);
-	screen.set_visarea(0, 1279, 0, 1023);
-	screen.set_screen_update("newport", FUNC(newport_video_device::screen_update));
-	screen.screen_vblank().set(m_newport, FUNC(newport_video_device::vblank_w));
-
-	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_hpc3);
-
 	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom", m_hpc3);
 
 	NSCSI_BUS(config, "scsibus", 0);
@@ -223,6 +218,12 @@ void ip22_state::ip22_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
+
+	// GIO
+	GIO(config, m_gio, m_maincpu, m_hpc3);
+	GIO_SLOT(config, m_gio_gfx, m_gio, gio_cards, nullptr);
+	GIO_SLOT(config, m_gio_exp0, m_gio, gio_cards, nullptr);
+	GIO_SLOT(config, m_gio_exp1, m_gio, gio_cards, nullptr);
 }
 
 void ip22_state::ip225015(machine_config &config)

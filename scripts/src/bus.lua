@@ -953,6 +953,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/gio/gio.h,BUSES["GIO"] = true
+---------------------------------------------------
+
+if (BUSES["GIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/gio/gio.cpp",
+		MAME_DIR .. "src/devices/bus/gio/gio.h",
+		MAME_DIR .. "src/devices/bus/gio/newport.cpp",
+		MAME_DIR .. "src/devices/bus/gio/newport.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/hp_hil/hp_hil.h,BUSES["HPHIL"] = true
 ---------------------------------------------------
 
