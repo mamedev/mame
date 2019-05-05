@@ -3578,7 +3578,7 @@ ROM_END
   * PCB label DR-106 (New Wide Screen), DR-802 (Crystal Screen)
   * Sharp SM511
      - label DR-106 9038B (new wide screen version) (no decap)
-	 - label DR-802 8626A (crystal screen) (not dumped yet)
+     - label DR-802 8626A (crystal screen) (not dumped yet)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
