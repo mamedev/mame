@@ -179,52 +179,37 @@ protected:
 		// artifacting config
 		void setup_config(device_t *device);
 		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
-        void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
-        bool get_pal_artifacting() { return m_palartifacting; }
-        void create_luma_table( const pixel_t *palette );
+		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+		bool get_pal_artifacting() { return m_palartifacting; }
+		void create_color_blend_table( const pixel_t *palette );
 
 		// artifacting application
 		template<int xscale>
 		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
 		{
-            if( !m_artifacting || !m_palartifacting )
-                return;
+			if( !m_artifacting || !m_palartifacting )
+				return;
 
-            // TODO: Create a map of pairs of colors to resulting colors, and convert spaces to tabs.
-            //if( (mode & (MODE_AS|MODE_GM0)) == MODE_AS )
-            {
-                uint32_t tmpPixel;
-                pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
-                pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
-                std::map<uint32_t,uint8_t>::const_iterator luma1;
-                std::map<uint32_t,uint8_t>::const_iterator luma2;
+			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
+			{
+				pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
+				pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
+				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
 
-                for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
-                {
-                    if( line1[pixel] == line2[pixel] )
-                        continue;
+				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
+				{
+					if( line1[pixel] == line2[pixel] )
+						continue;
 
-                    luma1 = m_luminance_map.find( line1[pixel] );
-                    luma2 = m_luminance_map.find( line2[pixel] );
-
-                    if( luma1 != m_luminance_map.end() && luma2 != m_luminance_map.end() && (luma1->second == luma2->second))
-                    {
-                        /*tmpPixel  = (((line1[pixel] & 0xFF000000) >> 25) + ((line2[pixel] & 0xFF000000) >> 24)) << 24;
-                        tmpPixel |= (((line1[pixel] & 0x00FF0000) >> 17) + ((line2[pixel] & 0x00FF0000) >> 16)) << 16; 
-                        tmpPixel |= (((line1[pixel] & 0x0000FF00) >>  9) + ((line2[pixel] & 0x0000FF00) >>  8)) <<  8; 
-                        tmpPixel |= (((line1[pixel] & 0x000000FF) >>  1) + ((line2[pixel] & 0x000000FF) >>  0)); */
-
-                        //tmpPixel  = (( ((uint32_t)(line1[pixel] & 0xFF000000) >> 24) + ((uint32_t)(line2[pixel] & 0xFF000000) >> 24) / 2) << 24);
-                        tmpPixel  = (( ((uint32_t)(line1[pixel] & 0xFF0000  ) >> 16) + ((uint32_t)(line2[pixel] & 0xFF0000  ) >> 16) / 2) << 16);
-                        tmpPixel |= (( ((uint32_t)(line1[pixel] & 0xFF00    ) >> 8 ) + ((uint32_t)(line2[pixel] & 0xFF00    ) >> 8 ) / 2) << 8 );
-                        tmpPixel |=  ( ((uint32_t) line1[pixel] & 0xFF      )        +  (uint32_t)(line2[pixel] & 0xFF      )      ) / 2;
-
-                        line1[pixel] = tmpPixel;
-                        line2[pixel] = tmpPixel;
-                    }
-                }
-            }
-        }
+					newColor = m_palcolorblendmap.find(std::pair<pixel_t,pixel_t>(line1[pixel],line2[pixel]));
+					if( newColor != m_palcolorblendmap.end() )
+					{
+						line1[pixel] = newColor->second;
+						line2[pixel] = newColor->second;
+					}
+				}
+			}
+		}
 
 		template<int xscale>
 		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
@@ -271,7 +256,7 @@ protected:
 		pixel_t m_expanded_colors[128];
 
 		// PAL color blend emulation values.
-		std::map<uint32_t, unsigned char> m_luminance_map;
+		std::map<std::pair<pixel_t,pixel_t>,pixel_t> m_palcolorblendmap;
 
 		void update_colors(pixel_t c0, pixel_t c1);
 		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);
