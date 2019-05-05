@@ -174,8 +174,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( tl_mmu_r );
-	DECLARE_WRITE16_MEMBER( tl_mmu_w );
+	DECLARE_READ16_MEMBER( mmu_r );
+	DECLARE_WRITE16_MEMBER( mmu_w );
+	uint16_t tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask);
+	void tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask);
 	DECLARE_READ16_MEMBER( video_ctrl_r );
 	DECLARE_WRITE16_MEMBER( video_ctrl_w );
 	DECLARE_READ16_MEMBER( ram_r );
@@ -183,6 +185,8 @@ private:
 	uint8_t ethernet_r();
 	void ethernet_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_int_w);
+	uint16_t edlc_mmu_r(offs_t offset, uint16_t mem_mask);
+	void edlc_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -191,6 +195,7 @@ private:
 	void mbustype2space_map(address_map &map);
 	void mbustype3space_map(address_map &map);
 	void sun2_mem(address_map &map);
+	void edlc_mem(address_map &map);
 	void vmetype0space_map(address_map &map);
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
@@ -218,10 +223,13 @@ WRITE16_MEMBER( sun2_state::ram_w )
 	if (offset < m_ram_size_words) COMBINE_DATA(&m_ram_ptr[offset]);
 }
 
-READ16_MEMBER( sun2_state::tl_mmu_r )
+READ16_MEMBER( sun2_state::mmu_r )
 {
-	uint8_t fc = m_maincpu->get_fc();
+	return tl_mmu_r(m_maincpu->get_fc(), offset, mem_mask);
+}
 
+uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
+{
 	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		if (offset & 0x4)   // set for CPU space
@@ -352,10 +360,13 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::tl_mmu_w )
+WRITE16_MEMBER( sun2_state::mmu_w )
 {
-	uint8_t fc = m_maincpu->get_fc();
+	tl_mmu_w(m_maincpu->get_fc(), offset, data, mem_mask);
+}
 
+void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask)
+{
 	//printf("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 
 	if (fc == 3)
@@ -521,9 +532,25 @@ WRITE_LINE_MEMBER(sun2_state::ethernet_int_w)
 	}
 }
 
+uint16_t sun2_state::edlc_mmu_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t result = tl_mmu_r(M68K_FC_SUPERVISOR_DATA, offset, (mem_mask >> 8) | (mem_mask << 8));
+	return (result >> 8) | (result << 8);
+}
+
+void sun2_state::edlc_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	tl_mmu_w(M68K_FC_SUPERVISOR_DATA, offset, (data >> 8) | (data << 8), (mem_mask >> 8) | (mem_mask << 8));
+}
+
 void sun2_state::sun2_mem(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(FUNC(sun2_state::tl_mmu_r), FUNC(sun2_state::tl_mmu_w));
+	map(0x000000, 0xffffff).rw(FUNC(sun2_state::mmu_r), FUNC(sun2_state::mmu_w));
+}
+
+void sun2_state::edlc_mem(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(FUNC(sun2_state::edlc_mmu_r), FUNC(sun2_state::edlc_mmu_w));
 }
 
 // VME memory spaces
@@ -678,7 +705,7 @@ void sun2_state::sun2vme(machine_config &config)
 	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
 
 	I82586(config, m_edlc, 16_MHz_XTAL / 2);
-	m_edlc->set_addrmap(0, &sun2_state::sun2_mem);
+	m_edlc->set_addrmap(0, &sun2_state::edlc_mem);
 	m_edlc->out_irq_cb().set(FUNC(sun2_state::ethernet_int_w));
 
 	am9513a_device &timer(AM9513A(config, "timer", 19.6608_MHz_XTAL / 4));
