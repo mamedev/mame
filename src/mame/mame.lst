@@ -2398,7 +2398,9 @@ at386                           // 19?? IBM AT 386
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
+c286lt							// 1990 Commodore Laptop 286-LT
 c386sx16                        // 1990 Commodore 386SX-16
+c386sxlt						// 1992 Commodore Laptop C386SX-LT
 pc30iii                         // Commodore PC 30-III
 pc40iii                         // Commodore PC 40-III
 mbc28                           // Sanyo MBC-28
