@@ -212,6 +212,8 @@ m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, dev
 	strcat(m_remotehost, mconfig.options().comm_remoteport());
 
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
+
+	m_frameoffset = 0x1c0; // default
 }
 
 //-------------------------------------------------
@@ -301,13 +303,13 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
 		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
 
-		// frameSize - 0x0e00
+		// frameSize - 0x0e00. is it = frameoffset*8 ? if true - it should be 0xC00 for Power Sled
 		m_shared[0x12] = 0x00;
 		m_shared[0x13] = 0x0e;
 
-		// frameOffset - 0x01c0
-		m_shared[0x14] = 0xc0;
-		m_shared[0x15] = 0x01;
+		// frameOffset - 0x01c0 in most games or 0x180 in Power Sled
+		m_shared[0x14] = m_frameoffset & 0xff;
+		m_shared[0x15] = m_frameoffset >> 8;
 
 		comm_tick();
 	}
