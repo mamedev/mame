@@ -196,10 +196,10 @@ signal levels. The four serial ports are routed to four RJ45 telephone connector
 class mvme162_state : public driver_device
 {
 public:
-mvme162_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device (mconfig, type, tag),
-		m_maincpu (*this, "maincpu")
-		,m_sccterm(*this, "scc")
+mvme162_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device (mconfig, type, tag)
+		, m_maincpu (*this, "maincpu")
+		, m_sccterm(*this, "scc")
 	{
 	}
 
@@ -217,8 +217,8 @@ private:
 	//required_device<scc85230_device> m_sccterm2;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint32_t	*m_sysrom;
-	uint32_t	m_sysram[2];
+	uint32_t *m_sysrom;
+	uint32_t m_sysram[2];
 
 	// PCC registers
 	uint8_t	m_genpurp_stat;
@@ -277,11 +277,13 @@ void mvme162_state::machine_reset ()
   in the MCchip EPROM control register is high (ROM0=1). ROM0 is set to 1 after each reset. The ROM0 bit must be
   cleared before other resources (DRAM or SRAM) can be mapped in this range ($00000000 - $001FFFFF).
 */
-READ32_MEMBER (mvme162_state::bootvect_r){
+READ32_MEMBER (mvme162_state::bootvect_r)
+{
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (mvme162_state::bootvect_w){
+WRITE32_MEMBER (mvme162_state::bootvect_w)
+{
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
