@@ -40,7 +40,7 @@ public:
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 
 	/* Returns the priority order of the bg tilemaps set in the internal
 	register. The order in which the four layers should be drawn is
@@ -85,8 +85,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	void set_layer_ptrs();
-	void bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority );
-	void bg23_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority );
+	void bg01_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
+	void bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 };
 
 DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)
