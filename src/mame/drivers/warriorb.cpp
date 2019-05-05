@@ -398,9 +398,13 @@ static const gfx_layout charlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( gfx_warriorb )
+static GFXDECODE_START( gfx_warriorb_1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles (screen 1) */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_warriorb_2 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screen 2) */
 GFXDECODE_END
 
@@ -440,9 +444,8 @@ void warriorb_state::darius2d(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_warriorb);
-	PALETTE(config, m_palette).set_entries(4096);
-	PALETTE(config, "palette2").set_entries(4096);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb_1);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb_2);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -452,15 +455,15 @@ void warriorb_state::darius2d(machine_config &config)
 	lscreen.set_size(40*8, 32*8);
 	lscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
 	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
-	lscreen.set_palette(m_palette);
+	lscreen.set_palette(m_tc0110pcr[0]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(4, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[0]->set_palette(m_palette);
+	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
+	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
+	TC0110PCR(config, m_tc0110pcr[0], 0);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
@@ -468,16 +471,16 @@ void warriorb_state::darius2d(machine_config &config)
 	rscreen.set_size(40*8, 32*8);
 	rscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
 	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
-	rscreen.set_palette("palette2");
+	rscreen.set_palette(m_tc0110pcr[1]);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(2);
+	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[1]->set_palette("palette2");
+	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
+	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
+	TC0110PCR(config, m_tc0110pcr[1], 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -521,9 +524,8 @@ void warriorb_state::warriorb(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_warriorb);
-	PALETTE(config, m_palette).set_entries(4096);
-	PALETTE(config, "palette2").set_entries(4096);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb_1);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb_2);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -533,15 +535,15 @@ void warriorb_state::warriorb(machine_config &config)
 	lscreen.set_size(40*8, 32*8);
 	lscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
-	lscreen.set_palette(m_palette);
+	lscreen.set_palette(m_tc0110pcr[0]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(4, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[0]->set_palette(m_palette);
+	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
+	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
+	TC0110PCR(config, m_tc0110pcr[0], 0);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
@@ -549,17 +551,17 @@ void warriorb_state::warriorb(machine_config &config)
 	rscreen.set_size(40*8, 32*8);
 	rscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
-	rscreen.set_palette("palette2");
+	rscreen.set_palette(m_tc0110pcr[1]);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(2);
+	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(1);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[1]->set_palette("palette2");
+	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
+	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
+	TC0110PCR(config, m_tc0110pcr[1], 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

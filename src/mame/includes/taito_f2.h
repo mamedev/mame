@@ -49,6 +49,7 @@ public:
 	void taito_f2_tc0220ioc(machine_config &config);
 	void taito_f2_tc0510nio(machine_config &config);
 	void taito_f2_te7750(machine_config &config);
+	void taito_f2_tc0110pcr(machine_config &config);
 	void taito_f2(machine_config &config);
 	void thundfox(machine_config &config);
 	void dinorex(machine_config &config);
@@ -170,7 +171,7 @@ protected:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(coin_nibble_w);
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);

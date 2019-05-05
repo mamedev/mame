@@ -218,24 +218,23 @@ void galastrm_state::galastrm(machine_config &config)
 	m_screen->set_size(64*8, 50*8);
 	m_screen->set_visarea(0+96, 40*8-1+96, 3*8+60, 32*8-1+60);
 	m_screen->set_screen_update(FUNC(galastrm_state::screen_update));
-	m_screen->set_palette(m_palette);
+	m_screen->set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galastrm);
-	PALETTE(config, m_palette).set_entries(4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_galastrm);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(-48, -56);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_palette(m_palette);
+	m_tc0480scp->set_palette(m_tc0110pcr);
 	m_tc0480scp->set_offsets(-40, -3);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);

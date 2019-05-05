@@ -2939,9 +2939,18 @@ void taitof2_state::taito_f2_te7750(machine_config &config)
 	te7750.in_port9_cb().set_ioport("IN4");
 }
 
+void taitof2_state::taito_f2_tc0110pcr(machine_config &config)
+{
+	TC0110PCR(config, m_tc0110pcr, 0);
+	m_gfxdecode->set_palette(m_tc0110pcr);
+	m_screen->set_palette(m_tc0110pcr);
+}
+
 void taitof2_state::finalb(machine_config &config)
 {
 	taito_f2_tc0220ioc(config);
+	taito_f2_tc0110pcr(config);
+	config.device_remove("palette");
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::finalb_map);
@@ -2955,9 +2964,7 @@ void taitof2_state::finalb(machine_config &config)
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
-
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 }
 
 void taitof2_state::dondokod(machine_config &config)
@@ -3074,6 +3081,8 @@ void taitof2_state::cameltry(machine_config &config)
 void taitof2_state::qtorimon(machine_config &config)
 {
 	taito_f2_tc0220ioc(config);
+	taito_f2_tc0110pcr(config);
+	config.device_remove("palette");
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::qtorimon_map);
@@ -3085,9 +3094,7 @@ void taitof2_state::qtorimon(machine_config &config)
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
-
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 }
 
 void taitof2_state::liquidk(machine_config &config)
@@ -3114,6 +3121,8 @@ void taitof2_state::liquidk(machine_config &config)
 void taitof2_state::quizhq(machine_config &config)
 {
 	taito_f2(config);
+	taito_f2_tc0110pcr(config);
+	config.device_remove("palette");
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::quizhq_map);
@@ -3125,9 +3134,7 @@ void taitof2_state::quizhq(machine_config &config)
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
-
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 }
 
 void taitof2_state::ssi(machine_config &config)
@@ -3199,6 +3206,8 @@ void taitof2_state::growl(machine_config &config)
 void taitof2_state::mjnquest(machine_config &config)
 {
 	taito_f2(config);
+	taito_f2_tc0110pcr(config);
+	config.device_remove("palette");
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::mjnquest_map);
@@ -3209,10 +3218,8 @@ void taitof2_state::mjnquest(machine_config &config)
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 	m_tc0100scn->set_tile_callback(FUNC(taitof2_state::mjnquest_tmap_cb), this);
-
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 }
 
 void taitof2_state::footchmp(machine_config &config)
