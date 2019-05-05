@@ -90,6 +90,8 @@ if (BUSES["ABCBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/abcbus/sio.h",
 		MAME_DIR .. "src/devices/bus/abcbus/slutprov.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/slutprov.h",
+		MAME_DIR .. "src/devices/bus/abcbus/ssa.cpp",
+		MAME_DIR .. "src/devices/bus/abcbus/ssa.h",
 		MAME_DIR .. "src/devices/bus/abcbus/uni800.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/uni800.h",
 		MAME_DIR .. "src/devices/bus/abcbus/unidisk.cpp",
