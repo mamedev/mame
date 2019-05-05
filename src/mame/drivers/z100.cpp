@@ -253,6 +253,7 @@ void z100_state::video_start()
 MC6845_UPDATE_ROW(z100_state::update_row)
 {
 	uint32_t *const pix = &bitmap.pix32(y);
+	const uint16_t amask = m_vram_config->read() ? 0xfff : 0x7ff;
 
 	for (int x = 0; x < x_count; x++)
 	{
@@ -266,7 +267,7 @@ MC6845_UPDATE_ROW(z100_state::update_row)
 			else
 			{
 				for (int i = 0; i < 3; i++)
-					dot |= ((m_gvram[((x + ma) & 0xfff) << 4 | (ra & 0xf) | (0x10000*i)] >> (7-xi)) & 1) << i; // b, r, g
+					dot |= ((m_gvram[((x + ma) & amask) << 4 | (ra & 0xf) | (0x10000*i)] >> (7-xi)) & 1) << i; // b, r, g
 
 				if (x == cursor_x)
 					dot ^= 7;
