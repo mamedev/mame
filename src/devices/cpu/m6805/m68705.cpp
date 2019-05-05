@@ -917,7 +917,7 @@ void m6805_timer::update(unsigned count)
 		return;
 
 	// compute new prescaler value and counter decrements
-	unsigned const prescale = m_prescale + ((m_source == TIMER) ? m_timer_edges : count);
+	unsigned const prescale = (m_prescale & ((1 << m_divisor) - 1)) + ((m_source == TIMER) ? m_timer_edges : count);
 	unsigned const decrements(prescale >> m_divisor);
 
 	// check for zero crossing
