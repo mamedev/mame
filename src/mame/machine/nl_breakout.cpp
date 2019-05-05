@@ -124,8 +124,8 @@ CIRCUIT_LAYOUT( breakout )
 	ANALOG_INPUT(V5, 5)
 	ALIAS(VCC, V5)
 
-#define GNDD "ttllow", Q
-#define P "ttlhigh", Q
+#define GNDD "GND", Q
+#define P "V5", Q
 
 	//----------------------------------------------------------------
 	// Clock circuit

@@ -8,7 +8,7 @@
 #include "nld_4316.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
-#include "nlid_cmos.h"
+#include "nlid_system.h"
 
 namespace netlist { namespace devices {
 
@@ -16,7 +16,7 @@ namespace netlist { namespace devices {
 	{
 		NETLIB_CONSTRUCTOR(CD4316_GATE)
 		NETLIB_FAMILY("CD4XXX")
-		, m_supply(*this, "PS")
+		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "_R")
 		, m_S(*this, "S")
 		, m_E(*this, "E")
@@ -28,7 +28,7 @@ namespace netlist { namespace devices {
 		NETLIB_UPDATEI();
 
 	public:
-		NETLIB_SUB(vdd_vss)        m_supply;
+		nld_power_pins             m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 
 		logic_input_t              m_S;

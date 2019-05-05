@@ -755,7 +755,8 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const state_e state);
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state,
+			nldelegate delegate = nldelegate());
 
 		const analog_net_t & net() const NL_NOEXCEPT;
 		analog_net_t & net() NL_NOEXCEPT;
@@ -869,8 +870,9 @@ namespace netlist
 	{
 	public:
 		/*! Constructor */
-		analog_input_t(core_device_t &dev, /*!< owning device */
-				const pstring &aname       /*!< name of terminal */
+		analog_input_t(core_device_t &dev,  /*!< owning device */
+				const pstring &aname,       /*!< name of terminal */
+				nldelegate delegate = nldelegate() /*!< delegate */
 		);
 
 		/*! returns voltage at terminal.
