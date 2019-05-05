@@ -143,6 +143,7 @@ public:
 	void pc40iii(machine_config &config);
 	void atvga(machine_config &config);
 	void at386(machine_config &config);
+	void m290(machine_config &config);
 	void ncrpc8(machine_config &config);
 	void n8810m55(machine_config &config);
 	void ews286(machine_config &config);
@@ -1697,6 +1698,15 @@ ROM_START( n8810m55 )
 	ROM_LOAD16_BYTE( "150-3872_u113_27_4.5.1.bin", 0x10001, 0x8000, CRC(35ff4fba) SHA1(557f0f98c27af76f6fa6990592e7150f5fc1fc02))
 	ROM_LOAD16_BYTE( "150-3873_u127_30_4.5.1.bin", 0x10000, 0x8000, CRC(5a7e6643) SHA1(f3890919a772eead7232bd227b2c8677377f6e24))
 ROM_END
+
+// Olivetti M290 - has an Olivetti branded Paradise VGA - locks up with "Error 2" and a key symbol
+ROM_START( m290 )
+	ROM_REGION( 0x20000, "bios", 0 )
+   	ROM_LOAD( "m290_pep3_1.25.bin", 0x10000, 0x10000, CRC(cb57d677) SHA1(4bdf5c52567c129b413c866c63b5fb3562fccd23))
+
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "m290_csl0_1.10.bin", 0x000, 0x0800, CRC(d767d496) SHA1(84246f7b39e0a005425948931cf93624b831e121) )
+ROM_END
 	
 
 // Nokia Data WS286
@@ -1765,4 +1775,5 @@ COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
+COMP( 198?, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

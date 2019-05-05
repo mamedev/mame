@@ -2406,7 +2406,7 @@ comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
-pcd2                            // Siemens PCD-2
+pcd2                            // 1986 Siemens PCD-2
 ct386sx                         //
 ec1842                          //
 ec1849                          //
@@ -2418,6 +2418,7 @@ ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
+m290							// Olivetti M290
 megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
