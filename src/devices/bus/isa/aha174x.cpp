@@ -91,7 +91,12 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1740_device::hpc_map);
 
+	AIC565(config, m_busaic);
+	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
+	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
+
 	I82355(config, "bmic", 0);
+	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
