@@ -13,6 +13,7 @@
 
 #include "isa.h"
 #include "machine/aic565.h"
+#include "machine/aic6250.h"
 #include "machine/upd765.h"
 
 class aha154x_device : public device_t, public device_isa16_card_interface
@@ -21,12 +22,25 @@ protected:
 	aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
+	void dma_mode_w(u8 data);
+	u8 fifo_data_r();
+	void fifo_data_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(aic_breq_w);
+
+	void i8085_base_map(address_map &map);
 	void scsi_add(machine_config &config);
 	void scsic_config(device_t *device);
 
+	required_device<aic6250_device> m_scsic;
 	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u8> m_bios;
+	required_shared_ptr<u8> m_fifo_data;
+
+	u8 m_fifo_read_index;
+	u8 m_fifo_write_index;
+	u8 m_dma_mode;
 };
 
 class aha1542a_device : public aha154x_device

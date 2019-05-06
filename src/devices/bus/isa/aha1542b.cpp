@@ -13,7 +13,6 @@
 #include "aha1542b.h"
 
 #include "cpu/i8085/i8085.h"
-#include "machine/aic6250.h"
 #include "machine/gen_latch.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_hd.h"
@@ -26,8 +25,13 @@ DEFINE_DEVICE_TYPE(AHA1542B, aha1542b_device, "aha1542b", "AHA-1542B SCSI Contro
 aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
+	, m_scsic(*this, "scsi:7:scsic")
 	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
+	, m_fifo_data(*this, "fifo_data")
+	, m_fifo_read_index(0)
+	, m_fifo_write_index(0)
+	, m_dma_mode(0)
 {
 }
 
@@ -44,23 +48,80 @@ aha1542b_device::aha1542b_device(const machine_config &mconfig, const char *tag,
 
 void aha154x_device::device_start()
 {
+	save_item(NAME(m_fifo_read_index));
+	save_item(NAME(m_fifo_write_index));
+	save_item(NAME(m_dma_mode));
+}
+
+void aha154x_device::device_reset()
+{
+	m_fifo_read_index = 0;
+	m_fifo_write_index = 0;
+	m_dma_mode = 0;
+}
+
+void aha154x_device::dma_mode_w(u8 data)
+{
+	m_dma_mode = data;
+}
+
+u8 aha154x_device::fifo_data_r()
+{
+	const u8 data = m_fifo_data[m_fifo_read_index];
+	if (!machine().side_effects_disabled())
+		m_fifo_read_index = (m_fifo_read_index + 1) % 10;
+	return data;
+}
+
+void aha154x_device::fifo_data_w(u8 data)
+{
+	m_fifo_data[m_fifo_write_index] = data;
+	if (!machine().side_effects_disabled())
+		m_fifo_write_index = (m_fifo_write_index + 1) % 10;
+}
+
+WRITE_LINE_MEMBER(aha154x_device::aic_breq_w)
+{
+	if (state)
+	{
+		if (m_dma_mode == 0x80)
+		{
+			m_fifo_data[m_fifo_write_index] = m_scsic->dma_r();
+			m_fifo_write_index = (m_fifo_write_index + 1) % 10;
+			m_scsic->back_w(0);
+		}
+		else if (m_dma_mode == 0x90)
+		{
+			m_scsic->dma_w(m_fifo_data[m_fifo_read_index]);
+			m_fifo_read_index = (m_fifo_read_index + 1) % 10;
+			m_scsic->back_w(0);
+		}
+		else
+			logerror("AIC-6250 BREQ (DMA mode %02X)\n", m_dma_mode);
+	}
+}
+
+void aha154x_device::i8085_base_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("mcode", 0);
+	map(0x8000, 0x800f).m(m_scsic, FUNC(aic6250_device::map));
+	map(0xc082, 0xc082).w(FUNC(aha154x_device::dma_mode_w));
+	map(0xc0ac, 0xc0ac).rw(FUNC(aha154x_device::fifo_data_r), FUNC(aha154x_device::fifo_data_w));
+	map(0xc0c0, 0xc0c9).ram().share("fifo_data");
+	map(0xe000, 0xe7ff).ram();
 }
 
 void aha1542a_device::i8085_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("mcode", 0);
-	map(0x8000, 0x800f).m("scsi:7:scsic", FUNC(aic6250_device::map));
+	i8085_base_map(map);
 	map(0xa001, 0xa001).r("fromhost", FUNC(generic_latch_8_device::read));
 	map(0xa001, 0xa001).w("tohost", FUNC(generic_latch_8_device::write));
-	map(0xe000, 0xe7ff).ram();
 }
 
 void aha1542b_device::i8085_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("mcode", 0);
-	map(0x8000, 0x800f).m("scsi:7:scsic", FUNC(aic6250_device::map));
+	i8085_base_map(map);
 	map(0xa000, 0xa003).rw(m_busaic, FUNC(aic565_device::local_r), FUNC(aic565_device::local_w));
-	map(0xe000, 0xe7ff).ram();
 }
 
 static INPUT_PORTS_START(aha1542a)
@@ -346,6 +407,7 @@ void aha154x_device::scsic_config(device_t *device)
 {
 	device->set_clock(20'000'000);
 	downcast<aic6250_device &>(*device).int_cb().set_inputline("^^localcpu", I8085_RST65_LINE);
+	downcast<aic6250_device &>(*device).breq_cb().set("^^", FUNC(aha154x_device::aic_breq_w));
 	downcast<aic6250_device &>(*device).port_a_r_cb().set_ioport("^^SETUP");
 	downcast<aic6250_device &>(*device).port_b_r_cb().set_ioport("^^CONFIG");
 }
