@@ -66,25 +66,39 @@ static const int zoomy_conv_table[] =
 	0x67,0x68,0x6a,0x6b,0x6c,0x6e,0x6f,0x71, 0x72,0x74,0x76,0x78,0x80,0x7b,0x7d,0x7f
 };
 
-inline void taitoh_state::draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 tile_offs, int x, int y, int zx, int zy)
+inline void taitoh_state::draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 tile_offs, int sx, int sy, int ysize, int dx, int dy, int zx, int zy)
 {
-	const u32 tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
-	const u32 color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
-	int flipx       = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
-	int flipy       = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
-
-	if (m_tc0080vco->flipscreen_r())
+	int y = sy;
+	for (int j = 0; j < ysize; j++)
 	{
-		flipx ^= 0x0040;
-		flipy ^= 0x0080;
-	}
+		int x = sx;
+		for (int k = 0; k < 4; k++)
+		{
+			if (tile_offs >= 0x1000)    /* or dleague pitcher gets blanked */
+			{
+				const u32 tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+				const u32 color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+				int flipx       = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+				int flipy       = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
-	m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
-				tile,
-				color,
-				flipx, flipy,
-				x, y,
-				zx, zx, 0);
+				if (m_tc0080vco->flipscreen_r())
+				{
+					flipx ^= 0x0040;
+					flipy ^= 0x0080;
+				}
+
+				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+							tile,
+							color,
+							flipx, flipy,
+							x, y,
+							zx, zy, 0);
+			}
+			tile_offs++;
+			x += dx;
+		}
+		y += dy;
+	}
 }
 
 /***************************************************************************
@@ -139,21 +153,7 @@ void taitoh_state::syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 				y0 += 2;
 			}
 
-			int y = y0;
-			for (int j = 0; j < ysize; j++)
-			{
-				int x = x0;
-				for (int k = 0; k < 4; k++)
-				{
-					if (tile_offs >= 0x1000)
-					{
-						draw_single_sprite(bitmap, cliprect, tile_offs, x, y, zx, zx);
-					}
-					tile_offs++;
-					x += dx;
-				}
-				y += dx;
-			}
+			draw_single_sprite(bitmap, cliprect, tile_offs, x0, y0, ysize, dx, dx, zx, zx);
 		}
 	}
 }
@@ -225,21 +225,7 @@ void taitoh_state::recordbr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 				y0 += 2;
 			}
 
-			int y = y0;
-			for (int j = 0; j < ysize; j++)
-			{
-				int x = x0;
-				for (int k = 0; k < 4; k++)
-				{
-					if (tile_offs >= 0x1000)
-					{
-						draw_single_sprite(bitmap, cliprect, tile_offs, x, y, zx, zy);
-					}
-					tile_offs++;
-					x += dx;
-				}
-				y += dy;
-			}
+			draw_single_sprite(bitmap, cliprect, tile_offs, x0, y0, ysize, dx, dy, zx, zy);
 		}
 	}
 }
@@ -299,21 +285,7 @@ void taitoh_state::dleague_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 
 			if (priority == pribit)
 			{
-				int y = y0;
-				for (int j = 0; j < ysize; j++)
-				{
-					int x = x0;
-					for (int k = 0; k < 4; k++)
-					{
-						if (tile_offs >= 0x1000)    /* or pitcher gets blanked */
-						{
-							draw_single_sprite(bitmap, cliprect, tile_offs, x, y, zx, zx);
-						}
-						tile_offs++;
-						x += dx;
-					}
-					y += dx;
-				}
+				draw_single_sprite(bitmap, cliprect, tile_offs, x0, y0, ysize, dx, dx, zx, zx);
 			}
 		}
 	}

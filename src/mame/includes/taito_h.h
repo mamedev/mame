@@ -67,7 +67,7 @@ private:
 	void syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void recordbr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void dleague_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	inline void draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 tile_offs, int x, int y, int zx, int zy);
+	inline void draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 tile_offs, int sx, int sy, int ysize, int dx, int dy, int zx, int zy);
 	void taitoh_log_vram();
 	void dleague_map(address_map &map);
 	void recordbr_map(address_map &map);
