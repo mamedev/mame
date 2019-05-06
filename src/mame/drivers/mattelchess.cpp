@@ -11,8 +11,6 @@ Hardware notes:
 - custom LCD screen with chess squares background
 
 TODO:
-- It goes bonkers at computer's turn, it reads from LCD RAM and seems it doesn't
-  get the data it expects
 - add SAVE switch
 - internal artwork
 
@@ -120,8 +118,8 @@ WRITE8_MEMBER(mchess_state::lcd_w)
 	// d5: both LCDC DATA IN
 	for (int i = 0; i < 2; i++)
 	{
-		m_lcd[i]->clock_w(BIT(data, 4));
 		m_lcd[i]->data_w(BIT(data, 5));
+		m_lcd[i]->clock_w(BIT(~data, 4));
 	}
 
 	m_lcd_control = data;
@@ -216,4 +214,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, mchess, 0,      0, mchess,  mchess, mchess_state, empty_init, "Mattel", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+CONS( 1980, mchess, 0,      0, mchess,  mchess, mchess_state, empty_init, "Mattel", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

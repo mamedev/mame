@@ -9,9 +9,6 @@
   0530: specifications unknown, pinout seems similar to 0569
   0601: specifications unknown, pinout seems similar to 0569
 
-  TODO:
-  - read mode is untested
-
 */
 
 #include "emu.h"
@@ -129,7 +126,13 @@ void hlcd0515_device::set_control()
 	}
 
 	// clock 4: read/write mode
-	m_buffer = (m_control & 1) ? m_ram[m_rowsel] : 0;
+	if (m_control & 1)
+	{
+		m_buffer = m_ram[m_rowsel];
+		clock_data(-1);
+	}
+	else
+		m_buffer = 0;
 }
 
 void hlcd0569_device::set_control()
@@ -143,11 +146,11 @@ void hlcd0515_device::clock_data(int col)
 {
 	if (m_control & 1)
 	{
-		if (col < m_colmax)
-			m_buffer <<= 1;
-
-		m_dataout = m_buffer >> m_colmax & 1;
+		m_dataout = m_buffer & 1;
 		m_write_data(m_dataout);
+
+		if (col < m_colmax)
+			m_buffer >>= 1;
 	}
 	else
 	{
