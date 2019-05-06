@@ -1430,8 +1430,7 @@ void a4000_state::a400030_mem(address_map &map)
 {
 	map.unmap_value_high();
 	a4000_mem(map);
-	map(0x07000000, 0x07dfffff).noprw(); // motherboard ram
-	map(0x07e00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+	map(0x07000000, 0x07dfffff).noprw(); // Drop the first 2Mb
 }
 
 // 2MB chip RAM and CD-ROM

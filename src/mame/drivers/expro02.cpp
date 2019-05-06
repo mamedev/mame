@@ -816,7 +816,6 @@ void expro02_state::supmodel_map(address_map &map)
 {
 	expro02_video_base_map_noview2(map);
 	map(0x000000, 0x4fffff).rom();
-	map(0x500000, 0x51ffff).ram().share("fgvideoram");
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
@@ -835,7 +834,6 @@ void expro02_state::smissw_map(address_map &map)
 {
 	expro02_video_base_map_noview2(map);
 	map(0x000000, 0x4fffff).rom();
-	map(0x500000, 0x51ffff).ram().share("fgvideoram");
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");

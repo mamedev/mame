@@ -255,8 +255,8 @@ void m62_state::ldrun3_map(address_map &map)
 	map(0xcc00, 0xcc00).r(FUNC(m62_state::ldrun3_prot_7_r));
 	map(0xcfff, 0xcfff).r(FUNC(m62_state::ldrun3_prot_7_r));
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xd000, 0xefff).ram();
 	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
 }
 
 void m62_state::ldrun3_io_map(address_map &map)

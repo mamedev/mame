@@ -89,9 +89,9 @@ void goindol_state::goindol_map(address_map &map)
 	map(0xc800, 0xc800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write)); // watchdog?
 	map(0xc810, 0xc810).w(FUNC(goindol_state::goindol_bankswitch_w));
 	map(0xc820, 0xc820).portr("DIAL");
-	map(0xc820, 0xd820).writeonly().share("fg_scrolly");
+	map(0xc820, 0xc820).writeonly().share("fg_scrolly");
 	map(0xc830, 0xc830).portr("P1");
-	map(0xc830, 0xd830).writeonly().share("fg_scrollx");
+	map(0xc830, 0xc830).writeonly().share("fg_scrollx");
 	map(0xc834, 0xc834).portr("P2");
 	map(0xd000, 0xd03f).ram().share("spriteram");
 	map(0xd040, 0xd7ff).ram();

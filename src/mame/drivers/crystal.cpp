@@ -247,7 +247,6 @@ public:
 	crystal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_sysregs(*this, "sysregs"),
-		m_crtcregs(*this, "crtcregs"),
 		m_workram(*this, "workram"),
 		m_vidregs(*this, "vidregs"),
 		m_textureram(*this, "textureram"),
@@ -277,7 +276,7 @@ public:
 private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_sysregs;
-	required_shared_ptr<uint32_t> m_crtcregs;
+	uint32_t *m_crtcregs;
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_vidregs;
 	required_shared_ptr<uint32_t> m_textureram;
@@ -676,7 +675,7 @@ void crystal_state::internal_map(address_map &map)
 //  map(0x01802400, 0x018027ff)                            // Peripheral Chip Select
 //  map(0x01802800, 0x01802bff)                            // SIO
 //  map(0x01803400, 0x018037ff)                            // CRT Controller
-	map(0x01803400, 0x018037ff).rw(FUNC(crystal_state::crtc_r), FUNC(crystal_state::crtc_w)).share("crtcregs");
+	map(0x01803400, 0x018037ff).rw(FUNC(crystal_state::crtc_r), FUNC(crystal_state::crtc_w));
 //  map(0x01804000, 0x018043ff)                            // RAMDAC & PLL
 
 //  map(0x02000000, 0x02ffffff).ram().share("workram");    // Local RAM/DRAM (Max.16MB)
@@ -1008,7 +1007,7 @@ void crystal_state::machine_reset()
 {
 	std::fill_n(&m_sysregs[0], m_sysregs.bytes() / 4, 0);
 	std::fill_n(&m_vidregs[0], m_vidregs.bytes() / 4, 0);
-	std::fill_n(&m_crtcregs[0], m_crtcregs.bytes() / 4, 0);
+	m_crtcregs = &m_sysregs[0x3400/4];
 	m_crtcregs[1] = 0x00000022;
 
 	m_FlipCount = 0;

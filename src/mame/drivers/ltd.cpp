@@ -108,8 +108,6 @@ void ltd_state::ltd3_map(address_map &map)
 
 void ltd_state::ltd4_map(address_map &map)
 {
-	map(0x0000, 0x001f).ram(); // internal to the cpu
-	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("nvram");
 	map(0x0800, 0x0800).w(FUNC(ltd_state::count_reset_w));
 	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));

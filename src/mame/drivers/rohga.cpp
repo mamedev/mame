@@ -221,8 +221,9 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x380000, 0x381fff).ram().w(m_decocomn, FUNC(decocomn_device::buffered_palette_w)).share("paletteram");
 	map(0x390008, 0x390009).w(m_decocomn, FUNC(decocomn_device::palette_dma_w));
 
-	map(0xfdc000, 0xffffff).ram();
+	map(0xfdc000, 0xfe3fff).ram();
 	map(0xfe4000, 0xfe7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0xfe8000, 0xffffff).ram();
 }
 
 

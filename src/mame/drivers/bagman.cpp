@@ -133,14 +133,11 @@ void bagman_state::main_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram();
 	map(0x9000, 0x93ff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
 	map(0xa000, 0xa000).r(FUNC(bagman_state::pal16r6_r));
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xc000, 0xffff).rom(); /* Super Bagman only */
-	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
-									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
 	map(0xa800, 0xa807).w(FUNC(bagman_state::ls259_w)); /* TMS5110 driving state machine */
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb800, 0xb800).nopr();                             /* looks like watchdog from schematics */
@@ -158,10 +155,7 @@ void bagman_state::pickin_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x7000, 0x77ff).ram();
 	map(0x8800, 0x8bff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
-	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
-									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).portr("DSW");
