@@ -44,7 +44,6 @@ protected:
 void o2_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("bank1");
-	map(0x00000000, 0x00000fff).ram();
 	map(0x14000000, 0x15ffffff).m(m_crime, FUNC(crime_device::map));
 	map(0x1f000000, 0x1f3fffff).m(m_mace, FUNC(mace_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);

@@ -5254,13 +5254,6 @@ WRITE16_MEMBER(nmk16_state::afega_scroll_w)
 	COMBINE_DATA(&m_afega_scroll[Scroll][offset]);
 }
 
-/*
- Lines starting with an empty comment in the following MemoryReadAddress
- arrays are there for debug (e.g. the game does not read from those ranges
- AFAIK)
-*/
-
-
 void nmk16_state::afega_map(address_map &map)
 {
 	map.global_mask(0xfffff);
@@ -5269,16 +5262,12 @@ void nmk16_state::afega_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");            // P1 + P2
 	map(0x080004, 0x080005).portr("DSW1");           // 2 x DSW
 	map(0x080012, 0x080013).r(FUNC(nmk16_state::afega_unknown_r));
-	map(0x080000, 0x08001d).writeonly();               //
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
-	map(0x080020, 0x087fff).writeonly();               //
 	map(0x084000, 0x084003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x084004, 0x084007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x088000, 0x0885ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x088600, 0x08bfff).writeonly();               //
 	map(0x08c000, 0x08c003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>)).share("afega_scroll_0");   // Scroll
 	map(0x08c004, 0x08c007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>)).share("afega_scroll_1");   //
-	map(0x08c008, 0x08ffff).writeonly();               //
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");    // Layer 0                  // ?
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");  // Layer 1
 
@@ -5295,16 +5284,12 @@ void nmk16_state::firehawk_map(address_map &map)
 	map(0x280002, 0x280003).portr("IN1");            // P1 + P2
 	map(0x280004, 0x280005).portr("DSW1");           // 2 x DSW
 	map(0x280012, 0x280013).r(FUNC(nmk16_state::afega_unknown_r));
-	map(0x280000, 0x28001d).writeonly();               //
 	map(0x28001f, 0x28001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
-	map(0x280020, 0x287fff).writeonly();               //
 	map(0x284000, 0x284003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x284004, 0x284007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x288000, 0x2885ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x288600, 0x28bfff).writeonly();               //
 	map(0x28c000, 0x28c003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>)).share("afega_scroll_0");   // Scroll
 	map(0x28c004, 0x28c007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>)).share("afega_scroll_1");   //
-	map(0x28c008, 0x28ffff).writeonly();               //
 	map(0x290000, 0x293fff).ram().w(FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");    // Layer 0                  // ?
 	map(0x29c000, 0x29c7ff).ram().w(FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");  // Layer 1
 

@@ -27,7 +27,7 @@
       The sub CPU bit-bangs 30864 bits worth of data to 0x40000003 twice.
 
     - There seems to be a bug in the game code drawing routines, causing objects to have some pixels
-      chopped off. This is most noticeable for distant thin objects (falgs, poles of the start banner).
+      chopped off. This is most noticeable for distant thin objects (flags, poles of the start banner).
       See maincpu routine at 387B8, specifically the jump at 3880E throws 4 horizontal pixels away.
 
     - The player often disappears (when she's too slow?). Is this normal ?
@@ -378,7 +378,7 @@ void skimaxx_state::m68030_2_map(address_map &map)
 	map(0xfffc0000, 0xfffcffff).ram().share("share1");
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
 	map(0xfffe0000, 0xfffeffff).ram().share("share1");  // HACK
-	map(0xfffe0010, 0xfffeffff).ram();             // HACK
+	//	map(0xfffe0010, 0xfffeffff).ram();             // HACK
 	map(0xffff0000, 0xffffffff).ram();
 }
 

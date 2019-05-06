@@ -2,6 +2,34 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
+	<software name="poohstuck" supported="no">
+		<description>Disney's Pooh Gets Stuck (UK)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<!-- No serial on cart or book -->
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500 - Pooh Gets Stuck.bin" size="0x200000" crc="3cfcfdfe" sha1="ec91a563baa1939e99ff5ad6061fc1876be40f0d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rsblwbea" supported="no">
+		<description>Richard Scarry's Best Little Word Book Ever! (UK)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<!-- No serial on cart or book -->
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="LeapFrog 2000 16Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500 - Richard Scarry's Best Little Word Book Ever.bin" size="0x200000" crc="d4dd4c2f" sha1="a5027d38a80135d0dc332e075e757c951b6c04bf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hititmstro" supported="no">
 		<description>Music - Hit it, Maestro! (UK)</description>
 		<year>2001</year>
@@ -138,6 +166,21 @@
 		</part>
 	</software>
 
+	<software name="scoobydonut" supported="no">
+		<description>Leap 1 - Reading - Cartoon Network Scooby-Doo! and the Disappearing Donuts (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00538"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00538 - Leap 1 - Reading - Scooby-Doo! and the Disappearing Donuts.bin" size="0x200000" crc="cd887b33" sha1="c51c83f0abe6ede9aa03abcc38fc3a3feb1f249c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dinobdark" supported="no">
 		<description>- Great Reader Series - Dinosaurs Before Dark (UK)</description>
 		<year>2002</year>
@@ -260,6 +303,21 @@
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10478 UBL - LeapPad - Libro Interactivo (SP).bin" size="0x400000" crc="6a85ec74" sha1="024927d8eae8c4327079dd7d752f483445b51f3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystory2" supported="no">
+		<description>Toy Story 2 (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10497 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2911"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10497 UBL - Toy Story 2.bin" size="0x400000" crc="a5e841e2" sha1="7dbb0f053cbf8e9459a964bec43a5013d84ae87b" />
 			</dataarea>
 		</part>
 	</software>
@@ -393,6 +451,21 @@
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10875 UBL - Fiesta in the House! - Party en la Casa!.bin" size="0x400000" crc="0b058df5" sha1="06931683c181c04b967da63e9fab160f6596c5e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princesstry" supported="no">
+		<description>Disney Princess - Princess Stories (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10900 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7210"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10900 UBL - Disney Princess - Princess Stories.bin" size="0x200000" crc="dfc09ce8" sha1="85645ade8b7a472b113e1ad2fecfd9cd2210665f" />
 			</dataarea>
 		</part>
 	</software>

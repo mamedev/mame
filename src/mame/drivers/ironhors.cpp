@@ -124,15 +124,14 @@ void ironhors_state::farwest_master_map(address_map &map)
 	map(0x1a00, 0x1a00).ram().share("int_enable");
 	map(0x1a01, 0x1a01).ram().w(FUNC(ironhors_state::charbank_w));
 	map(0x1a02, 0x1a02).w(FUNC(ironhors_state::palettebank_w));
-//  map(0x1c00, 0x1fff).ram();
+	map(0x1e00, 0x1eff).ram().share("spriteram");
 	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
 	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x1c00, 0x1dff).ram().share("spriteram2");
-	map(0x3000, 0x38ff).ram();
+	map(0x3000, 0x31da).ram();
 	map(0x31db, 0x31fa).ram().share("scroll");
-	map(0x1e00, 0x1eff).ram().share("spriteram");
-	map(0x3900, 0x3fff).ram();
+	map(0x31fb, 0x3fff).ram();
 	map(0x4000, 0xffff).rom();
 }
 

@@ -46,6 +46,7 @@ aha174x_device::aha174x_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_hpc(*this, "hpc")
+	, m_busaic(*this, "busaic")
 	, m_bios(*this, "bios")
 {
 }
@@ -68,6 +69,7 @@ void aha174x_device::device_start()
 
 void aha174x_device::hpc_map(address_map &map)
 {
+	map(0x2000, 0x2003).rw(m_busaic, FUNC(aic565_device::local_r), FUNC(aic565_device::local_w));
 	map(0x4000, 0x4002).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w));
 	map(0x5000, 0x500f).m("scsi:7:scsic", FUNC(aic6251a_device::map));
 	map(0x8000, 0xffff).rom().region("mcode", 0);
@@ -89,7 +91,12 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1740_device::hpc_map);
 
+	AIC565(config, m_busaic);
+	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
+	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
+
 	I82355(config, "bmic", 0);
+	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
@@ -108,7 +115,12 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1742a_device::hpc_map);
 
+	AIC565(config, m_busaic);
+	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
+	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
+
 	I82355(config, "bmic", 0);
+	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);

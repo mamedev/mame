@@ -408,9 +408,8 @@ void ssv_state::ssv_map(address_map &map, u32 rom)
 	map(0x100000, 0x13ffff).ram().share("spriteram");                                                                /*  Sprites */
 	map(0x140000, 0x15ffff).ram().w("palette", FUNC(palette_device::write16)).share("palette");                      /*  Palette */
 	map(0x160000, 0x17ffff).ram();                                                                                   /*          */
+	map(0x1c0000, 0x1c007f).ram().w(FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
 	map(0x1c0000, 0x1c0001).r(FUNC(ssv_state::vblank_r));                                                      /*  Vblank? */
-/**/map(0x1c0002, 0x1c007f).readonly();                                                                              /*  Scroll  */
-	map(0x1c0000, 0x1c007f).w(FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
 	map(0x210002, 0x210003).portr("DSW1");
 	map(0x210004, 0x210005).portr("DSW2");
 	map(0x210008, 0x210009).portr("P1");

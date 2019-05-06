@@ -923,9 +923,9 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x400000, 0x40000b).ram().share("output");                                                      /* CPS2 object output */
 	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
 	map(0x660000, 0x663fff).ram();                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
-	map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	//	map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	//	map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	//	map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x664000, 0x664001).ram();                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
 	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
 	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
@@ -956,9 +956,9 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x400000, 0x40000b).ram().share("output");                                                      /* CPS2 object output */
 	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
 	map(0x660000, 0x663fff).ram();                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
-	map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	//	map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	//	map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	//	map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
 	map(0x664000, 0x664001).ram();                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
 	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
 	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */

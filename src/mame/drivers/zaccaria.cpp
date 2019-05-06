@@ -148,9 +148,8 @@ WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
 void zaccaria_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x63ff).readonly();
+	map(0x6000, 0x67ff).ram().w(FUNC(zaccaria_state::videoram_w)).share("videoram"); /* 6400-67ff is 4 bits wide */
 	map(0x6400, 0x6407).r(FUNC(zaccaria_state::prot1_r));
-	map(0x6000, 0x67ff).w(FUNC(zaccaria_state::videoram_w)).share("videoram"); /* 6400-67ff is 4 bits wide */
 	map(0x6800, 0x683f).w(FUNC(zaccaria_state::attributes_w)).share("attributesram");
 	map(0x6840, 0x685f).ram().share("spriteram");
 	map(0x6881, 0x68c0).ram().share("spriteram2");
