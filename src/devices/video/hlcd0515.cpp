@@ -2,12 +2,16 @@
 // copyright-holders:hap
 /*
 
-  Hughes HLCD 0515 family LCD Driver
+Hughes HLCD 0515 family LCD Driver
 
-  0515: 25 columns(also size of buffer/ram)
-  0569: 24 columns, display blank has no effect(instead it's external with VDRIVE?)
-  0530: specifications unknown, pinout seems similar to 0569
-  0601: specifications unknown, pinout seems similar to 0569
+0515: 25 columns(also size of buffer/ram)
+0569: 24 columns, display blank has no effect(instead it's external with VDRIVE?)
+0530: specifications unknown, pinout seems similar to 0569
+0601: specifications unknown, pinout seems similar to 0569
+
+TODO:
+- Does DATA OUT pin function the same on each chip? The 0515 datasheet says that
+  the 25th column is output first, but on 0569(no datasheet available) it's reversed.
 
 */
 
@@ -129,7 +133,7 @@ void hlcd0515_device::set_control()
 	if (m_control & 1)
 	{
 		m_buffer = m_ram[m_rowsel];
-		clock_data(-1);
+		clock_data();
 	}
 	else
 		m_buffer = 0;
@@ -149,8 +153,7 @@ void hlcd0515_device::clock_data(int col)
 		m_dataout = m_buffer & 1;
 		m_write_data(m_dataout);
 
-		if (col < m_colmax)
-			m_buffer >>= 1;
+		m_buffer >>= 1;
 	}
 	else
 	{

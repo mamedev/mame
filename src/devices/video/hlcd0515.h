@@ -63,7 +63,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void set_control();
-	void clock_data(int col);
+	void clock_data(int col = 0);
 
 	const u8 m_colmax;    // number of column pins
 

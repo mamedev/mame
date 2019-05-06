@@ -11,7 +11,6 @@ Hardware notes:
 - custom LCD screen with chess squares background
 
 TODO:
-- add SAVE switch
 - internal artwork
 
 ******************************************************************************/
@@ -37,18 +36,23 @@ public:
 
 	void mchess(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
+
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device_array<hlcd0569_device, 2> m_lcd;
-	required_ioport_array<3> m_inputs;
+	required_ioport_array<4> m_inputs;
 	output_finder<2, 8, 22> m_out_x;
 
 	u8 m_inp_mux;
 	u8 m_lcd_control;
+
+	void update_reset(ioport_value state);
 
 	// I/O handlers
 	template<int Sel> DECLARE_WRITE32_MEMBER(lcd_output_w);
@@ -72,6 +76,19 @@ void mchess_state::machine_start()
 	save_item(NAME(m_lcd_control));
 }
 
+void mchess_state::machine_reset()
+{
+	update_reset(m_inputs[3]->read());
+}
+
+void mchess_state::update_reset(ioport_value state)
+{
+	// assume that SAVE switch powers off the CPU
+	// (at reboot, the game will read the chessboard positions from LCD RAM)
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 
 /******************************************************************************
     Devices, I/O
@@ -80,10 +97,12 @@ void mchess_state::machine_start()
 template<int Sel>
 WRITE32_MEMBER(mchess_state::lcd_output_w)
 {
+	int enabled = ~m_inputs[3]->read() & m_lcd_control & 1;
+
 	// output to x.y.z where x = chip, y = row, z = col
 	// up to 22 columns used
 	for (int i = 0; i < 22; i++)
-		m_out_x[Sel][offset][i] = BIT(data, i);
+		m_out_x[Sel][offset][i] = BIT(data, i) & enabled;
 }
 
 WRITE8_MEMBER(mchess_state::input_w)
@@ -161,6 +180,9 @@ static INPUT_PORTS_START( mchess )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Color")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Take Back")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, mchess_state, reset_switch, nullptr) PORT_NAME("Save Switch")
 INPUT_PORTS_END
 
 
