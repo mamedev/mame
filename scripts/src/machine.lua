@@ -3897,6 +3897,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/aic565.h,MACHINES["AIC565"] = true
+---------------------------------------------------
+
+if (MACHINES["AIC565"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/aic565.cpp",
+		MAME_DIR .. "src/devices/machine/aic565.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/aic6250.h,MACHINES["AIC6250"] = true
 ---------------------------------------------------
 

@@ -660,6 +660,7 @@ MACHINES["PS2INTC"] = true
 --MACHINES["IOPINTC"] = true
 --MACHINES["IOPSIO2"] = true
 --MACHINES["IOPTIMER"] = true
+MACHINES["AIC565"] = true
 MACHINES["AIC6250"] = true
 
 --------------------------------------------------

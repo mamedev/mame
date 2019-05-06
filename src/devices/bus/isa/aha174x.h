@@ -13,6 +13,7 @@
 
 #include "isa.h"
 #include "cpu/hpc/hpc.h"
+#include "machine/aic565.h"
 #include "machine/upd765.h"
 
 class aha174x_device : public device_t, public device_isa16_card_interface
@@ -26,6 +27,7 @@ protected:
 	void scsic_config(device_t *device);
 
 	required_device<hpc46003_device> m_hpc;
+	required_device<aic565_device> m_busaic;
 	required_region_ptr<u8> m_bios;
 };
 
