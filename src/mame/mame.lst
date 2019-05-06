@@ -18618,9 +18618,6 @@ spelunkrj                       // (c) 1985 licensed from Broderbund
 yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
 
-@source:spartanxtec.cpp
-spartanxtec
-
 @source:m63.cpp
 atomboy                         // M63 (c) 1985 Irem + Memetron license
 atomboya                        // M63 (c) 1985 Irem + Memetron license
@@ -18969,6 +18966,9 @@ excthour                        // TA-0015 (c) 1985 + Taito license
 maniach                         // TA-0017 (c) 1986 + Taito America license
 maniach2                        // TA-0017 (c) 1986 + Taito America license
 matmania                        // TA-0015 (c) 1985 + Taito America license
+
+@source:mattelchess.cpp
+mchess
 
 @source:maxaflex.cpp
 maxaflex                        //
@@ -35908,6 +35908,9 @@ starwarr                        // Potomac Mortgage
 
 @source:spaceg.cpp
 spaceg                          // (c) 19??
+
+@source:spartanxtec.cpp
+spartanxtec
 
 @source:spbactn.cpp
 spbactn                         // 9002 - (c) 1991 Tecmo

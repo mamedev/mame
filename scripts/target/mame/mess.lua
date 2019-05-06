@@ -2512,6 +2512,7 @@ files {
 	MAME_DIR .. "src/mame/video/aquarius.cpp",
 	MAME_DIR .. "src/mame/drivers/juicebox.cpp",
 	MAME_DIR .. "src/mame/drivers/hyperscan.cpp",
+	MAME_DIR .. "src/mame/drivers/mattelchess.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "matsushi")
