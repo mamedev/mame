@@ -14,6 +14,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "machine/aic6250.h"
+#include "machine/gen_latch.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_hd.h"
 
@@ -49,6 +50,8 @@ void aha1542a_device::i8085_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("mcode", 0);
 	map(0x8000, 0x800f).m("scsi:7:scsic", FUNC(aic6250_device::map));
+	map(0xa001, 0xa001).r("fromhost", FUNC(generic_latch_8_device::read));
+	map(0xa001, 0xa001).w("tohost", FUNC(generic_latch_8_device::write));
 	map(0xe000, 0xe7ff).ram();
 }
 
@@ -68,7 +71,7 @@ static INPUT_PORTS_START(aha1542a)
 	PORT_DIPNAME(0x02, 0x02, "Diagnostic Test Loop") PORT_DIPLOCATION("J1:2")
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) // Data accepted by host
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("tohost", generic_latch_8_device, pending_r)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_DIPNAME(0x10, 0x10, "SCSI Parity Checking") PORT_DIPLOCATION("J1:3")
 	PORT_DIPSETTING(0x00, "Disabled")
@@ -365,6 +368,11 @@ void aha1542a_device::device_add_mconfig(machine_config &config)
 {
 	i8085a_cpu_device &localcpu(I8085A(config, "localcpu", 10'000'000));
 	localcpu.set_addrmap(AS_PROGRAM, &aha1542a_device::i8085_map);
+
+	generic_latch_8_device &fromhost(GENERIC_LATCH_8(config, "fromhost"));
+	fromhost.data_pending_callback().set_inputline("localcpu", I8085_RST55_LINE);
+
+	GENERIC_LATCH_8(config, "tohost");
 
 	scsi_add(config);
 
