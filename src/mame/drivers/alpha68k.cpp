@@ -282,7 +282,7 @@ READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 
 WRITE8_MEMBER(alpha68k_state::outlatch_w)
 {
-	m_outlatch->write_bit((offset >> 2) & 7, BIT(offset, 5));
+	m_outlatch->write_bit((offset >> 3) & 7, BIT(offset, 6));
 }
 
 
