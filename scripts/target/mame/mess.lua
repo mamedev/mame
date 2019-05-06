@@ -691,6 +691,7 @@ MACHINES["IOPINTC"] = true
 MACHINES["IOPSIO2"] = true
 MACHINES["IOPTIMER"] = true
 MACHINES["Z8038"] = true
+MACHINES["AIC565"] = true
 MACHINES["AIC6250"] = true
 MACHINES["DC7085"] = true
 MACHINES["I82357"] = true
@@ -755,6 +756,7 @@ BUSES["GAMEBOY"] = true
 BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true
 BUSES["GENERIC"] = true
+BUSES["GIO"] = true
 BUSES["HEXBUS"] = true
 BUSES["HPHIL"] = true
 BUSES["HPDIO"] = true
@@ -3111,8 +3113,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/indy_indigo2.cpp",
 	MAME_DIR .. "src/mame/video/light.cpp",
 	MAME_DIR .. "src/mame/video/light.h",
-	MAME_DIR .. "src/mame/video/newport.cpp",
-	MAME_DIR .. "src/mame/video/newport.h",
 	MAME_DIR .. "src/mame/video/crime.cpp",
 	MAME_DIR .. "src/mame/video/crime.h",
 }

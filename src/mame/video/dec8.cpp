@@ -157,30 +157,29 @@ void dec8_state::allocate_buffered_spriteram16()
 /******************************************************************************/
 
 
-void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void dec8_state::srdarwin_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap)
 {
 	uint8_t *buffered_spriteram = m_spriteram->buffer();
-	int offs;
 
 	/* Sprites */
-	for (offs = 0; offs < 0x200; offs += 4)
+	for (int offs = 0x200 - 4; offs >= 0; offs -= 4)
 	{
-		int multi, fx, sx, sy, sy2, code, color;
+		u32 pri_mask = 0;
+		int sy2;
 
-		color = (buffered_spriteram[offs + 1] & 0x03) + ((buffered_spriteram[offs + 1] & 0x08) >> 1);
-		if (pri == 0 && color != 0) continue;
-		if (pri == 1 && color == 0) continue;
+		const u32 color = (buffered_spriteram[offs + 1] & 0x03) + ((buffered_spriteram[offs + 1] & 0x08) >> 1);
+		if (color == 0) pri_mask |= GFX_PMASK_2;
 
-		code = buffered_spriteram[offs + 3] + ((buffered_spriteram[offs + 1] & 0xe0) << 3);
+		const u32 code = buffered_spriteram[offs + 3] + ((buffered_spriteram[offs + 1] & 0xe0) << 3);
 		if (!code) continue;
 
-		sy = buffered_spriteram[offs];
+		int sy = buffered_spriteram[offs];
 		if (sy == 0xf8) continue;
 
-		sx = (241 - buffered_spriteram[offs + 2]);
+		int sx = (241 - buffered_spriteram[offs + 2]);
 
-		fx = buffered_spriteram[offs + 1] & 0x04;
-		multi = buffered_spriteram[offs + 1] & 0x10;
+		int fx = buffered_spriteram[offs + 1] & 0x04;
+		const bool multi = buffered_spriteram[offs + 1] & 0x10;
 
 		if (flip_screen())
 		{
@@ -191,17 +190,17 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 		}
 		else sy2 = sy + 16;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					code,
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+				code,
 				color,
 				fx,flip_screen(),
-				sx,sy,0);
+				sx,sy,primap,pri_mask,0);
 		if (multi)
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 				code+1,
 				color,
 				fx,flip_screen(),
-				sx,sy2,0);
+				sx,sy2,primap,pri_mask,0);
 	}
 }
 
@@ -412,12 +411,12 @@ VIDEO_START_MEMBER(dec8_state,shackled)
 
 uint32_t dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	m_bg_tilemap->set_scrollx(0, (m_scroll2[0] << 8) + m_scroll2[1]);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	srdarwin_draw_sprites(bitmap, cliprect, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	srdarwin_draw_sprites(bitmap, cliprect, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 2);
+	srdarwin_draw_sprites(bitmap, cliprect, screen.priority());
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

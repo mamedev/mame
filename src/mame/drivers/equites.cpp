@@ -638,11 +638,10 @@ WRITE_LINE_MEMBER(equites_state::mcu_switch_w)
 /******************************************************************************/
 // CPU Memory Maps
 
-void equites_state::equites_map(address_map &map)
+void equites_state::equites_common_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom(); // ROM area is written several times (dev system?)
-	map(0x040000, 0x040fff).ram();
 	map(0x080000, 0x080fff).rw(FUNC(equites_state::equites_fg_videoram_r), FUNC(equites_state::equites_fg_videoram_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c01ff).ram().w(FUNC(equites_state::equites_bg_videoram_w)).share("bg_videoram");
 	map(0x0c0200, 0x0c0fff).ram();
@@ -657,9 +656,15 @@ void equites_state::equites_map(address_map &map)
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
 
+void equites_state::equites_map(address_map &map)
+{
+	equites_common_map(map);
+	map(0x040000, 0x040fff).ram();
+}
+
 void gekisou_state::gekisou_map(address_map &map)
 {
-	equites_map(map);
+	equites_common_map(map);
 	map(0x040000, 0x040fff).ram().share("nvram"); // mainram is battery-backed
 	map(0x580000, 0x580001).select(0x020000).w(FUNC(gekisou_state::gekisou_unknown_bit_w));
 }

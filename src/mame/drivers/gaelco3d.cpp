@@ -429,16 +429,6 @@ WRITE_LINE_MEMBER(gaelco3d_state::tms_control3_w)
 		logerror("%06X:tms_control3_w = %d\n", m_maincpu->pc(), state);
 }
 
-
-WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
-{
-	COMBINE_DATA(&m_tms_comm_base[offset ^ m_tms_offset_xor]);
-	if (LOG)
-		logerror("%s:tms_comm_w(%02X) = %08X & %08X\n", machine().describe_context(), offset*2, data, mem_mask);
-}
-
-
-
 /*************************************
  *
  *  ADSP control registers
@@ -683,7 +673,6 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
 	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
-	map(0xfe7f80, 0xfe7fff).w(FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
 }
 
 
@@ -703,7 +692,6 @@ void gaelco3d_state::main020_map(address_map &map)
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
 	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
-	map(0xfe7f80, 0xfe7fff).w(FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
 }
 
 void gaelco3d_state::tms_map(address_map &map)

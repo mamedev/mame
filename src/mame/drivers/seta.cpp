@@ -2049,7 +2049,7 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();                             // ROM (up to 2MB)
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0x210000, 0x21ffff).ram();                             // RAM (gundhara)
-	map(0x300000, 0x30ffff).ram();                             // RAM (wrofaero only?)
+	map(0x300000, 0x30ffff).ram().share("nvram");              // actually 8K x8 SRAM in zombraid
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
@@ -2086,7 +2086,6 @@ void seta_state::wrofaero_map(address_map &map)
 void zombraid_state::zombraid_map(address_map &map)
 {
 	wrofaero_map(map);
-	map(0x300000, 0x30ffff).ram().share("nvram");           // actually 8K x8 SRAM
 	map(0xf00000, 0xf00001).w(FUNC(zombraid_state::gun_w));
 	map(0xf00002, 0xf00003).r(FUNC(zombraid_state::gun_r));
 }

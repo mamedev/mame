@@ -90,6 +90,7 @@ public:
 	void init_zerogun();
 	void init_sgt24h();
 	void init_srallyc();
+	void init_powsledm();
 
 protected:
 	virtual void machine_start() override;

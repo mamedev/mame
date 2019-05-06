@@ -1592,13 +1592,13 @@ void galaxian_state::galaxian_map(address_map &map)
 void galaxian_state::frogg_map(address_map &map)
 {
 	galaxian_map(map);
-	map(0x4000, 0x47ff).ram(); // needs a full 2k of RAM
+	map(0x4400, 0x47ff).ram(); // needs a full 2k of RAM
 }
 
 void galaxian_state::mandingarf_map(address_map &map)
 {
 	galaxian_map(map);
-	map(0x4000, 0x47ff).ram(); // needs a full 2k of RAM
+	map(0x4400, 0x47ff).ram(); // needs a full 2k of RAM
 	map(0xc000, 0xc7ff).rom().region("maincpu", 0xc000); // extend ROM
 }
 
@@ -1654,7 +1654,7 @@ void galaxian_state::mooncrst_map(address_map &map)
 void galaxian_state::froggermc_map(address_map &map)
 {
 	mooncrst_map_base(map); // no discrete sound
-	map(0x8000, 0x87ff).ram(); // actually needs 2k of RAM
+	map(0x8400, 0x87ff).ram(); // actually needs 2k of RAM
 	map(0xa800, 0xa800).mirror(0x7ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::froggermc_sound_control_w));
 }
@@ -1672,7 +1672,7 @@ void galaxian_state::skybase_map(address_map &map)
 {
 	mooncrst_map(map);
 	map(0x0000, 0x5fff).rom().region("maincpu", 0); // extend ROM
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
+	map(0x8400, 0x87ff).ram(); // needs a full 2k of RAM
 	map(0xa002, 0xa002).mirror(0x7f8).w(FUNC(galaxian_state::galaxian_gfxbank_w)); // coin lockout replaced by graphics bank
 }
 
@@ -1680,7 +1680,7 @@ void galaxian_state::kong_map(address_map &map)
 {
 	mooncrst_map(map);
 	map(0x0000, 0x7fff).rom().region("maincpu", 0); // extend ROM
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
+	map(0x8400, 0x87ff).ram(); // needs a full 2k of RAM
 }
 
 void galaxian_state::scorpnmc_map(address_map &map)
@@ -1688,7 +1688,7 @@ void galaxian_state::scorpnmc_map(address_map &map)
 	mooncrst_map(map);
 	map(0x4000, 0x47ff).ram();
 	map(0x5000, 0x67ff).rom().region("maincpu", 0x5000); // extra ROM
-	map(0x8000, 0x87ff).unmaprw(); // doesn't appear to use original RAM
+	map(0x8400, 0x87ff).unmaprw(); // doesn't appear to use original RAM
 	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
 }

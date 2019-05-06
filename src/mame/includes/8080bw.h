@@ -39,6 +39,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_gunx(*this, "GUNX")
 		, m_guny(*this, "GUNY")
+		, m_timer_state(1)
 	{ }
 
 	void indianbtbr(machine_config &config);
@@ -111,7 +112,7 @@ private:
 	uint8_t m_schaser_background_select;
 	uint16_t m_claybust_gun_pos;
 	u8 m_sound_data;
-	u16 m_timer_state;
+	bool m_timer_state;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	DECLARE_READ8_MEMBER(indianbt_r);

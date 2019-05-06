@@ -4,28 +4,25 @@
     SGI "Newport" graphics board used in the Indy and some Indigo2s
 */
 
-#ifndef MAME_VIDEO_NEWPORT_H
-#define MAME_VIDEO_NEWPORT_H
+#ifndef MAME_BUS_GIO_NEWPORT_H
+#define MAME_BUS_GIO_NEWPORT_H
 
 #pragma once
 
-#include "cpu/mips/r4000.h"
-#include "machine/hpc3.h"
+#include "gio.h"
+#include "screen.h"
 
-#define ENABLE_NEWVIEW_LOG      (0)
+#define ENABLE_NEWVIEW_LOG      (1)
 
-class newport_video_device : public device_t, public device_palette_interface
+class newport_base_device : public device_t
+                          , public device_palette_interface
+                          , public device_gio_card_interface
 {
 public:
-	template <typename T, typename U>
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&hpc3_tag)
-		: newport_video_device(mconfig, tag, owner, (uint32_t)0) // TODO: Use actual pixel clock
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_hpc3.set_tag(std::forward<U>(hpc3_tag));
-	}
+	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask);
 
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// device_gio_slot_interface overrides
+	virtual void install_device() override;
 
 	DECLARE_READ64_MEMBER(rex3_r);
 	DECLARE_WRITE64_MEMBER(rex3_w);
@@ -35,11 +32,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual uint32_t palette_entries() const override { return 0x2000; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
+	void mem_map(address_map &map) override;
+
 	enum
 	{
 		DCR_CURSOR_FUNC_ENABLE_BIT = 4,
@@ -194,6 +193,9 @@ private:
 
 	void iterate_shade();
 
+	virtual uint32_t get_cmap_revision() = 0;
+	virtual uint32_t get_xmap_revision() = 0;
+
 	uint32_t get_rgb_color(int16_t x, int16_t y);
 
 	void do_v_iline(uint32_t color);
@@ -202,9 +204,6 @@ private:
 	uint32_t do_pixel_read();
 	uint64_t do_pixel_word_read();
 	void do_rex3_command();
-
-	required_device<r4000_base_device> m_maincpu;
-	required_device<hpc3_device> m_hpc3;
 
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
@@ -215,6 +214,7 @@ private:
 	std::unique_ptr<uint32_t[]> m_pup;
 	std::unique_ptr<uint32_t[]> m_cid;
 	cmap_t m_cmap0;
+	uint32_t m_global_mask;
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();
@@ -224,7 +224,27 @@ private:
 #endif
 };
 
-DECLARE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device)
+class gio_xl8_device : public newport_base_device
+{
+public:
+	gio_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
+protected:
+	virtual uint32_t get_cmap_revision() override;
+	virtual uint32_t get_xmap_revision() override;
+};
 
-#endif // MAME_VIDEO_NEWPORT_H
+class gio_xl24_device : public newport_base_device
+{
+public:
+	gio_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+
+protected:
+	virtual uint32_t get_cmap_revision() override;
+	virtual uint32_t get_xmap_revision() override;
+};
+
+DECLARE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device)
+DECLARE_DEVICE_TYPE(GIO_XL24, gio_xl24_device)
+
+#endif // MAME_BUS_GIO_NEWPORT_H

@@ -132,6 +132,7 @@ protected:
 	virtual void machine_reset() override;
 	void common_sound(machine_config &config);
 	void equites_map(address_map &map);
+	void equites_common_map(address_map &map);
 	void mcu_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);

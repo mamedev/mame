@@ -1023,14 +1023,8 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
 // The timer frequency controls the speed of the sounds
 TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
 {
-	// This is to prevent an instant NMI and crash before the CPU can set up its environment
-	m_timer_state++;
-	if (m_timer_state < 0x1000)
-		return;
-
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(m_timer_state, 0) ? ASSERT_LINE : CLEAR_LINE );
-	if (m_timer_state == 0xf000)
-		m_timer_state = 0x8000;
+	m_timer_state ^= 1;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_timer_state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

@@ -760,9 +760,8 @@ void bang_state::bang_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().w(FUNC(bang_state::vram_w)).share("spriteram");                                          /* Video RAM */
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));    /* Sound Registers */
 	map(0x210000, 0x211fff).ram().w(FUNC(bang_state::palette_w)).share("paletteram");                                      /* Palette */
-	map(0x218004, 0x218009).readonly();                                                                                    /* Video Registers */
-	map(0x218004, 0x218007).w(FUNC(bang_state::vregs_w)).share("vregs");                                                   /* Video Registers */
-	map(0x218008, 0x218009).nopw();                                                                                        /* CLR INT Video */
+	map(0x218004, 0x218007).ram().w(FUNC(bang_state::vregs_w)).share("vregs");                                             /* Video Registers */
+	map(0x218008, 0x218009).noprw();                                                                                       /* CLR INT Video */
 	map(0x300000, 0x300001).portr("P1");
 	map(0x300002, 0x300003).nopr();                                                                                        /* Random number generator? */
 	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                                  /* Coin Counters & serial EEPROM */

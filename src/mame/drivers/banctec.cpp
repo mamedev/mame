@@ -61,7 +61,6 @@ void banctec_state::banctec_mem(address_map &map)
 
 void banctec_state::banctec_mcu_mem(address_map &map)
 {
-	map(0x0000, 0x00ff).ram(); /* Probably wrong. Must be verified on pcb! */
 	map(0x2000, 0x2000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2003, 0x2003).w(FUNC(banctec_state::videoram_w));

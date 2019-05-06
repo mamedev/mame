@@ -432,6 +432,7 @@ protected:
 	uint32_t        c_system_clock;
 	uint32_t        m_cpu_clock;
 	emu_timer *     m_compare_int_timer;
+	uint32_t        m_tlb_seed;
 
 	/* derived info based on flavor */
 	uint32_t        m_pfnmask;
@@ -511,7 +512,6 @@ protected:
 	}               m_hotspot[MIPS3_MAX_HOTSPOTS];
 	bool            m_isdrc;
 
-
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
 	virtual void check_irqs();
@@ -529,6 +529,7 @@ private:
 	uint32_t compute_config_register();
 	uint32_t compute_prid_register();
 
+	uint32_t generate_tlb_index();
 	void tlb_map_entry(int tlbindex);
 	void tlb_write_common(int tlbindex);
 

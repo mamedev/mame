@@ -304,6 +304,7 @@ void c64_expansion_slot_device::set_passthrough()
 
 // slot devices
 #include "16kb.h"
+#include "buscard.h"
 #include "c128_comal80.h"
 #include "c128_partner.h"
 #include "comal80.h"
@@ -393,6 +394,7 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("supercpu", C64_SUPERCPU);
 	device.option_add("swiftlink", C64_SWIFTLINK);
 	device.option_add("turbo232", C64_TURBO232);
+	device.option_add("buscard", C64_BUSCARD);
 
 	// the following need ROMs from the software list
 	device.option_add_internal("standard", C64_STD);

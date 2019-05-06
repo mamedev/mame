@@ -33,7 +33,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_adsp_ram_base(*this, "adsp_ram_base")
 		, m_m68k_ram_base(*this, "m68k_ram_base", 0)
-		, m_tms_comm_base(*this, "tms_comm_base", 0)
 		, m_adsp_control_regs(*this, "adsp_regs")
 		, m_adsp_fastram_base(*this, "adsp_fastram")
 		, m_maincpu(*this, "maincpu")
@@ -104,7 +103,6 @@ private:
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
 	required_shared_ptr<uint16_t> m_m68k_ram_base;
-	required_shared_ptr<uint16_t> m_tms_comm_base;
 	required_shared_ptr<uint16_t> m_adsp_control_regs;
 	required_shared_ptr<uint16_t> m_adsp_fastram_base;
 	required_device<cpu_device> m_maincpu;
@@ -154,7 +152,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
-	DECLARE_WRITE16_MEMBER(tms_comm_w);
 	DECLARE_WRITE16_MEMBER(adsp_control_w);
 	DECLARE_WRITE16_MEMBER(adsp_rombank_w);
 	DECLARE_WRITE_LINE_MEMBER(radikalb_lamp_w);
