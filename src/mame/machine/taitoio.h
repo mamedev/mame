@@ -28,13 +28,13 @@ public:
 	auto write_4_callback() { return m_write_4_cb.bind(); }
 	auto read_7_callback() { return m_read_7_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( watchdog_r );
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
-	DECLARE_READ8_MEMBER( portreg_r );
-	DECLARE_WRITE8_MEMBER( portreg_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 watchdog_r();
+	u8 port_r();
+	void port_w(u8 data);
+	u8 portreg_r();
+	void portreg_w(u8 data);
 
 protected:
 	// device-level overrides
@@ -44,8 +44,8 @@ protected:
 
 private:
 	// internal state
-	uint8_t      m_regs[8];
-	uint8_t      m_port;
+	u8      m_regs[8];
+	u8      m_port;
 
 	required_device<watchdog_timer_device> m_watchdog;
 
@@ -72,8 +72,8 @@ public:
 	auto write_4_callback() { return m_write_4_cb.bind(); }
 	auto read_7_callback() { return m_read_7_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -83,7 +83,7 @@ protected:
 
 private:
 	// internal state
-	uint8_t      m_regs[8];
+	u8      m_regs[8];
 
 	required_device<watchdog_timer_device> m_watchdog;
 
@@ -111,12 +111,12 @@ public:
 	auto write_4_callback() { return m_write_4_cb.bind(); }
 	auto read_7_callback() { return m_read_7_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( halfword_r );
-	DECLARE_WRITE16_MEMBER( halfword_w );
-	DECLARE_READ16_MEMBER( halfword_wordswap_r );
-	DECLARE_WRITE16_MEMBER( halfword_wordswap_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 halfword_r(offs_t offset);
+	void halfword_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 halfword_wordswap_r(offs_t offset);
+	void halfword_wordswap_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -126,7 +126,7 @@ protected:
 
 private:
 	// internal state
-	uint8_t   m_regs[8];
+	u8   m_regs[8];
 
 	required_device<watchdog_timer_device> m_watchdog;
 
@@ -153,12 +153,12 @@ public:
 	auto write_4_callback() { return m_write_4_cb.bind(); }
 	auto read_7_callback() { return m_read_7_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( halfword_r );
-	DECLARE_WRITE16_MEMBER( halfword_w );
-	DECLARE_READ16_MEMBER( halfword_byteswap_r );
-	DECLARE_WRITE16_MEMBER( halfword_byteswap_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 halfword_r(offs_t offset);
+	void halfword_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 halfword_byteswap_r(offs_t offset);
+	void halfword_byteswap_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -168,7 +168,7 @@ protected:
 
 	private:
 	// internal state
-	uint8_t   m_regs[8];
+	u8   m_regs[8];
 
 	required_device<watchdog_timer_device> m_watchdog;
 

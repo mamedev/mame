@@ -1404,7 +1404,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0040IOC controller for analog input */
 
-	uint8_t port = m_tc0040ioc->port_r(space, 0);   /* read port number */
+	uint8_t port = m_tc0040ioc->port_r();   /* read port number */
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
@@ -1416,7 +1416,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0040ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r();
 	}
 }
 
@@ -1425,7 +1425,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 {
 	/* Bypass TC0040IOC controller for extra inputs */
 
-	uint8_t port = m_tc0040ioc->port_r(space, 0);   /* read port number */
+	uint8_t port = m_tc0040ioc->port_r();   /* read port number */
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
@@ -1449,7 +1449,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0040ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r();
 	}
 }
 
