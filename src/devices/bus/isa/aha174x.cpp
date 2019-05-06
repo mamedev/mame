@@ -103,6 +103,9 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	I82355(config, "bmic", 0);
 	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
+	IDT7201(config, m_fifo[0]);
+	IDT7201(config, m_fifo[1]);
+
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", aha174x_scsi_devices, nullptr);
