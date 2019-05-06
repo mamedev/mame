@@ -20,7 +20,7 @@
         AIC-575 EISA Configuration Chip
         AIC-4600 HPC (HPC46003V20)
         AIC-6251A SCSI Interface and Protocol Chip
-        IDT7201 512x9 FIFO (2 on board)
+        IDT7201 or QS7201 512x9 FIFO (2 on board)
         Intel 82355 Bus Master Interface Controller
 
     AHA-1742A is the same as AHA-1740A, only with the FDC populated.

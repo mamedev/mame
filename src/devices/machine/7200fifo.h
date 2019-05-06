@@ -33,6 +33,7 @@ The following chips are functionally equivalent and pin-compatible.
 
     AM7200    AM7201    AM7202    AM7203    AM7204
     MS7200    MS7201    MS7202    MS7203    MS7204
+              QS7201    QS7202    QS7203    QS7204
 
     LH5495    LH5496    LH5497    LH5498    LH5499
               LH540201  LH540202  LH540203  LH540204  LH540205  LH540206
