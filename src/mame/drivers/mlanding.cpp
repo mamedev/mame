@@ -483,19 +483,19 @@ WRITE16_MEMBER(mlanding_state::output_w)
 
 READ16_MEMBER(mlanding_state::analog1_msb_r)
 {
-	return (m_yoke->throttle_r(space,0) >> 4) & 0xff;
+	return (m_yoke->throttle_r() >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog2_msb_r)
 {
-	return (m_yoke->stickx_r(space,0) >> 4) & 0xff;
+	return (m_yoke->stickx_r() >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog3_msb_r)
 {
-	return (m_yoke->sticky_r(space,0) >> 4) & 0xff;
+	return (m_yoke->sticky_r() >> 4) & 0xff;
 }
 
 
@@ -509,7 +509,7 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 	    .x......    Slot down
 	*/
 
-	uint8_t res = (ioport("LIMIT0")->read() & 0x70) | (m_yoke->throttle_r(space,0) & 0xf);
+	uint8_t res = (ioport("LIMIT0")->read() & 0x70) | (m_yoke->throttle_r() & 0xf);
 
 	return res;
 }
@@ -521,7 +521,7 @@ READ16_MEMBER(mlanding_state::analog2_lsb_r)
 	    76543210
 	    ....xxxx    Counter 2 bits 3-0
 	*/
-	return m_yoke->stickx_r(space,0) & 0x0f;
+	return m_yoke->stickx_r() & 0x0f;
 }
 
 
@@ -534,7 +534,7 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
 	    ..x.....    Handle left
 	    .x......    Handle up
 	*/
-	uint8_t res = (ioport("LIMIT1")->read() & 0x70) | (m_yoke->sticky_r(space,0) & 0xf);
+	uint8_t res = (ioport("LIMIT1")->read() & 0x70) | (m_yoke->sticky_r() & 0xf);
 
 	return res;
 }
