@@ -83,7 +83,7 @@ void mchess_state::machine_reset()
 
 void mchess_state::update_reset(ioport_value state)
 {
-	// assume that SAVE switch powers off the CPU
+	// battery is disconnected from CPU VCC pin when power switch is in SAVE mode
 	// (at reboot, the game will read the chessboard positions from LCD RAM)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
