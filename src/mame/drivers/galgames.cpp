@@ -375,9 +375,10 @@ u8 galgames_cart_device::pic_status_r()
 
 u8 galgames_cart_device::pic_data_r()
 {
-	if (is_selected() && (!machine().side_effects_disabled()))
+	if (is_selected())
 	{
-		m_pic_data_rdy = 0;
+		if (!machine().side_effects_disabled())
+			m_pic_data_rdy = 0;
 		return m_pic_data;
 	}
 	return 0xff;
