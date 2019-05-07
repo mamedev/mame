@@ -24,7 +24,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void transfer_speed_w(u8 data);
 	void dma_mode_w(u8 data);
+	void bus_on_time_w(u8 data);
+	void bus_off_time_w(u8 data);
 	u8 fifo_data_r();
 	void fifo_data_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(aic_breq_w);
@@ -33,6 +36,7 @@ protected:
 	void scsi_add(machine_config &config);
 	void scsic_config(device_t *device);
 
+	required_device<cpu_device> m_localcpu;
 	required_device<aic6250_device> m_scsic;
 	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u8> m_bios;
@@ -50,12 +54,20 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
+	DECLARE_READ_LINE_MEMBER(host_int_r);
+	DECLARE_READ_LINE_MEMBER(scsi_rstreq_r);
+
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	void local_status_w(u8 data);
+	void int_status_w(u8 data);
+	void srst_clear_w(u8 data);
+	void scsi_rstreq_clear_w(u8 data);
+
 	void i8085_map(address_map &map);
 };
 

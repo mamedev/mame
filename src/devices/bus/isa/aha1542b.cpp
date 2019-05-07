@@ -25,6 +25,7 @@ DEFINE_DEVICE_TYPE(AHA1542B, aha1542b_device, "aha1542b", "AHA-1542B SCSI Contro
 aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
+	, m_localcpu(*this, "localcpu")
 	, m_scsic(*this, "scsi:7:scsic")
 	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
@@ -60,9 +61,25 @@ void aha154x_device::device_reset()
 	m_dma_mode = 0;
 }
 
+void aha154x_device::transfer_speed_w(u8 data)
+{
+	const unsigned div = BIT(data, 3) ? (data & 3) + 5 : 4;
+	logerror("Transfer speed = %.2f MB/s\n", 20.0 * 2 / div);
+}
+
 void aha154x_device::dma_mode_w(u8 data)
 {
 	m_dma_mode = data;
+}
+
+void aha154x_device::bus_on_time_w(u8 data)
+{
+	logerror("Bus on time = %d microseconds\n", data & 0x0f);
+}
+
+void aha154x_device::bus_off_time_w(u8 data)
+{
+	logerror("Bus off time = %d microseconds\n", std::max(1, (data & 0x0f) * 4));
 }
 
 u8 aha154x_device::fifo_data_r()
@@ -105,17 +122,53 @@ void aha154x_device::i8085_base_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("mcode", 0);
 	map(0x8000, 0x800f).m(m_scsic, FUNC(aic6250_device::map));
+	map(0xc080, 0xc080).w(FUNC(aha154x_device::transfer_speed_w));
 	map(0xc082, 0xc082).w(FUNC(aha154x_device::dma_mode_w));
+	map(0xc08c, 0xc08c).w(FUNC(aha154x_device::bus_on_time_w));
+	map(0xc08d, 0xc08d).w(FUNC(aha154x_device::bus_off_time_w));
 	map(0xc0ac, 0xc0ac).rw(FUNC(aha154x_device::fifo_data_r), FUNC(aha154x_device::fifo_data_w));
 	map(0xc0c0, 0xc0c9).ram().share("fifo_data");
 	map(0xe000, 0xe7ff).ram();
 }
 
+void aha1542a_device::local_status_w(u8 data)
+{
+	logerror("Setting local status = %02X\n", data);
+}
+
+void aha1542a_device::int_status_w(u8 data)
+{
+	logerror("Setting interrupt status = %02X\n", data);
+}
+
+void aha1542a_device::srst_clear_w(u8 data)
+{
+	m_localcpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
+}
+
+void aha1542a_device::scsi_rstreq_clear_w(u8 data)
+{
+}
+
+READ_LINE_MEMBER(aha1542a_device::host_int_r)
+{
+	return 0;
+}
+
+READ_LINE_MEMBER(aha1542a_device::scsi_rstreq_r)
+{
+	return 0;
+}
+
 void aha1542a_device::i8085_map(address_map &map)
 {
 	i8085_base_map(map);
+	map(0xa000, 0xa000).w(FUNC(aha1542a_device::local_status_w));
 	map(0xa001, 0xa001).r("fromhost", FUNC(generic_latch_8_device::read));
 	map(0xa001, 0xa001).w("tohost", FUNC(generic_latch_8_device::write));
+	map(0xa002, 0xa002).w(FUNC(aha1542a_device::int_status_w));
+	map(0xa003, 0xa003).w(FUNC(aha1542a_device::srst_clear_w));
+	map(0xa004, 0xa004).w(FUNC(aha1542a_device::scsi_rstreq_clear_w));
 }
 
 void aha1542b_device::i8085_map(address_map &map)
@@ -133,7 +186,7 @@ static INPUT_PORTS_START(aha1542a)
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("tohost", generic_latch_8_device, pending_r)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, aha1542a_device, host_int_r)
 	PORT_DIPNAME(0x10, 0x10, "SCSI Parity Checking") PORT_DIPLOCATION("J1:3")
 	PORT_DIPSETTING(0x00, "Disabled")
 	PORT_DIPSETTING(0x10, "Enabled")
@@ -142,7 +195,7 @@ static INPUT_PORTS_START(aha1542a)
 	PORT_DIPSETTING(0x40, "5.7 MB/s")
 	PORT_DIPSETTING(0x20, "6.7 MB/s")
 	PORT_DIPSETTING(0x00, "8.0 MB/s")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) // SCSI reset
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, aha1542a_device, scsi_rstreq_r)
 
 	PORT_START("CONFIG")
 	PORT_DIPNAME(0x07, 0x07, "SCSI Address ID") PORT_DIPLOCATION("J1:4,5,6")
@@ -428,11 +481,11 @@ void aha154x_device::scsi_add(machine_config &config)
 
 void aha1542a_device::device_add_mconfig(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, "localcpu", 10'000'000));
+	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 10'000'000));
 	localcpu.set_addrmap(AS_PROGRAM, &aha1542a_device::i8085_map);
 
 	generic_latch_8_device &fromhost(GENERIC_LATCH_8(config, "fromhost"));
-	fromhost.data_pending_callback().set_inputline("localcpu", I8085_RST55_LINE);
+	fromhost.data_pending_callback().set_inputline(m_localcpu, I8085_RST55_LINE);
 
 	GENERIC_LATCH_8(config, "tohost");
 
@@ -443,11 +496,11 @@ void aha1542a_device::device_add_mconfig(machine_config &config)
 
 void aha1542b_device::device_add_mconfig(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, "localcpu", 10'000'000));
+	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 10'000'000));
 	localcpu.set_addrmap(AS_PROGRAM, &aha1542b_device::i8085_map);
 
 	AIC565(config, m_busaic);
-	m_busaic->hrst_callback().set_inputline("localcpu", INPUT_LINE_RESET);
+	m_busaic->hrst_callback().set_inputline(m_localcpu, INPUT_LINE_RESET);
 	// Soft reset interrupt is not used
 
 	scsi_add(config);
