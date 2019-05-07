@@ -57,8 +57,49 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 		break;
 
 	case 0xabf:
-		logerror("%s:possible DMA operation @ 0x%04x (trigger %04x) with params unk:%04x unk:%04x source:%04x length:%04x unk:%04x unk:%04x unk:%04x\n", machine().describe_context(), offset + 0x7000, data, m_dma_params[0], m_dma_params[1], m_dma_params[2], m_dma_params[3], m_dma_params[4], m_dma_params[5], m_dma_params[6]);
+	{
+		uint16_t mode = m_dma_params[0];
+		uint16_t sourcelow = m_dma_params[1];
+		uint16_t dest = m_dma_params[2];
+		uint16_t length = m_dma_params[3];
+		uint16_t srchigh = m_dma_params[4];
+
+		logerror("%s:possible DMA operation @ 0x%04x (trigger %04x) with params mode:%04x source:%04x dest:%04x length:%04x srchigh:%04x unk:%04x unk:%04x\n", machine().describe_context(), offset + 0x7000, data, mode, sourcelow, dest, length, srchigh, m_dma_params[5], m_dma_params[6]);
+
+		uint32_t source = sourcelow | (srchigh << 16);
+
+		// wrlshunt uses the extra params, might be doing very large ROM -> RAM transfers with even more upper address bits?
+
+		if (mode == 0x0089) // no source inc, used for memory clear operations? (source usually points at stack value)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				address_space& mem = m_cpu->space(AS_PROGRAM);
+				uint16_t val = mem.read_word(source);
+				mem.write_word(dest, val);
+				dest += 1;
+			}
+		}
+		else if (mode == 0x0009) // regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				address_space& mem = m_cpu->space(AS_PROGRAM);
+				uint16_t val = mem.read_word(source);
+				mem.write_word(dest, val);
+				dest += 1;
+				source += 1;
+			}
+		}
+		else
+		{
+			logerror("unhandled!\n");
+		}
+
+		m_dma_params[0] = m_dma_params[1] = m_dma_params[2] = m_dma_params[3] = m_dma_params[4] = m_dma_params[5] = m_dma_params[6] = 0x0000;
+		//machine().debug_break();
 		break;
+	}
 
 	default:
 		logerror("%s:sunplus_gcm394_base_device::unk_w @ 0x%04x (data 0x%04x)\n", machine().describe_context(), offset + 0x7000, data);
