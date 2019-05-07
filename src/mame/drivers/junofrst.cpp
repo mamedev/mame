@@ -376,8 +376,8 @@ void junofrst_state::machine_start()
 	save_item(NAME(m_last_irq));
 	save_item(NAME(m_irq_toggle));
 	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_flip_x));
-	save_item(NAME(m_flip_y));
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
 	save_item(NAME(m_blitterdata));
 }
 
