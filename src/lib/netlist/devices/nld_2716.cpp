@@ -7,6 +7,7 @@
 
 #include "nld_2716.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -21,6 +22,7 @@ namespace netlist
 		, m_D(*this, {{ "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" }})
 		, m_last_EPQ(*this, "m_last_EPQ", 1)
 		, m_ROM(*this, "ROM")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -35,6 +37,7 @@ namespace netlist
 		state_var<unsigned> m_last_EPQ;
 
 		param_rom_t<uint8_t, 11, 8> m_ROM; // 16 Kbits, used as 2 Kbit x 8
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(2716_dip, 2716)
@@ -64,6 +67,9 @@ namespace netlist
 			register_subalias("15",    m_D[5]);
 			register_subalias("16",    m_D[6]);
 			register_subalias("17",    m_D[7]);
+
+			register_subalias("12",    "GND");
+			register_subalias("24",    "VCC");
 		}
 	};
 
@@ -92,7 +98,7 @@ namespace netlist
 			m_D[i].push((d >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL(2716, "EPROM_2716", "+GQ,+EPQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
+	NETLIB_DEVICE_IMPL(2716, "EPROM_2716", "+GQ,+EPQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(2716_dip, "EPROM_2716_DIP",         "")
 
 	} //namespace devices

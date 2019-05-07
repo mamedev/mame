@@ -80,7 +80,7 @@ READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
+	uint16_t data = m_deco104->read_data( real_address&0x7fff, cs );
 	return data;
 }
 

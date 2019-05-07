@@ -170,9 +170,6 @@ void miniframe_state::machine_reset()
 	// force ROM into lower mem on reset
 	m_ramrombank->set_bank(0);
 
-	// reset cpu so that it can pickup the new values
-	m_maincpu->reset();
-
 	// invalidate all pages by clearing all entries
 	memset(m_mapram, 0, MMU_MAX_PAGES * sizeof(uint16_t));
 }

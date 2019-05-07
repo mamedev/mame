@@ -321,11 +321,13 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
-		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
+		switch ((offset>>1) & 7)
 		{
-			uint8_t p = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
-				| (ioport("EVPC-SW4")->read()<<3) | (ioport("EVPC-SW8")->read()<<7));
-			*value = BIT(p, (offset >> 1) & 7);
+		case 0: *value = ~(ioport("EVPC-SW1")->read()); break;
+		case 2: *value = ~(ioport("EVPC-SW3")->read()); break;
+		case 3: *value = ~(ioport("EVPC-SW4")->read()); break;
+		case 7: *value = ~(ioport("EVPC-SW8")->read()); break;
+		default: *value = ~0; break;
 		}
 	}
 }

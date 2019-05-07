@@ -426,7 +426,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
+			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 		}
 	}
 	else if (offset == 1)
@@ -462,10 +462,10 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			m_adc12138->cs_w(space, 0, cs);
-			m_adc12138->conv_w(space, 0, conv);
-			m_adc12138->di_w(space, 0, di);
-			m_adc12138->sclk_w(space, 0, sclk);
+			m_adc12138->cs_w(cs);
+			m_adc12138->conv_w(conv);
+			m_adc12138->di_w(di);
+			m_adc12138->sclk_w(sclk);
 		}
 		if (ACCESSING_BITS_0_7)
 		{

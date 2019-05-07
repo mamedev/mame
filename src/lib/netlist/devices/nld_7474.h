@@ -44,14 +44,16 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_7474(name, cCLK, cD, cCLRQ, cPREQ)                                  \
-		NET_REGISTER_DEV(TTL_7474, name)                                        \
-		NET_CONNECT(name, CLK, cCLK)                                            \
-		NET_CONNECT(name, D,  cD)                                               \
-		NET_CONNECT(name, CLRQ,  cCLRQ)                                         \
+#define TTL_7474(name, cCLK, cD, cCLRQ, cPREQ)                                 \
+		NET_REGISTER_DEV(TTL_7474, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK, cCLK)                                           \
+		NET_CONNECT(name, D,  cD)                                              \
+		NET_CONNECT(name, CLRQ,  cCLRQ)                                        \
 		NET_CONNECT(name, PREQ,  cPREQ)
 
-#define TTL_7474_DIP(name)                                                      \
+#define TTL_7474_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7474_DIP, name)
 
 #endif /* NLD_7474_H_ */

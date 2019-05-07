@@ -36,7 +36,7 @@ public:
 
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
-	
+
 	virtual DECLARE_READ16_MEMBER(io_extended_r);
 	virtual DECLARE_WRITE16_MEMBER(io_extended_w);
 

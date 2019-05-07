@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
-*
+
 * cking_master.cpp, subdriver of machine/chessbase.cpp
 
 TODO:

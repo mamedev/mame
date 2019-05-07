@@ -114,14 +114,15 @@ void bagman_state::video_start()
 
 void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	// Spriteram is at the start of the colorram
+	for (int offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
-		sx = m_spriteram[offs + 3];
-		sy = 256 - m_spriteram[offs + 2] - 16;
-		flipx = m_spriteram[offs] & 0x40;
-		flipy = m_spriteram[offs] & 0x80;
+		sx = m_colorram[offs + 3];
+		sy = 256 - m_colorram[offs + 2] - 16;
+		flipx = m_colorram[offs] & 0x40;
+		flipy = m_colorram[offs] & 0x80;
 		if (flip_screen())
 		{
 			sx = 256 - sx - 15;
@@ -130,11 +131,11 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		if (m_spriteram[offs + 2] && m_spriteram[offs + 3])
+		if (m_colorram[offs + 2] && m_colorram[offs + 3])
 			m_gfxdecode->gfx(1)->transpen(bitmap,
 					cliprect,
-					(m_spriteram[offs] & 0x3f) + 2 * (m_spriteram[offs + 1] & 0x20),
-					m_spriteram[offs + 1] & 0x1f,
+					(m_colorram[offs] & 0x3f) + 2 * (m_colorram[offs + 1] & 0x20),
+					m_colorram[offs + 1] & 0x1f,
 					flipx,flipy,
 					sx,sy,0);
 	}

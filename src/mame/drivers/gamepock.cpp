@@ -21,7 +21,6 @@ void gamepock_state::gamepock_mem(address_map &map)
 	map(0x1000, 0x3fff).noprw();
 	//AM_RANGE(0x4000,0xbfff) AM_ROM        // mapped by the cartslot
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
-	map(0xff80, 0xffff).ram();              // 128 bytes microcontroller RAM
 }
 
 

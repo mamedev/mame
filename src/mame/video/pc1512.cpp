@@ -233,17 +233,17 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 			case ALPHA_40:
 			case GRAPHICS_1:
 				m_vdu->set_hpixels_per_column(8);
-				m_vdu->set_clock(XTAL(28'636'363)/32);
+				m_vdu->set_unscaled_clock(XTAL(28'636'363)/32);
 				break;
 
 			case ALPHA_80:
 				m_vdu->set_hpixels_per_column(8);
-				m_vdu->set_clock(XTAL(28'636'363)/16);
+				m_vdu->set_unscaled_clock(XTAL(28'636'363)/16);
 				break;
 
 			case GRAPHICS_2:
 				m_vdu->set_hpixels_per_column(16);
-				m_vdu->set_clock(XTAL(28'636'363)/32);
+				m_vdu->set_unscaled_clock(XTAL(28'636'363)/32);
 				break;
 			}
 		}

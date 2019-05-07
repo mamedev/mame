@@ -525,13 +525,13 @@ void toaplan2_state::init_enmadaio()
 void toaplan2_state::cpu_space_fixeightbl_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff4, 0xfffff5).lr16("irq 2", [this]() -> u16 { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); return 0x18+2; });
+	map(0xfffff5, 0xfffff5).lr8("irq 2", [this]() { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); return m68000_device::autovector(2); });
 }
 
 void toaplan2_state::cpu_space_pipibibsbl_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff8, 0xfffff9).lr16("irq 4", [this]() -> u16 { m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); return 0x18+4; });
+	map(0xfffff9, 0xfffff9).lr8("irq 4", [this]() { m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); return m68000_device::autovector(4); });
 }
 
 

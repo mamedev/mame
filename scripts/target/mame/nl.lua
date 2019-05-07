@@ -189,6 +189,33 @@ files{
   MAME_DIR .. "src/mame/includes/zaccaria.h",
   MAME_DIR .. "src/mame/video/zaccaria.cpp",
 
+  MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
+
+  MAME_DIR .. "src/mame/drivers/palestra.cpp",
+  MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
+  MAME_DIR .. "src/mame/machine/nl_palestra.h",
+  
+  MAME_DIR .. "src/mame/drivers/testpat.cpp",
+  MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",
+  MAME_DIR .. "src/mame/machine/nl_tp1983.h",
+  MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
+  MAME_DIR .. "src/mame/machine/nl_tp1985.h",
+
+  -- Skeletons ...
+  MAME_DIR .. "src/mame/drivers/a1supply.cpp",
+  MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
+  MAME_DIR .. "src/mame/drivers/bailey.cpp",
+  MAME_DIR .. "src/mame/drivers/chicago.cpp",
+  MAME_DIR .. "src/mame/drivers/electra.cpp",
+  MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
+  MAME_DIR .. "src/mame/drivers/fungames.cpp",
+  MAME_DIR .. "src/mame/drivers/meadwttl.cpp",
+  MAME_DIR .. "src/mame/drivers/monacogp.cpp",
+  MAME_DIR .. "src/mame/drivers/pse.cpp",
+  MAME_DIR .. "src/mame/drivers/ramtek.cpp",
+  MAME_DIR .. "src/mame/drivers/segattl.cpp",
+  MAME_DIR .. "src/mame/drivers/taitottl.cpp",
+  MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
 }
 end
 

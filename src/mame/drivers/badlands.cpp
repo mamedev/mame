@@ -275,7 +275,7 @@ READ8_MEMBER(badlands_state::audio_io_r)
 			break;
 
 		case 0x002:     /* /RDP */
-			result = m_soundcomm->sound_command_r(space, offset);
+			result = m_soundcomm->sound_command_r();
 			break;
 
 		case 0x004:     /* /RDIO */
@@ -295,7 +295,7 @@ READ8_MEMBER(badlands_state::audio_io_r)
 			break;
 
 		case 0x006:     /* /IRQACK */
-			m_soundcomm->sound_irq_ack_r(space, 0);
+			m_soundcomm->sound_irq_ack_r();
 			break;
 
 		case 0x200:     /* /VOICE */
@@ -321,7 +321,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 			break;
 
 		case 0x006:     /* /IRQACK */
-			m_soundcomm->sound_irq_ack_r(space, 0);
+			m_soundcomm->sound_irq_ack_w();
 			break;
 
 		case 0x200:     /* n/c */
@@ -329,7 +329,7 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 			break;
 
 		case 0x202:     /* /WRP */
-			m_soundcomm->sound_response_w(space, offset, data);
+			m_soundcomm->sound_response_w(data);
 			break;
 
 		case 0x204:     /* WRIO */

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+    Known cartridges
+
+Dumped|Name       |Notes
+______|___________|______
+ XXX  |4 in 1     |No controller
+ XXX  |Whac-A-Mole|Hammer-shaped IR motion controller
+ XXX  |Tennis     |Racquet-shaped IR motion controller
+      |Paintball  |Gun controller
+      |Skateboard |Skateboard-shaped motion controller
+      |Basketball |Ball-shaped motion controller
+      |Dodgeball  |Motion controller
+-->
+
+<softwarelist name="tvgogo" description="Toyquest TV Go Go cartridges">
+	<software name="4in1" supported="no">
+		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze)</description>
+		<year>2005</year>
+		<publisher>Toyquest</publisher>
+		<part name="cart" interface="tvgogo_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="4in1.bin" size="0x400000" crc="6e467279" sha1="09ba40524f0b5ee65b9aa8742df9c39baf1046d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis" supported="no">
+		<description>Tennis</description>
+		<year>2005</year>
+		<publisher>Toyquest</publisher>
+		<part name="cart" interface="tvgogo_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="tennis.bin" size="0x400000" crc="39883db2" sha1="91f9319339eb2ccb4a2e16308ea505775dc82bfc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whacmole" supported="no">
+		<description>Whac-A-Mole</description>
+		<year>2005</year>
+		<publisher>Toyquest</publisher>
+		<part name="cart" interface="tvgogo_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="whac-a-mole.bin" size="0x400000" crc="62625c62" sha1="846045308e242aff347f93fab1e9b2e8ef46386f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

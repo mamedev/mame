@@ -90,6 +90,8 @@ if (BUSES["ABCBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/abcbus/sio.h",
 		MAME_DIR .. "src/devices/bus/abcbus/slutprov.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/slutprov.h",
+		MAME_DIR .. "src/devices/bus/abcbus/ssa.cpp",
+		MAME_DIR .. "src/devices/bus/abcbus/ssa.h",
 		MAME_DIR .. "src/devices/bus/abcbus/uni800.cpp",
 		MAME_DIR .. "src/devices/bus/abcbus/uni800.h",
 		MAME_DIR .. "src/devices/bus/abcbus/unidisk.cpp",
@@ -475,6 +477,8 @@ if (BUSES["C64"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/c64/exp.cpp",
 		MAME_DIR .. "src/devices/bus/c64/exp.h",
+		MAME_DIR .. "src/devices/bus/c64/buscard.cpp",
+		MAME_DIR .. "src/devices/bus/c64/buscard.h",
 		MAME_DIR .. "src/devices/bus/c64/c128_comal80.cpp",
 		MAME_DIR .. "src/devices/bus/c64/c128_comal80.h",
 		MAME_DIR .. "src/devices/bus/c64/c128_partner.cpp",
@@ -953,6 +957,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/gio/gio.h,BUSES["GIO"] = true
+---------------------------------------------------
+
+if (BUSES["GIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/gio/gio.cpp",
+		MAME_DIR .. "src/devices/bus/gio/gio.h",
+		MAME_DIR .. "src/devices/bus/gio/newport.cpp",
+		MAME_DIR .. "src/devices/bus/gio/newport.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/hp_hil/hp_hil.h,BUSES["HPHIL"] = true
 ---------------------------------------------------
 
@@ -1322,6 +1341,12 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/dcb.h",
 		MAME_DIR .. "src/devices/bus/isa/ultra12f.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ultra12f.h",
+		MAME_DIR .. "src/devices/bus/isa/ultra14f.cpp",
+		MAME_DIR .. "src/devices/bus/isa/ultra14f.h",
+		MAME_DIR .. "src/devices/bus/isa/ultra24f.cpp",
+		MAME_DIR .. "src/devices/bus/isa/ultra24f.h",
+		MAME_DIR .. "src/devices/bus/isa/tekram_dc820.cpp",
+		MAME_DIR .. "src/devices/bus/isa/tekram_dc820.h",
 	}
 end
 

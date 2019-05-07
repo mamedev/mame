@@ -24,7 +24,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="aee.bin" size="0x8000" crc="0ebf8f90" sha1="609cb2f5e235995eea66e9da0f06ca80e736e290" offset="0" />
+				<rom name="aee.bin" size="0x8000" crc="0ebf8f90" sha1="609cb2f5e235995eea66e9da0f06ca80e736e290" />
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 			<feature name="pcb" value="Mechatronic Systems" />
 			<feature name="ic1" value="27C512" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="ea.bin" size="0x10000" crc="42c5b541" sha1="565a00d688d6aac6eb688e3570d42e0236d2fcb2" offset="0" />
+				<rom name="ea.bin" size="0x10000" crc="42c5b541" sha1="565a00d688d6aac6eb688e3570d42e0236d2fcb2" />
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="finance.bin" size="0x8000" crc="d1671acc" sha1="a4a6da5504bea2b37b289c83e4af012ed8f4ad9b" offset="0" />
+				<rom name="finance.bin" size="0x8000" crc="d1671acc" sha1="a4a6da5504bea2b37b289c83e4af012ed8f4ad9b" />
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="games1.bin" size="0x8000" crc="54b52a26" sha1="1ad4c414b3aba73e10e30a2c2a2de8e92f96d46b" offset="0" />
+				<rom name="games1.bin" size="0x8000" crc="54b52a26" sha1="1ad4c414b3aba73e10e30a2c2a2de8e92f96d46b" />
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="mathematics.bin" size="0x8000" crc="f0f7a65a" sha1="88af8b822d296a774a275e26ed4c91140c93b074" offset="0" />
+				<rom name="mathematics.bin" size="0x8000" crc="f0f7a65a" sha1="88af8b822d296a774a275e26ed4c91140c93b074" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 		<info name="usage" value="Load with RUN &quot;MP&quot;" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="memo_processor.bin" size="0x8000" crc="817f77db" sha1="13541d447b30834efdb23718eb30ce243a32c7d5" offset="0" />
+				<rom name="memo_processor.bin" size="0x8000" crc="817f77db" sha1="13541d447b30834efdb23718eb30ce243a32c7d5" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<info name="usage" value="Load with RUN &quot;PASCAL&quot;" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="pascal.bin" size="0x8000" crc="e9bced03" sha1="770944a521bc8c1ad72c3aabdcfdc5929131c658" offset="0" />
+				<rom name="pascal.bin" size="0x8000" crc="e9bced03" sha1="770944a521bc8c1ad72c3aabdcfdc5929131c658" />
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
 		<part name="cart" interface="cc40_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="statistics.bin" size="0x8000" crc="2c0e5c22" sha1="73c2b3512ba8eaacdc529d4df80ae3673a53589d" offset="0" />
+				<rom name="statistics.bin" size="0x8000" crc="2c0e5c22" sha1="73c2b3512ba8eaacdc529d4df80ae3673a53589d" />
 			</dataarea>
 		</part>
 	</software>

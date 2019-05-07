@@ -1650,8 +1650,6 @@ void neogeo_base_state::machine_reset()
 	m_audionmi->in_w<1>(0);
 	m_soundlatch->acknowledge_w();
 
-	m_maincpu->reset();
-
 	start_interrupt_timers();
 
 	// trigger the IRQ3 that was set by MACHINE_START

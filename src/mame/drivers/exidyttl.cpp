@@ -98,8 +98,7 @@ void exidyttl_state::video_start()
 void exidyttl_state::attack(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_attack);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_attack);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -114,8 +113,7 @@ void exidyttl_state::attack(machine_config &config)
 void exidyttl_state::deathrac(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_attack);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_attack);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

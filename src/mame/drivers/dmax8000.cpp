@@ -134,7 +134,7 @@ MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	m_maincpu->reset();
-	m_maincpu->set_input_line_vector(0, 0xee); // fdc vector
+	m_maincpu->set_input_line_vector(0, 0xee); // Z80 - fdc vector
 }
 
 void dmax8000_state::init_dmax8000()

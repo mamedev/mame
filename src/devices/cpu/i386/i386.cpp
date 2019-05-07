@@ -1542,7 +1542,7 @@ void i386_device::i386_check_irq_line()
 {
 	if(!m_smm && m_smi)
 	{
-		pentium_smi();
+		enter_smm();
 		return;
 	}
 
@@ -3947,14 +3947,11 @@ void i386_device::device_reset()
 	CHANGE_PC(m_eip);
 }
 
-void i386_device::pentium_smi()
+void i386_device::enter_smm()
 {
 	uint32_t smram_state = m_smbase + 0xfe00;
 	uint32_t old_cr0 = m_cr[0];
 	uint32_t old_flags = get_flags();
-
-	if(m_smm)
-		return;
 
 	m_cr[0] &= ~(0x8000000d);
 	set_flags(2);
@@ -4023,7 +4020,7 @@ void i386_device::pentium_smi()
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffffffff;
 	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x8093;
-	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid =true;
+	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid = true;
 	m_sreg[CS].selector = 0x3000; // pentium only, ppro sel = smbase >> 4
 	m_sreg[CS].base = m_smbase;
 	m_sreg[CS].limit = 0xffffffff;
@@ -4035,6 +4032,87 @@ void i386_device::pentium_smi()
 
 	m_nmi_masked = true;
 	CHANGE_PC(m_eip);
+}
+
+void i386_device::leave_smm()
+{
+	uint32_t smram_state = m_smbase + 0xfe00;
+
+	// load state, no sanity checks anywhere
+	m_smbase = READ32(smram_state + SMRAM_SMBASE);
+	m_cr[4] = READ32(smram_state + SMRAM_IP5_CR4);
+	m_sreg[ES].limit = READ32(smram_state + SMRAM_IP5_ESLIM);
+	m_sreg[ES].base = READ32(smram_state + SMRAM_IP5_ESBASE);
+	m_sreg[ES].flags = READ32(smram_state + SMRAM_IP5_ESACC);
+	m_sreg[CS].limit = READ32(smram_state + SMRAM_IP5_CSLIM);
+	m_sreg[CS].base = READ32(smram_state + SMRAM_IP5_CSBASE);
+	m_sreg[CS].flags = READ32(smram_state + SMRAM_IP5_CSACC);
+	m_sreg[SS].limit = READ32(smram_state + SMRAM_IP5_SSLIM);
+	m_sreg[SS].base = READ32(smram_state + SMRAM_IP5_SSBASE);
+	m_sreg[SS].flags = READ32(smram_state + SMRAM_IP5_SSACC);
+	m_sreg[DS].limit = READ32(smram_state + SMRAM_IP5_DSLIM);
+	m_sreg[DS].base = READ32(smram_state + SMRAM_IP5_DSBASE);
+	m_sreg[DS].flags = READ32(smram_state + SMRAM_IP5_DSACC);
+	m_sreg[FS].limit = READ32(smram_state + SMRAM_IP5_FSLIM);
+	m_sreg[FS].base = READ32(smram_state + SMRAM_IP5_FSBASE);
+	m_sreg[FS].flags = READ32(smram_state + SMRAM_IP5_FSACC);
+	m_sreg[GS].limit = READ32(smram_state + SMRAM_IP5_GSLIM);
+	m_sreg[GS].base = READ32(smram_state + SMRAM_IP5_GSBASE);
+	m_sreg[GS].flags = READ32(smram_state + SMRAM_IP5_GSACC);
+	m_ldtr.flags = READ32(smram_state + SMRAM_IP5_LDTACC);
+	m_ldtr.limit = READ32(smram_state + SMRAM_IP5_LDTLIM);
+	m_ldtr.base = READ32(smram_state + SMRAM_IP5_LDTBASE);
+	m_gdtr.limit = READ32(smram_state + SMRAM_IP5_GDTLIM);
+	m_gdtr.base = READ32(smram_state + SMRAM_IP5_GDTBASE);
+	m_idtr.limit = READ32(smram_state + SMRAM_IP5_IDTLIM);
+	m_idtr.base = READ32(smram_state + SMRAM_IP5_IDTBASE);
+	m_task.limit = READ32(smram_state + SMRAM_IP5_TRLIM);
+	m_task.base = READ32(smram_state + SMRAM_IP5_TRBASE);
+	m_task.flags = READ32(smram_state + SMRAM_IP5_TRACC);
+
+	m_sreg[ES].selector = READ32(smram_state + SMRAM_ES);
+	m_sreg[CS].selector = READ32(smram_state + SMRAM_CS);
+	m_sreg[SS].selector = READ32(smram_state + SMRAM_SS);
+	m_sreg[DS].selector = READ32(smram_state + SMRAM_DS);
+	m_sreg[FS].selector = READ32(smram_state + SMRAM_FS);
+	m_sreg[GS].selector = READ32(smram_state + SMRAM_GS);
+	m_ldtr.segment = READ32(smram_state + SMRAM_LDTR);
+	m_task.segment = READ32(smram_state + SMRAM_TR);
+
+	m_dr[7] = READ32(smram_state + SMRAM_DR7);
+	m_dr[6] = READ32(smram_state + SMRAM_DR6);
+	REG32(EAX) = READ32(smram_state + SMRAM_EAX);
+	REG32(ECX) = READ32(smram_state + SMRAM_ECX);
+	REG32(EDX) = READ32(smram_state + SMRAM_EDX);
+	REG32(EBX) = READ32(smram_state + SMRAM_EBX);
+	REG32(ESP) = READ32(smram_state + SMRAM_ESP);
+	REG32(EBP) = READ32(smram_state + SMRAM_EBP);
+	REG32(ESI) = READ32(smram_state + SMRAM_ESI);
+	REG32(EDI) = READ32(smram_state + SMRAM_EDI);
+	m_eip = READ32(smram_state + SMRAM_EIP);
+	m_eflags = READ32(smram_state + SMRAM_EFLAGS);
+	m_cr[3] = READ32(smram_state + SMRAM_CR3);
+	m_cr[0] = READ32(smram_state + SMRAM_CR0);
+
+	m_CPL = (m_sreg[SS].flags >> 13) & 3; // cpl == dpl of ss
+
+	for (int i = 0; i <= GS; i++)
+	{
+		if (PROTECTED_MODE && !V8086_MODE)
+		{
+			m_sreg[i].valid = m_sreg[i].selector ? true : false;
+			m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
+		}
+		else
+			m_sreg[i].valid = true;
+	}
+
+	if (!m_smiact.isnull())
+		m_smiact(false);
+	m_smm = false;
+
+	CHANGE_PC(m_eip);
+	m_nmi_masked = false;
 }
 
 void i386_device::execute_set_input(int irqline, int state)
@@ -4708,6 +4786,8 @@ void athlonxp_device::device_start()
 	save_item(NAME(m_processor_name_string));
 	save_item(NAME(m_msr_top_mem));
 	save_item(NAME(m_msr_sys_cfg));
+	save_item(NAME(m_msr_smm_base));
+	save_item(NAME(m_msr_smm_mask));
 	save_item(NAME(m_msr_mtrrfix));
 	save_item(NAME(m_memory_ranges_1m));
 }
@@ -4761,6 +4841,8 @@ void athlonxp_device::device_reset()
 		m_memory_ranges_1m[n] = 0;
 	m_msr_top_mem = 1024 * 1024;
 	m_msr_sys_cfg = 0;
+	m_msr_smm_base = m_smbase;
+	m_msr_smm_mask = 0;
 
 	m_cpuid_max_input_value_eax = 0x01;
 	m_cpu_version = REG32(EDX);
@@ -4779,6 +4861,30 @@ device_memory_interface::space_config_vector athlonxp_device::memory_space_confi
 		std::make_pair(AS_DATA,    &m_data_config),
 		std::make_pair(AS_OPCODES, &m_opcodes_config)
 	};
+}
+
+void athlonxp_device::enter_smm()
+{
+	u64 data;
+
+	if (m_msr_smm_mask & 1)
+		data = 0x1818181818181818; // when smm is active
+	else
+		data = m_msr_mtrrfix[2];
+	parse_mtrrfix(data, 0xa0000, 16);
+	i386_device::enter_smm();
+}
+
+void athlonxp_device::leave_smm()
+{
+	u64 data;
+
+	i386_device::leave_smm();
+	if (m_msr_smm_mask & 1)
+		data = 0; // when smm is not active
+	else
+		data = m_msr_mtrrfix[2];
+	parse_mtrrfix(data, 0xa0000, 16);
 }
 
 void athlonxp_device::parse_mtrrfix(u64 mtrr, offs_t base, int kblock)

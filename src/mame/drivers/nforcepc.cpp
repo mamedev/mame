@@ -25,6 +25,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "machine/intelfsh.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
@@ -70,6 +71,7 @@ void crush11_host_device::config_map(address_map &map)
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, CRUSH11, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
+	, biosrom(*this, finder_base::DUMMY_TAG)
 	, ram_size(0)
 {
 }
@@ -103,10 +105,13 @@ void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
+	memory_space->install_device(0, 0xffffffff, *this, &crush11_host_device::bios_map);
+}
 
-	uint32_t mask = m_region->bytes() - 1;
-	memory_space->install_rom(0x000c0000, 0x000fffff, m_region->base() + (0x000c0000 & mask));
-	memory_space->install_rom(0xfffc0000, 0xffffffff, m_region->base() + (0x000c0000 & mask));
+void crush11_host_device::bios_map(address_map &map)
+{
+	map(0x000c0000, 0x000fffff).rw(biosrom, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0xfffc0000, 0xffffffff).rw(biosrom, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 }
 
 READ8_MEMBER(crush11_host_device::unknown_r)
@@ -333,6 +338,273 @@ void as99127f_sensor3_device::device_start()
 	memset(buffer, 0, sizeof(buffer));
 }
 
+// ITE IT8703F-A SuperIO
+
+DEFINE_DEVICE_TYPE(IT8703F, it8703f_device, "it8703f_device", "ITE IT8703F-A SuperIO")
+
+it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, IT8703F, tag, owner, clock)
+	, mode(OperatingMode::Run)
+	, config_key_step(0)
+	, config_index(0)
+	, logical_device(0)
+	, pin_reset_callback(*this)
+	, pin_gatea20_callback(*this)
+	, m_kbdc(*this, "pc_kbdc")
+{
+	memset(global_configuration_registers, 0, sizeof(global_configuration_registers));
+	memset(configuration_registers, 0, sizeof(configuration_registers));
+	for (int n = 0; n < 13; n++)
+		enabled_logical[n] = false;
+}
+
+void it8703f_device::device_start()
+{
+	pin_reset_callback.resolve_safe();
+	pin_gatea20_callback.resolve_safe();
+}
+
+void it8703f_device::internal_memory_map(address_map &map)
+{
+}
+
+void it8703f_device::internal_io_map(address_map &map)
+{
+	map(0x002e, 0x002f).rw(FUNC(it8703f_device::read_it8703f), FUNC(it8703f_device::write_it8703f));
+}
+
+uint16_t it8703f_device::get_base_address(int logical, int index)
+{
+	int position = index * 2 + 0x60;
+
+	return ((uint16_t)configuration_registers[logical][position] << 8) + (uint16_t)configuration_registers[logical][position + 1];
+}
+
+void it8703f_device::device_add_mconfig(machine_config &config)
+{
+	// keyboard
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
+	m_kbdc->input_buffer_full_callback().set(FUNC(it8703f_device::irq_keyboard_w));
+	m_kbdc->system_reset_callback().set(FUNC(it8703f_device::kbdp20_gp20_reset_w));
+	m_kbdc->gate_a20_callback().set(FUNC(it8703f_device::kbdp21_gp25_gatea20_w));
+}
+
+READ8_MEMBER(it8703f_device::read_it8703f)
+{
+	if (offset == 0)
+	{
+		if (mode == OperatingMode::Run)
+			return 0;
+		return config_index;
+	}
+	else if (offset == 1)
+	{
+		if (mode == OperatingMode::Run)
+			return 0;
+		if (config_index < 0x30)
+			return read_global_configuration_register(config_index);
+		else
+			return read_logical_configuration_register(config_index);
+	}
+	else
+		return 0;
+}
+
+WRITE8_MEMBER(it8703f_device::write_it8703f)
+{
+	uint8_t byt;
+
+	if (offset == 0)
+	{
+		byt = data & 0xff;
+		if (mode == OperatingMode::Run)
+		{
+			if (byt != 0x87)
+				return;
+			config_key_step++;
+			if (config_key_step > 1)
+			{
+				config_key_step = 0;
+				mode = OperatingMode::Configuration;
+			}
+		}
+		else
+		{
+			if (byt == 0xaa)
+			{
+				mode = OperatingMode::Run;
+				return;
+			}
+			config_index = byt;
+		}
+	}
+	else if (offset == 1)
+	{
+		if (mode == OperatingMode::Run)
+			return;
+		byt = data & 0xff;
+		if (config_index < 0x30)
+			write_global_configuration_register(config_index, byt);
+		else
+			write_logical_configuration_register(config_index, byt);
+	}
+	else
+		return;
+}
+
+void it8703f_device::write_global_configuration_register(int index, int data)
+{
+	global_configuration_registers[index] = data;
+	switch (index)
+	{
+	case 7:
+		logical_device = data;
+		logerror("Selected logical device %d\n", data);
+		break;
+	}
+	logerror("Write global configuration register %02X = %02X\n", index, data);
+}
+
+void it8703f_device::write_logical_configuration_register(int index, int data)
+{
+	configuration_registers[logical_device][index] = data;
+	switch (logical_device)
+	{
+	case LogicalDevice::Keyboard:
+		if (index == 0x30)
+		{
+			if (data & 1)
+			{
+				if (enabled_logical[LogicalDevice::Keyboard] == false)
+					map_keyboard_addresses();
+				enabled_logical[LogicalDevice::Keyboard] = true;
+				logerror("Enabled Keyboard\n");
+			}
+			else
+			{
+				if (enabled_logical[LogicalDevice::Keyboard] == true)
+					unmap_keyboard_addresses();
+				enabled_logical[LogicalDevice::Keyboard] = false;
+			}
+		}
+		break;
+	}
+}
+
+uint16_t it8703f_device::read_global_configuration_register(int index)
+{
+	uint16_t ret = 0;
+
+	ret = global_configuration_registers[index];
+	switch (index)
+	{
+	case 7:
+		ret = logical_device;
+		break;
+	}
+	logerror("Read global configuration register %02X = %02X\n", index, ret);
+	return ret;
+}
+
+uint16_t it8703f_device::read_logical_configuration_register(int index)
+{
+	return configuration_registers[logical_device][index];
+}
+
+WRITE_LINE_MEMBER(it8703f_device::irq_keyboard_w)
+{
+	if (enabled_logical[LogicalDevice::Keyboard] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Keyboard][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::kbdp21_gp25_gatea20_w)
+{
+	if (enabled_logical[LogicalDevice::Keyboard] == false)
+		return;
+	pin_gatea20_callback(state);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::kbdp20_gp20_reset_w)
+{
+	if (enabled_logical[LogicalDevice::Keyboard] == false)
+		return;
+	pin_reset_callback(state);
+}
+
+void it8703f_device::map_keyboard(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(it8703f_device::at_keybc_r), FUNC(it8703f_device::at_keybc_w));
+	map(0x4, 0x4).rw(FUNC(it8703f_device::keybc_status_r), FUNC(it8703f_device::keybc_command_w));
+}
+
+void it8703f_device::unmap_keyboard(address_map &map)
+{
+	map(0x0, 0x0).noprw();
+	map(0x4, 0x4).noprw();
+}
+
+READ8_MEMBER(it8703f_device::at_keybc_r)
+{
+	switch (offset) //m_kbdc
+	{
+	case 0:
+		return m_kbdc->data_r(space, 0);
+	}
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(it8703f_device::at_keybc_w)
+{
+	switch (offset)
+	{
+	case 0:
+		m_kbdc->data_w(space, 0, data);
+	}
+}
+
+READ8_MEMBER(it8703f_device::keybc_status_r)
+{
+	return m_kbdc->data_r(space, 4);
+}
+
+WRITE8_MEMBER(it8703f_device::keybc_command_w)
+{
+	m_kbdc->data_w(space, 4, data);
+}
+
+
+void it8703f_device::map_keyboard_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Keyboard, 0);
+
+	iospace->install_device(base, base + 7, *this, &it8703f_device::map_keyboard);
+}
+
+void it8703f_device::unmap_keyboard_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Keyboard, 0);
+
+	iospace->install_device(base, base + 7, *this, &it8703f_device::unmap_keyboard);
+}
+
+void it8703f_device::map_extra(address_space *memory_space, address_space *io_space)
+{
+	memspace = memory_space;
+	iospace = io_space;
+	io_space->install_device(0, 0xffff, *this, &it8703f_device::internal_io_map);
+	if (enabled_logical[LogicalDevice::Keyboard] == true)
+		map_keyboard_addresses();
+}
+
+void it8703f_device::set_host(int index, lpcbus_host_interface *host)
+{
+	lpchost = host;
+	lpcindex = index;
+}
+
 /*
   Machine state
 */
@@ -385,7 +657,7 @@ void nforcepc_state::machine_reset()
 }
 
 const nforcepc_state::boot_state_info nforcepc_state::boot_state_infos_award[] = {
-	{ 0xC0, "Turn off chipset cache" },
+	{ 0xC0, "First basic initialization" },
 	{ 0, nullptr }
 };
 
@@ -431,15 +703,20 @@ void nforcepc_state::nforcepc(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &nforcepc_state::nforce_map);
 	maincpu.set_addrmap(AS_IO, &nforcepc_state::nforce_map_io);
 	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
+	//maincpu.smiact().set("pci:01.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, ":pci", 0);
-	CRUSH11(config, ":pci:00.0", 0, "maincpu"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
+	CRUSH11(config, ":pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
 	CRUSH11_MEMORY(config, ":pci:00.1", 0, 2); /* 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
 	10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
 	10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)*/
 	mcpx_isalpc_device &isa(MCPX_ISALPC(config, ":pci:01.0", 0, 0x10430c11)); // 10de:01b2 NVIDIA Corporation nForce ISA Bridge (LPC bus)
+	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
+	it8703f_device &ite(IT8703F(config, ":pci:01.0:0", 0));
+	ite.pin_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	ite.pin_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
 	SMBUS_ROM(config, ":pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
 	SMBUS_LOGGER(config, ":pci:01.1:051", 0);
@@ -448,6 +725,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	AS99127F(config, ":pci:01.1:12d", 0);
 	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
 	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
+	SST_49LF020(config, "bios", 0);
 	/*10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
@@ -464,7 +742,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 }
 
 ROM_START(nforcepc)
-	ROM_REGION32_LE(0x40000, ":pci:00.0", 0) /* PC bios */
+	ROM_REGION32_LE(0x40000, "bios", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "a7n266c", "a7n266c") // Motherboard dump. Chip: SST49LF020 Package: PLCC32 Label had 3 lines of text: "A7NC3" "1001.D" "GSQ98"
 	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(f4f0e4fc) SHA1(87f11545db178914623e41fb51e328da479a2efc), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D downloaded from Asus website
@@ -472,7 +750,7 @@ ROM_START(nforcepc)
 ROM_END
 
 static INPUT_PORTS_START(nforcepc)
-	//PORT_INCLUDE(at_keyboard)
+	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 COMP(2002, nforcepc, 0, 0, nforcepc, nforcepc, nforcepc_state, empty_init, "Nvidia", "Nvidia nForce PC (CRUSH11/12)", MACHINE_IS_SKELETON)

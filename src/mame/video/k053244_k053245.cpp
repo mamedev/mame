@@ -160,17 +160,17 @@ void k05324x_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_MEMBER( k05324x_device::k053245_word_r )
+u16 k05324x_device::k053245_word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( k05324x_device::k053245_word_w )
+void k05324x_device::k053245_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_ram.get() + offset);
 }
 
-READ8_MEMBER( k05324x_device::k053245_r )
+u8 k05324x_device::k053245_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_ram[offset >> 1] & 0xff;
@@ -179,7 +179,7 @@ READ8_MEMBER( k05324x_device::k053245_r )
 }
 
 
-WRITE8_MEMBER( k05324x_device::k053245_w )
+void k05324x_device::k053245_w(offs_t offset, u8 data)
 {
 	if(offset & 1)
 		m_ram[offset >> 1] = (m_ram[offset >> 1] & 0xff00) | data;
@@ -200,7 +200,7 @@ void k05324x_device::update_buffer()
 	memcpy(m_buffer.get(), m_ram.get(), m_ramsize);
 }
 
-READ8_MEMBER( k05324x_device::k053244_r )
+u8 k05324x_device::k053244_r(offs_t offset)
 {
 	if ((m_regs[5] & 0x10) && offset >= 0x0c && offset < 0x10)
 	{
@@ -227,7 +227,7 @@ READ8_MEMBER( k05324x_device::k053244_r )
 	}
 }
 
-WRITE8_MEMBER( k05324x_device::k053244_w )
+void k05324x_device::k053244_w(offs_t offset, u8 data)
 {
 	m_regs[offset] = data;
 
@@ -247,30 +247,6 @@ WRITE8_MEMBER( k05324x_device::k053244_w )
 	}
 }
 
-
-READ16_MEMBER( k05324x_device::k053244_lsb_r )
-{
-	return k053244_r(space, offset);
-}
-
-WRITE16_MEMBER( k05324x_device::k053244_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		k053244_w(space, offset, data & 0xff);
-}
-
-READ16_MEMBER( k05324x_device::k053244_word_r )
-{
-	return (k053244_r(space, offset * 2) << 8) | k053244_r(space, offset * 2 + 1);
-}
-
-WRITE16_MEMBER( k05324x_device::k053244_word_w )
-{
-	if (ACCESSING_BITS_8_15)
-		k053244_w(space, offset * 2, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		k053244_w(space, offset * 2 + 1, data & 0xff);
-}
 
 void k05324x_device::bankselect( int bank )
 {

@@ -4862,9 +4862,9 @@ void harddriv_state::init_dsk()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x910000, 0x910fff, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), m_dsk_30c.target()), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), m_dsk_30c.target()), 0x00ff);
 
 	/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x914000, 0x917fff, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x914000, 0x917fff, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x918000, 0x91bfff, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x914000, 0x917fff, write16sm_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x914000, 0x917fff, read16smo_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x918000, 0x91bfff, read16smo_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x940000, 0x9fffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_small_rom_r), this));
@@ -4878,9 +4878,9 @@ void harddriv_state::init_dsk2()
 	uint8_t *usr3 = memregion("user3")->base();
 
 	/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x824000, 0x824003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x824000, 0x824003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x825000, 0x825001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x824000, 0x824003, write16sm_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x824000, 0x824003, read16smo_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x825000, 0x825001, read16smo_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install ASIC61 */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x827000, 0x8277ff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_r), this), write16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_w), this));
@@ -4902,9 +4902,9 @@ void harddriv_state::init_dsk2()
 void harddriv_state::init_dspcom()
 {
 		/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x900003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x900003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x901000, 0x910001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x900003, write16sm_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x900003, read16smo_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x901000, 0x910001, read16smo_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install DSPCOM control */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x904000, 0x90401f, write16_delegate(FUNC(harddriv_state::hddspcom_control_w), this));

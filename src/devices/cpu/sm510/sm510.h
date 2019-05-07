@@ -149,6 +149,7 @@ protected:
 	u8 m_bl;
 	u8 m_bm;
 	bool m_sbm;
+	bool m_sbl;
 	u8 m_c;
 	bool m_skip;
 	u8 m_w;
@@ -164,7 +165,7 @@ protected:
 	emu_timer *m_lcd_timer;
 	u8 m_l, m_x;
 	u8 m_y;
-	bool m_bp;
+	u8 m_bp;
 	bool m_bc;
 
 	u16 get_lcd_row(int column, u8* ram);
@@ -214,6 +215,7 @@ protected:
 	// opcode handlers
 	virtual void op_lb();
 	virtual void op_lbl();
+	virtual void op_sbl();
 	virtual void op_sbm();
 	virtual void op_exbla();
 	virtual void op_incb();

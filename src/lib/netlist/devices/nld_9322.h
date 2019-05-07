@@ -24,16 +24,18 @@
 #include "netlist/nl_setup.h"
 
 #define TTL_9322(name, cSELECT, cA1, cB1, cA2, cB2, cA3, cB3, cA4, cB4, cSTROBE)    \
-		NET_REGISTER_DEV(TTL_9322, name)    \
-		NET_CONNECT(name, SELECT, cSELECT)  \
-		NET_CONNECT(name, A1,     cA1)      \
-		NET_CONNECT(name, B1,     cB1)      \
-		NET_CONNECT(name, A2,     cA2)      \
-		NET_CONNECT(name, B2,     cB2)      \
-		NET_CONNECT(name, A3,     cA3)      \
-		NET_CONNECT(name, B3,     cB3)      \
-		NET_CONNECT(name, A4,     cA4)      \
-		NET_CONNECT(name, B4,     cB4)      \
+		NET_REGISTER_DEV(TTL_9322, name)                                       \
+		NET_CONNECT(name, SELECT, cSELECT)                                     \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, A1,     cA1)                                         \
+		NET_CONNECT(name, B1,     cB1)                                         \
+		NET_CONNECT(name, A2,     cA2)                                         \
+		NET_CONNECT(name, B2,     cB2)                                         \
+		NET_CONNECT(name, A3,     cA3)                                         \
+		NET_CONNECT(name, B3,     cB3)                                         \
+		NET_CONNECT(name, A4,     cA4)                                         \
+		NET_CONNECT(name, B4,     cB4)                                         \
 		NET_CONNECT(name, STROBE, cSTROBE)
 
 #define TTL_9322_DIP(name)                                                     \

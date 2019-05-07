@@ -213,7 +213,7 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 		++p;
 	pstring val = plib::left(sin, p);
 	pstring unit = sin.substr(p);
-	double ret = get_sp_unit(unit) * plib::pstonum<double>(val);
+	double ret = get_sp_unit(unit) * plib::pstonum<double, true>(val);
 	return ret;
 }
 
@@ -322,7 +322,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				pstring model;
 				pstring pins ="CBE";
 				bool err;
-				auto nval = plib::pstonum_ne<long>(tt[4], err);
+				auto nval = plib::pstonum_ne<long, true>(tt[4], err);
 				plib::unused_var(nval);
 
 				if ((!err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
@@ -532,7 +532,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					else if (plib::ucase(sval) == "LOW")
 						add_device("TTL_INPUT", name, 0);
 					else
-						add_device("ANALOG_INPUT", name, plib::pstonum<double>(sval));
+						add_device("ANALOG_INPUT", name, plib::pstonum<double, true>(sval));
 					add_pin_alias(name, "1", "Q");
 					break;
 				case 'D':

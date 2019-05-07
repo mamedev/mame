@@ -139,8 +139,7 @@ void taitottl_state::video_start()
 void taitottl_state::taitottl(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_taitottl);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_taitottl);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

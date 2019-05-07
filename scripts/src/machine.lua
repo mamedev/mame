@@ -179,6 +179,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/2812fifo.h,MACHINES["2812FIFO"] = true
+---------------------------------------------------
+
+if (MACHINES["2812FIFO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/2812fifo.cpp",
+		MAME_DIR .. "src/devices/machine/2812fifo.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/6522via.h,MACHINES["6522VIA"] = true
 ---------------------------------------------------
 
@@ -1202,6 +1214,18 @@ if (MACHINES["I8214"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i8214.cpp",
 		MAME_DIR .. "src/devices/machine/i8214.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i82355.h,MACHINES["I82355"] = true
+---------------------------------------------------
+
+if (MACHINES["I82355"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i82355.cpp",
+		MAME_DIR .. "src/devices/machine/i82355.h",
 	}
 end
 
@@ -2543,6 +2567,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/scc68070.h,MACHINES["SCC68070"] = true
+---------------------------------------------------
+if (MACHINES["SCC68070"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scc68070.cpp",
+		MAME_DIR .. "src/devices/machine/scc68070.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
 ---------------------------------------------------
 
@@ -2616,6 +2651,8 @@ end
 ---------------------------------------------------
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/sunplus_gcm394.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if (MACHINES["SPG2XX"]~=null) then
@@ -2634,6 +2671,8 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110.h",
 		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
+		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
+		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
 	}
 end
 
@@ -3853,6 +3892,18 @@ if (MACHINES["SCC2698B"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/scc2698b.cpp",
 		MAME_DIR .. "src/devices/machine/scc2698b.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/aic565.h,MACHINES["AIC565"] = true
+---------------------------------------------------
+
+if (MACHINES["AIC565"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/aic565.cpp",
+		MAME_DIR .. "src/devices/machine/aic565.h",
 	}
 end
 

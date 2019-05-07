@@ -207,7 +207,6 @@ namespace netlist
 			if (idx != plib::container::npos)
 				connect(m_Q[i], m_I[idx]);
 		}
-
 		m_ign = 0;
 	}
 
@@ -236,6 +235,9 @@ namespace netlist
 			/* update truthtable family definitions */
 			if (m_family_name != "")
 				m_family_desc = anetlist.setup().family_from_model(m_family_name);
+
+			if (m_family_desc == nullptr)
+				throw nl_exception("family description not found for {1}", m_family_name);
 
 			return pool().make_poolptr<tt_type>(anetlist, name, m_family_desc, m_ttbl, m_desc);
 		}
@@ -399,7 +401,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 			else
 				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
 			// FIXME: error handling
-			netlist_time t = netlist_time::from_nsec(plib::pstonum<std::int64_t>(plib::trim(times[j])));
+			netlist_time t = netlist_time::from_nsec(plib::pstonum<std::int64_t, true>(plib::trim(times[j])));
 			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;

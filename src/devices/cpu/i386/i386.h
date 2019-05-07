@@ -72,6 +72,10 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override;
 
+	// cpu-specific system management mode routines
+	virtual void enter_smm();
+	virtual void leave_smm();
+
 	// routines for opcodes whose operation can vary between cpu models
 	// default implementations usually just log an error message
 	virtual void opcode_cpuid();
@@ -1504,7 +1508,6 @@ protected:
 	void i386_postload();
 	void i386_common_init();
 	void build_opcode_table(uint32_t features);
-	void pentium_smi();
 	void zero_state();
 	void i386_set_a20_line(int state);
 
@@ -1644,6 +1647,8 @@ protected:
 	virtual void cache_clean() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void enter_smm() override;
+	virtual void leave_smm() override;
 
 	virtual u8 mem_pr8(offs_t address) override { return opcode_read_cache<u8, NATIVE_ENDIAN_VALUE_LE_BE(0, 3)>(address);   }
 	virtual u16 mem_pr16(offs_t address) override { return opcode_read_cache<u16, NATIVE_ENDIAN_VALUE_LE_BE(0, 2)>(address); }
@@ -1677,6 +1682,8 @@ private:
 	uint8_t m_processor_name_string[48];
 	offs_t m_msr_top_mem;
 	uint64_t m_msr_sys_cfg;
+	offs_t m_msr_smm_base;
+	uint64_t m_msr_smm_mask;
 	uint64_t m_msr_mtrrfix[11];
 	uint8_t m_memory_ranges_1m[1024 / 4];
 	cpucache<17, 9, Cache2Way, CacheLineBytes64> cache; // 512 sets, 2 ways (cachelines per set), 64 bytes per cacheline

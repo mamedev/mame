@@ -56,7 +56,6 @@ public:
 		, m_is_ntsc(is_ntsc)
 		, m_ram(*this, RAM_TAG)
 		, m_p_videoram(*this, "videoram")
-		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
@@ -127,7 +126,6 @@ private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<u8> m_p_videoram;
-	required_device<screen_device> m_screen;
 	u8 m_flashcnt;
 	u8 m_cass_data[4];
 	u8 m_port_10, m_port_20, m_port_30, m_port_f0;
@@ -245,7 +243,7 @@ uint8_t alphatro_state::port10_r()
 	// we'll get "FDC present" and "graphics expansion present" from the config switches
 	retval |= (m_config->read() & 3);
 
-	if ((m_screen->vblank()) || (m_screen->hblank()))
+	if (!m_crtc->de_r())
 	{
 		retval |= 0x80;
 	}
@@ -311,7 +309,7 @@ uint8_t alphatro_state::port30_r()
 
 	u8 retval = 0;
 
-	if (m_screen->vblank()) retval |= 0x02;
+	if (m_crtc->vsync_r()) retval |= 0x02;
 
 	return retval;
 }
@@ -768,7 +766,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 	HD6845(config, m_crtc, 16_MHz_XTAL / 8);
-	m_crtc->set_screen(m_screen);
+	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(alphatro_state::crtc_update_row), this);

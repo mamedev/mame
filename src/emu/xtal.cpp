@@ -226,6 +226,7 @@ const double XTAL::known_xtals[] = {
 	 16'000'000, /* 16_MHz_XTAL            Extremely common, used on 100's of PCBs */
 	 16'097'280, /* 16.09728_MHz_XTAL      DEC VT240 (1024 * 262 * 60) */
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
+	 16'200'000, /* 16.2_MHz_XTAL          Debut */
 	 16'257'000, /* 16.257_MHz_XTAL        IBM PC MDA & EGA */
 	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
@@ -322,6 +323,7 @@ const double XTAL::known_xtals[] = {
 	 29'376'000, /* 29.376_MHz_XTAL        Qume QVT-103 */
 	 29'491'200, /* 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics) */
 	 30'000'000, /* 30_MHz_XTAL            Impera Magic Card */
+	 30'209'800, /* 30.2098_MHz_XTAL       Philips CD-i NTSC (1920x NTSC line rate) */
 	 30'476'100, /* 30.4761_MHz_XTAL       Taito JC */
 	 30'800'000, /* 30.8_MHz_XTAL          15IE-00-013 */
 	 31'279'500, /* 31.2795_MHz_XTAL       Wyse WY-30+ */
@@ -334,6 +336,7 @@ const double XTAL::known_xtals[] = {
 	 32'530'400, /* 32.5304_MHz_XTAL       Seta 2 */
 	 33'000'000, /* 33_MHz_XTAL            Sega Model 3 video board */
 	 33'264'000, /* 33.264_MHz_XTAL        Hazeltine 1500 terminal */
+	 33'330'000, /* 33.33_MHz_XTAL         Sharp X68000 XVI */
 	 33'333'000, /* 33.333_MHz_XTAL        Sega Model 3 CPU board, Vegas */
 	 33'833'000, /* 33.833_MHz_XTAL        - */
 	 33'868'800, /* 33.8688_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
@@ -359,7 +362,7 @@ const double XTAL::known_xtals[] = {
 	 44'452'800, /* 44.4528_MHz_XTAL       TeleVideo 965 */
 	 44'900'000, /* 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics */
 	 45'000'000, /* 45_MHz_XTAL            Eolith with Hyperstone CPUs */
-	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
+	 45'158'400, /* 45.1584_MHz_XTAL       Philips CD-i CDIC, Sega Model 2A video, Sega Model 3 CPU */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */
 	 45'830'400, /* 45.8304_MHz_XTAL       Microterm 5510 */
 	 46'615'120, /* 46.61512_Mhz_XTAL      Soundblaster 16 PCM base clock */
@@ -374,6 +377,7 @@ const double XTAL::known_xtals[] = {
 	 50'000'000, /* 50_MHz_XTAL            Williams/Midway T/W/V-unit system */
 	 50'113'000, /* 50.113_MHz_XTAL        Namco NA-1 (14x NTSC subcarrier)*/
 	 50'349'000, /* 50.349_MHz_XTAL        Sega System 18 (~3200x NTSC line rate) */
+	 50'350'000, /* 50.35_MHz_XTAL         Sharp X68030 video */
 	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */

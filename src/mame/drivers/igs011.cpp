@@ -89,8 +89,14 @@ public:
 		, m_ics(*this, "ics")
 		, m_priority_ram(*this, "priority_ram")
 		, m_vbowl_trackball(*this, "vbowl_trackball")
+		, m_maincpu_region(*this, "maincpu")
 		, m_gfx(*this, "blitter")
 		, m_gfx2(*this, "blitter_hi")
+		, m_io_in(*this, "IN%u", 0U)
+		, m_io_key(*this, "KEY%u", 0U)
+		, m_io_an(*this, "AN%u", 0U)
+		, m_io_dsw(*this, "DSW%u", 1U)
+		, m_io_coin(*this, "COIN")
 	{
 	}
 
@@ -140,32 +146,39 @@ private:
 	optional_device<ics2115_device> m_ics;
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_priority_ram;
-	optional_shared_ptr<uint16_t> m_vbowl_trackball;
+	required_shared_ptr<u16> m_priority_ram;
+	optional_shared_ptr<u16> m_vbowl_trackball;
 
 	/* memory regions */
-	required_region_ptr<uint8_t> m_gfx;
-	optional_region_ptr<uint8_t> m_gfx2;
+	required_memory_region m_maincpu_region;
+	required_region_ptr<u8> m_gfx;
+	optional_region_ptr<u8> m_gfx2;
 
-	std::unique_ptr<uint8_t[]> m_layer[8];
-	uint16_t m_priority;
-	uint8_t m_lhb2_pen_hi;
-	uint16_t m_igs_dips_sel;
-	uint16_t m_igs_input_sel;
-	uint16_t m_igs_hopper;
-	uint8_t m_prot1;
-	uint8_t m_prot1_swap;
-	uint32_t m_prot1_addr;
-	uint8_t m_prot2;
-	uint8_t m_igs012_prot;
-	uint8_t m_igs012_prot_swap;
-	uint8_t m_igs012_prot_mode;
-	uint16_t m_igs003_reg[2];
-	uint16_t m_lhb_irq_enable;
+	optional_ioport_array<3> m_io_in;
+	optional_ioport_array<5> m_io_key;
+	optional_ioport_array<2> m_io_an;
+	optional_ioport_array<5> m_io_dsw;
+	optional_ioport m_io_coin;
+
+	std::unique_ptr<u8[]> m_layer[8];
+	u16 m_priority;
+	u8 m_lhb2_pen_hi;
+	u16 m_igs_dips_sel;
+	u16 m_igs_input_sel;
+	u16 m_igs_hopper;
+	u8 m_prot1;
+	u8 m_prot1_swap;
+	u32 m_prot1_addr;
+	u8 m_prot2;
+	u8 m_igs012_prot;
+	u8 m_igs012_prot_swap;
+	u8 m_igs012_prot_mode;
+	u16 m_igs003_reg;
+	u16 m_lhb_irq_enable;
 
 	struct blitter_t
 	{
-		uint16_t  x, y, w, h,
+		u16  x, y, w, h,
 			gfx_lo, gfx_hi,
 			depth,
 			pen,
@@ -174,85 +187,83 @@ private:
 
 	blitter_t m_blitter;
 
-	uint16_t m_igs003_prot_hold;
-	uint8_t m_igs003_prot_x;
-	uint8_t m_igs003_prot_y;
-	uint8_t m_igs003_prot_z;
-	uint8_t m_igs003_prot_h1;
-	uint8_t m_igs003_prot_h2;
+	u16 m_igs003_prot_hold;
+	u8 m_igs003_prot_x;
+	u8 m_igs003_prot_y;
+	u8 m_igs003_prot_z;
+	u8 m_igs003_prot_h1;
+	u8 m_igs003_prot_h2;
 
-	DECLARE_WRITE16_MEMBER(igs011_priority_w);
-	DECLARE_READ16_MEMBER(igs011_layers_r);
-	DECLARE_WRITE16_MEMBER(igs011_layers_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_x_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_y_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_lo_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_hi_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_w_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_h_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_depth_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_pen_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_flags_w);
-	DECLARE_WRITE16_MEMBER(igs_dips_w);
-	DECLARE_READ16_MEMBER(igs_3_dips_r);
-	DECLARE_READ16_MEMBER(igs_4_dips_r);
-	DECLARE_READ16_MEMBER(igs_5_dips_r);
-	DECLARE_WRITE16_MEMBER(igs011_prot1_w);
-	DECLARE_READ16_MEMBER(igs011_prot1_r);
-	DECLARE_WRITE16_MEMBER(igs011_prot_addr_w);
-	DECLARE_WRITE16_MEMBER(igs011_prot2_reset_w);
-	DECLARE_READ16_MEMBER(igs011_prot2_reset_r);
-	DECLARE_WRITE16_MEMBER(igs011_prot2_inc_w);
-	DECLARE_WRITE16_MEMBER(igs011_prot2_dec_w);
-	DECLARE_WRITE16_MEMBER(drgnwrld_igs011_prot2_swap_w);
-	DECLARE_WRITE16_MEMBER(lhb_igs011_prot2_swap_w);
-	DECLARE_WRITE16_MEMBER(wlcc_igs011_prot2_swap_w);
-	DECLARE_WRITE16_MEMBER(vbowl_igs011_prot2_swap_w);
-	DECLARE_READ16_MEMBER(drgnwrldv40k_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(drgnwrldv21_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(drgnwrldv20j_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(lhb_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(dbc_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(ryukobou_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(lhb2_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(vbowl_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(vbowlhk_igs011_prot2_r);
-	DECLARE_WRITE16_MEMBER(igs012_prot_reset_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_mode_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_inc_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_dec_inc_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_dec_copy_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_copy_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_swap_w);
-	DECLARE_READ16_MEMBER(igs012_prot_r);
-	DECLARE_WRITE16_MEMBER(drgnwrld_igs003_w);
-	DECLARE_READ16_MEMBER(drgnwrld_igs003_r);
-	DECLARE_WRITE16_MEMBER(lhb_inputs_w);
-	DECLARE_READ16_MEMBER(lhb_inputs_r);
-	DECLARE_WRITE16_MEMBER(lhb2_igs003_w);
-	DECLARE_READ16_MEMBER(lhb2_igs003_r);
-	DECLARE_WRITE16_MEMBER(wlcc_igs003_w);
-	DECLARE_READ16_MEMBER(wlcc_igs003_r);
-	DECLARE_WRITE16_MEMBER(xymg_igs003_w);
-	DECLARE_READ16_MEMBER(xymg_igs003_r);
-	DECLARE_WRITE16_MEMBER(vbowl_igs003_w);
-	DECLARE_READ16_MEMBER(vbowl_igs003_r);
-	DECLARE_WRITE16_MEMBER(vbowlhk_igs003_w);
-	DECLARE_WRITE16_MEMBER(lhb_irq_enable_w);
-	DECLARE_READ16_MEMBER(vbowl_unk_r);
-	DECLARE_WRITE16_MEMBER(vbowl_pen_hi_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_0_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_1_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_2_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_3_w);
-	uint16_t igs_dips_r(int NUM);
-	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
+	void igs011_priority_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 igs011_layers_r(offs_t offset);
+	void igs011_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_gfx_hi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_w_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_h_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_depth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs_dips_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<unsigned Num> u16 igs_dips_r();
+	void igs011_prot1_w(offs_t offset, u8 data);
+	u16 igs011_prot1_r();
+	void igs011_prot_addr_w(u16 data);
+	void igs011_prot2_reset_w(u8 data);
+	u16 igs011_prot2_reset_r();
+	void igs011_prot2_inc_w(u8 data);
+	void igs011_prot2_dec_w(u8 data);
+	void drgnwrld_igs011_prot2_swap_w(u8 data);
+	void lhb_igs011_prot2_swap_w(u8 data);
+	void wlcc_igs011_prot2_swap_w(u8 data);
+	void vbowl_igs011_prot2_swap_w(u8 data);
+	u16 drgnwrldv40k_igs011_prot2_r();
+	u16 drgnwrldv21_igs011_prot2_r();
+	u16 drgnwrldv20j_igs011_prot2_r();
+	u16 lhb_igs011_prot2_r();
+	u16 dbc_igs011_prot2_r();
+	u16 ryukobou_igs011_prot2_r();
+	u16 lhb2_igs011_prot2_r();
+	u16 vbowl_igs011_prot2_r();
+	u16 vbowlhk_igs011_prot2_r();
+	void igs012_prot_reset_w(u16 data);
+	void igs012_prot_mode_w(offs_t offset, u8 data);
+	void igs012_prot_inc_w(offs_t offset, u8 data);
+	void igs012_prot_dec_inc_w(offs_t offset, u8 data);
+	void igs012_prot_dec_copy_w(offs_t offset, u8 data);
+	void igs012_prot_copy_w(offs_t offset, u8 data);
+	void igs012_prot_swap_w(offs_t offset, u8 data);
+	u16 igs012_prot_r();
+	void igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void drgnwrld_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 drgnwrld_igs003_r();
+	void lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 lhb_inputs_r(offs_t offset);
+	void lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 lhb2_igs003_r();
+	void wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 wlcc_igs003_r();
+	void xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 xymg_igs003_r();
+	void vbowl_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 vbowl_igs003_r();
+	void vbowlhk_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 vbowl_unk_r();
+	void vbowl_pen_hi_w(u8 data);
+	void vbowl_link_0_w(u16 data);
+	void vbowl_link_1_w(u16 data);
+	void vbowl_link_2_w(u16 data);
+	void vbowl_link_3_w(u16 data);
+	void lhb_okibank_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
 
-	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_vbowl);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
@@ -302,10 +313,7 @@ private:
 ***************************************************************************/
 
 
-
-
-
-WRITE16_MEMBER(igs011_state::igs011_priority_w)
+void igs011_state::igs011_priority_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 
@@ -320,7 +328,7 @@ void igs011_state::video_start()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_layer[i] = std::make_unique<uint8_t[]>(512 * 256);
+		m_layer[i] = std::make_unique<u8[]>(512 * 256);
 		save_pointer(NAME(m_layer[i]), 512 * 256, i);
 	}
 
@@ -339,14 +347,11 @@ void igs011_state::video_start()
 	save_item(NAME(m_blitter.flags));
 }
 
-uint32_t igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
 #endif
-
-	int x,y,l,scr_addr,pri_addr;
-	uint16_t *pri_ram;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z))
@@ -364,18 +369,19 @@ uint32_t igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 
 	}
 #endif
 
-	pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
+	u16 *pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			scr_addr = x + y * 512;
-			pri_addr = 0xff;
+			int scr_addr = x + y * 512;
+			int pri_addr = 0xff;
 
+			int l;
 			for (l = 0; l < 8; l++)
 			{
-				if (    (m_layer[l][scr_addr] != 0xff)
+				if (  (m_layer[l][scr_addr] != 0xff)
 #ifdef MAME_DEBUG
 						&& (layer_enable & (1 << l))
 #endif
@@ -415,12 +421,12 @@ uint32_t igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 
 
 ***************************************************************************/
 
-READ16_MEMBER(igs011_state::igs011_layers_r)
+u16 igs011_state::igs011_layers_r(offs_t offset)
 {
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	uint8_t *l0 = m_layer[layer0].get();
-	uint8_t *l1 = m_layer[layer0+1].get();
+	u8 *l0 = m_layer[layer0].get();
+	u8 *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -428,14 +434,14 @@ READ16_MEMBER(igs011_state::igs011_layers_r)
 	return (l0[offset] << 8) | l1[offset];
 }
 
-WRITE16_MEMBER(igs011_state::igs011_layers_w)
+void igs011_state::igs011_layers_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t word;
+	u16 word;
 
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	uint8_t *l0 = m_layer[layer0].get();
-	uint8_t *l1 = m_layer[layer0+1].get();
+	u8 *l0 = m_layer[layer0].get();
+	u8 *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -453,63 +459,62 @@ WRITE16_MEMBER(igs011_state::igs011_layers_w)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(igs011_state::igs011_blit_x_w)
+void igs011_state::igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.x);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_y_w)
+void igs011_state::igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.y);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_gfx_lo_w)
+void igs011_state::igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.gfx_lo);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_gfx_hi_w)
+void igs011_state::igs011_blit_gfx_hi_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.gfx_hi);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_w_w)
+void igs011_state::igs011_blit_w_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.w);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_h_w)
+void igs011_state::igs011_blit_h_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.h);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_depth_w)
+void igs011_state::igs011_blit_depth_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.depth);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_pen_w)
+void igs011_state::igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.pen);
 }
 
 
-WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
+void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
-	int x, xstart, xend, xinc, flipx;
-	int y, ystart, yend, yinc, flipy;
-	int depth4, clear, opaque, z;
-	uint8_t trans_pen, clear_pen, pen_hi, *dest;
-	uint8_t pen = 0;
+	int xend, xinc;
+	int yend, yinc;
+	u8 trans_pen, clear_pen;
+	u8 pen = 0;
 
 	const rectangle &clip = m_screen->visible_area();
 
@@ -520,21 +525,21 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
-	dest    =   m_layer[   blitter.flags & 0x0007   ].get();
-	opaque  =            !(blitter.flags & 0x0008);
-	clear   =              blitter.flags & 0x0010;
-	flipx   =              blitter.flags & 0x0020;
-	flipy   =              blitter.flags & 0x0040;
+	u8 *dest     = m_layer[blitter.flags & 0x0007].get();
+	const bool opaque =  !(blitter.flags & 0x0008);
+	const bool clear  =    blitter.flags & 0x0010;
+	const bool flipx  =    blitter.flags & 0x0020;
+	const bool flipy  =    blitter.flags & 0x0040;
 	if                  (!(blitter.flags & 0x0400))
 		return;
 
-	pen_hi  =   (m_lhb2_pen_hi & 0x07) << 5;
+	u8 pen_hi   =   (m_lhb2_pen_hi & 0x07) << 5;
 
 	// pixel address
-	z       =   blitter.gfx_lo  + (blitter.gfx_hi << 16);
+	u32 z       =   blitter.gfx_lo  + (blitter.gfx_hi << 16);
 
 	// what were they smoking???
-	depth4  =   !((blitter.flags & 0x7) < (4 - (blitter.depth & 0x7))) ||
+	const bool depth4 = !((blitter.flags & 0x7) < (4 - (blitter.depth & 0x7))) ||
 				(z & 0x800000);     // see lhb2
 
 	z &= 0x7fffff;
@@ -555,8 +560,8 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 		clear_pen = blitter.pen;
 	}
 
-	xstart = (blitter.x & 0x1ff) - (blitter.x & 0x200);
-	ystart = (blitter.y & 0x0ff) - (blitter.y & 0x100);
+	int xstart = (blitter.x & 0x1ff) - (blitter.x & 0x200);
+	int ystart = (blitter.y & 0x0ff) - (blitter.y & 0x100);
 
 	if (flipx)  { xend = xstart - (blitter.w & 0x1ff) - 1;  xinc = -1; }
 	else        { xend = xstart + (blitter.w & 0x1ff) + 1;  xinc =  1; }
@@ -564,9 +569,9 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	if (flipy)  { yend = ystart - (blitter.h & 0x0ff) - 1;  yinc = -1; }
 	else        { yend = ystart + (blitter.h & 0x0ff) + 1;  yinc =  1; }
 
-	for (y = ystart; y != yend; y += yinc)
+	for (int y = ystart; y != yend; y += yinc)
 	{
-		for (x = xstart; x != xend; x += xinc)
+		for (int x = xstart; x != xend; x += xinc)
 		{
 			// fetch the pixel
 			if (!clear)
@@ -574,10 +579,10 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 				if (depth4)     pen = (m_gfx[(z/2)%m_gfx.length()] >> ((z&1)?4:0)) & 0x0f;
 				else            pen = m_gfx[z%m_gfx.length()];
 
-				if ( m_gfx2 )
+				if (m_gfx2)
 				{
 					pen &= 0x0f;
-					if ( m_gfx2[(z/8)%m_gfx2.length()] & (1 << (z & 7)) )
+					if (m_gfx2[(z/8)%m_gfx2.length()] & (1 << (z & 7)))
 						pen |= 0x10;
 				}
 			}
@@ -641,29 +646,25 @@ CUSTOM_INPUT_MEMBER(igs011_state::igs_hopper_r)
 	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
-WRITE16_MEMBER(igs011_state::igs_dips_w)
+void igs011_state::igs_dips_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_igs_dips_sel);
 }
 
-uint16_t igs011_state::igs_dips_r(int NUM)
+template<unsigned Num>
+u16 igs011_state::igs_dips_r()
 {
-	int i;
-	uint16_t ret=0;
-	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };
+	u16 ret=0;
 
-	for (i = 0; i < NUM; i++)
-		if ((~m_igs_dips_sel) & (1 << i) )
-			ret = ioport(dipnames[i])->read();
+	for (int i = 0; i < Num; i++)
+		if ((~m_igs_dips_sel) & (1 << i))
+			ret = m_io_dsw[i]->read();
 
 	// 0x0100 is blitter busy
 	return  (ret & 0xff) | 0x0000;
 }
 
 // Games have 3 to 5 dips
-READ16_MEMBER(igs011_state::igs_3_dips_r){ return igs_dips_r(3); }
-READ16_MEMBER(igs011_state::igs_4_dips_r){ return igs_dips_r(4); }
-READ16_MEMBER(igs011_state::igs_5_dips_r){ return igs_dips_r(5); }
 
 /***************************************************************************
 
@@ -673,14 +674,13 @@ READ16_MEMBER(igs011_state::igs_5_dips_r){ return igs_dips_r(5); }
 
 void igs011_state::wlcc_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
@@ -697,14 +697,13 @@ void igs011_state::wlcc_decrypt()
 
 void igs011_state::lhb_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if ((i & 0x1100) != 0x0100)
 			x ^= 0x0200;
@@ -722,14 +721,13 @@ void igs011_state::lhb_decrypt()
 
 void igs011_state::drgnwrld_type3_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
@@ -750,31 +748,30 @@ void igs011_state::drgnwrld_type3_decrypt()
 
 void igs011_state::drgnwrld_type2_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
-		if(((i & 0x000090) == 0x000000) || ((i & 0x002004) != 0x002004))
+		if (((i & 0x000090) == 0x000000) || ((i & 0x002004) != 0x002004))
 			x ^= 0x0004;
 
-		if((((i & 0x000050) == 0x000000) || ((i & 0x000142) != 0x000000)) && ((i & 0x000150) != 0x000000))
+		if ((((i & 0x000050) == 0x000000) || ((i & 0x000142) != 0x000000)) && ((i & 0x000150) != 0x000000))
 			x ^= 0x0020;
 
-		if(((i & 0x004280) == 0x004000) || ((i & 0x004080) == 0x000000))
+		if (((i & 0x004280) == 0x004000) || ((i & 0x004080) == 0x000000))
 			x ^= 0x0200;
 
-		if((i & 0x0011a0) != 0x001000)
+		if ((i & 0x0011a0) != 0x001000)
 			x ^= 0x0200;
 
-		if((i & 0x000180) == 0x000100)
+		if ((i & 0x000180) == 0x000100)
 			x ^= 0x0200;
 
-		if((x & 0x0024) == 0x0020 || (x & 0x0024) == 0x0004)
+		if ((x & 0x0024) == 0x0020 || (x & 0x0024) == 0x0004)
 			x ^= 0x0024;
 
 		src[i] = x;
@@ -783,14 +780,13 @@ void igs011_state::drgnwrld_type2_decrypt()
 
 void igs011_state::drgnwrld_type1_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
@@ -813,13 +809,13 @@ void igs011_state::drgnwrldv40k_decrypt()
 {
 	drgnwrld_type1_decrypt();
 
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for(int i = 0; i < rom_size / 2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if ((i & 0x0800) != 0x0800)
 			x ^= 0x0200;
@@ -842,14 +838,13 @@ void igs011_state::drgnwrldv40k_decrypt()
 
 void igs011_state::lhb2_decrypt()
 {
-	int i,j;
 	int rom_size = 0x80000;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-	std::vector<uint16_t> result_data(rom_size/2);
+	u16 *src = (u16 *) (m_maincpu_region->base());
+	std::vector<u16> result_data(rom_size/2);
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if ((i & 0x0054) != 0x0000 && (i & 0x0056) != 0x0010)
 			x ^= 0x0004;
@@ -860,7 +855,7 @@ void igs011_state::lhb2_decrypt()
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
 			x ^= 0x0020;
 
-		j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		int j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
 		result_data[j] = x;
 	}
@@ -872,32 +867,31 @@ void igs011_state::lhb2_decrypt()
 // xor similar to ryukobou (both sets are Japan), address scrambling from lhb2
 void igs011_state::nkishusp_decrypt()
 {
-	int i,j;
 	int rom_size = 0x80000;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-	std::vector<uint16_t> result_data(rom_size/2);
+	u16 *src = (u16 *) (m_maincpu_region->base());
+	std::vector<u16> result_data(rom_size/2);
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		// lhb2 address scrambling
-		j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		int j = bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
 		// ryukobou xor:
 
-//      if ( (j & 0x00100) && (j & 0x00400) )
+//      if ((j & 0x00100) && (j & 0x00400))
 //          x ^= 0x0200;
 
-		if ( !(j & 0x00004) || !(j & 0x02000) || (!(j & 0x00080) && !(j & 0x00010) ) )
+		if (!(j & 0x00004) || !(j & 0x02000) || (!(j & 0x00080) && !(j & 0x00010)))
 			x ^= 0x0020;
 
-		if ( (j & 0x00100) || (j & 0x00040) || ( (j & 0x00010)&&(j & 0x00002) ) )
+		if ((j & 0x00100) || (j & 0x00040) || ((j & 0x00010)&&(j & 0x00002)))
 			x ^= 0x00004;
 
 		// additional xor:
 
-		if ( !(j & 0x4000) && (j & 0x1000) && (j & 0x00200) )
+		if (!(j & 0x4000) && (j & 0x1000) && (j & 0x00200))
 			x ^= 0x0008;
 
 		result_data[j] = x;
@@ -909,31 +903,30 @@ void igs011_state::nkishusp_decrypt()
 
 void igs011_state::vbowl_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for(i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
-		if((i & 0x4100) == 0x0100)
+		if ((i & 0x4100) == 0x0100)
 			x ^= 0x0200;
 
-		if((i & 0x4000) == 0x4000 && (i & 0x0300) != 0x0100)
+		if ((i & 0x4000) == 0x4000 && (i & 0x0300) != 0x0100)
 			x ^= 0x0200;
 
-		if((i & 0x5700) == 0x5100)
+		if ((i & 0x5700) == 0x5100)
 			x ^= 0x0200;
 
-		if((i & 0x5500) == 0x1000)
+		if ((i & 0x5500) == 0x1000)
 			x ^= 0x0200;
 
-		if((i & 0x0140) != 0x0000 || (i & 0x0012) == 0x0012)
+		if ((i & 0x0140) != 0x0000 || (i & 0x0012) == 0x0012)
 			x ^= 0x0004;
 
-		if((i & 0x2004) != 0x2004 || (i & 0x0090) == 0x0000)
+		if ((i & 0x2004) != 0x2004 || (i & 0x0090) == 0x0000)
 			x ^= 0x0020;
 
 		src[i] = x;
@@ -945,45 +938,44 @@ void igs011_state::vbowlhk_decrypt()
 {
 	vbowl_decrypt();
 
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for(i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		// 00000-07fff, 2000 off, 800 off, 400 off, 200 on (2xx, 3xx)
-		if((i & 0xd700) == 0x0100)
+		if ((i & 0xd700) == 0x0100)
 			x ^= 0x0200;
 
 		// 00000-07fff, 800 on, 400 off, 200 on (axx, bxx)
-		if((i & 0xc700) == 0x0500)
+		if ((i & 0xc700) == 0x0500)
 			x ^= 0x0200;
 
 		// 08000-0ffff, 2000 off, 800 off, 200 off (0xx, 1xx, 4xx, 5xx)
-		if((i & 0xd500) == 0x4000)
+		if ((i & 0xd500) == 0x4000)
 			x ^= 0x0200;
 
 		// 08000-0ffff, 800 on, 200 off (8xx, 9xx, cxx, dxx)
-		if((i & 0xc500) == 0x4400)
+		if ((i & 0xc500) == 0x4400)
 			x ^= 0x0200;
 
 		// 10000-17fff, 2000 off, 200 off (0xx, 1xx, 4xx, 5xx, 8xx, 9xx, cxx, dxx)
-		if((i & 0xd100) == 0x8000)
+		if ((i & 0xd100) == 0x8000)
 			x ^= 0x0200;
 
 		// 10000-17fff, 2000 on, 800 on, 400 off, 200 on (axx, bxx)
-		if((i & 0xd700) == 0x9500)
+		if ((i & 0xd700) == 0x9500)
 			x ^= 0x0200;
 
 		// 18000-1ffff, 2000 off, 400 off, 200 on (2xx, 3xx, axx, bxx)
-		if((i & 0xd300) == 0xc100)
+		if ((i & 0xd300) == 0xc100)
 			x ^= 0x0200;
 
 		// 18000-1ffff, 2000 on, 800 on, 200 off (8xx, 9xx, cxx, dxx)
-		if((i & 0xd500) == 0xd400)
+		if ((i & 0xd500) == 0xd400)
 			x ^= 0x0200;
 
 		src[i] = x;
@@ -993,31 +985,30 @@ void igs011_state::vbowlhk_decrypt()
 
 void igs011_state::dbc_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	u16 *src = (u16 *) (m_maincpu_region->base());
 
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
-		if( i & 0x1000/2 )
+		if (i & 0x1000/2)
 		{
-			if( ~i & 0x400/2 )
+			if (~i & 0x400/2)
 				x ^= 0x0200;
 		}
 
-		if( i & 0x4000/2 )
+		if (i & 0x4000/2)
 		{
-			if( i & 0x100/2 )
+			if (i & 0x100/2)
 			{
-				if( ~i & 0x08/2 )
+				if (~i & 0x08/2)
 					x ^= 0x0020;
 			}
 			else
 			{
-				if( ~i & 0x28/2 )
+				if (~i & 0x28/2)
 					x ^= 0x0020;
 			}
 		}
@@ -1026,13 +1017,13 @@ void igs011_state::dbc_decrypt()
 			x ^= 0x0020;
 		}
 
-		if( i & 0x200/2 )
+		if (i & 0x200/2)
 		{
 			x ^= 0x0004;
 		}
 		else
 		{
-			if( (i & 0x80/2) == 0x80/2 || (i & 0x24/2) == 0x24/2 )
+			if ((i & 0x80/2) == 0x80/2 || (i & 0x24/2) == 0x24/2)
 				x ^= 0x0004;
 		}
 
@@ -1043,21 +1034,20 @@ void igs011_state::dbc_decrypt()
 
 void igs011_state::ryukobou_decrypt()
 {
-	int i;
-	uint16_t *src = (uint16_t *) memregion("maincpu")->base();
+	u16 *src = (u16 *) m_maincpu_region->base();
 	int rom_size = 0x80000;
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
-		if ( (i & 0x00100) && (i & 0x00400) )
+		if ((i & 0x00100) && (i & 0x00400))
 			x ^= 0x0200;
 
-		if ( !(i & 0x00004) || !(i & 0x02000) || (!(i & 0x00080) && !(i & 0x00010) ) )
+		if (!(i & 0x00004) || !(i & 0x02000) || (!(i & 0x00080) && !(i & 0x00010)))
 			x ^= 0x0020;
 
-		if ( (i & 0x00100) || (i & 0x00040) || ( (i & 0x00010)&&(i & 0x00002) ) )
+		if ((i & 0x00100) || (i & 0x00040) || ((i & 0x00010)&&(i & 0x00002)))
 			x ^= 0x00004;
 
 		src[i] = x;
@@ -1074,12 +1064,11 @@ void igs011_state::ryukobou_decrypt()
 
 void igs011_state::lhb2_gfx_decrypt()
 {
-	int i;
 	unsigned rom_size = 0x200000;
-	uint8_t *src = (uint8_t *) (memregion("blitter")->base());
-	std::vector<uint8_t> result_data(rom_size);
+	u8 *src = (u8 *) (memregion("blitter")->base());
+	std::vector<u8> result_data(rom_size);
 
-	for (i=0; i<rom_size; i++)
+	for (int i=0; i<rom_size; i++)
 		result_data[i] = src[bitswap<24>(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
 
 	memcpy(src,&result_data[0],rom_size);
@@ -1087,12 +1076,11 @@ void igs011_state::lhb2_gfx_decrypt()
 
 void igs011_state::drgnwrld_gfx_decrypt()
 {
-	int i;
 	unsigned rom_size = 0x400000;
-	uint8_t *src = (uint8_t *) (memregion("blitter")->base());
-	std::vector<uint8_t> result_data(rom_size);
+	u8 *src = (u8 *) (memregion("blitter")->base());
+	std::vector<u8> result_data(rom_size);
 
-	for (i=0; i<rom_size; i++)
+	for (int i=0; i<rom_size; i++)
 		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
 
 	memcpy(src,&result_data[0],rom_size);
@@ -1100,7 +1088,7 @@ void igs011_state::drgnwrld_gfx_decrypt()
 
 void igs011_state::vbowl_gfx_decrypt()
 {
-	uint8_t  *gfx = (uint8_t *)memregion("blitter")->base();
+	u8  *gfx = (u8 *)memregion("blitter")->base();
 	for (int i = 0x400000-1; i >= 0; i--)
 	{
 		gfx[i * 2 + 1] = (gfx[i] & 0xf0) >> 4;
@@ -1149,15 +1137,14 @@ void igs011_state::vbowl_gfx_decrypt()
 ***************************************************************************/
 
 
-
-WRITE16_MEMBER(igs011_state::igs011_prot1_w)
+void igs011_state::igs011_prot1_w(offs_t offset, u8 data)
 {
 	offset *= 2;
 
 	switch (offset)
 	{
 		case 0: // COPY
-			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300)
+			if ((data & 0xff) == 0x33)
 			{
 				m_prot1 = m_prot1_swap;
 				return;
@@ -1165,7 +1152,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			break;
 
 		case 2: // INC
-			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xff00)
+			if ((data & 0xff) == 0xff)
 			{
 				m_prot1++;
 				return;
@@ -1173,7 +1160,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			break;
 
 		case 4: // DEC
-			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xaa00)
+			if ((data & 0xff) == 0xaa)
 			{
 				m_prot1--;
 				return;
@@ -1181,27 +1168,27 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			break;
 
 		case 6: // SWAP
-			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500)
+			if ((data & 0xff) == 0x55)
 			{
 				// b1 . (b2|b3) . b2 . (b0&b3)
-				uint8_t x = m_prot1;
+				u8 x = m_prot1;
 				m_prot1_swap = (BIT(x,1)<<3) | ((BIT(x,2)|BIT(x,3))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,3));
 				return;
 			}
 			break;
 	}
 
-	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", machine().describe_context(), offset, data);
+	logerror("%s: warning, unknown igs011_prot1_w( %04x, %02x )\n", machine().describe_context(), offset, data);
 }
-READ16_MEMBER(igs011_state::igs011_prot1_r)
+u16 igs011_state::igs011_prot1_r()
 {
 	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
-	uint8_t x = m_prot1;
+	u8 x = m_prot1;
 	return (((BIT(x,1)&BIT(x,2))^1)<<5) | ((BIT(x,0)^BIT(x,3))<<2);
 }
 
 
-WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
+void igs011_state::igs011_prot_addr_w(u16 data)
 {
 	m_prot1 = 0x00;
 	m_prot1_swap = 0x00;
@@ -1209,7 +1196,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
 //  m_prot2 = 0x00;
 
 	address_space &sp = m_maincpu->space(AS_PROGRAM);
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = m_maincpu_region->base();
 
 	// Plug previous address range with ROM access
 	sp.install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
@@ -1224,8 +1211,8 @@ void igs011_state::prot_mem_range_set()
 	address_space &sp = m_maincpu->space(AS_PROGRAM);
 
 	// Add protection memory range
-	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write16_delegate(FUNC(igs011_state::igs011_prot1_w), this));
-	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));
+	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write8sm_delegate(FUNC(igs011_state::igs011_prot1_w), this), 0xff00);
+	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16smo_delegate(FUNC(igs011_state::igs011_prot1_r), this));
 }
 /*
 READ16_MEMBER(igs011_state::igs011_prot_fake_r)
@@ -1241,31 +1228,28 @@ READ16_MEMBER(igs011_state::igs011_prot_fake_r)
 */
 
 
-
-
-
-
 // Prot2
 
 // drgnwrld (33)
-WRITE16_MEMBER(igs011_state::igs011_prot2_reset_w)
+void igs011_state::igs011_prot2_reset_w(u8 data)
 {
 	m_prot2 = 0x00;
 }
 
 // wlcc
-READ16_MEMBER(igs011_state::igs011_prot2_reset_r)
+u16 igs011_state::igs011_prot2_reset_r()
 {
-	m_prot2 = 0x00;
+	if (!machine().side_effects_disabled())
+		m_prot2 = 0x00;
+
 	return 0;
 }
 
 
-
 // lhb2 (55), lhb/dbc/ryukobou (33)
-WRITE16_MEMBER(igs011_state::igs011_prot2_inc_w)
+void igs011_state::igs011_prot2_inc_w(u8 data)
 {
-//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0055)) )
+//  if ((data & 0xff) == 0x55)
 	{
 		m_prot2++;
 	}
@@ -1274,9 +1258,9 @@ WRITE16_MEMBER(igs011_state::igs011_prot2_inc_w)
 }
 
 // vbowl (33)
-WRITE16_MEMBER(igs011_state::igs011_prot2_dec_w)
+void igs011_state::igs011_prot2_dec_w(u8 data)
 {
-//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+//  if ((data & 0xff) == 0x33)
 	{
 		m_prot2--;
 	}
@@ -1285,15 +1269,12 @@ WRITE16_MEMBER(igs011_state::igs011_prot2_dec_w)
 }
 
 
-
-WRITE16_MEMBER(igs011_state::drgnwrld_igs011_prot2_swap_w)
+void igs011_state::drgnwrld_igs011_prot2_swap_w(u8 data)
 {
-	offset *= 2;
-
-//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+//  if ((data & 0xff) == 0x33)
 	{
 		// (b3&b0) . b2 . (b0|b1) . (b2^!b4) . (!b1^b3)
-		uint8_t x = m_prot2;
+		u8 x = m_prot2;
 		m_prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
 	}
 //  else
@@ -1301,14 +1282,12 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs011_prot2_swap_w)
 }
 
 // lhb, xymg, lhb2
-WRITE16_MEMBER(igs011_state::lhb_igs011_prot2_swap_w)
+void igs011_state::lhb_igs011_prot2_swap_w(u8 data)
 {
-	offset *= 2;
-
-//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+//  if ((data & 0xff) == 0x33)
 	{
 		// (!b0|b1) . b2 . (b0&b1)
-		uint8_t x = m_prot2;
+		u8 x = m_prot2;
 		m_prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
 	}
 //  else
@@ -1316,14 +1295,12 @@ WRITE16_MEMBER(igs011_state::lhb_igs011_prot2_swap_w)
 }
 
 // wlcc
-WRITE16_MEMBER(igs011_state::wlcc_igs011_prot2_swap_w)
+void igs011_state::wlcc_igs011_prot2_swap_w(u8 data)
 {
-	offset *= 2;
-
-//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+//  if ((data & 0xff) == 0x33)
 	{
 		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . !(b4 ^ b0) . !(b4 ^ b3)
-		uint8_t x = m_prot2;
+		u8 x = m_prot2;
 		m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
 	}
 //  else
@@ -1331,14 +1308,12 @@ WRITE16_MEMBER(igs011_state::wlcc_igs011_prot2_swap_w)
 }
 
 // vbowl
-WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
+void igs011_state::vbowl_igs011_prot2_swap_w(u8 data)
 {
-	offset *= 2;
-
-//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+//  if ((data & 0xff) == 0x33)
 	{
 		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . (b4 ^ b0) . (b4 ^ b3)
-		uint8_t x = m_prot2;
+		u8 x = m_prot2;
 		m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
 	}
 //  else
@@ -1346,82 +1321,81 @@ WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
 }
 
 
-
 // drgnwrld
-READ16_MEMBER(igs011_state::drgnwrldv40k_igs011_prot2_r)
+u16 igs011_state::drgnwrldv40k_igs011_prot2_r()
 {
 	// b9 = (!b4 & !b0) | ((b3 & !b2) & !(b1 ^ b0)
-	uint8_t x = m_prot2;
-	uint8_t b9 = ((BIT(x, 4) ^ 1) & (BIT(x, 0) ^ 1)) | (((BIT(x, 3)) & ((BIT(x, 2)) ^ 1)) & (((BIT(x, 1)) ^ (BIT(x, 0))) ^ 1));
+	u8 x = m_prot2;
+	u8 b9 = ((BIT(x, 4) ^ 1) & (BIT(x, 0) ^ 1)) | (((BIT(x, 3)) & ((BIT(x, 2)) ^ 1)) & (((BIT(x, 1)) ^ (BIT(x, 0))) ^ 1));
 	return (b9 << 9);
 }
 
-READ16_MEMBER(igs011_state::drgnwrldv21_igs011_prot2_r)
+u16 igs011_state::drgnwrldv21_igs011_prot2_r()
 {
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
-	uint8_t x = m_prot2;
-	uint8_t b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
+	u8 x = m_prot2;
+	u8 b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ((BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
 	return (b9 << 9);
 }
-READ16_MEMBER(igs011_state::drgnwrldv20j_igs011_prot2_r)
+u16 igs011_state::drgnwrldv20j_igs011_prot2_r()
 {
 	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
-	uint8_t x = m_prot2;
-	uint8_t b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
+	u8 x = m_prot2;
+	u8 b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
 	return (b9 << 9);
 }
 
 // lhb, xymg
-READ16_MEMBER(igs011_state::lhb_igs011_prot2_r)
+u16 igs011_state::lhb_igs011_prot2_r()
 {
 	// b9 = !b2 | (b1 & b0)
-	uint8_t x = m_prot2;
-	uint8_t b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
+	u8 x = m_prot2;
+	u8 b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
 	return (b9 << 9);
 }
 
 // dbc
-READ16_MEMBER(igs011_state::dbc_igs011_prot2_r)
+u16 igs011_state::dbc_igs011_prot2_r()
 {
 	// b9 = !b1 | (!b0 & b2)
-	uint8_t x = m_prot2;
-	uint8_t b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
+	u8 x = m_prot2;
+	u8 b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
 	return (b9 << 9);
 }
 
 // ryukobou
-READ16_MEMBER(igs011_state::ryukobou_igs011_prot2_r)
+u16 igs011_state::ryukobou_igs011_prot2_r()
 {
 	// b9 = (!b1 | b2) & b0
-	uint8_t x = m_prot2;
-	uint8_t b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
+	u8 x = m_prot2;
+	u8 b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
 	return (b9 << 9);
 }
 
 // lhb2
-READ16_MEMBER(igs011_state::lhb2_igs011_prot2_r)
+u16 igs011_state::lhb2_igs011_prot2_r()
 {
 	// b3 = !b2 | !b1 | b0
-	uint8_t x = m_prot2;
-	uint8_t b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
+	u8 x = m_prot2;
+	u8 b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
 	return (b3 << 3);
 }
 
 // vbowl, vbowlj
-READ16_MEMBER(igs011_state::vbowl_igs011_prot2_r)
+u16 igs011_state::vbowl_igs011_prot2_r()
 {
 	// b9 = (!b4 & !b3) | !(b2 & b1) | !(b4 | b0)
-	uint8_t x = m_prot2;
-	uint8_t b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
+	u8 x = m_prot2;
+	u8 b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
 	return (b9 << 9);
 }
 
 // vbowlhk
-READ16_MEMBER(igs011_state::vbowlhk_igs011_prot2_r)
+u16 igs011_state::vbowlhk_igs011_prot2_r()
 {
 	// b9 = (!b4 & !b3) | !(!b2 & !b1) | !(b4 | !b0)
-	uint8_t x = m_prot2;
-	uint8_t b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | (((BIT(x,2)^1) & (BIT(x,1)^1))^1) | ((BIT(x,4) | (BIT(x,0)^1))^1);
+	u8 x = m_prot2;
+	u8 b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | (((BIT(x,2)^1) & (BIT(x,1)^1))^1) | ((BIT(x,4) | (BIT(x,0)^1))^1);
 	return (b9 << 9);
 }
 
@@ -1447,7 +1421,7 @@ READ16_MEMBER(igs011_state::vbowlhk_igs011_prot2_r)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(igs011_state::igs012_prot_reset_w)
+void igs011_state::igs012_prot_reset_w(u16 data)
 {
 	m_igs012_prot = 0x00;
 	m_igs012_prot_swap = 0x00;
@@ -1468,11 +1442,11 @@ READ16_MEMBER(igs011_state::igs012_prot_fake_r)
 */
 
 // Macro that checks whether the current mode and data byte written match the arguments
-#define MODE_AND_DATA(_MODE,_DATA)  (m_igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
+#define MODE_AND_DATA(_MODE,_DATA)  (m_igs012_prot_mode == (_MODE) && ((data & 0xff) == (_DATA)) )
 
-WRITE16_MEMBER(igs011_state::igs012_prot_mode_w)
+void igs011_state::igs012_prot_mode_w(offs_t offset, u8 data)
 {
-	if ( MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xcc) || MODE_AND_DATA(0, 0xdd) || MODE_AND_DATA(1, 0xdd))
+	if (MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xcc) || MODE_AND_DATA(0, 0xdd) || MODE_AND_DATA(1, 0xdd))
 	{
 		m_igs012_prot_mode = m_igs012_prot_mode ^ 1;
 	}
@@ -1480,9 +1454,9 @@ WRITE16_MEMBER(igs011_state::igs012_prot_mode_w)
 		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_inc_w)
+void igs011_state::igs012_prot_inc_w(offs_t offset, u8 data)
 {
-	if ( MODE_AND_DATA(0, 0xff) )
+	if (MODE_AND_DATA(0, 0xff) )
 	{
 		m_igs012_prot = (m_igs012_prot + 1) & 0x1f;
 	}
@@ -1490,13 +1464,13 @@ WRITE16_MEMBER(igs011_state::igs012_prot_inc_w)
 		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_dec_inc_w)
+void igs011_state::igs012_prot_dec_inc_w(offs_t offset, u8 data)
 {
-	if ( MODE_AND_DATA(0, 0xaa) )
+	if (MODE_AND_DATA(0, 0xaa) )
 	{
 		m_igs012_prot = (m_igs012_prot - 1) & 0x1f;
 	}
-	else if ( MODE_AND_DATA(1, 0xfa) )
+	else if (MODE_AND_DATA(1, 0xfa) )
 	{
 		m_igs012_prot = (m_igs012_prot + 1) & 0x1f;
 	}
@@ -1504,13 +1478,13 @@ WRITE16_MEMBER(igs011_state::igs012_prot_dec_inc_w)
 		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_dec_copy_w)
+void igs011_state::igs012_prot_dec_copy_w(offs_t offset, u8 data)
 {
-	if ( MODE_AND_DATA(0, 0x33) )
+	if (MODE_AND_DATA(0, 0x33) )
 	{
 		m_igs012_prot = m_igs012_prot_swap;
 	}
-	else if ( MODE_AND_DATA(1, 0x5a) )
+	else if (MODE_AND_DATA(1, 0x5a) )
 	{
 		m_igs012_prot = (m_igs012_prot - 1) & 0x1f;
 	}
@@ -1518,9 +1492,9 @@ WRITE16_MEMBER(igs011_state::igs012_prot_dec_copy_w)
 		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_copy_w)
+void igs011_state::igs012_prot_copy_w(offs_t offset, u8 data)
 {
-	if ( MODE_AND_DATA(1, 0x22) )
+	if (MODE_AND_DATA(1, 0x22) )
 	{
 		m_igs012_prot = m_igs012_prot_swap;
 	}
@@ -1528,25 +1502,25 @@ WRITE16_MEMBER(igs011_state::igs012_prot_copy_w)
 		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_swap_w)
+void igs011_state::igs012_prot_swap_w(offs_t offset, u8 data)
 {
-	if ( MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
+	if (MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
 	{
 		// !(3 | 1)..(2 & 1)..(3 ^ 0)..(!2)
-		uint8_t x = m_igs012_prot;
+		u8 x = m_igs012_prot;
 		m_igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
 	}
 	else
 		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-READ16_MEMBER(igs011_state::igs012_prot_r)
+u16 igs011_state::igs012_prot_r()
 {
 	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
-	uint8_t x = m_igs012_prot;
+	u8 x = m_igs012_prot;
 
-	uint8_t b1 = (BIT(x,3) | BIT(x,1))^1;
-	uint8_t b0 = BIT(x,3) ^ BIT(x,0);
+	u8 b1 = (BIT(x,3) | BIT(x,1))^1;
+	u8 b0 = BIT(x,3) ^ BIT(x,0);
 
 	return (b1 << 1) | (b0 << 0);
 }
@@ -1557,15 +1531,14 @@ READ16_MEMBER(igs011_state::igs012_prot_r)
 
 ***************************************************************************/
 
-
-WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
+void igs011_state::igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs003_reg[offset]);
+	COMBINE_DATA(&m_igs003_reg);
+}
 
-	if (offset == 0)
-		return;
-
-	switch(m_igs003_reg[0])
+void igs011_state::drgnwrld_igs003_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	switch (m_igs003_reg)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
@@ -1584,17 +1557,17 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 //      case 0x05:
 
 		default:
-//          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
+//          popmessage("igs003 %x <- %04x",m_igs003_reg,data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
+u16 igs011_state::drgnwrld_igs003_r()
 {
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
-		case 0x00:  return ioport("IN0")->read();
-		case 0x01:  return ioport("IN1")->read();
-		case 0x02:  return ioport("IN2")->read();
+		case 0x00:  return m_io_in[0]->read();
+		case 0x01:  return m_io_in[1]->read();
+		case 0x02:  return m_io_in[2]->read();
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;
@@ -1619,15 +1592,14 @@ READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 	}
 
 	return 0;
 }
 
 
-
-WRITE16_MEMBER(igs011_state::lhb_inputs_w)
+void igs011_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_igs_input_sel);
 
@@ -1638,23 +1610,23 @@ WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 		m_igs_hopper        =   data & 0x80;
 	}
 
-	if ( m_igs_input_sel & (~0xff) )
+	if (m_igs_input_sel & (~0xff) )
 		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 
 //  popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 }
-READ16_MEMBER(igs011_state::lhb_inputs_r)
+u16 igs011_state::lhb_inputs_r(offs_t offset)
 {
-	switch(offset)
+	switch (offset)
 	{
 		case 0:     return m_igs_input_sel;
 
 		case 1:
-			if (~m_igs_input_sel & 0x01)    return ioport("KEY0")->read();
-			if (~m_igs_input_sel & 0x02)    return ioport("KEY1")->read();
-			if (~m_igs_input_sel & 0x04)    return ioport("KEY2")->read();
-			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
-			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
+			if (~m_igs_input_sel & 0x01)    return m_io_key[0]->read();
+			if (~m_igs_input_sel & 0x02)    return m_io_key[1]->read();
+			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
+			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
+			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
 
 			logerror("%06x: warning, reading with igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 			break;
@@ -1663,15 +1635,9 @@ READ16_MEMBER(igs011_state::lhb_inputs_r)
 }
 
 
-
-WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
+void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs003_reg[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
 		case 0x00:
 			COMBINE_DATA(&m_igs_input_sel);
@@ -1683,7 +1649,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 				m_igs_hopper        =   data & 0x80;
 			}
 
-			if ( m_igs_input_sel & ~0x7f )
+			if (m_igs_input_sel & ~0x7f )
 				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 
 //          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
@@ -1697,7 +1663,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 				m_oki->set_rom_bank((data >> 3) & 1);
 			}
 
-			if ( m_lhb2_pen_hi & ~0xf )
+			if (m_lhb2_pen_hi & ~0xf )
 				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", m_maincpu->pc(), m_lhb2_pen_hi);
 
 //          popmessage("oki %02x",m_lhb2_pen_hi & 0x08);
@@ -1719,10 +1685,10 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 
 		case 0x48:
 			m_igs003_prot_x = 0;
-			if((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08; // $100de6 (always 0 in lhb2)
-			if((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04; // $100de7 (always 0 in lhb2)
-			if((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02; // $100de8
-			if((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01; // $100de9
+			if ((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08; // $100de6 (always 0 in lhb2)
+			if ((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04; // $100de7 (always 0 in lhb2)
+			if ((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02; // $100de8
+			if ((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01; // $100de9
 			break;
 
 		case 0x50: // reset?
@@ -1738,9 +1704,9 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 		case 0x86:
 		case 0x87:
 			{
-				uint16_t old;
+				u16 old;
 
-				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
+				m_igs003_prot_y = m_igs003_reg & 0x07;
 				m_igs003_prot_z = data;
 
 				old = m_igs003_prot_hold;
@@ -1763,23 +1729,23 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			break;
 
 		default:
-//          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
+//          popmessage("igs003 %x <- %04x",m_igs003_reg,data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-READ16_MEMBER(igs011_state::lhb2_igs003_r)
+u16 igs011_state::lhb2_igs003_r()
 {
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
 		case 0x01:
-			if (~m_igs_input_sel & 0x01)    return ioport("KEY0")->read();
-			if (~m_igs_input_sel & 0x02)    return ioport("KEY1")->read();
-			if (~m_igs_input_sel & 0x04)    return ioport("KEY2")->read();
-			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
-			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
+			if (~m_igs_input_sel & 0x01)    return m_io_key[0]->read();
+			if (~m_igs_input_sel & 0x02)    return m_io_key[1]->read();
+			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
+			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
+			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
 			/* fall through */
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 			break;
 
 		case 0x03:
@@ -1816,15 +1782,9 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 }
 
 
-
-WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
+void igs011_state::wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs003_reg[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
@@ -1843,14 +1803,14 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-READ16_MEMBER(igs011_state::wlcc_igs003_r)
+u16 igs011_state::wlcc_igs003_r()
 {
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
-		case 0x00:  return ioport("IN0")->read();
+		case 0x00:  return m_io_in[0]->read();
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;
@@ -1875,22 +1835,16 @@ READ16_MEMBER(igs011_state::wlcc_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 	}
 
 	return 0;
 }
 
 
-
-WRITE16_MEMBER(igs011_state::xymg_igs003_w)
+void igs011_state::xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs003_reg[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
 		case 0x01:
 			COMBINE_DATA(&m_igs_input_sel);
@@ -1902,28 +1856,28 @@ WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 				m_igs_hopper        =   data & 0x80;
 			}
 
-			if ( m_igs_input_sel & 0x40 )
+			if (m_igs_input_sel & 0x40 )
 				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", m_maincpu->pc(), m_igs_input_sel);
 
 //          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-READ16_MEMBER(igs011_state::xymg_igs003_r)
+u16 igs011_state::xymg_igs003_r()
 {
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
-		case 0x00:  return ioport("COIN")->read();
+		case 0x00:  return m_io_coin->read();
 
 		case 0x02:
-			if (~m_igs_input_sel & 0x01)    return ioport("KEY0")->read();
-			if (~m_igs_input_sel & 0x02)    return ioport("KEY1")->read();
-			if (~m_igs_input_sel & 0x04)    return ioport("KEY2")->read();
-			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
-			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
+			if (~m_igs_input_sel & 0x01)    return m_io_key[0]->read();
+			if (~m_igs_input_sel & 0x02)    return m_io_key[1]->read();
+			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
+			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
+			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
 			/* fall through */
 
 		case 0x20:  return 0x49;
@@ -1949,7 +1903,7 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 			break;
 	}
 
@@ -1958,14 +1912,9 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 
 
 // vbowl, vbowlj
-WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
+void igs011_state::vbowl_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs003_reg[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
@@ -1995,10 +1944,10 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 
 		case 0x48:
 			m_igs003_prot_x = 0;
-			if((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
-			if((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
-			if((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
-			if((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
+			if ((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
+			if ((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
+			if ((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
+			if ((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
 			break;
 
 		case 0x50: // reset?
@@ -2014,9 +1963,9 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 		case 0x86:
 		case 0x87:
 			{
-				uint16_t old;
+				u16 old;
 
-				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
+				m_igs003_prot_y = m_igs003_reg & 0x07;
 				m_igs003_prot_z = data;
 
 				old = m_igs003_prot_hold;
@@ -2039,16 +1988,16 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 			break;
 
 		default:
-//          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
+//          popmessage("igs003 %x <- %04x",m_igs003_reg,data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-READ16_MEMBER(igs011_state::vbowl_igs003_r)
+u16 igs011_state::vbowl_igs003_r()
 {
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
-		case 0x00:  return ioport("IN0")->read();
-		case 0x01:  return ioport("IN1")->read();
+		case 0x00:  return m_io_in[0]->read();
+		case 0x01:  return m_io_in[1]->read();
 
 		case 0x03:
 			return bitswap<16>(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
@@ -2076,7 +2025,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 		case 0x34:  return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 	}
 
 	return 0;
@@ -2084,14 +2033,9 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 
 
 // vbowlhk (different bitswap)
-WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
+void igs011_state::vbowlhk_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_igs003_reg[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs003_reg[0])
+	switch (m_igs003_reg)
 	{
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
@@ -2121,10 +2065,10 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 
 		case 0x48:
 			m_igs003_prot_x = 0;
-			if((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
-			if((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
-			if((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
-			if((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
+			if ((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
+			if ((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
+			if ((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
+			if ((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
 			break;
 
 		case 0x50: // reset?
@@ -2140,9 +2084,9 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 		case 0x86:
 		case 0x87:
 			{
-				uint16_t old;
+				u16 old;
 
-				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
+				m_igs003_prot_y = m_igs003_reg & 0x07;
 				m_igs003_prot_z = data;
 
 				old = m_igs003_prot_hold;
@@ -2165,11 +2109,10 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 			break;
 
 		default:
-//          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg[0], data);
+//          popmessage("igs003 %x <- %04x",m_igs003_reg,data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-
 
 
 /***************************************************************************
@@ -2181,7 +2124,7 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 // V0400O
 void igs011_state::init_drgnwrld()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2207,7 +2150,7 @@ void igs011_state::init_drgnwrld()
 
 void igs011_state::init_drgnwrldv30()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2232,11 +2175,11 @@ void igs011_state::init_drgnwrldv30()
 
 void igs011_state::init_drgnwrldv21()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	drgnwrld_type2_decrypt();
 	drgnwrld_gfx_decrypt();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -2261,7 +2204,7 @@ void igs011_state::init_drgnwrldv21()
 
 void igs011_state::init_drgnwrldv21j()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	drgnwrld_type3_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2288,7 +2231,7 @@ void igs011_state::init_drgnwrldv21j()
 
 void igs011_state::init_drgnwrldv20j()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	drgnwrld_type3_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2320,7 +2263,7 @@ void igs011_state::init_drgnwrldv40k()
 	drgnwrldv40k_decrypt();
 	drgnwrld_gfx_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv40k_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(FUNC(igs011_state::drgnwrldv40k_igs011_prot2_r), this));
 }
 
 void igs011_state::init_drgnwrldv11h()
@@ -2334,7 +2277,7 @@ void igs011_state::init_drgnwrldv11h()
 
 void igs011_state::init_drgnwrldv10c()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2360,7 +2303,7 @@ void igs011_state::init_drgnwrldv10c()
 
 void igs011_state::init_lhb()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	lhb_decrypt();
 
@@ -2370,7 +2313,7 @@ void igs011_state::init_lhb()
 
 void igs011_state::init_lhbv33c()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	lhb_decrypt();
 
@@ -2380,11 +2323,11 @@ void igs011_state::init_lhbv33c()
 
 void igs011_state::init_dbc()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	dbc_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), this));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -2410,11 +2353,11 @@ void igs011_state::init_dbc()
 
 void igs011_state::init_ryukobou()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	ryukobou_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), this));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -2423,7 +2366,7 @@ void igs011_state::init_ryukobou()
 
 void igs011_state::init_xymg()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	lhb_decrypt();
 /*
@@ -2457,7 +2400,7 @@ void igs011_state::init_xymg()
 
 void igs011_state::init_wlcc()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	wlcc_decrypt();
 /*
@@ -2481,7 +2424,7 @@ void igs011_state::init_wlcc()
 
 void igs011_state::init_lhb2()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	lhb2_decrypt();
 	lhb2_gfx_decrypt();
@@ -2504,7 +2447,7 @@ void igs011_state::init_lhb2()
 
 void igs011_state::init_vbowl()
 {
-	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+	u16 *rom = (u16 *) m_maincpu_region->base();
 
 	vbowl_decrypt();
 	vbowl_gfx_decrypt();
@@ -2524,7 +2467,7 @@ void igs011_state::init_vbowl()
 
 void igs011_state::init_vbowlj()
 {
-//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+//  u16 *rom = (u16 *) m_maincpu_region->base();
 
 	vbowl_decrypt();
 	vbowl_gfx_decrypt();
@@ -2551,7 +2494,7 @@ void igs011_state::init_vbowlhk()
 
 void igs011_state::init_nkishusp()
 {
-	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+	u16 *rom = (u16 *) m_maincpu_region->base();
 
 	nkishusp_decrypt();
 	lhb2_gfx_decrypt();
@@ -2588,7 +2531,7 @@ void igs011_state::init_nkishusp()
 void igs011_state::drgnwrld_mem(address_map &map)
 {
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
-//  map(0x01dd70, 0x01dd77).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x01dd70, 0x01dd77).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x01dd78, 0x01dd79).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x000000, 0x07ffff).rom();
@@ -2600,8 +2543,8 @@ void igs011_state::drgnwrld_mem(address_map &map)
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700003).w("ymsnd", FUNC(ym3812_device::write)).umask16(0x00ff);
 
-	map(0x800000, 0x800003).w(FUNC(igs011_state::drgnwrld_igs003_w));
-	map(0x800002, 0x800003).r(FUNC(igs011_state::drgnwrld_igs003_r));
+	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
+	map(0x800002, 0x800003).rw(FUNC(igs011_state::drgnwrld_igs003_r), FUNC(igs011_state::drgnwrld_igs003_w));
 
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
@@ -2618,7 +2561,7 @@ void igs011_state::drgnwrld_mem(address_map &map)
 	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
 	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_dips_r<3>));
 }
 
 void igs011_state::drgnwrld_igs012_mem(address_map &map)
@@ -2645,21 +2588,17 @@ void igs011_state::drgnwrld_igs012_mem(address_map &map)
 }
 
 
-
 // Only values 0 and 7 are written (1 bit per irq source?)
-WRITE16_MEMBER(igs011_state::lhb_irq_enable_w)
+void igs011_state::lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA( &m_lhb_irq_enable );
 }
 
-WRITE16_MEMBER(igs011_state::lhb_okibank_w)
+void igs011_state::lhb_okibank_w(u8 data)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		m_oki->set_rom_bank((data >> 9) & 1);
-	}
+	m_oki->set_rom_bank((data >> 1) & 1);
 
-	if ( data & (~0x200) )
+	if (data & (~0x2) )
 		logerror("%s: warning, unknown bits written in oki bank = %02x\n", machine().describe_context(), data);
 
 //  popmessage("oki %04x",data);
@@ -2670,10 +2609,10 @@ void igs011_state::lhb_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
-	map(0x010000, 0x010001).w(FUNC(igs011_state::lhb_okibank_w));
+	map(0x010000, 0x010000).w(FUNC(igs011_state::lhb_okibank_w));
 
 	map(0x010200, 0x0103ff).w(FUNC(igs011_state::igs011_prot2_inc_w));
 	map(0x010400, 0x0105ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));
@@ -2705,7 +2644,7 @@ void igs011_state::lhb_mem(address_map &map)
 	map(0x85b000, 0x85b001).w(FUNC(igs011_state::igs011_blit_flags_w));
 	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_5_dips_r));
+	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_dips_r<5>));
 }
 
 void igs011_state::xymg_mem(address_map &map)
@@ -2713,10 +2652,10 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  xymg: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
-	map(0x010000, 0x010001).w(FUNC(igs011_state::lhb_okibank_w));
+	map(0x010000, 0x010000).w(FUNC(igs011_state::lhb_okibank_w));
 
 	map(0x010200, 0x0103ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc  (33)
 	map(0x010400, 0x0105ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap (33)
@@ -2730,8 +2669,8 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700000, 0x700003).w(FUNC(igs011_state::xymg_igs003_w));
-	map(0x700002, 0x700003).r(FUNC(igs011_state::xymg_igs003_r));
+	map(0x700000, 0x700001).w(FUNC(igs011_state::igs003_w));
+	map(0x700002, 0x700003).rw(FUNC(igs011_state::xymg_igs003_r), FUNC(igs011_state::xymg_igs003_w));
 	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0x840000, 0x840001).w(FUNC(igs011_state::igs_dips_w));
 
@@ -2747,13 +2686,13 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x85b000, 0x85b001).w(FUNC(igs011_state::igs011_blit_flags_w));
 	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_3_dips_r));
+	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_dips_r<3>));
 }
 
 void igs011_state::wlcc_mem(address_map &map)
 {
 //  wlcc: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x518000, 0x5181ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (33)
@@ -2769,8 +2708,8 @@ void igs011_state::wlcc_mem(address_map &map)
 	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x800000, 0x800003).w(FUNC(igs011_state::wlcc_igs003_w));
-	map(0x800002, 0x800003).r(FUNC(igs011_state::wlcc_igs003_r));
+	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
+	map(0x800002, 0x800003).rw(FUNC(igs011_state::wlcc_igs003_r), FUNC(igs011_state::wlcc_igs003_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::igs_dips_w));
 
@@ -2786,9 +2725,8 @@ void igs011_state::wlcc_mem(address_map &map)
 	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
 	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_4_dips_r));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_dips_r<4>));
 }
-
 
 
 void igs011_state::lhb2_mem(address_map &map)
@@ -2796,7 +2734,7 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
-//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x020000, 0x0201ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
@@ -2807,8 +2745,8 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208003).w(FUNC(igs011_state::lhb2_igs003_w));
-	map(0x208002, 0x208003).r(FUNC(igs011_state::lhb2_igs003_r));
+	map(0x208000, 0x208001).w(FUNC(igs011_state::igs003_w));
+	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share("priority_ram");
 	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
@@ -2829,9 +2767,8 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
 	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_dips_r<3>));
 }
-
 
 
 void igs011_state::nkishusp_mem(address_map &map)
@@ -2839,7 +2776,7 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  nkishusp: IGS011 protection dynamically mapped at 1ff8x
-//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
 
 	// to be done:
@@ -2851,8 +2788,8 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208003).w(FUNC(igs011_state::lhb2_igs003_w));
-	map(0x208002, 0x208003).r(FUNC(igs011_state::lhb2_igs003_r));
+	map(0x208000, 0x208001).w(FUNC(igs011_state::igs003_w));
+	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share("priority_ram");
 	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
@@ -2874,11 +2811,11 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
 	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_dips_r<3>));
 }
 
 
-READ16_MEMBER(igs011_state::vbowl_unk_r)
+u16 igs011_state::vbowl_unk_r()
 {
 	return 0xffff;
 }
@@ -2889,32 +2826,29 @@ WRITE_LINE_MEMBER(igs011_state::screen_vblank_vbowl)
 	if (state)
 	{
 		m_vbowl_trackball[0] = m_vbowl_trackball[1];
-		m_vbowl_trackball[1] = (ioport("AN1")->read() << 8) | ioport("AN0")->read();
+		m_vbowl_trackball[1] = (m_io_an[1]->read() << 8) | m_io_an[0]->read();
 	}
 }
 
-WRITE16_MEMBER(igs011_state::vbowl_pen_hi_w)
+void igs011_state::vbowl_pen_hi_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_lhb2_pen_hi = data & 0x07;
-	}
+	m_lhb2_pen_hi = data & 0x07;
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", m_maincpu->pc(), m_priority);
+		logerror("%06x: warning, unknown bits written to pen_hi = %02x\n", m_maincpu->pc(), m_priority);
 }
 
-WRITE16_MEMBER(igs011_state::vbowl_link_0_w){ }
-WRITE16_MEMBER(igs011_state::vbowl_link_1_w){ }
-WRITE16_MEMBER(igs011_state::vbowl_link_2_w){ }
-WRITE16_MEMBER(igs011_state::vbowl_link_3_w){ }
+void igs011_state::vbowl_link_0_w(u16 data){ }
+void igs011_state::vbowl_link_1_w(u16 data){ }
+void igs011_state::vbowl_link_2_w(u16 data){ }
+void igs011_state::vbowl_link_3_w(u16 data){ }
 
 void igs011_state::vbowl_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
 //  vbowl: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w));
+//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
 //  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
 
 	// IGS012
@@ -2948,9 +2882,9 @@ void igs011_state::vbowl_mem(address_map &map)
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600000, 0x600007).rw(m_ics, FUNC(ics2115_device::word_r), FUNC(ics2115_device::word_w));
 	map(0x700000, 0x700003).ram().share("vbowl_trackball");
-	map(0x700004, 0x700005).w(FUNC(igs011_state::vbowl_pen_hi_w));
-	map(0x800000, 0x800003).w(FUNC(igs011_state::vbowl_igs003_w));
-	map(0x800002, 0x800003).r(FUNC(igs011_state::vbowl_igs003_r));
+	map(0x700005, 0x700005).w(FUNC(igs011_state::vbowl_pen_hi_w));
+	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
+	map(0x800002, 0x800003).rw(FUNC(igs011_state::vbowl_igs003_r), FUNC(igs011_state::vbowl_igs003_w));
 
 	map(0xa00000, 0xa00001).w(FUNC(igs011_state::vbowl_link_0_w));
 	map(0xa08000, 0xa08001).w(FUNC(igs011_state::vbowl_link_1_w));
@@ -2975,7 +2909,7 @@ void igs011_state::vbowl_mem(address_map &map)
 	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
 
 	map(0xa80000, 0xa80001).r(FUNC(igs011_state::vbowl_unk_r)); // comm
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_4_dips_r));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_dips_r<4>));
 	map(0xa90000, 0xa90001).r(FUNC(igs011_state::vbowl_unk_r)); // comm
 	map(0xa98000, 0xa98001).r(FUNC(igs011_state::vbowl_unk_r)); // comm
 }
@@ -2984,10 +2918,9 @@ void igs011_state::vbowl_mem(address_map &map)
 void igs011_state::vbowlhk_mem(address_map &map)
 {
 	vbowl_mem(map);
-	map(0x800000, 0x800003).w(FUNC(igs011_state::vbowlhk_igs003_w));
+	map(0x800002, 0x800003).w(FUNC(igs011_state::vbowlhk_igs003_w));
 	map(0x50f600, 0x50f7ff).r(FUNC(igs011_state::vbowlhk_igs011_prot2_r));   // read
 }
-
 
 
 /***************************************************************************
@@ -4092,7 +4025,6 @@ static INPUT_PORTS_START( xymg )
 INPUT_PORTS_END
 
 
-
 /***************************************************************************
 
     Machine Drivers
@@ -4181,7 +4113,7 @@ void igs011_state::igs011_base(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(igs011_state::screen_update_igs011));
+	m_screen->set_screen_update(FUNC(igs011_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000/4);

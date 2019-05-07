@@ -116,7 +116,7 @@ namespace netlist
 		{
 			m_type = static_cast<int>(m_model.m_TYPE);
 			if (m_type < 1 || m_type > 3)
-				log().fatal(MF_1_UNKNOWN_OPAMP_TYPE, m_type);
+				log().fatal(MF_OPAMP_UNKNOWN_TYPE(m_type));
 
 			if (m_type == 1)
 			{
@@ -157,7 +157,7 @@ namespace netlist
 
 				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
 				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
-				
+
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");
 				connect("DP.A", "DN.K");
@@ -225,7 +225,7 @@ namespace netlist
 
 			//printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
 			if (m_model.m_SLEW / (4.0 * constants::pi() * 0.0258) < m_model.m_UGF)
-				log().warning("Opamp <{1}> parameters fail convergence criteria", this->name());
+				log().warning(MW_OPAMP_FAIL_CONVERGENCE(this->name()));
 
 			m_CP->m_C.setTo(CP);
 			m_RP.set_R(RP);

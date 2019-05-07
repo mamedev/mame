@@ -300,11 +300,28 @@ namespace plib {
 			#endif
 		}
 
+#if 0
 		template<typename T, typename... Args>
 		owned_pool_ptr<T> make_poolptr(Args&&... args)
 		{
 			auto *mem = allocate(alignof(T), sizeof(T));
 			return owned_pool_ptr<T>(new (mem) T(std::forward<Args>(args)...), true, arena_deleter<aligned_arena, T>(*this));
+		}
+#endif
+		template<typename T, typename... Args>
+		owned_pool_ptr<T> make_poolptr(Args&&... args)
+		{
+			auto *mem = allocate(alignof(T), sizeof(T));
+			try
+			{
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return owned_pool_ptr<T>(mema, true, arena_deleter<aligned_arena, T>(*this));
+			}
+			catch (...)
+			{
+				deallocate(mem);
+				throw;
+			}
 		}
 
 	};

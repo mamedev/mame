@@ -81,14 +81,13 @@ void contra_state::contra_map(address_map &map)
 
 	map(0x1000, 0x1fff).ram();
 
-	map(0x2000, 0x5fff).readonly();
-	map(0x2000, 0x23ff).w(FUNC(contra_state::contra_fg_cram_w)).share("fg_cram");
-	map(0x2400, 0x27ff).w(FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
-	map(0x2800, 0x2bff).w(FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
-	map(0x2c00, 0x2fff).w(FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
+	map(0x2000, 0x23ff).ram().w(FUNC(contra_state::contra_fg_cram_w)).share("fg_cram");
+	map(0x2400, 0x27ff).ram().w(FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
+	map(0x2800, 0x2bff).ram().w(FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
+	map(0x2c00, 0x2fff).ram().w(FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
 	map(0x3000, 0x3fff).ram().share("spriteram");
-	map(0x4000, 0x43ff).w(FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
-	map(0x4400, 0x47ff).w(FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
+	map(0x4000, 0x43ff).ram().w(FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
+	map(0x4400, 0x47ff).ram().w(FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
 	map(0x4800, 0x4fff).ram();
 	map(0x5000, 0x5fff).ram().share("spriteram_2");
 

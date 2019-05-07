@@ -5,32 +5,32 @@
     Cartridges supported
 
     Piano Favourites (J7522)
-	Dora the Explorer Musical Adventure (J7523)
-	Jungle Boogie (J7524)
-	Scooby-Doo! Monster Mayhem (J7525)
-	Barbie Princess Enchanted Sounds (J7526)
-	Nicktoons Show Tunes (J7527)
-	Holiday Wonderland (J7528)
-	
-	Rockin' Dance Party (J8715)
-	
-	Pop Hits (K0653)
-	
-    Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan) (K4653)  
+    Dora the Explorer Musical Adventure (J7523)
+    Jungle Boogie (J7524)
+    Scooby-Doo! Monster Mayhem (J7525)
+    Barbie Princess Enchanted Sounds (J7526)
+    Nicktoons Show Tunes (J7527)
+    Holiday Wonderland (J7528)
+
+    Rockin' Dance Party (J8715)
+
+    Pop Hits (K0653)
+
+    Jammin Jungle Safari (Disney The Lion King, Disney The Jungle Book, Disney Tarzan) (K4653)
     The Wizard of Oz - We're Off to Play the Piano (K4654)
     American Idol - Take The Stage (K4655)
-    Disney Princess Magical Melodies (K4656)   
+    Disney Princess Magical Melodies (K4656)
 
-	
-	*NOT DUMPED*
-	
-	The system was also released as "Aprende A Tocar Piano" for Spanish (South American?) markets
-	with at least 3 carts having full Spanish labels and ingame presentation
-	
-	Piezas De Piano Populares (J9939) - Piano Favourites
 
-	Dora Aventura Musical (J9947)  - Dora the Explorer Musical Adventure
-	Ritmos de la Selva  (J9948)  - Jungle Boogie
+    *NOT DUMPED*
+
+    The system was also released as "Aprende A Tocar Piano" for Spanish (South American?) markets
+    with at least 3 carts having full Spanish labels and ingame presentation
+
+    Piezas De Piano Populares (J9939) - Piano Favourites
+
+    Dora Aventura Musical (J9947)  - Dora the Explorer Musical Adventure
+    Ritmos de la Selva  (J9948)  - Jungle Boogie
 
 
 
@@ -106,7 +106,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="barbie">
 		<description>Barbie Princess Enchanted Sounds (J7526)</description>
 		<year>2005</year>
@@ -117,7 +117,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="showtune">
 		<description>Nicktoons Show Tunes (J7527)</description>
 		<year>2005</year>
@@ -127,8 +127,8 @@
 				<rom name="icppshowtunes.bin" size="0x800000" crc="c95836fd" sha1="c07b500f241fc6b3a3302b580794bb2eb86977c7" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
-		
+	</software>
+
 	<software name="holidaywl">
 		<description>Holiday Wonderland (J7528)</description>
 		<year>2005</year>
@@ -139,7 +139,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="rdp">
 		<description>Rockin' Dance Party (J8715)</description>
 		<year>2005</year>
@@ -149,8 +149,8 @@
 				<rom name="icpprockindanceparty.bin" size="0x800000" crc="00d597d3" sha1="603c8d9d11f5e1d075a1b524e99b581d859b43ba" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="pophits">
 		<description>Pop Hits (K0653)</description>
 		<year>2005</year>
@@ -160,8 +160,8 @@
 				<rom name="icpppophits.bin" size="0x800000" crc="c15ccdad" sha1="f4a058c83b1a90a1c8c5cfa766429330ce34409d" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="jjs">
 		<description>Jammin' Jungle Safari (Disney's The Lion King, Jungle Book, Tarzan) (K4653)</description> <!-- Tarzan is shown on the cart, but none of the songs are from it? -->
 		<year>2005</year>
@@ -171,8 +171,8 @@
 				<rom name="icppjamminjunglesafari.bin" size="0x800000" crc="6408abb6" sha1="9c9c050e919222a80369d2a116a85db6cc4d7acb" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="wizardoz">
 		<description>The Wizard of Oz - We're Off to Play the Piano (K4654)</description>
 		<year>2005</year>
@@ -182,8 +182,8 @@
 				<rom name="icppwizardofoz.bin" size="0x800000" crc="4c004177" sha1="415463532e760542cacdc833ed1d201df70e18d3" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="aitts">
 		<description>American Idol Take the Stage (K4655)</description>
 		<year>2005</year>
@@ -193,7 +193,7 @@
 				<rom name="icppamericanidoltakethestage.bin" size="0x800000" crc="908a965d" sha1="9faca7bb85ca395e2f8cd444884f0a74ce22d151" offset="0" />
 			</dataarea>
 		</part>
-	</software>		
+	</software>
 
 	<software name="dpmagic">
 		<description>Disney Princess Magical Melodies (K4656)</description>

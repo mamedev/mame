@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { set_pa_line(5, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { set_pa_line(6, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { set_pa_line(7, state); }
-	DECLARE_WRITE8_MEMBER( write_pa );
+	void write_pa( u8 data );
 	DECLARE_WRITE_LINE_MEMBER( write_ca1 );
 	DECLARE_WRITE_LINE_MEMBER( write_ca2 );
 
@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { set_pb_line(5, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { set_pb_line(6, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { set_pb_line(7, state); }
-	DECLARE_WRITE8_MEMBER( write_pb );
+	void write_pb( u8 data );
 	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
 	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
 

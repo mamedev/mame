@@ -11,7 +11,7 @@
 		<info name="serial" value="CD3534"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd3534a.vsm" size="0x4000" crc="78410e74" sha1="29bf24f7d3a49c097542befc51874bd238989a7a" offset="0" />
+				<rom name="cd3534a.vsm" size="0x4000" crc="78410e74" sha1="29bf24f7d3a49c097542befc51874bd238989a7a" />
 			</dataarea>
 		</part>
 	</software>
@@ -23,7 +23,7 @@
 		<info name="serial" value="CD3536"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd3536.vsm" size="0x4000" crc="9a26e0c8" sha1="a7c5bba2174ad3f53ee4f492d47205fe3d8f267d" offset="0" />
+				<rom name="cd3536.vsm" size="0x4000" crc="9a26e0c8" sha1="a7c5bba2174ad3f53ee4f492d47205fe3d8f267d" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,7 +35,7 @@
 		<info name="serial" value="CD3538"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd3538.vsm" size="0x4000" crc="873eeca6" sha1="6673ef02635d8c418cc647840d110488c9fc76fd" offset="0" />
+				<rom name="cd3538.vsm" size="0x4000" crc="873eeca6" sha1="6673ef02635d8c418cc647840d110488c9fc76fd" />
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 		<info name="serial" value="CD2396"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd2396a.vsm" size="0x4000" crc="b005d92a" sha1="f1f9d83e18e77d89590e794cb157c8fe18e5aa05" offset="0" />
+				<rom name="cd2396a.vsm" size="0x4000" crc="b005d92a" sha1="f1f9d83e18e77d89590e794cb157c8fe18e5aa05" />
 			</dataarea>
 		</part>
 	</software>
@@ -59,7 +59,7 @@
 		<info name="serial" value="CD3540"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd3540.vsm" size="0x4000" crc="80c4da54" sha1="5663c8548484499a55052bc712440e794c8ba543" offset="0" />
+				<rom name="cd3540.vsm" size="0x4000" crc="80c4da54" sha1="5663c8548484499a55052bc712440e794c8ba543" />
 			</dataarea>
 		</part>
 	</software>
@@ -71,7 +71,7 @@
 		<info name="serial" value="CD3535"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd3535.vsm" size="0x4000" crc="0694525d" sha1="d7ce974ad70e05be50f8cba5aab0a0adbfb54f8b" offset="0" />
+				<rom name="cd3535.vsm" size="0x4000" crc="0694525d" sha1="d7ce974ad70e05be50f8cba5aab0a0adbfb54f8b" />
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@
 		<info name="serial" value="CD3539"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd3539.vsm" size="0x4000" crc="496ce890" sha1="d005447a74afc612809cc5de72d7cb6f711693ce" offset="0" />
+				<rom name="cd3539.vsm" size="0x4000" crc="496ce890" sha1="d005447a74afc612809cc5de72d7cb6f711693ce" />
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@
 		<info name="serial" value="CD2397"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd2397.vsm" size="0x4000" crc="e0f1e76d" sha1="1cb73cf1e754536e7c09ac23ee45db60c70acd58" offset="0" />
+				<rom name="cd2397.vsm" size="0x4000" crc="e0f1e76d" sha1="1cb73cf1e754536e7c09ac23ee45db60c70acd58" />
 			</dataarea>
 		</part>
 	</software>

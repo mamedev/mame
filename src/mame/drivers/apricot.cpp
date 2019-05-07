@@ -194,7 +194,7 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 		floppy->mon_w(0);
 
 	// switch video modes
-	m_crtc->set_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
+	m_crtc->set_unscaled_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
 	m_crtc->set_hpixels_per_column(m_video_mode ? 10 : 16);
 
 	// PB7 Centronics transceiver direction. 0 = output, 1 = input

@@ -429,11 +429,11 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-void ti99_4p_state::setaddress(offs_t mode, uint16_t address)
+void ti99_4p_state::setaddress(offs_t address, uint16_t busctrl)
 {
-	m_addr_buf = address;
+	m_addr_buf = address << 1;
 	m_waitcount = 0;
-	m_dbin = ((mode & TMS99xx_BUS_DBIN)!=0);
+	m_dbin = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "set address %04x\n", m_addr_buf);
 
@@ -717,7 +717,7 @@ void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 uint8_t ti99_4p_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
-	m_peribox->crureadz(offset<<4, &value);
+	m_peribox->crureadz(offset<<1, &value);
 	return value;
 }
 

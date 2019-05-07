@@ -29,7 +29,6 @@ TODO:
 #include "emu.h"
 #include "includes/cdi.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "imagedev/chd_cd.h"
 #include "machine/timekpr.h"
@@ -44,25 +43,16 @@ TODO:
 
 #include "cdi.lh"
 
-#define CLOCK_A XTAL(30'000'000)
-#define CLOCK_B XTAL(19'660'800)
+// TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
+#define CLOCK_A 30_MHz_XTAL
 
-#if ENABLE_VERBOSE_LOG
-static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror("%s: %s", device.machine().describe_context(), buf );
-	}
-}
-#else
-#define verboselog(x,y,z, ...)
-#endif
+#define LOG_SERVO       (1 << 0)
+#define LOG_SLAVE       (1 << 1)
+
+#define VERBOSE         (0)
+#include "logmacro.h"
+
+#define ENABLE_UART_PRINTING (0)
 
 /*************************
 *      Memory maps       *
@@ -70,11 +60,11 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 
 void cdi_state::cdimono1_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("planea");
-	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
+	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 	map(0x00300000, 0x00303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_scc, FUNC(cdi68070_device::uart_loopback_enable));
+	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
 	map(0x00303c00, 0x00303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
 	map(0x00310000, 0x00317fff).rw(m_slave_hle, FUNC(cdislave_device::slave_r), FUNC(cdislave_device::slave_w));
@@ -85,15 +75,14 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x00500000, 0x0057ffff).ram();
 	map(0x00580000, 0x00ffffff).noprw();
 	map(0x00e00000, 0x00efffff).ram(); // DVC
-	map(0x80000000, 0x8000807f).rw(m_scc, FUNC(cdi68070_device::periphs_r), FUNC(cdi68070_device::periphs_w));
 }
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("planea");
-	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
+	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_scc, FUNC(cdi68070_device::uart_loopback_enable));
+	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
 	//AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 	//AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
@@ -105,17 +94,16 @@ void cdi_state::cdimono2_mem(address_map &map)
 	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	map(0x00500000, 0x00ffffff).noprw();
 	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-	map(0x80000000, 0x8000807f).rw(m_scc, FUNC(cdi68070_device::periphs_r), FUNC(cdi68070_device::periphs_w));
 }
 
 void cdi_state::cdi910_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("planea");
+	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
 	map(0x00180000, 0x001fffff).rom().region("maincpu", 0); // boot vectors point here
 
-	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_scc, FUNC(cdi68070_device::uart_loopback_enable));
+	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
 //  AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 //  AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
@@ -126,7 +114,6 @@ void cdi_state::cdi910_mem(address_map &map)
 //  AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	map(0x00500000, 0x00ffffff).noprw();
 //  AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-	map(0x80000000, 0x8000807f).rw(m_scc, FUNC(cdi68070_device::periphs_r), FUNC(cdi68070_device::periphs_w));
 }
 
 
@@ -143,6 +130,7 @@ void cdi_state::cdimono2_slave_mem(address_map &map)
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region("slave", 0x100);
 }
+
 
 /*************************
 *      Input ports       *
@@ -190,7 +178,7 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 	if(send)
 	{
 		uint8_t data = (uint8_t)((uintptr_t)param & 0x000000ff);
-		m_scc->quizard_rx(data);
+		m_maincpu->quizard_rx(data);
 	}
 }
 
@@ -278,7 +266,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
 {
-	m_scc->mcu_frame();
+	m_maincpu->mcu_frame();
 }
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
@@ -288,8 +276,6 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	memcpy(dst, src, 0x8);
 	memset(m_servo_io_regs, 0, 0x20);
 	memset(m_slave_io_regs, 0, 0x20);
-
-	m_maincpu->reset();
 }
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
@@ -305,8 +291,8 @@ MACHINE_RESET_MEMBER( cdi_state, quizard1 )
 {
 	MACHINE_RESET_CALL_MEMBER( cdimono1 );
 
-	m_scc->set_quizard_mcu_value(0x021f);
-	m_scc->set_quizard_mcu_ack(0x5a);
+	m_maincpu->set_quizard_mcu_value(0x021f);
+	m_maincpu->set_quizard_mcu_ack(0x5a);
 }
 
 MACHINE_RESET_MEMBER( cdi_state, quizard2 )
@@ -317,8 +303,8 @@ MACHINE_RESET_MEMBER( cdi_state, quizard2 )
 	// 0x001: French
 	// 0x188: German
 
-	m_scc->set_quizard_mcu_value(0x188);
-	m_scc->set_quizard_mcu_ack(0x59);
+	m_maincpu->set_quizard_mcu_value(0x188);
+	m_maincpu->set_quizard_mcu_ack(0x59);
 }
 
 
@@ -327,17 +313,17 @@ MACHINE_RESET_MEMBER( cdi_state, quizard3 )
 {
 	MACHINE_RESET_CALL_MEMBER( cdimono1 );
 
-	m_scc->set_quizard_mcu_value(0x00ae);
-	m_scc->set_quizard_mcu_ack(0x58);
+	m_maincpu->set_quizard_mcu_value(0x00ae);
+	m_maincpu->set_quizard_mcu_ack(0x58);
 }
 
 MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 {
 	MACHINE_RESET_CALL_MEMBER( cdimono1 );
 
-	//m_scc->set_quizard_mcu_value(0x0139);
-	m_scc->set_quizard_mcu_value(0x011f);
-	m_scc->set_quizard_mcu_ack(0x57);
+	//m_maincpu->set_quizard_mcu_value(0x0139);
+	m_maincpu->set_quizard_mcu_value(0x011f);
+	m_maincpu->set_quizard_mcu_ack(0x57);
 }
 
 
@@ -358,100 +344,100 @@ READ8_MEMBER( cdi_state::servo_io_r )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SERVO Port A Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port A Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
 			ret = 0x08;
-			verboselog(*this, 1, "SERVO Port B Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port B Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
 			ret |= INV_CADDYSWITCH_IN;
-			verboselog(*this, 1, "SERVO Port C Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port C Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SERVO Port D Input read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port D Input read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SERVO Port A DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port A DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SERVO Port B DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port B DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SERVO Port C DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Port C DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SERVO SPI Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SERVO SPI Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SERVO SPI Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SERVO SCC Baud Rate read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Baud Rate read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SERVO SCC Control 1 read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 1 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SERVO SCC Control 2 read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 2 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SERVO SCC Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SERVO SCC Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SERVO Timer Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SERVO Timer Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SERVO Input Capture Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SERVO Input Capture Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SERVO Output Compare Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SERVO Output Compare Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SERVO Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::COUNT_LO:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SERVO Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Count Lo read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SERVO Alternate Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
 		{
 			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SERVO Alternate Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Lo read (%02x)\n", ret);
 			break;
 		}
 		default:
-			verboselog(*this, 0, "Unknown SERVO I/O read (%02x)\n", offset);
+			logerror("Unknown SERVO I/O read (%02x)\n", offset);
 			break;
 	}
 
@@ -464,82 +450,82 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SERVO Port A Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port A Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			verboselog(*this, 1, "SERVO Port B Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port B Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			verboselog(*this, 1, "SERVO Port C Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port C Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SERVO Port D Input write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port D Input write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SERVO Port A DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port A DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SERVO Port B DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port B DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SERVO Port C DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Port C DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SERVO SPI Control write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SERVO SPI Status write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SERVO SPI Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SPI Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SERVO SCC Baud Rate write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Baud Rate write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SERVO SCC Control 1 write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 1 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SERVO SCC Control 2 write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Control 2 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SERVO SCC Status write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SERVO SCC Data write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO SCC Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SERVO Timer Control write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SERVO Timer Status write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Timer Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SERVO Input Capture Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SERVO Input Capture Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Input Capture Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SERVO Output Compare Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SERVO Output Compare Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Output Compare Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
-			verboselog(*this, 1, "SERVO Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_LO:
-			verboselog(*this, 1, "SERVO Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Count Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
-			verboselog(*this, 1, "SERVO Alternate Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
-			verboselog(*this, 1, "SERVO Alternate Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Lo write (%02x)\n", data);
 			break;
 		default:
-			verboselog(*this, 0, "Unknown SERVO I/O write (%02x = %02x)\n", offset, data);
+			logerror("Unknown SERVO I/O write (%02x = %02x)\n", offset, data);
 			break;
 	}
 
@@ -558,98 +544,98 @@ READ8_MEMBER( cdi_state::slave_io_r )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SLAVE Port A Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			verboselog(*this, 1, "SLAVE Port B Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			verboselog(*this, 1, "SLAVE Port C Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SLAVE Port D Input read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port D Input read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SLAVE Port A DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SLAVE Port B DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SLAVE Port C DDR read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C DDR read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SLAVE SPI Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SLAVE SPI Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SLAVE SPI Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SLAVE SCC Baud Rate read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Baud Rate read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SLAVE SCC Control 1 read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 1 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SLAVE SCC Control 2 read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 2 read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SLAVE SCC Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SLAVE SCC Data read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Data read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SLAVE Timer Control read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Control read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SLAVE Timer Status read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Status read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SLAVE Input Capture Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SLAVE Input Capture Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SLAVE Output Compare Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Hi read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SLAVE Output Compare Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Lo read (%02x)\n", ret);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SLAVE Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::COUNT_LO:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SLAVE Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Lo read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count >> 8;
-			verboselog(*this, 1, "SLAVE Alternate Count Hi read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Hi read (%02x)\n", ret);
 			break;
 		}
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
 		{
 			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
 			ret = count & 0x00ff;
-			verboselog(*this, 1, "SLAVE Alternate Count Lo read (%02x)\n", ret);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Lo read (%02x)\n", ret);
 			break;
 		}
 		default:
-			verboselog(*this, 0, "Unknown SLAVE I/O read (%02x)\n", offset);
+			logerror("Unknown SLAVE I/O read (%02x)\n", offset);
 			break;
 	}
 
@@ -661,86 +647,153 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 	switch(offset)
 	{
 		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			verboselog(*this, 1, "SLAVE Port A Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			verboselog(*this, 1, "SLAVE Port B Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			verboselog(*this, 1, "SLAVE Port C Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C Data write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			verboselog(*this, 1, "SLAVE Port D Input write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port D Input write (%02x)\n", data);
 			return;
 		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			verboselog(*this, 1, "SLAVE Port A DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port A DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			verboselog(*this, 1, "SLAVE Port B DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port B DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			verboselog(*this, 1, "SLAVE Port C DDR write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Port C DDR write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_CTRL:
-			verboselog(*this, 1, "SLAVE SPI Control write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_STATUS:
-			verboselog(*this, 1, "SLAVE SPI Status write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SPI_DATA:
-			verboselog(*this, 1, "SLAVE SPI Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SPI Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_BAUD:
-			verboselog(*this, 1, "SLAVE SCC Baud Rate write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Baud Rate write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			verboselog(*this, 1, "SLAVE SCC Control 1 write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 1 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			verboselog(*this, 1, "SLAVE SCC Control 2 write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 2 write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_STATUS:
-			verboselog(*this, 1, "SLAVE SCC Status write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::SCC_DATA:
-			verboselog(*this, 1, "SLAVE SCC Data write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE SCC Data write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			verboselog(*this, 1, "SLAVE Timer Control write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Control write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			verboselog(*this, 1, "SLAVE Timer Status write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Timer Status write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_HI:
-			verboselog(*this, 1, "SLAVE Input Capture Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ICAP_LO:
-			verboselog(*this, 1, "SLAVE Input Capture Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_HI:
-			verboselog(*this, 1, "SLAVE Output Compare Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::OCMP_LO:
-			verboselog(*this, 1, "SLAVE Output Compare Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_HI:
-			verboselog(*this, 1, "SLAVE Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::COUNT_LO:
-			verboselog(*this, 1, "SLAVE Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Count Lo write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_HI:
-			verboselog(*this, 1, "SLAVE Alternate Count Hi write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Hi write (%02x)\n", data);
 			break;
 		case m68hc05eg_io_reg_t::ACOUNT_LO:
-			verboselog(*this, 1, "SLAVE Alternate Count Lo write (%02x)\n", data);
+			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Lo write (%02x)\n", data);
 			break;
 		default:
-			verboselog(*this, 0, "Unknown SLAVE I/O write (%02x = %02x)\n", offset, data);
+			logerror("Unknown SLAVE I/O write (%02x = %02x)\n", offset, data);
 			break;
 	}
 
 	m_slave_io_regs[offset] = data;
+}
+
+/*************************
+*       LCD screen       *
+*************************/
+
+static const uint16_t cdi220_lcd_char[20*22] =
+{
+	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x0000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0000, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x8000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0002, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x8000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0002, 0x0000, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x0000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0000, 0x0000, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x2000, 0x2000, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0200, 0x0200, 0x0200, 0x0200,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0000, 0x0000, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0000, 0x0000, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0000, 0x0010, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0008, 0x0000, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0010, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0008, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0000, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
+	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
+};
+
+void cdi_state::draw_lcd(int y)
+{
+	if (y >= 22 || !m_slave_hle.found())
+		return;
+
+	uint32_t *scanline = &m_lcdbitmap.pix32(y);
+
+	for (int lcd = 0; lcd < 8; lcd++)
+	{
+		uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
+						m_slave_hle->get_lcd_state()[lcd*2 + 1];
+		for (int x = 0; x < 20; x++)
+		{
+			if (data & cdi220_lcd_char[y*20 + x])
+			{
+				scanline[(7 - lcd)*24 + x] = rgb_t::white();
+			}
+			else
+			{
+				scanline[(7 - lcd)*24 + x] = rgb_t::black();
+			}
+		}
+	}
+}
+
+void cdi_state::video_start()
+{
+	if (m_lcd)
+		m_lcd->register_screen_bitmap(m_lcdbitmap);
+}
+
+uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_lcdbitmap, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 
 /*************************
@@ -750,18 +803,21 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 // CD-i Mono-I system base
 void cdi_state::cdimono1_base(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_A/2);
+	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
+	m_maincpu->iack4_callback().set(m_cdic, FUNC(cdicdic_device::intack_r));
 
-	MCD212(config, m_mcd212, 0);
+	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
+	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
+	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 302);
 	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update(FUNC(cdi_state::screen_update_cdimono1));
+	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -774,10 +830,14 @@ void cdi_state::cdimono1_base(machine_config &config)
 
 	config.set_default_layout(layout_cdi);
 
-	CDI_68070(config, m_scc, 0, "maincpu");
+	// IMS66490 CDIC input clocks are 22.5792 MHz and 19.3536 MHz
+	// DSP input clock is 7.5264 MHz
+	CDI_CDIC(config, m_cdic, 45.1584_MHz_XTAL / 2);
+	m_cdic->set_clock2(45.1584_MHz_XTAL * 3 / 7); // generated by PLL circuit incorporating 19.3575 MHz XTAL
+	m_cdic->intreq_callback().set(m_maincpu, FUNC(scc68070_device::in4_w));
 
-	CDI_CDIC(config, m_cdic, 0);
 	CDI_SLAVE(config, m_slave_hle, 0);
+	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -793,24 +853,26 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 }
 
 // CD-i model 220 (Mono-II, NTSC)
 void cdi_state::cdimono2(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_A/2);
+	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_mem);
 
-	MCD212(config, m_mcd212, 0);
+	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
+	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
+	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 302);
 	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update(FUNC(cdi_state::screen_update_cdimono1));
+	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -825,10 +887,9 @@ void cdi_state::cdimono2(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	CDI_68070(config, m_scc, 0, "maincpu");
-	M68HC05EG(config, m_servo, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_servo, 4_MHz_XTAL); // FIXME: actually MC68HC05C8
 	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
-	M68HC05EG(config, m_slave, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_slave, 4_MHz_XTAL); // FIXME: actually MC68HC05C8
 	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
@@ -848,23 +909,25 @@ void cdi_state::cdimono2(machine_config &config)
 	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 }
 
 void cdi_state::cdi910(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_A/2);
+	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdi910_mem);
 
-	MCD212(config, m_mcd212, 0);
+	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
+	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
+	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 302);
 	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update(FUNC(cdi_state::screen_update_cdimono1));
+	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -879,10 +942,9 @@ void cdi_state::cdi910(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	CDI_68070(config, m_scc, 0, "maincpu");
-	M68HC05EG(config, m_servo, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_servo, 4_MHz_XTAL); // FIXME: actually MC68HSC05C8
 	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
-	M68HC05EG(config, m_slave, 2000000); /* Unknown clock speed, docs say 2MHz internal clock */
+	M68HC05EG(config, m_slave, 4_MHz_XTAL); // FIXME: actually MC68HSC05C8
 	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
@@ -902,7 +964,7 @@ void cdi_state::cdi910(machine_config &config)
 	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 }
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)

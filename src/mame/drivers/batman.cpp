@@ -97,14 +97,14 @@ void batman_state::main_map(address_map &map)
 	map(0x2a0000, 0x2a0001).mirror(0x11fffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x2e0000, 0x2e0fff).mirror(0x100000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x2effc0, 0x2effff).mirror(0x100000).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
-	map(0x2f0000, 0x2fffff).mirror(0x100000).ram();
-	map(0x2f0000, 0x2f1fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
-	map(0x2f2000, 0x2f3fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
-	map(0x2f4000, 0x2f5fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
+	map(0x2f0000, 0x2f1fff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
+	map(0x2f2000, 0x2f3fff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
+	map(0x2f4000, 0x2f5fff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
 	map(0x2f6000, 0x2f7fff).mirror(0x100000).ram().share("vad:mob");
-	map(0x2f8000, 0x2f8eff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
-	map(0x2f8f00, 0x2f8f7f).mirror(0x100000).share("vad:eof");
+	map(0x2f8000, 0x2f8eff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
+	map(0x2f8f00, 0x2f8f7f).mirror(0x100000).ram().share("vad:eof");
 	map(0x2f8f80, 0x2f8fff).mirror(0x100000).ram().share("vad:mob:slip");
+	map(0x2f9000, 0x2fffff).mirror(0x100000).ram();
 }
 
 

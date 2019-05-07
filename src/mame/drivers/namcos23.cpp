@@ -3203,7 +3203,7 @@ void namcos23_state::s23iobrdmap(address_map &map)
 	map(0x6002, 0x6003).portr("IN23");
 	map(0x6004, 0x6005).nopw();
 	map(0x6006, 0x6007).noprw();
-	map(0xc000, 0xffff).ram();
+	map(0xc000, 0xfb7f).ram();
 }
 
 void namcos23_state::s23iobrdiomap(address_map &map)

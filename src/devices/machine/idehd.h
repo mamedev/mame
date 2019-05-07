@@ -81,7 +81,7 @@ private:
 	const uint8_t *   m_master_password;
 	const uint8_t *   m_user_password;
 	// DMA data transfer time for 1 sector
-	attotime		  m_dma_transfer_time;
+	attotime          m_dma_transfer_time;
 };
 
 // ======================> ide_hdd_device

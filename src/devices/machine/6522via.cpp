@@ -1002,7 +1002,7 @@ void via6522_device::set_pa_line(int line, int state)
 		m_in_a &= ~(1 << line);
 }
 
-WRITE8_MEMBER( via6522_device::write_pa )
+void via6522_device::write_pa( u8 data )
 {
 	m_in_a = data;
 }
@@ -1073,7 +1073,7 @@ void via6522_device::set_pb_line(int line, int state)
 	}
 }
 
-WRITE8_MEMBER( via6522_device::write_pb )
+void via6522_device::write_pb( u8 data )
 {
 	if (!BIT(data, 6) && BIT(m_in_b, 6))
 		counter2_decrement();

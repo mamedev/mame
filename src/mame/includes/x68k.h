@@ -229,7 +229,7 @@ protected:
 	} m_mdctrl;
 	uint8_t m_ppi_port[3];
 	int m_current_vector[8];
-	uint8_t m_current_irq_line;
+	//uint8_t m_current_irq_line;
 	int m_led_state;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
@@ -270,9 +270,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 
 	//dmac
-	void dma_irq(int channel);
+	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
 
 	int read_mouse();
 	void set_adpcm();

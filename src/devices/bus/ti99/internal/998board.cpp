@@ -367,10 +367,10 @@ void mainboard8_device::cruwrite(offs_t offset, uint8_t data)
 
 // =============== Memory bus access ==================
 
-void mainboard8_device::setaddress(offs_t mode, uint16_t offset)
+void mainboard8_device::setaddress(offs_t offset, uint8_t busctrl)
 {
+	m_dbin_level = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
-	m_dbin_level = ((mode & TMS99xx_BUS_DBIN)!=0);
 
 	// No data is waiting on the data bus
 	m_pending_write = false;

@@ -72,7 +72,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			{
 				rc.m_cmd = PUSH_CONST;
 				bool err;
-				rc.m_param = plib::pstonum_ne<decltype(rc.m_param)>(cmd, err);
+				rc.m_param = plib::pstonum_ne<decltype(rc.m_param), true>(cmd, err);
 				if (err)
 					throw plib::pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 				stk += 1;

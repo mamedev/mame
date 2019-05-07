@@ -79,7 +79,6 @@ namespace netlist
 			register_subalias("OUT",  m_ROUT.m_P);  // Pin 3
 
 			connect(m_R1.m_N, m_R2.m_P);
-			connect(m_R1.m_N, m_R2.m_P);
 			connect(m_R2.m_N, m_R3.m_P);
 			connect(m_RDIS.m_N, m_R3.m_N);
 			connect(m_OUT, m_ROUT.m_N);

@@ -78,7 +78,7 @@ private:
 			offset |= 0x1000;
 		}
 
-		return m_k056832->piratesh_rom_r(space, offset, mem_mask);
+		return m_k056832->piratesh_rom_r(offset);
 	}
 
 	void kzaurus_main(address_map &map);
@@ -314,7 +314,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K055555(config, m_k055555, 0);
@@ -332,7 +332,7 @@ ROM_START( kzaurus )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
 	ROM_LOAD16_WORD_SWAP( "540-b05-2n.bin", 0x000000, 0x080000, CRC(110d4ecb) SHA1(8903783f62ad5a983242a0fe8d835857964abc43) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD( "540-a06-14n.bin", 0x000000, 0x080000, CRC(260ad79e) SHA1(fb56bf6e59e78b2bd1f8df17c9c8fd0d1700dced) )
 	ROM_LOAD( "540-a07-17n.bin", 0x080000, 0x080000, CRC(442bcec2) SHA1(3100de8c146a28284ae3ab8763e5b1c6fb1755c2) )
 

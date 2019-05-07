@@ -1105,6 +1105,44 @@ void nmk16_state::gunnail_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
 
+void nmk16_state::gunnailb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x08000a, 0x08000b).portr("DSW2");
+	// map(0x08000e, 0x08000f).nopr();
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::nmk_flipscreen_w));
+	// map(0x080016, 0x080017).noprw();
+	map(0x080019, 0x080019).w(FUNC(nmk16_state::nmk_tilebank_w));
+	// map(0x08001e, 0x08001f).nopw();
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
+	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
+	map(0x08c400, 0x08c7ff).writeonly();   // unknown
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
+	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	// map(0x194000, 0x194000)
+}
+
+void nmk16_state::gunnailb_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xc000, 0xdfff).ram();
+}
+
+void nmk16_state::gunnailb_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	//map(0x00, 0x00).w(FUNC(nmk16_state::macross2_sound_bank_w));
+	//map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	//map(0x04, 0x04).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	//map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
 void nmk16_state::macross2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -4628,6 +4666,27 @@ void nmk16_state::gunnail(machine_config &config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
+void nmk16_state::gunnailb(machine_config &config)
+{
+	gunnail(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_map);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	Z80(config, m_audiocpu, 4000000); /* 4 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::gunnailb_sound_io_map);
+
+	subdevice<ym2203_device>("ymsnd")->irq_handler().set_inputline(m_audiocpu, 0);
+
+	OKIM6295(config.replace(), m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // no OKI banking
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+
+	config.device_remove("nmk004");
+	config.device_remove("oki2");
+}
+
 void nmk16_state::macross2(machine_config &config)
 {
 	/* basic machine hardware */
@@ -5147,6 +5206,12 @@ void nmk16_state::init_bjtwin()
 
 }
 
+void nmk16_state::init_gunnailb()
+{
+	decode_gfx();
+	init_banked_audiocpu();
+}
+
 /* NO NMK004, it has a PIC instead */
 READ16_MEMBER(nmk16_state::vandykeb_r){ return 0x0000; }
 void nmk16_state::init_vandykeb()
@@ -5189,13 +5254,6 @@ WRITE16_MEMBER(nmk16_state::afega_scroll_w)
 	COMBINE_DATA(&m_afega_scroll[Scroll][offset]);
 }
 
-/*
- Lines starting with an empty comment in the following MemoryReadAddress
- arrays are there for debug (e.g. the game does not read from those ranges
- AFAIK)
-*/
-
-
 void nmk16_state::afega_map(address_map &map)
 {
 	map.global_mask(0xfffff);
@@ -5204,16 +5262,12 @@ void nmk16_state::afega_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");            // P1 + P2
 	map(0x080004, 0x080005).portr("DSW1");           // 2 x DSW
 	map(0x080012, 0x080013).r(FUNC(nmk16_state::afega_unknown_r));
-	map(0x080000, 0x08001d).writeonly();               //
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
-	map(0x080020, 0x087fff).writeonly();               //
 	map(0x084000, 0x084003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x084004, 0x084007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x088000, 0x0885ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x088600, 0x08bfff).writeonly();               //
 	map(0x08c000, 0x08c003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>)).share("afega_scroll_0");   // Scroll
 	map(0x08c004, 0x08c007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>)).share("afega_scroll_1");   //
-	map(0x08c008, 0x08ffff).writeonly();               //
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");    // Layer 0                  // ?
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");  // Layer 1
 
@@ -5230,16 +5284,12 @@ void nmk16_state::firehawk_map(address_map &map)
 	map(0x280002, 0x280003).portr("IN1");            // P1 + P2
 	map(0x280004, 0x280005).portr("DSW1");           // 2 x DSW
 	map(0x280012, 0x280013).r(FUNC(nmk16_state::afega_unknown_r));
-	map(0x280000, 0x28001d).writeonly();               //
 	map(0x28001f, 0x28001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
-	map(0x280020, 0x287fff).writeonly();               //
 	map(0x284000, 0x284003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x284004, 0x284007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x288000, 0x2885ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x288600, 0x28bfff).writeonly();               //
 	map(0x28c000, 0x28c003).ram().w(FUNC(nmk16_state::afega_scroll_w<0>)).share("afega_scroll_0");   // Scroll
 	map(0x28c004, 0x28c007).ram().w(FUNC(nmk16_state::afega_scroll_w<1>)).share("afega_scroll_1");   //
-	map(0x28c008, 0x28ffff).writeonly();               //
 	map(0x290000, 0x293fff).ram().w(FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");    // Layer 0                  // ?
 	map(0x29c000, 0x29c7ff).ram().w(FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");  // Layer 1
 
@@ -6603,6 +6653,28 @@ ROM_START( gunnail )
 	ROM_LOAD( "8_82s129.u35",   0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  /* unknown */
 	ROM_LOAD( "9_82s135.u72",   0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  /* unknown */
 	ROM_LOAD( "10_82s123.u96",  0x0200, 0x0020, CRC(c60103c8) SHA1(dfb05b704bb5e1f75f5aaa4fa36e8ddcc905f8b6) )  /* unknown */
+ROM_END
+
+// bootleg board labeled 'GT ELEKTRONIK 16.04.93' with only 1 OKI and no NMK custom chips. Only sprites and bgtile ROMs are identical to the original.
+ROM_START( gunnailb )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_BYTE( "27c020.6d",  0x00000, 0x40000, CRC(b9566c46) SHA1(dcecec0d401cdf8054b4b7a5dedee62332d92002) )
+	ROM_LOAD16_BYTE( "27c020.6e",  0x00001, 0x40000, CRC(6ba7c54d) SHA1(3932b96d2f1f541f8679524de3bb8867aded9f83) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "27c010.3b",      0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "27c010.5g",    0x000000, 0x020000, CRC(6d2ca620) SHA1(6ed3b9987d1740f36235e33bdd66867c24f93f7e) )    /* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "27c160.k10", 0x000000, 0x200000, CRC(062100a9) SHA1(c7e81656b8112c161d3e9be3edf001da97721727) ) /* 16x16 tiles, 1st and 2nd half identical */
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c160.a9", 0x000000, 0x200000, CRC(d49169b3) SHA1(565ff7725dd6ace79b55706114132d8d867e81a9) ) /* Sprites */
+
+	ROM_REGION( 0x040000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "27c020.1c", 0x00000, 0x40000, CRC(c5f7c0d9) SHA1(dea090ee535edb4e9167078f6e6e5fe4e544625a) )
 ROM_END
 
 ROM_START( macross2 ) /* Title screen shows Kanji characters & Macross II */
@@ -8373,7 +8445,8 @@ GAME( 1991, hachamfp,   hachamf,  hachamf,      hachamfp,     nmk16_state, empty
 GAME( 1992, macross,    0,        macross,      macross,      nmk16_state, init_nmk,             ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", 0 )
 
 GAME( 1993, gunnail,    0,        gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
-// a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10
+GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_NO_SOUND ) // different sound hardware not hooked up
+// a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
 GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
 GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (GAMEST review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game

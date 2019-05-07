@@ -194,7 +194,6 @@ public:
 	void init_sq1();
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	void cpu_space_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
@@ -229,9 +228,7 @@ private:
 	uint8_t m_duart_io;
 	uint8_t otis_irq_state;
 	uint8_t dmac_irq_state;
-	int dmac_irq_vector;
 	uint8_t duart_irq_state;
-	int duart_irq_vector;
 
 	void update_irq_to_maincpu();
 
@@ -242,12 +239,14 @@ private:
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
 
+	void cpu_space_map(address_map &map);
+	void eps_cpu_space_map(address_map &map);
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
 
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -257,8 +256,13 @@ FLOPPY_FORMATS_END
 void esq5505_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff4, 0xfffff5).lr16("dmac irq", [this]() -> u16 { return dmac_irq_vector; });
-	map(0xfffff6, 0xfffff7).lr16("duart irq", [this]() -> u16 { return duart_irq_vector; });
+	map(0xfffff7, 0xfffff7).r(m_duart, FUNC(mc68681_device::get_irq_vector));
+}
+
+void esq5505_state::eps_cpu_space_map(address_map &map)
+{
+	cpu_space_map(map);
+	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
 }
 
 void esq5505_state::machine_start()
@@ -448,12 +452,11 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
 	if (state == ASSERT_LINE)
 	{
-		duart_irq_vector = m_duart->get_irq_vector();
 		duart_irq_state = 1;
 	}
 	else
 	{
-				duart_irq_state = 0;
+		duart_irq_state = 0;
 	}
 	update_irq_to_maincpu();
 }
@@ -524,30 +527,12 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-WRITE8_MEMBER(esq5505_state::dma_end)
+WRITE_LINE_MEMBER(esq5505_state::dma_irq)
 {
-	if (data != 0)
+	if (state != CLEAR_LINE)
 	{
-		//printf("DMAC IRQ, vector = %x\n", m_dmac->get_vector(offset));
+		logerror("DMAC error, vector = %x\n", m_dmac->iack());
 		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
-	}
-	else
-	{
-		dmac_irq_state = 0;
-	}
-
-	// printf("IRQ update from DMAC: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-	update_irq_to_maincpu();
-}
-
-WRITE8_MEMBER(esq5505_state::dma_error)
-{
-	if(data != 0)
-	{
-		logerror("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
-		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
@@ -666,6 +651,7 @@ void esq5505_state::eps(machine_config &config)
 {
 	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
@@ -683,8 +669,7 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->set_cpu_tag(m_maincpu);
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
-	m_dmac->dma_end().set(FUNC(esq5505_state::dma_end));
-	m_dmac->dma_error().set(FUNC(esq5505_state::dma_error));
+	m_dmac->irq_callback().set(FUNC(esq5505_state::dma_irq));
 	m_dmac->dma_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
 	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }

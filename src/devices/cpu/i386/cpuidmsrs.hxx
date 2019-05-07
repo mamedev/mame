@@ -236,7 +236,7 @@ void athlonxp_device::opcode_cpuid()
 
 		case 0x80000007:
 		{
-			REG32(EDX) = 1;
+			REG32(EDX) = 1; //  Advanced power management information, temperature sensor present
 			CYCLES(CYCLES_CPUID);
 			break;
 		}
@@ -368,7 +368,21 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			break;
 		case 0xC001001D: // TOP_MEM2
 			break;
+		case 0xC0010111: // SMM_BASE
+			// address of system management mode area
+			ret = (uint64_t)m_msr_smm_base;
+			break;
 		case 0xC0010113: // SMM_MASK
+			// 1     TValid  - Enable TSeg SMRAM Range
+			// 0     AValid  - Enable ASeg SMRAM Range
+			/* Access to the ASeg (a0000-bffff) depends on bit 0 of smm_mask
+			   if the bit is 0 use the associated fixed mtrr
+			   if the bit is 1
+				   if smm is active
+					   access goes to dram (wrmem 1 rdmem 1)
+				   if smm not active
+					   access goes to mmio (wrmem 0 rdmem 0) */
+			ret = m_msr_smm_mask;
 			break;
 	}
 	valid_msr = true;
@@ -414,6 +428,13 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 			break;
 		case 0x259: // MTRRfix16K_A0000
 			m_msr_mtrrfix[2] = data;
+			if (m_msr_smm_mask & 1)
+			{
+				if (m_smm)
+					data = 0x1818181818181818; // when smm is active
+				else
+					data = 0; // when smm is not active
+			}
 			parse_mtrrfix(data, 0xa0000, 16);
 			break;
 		case 0x268: // MTRRfix4K_C0000-F8000
@@ -448,7 +469,22 @@ void athlonxp_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		case 0xC001001A: // TOP_MEM
 			m_msr_top_mem = (offs_t)data;
 			break;
+		case 0xC0010111: // SMM_BASE
+			m_msr_smm_base = (offs_t)data;
+			m_smbase = m_msr_smm_base;
+			break;
 		case 0xC0010113: // SMM_MASK
+			m_msr_smm_mask = data;
+			if (m_msr_smm_mask & 1)
+			{
+				if (m_smm)
+					data = 0x1818181818181818; // when smm is active
+				else
+					data = 0; // when smm is not active
+			}
+			else
+				data = m_msr_mtrrfix[2];
+			parse_mtrrfix(data, 0xa0000, 16);
 			break;
 	}
 	valid_msr = true;

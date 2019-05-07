@@ -667,7 +667,6 @@ void maygayv1_state::sound_prg(address_map &map)
 
 void maygayv1_state::sound_data(address_map &map)
 {
-	map(0x0000, 0x1ff).ram(); // nothing?
 }
 
 void maygayv1_state::sound_io(address_map &map)

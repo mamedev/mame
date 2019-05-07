@@ -113,8 +113,7 @@ void ramtek_state::video_start()
 void ramtek_state::ramtek(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_ramtek);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_ramtek);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

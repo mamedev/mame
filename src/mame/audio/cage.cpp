@@ -588,7 +588,6 @@ void atari_cage_device::cage_map(address_map &map)
 	map(0x200000, 0x200000).nopw();
 	map(0x400000, 0x47ffff).bankr("bootbank");
 	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_device::tms32031_io_r), FUNC(atari_cage_device::tms32031_io_w));
-	map(0x809800, 0x809fff).ram();
 	map(0xa00000, 0xa00000).rw(FUNC(atari_cage_device::cage_from_main_r), FUNC(atari_cage_device::cage_to_main_w));
 	map(0xc00000, 0xffffff).bankr("mainbank");
 }
@@ -600,7 +599,6 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 	map(0x200000, 0x200000).nopw();
 	map(0x400000, 0x47ffff).bankr("bootbank");
 	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_seattle_device::tms32031_io_r), FUNC(atari_cage_seattle_device::tms32031_io_w));
-	map(0x809800, 0x809fff).ram();
 	map(0xa00000, 0xa00000).rw(FUNC(atari_cage_seattle_device::cage_from_main_r), FUNC(atari_cage_seattle_device::cage_from_main_ack_w));
 	map(0xa00001, 0xa00001).w(FUNC(atari_cage_seattle_device::cage_to_main_w));
 	map(0xa00003, 0xa00003).r(FUNC(atari_cage_seattle_device::cage_io_status_r));

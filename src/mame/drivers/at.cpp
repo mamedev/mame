@@ -73,6 +73,18 @@ Form factor: Desktop PC
 CPU: Intel 286, 8MHz
 RAM: 640KB
 Mass storage: Floppy: 5.25" 1.2Mb, HDD: 40Mb
+
+Nixdorf 8810 M55
+================
+Links: https://www.computerwoche.de/a/auch-nixdorf-nun-in-der-at-clone-riege,1166613
+Info: Rebadged NCR PC-8, an AT-clone in a huge desktop case
+Form factor: Desktop PC
+CPU: Intel 286; CPU card has a 20Mhz, a 12 MHz and a 14.31818 crystal
+RAM: 512K on CPU card, 128K on a piggyback card and a memory expansion board
+Bus: Passive backplane, ISA
+Video: Paradise EGA on another piggyback board
+Mass storage: Floppy: 5.25" 1.2MB, MFM HDD
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -118,6 +130,8 @@ public:
 	void at486l(machine_config &config);
 	void comportii(machine_config &config);
 	void comportiii(machine_config &config);
+	void comslt286(machine_config &config);
+	void dsys200(machine_config &config);
 	void ibm5162(machine_config &config);
 	void neat(machine_config &config);
 	void at386l(machine_config &config);
@@ -129,6 +143,8 @@ public:
 	void pc40iii(machine_config &config);
 	void atvga(machine_config &config);
 	void at386(machine_config &config);
+	void ncrpc8(machine_config &config);
+	void n8810m55(machine_config &config);
 	void ews286(machine_config &config);
 
 	void init_at();
@@ -832,6 +848,14 @@ void at_state::comportii(machine_config &config)
 	m_ram->set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4224K");
 }
 
+// Nixdorf 8810 M55
+void at_state::n8810m55(machine_config &config)
+{
+	ibm5170(config);
+	m_maincpu->set_clock(6000000); 
+	subdevice<isa16_slot_device>("isa1")->set_default_option("ega"); 
+}
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
@@ -931,91 +955,171 @@ ROM_START( ibmps1es )
 ROM_END
 
 ROM_START( at )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION(0x20000,"bios", 0) 
+	// 0: BIOS-String: ENET-1107-040990-K0
 	ROM_SYSTEM_BIOS(0, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(0))
+	// 1: BIOS-String: D286-0011-110387
 	ROM_SYSTEM_BIOS(1, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
-	ROMX_LOAD("at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) ) 
 	ROMX_LOAD("at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
+	// 2: BIOS-String: S286-6181-101590-K0
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(2) )
+	//3: BIOS-String: ENET-1230-043089-K0
 	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: Quadtel Enhanced 286 BIOS Version 3.04.02
 	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(4) )
+	// 5: BIOS-String: DH12-1211-061390-K0
 	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1")
 	ROMX_LOAD( "ami2od86.bin",  0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "ami2ev86.bin",  0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(5) )
+	// 6: BIOS-String: DH12-1120-061390-K0
 	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2")
 	ROMX_LOAD( "ami2od89.bin",  0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "ami2ev89.bin",  0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(6) )
+	// 7: BIOS-String: DH12-1112-061390-K0
 	ROM_SYSTEM_BIOS(7, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
 	ROMX_LOAD( "ht12h.bin",     0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(7) )
 	ROMX_LOAD( "ht12l.bin",     0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(7) )
+	// 8
 	ROM_SYSTEM_BIOS(8, "ami181", "AMI HT 18.1") /* not a bad dump, sets unknown probably chipset related registers at 0x1e8 before failing post */
 	ROMX_LOAD( "ht18.bin",     0x10000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(8) )
+	// 9
 	ROM_SYSTEM_BIOS(9, "amiht21", "AMI HT 21.1") /* as above */
 	ROMX_LOAD( "ht21e.bin",    0x10000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(9) )
+	// 10: BIOS-String: D286-1430-040990-K0
 	ROM_SYSTEM_BIOS(10, "amip1", "AMI P.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "poisk-h.bin",   0x10001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(10) )
 	ROMX_LOAD( "poisk-l.bin",   0x10000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(10) )
+	// 11: Award 286 Modular BIOS Version 3.11 - WINBOND
 	ROM_SYSTEM_BIOS(11, "aw201", "Award 201")
 	ROMX_LOAD( "83201-5h.bin",  0x10001, 0x8000, CRC(968d1fc0) SHA1(dc4122a6c696f0b43e7894dc1b669346eed755d5),ROM_SKIP(1) | ROM_BIOS(11) )
 	ROMX_LOAD( "83201-5l.bin",  0x10000, 0x8000, CRC(bf50a89a) SHA1(2349a1db6017a7fb0673e99d3680c8753407be8d),ROM_SKIP(1) | ROM_BIOS(11) )
+	// 12: Award 286 Modular BIOS V3.03 NFS 11/10/87" - T.M.C
 	ROM_SYSTEM_BIOS(12, "aw303", "Award 303 NFS")
 	ROMX_LOAD( "aw303-hi.bin",  0x18001, 0x4000, CRC(78f32d7e) SHA1(1c88398fb171b33b7e6191bad63704ae85bfed8b), ROM_SKIP(1) | ROM_BIOS(12) )
 	ROMX_LOAD( "aw303-lo.bin",  0x18000, 0x4000, CRC(3d2a70c0) SHA1(1329113bec514ed2a6d803067b1132744ef534dd), ROM_SKIP(1) | ROM_BIOS(12) )
+	// 13: Award 286 Modular BIOS Version 3.03GS
 	ROM_SYSTEM_BIOS(13, "aw303gs", "Award 303GS")
 	ROMX_LOAD( "aw303gs-hi.bin",  0x18001, 0x4000, CRC(82392e18) SHA1(042453b7b29933a1b72301d21fcf8fa6b293c9c9), ROM_SKIP(1) | ROM_BIOS(13) )
 	ROMX_LOAD( "aw303gs-lo.bin",  0x18000, 0x4000, CRC(a4cf8ba1) SHA1(b73e34be3b2754aaed1ac06471f4441fea06c67c), ROM_SKIP(1) | ROM_BIOS(13) )
+	// 14: BIOS-String: D286-6069-040990-K0
 	ROM_SYSTEM_BIOS(14, "ami_200960", "AMI 200960")
 	ROMX_LOAD( "ami_286_bios_sn200960_even.bin", 0x10000, 0x8000, CRC(67745815) SHA1(ca6886c7a0716a92a8720fc71ff2d95328c467a5), ROM_SKIP(1) | ROM_BIOS(14) )
 	ROMX_LOAD( "ami_286_bios_sn200960_odd.bin", 0x10001, 0x8000, CRC(360a5f73) SHA1(1b1980fd99779d0cdc4764928a641e081b35ee9f), ROM_SKIP(1) | ROM_BIOS(14) )
+	// 15: BIOS-String: DSUN-1105-043089-K0
 	ROM_SYSTEM_BIOS(15, "magitronic_b233", "Magitronic B233") // SUNTAC Chipset, http://toastytech.com/manuals/Magitronic%20B233%20Manual.pdf
 	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_even_sa027343.bin", 0x10000, 0x8000, CRC(d4a18444) SHA1(d95242104fc9b51cf26de72ef5b6c52d99ccce30), ROM_SKIP(1) | ROM_BIOS(15) )
 	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_odd_sa027343.bin", 0x10001, 0x8000, CRC(7ac3db56) SHA1(4340140450c4f8b4f6a19eae50a5dc5449edfdf6), ROM_SKIP(1) | ROM_BIOS(15) )
 	// ROM_LOAD("magitronic_b233_ami_1986_keyboard_bios_plus_a025352.bin", 0x0000, 0x1000), CRC(84fd28fd) SHA1(43da0f49e52c921844e60b6f3d22f2a316d865cc) )
+	// 16: BIOS-String: D286-1234-121589-K0
+	ROM_SYSTEM_BIOS(16, "ls103s", "LS-103S") // Headland Chipset
+	ROMX_LOAD( "ami_lm103-s_lo.bin", 0x10000, 0x8000, CRC(a24be20b) SHA1(ffc5faf6d773154bf2f037556d2e381e81a28a58), ROM_SKIP(1) | ROM_BIOS(16) )
+	ROMX_LOAD( "ami_lm103-s_hi.bin", 0x10001, 0x8000, CRC(7b63e60c) SHA1(da78b95b12051b6d4701a412fdc5e7874595c188), ROM_SKIP(1) | ROM_BIOS(16) )
+	// 17
+	ROM_SYSTEM_BIOS(17, "ev1806", "Everex EV-1806") // continuous beeps (RAM not detected?)
+	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_even_u62.bin", 0x18000, 0x4000, CRC(7364e49b) SHA1(e8f5f41514005da0e36792e009cf3eae51c19c20), ROM_SKIP(1) | ROM_BIOS(17) )
+	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_odd_u61.bin", 0x18001, 0x4000, CRC(05c87bf7) SHA1(8c2243d9ee3d2af1517dc1134a22a7d1ed11262f), ROM_SKIP(1) | ROM_BIOS(17) )
+	// 18: Award 286 Modular BIOS Version 3.03 - GCH
+	ROM_SYSTEM_BIOS(18, "ev1815303", "Everex EV-1815 V3.03")
+	ROMX_LOAD( "award_v3.03_ev1815_even.bin", 0x18000, 0x4000, CRC(dd64bdd6) SHA1(b3108b692d2aa03701ac894602e9418ae0779702), ROM_SKIP(1) | ROM_BIOS(18) )
+	ROMX_LOAD( "award_v3.03_ev1815_odd.bin", 0x18001, 0x4000, CRC(29f023fb) SHA1(873561bb7087483c0c763ef9cd32c1adf0f7cb5e), ROM_SKIP(1) | ROM_BIOS(18) )
+	// 19: Award 286 Modular BIOS Version 3.03GS 
+	ROM_SYSTEM_BIOS(19, "ev1815303gs", "Everex EV-1815 V3.03GS")
+	ROMX_LOAD( "award_v3.03gs_ev1815_even.bin", 0x10000, 0x8000, CRC(59489ec2) SHA1(b3c13ba53d4c4ee75a15703236a748121102ce84), ROM_SKIP(1) | ROM_BIOS(19) )
+	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(19) )
+	// 20: BIOS-String: DVL2-1160-040990-K0
+	ROM_SYSTEM_BIOS(20, "dvl2", "DVL2")
+	ROMX_LOAD( "ami_dvl2-1160-040990-k8_even.bin", 0x10000, 0x8000, CRC(86093016) SHA1(f60b2679c8c23a34bdd64f25d83cb5a5a337bd57), ROM_SKIP(1) | ROM_BIOS(20) )
+	ROMX_LOAD( "ami_dvl2-1160-040990-k8_odd.bin", 0x10001, 0x8000, CRC(4e1c944a) SHA1(0763a0a1002baced071fea301f627d2e550878b8), ROM_SKIP(1) | ROM_BIOS(20) )
+	// 21: DTK 286 BIOS Ver 3.18 07/01/88
+	ROM_SYSTEM_BIOS(21, "dtk318", "DTK v3.18") 
+	ROMX_LOAD( "dtk_286_bios_ver3.18.bin", 0x18000, 0x8000, CRC(b4b8b59a) SHA1(73c12222f5003fdc8bbfee178b20c8dda2fe5cb4), ROM_BIOS(21) )
+	// 22: BIOS-String: D286-6061-040990-K0
+	ROM_SYSTEM_BIOS(22, "d286-k0", "AMI D286-K0") 
+	ROMX_LOAD( "ami_d286-6061-040990-k0.bin", 0x10000, 0x10000, CRC(1679c1b5) SHA1(9d95da3b40c5f13d096823f383aba099b3a77183), ROM_BIOS(22) )
+	// 23: BIOS-String: S286-1169-030389-K0 for ACHIEVE MICROSYSTEMS
+	ROM_SYSTEM_BIOS(23, "s286-k0", "Achieve S286-K0")
+	ROMX_LOAD( "ach_s286-1169-030389-k0_ev.bin", 0x10000, 0x8000, CRC(58f1f29c) SHA1(42f5189d12b75fad5e53ff472b4603c6fcbd46cd), ROM_SKIP(1) | ROM_BIOS(23) )
+	ROMX_LOAD( "ach_s286-1169-030389-k0_od.bin", 0x10001, 0x8000, CRC(84bfc180) SHA1(2daa51b09c449712c9a737793b83754951e53a41), ROM_SKIP(1) | ROM_BIOS(23) )
+	// 24: BIOS-String: DH12-1343-061390-K0
+	ROM_SYSTEM_BIOS(24, "dh12-k0", "AMI DH12-K0")
+	ROMX_LOAD( "ami286lo.rom", 0x10000, 0x8000, CRC(a2530914) SHA1(1aca289240caa6d4bf811d301c338c157b6902a1), ROM_SKIP(1) | ROM_BIOS(24) )
+	ROMX_LOAD( "ami286hi.rom", 0x10001, 0x8000, CRC(b5f69002) SHA1(ee9ceef1fc7a328ee82006cd504e72e16f21b3c8), ROM_SKIP(1) | ROM_BIOS(24) )
+	// 25: Award BIOS Version 3.01B
+	ROM_SYSTEM_BIOS(25, "awa301b", "Award BIOS Version 3.01B")
+	ROMX_LOAD( "aw286lo.rom", 0x18000, 0x4000, CRC(5afbb4a2) SHA1(513fd75d90720820484fdd280e4a6c22a0ef238c), ROM_SKIP(1) | ROM_BIOS(25) )
+	ROMX_LOAD( "aw286hi.rom", 0x18001, 0x4000, CRC(b2551251) SHA1(0c8bd12a3d54ae6d2ad0210b9ca4deca94be10ed), ROM_SKIP(1) | ROM_BIOS(25) )
+	// 26
+	ROM_SYSTEM_BIOS(26, "awa286", "awa286") // no screen display
+	ROMX_LOAD( "awd286lo.rom", 0x18000, 0x4000, CRC(d1a9c01f) SHA1(9123c6f76d85725036a0f8b9c6480142abea478f), ROM_SKIP(1) | ROM_BIOS(26) )
+	ROMX_LOAD( "awd286hi.rom", 0x18001, 0x4000, CRC(b0bde4cc) SHA1(9c3fd2c0f69dde905d4e8f3be421374ef99682df), ROM_SKIP(1) | ROM_BIOS(26) )
+	// 27: DTK 286 BIOS Ver. 3.01 07/24/87
+	ROM_SYSTEM_BIOS(27, "dtk286", "dtk286") // no screen display
+	ROMX_LOAD( "dtk286lo.rom", 0x18000, 0x4000, CRC(dfc70856) SHA1(39158e6ed50236d371277631e77d06f77fb0531e), ROM_SKIP(1) | ROM_BIOS(27) )
+	ROMX_LOAD( "dtk286hi.rom", 0x18001, 0x4000, CRC(a98fc743) SHA1(fb9e330148cb5584f61c1febea71c53b6f9d61b7), ROM_SKIP(1) | ROM_BIOS(27) )
+	// 28: Phoenix 80286 ROM BIOS Version 3.07 (R04)
+	ROM_SYSTEM_BIOS(28, "mitph307", "Mitac Phoenix v3.07")
+	ROMX_LOAD( "mitac_phoenix_v3.07_even.bin", 0x10000, 0x8000, CRC(1c4becc9) SHA1(bfdea3f2a248312ed8cf4765a1a7dc1a2f7cecd8), ROM_SKIP(1) | ROM_BIOS(28) )
+	ROMX_LOAD( "mitac_phoenix_v3.07_odd.bin", 0x10001, 0x8000, CRC(3ee16ed1) SHA1(b77e18e10e9187a01cb55c05b2a6e5311981ab56), ROM_SKIP(1) | ROM_BIOS(28) )
 ROM_END
 
 
 ROM_START( atvga )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: BIOS-String: 20-0001-001223-00101111-050591-KB-8042--0
 	ROM_SYSTEM_BIOS(0, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
 	ROMX_LOAD( "2vlm001.bin",     0x10000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(0) )
+	// 1: same as BIOS '0' in at 
 	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(1))
+	// 2: same as BIOS '2' in at
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(2) )
+	// 3: same as BIOS '3' in at
 	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: same as BIOS '4' in at
 	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(4) )
+	// 5: same as BIOS '5' in at
 	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1")
 	ROMX_LOAD( "ami2od86.bin",  0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "ami2ev86.bin",  0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(5) )
+	// 6: same as BIOS '6' in at
 	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2")
 	ROMX_LOAD( "ami2od89.bin",  0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "ami2ev89.bin",  0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(6) )
+	// 7: same as BIOS '7' in at
 	ROM_SYSTEM_BIOS(7, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
 	ROMX_LOAD( "ht12h.bin",     0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(7) )
 	ROMX_LOAD( "ht12l.bin",     0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(7) )
+	// 8: same as BIOS '8' in at
 	ROM_SYSTEM_BIOS(8, "ami181", "AMI HT 18.1") /* not a bad dump, sets unknown probably chipset related registers at 0x1e8 before failing post */
 	ROMX_LOAD( "ht18.bin",     0x10000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(8) )
+	// 9: same as BIOS '9' in at
 	ROM_SYSTEM_BIOS(9, "amiht21", "AMI HT 21.1") /* as above */
 	ROMX_LOAD( "ht21e.bin",    0x10000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(9) )
+	// 10: same as BIOS '10' in at
 	ROM_SYSTEM_BIOS(10, "amip1", "AMI P.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "poisk-h.bin",   0x10001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(10) )
 	ROMX_LOAD( "poisk-l.bin",   0x10000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(10) )
+	// 11: BIOS-String: DG22-1131-040990-K11 / 286-BIOS G2 V1.1 6-28-90
 	ROM_SYSTEM_BIOS(11, "ami1131", "AMI-1131") /*(Motherboard Manufacturer: Elitegroup Computer Co., Ltd.) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "2hlm003h.bin",   0x10001, 0x8000, CRC(2babb42b) SHA1(3da6538f44b434cdec0cbdddd392ccfd34666f06),ROM_SKIP(1) | ROM_BIOS(11) )
 	ROMX_LOAD( "2hlm003l.bin",   0x10000, 0x8000, CRC(317cbcbf) SHA1(1adad6280d8b07c2921fc5fc13ecaa10e6bfebdc),ROM_SKIP(1) | ROM_BIOS(11) )
+	// 12: same as BIOS '1' in at
 	ROM_SYSTEM_BIOS(12, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
 	ROMX_LOAD("at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(12) )
 	ROMX_LOAD("at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(12) )
+	// 13
 	ROM_SYSTEM_BIOS(13, "bravo", "AST Bravo/286") // fails with keyboard controller test, probably expects specific kbdc rom
 	ROMX_LOAD("107000-704.bin", 0x10000, 0x8000, CRC(94faf87e) SHA1(abaafa6c2ae9b9fba95b244dcbcc1c752ac6c0a0),ROM_SKIP(1) | ROM_BIOS(13) )
 	ROMX_LOAD("107000-705.bin", 0x10001, 0x8000, CRC(e1263c1e) SHA1(b564f1043ef45ecbdf4f06bb500150ad992c2931),ROM_SKIP(1) | ROM_BIOS(13) )
@@ -1055,9 +1159,11 @@ ROM_END
 
 ROM_START( neat )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: BIOS-String: ENET-1131-030389-K0
 	ROM_SYSTEM_BIOS(0, "neat286", "NEAT 286")
 	ROMX_LOAD("at030389.0", 0x10000, 0x8000, CRC(4c36e61d) SHA1(094e8d5e6819889163cb22a2cf559186de782582),ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("at030389.1", 0x10001, 0x8000, CRC(4e90f294) SHA1(18c21fd8d7e959e2292a9afbbaf78310f9cad12f),ROM_SKIP(1) | ROM_BIOS(0))
+	// 1: Phoenix 80286 ROM BIOS PLUS Version 3.10 12 - High Performance 286 ROM BIOS Ver C.12
 	ROM_SYSTEM_BIOS(1, "pb800", "Packard Bell PB800")
 	ROMX_LOAD("3.10.12-1.bin", 0x10001, 0x8000, CRC(e6bb54c5) SHA1(fa5a376dd44696c78dcc8994e18938b5e1b3e45a),ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("3.10.12-2.bin", 0x10000, 0x8000, CRC(bde46933) SHA1(c7221192f48d6f2f5b773c3c7d2a52b635cb473e),ROM_SKIP(1) | ROM_BIOS(1))
@@ -1065,12 +1171,20 @@ ROM_END
 
 ROM_START( at386sx )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: BIOS-String: 30-0100-D61204-00101111-050591-SCAMPSX-0 / MB-1316/20/25VST
 	ROM_SYSTEM_BIOS(0, "mb386sx", "mb386sx-25spb") // VLSI SCAMPSX
 	ROMX_LOAD("386sx_bios_plus.bin", 0x10000, 0x10000, CRC(f71e5a8d) SHA1(e73fda2547d92bf578e93623d5f2349b97e22393), ROM_BIOS(0))
+	// 1: BIOS-String: 30-0400-428027-00101111-070791-SCMPSX-0 / VLSI SCAMP 386SX 16/20/25MHz
+	ROM_SYSTEM_BIOS(1, "scamp", "VLSI SCAMPSX")
+	ROMX_LOAD("ami_386sx_vlsi_scamp_070791.bin", 0x10000, 0x10000, CRC(082d071c) SHA1(69af9a951f138146036b3c9ac3761cc6589b6cf5), ROM_BIOS(1))
+	// 2: BIOS-String: 03/25/93-SARC_RC2016A-219v0000 / CX 386SX System
+	ROM_SYSTEM_BIOS(2, "cxsxd", "CX SXD")
+	ROMX_LOAD("award_cx-sxd_v4.50.srd.bin", 0x10000, 0x10000, CRC(ef1c74d7) SHA1(b40b1cb7143c4e352798bdf3b488d9342a4029a7), ROM_BIOS(2))
 ROM_END
 
 ROM_START( ct386sx )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: BIOS-String: ENSX-1131-0040990-K0
 	ROM_SYSTEM_BIOS(0, "neatsx", "NEATsx 386sx")
 	ROMX_LOAD("012l-u25.bin", 0x10000, 0x8000, CRC(4ab1862d) SHA1(d4e8d0ff43731270478ca7671a129080ff350a4f),ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("012h-u24.bin", 0x10001, 0x8000, CRC(17472521) SHA1(7588c148fe53d9dc4cb2d0ab6e0fd51a39bb5d1a),ROM_SKIP(1) | ROM_BIOS(0))
@@ -1080,22 +1194,63 @@ ROM_END
 
 ROM_START( at386 )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: BIOS-String: X0-0100-000000-00101111-060692-386SX-0 / AMIBIOS Ver 5.19a
 	ROM_SYSTEM_BIOS(0, "ami386", "AMI 386")
 	ROMX_LOAD("ami386.bin",  0x10000, 0x10000, CRC(3a807d7f) SHA1(8289ba36a3dfc3324333b1a834bc6b0402b546f0), ROM_BIOS(0))
+	// 1: Phoenix 80386 ROM BIOS PLUS Verson 1.10 (R22)
 	ROM_SYSTEM_BIOS(1, "at386", "unknown 386")  // This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
 	ROMX_LOAD("at386.bin",  0x10000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(1))
+	// 2: BIOS-String: 30-0101-429999-00101111-050591-D90-0 / AMI TD60C BIOS VERSION 2.42B
 	ROM_SYSTEM_BIOS(2, "amicg", "AMI CG")
 	ROMX_LOAD("amicg.1",        0x10000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(2))
+	// 3: BIOS-String: EC&T-1131-030389-K0
+	ROM_SYSTEM_BIOS(3, "ecs386-32", "ECS-386/32") // Elitegroup ECS-386/32 mainboard
+	ROMX_LOAD("ami_ecs-386_32_lo.bin", 0x10000, 0x8000, CRC(e119d6a4) SHA1(bcc6164173b44832b8ebfa1883e22efc167e2cd4), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("ami_ecs-386_32_hi.bin", 0x10001, 0x8000, CRC(e3072bf8) SHA1(74eec72e190f682cfd5ae5425ebdc854e0ba7bc9), ROM_SKIP(1) | ROM_BIOS(3))
+	// 4: BIOS-String: 30-0200-D01247-00101111-050591-PEAKDM_B-0 / FU340 REV-B PAGE MODE BIOS
+	ROM_SYSTEM_BIOS(4, "afu340", "Abit FU340") // Abit FU340 mainboard
+	ROMX_LOAD("ami_abit_fu340.bin", 0x10000, 0x10000,CRC(9ea90d90) SHA1(091bdae7b1e36ac5168823d80d5907af2a95e583), ROM_BIOS(4))
+	// 5: BIOS-String: 30-0500-D01131-00101111-070791-UMCWB-0 / UM386 V1.1 03-06-92
+	ROM_SYSTEM_BIOS(5, "ecsum386", "Elitegroup UM386 V1.1") // Elitegroup UM386 mainboard Rev 1.1
+	ROMX_LOAD("ami_um386_rev1.1.bin", 0x10000, 0x10000,CRC(81fe4297) SHA1(efb2ba2be6f08cb487ee1b867a2456ed6b5975ad), ROM_BIOS(5))
+	// 6: BIOS-String: 30-0400-428005-00101111-070791-FORX-0 / BIOS ID SMIH0107 / IT9112
+	ROM_SYSTEM_BIOS(6, "smih0107", "SMIH0107") // keyboard not working
+	ROMX_LOAD( "ami_smih0107.bin", 0x10000, 0x10000, CRC(970bb0c0) SHA1(4a958887485f7239d25fa7b0c98569b97ce93800), ROM_BIOS(6) )
+	// 7: Award Modular BIOS 4.50
+	ROM_SYSTEM_BIOS(7, "pccm326", "PCChips M326 V5.2") //  BIOS reports a 66MHz 386DX original board has a TI TX486DLC/E-40PCE and IIT 4C87DLC-40 CPU/FPU combo
+	ROMX_LOAD( "m326_v5.2_m601-326.bin", 0x10000, 0x10000, CRC(cca6a443) SHA1(096c8bfa000c682d6c801da27c7fd14243ebb63b), ROM_BIOS(7) )
+	// 8
+	ROM_SYSTEM_BIOS(8, "msi386", "MSI 386") // MSI 386 mainboard, initializes graphics card, then hangs
+	ROMX_LOAD("ami_386_msi_02297_even.bin", 0x10000, 0x8000, CRC(768590a0) SHA1(90c5203d78591a093fd4f54ceb8d9827f1e64f39), ROM_SKIP(1) | ROM_BIOS(8) )
+	ROMX_LOAD("ami_386_msi_02297_odd.bin", 0x10001, 0x8000, CRC(7b1360dc) SHA1(552ccda9f90826621e88d9abdc47306b9c2b2b15), ROM_SKIP(1) | ROM_BIOS(8) )
+	// 9: BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
+	ROM_SYSTEM_BIOS(9, "386sc2c", "386-SC-2C")
+	ROMX_LOAD("386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52), ROM_BIOS(9) )
+	// 10: BIOS-String: EC&T-1332-040990-K0
+	ROM_SYSTEM_BIOS(10, "cs8230", "CS8230")
+	ROMX_LOAD("ami_386_cs8230_chipset.bin", 0x10000, 0x10000, CRC(1ee766d0) SHA1(75dba3c9817dfe6caca46f5f4f2f1d76ba88d3c7), ROM_BIOS(10) )
+	// 11
+	ROM_SYSTEM_BIOS(11, "ami2939", "AMI2939") // no display
+	ROMX_LOAD("ami2939e.rom", 0x10000, 0x8000, CRC(65cbbd32) SHA1(d7d26b496f8e86f01722ad9f171a68f9fcdc477c), ROM_SKIP(1) | ROM_BIOS(11) )
+	ROMX_LOAD("ami2939o.rom", 0x10001, 0x8000, CRC(8db6e739) SHA1(cdd47709d6036fad4be40c15bff41752d831d4b8), ROM_SKIP(1) | ROM_BIOS(11) )
+	// 12: BIOS-String: 30-0201-ZZ1347-00101111-050591-M320-0
+	ROM_SYSTEM_BIOS(12, "m321_23", "PCChips M321 Rev.2.3")
+	ROMX_LOAD("pcchips_m321_rev2.3.bin", 0x10000, 0x10000, CRC(ca0542e4) SHA1(8af9f88e022f8115708178c6c0b313ea0423a2b5), ROM_BIOS(12) )
+	// 13: BIOS-String: 30-0200-DH1102-00101111-070791-ETEQ386-0 / REV C3
+	ROM_SYSTEM_BIOS(13, "sy19i", "Soyo SY-19I")
+	ROMX_LOAD("ami_soyo_sy-19i.bin", 0x10000, 0x10000, CRC(369a040f) SHA1(3dbcbcb8b8a50717cae3b17f44ca1b7c394b75fc), ROM_BIOS(13) )
 ROM_END
 
 
 ROM_START( at486 )
 	ROM_REGION(0x20000, "bios", 0)
-
+	// 0: BIOS-String: 30-0500-ZZ1130-00101111-070791-1219-0
 	ROM_SYSTEM_BIOS(0, "at486", "PC/AT 486")
 	ROMX_LOAD("at486.bin",   0x10000, 0x10000, CRC(31214616) SHA1(51b41fa44d92151025fc9ad06e518e906935e689), ROM_BIOS(0))
+	// 1: BIOS-String: 40-0100-009999-11101111-070791-UMC480A-0 / United Microelectronics Corporation (UMC) MG-48602
 	ROM_SYSTEM_BIOS(1, "mg48602", "UMC MG-48602")
 	ROMX_LOAD("mg48602.bin", 0x10000, 0x10000, CRC(45797823) SHA1(a5fab258aecabde615e1e97af5911d6cf9938c11), ROM_BIOS(1))
+	// 2: BIOS-String: 40-0000-001470-00101111-060692-SIS3486-0 / 24X-VS-XX-B
 	ROM_SYSTEM_BIOS(2, "ft01232", "Free Tech 01-232")
 	ROMX_LOAD("ft01232.bin", 0x10000, 0x10000, CRC(30efaf92) SHA1(665c8ef05ca052dcc06bb473c9539546bfef1e86), ROM_BIOS(2))
 
@@ -1110,65 +1265,138 @@ ROM_START( at486 )
 	xxxxJxxx --> Winbond W83877F IO Core Logic
 
 	*/
-
+	// 3: BIOS-String: 06/16/97-VT82C486A-214L2000-00 / Version 3.276GN1
 	/* this is the year 2000 beta bios from FIC, supports GIO-VT, GAC-V, GAC-2, VIP-IO, VIO-VP and GVT-2 */
-	ROM_SYSTEM_BIOS(3, "ficy2k", "FIC 486 3.276GN1") /* 1997-06-16, includes CL-GD5429 VGA BIOS 1.00a */
+	ROM_SYSTEM_BIOS(3, "ficy2k", "FIC 486 3.276GN1") /* includes CL-GD5429 VGA BIOS 1.00a */
 	ROMX_LOAD("3276gn1.bin",  0x00000, 0x20000, CRC(d4ff0cc4) SHA1(567b6bdbc9bff306c8c955f275e01ae4c45fd5f2), ROM_BIOS(3))
-
-	ROM_SYSTEM_BIOS(4, "ficgac2", "FIC 486-GAC-2") /* 1994-04-29, includes CL-GD542X VGA BIOS 1.50 */
+	// 4: BIOS-String: 04/29/94-VT82C486A-214L2000-00 / Award Modular BIOS v4.50
+	ROM_SYSTEM_BIOS(4, "ficgac2", "FIC 486-GAC-2") /* includes CL-GD542X VGA BIOS 1.50 */
 	ROMX_LOAD("att409be.bin", 0x00000, 0x20000, CRC(c58e017b) SHA1(14c19e720ce62eb2afe28a70f4e4ebafab0f9e77), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "ficgacv", "FIC 486-GAC-V 3.27GN1") /* 1996-04-08, includes CL-GD542X VGA BIOS 1.41 */
+	// 5: BIOS-String: 04/08/96-VT82C486A-214L2000-00 / Version 3.27GN1
+	ROM_SYSTEM_BIOS(5, "ficgacv", "FIC 486-GAC-V 3.27GN1") /* includes CL-GD542X VGA BIOS 1.41 */
 	ROMX_LOAD("327gn1.awd",   0x00000, 0x20000, CRC(017614d4) SHA1(2228c28f21a7e78033d24319449297936465b164), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "ficgiovp", "FIC 486-GIO-VP 3.15GN") /* 1994-05-06 */
+	// 6: BIOS-String: 05/06/94-VT82C486A-214L2000-00 / Version 3.15GN
+	ROM_SYSTEM_BIOS(6, "ficgiovp", "FIC 486-GIO-VP 3.15GN")
 	ROMX_LOAD("giovp315.rom", 0x10000, 0x10000, CRC(e102c3f5) SHA1(f15a7e9311cc17afe86da0b369607768b030ddec), ROM_BIOS(6))
+	// 7: BIOS-String: 11/20/94-VT82C486A-214L2000-00 / Version 3.06G (11/25/94)
 	ROM_SYSTEM_BIOS(7, "ficgiovt", "FIC 486-GIO-VT 3.06G") /* 1994-11-20 */
 	ROMX_LOAD("306gcd00.awd", 0x10000, 0x10000, CRC(75f3ded4) SHA1(999d4b58204e0b0f33262d0613c855b528bf9597), ROM_BIOS(7))
-
-	ROM_SYSTEM_BIOS(8, "ficgiovt2_326", "FIC 486-GIO-VT2 3.26G")  /* 1994-07-06 */
+	// 8: BIOS-String: 07/06/VT82C486A-214L2000-00 / Version  3.26G
+	ROM_SYSTEM_BIOS(8, "ficgiovt2_326", "FIC 486-GIO-VT2 3.26G")
 	ROMX_LOAD("326g1c00.awd", 0x10000, 0x10000, CRC(2e729ab5) SHA1(b713f97fa0e0b62856dab917f417f5b21020b354), ROM_BIOS(8))
-	ROM_SYSTEM_BIOS(9, "486_gio_vt2","VBS1.08H 486-GVT-2")        /* 1995-06-19 */
+	// 9: BIOS-String: 06/19/95-VT82C486A-214L2000-00 / Version VBS1.08H 486-GIO-VT2
+	ROM_SYSTEM_BIOS(9, "486_gio_vt2","VBS1.08H 486-GVT-2")
 	ROMX_LOAD("award_486_gio_vt2.bin", 0x10000, 0x10000, CRC(58d7c7f9) SHA1(097f15ec2bd672cb3f1763298ca802c7ff26021f), ROM_BIOS(9)) // Vobis version, Highscreen boot logo
-	ROM_SYSTEM_BIOS(10, "ficgiovt2_3276", "FIC 486-GIO-VT2 3.276") /* 1997-07-17 */
+	// 10: BIOS-String: 07/17/97-VT82C486A-214L2000-00 / Version 3.276
+	ROM_SYSTEM_BIOS(10, "ficgiovt2_3276", "FIC 486-GIO-VT2 3.276")
 	ROMX_LOAD("32760000.bin", 0x10000, 0x10000, CRC(ad179128) SHA1(595f67ba4a1c8eb5e118d75bf657fff3803dcf4f), ROM_BIOS(10))
-
-	ROM_SYSTEM_BIOS(11, "ficgvt2", "FIC 486-GVT-2 3.07G") /* 1994-11-02 */
+	// 11: BIOS-String: 11/02/94-VT82C486A-214L2000-00 Version 3.07G
+	ROM_SYSTEM_BIOS(11, "ficgvt2", "FIC 486-GVT-2 3.07G")
 	ROMX_LOAD("3073.bin",     0x10000, 0x10000, CRC(a6723863) SHA1(ee93a2f1ec84a3d67e267d0a490029f9165f1533), ROM_BIOS(11))
-	ROM_SYSTEM_BIOS(12, "ficgpak2", "FIC 486-PAK-2 5.15S") /* 1995-06-27, includes Phoenix S3 TRIO64 Enhanced VGA BIOS 1.4-01 */
+	// 12: BIOS-String: 06/27/95-VT82C505-2A4L4000-00 / Version 5.15S
+	ROM_SYSTEM_BIOS(12, "ficgpak2", "FIC 486-PAK-2 5.15S") /* includes Phoenix S3 TRIO64 Enhanced VGA BIOS 1.4-01 */
 	ROMX_LOAD("515sbd8a.awd", 0x00000, 0x20000, CRC(778247e1) SHA1(07d8f0f2464abf507be1e8dfa06cd88737782411), ROM_BIOS(12))
-
+	// 13
 	ROM_SYSTEM_BIOS(13, "ficpio3g7", "FIC 486-PIO-3 1.15G705") /* pnp */
 	ROMX_LOAD("115g705.awd",  0x00000, 0x20000, CRC(ddb1544a) SHA1(d165c9ecdc9397789abddfe0fef69fdf954fa41b), ROM_BIOS(13))
+	// 14
 	ROM_SYSTEM_BIOS(14, "ficpio3g1", "FIC 486-PIO-3 1.15G105") /* non-pnp */
 	ROMX_LOAD("115g105.awd",  0x00000, 0x20000, CRC(b327eb83) SHA1(9e1ff53e07ca035d8d43951bac345fec7131678d), ROM_BIOS(14))
-
+	// 15
 	ROM_SYSTEM_BIOS(15, "ficpos", "FIC 486-POS")
 	ROMX_LOAD("116di6b7.bin", 0x00000, 0x20000, CRC(d1d84616) SHA1(2f2b27ce100cf784260d8e155b48db8cfbc63285), ROM_BIOS(15))
-	ROM_SYSTEM_BIOS(16, "ficpvt", "FIC 486-PVT 5.15")          /* 1995-06-27 */
+	// 16: BIOS-String: 06/27/95-VT82C505-2A4L4000-00 / Version 5.15
+	ROM_SYSTEM_BIOS(16, "ficpvt", "FIC 486-PVT 5.15")
 	ROMX_LOAD("5150eef3.awd", 0x00000, 0x20000, CRC(eb35785d) SHA1(1e601bc8da73f22f11effe9cdf5a84d52576142b), ROM_BIOS(16))
-	ROM_SYSTEM_BIOS(17, "ficpvtio", "FIC 486-PVT-IO 5.162W2")  /* 1995-10-05 */
+	// 17: BIOS-String: 10/05/95-VT82C505-2A4L4000-00 / Version 5.162W2(PCTIO)
+	ROM_SYSTEM_BIOS(17, "ficpvtio", "FIC 486-PVT-IO 5.162W2")
 	ROMX_LOAD("5162cf37.awd", 0x00000, 0x20000, CRC(378d813d) SHA1(aa674eff5b972b31924941534c3c988f6f78dc93), ROM_BIOS(17))
-	ROM_SYSTEM_BIOS(18, "ficvipio426", "FIC 486-VIP-IO 4.26GN2") /* 1994-12-07 */
+	// 18: BIOS-String: 12/07/94-VT82C505-2A4L4000-00 / Version 4.26GN2(ES2) (12/07/94)
+	ROM_SYSTEM_BIOS(18, "ficvipio426", "FIC 486-VIP-IO 4.26GN2")
 	ROMX_LOAD("426gn2.awd",   0x00000, 0x20000, CRC(5f472aa9) SHA1(9160abefae32b450e973651c052657b4becc72ba), ROM_BIOS(18))
-	ROM_SYSTEM_BIOS(19, "ficvipio427", "FIC 486-VIP-IO 4.27GN2A") /* 1996-02-14 */
+	// 19: BIOS-String: 02/08/96-VT82C505-2A4L4000-00 / Version 4.27GN2A (02/14/96)
+	ROM_SYSTEM_BIOS(19, "ficvipio427", "FIC 486-VIP-IO 4.27GN2A")
 	ROMX_LOAD("427gn2a.awd",  0x00000, 0x20000, CRC(035ad56d) SHA1(0086db3eff711fc710b30e7f422fc5b4ab8d47aa), ROM_BIOS(19))
+	// 20
 	ROM_SYSTEM_BIOS(20, "ficvipio2", "FIC 486-VIP-IO2")
 	ROMX_LOAD("1164g701.awd", 0x00000, 0x20000, CRC(7b762683) SHA1(84debce7239c8b1978246688ae538f7c4f519d13), ROM_BIOS(20))
-
+	// 21: BIOS-String: 40-0401-428003-00101111-111192-OP495SLC-0 / PX486DX33/50P3 IVN 1.0 25/06/1993
 	ROM_SYSTEM_BIOS(21, "qdi", "QDI PX486DX33/50P3")
 	ROMX_LOAD("qdi_px486.u23", 0x10000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(21))
-ROM_END
+	// 22: BIOS-String: 40-0200-001353-0010111-070791-ETEQ4/1C-0 / ETEQ 486 Mar. 05, 1992
+	ROM_SYSTEM_BIOS(22, "a433cc", "J-Bond A433C-C/A450C-C")
+	ROMX_LOAD("ami_j-bond_a433c-c.bin", 0x10000, 0x10000, CRC(66031e98) SHA1(d2d1a26837d3ca943a6ef09ec3e6fbfaaa62cc46), ROM_BIOS(22))
+	// 23: BIOS-String: 40-00AG-001247-00101111-060692-SIS3486-0 / AV4 ISA/VL-BUS SYSTEM BIOS
+	ROM_SYSTEM_BIOS(23, "ava4529j", "AVA4529J") // this is a board with two VLB slots
+	ROMX_LOAD("amibios_486dx_isa_bios_aa4025963.bin", 0x10000, 0x10000, CRC(65558d9e) SHA1(2e2840665d069112a2c7169afec687ad03449295), ROM_BIOS(23))
+	// 24: BIOS-String: 40-0200-001343-00101111-111192-OPT495SX-0 / Version 2.0
+	ROM_SYSTEM_BIOS(24, "hot409", "Shuttle HOT-409") // 486 board with two VLB slots
+	ROMX_LOAD("ami1992.bin", 0x10000, 0x10000, CRC(a19c3fd4) SHA1(404822c98344061b60883533395a89fe4902c177), ROM_BIOS(24))
+	// 25: BIOS-String: 40-0204-001343-00101111-080893-OPT495SX-0 / OPTi495SX Version 3.0
+	ROM_SYSTEM_BIOS(25, "hot409lba", "Shuttle HOT-409 with LBA")
+	ROMX_LOAD("409lba.rom", 0x10000, 0x10000, CRC(78c5e47e) SHA1(7f14a88a5548fc67dd00e73fd09745e899b93a89), ROM_BIOS(25))
+	// 26: BIOS-String: 07/20/94-ARIES-P/I-AP4G-00 / #401A0-0104
+	ROM_SYSTEM_BIOS(26, "486ap4v104", "ASUS PVI-486AP4 V1.04") // 4xISA 1xVLB 4xPCI
+	ROMX_LOAD("awai0104.bin", 0x00000, 0x20000, CRC(52ea7123) SHA1(3d242ea6d1bcdddd41e32e40708133c72f2bd060), ROM_BIOS(26))
+	// 27: BIOS-String: 10/21/94-ARIES-P/I-AP4G-00 / #401A0-0203
+	ROM_SYSTEM_BIOS(27, "486ap4v203", "ASUS PVI-486AP4 V2.03")
+	ROMX_LOAD("awai0203.bin", 0x00000, 0x20000, CRC(68d3a3f4) SHA1(6eee0c9aed2ede028eb170f8dd7921563293b99f), ROM_BIOS(27))
+	// 28: BIOS-String: 11/08/94-ARIES-P/I-AP4G-00 / #401A0-0204
+	ROM_SYSTEM_BIOS(28, "486ap4v204", "ASUS PVI-486AP4 V2.04")
+	ROMX_LOAD("awai0204.bin", 0x00000, 0x20000, CRC(b62b35bb) SHA1(b6fa3d7b1c88da37ce74aca329a31d2587652d97), ROM_BIOS(28))
+	// 29: BIOS-String: 11/25/97/ARIES-P/I-AP4G-00 / #401A0-0205-2
+	ROM_SYSTEM_BIOS(29, "486ap4v205-2", "ASUS PVI-486AP4 V2.05-2")
+	ROMX_LOAD("0205.002", 0x00000, 0x20000, CRC(632e8ee6) SHA1(3cf57b2654b0365e41ef5f5c82f68eeadf0e7a21), ROM_BIOS(29))
+	// 30: BIOS-String: 07/22/94-SATURN-P/I-4SP3-00 / #401A0-0207
+	ROM_SYSTEM_BIOS(30, "486sp3v207", "ASUS PVI-486SP3 V2.07") // 4xISA 1xVLB 3xPCI
+	ROMX_LOAD("awsi0207.bin", 0x00000, 0x20000, CRC(0cb862aa) SHA1(7ffead05c1df47ec36afba395191145279c5e789), ROM_BIOS(30))
+	// 31: BIOS-String: 07/22/94-SATURN-P/I-4SP3-00 / #401A0-0207
+	ROM_SYSTEM_BIOS(31, "486spv2737", "ASUS PVI-486SP3 V2.07 #2")
+	ROMX_LOAD("awsi2737.bin", 0x00000, 0x20000, CRC(8cd9a89c) SHA1(6c68c23cc5e8ae66261e9fe931f2ce07efe767b6), ROM_BIOS(31))
+	// 32: BIOS-String: 10/21/94-SATURN-II-P/I-SP3G-00 / #401A0-302
+	ROM_SYSTEM_BIOS(32, "486sp3gv302", "ASUS PCI/I-486SP3G V3.02") // 4xISA 3xPCI
+	ROMX_LOAD("awsg0302.bin", 0x00000, 0x20000, CRC(21e918a0) SHA1(c7f937e3e90a43d7c7f867e686625b28a9c2484c), ROM_BIOS(32))
+	// 33: BIOS-String: 08/15/95-SATURN-II-P/I-SP3G-00 / #401A0-304
+	ROM_SYSTEM_BIOS(33, "486sp3gv304", "ASUS PCI/I-486SP3G V3.04")
+	ROMX_LOAD("awsg0304.bin", 0x00000, 0x20000, CRC(f4d830d2) SHA1(086ccd14c7b0c521be1958d58b3539c4bfe4721f), ROM_BIOS(33))
+	// 34: BIOS-String: 05/22/95/SiS-496-497B-PCI-A486-0-00 / #401A0-0203
+	ROM_SYSTEM_BIOS(34, "a486sv203", "ASUS PCI/I-A486S V2.03") // 1xEISA
+	ROMX_LOAD("si4a0203.awd", 0x00000, 0x20000, CRC(95fcb7c6) SHA1(c19164d67af18c774e6eb06bd1570d95a24b2856), ROM_BIOS(34))
+	// 35 boots into "boot block" rescue BIOS
+	ROM_SYSTEM_BIOS(35, "a486sv304", "ASUS PCI/I-A486S V3.04")
+	ROMX_LOAD("si4a0304.awd", 0x00000, 0x20000, CRC(a00ad907) SHA1(598d97ea29f930a9359429dc540d27bfdd0fcd20), ROM_BIOS(35))
+	// 36: BIOS-String: 05/20/94-SIS-486/EISA-E-486SV1-00 / #401A0-0112
+	ROM_SYSTEM_BIOS(36, "486sv1v112", "ASUS VL/EISA-486SV1 V1.12") // 8xEISA 1XVLB
+	ROMX_LOAD("e4sv0112.awd", 0x10000, 0x10000, CRC(d1d42fc9) SHA1(61549bf597517bb3c33e724e32b3cca981e65000), ROM_BIOS(36))
+	// 37: BIOS-String: 11/17/94-SIS-85C471-I486SV2G-00 / #401A0-0304
+	ROM_SYSTEM_BIOS(37, "486sv2gv304", "ASUS VL/I-486SV2G (GX4) V3.04") // 7xISA 2xVLB
+	ROMX_LOAD("sv2g0304.bin", 0x10000, 0x10000, CRC(cceabe6f) SHA1(45d0e25603045255d1ccaf5cbddd1a9146f61529), ROM_BIOS(37))
+	// 38: BIOS-String: 01/11/95-SIS-85C471-I486SV2G-00 / #401A0-0305-1
+	ROM_SYSTEM_BIOS(38, "486sv2gv305", "ASUS VL/I-486SV2G (GX4) V3.05")
+	ROMX_LOAD("0305.001", 0x10000, 0x10000, CRC(9f2f9b75) SHA1(789807d82e39d69f948f7897f99b2fe362330dd1), ROM_BIOS(38))
+	// 39: BIOS-String: 08/22/95-SIS-85C471-I486SV2G-00 / #401A0-0401
+	ROM_SYSTEM_BIOS(39, "486sv2gv401", "ASUS VL/I-486SV2G (GX4) V4.01")
+	ROMX_LOAD("sv2g0401.bin", 0x10000, 0x10000, CRC(f544f65a) SHA1(9a5e39cfbd545a0026f959b42dbc742246205b3c), ROM_BIOS(39))
+	// 40: BIOS-String: 11/03/95-SIS-85C471-I486SV2G-00 / #401A0-0402-1
+	ROM_SYSTEM_BIOS(40, "486sv2gv402", "ASUS VL/I-486SV2G (GX4) V4.02")
+	ROMX_LOAD("sv2g0402.bin", 0x10000, 0x10000, CRC(db8fe666) SHA1(e499da86261bc6b312a6bc3d94b9465e17c5a449), ROM_BIOS(40))
+	ROM_END
 
 
 // FIC 486-PIO-2 (4 ISA, 4 PCI)
 // VIA VT82C505 (ISA/VL to PCI bridge) + VT82C496G (system chipset) + VT82C406MV (keyboard controller, RTC, CMOS), NS311/312 or NS332 I/O
 ROM_START( ficpio2 )
 	ROM_REGION(0x40000, "isa", 0)
+	// 0
 	ROM_SYSTEM_BIOS(0, "ficpio2c7", "FIC 486-PIO-2 1.15C701") /* pnp, i/o core: NS 332, doesn't boot, requires cache emulation? */
 	ROMX_LOAD("115c701.awd",  0x020000, 0x20000, CRC(b0dd7975) SHA1(bfde13b0fbd141bc945d37d92faca9f4f59b716d), ROM_BIOS(0))
+	// 1
 	ROM_SYSTEM_BIOS(1, "ficpio2b7", "FIC 486-PIO-2 1.15B701") /* pnp, i/o core: NS 311/312, doesn't boot, requires cache emulation? */
 	ROMX_LOAD("115b701.awd",  0x020000, 0x20000, CRC(ac24abad) SHA1(01174d84ed32fb1d95cd632d09f773acb8666c83), ROM_BIOS(1))
+	// 2: BIOS-String: 04/18/96-VT496G-2A4LF0IC-00 / Version 1.15C101
 	ROM_SYSTEM_BIOS(2, "ficpio2c1", "FIC 486-PIO-2 1.15C101") /* non-pnp, i/o core: NS 332, working  */
 	ROMX_LOAD("115c101.awd",  0x020000, 0x20000, CRC(5fadde88) SHA1(eff79692c1ecf34b6ea3f02409d14ce1f5c51bf9), ROM_BIOS(2))
+	// 3: BIOS-String: 04/18/96-VT496G-2A4LF0IC-00 / Version 1.15B101
 	ROM_SYSTEM_BIOS(3, "ficpio2b1", "FIC 486-PIO-2 1.15B101") /* non-pnp, i/o core: NS 311/312, working  */
 	ROMX_LOAD("115b101.awd",  0x020000, 0x20000, CRC(ff69617d) SHA1(ecbfc7315dcf6bd3e5b59e3ae9258759f64fe7a0), ROM_BIOS(3))
 ROM_END
@@ -1416,12 +1644,47 @@ ROM_START( comportiii )
 	ROMX_LOAD( "109737-002.bin", 0x10001, 0x8000, CRC(8463cc41) SHA1(cb9801591e4a2cd13bbcc40739c9e675ba84c079), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
 
+// Compaq SLT/286 - complains about "102 - System board failure"
+ROM_START( comslt286 )
+   ROM_REGION(0x20000,"bios", 0)
+   	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
+	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-odd.bin", 0x10001, 0x8000, CRC(4a0febac) SHA1(7da5ac4bc50f25063a1d1e382b8cff9b297976f8))
+ROM_END
+
+// Dell System 200 - complains about "memory overlap at 400000" but seems to work otherwise
+ROM_START( dsys200 )
+	ROM_REGION( 0x20000, "bios", 0 )
+   	ROM_LOAD16_BYTE( "version_3.10_a12_even.bin", 0x10000, 0x8000, CRC(5aa81939) SHA1(d9029d3708c49e72f57ae2a340429c28ec39acab))
+	ROM_LOAD16_BYTE( "version_3.10_a12_odd.bin", 0x10001, 0x8000, CRC(942416cb) SHA1(b321704471e159030af82556ff25ac46c27a807e))
+
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "20575_b47-00.bin", 0x000, 0x0800, CRC(148187db) SHA1(0d7542dd0b2bc3d6724ae3618a8543cb84a30e92) )
+ROM_END
+
 // Ericsson WS286
-ROM_START(ews286 ) // Computer is brown/yellow-ish with Ericsson logo
-	ROM_REGION(0x20000,"bios", 0)
+ROM_START( ews286 ) // Computer is brown/yellow-ish with Ericsson logo
+	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "rys_103_1002_r8a_3c00_ic-pos_71.bin", 0x18000, 0x4000, CRC(af179e56) SHA1(58b1df46d6e68eef472a0529cb9317abaf17880f)) // Last ROM set and has Nokia
 	ROM_LOAD16_BYTE( "rys_103_1003_r8a_8600_ic-pos_69.bin", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
 ROM_END
+
+//  NCR, probably PC-8 - should get a "NGA" extended CGA graphics card once it's emulated
+ROM_START( ncrpc8 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "ncr_35116_u113_vers.4-2.bin", 0x10001, 0x8000, CRC(b1b6a2e2) SHA1(5b2c0a2be59e064076ed757d84f61bf955ceca08))
+	ROM_LOAD16_BYTE( "ncr_35117_u127_vers.4-2.bin", 0x10000, 0x8000, CRC(f4338669) SHA1(c1d6e714591c8d7ab966acfdbc3b463e06fbd073))
+	
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD ("ncr_keyboard_mcu_35091.bin", 0x0000, 0x800, CRC(632556cc) SHA1(b35f30bd0664fc1c2775a594f248d1e30237900a))
+ROM_END
+
+// Nixdorf 8810 M55
+ROM_START( n8810m55 )
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "150-3872_u113_27_4.5.1.bin", 0x10001, 0x8000, CRC(35ff4fba) SHA1(557f0f98c27af76f6fa6990592e7150f5fc1fc02))
+	ROM_LOAD16_BYTE( "150-3873_u127_30_4.5.1.bin", 0x10000, 0x8000, CRC(5a7e6643) SHA1(f3890919a772eead7232bd227b2c8677377f6e24))
+ROM_END
+	
 
 // Nokia Data WS286
 //ROM_START(nws286 ) // Computer is grey with Nokia logo.
@@ -1477,6 +1740,7 @@ COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
 COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
 COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
+COMP( 1988, dsys200,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Dell Computer Corporation",    "System 200", MACHINE_NOT_WORKING )
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
@@ -1484,5 +1748,8 @@ COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
 COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
 COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
+COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
+COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
+COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

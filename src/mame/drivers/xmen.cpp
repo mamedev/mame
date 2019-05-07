@@ -86,15 +86,15 @@ void xmen_state::main_map(address_map &map)
 	map(0x101000, 0x101fff).ram();
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
-	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w));
+	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x10a002, 0x10a003).portr("P1_P3");
 	map(0x10a004, 0x10a005).portr("EEPROM");
-	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r));
+	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x110000, 0x113fff).ram();     /* main RAM */
-	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::lsb_r), FUNC(k052109_device::lsb_w));
+	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask16(0x00ff);
 	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 }
 
@@ -120,16 +120,16 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
-	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w)); /* sprites */
+	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_w)); /* sprites */
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x10a002, 0x10a003).portr("P1_P3");
 	map(0x10a004, 0x10a005).portr("EEPROM");
 	map(0x10a006, 0x10a007).portr("P5_P6");
-	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r)); /* sprites */
+	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r)); /* sprites */
 	map(0x110000, 0x113fff).ram();     /* main RAM */
-/*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
+/*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:write)).umask16(0x00ff).share("tilemapleft"); */
 	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
 	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 /*
@@ -330,7 +330,7 @@ void xmen_state::xmen(machine_config &config)
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
 	m_k053246->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
@@ -392,7 +392,7 @@ void xmen_state::xmen6p(machine_config &config)
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
 	m_k053246->set_screen(m_screen);
 	m_k053246->set_palette("palette");
 
@@ -482,7 +482,7 @@ ROM_START( xmen )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -509,7 +509,7 @@ ROM_START( xmenj )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -536,7 +536,7 @@ ROM_START( xmenja )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -563,7 +563,7 @@ ROM_START( xmene )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -590,7 +590,7 @@ ROM_START( xmena )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -617,7 +617,7 @@ ROM_START( xmenaa )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -644,7 +644,7 @@ ROM_START( xmen2pe )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -671,7 +671,7 @@ ROM_START( xmen2pu )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -698,7 +698,7 @@ ROM_START( xmen2pa )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -725,7 +725,7 @@ ROM_START( xmen2pj )
 	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
 	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -806,7 +806,7 @@ ROM_START( xmen6p )
 	ROM_LOAD32_WORD( "065-a08.1l",  0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.1h",  0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.12l", 0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) )    /* sprites */
 	ROM_LOAD64_WORD( "065-a10.17l", 0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.22h", 0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
@@ -833,7 +833,7 @@ ROM_START( xmen6pu )
 	ROM_LOAD32_WORD( "065-a08.1l",  0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.1h",  0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD64_WORD( "065-a09.12l", 0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) )    /* sprites */
 	ROM_LOAD64_WORD( "065-a10.17l", 0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "065-a12.22h", 0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )

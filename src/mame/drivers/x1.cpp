@@ -1510,7 +1510,7 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_hres_320 = data & 0x40;
 
 	/* set up the pixel clock according to the above divider */
-	m_crtc->set_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
+	m_crtc->set_unscaled_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
 
 	if(!BIT(data, 5) && BIT(m_io_switch, 5))
 		m_iobank->set_bank(1);

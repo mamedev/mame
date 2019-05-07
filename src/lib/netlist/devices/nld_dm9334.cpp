@@ -7,6 +7,7 @@
 
 #include "nld_dm9334.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -25,6 +26,7 @@ namespace netlist
 		, m_last_D(*this, "m_last_D", 0)
 		, m_last_A(*this, "m_last_A", 0)
 		, m_last_Q(*this, "m_last_Q", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -43,6 +45,7 @@ namespace netlist
 		state_var<unsigned> m_last_D;
 		state_var<unsigned> m_last_A;
 		state_var<unsigned> m_last_Q;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(9334_dip, 9334)
@@ -56,6 +59,7 @@ namespace netlist
 			register_subalias("5", m_Q[1]);
 			register_subalias("6", m_Q[2]);
 			register_subalias("7", m_Q[3]);
+			register_subalias("8", "GND");
 
 			register_subalias("9",  m_Q[4]);
 			register_subalias("10", m_Q[5]);
@@ -64,6 +68,7 @@ namespace netlist
 			register_subalias("13", m_D);
 			register_subalias("14", m_EQ);
 			register_subalias("15", m_CQ);
+			register_subalias("16", "VCC");
 
 		}
 	};
@@ -143,7 +148,7 @@ namespace netlist
 			m_Q[i].push((q >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL(9334,     "TTL_9334",     "+CQ,+EQ,+D,+A0,+A1,+A2")
+	NETLIB_DEVICE_IMPL(9334,     "TTL_9334",     "+CQ,+EQ,+D,+A0,+A1,+A2,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(9334_dip, "TTL_9334_DIP", "")
 
 	} //namespace devices

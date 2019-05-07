@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 /******************************************************************************
-*
+
 * novag_scon.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:

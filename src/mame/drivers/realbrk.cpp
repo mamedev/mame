@@ -170,8 +170,9 @@ void realbrk_state::base_mem(address_map &map)
 	map(0x600000, 0x601fff).ram().w(FUNC(realbrk_state::vram_w<0>)).share("vram_0");  // Background   (0)
 	map(0x602000, 0x603fff).ram().w(FUNC(realbrk_state::vram_w<1>)).share("vram_1");  // Background   (1)
 	map(0x604000, 0x604fff).ram().w(FUNC(realbrk_state::vram_2_w)).share("vram_2");  // Text         (2)
-	map(0x605000, 0x61ffff).ram();                                         //
+	map(0x605000, 0x605fff).ram();                                         //
 	map(0x606000, 0x60600f).ram().w(FUNC(realbrk_state::vregs_w)).share("vregs");    // Scroll + Video Regs
+	map(0x606010, 0x61ffff).ram();                                         //
 	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);   // YMZ280
 	map(0xfe0000, 0xfeffff).ram();                                         // RAM
 }

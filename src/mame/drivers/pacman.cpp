@@ -438,7 +438,7 @@ WRITE_LINE_MEMBER(pacman_state::irq_mask_w)
 
 WRITE8_MEMBER(pacman_state::pacman_interrupt_vector_w)
 {
-	m_maincpu->set_input_line_vector(0, data);
+	m_maincpu->set_input_line_vector(0, data); // Z80
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -503,7 +503,7 @@ WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	m_maincpu->set_input_line_vector(0, data );
+	m_maincpu->set_input_line_vector(0, data ); // Z80
 }
 
 
@@ -512,7 +512,7 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	m_maincpu->set_input_line_vector(0, data );
+	m_maincpu->set_input_line_vector(0, data ); // Z80
 }
 
 

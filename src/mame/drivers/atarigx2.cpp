@@ -103,7 +103,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		m_rle->control_write(space, offset, (data >> 27) & 7);
+		m_rle->control_write((data >> 27) & 7);
 	}
 
 	/* lower byte */
@@ -116,7 +116,7 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		m_rle->command_write(space, offset, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		m_rle->command_write(((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -1194,11 +1194,14 @@ void atarigx2_state::main_map(address_map &map)
 	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd40fff).ram().w("palette", FUNC(palette_device::write32)).share("palette");
-	map(0xd70000, 0xd7ffff).ram();
-	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
-	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd70000, 0xd71fff).ram();
+	map(0xd72000, 0xd75fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
+	map(0xd76000, 0xd76fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd77000, 0xd77fff).ram();
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd79000, 0xd7a1ff).ram();
+	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd7a204, 0xd7ffff).ram();
 	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
 	map(0xe08000, 0xe08003).w(FUNC(atarigx2_state::latch_w));

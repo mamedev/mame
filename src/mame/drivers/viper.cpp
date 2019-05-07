@@ -577,46 +577,68 @@ uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &b
 }
 
 #ifdef UNUSED_FUNCTION
-static inline uint64_t read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
+static inline uint64_t read64le_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(space, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (uint64_t)(handler)(offset * 2 + 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
 	return result;
 }
 
 
-static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
+static inline uint64_t read64le_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
+{
+	uint64_t result = 0;
+	if (ACCESSING_BITS_0_31)
+		result |= (uint64_t)(handler)(offset * 2 + 0, mem_mask >> 0) << 0;
+	if (ACCESSING_BITS_32_63)
+		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
+	return result;
+}
+
+
+static inline void write64le_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		handler(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		handler(offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
-		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 #endif
 
-static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
+static inline uint64_t read64be_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
 {
 	mem_mask = swapendian_int64(mem_mask);
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+		result = (uint64_t)(handler)(offset * 2);
 	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
+	return swapendian_int64(result);
+}
+
+static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
+{
+	mem_mask = swapendian_int64(mem_mask);
+	uint64_t result = 0;
+	if (ACCESSING_BITS_0_31)
+		result = (uint64_t)(handler)(offset * 2, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
 	return swapendian_int64(result);
 }
 
 
-static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
+static inline void write64be_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	data = swapendian_int64(data);
 	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
-		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
+		handler(offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
-		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 /*****************************************************************************/
@@ -1723,35 +1745,35 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 
 READ64_MEMBER(viper_state::voodoo3_io_r)
 {
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_io_r), &(*m_voodoo)), space, offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(FUNC(voodoo_3_device::banshee_io_r), &(*m_voodoo)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_r)
 {
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_r), &(*m_voodoo)), space, offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(FUNC(voodoo_3_device::banshee_r), &(*m_voodoo)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_fb_r), &(*m_voodoo)), space, offset, mem_mask);
+	return read64be_with_32smle_device_handler(read32sm_delegate(FUNC(voodoo_3_device::banshee_fb_r), &(*m_voodoo)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), offset, data, mem_mask);
 }
 
 

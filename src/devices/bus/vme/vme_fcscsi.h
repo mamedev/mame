@@ -32,15 +32,14 @@ protected:
 
 	uint8_t fdc_irq_state;
 	uint8_t dmac_irq_state;
-	int dmac_irq_vector;
 
 private:
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_WRITE_LINE_MEMBER(dma_irq);
+	uint8_t dma_iack();
 
 	//fdc
-	DECLARE_WRITE8_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_READ8_MEMBER(fdc_read_byte);
 	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);

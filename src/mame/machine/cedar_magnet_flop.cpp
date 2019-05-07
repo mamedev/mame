@@ -12,6 +12,7 @@ DEFINE_DEVICE_TYPE(CEDAR_MAGNET_FLOP, cedar_magnet_flop_device, "cedmag_flop", "
 
 cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CEDAR_MAGNET_FLOP, tag, owner, clock)
+	, m_disk(*this, "disk")
 {
 }
 
@@ -36,27 +37,26 @@ void cedar_magnet_flop_device::device_reset()
 	m_floptrk = 0;
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::port60_r)
+u8 cedar_magnet_flop_device::port60_r()
 {
-	uint8_t ret = m_flopstat;
+	u8 ret = m_flopstat;
 	return ret;
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::port61_r)
+u8 cedar_magnet_flop_device::port61_r()
 {
-	uint8_t ret = m_curtrack;
+	u8 ret = m_curtrack;
 	return ret;
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::port63_r)
+u8 cedar_magnet_flop_device::port63_r()
 {
-	uint8_t ret = machine().rand();
+	u8 ret = machine().rand();
 
 	// printf("%s: port63_r (DATA) (%02x)\n", machine().describe_context().c_str(), ret);
 
 	if ((m_flopcmd&0xf0) == 0x90) // reading data
 	{
-		uint8_t *flop      =   memregion("disk")->base();
 		int side = (m_flopcmd & 0x02)>>1;
 		int read_offset_base = (m_flopsec * 0x400) + (m_curtrack * 0x3000) + (side * 0x1800);
 
@@ -67,7 +67,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 			m_flopstat |= 0x05;
 
 			int read_offset = read_offset_base + m_secoffs;
-			ret = flop[read_offset];
+			ret = m_disk[read_offset];
 
 			if (m_secoffs == 0)
 			{
@@ -102,7 +102,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
+void cedar_magnet_flop_device::port60_w(u8 data)
 {
 	//printf("%s: port60_w (COMMAND) %02x\n", machine().describe_context().c_str(), data);
 	m_flopcmd = data;
@@ -149,7 +149,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
 
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::port62_w)
+void cedar_magnet_flop_device::port62_w(u8 data)
 {
 	//printf("%s: port62_w (SECTOR) %02x\n", machine().describe_context().c_str(), data);
 	m_flopsec = data;
@@ -162,14 +162,13 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port62_w)
 	m_flopsec -= 200;
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::port63_w)
+void cedar_magnet_flop_device::port63_w(u8 data)
 {
 	//printf("%s: port63_w (DATA) %02x\n", machine().describe_context().c_str(), data);
 	m_flopdat = data;
 
 	if ((m_flopcmd & 0xf0) == 0xb0) // writing data
 	{
-		uint8_t *flop      =   memregion("disk")->base();
 		int side = (m_flopcmd & 0x02)>>1;
 		int read_offset_base = (m_flopsec * 0x400) + (m_curtrack * 0x3000) + (side * 0x1800);
 
@@ -180,7 +179,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port63_w)
 			m_flopstat |= 0x05;
 
 			int read_offset = read_offset_base + m_secoffs;
-			flop[read_offset] = data;
+			m_disk[read_offset] = data;
 
 			if (m_secoffs == 0)
 			{
@@ -206,10 +205,10 @@ WRITE8_MEMBER(cedar_magnet_flop_device::write)
 {
 	switch (offset & 3)
 	{
-		case 0x00:port60_w(space, offset, data);break;
+		case 0x00:port60_w(data);break;
 	//  case 0x01:port61_w(space, offset, data);break;
-		case 0x02:port62_w(space, offset, data);break;
-		case 0x03:port63_w(space, offset, data);break;
+		case 0x02:port62_w(data);break;
+		case 0x03:port63_w(data);break;
 		default:break;
 	}
 }
@@ -218,10 +217,10 @@ READ8_MEMBER(cedar_magnet_flop_device::read)
 {
 	switch (offset & 3)
 	{
-		case 0x00: return port60_r(space, offset);
-		case 0x01: return port61_r(space, offset);
+		case 0x00: return port60_r();
+		case 0x01: return port61_r();
 		//case 0x02: return port62_r(space, offset);
-		case 0x03: return port63_r(space, offset);
+		case 0x03: return port63_r();
 		default: return 0x00;
 	}
 

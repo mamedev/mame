@@ -32,6 +32,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
+		m_bubsys_shared_ram(*this, "bubsys_shared"),
+		m_bubsys_control_ram(*this, "bubsys_control"),	
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_filter1(*this, "filter1"),
@@ -57,6 +59,8 @@ public:
 	void nemesis(machine_config &config);
 	void blkpnthr(machine_config &config);
 
+	void bubsys_init();
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_charram;
@@ -71,6 +75,8 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint8_t> m_gx400_shared_ram;
+	optional_shared_ptr<uint16_t> m_bubsys_shared_ram;
+	optional_shared_ptr<uint16_t> m_bubsys_control_ram;
 
 	/* video-related */
 	tilemap_t *m_background;
@@ -112,11 +118,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_nmi_w);
 	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
 	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
 	DECLARE_READ16_MEMBER(konamigt_input_word_r);
 	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
 	DECLARE_READ16_MEMBER(selected_ip_word_r);
+	DECLARE_WRITE16_MEMBER(bubsys_mcu_w);
 	DECLARE_READ8_MEMBER(wd_r);
 	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
 	DECLARE_WRITE_LINE_MEMBER(gfx_flipy_w);
@@ -139,6 +147,8 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(bubsys_vblank_irq);
+	
 	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
@@ -163,6 +173,7 @@ private:
 	void salamand_map(address_map &map);
 	void salamand_vlm_map(address_map &map);
 	void sound_map(address_map &map);
+	void bubsys_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_NEMESIS_H

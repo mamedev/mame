@@ -146,7 +146,7 @@ READ16_MEMBER( rohga_state::ioprot_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_ioprot->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_ioprot->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -221,8 +221,9 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x380000, 0x381fff).ram().w(m_decocomn, FUNC(decocomn_device::buffered_palette_w)).share("paletteram");
 	map(0x390008, 0x390009).w(m_decocomn, FUNC(decocomn_device::palette_dma_w));
 
-	map(0xfdc000, 0xffffff).ram();
+	map(0xfdc000, 0xfe3fff).ram();
 	map(0xfe4000, 0xfe7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0xfe8000, 0xffffff).ram();
 }
 
 

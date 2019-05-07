@@ -112,7 +112,7 @@ void cgenie_state::cgenie_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
-//  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
+//  map(0x4000, 0xbfff).ram(); // set up in machine_start()
 	map(0xc000, 0xefff).noprw(); // cartridge space
 	map(0xf000, 0xf3ff).rw(FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
 	map(0xf400, 0xf7ff).ram().share("fontram");
@@ -337,7 +337,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 	for (int column = 0; column < x_count; column++)
 	{
 		uint8_t code = m_ram->pointer()[ma + column];
-		uint8_t color = m_color_ram[(ma & 0xbff) + column];
+		uint8_t color = m_color_ram[(ma + column) & 0x3ff];
 
 		// gfx mode?
 		if (BIT(m_control, 5))
@@ -358,7 +358,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 				gfx = 0xff;
 
 			// or use character rom?
-			else if ((code < 128) || (code < 192 && BIT(m_control, 4)) || (code > 192 && BIT(m_control, 3)))
+			else if ((code < 128) || (code < 192 && BIT(m_control, 4)) || (code >= 192 && BIT(m_control, 3)))
 				gfx = m_char_rom->base()[(code << 3) | ra];
 
 			// or the programmable characters?

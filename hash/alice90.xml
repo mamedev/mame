@@ -10,7 +10,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="20242">
-				<rom name="budget.k7" size="20242" crc="228e4b62" sha1="31f838d7490b8484ddbabf036119654ac5bf45fe" offset="0"/>
+				<rom name="budget.k7" size="20242" crc="228e4b62" sha1="31f838d7490b8484ddbabf036119654ac5bf45fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="31324">
-				<rom name="dessin.k7" size="31324" crc="4fed7561" sha1="6f7a1bf3717b67f5e54bd5fb4feb479844187346" offset="0"/>
+				<rom name="dessin.k7" size="31324" crc="4fed7561" sha1="6f7a1bf3717b67f5e54bd5fb4feb479844187346"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="52953">
-				<rom name="fringale.k7" size="52953" crc="b55fa035" sha1="f3c1e95a434d3e11905952caed3210addf319eee" offset="0"/>
+				<rom name="fringale.k7" size="52953" crc="b55fa035" sha1="f3c1e95a434d3e11905952caed3210addf319eee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="20961">
-				<rom name="galixian.k7" size="20961" crc="1af30fd8" sha1="e875da577e24b1ed020df559816924e0a447d471" offset="0"/>
+				<rom name="galixian.k7" size="20961" crc="1af30fd8" sha1="e875da577e24b1ed020df559816924e0a447d471"/>
 			</dataarea>
 		</part>
 	</software>
@@ -59,13 +59,13 @@
 		<part name="cass1" interface="mc10_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="10598">
-				<rom name="incv40.k7" size="10598" crc="ed0f60dc" sha1="01bad4777519de9bc4bf4c1cbd80c883ace6bdfa" offset="0"/>
+				<rom name="incv40.k7" size="10598" crc="ed0f60dc" sha1="01bad4777519de9bc4bf4c1cbd80c883ace6bdfa"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
 			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="8950">
-				<rom name="incv80.k7" size="8950" crc="11ecea51" sha1="c2edac43dc6437a03f78ed4076497bb41e1d29c6" offset="0"/>
+				<rom name="incv80.k7" size="8950" crc="11ecea51" sha1="c2edac43dc6437a03f78ed4076497bb41e1d29c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="41119">
-				<rom name="monop.k7" size="41119" crc="c9f1ab62" sha1="003e66698cf5538e62bf8cee5d6bebcdb16c7c3f" offset="0"/>
+				<rom name="monop.k7" size="41119" crc="c9f1ab62" sha1="003e66698cf5538e62bf8cee5d6bebcdb16c7c3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -89,7 +89,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="19968">
-				<rom name="planvl.k7" size="19968" crc="ec0838be" sha1="335f775e45b84fb15c142440eaee12649637210b" offset="0"/>
+				<rom name="planvl.k7" size="19968" crc="ec0838be" sha1="335f775e45b84fb15c142440eaee12649637210b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -101,7 +101,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="17947">
-				<rom name="textra.k7" size="17947" crc="eda0fdd4" sha1="92044736d0780e4b331a412631fbee94027bafe4" offset="0"/>
+				<rom name="textra.k7" size="17947" crc="eda0fdd4" sha1="92044736d0780e4b331a412631fbee94027bafe4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="13534">
-				<rom name="t'extra - traitement de texte (matra) (arnaud delrue) (1985) (alice90) (modifie).k7" size="13534" crc="4bef740f" sha1="021683b5c8cc7209d830d78d5559baac3704e35f" offset="0" />
+				<rom name="t'extra - traitement de texte (matra) (arnaud delrue) (1985) (alice90) (modifie).k7" size="13534" crc="4bef740f" sha1="021683b5c8cc7209d830d78d5559baac3704e35f" />
 			</dataarea>
 		</part>
 	</software>

@@ -1492,7 +1492,7 @@ void pc88va_state::machine_reset()
 	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
 	#if TEST_SUBFDC
-	m_fdccpu->set_input_line_vector(0, 0);
+	m_fdccpu->set_input_line_vector(0, 0); // Z80
 	#endif
 
 	m_fdc_motor_status[0] = 0;

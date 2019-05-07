@@ -201,7 +201,7 @@ void feversoc_state::feversoc_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).rom();
 	map(0x02000000, 0x0202ffff).ram().share("workram1"); //work ram
-	map(0x02030000, 0x0203ffff).ram().share("nvram");
+	map(0x02030000, 0x02033fff).ram().share("nvram");
 	map(0x02034000, 0x0203dfff).ram().share("workram2"); //work ram
 	map(0x0203e000, 0x0203ffff).ram().share("spriteram");
 	map(0x06000000, 0x06000001).w(FUNC(feversoc_state::output_w));

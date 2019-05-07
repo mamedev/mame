@@ -10,8 +10,11 @@
 
 /*
 
-Attached are the three main aim-65/40 roms, plus one unlabeled expansion rom for the 65/40 which someone had accidentally stuck into the aim-65 non/40 I was restoring on campus. (The rom pinout is different between the two systems, iirc.). I have no idea what that rom does.
-The .zxx location on the rom filename (labeled R2332LP // R3224-11 // 8224) is hence wrong; it should probably be .z70 (at 0xc000-cfff) or .z72 (0xe000-0xefff)
+Attached are the three main aim-65/40 roms, plus one unlabeled expansion rom for the 65/40 which someone
+had accidentally stuck into the aim-65 non/40 I was restoring on campus. (The rom pinout is different between
+the two systems, iirc.). I have no idea what that rom does.
+The .zxx location on the rom filename (labeled R2332LP // R3224-11 // 8224) is hence wrong; it should probably
+be .z70 (at 0xc000-cfff) or .z72 (0xe000-0xefff)
 
 
 The aim-65/40 has the following stuff on it:
@@ -23,7 +26,9 @@ XTALS: 16Mhz, 1.8432Mhz
 6551 ACIA (marked JACIA on board; used for serial port, has its own 1.8432Mhz XTAL)
 Onboard beeper/speaker
 Other chips: MC3242A, MC3480P, SN74159N, mc1488/1489 pair (for rs232)
-ROM: 8 sockets meant for 2332 mask roms/mcm68732 eproms, or, if only 4 sockets are used, 2364 mask roms/mcm68764 eproms, selectable which mode by jumper. (normal 2732s won't work due to an inverted vpp pin i think, but theres jumpers on the board which will probably allow it), each socket addresses 0x1000 (or 0x2000) of space:
+ROM: 8 sockets meant for 2332 mask roms/mcm68732 eproms, or, if only 4 sockets are used, 2364 mask roms/mcm68764
+eproms, selectable which mode by jumper. (normal 2732s won't work due to an inverted vpp pin i think, but there's
+jumpers on the board which will probably allow it), each socket addresses 0x1000 (or 0x2000) of space:
 z63 is 0x8000-0x8fff, (see below about possible expansion ram here instead of rom)
 z64 is 0x9000-0x9fff, (see below about possible expansion ram here instead of rom)
 z65 is 0xa000-0xafff (first monitor rom lives here on my board),(see below about possible expansion ram here instead of rom)
@@ -33,7 +38,10 @@ z71 is 0xd000-0xdfff
 z72 is 0xe000-0xefff
 z73 is 0xf000-0xffff (i/o rom always lives here)
 RAM:
-The aim-65/40 comes standard with anywhere from 4k to 16k of ram at 0x0000-0x3fff, and can be populated in 4k increments with another 16k at 0x4000-0x7fff and another 16k at 0x8000-0xbfff (if installed, this last 16k prevents the first four rom sockets from being used since they address the same place, and the monitor roms must be moved to the z70 and z71, or z71 and z72 sockets. The i/o rom knows to search on 4k boundaries for the monitor roms)
+The aim-65/40 comes standard with anywhere from 4k to 16k of ram at 0x0000-0x3fff, and can be populated in 4k
+increments with another 16k at 0x4000-0x7fff and another 16k at 0x8000-0xbfff (if installed, this last 16k prevents
+the first four rom sockets from being used since they address the same place, and the monitor roms must be moved to
+the z70 and z71, or z71 and z72 sockets. The i/o rom knows to search on 4k boundaries for the monitor roms)
 The vias and acia are memory mapped over top of a blank area in the i/o rom from 0xff80 to 0xffe0, as such:
 ff80-ff9f = unknown, open bus?
 ffa0-ffaf = user via
@@ -41,8 +49,14 @@ ffb0-ffbf = system via
 ffc0-ffcf = keyboars via
 ffd0-ffd3 (mirrored at ffd4, ffd8, ffdc probably) = acia
 
-I have a copy of the official 'green book' Aim 65/40 i/o rom listing/asm source code, which is very informative about how the hardware works. However it is going to be a major pain in the ass to scan, owing to its small size and failing binding.
+I have a copy of the official 'green book' Aim 65/40 i/o rom listing/asm source code, which is very informative about
+how the hardware works. However it is going to be a major pain in the ass to scan, owing to its small size and failing binding.
 The source code there implies that *maybe* ff7e and ff7f are also open bus.
+
+One web page says that the display and printer have their own 65c02 cpus, making them intelligent devices. Are the roms for
+those included?
+
+Unable to locate any manuals so unable to proceed.
 
 */
 
@@ -80,12 +94,6 @@ public:
 
 private:
 	void mem_map(address_map &map);
-	// devices
-	//device_t *m_via0;
-	//device_t *m_via1;
-	//device_t *m_via2;
-	//device_t *m_speaker;
-private:
 };
 
 
@@ -97,12 +105,11 @@ void aim65_40_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
 	map(0xa000, 0xcfff).rom().region("roms", 0);
-	map(0xf000, 0xff7f).rom().region("roms", 0x3000);
+	map(0xf000, 0xffff).rom().region("roms", 0x3000);
 	map(0xffa0, 0xffaf).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xffb0, 0xffbf).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xffc0, 0xffcf).rw(M6522_2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xffd0, 0xffd3).rw(M6551_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xffe0, 0xffff).rom().region("roms", 0x3fe0);
 }
 
 /***************************************************************************

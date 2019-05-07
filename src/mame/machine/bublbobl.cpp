@@ -222,7 +222,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	if ((m_port1_out & 0x40) && (~data & 0x40))
 	{
 		// logerror("triggering IRQ on main CPU\n");
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
@@ -473,7 +473,7 @@ WRITE8_MEMBER(bub68705_state::port_b_w)
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
 
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 

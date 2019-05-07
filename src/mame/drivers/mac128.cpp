@@ -302,7 +302,6 @@ void mac128_state::machine_reset()
 	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
-	m_maincpu->reset();
 	m_screen_buffer = 1;
 #ifndef MAC_USE_EMULATED_KBD
 	m_keyboard_reply = 0;
@@ -714,10 +713,7 @@ WRITE16_MEMBER ( mac128_state::mac_via_w )
 	if (LOG_VIA)
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
-	if (ACCESSING_BITS_0_7)
-		m_via->write(offset, data & 0xff);
-	if (ACCESSING_BITS_8_15)
-		m_via->write(offset, (data >> 8) & 0xff);
+	m_via->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }

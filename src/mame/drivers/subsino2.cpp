@@ -197,6 +197,7 @@ private:
 	void ramdac_map(address_map &map);
 	void saklove_io(address_map &map);
 	void saklove_map(address_map &map);
+	void xplan_common_io(address_map &map);
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
 	void xtrain_io(address_map &map);
@@ -1452,7 +1453,7 @@ void subsino2_state::xplan_map(address_map &map)
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void subsino2_state::xplan_io(address_map &map)
+void subsino2_state::xplan_common_io(address_map &map)
 {
 	map(0x0000, 0x0000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -1479,6 +1480,11 @@ void subsino2_state::xplan_io(address_map &map)
 	map(0x0304, 0x0304).portr("IN B");
 	map(0x0305, 0x0305).portr("IN A");
 	map(0x0306, 0x0306).portr("IN D"); // 0x40 serial out, 0x80 serial in
+}
+
+void subsino2_state::xplan_io(address_map &map)
+{
+	xplan_common_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	map(0x0306, 0x0309).w(FUNC(subsino2_state::xplan_outputs_w)).share("outputs");
@@ -1524,7 +1530,7 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 
 void subsino2_state::expcard_io(address_map &map)
 {
-	xplan_io(map);
+	xplan_common_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	map(0x0306, 0x0309).w(FUNC(subsino2_state::expcard_outputs_w)).share("outputs");
@@ -1532,7 +1538,7 @@ void subsino2_state::expcard_io(address_map &map)
 
 void subsino2_state::xtrain_io(address_map &map)
 {
-	xplan_io(map);
+	xplan_common_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");

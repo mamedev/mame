@@ -7,6 +7,7 @@
 
 #include "nld_82S16.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -25,6 +26,7 @@ namespace netlist
 		, m_ram(*this, "m_ram", 0)
 		, m_addr(*this, "m_addr", 0)
 		, m_enq(*this, "m_enq", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -77,6 +79,7 @@ namespace netlist
 		state_array<uint64_t, 4> m_ram; // 256 bits
 		state_var_u8 m_addr; // 256 bits
 		state_var_sig m_enq;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)
@@ -99,7 +102,10 @@ namespace netlist
 			register_subalias("12",    m_WEQ);
 			register_subalias("13",    m_DIN);
 
-			register_subalias("6",    m_DOUTQ);
+			register_subalias("6",     m_DOUTQ);
+
+			register_subalias("8",     "GND");
+			register_subalias("16",    "VCC");
 		}
 	};
 

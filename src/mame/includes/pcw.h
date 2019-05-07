@@ -46,6 +46,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_ppalette(*this, "ppalette")
+		, m_rdbanks(*this, "bank%u", 1U)
+		, m_wrbanks(*this, "bank%u", 5U)
+		, m_iptlines(*this, "LINE%u", 0U)
 	{ }
 
 	int m_boot;
@@ -141,6 +144,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_ppalette;
+	required_memory_bank_array<4> m_rdbanks, m_wrbanks;
+	required_ioport_array<16> m_iptlines;
 
 	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw_update_interrupt_counter();

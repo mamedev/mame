@@ -4,8 +4,9 @@
 
     Leapfrog Clickstart Emulation
 
-        die markings show
-        "SunPlus QL8041C" ( known as Sunplus SPG2?? )
+        Die markings show "SunPlus QL8041C" ( known as Sunplus SPG2?? )
+    The keyboard has a "SunPlus PU6583" MCU under a glob, and the
+     mouse optical sensor is a N2163, probably from Agilent.
 
     Status:
 

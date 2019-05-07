@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
 /******************************************************************************
-*
+
 * fidel_dames.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 *******************************************************************************

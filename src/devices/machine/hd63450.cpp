@@ -16,8 +16,8 @@ DEFINE_DEVICE_TYPE(HD63450, hd63450_device, "hd63450", "Hitachi HD63450 DMAC")
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HD63450, tag, owner, clock),
+		m_irq_callback(*this),
 		m_dma_end(*this),
-		m_dma_error(*this),
 		m_dma_read{{*this}, {*this}, {*this}, {*this}},
 		m_dma_write{{*this}, {*this}, {*this}, {*this}},
 		m_cpu(*this, finder_base::DUMMY_TAG)
@@ -43,8 +43,8 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 void hd63450_device::device_start()
 {
 	// resolve callbacks
-	m_dma_end.resolve();
-	m_dma_error.resolve_safe();
+	m_irq_callback.resolve_safe();
+	m_dma_end.resolve_safe();
 	for (auto &cb : m_dma_read)
 		cb.resolve();
 	for (auto &cb : m_dma_write)
@@ -77,10 +77,13 @@ void hd63450_device::device_start()
 	save_item(NAME(m_transfer_size));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_drq_state));
+	save_item(NAME(m_irq_channel));
 }
 
 void hd63450_device::device_reset()
 {
+	// Device is reset by pulling /BEC0-/BEC2 all low for 10 clocks
+
 	for (int x = 0; x < 4; x++)
 	{
 		m_reg[x].niv = 0x0f;
@@ -90,13 +93,16 @@ void hd63450_device::device_reset()
 		m_reg[x].ocr = 0;
 		m_reg[x].scr = 0;
 		m_reg[x].ccr = 0;
-		m_reg[x].csr &= 0xfe;
+		m_reg[x].csr &= 0x01;
 		m_reg[x].cer = 0;
 		m_reg[x].gcr = 0;
 
 		m_timer[x]->adjust(attotime::never);
 		m_halted[x] = 0;
 	}
+
+	m_irq_channel = -1;
+	m_irq_callback(CLEAR_LINE);
 }
 
 READ16_MEMBER(hd63450_device::read)
@@ -166,6 +172,9 @@ WRITE16_MEMBER(hd63450_device::write)
 			// Clearing ERR also resets CER (which is otherwise read-only)
 			if ((data & 0x1000) != 0)
 				m_reg[channel].cer = 0;
+
+			if ((m_reg[channel].csr & 0xf2) == 0)
+				clear_irq(channel);
 		}
 		break;
 	case 0x02:  // DCR / OCR
@@ -197,6 +206,10 @@ WRITE16_MEMBER(hd63450_device::write)
 				dma_transfer_halt(channel);
 			if (data & 0x0040)  // continure operation
 				dma_transfer_continue(channel);
+			if ((data & 0x0008) == 0)
+				clear_irq(channel);
+			else if ((m_reg[channel].csr & 0xf2) != 0)
+				set_irq(channel);
 			LOG("DMA#%i: Channel Control write : %02x\n",channel,m_reg[channel].ccr);
 		}
 		break;
@@ -317,11 +330,7 @@ void hd63450_device::dma_transfer_abort(int channel)
 
 	LOG("DMA#%i: Transfer aborted\n",channel);
 	m_timer[channel]->adjust(attotime::never);
-	m_reg[channel].csr |= 0x90;  // channel error
-	m_reg[channel].csr &= ~0x08;  // channel no longer active
-	m_reg[channel].cer = 0x11;
-	m_reg[channel].ccr &= ~0xc0;
-	m_dma_error((offs_t)3, m_reg[channel].ccr & 0x08);
+	set_error(channel, 0x11);
 }
 
 void hd63450_device::dma_transfer_halt(int channel)
@@ -467,9 +476,19 @@ void hd63450_device::single_transfer(int x)
 			m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		}
 
-		if (!m_dma_end.isnull())
-			m_dma_end((offs_t)x, m_reg[x].ccr & 0x08);
+		m_dma_end((offs_t)x, 0);
+		set_irq(x);
 	}
+}
+
+void hd63450_device::set_error(int channel, uint8_t code)
+{
+	m_reg[channel].csr |= 0x90;  // channel error
+	m_reg[channel].csr &= ~0x08;  // channel no longer active
+	m_reg[channel].cer = code;
+	m_reg[channel].ccr &= ~0xc0;
+
+	set_irq(channel);
 }
 
 WRITE_LINE_MEMBER(hd63450_device::drq0_w)
@@ -529,12 +548,52 @@ WRITE_LINE_MEMBER(hd63450_device::drq3_w)
 		m_timer[3]->adjust(attotime::never);
 }
 
-int hd63450_device::get_vector(int channel)
+void hd63450_device::set_irq(int channel)
 {
-	return m_reg[channel].niv;
+	if ((m_reg[channel].ccr & 0x08) == 0)
+		return;
+
+	if (m_irq_channel == -1)
+	{
+		m_irq_channel = channel;
+		m_irq_callback(ASSERT_LINE);
+	}
+	else if ((m_reg[channel].cpr & 0x03) < (m_reg[m_irq_channel].cpr & 0x03))
+		m_irq_channel = channel;
 }
 
-int hd63450_device::get_error_vector(int channel)
+void hd63450_device::clear_irq(int channel)
 {
-	return m_reg[channel].eiv;
+	if (m_irq_channel != channel)
+		return;
+
+	for (int pri = m_reg[channel].cpr & 0x03; pri <= 3; pri++)
+	{
+		for (int offset = 1; offset <= 3; offset++)
+		{
+			if ((m_reg[(channel + offset) & 3].ccr & 0x08) != 0 &&
+				(m_reg[(channel + offset) & 3].csr & 0xf2) != 0)
+			{
+				m_irq_channel = (channel + offset) & 3;
+				return;
+			}
+		}
+	}
+
+	m_irq_channel = -1;
+	m_irq_callback(CLEAR_LINE);
+}
+
+uint8_t hd63450_device::iack()
+{
+	if (m_irq_channel != -1)
+	{
+		if ((m_reg[m_irq_channel].csr & 0x10) != 0)
+			return m_reg[m_irq_channel].eiv;
+		else
+			return m_reg[m_irq_channel].niv;
+	}
+
+	// Spurious interrupt (no response actually)
+	return 0x18;
 }

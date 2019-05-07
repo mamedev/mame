@@ -4,13 +4,13 @@
 
     SunPlus SPG2xx-series SoC peripheral emulation (Audio)
 
-	This is also used for SPG110, although that should be limited to
-	just 8 channels and has some things shifted around (phase appears
-	to be in the regular register set instead, formats might be fixed
-	or at least not per-channel)
+    This is also used for SPG110, although that should be limited to
+    just 8 channels and has some things shifted around (phase appears
+    to be in the regular register set instead, formats might be fixed
+    or at least not per-channel)
 
-	SPG110 Beat interrupt frequency might be different too, seems to
-	trigger an FIQ, but music is very slow in jak_spdmo
+    SPG110 Beat interrupt frequency might be different too, seems to
+    trigger an FIQ, but music is very slow in jak_spdmo
 
 **********************************************************************/
 

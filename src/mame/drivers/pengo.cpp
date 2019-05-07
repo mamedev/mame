@@ -962,7 +962,7 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 				case 0x00: srcdec = (srcdec & ~0x51) | 0x10; break; // looks good for ld ops
 				case 0x01: srcdec = (srcdec & ~0x51) | 0x50; break; // ok?
 				case 0x10: srcdec = (srcdec & ~0x51) | 0x11; break; // ok?
-				case 0x11: srcdec = (srcdec & ~0x51) | 0x51; break; // push/pull opcodes, see f1a1, f1a2, f1fd etc  (d3 case too) 
+				case 0x11: srcdec = (srcdec & ~0x51) | 0x51; break; // push/pull opcodes, see f1a1, f1a2, f1fd etc  (d3 case too)
 				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // ok for some NOPs? and jr ops
 				case 0x41: srcdec = (srcdec & ~0x51) | 0x40; break; // maybe, ret z at f3be
 				case 0x50: srcdec = (srcdec & ~0x51) | 0x01; break; // not 11, not 50, maybe 01? see fcc1
@@ -987,7 +987,7 @@ void pengo_state::decode_schick_extra(int size, uint8_t* rom)
 				switch (srcdec & 0x51)
 				{
 				case 0x00: srcdec = (srcdec & ~0x51) | 0x40; break;
-				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break; 
+				case 0x01: srcdec = (srcdec & ~0x51) | 0x01; break;
 				case 0x10: srcdec = (srcdec & ~0x51) | 0x41; break; // JMP table EFA0
 				case 0x11: srcdec = (srcdec & ~0x51) | 0x11; break;
 				case 0x40: srcdec = (srcdec & ~0x51) | 0x00; break; // NOPs at e538

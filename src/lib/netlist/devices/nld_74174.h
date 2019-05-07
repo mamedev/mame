@@ -38,18 +38,20 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_74174(name, cCLK, cD1, cD2, cD3, cD4, cD5, cD6, cCLRQ)  \
-		NET_REGISTER_DEV(TTL_74174, name)   \
-		NET_CONNECT(name, CLK,  cCLK)       \
-		NET_CONNECT(name, D1,   cD1)        \
-		NET_CONNECT(name, D2,   cD2)        \
-		NET_CONNECT(name, D3,   cD3)        \
-		NET_CONNECT(name, D4,   cD4)        \
-		NET_CONNECT(name, D5,   cD5)        \
-		NET_CONNECT(name, D6,   cD6)        \
+#define TTL_74174(name, cCLK, cD1, cD2, cD3, cD4, cD5, cD6, cCLRQ)             \
+		NET_REGISTER_DEV(TTL_74174, name)                                      \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK,  cCLK)                                          \
+		NET_CONNECT(name, D1,   cD1)                                           \
+		NET_CONNECT(name, D2,   cD2)                                           \
+		NET_CONNECT(name, D3,   cD3)                                           \
+		NET_CONNECT(name, D4,   cD4)                                           \
+		NET_CONNECT(name, D5,   cD5)                                           \
+		NET_CONNECT(name, D6,   cD6)                                           \
 		NET_CONNECT(name, CLRQ, cCLRQ)
 
-#define TTL_74174_DIP(name)                                 \
+#define TTL_74174_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74174_DIP, name)
 
 

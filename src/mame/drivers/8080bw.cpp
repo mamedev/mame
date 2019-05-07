@@ -867,23 +867,26 @@ void _8080bw_state::invrvnge_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invrvnge_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invrvnge_port03_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invrvnge_sh_port_2_w));
+	map(0x05, 0x05).w(FUNC(_8080bw_state::invrvnge_port05_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
 void _8080bw_state::invrvnge_sound_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0xffff).rom(); // dummy prg map, TODO: decrypt ROM
+	map(0x0000, 0x007f).ram(); // inside CPU
+	map(0xa001, 0xa001).r("psg",FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa003).w("psg",FUNC(ay8910_device::data_address_w));
+	map(0xc000, 0xc7ff).mirror(0x1800).rom();
+	map(0xe000, 0xe7ff).mirror(0x1800).rom();
 }
 
 
 static INPUT_PORTS_START( invrvnge )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:5,6") // [code: 0x3b1-3b5]
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
@@ -892,7 +895,7 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x80, "Fuel Destroyed by Comet" )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x80, 0x80, "Fuel Destroyed by Comet" )   PORT_DIPLOCATION("SW1:7") // [code: 0x1cb0-1cb6]
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "6" )
 
@@ -937,7 +940,9 @@ void _8080bw_state::invrvnge(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	M6808(config, "audiocpu", XTAL(4'000'000)/2).set_addrmap(AS_PROGRAM, &_8080bw_state::invrvnge_sound_map); // MC6808P
+	// 4 MHz crystal connected directly to the CPU
+	M6802(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_8080bw_state::invrvnge_sound_map);
 
 	/* add shifter */
 	MB14241(config, m_mb14241);
@@ -952,7 +957,23 @@ void _8080bw_state::invrvnge(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.5);
+	// CPU E-pin connects to AY clock pin
+	ay8910_device &psg(AY8910(config, "psg", XTAL(4'000'000)/2));
+	psg.port_a_read_callback().set([this] () { return m_sound_data >> 1; });
+	psg.port_b_read_callback().set_constant(0xff);
+	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
+
+	// CPU E-pin also connects to a 4040 divider. The Q8 output goes to the CPU's NMI pin.
+	TIMER(config, "nmi").configure_periodic(FUNC(_8080bw_state::nmi_timer), attotime::from_hz((XTAL(4'000'000)/2)/512));
+}
+
+void _8080bw_state::init_invrvnge()
+{
+	uint8_t *rom = memregion("audiocpu")->base();
+	for (offs_t i = 0xc000; i < 0xc800; i++)
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	for (offs_t i = 0xe000; i < 0xe800; i++)
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 3, 4, 2, 1, 0);
 }
 
 
@@ -4035,8 +4056,8 @@ ROM_START( invrvnge ) // Space Invaders hw + sound daughterboard
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
-	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
-	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+	ROM_LOAD( "snd.2c",      0xc000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
+	ROM_LOAD( "snd.1c",      0xe000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
@@ -4050,8 +4071,8 @@ ROM_START( invrvngea ) // Space Invaders hw + sound daughterboard
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
-	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
-	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+	ROM_LOAD( "snd.2c",      0xc000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
+	ROM_LOAD( "snd.1c",      0xe000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
@@ -4065,8 +4086,8 @@ ROM_START( invrvngeb ) // source unknown
 	ROM_LOAD( "invrvnge.e",  0x1800, 0x0800, CRC(1ec8dfc8) SHA1(fc8fbe1161958f57c9f4ccbcab8a769184b1c562) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
-	ROM_LOAD( "snd.2c",      0xf000, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
-	ROM_LOAD( "snd.1c",      0xf800, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
+	ROM_LOAD( "snd.2c",      0xc000, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
+	ROM_LOAD( "snd.1c",      0xe000, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, BAD_DUMP CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) ) // not dumped, taken from parent
@@ -4080,8 +4101,8 @@ ROM_START( invrvngedu ) // single PCB
 	ROM_LOAD( "ir.5r",       0x1800, 0x0800, CRC(74516811) SHA1(0f595c7b0fae5f3f83fdd1ffed5a408ee77c9438) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
-	ROM_LOAD( "ir.1t",       0xf000, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
-	ROM_LOAD( "ir.1u",       0xf800, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
+	ROM_LOAD( "ir.1t",       0xc000, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
+	ROM_LOAD( "ir.1u",       0xe000, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "ir.3r",       0x0000, 0x0800, CRC(57da51a9) SHA1(a8cb0b45c52eef353b83fe75b61e4990e27eb124) )
@@ -4095,8 +4116,8 @@ ROM_START( invrvngegw ) // single PCB
 	ROM_LOAD( "ir.5r",       0x1800, 0x0800, CRC(657ddf27) SHA1(957c6bbdb2133d4697d3302b2358979d1451b6d5) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
-	ROM_LOAD( "ir.1t",       0xf000, 0x0800, CRC(64e9e81e) SHA1(3390f8bab219cf134b33ae21c473da0873e01929) ) // sldh - bad?
-	ROM_LOAD( "ir.1u",       0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+	ROM_LOAD( "ir.1t",       0xc000, 0x0800, BAD_DUMP CRC(64e9e81e) SHA1(3390f8bab219cf134b33ae21c473da0873e01929) ) // sldh - bad? yes extremely bad, throw it away
+	ROM_LOAD( "ir.1u",       0xe000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "ir.3r",       0x0000, 0x0800, CRC(6ce639bf) SHA1(73752f5886dcf8729d9853ddc258770f5c724ca3) ) // sldh
@@ -5258,10 +5279,10 @@ GAME( 1979, starw1,      galxwars, starw1,    galxwars,  _8080bw_state,  empty_i
 
 GAME( 1979, cosmo,       0,        cosmo,     cosmo,     _8080bw_state,  empty_init,    ROT90,  "TDS & MINTS", "Cosmo", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1980?,invrvnge,    0,        invrvnge,  invrvnge,  _8080bw_state,  empty_init,    ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // copyright is either late-1980, or early-1981
-GAME( 1980?,invrvngea,   invrvnge, invrvnge,  invrvnge,  _8080bw_state,  empty_init,    ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-GAME( 1980?,invrvngeb,   invrvnge, invrvnge,  invrvnge,  _8080bw_state,  empty_init,    ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-GAME( 1980?,invrvngedu,  invrvnge, invrvnge,  invrvnge,  _8080bw_state,  empty_init,    ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford, single PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1980?,invrvnge,    0,        invrvnge,  invrvnge,  _8080bw_state,  init_invrvnge, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", MACHINE_SUPPORTS_SAVE ) // copyright is either late-1980, or early-1981
+GAME( 1980?,invrvngea,   invrvnge, invrvnge,  invrvnge,  _8080bw_state,  init_invrvnge, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,invrvngeb,   invrvnge, invrvnge,  invrvnge,  _8080bw_state,  init_invrvnge, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,invrvngedu,  invrvnge, invrvnge,  invrvnge,  _8080bw_state,  init_invrvnge, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford, single PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,invrvngegw,  invrvnge, invrvnge,  invrvnge,  _8080bw_state,  empty_init,    ROT270, "Zenitone-Microsec Ltd. (Game World license)", "Invader's Revenge (Game World, single PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
 
 GAME( 1980, vortex,      0,        vortex,    vortex,    _8080bw_state,  init_vortex,   ROT270, "Zilec Electronics", "Vortex", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Encrypted 8080/IO */

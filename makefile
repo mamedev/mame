@@ -35,7 +35,7 @@
 # DONT_USE_NETWORK = 1
 # USE_QTDEBUG = 1
 # NO_X11 = 1
-# NO_USE_XINPUT = 0
+# NO_USE_XINPUT = 1
 # FORCE_DRC_C_BACKEND = 1
 
 # DEBUG = 1
@@ -1579,10 +1579,9 @@ genieclean:
 clean: genieclean
 	@echo Cleaning...
 	-@rm -rf $(BUILDDIR)
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 	-@rm -rf 3rdparty/bgfx/.build
 
-GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
@@ -1606,8 +1605,7 @@ generate: \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/mame/drivers/ymmu100.hxx \
-		$(SRC)/devices/cpu/m68000/m68kops.cpp \
+		$(GENDIR)/mame/machine/mulcd.hxx \
 		$(GENDIR)/includes/SDL2
 
 $(GENDIR)/includes/SDL2:
@@ -1625,14 +1623,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.208"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.209"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.208" > $@
+	@echo #define BARE_BUILD_VERSION "0.209" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1644,16 +1642,9 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 	@echo Compressing $<...
 	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/mame/drivers/ymmu100.hxx: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
+$(GENDIR)/mame/machine/mulcd.hxx: $(SRC)/mame/machine/mulcd.ppm scripts/build/file2str.py
 	@echo Converting $<...
-	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg uint8_t
-
-$(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
-ifeq ($(TARGETOS),asmjs)
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000
-else
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 CC="$(CC)" CXX="$(CXX)"
-endif
+	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ mulcd_bkg uint8_t
 
 %.mo: %.po
 	@echo Converting translation $<...
@@ -1721,7 +1712,6 @@ CPPCHECK_PARAMS += -Isrc/lib/util
 CPPCHECK_PARAMS += -Isrc/mame
 CPPCHECK_PARAMS += -Isrc/osd/modules/render
 CPPCHECK_PARAMS += -Isrc/osd/windows
-CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
 CPPCHECK_PARAMS += -I3rdparty
 ifndef USE_SYSTEM_LIB_LUA
 CPPCHECK_PARAMS += -I3rdparty/lua/src

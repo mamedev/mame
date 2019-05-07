@@ -379,10 +379,9 @@ void tgm_state::tgm(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-
-	snd_nl.set_constructor(netlist_nl_gamemachine);
-	snd_nl.add_route(ALL_OUTPUTS, "speaker", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(netlist_nl_gamemachine)
+		.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0, 10000.0 * 3.75);
 
@@ -416,4 +415,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, 2001tgm, 0,      0, tgm,     tgm,   tgm_state, empty_init, "Waddingtons", "2001: The Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1978, 2001tgm, 0,      0, tgm,     tgm,   tgm_state, empty_init, "Waddingtons", "2001: The Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

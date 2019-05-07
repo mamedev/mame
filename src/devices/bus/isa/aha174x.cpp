@@ -20,7 +20,7 @@
         AIC-575 EISA Configuration Chip
         AIC-4600 HPC (HPC46003V20)
         AIC-6251A SCSI Interface and Protocol Chip
-        IDT7201 512x9 FIFO (2 on board)
+        IDT7201 or QS7201 512x9 FIFO (2 on board)
         Intel 82355 Bus Master Interface Controller
 
     AHA-1742A is the same as AHA-1740A, only with the FDC populated.
@@ -34,7 +34,7 @@
 #include "aha174x.h"
 
 #include "machine/aic6250.h"
-//#include "machine/i82355.h"
+#include "machine/i82355.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_hd.h"
 
@@ -46,6 +46,8 @@ aha174x_device::aha174x_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_hpc(*this, "hpc")
+	, m_busaic(*this, "busaic")
+	, m_fifo(*this, "fifo%u", 0U)
 	, m_bios(*this, "bios")
 {
 }
@@ -68,7 +70,13 @@ void aha174x_device::device_start()
 
 void aha174x_device::hpc_map(address_map &map)
 {
+	map(0x2000, 0x2003).rw(m_busaic, FUNC(aic565_device::local_r), FUNC(aic565_device::local_w));
+	map(0x4000, 0x4002).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w));
 	map(0x5000, 0x500f).m("scsi:7:scsic", FUNC(aic6251a_device::map));
+	map(0x7000, 0x7000).w(m_fifo[0], FUNC(fifo7200_device::data_byte_w));
+	map(0x7001, 0x7001).w(m_fifo[1], FUNC(fifo7200_device::data_byte_w));
+	map(0x7002, 0x7002).r(m_fifo[0], FUNC(fifo7200_device::data_byte_r));
+	map(0x7003, 0x7003).r(m_fifo[1], FUNC(fifo7200_device::data_byte_r));
 	map(0x8000, 0xffff).rom().region("mcode", 0);
 }
 
@@ -88,6 +96,16 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1740_device::hpc_map);
 
+	AIC565(config, m_busaic);
+	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
+	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
+
+	I82355(config, "bmic", 0);
+	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
+
+	IDT7201(config, m_fifo[0]);
+	IDT7201(config, m_fifo[1]);
+
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", aha174x_scsi_devices, nullptr);
@@ -104,6 +122,16 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 {
 	HPC46003(config, m_hpc, 40_MHz_XTAL / 2);
 	m_hpc->set_addrmap(AS_PROGRAM, &aha1742a_device::hpc_map);
+
+	AIC565(config, m_busaic);
+	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
+	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
+
+	I82355(config, "bmic", 0);
+	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
+
+	IDT7201(config, m_fifo[0]);
+	IDT7201(config, m_fifo[1]);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);

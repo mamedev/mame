@@ -103,12 +103,12 @@ READ8_MEMBER( isa8_sblaster1_0_device::saa1099_16_r )
 
 WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_1_16_w )
 {
-	m_saa1099_1->write(space, offset, data);
+	m_saa1099_1->write(offset, data);
 }
 
 WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_2_16_w )
 {
-	m_saa1099_2->write(space, offset, data);
+	m_saa1099_2->write(offset, data);
 }
 
 void sb_device::queue(uint8_t data)

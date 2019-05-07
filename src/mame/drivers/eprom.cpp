@@ -52,14 +52,13 @@ void eprom_state::update_interrupts()
 void eprom_state::machine_start()
 {
 	atarigen_state::machine_start();
-	save_item(NAME(m_sync_data));
 }
 
 void eprom_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
-	m_sync_data = 0;
+	m_share1[0xcc00/2] = 0;
 }
 
 
@@ -123,18 +122,13 @@ WRITE16_MEMBER(eprom_state::eprom_latch_w)
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::sync_r)
-{
-	return m_sync_data;
-}
-
-
 template<bool maincpu> WRITE16_MEMBER(eprom_state::sync_w)
 {
-	int oldword = m_sync_data;
-	COMBINE_DATA(&m_sync_data);
+	u16 oldword = m_share1[0xcc00/2];
+	COMBINE_DATA(&m_share1[0xcc00/2]);
+	u16 newword = m_share1[0xcc00/2];
 
-	if ((oldword & 0xff00) != (m_sync_data & 0xff00))
+	if ((oldword & 0xff00) != (newword & 0xff00))
 		(maincpu ? m_maincpu->yield() : m_extra->yield());
 }
 
@@ -150,7 +144,7 @@ void eprom_state::main_map(address_map &map)
 	map(0x000000, 0x09ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
+	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
@@ -162,12 +156,12 @@ void eprom_state::main_map(address_map &map)
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_base_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_base_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().share("paletteram");
-	map(0x3f0000, 0x3f9fff).ram();
-	map(0x3f0000, 0x3f1fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x3f0000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f2000, 0x3f3fff).ram().share("mob");
-	map(0x3f4000, 0x3f4f7f).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0x3f4000, 0x3f4f7f).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0x3f4f80, 0x3f4fff).ram().share("mob:slip");
-	map(0x3f8000, 0x3f9fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
+	map(0x3f5000, 0x3f7fff).ram();
+	map(0x3f8000, 0x3f9fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
 }
 
 
@@ -176,7 +170,7 @@ void eprom_state::guts_map(address_map &map)
 	map(0x000000, 0x09ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
+	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
@@ -208,7 +202,7 @@ void eprom_state::extra_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<false>)).share("sync_data");
+	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<false>));
 	map(0x260000, 0x26000f).portr("260000");
 	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);

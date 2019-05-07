@@ -444,8 +444,6 @@ void cgc7900_state::machine_reset()
 
 	memcpy((uint8_t *)m_chrom_ram.target(), user1, 8); // not really what happens but...
 
-	m_maincpu->reset();
-
 	kbd_mods = 0x300; // forces cold boot -- initializes SRAM contents
 	kbd_data = 0;
 	kbd_ready = false;
@@ -469,7 +467,6 @@ void cgc7900_state::cgc7900(machine_config &config)
 	M68000(config, m_maincpu, XTAL(28'480'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cgc7900_state::cgc7900_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cgc7900_state::cpu_space_map);
-
 
 	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
 	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);

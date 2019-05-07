@@ -234,28 +234,22 @@ void mgolf_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 
-	map(0x0040, 0x0040).portr("40");
-	map(0x0041, 0x0041).r(FUNC(mgolf_state::dial_r));
-	map(0x0060, 0x0060).portr("60");
-	map(0x0061, 0x0061).r(FUNC(mgolf_state::misc_r));
-	map(0x0080, 0x00ff).r(FUNC(mgolf_state::wram_r));
-	map(0x0180, 0x01ff).r(FUNC(mgolf_state::wram_r));
-	map(0x0800, 0x0bff).readonly();
 
 	map(0x0000, 0x0009).nopw();
 	map(0x0024, 0x0024).nopw();
 	map(0x0028, 0x0028).nopw();
+	map(0x0040, 0x0040).portr("40");
+	map(0x0041, 0x0041).r(FUNC(mgolf_state::dial_r));
 	map(0x0042, 0x0042).nopw();
 	map(0x0044, 0x0044).nopw(); /* watchdog? */
 	map(0x0046, 0x0046).nopw();
-	map(0x0060, 0x0060).nopw();
-	map(0x0061, 0x0061).nopw();
+	map(0x0060, 0x0060).portr("60").nopw();
+	map(0x0061, 0x0061).r(FUNC(mgolf_state::misc_r)).nopw();
 	map(0x006a, 0x006a).nopw();
 	map(0x006c, 0x006c).nopw();
 	map(0x006d, 0x006d).nopw();
-	map(0x0080, 0x00ff).w(FUNC(mgolf_state::wram_w));
-	map(0x0180, 0x01ff).w(FUNC(mgolf_state::wram_w));
-	map(0x0800, 0x0bff).w(FUNC(mgolf_state::vram_w)).share("video_ram");
+	map(0x0080, 0x00ff).rw(FUNC(mgolf_state::wram_r), FUNC(mgolf_state::wram_w)).mirror(0x100);
+	map(0x0800, 0x0bff).ram().w(FUNC(mgolf_state::vram_w)).share("video_ram");
 
 	map(0x2000, 0x3fff).rom();
 }

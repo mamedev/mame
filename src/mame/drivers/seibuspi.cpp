@@ -1883,8 +1883,8 @@ void seibuspi_state::spi(machine_config &config)
 	INTEL_E28F008SA(config, "soundflash1"); // Sharp LH28F008 on newer mainboard revision
 	INTEL_E28F008SA(config, "soundflash2"); // "
 
-	FIFO7200(config, m_soundfifo[0], 0x200); // LH5496D, but on single board hw it's one CY7C421
-	FIFO7200(config, m_soundfifo[1], 0x200); // "
+	IDT7201(config, m_soundfifo[0]); // LH5496D, but on single board hw it's one CY7C421
+	IDT7201(config, m_soundfifo[1]); // "
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

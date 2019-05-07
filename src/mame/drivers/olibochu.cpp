@@ -282,9 +282,11 @@ void olibochu_state::olibochu_map(address_map &map)
 	map(0xa005, 0xa005).portr("DSW2");
 	map(0xa800, 0xa801).w(FUNC(olibochu_state::sound_command_w));
 	map(0xa802, 0xa802).w(FUNC(olibochu_state::olibochu_flipscreen_w));    /* bit 6 = enable sound? */
-	map(0xf000, 0xffff).ram();
+	map(0xf000, 0xf3ff).ram();
 	map(0xf400, 0xf41f).ram().share("spriteram");
+	map(0xf420, 0xf43f).ram();
 	map(0xf440, 0xf47f).ram().share("spriteram2");
+	map(0xf480, 0xffff).ram();
 }
 
 void olibochu_state::olibochu_sound_map(address_map &map)

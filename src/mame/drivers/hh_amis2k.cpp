@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Sean Riddle
 /***************************************************************************
 
   AMI S2000 series handhelds or other simple devices.

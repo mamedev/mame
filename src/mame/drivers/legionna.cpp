@@ -250,7 +250,6 @@ void legionna_state::godzilla_map(address_map &map)
 	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
 	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
 	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
-	map(0x103800, 0x103fff).ram(); // check?
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x1067ff).ram();

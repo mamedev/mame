@@ -67,7 +67,7 @@ void meg_base_device::lfo_w(u8 reg, u16 value)
 void meg_base_device::map_w(u8 reg, u16 value)
 {
 	m_map[reg] = value;
-	logerror("map %d: start = %06x size = %06x extra = %x\n", reg, (value & 0xff) << 10, 1 << (10 + ((value & 0x0700) >> 8)), (value & 0xf800) >> 11);			 
+	logerror("map %d: start = %06x size = %06x extra = %x\n", reg, (value & 0xff) << 10, 1 << (10 + ((value & 0x0700) >> 8)), (value & 0xf800) >> 11);
 }
 
 u64 meg_base_device::prg_r(u16 address) const

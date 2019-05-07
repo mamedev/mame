@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle
+// copyright-holders:hap
+// thanks-to:Sean Riddle
 /***************************************************************************
 
   ** subclass of hh_sm510_state (includes/hh_sm510.h, drivers/hh_sm510.cpp) **

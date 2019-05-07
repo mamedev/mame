@@ -12,14 +12,12 @@
  *   http://lxr.free-electrons.com/source/drivers/net/3c505.h
  *   http://lxr.free-electrons.com/source/drivers/net/3c505.c
  *   http://stason.org/TULARC/pc/network-cards/O/OLIVETTI-Ethernet-NPU-9144-3C505.html
- *   http://www.bitsavers.org/pdf/3Com/3c505_Etherlink_Plus_Developers_Guide_May86.pdf'
+ *   http://www.bitsavers.org/pdf/3Com/3c505_Etherlink_Plus_Developers_Guide_May86.pdf
  *   http://www.bitsavers.org/pdf/3Com/1569-03_EtherLink_Plus_Technical_Reference_Jan89.pdf
  *
  * TODO
  *   - resolve intermittent diagnostics bug on 8-bit dma channels
- *   - testing on Apollo Domain/OS
- *   - externalize mac address
- *   - 8 bit isa slot support
+ *   - 8-bit isa slot support
  *   - revision 1.0 and 2.0 hardware/firmware variants
  *   - 8023 loopback mode
  */
@@ -42,14 +40,19 @@ ROM_START(3c505)
 	ROM_LOAD16_BYTE("0729-12_a.3h", 0x00000, 0x02000, CRC(5415fccd) SHA1(6a42d7f3acdb3e0213e1037fee1864819ac33991))
 	ROM_LOAD16_BYTE("0729-62_a.3f", 0x00001, 0x02000, CRC(4240bd9d) SHA1(015d2f7282def85681bcf1a7c5a7f501a16d5a6c))
 
-	ROM_REGION(0x02000, "host", 0)
 	ROM_SYSTEM_BIOS(0, "unused", "Unused")
-
 	ROM_SYSTEM_BIOS(1, "apollo", "Apollo")
-	ROMX_LOAD("3000_3c505_010728-00.bin", 0x00000, 0x02000, CRC(69b77ec6) SHA1(7ac36cc6fc90b90ddfc56c45303b514cbe18ae58), ROM_BIOS(1))
-
 	ROM_SYSTEM_BIOS(2, "netware", "3C505-NW EtherLink Plus NetWare Boot PROM")
+
+	// host firmware
+	ROM_REGION(0x02000, "host", 0)
+	ROMX_LOAD("3000_3c505_010728-00.bin", 0x00000, 0x02000, CRC(69b77ec6) SHA1(7ac36cc6fc90b90ddfc56c45303b514cbe18ae58), ROM_BIOS(1))
 	ROMX_LOAD("3c505-nw.bin", 0x00000, 0x02000, NO_DUMP, ROM_BIOS(2))
+
+	// station address prom
+	ROM_REGION16_LE(0x10, "mac", 0)
+	ROM_LOAD("3com.9h", 0x00, 0x10, CRC(8e207354) SHA1(ca5ddcb272ab2851e00473dc960b23039746e3d2))
+	ROMX_LOAD("apollo.9h", 0x00, 0x10, CRC(490f283e) SHA1(fe4c26b6a41e643f4397990b066fdc04b6f4c5ae), ROM_BIOS(1))
 ROM_END
 
 static INPUT_PORTS_START(3c505)
@@ -349,14 +352,7 @@ void isa16_3c505_device::map_io(address_map &map)
 	map(0x0103, 0x0103).rw(FUNC(isa16_3c505_device::asr_r), FUNC(isa16_3c505_device::acr_w));
 	map(0x0104, 0x0105).rw(FUNC(isa16_3c505_device::adata_r), FUNC(isa16_3c505_device::adata_w));
 
-	map(0x0180, 0x018f).lr16("mac",
-		[](offs_t offset)
-		{
-			// TODO: hard-code to 3Com dummy address for now
-			static const u8 mac[] = { 0x02, 0x60, 0x8c, 0x12, 0x34, 0x56, 0xff, 0xff};
-
-			return mac[offset];
-		});
+	map(0x0180, 0x018f).rom().region("mac", 0);
 }
 
 void isa16_3c505_device::map_isa(address_map &map)
@@ -406,11 +402,7 @@ void isa16_3c505_device::acr_w(u8 data)
 	if ((data ^ m_acr) & ACR_LED2)
 		m_led[1] = !!(data & ACR_LED2);
 
-	if (!(m_acr & ACR_R586) && (data & ACR_R586))
-	{
-		LOGMASKED(LOG_REG, "i82586 reset\n");
-		m_net->reset();
-	}
+	m_net->reset_w((data & ACR_R586) ? 1 : 0);
 
 	if ((data ^ m_acr) & ACR_FLSH)
 	{

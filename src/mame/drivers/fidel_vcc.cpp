@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
-*
+
 * fidel_vcc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Voice Chess Challenger series hardware

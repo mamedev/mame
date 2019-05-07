@@ -13,24 +13,23 @@
 #include "screen.h"
 
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
+void kaneko16_state::display_enable_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_disp_enable);
 }
 
-VIDEO_START_MEMBER(kaneko16_state,kaneko16)
+void kaneko16_state::video_start()
 {
 	m_disp_enable = 1;  // default enabled for games not using it
 	save_item(NAME(m_disp_enable));
 }
 
 
-
 /* Fill the bitmap with a single colour. This is wrong, but will work most of
    the times. To do it right, each pixel should be drawn with pen 0
    of the bottomost tile that covers it (which is pretty tricky to do) */
 template<class _BitmapClass>
-void kaneko16_state::kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect)
+void kaneko16_state::fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int pen = 0;
 
@@ -56,10 +55,8 @@ void kaneko16_state::kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle 
 }
 
 
-
-
 template<class _BitmapClass>
-uint32_t kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
+u32 kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -78,12 +75,9 @@ uint32_t kaneko16_state::screen_update_common(screen_device &screen, _BitmapClas
 }
 
 
-
-
-
-uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 kaneko16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_fill_bitmap(bitmap,cliprect);
+	fill_bitmap(bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;
@@ -94,15 +88,12 @@ uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_in
 }
 
 
+/* berlwall and have an additional hi-color layers */
 
-
-
-
-/* berlwall have an additional hi-color layers */
-
-VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
+void kaneko16_berlwall_state::video_start()
 {
-	uint8_t *RAM  =   memregion("gfx3")->base();
+	m_bg15_bright = 0xff;
+	u8 *RAM  =   memregion("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
@@ -116,9 +107,9 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 
 	for (int screen = 0; screen < 32; screen++)
 	{
-		for (int x = 0 ; x < 256 ; x++)
+		for (int x = 0; x < 256; x++)
 		{
-			for (int y = 0 ; y < 256 ; y++)
+			for (int y = 0; y < 256; y++)
 			{
 				int addr  = screen * (256 * 256) + x + y * 256;
 				int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
@@ -146,47 +137,47 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 		}
 	}
 
-	VIDEO_START_CALL_MEMBER(kaneko16);
+	kaneko16_state::video_start();
+	save_item(NAME(m_bg15_select));
+	save_item(NAME(m_bg15_bright));
 }
-
-
-
-
-
 
 
 /* Select the high color background image (out of 32 in the ROMs) */
-READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_r)
+u8 kaneko16_berlwall_state::bg15_select_r()
 {
-	return m_bg15_select[0];
+	return m_bg15_select;
 }
-WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_w)
+void kaneko16_berlwall_state::bg15_select_w(u8 data)
 {
-	COMBINE_DATA(&m_bg15_select[0]);
+	m_bg15_select = data;
 }
 
 /* Brightness (00-ff) */
-READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_bright_r)
+u8 kaneko16_berlwall_state::bg15_bright_r()
 {
-	return m_bg15_bright[0];
+	return m_bg15_bright;
 }
-WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_bright_w)
+void kaneko16_berlwall_state::bg15_bright_w(u8 data)
 {
-	COMBINE_DATA(&m_bg15_bright[0]);
-	double brt1 = data & 0xff;
-	brt1 = brt1 / 255.0;
+	if (m_bg15_bright != data)
+	{
+		m_bg15_bright = data;
+		double brt1 = m_bg15_bright & 0xff;
+		brt1 = brt1 / 255.0;
 
-	for (int i = 0; i < 0x8000; i++)
-		m_bgpalette->set_pen_contrast(i, brt1);
+		for (int i = 0; i < 0x8000; i++)
+			m_bgpalette->set_pen_contrast(i, brt1);
+	}
 }
 
 
-void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void kaneko16_berlwall_state::render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_bg15_bitmap[0].valid())
 		return;
 
-	int select  =   m_bg15_select[ 0 ];
+	int select  =   m_bg15_select;
 	int scroll  =   m_bg15_scroll[ 0 ];
 
 	int screen  =   select & 0x1f;
@@ -207,8 +198,8 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 	}
 
 	const pen_t *pal = m_bgpalette->pens();
-	uint16_t* srcbitmap;
-	uint32_t* dstbitmap;
+	u16* srcbitmap;
+	u32* dstbitmap;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -219,7 +210,7 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t pix;
+			u16 pix;
 
 			if (!flip)  pix = srcbitmap[        (x - scrollx) & 0xff  ];
 			else        pix = srcbitmap[ 255 - ((x - scrollx) & 0xff) ];
@@ -229,10 +220,10 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 	}
 }
 
-uint32_t kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 kaneko16_berlwall_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
-	kaneko16_render_15bpp_bitmap(bitmap,cliprect);
+	render_15bpp_bitmap(bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;

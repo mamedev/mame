@@ -7,6 +7,7 @@
 
 #include "nld_74107.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -25,6 +26,7 @@ namespace netlist
 		, m_J(*this, "J")
 		, m_K(*this, "K")
 		, m_clrQ(*this, "CLRQ")
+		, m_power_pins(*this)
 		{
 			m_delay[0] = delay_107A[0];
 			m_delay[1] = delay_107A[1];
@@ -50,6 +52,7 @@ namespace netlist
 		logic_input_t m_K;
 		logic_input_t m_clrQ;
 
+		nld_power_pins m_power_pins;
 		void newstate(const netlist_sig_t state)
 		{
 			m_Q.push(state, m_delay[state]);
@@ -70,36 +73,39 @@ namespace netlist
 	NETLIB_OBJECT(74107_dip)
 	{
 		NETLIB_CONSTRUCTOR(74107_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1", m_1.m_J);
-			register_subalias("2", m_1.m_QQ);
-			register_subalias("3", m_1.m_Q);
+			register_subalias("1", m_A.m_J);
+			register_subalias("2", m_A.m_QQ);
+			register_subalias("3", m_A.m_Q);
 
-			register_subalias("4", m_1.m_K);
-			register_subalias("5", m_2.m_Q);
-			register_subalias("6", m_2.m_QQ);
+			register_subalias("4", m_A.m_K);
+			register_subalias("5", m_B.m_Q);
+			register_subalias("6", m_B.m_QQ);
 
-			// register_subalias("7", ); ==> GND
+			register_subalias("7", "A.GND");
 
-			register_subalias("8", m_2.m_J);
-			register_subalias("9", m_2.m_clk);
-			register_subalias("10", m_2.m_clrQ);
+			register_subalias("8", m_B.m_J);
+			register_subalias("9", m_B.m_clk);
+			register_subalias("10", m_B.m_clrQ);
 
-			register_subalias("11", m_2.m_K);
-			register_subalias("12", m_1.m_clk);
-			register_subalias("13", m_1.m_clrQ);
+			register_subalias("11", m_B.m_K);
+			register_subalias("12", m_A.m_clk);
+			register_subalias("13", m_A.m_clrQ);
 
-			// register_subalias("14", ); ==> VCC
+			 register_subalias("14", "A.VCC" );
+
+			 connect("A.GND", "B.GND");
+			 connect("A.VCC", "B.VCC");
 
 		}
 		//NETLIB_RESETI();
 		//NETLIB_UPDATEI();
 
 	private:
-		NETLIB_SUB(74107) m_1;
-		NETLIB_SUB(74107) m_2;
+		NETLIB_SUB(74107) m_A;
+		NETLIB_SUB(74107) m_B;
 	};
 
 	NETLIB_RESET(74107A)
@@ -139,9 +145,11 @@ namespace netlist
 			m_clk.activate_hl();
 	}
 
-	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ")
-	NETLIB_DEVICE_IMPL(74107A,      "TTL_74107A",   "+CLK,+J,+K,+CLRQ")
+#if (!USE_TRUTHTABLE_74107)
+	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74107_dip,   "TTL_74107_DIP", "")
+#endif
+	NETLIB_DEVICE_IMPL(74107A,      "TTL_74107A",   "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

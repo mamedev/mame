@@ -92,8 +92,7 @@ void usbilliards_state::video_start()
 void usbilliards_state::usbilliards(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_usbilliards);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_usbilliards);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

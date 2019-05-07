@@ -497,11 +497,11 @@ void zr107_state::machine_start()
 void midnrun_state::main_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("workram"); /* Work RAM */
-	map(0x74000000, 0x74003fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));
-	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::long_r), FUNC(k056832_device::long_w));
+	map(0x74000000, 0x74003fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
 	map(0x74080000, 0x74081fff).ram().w(FUNC(midnrun_state::paletteram32_w)).share("paletteram");
-	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_long_r));
+	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));        /* 21N 21K 23N 23K */
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
@@ -851,7 +851,7 @@ void midnrun_state::midnrun(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback), this);
-	m_k056832->set_config("gfx2", K056832_BPP_8, 1, 0);
+	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 }
 
@@ -904,7 +904,7 @@ ROM_START( midnrun )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
@@ -930,7 +930,7 @@ ROM_START( midnrunj )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
@@ -956,7 +956,7 @@ ROM_START( midnruna )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
@@ -982,7 +982,7 @@ ROM_START( windheat )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1008,7 +1008,7 @@ ROM_START( windheatu )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1034,7 +1034,7 @@ ROM_START( windheatj )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1060,7 +1060,7 @@ ROM_START( windheata )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 

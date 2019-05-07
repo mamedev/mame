@@ -298,7 +298,7 @@ protected:
 	virtual u32 get_cop0_reg(unsigned const reg) override;
 
 	virtual void handle_cop1(u32 const op) override;
-	virtual void set_cop1_reg(unsigned const reg, u64 const data);
+	template <typename T> void set_cop1_reg(unsigned const reg, T const data);
 
 private:
 	u64 m_reset_time;

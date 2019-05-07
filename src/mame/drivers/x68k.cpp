@@ -313,7 +313,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::scc_ack)
 			{
 				m_mouse.irqactive = 1;
 				m_current_vector[5] = 0x54;
-				m_current_irq_line = 5;
+				//m_current_irq_line = 5;
 				m_maincpu->set_input_line(5,ASSERT_LINE);
 			}
 		}
@@ -680,7 +680,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 	{
 		m_current_vector[1] = m_ioc.fdcvector;
 		m_ioc.irqstatus |= 0x80;
-		m_current_irq_line = 1;
+		//m_current_irq_line = 1;
 		LOGMASKED(LOG_FDC, "FDC: IRQ triggered\n");
 		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
@@ -998,34 +998,21 @@ WRITE16_MEMBER(x68k_state::exp_w)
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
-void x68k_state::dma_irq(int channel)
+WRITE_LINE_MEMBER(x68k_state::dma_irq)
 {
-	m_current_vector[3] = m_hd63450->get_vector(channel);
-	m_current_irq_line = 3;
-	LOGMASKED(LOG_SYS, "DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
-	m_maincpu->set_input_line(3,ASSERT_LINE);
+	if (state != CLEAR_LINE)
+	{
+		//m_current_irq_line = 3;
+		LOGMASKED(LOG_SYS, "DMA IRQ (vector 0x%02x)\n", m_hd63450->iack());
+	}
+	m_maincpu->set_input_line(3, state);
 }
 
 WRITE8_MEMBER(x68k_state::dma_end)
 {
-	if(data != 0)
-	{
-		dma_irq(offset);
-	}
 	if(offset == 0)
 	{
 		m_fdc_tc->adjust(attotime::from_usec(1), 0, attotime::never);
-	}
-}
-
-WRITE8_MEMBER(x68k_state::dma_error)
-{
-	if(data != 0)
-	{
-		m_current_vector[3] = m_hd63450->get_error_vector(offset);
-		m_current_irq_line = 3;
-		LOGMASKED(LOG_SYS, "DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
-		m_maincpu->set_input_line(3,ASSERT_LINE);
 	}
 }
 
@@ -1104,7 +1091,7 @@ void x68k_state::cpu_space_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0xfffff3, 0xfffff3).r(FUNC(x68k_state::int_ack<1>));
 	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::int_ack<2>));
-	map(0xfffff7, 0xfffff7).r(FUNC(x68k_state::int_ack<3>));
+	map(0xfffff7, 0xfffff7).r(m_hd63450, FUNC(hd63450_device::iack));
 	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::int_ack<4>));
 	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::int_ack<5>));
 	map(0xfffffd, 0xfffffd).r(FUNC(x68k_state::mfp_ack));
@@ -1117,7 +1104,7 @@ WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 	if(state != 0)
 	{
 		m_current_vector[1] = 0x6c;
-		m_current_irq_line = 1;
+		//m_current_irq_line = 1;
 		m_maincpu->set_input_line(1,ASSERT_LINE);
 	}
 }
@@ -1383,7 +1370,7 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	{
 		m_current_vector[1] = 0x61;
 		m_ioc.irqstatus |= 0x40;
-		m_current_irq_line = 1;
+		//m_current_irq_line = 1;
 		m_maincpu->set_input_line(1,ASSERT_LINE);  // Disk insert/eject interrupt
 		LOGMASKED(LOG_FDC, "IOC: Disk image inserted\n");
 	}
@@ -1403,7 +1390,7 @@ void x68k_state::floppy_unload(floppy_image_device *dev)
 TIMER_CALLBACK_MEMBER(x68k_state::net_irq)
 {
 	m_current_vector[2] = 0xf9;
-	m_current_irq_line = 2;
+	//m_current_irq_line = 2;
 	m_maincpu->set_input_line(2,ASSERT_LINE);
 }
 
@@ -1466,9 +1453,6 @@ void x68k_state::machine_reset()
 	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
 	m_fdc.select_drive = 0;
-
-	// reset CPU
-	m_maincpu->reset();
 }
 
 void x68k_state::machine_start()
@@ -1594,8 +1578,8 @@ void x68k_state::x68000_base(machine_config &config)
 	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_hd63450->irq_callback().set(FUNC(x68k_state::dma_irq));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
-	m_hd63450->dma_error().set(FUNC(x68k_state::dma_error));
 	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
 	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
@@ -1663,6 +1647,7 @@ void x68k_state::x68000(machine_config &config)
 	x68000_base(config);
 
 	VINAS(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->vdisp_cb().set(m_mfpdev, FUNC(mc68901_device::i4_w));
 	m_crtc->vdisp_cb().append(m_mfpdev, FUNC(mc68901_device::tai_w));
@@ -1695,6 +1680,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	m_scsictrl->drq_cb().set(FUNC(x68ksupr_state::scsi_drq));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->vdisp_cb().set(m_mfpdev, FUNC(mc68901_device::i4_w));
 	m_crtc->vdisp_cb().append(m_mfpdev, FUNC(mc68901_device::tai_w));
@@ -1714,7 +1700,7 @@ void x68ksupr_state::x68ksupr(machine_config &config)
 
 void x68ksupr_state::x68kxvi(machine_config &config)
 {
-	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.333_MHz_XTAL / 2); /* 16 MHz (nominally) */
+	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.33_MHz_XTAL / 2); /* 16 MHz (nominally) */
 	x68ksupr_base(config);
 }
 
@@ -1726,6 +1712,8 @@ void x68030_state::x68030(machine_config &config)
 	m_hd63450->set_clock(50_MHz_XTAL / 4);
 	m_scc->set_clock(20_MHz_XTAL / 4);
 	m_scsictrl->set_clock(20_MHz_XTAL / 4);
+
+	m_crtc->set_clock_50m(50.35_MHz_XTAL);
 }
 
 ROM_START( x68000 )

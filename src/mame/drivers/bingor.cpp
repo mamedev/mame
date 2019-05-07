@@ -559,6 +559,7 @@ private:
 
 void bingor_state::video_start()
 {
+	m_palette->basemem().set(&m_blit_ram[0x300/2], 0x10 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
 }
 
 uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -608,7 +609,7 @@ void bingor_state::bingor_map(address_map &map)
 	map(0x00000, 0x0ffff).ram();
 	map(0x90000, 0x9ffff).rom().region("gfx", 0);
 	map(0xa0000, 0xaffff).ram().share("blit_ram");
-	map(0xa0300, 0xa031f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); //wrong
+	map(0xa0300, 0xa031f).w(m_palette, FUNC(palette_device::write16)); //wrong
 	map(0xf0000, 0xfffff).rom().region("boot_prg", 0);
 }
 
@@ -713,7 +714,7 @@ void bingor_state::bingor(machine_config &config)
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(bingor_state::screen_update_bingor));
 
-	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
+	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x10);
 
 	SPEAKER(config, "mono").front_center();
 	SAA1099(config, "saa", 6000000).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -729,7 +730,7 @@ void bingor_state::vip2000_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
 	map(0x40000, 0x4ffff).ram().share("blit_ram");
-	map(0x40300, 0x4031f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); //wrong
+	map(0x40300, 0x4031f).w(m_palette, FUNC(palette_device::write16)); //wrong
 	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
 	map(0x60000, 0x60003).w("ymz", FUNC(ymz284_device::address_data_w)).umask16(0x00ff);
 	map(0x80000, 0xeffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
@@ -783,7 +784,7 @@ void bingor_state::vip2000(machine_config &config)
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(bingor_state::screen_update_bingor));
 
-	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
+	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x10);
 
 	SPEAKER(config, "mono").front_center();
 

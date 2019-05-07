@@ -41,7 +41,7 @@ private:
 	u32 m_table_adr;
 	u16 m_prg_adr;
 	u16 m_status;
-	
+
 	// Table ram access
 	void table_adrh_w(u16 data);
 	void table_adrl_w(u16 data);
