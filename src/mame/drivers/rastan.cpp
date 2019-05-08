@@ -207,7 +207,6 @@ void rastan_state::msm5205_stop_w(u8 data)
 }
 
 
-
 void rastan_state::main_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
@@ -314,7 +313,6 @@ static INPUT_PORTS_START( rastsaga )
 INPUT_PORTS_END
 
 
-
 static const gfx_layout tilelayout =
 {
 	8,8,
@@ -418,7 +416,6 @@ void rastan_state::rastan(machine_config &config)
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
-
 
 
 /***************************************************************************
