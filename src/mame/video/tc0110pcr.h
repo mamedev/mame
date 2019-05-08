@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 
 class tc0110pcr_device : public device_t, public device_palette_interface
 {
