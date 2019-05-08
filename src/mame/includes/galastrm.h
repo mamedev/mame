@@ -53,8 +53,7 @@ public:
 		m_tc0110pcr(*this, "tc0110pcr"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_screen(*this, "screen")
 	{ }
 
 	void galastrm(machine_config &config);
@@ -75,7 +74,6 @@ private:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 	struct gs_tempsprite
 	{
