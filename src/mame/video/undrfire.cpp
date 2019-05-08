@@ -135,8 +135,8 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			int curx = x + ((k * zoomx) / dimension);
 			int cury = y + ((j * zoomy) / dimension);
 
-			int zx = x + (((k + 1) * zoomx) / dimension) - curx;
-			int zy = y + (((j + 1) * zoomy) / dimension) - cury;
+			const int zx = x + (((k + 1) * zoomx) / dimension) - curx;
+			const int zy = y + (((j + 1) * zoomy) / dimension) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -262,8 +262,8 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 			int curx = x + ((k * zoomx) / dimension);
 			int cury = y + ((j * zoomy) / dimension);
 
-			int zx = x + (((k + 1) * zoomx) / dimension) - curx;
-			int zy = y + (((j + 1) * zoomy) / dimension) - cury;
+			const int zx = x + (((k + 1) * zoomx) / dimension) - curx;
+			const int zy = y + (((j + 1) * zoomy) / dimension) - cury;
 
 			if (sprites_flipscreen)
 			{
