@@ -2714,7 +2714,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			volbyte -= 0x100;
 
 		float volume = version >= 0x160 && data_start >= 0x7d ? powf(2.0f, float(volbyte) / float(0x20)) : 1.0f;
-		uint32_t chip_count = 0;
 
 		uint32_t extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
 		uint32_t header_size = extra_header_start ? extra_header_start : data_start;
@@ -2726,14 +2725,19 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (chip_volume_start != 0)
 			osd_printf_warning("Warning: file has unsupported chip volumes\n");
 
-		const auto&& setup_device([&](device_t &device, int chip_num, vgm_chip chip_type, uint32_t offset, uint32_t &chip_count, uint32_t min_version = 0)
+		const auto&& setup_device([&](device_t &device, int chip_num, vgm_chip chip_type, uint32_t offset, uint32_t min_version = 0)
 		{
 			uint32_t c = 0;
+			//float chip_volume = 1.0f;
 
 			if (min_version <= version && offset + 4 <= header_size && (chip_num == 0 || (r32(offset) & 0x40000000) != 0))
 			{
 				c =  r32(offset);
 
+				/*if ((c & 0x40000000) != 0)
+				{
+					chip_volume /= 2.0f;
+				}*/
 				if (chip_clock_start && chip_num != 0)
 					for (auto i(0); i < r8(chip_clock_start); i++)
 					{
@@ -2746,69 +2750,67 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			}
 
 			device.set_unscaled_clock(c & ~0xc0000000);
-
-			if (device.unscaled_clock() != 0)
-			{
-				chip_count++;
-			}
+			/*if (device.unscaled_clock() != 0)
+				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
+			*/
 			return (c & 0x80000000) != 0;
 		});
 
 		// Parse clocks
-		if (setup_device(*m_sn76489[0], 0, CT_SN76489, 0x0c, chip_count) ||
-			setup_device(*m_sn76489[1], 1, CT_SN76489, 0x0c, chip_count))
+		if (setup_device(*m_sn76489[0], 0, CT_SN76489, 0x0c) ||
+			setup_device(*m_sn76489[1], 1, CT_SN76489, 0x0c))
 			osd_printf_warning("Warning: file requests an unsupported T6W28\n");
 
-		if (setup_device(*m_ym2413[0], 0, CT_YM2413, 0x10, chip_count) ||
-			setup_device(*m_ym2413[1], 1, CT_YM2413, 0x10, chip_count))
+		if (setup_device(*m_ym2413[0], 0, CT_YM2413, 0x10) ||
+			setup_device(*m_ym2413[1], 1, CT_YM2413, 0x10))
 			osd_printf_warning("Warning: file requests an unsupported VRC7\n");
 
-		if (setup_device(*m_ym2612[0], 0, CT_YM2612, version < 110 ? 0x10 : 0x2c, chip_count) ||
-			setup_device(*m_ym2612[1], 1, CT_YM2612, version < 110 ? 0x10 : 0x2c, chip_count))
+		if (setup_device(*m_ym2612[0], 0, CT_YM2612, version < 110 ? 0x10 : 0x2c) ||
+			setup_device(*m_ym2612[1], 1, CT_YM2612, version < 110 ? 0x10 : 0x2c))
 			osd_printf_warning("Warning: file requests an unsupported YM3438\n");
 
-		setup_device(*m_ym2151[0], 0, CT_YM2151, version < 110 ? 0x10 : 0x30, chip_count);
-		setup_device(*m_ym2151[1], 1, CT_YM2151, version < 110 ? 0x10 : 0x30, chip_count);
+		setup_device(*m_ym2151[0], 0, CT_YM2151, version < 110 ? 0x10 : 0x30);
+		setup_device(*m_ym2151[1], 1, CT_YM2151, version < 110 ? 0x10 : 0x30);
 
-		setup_device(*m_segapcm[0], 0, CT_SEGAPCM, 0x38, chip_count, 0x151);
-		setup_device(*m_segapcm[1], 1, CT_SEGAPCM, 0x38, chip_count, 0x151);
+		setup_device(*m_segapcm[0], 0, CT_SEGAPCM, 0x38, 0x151);
+		setup_device(*m_segapcm[1], 1, CT_SEGAPCM, 0x38, 0x151);
 		m_segapcm[0]->set_bank(version >= 0x151 && header_size >= 0x40 ? r32(0x3c) : 0);
 		m_segapcm[1]->set_bank(version >= 0x151 && header_size >= 0x40 ? r32(0x3c) : 0);
 
-		setup_device(*m_rf5c68, 0, CT_RF5C68, 0x40, chip_count, 0x151);
-		setup_device(*m_ym2203[0], 0, CT_YM2203, 0x44, chip_count, 0x151);
-		setup_device(*m_ym2203[1], 1, CT_YM2203, 0x44, chip_count, 0x151);
-		setup_device(*m_ym2608[0], 0, CT_YM2608, 0x48, chip_count, 0x151);
-		setup_device(*m_ym2608[1], 1, CT_YM2608, 0x48, chip_count, 0x151);
+		setup_device(*m_rf5c68, 0, CT_RF5C68, 0x40, 0x151);
+		setup_device(*m_ym2203[0], 0, CT_YM2203, 0x44, 0x151);
+		setup_device(*m_ym2203[1], 1, CT_YM2203, 0x44, 0x151);
+		setup_device(*m_ym2608[0], 0, CT_YM2608, 0x48, 0x151);
+		setup_device(*m_ym2608[1], 1, CT_YM2608, 0x48, 0x151);
 
-		if (setup_device(*m_ym2610[0], 0, CT_YM2610, 0x4c, chip_count, 0x151) ||
-			setup_device(*m_ym2610[1], 1, CT_YM2610, 0x4c, chip_count, 0x151))
+		if (setup_device(*m_ym2610[0], 0, CT_YM2610, 0x4c, 0x151) ||
+			setup_device(*m_ym2610[1], 1, CT_YM2610, 0x4c, 0x151))
 			osd_printf_warning("Warning: file requests an unsupported YM2610B\n");
 
-		if (setup_device(*m_ym3812[0], 0, CT_YM3812, 0x50, chip_count, 0x151) ||
-			setup_device(*m_ym3812[1], 1, CT_YM3812, 0x50, chip_count, 0x151))
+		if (setup_device(*m_ym3812[0], 0, CT_YM3812, 0x50, 0x151) ||
+			setup_device(*m_ym3812[1], 1, CT_YM3812, 0x50, 0x151))
 			osd_printf_warning("Warning: file requests an unsupported SoundBlaster Pro\n");
 
-		setup_device(*m_ym3526[0], 0, CT_YM3526, 0x54, chip_count, 0x151);
-		setup_device(*m_ym3526[1], 1, CT_YM3526, 0x54, chip_count, 0x151);
-		setup_device(*m_y8950[0], 0, CT_Y8950, 0x58, chip_count, 0x151);
-		setup_device(*m_y8950[1], 1, CT_Y8950, 0x58, chip_count, 0x151);
-		setup_device(*m_ymf262[0], 0, CT_YMF262, 0x5c, chip_count, 0x151);
-		setup_device(*m_ymf262[1], 1, CT_YMF262, 0x5c, chip_count, 0x151);
-		setup_device(*m_ymf278b[0], 0, CT_YMF278B, 0x60, chip_count, 0x151);
-		setup_device(*m_ymf278b[1], 1, CT_YMF278B, 0x60, chip_count, 0x151);
-		setup_device(*m_ymf271[0], 0, CT_YMF271, 0x64, chip_count, 0x151);
-		setup_device(*m_ymf271[1], 1, CT_YMF271, 0x64, chip_count, 0x151);
-		setup_device(*m_ymz280b[0], 0, CT_YMZ280B, 0x68, chip_count, 0x151);
-		setup_device(*m_ymz280b[1], 1, CT_YMZ280B, 0x68, chip_count, 0x151);
+		setup_device(*m_ym3526[0], 0, CT_YM3526, 0x54, 0x151);
+		setup_device(*m_ym3526[1], 1, CT_YM3526, 0x54, 0x151);
+		setup_device(*m_y8950[0], 0, CT_Y8950, 0x58, 0x151);
+		setup_device(*m_y8950[1], 1, CT_Y8950, 0x58, 0x151);
+		setup_device(*m_ymf262[0], 0, CT_YMF262, 0x5c, 0x151);
+		setup_device(*m_ymf262[1], 1, CT_YMF262, 0x5c, 0x151);
+		setup_device(*m_ymf278b[0], 0, CT_YMF278B, 0x60, 0x151);
+		setup_device(*m_ymf278b[1], 1, CT_YMF278B, 0x60, 0x151);
+		setup_device(*m_ymf271[0], 0, CT_YMF271, 0x64, 0x151);
+		setup_device(*m_ymf271[1], 1, CT_YMF271, 0x64, 0x151);
+		setup_device(*m_ymz280b[0], 0, CT_YMZ280B, 0x68, 0x151);
+		setup_device(*m_ymz280b[1], 1, CT_YMZ280B, 0x68, 0x151);
 
-		if (setup_device(*m_rf5c164, 0, CT_RF5C164, 0x6c, chip_count, 0x151))
+		if (setup_device(*m_rf5c164, 0, CT_RF5C164, 0x6c, 0x151))
 			osd_printf_warning("Warning: file requests an unsupported Cosmic Fantasy Stories HACK\n");
 
-		setup_device(*m_sega32x, 0, CT_SEGA32X, 0x70, chip_count, 0x151);
+		setup_device(*m_sega32x, 0, CT_SEGA32X, 0x70, 0x151);
 
-		setup_device(*m_ay8910[0], 0, CT_AY8910, 0x74, chip_count, 0x151);
-		setup_device(*m_ay8910[1], 1, CT_AY8910, 0x74, chip_count, 0x151);
+		setup_device(*m_ay8910[0], 0, CT_AY8910, 0x74, 0x151);
+		setup_device(*m_ay8910[1], 1, CT_AY8910, 0x74, 0x151);
 		m_ay8910[0]->set_psg_type(vgm_ay8910_type(version >= 0x151 && header_size >= 0x7c ? r8(0x78) : 0));
 		m_ay8910[1]->set_psg_type(vgm_ay8910_type(version >= 0x151 && header_size >= 0x7c ? r8(0x78) : 0));
 		m_ay8910[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7a ? r8(0x79) : 0));
@@ -2818,25 +2820,25 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_ym2608[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7c ? r8(0x7b) : 0));
 		m_ym2608[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7c ? r8(0x7b) : 0));
 
-		setup_device(*m_dmg[0], 0, CT_GAMEBOY, 0x80, chip_count, 0x161);
-		setup_device(*m_dmg[1], 1, CT_GAMEBOY, 0x80, chip_count, 0x161);
+		setup_device(*m_dmg[0], 0, CT_GAMEBOY, 0x80, 0x161);
+		setup_device(*m_dmg[1], 1, CT_GAMEBOY, 0x80, 0x161);
 
-		if (setup_device(*m_nescpu[0], 0, CT_NESAPU, 0x84, chip_count, 0x161) ||
-			setup_device(*m_nescpu[1], 1, CT_NESAPU, 0x84, chip_count, 0x161))
+		if (setup_device(*m_nescpu[0], 0, CT_NESAPU, 0x84, 0x161) ||
+			setup_device(*m_nescpu[1], 1, CT_NESAPU, 0x84, 0x161))
 			osd_printf_warning("Warning: file requests an unsupported FDS sound addon\n");
 
-		setup_device(*m_multipcm[0], 0, CT_MULTIPCM, 0x88, chip_count, 0x161);
-		setup_device(*m_multipcm[1], 1, CT_MULTIPCM, 0x88, chip_count, 0x161);
+		setup_device(*m_multipcm[0], 0, CT_MULTIPCM, 0x88, 0x161);
+		setup_device(*m_multipcm[1], 1, CT_MULTIPCM, 0x88, 0x161);
 
-		setup_device(*m_upd7759[0], 0, CT_UPD7759, 0x8c, chip_count, 0x161);
-		setup_device(*m_upd7759[1], 1, CT_UPD7759, 0x8c, chip_count, 0x161);
+		setup_device(*m_upd7759[0], 0, CT_UPD7759, 0x8c, 0x161);
+		setup_device(*m_upd7759[1], 1, CT_UPD7759, 0x8c, 0x161);
 		m_upd7759_md[0] = r32(0x8c) & 0x80000000 ? 0 : 1;
 		m_upd7759_md[1] = r32(0x8c) & 0x80000000 ? 0 : 1;
 		m_upd7759[0]->md_w(m_upd7759_md[0]);
 		m_upd7759[1]->md_w(m_upd7759_md[1]);
 
-		setup_device(*m_okim6258[0], 0, CT_OKIM6258, 0x90, chip_count, 0x161);
-		setup_device(*m_okim6258[1], 1, CT_OKIM6258, 0x90, chip_count, 0x161);
+		setup_device(*m_okim6258[0], 0, CT_OKIM6258, 0x90, 0x161);
+		setup_device(*m_okim6258[1], 1, CT_OKIM6258, 0x90, 0x161);
 
 		uint8_t okim6258_flags = version >= 0x161 && header_size >= 0x95 ? r8(0x94) : 0;
 		m_okim6258_divider[0] = okim6258_flags & 3;
@@ -2854,17 +2856,17 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_c140[0]->set_bank_type(c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0));
 		m_c140[1]->set_bank_type(c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0));
 
-		m_okim6295_pin7[0] = setup_device(*m_okim6295[0], 0, CT_OKIM6295, 0x98, chip_count, 0x161);
-		m_okim6295_pin7[1] = setup_device(*m_okim6295[1], 1, CT_OKIM6295, 0x98, chip_count, 0x161);
+		m_okim6295_pin7[0] = setup_device(*m_okim6295[0], 0, CT_OKIM6295, 0x98, 0x161);
+		m_okim6295_pin7[1] = setup_device(*m_okim6295[1], 1, CT_OKIM6295, 0x98, 0x161);
 		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 
-		if (setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, chip_count, 0x161) ||
-			setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, chip_count, 0x161))
+		if (setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161) ||
+			setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161))
 			osd_printf_warning("Warning: file requests an unsupported Konami SCC\n");
 
-		setup_device(*m_k054539[0], 0, CT_K054539, 0xa0, chip_count, 0x161);
-		setup_device(*m_k054539[1], 1, CT_K054539, 0xa0, chip_count, 0x161);
+		setup_device(*m_k054539[0], 0, CT_K054539, 0xa0, 0x161);
+		setup_device(*m_k054539[1], 1, CT_K054539, 0xa0, 0x161);
 
 		// HACK: Some VGMs contain 48,000 instead of 18,432,000
 		m_k054539[0]->set_clock_scale(m_k054539[0]->unscaled_clock() == 48000 ? 384.0 : 1.0);
@@ -2876,35 +2878,35 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_huc6280[0]->set_clock_scale(2);
 		m_huc6280[1]->set_clock_scale(2);
 
-		setup_device(*m_huc6280[0], 0, CT_C6280, 0xa4, chip_count, 0x161);
-		setup_device(*m_huc6280[1], 1, CT_C6280, 0xa4, chip_count, 0x161);
-		setup_device(*m_c140[0], 0, CT_C140, 0xa8, chip_count, 0x161);
-		setup_device(*m_c140[1], 1, CT_C140, 0xa8, chip_count, 0x161);
-		setup_device(*m_k053260[0], 0, CT_K053260, 0xac, chip_count, 0x161);
-		setup_device(*m_k053260[1], 1, CT_K053260, 0xac, chip_count, 0x161);
-		setup_device(*m_pokey[0], 0, CT_POKEY, 0xb0, chip_count, 0x161);
-		setup_device(*m_pokey[1], 1, CT_POKEY, 0xb0, chip_count, 0x161);
+		setup_device(*m_huc6280[0], 0, CT_C6280, 0xa4, 0x161);
+		setup_device(*m_huc6280[1], 1, CT_C6280, 0xa4, 0x161);
+		setup_device(*m_c140[0], 0, CT_C140, 0xa8, 0x161);
+		setup_device(*m_c140[1], 1, CT_C140, 0xa8, 0x161);
+		setup_device(*m_k053260[0], 0, CT_K053260, 0xac, 0x161);
+		setup_device(*m_k053260[1], 1, CT_K053260, 0xac, 0x161);
+		setup_device(*m_pokey[0], 0, CT_POKEY, 0xb0, 0x161);
+		setup_device(*m_pokey[1], 1, CT_POKEY, 0xb0, 0x161);
 
-		setup_device(*m_qsound, 0, CT_QSOUND, 0xb4, chip_count, 0x161);
+		setup_device(*m_qsound, 0, CT_QSOUND, 0xb4, 0x161);
 
 		// HACK: VGMs contain 4,000,000 instead of 60,000,000
 		m_qsound->set_clock_scale(m_qsound->unscaled_clock() == 4000000 ? 15.0 : 1.0);
 		if (m_qsound->unscaled_clock() == 4000000)
 			osd_printf_error("bad rip detected, correcting qsound clock\n");
 
-		setup_device(*m_scsp[0], 0, CT_SCSP, 0xb8, chip_count, 0x171);
-		setup_device(*m_scsp[1], 1, CT_SCSP, 0xb8, chip_count, 0x171);
-		setup_device(*m_wswan[0], 0, CT_WSWAN, 0xc0, chip_count, 0x171);
-		setup_device(*m_wswan[1], 1, CT_WSWAN, 0xc0, chip_count, 0x171);
-		setup_device(*m_vsu_vue[0], 0, CT_VSU_VUE, 0xc4, chip_count, 0x171);
-		setup_device(*m_vsu_vue[1], 1, CT_VSU_VUE, 0xc4, chip_count, 0x171);
-		setup_device(*m_saa1099[0], 0, CT_SAA1099, 0xc8, chip_count, 0x171);
-		setup_device(*m_saa1099[1], 1, CT_SAA1099, 0xc8, chip_count, 0x171);
-		setup_device(*m_es5503[0], 0, CT_ES5503, 0xcc, chip_count, 0x171);
-		setup_device(*m_es5503[1], 1, CT_ES5503, 0xcc, chip_count, 0x171);
+		setup_device(*m_scsp[0], 0, CT_SCSP, 0xb8, 0x171);
+		setup_device(*m_scsp[1], 1, CT_SCSP, 0xb8, 0x171);
+		setup_device(*m_wswan[0], 0, CT_WSWAN, 0xc0, 0x171);
+		setup_device(*m_wswan[1], 1, CT_WSWAN, 0xc0, 0x171);
+		setup_device(*m_vsu_vue[0], 0, CT_VSU_VUE, 0xc4, 0x171);
+		setup_device(*m_vsu_vue[1], 1, CT_VSU_VUE, 0xc4, 0x171);
+		setup_device(*m_saa1099[0], 0, CT_SAA1099, 0xc8, 0x171);
+		setup_device(*m_saa1099[1], 1, CT_SAA1099, 0xc8, 0x171);
+		setup_device(*m_es5503[0], 0, CT_ES5503, 0xcc, 0x171);
+		setup_device(*m_es5503[1], 1, CT_ES5503, 0xcc, 0x171);
 
-		if (setup_device(*m_es5505[0], 0, CT_ES5505, 0xd0, chip_count, 0x171) ||
-			setup_device(*m_es5505[1], 1, CT_ES5503, 0xd0, chip_count, 0x171))
+		if (setup_device(*m_es5505[0], 0, CT_ES5505, 0xd0, 0x171) ||
+			setup_device(*m_es5505[1], 1, CT_ES5503, 0xd0, 0x171))
 			osd_printf_warning("Warning: file requests an unsupported ES5506\n");
 
 		// TODO: dynamically remap es5503/es5505 channels?
@@ -2916,24 +2918,19 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_c352[0]->set_divider(version >= 0x171 && header_size >= 0xd7 && r8(0xd6) ? r8(0xd6) * 4 : 1);
 		m_c352[1]->set_divider(version >= 0x171 && header_size >= 0xd7 && r8(0xd6) ? r8(0xd6) * 4 : 1);
 
-		setup_device(*m_x1_010[0], 0, CT_X1_010, 0xd8, chip_count, 0x171);
-		setup_device(*m_x1_010[1], 1, CT_X1_010, 0xd8, chip_count, 0x171);
+		setup_device(*m_x1_010[0], 0, CT_X1_010, 0xd8, 0x171);
+		setup_device(*m_x1_010[1], 1, CT_X1_010, 0xd8, 0x171);
 
-		if (setup_device(*m_c352[0], 0, CT_C352, 0xdc, chip_count, 0x171) ||
-			setup_device(*m_c352[1], 1, CT_C352, 0xdc, chip_count, 0x171))
+		if (setup_device(*m_c352[0], 0, CT_C352, 0xdc, 0x171) ||
+			setup_device(*m_c352[1], 1, CT_C352, 0xdc, 0x171))
 			osd_printf_warning("Warning: file requests an unsupported disable rear speakers\n");
 
-		setup_device(*m_ga20[0], 0, CT_GA20, 0xe0, chip_count, 0x171);
-		setup_device(*m_ga20[1], 1, CT_GA20, 0xe0, chip_count, 0x171);
+		setup_device(*m_ga20[0], 0, CT_GA20, 0xe0, 0x171);
+		setup_device(*m_ga20[1], 1, CT_GA20, 0xe0, 0x171);
 
 		for (device_t &child : subdevices())
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
-
-		if (chip_count == 0)
-			volume = 1.0f;
-		else
-			volume /= (float)chip_count;
 
 		for (int i = 0; i < m_lspeaker->inputs(); i++)
 			m_lspeaker->set_input_gain(i, volume); // TODO : Volume is related to chip number
