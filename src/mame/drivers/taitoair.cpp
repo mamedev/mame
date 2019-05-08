@@ -300,16 +300,16 @@ READ16_MEMBER(taitoair_state::stick_input_r)
 	switch (offset)
 	{
 		case 0x00:  /* "counter 1" lo */
-			return m_yoke->throttle_r(space,0) & 0xff;
+			return m_yoke->throttle_r() & 0xff;
 
 		case 0x01:  /* "counter 2" lo */
-			return m_yoke->stickx_r(space,0) & 0xff;
+			return m_yoke->stickx_r() & 0xff;
 
 		case 0x02:  /* "counter 1" hi */
-			return (m_yoke->throttle_r(space,0) & 0xff00) >> 8;
+			return (m_yoke->throttle_r() & 0xff00) >> 8;
 
 		case 0x03:  /* "counter 2" hi */
-			return (m_yoke->stickx_r(space,0) & 0xff00) >> 8;
+			return (m_yoke->stickx_r() & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -320,10 +320,10 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 	switch (offset)
 	{
 		case 0x00:  /* "counter 3" lo */
-			return m_yoke->sticky_r(space,0);
+			return m_yoke->sticky_r();
 
 		case 0x02:  /* "counter 3" hi */
-			return (m_yoke->sticky_r(space,0) & 0xff00) >> 8;
+			return (m_yoke->sticky_r() & 0xff00) >> 8;
 	}
 
 	return 0;
