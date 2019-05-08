@@ -2728,16 +2728,14 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		const auto&& setup_device([&](device_t &device, int chip_num, vgm_chip chip_type, uint32_t offset, uint32_t min_version = 0)
 		{
 			uint32_t c = 0;
-			//float chip_volume = 1.0f;
+			float chip_volume = volume;
+			bool has_2chip = false;
 
 			if (min_version <= version && offset + 4 <= header_size && (chip_num == 0 || (r32(offset) & 0x40000000) != 0))
 			{
 				c =  r32(offset);
+				has_2chip = (c & 0x40000000) != 0;
 
-				/*if ((c & 0x40000000) != 0)
-				{
-					chip_volume /= 2.0f;
-				}*/
 				if (chip_clock_start && chip_num != 0)
 					for (auto i(0); i < r8(chip_clock_start); i++)
 					{
@@ -2749,10 +2747,14 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 					}
 			}
 
+			if (has_2chip)
+			{
+				chip_volume /= 2.0f;
+			}
 			device.set_unscaled_clock(c & ~0xc0000000);
-			/*if (device.unscaled_clock() != 0)
+			if (device.unscaled_clock() != 0)
 				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
-			*/
+
 			return (c & 0x80000000) != 0;
 		});
 
@@ -2931,11 +2933,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		for (device_t &child : subdevices())
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
-
-		for (int i = 0; i < m_lspeaker->inputs(); i++)
-			m_lspeaker->set_input_gain(i, volume); // TODO : Volume is related to chip number
-		for (int i = 0; i < m_rspeaker->inputs(); i++)
-			m_rspeaker->set_input_gain(i, volume);
 
 		//for (auto &stream : machine().sound().streams())
 		//  if (stream->sample_rate() != 0)
