@@ -70,7 +70,7 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+int taitoair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return draw_sprites(bitmap,cliprect, 0x3f8 / 2);
 }
@@ -79,20 +79,14 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
  @param start_offset DMA sprite offset source
  @return value acquired by a pause flag acquisition.
  */
-int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset )
+int taitoair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
-	//const uint16_t stop_values[4] = { 0xc00, 0, 0, 0 };
-	static const int size[] = { 1, 2, 4, 4 };
-	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
-	int ysize;
-	int j, k;
-	int offs;                   /* sprite RAM offset */
-	int tile_offs;              /* sprite chain offset */
-	int zoomx, zoomy;           /* zoom value */
+	//const u16 stop_values[4] = { 0xc00, 0, 0, 0 };
+	static const u8 size[] = { 1, 2, 4, 4 };
 
-	for (offs = start_offset; offs >= 0; offs -= 0x008 / 2)
+	for (int offs = start_offset; offs >= 0; offs -= 0x008 / 2)
 	{
 		/*!
 		 Starting at a particular sequence, sprite DMA seems to stop there and resume via "something",
@@ -101,23 +95,23 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		 @todo reported sequence for DMA pause flag is 0x0c** 0x0000 0x0000 0x0000.
 		       Verify how exactly via HW test. Continuing may be determined by a DMA bit write.
 		 */
-		if(m_tc0080vco->sprram_r(offs + 0) == 0xc00 ||
+		if (m_tc0080vco->sprram_r(offs + 0) == 0xc00 ||
 			m_tc0080vco->sprram_r(offs + 0) == 0xcff) // Air Inferno
 			return offs - 8/2;
 
-		x0        =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
-		y0        =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
-		zoomx     = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
-		zoomy     = (m_tc0080vco->sprram_r(offs + 2) & 0x007f);
-		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
-		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
-
+		int x0         =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
+		int y0         =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
+		int zoomx      = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
+		int zoomy      = (m_tc0080vco->sprram_r(offs + 2) & 0x007f);
+		u32 tile_offs  = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
+		const u8 ysize = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
 			/* Convert zoomy value to real value as zoomx */
 			zoomy = zoomy_conv_table[zoomy];
 
+			int dx, dy, ex, ey, zx, zy;
 			if (zoomx < 63)
 			{
 				dx = 8 + (zoomx + 2) / 8;
@@ -160,37 +154,33 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 				y0 += 2;
 			}
 
-			y = y0;
-			for (j = 0; j < ysize; j ++)
+			int y = y0;
+			for (int j = 0; j < ysize; j++)
 			{
-				x = x0;
-				for (k = 0; k < 4; k ++)
+				int x = x0;
+				for (int k = 0; k < 4; k++)
 				{
 					if (tile_offs >= 0x1000)
 					{
-						int tile, color, flipx, flipy;
-
-						tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
-						color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
-						flipx = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
-						flipy = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
+						const u32 tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+						const u32 color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+						int flipx       = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+						int flipy       = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
 						if (m_tc0080vco->flipscreen_r())
 						{
-							flipx ^= 0x0040;
-							flipy ^= 0x0080;
+							flipx = !flipx;
+							flipy = !flipy;
 						}
 
-
-									m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
 									tile,
 									color,
 									flipx, flipy,
 									x, y,
-									zx, zy, 0
-						);
+									zx, zy, 0);
 					}
-					tile_offs ++;
+					tile_offs++;
 					x += dx;
 				}
 				y += dy;
@@ -201,7 +191,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	return 0;
 }
 
-void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t header, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2 )
+void taitoair_state::fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 header, s32 x1, s32 x2, s32 sl1, s32 sl2, s32 y1, s32 y2, s32 *nx1, s32 *nx2)
 {
 	if (y1 > cliprect.max_y)
 		return;
@@ -230,7 +220,7 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	if (x1 > x2 || (x1==x2 && sl1 > sl2))
 	{
-		int32_t t, *tp;
+		s32 t, *tp;
 		t = x1;
 		x1 = x2;
 		x2 = t;
@@ -258,17 +248,17 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 				if (xx2 > cliprect.max_x)
 					xx2 = cliprect.max_x;
 
-				if(header & 0x4000 && machine().input().code_pressed(KEYCODE_Q))
+				if (header & 0x4000 && machine().input().code_pressed(KEYCODE_Q))
 				{
 					base_color = machine().rand() & 0x3fff;
 					grad_col = 0;
 				}
-				else if(m_paletteram[(header & 0xff)+0x300] & 0x8000)
+				else if (m_paletteram[(header & 0xff)+0x300] & 0x8000)
 				{
 					/* Terrain elements, with a gradient applied. */
 					/*! @todo it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
 					base_color = ((header & 0x3f) * 0x80) + 0x2040;
-					if(header & 0x3fe0)
+					if (header & 0x3fe0)
 						base_color = machine().rand() & 0x3fff;
 					grad_col = (y1 >> 3) & 0x3f;
 				}
@@ -295,22 +285,21 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 	*nx2 = x2;
 }
 
-void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
+void taitoair_state::fill_poly(bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q)
 {
-	int32_t sl1, sl2, cury, limy, x1, x2;
-	int pmin, pmax, i, ps1, ps2;
+	s32 sl1, sl2, x1, x2;
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT * 2];
-	uint16_t header = q->header;
+	u16 header = q->header;
 	int pcount = q->pcount;
 
-	for (i = 0; i < pcount; i++)
+	for (int i = 0; i < pcount; i++)
 	{
 		p[i].x = p[i + pcount].x = q->p[i].x << TAITOAIR_FRAC_SHIFT;
 		p[i].y = p[i + pcount].y = q->p[i].y;
 	}
 
-	pmin = pmax = 0;
-	for (i = 1; i < pcount; i++)
+	int pmin = 0, pmax = 0;
+	for (int i = 1; i < pcount; i++)
 	{
 		if (p[i].y < p[pmin].y)
 			pmin = i;
@@ -318,8 +307,8 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
 			pmax = i;
 	}
 
-	cury = p[pmin].y;
-	limy = p[pmax].y;
+	s32 cury = p[pmin].y;
+	s32 limy = p[pmax].y;
 
 	if (cury == limy)
 		return;
@@ -332,8 +321,8 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if (limy > cliprect.max_y)
 		limy = cliprect.max_y;
 
-	ps1 = pmin + pcount;
-	ps2 = pmin;
+	int ps1 = pmin + pcount;
+	int ps2 = pmin;
 
 	goto startup;
 
@@ -469,7 +458,7 @@ void taitoair_state::fb_fill_op()
     @todo still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
     In theory this should fit into framebuffer draw, display, clear and swap in some way.
 */
-WRITE16_MEMBER(taitoair_state::dsp_flags_w)
+void taitoair_state::dsp_flags_w(offs_t offset, u16 data)
 {
 	rectangle cliprect;
 
@@ -480,67 +469,67 @@ WRITE16_MEMBER(taitoair_state::dsp_flags_w)
 	cliprect.max_x = m_screen->width() - 1;
 	cliprect.max_y = m_screen->height() - 1;
 
+	/* clear and copy operation if offset is 0x3001 */
+	if (offset == 1)
 	{
-		/* clear and copy operation if offset is 0x3001 */
-		if(offset == 1)
-		{
-			fb_copy_op();
-		}
+		fb_copy_op();
+	}
 
-		/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
-		if(offset)
-		{
-			fb_fill_op();
-		}
+	/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
+	if (offset)
+	{
+		fb_fill_op();
 	}
 }
 
 void taitoair_state::video_start()
 {
-	int width, height;
-
-	width = m_screen->width();
-	height = m_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 	m_framebuffer[0] = std::make_unique<bitmap_ind16>(width, height);
 	m_framebuffer[1] = std::make_unique<bitmap_ind16>(width, height);
 	//m_buffer3d = std::make_unique<bitmap_ind16>(width, height);
 }
 
-uint32_t taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int sprite_ptr;
 	m_tc0080vco->tilemap_update();
 
-	uint32_t counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
-	uint32_t inc1x    = int16_t(m_tc0430grw[2]);
-	uint32_t inc1y    = int16_t(m_tc0430grw[3]);
-	uint32_t counter2 = (m_tc0430grw[4] << 16) | m_tc0430grw[5];
-	uint32_t inc2x    = int16_t(m_tc0430grw[6]);
-	uint32_t inc2y    = int16_t(m_tc0430grw[7]);
+	u32 counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
+	u32 inc1x    = s16(m_tc0430grw[2]);
+	u32 inc1y    = s16(m_tc0430grw[3]);
+	u32 counter2 = (m_tc0430grw[4] << 16) | m_tc0430grw[5];
+	u32 inc2x    = s16(m_tc0430grw[6]);
+	u32 inc2y    = s16(m_tc0430grw[7]);
 
 	// Deltas are 118/31
 	int dx = cliprect.min_x      + 118;
 	int dy = cliprect.min_y - 48 + 31;
 
-	counter1 += dx*inc1x + dy*inc1y;
-	counter2 += dx*inc2x + dy*inc2y;
+	counter1 += dx * inc1x + dy * inc1y;
+	counter2 += dx * inc2x + dy * inc2y;
 
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		uint32_t c1b = counter1;
-		uint32_t c2b = counter2;
-		uint16_t *dest = &bitmap.pix(y, cliprect.min_x);
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			uint16_t base = 0;
-			uint32_t cntr = 0;
-			if(c2b & 0x800000) {
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u32 c1b = counter1;
+		u32 c2b = counter2;
+		u16 *dest = &bitmap.pix(y, cliprect.min_x);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u16 base = 0;
+			u32 cntr = 0;
+			if (c2b & 0x800000)
+			{
 				base = 0x2040;
 				cntr = c2b;
-			} else if(c1b & 0x800000) {
+			}
+			else if (c1b & 0x800000)
+			{
 				base = 0x2000;
 				cntr = c1b;
 			}
-			if(m_gradbank == true)
-				base|= 0x1000;
+			if (m_gradbank == true)
+				base |= 0x1000;
 
 			*dest++ = base | (cntr >= 0x83f000 ? 0x3f : (cntr >> 12) & 0x3f);
 
@@ -551,13 +540,11 @@ uint32_t taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_in
 		counter2 += inc2y;
 	}
 
-
-
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	sprite_ptr = draw_sprites(bitmap, cliprect);
+	int sprite_ptr = draw_sprites(bitmap, cliprect);
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 
