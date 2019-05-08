@@ -63,42 +63,35 @@ Heavy use is made of sprite zooming.
 
 void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
-	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk,map_offset,code,j,k,px,py;
-	int dimension,total_chunks;
-	static const int primasks[4] = {0xffff, 0xfffc, 0xfff0, 0xff00 };
+	static const u32 primasks[4] = {0xffff, 0xfffc, 0xfff0, 0xff00 };
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
 	struct gfx_tempsprite *sprite_ptr = m_spritelist.get();
 
-	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
+	for (int offs = (m_spriteram.bytes() / 4 - 4); offs >= 0; offs -= 4)
 	{
-		data = spriteram32[offs+0];
-		flipx =    (data & 0x00800000) >> 23;
-		zoomx =    (data & 0x007f0000) >> 16;
-		tilenum =  (data & 0x00007fff);
+		u32 data = m_spriteram[offs+0];
+		int flipx =          (data & 0x00800000) >> 23;
+		int zoomx =          (data & 0x007f0000) >> 16;
+		const u32 tilenum =  (data & 0x00007fff);
 
-		data = spriteram32[offs+2];
-		priority = (data & 0x000c0000) >> 18;
-		color =    (data & 0x0003fc00) >> 10;
-		x =        (data & 0x000003ff);
+		data = m_spriteram[offs+2];
+		const int priority = (data & 0x000c0000) >> 18;
+		u32 color =          (data & 0x0003fc00) >> 10;
+		int x =              (data & 0x000003ff);
 
-		data = spriteram32[offs+3];
-		dblsize =  (data & 0x00040000) >> 18;
-		flipy =    (data & 0x00020000) >> 17;
-		zoomy =    (data & 0x0001fc00) >> 10;
-		y =        (data & 0x000003ff);
+		data = m_spriteram[offs+3];
+		const int dblsize =  (data & 0x00040000) >> 18;
+		int flipy =          (data & 0x00020000) >> 17;
+		int zoomy =          (data & 0x0001fc00) >> 10;
+		int y =              (data & 0x000003ff);
 
 //      color |= (0x100 + (priority << 6));     /* priority bits select color bank */
 		color /= 2;     /* as sprites are 5bpp */
 		flipy = !flipy;
-		y = (-y &0x3ff);
+		y = (-y & 0x3ff);
 
 		if (!tilenum) continue;
 
@@ -114,34 +107,34 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		x -= x_offs;
 
-		dimension = ((dblsize*2) + 2);  // 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
-		map_offset = tilenum << 2;
+		const int dimension = ((dblsize*2) + 2);  // 2 or 4
+		const int total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
+		const int map_offset = tilenum << 2;
 
 		{
-			for (sprite_chunk=0;sprite_chunk<total_chunks;sprite_chunk++)
+			for (int sprite_chunk = 0; sprite_chunk < total_chunks; sprite_chunk++)
 			{
-				j = sprite_chunk / dimension;   /* rows */
-				k = sprite_chunk % dimension;   /* chunks per row */
+				const int j = sprite_chunk / dimension;   /* rows */
+				const int k = sprite_chunk % dimension;   /* chunks per row */
 
-				px = k;
-				py = j;
+				int px = k;
+				int py = j;
 				/* pick tiles back to front for x and y flips */
 				if (flipx)  px = dimension-1-k;
 				if (flipy)  py = dimension-1-j;
 
-				code = spritemap[map_offset + px + (py<<(dblsize+1))];
+				const u16 code = m_spritemap[map_offset + px + (py << (dblsize + 1))];
 
 				if (code==0xffff)
 				{
 					continue;
 				}
 
-				curx = x + ((k*zoomx)/dimension);
-				cury = y + ((j*zoomy)/dimension);
+				int curx = x + ((k * zoomx) / dimension);
+				int cury = y + ((j * zoomy) / dimension);
 
-				zx= x + (((k+1)*zoomx)/dimension) - curx;
-				zy= y + (((j+1)*zoomy)/dimension) - cury;
+				const int zx = x + (((k + 1) * zoomx) / dimension) - curx;
+				const int zy = y + (((j + 1) * zoomy) / dimension) - cury;
 
 				if (sprites_flipscreen)
 				{
@@ -177,10 +170,10 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		sprite_ptr--;
 
-		if (do_hack && sprite_ptr->pri==1 && sprite_ptr->y<100)
-			clipper=&m_hack_cliprect;
+		if (do_hack && sprite_ptr->pri == 1 && sprite_ptr->y < 100)
+			clipper = &m_hack_cliprect;
 		else
-			clipper=&cliprect;
+			clipper = &cliprect;
 
 		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,*clipper,
 				sprite_ptr->code,
@@ -196,11 +189,11 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[5];
-	uint8_t scclayer[3];
-	uint16_t priority;
+	u8 layer[5];
+	u8 scclayer[3];
+	u16 priority;
 
 	m_tc0100scn->tilemap_update();
 	m_tc0480scp->tilemap_update();

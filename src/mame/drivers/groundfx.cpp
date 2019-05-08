@@ -85,7 +85,7 @@ READ_LINE_MEMBER(groundfx_state::frame_counter_r)
 	return m_frame_counter;
 }
 
-WRITE8_MEMBER(groundfx_state::coin_word_w)
+void groundfx_state::coin_word_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
@@ -93,21 +93,20 @@ WRITE8_MEMBER(groundfx_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */
+void groundfx_state::rotate_control_w(offs_t offset, u16 data) /* only a guess that it's rotation */
 {
-		if (ACCESSING_BITS_0_15)
-		{
-			m_rotate_ctrl[m_port_sel] = data;
-			return;
-		}
-
-		if (ACCESSING_BITS_16_31)
-		{
-			m_port_sel = (data &0x70000) >> 16;
-		}
+	if (offset & 1)
+	{
+		m_rotate_ctrl[m_port_sel] = data;
+		return;
+	}
+	else
+	{
+		m_port_sel = data & 0x7;
+	}
 }
 
-WRITE32_MEMBER(groundfx_state::motor_control_w)
+void groundfx_state::motor_control_w(u32 data)
 {
 /*
     Standard value poked is 0x00910200 (we ignore lsb and msb
@@ -187,13 +186,12 @@ INPUT_PORTS_END
 static const gfx_layout tile16x16_layout =
 {
 	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,5),
 	5,  /* 5 bits per pixel */
-	{ RGN_FRAC(1,2), 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	64*16   /* every sprite takes 128 consecutive bytes */
+	{ 0, RGN_FRAC(1,5), RGN_FRAC(2,5), RGN_FRAC(3,5), RGN_FRAC(4,5) },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout charlayout =
@@ -201,10 +199,10 @@ static const gfx_layout charlayout =
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,        /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8     /* every sprite takes 128 consecutive bytes */
+	{ STEP4(0,1) },
+	{ STEP8(7*4,-4), STEP8(15*4,-4) },
+	{ STEP16(0,16*4) },
+	16*16*4     /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout scclayout =
@@ -212,9 +210,9 @@ static const gfx_layout scclayout =
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,2),
 	6,      /* 4 bits per pixel */
-	{ RGN_FRAC(1,2), RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ RGN_FRAC(1,2), RGN_FRAC(1,2)+1, STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -238,7 +236,7 @@ INTERRUPT_GEN_MEMBER(groundfx_state::interrupt)
 void groundfx_state::groundfx(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(40'000'000)/2); /* 20MHz - verified */
+	M68EC020(config, m_maincpu, XTAL(40'000'000) / 2); /* 20MHz - verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &groundfx_state::groundfx_map);
 	m_maincpu->set_vblank_int("screen", FUNC(groundfx_state::interrupt));
 
@@ -306,23 +304,23 @@ ROM_START( groundfx )
 	ROM_LOAD16_BYTE( "d51-30.56", 0x100001, 0x40000,  CRC(45f339fe) SHA1(cc7adfb2b86070f5bb426542e3b7ed2a50b3c39e) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "d51-08.35", 0x000000, 0x200000, CRC(835b7a0f) SHA1(0131fceabd73b0045b5d4ae0bb2f03efdd407962) )    /* SCR 16x16 tiles */
-	ROM_LOAD16_BYTE( "d51-09.34", 0x000001, 0x200000, CRC(6dabd83d) SHA1(3dbd7ea36b9900faa6420af1f1600efe295db74c) )
+	ROM_LOAD32_WORD_SWAP( "d51-08.35", 0x000002, 0x200000, CRC(835b7a0f) SHA1(0131fceabd73b0045b5d4ae0bb2f03efdd407962) )    /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD_SWAP( "d51-09.34", 0x000000, 0x200000, CRC(6dabd83d) SHA1(3dbd7ea36b9900faa6420af1f1600efe295db74c) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d51-03.47", 0x800000, 0x200000, CRC(629a5c99) SHA1(cfc1c0b07ecefd6eddb83edcbcf710e8b8de19e4) )    /* OBJ 16x16 tiles */
-	ROM_LOAD32_BYTE( "d51-04.48", 0x000000, 0x200000, CRC(f49b14b7) SHA1(31129771159c1295a074c8311344ece525302289) )
-	ROM_LOAD32_BYTE( "d51-05.49", 0x000001, 0x200000, CRC(3a2e2cbf) SHA1(ed2c1ca9211b1d70b4767a54e08263a3e4867199) )
-	ROM_LOAD32_BYTE( "d51-06.50", 0x000002, 0x200000, CRC(d33ce2a0) SHA1(92c4504344672ea798cd6dd34f4b46848bf9f82b) )
-	ROM_LOAD32_BYTE( "d51-07.51", 0x000003, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
+	ROM_REGION( 0xa00000, "gfx2", 0 )
+	ROM_LOAD16_WORD_SWAP( "d51-03.47", 0x000000, 0x200000, CRC(629a5c99) SHA1(cfc1c0b07ecefd6eddb83edcbcf710e8b8de19e4) )    /* OBJ 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "d51-04.48", 0x200000, 0x200000, CRC(f49b14b7) SHA1(31129771159c1295a074c8311344ece525302289) )
+	ROM_LOAD16_WORD_SWAP( "d51-05.49", 0x400000, 0x200000, CRC(3a2e2cbf) SHA1(ed2c1ca9211b1d70b4767a54e08263a3e4867199) )
+	ROM_LOAD16_WORD_SWAP( "d51-06.50", 0x600000, 0x200000, CRC(d33ce2a0) SHA1(92c4504344672ea798cd6dd34f4b46848bf9f82b) )
+	ROM_LOAD16_WORD_SWAP( "d51-07.51", 0x800000, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* SCC 8x8 tiles, 6bpp */
-	ROM_LOAD16_BYTE( "d51-11.96", 0x000001, 0x100000, CRC(fee5f5c6) SHA1(1be88747f9c71c348dd61a8f0040007df3a3e6a6) )
+	ROM_LOAD16_BYTE( "d51-10.95", 0x000001, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* SCC 8x8 tiles, 6bpp */
+	ROM_LOAD16_BYTE( "d51-11.96", 0x000000, 0x100000, CRC(fee5f5c6) SHA1(1be88747f9c71c348dd61a8f0040007df3a3e6a6) )
 	ROM_LOAD       ( "d51-12.97", 0x300000, 0x100000, CRC(d630287b) SHA1(2fa09e1821b7280d193ca9a2a270759c3c3189d1) )
 	ROM_FILL       (              0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d51-13.7", 0x00000,  0x80000,  CRC(36921b8b) SHA1(2130120f78a3b984618a53054fc937cf727177b9) ) /* STY, spritemap */
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
@@ -343,40 +341,40 @@ READ32_MEMBER(groundfx_state::irq_speedup_r)
 {
 	int ptr;
 	offs_t sp = m_maincpu->sp();
-	if ((sp&2)==0) ptr=m_ram[(sp&0x1ffff)/4];
-	else ptr=(((m_ram[(sp&0x1ffff)/4])&0x1ffff)<<16) |
-	(m_ram[((sp&0x1ffff)/4)+1]>>16);
+	if ((sp & 2) == 0) ptr = m_ram[(sp & 0x1ffff) / 4];
+	else ptr = (((m_ram[(sp & 0x1ffff) / 4]) & 0x1ffff) << 16) |
+	(m_ram[((sp & 0x1ffff) / 4) + 1] >> 16);
 
-	if (m_maincpu->pc()==0x1ece && ptr==0x1b9a)
+	if (m_maincpu->pc() == 0x1ece && ptr == 0x1b9a)
 		m_maincpu->spin_until_interrupt();
 
-	return m_ram[0xb574/4];
+	return m_ram[0xb574 / 4];
 }
 
 
 void groundfx_state::init_groundfx()
 {
-	uint8_t *gfx = memregion("gfx3")->base();
-	int size = memregion("gfx3")->bytes();
+	u8 *gfx = memregion("gfx3")->base();
+	const u32 size = memregion("gfx3")->bytes();
 
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
 
 	/* make SCC tile GFX format suitable for gfxdecode */
-	uint32_t offset = size/2;
-	for (uint32_t i = size/2 + size/4; i < size; i++)
+	u32 offset = size/2;
+	for (u32 i = size/2 + size / 4; i < size; i++)
 	{
 		/* Expand 2bits into 4bits format */
-		int data = gfx[i];
-		int d1 = (data>>0) & 3;
-		int d2 = (data>>2) & 3;
-		int d3 = (data>>4) & 3;
-		int d4 = (data>>6) & 3;
+		const u8 data = gfx[i];
+		const u8 d1 = (data >> 0) & 3;
+		const u8 d2 = (data >> 2) & 3;
+		const u8 d3 = (data >> 4) & 3;
+		const u8 d4 = (data >> 6) & 3;
 
-		gfx[offset] = (d1<<2) | (d2<<6);
+		gfx[offset] = (d3 << 2) | (d4 << 6);
 		offset++;
 
-		gfx[offset] = (d3<<2) | (d4<<6);
+		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
 	}
 }
