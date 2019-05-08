@@ -324,11 +324,9 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 
 void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	u16 *spriteram16 = m_spriteram;
-
 	for (int offs = 0; offs < 0x400; offs += 4)
 	{
-		const u16 data = spriteram16[offs];
+		const u16 data = m_spriteram[offs];
 		if (!(data & 0x8000)) continue;
 
 		u8 cur_pri = 0;
@@ -336,7 +334,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		if (m_has_extended_priority)
 		{
-			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+			cur_pri = (m_spriteram[offs+1] & 0xc000) >> 14;
 
 			if (data & 0x0040)
 			{
@@ -368,7 +366,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		}
 		else
 		{
-			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+			cur_pri = (m_spriteram[offs+1] & 0xc000) >> 14;
 			pri_mask = m_sprite_pri_mask[cur_pri];
 			#if 0
 			static u8 pri_test;
@@ -419,7 +417,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			#endif
 		}
 
-		u32 sprite = spriteram16[offs+1];
+		u32 sprite = m_spriteram[offs+1];
 
 		sprite &= 0x3fff;
 
@@ -429,14 +427,14 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			{
 				sprite |= 0x4000;//tile banking,used in Denjin Makai
 			}
-			if (spriteram16[offs+3] & 0x8000)
+			if (m_spriteram[offs+3] & 0x8000)
 			{
 				sprite |= 0x8000;//tile banking?,used in Denjin Makai
 			}
 		}
 
-		int y = spriteram16[offs+3];
-		int x = spriteram16[offs+2];
+		int y = m_spriteram[offs+3];
+		int x = m_spriteram[offs+2];
 
 		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
 		   this doesn't work on denjin makai as the visible area is larger */
