@@ -182,7 +182,7 @@ READ16_MEMBER(slapshot_state::service_input_r)
 					(ioport("SERVICE")->read() & 0x10))  << 8;  /* IN3 + service switch */
 
 		default:
-			return m_tc0640fio->read(space, offset) << 8;
+			return m_tc0640fio->read(offset) << 8;
 	}
 }
 

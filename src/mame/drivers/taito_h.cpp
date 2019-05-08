@@ -165,7 +165,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
 	/* Bypass TC0040IOC controller for analog input */
 
-	u8 port = m_tc0040ioc->port_r(space, 0); /* read port number */
+	u8 port = m_tc0040ioc->port_r(); /* read port number */
 
 	switch (port)
 	{
@@ -206,7 +206,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 				return 0x00;
 
 		default:
-			return m_tc0040ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r();
 	}
 }
 
