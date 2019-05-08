@@ -370,6 +370,14 @@ void unsp_device::execute_fxxx_101_group(uint16_t op)
 inline void unsp_device::execute_fxxx_110_group(uint16_t op)
 {
 	//uint32_t len = 1;
+	
+	// some sources say this is FFc0, but smartfp clearly uses ff80
+	// EXTOP   1 1 1 1   1 1 1 1   1 0 0 0   0 0 0 0    (+16 bit imm)
+	if ((op == 0xff80) && m_iso >= 20)
+	{
+		return execute_extended_group(op);
+	}	
+	
 	//                         |   | |
 	// signed * signed  (size 16,1,2,3,4,5,6,7)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
@@ -383,11 +391,7 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 {
 	//uint32_t len = 1;
 	//                         |   | |
-	// EXTOP   1 1 1 1   1 1 1 1   1 1 0 0   0 0 0 0    (+16 bit imm)
-	if ((op == 0xffc0) && m_iso >= 20)
-	{
-		return execute_extended_group(op);
-	}
+
 
 	// signed * signed  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)

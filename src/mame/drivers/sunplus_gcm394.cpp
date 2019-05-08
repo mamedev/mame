@@ -57,7 +57,7 @@ void gcm394_game_state::base(machine_config &config)
 {
 	GCM394(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 
-	UNSP_12(config, m_maincpu, XTAL(27'000'000));
+	UNSP_20(config, m_maincpu, XTAL(27'000'000)); // code at 8019 uses extended opcode, so must be 2.0+?
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

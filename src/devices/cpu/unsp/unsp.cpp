@@ -146,7 +146,7 @@ std::unique_ptr<util::disasm_interface> unsp_12_device::create_disassembler()
 
 std::unique_ptr<util::disasm_interface> unsp_20_device::create_disassembler()
 {
-	return std::make_unique<unsp_12_disassembler>();
+	return std::make_unique<unsp_20_disassembler>();
 }
 
 void unsp_device::unimplemented_opcode(uint16_t op)
