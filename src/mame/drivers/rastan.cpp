@@ -164,6 +164,7 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -393,7 +394,7 @@ void rastan_state::rastan(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_gfx_region(1);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

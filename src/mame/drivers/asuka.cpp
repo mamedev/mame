@@ -884,7 +884,7 @@ void asuka_state::bonzeadv(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag(m_tc0110pcr);
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
@@ -943,7 +943,7 @@ void asuka_state::asuka(machine_config &config)
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(1);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag(m_tc0110pcr);
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
@@ -1014,7 +1014,7 @@ void asuka_state::cadash(machine_config &config)
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(1);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag(m_tc0110pcr);
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
@@ -1073,7 +1073,7 @@ void asuka_state::mofflott(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag(m_tc0110pcr);
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
@@ -1140,7 +1140,7 @@ void asuka_state::eto(machine_config &config)
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag(m_tc0110pcr);
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
