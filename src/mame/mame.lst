@@ -2398,15 +2398,20 @@ at386                           // 19?? IBM AT 386
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
+c286lt							// 1990 Commodore Laptop 286-LT
+csl286							// Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
+c386sxlt						// 1992 Commodore Laptop C386SX-LT
 pc30iii                         // Commodore PC 30-III
 pc40iii                         // Commodore PC 40-III
+pc45iii							// Commodore PC 45-III
+pc50ii							// Commodore PC 50-II
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
-pcd2                            // Siemens PCD-2
+pcd2                            // 1986 Siemens PCD-2
 ct386sx                         //
 ec1842                          //
 ec1849                          //
@@ -2418,6 +2423,7 @@ ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
+m290							// Olivetti M290
 megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
@@ -9800,6 +9806,7 @@ mj3c                            // 2005.11 Sega Network Taisen Mahjong MJ 3 (Rev
 mj3d                            // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev D)
 mj3evo                          // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
 mj3evoa                         // 2007.02 Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)
+mj3evoup                        // 2006.12 Sega Network Taisen Mahjong MJ 3 Evolution Firmware Update (GDX-0023)
 ollie                           // 2004.03 Ollie King
 outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2stjo                       // 2004.09 Outrun 2 Special Tours (Japan)
@@ -15121,6 +15128,7 @@ gnw_bfight                      // Nintendo
 gnw_bjack                       // Nintendo
 gnw_boxing                      // Nintendo
 gnw_climber                     // Nintendo
+gnw_climbcs                     // Nintendo
 gnw_dkjr                        // Nintendo
 gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
@@ -18618,9 +18626,6 @@ spelunkrj                       // (c) 1985 licensed from Broderbund
 yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
 
-@source:spartanxtec.cpp
-spartanxtec
-
 @source:m63.cpp
 atomboy                         // M63 (c) 1985 Irem + Memetron license
 atomboya                        // M63 (c) 1985 Irem + Memetron license
@@ -18969,6 +18974,9 @@ excthour                        // TA-0015 (c) 1985 + Taito license
 maniach                         // TA-0017 (c) 1986 + Taito America license
 maniach2                        // TA-0017 (c) 1986 + Taito America license
 matmania                        // TA-0015 (c) 1985 + Taito America license
+
+@source:mattelchess.cpp
+mchess
 
 @source:maxaflex.cpp
 maxaflex                        //
@@ -29775,6 +29783,7 @@ meltyb                          // 2007.03 Melty Blood Act Cadenza Version B2 (R
 meltybld                        // 2005.08 Melty Blood Act Cadenza Ver. A (Rev C)
 meltyblo                        // 2005.03 Melty Blood Act Cadenza
 meltybo                         // 2006.12 Melty Blood Act Cadenza Version B
+mj1                             // 2002.10 Sega Yonin Uchi Mahjong MJ (Update Disc Ver.1.008) (CDP-10002B)
 moeru                           // 2002.12 Moeru Casinyo
 mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
@@ -29864,6 +29873,7 @@ shorse                          // 2000.11.28 Star Horse (satellite)
 shorsem                         // 2000.??    Star Horse (main screens)
 shorsel                         // 2000.12    Star Horse (live and backup)
 shors2k1                        // 2002.01.09 Star Horse 2001 (satellite, Rev B)
+shors2k2                        // 2002.12.09 Star Horse 2002 (sound, Export/Taiwan)
 shorsep                         // 2003.12.01 Star Horse Progress (satellite, Rev A)
 shorsepm                        // 2003.??    Star Horse Progress (main screens, Rev B)
 shorseps                        // 2003.12.02 Star Horse Progress (sound & backup, Rev A)
@@ -30410,6 +30420,7 @@ turfmast                        // 0200 (c) 1996 Nazca
 twinspri                        // 0224 (c) 1996 ADK
 twsoc96                         // 0086 (c) 1996 Tecmo
 viewpoin                        // 0051 (c) 1992 Sammy
+viewpoinp                       //
 vliner                          //
 vliner7e                        //
 vliner6e                        //
@@ -35109,6 +35120,7 @@ deerhuntb                       // (c) 2000 Sammy USA Corporation
 deerhuntc                       // (c) 2000 Sammy USA Corporation
 deerhuntd                       // (c) 2000 Sammy USA Corporation
 deerhunte                       // (c) 2000 Sammy USA Corporation
+deerhuntj                       // (c) 2000 Sammy USA Corporation
 endrichs                        // (c) 199? E.N.Tiger
 funcube                         // (c) 2000 Namco
 funcube2                        // (c) 2001 Namco
@@ -35908,6 +35920,9 @@ starwarr                        // Potomac Mortgage
 
 @source:spaceg.cpp
 spaceg                          // (c) 19??
+
+@source:spartanxtec.cpp
+spartanxtec
 
 @source:spbactn.cpp
 spbactn                         // 9002 - (c) 1991 Tecmo

@@ -623,19 +623,18 @@ void othunder_state::othunder(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(othunder_state::screen_update));
-	screen.set_palette(m_palette);
+	screen.set_palette(m_tc0110pcr);
 	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_othunder);
-	PALETTE(config, m_palette).set_entries(4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_othunder);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

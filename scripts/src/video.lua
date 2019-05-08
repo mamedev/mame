@@ -816,6 +816,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/t6963c.h,VIDEOS["T6963C"] = true
+--------------------------------------------------
+
+if (VIDEOS["T6963C"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/t6963c.cpp",
+		MAME_DIR .. "src/devices/video/t6963c.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/t6a04.h,VIDEOS["T6A04"] = true
 --------------------------------------------------
 

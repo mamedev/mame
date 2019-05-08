@@ -360,6 +360,7 @@ VIDEOS["SED1330"] = true
 VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
 VIDEOS["STVVDP"] = true
+VIDEOS["T6963C"] = true
 VIDEOS["T6A04"] = true
 VIDEOS["TEA1002"] = true
 --VIDEOS["TLC34076"] = true
@@ -2512,6 +2513,7 @@ files {
 	MAME_DIR .. "src/mame/video/aquarius.cpp",
 	MAME_DIR .. "src/mame/drivers/juicebox.cpp",
 	MAME_DIR .. "src/mame/drivers/hyperscan.cpp",
+	MAME_DIR .. "src/mame/drivers/mattelchess.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "matsushi")

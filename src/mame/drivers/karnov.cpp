@@ -793,8 +793,6 @@ void karnov_state::karnov(machine_config &config)
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
 	DECO_KARNOVSPRITES(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(2);
-	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -870,8 +868,6 @@ void karnov_state::wndrplnt(machine_config &config)
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
 	DECO_KARNOVSPRITES(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(2);
-	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 

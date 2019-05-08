@@ -18,6 +18,7 @@ TODO:
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
+- confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
@@ -97,7 +98,7 @@ BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302*   mvs  SM511?  Donkey Kong 3
 HK-303*   mvs  SM511?  Donkey Kong Hockey
 YM-801*   cs   SM511   Super Mario Bros. (assume same ROM as nws version)
-DR-802*   cs   SM511   Climber            "
+DR-802    cs   SM511   Climber            "
 BF-803*   cs   SM511   Balloon Fight      "
 YM-901-S* x    SM511   Super Mario Bros.  "
 
@@ -3572,14 +3573,18 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Climber (model: see below)
-  * PCB label DR-106
-  * Sharp SM511 label DR-106 9038B (new wide screen version) (no decap)
+  Nintendo Game & Watch: Climber New Wide Screen (model DR-106),
+  Nintendo Game & Watch: Climber Crystal Screen (model DR-802)
+  * PCB label DR-106 (New Wide Screen), DR-802 (Crystal Screen)
+  * Sharp SM511
+     - label DR-106 9038B (new wide screen version) (no decap)
+     - label DR-802 8626A (crystal screen) (not dumped yet)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
   New Wide Screen in 1988 (model DR-106). The graphic LCD elements look the same
-  in both versions but the graphical background is slightly different.
+  in both versions but the display aspect ratio and the graphical background is
+  slightly different.
   Until further proof, it's assumed that the ROM is the same for both models.
 
 ***************************************************************************/
@@ -3592,6 +3597,7 @@ public:
 	{ }
 
 	void gnw_climber(machine_config &config);
+	void gnw_climbcs(machine_config &config);
 };
 
 // config
@@ -3647,6 +3653,16 @@ void gnw_climber_state::gnw_climber(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void gnw_climber_state::gnw_climbcs(machine_config &config)
+{
+	gnw_climber(config);
+
+	/* video hardware */
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(1756, 1080);
+	screen->set_visarea_full();
+}
+
 // roms
 
 ROM_START( gnw_climber )
@@ -3658,6 +3674,17 @@ ROM_START( gnw_climber )
 
 	ROM_REGION( 542332, "svg", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
+ROM_END
+
+ROM_START( gnw_climbcs )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) ) // dumped from NWS version
+
+	ROM_REGION( 564704, "svg", 0)
+	ROM_LOAD( "gnw_climbcs.svg", 0, 564704, CRC(60b25cc5) SHA1(1c101539a861257c5b0334ffdf9491c877759fa1) )
 ROM_END
 
 
@@ -9182,6 +9209,9 @@ CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_stat
 CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (new wide screen)", MACHINE_SUPPORTS_SAVE )
+
+// Nintendo G&W: crystal screen
+CONS( 1986, gnw_climbcs, gnw_climber,0, gnw_climbcs, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (crystal screen)", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )

@@ -1340,7 +1340,7 @@ ROM_START( gunlocko )
 	ROM_LOAD32_BYTE("scr0-2.ic38", 0x000001, 0x080000, CRC(e023c0f0) SHA1(e73c3ea44a3e8fef110ea20b6a1e8102efd0b2a9) ) //  Odd bytes of D66-07.IC49
 	ROM_LOAD32_BYTE("scr0-1.ic46", 0x000002, 0x080000, CRC(5f0cb8bf) SHA1(6e50ebce5c2346de4101c1dace75e9d65d9e6add) ) // Even bytes of D66-06.IC48
 	ROM_LOAD32_BYTE("scr0-3.ic44", 0x000003, 0x080000, CRC(37bbdbb9) SHA1(6ea2a36005494c45d38c44ddfc6236b2efb40962) ) // Even bytes of D66-07.IC49
-	ROM_LOAD       ("scr0-4.ic36", 0x300000, 0x080000, CRC(4f073d71) SHA1(9ac80922310fd9e7a0e59b5e1979c3cfa8cbf78b) )
+	ROM_LOAD16_BYTE("scr0-4.ic36", 0x300000, 0x080000, CRC(4f073d71) SHA1(9ac80922310fd9e7a0e59b5e1979c3cfa8cbf78b) ) // Even bytes of D66-08.IC50 (Odd bytes of D66-08.IC50 == 0xFF)
 	ROM_FILL       (               0x200000, 0x100000, 0x00 )
 
 	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 code */

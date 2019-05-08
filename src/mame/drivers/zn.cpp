@@ -2717,8 +2717,8 @@ void zn_state::coh1002msnd(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zn_state::cbaj_z80_map);
 	m_audiocpu->set_addrmap(AS_IO, &zn_state::cbaj_z80_port_map);
 
-	FIFO7200(config, m_cbaj_fifo[0], 0x400); // LH540202
-	FIFO7200(config, m_cbaj_fifo[1], 0x400); // "
+	IDT7202(config, m_cbaj_fifo[0]); // LH540202
+	IDT7202(config, m_cbaj_fifo[1]); // "
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 

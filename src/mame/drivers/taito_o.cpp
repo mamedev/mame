@@ -42,9 +42,9 @@ TODO:
 
 static const int clear_hack = 1;
 
-WRITE16_MEMBER(taitoo_state::io_w)
+void taitoo_state::io_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	switch(offset)
+	switch (offset)
 	{
 		case 2: m_watchdog->watchdog_reset(); break;
 
@@ -52,14 +52,14 @@ WRITE16_MEMBER(taitoo_state::io_w)
 	}
 }
 
-READ16_MEMBER(taitoo_state::io_r)
+u16 taitoo_state::io_r(offs_t offset, u16 mem_mask)
 {
-	int retval = 0;
+	u16 retval = 0;
 
-	switch(offset)
+	switch (offset)
 	{
-		case 0: retval = ioport("IN0")->read() & (clear_hack ? 0xf7ff : 0xffff); break;
-		case 1: retval = ioport("IN1")->read() & (clear_hack ? 0xfff7 : 0xffff); break;
+		case 0: retval = m_io_in[0]->read() & (clear_hack ? 0xf7ff : 0xffff); break;
+		case 1: retval = m_io_in[1]->read() & (clear_hack ? 0xfff7 : 0xffff); break;
 		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, m_maincpu->pc());
 	}
 	return retval;
@@ -196,21 +196,12 @@ INPUT_PORTS_END
 static const gfx_layout parentj_layout =
 {
 	16,16,
-	RGN_FRAC(1,8),
+	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ RGN_FRAC(7,8)+4, RGN_FRAC(7,8)+0,
-		RGN_FRAC(6,8)+4, RGN_FRAC(6,8)+0,
-		RGN_FRAC(5,8)+4, RGN_FRAC(5,8)+0,
-		RGN_FRAC(4,8)+4, RGN_FRAC(4,8)+0,
-		RGN_FRAC(3,8)+4, RGN_FRAC(3,8)+0,
-		RGN_FRAC(2,8)+4, RGN_FRAC(2,8)+0,
-		RGN_FRAC(1,8)+4, RGN_FRAC(1,8)+0,
-		RGN_FRAC(0,8)+4, RGN_FRAC(0,8)+0
-		},
-	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120},
-
-	1*128
+	{ STEP4(0,1) },
+	{ STEP16(15*4, -4) },
+	{ STEP16(0, 16*4) },
+	16*16*4
 };
 
 static GFXDECODE_START( gfx_parentj )
@@ -246,7 +237,7 @@ void taitoo_state::parentj(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*16, 64*16);
 	screen.set_visarea(0*16, 32*16-1, 3*16, 31*16-1);
-	screen.set_screen_update(FUNC(taitoo_state::screen_update_parentj));
+	screen.set_screen_update(FUNC(taitoo_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_parentj);
@@ -273,17 +264,17 @@ ROM_START( parentj )
 	ROM_LOAD16_BYTE( "c42-12.20", 0x00001, 0x10000, CRC(8654b0ab) SHA1(edd23a731c1c60cab353e51ef5e66d33bc3fde61) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "c42-05.06", 0x00000, 0x20000, CRC(7af0d45d) SHA1(bc527b74185596e4e77b34d08eb3e1678614b451) )
-	ROM_LOAD( "c42-04.05", 0x20000, 0x20000, CRC(133009a1) SHA1(fae5dd600384790225c24a62d1f8a00f0366dae9) )
-	ROM_LOAD( "c42-09.13", 0x40000, 0x20000, CRC(ba35fb03) SHA1(b76e50d298ccc0f230c865b563cd8e02866a4ffb) )
-	ROM_LOAD( "c42-08.12", 0x60000, 0x20000, CRC(7fae35a7) SHA1(f4bc6c6fd4afc167eb36b8f16589e1bfd729085e) )
-	ROM_LOAD( "c42-07.10", 0x80000, 0x20000, CRC(f92c6f03) SHA1(ff42318ee425b423b67e2cec1fe3ef9d9785ebf6) )
-	ROM_LOAD( "c42-06.09", 0xa0000, 0x20000, CRC(3685febd) SHA1(637946377f6d934f791d52e9790c91f60a5b2c65) )
-	ROM_LOAD( "c42-11.17", 0xc0000, 0x20000, CRC(5d8d3c59) SHA1(c8a8a957ac9f2f1c346b4504495893c71fbfe14b) )
-	ROM_LOAD( "c42-10.16", 0xe0000, 0x20000, CRC(e85e536e) SHA1(9ed9e316869333338e39cb0d1293e3380861a3ca) )
+	ROM_LOAD64_BYTE( "c42-05.06", 0x00000, 0x20000, CRC(7af0d45d) SHA1(bc527b74185596e4e77b34d08eb3e1678614b451) )
+	ROM_LOAD64_BYTE( "c42-04.05", 0x00001, 0x20000, CRC(133009a1) SHA1(fae5dd600384790225c24a62d1f8a00f0366dae9) )
+	ROM_LOAD64_BYTE( "c42-09.13", 0x00002, 0x20000, CRC(ba35fb03) SHA1(b76e50d298ccc0f230c865b563cd8e02866a4ffb) )
+	ROM_LOAD64_BYTE( "c42-08.12", 0x00003, 0x20000, CRC(7fae35a7) SHA1(f4bc6c6fd4afc167eb36b8f16589e1bfd729085e) )
+	ROM_LOAD64_BYTE( "c42-07.10", 0x00004, 0x20000, CRC(f92c6f03) SHA1(ff42318ee425b423b67e2cec1fe3ef9d9785ebf6) )
+	ROM_LOAD64_BYTE( "c42-06.09", 0x00005, 0x20000, CRC(3685febd) SHA1(637946377f6d934f791d52e9790c91f60a5b2c65) )
+	ROM_LOAD64_BYTE( "c42-11.17", 0x00006, 0x20000, CRC(5d8d3c59) SHA1(c8a8a957ac9f2f1c346b4504495893c71fbfe14b) )
+	ROM_LOAD64_BYTE( "c42-10.16", 0x00007, 0x20000, CRC(e85e536e) SHA1(9ed9e316869333338e39cb0d1293e3380861a3ca) )
 
 	ROM_REGION( 0x2dd, "misc", 0 )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -477,8 +477,8 @@ void netlist_t::print_stats() const
 		log().verbose("Total time     {1:15}", total_time);
 
 		// FIXME: clang complains about unreachable code without
-		const auto dummy = USE_QUEUE_STATS;
-		if (dummy)
+		const auto clang_workaround_unreachable_code = USE_QUEUE_STATS;
+		if (clang_workaround_unreachable_code)
 		{
 			/* Only one serialization should be counted in total time */
 			/* But two are contained in m_stat_mainloop */
@@ -837,8 +837,9 @@ detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &anam
 {
 }
 
-analog_t::analog_t(core_device_t &dev, const pstring &aname, const state_e state)
-: core_terminal_t(dev, aname, state)
+analog_t::analog_t(core_device_t &dev, const pstring &aname, const state_e state,
+	nldelegate delegate)
+: core_terminal_t(dev, aname, state, delegate)
 {
 }
 
@@ -912,8 +913,9 @@ void logic_output_t::initial(const netlist_sig_t val)
 // analog_input_t
 // ----------------------------------------------------------------------------------------
 
-analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, STATE_INP_ACTIVE)
+analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname,
+	nldelegate delegate)
+: analog_t(dev, aname, STATE_INP_ACTIVE, delegate)
 {
 	state().setup().register_term(*this);
 }

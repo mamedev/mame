@@ -428,15 +428,19 @@ namespace devices
 	// power pins - not a device, but a helper
 	// -----------------------------------------------------------------------------
 
+	/**
+	 * Power Pins are passive inputs. Delegate noop will silently ignore any
+	 * updates.
+	 */
 	class nld_power_pins
 	{
 	public:
-		nld_power_pins(device_t &owner, const char *sVCC = "VCC", const char *sGND = "GND")
+		nld_power_pins(device_t &owner, const char *sVCC = "VCC", const char *sGND = "GND", bool force_analog_input = false)
 		{
-			if (owner.setup().is_validation())
+			if (owner.setup().is_validation() || force_analog_input)
 			{
-				m_GND = plib::make_unique<analog_input_t>(owner, sGND);
-				m_VCC = plib::make_unique<analog_input_t>(owner, sVCC);
+				m_GND = plib::make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
+				m_VCC = plib::make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
 			}
 			else
 			{
@@ -446,11 +450,16 @@ namespace devices
 			}
 		}
 
+		/* FIXME: this will seg-fault if force_analog_input = false */
+		nl_double VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
+		nl_double GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
+
 		NETLIB_SUBXX(analog, R) m_RVG; // dummy resistor between VCC and GND
 
 	private:
-		plib::unique_ptr<analog_input_t> m_VCC; // only used during validation
-		plib::unique_ptr<analog_input_t> m_GND; // only used during validation
+		void noop() { }
+		plib::unique_ptr<analog_input_t> m_VCC; // only used during validation or force_analog_input
+		plib::unique_ptr<analog_input_t> m_GND; // only used during validation or force_analog_input
 	};
 
 } //namespace devices

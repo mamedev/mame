@@ -1402,6 +1402,8 @@ void homedata_state::mjikaga(machine_config &config)
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::mjikaga_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &homedata_state::mjikaga_upd7807_map);
+
+	config.m_minimum_quantum = attotime::from_hz(9000); // boost synch a bit more, otherwise the game fails to start
 }
 
 static INPUT_PORTS_START( mirderby )

@@ -30,8 +30,7 @@ public:
 		m_tc0110pcr(*this, "tc0110pcr_%u", 1),
 		m_2610_l(*this, "2610.%u.l", 1),
 		m_2610_r(*this, "2610.%u.r", 1),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode_%u", 1),
 		m_spriteram(*this, "spriteram"),
 		m_z80bank(*this, "z80bank")
 	{ }
@@ -48,8 +47,7 @@ private:
 	required_device_array<tc0110pcr_device, 3> m_tc0110pcr;
 	required_device_array<filter_volume_device, 2> m_2610_l;
 	required_device_array<filter_volume_device, 2> m_2610_r;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	required_device_array<gfxdecode_device, 3> m_gfxdecode;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -74,8 +72,8 @@ private:
 	uint32_t screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
-	void parse_control(  );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs, int chip);
+	void parse_control();
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
 	void darius2_master_map(address_map &map);
 	void darius2_slave_map(address_map &map);

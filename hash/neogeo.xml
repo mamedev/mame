@@ -2781,7 +2781,44 @@
 		</part>
 	</software>
 
-
+	<software name="viewpoinp" cloneof="viewpoin"> <!-- crashes during stage 4 on real hardware (but stage 5 can be loaded with memcard) -->
+		<description>Viewpoint (prototype)</description>
+		<year>1992</year>
+		<publisher>Sammy / Aicom</publisher>
+		<info name="alt_title" value="ビューポイント"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="p1" offset="0x000001" size="0x080000" crc="0adb5eee" sha1="1766652601cfb69b227aa0a9cecb7039b45c19b5" />
+				<rom loadflag="load16_byte" name="p2" offset="0x000000" size="0x080000" crc="31129194" sha1="b088a0d400808a75a95895083845defdc01ed531" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1" crc="9fea5758" sha1="5c6f01da89f2639cf741ee7c39e27023b8083052" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="m1" crc="8e69f29a" sha1="7a25f4997996434ea1b7d0d1ca9e7aaf966cbd03" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x400000">
+				<rom name="v1" offset="0x000000" size="0x100000" crc="7e9af736" sha1="0a47080d48bf220f7388fa1338924b6b94149c33" />
+				<rom name="v2" offset="0x100000" size="0x100000" crc="503a9c51" sha1="2ecfe6c0cf348a01121399176bb84bf6a6ff2a45" />
+				<rom name="v3" offset="0x200000" size="0x100000" crc="dfa8d079" sha1="d33f94bd132aa7d5b953cc1be8c2bb22f63bd13c" />
+				<rom name="v4" offset="0x300000" size="0x100000" crc="612b9292" sha1="edf407150997a83c2d003be972e1f9dc781b07d1" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte --> <!-- the actual GFX are the same, but there's no gap between 0x200000-0x3fffff on the prototype, and the data pointers in the program ROM differ because of this -->
+				<rom loadflag="load32_byte" name="c1" offset="0x000000" size="0x080000" crc="97a3183b" sha1="2531681c28f39adc9de2dc360970c38b71fcf0d7" />
+				<rom loadflag="load32_byte" name="c2" offset="0x000002" size="0x080000" crc="f637667a" sha1="477d44f7d8505eecf97010343fd186681bbe3318" />
+				<rom loadflag="load32_byte" name="c3" offset="0x000001" size="0x080000" crc="b017d2d1" sha1="160bd4f3f4c09a244a9cfdd076f37299ec0ae4d5" />
+				<rom loadflag="load32_byte" name="c4" offset="0x000003" size="0x080000" crc="10f1624a" sha1="762fd106886c7f13cb29c97c3a3af9fbd6b30405" />
+				<rom loadflag="load32_byte" name="c5" offset="0x200000" size="0x080000" crc="714a8bc4" sha1="5f69a7e6acaf6916d76f3de6465a5b548d90af68" />
+				<rom loadflag="load32_byte" name="c6" offset="0x200002" size="0x080000" crc="5bc32495" sha1="d9e2635de3fe60d4adcc11d4acde2d613808c0b8" />
+				<rom loadflag="load32_byte" name="c7" offset="0x200001" size="0x080000" crc="28a0a127" sha1="488fa8acd474cd357e3d18043341bc7b5a1a654e" />
+				<rom loadflag="load32_byte" name="c8" offset="0x200003" size="0x080000" crc="439c9036" sha1="7a5b965ceab9343ece3b6d02cc6dbfc83ec67f04" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!--
 	ID-0052
 	. NGM-052
