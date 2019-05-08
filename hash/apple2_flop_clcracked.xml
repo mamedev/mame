@@ -6745,50 +6745,91 @@
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Associated nouns"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 1 - associated nouns.dsk" size="143360" crc="f1a01aa0" sha1="3495ec57e11c6190c46a50f42f62c4a5e6a4bc4d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Categories"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 2 - categories.dsk" size="143360" crc="6f36bcdd" sha1="e4648d1bce5ffb5e69bf0ccceaa6f97efa368820" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Modifiers"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 3 - modifiers.dsk" size="143360" crc="81f40b72" sha1="5c2f1c5d3ed4258e1027a8000b9968faf3f46e51" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Synonyms"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 4 - synonyms.dsk" size="143360" crc="ec2269ef" sha1="12316fcbb24bf237eb58166980e2c12dc3d9fa5d" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Antonyms"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 5 - antonyms.dsk" size="143360" crc="9bfb9dee" sha1="a0da31699c0b05d188eaf9bcc145ba70e9d216a8" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Non-associated nouns"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 6 - non-associated nouns.dsk" size="143360" crc="d236a387" sha1="66c5ac4d58787c22a9985359d494a602b1fdd477" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7 - Closure"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 7 - closure.dsk" size="143360" crc="eaddca8e" sha1="ed876474a2ab6cb78f9aba3f8b96f127f0705567" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8 - Yes/No Questions"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 8 - yes-no questions.dsk" size="143360" crc="615850be" sha1="b0eba97c4f6494400bc447a9751b18e76ea615fd" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9 - Definitions"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computerized reading for aphasics (4am crack) disk 9 - definitions.dsk" size="143360" crc="c13b6285" sha1="d4579e3fa09fb2d3989354238b9b4ae0cb69eb7f" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="7ctygold">
+		<description>Seven Cities of Gold (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2017-03-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="seven cities of gold (4am and san inc crack) side a.dsk" size="143360" crc="f9566cfe" sha1="ed194e27de65d7ec89e59834ceab579f92735900" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="seven cities of gold (4am and san inc crack) side b.dsk" size="143360" crc="5456b895" sha1="4fc6b15de84729ee06594b485e28b8da647f506b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stkybpr2">
+		<description>Stickybear Printer (Revision 2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2017-11-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stickybear printer rev. 2 (4am crack).dsk" size="143360" crc="692399fc" sha1="ceb1b6572b82e064a3ead8a3f61b41239d3bf4bd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
