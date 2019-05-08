@@ -42,6 +42,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 	}
 	case 0x02:
 	{
+		// register decoding could be incorrect here
+
 		// Ext Push/Pop
 		if (ximm & 0x8000)
 		{
