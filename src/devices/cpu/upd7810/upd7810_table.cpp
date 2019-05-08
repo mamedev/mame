@@ -812,7 +812,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_op4D[256] =
 	{&upd7810_device::illegal2,      2,10,10,L0|L1}, /* e2: 0100 1101 1110 0010                      */
 	{&upd7810_device::illegal2,      2,10,10,L0|L1}, /* e3: 0100 1101 1110 0011                      */
 	{&upd7810_device::illegal2,      2,10,10,L0|L1}, /* e4: 0100 1101 1110 0100                      */
-	{&upd7810_device::illegal2,      2,10,10,L0|L1}, /* e5: 0100 1101 1110 0101                      */
+	{&upd7810_device::MOV_MT_A,      2,10,10,L0|L1}, /* e5: 0100 1101 1110 0101                      */  /* 7807 */
 	{&upd7810_device::illegal2,      2,10,10,L0|L1}, /* e6: 0100 1101 1110 0110                      */
 	{&upd7810_device::illegal2,      2,10,10,L0|L1}, /* e7: 0100 1101 1110 0111                      */
 	{&upd7810_device::MOV_ZCM_A,     2,10,10,L0|L1}, /* e8: 0100 1101 1110 1000                      */

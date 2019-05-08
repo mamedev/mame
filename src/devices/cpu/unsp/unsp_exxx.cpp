@@ -150,9 +150,54 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		uint8_t rd =    (op & 0x0e00) >> 9;
 		uint8_t shift = (op & 0x0070) >> 4;
 		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s = %s %s %s\n", regs[rd], regs[rd], lsft[shift], regs[rs]);
-		unimplemented_opcode(op);
-		return;
+
+		switch (shift)
+		{
+		case 0x00:
+			logerror("%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
+			unimplemented_opcode(op);
+			return;
+
+		case 0x01:
+			logerror("%s = %s asror %s\n", regs[rd], regs[rd], regs[rs]);
+			unimplemented_opcode(op);
+			return;
+
+		case 0x02:
+			logerror("%s = %s lsl %s\n", regs[rd], regs[rd], regs[rs]);
+			unimplemented_opcode(op);
+			return;
+
+		case 0x03:
+			logerror("%s = %s lslor %s\n", regs[rd], regs[rd], regs[rs]);
+			unimplemented_opcode(op);
+			return;
+
+		case 0x04:
+			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
+			logerror("%s = %s lsr %s  (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			m_core->m_r[rd] = m_core->m_r[rd] >> m_core->m_r[rs];
+			return;
+
+		case 0x05:
+		{
+			logerror("%s = %s lsror %s  (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			uint16_t tmp = m_core->m_r[rd];
+			m_core->m_r[rd] = m_core->m_r[rd] >> m_core->m_r[rs];
+			m_core->m_r[rd] |= tmp; // guess
+			return;
+		}
+
+		case 0x06:
+			logerror("%s = %s rol %s\n", regs[rd], regs[rd], regs[rs]);
+			unimplemented_opcode(op);
+			return;
+
+		case 0x07:
+			logerror("%s = %s ror %s\n", regs[rd], regs[rd], regs[rs]);
+			unimplemented_opcode(op);
+			return;
+		}
 	}
 
 	logerror("<DUNNO>\n");

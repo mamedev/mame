@@ -3194,21 +3194,20 @@ void taitoz_state::contcirc(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3265,21 +3264,20 @@ void taitoz_state::chasehq(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_chasehq);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3338,21 +3336,20 @@ void taitoz_state::enforce(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 31*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3572,21 +3569,20 @@ void taitoz_state::nightstr(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_chasehq);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3645,21 +3641,20 @@ void taitoz_state::aquajack(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3723,18 +3718,17 @@ void taitoz_state::spacegun(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

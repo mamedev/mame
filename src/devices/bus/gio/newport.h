@@ -12,7 +12,7 @@
 #include "gio.h"
 #include "screen.h"
 
-#define ENABLE_NEWVIEW_LOG      (1)
+#define ENABLE_NEWVIEW_LOG      (0)
 
 class newport_base_device : public device_t
                           , public device_palette_interface
@@ -108,6 +108,10 @@ protected:
 		int32_t m_y_start;
 		int32_t m_x_end;
 		int32_t m_y_end;
+        int16_t m_x_start_frac;
+        int16_t m_y_start_frac;
+        int16_t m_x_end_frac;
+        int16_t m_y_end_frac;
 		int16_t m_x_save;
 		uint32_t m_xy_move;
 		int16_t m_x_move;
@@ -158,7 +162,12 @@ protected:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint8_t m_xfer_width;
-		bool m_read_active;
+		uint8_t m_plane_enable;
+		uint8_t m_plane_depth;
+		uint32_t m_store_shift;
+		uint8_t m_src_blend;
+		uint8_t m_dst_blend;
+		uint8_t m_logic_op;
 	};
 
 	struct cmap_t
@@ -198,11 +207,21 @@ protected:
 
 	uint32_t get_rgb_color(int16_t x, int16_t y);
 
-	void do_v_iline(uint32_t color);
-	void do_h_iline(uint32_t color);
+    struct bresenham_octant_info_t
+    {
+        int16_t incrx1;
+        int16_t incrx2;
+        int16_t incry1;
+        int16_t incry2;
+        uint8_t loop;
+    };
+    uint8_t get_octant(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t dx, int16_t dy);
+    void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
+
 	uint32_t do_pixel_read();
 	uint64_t do_pixel_word_read();
+
 	void do_rex3_command();
 
 	vc2_t  m_vc2;

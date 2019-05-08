@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
-Based on taito_h.c
+Based on taito_h.cpp
 
 ***************************************************************************/
 
@@ -26,33 +26,28 @@ static const int zoomy_conv_table[] =
 };
 
 
-void taitoo_state::parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void taitoo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	static const int size[] = { 1, 2, 4, 4 };
-	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
-	int ysize;
-	int j, k;
-	int offs;                   /* sprite RAM offset */
-	int tile_offs;              /* sprite chain offset */
-	int zoomx, zoomy;           /* zoom value */
+	static const u8 size[] = { 1, 2, 4, 4 };
 
-	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
+	for (int offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
 		if (offs <  0x01b0 && priority == 0)    continue;
 		if (offs >= 0x01b0 && priority == 1)    continue;
 
-		x0        =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
-		y0        =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
-		zoomx     = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
-		zoomy     = (m_tc0080vco->sprram_r(offs + 2) & 0x007f);
-		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
-		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
+		int x0         =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
+		int y0         =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
+		int zoomx      = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
+		int zoomy      = (m_tc0080vco->sprram_r(offs + 2) & 0x007f);
+		u32 tile_offs  = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
+		const u8 ysize = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
+			int dx, dy, ex, ey, zx, zy;
 			/* Convert zoomy value to real value as zoomx */
 			zoomy = zoomy_conv_table[zoomy];
 
@@ -98,20 +93,18 @@ void taitoo_state::parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 				y0 += 2;
 			}
 
-			y = y0;
-			for (j = 0; j < ysize; j ++)
+			int y = y0;
+			for (int j = 0; j < ysize; j++)
 			{
-				x = x0;
-				for (k = 0; k < 4; k ++)
+				int x = x0;
+				for (int k = 0; k < 4; k++)
 				{
 					if (tile_offs >= 0x1000)
 					{
-						int tile, color, flipx, flipy;
-
-						tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
-						color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
-						flipx = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
-						flipy = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
+						const u32 tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+						const u32 color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+						int flipx       = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+						int flipy       = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
 						if (m_tc0080vco->flipscreen_r())
 						{
@@ -119,8 +112,7 @@ void taitoo_state::parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 							flipy ^= 0x0080;
 						}
 
-
-									m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
 									tile,
 									color,
 									flipx, flipy,
@@ -128,7 +120,7 @@ void taitoo_state::parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 									zx, zy, 0
 						);
 					}
-					tile_offs ++;
+					tile_offs++;
 					x += dx;
 				}
 				y += dy;
@@ -138,7 +130,7 @@ void taitoo_state::parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 }
 
 
-uint32_t taitoo_state::screen_update_parentj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tc0080vco->tilemap_update();
 
@@ -146,8 +138,8 @@ uint32_t taitoo_state::screen_update_parentj(screen_device &screen, bitmap_ind16
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 
-	parentj_draw_sprites(bitmap, cliprect, 0);
-	parentj_draw_sprites(bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 1);
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);

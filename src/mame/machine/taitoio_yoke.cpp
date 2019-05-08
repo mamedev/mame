@@ -37,6 +37,9 @@ DEFINE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device, "taitoio_yoke", "Taito I/O
 
 taitoio_yoke_device::taitoio_yoke_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITOIO_YOKE, tag, owner, clock)
+	, m_stick_x(*this, "STICK_X")
+	, m_stick_y(*this, "STICK_Y")
+	, m_throttle(*this, "THROTTLE")
 {
 }
 
@@ -82,59 +85,59 @@ ioport_constructor taitoio_yoke_device::device_input_ports() const
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( taitoio_yoke_device::stickx_r )
+u16 taitoio_yoke_device::stickx_r()
 {
-	return ioport("STICK_X")->read();
+	return m_stick_x->read();
 }
 
-READ16_MEMBER( taitoio_yoke_device::sticky_r )
+u16 taitoio_yoke_device::sticky_r()
 {
-	return ioport("STICK_Y")->read();
+	return m_stick_y->read();
 }
 
-READ16_MEMBER( taitoio_yoke_device::throttle_r )
+u16 taitoio_yoke_device::throttle_r()
 {
-	return ioport("THROTTLE")->read();
+	return m_throttle->read();
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::slot_down_r )
 {
-	uint16_t throttle = ioport("THROTTLE")->read();
+	uint16_t throttle = m_throttle->read();
 
 	return (throttle & 0xe00) == 0x600;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::slot_up_r )
 {
-	uint16_t throttle = ioport("THROTTLE")->read();
+	uint16_t throttle = m_throttle->read();
 
 	return (throttle & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_left_r )
 {
-	uint16_t x = ioport("STICK_X")->read();
+	uint16_t x = m_stick_x->read();
 
 	return (x & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_right_r )
 {
-	uint16_t x = ioport("STICK_X")->read();
+	uint16_t x = m_stick_x->read();
 
 	return (x & 0xe00) == 0x600;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_up_r )
 {
-	uint16_t y = ioport("STICK_Y")->read();
+	uint16_t y = m_stick_y->read();
 
 	return (y & 0xe00) == 0x800;
 }
 
 READ_LINE_MEMBER( taitoio_yoke_device::handle_down_r )
 {
-	uint16_t y = ioport("STICK_Y")->read();
+	uint16_t y = m_stick_y->read();
 
 	return (y & 0xe00) == 0x600;
 }

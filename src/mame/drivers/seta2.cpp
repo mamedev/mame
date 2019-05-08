@@ -4044,12 +4044,45 @@ NEW FEATURES
  * Player can now advance through all result screens faster by pulling gun trigger.
  * The Auto Select bird is now GOOSE (easiest target) if player fails to choose bird at start of game.
 
+Commonly labeled as either:
+
+Deer Hunting:
+ Deer Hunting USA       AS0907
+    U7 Ver 4.3      or  E05
+    2000.11.1           U7
+                        5D89
+
+For version 3:
+ Deer Hunting USA
+    U7 Ver 3.0
+    2000.5.31
+
+Two PCBs (serial numbers WH 00111 & WH 00001) from Japan were labeled as:
+
+  AS0      AS0
+  909E01 & 908E01     <-- Higher ROM numbers and purports to be E01 but shows Ver .4.4.1
+  U7 JDH   U6 JDH
+
+Turkey Hunting:
+    Turkey              ASX
+  U7 Ver 1.00       or  907E01
+     AB40               TH
+
+Wing Shooting Championship:
+     WSC                AS
+  U7 Ver. 2.00      or  1007
+     A48F               E03
+
+Trophy Hunting - Bear & Moose:
+    Trophy              AS
+  U7 Ver 1.00       or  1107
+    CEEF                E01
 ***************************************************************************/
 
 ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks version label conventions but is correct & verified */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as0906e05.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) ) /* checksum 694E printed on label */
-	ROM_LOAD16_BYTE( "as0907e05.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* checksum 5D89 printed on label */
+	ROM_LOAD16_BYTE( "as0906_e05_u6_694e.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) ) /* checksum 694E printed on label */
+	ROM_LOAD16_BYTE( "as0907_e05_u7_5d89.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* checksum 5D89 printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4063,8 +4096,8 @@ ROM_END
 
 ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as0906e04-v4_2.u06", 0x000000, 0x100000, CRC(bb3af36f) SHA1(f04071347e8ad361bf666fcb6c0136e522f19d47) ) /* checksum 6640 printed on label */
-	ROM_LOAD16_BYTE( "as0907e04-v4_2.u07", 0x000001, 0x100000, CRC(83f02117) SHA1(70fc2291bc93af3902aae88688be6a8078f7a07e) ) /* checksum 595A printed on label */
+	ROM_LOAD16_BYTE( "as0906_e04_u6_6640.u06", 0x000000, 0x100000, CRC(bb3af36f) SHA1(f04071347e8ad361bf666fcb6c0136e522f19d47) ) /* checksum 6640 printed on label */
+	ROM_LOAD16_BYTE( "as0907_e04_u7_595a.u07", 0x000001, 0x100000, CRC(83f02117) SHA1(70fc2291bc93af3902aae88688be6a8078f7a07e) ) /* checksum 595A printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4078,8 +4111,8 @@ ROM_END
 
 ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	ROM_REGION( 0x200000, "maincpu", 0 )        // TMP68301 Code
-	ROM_LOAD16_BYTE( "as0906e04.u06", 0x000000, 0x100000, CRC(07d9b64a) SHA1(f9aac644aab920bbac84b14836ee589ccd51f6db) ) /* checksum 7BBB printed on label */
-	ROM_LOAD16_BYTE( "as0907e04.u07", 0x000001, 0x100000, CRC(19973d08) SHA1(da1cc02ce480a62ccaf94d0af1246a340f054b43) ) /* checksum 4C78 printed on label */
+	ROM_LOAD16_BYTE( "as_0906_e04.u06", 0x000000, 0x100000, CRC(07d9b64a) SHA1(f9aac644aab920bbac84b14836ee589ccd51f6db) ) /* also commonly labeled as: Deer Hunting USA U6 Ver 4.0 2000.6.15 - SUM16 = 7BBB */
+	ROM_LOAD16_BYTE( "as_0907_e04.u07", 0x000001, 0x100000, CRC(19973d08) SHA1(da1cc02ce480a62ccaf94d0af1246a340f054b43) ) /* also commonly labeled as: Deer Hunting USA U7 Ver 4.0 2000.6.15 - SUM16 = 4C78 */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4095,8 +4128,8 @@ ROM_END
 
 ROM_START( deerhuntc ) /* These rom labels break label conventions but is correct & verified. Version in program code is listed as 0.00 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as0937e01.u06", 0x000000, 0x100000, CRC(8d74088e) SHA1(cb11ffaf4c0267cc8cbe01accc3daeed910a3af3) ) /* SUM16 = C2CD */
-	ROM_LOAD16_BYTE( "as0938e01.u07", 0x000001, 0x100000, CRC(c7657889) SHA1(4cc707c8abbc0862457375a9a910d3c338859193) ) /* SUM16 = 27D7 */
+	ROM_LOAD16_BYTE( "as_0937_e01.u06", 0x000000, 0x100000, CRC(8d74088e) SHA1(cb11ffaf4c0267cc8cbe01accc3daeed910a3af3) ) /* SUM16 = C2CD - same as version dated 2000.5.31? */
+	ROM_LOAD16_BYTE( "as_0938_e01.u07", 0x000001, 0x100000, CRC(c7657889) SHA1(4cc707c8abbc0862457375a9a910d3c338859193) ) /* SUM16 = 27D7 - same as version dated 2000.5.31?  */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4110,8 +4143,8 @@ ROM_END
 
 ROM_START( deerhuntd ) /* Deer Hunting USA V2.x - No version number is printed to screen but "E02" in EPROM label signifies V2 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as0906e02.u06", 0x000000, 0x100000, CRC(190cca42) SHA1(aef63f5e8c71ed0156b8b0104c5d23872c119167) ) /* Version in program code is listed as 0.00 */
-	ROM_LOAD16_BYTE( "as0907e02.u07", 0x000001, 0x100000, CRC(9de2b901) SHA1(d271bc54c41e30c0d9962eedd22f3ef2b7b8c9e5) ) /* Verified with two different sets of chips */
+	ROM_LOAD16_BYTE( "as_0906_e02.u06", 0x000000, 0x100000, CRC(190cca42) SHA1(aef63f5e8c71ed0156b8b0104c5d23872c119167) ) /* Version in program code is listed as 0.00 */
+	ROM_LOAD16_BYTE( "as_0907_e02.u07", 0x000001, 0x100000, CRC(9de2b901) SHA1(d271bc54c41e30c0d9962eedd22f3ef2b7b8c9e5) ) /* Verified with two different sets of chips */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4125,8 +4158,23 @@ ROM_END
 
 ROM_START( deerhunte ) /* Deer Hunting USA V1.x - No version number is printed to screen but "E01" in EPROM label signifies V1 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as0906e01.u06", 0x000000, 0x100000, CRC(103e3ba3) SHA1(677d912ea9ed2ee1f26cdcac1687ce8ef416a96f) ) /* Version in program code is listed as 0.00 */
-	ROM_LOAD16_BYTE( "as0907e01.u07", 0x000001, 0x100000, CRC(ddeb0f97) SHA1(a2578071f3506d69057d2256685b969adc50d275) ) /* Verified with two different sets of chips */
+	ROM_LOAD16_BYTE( "as_0906_e01.u06", 0x000000, 0x100000, CRC(103e3ba3) SHA1(677d912ea9ed2ee1f26cdcac1687ce8ef416a96f) ) /* Version in program code is listed as 0.00 */
+	ROM_LOAD16_BYTE( "as_0907_e01.u07", 0x000001, 0x100000, CRC(ddeb0f97) SHA1(a2578071f3506d69057d2256685b969adc50d275) ) /* Verified with two different sets of chips */
+
+	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+ROM_END
+
+ROM_START( deerhuntj ) /* Higher ROM labels indicate a specific version / region - No specific "For use in Japan" warning */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "as0_908e01_u6_jdh.u06", 0x000000, 0x100000, CRC(52f037da) SHA1(72afb4461be059655a2fe9b138e9feef19ecaa84) ) /* Version shows as VER .4.4.1 */
+	ROM_LOAD16_BYTE( "as0_909e01_u7_jdh.u07", 0x000001, 0x100000, CRC(b391bc87) SHA1(eb62e18b6ac9b0198911ec6684de73102c1d6df0) )
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4140,8 +4188,8 @@ ROM_END
 
 ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "asx906e01.u06", 0x000000, 0x100000, CRC(c96266e1) SHA1(0ca462b3b0f27198e36384eee6ea5c5d4e7e1293) ) /* checksum E510 printed on label */
-	ROM_LOAD16_BYTE( "asx907e01.u07", 0x000001, 0x100000, CRC(7c67b502) SHA1(6a0e8883a115dac4095d86897e7eca2a007a1c71) ) /* checksum AB40 printed on label */
+	ROM_LOAD16_BYTE( "asx_906e01_th.u06", 0x000000, 0x100000, CRC(c96266e1) SHA1(0ca462b3b0f27198e36384eee6ea5c5d4e7e1293) ) /* also commonly labeled as: Turkey U6 Ver 1.00 E510 */
+	ROM_LOAD16_BYTE( "asx_907e01_th.u07", 0x000001, 0x100000, CRC(7c67b502) SHA1(6a0e8883a115dac4095d86897e7eca2a007a1c71) ) /* also commonly labeled as: Turkey U7 Ver 1.00 AB40 */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "asx901m01.u38", 0x0000000, 0x800000, CRC(eabd3f44) SHA1(5a1ac986d11a8b019e18761cf4ea0a6f49fbdbfc) )
@@ -4153,10 +4201,10 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "asx905m01.u18", 0x000000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
 ROM_END
 
-ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
+ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) - The "E03" breaks version label conventions but is correct & verified */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* also commonly labeled as: WSC U6 Ver. 2.00 421E */
-	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* also commonly labeled as: WSC U7 Ver. 2.00 A48F */
+	ROM_LOAD16_BYTE( "as_1006_e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* also commonly labeled as: WSC U6 Ver 2.00 421E */
+	ROM_LOAD16_BYTE( "as_1007_e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* also commonly labeled as: WSC U7 Ver 2.00 A48F */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
@@ -4170,8 +4218,8 @@ ROM_END
 
 ROM_START( wschampa ) /* Wing Shooting Championship V1.01 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1006e02.u06", 0x000000, 0x100000, CRC(d3d3b2b5) SHA1(2d036d795b40a4ed78bb9f7751f875cfc76276a9) ) /* checksum 31EF printed on label */
-	ROM_LOAD16_BYTE( "as1007e02.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) ) /* checksum 615E printed on label */
+	ROM_LOAD16_BYTE( "as_1006_e02.u06", 0x000000, 0x100000, CRC(d3d3b2b5) SHA1(2d036d795b40a4ed78bb9f7751f875cfc76276a9) ) /* SUM16 = 31EF */
+	ROM_LOAD16_BYTE( "as_1007_e02.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) ) /* SUM16 = 615E */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
@@ -4200,8 +4248,8 @@ ROM_END
 
 ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all mask ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver. 1.00 D8DA */
-	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver. 1.00 CEEF */
+	ROM_LOAD16_BYTE( "as_1106_e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver 1.00 D8DA */
+	ROM_LOAD16_BYTE( "as_1107_e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver 1.00 CEEF */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as1101m01.u38", 0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) )
@@ -4366,6 +4414,7 @@ GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,
 GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V3",                                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuntj, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.4.1 (Japan)",                     MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.00",                            MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )

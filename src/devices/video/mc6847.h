@@ -13,7 +13,7 @@
 #pragma once
 
 #include "screen.h"
-
+#include <map>
 
 //**************************************************************************
 //  MC6847 CONFIGURATION / INTERFACE
@@ -179,8 +179,38 @@ protected:
 		// artifacting config
 		void setup_config(device_t *device);
 		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
+		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+		bool get_pal_artifacting() { return m_palartifacting; }
+		void create_color_blend_table( const pixel_t *palette );
 
 		// artifacting application
+		template<int xscale>
+		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
+		{
+			if( !m_artifacting || !m_palartifacting )
+				return;
+
+			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
+			{
+				pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
+				pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
+				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
+
+				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
+				{
+					if( line1[pixel] == line2[pixel] )
+						continue;
+
+					newColor = m_palcolorblendmap.find(std::pair<pixel_t,pixel_t>(line1[pixel],line2[pixel]));
+					if( newColor != m_palcolorblendmap.end() )
+					{
+						line1[pixel] = newColor->second;
+						line2[pixel] = newColor->second;
+					}
+				}
+			}
+		}
+
 		template<int xscale>
 		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
 		{
@@ -218,11 +248,15 @@ protected:
 		}
 
 	private:
+		bool m_palartifacting;
 		ioport_port *m_config;
 		ioport_value m_artifacting;
 		ioport_value m_saved_artifacting;
 		pixel_t m_saved_c0, m_saved_c1;
 		pixel_t m_expanded_colors[128];
+
+		// PAL color blend emulation values.
+		std::map<std::pair<pixel_t,pixel_t>,pixel_t> m_palcolorblendmap;
 
 		void update_colors(pixel_t c0, pixel_t c1);
 		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);

@@ -212,4 +212,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, cp2000, 0,      0, cp2000,  cp2000, cp2000_state, empty_init, "SciSys", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, cp2000, 0,      0, cp2000,  cp2000, cp2000_state, empty_init, "SciSys", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

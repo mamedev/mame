@@ -26,6 +26,7 @@
 #include "machine/ncr5380n.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "video/t6963c.h"
 #include "screen.h"
 #include "emupal.h"
 #include "softlist.h"
@@ -54,25 +55,10 @@ private:
 	required_device<address_map_bank_device> m_1m_bank;
 	required_shared_ptr<uint16_t> m_mainram;
 
-	DECLARE_READ16_MEMBER(lcd_r);
-	DECLARE_WRITE16_MEMBER(lcd_w);
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 
 	void k2000_palette(palette_device &palette) const;
 };
-
-// LCD controller is byte-wide, data at 0, status/control at 1.
-READ16_MEMBER(k2000_state::lcd_r)
-{
-	return 0x0b0b;
-}
-WRITE16_MEMBER(k2000_state::lcd_w)
-{
-	if (offset == 0)
-	{
-		printf("%c", data & 0x7f);
-	}
-}
 
 WRITE16_MEMBER(k2000_state::ctrl_w)
 {
@@ -98,7 +84,7 @@ void k2000_state::k2000_map(address_map &map)
 	// word writes to 000180 region - unknown
 	// word writes to 000240 region - unknown
 	map(0x000000, 0x1fffff).m(m_1m_bank, FUNC(address_map_bank_device::amap16));
-	map(0x700000, 0x700003).rw(FUNC(k2000_state::lcd_r), FUNC(k2000_state::lcd_w));
+	map(0x700000, 0x700003).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
 	map(0x7e0000, 0x7e0001).w(FUNC(k2000_state::ctrl_w));
 }
 
@@ -116,6 +102,8 @@ void k2000_state::k2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &k2000_state::k2000_map);
 
 	ADDRESS_MAP_BANK(config, "bank1m").set_map(&k2000_state::bank_map_1m).set_options(ENDIANNESS_BIG, 16, 24, 0x200000);
+
+	LM24014H(config, "lcd");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

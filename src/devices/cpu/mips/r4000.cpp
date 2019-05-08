@@ -21,7 +21,6 @@
  *   - it's very very very slow
  *
  * TODO
- *   - try to eliminate mode check in address calculations
  *   - find a better way to deal with software interrupts
  *   - enforce mode checks for cp1
  *   - cache instructions
@@ -79,7 +78,7 @@
 #define ODD_REGS 0x00010840U
 
 // address computation
-#define ADDR(r, o) (cp0_64() ? ((r) + (o)) : s64(s32((r) + (o))))
+#define ADDR(r, o) ((r) + (o))
 
 #define SR         m_cp0[CP0_Status]
 #define CAUSE      m_cp0[CP0_Cause]
@@ -404,22 +403,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 					}
 				}
 				else if (SYSCALL_MASK & SYSCALL_WINNT4)
-				{
-					switch (m_r[2])
-					{
-					case 0x4f:
-						load<s32>(m_r[7] + 8,
-							[this](s64 string_pointer)
-							{
-								LOGMASKED(LOG_SYSCALL, "NtOpenFile(%s) (%s)\n", debug_string(string_pointer), machine().describe_context());
-							});
-						break;
-
-					default:
-						LOGMASKED(LOG_SYSCALL, "syscall 0x%x (%s)\n", m_r[2], machine().describe_context());
-						break;
-					}
-				}
+					LOGMASKED(LOG_SYSCALL, "syscall 0x%02x from 0x%08x (%s)\n", m_r[2], u32(m_r[31] - 8), machine().describe_context());
 			}
 			cpu_exception(EXCEPTION_SYS);
 			break;
@@ -457,7 +441,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				m_lo = s64(s32(product));
 				m_hi = s64(s32(product >> 32));
-				m_icount -= 3;
 			}
 			break;
 		case 0x19: // MULTU
@@ -466,7 +449,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				m_lo = s64(s32(product));
 				m_hi = s64(s32(product >> 32));
-				m_icount -= 3;
 			}
 			break;
 		case 0x1a: // DIV
@@ -475,7 +457,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = s64(s32(m_r[RSREG]) / s32(m_r[RTREG]));
 				m_hi = s64(s32(m_r[RSREG]) % s32(m_r[RTREG]));
 			}
-			m_icount -= 35;
 			break;
 		case 0x1b: // DIVU
 			if (m_r[RTREG])
@@ -483,15 +464,12 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = s64(s32(u32(m_r[RSREG]) / u32(m_r[RTREG])));
 				m_hi = s64(s32(u32(m_r[RSREG]) % u32(m_r[RTREG])));
 			}
-			m_icount -= 35;
 			break;
 		case 0x1c: // DMULT
 			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], reinterpret_cast<s64 *>(&m_hi));
-			m_icount -= 7;
 			break;
 		case 0x1d: // DMULTU
 			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], &m_hi);
-			m_icount -= 7;
 			break;
 		case 0x1e: // DDIV
 			if (m_r[RTREG])
@@ -499,7 +477,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = s64(m_r[RSREG]) / s64(m_r[RTREG]);
 				m_hi = s64(m_r[RSREG]) % s64(m_r[RTREG]);
 			}
-			m_icount -= 67;
 			break;
 		case 0x1f: // DDIVU
 			if (m_r[RTREG])
@@ -507,7 +484,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = m_r[RSREG] / m_r[RTREG];
 				m_hi = m_r[RSREG] % m_r[RTREG];
 			}
-			m_icount -= 67;
 			break;
 		case 0x20: // ADD
 			{
@@ -1075,6 +1051,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 							m_ll_watch = nullptr;
 						}
 					});
+				m_ll_addr = ADDR(m_r[RSREG], s16(op));
 			});
 		break;
 	case 0x31: // LWC1
@@ -1103,6 +1080,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 						m_ll_watch->remove();
 						m_ll_watch = nullptr;
 					});
+				m_ll_addr = ADDR(m_r[RSREG], s16(op));
 			});
 		break;
 	case 0x35: // LDC1
@@ -1119,7 +1097,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			});
 		break;
 	case 0x38: // SC
-		if (m_ll_watch)
+		if (m_ll_watch && m_ll_addr == ADDR(m_r[RSREG], s16(op)))
 		{
 			m_ll_watch->remove();
 			m_ll_watch = nullptr;
@@ -1138,7 +1116,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 		break;
 	//case 0x3b: // *
 	case 0x3c: // SCD
-		if (m_ll_watch)
+		if (m_ll_watch && m_ll_addr == ADDR(m_r[RSREG], s16(op)))
 		{
 			m_ll_watch->remove();
 			m_ll_watch = nullptr;
@@ -1369,7 +1347,6 @@ void r4000_base_device::cp0_execute(u32 const op)
 		case 0x18: // ERET
 			if (SR & SR_ERL)
 			{
-				logerror("eret from error\n");
 				m_branch_state = EXCEPTION;
 				m_pc = m_cp0[CP0_ErrorEPC];
 				SR &= ~SR_ERL;
@@ -2598,7 +2575,7 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		else
 		{
 			// 32-bit user mode
-			if (address & 0xffff'ffff'8000'0000)
+			if (address & 0x8000'0000)
 				return ERROR; // exception
 			else
 				extended = false; // useg
@@ -2624,8 +2601,8 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		else
 		{
 			// 32-bit supervisor mode
-			if (address & 0xffff'ffff'8000'0000)
-				if ((address & 0xffff'ffff'e000'0000) == 0xffff'ffff'c000'0000)
+			if (address & 0x8000'0000)
+				if ((address & 0xe000'0000) == 0xc000'0000)
 					extended = false; // sseg
 				else
 					return ERROR; // exception
@@ -2680,14 +2657,13 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		else
 		{
 			// 32-bit kernel mode
-			if (address & 0xffff'ffff'8000'0000)
-				switch (address & 0xffff'ffff'e000'0000)
+			if (address & 0x8000'0000)
+				switch (address & 0xe000'0000)
 				{
-				case 0xffff'ffff'8000'0000: address &= 0x7fff'ffff; return CACHED;   // kseg0
-				case 0xffff'ffff'a000'0000: address &= 0x1fff'ffff; return UNCACHED; // kseg1
-				case 0xffff'ffff'c000'0000: extended = false; break; // ksseg
-				case 0xffff'ffff'e000'0000: extended = false; break; // kseg3
-				default: return ERROR; // exception
+				case 0x8000'0000: address &= 0x7fff'ffff; return CACHED;   // kseg0
+				case 0xa000'0000: address &= 0x1fff'ffff; return UNCACHED; // kseg1
+				case 0xc000'0000: extended = false; break; // ksseg
+				case 0xe000'0000: extended = false; break; // kseg3
 				}
 			else
 				if (SR & SR_ERL)
@@ -2894,7 +2870,7 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::va
 	// alignment error
 	if (address & (sizeof(T) - 1))
 	{
-		address_error(TRANSLATE_READ, address);
+		address_error(TRANSLATE_WRITE, address);
 		return false;
 	}
 

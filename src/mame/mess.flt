@@ -427,6 +427,7 @@ mac.cpp
 mac128.cpp
 macpci.cpp
 magnum.cpp
+mattelchess.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp

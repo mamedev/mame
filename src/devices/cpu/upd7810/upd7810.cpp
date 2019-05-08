@@ -1630,6 +1630,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_mc));
 	save_item(NAME(m_mm));
 	save_item(NAME(m_mf));
+	save_item(NAME(m_mt)); // TODO: uPD7807 only
 	save_item(NAME(m_tmm));
 	save_item(NAME(m_etmm));
 	save_item(NAME(m_eom));

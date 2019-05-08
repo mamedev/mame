@@ -755,7 +755,8 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const state_e state);
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state,
+			nldelegate delegate = nldelegate());
 
 		const analog_net_t & net() const NL_NOEXCEPT;
 		analog_net_t & net() NL_NOEXCEPT;
@@ -869,8 +870,9 @@ namespace netlist
 	{
 	public:
 		/*! Constructor */
-		analog_input_t(core_device_t &dev, /*!< owning device */
-				const pstring &aname       /*!< name of terminal */
+		analog_input_t(core_device_t &dev,  /*!< owning device */
+				const pstring &aname,       /*!< name of terminal */
+				nldelegate delegate = nldelegate() /*!< delegate */
 		);
 
 		/*! returns voltage at terminal.
@@ -1689,17 +1691,21 @@ namespace netlist
 		if ((num_cons() != 0))
 		{
 			auto &lexec(exec());
-			//auto &q(lexec.queue());
-			auto nst(lexec.time() + delay);
+			const auto nst(lexec.time() + delay);
 
 			if (is_queued())
 				lexec.qremove(this);
-			m_in_queue = (!m_list_active.empty()) ?
-				queue_status::QUEUED : queue_status::DELAYED_DUE_TO_INACTIVE;    /* queued ? */
-			if (m_in_queue == queue_status::QUEUED)
+
+			if (!m_list_active.empty())
+			{
+				m_in_queue = queue_status::QUEUED;
 				lexec.qpush(queue_t::entry_t(nst, this));
+			}
 			else
+			{
+				m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
 				update_inputs();
+			}
 			m_next_scheduled_time = nst;
 		}
 	}
