@@ -50,24 +50,26 @@ private:
 	DECLARE_WRITE16_MEMBER(unk_w);
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
-	DECLARE_READ16_MEMBER(tmap1_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
-	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
-
 	DECLARE_WRITE16_MEMBER(tmap0_unk0_w);
 	DECLARE_WRITE16_MEMBER(tmap0_unk1_w);
+
+	DECLARE_READ16_MEMBER(tmap1_regs_r);
+	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE16_MEMBER(tmap1_unk0_w);
 	DECLARE_WRITE16_MEMBER(tmap1_unk1_w);
 
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_low_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_mid_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_high0_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_high1_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_unk0_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_unk1_w);
 
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_low_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_mid_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_high0_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_high1_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_unk0_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_unk1_w);
+
+	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk0_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk1_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk2_w);
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device

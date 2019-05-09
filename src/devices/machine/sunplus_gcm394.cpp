@@ -58,48 +58,60 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::tmap1_unk1_w)
 
 // **************************************** unknown video device 0 (another tilemap? sprite layer?) *************************************************
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_regs_low_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_regs_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_regs_low_w %01x %04x\n", machine().describe_context(), offset, data);
+	// offsets 0,1,4,5,6,7 used in main IRQ code
+	// offsets 2,3 only cleared on startup
+
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_regs_mid_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_unk0_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_regs_mid_w %01x %04x\n", machine().describe_context(), offset, data);
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_unk0_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_regs_high0_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_unk1_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_regs_high0_w %04x\n", machine().describe_context(), data);
-}
-
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device0_regs_high1_w)
-{
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_regs_high1_w %04x\n", machine().describe_context(), data);
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device0_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** unknown video device 1 (another tilemap? sprite layer?) *************************************************
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_regs_low_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_regs_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_regs_low_w %01x %04x\n", machine().describe_context(), offset, data);
+	// offsets 0,1,4,5,6,7 used in main IRQ code
+	// offsets 2,3 only cleared on startup
+
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_regs_mid_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_unk0_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_regs_mid_w %01x %04x\n", machine().describe_context(), offset, data);
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_unk0_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_regs_high0_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_unk1_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_regs_high0_w %04x\n", machine().describe_context(), data);
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_unk1_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device1_regs_high1_w)
+// **************************************** unknown video device 2 (sprite control?) *************************************************
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device2_unk0_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::unknown_video_device1_regs_high1_w %04x\n", machine().describe_context(), data);
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device2_unk0_w %04x\n", machine().describe_context(), data);
 }
 
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device2_unk1_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device2_unk1_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unknown_video_device2_unk2_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::unknown_video_device2_unk2_w %04x\n", machine().describe_context(), data);
+}
 
 
 READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
@@ -198,27 +210,25 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
 
-	map(0x007000, 0x007001).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_regs_low_w)); // gcm394_video_device::
-	map(0x007004, 0x007007).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_regs_mid_w)); // gcm394_video_device::
-
-	map(0x007008, 0x007009).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_regs_low_w)); // gcm394_video_device::
-	map(0x00700c, 0x00700f).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_regs_mid_w)); // gcm394_video_device::
+	map(0x007000, 0x007007).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_regs_w)); // gcm394_video_device::
+	map(0x007008, 0x00700f).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_regs_w)); // gcm394_video_device::
 
 	map(0x007010, 0x007015).rw(FUNC(sunplus_gcm394_base_device::tmap0_regs_r), FUNC(sunplus_gcm394_base_device::tmap0_regs_w)); // gcm394_video_device::
 	map(0x007016, 0x00701b).rw(FUNC(sunplus_gcm394_base_device::tmap1_regs_r), FUNC(sunplus_gcm394_base_device::tmap1_regs_w)); // gcm394_video_device::
 
 	map(0x007020, 0x007020).w(FUNC(sunplus_gcm394_base_device::tmap0_unk0_w)); // gcm394_video_device::  probably tilebase, written with other tmap0 regs
 	map(0x007021, 0x007021).w(FUNC(sunplus_gcm394_base_device::tmap1_unk0_w)); // gcm394_video_device::  probably tilebase, written with other tmap1 regs
-
-	map(0x007023, 0x007023).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_regs_high0_w)); // gcm394_video_device::  written with other unknown_video_device0 regs
-	map(0x007024, 0x007024).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_regs_high0_w)); // gcm394_video_device::  written with other unknown_video_device1 regs
+	map(0x007022, 0x007022).w(FUNC(sunplus_gcm394_base_device::unknown_video_device2_unk0_w)); // gcm394_video_device::  another tilebase? maybe sprites? written as 7022, 702d and 7042 group
+	map(0x007023, 0x007023).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_unk0_w)); // gcm394_video_device::  written with other unknown_video_device0 regs
+	map(0x007024, 0x007024).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_unk0_w)); // gcm394_video_device::  written with other unknown_video_device1 regs
 
 	map(0x00702b, 0x00702b).w(FUNC(sunplus_gcm394_base_device::tmap0_unk1_w)); // gcm394_video_device::   written with other tmap0 regs
 	map(0x00702c, 0x00702c).w(FUNC(sunplus_gcm394_base_device::tmap1_unk1_w)); // gcm394_video_device::   written with other tmap1 regs
+	map(0x00702d, 0x00702d).w(FUNC(sunplus_gcm394_base_device::unknown_video_device2_unk1_w)); // gcm394_video_device::  maybe sprites?  written as 7022, 702d and 7042 group
+	map(0x00702e, 0x00702e).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_unk1_w)); // gcm394_video_device::  written with other unknown_video_device0 regs
+	map(0x00702f, 0x00702f).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_unk1_w)); // gcm394_video_device::  written with other unknown_video_device1 regs
 
-	map(0x00702e, 0x00702e).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_regs_high1_w)); // gcm394_video_device::  written with other unknown_video_device0 regs
-	map(0x00702f, 0x00702f).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_regs_high1_w)); // gcm394_video_device::  written with other unknown_video_device1 regs
-
+	map(0x007042, 0x007042).w(FUNC(sunplus_gcm394_base_device::unknown_video_device2_unk2_w)); // gcm394_video_device::  maybe sprites?  written as 7022, 702d and 7042 group
 
 	map(0x007300, 0x0073ff).ram();
 	map(0x007400, 0x0074ff).ram();
