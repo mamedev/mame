@@ -1515,7 +1515,7 @@ ROM_START( pc50ii )
 	// 0: Commodore PC50-II BIOS Rev1.0 - 609200-03
 	ROM_SYSTEM_BIOS(0, "pc50iiv100", "PC 50-II V1.00") // complains "Time-of-day clock stopped" and reboots
 	ROMX_LOAD( "cbm-pc50b-bios-lo-v1.00-390339-01.bin", 0x10001, 0x8000, CRC(0f0e2fd6) SHA1(61a8043ac919c2a8fe668bf25e5f0b67868d11ae),ROM_SKIP(1) | ROM_BIOS(0) )
-	ROMX_LOAD( "cbm-pc50b-bios-hi-v1.00-390340-01.bin",  0x10000, 0x8000, CRC(87008421) SHA1(cf41973a7bd439441baec1138dd63044fafe7391),ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "cbm-pc50b-bios-hi-v1.00-390340-01.bin", 0x10000, 0x8000, CRC(87008421) SHA1(cf41973a7bd439441baec1138dd63044fafe7391),ROM_SKIP(1) | ROM_BIOS(0) )
 	// 1: Commodore PC50-II BIOS Rev1.01 - 609200-03
 	ROM_SYSTEM_BIOS(1, "pc50iiv101", "PC 50-II V1.01") // same behaviour as above
 	ROMX_LOAD( "cbm-pc50b-bios-lo-u31-v1.01-xxxxxx-xx-a800.bin", 0x10001, 0x8000, CRC(bf2c7009) SHA1(6b94df37861b30ef6a39a4ed64d4c9ac1e96043a),ROM_SKIP(1) | ROM_BIOS(1) )
@@ -1528,6 +1528,38 @@ ROM_START( pc50ii )
  	// VGA BIOS
 	// ROM_LOAD( "m_pc50-ii_1bad_pvgadk_odd.bin", 0x00000, 0x8000, CRC(f36eca7e) SHA1(4335fa4a4567cbc010ff2ffeb97a536ed93b0219))
 	// ROM_LOAD( "m_pc50-ii_54e3_pvgadk_even.bin", 0x00001, 0x8000, CRC(01f6b964) SHA1(799a84ddde8a7672a6df9439bad6198ec3ff98ec))
+ROM_END
+
+// Commodore PC-60-III
+ROM_START( pc60iii )
+    ROM_REGION(0x20000, "bios", 0)
+	// 0: Commodore PC60-III 80386 BIOS Rev. 1.2 - 390473-01/390474-01
+	ROM_SYSTEM_BIOS(0, "pc60iiiv12", "PC60-III V1.2")
+	ROMX_LOAD( "cbm-pc60c-bios-lo_u73-v1.2-390473-01.bin", 0x00000, 0x10000, CRC(ff2cd8b3) SHA1(62e95f818c5016f4be2741872dc644999dee33ce),ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "cbm-pc60c-bios-hi_u67-v1.2-390474-01.bin", 0x00001, 0x10000, CRC(690fff4b) SHA1(adc262d40da64354c7c76b61f46d2c7ed35e9df9),ROM_SKIP(1) | ROM_BIOS(0) )
+	// 1: Commodore PC-60-III 80386/25MHz BIOS Rev. 1.3 390473-02/390474-02
+	ROM_SYSTEM_BIOS(1, "pc60iiiv13", "PC 60-III V1.3")
+	ROMX_LOAD( "cbm-pc60c-bios-lo-v1.30-390473-02.bin", 0x00000, 0x10000, CRC(3edd83e0) SHA1(3ebf393d6c33d9b8600f56c7be9eedb5aefb2645),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "cbm-pc60c-bios-hi-v1.30-390474-02.bin", 0x00001, 0x10000, CRC(12209ac4) SHA1(76f271944894c77dde735da2b2ba065e81a99564),ROM_SKIP(1) | ROM_BIOS(1) )
+	// 2: Commodore PC60-III 80386/25MHz BIOS rev.1.33 390473-04/390474-04
+	ROM_SYSTEM_BIOS(2, "pc60iiiv133", "PC60-III V1.33")
+	ROMX_LOAD( "cbm-pc60-bios-lo-v1.33-390473-04.bin", 0x00000, 0x10000, CRC(afd0aae0) SHA1(7fa4388c939f30e603f0fc90f9512e500b282432),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cbm-pc60-bios-hi-v1.33-390474-04.bin", 0x00001, 0x10000, CRC(7b7958db) SHA1(d542c63ec0d17e1e87403ac01735e75ce58302a9),ROM_SKIP(1) | ROM_BIOS(2) )
+	// 3: Commodore PC60-III 80386-25MHz BIOS Rev.1.3.5 - 390473-06/390474-06
+	ROM_SYSTEM_BIOS(3, "pc60iiiv135", "PC60-III V1.3.5")
+	ROMX_LOAD( "cbm-pc60c-bios-lo-v1.35-390473-06.bin", 0x00000, 0x10000, CRC(6ff4aea9) SHA1(3fcb3a5c275dbfb93c3e55224d731f1b52343d4b),ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "cbm-pc60c-bios-hi-v1.35-390474-06.bin", 0x00001, 0x10000, CRC(5a04e3f0) SHA1(311a3ff3e578ecbce0ecd9f3b006ab772623255a),ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: Commodore 80386 BIOS Rev.1.36 - 390473-07/390474-07
+	ROM_SYSTEM_BIOS(4, "c386v136", "Commodore 386 V1.3.6")
+	ROMX_LOAD( "cbm-pc60c-bios-lo-v1.36-390473-07-9b0e.bin", 0x00000, 0x10000, CRC(be7504f8) SHA1(a45f7690a41d416bc10ca6f583b8fdd2219a3d8a),ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "cbm-pc60c-bios-hi-v1.36-390474-07-ddf2.bin", 0x00001, 0x10000, CRC(d8e08ffa) SHA1(fb5fb973b01df6e486d76076d3373583758b1d01),ROM_SKIP(1) | ROM_BIOS(4) )
+	// 5: Commodore 80386 BIOS Rev.1.36.03 - 390473-07/390474-07
+	ROM_SYSTEM_BIOS(5, "c386v13603", "Commodore 386 V1.3.603")
+	ROMX_LOAD( "cbm-pc60c-bios-lo-v1.3603-390473-07.bin", 0x00000, 0x10000, CRC(2cda07c7) SHA1(01fd6260192541dd73f88d2cc0f99fe5603efc81),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "cbm-pc60c-bios-hi-v1.3603-390474-07.bin", 0x00001, 0x10000, CRC(39845b9b) SHA1(9d3cbfde4b2acc1d576aafa80126b75a49d3d8df),ROM_SKIP(1) | ROM_BIOS(5) )
+
+
+
 
 ROM_END
 
@@ -1675,6 +1707,7 @@ ROM_START( t2000sx )
 	ROM_LOAD( "014d.ic9", 0x00000, 0x20000, CRC(e9010b02) SHA1(75688fc8e222640fa22bcc90343c6966fe0da87f))
 ROM_END
 
+// Amstrad PC2386
 ROM_START( pc2386 )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "c000.bin", 0x00000, 0x4000, CRC(33145bbf) SHA1(c49eaec19f656482e12c8bf282cd4ee5986d227d) )
@@ -1849,6 +1882,7 @@ COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at
 COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
 COMP( 198?, pc45iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 45-III", MACHINE_NOT_WORKING )
 COMP( 198?, pc50ii,    ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 50-II", MACHINE_NOT_WORKING )
+COMP( 198?, pc60iii,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Commodore Business Machines",  "PC 60-III", MACHINE_NOT_WORKING )
 COMP( 1990, c286lt,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C286LT", MACHINE_NOT_WORKING )
 COMP( 1991, c386sxlt,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C386SX-LT", MACHINE_NOT_WORKING )
 COMP( 199?, csl286,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "SL 286-16", MACHINE_NOT_WORKING )
