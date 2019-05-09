@@ -227,6 +227,18 @@ READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7868_r)
 	return 0x0000;
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_782d_r)
+{
+	logerror("%s:sunplus_gcm394_base_device::unkarea_782d_r\n", machine().describe_context());
+	return m_782d;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_782d_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::unkarea_782d_w %04x\n", machine().describe_context(), data);
+	m_782d = data;
+}
+
 // **************************************** fallthrough logger etc. *************************************************
 
 READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
@@ -296,6 +308,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
 	
+	map(0x00782d, 0x00782d).rw(FUNC(sunplus_gcm394_base_device::unkarea_782d_r), FUNC(sunplus_gcm394_base_device::unkarea_782d_w)); // on startup
+
+
 	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup
 	
 	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
@@ -327,6 +342,8 @@ void sunplus_gcm394_base_device::device_reset()
 		tmap0_regs[i] = 0x0000;
 		tmap1_regs[i] = 0x0000;
 	}
+
+	m_782d = 0x0000;
 }
 
 void sunplus_gcm394_device::device_add_mconfig(machine_config &config)

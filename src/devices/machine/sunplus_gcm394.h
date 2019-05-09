@@ -39,6 +39,8 @@ protected:
 	required_device<screen_device> m_screen;
 
 	uint16_t m_78fb;
+	uint16_t m_782d;
+
 	uint16_t m_dma_params[7];
 
 	uint16_t tmap0_regs[0x6];
@@ -85,6 +87,10 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
 
 	DECLARE_READ16_MEMBER(unkarea_7868_r);
+
+	DECLARE_READ16_MEMBER(unkarea_782d_r);
+	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
+
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
