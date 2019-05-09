@@ -219,6 +219,13 @@ READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78fb_status_r)
 	return m_78fb;
 }
 
+// ***********************************************************************************
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7868_r)
+{
+	logerror("%s:sunplus_gcm394_base_device::unkarea_7868_r\n", machine().describe_context());
+	return 0x0000;
+}
 
 // **************************************** fallthrough logger etc. *************************************************
 
@@ -285,7 +292,12 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007600, 0x0076ff).ram();
 	map(0x007700, 0x0077ff).ram();
 
+	
+
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
+	
+	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup
+	
 	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
 	
 	map(0x007a80, 0x007a86).w(FUNC(sunplus_gcm394_base_device::system_dma_params_w));
@@ -308,6 +320,12 @@ void sunplus_gcm394_base_device::device_reset()
 	for (int i = 0; i < 7; i++)
 	{
 		m_dma_params[i] = 0x0000;
+	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		tmap0_regs[i] = 0x0000;
+		tmap1_regs[i] = 0x0000;
 	}
 }
 

@@ -84,6 +84,7 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
 
+	DECLARE_READ16_MEMBER(unkarea_7868_r);
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
