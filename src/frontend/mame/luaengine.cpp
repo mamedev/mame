@@ -736,6 +736,7 @@ void lua_engine::initialize()
  * emu.start(driver_name) - start given driver_name
  * emu.pause() - pause emulation
  * emu.unpause() - unpause emulation
+ * emu.step() - advance one frame
  * emu.keypost(keys) - post keys to natural keyboard
  * emu.wait(len) - wait for len within coroutine
  * emu.lang_translate(str) - get translation for str if available
@@ -748,7 +749,7 @@ void lua_engine::initialize()
  * emu.register_frame(callback) - register callback at end of frame
  * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
  * emu.register_periodic(callback) - register periodic callback while program is running
- * emu.register_callback(callback, name) - TODO
+ * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
  * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
  * emu.show_menu(menu_name) - show menu by name and pause the machine
  *
@@ -777,6 +778,10 @@ void lua_engine::initialize()
 		};
 	emu["pause"] = [this](){ return machine().pause(); };
 	emu["unpause"] = [this](){ return machine().resume(); };
+	emu["step"] = [this]() {
+			mame_machine_manager::instance()->ui().set_single_step(true);
+			machine().resume();
+		};
 	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
 	emu["register_stop"] = [this](sol::function func){ register_function(func, "LUA_ON_STOP"); };
