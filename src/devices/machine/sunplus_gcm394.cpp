@@ -147,6 +147,12 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::video_dma_unk_w)
 
 // **************************************** SYSTEM DMA device *************************************************
 
+READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
+{
+	logerror("%s:sunplus_gcm394_base_device::system_dma_status_r (7abf))\n", machine().describe_context());
+	return 0x0001;
+}
+
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_w)
 {
 	m_dma_params[offset] = data;
@@ -215,11 +221,6 @@ READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
 		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
 		m_78fb ^= 0x0100; // status flag for something?
 		return m_78fb;
-
-	case 0xabf:
-		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
-		return 0x0001;
-
 	}
 
 	logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
@@ -278,7 +279,7 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007700, 0x0077ff).ram();
 
 	map(0x007a80, 0x007a86).w(FUNC(sunplus_gcm394_base_device::system_dma_params_w));
-	map(0x007abf, 0x007abf).w(FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));	
+	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));	
 
 	map(0x007c00, 0x007cff).ram();
 	map(0x007d00, 0x007dff).ram();
