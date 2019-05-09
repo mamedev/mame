@@ -301,14 +301,12 @@ void tutankhm_state::tutankhm(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	//screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 	PALETTE(config, m_palette).set_format(1, tutankhm_state::raw_to_rgb_func, 16);
 
 	m_screen->set_screen_update(FUNC(tutankhm_state::screen_update_tutankhm));
 	m_screen->screen_vblank().set(FUNC(tutankhm_state::vblank_irq));
-
 
 	/* sound hardware */
 	TIMEPLT_AUDIO(config, "timeplt_audio");
