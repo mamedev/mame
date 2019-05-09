@@ -70,6 +70,15 @@ private:
 	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk0_w);
 	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk1_w);
 	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk2_w);
+
+	DECLARE_WRITE16_MEMBER(video_dma_source_w);
+	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
+	DECLARE_READ16_MEMBER(video_dma_size_r);
+	DECLARE_WRITE16_MEMBER(video_dma_size_w);
+	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
+
+	DECLARE_WRITE16_MEMBER(system_dma_params_w);
+	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
