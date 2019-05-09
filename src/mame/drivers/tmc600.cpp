@@ -234,9 +234,7 @@ READ_LINE_MEMBER( tmc600_state::ef2_r )
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
-	uint8_t keylatch = m_bwio->do_r();
-
-	return !BIT(m_key_row[(keylatch >> 3) & 0x07]->read(), keylatch & 0x07);
+	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
 }
 
 WRITE_LINE_MEMBER( tmc600_state::q_w )
@@ -249,6 +247,11 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
 		m_maincpu->int_w(CLEAR_LINE);
 	}
+}
+
+WRITE8_MEMBER( tmc600_state::out3_w )
+{
+	m_out3 = data;
 }
 
 /* Machine Drivers */
@@ -273,6 +276,7 @@ void tmc600_state::tmc600(machine_config &config)
 	// keyboard output latch
 	CDP1852(config, m_bwio); // clock is CDP1802 TPB
 	m_bwio->mode_cb().set_constant(1);
+	m_bwio->do_cb().set(FUNC(tmc600_state::out3_w));
 
 #if 0
 	// address bus demux for expansion bus
