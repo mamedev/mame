@@ -530,4 +530,5 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("vic1515", VIC1515);
 	device.option_add("vic1520", VIC1520);
 	device.option_add("c1526", C1526);
+	device.option_add("technica", TECHNICA);
 }
