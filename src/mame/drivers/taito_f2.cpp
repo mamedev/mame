@@ -2735,17 +2735,6 @@ static const gfx_layout yuyugogo_charlayout =
 	8*8 /* every sprite takes 8 consecutive bytes */
 };
 
-static const gfx_layout pivotlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_finalb )
 	GFXDECODE_ENTRY( "gfx2", 0, finalb_tilelayout, 0,  64 ) /* sprites, 6-bit deep */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 256 ) /* playfield */
