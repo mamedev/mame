@@ -41,10 +41,33 @@ protected:
 	uint16_t m_78fb;
 	uint16_t m_dma_params[7];
 
+	uint16_t tmap0_regs[0x6];
+	uint16_t tmap1_regs[0x6];
+
+
 private:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
 
+	DECLARE_READ16_MEMBER(tmap0_regs_r);
+	DECLARE_READ16_MEMBER(tmap1_regs_r);
+	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
+	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
+
+	DECLARE_WRITE16_MEMBER(tmap0_unk0_w);
+	DECLARE_WRITE16_MEMBER(tmap0_unk1_w);
+	DECLARE_WRITE16_MEMBER(tmap1_unk0_w);
+	DECLARE_WRITE16_MEMBER(tmap1_unk1_w);
+
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_low_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_mid_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_high0_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_high1_w);
+
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_low_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_mid_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_high0_w);
+	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_high1_w);
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
