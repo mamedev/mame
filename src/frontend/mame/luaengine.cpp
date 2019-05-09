@@ -937,11 +937,12 @@ void lua_engine::initialize()
  *
  * emu.thread()
  *
- * thread.start(scr) - run scr (string not function) in a seperate thread
- *                     in a new empty (other than modules) lua context
- * thread.continue(val) - resume thread and pass val to it
- * thread.result() - get thread result as string
+ * thread:start(scr) - run scr (lua code as string) in a seperate thread
+ *                     in a new empty (other than modules) lua context.
+ *                     thread runs until yield() and/or terminates on return.
+ * thread:continue(val) - resume thread that has yielded and pass val to it
  *
+ * thread.result - get result of a terminated thread as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
  */
@@ -1182,6 +1183,7 @@ void lua_engine::initialize()
  * machine:save(filename) - save state to filename
  * machine:load(filename) - load state from filename
  * machine:popmessage(str) - print str as popup
+ * machine:popmessage() - clear displayed popup message
  * machine:logerror(str) - print str to log
  *
  * machine:system() - get game_driver for running driver
@@ -1289,7 +1291,7 @@ void lua_engine::initialize()
 			"default_layout", sol::readonly(&game_driver::default_layout));
 
 
-/*  debugger_manager library
+/*  debugger_manager library (requires debugger to be active)
  *
  * manager:machine():debugger()
  *
@@ -1321,7 +1323,7 @@ void lua_engine::initialize()
 				}));
 
 
-/*  wrap_textbuf library
+/*  wrap_textbuf library (requires debugger to be active)
  *
  * manager:machine():debugger().consolelog
  * manager:machine():debugger().errorlog
@@ -1337,18 +1339,21 @@ void lua_engine::initialize()
 			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
 
 
-/*  device_debug library
+/*  device_debug library (requires debugger to be active)
  *
  * manager:machine().devices[device_tag]:debug()
  *
  * debug:step([opt] steps) - run cpu steps, default 1
  * debug:go() - run cpu
- * debug:bpset(addr, cond, act) - set break on addr, cond and act are debugger expressions
+ * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
+ *                                            expressions. returns breakpoint index
  * debug:bpclr(idx) - clear break
  * debug:bplist()[] - table of breakpoints (k=index, v=device_debug::breakpoint)
- * debug:wpset(space, type, addr, len, cond, act) - set watch, cond and act are debugger expressions
+ * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
+ *                                                              are debugger expressions.
+ *                                                              returns watchpoint index
  * debug:wpclr(idx) - clear watch
- * debug:wplist(space)[] - table of watchpoints (kv TODO)
+ * debug:wplist(space)[] - table of watchpoints (k=index, v=watchpoint)
  */
 
 	sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor,
@@ -1492,11 +1497,11 @@ void lua_engine::initialize()
  *
  * read/write by signedness u/i and bit-width 8/16/32/64:
  * space:read_*(addr)
- * space:write_*(addr)
+ * space:write_*(addr, val)
  * space:read_log_*(addr)
- * space:write_log_*(addr)
+ * space:write_log_*(addr, val)
  * space:read_direct_*(addr)
- * space:write_direct_*(addr)
+ * space:write_direct_*(addr, val)
  *
  * space.name - address space name
  * space.shift - address bus shift, bitshift required for a bytewise address
@@ -1791,9 +1796,10 @@ void lua_engine::initialize()
  * input:seq_pressed(seq) - get pressed state for input_seq
  * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
  * input:seq_name(seq) - get seq friendly name
- * input:seq_poll_start() - TODO
- * input:seq_poll() - TODO
- * input:seq_poll_final() - TODO
+ * input:seq_poll_start(class, [opt] start_seq) - start polling for input_item_class passed as string
+ *                                                (switch/abs[olute]/rel[ative]/max[imum])
+ * input:seq_poll() - poll once, returns true if input was fetched
+ * input:seq_poll_final() - get final input_seq
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
@@ -2172,8 +2178,8 @@ void lua_engine::initialize()
  * manager:machine():memory().regions[region_tag]
  *
  * read/write by signedness u/i and bit-width 8/16/32/64:
- * region:read_*()
- * region:write_*()
+ * region:read_*(addr)
+ * region:write_*(addr, val)
  *
  * region.size
  */
@@ -2201,8 +2207,8 @@ void lua_engine::initialize()
  * manager:machine():memory().shares[share_tag]
  *
  * read/write by signedness u/i and bit-width 8/16/32/64:
- * region:read_*()
- * region:write_*()
+ * share:read_*(addr)
+ * share:write_*(addr, val)
  *
  * region.size
 */
