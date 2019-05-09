@@ -149,7 +149,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::video_dma_unk_w)
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
 {
-	logerror("%s:sunplus_gcm394_base_device::system_dma_status_r (7abf))\n", machine().describe_context());
+	logerror("%s:sunplus_gcm394_base_device::system_dma_status_r (7abf)\n", machine().describe_context());
 	return 0x0001;
 }
 
@@ -206,24 +206,31 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 
 // ***********************************************************************************
 
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_780f_status_r)
+{
+	logerror("%s:sunplus_gcm394_base_device::unkarea_780f_status_r\n", machine().describe_context());
+	return 0x0002;
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78fb_status_r)
+{
+	logerror("%s:sunplus_gcm394_base_device::unkarea_78fb_status_r\n", machine().describe_context());
+	m_78fb ^= 0x0100; // status flag for something?
+	return m_78fb;
+}
+
+
 // **************************************** fallthrough logger etc. *************************************************
 
 READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
 {
 	switch (offset)
 	{
-
-	case 0x80f:
+	default:
 		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
-		return 0x0002;
-
-	case 0x8fb:
-		logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
-		m_78fb ^= 0x0100; // status flag for something?
-		return m_78fb;
+		return 0x0000;
 	}
 
-	logerror("%s:sunplus_gcm394_base_device::unk_r @ 0x%04x\n", machine().describe_context(), offset + 0x7000);
 	return 0x0000;
 }
 
@@ -278,6 +285,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007600, 0x0076ff).ram();
 	map(0x007700, 0x0077ff).ram();
 
+	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
+	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
+	
 	map(0x007a80, 0x007a86).w(FUNC(sunplus_gcm394_base_device::system_dma_params_w));
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));	
 

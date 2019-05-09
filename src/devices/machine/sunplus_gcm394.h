@@ -79,6 +79,11 @@ private:
 
 	DECLARE_WRITE16_MEMBER(system_dma_params_w);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
+	DECLARE_READ16_MEMBER(system_dma_status_r);
+
+	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
+	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
+
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
