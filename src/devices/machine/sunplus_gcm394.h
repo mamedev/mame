@@ -64,8 +64,11 @@ protected:
 	uint16_t m_7088;
 
 	// unk 78xx
-	uint16_t m_78fb;
-	uint16_t m_782d;
+	uint16_t m_7803;
+
+	uint16_t m_7810;
+
+	uint16_t m_7819;
 
 	uint16_t m_7820;
 	uint16_t m_7821;
@@ -73,14 +76,26 @@ protected:
 	uint16_t m_7823;
 	uint16_t m_7824;
 
+	uint16_t m_782d;
+
+	uint16_t m_7860;
+
+	uint16_t m_7861;
+
 	uint16_t m_7862;
 	uint16_t m_7863;
+
+	uint16_t m_7870;
+
+	uint16_t m_7871;
 
 	uint16_t m_7872;
 	uint16_t m_7873;
 
 	uint16_t m_7882;
 	uint16_t m_7883;
+
+	uint16_t m_78fb;
 
 
 	// unk 79xx
@@ -154,6 +169,15 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
 
+	DECLARE_READ16_MEMBER(unkarea_7803_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7803_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7810_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7810_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7819_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7819_w);
+
 	DECLARE_WRITE16_MEMBER(unkarea_7820_w);
 	DECLARE_WRITE16_MEMBER(unkarea_7821_w);
 	DECLARE_WRITE16_MEMBER(unkarea_7822_w);
@@ -165,10 +189,20 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
 
+	DECLARE_READ16_MEMBER(unkarea_7860_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7860_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7861_r);
+
 	DECLARE_READ16_MEMBER(unkarea_7862_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7862_w);
 	DECLARE_READ16_MEMBER(unkarea_7863_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7863_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7870_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7870_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7871_r);
 
 	DECLARE_READ16_MEMBER(unkarea_7872_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7872_w);
