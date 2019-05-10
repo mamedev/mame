@@ -13,6 +13,7 @@
 
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
+#include "emupal.h"
 
 class sunplus_gcm394_base_device : public device_t, public device_mixer_interface
 {
@@ -22,13 +23,17 @@ public:
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
 	{
 	}
 
 	void map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank) { /*m_spg_video->vblank(state);*/ }
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect) { return 0; /* m_spg_video->screen_update(screen, bitmap, cliprect);*/ }
+
+	DECLARE_WRITE_LINE_MEMBER(vblank);
+
+	virtual void device_add_mconfig(machine_config& config) override;
 
 protected:
 
@@ -37,7 +42,8 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-	
+	required_device<palette_device> m_palette;
+
 	// video 70xx
 	uint16_t tmap0_regs[0x6];
 	uint16_t tmap1_regs[0x6];
@@ -265,7 +271,11 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
 
+	uint16_t m_video_irq_status;
 
+
+	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
+	void check_video_irq();
 
 };
 
@@ -281,8 +291,6 @@ public:
 	}
 
 	sunplus_gcm394_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
-
-	virtual void device_add_mconfig(machine_config& config) override;
 };
 
 

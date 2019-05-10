@@ -426,7 +426,7 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// 73xx-77xx = ram areas?
 	// ######################################################################################################################################################################################
 
-	map(0x007300, 0x0073ff).ram();
+	map(0x007300, 0x0073ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x007400, 0x0074ff).ram();
 	map(0x007500, 0x0075ff).ram();
 	map(0x007600, 0x0076ff).ram();
@@ -617,11 +617,48 @@ void sunplus_gcm394_base_device::device_reset()
 	m_7934 = 0x0000;
 	m_7936 = 0x0000;
 
+
+	m_video_irq_status = 0x0000;
+
 }
 
-void sunplus_gcm394_device::device_add_mconfig(machine_config &config)
+WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
+{
+	m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, state);
+}
+
+void sunplus_gcm394_base_device::check_video_irq()
+{
+	videoirq_w((m_video_irq_status & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(sunplus_gcm394_base_device::vblank)
+{
+	int i = 0x0001;
+
+	if (!state)
+	{
+		m_video_irq_status &= ~i;
+		check_video_irq();
+		return;
+	}
+
+	//if (m_video_irq_enable & 1)
+	{
+		m_video_irq_status |= i;
+		check_video_irq();
+	}
+}
+
+
+void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 {
 	//SUNPLUS_GCM394_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
 	//m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	//m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x100);
+
 }
+
+

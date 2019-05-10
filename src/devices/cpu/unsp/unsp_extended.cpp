@@ -60,7 +60,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			else
 				logerror("(Ext) push <BAD>\n");
 
-			unimplemented_opcode(op, ximm);
+			//unimplemented_opcode(op, ximm);
+			return;
 		}
 		else
 		{
@@ -78,7 +79,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				logerror("(Ext) pop <BAD>\n");
 
 
-			unimplemented_opcode(op, ximm);
+			//unimplemented_opcode(op, ximm);
+			return;
 		}
 		return;
 	}
