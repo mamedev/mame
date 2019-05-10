@@ -26,17 +26,33 @@ function autofire.startplugin()
 		local keycode = manager:machine():input():code_from_token(button.key)
 		local pressed = manager:machine():input():code_pressed(keycode)
 		if pressed then
-			button.button:set_value(button.counter < button.on_frames and 1 or 0)
+			local state = button.counter < button.on_frames and 1 or 0
 			button.counter = (button.counter + 1) % (button.on_frames + button.off_frames)
+			return state
 		else
 			button.counter = 0
-			button.button:set_value(0)
+			return 0
 		end
 	end
 
+	local function button_states_key(button)
+		return button.port .. '\0' .. button.field
+	end
+
 	local function process_frame()
+		-- Resolves conflicts between multiple autofire keybindings for the same button.
+		local button_states = {}
+
 		for i, button in ipairs(buttons) do
-			process_button(button)
+			local state = button_states[button_states_key(button)]
+			if not state then
+				state = 0
+			end
+			state = process_button(button) | state
+			button_states[button_states_key(button)] = state
+		end
+		for i, button in ipairs(buttons) do
+			button.button:set_value(button_states[button_states_key(button)])
 		end
 	end
 
