@@ -47,31 +47,7 @@ protected:
 	//required_device<palette_device> m_palette;
 	required_device<gcm394_video_device> m_spg_video;
 
-	// video 70xx
-	uint16_t tmap0_regs[0x6];
-	uint16_t tmap1_regs[0x6];
-
 	uint16_t m_dma_params[7];
-
-	uint16_t m_707f;
-	uint16_t m_703a;
-	uint16_t m_7062;
-	uint16_t m_7063;
-
-	uint16_t m_702a;
-	uint16_t m_7030;
-	uint16_t m_703c;
-
-
-	uint16_t m_7080;
-	uint16_t m_7081;
-	uint16_t m_7082;
-	uint16_t m_7083;
-	uint16_t m_7084;
-	uint16_t m_7085;
-	uint16_t m_7086;
-	uint16_t m_7087;
-	uint16_t m_7088;
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -140,64 +116,6 @@ private:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
 
-	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
-
-	DECLARE_READ16_MEMBER(tmap0_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
-	DECLARE_WRITE16_MEMBER(tmap0_unk0_w);
-	DECLARE_WRITE16_MEMBER(tmap0_unk1_w);
-
-	DECLARE_READ16_MEMBER(tmap1_regs_r);
-	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
-	DECLARE_WRITE16_MEMBER(tmap1_unk0_w);
-	DECLARE_WRITE16_MEMBER(tmap1_unk1_w);
-
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_unk0_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device0_unk1_w);
-
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_regs_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_unk0_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device1_unk1_w);
-
-	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk0_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk1_w);
-	DECLARE_WRITE16_MEMBER(unknown_video_device2_unk2_w);
-
-	DECLARE_WRITE16_MEMBER(video_dma_source_w);
-	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
-	DECLARE_READ16_MEMBER(video_dma_size_r);
-	DECLARE_WRITE16_MEMBER(video_dma_size_w);
-	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
-
-	DECLARE_READ16_MEMBER(video_703a_r);
-	DECLARE_WRITE16_MEMBER(video_703a_w);
-
-	DECLARE_READ16_MEMBER(video_7062_r);
-	DECLARE_WRITE16_MEMBER(video_7062_w);
-
-	DECLARE_WRITE16_MEMBER(video_7063_w);
-
-	DECLARE_WRITE16_MEMBER(video_702a_w);
-	DECLARE_READ16_MEMBER(video_7030_r);
-	DECLARE_WRITE16_MEMBER(video_7030_w);
-	DECLARE_WRITE16_MEMBER(video_703c_w);
-
-
-	DECLARE_READ16_MEMBER(video_707f_r);
-	DECLARE_WRITE16_MEMBER(video_707f_w);
-
-	DECLARE_WRITE16_MEMBER(video_7080_w);
-	DECLARE_WRITE16_MEMBER(video_7081_w);
-	DECLARE_WRITE16_MEMBER(video_7082_w);
-	DECLARE_WRITE16_MEMBER(video_7083_w);
-	DECLARE_WRITE16_MEMBER(video_7084_w);
-	DECLARE_WRITE16_MEMBER(video_7085_w);
-	DECLARE_WRITE16_MEMBER(video_7086_w);
-	DECLARE_WRITE16_MEMBER(video_7087_w);
-	DECLARE_WRITE16_MEMBER(video_7088_w);
-
-	DECLARE_READ16_MEMBER(video_7083_r);
 
 	DECLARE_WRITE16_MEMBER(system_dma_params_w);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
