@@ -217,6 +217,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::video_707f_w) { LOGMASKED(LOG_GCM394,
 READ16_MEMBER(sunplus_gcm394_base_device::video_703a_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_703a_r\n", machine().describe_context()); return m_703a; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_703a_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_703a_w %04x\n", machine().describe_context(), data); m_703a = data; }
 
+READ16_MEMBER(sunplus_gcm394_base_device::video_7062_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7062_r\n", machine().describe_context()); return m_7062; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::video_7062_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
+
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7080_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7081_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
@@ -302,7 +305,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
 
+	// ######################################################################################################################################################################################
 	// 70xx region = video hardware
+	// ######################################################################################################################################################################################
 
 	// note, tilemaps are at the same address offsets in video device as spg2xx (but unknown devices are extra)
 
@@ -328,6 +333,8 @@ void sunplus_gcm394_base_device::map(address_map &map)
 
 	map(0x007042, 0x007042).w(FUNC(sunplus_gcm394_base_device::unknown_video_device2_unk2_w)); // gcm394_video_device::  maybe sprites?  written as 7022, 702d and 7042 group
 
+	map(0x007062, 0x007062).rw(FUNC(sunplus_gcm394_base_device::video_7062_r), FUNC(sunplus_gcm394_base_device::video_7062_w));
+
 	// note, 70 / 71 / 72 are the same offsets used for DMA as in spg2xx video device
 	map(0x007070, 0x007070).w(FUNC(sunplus_gcm394_base_device::video_dma_source_w));                                                      // gcm394_video_device::  video dma, not system dma? (sets pointers to ram buffers)
 	map(0x007071, 0x007071).w(FUNC(sunplus_gcm394_base_device::video_dma_dest_w));                                                        // gcm394_video_device::  sets pointers to 7300, 7400 ram areas below
@@ -348,7 +355,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007087, 0x007087).w(FUNC(sunplus_gcm394_base_device::video_7087_w));
 	map(0x007088, 0x007088).w(FUNC(sunplus_gcm394_base_device::video_7088_w));
 
+	// ######################################################################################################################################################################################
 	// 73xx-77xx = ram areas?
+	// ######################################################################################################################################################################################
 
 	map(0x007300, 0x0073ff).ram();
 	map(0x007400, 0x0074ff).ram();
@@ -356,7 +365,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007600, 0x0076ff).ram();
 	map(0x007700, 0x0077ff).ram();
 
+	// ######################################################################################################################################################################################
 	// 78xx region = ??	
+	// ######################################################################################################################################################################################
 
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
 	
@@ -373,21 +384,25 @@ void sunplus_gcm394_base_device::map(address_map &map)
 
 	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup
 	
-
-
 	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
 	
+	// ######################################################################################################################################################################################
 	// 79xx region = ??
+	// ######################################################################################################################################################################################
 
 	map(0x007934, 0x007934).rw(FUNC(sunplus_gcm394_base_device::unkarea_7934_r), FUNC(sunplus_gcm394_base_device::unkarea_7934_w));
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
+	// ######################################################################################################################################################################################
 	// 7axx region = system (including dma)
+	// ######################################################################################################################################################################################
 
 	map(0x007a80, 0x007a86).w(FUNC(sunplus_gcm394_base_device::system_dma_params_w));
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));	
 
+	// ######################################################################################################################################################################################
 	// 7cxx-7fxx = ram areas?
+	// ######################################################################################################################################################################################
 
 	map(0x007c00, 0x007cff).ram();
 	map(0x007d00, 0x007dff).ram();
@@ -416,6 +431,7 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_707f = 0x0000;
 	m_703a = 0x0000;
+	m_7062 = 0x0000;
 
 	m_7080 = 0x0000;
 	m_7081 = 0x0000;

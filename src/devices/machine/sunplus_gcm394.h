@@ -45,6 +45,7 @@ protected:
 	uint16_t m_dma_params[7];
 	uint16_t m_707f;
 	uint16_t m_703a;
+	uint16_t m_7062;
 
 	uint16_t m_7080;
 	uint16_t m_7081;
@@ -108,6 +109,9 @@ private:
 
 	DECLARE_READ16_MEMBER(video_703a_r);
 	DECLARE_WRITE16_MEMBER(video_703a_w);
+
+	DECLARE_READ16_MEMBER(video_7062_r);
+	DECLARE_WRITE16_MEMBER(video_7062_w);
 
 	DECLARE_READ16_MEMBER(video_707f_r);
 	DECLARE_WRITE16_MEMBER(video_707f_w);
