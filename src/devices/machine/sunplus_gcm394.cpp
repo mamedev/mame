@@ -437,39 +437,12 @@ void sunplus_gcm394_base_device::device_reset()
 	m_7934 = 0x0000;
 	m_7936 = 0x0000;
 
-
-	m_video_irq_status = 0x0000;
-
 }
 
 WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 {
 	m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
-
-void sunplus_gcm394_base_device::check_video_irq()
-{
-	videoirq_w((m_video_irq_status & 1) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(sunplus_gcm394_base_device::vblank)
-{
-	int i = 0x0001;
-
-	if (!state)
-	{
-		m_video_irq_status &= ~i;
-		check_video_irq();
-		return;
-	}
-
-	//if (m_video_irq_enable & 1)
-	{
-		m_video_irq_status |= i;
-		check_video_irq();
-	}
-}
-
 
 void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 {

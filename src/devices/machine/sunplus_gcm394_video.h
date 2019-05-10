@@ -140,8 +140,6 @@ protected:
 	uint8_t m_rgb5_to_rgb8[32];
 	uint32_t m_rgb555_to_rgb888[0x8000];
 
-	uint16_t m_video_regs[0x100];
-
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 //	required_shared_ptr<uint16_t> m_scrollram;
@@ -156,8 +154,8 @@ protected:
 
 
 	// video 70xx
-	uint16_t tmap0_regs[0x6];
-	uint16_t tmap1_regs[0x6];
+	uint16_t m_tmap0_regs[0x6];
+	uint16_t m_tmap1_regs[0x6];
 
 	uint16_t m_707f;
 	uint16_t m_703a;
@@ -178,6 +176,8 @@ protected:
 	uint16_t m_7086;
 	uint16_t m_7087;
 	uint16_t m_7088;
+
+	uint16_t m_video_irq_status;
 
 };
 

@@ -48,16 +48,12 @@ void gcm394_base_video_device::device_start()
 								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
 	}
 
-	save_item(NAME(m_video_regs));
-
 	m_video_irq_cb.resolve();
 
 }
 
 void gcm394_base_video_device::device_reset()
 {
-	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
-
 	for (int i = 0; i < 6; i++)
 	{
 		tmap0_regs[i] = 0x0000;
@@ -83,6 +79,8 @@ void gcm394_base_video_device::device_reset()
 	m_7086 = 0x0000;
 	m_7087 = 0x0000;
 	m_7088 = 0x0000;
+
+	m_video_irq_status = 0x0000;
 
 }
 
@@ -275,10 +273,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 {
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
-	const uint32_t page1_addr = 0x40 * m_page1_addr;// m_video_regs[0x20];
-	const uint32_t page2_addr = 0x40 * m_page2_addr;// m_video_regs[0x21];
-	uint16_t *page1_regs = m_video_regs + 0x10;
-	uint16_t *page2_regs = m_video_regs + 0x16;
+	const uint32_t page1_addr = 0x40 * m_page1_addr;
+	const uint32_t page2_addr = 0x40 * m_page2_addr;
+	uint16_t* page1_regs = m_tmap0_regs;
+	uint16_t* page2_regs = m_tmap1_regs;
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
@@ -299,104 +297,6 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	return 0;
 }
 
-#if 0
-READ16_MEMBER(gcm394_base_video_device::video_r)
-{
-	return m_video_regs[offset];
-}
-
-WRITE16_MEMBER(gcm394_base_video_device::video_w)
-{
-	switch (offset)
-	{
-	case 0x10: // Page 1 X scroll
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 X Scroll = %04x\n", data & 0x01ff);
-		m_video_regs[offset] = data & 0x01ff;
-		break;
-
-	case 0x11: // Page 1 Y scroll
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 Y Scroll = %04x\n", data & 0x00ff);
-		m_video_regs[offset] = data & 0x00ff;
-		break;
-
-	case 0x12: // Page 1 Attributes
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", data
-			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x13: // Page 1 Control
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", data
-			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x14: // Page 1 Tile Address
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 Tile Address = %04x\n", data & 0x1fff);
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x15: // Page 1 Attribute Address
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 Attribute Address = %04x\n", data & 0x1fff);
-		m_video_regs[offset] = data;
-		break;
-
-//
-
-	case 0x16: // Page 2 X scroll
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 X Scroll = %04x\n", data & 0x01ff);
-		m_video_regs[offset] = data & 0x01ff;
-		break;
-
-	case 0x17: // Page 2 Y scroll
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 Y Scroll: %04x = %04x\n", 0x2800 | offset, data & 0x00ff);
-		m_video_regs[offset] = data & 0x00ff;
-		break;
-
-	case 0x18: // Page 2 Attributes
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", data
-			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x19: // Page 2 Control
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", data
-			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x1a: // Page 2 Tile Address
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 Tile Address = %04x\n", data & 0x1fff);
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x1b: // Page 2 Attribute Address
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 Attribute Address = %04x\n", data & 0x1fff);
-		m_video_regs[offset] = data;
-		break;
-
-
-//
-
-	case 0x20: // Page 1 Segment Address
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 1 Segment Address = %04x\n", data);
-		m_video_regs[offset] = data;
-		break;
-
-	case 0x21: // Page 2 Segment Address
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Page 2 Segment Address = %04x\n", data);
-		m_video_regs[offset] = data;
-		break;
-
-	default:
-		LOGMASKED(LOG_UNKNOWN_PPU, "video_w: Unknown register %04x = %04x\n", 0x2800 + offset, data);
-		m_video_regs[offset] = data;
-		break;
-	}
-}
-#endif
-
-
 
 void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data)
 {
@@ -404,66 +304,68 @@ void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int off
 	{
 	case 0x0: // Page X scroll
 		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d X Scroll = %04x\n", tmap, data & 0x01ff);
-		tmap0_regs[offset] = data & 0x01ff;
+		regs[offset] = data & 0x01ff;
 		break;
 
 	case 0x1: // Page Y scroll
 		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Y Scroll = %04x\n", tmap, data & 0x00ff);
-		tmap0_regs[offset] = data & 0x00ff;
+		regs[offset] = data & 0x00ff;
 		break;
 
 	case 0x2: // Page Attributes
 		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", tmap, data
 			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
-		tmap0_regs[offset] = data;
+		regs[offset] = data;
 		break;
 
 	case 0x3: // Page Control
 		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", tmap, data
 			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
-		tmap0_regs[offset] = data;
+		regs[offset] = data;
 		break;
 
 	case 0x4: // Page Tile Address
 		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Tile Address = %04x\n", tmap, data & 0x1fff);
-		tmap0_regs[offset] = data;
+		regs[offset] = data;
 		break;
 
 	case 0x5: // Page Attribute write_tmap_regs
 		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Attribute Address = %04x\n", tmap, data & 0x1fff);
-		tmap0_regs[offset] = data;
+		regs[offset] = data;
 		break;
 	}
 }
 
 // **************************************** TILEMAP 0 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return tmap0_regs[offset]; }
+READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return m_tmap0_regs[offset]; }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(0, tmap0_regs, offset, data);
+	write_tmap_regs(0, ,m_tmap0_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk0_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	m_page1_addr = data;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk1_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	m_page2_addr = data;
 }
 
 // **************************************** TILEMAP 1 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r) { return tmap1_regs[offset]; }
+READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r) { return m_tmap1_regs[offset]; }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(1, tmap1_regs, offset, data);
+	write_tmap_regs(1, m_tmap1_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk0_w)
@@ -591,31 +493,25 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7088_w) { LOGMASKED(LOG_GCM394, "
 
 READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
 
+void gcm394_base_video_device::check_video_irq()
+{
+	m_video_irq_cb((m_video_irq_status & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
 
 WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 {
-/*
+	int i = 0x0001;
+
 	if (!state)
 	{
-		VIDEO_IRQ_STATUS &= ~1;
-		LOGMASKED(LOG_IRQS, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+		m_video_irq_status &= ~i;
 		check_video_irq();
 		return;
 	}
 
-	if (VIDEO_IRQ_ENABLE & 1)
+	//if (m_video_irq_enable & 1)
 	{
-		VIDEO_IRQ_STATUS |= 1;
-		LOGMASKED(LOG_IRQS, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+		m_video_irq_status |= i;
 		check_video_irq();
 	}
-*/
-}
-
-void gcm394_base_video_device::check_video_irq()
-{
-/*
-	LOGMASKED(LOG_IRQS, "%ssserting IRQ0 (%04x, %04x)\n", (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? "A" : "Dea", VIDEO_IRQ_STATUS, VIDEO_IRQ_ENABLE);
-	m_video_irq_cb((VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
-*/
 }

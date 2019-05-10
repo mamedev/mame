@@ -31,9 +31,9 @@ public:
 
 	void map(address_map &map);
 
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect) { return 0; /* m_spg_video->screen_update(screen, bitmap, cliprect);*/ }
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -197,12 +197,7 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
 
-	uint16_t m_video_irq_status;
-
-
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
-	void check_video_irq();
-
 };
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
