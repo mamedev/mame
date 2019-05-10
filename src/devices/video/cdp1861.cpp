@@ -34,12 +34,6 @@ Timing as it applies to the Studio II:
 - At the end, the random number seed (not part of video drawing) gets
   updated and the interrupt routine ends.
 
-The current situation:
-- For whatever reason, the CPU is taking 32 cycles to process the 14
-  pre-DMA instructions instead of the required 29 cycles. Therefore
-  the DMA timer is adjusted to fire 32*8 clocks after INT (every cycle
-  is 8 clocks).
-
 **********************************************************************/
 
 #include "emu.h"
@@ -175,7 +169,6 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 
 			m_int_timer->adjust(screen().time_until_pos( SCANLINE_INT_END, 0));
-			m_dma_timer->adjust(clocks_to_attotime(32*8));  // adjust DMA to occur exact number of cycle after INT - should be 29*8
 		}
 		else
 		{
