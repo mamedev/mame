@@ -206,6 +206,15 @@ void dec8_state::srdarwin_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 
 /******************************************************************************/
 
+void dec8_state::cobracom_colpri_cb(u32 &colour, u32 &pri_mask)
+{
+	pri_mask = 0; // above foreground, background
+	if ((colour & 4) == 0)
+		pri_mask |= GFX_PMASK_2; // behind foreground, above background
+
+	colour &= 3;
+}
+
 uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0,cliprect);
@@ -216,9 +225,8 @@ uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 1);
-	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x04, 0x00, 0x03);
 	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 2);
-	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x04, 0x04, 0x03);
+	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -296,7 +304,7 @@ uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bi
 
 	// we mimic the priority scheme in dec0.cpp, this was originally a bit different, so this could be wrong
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
-	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x00, 0x00, 0x0f);
+	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x08,0x08,0x08,0x08, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

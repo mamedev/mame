@@ -2307,8 +2307,6 @@ void dec8_state::oscar(machine_config &config)
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
-	m_spritegen_mxc->set_gfx_region(1);
-	m_spritegen_mxc->set_gfxdecode_tag(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2413,8 +2411,7 @@ void dec8_state::cobracom(machine_config &config)
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
-	m_spritegen_mxc->set_gfx_region(1);
-	m_spritegen_mxc->set_gfxdecode_tag(m_gfxdecode);
+	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb), this);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
