@@ -14,6 +14,7 @@
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
+#include "sunplus_gcm394_video.h"
 
 class sunplus_gcm394_base_device : public device_t, public device_mixer_interface
 {
@@ -23,7 +24,8 @@ public:
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, "palette")
+	//, m_palette(*this, "palette")
+	, m_spg_video(*this, "spgvideo")
 	{
 	}
 
@@ -42,7 +44,8 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	//required_device<palette_device> m_palette;
+	required_device<gcm394_video_device> m_spg_video;
 
 	// video 70xx
 	uint16_t tmap0_regs[0x6];

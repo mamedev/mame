@@ -2673,6 +2673,8 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
 		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
 		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
+		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.cpp",
+		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.h",
 	}
 end
 

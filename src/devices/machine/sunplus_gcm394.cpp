@@ -470,7 +470,7 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// 73xx-77xx = ram areas?
 	// ######################################################################################################################################################################################
 
-	map(0x007300, 0x0073ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x007300, 0x0073ff).ram().share("spgvideo:paletteram");
 	map(0x007400, 0x0074ff).ram();
 	map(0x007500, 0x0075ff).ram();
 	map(0x007600, 0x0076ff).ram();
@@ -701,7 +701,9 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	//m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	//m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x100);
+	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
+
 
 }
 
