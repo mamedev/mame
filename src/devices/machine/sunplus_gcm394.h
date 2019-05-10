@@ -44,6 +44,17 @@ protected:
 
 	uint16_t m_dma_params[7];
 	uint16_t m_707f;
+	uint16_t m_703a;
+
+	uint16_t m_7080;
+	uint16_t m_7081;
+	uint16_t m_7082;
+	uint16_t m_7083;
+	uint16_t m_7084;
+	uint16_t m_7085;
+	uint16_t m_7086;
+	uint16_t m_7087;
+	uint16_t m_7088;
 
 	// unk 78xx
 	uint16_t m_78fb;
@@ -54,6 +65,9 @@ protected:
 	uint16_t m_7822;
 	uint16_t m_7823;
 	uint16_t m_7824;
+
+	uint16_t m_7862;
+	uint16_t m_7863;
 
 	// unk 79xx
 	uint16_t m_7934;
@@ -92,9 +106,21 @@ private:
 	DECLARE_WRITE16_MEMBER(video_dma_size_w);
 	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
 
+	DECLARE_READ16_MEMBER(video_703a_r);
+	DECLARE_WRITE16_MEMBER(video_703a_w);
+
 	DECLARE_READ16_MEMBER(video_707f_r);
 	DECLARE_WRITE16_MEMBER(video_707f_w);
 
+	DECLARE_WRITE16_MEMBER(video_7080_w);
+	DECLARE_WRITE16_MEMBER(video_7081_w);
+	DECLARE_WRITE16_MEMBER(video_7082_w);
+	DECLARE_WRITE16_MEMBER(video_7083_w);
+	DECLARE_WRITE16_MEMBER(video_7084_w);
+	DECLARE_WRITE16_MEMBER(video_7085_w);
+	DECLARE_WRITE16_MEMBER(video_7086_w);
+	DECLARE_WRITE16_MEMBER(video_7087_w);
+	DECLARE_WRITE16_MEMBER(video_7088_w);
 
 	DECLARE_WRITE16_MEMBER(system_dma_params_w);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
@@ -113,6 +139,12 @@ private:
 
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7862_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7862_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7863_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7863_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7934_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7934_w);
