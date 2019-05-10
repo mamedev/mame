@@ -643,26 +643,6 @@ INPUT_PORTS_END
 
 
 /************************************************************
-                GFX DECODING
-************************************************************/
-
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16x16 pixels */
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0, 1) },
-	{ STEP16(15*4, -4) },
-	{ STEP16(0, 16*4) },
-	16*16*4
-};
-
-static GFXDECODE_START( gfx_airsys )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32*16 )
-GFXDECODE_END
-
-
-/************************************************************
                 MACHINE DRIVERS
 ************************************************************/
 
@@ -730,16 +710,12 @@ void taitoair_state::airsys(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitoair_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airsys);
-
 	PALETTE(config, m_palette, palette_device::BLACK, 512*16+512*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_gfx_region(0);
-	m_tc0080vco->set_tx_region(1);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0080vco->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -798,7 +774,7 @@ ROM_START( topland )
 	ROM_REGION( 0x10000, "mechacpu", 0 )
 	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
 	ROM_LOAD64_BYTE( "b62-36.48",  0x000006, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
 	ROM_LOAD64_BYTE( "b62-29.27",  0x000005, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
@@ -847,7 +823,7 @@ ROM_START( toplandj )
 	ROM_REGION( 0x10000, "mechacpu", 0 )
 	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
 	ROM_LOAD64_BYTE( "b62-36.48",  0x000006, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
 	ROM_LOAD64_BYTE( "b62-29.27",  0x000005, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
@@ -897,7 +873,7 @@ ROM_START( ainferno )
 	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
 	ROM_LOAD( "c45-30.9", 0x00000, 0x10000, CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "c45-11.28", 0x000007, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
 	ROM_LOAD64_BYTE( "c45-15.40", 0x000006, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
 	ROM_LOAD64_BYTE( "c45-12.29", 0x000005, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )
@@ -952,7 +928,7 @@ ROM_START( ainfernoj )
 	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
 	ROM_LOAD( "c45-30.9", 0x00000, 0x10000,  CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "c45-11.28", 0x000007, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
 	ROM_LOAD64_BYTE( "c45-15.40", 0x000006, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
 	ROM_LOAD64_BYTE( "c45-12.29", 0x000005, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )

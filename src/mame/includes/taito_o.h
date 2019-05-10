@@ -23,7 +23,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_tc0080vco(*this, "tc0080vco"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_io_in(*this, "IN%u", 0U)
 	{ }
@@ -38,7 +37,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0080vco_device> m_tc0080vco;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	required_ioport_array<2> m_io_in;
