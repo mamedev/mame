@@ -20199,22 +20199,21 @@
 		</part>
 	</software>
 
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
-	<!-- Dump of side A is currently missing -->
+	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 	<software name="mercs">
 		<description>Mercs</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
-<!--			<feature name="part_id" value="Side A: Amstrad CPC"/>
-			<dataarea name="flop" size="">
-				<rom name="" size="" crc="" sha1="" offset="0"/>
+			<feature name="part_id" value="Side A: ZX Spectrum"/>
+			<dataarea name="flop" size = "335301">
+				<rom name="mercs (1991)(us gold)(sidea)[samdisk].dsk" size="335301" crc="b8f67304" sha1="e79e7b4592c45ac2d99a835103628750709b56d7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: ZX Spectrum"/>-->
-			<dataarea name="flop" size="255232">
-				<rom name="mercs - side b (spectrum).dsk" size="255232" crc="fb3eb4db" sha1="bfb999f9442f0094a2590f0ebaac8f30ad40820a" offset="0"/>
+			<feature name="part_id" value="Side B: Amstrad CPC"/>
+			<dataarea name="flop" size = "335301">
+				<rom name="mercs (1991)(us gold)(sideb)[samdisk].dsk" size="335301" crc="cc917c2d" sha1="b71cad66a67778f825e727c50e916f433dac0ecf" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20671,4 +20670,24 @@
 		</part>
 	</software>
 
+	<software name="4soccersspa" cloneof="4soccers">
+		<description>4 Soccer Simulators (Spa)</description>
+		<year>1988</year>
+		<publisher>MCM Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: 11-a-Side Soccer + Indoor Soccer"/>
+			<dataarea name="flop" size = "214528">
+				<rom name="4soccer (spain) side a.dsk" size="214528" crc="de6444fc" sha1="df1e44a19f78faaa1adfdc96bd12080f4f16eb93" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Street Soccer + Soccer Skills"/>
+			<dataarea name="flop" size = "214528">
+				<rom name="4soccer (spain) side b.dsk" size="214528" crc="2104ec4b" sha1="da607fa1be919d1d898921d699e448bf5ce347b9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	
 </softwarelist>
