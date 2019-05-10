@@ -88,12 +88,17 @@ void gcm394_base_video_device::device_reset()
 *     Video Hardware     *
 *************************/
 
+inline uint16_t gcm394_base_video_device::read_data(uint32_t offset)
+{
+	address_space &space = m_cpu->space(AS_PROGRAM);
+	uint16_t b = space.read_word(offset);
+	return b;
+}
+
 
 template<gcm394_base_video_device::blend_enable_t Blend, gcm394_base_video_device::rowscroll_enable_t RowScroll, gcm394_base_video_device::flipx_t FlipX>
 void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset)
 {
-	address_space &space = m_cpu->space(AS_PROGRAM);
-
 	uint32_t nc_bpp = ((bpp) + 1) << 1;
 
 	palette_offset >>= nc_bpp;
@@ -123,7 +128,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = space.read_word(m++ & 0x3fffff);
+			uint16_t b = read_data((m++ & 0x3fffff));
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;

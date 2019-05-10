@@ -179,6 +179,7 @@ protected:
 
 	uint16_t m_video_irq_status;
 
+	uint16_t read_data(uint32_t offset);
 };
 
 class gcm394_video_device : public gcm394_base_video_device
