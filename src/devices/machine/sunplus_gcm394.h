@@ -49,6 +49,12 @@ protected:
 	uint16_t m_78fb;
 	uint16_t m_782d;
 
+	uint16_t m_7820;
+	uint16_t m_7821;
+	uint16_t m_7822;
+	uint16_t m_7823;
+	uint16_t m_7824;
+
 	// unk 79xx
 	uint16_t m_7934;
 	uint16_t m_7936;
@@ -96,6 +102,12 @@ private:
 
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
+
+	DECLARE_WRITE16_MEMBER(unkarea_7820_w);
+	DECLARE_WRITE16_MEMBER(unkarea_7821_w);
+	DECLARE_WRITE16_MEMBER(unkarea_7822_w);
+	DECLARE_WRITE16_MEMBER(unkarea_7823_w);
+	DECLARE_WRITE16_MEMBER(unkarea_7824_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7868_r);
 
