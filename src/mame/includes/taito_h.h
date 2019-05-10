@@ -24,7 +24,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_tc0080vco(*this, "tc0080vco"),
 		m_tc0040ioc(*this, "tc0040ioc"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_z80bank(*this, "z80bank"),
 		m_io_p1x(*this, "P1X"),
@@ -48,7 +47,6 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<tc0080vco_device> m_tc0080vco;
 	optional_device<tc0040ioc_device> m_tc0040ioc;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	required_memory_bank m_z80bank;
@@ -67,7 +65,6 @@ private:
 	void syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void recordbr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void dleague_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	inline void draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 tile_offs, int sx, int sy, int ysize, int dx, int dy, int zx, int zy);
 	void taitoh_log_vram();
 	void dleague_map(address_map &map);
 	void recordbr_map(address_map &map);

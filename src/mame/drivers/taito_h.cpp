@@ -589,44 +589,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16x16 pixels */
-	RGN_FRAC(1,1),  /* 32768 tiles */
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(15*4, -4) },
-	{ STEP16(0, 16*4) },
-	16*16*4
-};
-
-#if 0
-static const gfx_layout charlayout =
-{
-	8, 8,   /* 8x8 pixels */
-	256,    /* 256 chars */
-	4,      /* 4 bit per pixel */
-	{ 0x1000*8 + 8, 0x1000*8, 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
-	16*8
-};
-#endif
-
-
-static GFXDECODE_START( gfx_syvalion )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_recordbr )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_dleague )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
-GFXDECODE_END
-
-
 void taitoh_state::machine_reset()
 {
 }
@@ -666,15 +628,12 @@ void taitoh_state::syvalion(machine_config &config)
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_syvalion));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_syvalion);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_gfx_region(0);
-	m_tc0080vco->set_tx_region(1);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0080vco->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -719,15 +678,12 @@ void taitoh_state::recordbr(machine_config &config)
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_recordbr));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_recordbr);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 32*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_gfx_region(0);
-	m_tc0080vco->set_tx_region(1);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0080vco->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -782,15 +738,12 @@ void taitoh_state::dleague(machine_config &config)
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_dleague));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dleague);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_gfx_region(0);
-	m_tc0080vco->set_tx_region(1);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0080vco->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -823,7 +776,7 @@ ROM_START( syvalion )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b51-23.bin", 0x00000, 0x10000, CRC(734662de) SHA1(0058d6de68f26cd58b9eb8859e15f3ced6bd3489) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "b51-16.bin", 0x000007, 0x20000, CRC(c0fcf7a5) SHA1(4550ba6d822ba12ad39576bcbed09b5fa54279e8) )
 	ROM_LOAD64_BYTE( "b51-12.bin", 0x000006, 0x20000, CRC(6b36d358) SHA1(4101c110e99fe2ac1a989c84857f6438439b79a1) )
 	ROM_LOAD64_BYTE( "b51-08.bin", 0x000005, 0x20000, CRC(9f6a535c) SHA1(40d52d3f572dd87b41d89707a2ec189760d806b0) )
@@ -858,7 +811,7 @@ ROM_START( syvalionu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b51-23.bin", 0x00000, 0x10000, CRC(734662de) SHA1(0058d6de68f26cd58b9eb8859e15f3ced6bd3489) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "b51-16.bin", 0x000007, 0x20000, CRC(c0fcf7a5) SHA1(4550ba6d822ba12ad39576bcbed09b5fa54279e8) )
 	ROM_LOAD64_BYTE( "b51-12.bin", 0x000006, 0x20000, CRC(6b36d358) SHA1(4101c110e99fe2ac1a989c84857f6438439b79a1) )
 	ROM_LOAD64_BYTE( "b51-08.bin", 0x000005, 0x20000, CRC(9f6a535c) SHA1(40d52d3f572dd87b41d89707a2ec189760d806b0) )
@@ -893,7 +846,7 @@ ROM_START( syvalionw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b51-23.bin", 0x00000, 0x10000, CRC(734662de) SHA1(0058d6de68f26cd58b9eb8859e15f3ced6bd3489) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "b51-16.bin", 0x000007, 0x20000, CRC(c0fcf7a5) SHA1(4550ba6d822ba12ad39576bcbed09b5fa54279e8) )
 	ROM_LOAD64_BYTE( "b51-12.bin", 0x000006, 0x20000, CRC(6b36d358) SHA1(4101c110e99fe2ac1a989c84857f6438439b79a1) )
 	ROM_LOAD64_BYTE( "b51-08.bin", 0x000005, 0x20000, CRC(9f6a535c) SHA1(40d52d3f572dd87b41d89707a2ec189760d806b0) )
@@ -928,7 +881,7 @@ ROM_START( syvalionp )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c69b.ic58", 0x00000, 0x10000, CRC(07d3d789) SHA1(dbbe308f74637bb5a2651654bbada6a07f99ae14) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "chr-00.ic16", 0x000007, 0x20000, CRC(b0c66db7) SHA1(e3a1e9b0d6157e5085a55fdac1daa61f5a03b048) )
 	ROM_LOAD64_BYTE( "chr-01.ic12", 0x000006, 0x20000, CRC(dd07db12) SHA1(76317c27b1e649d73f639b565b67f42af0233118) )
 	ROM_LOAD64_BYTE( "chr-02.ic8",  0x000005, 0x20000, CRC(323a9ad9) SHA1(7ae6fa2dcc2078ae64d6d28cadacb52c6a069575) )
@@ -974,7 +927,7 @@ ROM_START( recordbr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b56-19.bin", 0x00000, 0x10000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "b56-04.bin", 0x000007, 0x20000, CRC(f7afdff0) SHA1(8f8ea0e8da20913426ff3b58d7bb63bd352d3fb4) )
 	ROM_LOAD64_BYTE( "b56-08.bin", 0x000006, 0x20000, CRC(c9f0d38a) SHA1(aa22f1a06e00f90c546eebcd8b42da3e3c7d0781) )
 	ROM_LOAD64_BYTE( "b56-03.bin", 0x000005, 0x20000, CRC(4045fd44) SHA1(a84be9eedba7aed30d4f2841016784f8024d9443) )
@@ -1004,7 +957,7 @@ ROM_START( gogold )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b56-19.bin", 0x00000, 0x10000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "b56-04.bin", 0x000007, 0x20000, CRC(f7afdff0) SHA1(8f8ea0e8da20913426ff3b58d7bb63bd352d3fb4) )
 	ROM_LOAD64_BYTE( "b56-08.bin", 0x000006, 0x20000, CRC(c9f0d38a) SHA1(aa22f1a06e00f90c546eebcd8b42da3e3c7d0781) )
 	ROM_LOAD64_BYTE( "b56-03.bin", 0x000005, 0x20000, CRC(4045fd44) SHA1(a84be9eedba7aed30d4f2841016784f8024d9443) )
@@ -1036,7 +989,7 @@ ROM_START( tetristh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c26-13.ic56", 0x00000, 0x10000, CRC(efa89dfa) SHA1(556e77c63cb95e441ea1d1beb3d43c61a48a3bb1) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "c26-04.ic51", 0x000007, 0x20000, CRC(23ddf00f) SHA1(f7bb19db62d5e6cb27a6e98db68c54c01e34b776) )
 	ROM_LOAD64_BYTE( "c26-08.ic65", 0x000006, 0x20000, CRC(86071824) SHA1(00ba24b35ad93aa0f29e05068ddc9276f2d333af) )
 	ROM_LOAD64_BYTE( "c26-03.ic50", 0x000005, 0x20000, CRC(341be9ac) SHA1(a93c55cb20cb0433855ceb125bffcbcecb0e552d) )
@@ -1067,7 +1020,7 @@ ROM_START( dleague )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c02-23.40", 0x00000, 0x10000, CRC(5632ee49) SHA1(90dedaf40ab526529cd7d569b78a9d5451ec3e25) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0080vco", 0 )
 	ROM_LOAD64_WORD_SWAP( "c02-02.15", 0x000006, 0x80000, CRC(b273f854) SHA1(5961b9fe2c49fb05f5bc3e27e05925dbef8577e9) )
 	ROM_LOAD64_WORD_SWAP( "c02-03.17", 0x000004, 0x80000, CRC(c3fd0dcd) SHA1(43f32cefbca203bd0453e1c3d4523f0834900418) )
 	ROM_LOAD64_WORD_SWAP( "c02-24.19", 0x000002, 0x80000, CRC(18ef740a) SHA1(27f0445c053e28267e5688627d4f91d158d4fb07) )
@@ -1098,7 +1051,7 @@ ROM_START( dleaguej )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c02-23.40", 0x00000, 0x10000, CRC(5632ee49) SHA1(90dedaf40ab526529cd7d569b78a9d5451ec3e25) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0080vco", 0 )
 	ROM_LOAD64_WORD_SWAP( "c02-02.15", 0x000006, 0x80000, CRC(b273f854) SHA1(5961b9fe2c49fb05f5bc3e27e05925dbef8577e9) )
 	ROM_LOAD64_WORD_SWAP( "c02-03.17", 0x000004, 0x80000, CRC(c3fd0dcd) SHA1(43f32cefbca203bd0453e1c3d4523f0834900418) )
 	ROM_LOAD64_WORD_SWAP( "c02-24.19", 0x000002, 0x80000, CRC(18ef740a) SHA1(27f0445c053e28267e5688627d4f91d158d4fb07) )

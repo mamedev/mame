@@ -193,21 +193,6 @@ static INPUT_PORTS_START( parentj )
 
 INPUT_PORTS_END
 
-static const gfx_layout parentj_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(15*4, -4) },
-	{ STEP16(0, 16*4) },
-	16*16*4
-};
-
-static GFXDECODE_START( gfx_parentj )
-	GFXDECODE_ENTRY( "gfx1", 0, parentj_layout,  0x0, 0x400/16  )
-GFXDECODE_END
-
 /* unknown sources ... */
 TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_interrupt)
 {
@@ -240,15 +225,12 @@ void taitoo_state::parentj(machine_config &config)
 	screen.set_screen_update(FUNC(taitoo_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_parentj);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_gfx_region(0);
-	m_tc0080vco->set_tx_region(1);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0080vco->set_palette(m_palette);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -263,7 +245,7 @@ ROM_START( parentj )
 	ROM_LOAD16_BYTE( "c42-13.21", 0x00000, 0x10000, CRC(823623eb) SHA1(7302cc0ac532f6190ae35218ea05bf8cf11fd687) )
 	ROM_LOAD16_BYTE( "c42-12.20", 0x00001, 0x10000, CRC(8654b0ab) SHA1(edd23a731c1c60cab353e51ef5e66d33bc3fde61) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )
 	ROM_LOAD64_BYTE( "c42-05.06", 0x00000, 0x20000, CRC(7af0d45d) SHA1(bc527b74185596e4e77b34d08eb3e1678614b451) )
 	ROM_LOAD64_BYTE( "c42-04.05", 0x00001, 0x20000, CRC(133009a1) SHA1(fae5dd600384790225c24a62d1f8a00f0366dae9) )
 	ROM_LOAD64_BYTE( "c42-09.13", 0x00002, 0x20000, CRC(ba35fb03) SHA1(b76e50d298ccc0f230c865b563cd8e02866a4ffb) )
