@@ -25656,6 +25656,17 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 
 	<!-- Official Nintendo cleaning cartridge is P/N "DMG-A-CN-USA" -->
 
+	<software name="gbtest" supported="no">
+		<description>Game Boy Test Cartridge (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="game boy test cartridge (usa, europe).bin" size="0x8000" crc="ae13a5c3" sha1="ce9c211852b4357b1356bb015db6f675def69c9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ggenie" supported="no">
 		<description>Game Genie BIOS (USA) (v2.1)</description>
 		<year>19??</year>
