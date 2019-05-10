@@ -19,9 +19,6 @@ function autofire.startplugin()
 		if emu.romname() == '___empty' then
 			return
 		end
-		if manager:machine().paused then
-			return
-		end
 		local keycode = manager:machine():input():code_from_token(key)
 		local pressed = manager:machine():input():code_pressed(keycode)
 		local p1b1 = manager:machine():ioport().ports[':P1'].fields['P1 Button 1']
@@ -34,7 +31,7 @@ function autofire.startplugin()
 		end
 	end
 
-	emu.register_frame(per_frame)
+	emu.register_frame_done(per_frame)
 end
 
 return exports
