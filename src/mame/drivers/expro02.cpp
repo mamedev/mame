@@ -914,11 +914,6 @@ static const gfx_layout layout_16x16x4 =
 
 static GFXDECODE_START( gfx_expro02 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400,      0x40 ) // [0] View2 tiles
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_expro02_noview2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
 GFXDECODE_END
 
 /*************************************
@@ -949,9 +944,9 @@ void expro02_state::expro02(machine_config &config)
 	PALETTE(config, m_palette, FUNC(expro02_state::expro02_palette)).set_format(palette_device::GRBx_555, 2048 + 32768);
 
 	KANEKO_TMAP(config, m_view2);
-	m_view2->set_gfx_region(1);
+	m_view2->set_colbase(0x400);
 	m_view2->set_offset(0x5b, 0x8, 256, 224);
-	m_view2->set_gfxdecode_tag("gfxdecode");
+	m_view2->set_palette(m_palette);
 	m_view2->set_tile_callback(kaneko_view2_tilemap_device::view2_cb_delegate(FUNC(expro02_state::tile_callback), this));
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
@@ -994,8 +989,6 @@ void expro02_state::comad_noview2(machine_config &config)
 	comad(config);
 
 	config.device_remove("view2");
-
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_expro02_noview2);
 }
 
 
@@ -1087,7 +1080,7 @@ ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm018e.u94",        0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	ROM_LOAD( "pm019u_u93-01.u93", 0x180000, 0x010000, CRC(3cb79005) SHA1(05a0b993b9071467265067c3762644f46343d8de) ) // ?? seems to be an extra / replacement enemy?, not sure where it maps, or when it's used, it might load over another rom
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* sprites - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
@@ -1126,7 +1119,7 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	/* U93 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* tiles - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
@@ -1164,7 +1157,7 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	/* U93 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* tiles - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
@@ -1201,7 +1194,7 @@ ROM_START( galsnewk ) /* EXPRO-02 PCB, Korean title is "Ddang Dda Meok Gi" */
 	ROM_LOAD( "pm018e.u94",        0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	ROM_LOAD( "pm19k.u93",         0x180000, 0x010000, CRC(c17d2989) SHA1(895f44a58dcf0065d42125d439dcc10f41563a94) ) // ?? seems to be an extra / replacement enemy?, not sure where it maps, or when it's used, it might load over another rom
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* sprites - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
@@ -1302,7 +1295,7 @@ ROM_START( fantasia ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD940429 MADE IN K
 	ROM_LOAD( "2.music1", 0x00000, 0x80000, CRC(22955efb) SHA1(791c18d1aa0c10810da05c199108f51f99fe1d49) )
 	ROM_LOAD( "1.music2", 0x80000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* tiles - encrypted */
 	ROM_LOAD16_BYTE( "15.obj3", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
@@ -1334,7 +1327,7 @@ ROM_START( fantasiaa ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD 940307 MADE IN
 	ROM_LOAD( "music1_1.ub6", 0x00000, 0x80000, CRC(af0be817) SHA1(5c8897dcd9957add19ff9553c01ce03fec68b354) ) /* This sound sample is different, Earlier ver or BAD??? */
 	ROM_LOAD( "music2_2.uc6", 0x80000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) ) /* same data, different PCB location */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* tiles - encrypted */
 	ROM_LOAD16_BYTE( "g-scr2_15.ul16b", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) ) /* same data, different PCB location */
@@ -1365,7 +1358,7 @@ ROM_START( fantasiab )
 	ROM_LOAD( "2.music1", 0x00000, 0x80000, CRC(22955efb) SHA1(791c18d1aa0c10810da05c199108f51f99fe1d49) )
 	ROM_LOAD( "1.music2", 0x80000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "view2", ROMREGION_ERASEFF )   /* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* tiles - encrypted */
 	ROM_LOAD16_BYTE( "15.obj3", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
@@ -1845,7 +1838,7 @@ ROM_END
 void expro02_state::init_expro02()
 {
 	uint32_t *src = (uint32_t *)memregion("gfx3" )->base();
-	uint32_t *dst = (uint32_t *)memregion("gfx2" )->base();
+	uint32_t *dst = (uint32_t *)memregion("view2" )->base();
 
 	// the VIEW2 tiledata is scrambled
 	if (src)
@@ -1869,8 +1862,7 @@ void expro02_state::init_expro02()
 			// reverse the initial bitswap
 			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 9, 10, 17, 4, 11, 12, 3, 15, 16, 14, 13, 8, 7, 6, 5, 2, 1, 0);
 
-			// swap nibbles to use the same gfxdecode
-			dst[x] = (src[offset] << 4 & 0xF0F0F0F0) | (src[offset] >> 4 & 0x0F0F0F0F);
+			dst[x] = src[offset];
 		}
 	}
 }

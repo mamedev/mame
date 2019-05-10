@@ -499,24 +499,6 @@ void jchan_state::jchan_sub(address_map &map)
 }
 
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24, 8*32+4, 8*32+0, 8*32+12, 8*32+8, 8*32+20, 8*32+16, 8*32+28, 8*32+24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 16*32,17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	32*32
-};
-
-// we don't decode the sprites, they are non-tile based and RLE encoded!, see sknsspr.cpp */
-
-static GFXDECODE_START( gfx_jchan )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
-GFXDECODE_END
-
-
 /* input ports */
 
 /* BUTTON1 : weak punch - BUTTON2 : strong punch - BUTTON3 : weak kick - BUTTON 4 : strong kick */
@@ -614,8 +596,6 @@ void jchan_state::jchan(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_jchan);
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -627,9 +607,9 @@ void jchan_state::jchan(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x10000);
 
 	KANEKO_TMAP(config, m_view2);
-	m_view2->set_gfx_region(0);
+	m_view2->set_colbase(0);
 	m_view2->set_offset(33, 11, 320, 240);
-	m_view2->set_gfxdecode_tag("gfxdecode");
+	m_view2->set_palette(m_palette);
 
 	for (auto &spritegen : m_spritegen)
 		SKNS_SPRITE(config, spritegen, 0);
@@ -675,7 +655,7 @@ ROM_START( jchan )
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) /* BG GFX */
+	ROM_REGION( 0x100000, "view2", 0 ) /* BG GFX */
 	ROM_LOAD( "jc-200.00", 0x000000, 0x100000, CRC(1f30c24e) SHA1(0c413fc67c3ec020e6786e7157d82aa242c8d2ad) )
 
 	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio */
@@ -715,7 +695,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? Mask ROMs dumped and confirmed 
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) /* BG GFX */
+	ROM_REGION( 0x100000, "view2", 0 ) /* BG GFX */
 	ROM_LOAD( "jc-200.00", 0x000000, 0x100000, CRC(1f30c24e) SHA1(0c413fc67c3ec020e6786e7157d82aa242c8d2ad) )
 
 	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio */

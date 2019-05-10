@@ -1652,8 +1652,8 @@ INPUT_PORTS_END
 
 
 /*
-    16x16x4 made of 4 8x8x4 blocks arrenged like:           01
-    (nibbles are swapped for tiles, not for sprites)        23
+    16x16x4 made of 4 8x8x4 blocks arrenged like:   01
+                                                    23
 */
 static const gfx_layout layout_16x16x4 =
 {
@@ -1681,21 +1681,13 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( gfx_1x4bit_1x4bit )
+static GFXDECODE_START( gfx_4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [1] Layers
-GFXDECODE_END
-static GFXDECODE_START( gfx_1x4bit_2x4bit )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [1] Layers
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [2] Layers
-GFXDECODE_END
-static GFXDECODE_START( gfx_1x8bit_2x4bit )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x40 * 256, 0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0,          0x40 ) // [1] Layers
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0,          0x40 ) // [2] Layers
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_8bit )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x40 * 256, 0x40 ) // [0] Sprites
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1754,15 +1746,15 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 	m_screen->set_visarea(0, 256-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_berlwall_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x4bit_1x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	PALETTE(config, m_bgpalette, palette_device::GRB_555); // 32768 static colors for the bg
 
 	KANEKO_TMAP(config, m_view2[0]);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x5b, -0x8, 256, 240+16);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_offsets(0, -1*64);
@@ -1816,18 +1808,18 @@ void kaneko16_state::bakubrkr(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x4bit_2x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x5b, -0x8, 256, 240);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_TMAP(config, m_view2[1]);
-	m_view2[1]->set_gfx_region(2);
+	m_view2[1]->set_colbase(0x40 * 16);
 	m_view2[1]->set_offset(0x5b, -0x8, 256, 240);
-	m_view2[1]->set_gfxdecode_tag("gfxdecode");
+	m_view2[1]->set_palette(m_palette);
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(8,8,8,8); // above all
@@ -1885,13 +1877,13 @@ void kaneko16_state::blazeon(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x4bit_1x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0], 0);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x33, 0x8, 320, 240);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
@@ -1938,13 +1930,13 @@ void kaneko16_state::wingforc(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x4bit_1x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x33, 0x8+1, 320, 240);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
@@ -2016,18 +2008,18 @@ void kaneko16_gtmr_state::gtmr(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_gtmr_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x8bit_2x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_8bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 32768);
 
 	KANEKO_TMAP(config, m_view2[0]);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0);
 	m_view2[0]->set_offset(0x33, 0x00, 320, 240);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_TMAP(config, m_view2[1]);
-	m_view2[1]->set_gfx_region(2);
+	m_view2[1]->set_colbase(0);
 	m_view2[1]->set_offset(0x33, 0x00, 320, 240);
-	m_view2[1]->set_gfxdecode_tag("gfxdecode");
+	m_view2[1]->set_palette(m_palette);
 
 	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
@@ -2127,18 +2119,18 @@ void kaneko16_state::mgcrystl(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x4bit_2x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x5b, -0x8, 256, 240);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_TMAP(config, m_view2[1]);
-	m_view2[1]->set_gfx_region(2);
+	m_view2[1]->set_colbase(0x40 * 16);
 	m_view2[1]->set_offset(0x5b, -0x8, 256, 240);
-	m_view2[1]->set_gfxdecode_tag("gfxdecode");
+	m_view2[1]->set_palette(m_palette);
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(2 /* below all */ ,3 /* above tile[0], below the other */ ,5 /* above all */ ,7 /* above all */);
@@ -2243,13 +2235,13 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1x4bit_1x4bit);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
-	m_view2[0]->set_gfx_region(1);
+	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x33, -0x8, 320, 240);
-	m_view2[0]->set_gfxdecode_tag("gfxdecode");
+	m_view2[0]->set_palette(m_palette);
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */);
@@ -2309,28 +2301,6 @@ void kaneko16_shogwarr_state::brapboys(machine_config &config)
 
 ***************************************************************************/
 
-/*
- Sprites and tiles are stored in the ROMs using the same layout. But tiles
- have the even and odd pixels swapped. So we use this function to untangle
- them and have one single gfxlayout for both tiles and sprites.
-*/
-void kaneko16_state::unscramble_tiles(const char *region)
-{
-	memory_region *tile_region = memregion(region);
-	if (tile_region == nullptr)
-	{
-		return;
-	}
-
-	u8 *ram = tile_region->base();
-	int size = tile_region->bytes();
-
-	for (int i = 0; i < size; i ++)
-	{
-		ram[i] = ((ram[i] & 0xF0) >> 4) + ((ram[i] & 0x0F) << 4);
-	}
-}
-
 void kaneko16_state::common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize)
 {
 	assert((m_okibank[bankno].found()) && (m_okiregion[bankno].found()));
@@ -2376,16 +2346,9 @@ void kaneko16_gtmr_state::common_oki_bank_install(int bankno, size_t fixedsize, 
 	}
 }
 
-void kaneko16_state::init_kaneko16()
-{
-	unscramble_tiles("gfx2");
-	unscramble_tiles("gfx3");
-}
-
 void kaneko16_state::init_bakubrkr()
 {
 	common_oki_bank_install(0, 0x20000, 0x20000);
-	init_kaneko16();
 }
 
 /*
@@ -2442,7 +2405,6 @@ void kaneko16_berlwall_state::patch_protection(u32 bra_offset,u16 bra_value,u16 
 
 void kaneko16_berlwall_state::init_berlwall_common()
 {
-	unscramble_tiles("gfx2");
 }
 
 void kaneko16_berlwall_state::init_berlwall()
@@ -2467,7 +2429,6 @@ void kaneko16_gtmr_state::init_gtmr()
 {
 	common_oki_bank_install(0, 0x30000, 0x10000);
 	common_oki_bank_install(1, 0x00000, 0x40000);
-	init_kaneko16();
 }
 
 
@@ -2540,10 +2501,10 @@ ROM_START( explbrkr ) /* MASTER UP= 92/10/08 20:10:16 */
 	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
@@ -2565,10 +2526,10 @@ ROM_START( explbrkrk ) /* MASTER UP= 92/10/08 21:35:56 - No "For use in Korea.."
 	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
@@ -2589,10 +2550,10 @@ ROM_START( bakubrkr ) /* MASTER UP= 92/10/08 20:56:03 */
 	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002j.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
@@ -2645,7 +2606,7 @@ ROM_START( berlwall )
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x080000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
@@ -2677,7 +2638,7 @@ ROM_START( berlwallt )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 	ROM_LOAD( "bw300.u82",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) ) // Masked players, Japanese text
 
-	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x080000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
@@ -2711,7 +2672,7 @@ ROM_START( berlwallk )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 	ROM_LOAD( "bw300k.u82", 0x100000, 0x020000, CRC(b8de79d7) SHA1(c9a78aa213105f3657349995aca2866bc6d80093) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x080000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
@@ -2742,7 +2703,7 @@ ROM_START( packbang ) /* same PCB as Berlin Wall - BW-002 */
 	ROM_LOAD( "bb.u84",  0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) )
 	ROM_LOAD( "pb_spr_ext_9_20_ver.u83",  0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) ) /* hand written label plus checksum BA63 */
 
-	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x080000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bbbox1.u77",  0x000000, 0x080000, CRC(b2ffd081) SHA1(e4b8b60ed0c5f2e0709477cc840864e1c0a351ea) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
@@ -2798,7 +2759,7 @@ ROM_START( blazeon )
 	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
 	ROM_LOAD( "bz_sp2.u86", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
 ROM_END
 
@@ -2816,7 +2777,7 @@ ROM_START( blazeonj )
 	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
 	ROM_LOAD( "bz_sp2.u86", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
 ROM_END
 
@@ -2902,7 +2863,7 @@ ROM_START( wingforc )
 	ROM_LOAD( "sp3m.u20", 0x180000, 0x80000, CRC(889ddf72) SHA1(1eaeb4580133d38185ff52fbdc445744c207a202) )
 	ROM_LOAD( "sp3m.u68", 0x180000, 0x80000, CRC(889ddf72) SHA1(1eaeb4580133d38185ff52fbdc445744c207a202) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD16_BYTE( "bg0am.u2", 0x000000, 0x80000, CRC(f4276860) SHA1(8c0848d43ec07f88734993a996a62919979c75ea) )
 	ROM_LOAD16_BYTE( "bg0bm.u2", 0x000001, 0x80000, CRC(9df92283) SHA1(53bcac1d63b7bb84b664507906ee768a83be28c9) )
 	ROM_LOAD16_BYTE( "bg1am.u3", 0x100000, 0x80000, CRC(a44fdebb) SHA1(676ade63d22818c7a7adf39d42aad41fa93319d2) )
@@ -3022,10 +2983,10 @@ ROM_START( bloodwar )
 	ROM_LOAD16_BYTE( "of-214e-0220.26", 0x1c00000, 0x100000, CRC(43c622de) SHA1(73efe57233f056127e2d34590c624f39d1c0ab79) )
 	ROM_LOAD16_BYTE( "of-2140-0221.27", 0x1c00001, 0x100000, CRC(d10bf03c) SHA1(a81d6b7df7382fc8d50614c1332611e0c202b805) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "of-300-0225.51",    0x000000, 0x100000, CRC(fbc3c08a) SHA1(0ba52b381e7a10fb1513244b394438b440950af3) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "of-301-0226.55",    0x000000, 0x100000, CRC(fcf215de) SHA1(83015f10e62b917efd6e3edfbd45fb8f9b35db2b) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
@@ -3066,10 +3027,10 @@ ROM_START( oedfight )
 	ROM_LOAD16_BYTE( "of-214e-0220.26", 0x1c00000, 0x100000, CRC(43c622de) SHA1(73efe57233f056127e2d34590c624f39d1c0ab79) )
 	ROM_LOAD16_BYTE( "of-2140-0221.27", 0x1c00001, 0x100000, CRC(d10bf03c) SHA1(a81d6b7df7382fc8d50614c1332611e0c202b805) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "of-300-0225.51",    0x000000, 0x100000, CRC(fbc3c08a) SHA1(0ba52b381e7a10fb1513244b394438b440950af3) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "of-301-0226.55",    0x000000, 0x100000, CRC(fcf215de) SHA1(83015f10e62b917efd6e3edfbd45fb8f9b35db2b) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
@@ -3206,11 +3167,11 @@ ROM_START( gtmr )
 	ROM_LOAD16_BYTE( "mms1x2.u30.bin",  0x800001, 0x020000, CRC(b42b426f) SHA1(6aee5759b5f0786c5ee074d9df3d2716919ea621) )
 	ROM_LOAD16_BYTE( "mms0x2.u29.bin",  0x800000, 0x020000, CRC(bd22b7d2) SHA1(ef82d00d72439590c71aed33ecfabc6ee71a6ff9) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
@@ -3235,11 +3196,11 @@ ROM_START( gtmra )
 	ROM_LOAD16_BYTE( "mms1x2.u30.bin",  0x800001, 0x020000, CRC(b42b426f) SHA1(6aee5759b5f0786c5ee074d9df3d2716919ea621) )
 	ROM_LOAD16_BYTE( "mms0x2.u29.bin",  0x800000, 0x020000, CRC(bd22b7d2) SHA1(ef82d00d72439590c71aed33ecfabc6ee71a6ff9) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
@@ -3264,11 +3225,11 @@ ROM_START( gtmrb )
 	ROM_LOAD16_BYTE( "mms1x1.u30",  0x800001, 0x020000, CRC(9463825c) SHA1(696bbfc816b564b3cff1487e1b848d375951f923) )
 	ROM_LOAD16_BYTE( "mms0x1.u29",  0x800000, 0x020000, CRC(bd22b7d2) SHA1(ef82d00d72439590c71aed33ecfabc6ee71a6ff9) ) // == mms0x2
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
@@ -3296,12 +3257,12 @@ ROM_START( gtmro )
 	ROM_LOAD16_BYTE( "mm203-e.bin",  0x600000, 0x100000, CRC(b9001f28) SHA1(b112c17b960a535a543565ca2e22734c7c510f18) )
 	ROM_LOAD16_BYTE( "mm203-o.bin",  0x600001, 0x100000, CRC(2ed6227d) SHA1(d9abbb739ef15437194c90cd01d5d82dbd4b7859) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD16_BYTE( "mm300-e.u53",  0x000000, 0x100000, CRC(f9ee708d) SHA1(4c11a9574ea815a87d7e4af04db4368b14bf7530) )
 	ROM_LOAD16_BYTE( "mm300-o.u54",  0x000001, 0x100000, CRC(76299353) SHA1(01997905ba019d770ac1998633f4ebf6f91a3945) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
@@ -3338,11 +3299,11 @@ ROM_START( gtmre )
 	ROM_LOAD( "gmmu30.bin",  0x600000, 0x080000, CRC(e9747c8c) SHA1(2507102ec34755c6f110eadb3444e6d3a3474051) )
 	/* codes 6800-6fff are explicitly skipped */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "gmmu52.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "gmmu23.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) ) // 16 x $10000
@@ -3375,11 +3336,11 @@ ROM_START( gtmrusa )
 	ROM_LOAD( "mm-203-405-s3.bin",  0x600000, 0x080000, CRC(e9747c8c) SHA1(2507102ec34755c6f110eadb3444e6d3a3474051) )
 	/* codes 6800-6fff are explicitly skipped */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-a0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) ) // 16 x $10000
@@ -3561,14 +3522,14 @@ ROM_START( gtmr2 )
 	ROM_LOAD16_BYTE( "m2s0x1a.u32", 0x700000, 0x080000, CRC(a485eec6) SHA1(f8aff62daed95a63544106472a9ef34902feaaa2) )
 	ROM_LOAD16_BYTE( "m2s1x1a.u33", 0x700001, 0x080000, CRC(c5b71bb2) SHA1(874e2a2e19cd8f916afa6fcf54169a8db035fe64) )
 
-	ROM_REGION( 0x440000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
 	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
 	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
-	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
+	ROM_REGION( 0x440000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
@@ -3592,14 +3553,14 @@ ROM_START( gtmr2a )
 	ROM_LOAD16_BYTE( "m2s0x1.u32", 0x700000, 0x080000, CRC(4069d6c7) SHA1(2ed1cbb7ebde8347e0359cd56ee3a0d4d42d551f) )
 	ROM_LOAD16_BYTE( "m2s1x1.u33", 0x700001, 0x080000, CRC(c53fe269) SHA1(e6c485bbaea4b67f074b89e047f686f107805713) )
 
-	ROM_REGION( 0x440000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
 	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
 	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
-	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
+	ROM_REGION( 0x440000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
@@ -3623,14 +3584,14 @@ ROM_START( gtmr2u )
 	ROM_LOAD16_BYTE( "m2s0a1.u32", 0x700000, 0x080000, CRC(98977171) SHA1(5b69462e07778b5bd1f5119cae6b63ede38cd642) )
 	ROM_LOAD16_BYTE( "m2s1a1.u33", 0x700001, 0x080000, CRC(c69a732e) SHA1(810b333f442c0714f4cb8b4a73136d0b44443277) )
 
-	ROM_REGION( 0x440000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
 	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
 	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
-	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
+	ROM_REGION( 0x440000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
@@ -3704,10 +3665,10 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 	ROM_RELOAD(               0x240000, 0x020000             )
 	ROM_RELOAD(               0x260000, 0x020000             )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "mc010.u04",  0x000000, 0x100000, CRC(85072772) SHA1(25e903cc2c893d61db791d1fe60a1205a4395667) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
@@ -3728,10 +3689,10 @@ ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_RELOAD(               0x240000, 0x020000             )
 	ROM_RELOAD(               0x260000, 0x020000             )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "mc010.u04",  0x000000, 0x100000, CRC(85072772) SHA1(25e903cc2c893d61db791d1fe60a1205a4395667) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
@@ -3753,10 +3714,10 @@ ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_RELOAD(             0x240000, 0x020000             )
 	ROM_RELOAD(             0x260000, 0x020000             )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "kaneko__mc-010_0003.u04",  0x000000, 0x100000, CRC(85072772) SHA1(25e903cc2c893d61db791d1fe60a1205a4395667) ) // Mask rom
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "kaneko__mc-020_0004.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) ) // Mask rom
 
 	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
@@ -3811,7 +3772,7 @@ ROM_START( shogwarr )
 	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
 	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )  // 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )  // 40 pin mask rom (verified correct)
 
@@ -3843,7 +3804,7 @@ ROM_START( shogwarrk )
 	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 	ROM_LOAD( "fb-024.u8",  0x700000, 0x080000, CRC(4bf3282d) SHA1(6058e46f20fe4faf32cddb6f2bb0fbf70f256a54) )  // extra censored gfx
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )  // 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )  // 40 pin mask rom (verified correct)
 
@@ -3918,7 +3879,7 @@ ROM_START( shogwarru )
 	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
 	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )  // 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )  // 40 pin mask rom (verified correct)
 
@@ -3986,7 +3947,7 @@ ROM_START( fjbuster )   // Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
 	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )  // 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )  // 40 pin mask rom (verified correct)
 
@@ -4132,7 +4093,7 @@ ROM_START( brapboys ) /* World 'normal version', no rom sub board, serial RB92E0
 	ROM_RELOAD( 0x480000,  0x080000 )
 	ROM_LOAD( "rb-025.01.u80",  0x500000, 0x040000, CRC(36cd6b90) SHA1(45c50f2652726ded67c9c24185a71a6367e09270) ) // eprom labeled RB-025/U80-01 (green label), contains title logo for this version
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
@@ -4165,7 +4126,7 @@ ROM_START( brapboysp ) /* World 'special version' with EXROM sub board; serial R
 	ROM_LOAD( "rb-025.a0.u80a",   0x500000, 0x080000, CRC(aa795ba5) SHA1(c5256dcceded2e76f548b60c18e51d0dd0209d81) ) // eprom labeled RB-025/U80aA0 (blue label), really at location next to capacitor C4 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-026.10.u80b",   0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // eprom labeled RB-026/U80b10 (red label), really at location next to capacitor C5 on Z01DK-EXROM daughterboard
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
@@ -4200,7 +4161,7 @@ ROM_START( brapboyspj ) /* Japanese 'special version' with EXROM sub board; seri
 	ROM_LOAD( "rb-025.a0.u80a",   0x500000, 0x080000, CRC(aa795ba5) SHA1(c5256dcceded2e76f548b60c18e51d0dd0209d81) ) // eprom labeled RB-025/U80aA0 (blue label), really at location next to capacitor C4 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-026.10.u80b",   0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // eprom labeled RB-026/U80b10 (red label), really at location next to capacitor C5 on Z01DK-EXROM daughterboard
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
@@ -4233,7 +4194,7 @@ ROM_START( brapboyspu ) /* US 'special version' with EXROM sub board; Serial RB9
 	ROM_LOAD( "rb-025.10.u80a",   0x500000, 0x080000, CRC(140fe400) SHA1(a764767aacec2f895f93256ab82125962c272951) ) // eprom labeled RB-025/U80a10 (red label), really at location next to capacitor C4 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-026.10.u80b",   0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // eprom labeled RB-026/U80b10 (red label), really at location next to capacitor C5 on Z01DK-EXROM daughterboard
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) ) // rb-010 0009 w17 mask rom
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) ) // rb-011 0010 w18 mask rom
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) ) // rb-012 0011 w21 mask rom
@@ -4313,10 +4274,10 @@ ROM_START( bonkadv )
 	ROM_LOAD16_BYTE( "pc600106.42",  0x400000, 0x080000, CRC(25877026) SHA1(96814d97e9f9284f98c35edfe5e76677ac50dd97) )
 	ROM_LOAD16_BYTE( "pc700107.43",  0x400001, 0x080000, CRC(bfe21c44) SHA1(9900a6fe4182b720a90d64d368bd0fd08bf936a8) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "pc400104.51",         0x000000, 0x100000, CRC(3b176f84) SHA1(0ad6fd5f03d275165490881173bafcb0a94762eb) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
 	ROM_LOAD( "pc500105.55",         0x000000, 0x100000, CRC(bebb3edc) SHA1(e0fed4307316deaeb811ec29f5022adeaf577a95) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
@@ -4335,7 +4296,6 @@ void kaneko16_shogwarr_state::init_shogwarr()
 	// default sample banks
 	common_oki_bank_install(0, 0x30000, 0x10000);
 	common_oki_bank_install(1, 0x00000, 0x40000);
-	init_kaneko16();
 }
 
 
@@ -4344,7 +4304,6 @@ void kaneko16_shogwarr_state::init_brapboys()
 	// default sample banks
 	common_oki_bank_install(0, 0x30000, 0x10000);
 	common_oki_bank_install(1, 0x20000, 0x20000);
-	init_kaneko16();
 }
 
 
@@ -4361,11 +4320,11 @@ GAME( 1991, berlwallt,  berlwall, berlwall, berlwallt, kaneko16_berlwall_state, 
 GAME( 1991, berlwallk,  berlwall, berlwall, berlwallk, kaneko16_berlwall_state, init_berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, init_berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
-GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeonj,   blazeon,  blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          empty_init,    ROT0,  "A.I (Atlus license)",  "Blaze On (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeonj,   blazeon,  blazeon,  blazeon,   kaneko16_state,          empty_init,    ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )

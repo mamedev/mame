@@ -64,7 +64,6 @@ public:
 	{
 	}
 
-	void init_kaneko16();
 	void init_bakubrkr();
 
 	void bakubrkr(machine_config &config);
@@ -130,8 +129,6 @@ protected:
 
 	template<class _BitmapClass>
 	void fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
-
-	void unscramble_tiles(const char *region);
 
 	void gtmr_oki1_map(address_map &map);
 	void gtmr_oki2_map(address_map &map);
