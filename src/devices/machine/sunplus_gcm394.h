@@ -37,14 +37,21 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
+	
+	// video 70xx
+	uint16_t tmap0_regs[0x6];
+	uint16_t tmap1_regs[0x6];
 
+	uint16_t m_dma_params[7];
+	uint16_t m_707f;
+
+	// unk 78xx
 	uint16_t m_78fb;
 	uint16_t m_782d;
 
-	uint16_t m_dma_params[7];
-
-	uint16_t tmap0_regs[0x6];
-	uint16_t tmap1_regs[0x6];
+	// unk 79xx
+	uint16_t m_7934;
+	uint16_t m_7936;
 
 
 private:
@@ -79,6 +86,10 @@ private:
 	DECLARE_WRITE16_MEMBER(video_dma_size_w);
 	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
 
+	DECLARE_READ16_MEMBER(video_707f_r);
+	DECLARE_WRITE16_MEMBER(video_707f_w);
+
+
 	DECLARE_WRITE16_MEMBER(system_dma_params_w);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
@@ -90,6 +101,12 @@ private:
 
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7934_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7934_w);
+	DECLARE_READ16_MEMBER(unkarea_7936_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
+
 
 };
 
