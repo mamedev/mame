@@ -12,7 +12,7 @@
 *  Memory map:
 *
 *  00000000 - 0007ffff      Alias for first 512kbyte of RAM
-*  00080000 - 0008ffff      EISA I/O space (pullups on Indy)
+*  00080000 - 0008ffff      EISA I/O space (VINO on Indy)
 *  00090000 - 0009ffff      EISA I/O space Alias (pullups on Indy)
 *  000a0000 - 07ffffff      EISA Memory
 *  08000000 - 17ffffff      Low System Memory
@@ -63,6 +63,7 @@
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 #include "machine/sgi.h"
+#include "machine/vino.h"
 
 #include "sound/cdda.h"
 
@@ -79,6 +80,7 @@ public:
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
 		, m_hpc3(*this, "hpc3")
+		, m_vino(*this, "vino")
 		, m_gio(*this, "gio")
 		, m_gio_gfx(*this, "gio_gfx")
 		, m_gio_exp0(*this, "gio_exp0")
@@ -93,11 +95,10 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(eisa_io_r);
-
 	DECLARE_WRITE64_MEMBER(write_ram);
 
 	void ip22_map(address_map &map);
+	void ip22_base_map(address_map &map);
 
 	void wd33c93(device_t *device);
 
@@ -108,6 +109,7 @@ protected:
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
 	required_device<hpc3_device> m_hpc3;
+	optional_device<vino_device> m_vino;
 	optional_device<gio_device> m_gio;
 	optional_device<gio_slot_device> m_gio_gfx;
 	optional_device<gio_slot_device> m_gio_exp0;
@@ -126,12 +128,16 @@ public:
 	void ip244415(machine_config &config);
 
 private:
+	DECLARE_READ32_MEMBER(eisa_io_r);
+
 	void wd33c93_2(device_t *device);
+
+	void ip24_map(address_map &map);
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
 
-READ32_MEMBER(ip22_state::eisa_io_r)
+READ32_MEMBER(ip24_state::eisa_io_r)
 {
 	return 0xffffffff;
 }
@@ -155,16 +161,27 @@ WRITE64_MEMBER(ip22_state::write_ram)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-void ip22_state::ip22_map(address_map &map)
+void ip22_state::ip22_base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
-	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f000000, 0x1f9fffff).rw(m_gio, FUNC(gio_device::read), FUNC(gio_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
 	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));
+}
+
+void ip22_state::ip22_map(address_map &map)
+{
+	ip22_base_map(map);
+	map(0x00080000, 0x0009ffff).rw(m_vino, FUNC(vino_device::read), FUNC(vino_device::write));
+}
+
+void ip24_state::ip24_map(address_map &map)
+{
+	ip22_base_map(map);
+	map(0x00080000, 0x0009ffff).r(FUNC(ip24_state::eisa_io_r));
 }
 
 void ip22_state::machine_reset()
@@ -236,6 +253,8 @@ void ip22_state::ip225015(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+
+	VINO(config, m_vino);
 }
 
 void ip22_state::ip224613(machine_config &config)
@@ -248,6 +267,8 @@ void ip22_state::ip224613(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+
+	VINO(config, m_vino);
 }
 
 void ip24_state::wd33c93_2(device_t *device)
@@ -264,7 +285,7 @@ void ip24_state::ip244415(machine_config &config)
 	R4400(config, m_maincpu, 50000000*3);
 	//m_maincpu->set_icache_size(32768);
 	//m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 
 	NSCSI_BUS(config, "scsibus2", 0);
 	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)

@@ -1353,7 +1353,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 		}
 		break;
 	case 0x0230/8:
-		if ((m_rex3.m_draw_mode0 & 7) == 5)
+		if ((m_rex3.m_draw_mode0 & 3) == 1)
 			m_rex3.m_host_dataport = do_pixel_word_read();
 		LOGMASKED(LOG_REX3, "%s: REX3 Host Data Port Read: %08x%08x\n", machine().describe_context(), (uint32_t)(m_rex3.m_host_dataport >> 32),
 			(uint32_t)m_rex3.m_host_dataport);
@@ -2262,8 +2262,27 @@ void newport_base_device::do_iline(uint32_t color)
 uint32_t newport_base_device::do_pixel_read()
 {
 	m_rex3.m_bres_octant_inc1 = 0;
-	const uint32_t ret = m_rgbci[m_rex3.m_y_start_i * (1280 + 64) + m_rex3.m_x_start_i];
-	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, m_rex3.m_x_start_i, m_rex3.m_y_start_i);
+	const int16_t src_x = m_rex3.m_x_start_i + m_rex3.m_x_window - 0x1000;
+	const int16_t src_y = m_rex3.m_y_start_i + m_rex3.m_y_window - 0x1000;
+	const uint32_t src_addr = src_y * (1280 + 64) + src_x;
+	uint32_t ret = 0;
+	switch (m_rex3.m_plane_enable)
+	{
+		case 1: // RGB/CI planes
+		case 2: // RGBA planes
+			ret = m_rgbci[src_addr];
+			break;
+		case 4: // Overlay planes
+			ret = m_olay[src_addr];
+			break;
+		case 5: // Popup planes
+			ret = m_pup[src_addr];
+			break;
+		case 6: // CID planes
+			ret = m_cid[src_addr];
+			break;
+	}
+	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, src_x, src_y);
 	m_rex3.m_x_start_i++;
 	if (m_rex3.m_x_start_i > m_rex3.m_x_end_i)
 	{
@@ -2376,322 +2395,295 @@ void newport_base_device::do_rex3_command()
 
 	LOGMASKED(LOG_COMMANDS, "REX3 Command: %08x|%08x - %s %s\n", mode0, mode1, s_opcode_str[mode0 & 3], s_adrmode_str[(mode0 >> 2) & 7]);
 
-	switch (mode0)
+	const uint8_t opcode = mode0 & 3;
+	const uint8_t adrmode = (mode0 >> 2) & 7;
+
+	switch (opcode)
 	{
-	case 0x00000000: // NoOp
-		break;
-	case 0x00000006: // Block, Draw
-	{
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, m_rex3.m_color_i);
-		m_rex3.m_bres_octant_inc1 = 0;
-		write_pixel(m_rex3.m_color_i);
-		start_x++;
-		if (start_x > end_x)
-		{
-			start_y += dy;
-			start_x = m_rex3.m_x_save;
-		}
-
-		write_x_start(start_x << 11);
-		write_y_start(start_y << 11);
-		break;
-	}
-	case 0x00000046: // ColorHost, Block, Draw
-	case 0x00000066: // ColorHost, DoSetup, Block, Draw
-	{
-		m_rex3.m_bres_octant_inc1 = 0;
-		if (BIT(mode1, 7)) // Packed
-		{
-			const bool doubleword = BIT(mode1, 10);
-			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> 32), (uint32_t)m_rex3.m_host_dataport);
-
-			uint16_t width = (end_x - start_x) + 1;
-			uint64_t shift = 0;
-			switch ((m_rex3.m_draw_mode1 >> 8) & 3)
-			{
-				case 0: // 4bpp
-				{
-					const uint16_t max_width = doubleword ? 16 : 8;
-					if (width > max_width)
-						width = max_width;
-
-					shift = 60;
-					for (uint16_t i = 0; i < width; i++)
-					{
-						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-						start_x++;
-						shift -= 4;
-					}
-					break;
-				}
-
-				case 1: // 8bpp
-				{
-					const uint16_t max_width = doubleword ? 8 : 4;
-					if (width > max_width)
-						width = max_width;
-
-					shift = 56;
-					for (uint16_t i = 0; i < width; i++)
-					{
-						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-						start_x++;
-						shift -= 8;
-					}
-					break;
-				}
-
-				case 2: // 12bpp
-				{
-					const uint16_t max_width = doubleword ? 4 : 2;
-					if (width > max_width)
-						width = max_width;
-
-					shift = 48;
-					for (uint16_t i = 0; i < width; i++)
-					{
-						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-						start_x++;
-						shift -= 16;
-					}
-					break;
-				}
-
-				case 3: // 32bpp
-				{
-					const uint16_t max_width = doubleword ? 2 : 1;
-					if (width > max_width)
-						width = max_width;
-
-					shift = 32;
-					for (uint16_t i = 0; i < width; i++)
-					{
-						write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-						start_x++;
-						shift -= 32;
-					}
-					break;
-				}
-			}
-		}
-		else
-		{
-			LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, (uint8_t)(m_rex3.m_host_dataport >> 56));
-			write_pixel(start_x, start_y, m_rex3.m_host_dataport >> 56);
-			start_x++;
-		}
-		if (start_x > end_x)
-		{
-			start_y += dy;
-			start_x = m_rex3.m_x_save;
-		}
-		write_x_start(start_x << 11);
-		write_y_start(start_y << 11);
-		break;
-	}
-	case 0x00000045: // ColorHost, Block, Read
-	case 0x00000065: // ColorHost, Block, Read
-	{
-		break;
-	}
-	case 0x00000022: // DoSetup, Span, Draw
-	case 0x00000102: // StopOnX, Span, Draw
-	case 0x00000122: // StopOnX, DoSetup, Span, Draw
-	case 0x00022102: // LSOpaque, EnLSPattern, StopOnX, Span, Draw
-	case 0x00080122: // LROnly, StopOnX, DoSetup, Span, Draw
-	case 0x00089102: // LROnly, Length32, EnZPattern, StopOnX, Span, Draw
-	case 0x000c0122: // LROnly, Shade, StopOnX, DoSetup, Span, Draw
-	case 0x000c9102: // LROnly, Shade, Length32, EnZPattern, StopOnX, Span, Draw
-	{
-		if (BIT(mode0, 19) && dx < 0) // LROnly
+		case 0: // NoOp
 			break;
-
-		if (!BIT(mode0, 8))
-			end_x = start_x;
-
-		end_x += dx;
-
-        if (BIT(mode0, 15) && abs(end_x - start_x) > 32)
-            end_x = start_x + 32 * dx;
-
-		const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
-		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
-		const bool shade = BIT(mode0, 18);
-		const bool rgbmode = BIT(mode1, 15);
-
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, pattern);
-
-		uint32_t bit = 31;
-		for (; start_x != end_x; start_x += dx)
-		{
-			if (BIT(pattern, bit))
+		case 1: // Read
+			// Handled on HOSTRW read
+			break;
+		case 2: // Draw
+			switch (adrmode)
 			{
-                if (shade || rgbmode)
-                    write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
-                else
-                    write_pixel(start_x, start_y, m_rex3.m_color_i);
-			}
-			else if (opaque)
-			{
-				write_pixel(start_x, start_y, m_rex3.m_color_back);
-			}
+				case 0: // Span
+				{
+					if (BIT(mode0, 19) && dx < 0) // LROnly
+						break;
 
-			if (shade)
-				iterate_shade();
+					if (!BIT(mode0, 8))
+						end_x = start_x;
 
-			bit = (bit - 1) & 0x1f;
-		}
+					end_x += dx;
 
-		write_x_start(start_x << 11);
-		break;
-	}
-	case 0x00000326: // StopOnX, StopOnY, DoSetup, Block, Draw
-	{
-		end_x += dx;
-		end_y += dy;
+					if (BIT(mode0, 15) && abs(end_x - start_x) > 32)
+						end_x = start_x + 32 * dx;
 
-		uint32_t color = m_rex3.m_color_i;
-		if (BIT(mode1, 17))
-		{
-			switch (m_rex3.m_plane_depth)
-			{
-				case 0: // 4bpp
-					color = m_rex3.m_color_vram & 0xf;
+					const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
+					const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
+					const bool shade = BIT(mode0, 18);
+					const bool rgbmode = BIT(mode1, 15);
+
+					LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, pattern);
+
+					uint32_t bit = 31;
+					for (; start_x != end_x; start_x += dx)
+					{
+						if (BIT(pattern, bit))
+						{
+							if (shade || rgbmode)
+								write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
+							else
+								write_pixel(start_x, start_y, m_rex3.m_color_i);
+						}
+						else if (opaque)
+						{
+							write_pixel(start_x, start_y, m_rex3.m_color_back);
+						}
+
+						if (shade)
+							iterate_shade();
+
+						bit = (bit - 1) & 0x1f;
+					}
+
+					write_x_start(start_x << 11);
 					break;
-				case 1: // 8bpp
-					color = m_rex3.m_color_vram & 0xff;
+				}
+
+				case 1: // Block
+					if (BIT(mode0, 19) && dx < 0) // LROnly
+						break;
+
+					end_x += dx;
+					end_y += dy;
+
+					if (BIT(mode0, 6)) // ColorHost
+					{
+						if (BIT(mode1, 7)) // Packed
+						{
+							const bool doubleword = BIT(mode1, 10);
+							LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> 32), (uint32_t)m_rex3.m_host_dataport);
+
+							uint16_t width = end_x - start_x;
+							uint64_t shift = 0;
+							switch ((m_rex3.m_draw_mode1 >> 8) & 3)
+							{
+								case 0: // 4bpp
+								{
+									const uint16_t max_width = doubleword ? 16 : 8;
+									if (width > max_width)
+										width = max_width;
+
+									shift = 60;
+									for (uint16_t i = 0; i < width; i++)
+									{
+										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+										start_x++;
+										shift -= 4;
+									}
+									break;
+								}
+
+								case 1: // 8bpp
+								{
+									const uint16_t max_width = doubleword ? 8 : 4;
+									if (width > max_width)
+										width = max_width;
+
+									shift = 56;
+									for (uint16_t i = 0; i < width; i++)
+									{
+										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+										start_x++;
+										shift -= 8;
+									}
+									break;
+								}
+
+								case 2: // 12bpp
+								{
+									const uint16_t max_width = doubleword ? 4 : 2;
+									if (width > max_width)
+										width = max_width;
+
+									shift = 48;
+									for (uint16_t i = 0; i < width; i++)
+									{
+										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+										start_x++;
+										shift -= 16;
+									}
+									break;
+								}
+
+								case 3: // 32bpp
+								{
+									const uint16_t max_width = doubleword ? 2 : 1;
+									if (width > max_width)
+										width = max_width;
+
+									shift = 32;
+									for (uint16_t i = 0; i < width; i++)
+									{
+										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
+										start_x++;
+										shift -= 32;
+									}
+									break;
+								}
+							}
+						}
+						else
+						{
+							LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, (uint8_t)(m_rex3.m_host_dataport >> 56));
+							write_pixel(start_x, start_y, m_rex3.m_host_dataport >> 56);
+							start_x++;
+						}
+
+						if (start_x == end_x)
+						{
+							start_y += dy;
+							start_x = m_rex3.m_x_save;
+						}
+					}
+					else
+					{
+						const bool stop_on_x = BIT(mode0, 8);
+						const bool stop_on_y = BIT(mode0, 9);
+						const bool shade = BIT(mode0, 18);
+						const bool rgbmode = BIT(mode1, 15);
+						const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
+						const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
+
+						if (BIT(mode0, 15) && (end_x - start_x) >= 32)
+							end_x = start_x + 32 * dx;
+
+						uint32_t color = m_rex3.m_color_i;
+						if (BIT(mode1, 17))
+						{
+							switch (m_rex3.m_plane_depth)
+							{
+								case 0: // 4bpp
+									color = m_rex3.m_color_vram & 0xf;
+									break;
+								case 1: // 8bpp
+									color = m_rex3.m_color_vram & 0xff;
+									break;
+								case 2: // 12bpp
+									color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+									break;
+								case 3: // 24bpp
+									color = m_rex3.m_color_vram & 0xffffff;
+									break;
+							}
+						}
+
+						do
+						{
+							uint32_t bit = 31;
+							do
+							{
+								if (BIT(pattern, bit))
+								{
+									if (shade || rgbmode)
+										write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
+									else
+										write_pixel(start_x, start_y, color);
+								}
+								else if (opaque)
+								{
+									write_pixel(start_x, start_y, m_rex3.m_color_back);
+								}
+
+								if (shade)
+									iterate_shade();
+
+								bit = (bit - 1) & 0x1f;
+								start_x += dx;
+							} while (start_x != end_x && stop_on_x);
+
+							if (start_x == end_x)
+							{
+								start_x = m_rex3.m_x_save;
+								start_y += dy;
+							}
+						} while (start_y != end_y && stop_on_y);
+					}
+
+					write_x_start(start_x << 11);
+					write_y_start(start_y << 11);
 					break;
-				case 2: // 12bpp
-					color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+
+				case 2: // I_Line
+					do_iline(m_rex3.m_color_i);
 					break;
-				case 3: // 24bpp
-					color = m_rex3.m_color_vram & 0xffffff;
+
+				case 3: // F_Line
+					do_fline(m_rex3.m_color_i);
+					break;
+
+				case 4: // A_Line
+					do_iline(m_rex3.m_color_i); // FIXME
+					break;
+
+				default: // Invalid
 					break;
 			}
-		}
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x, %04x\n", start_x, start_y, end_x, end_y, m_cmap0.m_palette[color], m_rex3.m_x_save);
-		for (; start_y != end_y; start_y += dy)
-		{
-			for (; start_x != end_x; start_x += dx)
+			break;
+		case 3: // Scr2Scr
+			if (adrmode < 2)
 			{
-				write_pixel(start_x, start_y, color);
+				const bool stop_on_x = BIT(mode0, 8);
+				const bool stop_on_y = BIT(mode0, 9);
+
+				end_x += dx;
+				end_y += dy;
+
+				LOGMASKED(LOG_COMMANDS, "%04x, %04x - %04x, %04x to %04x, %04x\n", start_x, start_y, end_x, end_y, start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move);
+				do
+				{
+					do
+					{
+						const uint32_t src_addr = (start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000);
+						uint32_t src = 0;
+						switch (mode1 & 7)
+						{
+						case 1: // RGB/CI planes
+							src = m_rgbci[src_addr];
+							break;
+						case 2: // RGBA planes (not yet implemented)
+							break;
+						case 4: // Overlay planes
+							src = m_olay[src_addr];
+							break;
+						case 5: // Popup planes
+							src = m_pup[src_addr] >> 2;
+							break;
+						case 6: // CID planes
+							src = m_cid[src_addr];
+							break;
+						default:
+							break;
+						}
+						write_pixel(start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move, src);
+
+						start_x += dx;
+					} while (start_x != end_x && stop_on_x);
+
+					if (start_x == end_x)
+					{
+						start_x = m_rex3.m_x_save;
+						start_y += dy;
+					}
+				} while (start_y != end_y && stop_on_y);
+
+				write_x_start(start_x << 11);
+				write_y_start(start_y << 11);
 			}
-			start_x = m_rex3.m_x_save;
-		}
-
-		write_x_start(start_x << 11);
-		write_y_start(start_y << 11);
-		break;
-	}
-	case 0x00000327: // StopOnX, StopOnY, DoSetup, Block, Scr2Scr
-	{
-		end_x += dx;
-		end_y += dy;
-		LOGMASKED(LOG_COMMANDS, "%04x, %04x - %04x, %04x to %04x, %04x\n", start_x, start_y, end_x, end_y, start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move);
-		for (; start_y != end_y; start_y += dy)
-		{
-			for (; start_x != end_x; start_x += dx)
-			{
-                const uint32_t src_addr = (start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000);
-                uint32_t src = 0;
-                switch (mode1 & 7)
-                {
-                case 1: // RGB/CI planes
-                    src = m_rgbci[src_addr];
-                    break;
-                case 2: // RGBA planes (not yet implemented)
-                    break;
-                case 4: // Overlay planes
-                    src = m_olay[src_addr];
-                    break;
-                case 5: // Popup planes
-                    src = m_pup[src_addr] >> 2;
-                    break;
-                case 6: // CID planes
-                    src = m_cid[src_addr];
-                    break;
-                default:
-                    break;
-                }
-                write_pixel(start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move, src);
-			}
-			start_x = m_rex3.m_x_save;
-		}
-		write_x_start(start_x << 11);
-		write_y_start(start_y << 11);
-		break;
-	}
-	case 0x0000000a: // I_Line, Draw
-	case 0x0000032a: // StopOnX, StopOnY, DoSetup, I_Line, Draw
-	case 0x00000b2a: // SkipLast, StopOnX, StopOnY, DoSetup, I_Line, Draw
-	case 0x0000232e: // EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
-	case 0x0000930e: // Length32, EnZPattern, StopOnX, StopOnY, F_Line, Draw
-	case 0x0004930e: // Shade, Length32, EnZPattern, StopOnX, StopOnY, F_Line, Draw
-	case 0x0004232e: // Shade, EnLSPattern, StopOnX, StopOnY, DoSetup, F_Line, Draw
-	case 0x00200b2e: // CIClamp, SkipLast, StopOnX, StopOnY, DoSetup, F_Line, Draw
-	case 0x00442332: // EndFilter, Shade, EnLSPattern, StopOnX, StopOnY, DoSetp, A_Line, Draw
-	{
-		LOGMASKED(LOG_COMMANDS, "%cLine: %04x, %04x to %04x, %04x = %08x\n", ((mode0 & 0x1c) >> 2) == 3 ? 'F' : 'I',
-			start_x, start_y, end_x, end_y, m_rex3.m_color_i);
-		if (start_x == end_x && start_y == end_y)
-			write_pixel(m_rex3.m_color_i);
-		else if (((mode0 & 0x1c) >> 2) == 3)
-			do_fline(m_rex3.m_color_i);
-		else
-			do_iline(m_rex3.m_color_i);
-		break;
-	}
-	case 0x00001106: // EnZPattern, StopOnX, Block, Draw
-	case 0x00002106: // EnLSPattern, StopOnX, Block, Draw
-	case 0x00009106: // Length32, EnZPattern, StopOnX, Block, Draw
-	case 0x00022106: // LSOpaque, EnLSPattern, StopOnX, Block, Draw
-	case 0x00019106: // ZPOpaque, EnLSPattern, StopOnX, Block, Draw
-	case 0x002c9126: // CIClamp, LROnly, Shade, Length32, EnZPattern, StopOnX, DoSetup, Block, Draw
-	{
-        if (BIT(mode0, 19) && dx < 0) // LROnly
-            break;
-
-		const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
-		const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : m_rex3.m_ls_pattern;
-		const bool shade = BIT(mode0, 18);
-		const bool rgbmode = BIT(mode1, 15);
-		LOGMASKED(LOG_COMMANDS, "%08x at %04x, %04x color %08x\n", pattern, start_x, start_y, m_rex3.m_color_i);
-
-		end_x += dx;
-
-		if (BIT(mode0, 15) && (end_x - start_x) >= 32)
-			end_x = start_x + 32 * dx;
-
-		uint32_t bit = 31;
-		for (; start_x != end_x; start_x += dx)
-		{
-			if (BIT(pattern, bit))
-			{
-                if (shade || rgbmode)
-                    write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
-                else
-                    write_pixel(start_x, start_y, m_rex3.m_color_i);
-			}
-			else if (opaque)
-			{
-				write_pixel(start_x, start_y, m_rex3.m_color_back);
-			}
-
-			if (shade)
-				iterate_shade();
-
-			bit = (bit - 1) & 0x1f;
-		}
-		start_y += dy;
-
-		start_x = m_rex3.m_x_save;
-		write_x_start(start_x << 11);
-		write_y_start(start_y << 11);
-		break;
-	}
-	default:
-		LOGMASKED(LOG_COMMANDS | LOG_UNKNOWN, "Draw command %08x not recognized\n", m_rex3.m_draw_mode0);
-		break;
+			break;
 	}
 }
 

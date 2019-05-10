@@ -3097,6 +3097,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/crimson.cpp",
 	MAME_DIR .. "src/mame/drivers/o2.cpp",
 	MAME_DIR .. "src/mame/drivers/octane.cpp",
+	MAME_DIR .. "src/mame/machine/vino.cpp",
+	MAME_DIR .. "src/mame/machine/vino.h",
 	MAME_DIR .. "src/mame/machine/sgi.cpp",
 	MAME_DIR .. "src/mame/machine/sgi.h",
 	MAME_DIR .. "src/mame/machine/hal2.cpp",
