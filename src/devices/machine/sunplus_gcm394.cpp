@@ -9,10 +9,12 @@
 #include "emu.h"
 #include "sunplus_gcm394.h"
 
+
+#define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394                (1U << 1)
 #define LOG_GCM394_UNMAPPED       (1U << 0)
 
-#define VERBOSE             (LOG_GCM394_UNMAPPED)
+#define VERBOSE             (LOG_GCM394_UNMAPPED | LOG_GCM394_TMAP)
 #include "logmacro.h"
 
 
@@ -23,14 +25,52 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 {
 }
 
+void sunplus_gcm394_base_device::write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data)
+{
+	switch (offset)
+	{
+	case 0x0: // Page X scroll
+		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d X Scroll = %04x\n", tmap, data & 0x01ff);
+		tmap0_regs[offset] = data & 0x01ff;
+		break;
+
+	case 0x1: // Page Y scroll
+		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Y Scroll = %04x\n", tmap, data & 0x00ff);
+		tmap0_regs[offset] = data & 0x00ff;
+		break;
+
+	case 0x2: // Page Attributes
+		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", tmap, data
+			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
+		tmap0_regs[offset] = data;
+		break;
+
+	case 0x3: // Page Control
+		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", tmap, data
+			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		tmap0_regs[offset] = data;
+		break;
+
+	case 0x4: // Page Tile Address
+		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Tile Address = %04x\n", tmap, data & 0x1fff);
+		tmap0_regs[offset] = data;
+		break;
+
+	case 0x5: // Page Attribute write_tmap_regs
+		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Attribute Address = %04x\n", tmap, data & 0x1fff);
+		tmap0_regs[offset] = data;
+		break;
+	}
+}
+
 // **************************************** TILEMAP 0 *************************************************
 
 READ16_MEMBER(sunplus_gcm394_base_device::tmap0_regs_r) { return tmap0_regs[offset]; }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::tmap0_regs_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	tmap0_regs[offset] = data;
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	write_tmap_regs(0, tmap0_regs, offset, data);
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::tmap0_unk0_w)
@@ -50,7 +90,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::tmap1_regs_r) { return tmap1_regs[offs
 WRITE16_MEMBER(sunplus_gcm394_base_device::tmap1_regs_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	tmap1_regs[offset] = data;
+	write_tmap_regs(1, tmap1_regs, offset, data);
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::tmap1_unk0_w)
@@ -210,19 +250,23 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	//machine().debug_break();
 }
 
+
 // single bit on/off operations?
-READ16_MEMBER(sunplus_gcm394_base_device::video_707f_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_707f_r\n", machine().describe_context()); return m_707f; }
+READ16_MEMBER(sunplus_gcm394_base_device::video_707f_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_707f_r\n", machine().describe_context()); return m_707f; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_707f_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_707f_w %04x\n", machine().describe_context(), data); m_707f = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::video_703a_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_703a_r\n", machine().describe_context()); return m_703a; }
+READ16_MEMBER(sunplus_gcm394_base_device::video_703a_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_703a_r\n", machine().describe_context()); return m_703a; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_703a_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_703a_w %04x\n", machine().describe_context(), data); m_703a = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::video_7062_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7062_r\n", machine().describe_context()); return m_7062; }
+READ16_MEMBER(sunplus_gcm394_base_device::video_7062_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7062_r\n", machine().describe_context()); return m_7062; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7062_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7063_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7063_w %04x\n", machine().describe_context(), data); m_7063 = data; }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_702a_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
+
+// read in IRQ
+READ16_MEMBER(sunplus_gcm394_base_device::video_7030_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7030_r\n", machine().describe_context()); return m_7030; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7030_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7030_w %04x\n", machine().describe_context(), data); m_7030 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_703c_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
 
@@ -236,7 +280,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::video_7086_w) { LOGMASKED(LOG_GCM394,
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7087_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7087_w %04x\n", machine().describe_context(), data); m_7087 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::video_7088_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7088_w %04x\n", machine().describe_context(), data); m_7088 = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::video_7083_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7083_r\n", machine().describe_context()); return m_7083; }
+READ16_MEMBER(sunplus_gcm394_base_device::video_7083_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::video_7083_r\n", machine().describe_context()); return m_7083; }
 
 
 // **************************************** 78xx region with some handling *************************************************
@@ -393,7 +437,7 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x00702e, 0x00702e).w(FUNC(sunplus_gcm394_base_device::unknown_video_device0_unk1_w)); // gcm394_video_device::  written with other unknown_video_device0 regs
 	map(0x00702f, 0x00702f).w(FUNC(sunplus_gcm394_base_device::unknown_video_device1_unk1_w)); // gcm394_video_device::  written with other unknown_video_device1 regs
 
-	map(0x007030, 0x007030).w(FUNC(sunplus_gcm394_base_device::video_7030_w));
+	map(0x007030, 0x007030).rw(FUNC(sunplus_gcm394_base_device::video_7030_r), FUNC(sunplus_gcm394_base_device::video_7030_w));
 	map(0x00703a, 0x00703a).rw(FUNC(sunplus_gcm394_base_device::video_703a_r), FUNC(sunplus_gcm394_base_device::video_703a_w));
 	map(0x00703c, 0x00703c).w(FUNC(sunplus_gcm394_base_device::video_703c_w));
 

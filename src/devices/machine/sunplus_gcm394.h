@@ -49,6 +49,7 @@ protected:
 	uint16_t tmap1_regs[0x6];
 
 	uint16_t m_dma_params[7];
+
 	uint16_t m_707f;
 	uint16_t m_703a;
 	uint16_t m_7062;
@@ -136,6 +137,8 @@ private:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
 
+	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
+
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
 	DECLARE_WRITE16_MEMBER(tmap0_unk0_w);
@@ -173,8 +176,10 @@ private:
 	DECLARE_WRITE16_MEMBER(video_7063_w);
 
 	DECLARE_WRITE16_MEMBER(video_702a_w);
+	DECLARE_READ16_MEMBER(video_7030_r);
 	DECLARE_WRITE16_MEMBER(video_7030_w);
 	DECLARE_WRITE16_MEMBER(video_703c_w);
+
 
 	DECLARE_READ16_MEMBER(video_707f_r);
 	DECLARE_WRITE16_MEMBER(video_707f_w);
