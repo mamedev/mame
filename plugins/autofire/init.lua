@@ -61,14 +61,23 @@ function autofire.startplugin()
 		return nil
 	end
 
+	local function get_settings_path()
+		return lfs.env_replace(manager:machine():options().entries.pluginspath:value():match("([^;]+)")) .. "/autofire/cfg/"
+	end
+
+	local function get_settings_filename()
+		return emu.romname() .. '.cfg'
+	end
+
 	local function load_settings()
 		buttons = {}
 		local json = require('json')
-		local file = io.open(lfs.env_replace(manager:machine():options().entries.pluginspath:value():match("([^;]+)")) .. "/autofire/cfg/" .. emu.romname() .. ".cfg", "r")
+		local file = io.open(get_settings_path() .. get_settings_filename(), 'r')
 		if not file then
 			return
 		end
 		local loaded_settings = json.parse(file:read('a'))
+		file:close()
 		if not loaded_settings then
 			return
 		end
@@ -80,8 +89,35 @@ function autofire.startplugin()
 		end
 	end
 
+	local function serialize_settings(button_list)
+		local settings = {}
+		for index, button in ipairs(button_list) do
+			setting = {}
+			setting.port = button.port
+			setting.field = button.field
+			setting.key = button.key
+			setting.on_frames = button.on_frames
+			setting.off_frames = button.off_frames
+			settings[#settings + 1] = setting
+		end
+		return settings
+	end
+
 	local function save_settings()
-		print('saving settings')
+		local path = get_settings_path()
+		local attr = lfs.attributes(path)
+		if not attr then
+			lfs.mkdir(path)
+		elseif attr.mode ~= 'directory' then
+			return
+		end
+		local json = require('json')
+		local settings = serialize_settings(buttons)
+		local file = io.open(path .. get_settings_filename(), 'w')
+		if file then
+			file:write(json.stringify(settings, {indent = true}))
+			file:close()
+		end
 	end
 
 	emu.register_frame_done(process_frame)
