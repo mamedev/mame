@@ -1,11 +1,11 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Jack Li
 local exports = {}
-exports.name = "autofire"
-exports.version = "0.0.1"
-exports.description = "Autofire plugin"
-exports.license = "The BSD 3-Clause License"
-exports.author = { name = "Jack Li" }
+exports.name = 'autofire'
+exports.version = '0.0.1'
+exports.description = 'Autofire plugin'
+exports.license = 'The BSD 3-Clause License'
+exports.author = { name = 'Jack Li' }
 
 local autofire = exports
 
@@ -78,7 +78,7 @@ function autofire.startplugin()
 	end
 
 	local function get_settings_path()
-		return lfs.env_replace(manager:machine():options().entries.pluginspath:value():match("([^;]+)")) .. "/autofire/cfg/"
+		return lfs.env_replace(manager:machine():options().entries.pluginspath:value():match('([^;]+)')) .. '/autofire/cfg/'
 	end
 
 	local function get_settings_filename()
