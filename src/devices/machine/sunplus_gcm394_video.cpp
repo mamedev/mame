@@ -343,7 +343,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return m_tmap0_regs[offs
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(0, ,m_tmap0_regs, offset, data);
+	write_tmap_regs(0, m_tmap0_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk0_w)
