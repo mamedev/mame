@@ -476,8 +476,8 @@ private:
 	DECLARE_WRITE8_MEMBER(out_c_w);
 	void amaticmg_palette(palette_device &palette) const;
 	void amaticmg2_palette(palette_device &palette) const;
-	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(amaticmg2_irq);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
@@ -497,7 +497,7 @@ void amaticmg_state::video_start()
 {
 }
 
-uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y, x;
@@ -522,7 +522,7 @@ uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y, x;
@@ -873,7 +873,6 @@ void amaticmg_state::amaticmg(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg));
-	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen("screen");

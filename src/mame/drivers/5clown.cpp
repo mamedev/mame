@@ -512,7 +512,7 @@ private:
 	void fclown_ay8910_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	void _5clown_palette(palette_device &palette) const;
-	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fclown(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void fcaudio_map(address_map &map);
 	void fclown_map(address_map &map);
@@ -574,7 +574,7 @@ void _5clown_state::video_start()
 }
 
 
-uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -1049,7 +1049,6 @@ void _5clown_state::fclown(machine_config &config)
 	screen.set_size((39+1)*8, (31+1)*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(_5clown_state::screen_update_fclown));
-	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fclown);
 	PALETTE(config, m_palette, FUNC(_5clown_state::_5clown_palette), 256);

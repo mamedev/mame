@@ -144,7 +144,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
 	void main_mem(address_map &map);
 	void ramdac_map(address_map &map);
@@ -160,7 +160,7 @@ private:
 };
 
 
-uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 /*
       280x230,4 bitmap layers, 8bpp,
@@ -168,7 +168,7 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 */
 
 	int x,y,z,pixdat;
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	z=0;
 	for (y=0;y<230;y++)
@@ -178,30 +178,30 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			pixdat = m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid2[z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			z++;
 		}
@@ -473,7 +473,6 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.set_size(35*8, 30*8);
 	screen.set_visarea(0*8, 35*8-1, 0*8, 29*8-1);
 	screen.set_screen_update(FUNC(bmcbowl_state::screen_update));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
 	PALETTE(config, m_palette).set_entries(256);

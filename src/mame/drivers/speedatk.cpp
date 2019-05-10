@@ -322,7 +322,6 @@ void speedatk_state::speedatk(machine_config &config)
 	screen.set_size(320, 256);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(speedatk_state::screen_update));
-	screen.set_palette(m_palette);
 
 	H46505(config, m_crtc, MASTER_CLOCK/16);   /* hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
