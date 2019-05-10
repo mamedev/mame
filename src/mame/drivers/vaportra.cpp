@@ -229,7 +229,7 @@ void vaportra_state::vaportra(machine_config &config)
 	screen.set_screen_update(FUNC(vaportra_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_vaportra);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vaportra);
 	PALETTE(config, m_palette).set_entries(1280);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
@@ -245,7 +245,7 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
@@ -260,11 +260,10 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
 	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(4);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
+	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

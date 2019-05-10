@@ -389,7 +389,7 @@ void deco_bac06_device::deco_bac06_pf_draw(screen_device &screen,bitmap_ind16 &b
 	}
 
 	if (tm)
-		custom_tilemap_draw(bitmap,screen.priority(),cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition, bppmult, bppmask);
+		custom_tilemap_draw(bitmap,screen.priority(),cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition, bppmult, bppmask, pri, primask);
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
@@ -410,7 +410,7 @@ void deco_bac06_device::deco_bac06_pf_draw_bootleg(screen_device &screen,bitmap_
 		bppmask = m_bppmask_16x16;
 	}
 
-	custom_tilemap_draw(bitmap,screen.priority(),cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),nullptr,nullptr,flags, 0, 0, 0, 0, bppmult, bppmask);
+	custom_tilemap_draw(bitmap,screen.priority(),cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),nullptr,nullptr,flags, 0, 0, 0, 0, bppmult, bppmask, pri, primask);
 }
 
 
