@@ -56,8 +56,8 @@ void gcm394_base_video_device::device_reset()
 {
 	for (int i = 0; i < 6; i++)
 	{
-		tmap0_regs[i] = 0x0000;
-		tmap1_regs[i] = 0x0000;
+		m_tmap0_regs[i] = 0x0000;
+		m_tmap1_regs[i] = 0x0000;
 	}
 
 	m_707f = 0x0000;
