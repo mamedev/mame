@@ -29,13 +29,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this,"spriteram"),
-		m_spriteext(*this,"spriteext")
+		m_spriteext(*this,"spriteext"),
+		m_z80bank(*this,"z80bank"),
+		m_io_system(*this,"SYSTEM"),
+		m_io_service(*this,"SERVICE")
 	{ }
 
 	void opwolf3(machine_config &config);
 	void slapshot(machine_config &config);
 
-	void init_slapshot();
+	void driver_init() override;
 
 protected:
 	enum
@@ -50,12 +53,12 @@ protected:
 private:
 	struct slapshot_tempsprite
 	{
-		int gfx;
-		int code,color;
-		int flipx,flipy;
+		u8 gfx;
+		u32 code,color;
+		bool flipx,flipy;
 		int x,y;
 		int zoomx,zoomy;
-		int primask;
+		u32 primask;
 	};
 
 	/* devices */
@@ -68,39 +71,43 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_spriteext;
-	std::unique_ptr<uint16_t[]>    m_spriteram_buffered;
-	std::unique_ptr<uint16_t[]>    m_spriteram_delayed;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_spriteext;
+	std::unique_ptr<u16[]>   m_spriteram_buffered;
+	std::unique_ptr<u16[]>   m_spriteram_delayed;
+
+	required_memory_bank m_z80bank;
+	optional_ioport m_io_system;
+	optional_ioport m_io_service;
 
 	/* video-related */
 	slapshot_tempsprite *m_spritelist;
-	int32_t       m_sprites_disabled;
-	int32_t       m_sprites_active_area;
-	int32_t       m_sprites_master_scrollx;
-	int32_t       m_sprites_master_scrolly;
-	int         m_sprites_flipscreen;
-	int         m_prepare_sprites;
-	int         m_dislayer[5];
+	bool      m_sprites_disabled;
+	s32       m_sprites_active_area;
+	s32       m_sprites_master_scrollx;
+	s32       m_sprites_master_scrolly;
+	bool      m_sprites_flipscreen;
+	bool      m_prepare_sprites;
+	int       m_dislayer[5];
 
 	emu_timer *m_int6_timer;
 
 	// generic
-	DECLARE_READ16_MEMBER(service_input_r);
+	u16 service_input_r(offs_t offset);
 	void sound_bankswitch_w(u8 data);
 	void coin_control_w(u8 data);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taito_no_buffer);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
-	void taito_handle_sprite_buffering();
-	void taito_update_sprites_active_area();
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int y_offset);
+	void handle_sprite_buffering();
+	void update_sprites_active_area();
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	void opwolf3_map(address_map &map);
-	void opwolf3_z80_sound_map(address_map &map);
 	void slapshot_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SLAPSHOT_H
