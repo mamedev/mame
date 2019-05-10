@@ -761,11 +761,7 @@ ROM_START( mpt02 )
 	ROM_LOAD( "87201.ic12",  0xc00, 0x400, CRC(8006a1e3) SHA1(b67612d98231485fce55d604915abd19b6d64eac) )
 ROM_END
 
-ROM_START( mpt02h )
-	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
-	ROM_LOAD( "86676.ic13",  0x000, 0x400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
-ROM_END
-
+#define rom_mpt02h rom_mpt02
 #define rom_mtc9016 rom_mpt02
 #define rom_shmc1200 rom_mpt02
 #define rom_cm1200 rom_mpt02
