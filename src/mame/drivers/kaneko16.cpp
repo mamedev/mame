@@ -1645,54 +1645,6 @@ INPUT_PORTS_END
 /***************************************************************************
 
 
-                                Graphics Layouts
-
-
-***************************************************************************/
-
-
-/*
-    16x16x4 made of 4 8x8x4 blocks arrenged like:   01
-                                                    23
-*/
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(8*8*4*0,4),   STEP8(8*8*4*1,4)   },
-	{ STEP8(8*8*4*0,8*4), STEP8(8*8*4*2,8*4) },
-	16*16*4
-};
-
-/*
-    16x16x8 made of 4 8x8x8 blocks arrenged like:   01
-                                                    23
-*/
-static const gfx_layout layout_16x16x8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
-	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
-	16*16*8
-};
-
-static GFXDECODE_START( gfx_4bit )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_8bit )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x40 * 256, 0x40 ) // [0] Sprites
-GFXDECODE_END
-
-
-/***************************************************************************
-
-
                                 Machine Drivers
 
 
@@ -1746,7 +1698,6 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 	m_screen->set_visarea(0, 256-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_berlwall_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	PALETTE(config, m_bgpalette, palette_device::GRB_555); // 32768 static colors for the bg
@@ -1758,7 +1709,8 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_offsets(0, -1*64);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1808,7 +1760,6 @@ void kaneko16_state::bakubrkr(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
@@ -1823,7 +1774,8 @@ void kaneko16_state::bakubrkr(machine_config &config)
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(8,8,8,8); // above all
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1877,7 +1829,6 @@ void kaneko16_state::blazeon(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0], 0);
@@ -1888,7 +1839,8 @@ void kaneko16_state::blazeon(machine_config &config)
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
 	m_kaneko_spr->set_offsets(0x10000 - 0x680, 0x000);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
@@ -1930,7 +1882,6 @@ void kaneko16_state::wingforc(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
@@ -1941,7 +1892,8 @@ void kaneko16_state::wingforc(machine_config &config)
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
 	m_kaneko_spr->set_offsets(0x10000 - 0x680, 0x000);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
@@ -2008,7 +1960,6 @@ void kaneko16_gtmr_state::gtmr(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_gtmr_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_8bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 32768);
 
 	KANEKO_TMAP(config, m_view2[0]);
@@ -2022,7 +1973,8 @@ void kaneko16_gtmr_state::gtmr(machine_config &config)
 	m_view2[1]->set_palette(m_palette);
 
 	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0x40 * 256);
 
 	KANEKO_TOYBOX(config, m_toybox, m_eeprom, m_dsw_port, m_mcuram, "mcudata");
 	/* part of the toybox? */
@@ -2119,7 +2071,6 @@ void kaneko16_state::mgcrystl(machine_config &config)
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
@@ -2134,7 +2085,8 @@ void kaneko16_state::mgcrystl(machine_config &config)
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(2 /* below all */ ,3 /* above tile[0], below the other */ ,5 /* above all */ ,7 /* above all */);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2235,7 +2187,6 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4bit);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2[0]);
@@ -2247,7 +2198,8 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 	m_kaneko_spr->set_priorities(1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */);
 	m_kaneko_spr->set_offsets(0xa00, -0x40);
 	m_kaneko_spr->set_fliptype(1);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	KANEKO_HIT(config, m_kaneko_hit);
 	m_kaneko_hit->set_type(1);
@@ -2494,7 +2446,7 @@ ROM_START( explbrkr ) /* MASTER UP= 92/10/08 20:10:16 */
 	ROM_LOAD16_BYTE( "ts101e.u19", 0x000001, 0x040000, CRC(88f4afb7) SHA1(08b8efd6bd935bc1b8cf9753d58b38ccf9a70b4d) )
 
 	/* these actually match the other set but have different names on the board..*/
-	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x240000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
 	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
@@ -2519,7 +2471,7 @@ ROM_START( explbrkrk ) /* MASTER UP= 92/10/08 21:35:56 - No "For use in Korea.."
 	ROM_LOAD16_BYTE( "u19", 0x000001, 0x040000, CRC(f0a243b1) SHA1(3448c85c9388b590ea28b9adcaf81b68c14c678c) ) /* TMS 27C020 with non descript label "MF" */
 
 	/* these actually match the other set but have different names on the board..*/
-	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x240000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
 	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
@@ -2543,7 +2495,7 @@ ROM_START( bakubrkr ) /* MASTER UP= 92/10/08 20:56:03 */
 	ROM_LOAD16_BYTE( "ts100j.u18", 0x000000, 0x040000, CRC(8cc0a4fd) SHA1(e7e18b5ea236522a79ba9db8f573ac8f7ade504b) )
 	ROM_LOAD16_BYTE( "ts101j.u19", 0x000001, 0x040000, CRC(aea92195) SHA1(e89f964e7e936fd7774f21956eb4ff5c9104837b) )
 
-	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x240000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "ts001j.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
 	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000j.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
@@ -2602,7 +2554,7 @@ ROM_START( berlwall )
 	ROM_LOAD16_BYTE( "bw100e_u23-01.u23", 0x000000, 0x020000, CRC(76b526ce) SHA1(95ba7cccbe88fd695c28b6a7c25a1afd130c1aa6) )
 	ROM_LOAD16_BYTE( "bw101e_u39-01.u39", 0x000001, 0x020000, CRC(78fa7ef2) SHA1(8392de6e307dcd2bf5bcbeb37d578d33246acfcf) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 
@@ -2633,7 +2585,7 @@ ROM_START( berlwallt )
 	ROM_LOAD16_BYTE( "bw100a.u23", 0x000000, 0x020000, CRC(e6bcb4eb) SHA1(220b8fddc79230b4f6a8cf33e1035355c485e8d1) )
 	ROM_LOAD16_BYTE( "bw101a.u39", 0x000001, 0x020000, CRC(38056fb2) SHA1(48338b9a5ebea872286541a3c45016673c4af76b) )
 
-	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x120000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 	ROM_LOAD( "bw300.u82",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) ) // Masked players, Japanese text
@@ -2667,7 +2619,7 @@ ROM_START( berlwallk )
 	ROM_LOAD16_BYTE( "bw100k.u23", 0x000000, 0x020000, CRC(0ce1d336) SHA1(9dbff4a72f03dd506726c3b305fd0a32e7da4ee1) )
 	ROM_LOAD16_BYTE( "bw101k.u39", 0x000001, 0x020000, CRC(3355be65) SHA1(bc3506236ee2f37b3cba7c4d8fe1b4dad61b06f1) )
 
-	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x120000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 	ROM_LOAD( "bw300k.u82", 0x100000, 0x020000, CRC(b8de79d7) SHA1(c9a78aa213105f3657349995aca2866bc6d80093) )
@@ -2699,7 +2651,7 @@ ROM_START( packbang ) /* same PCB as Berlin Wall - BW-002 */
 	ROM_LOAD16_BYTE( "bbp0x3.u23", 0x000000, 0x020000, CRC(105e978a) SHA1(d2aa72a25b70726ebe4b16bfe16da149bb37cd85) ) /* hand written checksum on label - 527B */
 	ROM_LOAD16_BYTE( "bbp1x3.u39", 0x000001, 0x020000, CRC(465d36f5) SHA1(d3bc9e5d444e086652d2bc562d9adfb8a1fd0d2d) ) /* hand written checksum on label - C5C8 */
 
-	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x120000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "bb.u84",  0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) )
 	ROM_LOAD( "pb_spr_ext_9_20_ver.u83",  0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) ) /* hand written label plus checksum BA63 */
 
@@ -2753,7 +2705,7 @@ ROM_START( blazeon )
 	ROM_REGION( 0x020000, "audiocpu", 0 )           /* Z80 Code */
 	ROM_LOAD( "3.u45", 0x000000, 0x020000, CRC(52fe4c94) SHA1(896230e4627503292575bbd84edc3cf9cb18b27e) )   // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "bz_sp1.u20", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
 	ROM_LOAD( "bz_sp1.u68", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
 	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
@@ -2771,7 +2723,7 @@ ROM_START( blazeonj )
 	ROM_REGION( 0x020000, "audiocpu", 0 )           /* Z80 Code */
 	ROM_LOAD( "3.u45", 0x000000, 0x020000, CRC(52fe4c94) SHA1(896230e4627503292575bbd84edc3cf9cb18b27e) )   // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "bz_sp1.u20", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
 	ROM_LOAD( "bz_sp1.u68", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
 	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
@@ -2849,7 +2801,7 @@ ROM_START( wingforc )
 	ROM_REGION( 0x10000, "audiocpu", 0 )           /* Z80 Code */
 	ROM_LOAD( "s-drv_2.22.u45", 0x00000, 0x10000, CRC(ccdc2758) SHA1(5c0448a70306bd7574f35056ad45ffcbd4a866a8) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "kan_spr", 0 )   /* Sprites */
 	// two sprite chips, roms are doubled
 	ROM_LOAD( "sp0m.u69", 0x000000, 0x80000, CRC(8be26a05) SHA1(5b54cd74235c0e32a234ddbe9cf26817700451f1) )
 	ROM_LOAD( "sp0m.u1",  0x000000, 0x80000, CRC(8be26a05) SHA1(5b54cd74235c0e32a234ddbe9cf26817700451f1) )
@@ -2960,7 +2912,7 @@ ROM_START( bloodwar )
 	ROM_LOAD16_WORD_SWAP( "ofd0x3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
 
 
-	ROM_REGION( 0x1e00000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x1e00000, "kan_spr", 0 )  /* Sprites */
 	ROM_LOAD       ( "of-200-0201.8",   0x0000000, 0x200000, CRC(bba63025) SHA1(daec5285469ee953f6f838fe3cb3903524e9ac39) )
 	ROM_LOAD       ( "of-201-0202.9",   0x0200000, 0x200000, CRC(4ffd9ddc) SHA1(62bc8c0ed2efab407fc2956c514c3e732bcc47ee) )
 	ROM_LOAD       ( "of-202-0203.10",  0x0400000, 0x200000, CRC(fbcc5363) SHA1(9eff48c29d5c887d39e4db442c6ee51ec879521e) )
@@ -3004,7 +2956,7 @@ ROM_START( oedfight )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "ofd0x3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
 
-	ROM_REGION( 0x1e00000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x1e00000, "kan_spr", 0 )  /* Sprites */
 	ROM_LOAD       ( "of-200-0201.8",   0x0000000, 0x200000, CRC(bba63025) SHA1(daec5285469ee953f6f838fe3cb3903524e9ac39) )
 	ROM_LOAD       ( "of-201-0202.9",   0x0200000, 0x200000, CRC(4ffd9ddc) SHA1(62bc8c0ed2efab407fc2956c514c3e732bcc47ee) )
 	ROM_LOAD       ( "of-202-0203.10",  0x0400000, 0x200000, CRC(fbcc5363) SHA1(9eff48c29d5c887d39e4db442c6ee51ec879521e) )
@@ -3159,7 +3111,7 @@ ROM_START( gtmr )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mmd0x2.u124.bin",  0x000000, 0x020000, CRC(3d7cb329) SHA1(053106acde642a414fde0b01105fe6762b6a10f6) ) // from gtmra
 
-	ROM_REGION( 0x840000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x840000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "mm-200-402-s0.bin",  0x000000, 0x200000, CRC(c0ab3efc) SHA1(e6cd15480977b036234d91e6f3a6e21b7f0a3c3e) )
 	ROM_LOAD( "mm-201-403-s1.bin",  0x200000, 0x200000, CRC(cf6b23dc) SHA1(ccfd0b17507e091e55c169361cd6a6b19641b717) )
 	ROM_LOAD( "mm-202-404-s2.bin",  0x400000, 0x200000, CRC(8f27f5d3) SHA1(219a86446ce2556682009d8aff837480f040a01e) )
@@ -3188,7 +3140,7 @@ ROM_START( gtmra )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mmd0x2.u124.bin",  0x000000, 0x020000, CRC(3d7cb329) SHA1(053106acde642a414fde0b01105fe6762b6a10f6) )
 
-	ROM_REGION( 0x840000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x840000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "mm-200-402-s0.bin",  0x000000, 0x200000, CRC(c0ab3efc) SHA1(e6cd15480977b036234d91e6f3a6e21b7f0a3c3e) )
 	ROM_LOAD( "mm-201-403-s1.bin",  0x200000, 0x200000, CRC(cf6b23dc) SHA1(ccfd0b17507e091e55c169361cd6a6b19641b717) )
 	ROM_LOAD( "mm-202-404-s2.bin",  0x400000, 0x200000, CRC(8f27f5d3) SHA1(219a86446ce2556682009d8aff837480f040a01e) )
@@ -3217,7 +3169,7 @@ ROM_START( gtmrb )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mmd0x1.u124",  0x000000, 0x020000, CRC(3d7cb329) SHA1(053106acde642a414fde0b01105fe6762b6a10f6) ) // == mmd0x2
 
-	ROM_REGION( 0x840000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x840000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "mm-200-402-s0.bin",  0x000000, 0x200000, CRC(c0ab3efc) SHA1(e6cd15480977b036234d91e6f3a6e21b7f0a3c3e) )
 	ROM_LOAD( "mm-201-403-s1.bin",  0x200000, 0x200000, CRC(cf6b23dc) SHA1(ccfd0b17507e091e55c169361cd6a6b19641b717) )
 	ROM_LOAD( "mm-202-404-s2.bin",  0x400000, 0x200000, CRC(8f27f5d3) SHA1(219a86446ce2556682009d8aff837480f040a01e) )
@@ -3247,7 +3199,7 @@ ROM_START( gtmro )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mmd0x0.u124",  0x000000, 0x020000, CRC(e1f6159e) SHA1(e4af85036756482d6fa27494842699e2647809c7) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "mm200-e.bin",  0x000000, 0x100000, CRC(eb104408) SHA1(a7805597161dc5acd2804d607dd0acac0c40111d) )
 	ROM_LOAD16_BYTE( "mm200-o.bin",  0x000001, 0x100000, CRC(b6d04e7c) SHA1(1fa9d6b967724ed0c9e6ae3eda7089a081120d54) )
 	ROM_LOAD16_BYTE( "mm201-e.bin",  0x200000, 0x100000, CRC(b8c64e14) SHA1(8e2b19f0ba715dfdf0d423a41989e715145adbeb) )
@@ -3289,7 +3241,7 @@ ROM_START( gtmre )
 	// this rom has the right version string, so is probably correct
 	ROM_LOAD16_WORD_SWAP( "gtmrusa.u12",  0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	/* fill the 0x700000-7fffff range first, with the second of the identical halves */
 	ROM_LOAD16_BYTE( "gmmu64.bin",  0x600000, 0x100000, CRC(57d77b33) SHA1(f7ae28ae889be4442b7b236705943eaad1f0c84e) )  // HALVES IDENTICAL
 	ROM_LOAD16_BYTE( "gmmu65.bin",  0x600001, 0x100000, CRC(05b8bdca) SHA1(44471d66787d5b48ae8b13676f42f27af44e5c6a) )  // HALVES IDENTICAL
@@ -3326,7 +3278,7 @@ ROM_START( gtmrusa )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "mmd0x3.u12",  0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	/* fill the 0x700000-7fffff range first, with the second of the identical halves */
 	ROM_LOAD16_BYTE( "mm-204-564.bin",  0x600000, 0x100000, CRC(57d77b33) SHA1(f7ae28ae889be4442b7b236705943eaad1f0c84e) )  // HALVES IDENTICAL
 	ROM_LOAD16_BYTE( "mm-204-406-565.bin",  0x600001, 0x100000, CRC(05b8bdca) SHA1(44471d66787d5b48ae8b13676f42f27af44e5c6a) )  // HALVES IDENTICAL
@@ -3515,7 +3467,7 @@ ROM_START( gtmr2 )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "m2-200-0.u49",       0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
 	ROM_LOAD( "m2-201-0.u50",       0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
 	ROM_LOAD( "m2-202-0.u51",       0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
@@ -3546,7 +3498,7 @@ ROM_START( gtmr2a )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "m2-200-0.u49",      0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
 	ROM_LOAD( "m2-201-0.u50",      0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
 	ROM_LOAD( "m2-202-0.u51",      0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
@@ -3577,7 +3529,7 @@ ROM_START( gtmr2u )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "m2-200-0.u49",      0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
 	ROM_LOAD( "m2-201-0.u50",      0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
 	ROM_LOAD( "m2-202-0.u51",      0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
@@ -3656,7 +3608,7 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 	ROM_LOAD16_BYTE( "mc100e02.u18", 0x000000, 0x020000, CRC(246a1335) SHA1(8333945a92e08a7bff425d2d6602557386016dc5) ) /* Labeled as MC100E/U18-02 */
 	ROM_LOAD16_BYTE( "mc101e02.u19", 0x000001, 0x040000, CRC(708ea1dc) SHA1(ae6eca6620729bc1e815f1bfbd8fe130f0ba943c) ) /* Labeled as MC101E/U19-02 */
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x280000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "mc000.u38",    0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) )
 	ROM_LOAD( "mc001.u37",    0x100000, 0x080000, CRC(005bc43d) SHA1(6f6cd99e8e60562fa86581008455a6d9d646fa95) )
 	ROM_RELOAD(               0x180000, 0x080000             )
@@ -3680,7 +3632,7 @@ ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_LOAD16_BYTE( "mc100h00.u18", 0x000000, 0x020000, CRC(c7456ba7) SHA1(96c25c3432069373fa86d7af3e093e02e39aea34) ) /* Labeled as MC100H/U18-00 */
 	ROM_LOAD16_BYTE( "mc101h00.u19", 0x000001, 0x040000, CRC(ea8f9300) SHA1(0cd0d448805aa45986b63befca00b08fe066dbb2) ) /* Labeled as MC101H/U19-00 */
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x280000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "mc000.u38",    0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) )
 	ROM_LOAD( "mc001.u37",    0x100000, 0x080000, CRC(005bc43d) SHA1(6f6cd99e8e60562fa86581008455a6d9d646fa95) )
 	ROM_RELOAD(               0x180000, 0x080000             )
@@ -3705,7 +3657,7 @@ ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_LOAD16_BYTE( "kaneko__mc100-u18j-02.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-02 */
 	ROM_LOAD16_BYTE( "kaneko__mc101-u19j-02.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-02 */
 
-	ROM_REGION( 0x280000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x280000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "kaneko__mc-000_0001.u38",  0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) ) // Mask rom
 	ROM_LOAD( "kaneko__mc-001_0002_r44.u37",  0x100000, 0x080000, CRC(005bc43d) SHA1(6f6cd99e8e60562fa86581008455a6d9d646fa95) ) // Mask rom
 	ROM_RELOAD(             0x180000, 0x080000             )
@@ -3763,7 +3715,7 @@ ROM_START( shogwarr )
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb040e.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", ROMREGION_ERASEFF )  /* Sprites */
 	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
 	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
@@ -3794,7 +3746,7 @@ ROM_START( shogwarrk )
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb-040a.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", ROMREGION_ERASEFF )  /* Sprites */
 	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
 	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
@@ -3870,7 +3822,7 @@ ROM_START( shogwarru )
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb040a.u33",  0x000000, 0x020000, CRC(4b62c4d9) SHA1(35c943dde70438a411714070e42a84366db5ef83) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", ROMREGION_ERASEFF )  /* Sprites */
 	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
 	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
@@ -3938,7 +3890,7 @@ ROM_START( fjbuster )   // Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb040j.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", ROMREGION_ERASEFF )  /* Sprites */
 	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
 	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
@@ -4084,7 +4036,7 @@ ROM_START( brapboys ) /* World 'normal version', no rom sub board, serial RB92E0
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-040.00.u33",  0x000000, 0x020000, CRC(757c6e19) SHA1(0f1c37b1b1eb6b230c593e4648c4302f413a61f5) ) /* eprom labeled RB-040/U33-00 (green label) */
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "rb-020.u100", 0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) )
 	ROM_LOAD( "rb-021.u76",  0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) )
 	ROM_LOAD( "rb-022.u77",  0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) )
@@ -4116,7 +4068,7 @@ ROM_START( brapboysp ) /* World 'special version' with EXROM sub board; serial R
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-040.a0.u33",  0x000000, 0x020000, CRC(7b856d27) SHA1(c9b3cb858302ed33c332a25f08573611d1468e94) ) /* eprom labeled RB-040/U33-A0 (black label) */
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", 0 )  /* Sprites */
 	ROM_LOAD( "rb-020.u100", 0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) ) // really at location next to capacitor C2 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-021.u76",  0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) )
 	ROM_LOAD( "rb-022.u77",  0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) )
@@ -4151,7 +4103,7 @@ ROM_START( brapboyspj ) /* Japanese 'special version' with EXROM sub board; seri
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-006.u33",  0x000000, 0x020000, CRC(f1d76b20) SHA1(c571b5f28e529589ee2d7697ef5d4b60ccb66e7a) ) // fill in suffix!
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", 0 )  /* Sprites */
 	ROM_LOAD( "rb-020.u100", 0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) ) // really at location next to capacitor C2 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-021.u76",  0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) )
 	ROM_LOAD( "rb-022.u77",  0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) )
@@ -4184,7 +4136,7 @@ ROM_START( brapboyspu ) /* US 'special version' with EXROM sub board; Serial RB9
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-040.10.u33",  0x000000, 0x020000, CRC(0c90d758) SHA1(9b1a9856ab00f80f15bffc01276f636f92f0bd12) ) /* eprom labeled RB-040/U33-10 (red label)*/
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x1000000, "kan_spr", 0 )  /* Sprites */
 	ROM_LOAD( "rb-020.u100", 0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) ) // rb-020 0013 mask rom; really at location next to capacitor C2 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-021.u76",  0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) ) // rb-021 0014 mask rom
 	ROM_LOAD( "rb-022.u77",  0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) ) // rb-022 0015 mask rom
@@ -4267,7 +4219,7 @@ ROM_START( bonkadv )
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mcu.124",             0x000000, 0x020000, CRC(9d4e2724) SHA1(9dd43703265e39f876877020a0ac3875de6faa8d) )
 
-	ROM_REGION( 0x500000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "pc100101.37",         0x000000, 0x200000, CRC(c96e7c10) SHA1(607cc7745abc3ff820047e8a00060ece61646623) )
 	ROM_LOAD( "pc200102.40",         0x200000, 0x100000, CRC(c2b7a26a) SHA1(1c8783442e0ccf30c5640866c5493f1dc1dd48f8) )
 	ROM_LOAD( "pc300103.38",         0x300000, 0x100000, CRC(51ee162c) SHA1(b33afc7d1e9f55f191e08472e8c51ca931b0389d) )

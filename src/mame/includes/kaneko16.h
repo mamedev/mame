@@ -42,7 +42,6 @@ public:
 		m_kaneko_calc3(*this, "calc3_prot"),
 		m_toybox(*this, "toybox"),
 		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_bgpalette(*this, "bgpalette"),
 		m_eeprom(*this, "eeprom"),
@@ -81,7 +80,6 @@ protected:
 	optional_device<kaneko_calc3_device> m_kaneko_calc3;
 	optional_device<kaneko_toybox_device> m_toybox;
 	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_bgpalette;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
