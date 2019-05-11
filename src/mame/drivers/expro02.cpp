@@ -893,29 +893,6 @@ READ8_MEMBER(expro02_state::comad_okim6295_r)
 }
 
 
-
-/*************************************
- *
- *  Graphics definitions
- *
- *************************************/
-
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(8*8*4*0,4),   STEP8(8*8*4*1,4)   },
-	{ STEP8(8*8*4*0,8*4), STEP8(8*8*4*2,8*4) },
-	16*16*4
-};
-
-
-static GFXDECODE_START( gfx_expro02 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
-GFXDECODE_END
-
 /*************************************
  *
  *  Machine driver
@@ -940,7 +917,6 @@ void expro02_state::expro02(machine_config &config)
 	m_screen->set_screen_update(FUNC(expro02_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_expro02);
 	PALETTE(config, m_palette, FUNC(expro02_state::expro02_palette)).set_format(palette_device::GRBx_555, 2048 + 32768);
 
 	KANEKO_TMAP(config, m_view2);
@@ -952,7 +928,8 @@ void expro02_state::expro02(machine_config &config)
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
 	m_kaneko_spr->set_offsets(0, -0x40);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0x100);
 
 	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
@@ -1073,7 +1050,7 @@ ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_REGION16_BE( 0x80000, "user2", 0 )  /* contains real (non-cartoon) women, used after each 3rd round */
 	ROM_LOAD16_WORD_SWAP( "pm017e.u84", 0x00000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF )   /* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83",        0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82",        0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
@@ -1112,7 +1089,7 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 	ROM_REGION16_BE( 0x80000, "user2", 0 )  /* contains real (non-cartoon) women, used after each 3rd round */
 	ROM_LOAD16_WORD_SWAP( "pm017e.u84", 0x00000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF )   /* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
@@ -1150,7 +1127,7 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_REGION16_BE( 0x80000, "user2", ROMREGION_ERASEFF )  /* contains real (non-cartoon) women, used after each 3rd round */
 	/* U84 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF )   /* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
@@ -1187,7 +1164,7 @@ ROM_START( galsnewk ) /* EXPRO-02 PCB, Korean title is "Ddang Dda Meok Gi" */
 	ROM_REGION16_BE( 0x80000, "user2", 0 )  /* contains real (non-cartoon) women, used after each 3rd round */
 	ROM_LOAD16_WORD_SWAP( "pm017k.u84", 0x00000, 0x80000, CRC(0c656fb5) SHA1(4610800a460c9f50f7a2ee7b2984bf8e79b62124) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )   /* sprites */
+	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF )   /* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83",        0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82",        0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
@@ -1286,7 +1263,7 @@ ROM_START( fantasia ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD940429 MADE IN K
 	ROM_LOAD16_BYTE( "10.imag2", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
 	ROM_LOAD16_BYTE( "6.imag1",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "17.scr3",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
 	/* SCR1 and SCR2 are unpopulated */
 
@@ -1318,7 +1295,7 @@ ROM_START( fantasiaa ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD 940307 MADE IN
 	ROM_LOAD16_BYTE( "imag2_10.ue20b", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
 	ROM_LOAD16_BYTE( "imag1_6.ue20a",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "obj1_17.u5",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) ) /* same data, different PCB location */
 	/* U4 OBJ2 18 and U3 OBJ3 19 are unpopulated */
 
@@ -1349,7 +1326,7 @@ ROM_START( fantasiab )
 	ROM_LOAD16_BYTE( "10.imag2", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
 	ROM_LOAD16_BYTE( "6.imag1",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "17.scr3",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
 	/* SCR1 and SCR2 are unpopulated */
 
@@ -1411,7 +1388,7 @@ ROM_START( fantsy95 )
 	ROM_LOAD16_BYTE( "i-scr8.11", 0x400000, 0x80000, CRC(33db8177) SHA1(9e9aa890dfa20e5aa6f1caec7d018d992217c2fe) )
 	ROM_LOAD16_BYTE( "i-scr7.6",  0x400001, 0x80000, CRC(8662dd01) SHA1(a349c1cd965d3d51c20178fcce2f61ae76f4006a) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1433,7 +1410,7 @@ ROM_START( fantasian ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD 940803 MADE IN
 	ROM_LOAD16_BYTE( "i-scr8_11.ue20b", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
 	ROM_LOAD16_BYTE( "i-scr7_6.ue20a",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "obj1_13.u5",  0x00000, 0x80000, CRC(f99751f5) SHA1(10f0a2e369abc36a6df2f0c9879ffb7071ee214b) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1455,7 +1432,7 @@ ROM_START( newfant )
 	ROM_LOAD16_BYTE( "iscr8.11", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
 	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) ) // sldh
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1477,7 +1454,7 @@ ROM_START( newfanta )
 	ROM_LOAD16_BYTE( "iscr8.11", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
 	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1497,7 +1474,7 @@ ROM_START( missw96 )
 	ROM_LOAD16_BYTE( "mw96_07.bin",  0x300000, 0x80000, CRC(26112ed3) SHA1(f49f92a4d1bcea322b171702591315950fbd70c6) )
 	ROM_LOAD16_BYTE( "mw96_03.bin",  0x300001, 0x80000, CRC(e9374a46) SHA1(eabfcc7cb9c9a2f932abc8103c3abfa8360dcbb5) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "mw96_11.bin",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1517,7 +1494,7 @@ ROM_START( missw96a )
 	ROM_LOAD16_BYTE( "mw96_07.bin",  0x300000, 0x80000, CRC(26112ed3) SHA1(f49f92a4d1bcea322b171702591315950fbd70c6) )
 	ROM_LOAD16_BYTE( "mw96_03.bin",  0x300001, 0x80000, CRC(e9374a46) SHA1(eabfcc7cb9c9a2f932abc8103c3abfa8360dcbb5) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "mw96_11.bin",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1537,7 +1514,7 @@ ROM_START( missw96b )
 	ROM_LOAD16_BYTE( "mw96_07.bin",  0x300000, 0x80000, CRC(26112ed3) SHA1(f49f92a4d1bcea322b171702591315950fbd70c6) )
 	ROM_LOAD16_BYTE( "mw96_03.bin",  0x300001, 0x80000, CRC(e9374a46) SHA1(eabfcc7cb9c9a2f932abc8103c3abfa8360dcbb5) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "mw96_11.bin",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1557,7 +1534,7 @@ ROM_START( missw96c )
 	ROM_LOAD16_BYTE( "7_im3_b.ue14b",  0x300000, 0x80000, CRC(7fd5ca2c) SHA1(7733bd0529953bdae718bf28053d173e5ec3ca92) )
 	ROM_LOAD16_BYTE( "3_im3-a.ue14a",  0x300001, 0x80000, CRC(4ba5dab7) SHA1(81d7b6fde6d9405793f60ee7d15a15a511396332) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "20_obj1.u5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1578,7 +1555,7 @@ ROM_START( missmw96 )
 	ROM_LOAD16_BYTE( "mmw96_07.bin",  0x300000, 0x80000, CRC(001572bf) SHA1(cdf59c624baaeaea70985ee6f2f2fed08a8dfa61) )
 	ROM_LOAD16_BYTE( "mmw96_03.bin",  0x300001, 0x80000, CRC(22204025) SHA1(442e7f754c65c598983d6f897a60870d7759c823) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "mmw96_11.bin",  0x00000, 0x80000, CRC(7d491f8c) SHA1(63f580bd65579cac70b90eaa0e7f2413ef1597b8) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1598,7 +1575,7 @@ ROM_START( smissw )
 	ROM_LOAD16_BYTE( "7_im3-b.ue14b",  0x300000, 0x80000, CRC(12a9441d) SHA1(d9cd51e0c3ffac5fc561e0927c419bce0157337e) )
 	ROM_LOAD16_BYTE( "3_im3-a.ue14a",  0x300001, 0x80000, CRC(8c656fc9) SHA1(c3fe5de7cd6cd520bbd205ec62ac0dda51f71eeb) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "15_obj11.u5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1621,7 +1598,7 @@ ROM_START( fantsia2 )
 	ROM_LOAD16_BYTE( "scr8.g20",     0x400000, 0x80000, CRC(694ae2b3) SHA1(82b7a565290fce07c8393af4718fd1e6136928e9) )
 	ROM_LOAD16_BYTE( "scr7.f20",     0x400001, 0x80000, CRC(6068712c) SHA1(80a136d76dca566772e34d832ac11b8c7d6ce9ab) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "kan_spr", 0 )   /* sprites */
 	ROM_LOAD( "obj1.1i",      0x00000, 0x80000, CRC(52e6872a) SHA1(7e5274b9a415ee0e536cd3b87f73d3eae9644669) )
 	ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
 
@@ -1644,7 +1621,7 @@ ROM_START( fantsia2a )
 	ROM_LOAD16_BYTE( "fnt2-18.bin",    0x400000, 0x80000, CRC(4cdaeda3) SHA1(f5b478e49b59496865982409517654f48296565d) )
 	ROM_LOAD16_BYTE( "fnt2-13.bin",    0x400001, 0x80000, CRC(68c7f042) SHA1(ed3c864f3d91377fec78f19897ba0b0d2bcf0d2b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "kan_spr", 0 )   /* sprites */
 	ROM_LOAD( "obj1.1i",      0x00000, 0x80000, CRC(52e6872a) SHA1(7e5274b9a415ee0e536cd3b87f73d3eae9644669) )
 	ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
 
@@ -1668,7 +1645,7 @@ ROM_START( fantsia2n )
 	ROM_LOAD16_BYTE( "scr8.g20",     0x400000, 0x80000, CRC(694ae2b3) SHA1(82b7a565290fce07c8393af4718fd1e6136928e9) )
 	ROM_LOAD16_BYTE( "scr7.f20",     0x400001, 0x80000, CRC(6068712c) SHA1(80a136d76dca566772e34d832ac11b8c7d6ce9ab) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "kan_spr", 0 )   /* sprites */
 	ROM_LOAD( "23_obj1.u5",      0x00000, 0x80000, CRC(b45c9234) SHA1(b5eeec91b9c6952b338130458405997e1a51bf2f) )
 	ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
 
@@ -1685,7 +1662,7 @@ ROM_START( wownfant)
 	ROM_LOAD16_WORD_SWAP( "ep-061 43750002 - 1.bin",    0x100000, 0x200000, CRC(c318e841) SHA1(ba7af736d3b0accca474b0de1c8299eb3c449ef9) )
 	ROM_LOAD16_WORD_SWAP( "ep-061 43750002 - 2.bin",    0x300000, 0x200000, CRC(8871dc3a) SHA1(8e028f1430474df19bb9a912ee9e407fe4582558) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "kan_spr", 0 )   /* sprites */
 	ROM_LOAD( "ep-4001 42750001 u113.bin",      0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) )
 	ROM_LOAD( "ep-4001 42750001 u112.bin",      0x80000, 0x80000, CRC(51f4b604) SHA1(52e8ce0a2c1b9b00f04e0c775789bc550bad8ae0) )
 
@@ -1702,7 +1679,7 @@ ROM_START( missw02)
 	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x200000, CRC(fdfe36ba) SHA1(128277e44e2368267e097bb3510c797cc690d1ff) )
 	ROM_LOAD16_WORD_SWAP( "4.bin", 0x300000, 0x200000, CRC(aa769a81) SHA1(2beb6da9327ddce7bec934bcf610061fc3b9ab09) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "kan_spr", 0 )   /* sprites */
 	ROM_LOAD( "6.u113", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) ) // same as wowfant
 	ROM_LOAD( "5.u112", 0x80000, 0x80000, CRC(ead3411d) SHA1(ee1b071e4a556b66ecdedcdc7e1ee60851c0ddb0) )
 
@@ -1724,7 +1701,7 @@ ROM_START( galhustl ) // An original PCB has been seen with genuine AFEGA labels
 	ROM_LOAD( "galhstl1.ub6", 0x00000, 0x80000,  CRC(23848790) SHA1(2e77fbe04f46e258daecb4c5917e383c7c06a306) ) // Also found as AFEGA 1
 	ROM_LOAD( "galhstl2.uc6", 0x80000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) ) // Also found as AFEGA 2
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "kan_spr", 0 )
 	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) ) // Also found as AFEGA 5
 ROM_END
 
@@ -1742,7 +1719,7 @@ ROM_START( pgalvip ) // this set has extra data roms for the gfx
 	ROM_LOAD( "afega_12.ub6", 0x00000, 0x20000,  CRC(d32a6c0c) SHA1(6f16043ed1e174b42de83462e2ea7a601bac6678) )
 	ROM_LOAD( "afega_11.uc6", 0x80000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "kan_spr", 0 )
 	ROM_LOAD( "afega_17.u5", 0x00000, 0x80000, CRC(a8a50745) SHA1(e51963947c7a7556b8531d172b9d7bf9f321b21b) )
 ROM_END
 
@@ -1758,7 +1735,7 @@ ROM_START( pgalvipa ) // this set is more like Gals Hustler
 	ROM_LOAD( "pgalvip_1.ub6", 0x00000, 0x20000,  CRC(d32a6c0c) SHA1(6f16043ed1e174b42de83462e2ea7a601bac6678) )
 	ROM_LOAD( "pgalvip_2.uc6", 0x80000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "kan_spr", 0 )
 	ROM_LOAD( "pgalvip_5.u5", 0x00000, 0x80000, CRC(2d6e5a90) SHA1(b5487e5764d83dfecd982a8614d213c9075fbee4) )
 ROM_END
 
@@ -1776,7 +1753,7 @@ ROM_START( supmodel )
 	ROM_LOAD16_BYTE( "i-scr8.11", 0x400000, 0x80000, CRC(7c1813c8) SHA1(80fe97ac640847360529edfb728955e1067b0c14) )
 	ROM_LOAD16_BYTE( "i-scr7.6",  0x400001, 0x80000, CRC(19c73268) SHA1(aa6dc8c817a2e9707ea74e219ab34cf826223741) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x80000, "kan_spr", 0 )    /* sprites */
 	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
@@ -1820,7 +1797,7 @@ ROM_START( zipzap )
 	ROM_LOAD16_BYTE( "937.bin",  0x100000, 0x80000, CRC(61dd653f) SHA1(68b5ae3423363cc64d933836bf6881431dad021a) ) // good, girls
 	ROM_LOAD16_BYTE( "941.bin",  0x100001, 0x80000, CRC(320321ed) SHA1(00b52cd34cd86c105ff6dbd0248ff239de31c851) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // sprites
+	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
 	ROM_LOAD( "u5.bin",  0x000000, 0x80000,  CRC(c274d8b5) SHA1(2c45961aaf8311f027a734df7e33fe085dfdd099) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
