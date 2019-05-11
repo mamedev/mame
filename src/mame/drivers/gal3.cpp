@@ -628,7 +628,7 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[0]->set_palxor(0xf); // reverse mapping
-	m_c355spr[0]->set_color_base(0x1000); // TODO : correct palette offset
+	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
 
 	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
 	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
@@ -657,7 +657,7 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[1]->set_palxor(0xf); // reverse mapping
-	m_c355spr[1]->set_color_base(0x1000); // TODO : correct palette offset
+	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
 
 	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
 	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
