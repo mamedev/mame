@@ -2233,7 +2233,7 @@
 	<software name="dogfaces">
 		<description>Dogfight for Aces Only</description>
 		<year>198?</year>
-		<publisher>slogger</publisher>
+		<publisher>Slogger</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="10080">
 				<rom name="dogfight-opus_e.uef" size="10080" crc="bdde02c3" sha1="c693536b24412fe415f32bd94afb9b7e45ce9448" offset="0"/>
@@ -5139,7 +5139,7 @@
 
 	<software name="kastle">
 		<description>Kastle</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19262">
@@ -6733,7 +6733,7 @@
 
 	<software name="psycast2a" cloneof="psycast2">
 		<description>Psycastria 2 (Atlantis)</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>Atlantis</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="20603">
@@ -7622,7 +7622,7 @@
 
 	<software name="snookerv">
 		<description>Snooker (Visions)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Visions</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="electron_cass">

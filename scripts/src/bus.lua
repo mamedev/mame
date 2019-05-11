@@ -361,6 +361,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/autoprom.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/autoprom.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/emrmidi.cpp",
@@ -446,6 +448,8 @@ if (BUSES["BBC_USERPORT"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/userport/beebspch.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.h",
+		MAME_DIR .. "src/devices/bus/bbc/userport/usersplit.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/usersplit.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.h",
 	}
@@ -2960,6 +2964,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.h",
 	}
 end
 
