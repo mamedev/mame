@@ -97,9 +97,10 @@ WRITE_LINE_MEMBER(bally_as3022_device::irq_w)
 void bally_as3022_device::as3022_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).mirror(0xef00).ram();
-	map(0x0080, 0x0083).mirror(0xef7c).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x17ff).mirror(0xe800).rom();
+	map.global_mask(0x1fff);  // A13-15 are unconnected
+	map(0x0000, 0x007f).mirror(0x0f00).ram();
+	map(0x0080, 0x0083).mirror(0x0f7c).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1fff).rom();  // 4k RAM space, but could be jumpered for 2k
 }
 
 

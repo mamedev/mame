@@ -1789,6 +1789,7 @@ ROM_START(ngndshkr)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("776-15_4.716", 0x1000, 0x0800, CRC(63c80c52) SHA1(3350919fce237b308b8f960948f70d01d312e9c0))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1802,6 +1803,7 @@ ROM_START(slbmania)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("786-11_4.716", 0x1000, 0x0800, CRC(2a3641e6) SHA1(64693d424277e2aaf5fd4af33b2d348a8a455448))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*-----------------------------------
@@ -1854,6 +1856,7 @@ ROM_START(futurspa)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("781-02_4.716", 0x1000, 0x0800, CRC(364f7c9a) SHA1(e6a3d425317eaeba4109712c6949f11c50b82892))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1867,6 +1870,7 @@ ROM_START(spaceinv)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("792-07_4.716", 0x1000, 0x0800, CRC(787ffd5e) SHA1(4dadad7095de27622c2120311a84555dacdc3364))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1880,6 +1884,7 @@ ROM_START(rollston)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("796-19_4.716", 0x1000, 0x0800, CRC(b740d047) SHA1(710edb6bbba0a03e4f516b501f019493a3a4033e))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1893,6 +1898,7 @@ ROM_START(mystic)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("798-05_4.716", 0x1000, 0x0800, CRC(e759e093) SHA1(e635dac4aa925804ec658e856f7830290bfbc7b8))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1945,6 +1951,7 @@ ROM_START(viking)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("802-07-4.716", 0x1000, 0x0800, CRC(62bc5030) SHA1(5a696f784a415d5b16ee23cd72a905264a2bbeac))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1958,6 +1965,7 @@ ROM_START(hotdoggn)
 	ROM_RELOAD( 0x7800, 0x0800)
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("809-07_4.716", 0x1000, 0x0800, CRC(43f28d7f) SHA1(01fca0ee0137a0715421eaa3582ff8d324340ecf))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 #ifdef MISSING_GAME
@@ -1988,6 +1996,7 @@ ROM_START(skatebll)
 	ROM_RELOAD( 0x7000, 0x1000 )
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("823-02_4.716", 0x1000, 0x0800, CRC(d1037b20) SHA1(8784728540573be5e8ebb940ec0046b778f9413b))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -2047,6 +2056,7 @@ ROM_START(frontier)
 	ROM_RELOAD( 0x7000, 0x1000 )
 	ROM_REGION(0x10000, "as3022:cpu", 0)
 	ROM_LOAD("819-09_4.716", 0x1000, 0x0800, CRC(a62059ca) SHA1(75e139ea2573a8c3b666c9a1024d9308da9875c7))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -2235,11 +2245,9 @@ ROM_START(speakesy)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("877-01_4.716", 0xf000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
-	ROM_RELOAD(0xf800, 0x0800)
-	ROM_RELOAD(0x1000, 0x0800)
-	ROM_RELOAD(0x1800, 0x0800)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("877-01_4.716", 0x1000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 ROM_START(speakesy4p)
@@ -2249,11 +2257,9 @@ ROM_START(speakesy4p)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("877-01_4.716", 0xf000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
-	ROM_RELOAD(0xf800, 0x0800)
-	ROM_RELOAD(0x1000, 0x0800)
-	ROM_RELOAD(0x1800, 0x0800)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("877-01_4.716", 0x1000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
+	ROM_RELOAD( 0x1800, 0x0800)
 ROM_END
 
 /*---------------------------------------------------
@@ -2266,9 +2272,8 @@ ROM_START(bmx)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("888-02_4.532", 0xf000, 0x1000, CRC(5692c679) SHA1(7eef074d16cde589cde7500c4dc76c9a902c7fe3))
-	ROM_RELOAD(0x1000, 0x1000)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("888-02_4.532", 0x1000, 0x1000, CRC(5692c679) SHA1(7eef074d16cde589cde7500c4dc76c9a902c7fe3))
 ROM_END
 
 /*--------------------------------
@@ -2310,9 +2315,8 @@ ROM_START(granslam)
 	ROM_LOAD( "grndslam.u6", 0x1800, 0x0800, CRC(9e6ccea1) SHA1(5e158e021e0f3eed063577ae22cf5f1bc9655065))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("grndslam.u4", 0xf000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
-	ROM_RELOAD(0x1000, 0x1000)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("grndslam.u4", 0x1000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
 ROM_END
 
 ROM_START(granslam4)
@@ -2322,9 +2326,8 @@ ROM_START(granslam4)
 	ROM_LOAD( "grndslam.u6", 0x1800, 0x0800, CRC(9e6ccea1) SHA1(5e158e021e0f3eed063577ae22cf5f1bc9655065))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("grndslam.u4", 0xf000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
-	ROM_RELOAD(0x1000, 0x1000)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("grndslam.u4", 0x1000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
 ROM_END
 
 
@@ -2342,9 +2345,8 @@ ROM_START(goldball)
 	ROM_LOAD( "goldball.u6", 0x1800, 0x0800, CRC(9b6e79d0) SHA1(4fcda91bbe930e6131d94964a08459e395f841af))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("gb_u4.532", 0xf000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
-	ROM_RELOAD(0x1000, 0x1000)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("gb_u4.532", 0x1000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
 ROM_END
 
 ROM_START(goldballn)
@@ -2354,9 +2356,8 @@ ROM_START(goldballn)
 	ROM_LOAD( "goldball.u6", 0x1800, 0x0800, CRC(9b6e79d0) SHA1(4fcda91bbe930e6131d94964a08459e395f841af))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("gb_u4.532", 0xf000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
-	ROM_RELOAD(0x1000, 0x1000)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("gb_u4.532", 0x1000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
 ROM_END
 
 /*--------------------------------
@@ -2927,14 +2928,13 @@ GAME( 1980, viking,     0,        as3022, by35_os35, as3022_state, init_by35_6, 
 GAME( 1980, hotdoggn,   0,        as3022, by35_os35, as3022_state, init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1980, skatebll,   0,        as3022, by35_os40, as3022_state, init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1980, frontier,   0,        as3022, frontier,  as3022_state, init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy,   0,        by35,   by35_os5x, by35_state,   init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, speakesy4p, speakesy, by35,   by35_os5x, by35_state,   init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, bmx,        0,        by35,   by35_os5x, by35_state,   init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, granslam,   0,        by35,   by35_os5x, by35_state,   init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, granslam4,  granslam, by35,   by35_os5x, by35_state,   init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, goldball,   0,        by35,   by35,      by35_state,   init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, goldballn,  goldball, by35,   by35,      by35_state,   init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_IS_SKELETON_MECHANICAL)
-
+GAME( 1982, speakesy,   0,        as3022, by35_os5x, as3022_state, init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, speakesy4p, speakesy, as3022, by35_os5x, as3022_state, init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, bmx,        0,        as3022, by35_os5x, as3022_state, init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, granslam,   0,        as3022, by35_os5x, as3022_state, init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, granslam4,  granslam, as3022, by35_os5x, as3022_state, init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, goldball,   0,        as3022, by35,      as3022_state, init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, goldballn,  goldball, as3022, by35,      as3022_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Squawk & Talk sound
 GAME( 1981, flashgdn,  0,        by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_IS_SKELETON_MECHANICAL)
