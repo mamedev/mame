@@ -1135,6 +1135,7 @@ ROM_START( atvga )
 	ROMX_LOAD( "107000-705.bin", 0x10001, 0x8000, CRC(e1263c1e) SHA1(b564f1043ef45ecbdf4f06bb500150ad992c2931),ROM_SKIP(1) | ROM_BIOS(13) )
 ROM_END
 
+// Apricot XEN-S (Venus I Motherboard 286)
 ROM_START( xb42639 )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x20000, "bios", 0)
@@ -1143,6 +1144,7 @@ ROM_START( xb42639 )
 	ROM_LOAD16_BYTE( "3-10-17i.hi", 0x10001, 0x8000, CRC(d66710eb) SHA1(e8c1cd5f9ecfbd8825655e416d7ddf2ae362e69b))
 ROM_END
 
+// Apricot XEN-S (Venus II Motherboard 286)
 ROM_START( xb42639a )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x20000, "bios", 0)
@@ -1151,6 +1153,7 @@ ROM_START( xb42639a )
 	ROM_LOAD16_BYTE( "10217.hi", 0x10001, 0x8000, CRC(111725cf) SHA1(f6018a45bda4476d40c5881fb0a506ff75ec1688))
 ROM_END
 
+// Apricot XEN-S (Venus I Motherboard 386)
 ROM_START( xb42664 )
 	/* actual VGA BIOS not dumped */
 	ROM_REGION(0x20000, "bios", 0)
@@ -1159,6 +1162,7 @@ ROM_START( xb42664 )
 	ROM_LOAD16_BYTE( "3-10-17i.hi", 0x10001, 0x8000, CRC(d66710eb) SHA1(e8c1cd5f9ecfbd8825655e416d7ddf2ae362e69b))
 ROM_END
 
+// Apricot XEN-S (Venus II Motherboard 386)
 ROM_START( xb42664a )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x20000, "bios", 0)
@@ -1476,6 +1480,30 @@ ROM_START( c386sxlt )
 	ROMX_LOAD( "cbm-386lt-bios-v1.2-390982-03-cf00.bin", 0x00000, 0x20000, CRC(c8cd2641) SHA1(18e55bff494c42389dfb445f2bc11e78db30e5f7), ROM_BIOS(1))
 ROM_END
 
+// Commodore DT386
+ROM_START( dt386 )
+	// BIOS-String: 40-0502-DG1112-00101111-070791-SOLUTION-0 / 386DX-33 BIOS V1.00 #391560-0
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "dt386vp10", "DT386 V.pre 1.0")
+	ROMX_LOAD( "cbm-dt386dx-33c-bios-hi-vpre1.0-391560-01.bin", 0x10000, 0x10000, CRC(600472f4) SHA1(2513c8bdb24fe27f73c82cbca9e1a983e4a0ba10), ROM_BIOS(0))
+	// BIOS-String: 40-0500-DG112-00101111-070791-SOLUTION-0 / 386DX-33 Rev.1E (091592)
+	ROM_SYSTEM_BIOS(1, "dt386v1e", "DT386 V.1e")
+	ROMX_LOAD( "cbm-dt386dx-33c-bios-hi-v-xxxxxx-xx.bin", 0x10000, 0x10000, CRC(dc1ca1b5) SHA1(7441cb9d5ad5ca6e6425de73295eb74d1281929f), ROM_BIOS(1))
+	// BIOS-String: 40-0500-DG1112-00101111-070791-SOLUTION-0 / 386DX-33 Rev.1E (091592) / Commodore BIOS Version 1.0 391560-01
+	ROM_SYSTEM_BIOS(2, "dt386v10", "DT386 V.1.0")
+	ROMX_LOAD( "cbm-dt386dx-33c-bios-hi-v1.00-391560-01.bin", 0x10000, 0x10000, CRC(da1f7e6d) SHA1(b825fc015233e7eef93a3abbdfc3eeb0da096f50), ROM_BIOS(2))
+	// BIOS-String: 40-0501-DG1112-00101111-070791-SOLUTION-0 / Commodore 386DX-33 BIOS Rev. 1.01 391560-02
+	ROM_SYSTEM_BIOS(3, "dt386v101", "DT386 V.1.01")
+	ROMX_LOAD( "cbm-dt386dx-33c-bios-hi-v1.01-391560-02.bin", 0x10000, 0x10000, CRC(b3157f57) SHA1(a1a96c8d111e3c1da8f655b4b7e1c5be4af140e9), ROM_BIOS(3))
+	ROM_END
+
+// Commodore DT486 - BIOS contains VGA ROM - Keyboard error
+ROM_START( dt486 ) // BIOS string: 41-0102-001283-00111111-060692-SYM_486-0 - Commodore 486DX-33 BIOS Version 1.01 391521-02
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "dt486", "DT486")
+	ROM_LOAD( "cbm-dt486dx-33c-bios-u32--v1.01-391521-02.bin", 0x00000, 0x20000, BAD_DUMP CRC(a3977625) SHA1(83bc563fb41eae3dd5d260f13c6fe8979a77e99c))
+ROM_END
+
 // Commodore PC 30-III
 ROM_START( pc30iii )
 	ROM_REGION(0x20000, "bios", 0)
@@ -1530,7 +1558,7 @@ ROM_START( pc50ii )
 	// ROM_LOAD( "m_pc50-ii_54e3_pvgadk_even.bin", 0x00001, 0x8000, CRC(01f6b964) SHA1(799a84ddde8a7672a6df9439bad6198ec3ff98ec))
 ROM_END
 
-// Commodore PC-60-III
+// Commodore PC-60-III - complaining "time-of-day-clock stopped"
 ROM_START( pc60iii )
     ROM_REGION(0x20000, "bios", 0)
 	// 0: Commodore PC60-III 80386 BIOS Rev. 1.2 - 390473-01/390474-01
@@ -1538,7 +1566,7 @@ ROM_START( pc60iii )
 	ROMX_LOAD( "cbm-pc60c-bios-lo_u73-v1.2-390473-01.bin", 0x00000, 0x10000, CRC(ff2cd8b3) SHA1(62e95f818c5016f4be2741872dc644999dee33ce),ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "cbm-pc60c-bios-hi_u67-v1.2-390474-01.bin", 0x00001, 0x10000, CRC(690fff4b) SHA1(adc262d40da64354c7c76b61f46d2c7ed35e9df9),ROM_SKIP(1) | ROM_BIOS(0) )
 	// 1: Commodore PC-60-III 80386/25MHz BIOS Rev. 1.3 390473-02/390474-02
-	ROM_SYSTEM_BIOS(1, "pc60iiiv13", "PC 60-III V1.3")
+	ROM_SYSTEM_BIOS(1, "pc60iiiv13", "PC60-III V1.3")
 	ROMX_LOAD( "cbm-pc60c-bios-lo-v1.30-390473-02.bin", 0x00000, 0x10000, CRC(3edd83e0) SHA1(3ebf393d6c33d9b8600f56c7be9eedb5aefb2645),ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "cbm-pc60c-bios-hi-v1.30-390474-02.bin", 0x00001, 0x10000, CRC(12209ac4) SHA1(76f271944894c77dde735da2b2ba065e81a99564),ROM_SKIP(1) | ROM_BIOS(1) )
 	// 2: Commodore PC60-III 80386/25MHz BIOS rev.1.33 390473-04/390474-04
@@ -1557,30 +1585,43 @@ ROM_START( pc60iii )
 	ROM_SYSTEM_BIOS(5, "c386v13603", "Commodore 386 V1.3.603")
 	ROMX_LOAD( "cbm-pc60c-bios-lo-v1.3603-390473-07.bin", 0x00000, 0x10000, CRC(2cda07c7) SHA1(01fd6260192541dd73f88d2cc0f99fe5603efc81),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "cbm-pc60c-bios-hi-v1.3603-390474-07.bin", 0x00001, 0x10000, CRC(39845b9b) SHA1(9d3cbfde4b2acc1d576aafa80126b75a49d3d8df),ROM_SKIP(1) | ROM_BIOS(5) )
-
-
-
-
 ROM_END
 
+// Commodore PC-70-III - complaining "time-of-day-clock stopped"
+ROM_START( pc70iii ) 
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: Commodore 80486 BIOS Rev.1.00 - 390934-01/390935-01
+	ROM_SYSTEM_BIOS(0, "pc70v100", "PC70 V1.00")
+	ROMX_LOAD("cbm-pc70c_bios-u117-lo-v1.00-390934-01.bin", 0x00000, 0x10000, CRC(3eafd811) SHA1(4deecd5dc429ab09e7c0d308250cb716f8b8e42a), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("cbm-pc70c_bios-u112-hi-v1.00-390935-01.bin", 0x00001, 0x10000, CRC(2d1dfec9) SHA1(d799b3579577108549d9d4138a8a32c35ac3ce1c), ROM_SKIP(1) | ROM_BIOS(0))
+	// 1: Commodore PC70-III 80486/25MHz BIOS Rev.1.00.01 - xxxxxx - 00/xxxxxx-00
+	ROM_SYSTEM_BIOS(1, "pc70v101", "PC70 V1.00.01")
+	ROMX_LOAD("cbm-pc70c-bios-lo-v1.00.01-xxxxxx-00.bin", 0x00000, 0x10000, CRC(6c8bbd31) SHA1(63d1739a58a0d441ebdd543e3994984c433aedb4), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("cbm-pc70c-bios-hi-v1.00.01-xxxxxx-00.bin", 0x00001, 0x10000, CRC(ef279cdd) SHA1(d250368b2f731e842d6f280a6134f1e38846874b), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_END
+
+// Apricot Qi 300 (Rev D,E & F Motherboard)
 ROM_START( xb42663 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "qi310223.lo", 0x00000, 0x10000, CRC(53047f49) SHA1(7b38e533f7f27295269549c63e5477d950239167))
 	ROM_LOAD16_BYTE( "qi310223.hi", 0x00001, 0x10000, CRC(4852869f) SHA1(98599d4691d40b3fac2936034c70b386ce4caf77))
 ROM_END
 
+// Apricot Qi 600 (Neptune Motherboard)
 ROM_START( qi600 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "qi610223.lo", 0x00000, 0x10000, CRC(563114a9) SHA1(62932b3bf0b5502ff708f604c21773f00afda58e))
 	ROM_LOAD16_BYTE( "qi610223.hi", 0x00001, 0x10000, CRC(0ae133f6) SHA1(6039c366f7fe0ebf60b34c1a7d6b2d781b664001))
 ROM_END
 
+// Apricot Qi 900 (Scorpion Motherboard)
 ROM_START( qi900 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "qi910224.lo", 0x00000, 0x10000, CRC(b012ad3c) SHA1(807e788a6bd03f5e983fe503af3d0b202c754b8a))
 	ROM_LOAD16_BYTE( "qi910224.hi", 0x00001, 0x10000, CRC(36e66d56) SHA1(0900c5272ec3ced550f18fb08db59ab7f67a621e))
 ROM_END
 
+// Apricot FTs (Scorpion)
 ROM_START( ftsserv )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "fts10226.lo", 0x00000, 0x10000, CRC(efbd738f) SHA1(d5258760bafdaf1bf13c4a49da76d4b5e7b4ccbd))
@@ -1590,12 +1631,14 @@ ROM_START( ftsserv )
 	ROM_LOAD( "fp10009.bin",     0x0000, 0x8000, CRC(8aa7f718) SHA1(9ee6c6a5bb92622ea8d3805196d42ff68887d820))
 ROM_END
 
+// Apricot XEN-LS (Venus IV Motherboard)
 ROM_START( apxenls3 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "31020.lo", 0x10000, 0x8000, CRC(a19678d2) SHA1(d13c12fa7e94333555eabf58b81bad421e21cd91))
 	ROM_LOAD16_BYTE( "31020.hi", 0x10001, 0x8000, CRC(4922e020) SHA1(64e6448323dad2209e004cd93fa181582e768ed5))
 ROM_END
 
+// Apricot LANstation (Krypton Motherboard)
 ROM_START( aplanst )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "31024", "Bios 3-10-24")
@@ -1609,18 +1652,21 @@ ROM_START( aplanst )
 	ROMX_LOAD( "31026i.hi", 0x10001, 0x8000, CRC(ef01c54f) SHA1(911f95d65ab96878e5e7ebccfc4b329db47a1351), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
+// Apricot LANstation (Novell Remote Boot)
 ROM_START( aplannb )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "lsl31025.lo", 0x00000, 0x10000, CRC(8bb7229b) SHA1(31449d12884ec4e7752e6c1ce7ce9e0d044eadf2))
 	ROM_LOAD16_BYTE( "lsh31025.hi", 0x00001, 0x10000, CRC(09e5c1b9) SHA1(d42be83b4181d3733268c29df04a4d2918370f4e))
 ROM_END
 
+// Apricot VX FT server
 ROM_START( apvxft )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "ft10221.lo", 0x00000, 0x10000, CRC(8f339de0) SHA1(a6542406746eaf1ff7f9e3678c5cbe5522fb314a))
 	ROM_LOAD16_BYTE( "ft10221.hi", 0x00001, 0x10000, CRC(3b16bc31) SHA1(0592d1d81e7fd4715b0612083482db122d78c7f2))
 ROM_END
 
+// Apricot LS Pro (Caracal Motherboard)
 ROM_START( aplscar )
 	ROM_REGION(0x40000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "car306", "Caracal 3.06")
@@ -1629,11 +1675,13 @@ ROM_START( aplscar )
 	ROMX_LOAD( "car307.bin",   0x00000, 0x40000, CRC(66a01852) SHA1(b0a68c9d67921d27ba483a1c50463406c08d3085), ROM_BIOS(1))
 ROM_END
 
+// Apricot XEN PC (A1 Motherboard)
 ROM_START( apxena1 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD( "a1-r26.bin",   0x00000, 0x20000, CRC(d29e983e) SHA1(5977df7f8d7ac2a154aa043bb6f539d96d51fcad))
 ROM_END
 
+// Apricot XEN PC (P2 Motherboard)
 ROM_START( apxenp2 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "p2r02g2", "p2r02g2")
@@ -1642,6 +1690,7 @@ ROM_START( apxenp2 )
 	ROMX_LOAD("p2r01f0.bin",   0x00000, 0x20000, CRC(bbc68f2e) SHA1(6954a52a7dda5521794151aff7a04225e9c7df77), ROM_BIOS(1))
 ROM_END
 
+// Apricot XEN-i 386 (Leopard Motherboard)
 ROM_START( apxeni )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "lep121", "Rom Bios 1.2.1")
@@ -1650,6 +1699,7 @@ ROM_START( apxeni )
 	ROMX_LOAD( "lep121s.bin", 0x18000, 0x8000, CRC(296118e4) SHA1(d1feaa9704e6ce3bc10c900bdd310d9494b02304), ROM_BIOS(1))
 ROM_END
 
+// Apricot LS Pro (Bonsai Motherboard)
 ROM_START( aplsbon )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "bon106", "Boinsai 1-06")
@@ -1662,6 +1712,7 @@ ROM_START( aplsbon )
 	ROMX_LOAD( "bon20402.bin",   0x00000, 0x20000, CRC(ac5803fb) SHA1(b8fe92711c6a38a5d9e6497e76a0929c1685c631), ROM_BIOS(3))
 ROM_END
 
+// Apricot XEN-LS II (Samurai Motherboard)
 ROM_START( apxlsam )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "sam107", "ROM BIOS Version 1-07")
@@ -1670,12 +1721,14 @@ ROM_START( apxlsam )
 	ROMX_LOAD( "sam2-06.bin",   0x00000, 0x20000, CRC(9768bb0f) SHA1(8166b77b133072f72f23debf85984eb19578ffc1), ROM_BIOS(1))
 ROM_END
 
+// Apricot FTs (Panther Rev F 1.02.26)
 ROM_START( aprpand )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "pf10226.std", 0x00000, 0x10000, CRC(7396fb87) SHA1(a109cbad2179eec55f86c0297a59bb015461da21))
 	ROM_CONTINUE( 0x00001, 0x10000 )
 ROM_END
 
+// Apricot FT//ex 486 (J3 Motherboard)
 ROM_START( aprfte )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD( "1-2r2-4.486", 0x00000, 0x20000, CRC(bccc236d) SHA1(0765299363e68cf65710a688c360a087856ece8f))
@@ -1877,12 +1930,15 @@ COMP( 1989, xb42664,   ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1990, xb42664a,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
 COMP( 1993, apxena1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
 COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
+COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "386SX-16", MACHINE_NOT_WORKING )
+COMP( 199?, dt386,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Commodore Business Machines", "DT386", MACHINE_NOT_WORKING )
+COMP( 199?, dt486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines", "DT486", MACHINE_NOT_WORKING )
 COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
 COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
 COMP( 198?, pc45iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 45-III", MACHINE_NOT_WORKING )
 COMP( 198?, pc50ii,    ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 50-II", MACHINE_NOT_WORKING )
 COMP( 198?, pc60iii,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Commodore Business Machines",  "PC 60-III", MACHINE_NOT_WORKING )
+COMP( 199?, pc70iii,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines",  "PC 70-III", MACHINE_NOT_WORKING )
 COMP( 1990, c286lt,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C286LT", MACHINE_NOT_WORKING )
 COMP( 1991, c386sxlt,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C386SX-LT", MACHINE_NOT_WORKING )
 COMP( 199?, csl286,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "SL 286-16", MACHINE_NOT_WORKING )
