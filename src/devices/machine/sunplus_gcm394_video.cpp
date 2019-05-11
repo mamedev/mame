@@ -9,23 +9,26 @@
 #include "emu.h"
 #include "sunplus_gcm394_video.h"
 
-DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GCM394-series System-on-a-Chip (Video)")
+DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus GCM394 System-on-a-Chip (Video)")
 
+#define LOG_GCM394_VIDEO_DMA      (1U << 3)
 #define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394                (1U << 1)
 
-#define VERBOSE             (LOG_GCM394_TMAP)
+#define VERBOSE             (LOG_GCM394_VIDEO_DMA)
 
 #include "logmacro.h"
 
 
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr)
+	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 //	, m_scrollram(*this, "scrollram")
-	, m_paletteram(*this, "paletteram")
-//	, m_spriteram(*this, "spriteram")
+	, m_paletteram(*this, "^palette")
+	, m_spriteram(*this, "^spriteram")
 	, m_video_irq_cb(*this)
 {
 }
@@ -50,6 +53,63 @@ void gcm394_base_video_device::device_start()
 
 	m_video_irq_cb.resolve();
 
+	uint8_t* gfxregion = memregion(":maincpu")->base();
+	int gfxregion_size = memregion(":maincpu")->bytes();
+
+	int gfxelement = 0;
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			16,16,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP16(0,4) },
+			{ STEP16(0,4 * 16) },
+			16 * 16 * 4
+		};
+		obj_layout.total = gfxregion_size / (16 * 16 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,16,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP32(0,4) },
+			{ STEP16(0,4 * 32) },
+			16 * 32 * 4
+		};
+		obj_layout.total = gfxregion_size / (16 * 32 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			16,32,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP16(0,4) },
+			{ STEP32(0,4 * 16) },
+			32 * 16 * 4
+		};
+		obj_layout.total = gfxregion_size / (32 * 16 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	save_item(NAME(m_spriteextra));
 }
 
 void gcm394_base_video_device::device_reset()
@@ -59,6 +119,9 @@ void gcm394_base_video_device::device_reset()
 		m_tmap0_regs[i] = 0x0000;
 		m_tmap1_regs[i] = 0x0000;
 	}
+
+	for (int i=0;i<0x100;i++)
+		m_spriteextra[i] = 0x0000;
 
 	m_707f = 0x0000;
 	m_703a = 0x0000;
@@ -79,6 +142,11 @@ void gcm394_base_video_device::device_reset()
 	m_7086 = 0x0000;
 	m_7087 = 0x0000;
 	m_7088 = 0x0000;
+
+	m_videodma_bank = 0x0000;
+	m_videodma_size = 0x0000;
+	m_videodma_dest = 0x0000;
+	m_videodma_source = 0x0000;
 
 	m_video_irq_status = 0x0000;
 
@@ -274,6 +342,79 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	}
 }
 
+
+void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+{
+	uint32_t bitmap_addr = 0;// 0x40 * m_video_regs[0x22];
+	uint16_t tile = m_spriteram[base_addr + 0];
+	int16_t x = m_spriteram[base_addr + 1];
+	int16_t y = m_spriteram[base_addr + 2];
+	uint16_t attr = m_spriteram[base_addr + 3];
+
+	if (!tile)
+	{
+		return;
+	}
+
+	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	{
+		return;
+	}
+
+	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+
+	/*
+	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
+	{
+		x = (160 + x) - w / 2;
+		y = (120 - y) - (h / 2) + 8;
+	}
+	*/
+
+	x &= 0x01ff;
+	y &= 0x01ff;
+
+	uint32_t tile_line = ((scanline - y) + 0x200) % h;
+	int16_t test_y = (y + tile_line) & 0x1ff;
+	if (test_y >= 0x01c0)
+		test_y -= 0x0200;
+
+	if (test_y != scanline)
+	{
+		return;
+	}
+
+	bool blend = (attr & 0x4000);
+	bool flip_x = (attr & TILE_X_FLIP);
+	const uint8_t bpp = attr & 0x0003;
+	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	const uint32_t palette_offset = (attr & 0x0f00) >> 4;
+
+	if (blend)
+	{
+		if (flip_x)
+			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+		else
+			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+	}
+	else
+	{
+		if (flip_x)
+			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+		else
+			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+	}
+}
+
+void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
+{
+	for (uint32_t n = 0; n < 0x100; n++)
+	{
+		draw_sprite(cliprect, scanline, priority, 4 * n);
+	}
+}
+
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
@@ -289,6 +430,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		{
 			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
 			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
+			draw_sprites(cliprect, scanline, i);
 		}
 	}
 
@@ -347,20 +489,19 @@ READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return m_tmap0_regs[offs
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	write_tmap_regs(0, m_tmap0_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
 	m_page1_addr = data;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
-	m_page2_addr = data;
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** TILEMAP 1 *************************************************
@@ -369,18 +510,19 @@ READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r) { return m_tmap1_regs[offs
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	write_tmap_regs(1, m_tmap1_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_unk0_w %04x\n", machine().describe_context(), data);
+	m_page2_addr = data;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** unknown video device 0 (another tilemap? sprite layer?) *************************************************
@@ -444,29 +586,76 @@ WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk2_w)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_source_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_dma_source_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_source_w %04x\n", machine().describe_context(), data);
+	m_videodma_source = data;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_dest_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_dma_dest_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_dest_w %04x\n", machine().describe_context(), data);
+	m_videodma_dest = data;
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_dma_size_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_dma_size_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_r\n", machine().describe_context());
 	return 0x0000;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_dma_size_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_w %04x\n", machine().describe_context(), data);
+	m_videodma_size = data;
+
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x bank %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_videodma_bank );
+
+
+	if (m_videodma_dest == 0x7400)
+	{
+		if (m_videodma_bank == 0x0001) // transfers an additional word for each sprite with this bit set
+		{
+			m_videodma_size &= 0xff;
+
+			for (int i = 0; i <= m_videodma_size; i++)
+			{
+				uint16_t dat = space.read_word(m_videodma_source+i);
+				m_spriteextra[i] = dat;
+			}
+
+		}
+		else if (m_videodma_bank == 0x0000)
+		{
+			m_videodma_size &= 0x3ff;
+
+			for (int i = 0; i <= m_videodma_size; i++)
+			{
+				uint16_t dat = space.read_word(m_videodma_source+i);
+				m_spriteram[i] = dat;
+			}
+
+		}
+		else
+		{
+			logerror("unhandled: m_videodma_bank is %04x\n", m_videodma_bank);
+		}
+	}
+	else
+	{
+		logerror("unhandled: m_videodma_dest is %04x\n", m_videodma_dest);
+	}
+
+	m_videodma_size = 0x0000;
+
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
+	m_videodma_bank = data;
 }
+
+
+
 
 READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
 WRITE16_MEMBER(gcm394_base_video_device::video_707f_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data); m_707f = data; }
@@ -520,3 +709,4 @@ WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 		check_video_irq();
 	}
 }
+

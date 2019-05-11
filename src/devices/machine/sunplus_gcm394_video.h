@@ -14,7 +14,7 @@
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 
-class gcm394_base_video_device : public device_t
+class gcm394_base_video_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,8 +83,7 @@ public:
 	DECLARE_WRITE16_MEMBER(video_7088_w);
 
 	DECLARE_READ16_MEMBER(video_7083_r);
-
-
+	
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 protected:
@@ -135,6 +134,8 @@ protected:
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
 	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset);
 	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
+	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
+	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 
 	uint32_t m_screenbuf[320 * 240];
 	uint8_t m_rgb5_to_rgb8[32];
@@ -144,11 +145,15 @@ protected:
 	required_device<screen_device> m_screen;
 //	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_paletteram;
-//	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	uint16_t m_page1_addr;
 	uint16_t m_page2_addr;
 
+	uint16_t m_videodma_bank;
+	uint16_t m_videodma_size;
+	uint16_t m_videodma_dest;
+	uint16_t m_videodma_source;
 
 	devcb_write_line m_video_irq_cb;
 
@@ -178,6 +183,8 @@ protected:
 	uint16_t m_7088;
 
 	uint16_t m_video_irq_status;
+
+	uint16_t m_spriteextra[0x100];
 
 	uint16_t read_data(uint32_t offset);
 };

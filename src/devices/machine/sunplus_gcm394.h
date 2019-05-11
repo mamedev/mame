@@ -24,7 +24,7 @@ public:
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
-	//, m_palette(*this, "palette")
+	, m_palette(*this, "palette")
 	, m_spg_video(*this, "spgvideo")
 	{
 	}
@@ -44,7 +44,7 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-	//required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette;
 	required_device<gcm394_video_device> m_spg_video;
 
 	uint16_t m_dma_params[7];

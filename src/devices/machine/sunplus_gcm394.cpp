@@ -10,10 +10,12 @@
 #include "sunplus_gcm394.h"
 
 
+
+#define LOG_GCM394_SYSDMA         (1U << 2)
 #define LOG_GCM394                (1U << 1)
 #define LOG_GCM394_UNMAPPED       (1U << 0)
 
-#define VERBOSE             (LOG_GCM394_UNMAPPED)
+#define VERBOSE             (LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
 #include "logmacro.h"
 
 
@@ -31,14 +33,14 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_status_r (7abf)\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::system_dma_status_r (7abf)\n", machine().describe_context());
 	return 0x0001;
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_w)
 {
 	m_dma_params[offset] = data;
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::sys_dma_params_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::sys_dma_params_w %01x %04x\n", machine().describe_context(), offset, data);
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
@@ -49,7 +51,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	uint16_t length = m_dma_params[3];
 	uint16_t srchigh = m_dma_params[4];
 
-	LOGMASKED(LOG_GCM394, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%04x dest:%04x length:%04x srchigh:%04x unk:%04x unk:%04x\n", machine().describe_context(), data, mode, sourcelow, dest, length, srchigh, m_dma_params[5], m_dma_params[6]);
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%04x dest:%04x length:%04x srchigh:%04x unk:%04x unk:%04x\n", machine().describe_context(), data, mode, sourcelow, dest, length, srchigh, m_dma_params[5], m_dma_params[6]);
 
 	uint32_t source = sourcelow | (srchigh << 16);
 
@@ -78,7 +80,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	}
 	else
 	{
-		LOGMASKED(LOG_GCM394, "unhandled!\n");
+		LOGMASKED(LOG_GCM394_SYSDMA, "unhandled!\n");
 	}
 
 	m_dma_params[0] = m_dma_params[1] = m_dma_params[2] = m_dma_params[3] = m_dma_params[4] = m_dma_params[5] = m_dma_params[6] = 0x0000;
@@ -274,11 +276,8 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// 73xx-77xx = ram areas?
 	// ######################################################################################################################################################################################
 
-	map(0x007300, 0x0073ff).ram().share("spgvideo:paletteram");
-	map(0x007400, 0x0074ff).ram();
-	map(0x007500, 0x0075ff).ram();
-	map(0x007600, 0x0076ff).ram();
-	map(0x007700, 0x0077ff).ram();
+	map(0x007300, 0x0073ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x007400, 0x0077ff).ram().share("spriteram");
 
 	// ######################################################################################################################################################################################
 	// 78xx region = ??	
@@ -452,8 +451,9 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
+	m_spg_video->set_palette(m_palette);
 
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 }
 
 
