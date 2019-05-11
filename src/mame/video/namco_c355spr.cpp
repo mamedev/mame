@@ -194,7 +194,7 @@ void namco_c355spr_device::device_start()
 	gfx_layout obj_layout =
 	{
 		16,16,
-		RGN_FRAC(1,1),
+		0,
 		8, /* bits per pixel */
 		{ STEP8(0,1) },
 		{ STEP16(0,8) },
