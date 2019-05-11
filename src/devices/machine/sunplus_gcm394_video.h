@@ -143,11 +143,15 @@ protected:
 	required_device<screen_device> m_screen;
 //	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_paletteram;
-//	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	uint16_t m_page1_addr;
 	uint16_t m_page2_addr;
 
+	uint16_t m_videodma_bank;
+	uint16_t m_videodma_size;
+	uint16_t m_videodma_dest;
+	uint16_t m_videodma_source;
 
 	devcb_write_line m_video_irq_cb;
 
@@ -177,6 +181,8 @@ protected:
 	uint16_t m_7088;
 
 	uint16_t m_video_irq_status;
+
+	uint16_t m_spriteextra[0x100];
 
 	uint16_t read_data(uint32_t offset);
 };
