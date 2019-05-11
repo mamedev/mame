@@ -22,6 +22,7 @@
 
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
+#include "bus/coco/dragon_sprites.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_orch90.h"
@@ -170,6 +171,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("premier_fdc", PREMIER_FDC);
 	device.option_add("sdtandy_fdc", SDTANDY_FDC);
 	device.option_add("jcbsnd", DRAGON_JCBSND);
+	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
