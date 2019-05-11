@@ -342,6 +342,79 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	}
 }
 
+
+void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+{
+	uint32_t bitmap_addr = 0;// 0x40 * m_video_regs[0x22];
+	uint16_t tile = m_spriteram[base_addr + 0];
+	int16_t x = m_spriteram[base_addr + 1];
+	int16_t y = m_spriteram[base_addr + 2];
+	uint16_t attr = m_spriteram[base_addr + 3];
+
+	if (!tile)
+	{
+		return;
+	}
+
+	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	{
+		return;
+	}
+
+	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+
+	/*
+	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
+	{
+		x = (160 + x) - w / 2;
+		y = (120 - y) - (h / 2) + 8;
+	}
+	*/
+
+	x &= 0x01ff;
+	y &= 0x01ff;
+
+	uint32_t tile_line = ((scanline - y) + 0x200) % h;
+	int16_t test_y = (y + tile_line) & 0x1ff;
+	if (test_y >= 0x01c0)
+		test_y -= 0x0200;
+
+	if (test_y != scanline)
+	{
+		return;
+	}
+
+	bool blend = (attr & 0x4000);
+	bool flip_x = (attr & TILE_X_FLIP);
+	const uint8_t bpp = attr & 0x0003;
+	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	const uint32_t palette_offset = (attr & 0x0f00) >> 4;
+
+	if (blend)
+	{
+		if (flip_x)
+			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+		else
+			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+	}
+	else
+	{
+		if (flip_x)
+			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+		else
+			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+	}
+}
+
+void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
+{
+	for (uint32_t n = 0; n < 0x100; n++)
+	{
+		draw_sprite(cliprect, scanline, priority, 4 * n);
+	}
+}
+
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
@@ -357,6 +430,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		{
 			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
 			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
+			draw_sprites(cliprect, scanline, i);
 		}
 	}
 
