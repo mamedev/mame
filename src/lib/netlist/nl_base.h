@@ -43,10 +43,10 @@ class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
  *  Used to start defining a netlist device class.
  *  The simplest device without inputs or outputs would look like this:
  *
- *      NETLIB_OBJECT(base_dummy)
+ *      NETLIB_OBJECT(some_object)
  *      {
  *      public:
- *          NETLIB_CONSTRUCTOR(base_dummy) { }
+ *          NETLIB_CONSTRUCTOR(some_object) { }
  *      };
  *
  *  Also refer to #NETLIB_CONSTRUCTOR.
@@ -1277,17 +1277,6 @@ namespace netlist
 		family_setter_t();
 		family_setter_t(core_device_t &dev, const pstring &desc);
 		family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_base_dummy : basis for dummy devices
-	// FIXME: this is not the right place to define this
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(base_dummy)
-	{
-	public:
-		NETLIB_CONSTRUCTOR(base_dummy) { }
 	};
 
 	// -----------------------------------------------------------------------------

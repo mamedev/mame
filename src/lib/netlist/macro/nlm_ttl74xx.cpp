@@ -401,7 +401,7 @@ static NETLIST_START(TTL_7425_DIP)
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.B,  /*    B1 |2           13| D2   */ B.D,
 		X.I,  /*    X1 |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7425   11| X2   */  X.I,
+		A.C,  /*    C1 |4    7425   11| X2   */ X.I,
 		A.D,  /*    D1 |5           10| B2   */ B.B,
 		A.Q,  /*    Y1 |6            9| A2   */ B.A,
 		A.GND,/*   GND |7            8| Y2   */ B.Q
