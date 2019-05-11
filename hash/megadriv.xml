@@ -2951,7 +2951,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14341-H"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="mpr-14341-h.ic1" size="524288" crc="2351ce61" sha1="54b9060699187bf32048c005a3379fda72c0fb96" offset="0x000000"/>
+				<rom name="mpr-14341-h.ic1" size="524288" crc="2351ce61" sha1="54b9060699187bf32048c005a3379fda72c0fb96" offset="0x000000 status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5518,7 +5518,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="PWA P10001 REV G"/>
 			<feature name="u1" value="EM200017"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="EM20017.bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
+				<rom name="EM20017.bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7231,7 +7231,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15008-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="mpr-15008-f.u1" size="1048576" crc="af9f275d" sha1="2b30982d04628edc620d8d99f7dceb4ed87b41e3" offset="0x000000"/>
+				<rom name="mpr-15008-f.u1" size="1048576" crc="af9f275d" sha1="2b30982d04628edc620d8d99f7dceb4ed87b41e3" offset="0x000000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14808,7 +14808,7 @@ but dumps still have to be confirmed.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="ecco jr. (usa, aus) (march 1995).bin" size="1048576" crc="3c517975" sha1="636d2fb5f865f916e4a9fe0ff1819fcbc61b4258" offset="0x000000"/>
+				<rom name="ecco jr. (usa, aus) (march 1995).bin" size="1048576" crc="3c517975" sha1="636d2fb5f865f916e4a9fe0ff1819fcbc61b4258" offset="0x000000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15342,7 +15342,7 @@ but dumps still have to be confirmed.
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
-				<rom name="f-22 interceptor (euro, usa) (june 1992).bin" size="786432" crc="dd19b2b3" sha1="32a479ed7571c5f99b2181829afc517370e3051a" offset="0x000000"/>
+				<rom name="f-22 interceptor (euro, usa) (june 1992).bin" size="786432" crc="dd19b2b3" sha1="32a479ed7571c5f99b2181829afc517370e3051a" offset="0x000000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24381,7 +24381,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="サイドポケット"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="side pocket (jpn).bin" size="1048576" crc="336bbf3e" sha1="161c1f67b712d8f4f82115877072486832b913fb" offset="0x000000"/>
+				<rom name="side pocket (jpn).bin" size="1048576" crc="336bbf3e" sha1="161c1f67b712d8f4f82115877072486832b913fb" offset="0x000000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
