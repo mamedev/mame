@@ -452,8 +452,9 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
+	m_spg_video->set_palette(m_palette);
 
-
+	PALETTE(config, m_palette).set_entries(256);
 }
 
 

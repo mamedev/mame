@@ -14,7 +14,7 @@
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 
-class gcm394_base_video_device : public device_t
+class gcm394_base_video_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,8 +83,7 @@ public:
 	DECLARE_WRITE16_MEMBER(video_7088_w);
 
 	DECLARE_READ16_MEMBER(video_7083_r);
-
-
+	
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 protected:

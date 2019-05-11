@@ -21,6 +21,8 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GCM394-se
 
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr)
+	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 //	, m_scrollram(*this, "scrollram")
@@ -49,6 +51,62 @@ void gcm394_base_video_device::device_start()
 	}
 
 	m_video_irq_cb.resolve();
+
+	uint8_t* gfxregion = memregion(":maincpu")->base();
+	int gfxregion_size = memregion(":maincpu")->bytes();
+
+	int gfxelement = 0;
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			16,16,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP16(0,4) },
+			{ STEP16(0,4 * 16) },
+			16 * 16 * 4
+		};
+		obj_layout.total = gfxregion_size / (16 * 16 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,16,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP32(0,4) },
+			{ STEP16(0,4 * 32) },
+			16 * 32 * 4
+		};
+		obj_layout.total = gfxregion_size / (16 * 32 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			16,32,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP16(0,4) },
+			{ STEP32(0,4 * 16) },
+			32 * 16 * 4
+		};
+		obj_layout.total = gfxregion_size / (32 * 16 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
 
 }
 
@@ -347,20 +405,19 @@ READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return m_tmap0_regs[offs
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	write_tmap_regs(0, m_tmap0_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
 	m_page1_addr = data;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
-	m_page2_addr = data;
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** TILEMAP 1 *************************************************
@@ -369,18 +426,19 @@ READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r) { return m_tmap1_regs[offs
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	write_tmap_regs(1, m_tmap1_regs, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_unk0_w %04x\n", machine().describe_context(), data);
+	m_page2_addr = data;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** unknown video device 0 (another tilemap? sprite layer?) *************************************************
@@ -520,3 +578,4 @@ WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 		check_video_irq();
 	}
 }
+
