@@ -83,8 +83,8 @@ public:
 	// computer interface
 	uint8_t cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	void cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	int game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
-	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
+	int game_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram);
+	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram);
 
 	// cartridge interface
 	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
@@ -96,7 +96,8 @@ public:
 	int phi2() { return clock(); }
 	int dotclock() { return phi2() * 8; }
 	int hiram() { return m_hiram; }
-
+	int loram() { return m_loram; }
+ 
 	void set_passthrough();
 
 protected:
@@ -132,6 +133,7 @@ protected:
 	device_c64_expansion_card_interface *m_card;
 
 	int m_hiram;
+	int m_loram;
 };
 
 

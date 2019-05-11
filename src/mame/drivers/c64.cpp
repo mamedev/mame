@@ -445,8 +445,8 @@ int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 	//int ba = m_vic->ba_r();
 	//int aec = !m_vic->aec_r();
 	int sphi2 = m_vic->phi0_r();
-	int game = m_exp->game_r(offset, sphi2, ba, rw, m_hiram);
-	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_hiram);
+	int game = m_exp->game_r(offset, sphi2, ba, rw, m_loram, m_hiram);
+	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_loram, m_hiram);
 	int cas = 0;
 
 	uint32_t input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 |

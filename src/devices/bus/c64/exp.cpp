@@ -27,13 +27,13 @@ DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion
 //  device_c64_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_roml(*this, "roml"),
-		m_romh(*this, "romh"),
-		m_nvram(*this, "nvram"),
-		m_game(1),
-		m_exrom(1)
+device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
+	m_roml(*this, "roml"),
+	m_romh(*this, "romh"),
+	m_nvram(*this, "nvram"),
+	m_game(1),
+	m_exrom(1)
 {
 	m_slot = dynamic_cast<c64_expansion_slot_device *>(device.owner());
 }
@@ -58,15 +58,15 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //-------------------------------------------------
 
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this),
-		m_read_dma_cd(*this),
-		m_write_dma_cd(*this),
-		m_write_irq(*this),
-		m_write_nmi(*this),
-		m_write_dma(*this),
-		m_write_reset(*this), m_card(nullptr), m_hiram(0)
+	device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_read_dma_cd(*this),
+	m_write_dma_cd(*this),
+	m_write_irq(*this),
+	m_write_nmi(*this),
+	m_write_dma(*this),
+	m_write_reset(*this), m_card(nullptr), m_hiram(0)
 {
 }
 
@@ -253,11 +253,12 @@ void c64_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int sphi2, int
 //  game_r - GAME read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram)
 {
 	int state = 1;
 
 	m_hiram = hiram;
+	m_loram = loram;
 
 	if (m_card != nullptr)
 	{
@@ -272,11 +273,12 @@ int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, 
 //  exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram)
 {
 	int state = 1;
 
 	m_hiram = hiram;
+	m_loram = loram;
 
 	if (m_card != nullptr)
 	{

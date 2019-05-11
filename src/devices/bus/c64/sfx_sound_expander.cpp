@@ -248,7 +248,7 @@ void c64_sfx_sound_expander_cartridge_device::c64_cd_w(offs_t offset, uint8_t da
 
 int c64_sfx_sound_expander_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exp->game_r(get_offset(offset, rw), sphi2, ba, rw, m_slot->hiram());
+	return m_exp->game_r(get_offset(offset, rw), sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }
 
 
@@ -258,5 +258,5 @@ int c64_sfx_sound_expander_cartridge_device::c64_game_r(offs_t offset, int sphi2
 
 int c64_sfx_sound_expander_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exp->exrom_r(get_offset(offset, rw), sphi2, ba, rw, m_slot->hiram());
+	return m_exp->exrom_r(get_offset(offset, rw), sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }
