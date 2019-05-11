@@ -319,11 +319,11 @@
   From the game screen, start with 0 credits remaining.
   Press SETTING to get a black screen. (HOLD 5 exits back to the game from here.)
   From this black screen, press BET to get a crosshatch pattern.
-  (HOLD 1 returns to the game from the crosshatch screen.)
   Press PAYOUT once. (The screen will not change.)
-  Then press BOOK 5 times, then HOLD 5 7 times, then SETTING 2 times.
+  Then press RECORD 5 times, then HOLD 5 7 times, then SETTING 2 times.
   If this sequence was successfully entered, the screen will now go black.
   Wait a few seconds for the settings table to appear.
+  (If you get stuck at the crosshatch screen, HOLD 1 will return to the game.)
 
 
   Settings Suggestions
