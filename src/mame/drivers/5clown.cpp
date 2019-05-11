@@ -316,7 +316,8 @@
 
   To access Chance Settings, follow the following directions precisely:
 
-  Press SERVICE to get a black screen. (HOLD 5 will exit.)
+  From the game screen, start with 0 credits remaining.
+  Press SERVICE to get a black screen. (HOLD 5 exits back to the game from here.)
   From this black screen, press BET to get a crosshatch pattern.
   Press PAYOUT once. (The screen will not change.)
   Then press BOOK 5 times, then HOLD 5 7 times, then SERVICE 2 times.
