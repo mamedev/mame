@@ -179,18 +179,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/2812fifo.h,MACHINES["2812FIFO"] = true
----------------------------------------------------
-
-if (MACHINES["2812FIFO"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/2812fifo.cpp",
-		MAME_DIR .. "src/devices/machine/2812fifo.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/6522via.h,MACHINES["6522VIA"] = true
 ---------------------------------------------------
 
@@ -937,6 +925,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds1994.h,MACHINES["DS1994"] = true
+---------------------------------------------------
+
+if (MACHINES["DS1994"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1994.cpp",
+		MAME_DIR .. "src/devices/machine/ds1994.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds2401.h,MACHINES["DS2401"] = true
 ---------------------------------------------------
 
@@ -1214,18 +1214,6 @@ if (MACHINES["I8214"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i8214.cpp",
 		MAME_DIR .. "src/devices/machine/i8214.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/i82355.h,MACHINES["I82355"] = true
----------------------------------------------------
-
-if (MACHINES["I82355"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/i82355.cpp",
-		MAME_DIR .. "src/devices/machine/i82355.h",
 	}
 end
 
@@ -2673,8 +2661,6 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
 		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
 		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.cpp",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.h",
 	}
 end
 
@@ -3894,18 +3880,6 @@ if (MACHINES["SCC2698B"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/scc2698b.cpp",
 		MAME_DIR .. "src/devices/machine/scc2698b.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/aic565.h,MACHINES["AIC565"] = true
----------------------------------------------------
-
-if (MACHINES["AIC565"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/aic565.cpp",
-		MAME_DIR .. "src/devices/machine/aic565.h",
 	}
 end
 
