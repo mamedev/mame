@@ -10,10 +10,12 @@
 #include "sunplus_gcm394.h"
 
 
+
+#define LOG_GCM394_SYSDMA         (1U << 2)
 #define LOG_GCM394                (1U << 1)
 #define LOG_GCM394_UNMAPPED       (1U << 0)
 
-#define VERBOSE             (LOG_GCM394_UNMAPPED)
+#define VERBOSE             (LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
 #include "logmacro.h"
 
 
@@ -31,14 +33,14 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_status_r (7abf)\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::system_dma_status_r (7abf)\n", machine().describe_context());
 	return 0x0001;
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_w)
 {
 	m_dma_params[offset] = data;
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::sys_dma_params_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::sys_dma_params_w %01x %04x\n", machine().describe_context(), offset, data);
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
@@ -49,7 +51,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	uint16_t length = m_dma_params[3];
 	uint16_t srchigh = m_dma_params[4];
 
-	LOGMASKED(LOG_GCM394, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%04x dest:%04x length:%04x srchigh:%04x unk:%04x unk:%04x\n", machine().describe_context(), data, mode, sourcelow, dest, length, srchigh, m_dma_params[5], m_dma_params[6]);
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%04x dest:%04x length:%04x srchigh:%04x unk:%04x unk:%04x\n", machine().describe_context(), data, mode, sourcelow, dest, length, srchigh, m_dma_params[5], m_dma_params[6]);
 
 	uint32_t source = sourcelow | (srchigh << 16);
 
@@ -78,7 +80,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	}
 	else
 	{
-		LOGMASKED(LOG_GCM394, "unhandled!\n");
+		LOGMASKED(LOG_GCM394_SYSDMA, "unhandled!\n");
 	}
 
 	m_dma_params[0] = m_dma_params[1] = m_dma_params[2] = m_dma_params[3] = m_dma_params[4] = m_dma_params[5] = m_dma_params[6] = 0x0000;
