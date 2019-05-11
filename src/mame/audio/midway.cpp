@@ -136,6 +136,11 @@ void bally_as3022_device::device_start()
 	m_ay->set_volume(0, 0);
 	m_ay->set_volume(1, 0);
 	m_ay->set_volume(2, 0);
+
+	save_item(NAME(m_bc1));
+        save_item(NAME(m_bdir));
+        save_item(NAME(m_sound_select));
+        save_item(NAME(m_ay_data));
 }
 
 
