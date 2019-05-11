@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "sunplus_gcm394_video.h"
 
-DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GCM394-series System-on-a-Chip (Video)")
+DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus GCM394 System-on-a-Chip (Video)")
 
 #define LOG_GCM394_VIDEO_DMA      (1U << 3)
 #define LOG_GCM394_TMAP           (1U << 2)
@@ -27,8 +27,8 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 //	, m_scrollram(*this, "scrollram")
-	, m_paletteram(*this, "paletteram")
-	, m_spriteram(*this, "spriteram")
+	, m_paletteram(*this, "^palette")
+	, m_spriteram(*this, "^spriteram")
 	, m_video_irq_cb(*this)
 {
 }

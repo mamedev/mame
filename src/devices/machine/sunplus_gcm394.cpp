@@ -276,8 +276,8 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// 73xx-77xx = ram areas?
 	// ######################################################################################################################################################################################
 
-	map(0x007300, 0x0073ff).ram().share("spgvideo:paletteram");
-	map(0x007400, 0x0077ff).ram().share("spgvideo:spriteram");
+	map(0x007300, 0x0073ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x007400, 0x0077ff).ram().share("spriteram");
 
 	// ######################################################################################################################################################################################
 	// 78xx region = ??	
@@ -453,7 +453,7 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
 	m_spg_video->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(256);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 }
 
 
