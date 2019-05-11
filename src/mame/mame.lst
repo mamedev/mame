@@ -2410,6 +2410,8 @@ pc45iii							// Commodore PC 45-III
 pc50ii							// Commodore PC 50-II
 pc60iii							// Commodore PC 60-III
 pc70iii							// Commodore PC 70-III
+comt386							// Commodore Tower 386
+comt486							// Commodore Tower 486
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
