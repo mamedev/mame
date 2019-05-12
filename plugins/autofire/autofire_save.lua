@@ -13,7 +13,7 @@ local function initialize_button(settings)
 		local new_button = {}
 		new_button.port = settings.port
 		new_button.field = settings.field
-		new_button.key = settings.key
+		new_button.key = manager:machine():input():code_from_token(settings.key)
 		new_button.on_frames = settings.on_frames
 		new_button.off_frames = settings.off_frames
 		new_button.counter = 0
@@ -35,7 +35,7 @@ local function serialize_settings(button_list)
 		setting = {}
 		setting.port = button.port
 		setting.field = button.field
-		setting.key = button.key
+		setting.key = manager:machine():input():code_to_token(button.key)
 		setting.on_frames = button.on_frames
 		setting.off_frames = button.off_frames
 		settings[#settings + 1] = setting

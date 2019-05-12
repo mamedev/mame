@@ -14,17 +14,15 @@ function autofire.startplugin()
 	-- List of autofire buttons, each being a table with keys:
 	--   'port' - port name of the button being autofired
 	--   'field' - field name of the button being autofired
-	--   'key' - token of the keybinding
+	--   'key' - input_code of the keybinding
 	--   'on_frames' - number of frames button is pressed
 	--   'off_frames' - number of frames button is released
-	--   'button' - reference to ioport_field (not persisted)
-	--   'counter' - position in autofire cycle (not persisted)
-	-- port, field, key, on_frames, and off_frames are loaded from/saved to a file on start/stop.
+	--   'button' - reference to ioport_field
+	--   'counter' - position in autofire cycle
 	local buttons = {}
 
 	local function process_button(button)
-		local keycode = manager:machine():input():code_from_token(button.key)
-		local pressed = manager:machine():input():code_pressed(keycode)
+		local pressed = manager:machine():input():code_pressed(button.key)
 		if pressed then
 			local state = button.counter < button.on_frames and 1 or 0
 			button.counter = (button.counter + 1) % (button.on_frames + button.off_frames)
