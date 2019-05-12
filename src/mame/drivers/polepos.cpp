@@ -311,7 +311,7 @@ template<bool sub1> WRITE16_MEMBER(polepos_state::z8002_nvi_enable_w)
 
 	m_sub_irq_mask = data;
 	if (!data)
-		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(0, CLEAR_LINE);
+		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(z8002_device::NVI_LINE, CLEAR_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
@@ -388,8 +388,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::scanline)
 
 	if (scanline == 240 && m_sub_irq_mask)  // VBLANK
 	{
-		m_subcpu->set_input_line(0, ASSERT_LINE);
-		m_subcpu2->set_input_line(0, ASSERT_LINE);
+		m_subcpu->set_input_line(z8002_device::NVI_LINE, ASSERT_LINE);
+		m_subcpu2->set_input_line(z8002_device::NVI_LINE, ASSERT_LINE);
 	}
 }
 
@@ -407,9 +407,6 @@ void polepos_state::machine_start()
 
 void polepos_state::machine_reset()
 {
-	/* set the interrupt vectors (this shouldn't be needed) */
-	m_subcpu->set_input_line_vector(0, Z8000_NVI); // Z8002
-	m_subcpu2->set_input_line_vector(0, Z8000_NVI); // Z8002
 }
 
 
