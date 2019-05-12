@@ -111,6 +111,18 @@ Notes:
     - tmc2000: TOOL-2000 rom banking
     - nano: correct time constant for EF4 RC circuit
 
+
+    Usage:
+    - Same as VIP except the machine begins in the stopped mode.
+    - So, to enter the monitor, hold C and press R
+    - The support for chip-8 is not yet written, due to missing roms.
+    - The screen for nano should be white not red (caused by using only the
+      red output of a colour crt controller)
+    - The monitor of the tmc1800 is difficult to read because the colour ram
+      contains random values.
+    - Both nano and tmc1800 seem to "work", but there's insufficient software
+      to test with.
+
 */
 
 #include "emu.h"
@@ -875,5 +887,5 @@ void tmc1800_state::init_tmc1800()
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT          COMPANY        FULLNAME       FLAGS
 COMP( 1977, tmc1800,  0,       0,      tmc1800,  tmc1800, tmc1800_state,  init_tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
 COMP( 1977, osc1000b, tmc1800, 0,      osc1000b, tmc1800, osc1000b_state, empty_init,   "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
-COMP( 1980, tmc2000,  0,       0,      tmc2000,  tmc2000, tmc2000_state,  empty_init,   "Telercas Oy", "Telmac 2000", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, nano,     tmc2000, 0,      nano,     nano,    nano_state,     empty_init,   "OSCOM Oy",    "OSCOM Nano",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, tmc2000,  0,       0,      tmc2000,  tmc2000, tmc2000_state,  empty_init,   "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, nano,     tmc2000, 0,      nano,     nano,    nano_state,     empty_init,   "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
