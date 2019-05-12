@@ -3735,6 +3735,7 @@ void taitof2_state::driveout(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->set_addrmap(0, &taitof2_state::driveout_oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
