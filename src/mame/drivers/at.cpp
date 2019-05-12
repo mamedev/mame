@@ -1077,6 +1077,26 @@ ROM_START( at )
 	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(29) )
 	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(29) )
 	// ROM_LOAD( "precise_860407_keyboard_mcu.bin", 0x0000, 0x800, CRC(d1faad5c) SHA1(cb315a3da632c969012c298bb8e1cf8883b70501))
+	// 30: BIOS-String: D286-1149-083090-K0 - WIN 286 BIOS
+	ROM_SYSTEM_BIOS(30, "6wb5", "KT216WB5-HI Rev.2")
+	ROMX_LOAD( "kt216wb5_even.bin", 0x10000, 0x8000, CRC(6b5509c0) SHA1(73b303b90cc0cd23b7e13362019193c938a2e502), ROM_SKIP(1) | ROM_BIOS(30) )
+	ROMX_LOAD( "kt216wb5_odd.bin", 0x10001, 0x8000, CRC(af541ada) SHA1(26d2617dbe8c15f1b0d4782375bcb291a7923703), ROM_SKIP(1) | ROM_BIOS(30) )
+	// 31: BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS
+	ROM_SYSTEM_BIOS(31, "mat286revd", "MAT 286 Rev.D")
+	ROMX_LOAD( "mat286revd.bin", 0x10000, 0x10000, CRC(deeea2da) SHA1(c9186f835c7c12b28befa75851cb8ac7e1f95cbb), ROM_BIOS(31) )
+	// 32: BIOS-String: D286-1295-091589-K0
+	ROM_SYSTEM_BIOS(32, "topvlsi", "Toptek VLSI")
+	ROMX_LOAD( "toptek_vlsi.bin", 0x10000, 0x10000, CRC(f1d05c2e) SHA1(05540f6af6a3209107a7fd29e526e61d12c32b6e), ROM_BIOS(32) )
+	// 33: DTK Corp. 286 Computer - DTK 286 Chipset ROM BIOS Version 3.26 - #24062890N
+	ROM_SYSTEM_BIOS(33, "ptm1632c", "UNIT PTM1632C DTK V.3.26")
+	ROMX_LOAD( "ptm1632c_l.bin", 0x10000, 0x8000, CRC(df0bc27c) SHA1(f94e2decd13c285c23b6a61c035cab88fa00ba6e), ROM_SKIP(1) | ROM_BIOS(33))
+	ROMX_LOAD( "ptm1632c_h.bin", 0x10001, 0x8000, CRC(a80136e0) SHA1(5edc2d387efb42cf70361197de808ce1b06d8aec), ROM_SKIP(1) | ROM_BIOS(33))
+	// 34: BIOS-String: DH12-1343-061390-K0
+	ROM_SYSTEM_BIOS(34, "headland", "Headland")
+	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(34) )
+	// 35: BIOS-String: 20-0300-00834-00101111-050591-SARC286 / [80286 Standard System 2V1]
+	ROM_SYSTEM_BIOS(35, "sarcrev12", "SARC Rev. 1.2")
+	ROMX_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654), ROM_BIOS(35) )
 ROM_END
 
 
@@ -1598,7 +1618,33 @@ ROM_START( pc70iii )
 	ROM_SYSTEM_BIOS(1, "pc70v101", "PC70 V1.00.01")
 	ROMX_LOAD("cbm-pc70c-bios-lo-v1.00.01-xxxxxx-00.bin", 0x00000, 0x10000, CRC(6c8bbd31) SHA1(63d1739a58a0d441ebdd543e3994984c433aedb4), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("cbm-pc70c-bios-hi-v1.00.01-xxxxxx-00.bin", 0x00001, 0x10000, CRC(ef279cdd) SHA1(d250368b2f731e842d6f280a6134f1e38846874b), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_END
+ROM_END
+
+// Commodore Tower 386
+ROM_START( comt386 )
+	ROM_REGION(0x20000, "bios", 0)
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10 22 - Twinhead International Corporation
+	ROM_LOAD16_BYTE( "cbm-t386-bios-lo-v1.1022c-.bin", 0x10000, 0x8000, CRC(6857777e) SHA1(e80dbffd3523c9a1b027f57138c55768fc8328a6))
+	ROM_LOAD16_BYTE( "cbm-t386-bios-hi-v1.1022c-.bin", 0x10001, 0x8000, CRC(6a321a7e) SHA1(c350fb273522f742c6008deda00ed13947a269b7))
+ROM_END
+
+// Commodore Tower 486
+ROM_START( comt486 )
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: BIOS-String: 40-0500-DG1112-00101111-070791-SOLUTION-0 - 4D3FF Rev.D (092892)
+	ROM_SYSTEM_BIOS(0, "v0", "Tower 486 V0")
+	ROMX_LOAD( "cbm-t486dx-bios-v-xxxxxx-xx.bin", 0x10000, 0x10000, CRC(f51c0ca0) SHA1(2b08a606ae2f37b3e72d687f890d729a58fd3ccd), ROM_BIOS(0))
+	// continuous chirps
+	ROM_SYSTEM_BIOS(1, "v1", "Tower 486 V1")
+	ROMX_LOAD( "cbm-t486dx-66-bios-v1.01-391566-02.bin", 0x10000, 0x10000, CRC(3d740698) SHA1(888f23d85b41c07e15e2811b76194cf478bc80cd), ROM_BIOS(1))
+	// BIOS-String: 40-0103-001283-00101111-0606-SYM_486-0 - Commodore 486DX2-66 BIOS Version 1.03 391684-02
+	ROM_SYSTEM_BIOS(2, "v2", "Tower 486 V2")
+	ROMX_LOAD( "cbm-t486dx-66-bios-v1.03-391684-02.bin", 0x10000, 0x10000, CRC(13e8b04b) SHA1(dc5c84d228f802f7580b3f3b8e70cf8f74de5d79), ROM_BIOS(2))
+	// BIOS-String: 40-0103-001283-00101111-060692-SYM_486-0 - Commodore 486DX-50 BIOS Version 1.03 391522-03
+	ROM_SYSTEM_BIOS(3, "v3", "Tower 486 V3")
+	ROMX_LOAD( "cbm-t486dx-50-bios-v1.03-.bin", 0x10000, 0x10000, CRC(e02bb928) SHA1(6ea121b214403390d382ca4685cfabcbcca1a28b), ROM_BIOS(3))
+ROM_END
+
 
 // Apricot Qi 300 (Rev D,E & F Motherboard)
 ROM_START( xb42663 )
@@ -1734,6 +1780,7 @@ ROM_START( aprfte )
 	ROM_LOAD( "1-2r2-4.486", 0x00000, 0x20000, CRC(bccc236d) SHA1(0765299363e68cf65710a688c360a087856ece8f))
 ROM_END
 
+// Amstrad MegaPC
 ROM_START( megapc )
 	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x20000, "bios", 0)
@@ -1741,6 +1788,7 @@ ROM_START( megapc )
 	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0x00001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
 ROM_END
 
+// Amstrad MegaPC Plus
 ROM_START( megapcpl )
 	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x20000, "bios", 0)
@@ -1748,6 +1796,7 @@ ROM_START( megapcpl )
 	ROM_LOAD16_BYTE( "486slc.u19", 0x00001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))
 ROM_END
 
+// Amstrad MegaPC Plus (Winbond chipset)
 ROM_START( megapcpla )
 	ROM_REGION(0x40000, "bios", 0)
 	ROM_LOAD( "megapc_bios.bin",  0x00000, 0x10000, CRC(b84938a2) SHA1(cecab72a96993db4f7c648c229b4211a8c53a380))
@@ -1942,6 +1991,8 @@ COMP( 199?, pc70iii,   ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1990, c286lt,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C286LT", MACHINE_NOT_WORKING )
 COMP( 1991, c386sxlt,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C386SX-LT", MACHINE_NOT_WORKING )
 COMP( 199?, csl286,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "SL 286-16", MACHINE_NOT_WORKING )
+COMP( 199?, comt386,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Commodore Business Machines",  "Tower 386", MACHINE_NOT_WORKING )
+COMP( 199?, comt486,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines",  "Tower 486", MACHINE_NOT_WORKING )
 COMP( 1988, dsys200,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Dell Computer Corporation",    "System 200", MACHINE_NOT_WORKING )
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
