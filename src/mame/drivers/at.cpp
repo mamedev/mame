@@ -1932,6 +1932,17 @@ ROM_START( m290 )
 	ROM_LOAD( "m290_csl0_1.10.bin", 0x000, 0x0800, CRC(d767d496) SHA1(84246f7b39e0a005425948931cf93624b831e121) )
 ROM_END
 
+// Siemens-Nixdorf PCD-3Nsx notebook
+ROM_START( pcd3nsx )
+	ROM_REGION( 0x20000, "bios", 0 )
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - failure at 100000-10FFFF - Resume memory backup failure
+	ROM_SYSTEM_BIOS(0, "pcd3nsxno1", "pcd3nsxno1")
+	ROMX_LOAD( "3n102l30.bin", 0x00000, 0x20000, CRC(02384c19) SHA1(552dc41b40272027e2b031187f8ab1e1513751b9), ROM_BIOS(0) )
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - Memory high address failure at 100000-10FFFF - Resume memory backup failure
+	ROM_SYSTEM_BIOS(1, "pcd3nsxno2", "pcd3nsxno2")
+	ROMX_LOAD( "3n120l40.bin", 0x00000, 0x20000, CRC(1336dd75) SHA1(80306d85f417c51a5235ac2f02ceb58bdb51205f), ROM_BIOS(1) )
+ROM_END
+
 // Siemens-Nixdorf 486 mainboards and BIOS versions
 // The same mainboards were used in various case versions to get the different model lines, so an identification by the mainboard number (Dxxx) is safest
 ROM_START( pcd4x )
@@ -2039,6 +2050,7 @@ COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
 COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
+COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
