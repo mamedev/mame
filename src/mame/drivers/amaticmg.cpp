@@ -897,7 +897,6 @@ void amaticmg_state::amaticmg(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg));
-	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen("screen");
