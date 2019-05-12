@@ -10,13 +10,14 @@ end
 
 local function initialize_button(settings)
 	if settings.port and settings.field and settings.key and settings.on_frames and settings.off_frames then
-		local new_button = {}
-		new_button.port = settings.port
-		new_button.field = settings.field
-		new_button.key = manager:machine():input():code_from_token(settings.key)
-		new_button.on_frames = settings.on_frames
-		new_button.off_frames = settings.off_frames
-		new_button.counter = 0
+		local new_button = {
+			port = settings.port,
+			field = settings.field,
+			key = manager:machine():input():code_from_token(settings.key),
+			on_frames = settings.on_frames,
+			off_frames = settings.off_frames,
+			counter = 0
+		}
 		local port = manager:machine():ioport().ports[settings.port]
 		if port then
 			local field = port.fields[settings.field]
@@ -32,12 +33,13 @@ end
 local function serialize_settings(button_list)
 	local settings = {}
 	for index, button in ipairs(button_list) do
-		setting = {}
-		setting.port = button.port
-		setting.field = button.field
-		setting.key = manager:machine():input():code_to_token(button.key)
-		setting.on_frames = button.on_frames
-		setting.off_frames = button.off_frames
+		setting = {
+			port = button.port,
+			field = button.field,
+			key = manager:machine():input():code_to_token(button.key),
+			on_frames = button.on_frames,
+			off_frames = button.off_frames
+		}
 		settings[#settings + 1] = setting
 	end
 	return settings
