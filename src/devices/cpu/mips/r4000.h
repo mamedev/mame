@@ -394,7 +394,7 @@ protected:
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
-	memory_passthrough_handler *m_ll_watch;
+	bool m_ll_active;
 	u64 m_ll_addr;
 	struct tlb_entry_t
 	{
