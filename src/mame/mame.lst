@@ -2418,6 +2418,9 @@ comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
 pcd2                            // 1986 Siemens PCD-2
+pcd4x							// Siemens-Nixdorf PCD-4H and other 486 desktops and towers
+pcd4nl							// Siemens-Nixdorf PCD-4NL 486 subnotebook
+pcd4nd							// Siemens-Nixdorf 486 notebook
 ct386sx                         //
 ec1842                          //
 ec1849                          //
@@ -2435,6 +2438,7 @@ megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
 ncrpc8                          // 1986 NCR PC-8
+n8810m30
 n8810m55                        // 1986 Nixdorf 8810 M55
 //nws286                          // 1988 Nokia WS286
 pc2386                          //
