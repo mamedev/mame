@@ -2460,17 +2460,19 @@
 		<year>1986</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 		<!-- No compatibility data known at this time. -->
+		<!-- On May 10th, 2019, updated disk image from new source to fix some
+		minor data corruption	on side A, track $1C -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="grammar gremlins (4am crack) side a.dsk" size="143360" crc="6c8489fa" sha1="38428a2f090900660fa4ff581e770004b71ad801" />
+				<rom name="grammar gremlins (4am crack) side a.dsk" size="143360" crc="31adc94a" sha1="40527334a0d59281b6559f2464018fae8fc807ac" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
-				<rom name="grammar gremlins (4am crack) side b.dsk" size="143360" crc="b07ee7b3" sha1="0c4171e8a85bd5627a8c3a25da4c29cc68c2038b" />
+				<rom name="grammar gremlins (4am crack) side b.dsk" size="143360" crc="21e242be" sha1="1f922b9c30bea0d4a9e2bdbdb66d67da8bd361f8" />
 			</dataarea>
 		</part>
 	</software>
