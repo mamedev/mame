@@ -2418,6 +2418,7 @@ comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
 pcd2                            // 1986 Siemens PCD-2
+pcd3nsx							// Siemens-Nixdorf PCD-3Nsx
 pcd4x							// Siemens-Nixdorf PCD-4H and other 486 desktops and towers
 pcd4nl							// Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd							// Siemens-Nixdorf 486 notebook
@@ -2445,6 +2446,8 @@ pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 t2000sx                         //
+walk386sx						// Triumph-Adler Walkstation 386 SX
+walk386dx						// Triumph-Adler Walkstation 386 DX
 xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
 xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
