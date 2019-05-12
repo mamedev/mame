@@ -396,6 +396,8 @@ if (BUSES["BBC_ROM"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/rom/ram.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/genie.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/genie.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/pal.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/pal.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/rtc.cpp",
