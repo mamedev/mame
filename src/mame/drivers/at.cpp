@@ -149,6 +149,7 @@ public:
 	void at386(machine_config &config);
 	void m290(machine_config &config);
 	void ncrpc8(machine_config &config);
+	void n8810m15(machine_config &config);
 	void n8810m55(machine_config &config);
 	void ews286(machine_config &config);
 
@@ -851,6 +852,14 @@ void at_state::comportii(machine_config &config)
 	subdevice<isa16_slot_device>("isa2")->set_option_machine_config("fdc", cfg_single_360K);
 	subdevice<isa16_slot_device>("isa4")->set_default_option("hdc");
 	m_ram->set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4224K");
+}
+
+// Nixdorf 8810 M55
+void at_state::n8810m15(machine_config &config)
+{
+	ibm5170(config);
+	m_maincpu->set_clock(6000000); 
+	subdevice<isa16_slot_device>("isa1")->set_default_option("cga"); 
 }
 
 // Nixdorf 8810 M55
@@ -1912,6 +1921,35 @@ ROM_START( ncrpc8 )
 	ROM_LOAD ("ncr_keyboard_mcu_35091.bin", 0x0000, 0x800, CRC(632556cc) SHA1(b35f30bd0664fc1c2775a594f248d1e30237900a))
 ROM_END
 
+// Nixdorf 8810 M15 Laptop - PC07 - boot from harddisk doesn't work
+ROM_START( n8810m15 )
+	// ROM_LOAD("charagene_v1.1_daft2c2.bin", 0x00000, 0x4000, CRC(dd324efd) SHA1(67fd91277733596bfad8506dc92d9f776e563dda)) // CGA chargen
+	
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "rbios_even_daft2a3.bin", 0x10000, 0x8000, CRC(790abf68) SHA1(fbdb5e628ee9a605c8c1485a3fbb67736ff03153))
+	ROM_LOAD16_BYTE( "rbios_odd_daft2b3.bin", 0x10001, 0x8000, CRC(b09a812a) SHA1(c1b3321715260f9cd8c810325dc10c674ea05174))
+ROM_END
+
+// Nixdorf 8810 M16 Laptop - PC17 - CGA version - boot from harddisk doesn't work
+ROM_START( n8810m16c )
+	// ROM_LOAD("201cg rev 1.0.u78", 0x00000, 0x4000, CRC(3e31143b) SHA1(489da357e0ab8a469a3fb81cce160637486c87bc)) // CGA chargen
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "nmc27c256.u35", 0x10000, 0x8000, CRC(51acd116) SHA1(1a0bf24af4eba48d0deb0132a523e131902d2bcd))
+	ROM_LOAD16_BYTE( "nmc27c256.u36", 0x10001, 0x8000, CRC(fb47f9da) SHA1(d9bd4aea850a83764454a5c86c8da09f7c640fd6))
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "d8749h.u69", 0x000, 0x0800, CRC(030051da) SHA1(91b60228452cd1d6af99786402bd3b4d3efc2f05) )
+ROM_END
+
+// Nixdorf 8810 M16 Laptop - PC17 - VGA version - boot from harddisk doesn't work
+ROM_START( n8810m16v )
+	// ROM_LOAD("8810m16vga_27c256_221vb_123g1.bin", 0x00000, 0x4000, CRC(3bc80739) SHA1(3d6d7fb01681eccbc0b560818654d5aa1e3c5230)) // C&T VGA BIOS for 82C455
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "8810m16vga_27c256_286bios_a2531511_a.bin", 0x10000, 0x8000, CRC(1de5e49b) SHA1(759878e13801278de96700bbef318a49cca68054))
+	ROM_LOAD16_BYTE( "8810m16vga_27c256_286bios_a2531511_b.bin", 0x10001, 0x8000, CRC(a65cf1f8) SHA1(30d46b49e87f272540e24a278848122b3c40bdaf))
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "8810m16vga_8749_201kb_rev3a.bin", 0x000, 0x0800, CRC(030051da) SHA1(91b60228452cd1d6af99786402bd3b4d3efc2f05) )
+ROM_END
+
 // Nixdorf 8810 M30
 ROM_START( n8810m30 )
 	ROM_REGION(0x20000, "bios", 0 )
@@ -2074,6 +2112,9 @@ COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at
 COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m16v, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
 COMP( 198?, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 198?, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )

@@ -2439,7 +2439,10 @@ megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
 ncrpc8                          // 1986 NCR PC-8
-n8810m30
+n8810m15						// Nixdorf 8810 M15 Laptop - PC07
+n8810m16c						// Nixdorf 8810 M16 Laptop - PC17 - CGA version
+n8810m16v						// Nixdorf 8810 M16 Laptop - PC17 - VGA version
+n8810m30						// Nixdorf 8810 M30
 n8810m55                        // 1986 Nixdorf 8810 M55
 //nws286                          // 1988 Nokia WS286
 pc2386                          //
