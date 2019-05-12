@@ -42,6 +42,7 @@ public:
 
 private:
 	bool parse_header(io_generic *io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id);
+    void parse_os9_header(io_generic *io, int *tracks, int *heads, int *sectors);
 };
 
 extern const floppy_format_type FLOPPY_JVC_FORMAT;
