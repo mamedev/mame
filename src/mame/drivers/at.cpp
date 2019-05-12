@@ -1950,7 +1950,7 @@ ROM_END
 
 // Siemens-Nixdorf PCD-4NL 486 subnotebook
 // PhoenixBIOS(TM) A486 Version 1.03
-// complains about "Pointer device failure" and "Memory fialure at 00100000, read AA55 expecting 002C
+// complains about "Pointer device failure" and "Memory failure at 00100000, read AA55 expecting 002C
 ROM_START( pcd4nl )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "pcd4nl.bin", 0x00000, 0x20000, CRC(8adb4900) SHA1(a01c665fed769ff815bc2e5ae30901f7e12d721b) )	
@@ -1963,6 +1963,8 @@ ROM_START( pcd4nd )
 	ROMX_LOAD( "bf3m51.bin", 0x00000, 0x20000, CRC(6a2f90dd) SHA1(75704a83976e4bb02a028e761d01bd053cc0d4e7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "pcd4ndno2", "pcd4ndno2")
 	ROMX_LOAD( "bf3q42.bin", 0x00000, 0x20000, CRC(fa81cf6e) SHA1(91313a6856ca22f40710a6c9c8a65f8e340784ab), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "pcd4ndno3", "pcd4ndno3")
+	ROMX_LOAD( "pcd-4nd_flash_28010.bin", 0x00000, 0x20000, CRC(53c0beea) SHA1(bfa17947529c51a8c9315884e156c01ddd23c0d8), ROM_BIOS(2) )
 ROM_END
 
 
@@ -2045,7 +2047,7 @@ COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at
 COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
-COMP( 198?, n8810m30,  ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 198?, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )
