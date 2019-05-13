@@ -89,7 +89,7 @@
 		configuration "haiku"
 			targetdir   "../bin/haiku"
 			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
-			links       { "root" }
+			links       { "root bsd" }
 
 
 --

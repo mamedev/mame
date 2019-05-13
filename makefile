@@ -1561,16 +1561,18 @@ $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: haiku_x64
 haiku_x64: generate $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)64
-
-.PHONY: haiku
-haiku: haiku_x86
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)64
 
 .PHONY: haiku_x86
 haiku_x86: generate $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)32 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)32
+
+.PHONY: haiku
+haiku: generate $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)
 
 #-------------------------------------------------
 # cmake

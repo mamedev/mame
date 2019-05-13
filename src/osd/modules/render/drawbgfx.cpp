@@ -161,7 +161,7 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	return wmi.info.win.window;
 #   elif BX_PLATFORM_STEAMLINK
 	return wmi.info.vivante.window;
-#   elif BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_ANDROID
+#   elif BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_ANDROID || BX_PLATFORM_HAIKU
 	return nullptr;
 #   endif // BX_PLATFORM_
 }

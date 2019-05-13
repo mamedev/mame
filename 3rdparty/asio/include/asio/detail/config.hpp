@@ -1080,6 +1080,8 @@
 #   define ASIO_HAS_THREADS 1
 #  elif defined(__APPLE__)
 #   define ASIO_HAS_THREADS 1
+#  elif defined(__HAIKU__)
+#   define ASIO_HAS_THREADS 1
 #  elif defined(_POSIX_THREADS) && (_POSIX_THREADS + 0 >= 0)
 #   define ASIO_HAS_THREADS 1
 #  elif defined(_PTHREADS)
@@ -1094,6 +1096,8 @@
 #  if defined(ASIO_HAS_BOOST_CONFIG) && defined(BOOST_HAS_PTHREADS)
 #   define ASIO_HAS_PTHREADS 1
 #  elif defined(_POSIX_THREADS) && (_POSIX_THREADS + 0 >= 0)
+#   define ASIO_HAS_PTHREADS 1
+#  elif defined(__HAIKU__)
 #   define ASIO_HAS_PTHREADS 1
 #  endif // defined(ASIO_HAS_BOOST_CONFIG) && defined(BOOST_HAS_PTHREADS)
 # endif // defined(ASIO_HAS_THREADS)
