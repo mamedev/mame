@@ -144,6 +144,27 @@ void gcm394_base_video_device::device_start()
 		gfxelement++;
 	}
 
+	if (1)
+	{
+		const uint32_t texlayout_xoffset[64] = { STEP64(0,2) };
+		const uint32_t texlayout_yoffset[32] = { STEP32(0,2*64) };
+
+		gfx_layout obj_layout =
+		{
+			64,32,
+			0,
+			2,
+			{ 0,1 },
+			EXTENDED_XOFFS,
+			EXTENDED_YOFFS,
+			32 * 64 * 2,
+			texlayout_xoffset,
+			texlayout_yoffset
+		};
+		obj_layout.total = m_gfxregionsize / (16 * 32 * 2 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x40, 0));
+		gfxelement++;
+	}
 	save_item(NAME(m_spriteextra));
 }
 
