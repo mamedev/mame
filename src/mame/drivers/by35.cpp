@@ -486,7 +486,7 @@ static INPUT_PORTS_START( by35 )
 INPUT_PORTS_END
 
 /*
-	dips for os35 - Harlem Globetrotters, Dolly, Future Spa, Nitro Ground Shaker, Silverball Mania, Space Invaders, Rolling Stones, Mystic, Hotdoggin', Viking
+	Dips for os35 - Harlem Globetrotters, Dolly, Future Spa, Nitro Ground Shaker, Silverball Mania, Space Invaders, Rolling Stones, Mystic, Hotdoggin', Viking
 */
 static INPUT_PORTS_START ( by35_os35 )
 	PORT_INCLUDE( by35 )
@@ -526,7 +526,6 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x1f, "2 Coins/15 Credits")
 	PORT_DIPNAME( 0x60, 0x60, "High Score Feature")    PORT_DIPLOCATION("SW0:!6,!7")
 	PORT_DIPSETTING(    0x00, "No Award")
-	// PORT_DIPSETTING(    0x20, "1 Credit") // Invalid
 	PORT_DIPSETTING(    0x40, "Extra Ball")
 	PORT_DIPSETTING(    0x60, "Replay")
 	PORT_DIPNAME( 0x80, 0x80, "S8 (game specific)")    PORT_DIPLOCATION("SW0:!8")
@@ -624,15 +623,15 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x20, "Option 3")
 	PORT_DIPSETTING(    0x30, "Option 4")
 	PORT_DIPNAME( 0x40, 0x00, "Balls Per Game")         PORT_DIPLOCATION("SW3:!7") // s31
-	PORT_DIPSETTING(	0x00, "3")
-	PORT_DIPSETTING(	0x40, "5")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x40, "5")
 	PORT_DIPNAME( 0x80, 0x00, "S32 (game specific)")    PORT_DIPLOCATION("SW3:!8") // s32
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 INPUT_PORTS_END
 
 /*
-	dips for os40 - Skateball, Frontier, Xenon
+	Dips for os40 - Skateball, Frontier, Xenon
 */
 static INPUT_PORTS_START( by35_os40 )
 	PORT_INCLUDE( by35 )
@@ -782,7 +781,7 @@ static INPUT_PORTS_START( by35_os40 )
 INPUT_PORTS_END
 
 /*
-	dips for os5x - Flash Gordon -> Cybernaut
+	Dips for os5x - Flash Gordon to Cybernaut
 */
 static INPUT_PORTS_START( by35_os5x ) 
 	PORT_INCLUDE( by35_os40 )
@@ -2963,25 +2962,25 @@ GAME( 1984, blakpyra,   0,        by35, by35_os5x, by35_state, init_by35_7, ROT0
 GAME( 1985, cybrnaut,   0,        by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_IS_SKELETON_MECHANICAL)
 
 // Other manufacturers
-GAME( 1984, suprbowl,   xsandos,  by35,  by35,  by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, tigerrag,   kosteel,  by35,  by35,  by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, cosflash,   flashgdn, by35,  by35,  by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, newwave,    blakpyra, by35,  by35,  by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, saturn2,    spyhuntr, by35,  by35,  by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, worlddef,   0,        by35,  by35,  by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, spacehaw,   cybrnaut, by35,  by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, darkshad,   0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, skflight,   0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, cobrap,     0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, futrquen,   0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, f1gpp,      0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, toppin,     0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, uboat65,    0,        nuovo, by35,  by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye,   0,        by35,  by35,  by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseyn,   bullseye, by35,  by35,  by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, bbbowlin,   0,        by35,  by35,  by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, monrobwl,   0,        by35,  by35,  by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, bigbat,     0,        by35,  by35,  by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, mdntmrdr,   0,        by35,  by35,  by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, blbeauty,   0,        by35,  by35,  by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, myststar,   0,        by35,  by35,  by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, suprbowl,   xsandos,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, tigerrag,   kosteel,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, cosflash,   flashgdn, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, newwave,    blakpyra, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, saturn2,    spyhuntr, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, worlddef,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, spacehaw,   cybrnaut, by35,  by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, darkshad,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, skflight,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, cobrap,     0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, futrquen,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, toppin,     0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseye,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseyn,   bullseye, by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, bbbowlin,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, monrobwl,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, bigbat,     0,        by35,  by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, mdntmrdr,   0,        by35,  by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, blbeauty,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, myststar,   0,        by35,  by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_IS_SKELETON_MECHANICAL)
