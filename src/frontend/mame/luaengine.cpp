@@ -1283,8 +1283,18 @@ void lua_engine::initialize()
  * driver.manufacturer
  * driver.compatible_with
  * driver.default_layout
- *
- * driver.flags[] - machine_flags table (k=name, v=value)
+ * driver.orientation - screen rotation degree (rot0/90/180/270)
+ * driver.type - machine type (arcade/console/computer/other)
+ * driver.not_working - not considered working
+ * driver.supports_save - supports save states
+ * driver.no_cocktail - screen flip support is missing
+ * driver.is_bios_root - this driver entry is a BIOS root
+ * driver.requires_artwork - requires external artwork for key game elements
+ * driver.clickable_artwork - artwork is clickable and requires mouse cursor
+ * driver.unofficial - unofficial hardware modification
+ * driver.no_sound_hw - system has no sound output
+ * driver.mechanical - contains mechanical parts (pinball, redemption games, ...)
+ * driver.is_incomplete - official system with blatantly incomplete hardware/software
  */
 
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
@@ -1296,74 +1306,58 @@ void lua_engine::initialize()
 			"manufacturer", sol::readonly(&game_driver::manufacturer),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),
 			"default_layout", sol::readonly(&game_driver::default_layout),
-			"flags", sol::property([this](game_driver const &driver) {
-
-
-/*  machine_flags library
- *
- * emu.driver_find(driver_name).flags
- * 
- * flags.orientation - screen rotation degree (rot0/90/180/270)
- * flags.type - machine type (arcade/console/computer/other)
- * flags.not_working - not considered working
- * flags.supports_save - supports save states
- * flags.no_cocktail - screen flip support is missing
- * flags.is_bios_root - this driver entry is a BIOS root
- * flags.requires_artwork - requires external artwork for key game elements
- * flags.clickable_artwork - artwork is clickable and requires mouse cursor
- * flags.unofficial - unofficial hardware modification
- * flags.no_sound_hw - system has no sound output
- * flags.mechanical - contains mechanical parts (pinball, redemption games, ...)
- * flags.is_incomplete - official system with blatantly incomplete hardware/software
- */
-
-					sol::table table = sol().create_table();
-					machine_flags::type flags = driver.flags;
-					switch (flags & machine_flags::MASK_ORIENTATION)
+			"orientation", sol::property([](game_driver const &driver) {
+					std::string rot;
+					switch (driver.flags & machine_flags::MASK_ORIENTATION)
 					{
 					case machine_flags::ROT0:
-						table["orientation"] = "rot0";
+						rot = "rot0";
 						break;
 					case machine_flags::ROT90:
-						table["orientation"] = "rot90";
+						rot = "rot90";
 						break;
 					case machine_flags::ROT180:
-						table["orientation"] = "rot180";
+						rot = "rot180";
 						break;
 					case machine_flags::ROT270:
-						table["orientation"] = "rot270";
+						rot = "rot270";
 						break;
 					default:
-						table["orientation"] = "undefined";
+						rot = "undefined";
 						break;
 					}
-					switch (flags & machine_flags::MASK_TYPE)
+					return rot;
+				}),
+			"type", sol::property([](game_driver const &driver) {
+					std::string type;
+					switch (driver.flags & machine_flags::MASK_TYPE)
 					{
 					case machine_flags::TYPE_ARCADE:
-						table["type"] = "arcade";
+						type = "arcade";
 						break;
 					case machine_flags::TYPE_CONSOLE:
-						table["type"] = "console";
+						type = "console";
 						break;
 					case machine_flags::TYPE_COMPUTER:
-						table["type"] = "computer";
+						type = "computer";
 						break;
 					default:
-						table["type"] = "other";
+						type = "other";
 						break;
 					}
-					table["not_working"] = (flags & machine_flags::NOT_WORKING) > 0;
-					table["supports_save"] = (flags & machine_flags::SUPPORTS_SAVE) > 0;
-					table["no_cocktail"] = (flags & machine_flags::NO_COCKTAIL) > 0;
-					table["is_bios_root"] = (flags & machine_flags::IS_BIOS_ROOT) > 0;
-					table["requires_artwork"] = (flags & machine_flags::REQUIRES_ARTWORK) > 0;
-					table["clickable_artwork"] = (flags & machine_flags::CLICKABLE_ARTWORK) > 0;
-					table["unofficial"] = (flags & machine_flags::UNOFFICIAL) > 0;
-					table["no_sound_hw"] = (flags & machine_flags::NO_SOUND_HW) > 0;
-					table["mechanical"] = (flags & machine_flags::MECHANICAL) > 0;
-					table["is_incomplete"] = (flags & machine_flags::IS_INCOMPLETE) > 0;
-					return table;
-				}));
+					return type;
+				}),
+			"not_working", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) > 0; }),
+			"supports_save", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) > 0; }),
+			"no_cocktail", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) > 0; }),
+			"is_bios_root", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) > 0; }),
+			"requires_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) > 0; }),
+			"clickable_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) > 0; }),
+			"unofficial", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) > 0; }),
+			"no_sound_hw", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) > 0; }),
+			"mechanical", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) > 0; }),
+			"is_incomplete", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) > 0; }
+		));
 
 
 /*  debugger_manager library (requires debugger to be active)
