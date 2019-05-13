@@ -642,10 +642,14 @@ void nscsi_cdrom_apple_device::scsi_command()
 	case SC_TEST_UNIT_READY:
 		LOG("command TEST UNIT READY (AppleCD)\n");
 		if(cdrom)
+		{
 			scsi_status_complete(SS_GOOD);
+		}
 		else
+		{
 			sense(false, SK_NOT_READY, 0xb0);
 			scsi_status_complete(SS_CHECK_CONDITION);
+		}
 		break;
 
 	default:
