@@ -702,7 +702,7 @@ void z100_state::z100(machine_config &config)
 
 	I8085A(config, "cpu85", 10_MHz_XTAL).set_disable();
 
-	I8041(config, "upi", 6_MHz_XTAL).set_disable();
+	I8041(config, "kbdc", 6_MHz_XTAL); // TODO: keyboard LLE
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -776,8 +776,8 @@ ROM_START( z100 )
 	ROM_REGION( 0x4000, "ipl", 0 )
 	ROM_LOAD( "intel-d27128-1.bin", 0x0000, 0x4000, CRC(b21f0392) SHA1(69e492891cceb143a685315efe0752981a2d8143))
 
-	ROM_REGION( 0x0400, "upi", ROMREGION_ERASE00 ) // 8041A keyboard controller
-	ROM_LOAD( "444-109.u284", 0x0000, 0x0400, NO_DUMP )
+	ROM_REGION( 0x0400, "kbdc", ROMREGION_ERASE00 ) // 8041A keyboard controller
+	ROM_LOAD( "444-109.u204", 0x0000, 0x0400, CRC(45181029) SHA1(0e89649364d25cf2d8669d2a293ee162e274cb64) )
 
 	ROM_REGION( 0x0100, "vrmm", 0 ) // Video RAM Mapping Module
 	ROM_LOAD( "444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP ) // typed in from manual
