@@ -86,6 +86,9 @@ public:
 	
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
+	uint8_t* m_gfxregion;
+	uint32_t m_gfxregionsize;
+
 protected:
 
 	enum

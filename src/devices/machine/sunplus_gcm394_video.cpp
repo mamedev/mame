@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 #define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394_VIDEO          (1U << 1)
 
-#define VERBOSE             (LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO | LOG_GCM394_TMAP)
+#define VERBOSE             (LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO)
 
 #include "logmacro.h"
 
@@ -53,8 +53,9 @@ void gcm394_base_video_device::device_start()
 
 	m_video_irq_cb.resolve();
 
-	uint8_t* gfxregion = memregion(":maincpu")->base();
-	int gfxregion_size = memregion(":maincpu")->bytes();
+
+	m_gfxregion = memregion(":maincpu")->base();
+	m_gfxregionsize = memregion(":maincpu")->bytes();
 
 	int gfxelement = 0;
 
@@ -70,8 +71,8 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,4 * 16) },
 			16 * 16 * 4
 		};
-		obj_layout.total = gfxregion_size / (16 * 16 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		obj_layout.total = m_gfxregionsize / (16 * 16 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
 		gfxelement++;
 	}
 
@@ -87,8 +88,8 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,4 * 32) },
 			16 * 32 * 4
 		};
-		obj_layout.total = gfxregion_size / (16 * 32 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		obj_layout.total = m_gfxregionsize / (16 * 32 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
 		gfxelement++;
 	}
 
@@ -104,8 +105,42 @@ void gcm394_base_video_device::device_start()
 			{ STEP32(0,4 * 16) },
 			32 * 16 * 4
 		};
-		obj_layout.total = gfxregion_size / (32 * 16 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, gfxregion, 0, 0x10, 0));
+		obj_layout.total = m_gfxregionsize / (32 * 16 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,32,
+			0,
+			4,
+			{ STEP4(0,1) },
+			{ STEP32(0,4) },
+			{ STEP32(0,4 * 32) },
+			32 * 32 * 4
+		};
+		obj_layout.total = m_gfxregionsize / (32 * 32 * 4 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
+		gfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			8,16,
+			0,
+			2,
+			{ 0,1 },
+			{ STEP8(0,2) },
+			{ STEP16(0,2 * 8) },
+			8 * 16 * 2
+		};
+		obj_layout.total = m_gfxregionsize / (8 * 16 * 2 / 8);
+		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x40, 0));
 		gfxelement++;
 	}
 
@@ -158,8 +193,7 @@ void gcm394_base_video_device::device_reset()
 
 inline uint16_t gcm394_base_video_device::read_data(uint32_t offset)
 {
-	address_space &space = m_cpu->space(AS_PROGRAM);
-	uint16_t b = space.read_word(offset);
+	uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
 	return b;
 }
 
@@ -428,8 +462,11 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
-			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
+			if (0)
+			{
+				draw_page(cliprect, scanline, i, page1_addr, page1_regs);
+				draw_page(cliprect, scanline, i, page2_addr, page2_regs);
+			}
 			draw_sprites(cliprect, scanline, i);
 		}
 	}
