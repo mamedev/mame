@@ -68,9 +68,28 @@ function autofire.startplugin()
 		end
 	end
 
+	local function menu_callback(index, event)
+		local menu_handler = require('autofire/autofire_menu')
+		if menu_handler then
+			return menu_handler:handle_menu_event(index, event, buttons)
+		else
+			return false
+		end
+	end
+
+	local function menu_populate()
+		local menu_handler = require('autofire/autofire_menu')
+		if menu_handler then
+			return menu_handler:populate_menu(buttons)
+		else
+			return {{_('Failed to load autofire menu'), '', ''}}
+		end
+	end
+
 	emu.register_frame_done(process_frame)
 	emu.register_start(load_settings)
 	emu.register_stop(save_settings)
+	emu.register_menu(menu_callback, menu_populate, _('Autofire'))
 end
 
 return exports
