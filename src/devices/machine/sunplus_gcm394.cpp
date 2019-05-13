@@ -136,7 +136,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7824_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7835_w %04x\n", machine().describe_context(), data); m_7835 = data; }
 
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7860_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7860_r\n", machine().describe_context()); return m_7860; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7860_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7860_r\n", machine().describe_context()); return m_porta_in();  }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7860_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7860_w %04x\n", machine().describe_context(), data); m_7860 = data; }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7861_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7861_r\n", machine().describe_context()); return m_7861; }
@@ -368,6 +368,7 @@ void sunplus_gcm394_base_device::map(address_map &map)
 
 void sunplus_gcm394_base_device::device_start()
 {
+	m_porta_in.resolve_safe(0);
 }
 
 void sunplus_gcm394_base_device::device_reset()

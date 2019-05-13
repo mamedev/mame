@@ -26,12 +26,15 @@ public:
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
 	, m_spg_video(*this, "spgvideo")
+	, m_porta_in(*this)
 	{
 	}
 
 	void map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
+
+	auto porta_in() { return m_porta_in.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
@@ -46,6 +49,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<gcm394_video_device> m_spg_video;
+
+	devcb_read16 m_porta_in;
 
 	uint16_t m_dma_params[7];
 
