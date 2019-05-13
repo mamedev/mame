@@ -109,6 +109,8 @@ void c64_final_chesscard_device::device_start()
 
 void c64_final_chesscard_device::device_reset()
 {
+	m_mainlatch->read();
+	m_sublatch->read();
 	m_maincpu->reset();
 
 	m_bank = 0;
