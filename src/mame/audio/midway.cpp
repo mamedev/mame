@@ -27,10 +27,23 @@ DEFINE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device, 
 DEFINE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device,      "midsnt",  "Midway Squawk 'n' Talk Sound Board")
 
 
-
 //**************************************************************************
 //  AS3022
 //**************************************************************************
+
+
+//**************************************************************************
+//  IO ports
+//**************************************************************************
+static INPUT_PORTS_START(as3022)
+        PORT_START("SW1")
+        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
+INPUT_PORTS_END
+
+ioport_constructor bally_as3022_device::device_input_ports() const
+{
+        return INPUT_PORTS_NAME(as3022);
+}
 
 //-------------------------------------------------
 //  bally_as3022_device - constructor
@@ -45,9 +58,13 @@ bally_as3022_device::bally_as3022_device(const machine_config &mconfig, const ch
 {
 }
 
+INPUT_CHANGED_MEMBER(bally_as3022_device::sw1)
+{
+        if (newval != oldval)
+                m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+}
 
 //-------------------------------------------------
-
 //  sound_select - handle an external write to the board
 //-------------------------------------------------
 

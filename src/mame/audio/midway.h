@@ -49,6 +49,7 @@ public:
 	bally_as3022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 3'579'545);
 
 	// read/write
+	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	DECLARE_WRITE8_MEMBER(sound_select);
 	DECLARE_WRITE_LINE_MEMBER(sound_int);
 
@@ -58,6 +59,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	bool m_bc1;
