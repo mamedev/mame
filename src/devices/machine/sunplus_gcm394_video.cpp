@@ -470,7 +470,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			if (0)
+			if (1)
 			{
 				draw_page(cliprect, scanline, i, page1_addr, page1_regs);
 				draw_page(cliprect, scanline, i, page2_addr, page2_regs);
