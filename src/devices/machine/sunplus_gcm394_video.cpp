@@ -199,7 +199,7 @@ inline uint16_t gcm394_base_video_device::read_data(uint32_t offset)
 
 
 template<gcm394_base_video_device::blend_enable_t Blend, gcm394_base_video_device::rowscroll_enable_t RowScroll, gcm394_base_video_device::flipx_t FlipX>
-void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset)
+void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset)
 {
 	uint32_t nc_bpp = ((bpp) + 1) << 1;
 
@@ -207,13 +207,13 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	palette_offset <<= nc_bpp;
 
 	uint32_t bits_per_row = nc_bpp * w / 16;
-	uint32_t words_per_tile = bits_per_row * h;
+	//uint32_t words_per_tile = bits_per_row * h;
 
-	words_per_tile = 8;
+	uint32_t words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp
 
 	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * (line ^ yflipmask);
 
-	m += (0x700000 / 2);
+	m += (0x300000 / 2);
 
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
@@ -386,10 +386,12 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
 	uint32_t bitmap_addr = 0;// 0x40 * m_video_regs[0x22];
-	uint16_t tile = m_spriteram[base_addr + 0];
+	uint32_t tile = m_spriteram[base_addr + 0];
 	int16_t x = m_spriteram[base_addr + 1];
 	int16_t y = m_spriteram[base_addr + 2];
 	uint16_t attr = m_spriteram[base_addr + 3];
+
+	tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (!tile)
 	{
