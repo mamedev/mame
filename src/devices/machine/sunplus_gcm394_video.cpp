@@ -13,9 +13,9 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 
 #define LOG_GCM394_VIDEO_DMA      (1U << 3)
 #define LOG_GCM394_TMAP           (1U << 2)
-#define LOG_GCM394                (1U << 1)
+#define LOG_GCM394_VIDEO          (1U << 1)
 
-#define VERBOSE             (LOG_GCM394_VIDEO_DMA)
+#define VERBOSE             (LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO | LOG_GCM394_TMAP)
 
 #include "logmacro.h"
 
@@ -532,17 +532,17 @@ WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device0_regs_w)
 	// offsets 0,1,4,5,6,7 used in main IRQ code
 	// offsets 2,3 only cleared on startup
 
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device0_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device0_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device0_unk0_w %04x\n", machine().describe_context(), data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device0_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device0_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device0_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** unknown video device 1 (another tilemap? sprite layer?) *************************************************
@@ -552,34 +552,34 @@ WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device1_regs_w)
 	// offsets 0,1,4,5,6,7 used in main IRQ code
 	// offsets 2,3 only cleared on startup
 
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device1_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device1_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device1_unk0_w %04x\n", machine().describe_context(), data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device1_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device1_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device1_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** unknown video device 2 (sprite control?) *************************************************
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk0_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device2_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device2_unk0_w %04x\n", machine().describe_context(), data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk1_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device2_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device2_unk1_w %04x\n", machine().describe_context(), data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk2_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::unknown_video_device2_unk2_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device2_unk2_w %04x\n", machine().describe_context(), data);
 }
 
 // **************************************** video DMA device *************************************************
@@ -657,35 +657,35 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 
 
 
-READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
-WRITE16_MEMBER(gcm394_base_video_device::video_707f_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data); m_707f = data; }
+READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
+WRITE16_MEMBER(gcm394_base_video_device::video_707f_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data); m_707f = data; }
 
-READ16_MEMBER(gcm394_base_video_device::video_703a_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_703a_r\n", machine().describe_context()); return m_703a; }
-WRITE16_MEMBER(gcm394_base_video_device::video_703a_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_703a_w %04x\n", machine().describe_context(), data); m_703a = data; }
+READ16_MEMBER(gcm394_base_video_device::video_703a_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_r\n", machine().describe_context()); return m_703a; }
+WRITE16_MEMBER(gcm394_base_video_device::video_703a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_w %04x\n", machine().describe_context(), data); m_703a = data; }
 
-READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
+READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7063_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7063_w %04x\n", machine().describe_context(), data); m_7063 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7063_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_w %04x\n", machine().describe_context(), data); m_7063 = data; }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
 
 // read in IRQ
-READ16_MEMBER(gcm394_base_video_device::video_7030_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7030_r\n", machine().describe_context()); return m_7030; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7030_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7030_w %04x\n", machine().describe_context(), data); m_7030 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
+READ16_MEMBER(gcm394_base_video_device::video_7030_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_r\n", machine().describe_context()); return m_7030; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7030_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_w %04x\n", machine().describe_context(), data); m_7030 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7081_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7082_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7082_w %04x\n", machine().describe_context(), data); m_7082 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7083_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7083_w %04x\n", machine().describe_context(), data); m_7083 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7084_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7084_w %04x\n", machine().describe_context(), data); m_7084 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7085_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7085_w %04x\n", machine().describe_context(), data); m_7085 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7086_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7086_w %04x\n", machine().describe_context(), data); m_7086 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7087_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7087_w %04x\n", machine().describe_context(), data); m_7087 = data; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7088_w) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7088_w %04x\n", machine().describe_context(), data); m_7088 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7081_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7082_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7082_w %04x\n", machine().describe_context(), data); m_7082 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7083_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_w %04x\n", machine().describe_context(), data); m_7083 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7084_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7084_w %04x\n", machine().describe_context(), data); m_7084 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7085_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7085_w %04x\n", machine().describe_context(), data); m_7085 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7086_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7086_w %04x\n", machine().describe_context(), data); m_7086 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7087_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7087_w %04x\n", machine().describe_context(), data); m_7087 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7088_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7088_w %04x\n", machine().describe_context(), data); m_7088 = data; }
 
-READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
+READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
 
 void gcm394_base_video_device::check_video_irq()
 {
