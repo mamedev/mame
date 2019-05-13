@@ -2,7 +2,14 @@
 // copyright-holders:Curt Coder, hap
 /**********************************************************************
 
-    Mouse emulation (Commodore 1351 or compatible)
+Mouse emulation (Commodore 1351 or compatible)
+
+At power-on, holding the right mouse button will put it in joystick mode.
+In proportional mode, left button goes to pin #6, right button to pin #1.
+POT(X/Y) d1-d6 holds the current direction, d7 unused, d0 is a 'noise bit'.
+
+TODO:
+- joystick mode
 
 **********************************************************************/
 
@@ -25,10 +32,10 @@ static INPUT_PORTS_START( vcs_mouse )
 	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("POTX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(30) PORT_KEYDELTA(20)
+	PORT_BIT( 0x3f, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(15) PORT_KEYDELTA(10)
 
 	PORT_START("POTY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE
+	PORT_BIT( 0x3f, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -86,7 +93,7 @@ uint8_t vcs_mouse_device::vcs_joy_r()
 
 uint8_t vcs_mouse_device::vcs_pot_x_r()
 {
-	return m_potx->read();
+	return m_potx->read() << 1;
 }
 
 
@@ -96,5 +103,5 @@ uint8_t vcs_mouse_device::vcs_pot_x_r()
 
 uint8_t vcs_mouse_device::vcs_pot_y_r()
 {
-	return m_poty->read();
+	return m_poty->read() << 1;
 }
