@@ -369,7 +369,7 @@ void p8k_state::p8k_16_iomap(address_map &map)
 
 WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

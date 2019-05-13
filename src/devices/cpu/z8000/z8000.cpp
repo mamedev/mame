@@ -448,13 +448,13 @@ void z8002_device::Interrupt()
 
 	if (m_irq_req & Z8000_NVI)
 	{
-		int type = standard_irq_callback(0);
+		int type = standard_irq_callback(NVI_LINE);
 		set_irq(type | Z8000_NVI);
 	}
 
 	if (m_irq_req & Z8000_VI)
 	{
-		int type = standard_irq_callback(1);
+		int type = standard_irq_callback(VI_LINE);
 		set_irq(type | Z8000_VI);
 	}
 
@@ -636,6 +636,28 @@ void z8002_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
+void z8002_device::register_save_state()
+{
+	save_item(NAME(m_op));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_psapseg));
+	save_item(NAME(m_psapoff));
+	save_item(NAME(m_fcw));
+	save_item(NAME(m_refresh));
+	save_item(NAME(m_nspseg));
+	save_item(NAME(m_nspoff));
+	save_item(NAME(m_irq_req));
+	save_item(NAME(m_irq_vec));
+	save_item(NAME(m_op_valid));
+	save_item(NAME(m_regs.Q));
+	save_item(NAME(m_nmi_state));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_mi));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_vector_mult));
+}
+
 void z8002_device::init_tables()
 {
 	/* set up the zero, sign, parity lookup table */
@@ -671,6 +693,7 @@ void z8001_device::device_start()
 	init_tables();
 
 	register_debug_state();
+	register_save_state();
 
 	set_icountptr(m_icount);
 	m_mo_out.resolve_safe();
@@ -694,6 +717,7 @@ void z8002_device::device_start()
 	init_tables();
 
 	register_debug_state();
+	register_save_state();
 
 	set_icountptr(m_icount);
 	m_mo_out.resolve_safe();
@@ -756,7 +780,7 @@ void z8002_device::execute_run()
 
 void z8002_device::execute_set_input(int irqline, int state)
 {
-	if (irqline == INPUT_LINE_NMI)
+	if (irqline == NMI_LINE)
 	{
 		if (m_nmi_state == state)
 			return;
@@ -772,7 +796,7 @@ void z8002_device::execute_set_input(int irqline, int state)
 	else if (irqline < 2)
 	{
 		m_irq_state[irqline] = state;
-		if (irqline == 0)
+		if (irqline == NVI_LINE)
 		{
 			if (state == CLEAR_LINE)
 			{

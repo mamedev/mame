@@ -2410,6 +2410,8 @@ pc45iii							// Commodore PC 45-III
 pc50ii							// Commodore PC 50-II
 pc60iii							// Commodore PC 60-III
 pc70iii							// Commodore PC 70-III
+comt386							// Commodore Tower 386
+comt486							// Commodore Tower 486
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
@@ -10098,6 +10100,7 @@ mercenario                      // bootleg
 @source:compc.cpp
 compc10                         // 1984 Commodore PC-10, PC-20 and PC-30
 pc10iii                         // 1987 Commodore PC-10 III
+compc1                          // 1984 Commodore PC-1
 
 @source:compgolf.cpp
 compgolf                        // (c) 1985 Data East Corporation (Japan)
@@ -15203,6 +15206,7 @@ trobhood                        // Tiger
 trobocop2                       // Tiger
 trobocop3                       // Tiger
 trockteer                       // Tiger
+trshutvoy                       // Tronica
 trsrescue                       // Tronica
 tsddragon                       // Tiger
 tsf2010                         // Tiger
@@ -21389,10 +21393,11 @@ gunmast                         // (c) 1994
 karatour                        // (c) 1992 Mitchell
 karatourj                       // (c) 1992 Mitchell
 ladykill                        // (c) 1993 Yanyaka + Mitchell license - (Arcade TV Game List - P.101, Right, 2 from Bottom)
-lastfort                        // (c) 1994
+lastfort                        // (c) 1994 - VG420 PCB version
 lastforte                       // (c) 1994
 lastfortea                      // (c) 1994
-lastfortg                       // (c) 1994
+lastfortg                       // (c) 1994 - VG460-(A) PCB version
+lastfortj                       // (c) 1994 - VG460-(A) PCB version
 lastfortk                       // (c) 1994
 moegonta                        // (c) 1993 Yanyaka (Japan) (Arcade TV Game List - P.101, Right, 2 from Bottom)
 mouja                           // (c) 1996 Etona (Japan)
@@ -31274,7 +31279,6 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
-compc1                          // 1984 Commodore PC-1
 comport                         // Compaq Portable
 dgone                           // 1984 Data General/One
 eagle1600                       //

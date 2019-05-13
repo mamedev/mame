@@ -29,9 +29,9 @@
     - sometimes there's no sound when started. You may need to hard reset until it beeps.
     - doesn't run programs for other chip-8 computers (this might be normal?)
     - we support BIN files, but have none to test with.
-    - probable CPU bugs:
+    - possible CPU bugs?:
       - in Invaders, can't shoot them
-      - in Maze, the result is rubbish (these work in Emma02 emulator)
+      - in Maze, the result is rubbish (works in Emma02 emulator v1.21, but not in v1.30)
 
 **************************************************************************************************/
 

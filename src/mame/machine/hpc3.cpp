@@ -414,11 +414,11 @@ READ32_MEMBER(hpc3_device::pbus4_r)
 		break;
 	case 0x0014/4:
 		ret = m_ioc2->get_map_int_mask(0);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0018/4:
 		ret = m_ioc2->get_map_int_mask(1);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0030/4:
 		ret = m_ioc2->get_pit_reg(0);
@@ -457,11 +457,11 @@ WRITE32_MEMBER(hpc3_device::pbus4_w)
 		break;
 	case 0x0014/4:
 		m_ioc2->set_map_int_mask(0, data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x0018/4:
 		m_ioc2->set_map_int_mask(1, data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x0020/4:
 		m_ioc2->set_timer_int_clear(data);

@@ -181,6 +181,12 @@ Notes:
 
     - NE555 discrete sound
 
+
+    Usage
+    - All variants: Boot up, then press F3, then press a letter (Q,W,E,A) to choose an inbuilt game.
+    - If using a cart, boot up, press F3, then follow the instructions that came with the cart (usually press Q).
+    - Currently, Visicom cannot run any carts, and has no support for st2 files.
+
 */
 
 #include "emu.h"

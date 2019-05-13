@@ -380,29 +380,6 @@ ROM_START( mpc1600 )
 ROM_END
 
 
-/*********************************************************** Commodore PC-1 ***
-
-Links: http://www.amiga-stuff.com/hardware/pc-i.html , http://www.zimmers.net/cbmpics/cpci.html
-Form Factor: Desktop
-CPU: 8088 @ 4.77 MHz
-RAM: 512K / 640K
-Bus: Proprietary expansion slot, carrying almost all ISA signals
-Video: On board, MDA/Hercules/CGA
-Mass storage: 1x 5.25" 360K
-On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse,
-Options: 8087 FPU
-Expansion: Expansion box: 2x ISA
-
-******************************************************************************/
-
-
-ROM_START( compc1 )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_LOAD("pc1_bios.bin", 0xc000, 0x4000, CRC(e37367c8) SHA1(9aac9c38b4ebdb9a740e393199c2eff75a0bde03))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
-ROM_END
-
 /********************************************************** Compaq Portable ***
 
 Links:  https://en.wikipedia.org/wiki/Compaq_Portable , http://oldcomputers.net/compaqi.html ,
@@ -1270,7 +1247,6 @@ COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state,
 COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
-COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,       MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                 MACHINE_NOT_WORKING )
 COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",               MACHINE_NOT_WORKING )
