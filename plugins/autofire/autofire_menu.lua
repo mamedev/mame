@@ -148,6 +148,7 @@ local function handle_configure_menu(index, event)
 		end
 	-- On frames
 	elseif index == 3 then
+		manager:machine():popmessage(_('Number of frames button will be pressed'))
 		if event == 'left' then
 			current_button.on_frames = current_button.on_frames - 1
 		elseif event == 'right' then
@@ -155,6 +156,7 @@ local function handle_configure_menu(index, event)
 		end
 	-- Off frames
 	elseif index == 4 then
+		manager:machine():popmessage(_('Number of frames button will be released'))
 		if event == 'left' then
 			current_button.off_frames = current_button.off_frames - 1
 		elseif event == 'right' then
@@ -277,6 +279,7 @@ function lib:populate_menu(buttons)
 end
 
 function lib:handle_menu_event(index, event, buttons)
+	manager:machine():popmessage()
 	local current_menu = menu_stack[#menu_stack]
 	if current_menu == MENU_TYPES.MAIN then
 		return handle_main_menu(index, event, buttons)
