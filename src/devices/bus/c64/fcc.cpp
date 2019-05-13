@@ -4,6 +4,8 @@
 
 Tasc Final ChessCard cartridge emulation
 
+It expects a mouse in port 2, and/or joystick in port 1.
+
 The cartridge includes its own CPU (G65SC02P-4 @ 5MHz), making a relatively
 strong chess program possible on C64.
 It was also released for IBM PC, with an ISA card.
