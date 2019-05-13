@@ -208,7 +208,13 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 	uint32_t bits_per_row = nc_bpp * w / 16;
 	uint32_t words_per_tile = bits_per_row * h;
+
+	words_per_tile = 8;
+
 	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * (line ^ yflipmask);
+
+	m += (0x700000 / 2);
+
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
 	uint32_t y = line;
