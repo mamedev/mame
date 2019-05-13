@@ -58,7 +58,7 @@ private:
 	int m_hidden;
 
 	DECLARE_WRITE_LINE_MEMBER(mainlatch_int) { m_slot->nmi_w(state); }
-	DECLARE_READ8_MEMBER(rom_r) { return m_romh[offset]; } // cartridge cpu rom
+	DECLARE_READ8_MEMBER(rom_r) { return m_romx[offset]; } // cartridge cpu rom
 	DECLARE_READ8_MEMBER(nvram_r) { return m_nvram[offset & m_nvram.mask()]; }
 	DECLARE_WRITE8_MEMBER(nvram_w) { m_nvram[offset & m_nvram.mask()] = data; }
 

@@ -31,6 +31,7 @@ device_c64_expansion_card_interface::device_c64_expansion_card_interface(const m
 	device_slot_card_interface(mconfig, device),
 	m_roml(*this, "roml"),
 	m_romh(*this, "romh"),
+	m_romx(*this, "romx"),
 	m_nvram(*this, "nvram"),
 	m_game(1),
 	m_exrom(1)
@@ -193,6 +194,7 @@ image_init_result c64_expansion_slot_device::call_load()
 				// Commodore 64/128 cartridge
 				load_software_region("roml", m_card->m_roml);
 				load_software_region("romh", m_card->m_romh);
+				load_software_region("romx", m_card->m_romx);
 				load_software_region("nvram", m_card->m_nvram);
 
 				if (get_feature("exrom") != nullptr) m_card->m_exrom = atol(get_feature("exrom"));

@@ -405,7 +405,7 @@ int buscard_t::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 
 int buscard_t::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return !pd_pgm1(offset, sphi2) | m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
+	return (!pd_pgm1(offset, sphi2)) | m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }
 
 

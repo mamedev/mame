@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "finalchs.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/m65sc02.h"
 
 WRITE8_MEMBER( isa8_finalchs_device::io7ff8_write )
 {
@@ -73,7 +73,7 @@ DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "Final C
 
 void isa8_finalchs_device::device_add_mconfig(machine_config &config)
 {
-	m65c02_device &cpu(M65C02(config, "maincpu", 5000000));
+	m65sc02_device &cpu(M65SC02(config, "maincpu", 5_MHz_XTAL));
 	cpu.set_addrmap(AS_PROGRAM, &isa8_finalchs_device::finalchs_mem);
 }
 
