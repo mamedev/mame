@@ -24,7 +24,6 @@ public:
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, "palette")
 	, m_spg_video(*this, "spgvideo")
 	, m_porta_in(*this)
 	{
@@ -47,7 +46,6 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	required_device<gcm394_video_device> m_spg_video;
 
 	devcb_read16 m_porta_in;

@@ -22,14 +22,15 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, nullptr)
+	//, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 //	, m_scrollram(*this, "scrollram")
-	, m_paletteram(*this, "^palette")
 	, m_spriteram(*this, "^spriteram")
 	, m_video_irq_cb(*this)
+	, m_palette(*this, "palette")
+	, m_gfxdecode(*this, "gfxdecode")
 {
 }
 
@@ -72,7 +73,7 @@ void gcm394_base_video_device::device_start()
 			16 * 16 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (16 * 16 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
 		gfxelement++;
 	}
 
@@ -89,7 +90,7 @@ void gcm394_base_video_device::device_start()
 			16 * 32 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (16 * 32 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
 		gfxelement++;
 	}
 
@@ -106,7 +107,7 @@ void gcm394_base_video_device::device_start()
 			32 * 16 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (32 * 16 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
 		gfxelement++;
 	}
 
@@ -123,7 +124,7 @@ void gcm394_base_video_device::device_start()
 			32 * 32 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (32 * 32 * 4 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
 		gfxelement++;
 	}
 
@@ -140,7 +141,7 @@ void gcm394_base_video_device::device_start()
 			8 * 16 * 2
 		};
 		obj_layout.total = m_gfxregionsize / (8 * 16 * 2 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x40, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40, 0));
 		gfxelement++;
 	}
 
@@ -162,7 +163,7 @@ void gcm394_base_video_device::device_start()
 			texlayout_yoffset
 		};
 		obj_layout.total = m_gfxregionsize / (16 * 32 * 2 / 8);
-		set_gfx(gfxelement, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfxregion, 0, 0x40, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40, 0));
 		gfxelement++;
 	}
 	save_item(NAME(m_spriteextra));
@@ -178,6 +179,10 @@ void gcm394_base_video_device::device_reset()
 
 	for (int i=0;i<0x100;i++)
 		m_spriteextra[i] = 0x0000;
+
+	for (int i=0;i<0x100;i++)
+		m_paletteram[i] = 0x0000;
+
 
 	m_707f = 0x0000;
 	m_703a = 0x0000;
@@ -753,6 +758,24 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7088_w) { LOGMASKED(LOG_GCM394_VI
 
 READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
 
+WRITE16_MEMBER(gcm394_base_video_device::palette_w)
+{
+	m_paletteram[offset] = data;
+
+	uint32_t pal = m_rgb555_to_rgb888[data & 0x7fff];
+	int r = (pal >> 16) & 0xff;
+	int g = (pal >> 8) & 0xff;
+	int b = (pal >> 0) & 0xff;
+
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+}
+
+READ16_MEMBER(gcm394_base_video_device::palette_r)
+{
+	return m_paletteram[offset];
+}
+
+
 void gcm394_base_video_device::check_video_irq()
 {
 	m_video_irq_cb((m_video_irq_status & 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -775,4 +798,15 @@ WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 		check_video_irq();
 	}
 }
+
+static GFXDECODE_START( gfx )
+GFXDECODE_END
+
+void gcm394_base_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
+
+}
+
 
