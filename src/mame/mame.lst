@@ -2398,26 +2398,30 @@ at386                           // 19?? IBM AT 386
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
-c286lt							// 1990 Commodore Laptop 286-LT
-csl286							// Commodore SL 286-16
+c286lt                          // 1990 Commodore Laptop 286-LT
+csl286                          // Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
-c386sxlt						// 1992 Commodore Laptop C386SX-LT
-dt386							// Commodore DT386
-dt486							// Commodore DT486
+c386sxlt                        // 1992 Commodore Laptop C386SX-LT
+dt386                           // Commodore DT386
+dt486                           // Commodore DT486
 pc30iii                         // Commodore PC 30-III
 pc40iii                         // Commodore PC 40-III
-pc45iii							// Commodore PC 45-III
-pc50ii							// Commodore PC 50-II
-pc60iii							// Commodore PC 60-III
-pc70iii							// Commodore PC 70-III
-comt386							// Commodore Tower 386
-comt486							// Commodore Tower 486
+pc45iii                         // Commodore PC 45-III
+pc50ii                          // Commodore PC 50-II
+pc60iii                         // Commodore PC 60-III
+pc70iii                         // Commodore PC 70-III
+comt386                         // Commodore Tower 386
+comt486                         // Commodore Tower 486
 mbc28                           // Sanyo MBC-28
 comportii                       // Compaq Portable II
 comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
 pcd2                            // 1986 Siemens PCD-2
+pcd3nsx                         // Siemens-Nixdorf PCD-3Nsx
+pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops and towers
+pcd4nl                          // Siemens-Nixdorf PCD-4NL 486 subnotebook
+pcd4nd                          // Siemens-Nixdorf 486 notebook
 ct386sx                         //
 ec1842                          //
 ec1849                          //
@@ -2429,18 +2433,24 @@ ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
-m290							// Olivetti M290
+m290                            // Olivetti M290
 megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
 ncrpc8                          // 1986 NCR PC-8
+n8810m15                        // Nixdorf 8810 M15 Laptop - PC07
+n8810m16c                       // Nixdorf 8810 M16 Laptop - PC17 - CGA version
+n8810m16v                       // Nixdorf 8810 M16 Laptop - PC17 - VGA version
+n8810m30                        // Nixdorf 8810 M30
 n8810m55                        // 1986 Nixdorf 8810 M55
 //nws286                          // 1988 Nokia WS286
 pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 t2000sx                         //
+walk386sx                       // Triumph-Adler Walkstation 386 SX
+walk386dx                       // Triumph-Adler Walkstation 386 DX
 xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
 xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)

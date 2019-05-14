@@ -4,6 +4,8 @@
 
 Tasc Final ChessCard cartridge emulation
 
+It expects a mouse in port 2, and/or joystick in port 1.
+
 The cartridge includes its own CPU (G65SC02P-4 @ 5MHz), making a relatively
 strong chess program possible on C64.
 It was also released for IBM PC, with an ISA card.
@@ -28,6 +30,7 @@ DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "Final ChessC
 void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w)); // A13-A15 = low
+	//map(0x6000, 0x6000).noprw(); // N/C
 	map(0x7f00, 0x7f00).mirror(0x00ff).r(m_sublatch, FUNC(generic_latch_8_device::read)).w(m_mainlatch, FUNC(generic_latch_8_device::write)); // A8-A14 = high
 	map(0x8000, 0xffff).r(FUNC(c64_final_chesscard_device::rom_r));
 }
@@ -39,7 +42,7 @@ void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 
 void c64_final_chesscard_device::device_add_mconfig(machine_config &config)
 {
-	M65SC02(config, m_maincpu, XTAL(5'000'000));
+	M65SC02(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_final_chesscard_device::c64_fcc_map);
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -108,6 +111,8 @@ void c64_final_chesscard_device::device_start()
 
 void c64_final_chesscard_device::device_reset()
 {
+	m_mainlatch->read();
+	m_sublatch->read();
 	m_maincpu->reset();
 
 	m_bank = 0;

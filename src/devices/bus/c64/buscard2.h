@@ -2,12 +2,12 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Batteries Included BusCard cartridge emulation
+    Batteries Included BusCard II cartridge emulation
 
 **********************************************************************/
 
-#ifndef MAME_BUS_C64_BUSCARD_H
-#define MAME_BUS_C64_BUSCARD_H
+#ifndef MAME_BUS_C64_BUSCARD2_H
+#define MAME_BUS_C64_BUSCARD2_H
 
 #pragma once
 
@@ -15,9 +15,8 @@
 #include "bus/c64/exp.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
-#include "machine/ds75160a.h"
-#include "machine/ds75161a.h"
-#include "machine/i8255.h"
+#include "machine/6532riot.h"
+#include "machine/6821pia.h"
 
 
 
@@ -25,14 +24,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> buscard_t
+// ======================> buscard2_t
 
-class buscard_t : public device_t,
-				  public device_c64_expansion_card_interface
+class buscard2_t : public device_t,
+				   public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	buscard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	buscard2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -51,35 +50,23 @@ protected:
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
-	required_device<i8255_device> m_ppi;
-	required_device<ds75160a_device> m_ieee1;
-	required_device<ds75161a_device> m_ieee2;
+	required_device<riot6532_device> m_riot;
+	required_device<pia6821_device> m_pia;
 	required_device<ieee488_device> m_bus;
 	required_device<centronics_device> m_centronics;
 	required_device<c64_expansion_slot_device> m_exp;
 	required_ioport m_s1;
 	required_memory_region m_rom;
+	required_memory_region m_prom;
 
-	bool m_te;
-	int m_bank;
-	bool m_basic;
-	bool m_dipsw;
 	bool m_busy;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
-
-	bool pd_pgm1(offs_t offset, int sphi2);
-	bool pd_pgm234(offs_t offset, int sphi2, int bank);
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C64_BUSCARD, buscard_t)
+DECLARE_DEVICE_TYPE(C64_BUSCARD2, buscard2_t)
 
 
 #endif // MAME_BUS_C64_BUSCARD_H

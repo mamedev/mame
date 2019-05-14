@@ -395,7 +395,6 @@ protected:
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
 	bool m_ll_active;
-	u64 m_ll_addr;
 	struct tlb_entry_t
 	{
 		u64 mask;

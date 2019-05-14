@@ -2940,7 +2940,7 @@ uint16_t kiwame_state::input_r(offs_t offset)
 	switch( offset )
 	{
 		case 0x00/2:    return m_key[i]->read();
-		case 0x02/2:    return m_key[i + 5]->read();;
+		case 0x02/2:    return m_key[i + 5]->read();
 		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
 		case 0x08/2:    return 0xffff;

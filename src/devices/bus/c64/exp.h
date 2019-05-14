@@ -97,7 +97,7 @@ public:
 	int dotclock() { return phi2() * 8; }
 	int hiram() { return m_hiram; }
 	int loram() { return m_loram; }
- 
+
 	void set_passthrough();
 
 protected:
@@ -157,6 +157,7 @@ protected:
 
 	optional_shared_ptr<uint8_t> m_roml;
 	optional_shared_ptr<uint8_t> m_romh;
+	optional_shared_ptr<uint8_t> m_romx;
 	optional_shared_ptr<uint8_t> m_nvram;
 
 	int m_game;

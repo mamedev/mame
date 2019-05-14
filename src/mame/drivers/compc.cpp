@@ -337,4 +337,4 @@ ROM_END
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT     CLASS        INIT        COMPANY                        FULLNAME               FLAGS
 COMP( 1984, compc10, ibm5150, 0,      compc,   compc,    compc_state, empty_init, "Commodore Business Machines", "Commodore PC 10",     MACHINE_NOT_WORKING )
 COMP( 1987, pc10iii, ibm5150, 0,      pc10iii, compciii, compc_state, empty_init, "Commodore Business Machines", "Commodore PC-10 III", MACHINE_NOT_WORKING )
-COMP( 108?, compc1,  ibm5150, 0,      pc10iii, compciii, compc_state, empty_init, "Commodore Business Machines", "PC-1",				MACHINE_NOT_WORKING )
+COMP( 198?, compc1,  ibm5150, 0,      pc10iii, compciii, compc_state, empty_init, "Commodore Business Machines", "PC-1",                MACHINE_NOT_WORKING )
