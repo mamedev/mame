@@ -112,6 +112,7 @@ protected:
 
 	// unk 79xx
 	uint16_t m_7934;
+	uint16_t m_7935;
 	uint16_t m_7936;
 
 
@@ -197,11 +198,23 @@ private:
 
 	DECLARE_READ16_MEMBER(unkarea_7934_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7934_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7935_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7935_w);
+
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
 
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
+
+	void checkirq6();
+
+	emu_timer *m_unk_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 };
+
+
 
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {

@@ -181,10 +181,19 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78f0_w) { LOGMASKED(LOG_GCM39
 
 // **************************************** 79xx region stubs *************************************************
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return m_7934; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_w %04x\n", machine().describe_context(), data); m_7934 = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return m_7936; }
+// value of 7935 is read then written in irq6, nothing happens unless bit 0x0100 was set, which could be some kind of irq source being acked?
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_r\n", machine().describe_context()); return m_7935; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_w %04x\n", machine().describe_context(), data);
+	m_7935 &= ~data;
+	checkirq6();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_w %04x\n", machine().describe_context(), data); m_7936 = data; }
 
 // **************************************** fallthrough logger etc. *************************************************
@@ -348,11 +357,13 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// ######################################################################################################################################################################################
 
 	map(0x007934, 0x007934).rw(FUNC(sunplus_gcm394_base_device::unkarea_7934_r), FUNC(sunplus_gcm394_base_device::unkarea_7934_w));
+	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));	
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
 	// ######################################################################################################################################################################################
 	// 7axx region = system (including dma)
 	// ######################################################################################################################################################################################
+
 
 	map(0x007a80, 0x007a86).w(FUNC(sunplus_gcm394_base_device::system_dma_params_w));
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));	
@@ -370,6 +381,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 void sunplus_gcm394_base_device::device_start()
 {
 	m_porta_in.resolve_safe(0);
+
+	m_unk_timer = timer_alloc(0);
+	m_unk_timer->adjust(attotime::never);
 }
 
 void sunplus_gcm394_base_device::device_reset()
@@ -436,9 +450,33 @@ void sunplus_gcm394_base_device::device_reset()
 	// 79xx unknown
 
 	m_7934 = 0x0000;
+	m_7935 = 0x0000;
 	m_7936 = 0x0000;
 
+	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
+
+void sunplus_gcm394_base_device::checkirq6()
+{
+	if (m_7935 & 0x0100)
+		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	else
+		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+}
+
+void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case 0:
+	{
+		m_7935 |= 0x0100;
+		checkirq6();
+		break;
+	}
+	}
+}
+
 
 WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 {

@@ -760,16 +760,20 @@ READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VID
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a); 
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context().c_str(), offset, data, m_703a); 
 
-	m_paletteram[offset] = data;
+	//if (m_703a == 0x0009)
+	{
 
-	uint32_t pal = m_rgb555_to_rgb888[data & 0x7fff];
-	int r = (pal >> 16) & 0xff;
-	int g = (pal >> 8) & 0xff;
-	int b = (pal >> 0) & 0xff;
+		m_paletteram[offset] = data;
 
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+		uint32_t pal = m_rgb555_to_rgb888[data & 0x7fff];
+		int r = (pal >> 16) & 0xff;
+		int g = (pal >> 8) & 0xff;
+		int b = (pal >> 0) & 0xff;
+
+		m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	}
 }
 
 READ16_MEMBER(gcm394_base_video_device::palette_r)
