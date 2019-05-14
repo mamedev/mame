@@ -165,7 +165,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 
 		case 0x02:
 			logerror("%s = %s lsl %s\n", regs[rd], regs[rd], regs[rs]);
-			unimplemented_opcode(op);
+			m_core->m_r[rd] = m_core->m_r[rd] << m_core->m_r[rs];
 			return;
 
 		case 0x03:
