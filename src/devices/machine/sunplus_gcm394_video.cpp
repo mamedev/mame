@@ -731,7 +731,7 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
 WRITE16_MEMBER(gcm394_base_video_device::video_707f_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data); m_707f = data; }
 
-READ16_MEMBER(gcm394_base_video_device::video_703a_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_r\n", machine().describe_context()); return m_703a; }
+READ16_MEMBER(gcm394_base_video_device::video_703a_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_r\n", machine().describe_context()); return m_703a; } // something to do with palette access, maybe bank?
 WRITE16_MEMBER(gcm394_base_video_device::video_703a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_w %04x\n", machine().describe_context(), data); m_703a = data; }
 
 READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
@@ -760,6 +760,8 @@ READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VID
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a); 
+
 	m_paletteram[offset] = data;
 
 	uint32_t pal = m_rgb555_to_rgb888[data & 0x7fff];
