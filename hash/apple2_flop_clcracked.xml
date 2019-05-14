@@ -1365,22 +1365,6 @@
 		</part>
 	</software>
 
-<<<<<<< HEAD
-	<software name="casemisc">
-		<description>Case of the Missing Chick (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Troll Associates</publisher>
-		<!-- No compatibility data known at this time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="case of the missing chick (4am crack).dsk" size="143360" crc="c6bfecda" sha1="f434cf814040b36130e54456bcafcdb9b5559c89" />
-			</dataarea>
-		</part>
-	</software>
-
-=======
->>>>>>> Correct duplicate entry, redumped images, set name adjustments (nw)
 	<software name="catmouse">
 		<description>Cat 'n Mouse (cleanly cracked)</description>
 		<year>1986</year>
