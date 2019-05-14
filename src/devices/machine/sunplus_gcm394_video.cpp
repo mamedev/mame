@@ -181,7 +181,7 @@ void gcm394_base_video_device::device_reset()
 		m_spriteextra[i] = 0x0000;
 
 	for (int i=0;i<0x100;i++)
-		m_paletteram[i] = 0x0000;
+		m_paletteram[i] = machine().rand()&0x7fff;
 
 
 	m_707f = 0x0000;
@@ -367,7 +367,9 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		const bool row_scroll = (tilectrl & 0x0010);
 		const bool flip_x = (tileattr & TILE_X_FLIP);
 		const uint32_t yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-		const uint32_t palette_offset = (tileattr & 0x0f00) >> 4;
+		uint32_t palette_offset = (tileattr & 0x0f00) >> 4;
+
+		palette_offset |= 0x0900;
 
 		const uint8_t bpp = tileattr & 0x0003;
 
@@ -457,7 +459,9 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	bool flip_x = (attr & TILE_X_FLIP);
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	const uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+
+	palette_offset |= 0x0d00;
 
 	if (blend)
 	{
@@ -762,8 +766,13 @@ WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context().c_str(), offset, data, m_703a); 
 
-	//if (m_703a == 0x0009)
+	if (m_703a & 0xfff0)
 	{
+		fatalerror("palette writes with m_703a %04x\n", m_703a);
+	}
+	else
+	{
+		offset |= (m_703a & 0x000f) << 8;
 
 		m_paletteram[offset] = data;
 
@@ -778,7 +787,15 @@ WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 
 READ16_MEMBER(gcm394_base_video_device::palette_r)
 {
-	return m_paletteram[offset];
+	if (m_703a & 0xfff0)
+	{
+		fatalerror("palette read with m_703a %04x\n", m_703a);
+	}
+	else
+	{
+		offset |= (m_703a & 0x000f) << 8;
+		return m_paletteram[offset];
+	}
 }
 
 
@@ -810,7 +827,7 @@ GFXDECODE_END
 
 void gcm394_base_video_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256*0x10);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 
 }

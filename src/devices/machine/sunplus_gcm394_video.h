@@ -190,7 +190,7 @@ protected:
 	uint16_t m_video_irq_status;
 
 	uint16_t m_spriteextra[0x100];
-	uint16_t m_paletteram[0x100];
+	uint16_t m_paletteram[0x100*0x10];
 
 	uint16_t read_data(uint32_t offset);
 
