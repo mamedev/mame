@@ -56,6 +56,7 @@ private:
 
 	void data_map(address_map &map);
 	void io_map(address_map &map);
+	void special_io_map(address_map &map);
 	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_spkrdev;
@@ -82,6 +83,11 @@ void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	map(0x0100, 0x013f).rw("scc", FUNC(scc8030_device::zbus_r), FUNC(scc8030_device::zbus_w)).umask16(0x00ff);
+}
+
+void c900_state::special_io_map(address_map &map)
+{
+	// TODO: Z8010 MMU
 }
 
 static INPUT_PORTS_START( c900 )
@@ -112,6 +118,7 @@ void c900_state::c900(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c900_state::mem_map);
 	m_maincpu->set_addrmap(AS_DATA, &c900_state::data_map);
 	m_maincpu->set_addrmap(AS_IO, &c900_state::io_map);
+	m_maincpu->set_addrmap(z8001_device::AS_SIO, &c900_state::special_io_map);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_c900);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
