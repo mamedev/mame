@@ -116,7 +116,7 @@ READ_LINE_MEMBER( microkit_state::clear_r )
 	if (m_resetcnt == 0x1c)
 		m_a15 = 0;
 
-		return 1;
+	return 1;
 }
 
 READ8_MEMBER( microkit_state::ram_r )
