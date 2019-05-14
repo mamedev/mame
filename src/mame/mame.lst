@@ -35892,6 +35892,7 @@ iqunlimz                        // 1991 IQ Unlimited (Z80)
 profweis                        // 1988 (Yeno) Professor Weiss-Alles (Germany)
 socrates                        // 1988 Socrates Educational Video System (USA)
 socratfc                        // 1988 Socrates SAITOUT (French Canada)
+vpainter                        // 1991 Video Painter
 
 @source:softbox.cpp
 softbox                         //
