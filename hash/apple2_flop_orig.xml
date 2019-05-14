@@ -4793,11 +4793,10 @@
 		<info name="release" value="2019-04-30"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
-		<!-- Appears to be at least one missing disk. We'll need to revisit this later.. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233545">
-				<rom name="Wishbringer - Disk 1, Side A.woz" size="233545" crc="02a3fb1d" sha1="d21077ff029223bbdcb1dafae0433ca6cdff670a" offset="0x0000" />
+				<rom name="Wishbringer r68.woz" size="233545" crc="02a3fb1d" sha1="d21077ff029223bbdcb1dafae0433ca6cdff670a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
