@@ -195,68 +195,41 @@ int32_t k573fpga_device::find_enc_key()
     return k573enc_lookup[crypto_key1];
 }
 
-
-inline uint8_t IsBitSet(int value, int n)
-{
-    return (value >> n) & 1;
-}
-
-inline uint16_t BitSwap16(int v, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
-    int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0)
-{
-    return (IsBitSet(v, b15) << 15) |
-        (IsBitSet(v, b14) << 14) |
-        (IsBitSet(v, b13) << 13) |
-        (IsBitSet(v, b12) << 12) |
-        (IsBitSet(v, b11) << 11) |
-        (IsBitSet(v, b10) << 10) |
-        (IsBitSet(v, b9) << 9) |
-        (IsBitSet(v, b8) << 8) |
-        (IsBitSet(v, b7) << 7) |
-        (IsBitSet(v, b6) << 6) |
-        (IsBitSet(v, b5) << 5) |
-        (IsBitSet(v, b4) << 4) |
-        (IsBitSet(v, b3) << 3) |
-        (IsBitSet(v, b2) << 2) |
-        (IsBitSet(v, b1) << 1) |
-        (IsBitSet(v, b0) << 0);
-}
-
 inline uint16_t k573fpga_device::fpga_decrypt_byte_real(uint16_t v)
 {
     uint16_t m = crypto_key1 ^ crypto_key2;
 
-    v = BitSwap16(
+    v = bitswap<16>(
         v,
-        15 - IsBitSet(m, 0xF),
-        14 + IsBitSet(m, 0xF),
-        13 - IsBitSet(m, 0xE),
-        12 + IsBitSet(m, 0xE),
-        11 - IsBitSet(m, 0xB),
-        10 + IsBitSet(m, 0xB),
-        9 - IsBitSet(m, 0x9),
-        8 + IsBitSet(m, 0x9),
-        7 - IsBitSet(m, 0x8),
-        6 + IsBitSet(m, 0x8),
-        5 - IsBitSet(m, 0x5),
-        4 + IsBitSet(m, 0x5),
-        3 - IsBitSet(m, 0x3),
-        2 + IsBitSet(m, 0x3),
-        1 - IsBitSet(m, 0x2),
-        0 + IsBitSet(m, 0x2)
+        15 - BIT(m, 0xF),
+        14 + BIT(m, 0xF),
+        13 - BIT(m, 0xE),
+        12 + BIT(m, 0xE),
+        11 - BIT(m, 0xB),
+        10 + BIT(m, 0xB),
+        9 - BIT(m, 0x9),
+        8 + BIT(m, 0x9),
+        7 - BIT(m, 0x8),
+        6 + BIT(m, 0x8),
+        5 - BIT(m, 0x5),
+        4 + BIT(m, 0x5),
+        3 - BIT(m, 0x3),
+        2 + BIT(m, 0x3),
+        1 - BIT(m, 0x2),
+        0 + BIT(m, 0x2)
     );
 
-    v ^= (IsBitSet(m, 0xD) << 14) ^
-        (IsBitSet(m, 0xC) << 12) ^
-        (IsBitSet(m, 0xA) << 10) ^
-        (IsBitSet(m, 0x7) << 8) ^
-        (IsBitSet(m, 0x6) << 6) ^
-        (IsBitSet(m, 0x4) << 4) ^
-        (IsBitSet(m, 0x1) << 2) ^
-        (IsBitSet(m, 0x0) << 0);
+    v ^= (BIT(m, 0xD) << 14) ^
+        (BIT(m, 0xC) << 12) ^
+        (BIT(m, 0xA) << 10) ^
+        (BIT(m, 0x7) << 8) ^
+        (BIT(m, 0x6) << 6) ^
+        (BIT(m, 0x4) << 4) ^
+        (BIT(m, 0x1) << 2) ^
+        (BIT(m, 0x0) << 0);
 
-    v ^= BitSwap16(
-        crypto_key3,
+    v ^= bitswap<16>(
+        (uint16_t)crypto_key3,
         7, 0, 6, 1,
         5, 2, 4, 3,
         3, 4, 2, 5,
