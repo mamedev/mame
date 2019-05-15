@@ -328,6 +328,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         mp3dec_load_buf(&mp3_dec, ((uint8_t*)ram_swap.get()) + mp3_start_adr, mp3_end_adr - mp3_start_adr, &mp3_info, NULL, NULL);
         new_samples = mp3_info.samples;
         last_copied_samples = 0;
+        mp3_last_adr += mp3_end_adr - mp3_start_adr;
     } else {
         // For base address files, decrypt in a streaming manner.
         // By the time the play flag is set, there's usually enough data to decode the first frame or two.
