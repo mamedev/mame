@@ -7,6 +7,10 @@ Milton Bradley Milton
 
 This is the talking tabletop game, not the chess computer with the same name.
 
+Game 1: Match beginning of a phrase(red button) with end of phrase(yellow button).
+Game 2: Same as game 1, but all in one turn.
+Game 3: Press phrase end buttons, memorize them, press Go and match them.
+
 Hardware is an odd combination: MC6805P2 MCU, GI SP0250 speech + 2*TMC0430 GROM.
 See patent 4326710 for detailed information, except MC6805 clocked from SP0250 3.12MHz
 and GROM clocked by 3.12MHz/8=390kHz.
@@ -22,6 +26,9 @@ TODO:
 #include "machine/tmc0430.h"
 #include "sound/sp0250.h"
 #include "speaker.h"
+
+// internal artwork
+#include "milton.lh" // clickable
 
 
 namespace {
@@ -86,7 +93,7 @@ READ8_MEMBER(milton_state::data_r)
 		return 0;
 
 	// TMC0430 data
-	u8 data = 0xff;
+	u8 data = 0;
 	m_grom[0]->readz(&data);
 	m_grom[1]->readz(&data);
 	return data;
@@ -150,15 +157,15 @@ READ8_MEMBER(milton_state::input_r)
 
 static INPUT_PORTS_START( milton )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Red Button 7")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Red Button 6")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Red Button 5")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Red Button 4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Red Button 7")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Red Button 6")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Red Button 5")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Red Button 4")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Red Button 3")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Red Button 2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Red Button 1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Red Button 3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Red Button 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Red Button 1")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Purple Button 1")
 
 	PORT_START("IN.2")
@@ -169,15 +176,15 @@ static INPUT_PORTS_START( milton )
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Reset")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Yellow Button 1") // starting at top, then clockwise
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Yellow Button 2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Yellow Button 3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Yellow Button 1") // starting at top, then clockwise
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Yellow Button 2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Yellow Button 3")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Yellow Button 4")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Yellow Button 5")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Yellow Button 6")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Yellow Button 7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Yellow Button 4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Yellow Button 5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Yellow Button 6")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Yellow Button 7")
 INPUT_PORTS_END
 
 
@@ -203,6 +210,8 @@ void milton_state::milton(machine_config &config)
 	gromclock.signal_handler().set(m_grom[0], FUNC(tmc0430_device::gclock_in));
 	gromclock.signal_handler().append(m_grom[1], FUNC(tmc0430_device::gclock_in));
 
+	config.set_default_layout(layout_milton);
+
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	SP0250(config, m_speech, 3.12_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -218,7 +227,7 @@ ROM_START( milton )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD("sc87008p_783-4043-001", 0x000, 0x800, CRC(b054dbea) SHA1(b5339c8170e773b68505c3d60dc75249a583d60a) )
 
-	ROM_REGION( 0x4000, "groms", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "groms", ROMREGION_ERASE00 )
 	ROM_LOAD("4043-003", 0x0000, 0x1800, CRC(d95df757) SHA1(6723480866f6393d310e304ef3b61e3a319a7beb) )
 	ROM_LOAD("4043-004", 0x2000, 0x1800, CRC(9ac929f7) SHA1(1a27d56fc49eb4e58ea3b5c58d7fbedc5a751592) )
 ROM_END
@@ -232,4 +241,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, milton, 0,      0, milton,  milton, milton_state, empty_init, "Milton Bradley", "Electronic Milton", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, milton, 0,      0, milton,  milton, milton_state, empty_init, "Milton Bradley", "Electronic Milton", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
