@@ -12,6 +12,7 @@
 #pragma once
 
 #include "cbmiec.h"
+#include "bus/rs232/rs232.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
@@ -21,23 +22,17 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define INTERPOD_TAG            "interpod"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> interpod_device
+// ======================> interpod_t
 
-class interpod_device : public device_t, public device_cbm_iec_interface
+class interpod_t : public device_t, 
+				   public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	interpod_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -54,13 +49,14 @@ private:
 	required_device<mos6532_new_device> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
+	required_device<rs232_port_device> m_rs232;
 
 	void interpod_mem(address_map &map);
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(INTERPOD, interpod_device)
+DECLARE_DEVICE_TYPE(INTERPOD, interpod_t)
 
 
 #endif // MAME_BUS_CBMIEC_INTERPOD_H

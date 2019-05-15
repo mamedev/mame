@@ -16,7 +16,6 @@
  *   - reworked address translation logic, including 64-bit modes
  *   - reworked softfloat3-based floating point
  *   - experimental primary instruction cache
- *   - memory tap based ll/sc
  *   - configurable endianness
  *   - it's very very very slow
  *
@@ -91,7 +90,6 @@ r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
-	, m_ll_watch(nullptr)
 	, m_fcr0(0x00000500U)
 {
 	m_cp0[CP0_PRId] = prid;
@@ -200,11 +198,7 @@ void r4000_base_device::device_reset()
 
 	m_cp0_timer_zero = total_cycles();
 
-	if (m_ll_watch)
-	{
-		m_ll_watch->remove();
-		m_ll_watch = nullptr;
-	}
+	m_ll_active = false;
 
 	m_cp0[CP0_WatchLo] = 0;
 	m_cp0[CP0_WatchHi] = 0;
@@ -884,14 +878,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 	//case 0x1e: // *
 	//case 0x1f: // *
 	case 0x20: // LB
-		load<s8>(ADDR(m_r[RSREG], s16(op)),
+		load<u8>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s8 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x21: // LH
-		load<s16>(ADDR(m_r[RSREG], s16(op)),
+		load<u16>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s16 data)
 			{
 				m_r[RTREG] = data;
@@ -901,14 +895,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 		cpu_lwl(op);
 		break;
 	case 0x23: // LW
-		load<s32>(ADDR(m_r[RSREG], s16(op)),
+		load<u32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s32 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x24: // LBU
-		load<s8>(ADDR(m_r[RSREG], s16(op)),
+		load<u8>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u8 data)
 			{
 				m_r[RTREG] = data;
@@ -1030,28 +1024,12 @@ void r4000_base_device::cpu_execute(u32 const op)
 		}
 		break;
 	case 0x30: // LL
-		load_linked<s32>(ADDR(m_r[RSREG], s16(op)),
+		load_linked<u32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, s32 data)
 			{
-				// remove existing tap
-				if (m_ll_watch)
-					m_ll_watch->remove();
-
-				m_r[RTREG] = data;
+				m_r[RTREG] = s64(data);
 				m_cp0[CP0_LLAddr] = u32(address >> 4);
-
-				// install write tap
-				// FIXME: physical address truncation
-				m_ll_watch = space(0).install_write_tap(offs_t(address & ~7), offs_t(address | 7), "ll",
-					[this, hi(bool(BIT(address, 2)))](offs_t offset, u64 &data, u64 mem_mask)
-					{
-						if (hi ? ACCESSING_BITS_32_63 : ACCESSING_BITS_0_31)
-						{
-							m_ll_watch->remove();
-							m_ll_watch = nullptr;
-						}
-					});
-				m_ll_addr = ADDR(m_r[RSREG], s16(op));
+				m_ll_active = true;
 			});
 		break;
 	case 0x31: // LWC1
@@ -1065,22 +1043,9 @@ void r4000_base_device::cpu_execute(u32 const op)
 		load_linked<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, u64 data)
 			{
-				// remove existing tap
-				if (m_ll_watch)
-					m_ll_watch->remove();
-
 				m_r[RTREG] = data;
 				m_cp0[CP0_LLAddr] = u32(address >> 4);
-
-				// install write tap
-				// FIXME: address truncation
-				m_ll_watch = space(0).install_write_tap(offs_t(address & ~7), offs_t(address | 7), "lld",
-					[this](offs_t offset, u64 &data, u64 mem_mask)
-					{
-						m_ll_watch->remove();
-						m_ll_watch = nullptr;
-					});
-				m_ll_addr = ADDR(m_r[RSREG], s16(op));
+				m_ll_active = true;
 			});
 		break;
 	case 0x35: // LDC1
@@ -1097,13 +1062,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 			});
 		break;
 	case 0x38: // SC
-		if (m_ll_watch && m_ll_addr == ADDR(m_r[RSREG], s16(op)))
+		if (m_ll_active)
 		{
-			m_ll_watch->remove();
-			m_ll_watch = nullptr;
+			if (store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG])))
+				m_r[RTREG] = 1;
+			else
+				m_r[RTREG] = 0;
 
-			store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG]));
-			m_r[RTREG] = 1;
+			m_ll_active = false;
 		}
 		else
 			m_r[RTREG] = 0;
@@ -1116,13 +1082,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 		break;
 	//case 0x3b: // *
 	case 0x3c: // SCD
-		if (m_ll_watch && m_ll_addr == ADDR(m_r[RSREG], s16(op)))
+		if (m_ll_active)
 		{
-			m_ll_watch->remove();
-			m_ll_watch = nullptr;
+			if (store<u64>(ADDR(m_r[RSREG], s16(op)), m_r[RTREG]))
+				m_r[RTREG] = 1;
+			else
+				m_r[RTREG] = 0;
 
-			store<u64>(ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
-			m_r[RTREG] = 1;
+			m_ll_active = false;
 		}
 		else
 			m_r[RTREG] = 0;
@@ -1358,11 +1325,7 @@ void r4000_base_device::cp0_execute(u32 const op)
 				SR &= ~SR_EXL;
 			}
 
-			if (m_ll_watch)
-			{
-				m_ll_watch->remove();
-				m_ll_watch = nullptr;
-			}
+			m_ll_active = false;
 			break;
 
 		default:
@@ -3018,14 +2981,14 @@ std::string r4000_base_device::debug_string_array(u64 array_pointer)
 	while (!done)
 	{
 		done = true;
-		load<s32>(array_pointer, [this, &done, &result](u64 string_pointer)
+		load<u32>(array_pointer, [this, &done, &result](s32 string_pointer)
 		{
 			if (string_pointer != 0)
 			{
 				if (!result.empty())
 					result += ", ";
 
-				result += '\"' + debug_string(string_pointer) + '\"';
+				result += '\"' + debug_string(s64(string_pointer)) + '\"';
 
 				done = false;
 			}

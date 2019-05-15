@@ -10328,6 +10328,7 @@ ROM_START( wccf116 )
 ROM_END
 
 // Sega Yonin Uchi Mahjong MJ (セガ四人打ち麻雀MJ), "Sega The 4Players Mah-Jong"
+// uses CRP-1231 card RW connected via 838-13661 RS422/RS232C converter BD, and 2x JVS I/O boards (or one special I/O ?).
 ROM_START( mj1 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -10336,7 +10337,7 @@ ROM_START( mj1 )
 	DISK_IMAGE_READONLY( "cdp-10002b", 0, SHA1(bbbaf84c55a39c1ad4b82e01be731f65e07e7d18) ) // CD-R
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	// chip label is a guess
+	// chip label is a guess, probably incorrect
 	ROM_LOAD("317-0352-jpn.pic", 0x00, 0x4000, CRC(c2c45f9c) SHA1(d1ff2099db3d918846bb096d335cd7ef05df3901) )
 ROM_END
 

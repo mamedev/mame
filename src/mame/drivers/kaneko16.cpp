@@ -161,7 +161,7 @@ void kaneko16_state::bloodwar_coin_lockout_w(u8 data)
 
 /* Two identically mapped YM2149 chips */
 template<unsigned Chip>
-READ16_MEMBER(kaneko16_state::ym2149_r)
+u16 kaneko16_state::ym2149_r(offs_t offset)
 {
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149[Chip]->address_w(offset);
@@ -170,7 +170,7 @@ READ16_MEMBER(kaneko16_state::ym2149_r)
 
 
 template<unsigned Chip>
-WRITE16_MEMBER(kaneko16_state::ym2149_w)
+void kaneko16_state::ym2149_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149[Chip]->address_w(offset);
@@ -228,7 +228,7 @@ void kaneko16_state::eeprom_cs_w(u8 data)
                                 The Berlin Wall
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
+void kaneko16_berlwall_state::berlwall_oki_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (mem_mask == 0xff00) // reads / writes to the upper byte only appear to act as a mirror to the lower byte, 16-bit reads/writes only access the lower byte.
 	{
@@ -243,17 +243,17 @@ u16 kaneko16_berlwall_state::berlwall_spriteram_r(offs_t offset)
 {
 	offset = bitswap<16>(offset, 15, 14, 13, 12, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0);
 	offset ^= 0x800;
-	return m_spriteram[offset];
+	return m_spriteram->live()[offset];
 }
 
 void kaneko16_berlwall_state::berlwall_spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset = bitswap<16>(offset, 15, 14, 13, 12, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0);
 	offset ^= 0x800;
-	COMBINE_DATA(&m_spriteram[offset]);
+	COMBINE_DATA(&m_spriteram->live()[offset]);
 }
 
-READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_r)
+u16 kaneko16_berlwall_state::berlwall_spriteregs_r(offs_t offset)
 {
 	if (offset & 0x4)
 		return 0;
@@ -261,7 +261,7 @@ READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_r)
 	return m_kaneko_spr->regs_r(offset);
 }
 
-WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_w)
+void kaneko16_berlwall_state::berlwall_spriteregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset & 0x4)
 		return;
@@ -461,7 +461,7 @@ void kaneko16_gtmr_state::gtmr_map(address_map &map)
 
 	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x310000, 0x327fff).ram();                                                                     //
-	map(0x400000, 0x401fff).ram().share(m_spriteram);                       // Sprites
+	map(0x400000, 0x401fff).ram().share("spriteram");                       // Sprites
 
 	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
@@ -531,7 +531,7 @@ void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 
 	map(0x300000, 0x30ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x310000, 0x327fff).ram(); //
-	map(0x400000, 0x401fff).ram().share(m_spriteram); // Sprites
+	map(0x400000, 0x401fff).ram().share("spriteram"); // Sprites
 
 	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
 	map(0x580000, 0x583fff).m(m_view2[1], FUNC(kaneko_view2_tilemap_device::vram_map));
@@ -1655,15 +1655,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::interrupt)
 	int scanline = param;
 
 	// main vblank interrupt
-	if(scanline == 224)
+	if (scanline == 224)
+	{
+		m_spriteram->copy();
 		m_maincpu->set_input_line(5, HOLD_LINE);
+	}
 
 	// each of these 2 int are responsible of translating a part of sprite buffer
 	// from work ram to sprite ram. How these are scheduled is unknown.
-	if(scanline == 64)
+	if (scanline == 64)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 144)
+	if (scanline == 144)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
@@ -1690,8 +1693,9 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);    // mangled sprites otherwise
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
@@ -1751,8 +1755,9 @@ void kaneko16_state::bakubrkr(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);    // mangled sprites otherwise
 	m_screen->set_refresh_hz(59);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
@@ -1820,8 +1825,9 @@ void kaneko16_state::blazeon(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &kaneko16_state::blazeon_soundport);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(320, 240);
@@ -1873,8 +1879,9 @@ void kaneko16_state::wingforc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &kaneko16_state::wingforc_soundport);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(59.1854);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(320, 240);
@@ -1951,8 +1958,9 @@ void kaneko16_gtmr_state::gtmr(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(320, 240);
@@ -2062,8 +2070,9 @@ void kaneko16_state::mgcrystl(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
@@ -2126,16 +2135,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_shogwarr_state::shogwarr_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 224)
+	if (scanline == 224)
 	{
+		m_spriteram->copy(); // TODO : shogwarr sprites are 1 frame delayed? reference : https://youtu.be/aj4ayOc4MuI
 		// the code for this interrupt is provided by the MCU..
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
-	if(scanline == 64)
+	if (scanline == 64)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 
-	if(scanline == 144)
+	if (scanline == 144)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -2178,6 +2188,8 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.1854);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2185,7 +2197,6 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 	m_screen->set_visarea(40, 296-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_shogwarr_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 

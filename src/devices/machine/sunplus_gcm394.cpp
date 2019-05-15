@@ -136,7 +136,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7824_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7835_w %04x\n", machine().describe_context(), data); m_7835 = data; }
 
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7860_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7860_r\n", machine().describe_context()); return m_7860; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7860_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7860_r\n", machine().describe_context()); return m_porta_in();  }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7860_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7860_w %04x\n", machine().describe_context(), data); m_7860 = data; }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7861_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7861_r\n", machine().describe_context()); return m_7861; }
@@ -181,10 +181,19 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78f0_w) { LOGMASKED(LOG_GCM39
 
 // **************************************** 79xx region stubs *************************************************
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return m_7934; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_w %04x\n", machine().describe_context(), data); m_7934 = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return m_7936; }
+// value of 7935 is read then written in irq6, nothing happens unless bit 0x0100 was set, which could be some kind of irq source being acked?
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_r\n", machine().describe_context()); return m_7935; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_w %04x\n", machine().describe_context(), data);
+	m_7935 &= ~data;
+	checkirq6();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_w %04x\n", machine().describe_context(), data); m_7936 = data; }
 
 // **************************************** fallthrough logger etc. *************************************************
@@ -276,7 +285,8 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// 73xx-77xx = ram areas?
 	// ######################################################################################################################################################################################
 
-	map(0x007300, 0x0073ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x007300, 0x0073ff).rw(m_spg_video, FUNC(gcm394_base_video_device::palette_r), FUNC(gcm394_base_video_device::palette_w));
+
 	map(0x007400, 0x0077ff).ram().share("spriteram");
 
 	// ######################################################################################################################################################################################
@@ -347,11 +357,13 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	// ######################################################################################################################################################################################
 
 	map(0x007934, 0x007934).rw(FUNC(sunplus_gcm394_base_device::unkarea_7934_r), FUNC(sunplus_gcm394_base_device::unkarea_7934_w));
+	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));	
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
 	// ######################################################################################################################################################################################
 	// 7axx region = system (including dma)
 	// ######################################################################################################################################################################################
+
 
 	map(0x007a80, 0x007a86).w(FUNC(sunplus_gcm394_base_device::system_dma_params_w));
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));	
@@ -368,6 +380,10 @@ void sunplus_gcm394_base_device::map(address_map &map)
 
 void sunplus_gcm394_base_device::device_start()
 {
+	m_porta_in.resolve_safe(0);
+
+	m_unk_timer = timer_alloc(0);
+	m_unk_timer->adjust(attotime::never);
 }
 
 void sunplus_gcm394_base_device::device_reset()
@@ -434,9 +450,33 @@ void sunplus_gcm394_base_device::device_reset()
 	// 79xx unknown
 
 	m_7934 = 0x0000;
+	m_7935 = 0x0000;
 	m_7936 = 0x0000;
 
+	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
+
+void sunplus_gcm394_base_device::checkirq6()
+{
+	if (m_7935 & 0x0100)
+		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	else
+		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+}
+
+void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case 0:
+	{
+		m_7935 |= 0x0100;
+		checkirq6();
+		break;
+	}
+	}
+}
+
 
 WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 {
@@ -451,9 +491,6 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
-	m_spg_video->set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 }
 
 

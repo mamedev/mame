@@ -149,6 +149,7 @@ public:
 	void at386(machine_config &config);
 	void m290(machine_config &config);
 	void ncrpc8(machine_config &config);
+	void n8810m15(machine_config &config);
 	void n8810m55(machine_config &config);
 	void ews286(machine_config &config);
 
@@ -854,6 +855,14 @@ void at_state::comportii(machine_config &config)
 }
 
 // Nixdorf 8810 M55
+void at_state::n8810m15(machine_config &config)
+{
+	ibm5170(config);
+	m_maincpu->set_clock(6000000); 
+	subdevice<isa16_slot_device>("isa1")->set_default_option("cga"); 
+}
+
+// Nixdorf 8810 M55
 void at_state::n8810m55(machine_config &config)
 {
 	ibm5170(config);
@@ -1077,6 +1086,26 @@ ROM_START( at )
 	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(29) )
 	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(29) )
 	// ROM_LOAD( "precise_860407_keyboard_mcu.bin", 0x0000, 0x800, CRC(d1faad5c) SHA1(cb315a3da632c969012c298bb8e1cf8883b70501))
+	// 30: BIOS-String: D286-1149-083090-K0 - WIN 286 BIOS
+	ROM_SYSTEM_BIOS(30, "6wb5", "KT216WB5-HI Rev.2")
+	ROMX_LOAD( "kt216wb5_even.bin", 0x10000, 0x8000, CRC(6b5509c0) SHA1(73b303b90cc0cd23b7e13362019193c938a2e502), ROM_SKIP(1) | ROM_BIOS(30) )
+	ROMX_LOAD( "kt216wb5_odd.bin", 0x10001, 0x8000, CRC(af541ada) SHA1(26d2617dbe8c15f1b0d4782375bcb291a7923703), ROM_SKIP(1) | ROM_BIOS(30) )
+	// 31: BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS
+	ROM_SYSTEM_BIOS(31, "mat286revd", "MAT 286 Rev.D")
+	ROMX_LOAD( "mat286revd.bin", 0x10000, 0x10000, CRC(deeea2da) SHA1(c9186f835c7c12b28befa75851cb8ac7e1f95cbb), ROM_BIOS(31) )
+	// 32: BIOS-String: D286-1295-091589-K0
+	ROM_SYSTEM_BIOS(32, "topvlsi", "Toptek VLSI")
+	ROMX_LOAD( "toptek_vlsi.bin", 0x10000, 0x10000, CRC(f1d05c2e) SHA1(05540f6af6a3209107a7fd29e526e61d12c32b6e), ROM_BIOS(32) )
+	// 33: DTK Corp. 286 Computer - DTK 286 Chipset ROM BIOS Version 3.26 - #24062890N
+	ROM_SYSTEM_BIOS(33, "ptm1632c", "UNIT PTM1632C DTK V.3.26")
+	ROMX_LOAD( "ptm1632c_l.bin", 0x10000, 0x8000, CRC(df0bc27c) SHA1(f94e2decd13c285c23b6a61c035cab88fa00ba6e), ROM_SKIP(1) | ROM_BIOS(33))
+	ROMX_LOAD( "ptm1632c_h.bin", 0x10001, 0x8000, CRC(a80136e0) SHA1(5edc2d387efb42cf70361197de808ce1b06d8aec), ROM_SKIP(1) | ROM_BIOS(33))
+	// 34: BIOS-String: DH12-1343-061390-K0
+	ROM_SYSTEM_BIOS(34, "headland", "Headland")
+	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(34) )
+	// 35: BIOS-String: 20-0300-00834-00101111-050591-SARC286 / [80286 Standard System 2V1]
+	ROM_SYSTEM_BIOS(35, "sarcrev12", "SARC Rev. 1.2")
+	ROMX_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654), ROM_BIOS(35) )
 ROM_END
 
 
@@ -1598,7 +1627,33 @@ ROM_START( pc70iii )
 	ROM_SYSTEM_BIOS(1, "pc70v101", "PC70 V1.00.01")
 	ROMX_LOAD("cbm-pc70c-bios-lo-v1.00.01-xxxxxx-00.bin", 0x00000, 0x10000, CRC(6c8bbd31) SHA1(63d1739a58a0d441ebdd543e3994984c433aedb4), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("cbm-pc70c-bios-hi-v1.00.01-xxxxxx-00.bin", 0x00001, 0x10000, CRC(ef279cdd) SHA1(d250368b2f731e842d6f280a6134f1e38846874b), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_END
+ROM_END
+
+// Commodore Tower 386
+ROM_START( comt386 )
+	ROM_REGION(0x20000, "bios", 0)
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10 22 - Twinhead International Corporation
+	ROM_LOAD16_BYTE( "cbm-t386-bios-lo-v1.1022c-.bin", 0x10000, 0x8000, CRC(6857777e) SHA1(e80dbffd3523c9a1b027f57138c55768fc8328a6))
+	ROM_LOAD16_BYTE( "cbm-t386-bios-hi-v1.1022c-.bin", 0x10001, 0x8000, CRC(6a321a7e) SHA1(c350fb273522f742c6008deda00ed13947a269b7))
+ROM_END
+
+// Commodore Tower 486
+ROM_START( comt486 )
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: BIOS-String: 40-0500-DG1112-00101111-070791-SOLUTION-0 - 4D3FF Rev.D (092892)
+	ROM_SYSTEM_BIOS(0, "v0", "Tower 486 V0")
+	ROMX_LOAD( "cbm-t486dx-bios-v-xxxxxx-xx.bin", 0x10000, 0x10000, CRC(f51c0ca0) SHA1(2b08a606ae2f37b3e72d687f890d729a58fd3ccd), ROM_BIOS(0))
+	// continuous chirps
+	ROM_SYSTEM_BIOS(1, "v1", "Tower 486 V1")
+	ROMX_LOAD( "cbm-t486dx-66-bios-v1.01-391566-02.bin", 0x10000, 0x10000, CRC(3d740698) SHA1(888f23d85b41c07e15e2811b76194cf478bc80cd), ROM_BIOS(1))
+	// BIOS-String: 40-0103-001283-00101111-0606-SYM_486-0 - Commodore 486DX2-66 BIOS Version 1.03 391684-02
+	ROM_SYSTEM_BIOS(2, "v2", "Tower 486 V2")
+	ROMX_LOAD( "cbm-t486dx-66-bios-v1.03-391684-02.bin", 0x10000, 0x10000, CRC(13e8b04b) SHA1(dc5c84d228f802f7580b3f3b8e70cf8f74de5d79), ROM_BIOS(2))
+	// BIOS-String: 40-0103-001283-00101111-060692-SYM_486-0 - Commodore 486DX-50 BIOS Version 1.03 391522-03
+	ROM_SYSTEM_BIOS(3, "v3", "Tower 486 V3")
+	ROMX_LOAD( "cbm-t486dx-50-bios-v1.03-.bin", 0x10000, 0x10000, CRC(e02bb928) SHA1(6ea121b214403390d382ca4685cfabcbcca1a28b), ROM_BIOS(3))
+ROM_END
+
 
 // Apricot Qi 300 (Rev D,E & F Motherboard)
 ROM_START( xb42663 )
@@ -1734,6 +1789,7 @@ ROM_START( aprfte )
 	ROM_LOAD( "1-2r2-4.486", 0x00000, 0x20000, CRC(bccc236d) SHA1(0765299363e68cf65710a688c360a087856ece8f))
 ROM_END
 
+// Amstrad MegaPC
 ROM_START( megapc )
 	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x20000, "bios", 0)
@@ -1741,6 +1797,7 @@ ROM_START( megapc )
 	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0x00001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
 ROM_END
 
+// Amstrad MegaPC Plus
 ROM_START( megapcpl )
 	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x20000, "bios", 0)
@@ -1748,6 +1805,7 @@ ROM_START( megapcpl )
 	ROM_LOAD16_BYTE( "486slc.u19", 0x00001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))
 ROM_END
 
+// Amstrad MegaPC Plus (Winbond chipset)
 ROM_START( megapcpla )
 	ROM_REGION(0x40000, "bios", 0)
 	ROM_LOAD( "megapc_bios.bin",  0x00000, 0x10000, CRC(b84938a2) SHA1(cecab72a96993db4f7c648c229b4211a8c53a380))
@@ -1789,13 +1847,15 @@ ROM_START( mbc28 ) // Complains about missing mouse hardware
 ROM_END
 
 // Siemens PCD-2
+	// ROM_LOAD( "vga_nmc27c256q_435-0029-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0d8d7dff) SHA(cb5b2ab78d480ec3164d16c9c75f1449fa81a0e7) ) // Video7 VGA card
+	// ROM_LOAD( "vga_nmc27c256q_435-0030-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0935c003) SHA(35ac571818f616b856da8bbf6a7a9172f68b3ab6) )
 ROM_START( pcd2 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "bios_tandon_188782-032a_rev_5.21_low.bin", 0x10000, 0x8000, CRC(a8fbffd3) SHA1(8a3ad5bc7f86ff984be10a8b1ae4542be4c80e5f) )
 	ROM_LOAD16_BYTE( "bios_tandon_188782-031a_rev_5.21_high.bin", 0x10001, 0x8000, CRC(8d7dfdcc) SHA1(d1d58c0ad7db60399f9a93db48feb10e44ffd624) )
-	// ROM_LOAD( "kbd_8742_award_upi_1.61_rev_1.01.bin", 0x0000, 0x0800, CRC(bb8a1979) SHA(43d35ecf76e5e8d5ddf6c32b0f6f628a7542d6e4) ) // 8742 keyboard controller
-	// ROM_LOAD( "vga_nmc27c256q_435-0029-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0d8d7dff) SHA(cb5b2ab78d480ec3164d16c9c75f1449fa81a0e7) ) // Video7 VGA card
-	// ROM_LOAD( "vga_nmc27c256q_435-0030-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0935c003) SHA(35ac571818f616b856da8bbf6a7a9172f68b3ab6) )
+
+	ROM_REGION( 0x0800, "keyboard", 0 ) // reporting keyboard controller failure
+	ROM_LOAD( "kbd_8742_award_upi_1.61_rev_1.01.bin", 0x000, 0x800, CRC(bb8a1979) SHA1(43d35ecf76e5e8d5ddf6c32b0f6f628a7542d6e4) ) // 8742 keyboard controller
 ROM_END
 
 // Compaq Portable II
@@ -1861,6 +1921,40 @@ ROM_START( ncrpc8 )
 	ROM_LOAD ("ncr_keyboard_mcu_35091.bin", 0x0000, 0x800, CRC(632556cc) SHA1(b35f30bd0664fc1c2775a594f248d1e30237900a))
 ROM_END
 
+// Nixdorf 8810 M15 Laptop - PC07 - boot from harddisk doesn't work
+ROM_START( n8810m15 )
+	// ROM_LOAD("charagene_v1.1_daft2c2.bin", 0x00000, 0x4000, CRC(dd324efd) SHA1(67fd91277733596bfad8506dc92d9f776e563dda)) // CGA chargen
+	
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "rbios_even_daft2a3.bin", 0x10000, 0x8000, CRC(790abf68) SHA1(fbdb5e628ee9a605c8c1485a3fbb67736ff03153))
+	ROM_LOAD16_BYTE( "rbios_odd_daft2b3.bin", 0x10001, 0x8000, CRC(b09a812a) SHA1(c1b3321715260f9cd8c810325dc10c674ea05174))
+ROM_END
+
+// Nixdorf 8810 M16 Laptop - PC17 - CGA version - boot from harddisk doesn't work
+ROM_START( n8810m16c )
+	// ROM_LOAD("201cg rev 1.0.u78", 0x00000, 0x4000, CRC(3e31143b) SHA1(489da357e0ab8a469a3fb81cce160637486c87bc)) // CGA chargen
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "nmc27c256.u35", 0x10000, 0x8000, CRC(51acd116) SHA1(1a0bf24af4eba48d0deb0132a523e131902d2bcd))
+	ROM_LOAD16_BYTE( "nmc27c256.u36", 0x10001, 0x8000, CRC(fb47f9da) SHA1(d9bd4aea850a83764454a5c86c8da09f7c640fd6))
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "d8749h.u69", 0x000, 0x0800, CRC(030051da) SHA1(91b60228452cd1d6af99786402bd3b4d3efc2f05) )
+ROM_END
+
+// Nixdorf 8810 M16 Laptop - PC17 - VGA version - boot from harddisk doesn't work
+ROM_START( n8810m16v )
+	// ROM_LOAD("8810m16vga_27c256_221vb_123g1.bin", 0x00000, 0x4000, CRC(3bc80739) SHA1(3d6d7fb01681eccbc0b560818654d5aa1e3c5230)) // C&T VGA BIOS for 82C455
+    ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD16_BYTE( "8810m16vga_27c256_286bios_a2531511_a.bin", 0x10000, 0x8000, CRC(1de5e49b) SHA1(759878e13801278de96700bbef318a49cca68054))
+	ROM_LOAD16_BYTE( "8810m16vga_27c256_286bios_a2531511_b.bin", 0x10001, 0x8000, CRC(a65cf1f8) SHA1(30d46b49e87f272540e24a278848122b3c40bdaf))
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "8810m16vga_8749_201kb_rev3a.bin", 0x000, 0x0800, CRC(030051da) SHA1(91b60228452cd1d6af99786402bd3b4d3efc2f05) )
+ROM_END
+
+// Nixdorf 8810 M30
+ROM_START( n8810m30 )
+	ROM_REGION(0x20000, "bios", 0 )
+	ROM_LOAD( "at286bios_53889.00.0.17jr.bin", 0x00000, 0x20000, CRC(74870212) SHA1(adb3f379c9aeee6a5beb946d23af6eea706aca1d) )
+ROM_END
 
 // Nixdorf 8810 M55
 ROM_START( n8810m55 )
@@ -1877,7 +1971,64 @@ ROM_START( m290 )
 	ROM_REGION( 0x0800, "keyboard", 0 ) 
 	ROM_LOAD( "m290_csl0_1.10.bin", 0x000, 0x0800, CRC(d767d496) SHA1(84246f7b39e0a005425948931cf93624b831e121) )
 ROM_END
-	
+
+// Siemens-Nixdorf PCD-3Nsx notebook
+ROM_START( pcd3nsx )
+	ROM_REGION( 0x20000, "bios", 0 )
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - failure at 100000-10FFFF - Resume memory backup failure
+	ROM_SYSTEM_BIOS(0, "pcd3nsxno1", "pcd3nsxno1")
+	ROMX_LOAD( "3n102l30.bin", 0x00000, 0x20000, CRC(02384c19) SHA1(552dc41b40272027e2b031187f8ab1e1513751b9), ROM_BIOS(0) )
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - Memory high address failure at 100000-10FFFF - Resume memory backup failure
+	ROM_SYSTEM_BIOS(1, "pcd3nsxno2", "pcd3nsxno2")
+	ROMX_LOAD( "3n120l40.bin", 0x00000, 0x20000, CRC(1336dd75) SHA1(80306d85f417c51a5235ac2f02ceb58bdb51205f), ROM_BIOS(1) )
+ROM_END
+
+// Siemens-Nixdorf 486 mainboards and BIOS versions
+// The same mainboards were used in various case versions to get the different model lines, so an identification by the mainboard number (Dxxx) is safest
+ROM_START( pcd4x )
+	ROM_REGION( 0x20000, "bios", 0 )
+	// D756, was used in PCD-4Lsx, contains Cirrus Logic VGA ROM
+	ROM_SYSTEM_BIOS(0, "d756v320r316", "D756 BIOS V3.20 R3.16")
+	ROMX_LOAD( "fts_biosupdated756noflashbiosepromv320_320316_149.bin", 0x00000, 0x20000, CRC(2ab60725) SHA1(333b64424c08ecbbaf47110c99ad0335da211489), ROM_BIOS(0) )
+	// D674, was used in PCD-4M, PCD-4Msx, PCD-4RSXA/4RA
+	ROM_SYSTEM_BIOS(1, "d674v320r316", "D674 BIOS V3.20 R3.16")
+	ROMX_LOAD( "fts_biosupdated674noflashbiosepromv320_320316_144.bin", 0x00000, 0x20000, CRC(1293d27c) SHA1(22f36c4a5a0912011ed54ff917244f412208ffc0), ROM_BIOS(1) )
+	// D802, was used in PCD-4HVL
+	ROM_SYSTEM_BIOS(2, "d802v320r316", "D802 BIOS V3.20 R3.34.802")
+	// PCD-4NL, contains C&T VGA BIOS
+	ROMX_LOAD( "fts_biosupdated802noflashbiosepromv320_320334_152.bin", 0x00000, 0x20000, CRC(fb1cd3d2) SHA1(98043c6f0299e1c56e5f266ea5f117ae456447ff), ROM_BIOS(2) )
+ROM_END
+
+// Siemens-Nixdorf PCD-4NL 486 subnotebook
+// PhoenixBIOS(TM) A486 Version 1.03
+// complains about "Pointer device failure" and "Memory failure at 00100000, read AA55 expecting 002C
+ROM_START( pcd4nl )
+	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_LOAD( "pcd4nl.bin", 0x00000, 0x20000, CRC(8adb4900) SHA1(a01c665fed769ff815bc2e5ae30901f7e12d721b) )	
+ROM_END
+
+// Siemens-Nixdorf PCD-4ND 486 notebook - display remains blank
+ROM_START( pcd4nd )
+	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_SYSTEM_BIOS(0, "pcd4ndno1", "pcd4ndno1")
+	ROMX_LOAD( "bf3m51.bin", 0x00000, 0x20000, CRC(6a2f90dd) SHA1(75704a83976e4bb02a028e761d01bd053cc0d4e7), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "pcd4ndno2", "pcd4ndno2")
+	ROMX_LOAD( "bf3q42.bin", 0x00000, 0x20000, CRC(fa81cf6e) SHA1(91313a6856ca22f40710a6c9c8a65f8e340784ab), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "pcd4ndno3", "pcd4ndno3")
+	ROMX_LOAD( "pcd-4nd_flash_28010.bin", 0x00000, 0x20000, CRC(53c0beea) SHA1(bfa17947529c51a8c9315884e156c01ddd23c0d8), ROM_BIOS(2) )
+ROM_END
+
+// Triumph-Adler Walkstation 386 SX - German version of the Olivetti S20 - screen remains blank
+ROM_START( walk386sx )
+	ROM_REGION( 0x20000, "bios", 0 ) // contains Cirrus Logic VGA BIOS
+	ROM_LOAD( "cthj01_1014.bin", 0x00000, 0x20000, CRC(805084b9) SHA1(a92d78050844ccbcce53109c42603639aedd2335) )
+ROM_END
+
+// Triumph-Adler Walkstation 386DX - German version of the Olivetti D33 - screen remains blank
+ROM_START( walk386dx )
+	ROM_REGION( 0x20000, "bios", 0 ) // contains Cirrus Logic VGA BIOS
+	ROM_LOAD( "am28f010_ctaa060125rc.bin", 0x00000, 0x20000, CRC(6cc540fe) SHA1(9853793d5433bbc5efc09c7f31c4a8a8f78d4549) )	
+ROM_END
 
 // Nokia Data WS286
 //ROM_START(nws286 ) // Computer is grey with Nokia logo.
@@ -1942,17 +2093,29 @@ COMP( 199?, pc70iii,   ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1990, c286lt,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C286LT", MACHINE_NOT_WORKING )
 COMP( 1991, c386sxlt,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines",  "Laptop C386SX-LT", MACHINE_NOT_WORKING )
 COMP( 199?, csl286,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Commodore Business Machines",  "SL 286-16", MACHINE_NOT_WORKING )
+COMP( 199?, comt386,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Commodore Business Machines",  "Tower 386", MACHINE_NOT_WORKING )
+COMP( 199?, comt486,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines",  "Tower 486", MACHINE_NOT_WORKING )
 COMP( 1988, dsys200,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Dell Computer Corporation",    "System 200", MACHINE_NOT_WORKING )
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
 COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
+COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx", MACHINE_NOT_WORKING )
+COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
+COMP( 199?, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
+COMP( 199?, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
+COMP( 199?, walk386sx, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386 SX", MACHINE_NOT_WORKING )
+COMP( 199?, walk386dx, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386DX", MACHINE_NOT_WORKING )
 COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
 COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m16v, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
+COMP( 198?, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 198?, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )
