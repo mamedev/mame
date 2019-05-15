@@ -7,13 +7,10 @@
     15/07/2011 Skeleton driver.
 
     Commands:
-    Press H to list all the commands.
+    Press DELETE to abort boot, then press H to list all the commands.
 
     TODO:
-    - remove parity check IRQ patch (understand what it really wants there!)
     - implement S-100 bus features;
-    - irqs needs 8259 "auto-ack"-ing in order to work properly;
-    - vertical scrolling isn't understood;
 
 ============================================================================
 
@@ -171,6 +168,7 @@ public:
 	z100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
 		m_pia(*this, "pia%u", 0U),
 		m_picm(*this, "pic8259_master"),
 		m_pics(*this, "pic8259_slave"),
@@ -191,14 +189,16 @@ public:
 
 	void z100(machine_config &config);
 
-	virtual void driver_init() override;
-
 	DECLARE_INPUT_CHANGED_MEMBER(kbd_reset);
 
 private:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	void memory_ctrl_w(uint8_t data);
 	offs_t vram_map(offs_t offset) const;
 	DECLARE_READ8_MEMBER(z100_vram_r);
 	DECLARE_WRITE8_MEMBER(z100_vram_w);
@@ -227,6 +227,7 @@ private:
 	void z100_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_ram;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<pic8259_device> m_picm;
 	required_device<pic8259_device> m_pics;
@@ -244,6 +245,7 @@ private:
 	required_ioport m_ctrl;
 
 	std::unique_ptr<uint8_t[]> m_gvram;
+	std::unique_ptr<uint32_t[]> m_parity;
 	uint8_t m_kbd_col;
 	uint8_t m_vram_enable;
 	uint8_t m_gbank;
@@ -253,16 +255,55 @@ private:
 	uint8_t m_tmr_status;
 	uint8_t m_start_addr;
 	bool m_vidint_enable;
+	uint8_t m_memory_ctrl;
 
 	floppy_image_device *m_floppy;
 };
 
+
+void z100_state::machine_start()
+{
+	m_parity = make_unique_clear<uint32_t[]>(m_ram.bytes() / 32);
+}
 
 void z100_state::video_start()
 {
 	m_gvram = make_unique_clear<uint8_t[]>(0x30000);
 
 	m_vidint_enable = false;
+}
+
+uint8_t z100_state::ram_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled() && BIT(m_memory_ctrl, 5))
+	{
+		uint32_t parity = m_parity[offset >> 5];
+		if (BIT(parity, offset & 31))
+			m_picm->ir0_w(1);
+	}
+
+	return m_ram[offset];
+}
+
+void z100_state::ram_w(offs_t offset, uint8_t data)
+{
+	if (!machine().side_effects_disabled())
+	{
+		uint32_t &parity = m_parity[offset >> 5];
+		if (!BIT(m_memory_ctrl, 4) && BIT(population_count_32(data), 0))
+			parity |= 1 << (offset & 31);
+		else if (parity != 0)
+			parity &= ~(1 << (offset & 31));
+	}
+
+	m_ram[offset] = data;
+}
+
+void z100_state::memory_ctrl_w(uint8_t data)
+{
+	m_memory_ctrl = data & 0x3f;
+	if (!BIT(data, 5))
+		m_picm->ir0_w(0);
 }
 
 MC6845_UPDATE_ROW(z100_state::update_row)
@@ -324,7 +365,7 @@ WRITE8_MEMBER( z100_state::z100_vram_w )
 void z100_state::z100_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x3ffff).ram(); // 128*2 KB RAM
+	map(0x00000, 0x3ffff).rw(FUNC(z100_state::ram_r), FUNC(z100_state::ram_w)).share("ram"); // 128*2 KB RAM
 //  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
 	map(0xc0000, 0xeffff).rw(FUNC(z100_state::z100_vram_r), FUNC(z100_state::z100_vram_w)); // Blue / Red / Green
 //  AM_RANGE(0xf0000,0xf0fff) // network card (NET-100)
@@ -453,7 +494,7 @@ void z100_state::z100_io(address_map &map)
 	map(0xf4, 0xf5).rw("kbdc", FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
 	map(0xfb, 0xfb).rw(FUNC(z100_state::tmr_status_r), FUNC(z100_state::tmr_status_w));
-//  AM_RANGE (0xfc, 0xfc) memory latch
+	map(0xfc, 0xfc).w(FUNC(z100_state::memory_ctrl_w));
 //  AM_RANGE (0xfd, 0xfd) Hi-address latch
 //  AM_RANGE (0xfe, 0xfe) Processor swap port
 	map(0xff, 0xff).portr("DSW101");
@@ -701,6 +742,8 @@ void z100_state::machine_reset()
 		for(i=0;i<8;i++)
 			m_palette->set_pen_color(i,pal3bit(0),pal3bit(i),pal3bit(0));
 	}
+
+	memory_ctrl_w(0);
 }
 
 static void z100_floppies(device_slot_interface &device)
@@ -837,18 +880,8 @@ ROM_START( z100 )
 	ROM_LOAD( "444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP ) // typed in from manual
 ROM_END
 
-void z100_state::driver_init()
-{
-	uint8_t *ROM = memregion("ipl")->base();
-
-	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
-	ROM[0xfc117 & 0x3fff] = 0x90;
-
-	ROM[0xfc0d4 & 0x3fff] = 0x75; // patch checksum
-}
-
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY                FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY                FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, empty_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING )
