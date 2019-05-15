@@ -141,10 +141,7 @@ void timeplt_state::timeplt_main_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x0cff).r(FUNC(timeplt_state::scanline_r)).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
 	map(0xc200, 0xc200).mirror(0x0cff).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc300, 0xc300).mirror(0x0c9f).portr("IN0");
-	map(0xc300, 0xc30f).lw8("mainlatch_w",
-							[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-								m_mainlatch->write_d0(space, offset >> 1, data, mem_mask);
-							});
+	map(0xc300, 0xc30f).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 1, data); });
 	map(0xc320, 0xc320).mirror(0x0c9f).portr("IN1");
 	map(0xc340, 0xc340).mirror(0x0c9f).portr("IN2");
 	map(0xc360, 0xc360).mirror(0x0c9f).portr("DSW0");

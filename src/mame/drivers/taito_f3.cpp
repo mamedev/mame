@@ -1307,7 +1307,7 @@ ROM_START( gunlock )
 	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
 	ROM_LOAD16_BYTE("d66-06.ic48", 0x000000, 0x100000, CRC(b3d8126d) SHA1(3cbb44f396973c36abdf3fdf391becb22bb6d661) )
 	ROM_LOAD16_BYTE("d66-07.ic49", 0x000001, 0x100000, CRC(a6da9be7) SHA1(b528505ab925db75acf31bfbed2035cbe36e7a74) )
-	ROM_LOAD       ("d66-08.ic49", 0x300000, 0x100000, CRC(9959f30b) SHA1(64bf2bf995c283c00d968e3c078b824de4084d3d) )
+	ROM_LOAD       ("d66-08.ic50", 0x300000, 0x100000, CRC(9959f30b) SHA1(64bf2bf995c283c00d968e3c078b824de4084d3d) )
 	ROM_FILL       (               0x200000, 0x100000, 0x00 )
 
 	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 code */
@@ -1317,6 +1317,45 @@ ROM_START( gunlock )
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("d66-01.ic2", 0x000000, 0x200000, CRC(58c92efa) SHA1(bb207b35b8f9538362bb99a9ec8df206694f00ce) )    // C8 C9 CA CB
 	ROM_LOAD16_BYTE("d66-02.ic3", 0x400000, 0x200000, CRC(dcdafaab) SHA1(c981c7e54a2a9aaa85bb758691858495d623b029) )    // CC CD -std-
+ROM_END
+
+ROM_START( gunlocko )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("ic24.ic24", 0x000000, 0x40000, CRC(c6a89434) SHA1(8c9da876f4c8e1ee234431949357e8208b2178dd) )  // Gunlock  Ver 2.0O  1993/12/15  17:38:00
+	ROM_LOAD32_BYTE("ic26.ic26", 0x000001, 0x40000, CRC(0d1dd41d) SHA1(6bfa52305fc72e41dfe2d91a87e697dfe60e775a) )
+	ROM_LOAD32_BYTE("ic37.ic37", 0x000002, 0x40000, CRC(94bc17fe) SHA1(0786d6f028bcd53e8af4c3fe05a0df141d898da1) )
+	ROM_LOAD32_BYTE("ic35.ic35", 0x000003, 0x40000, CRC(ca47e1cd) SHA1(36163b7f7ff73c16d829d6917a2a4e6c1bf463f7) )
+
+	ROM_REGION(0x400000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("lobj0-l.ic33", 0x000000, 0x080000, CRC(5fde6dbb) SHA1(390fb596566674b494e533f49b83655a8b27c312) )
+	ROM_LOAD16_BYTE("lobj0-m.ic25", 0x000001, 0x080000, CRC(d308db27) SHA1(b7a309c30a92abd9ed2f31d3827f19427949075f) )
+	ROM_LOAD16_BYTE("lobj1-l.ic32", 0x100000, 0x080000, CRC(83d76f4b) SHA1(8b0894f636e2f7d0c53d0789e7a8fb8e421f28cb) )  // LOBJ0-L + LOBJ1-L == D66-03.IC45
+	ROM_LOAD16_BYTE("lobj1-m.ic24", 0x100001, 0x080000, CRC(5034a854) SHA1(2e021e48e57ad4fc76d5f3a707c6634d1bc98b9c) )  // LOBJ0-M + LOBJ1-M == D66-04.IC46
+	ROM_LOAD       ("lobj0-h.ic16", 0x300000, 0x080000, CRC(8899db2e) SHA1(6767e398f5c7df79b0dc2f97b3e7af407793dd37) )
+	ROM_LOAD       ("lobj1-h.ic15", 0x380000, 0x080000, CRC(0607fd85) SHA1(f9c7116a4185a45e041c8e8726a781e6de859fc7) )  // LOBJ0-H + LOBJ1-H == D66-05.IC47
+	ROM_FILL       (                0x200000, 0x100000, 0x00 )
+
+	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD32_BYTE("scr0-0.ic40", 0x000000, 0x080000, CRC(1c429d92) SHA1(71d2e2628e4ba5fdda34ed42c9d1c7c3df33b9aa) ) //  Odd bytes of D66-06.IC48
+	ROM_LOAD32_BYTE("scr0-2.ic38", 0x000001, 0x080000, CRC(e023c0f0) SHA1(e73c3ea44a3e8fef110ea20b6a1e8102efd0b2a9) ) //  Odd bytes of D66-07.IC49
+	ROM_LOAD32_BYTE("scr0-1.ic46", 0x000002, 0x080000, CRC(5f0cb8bf) SHA1(6e50ebce5c2346de4101c1dace75e9d65d9e6add) ) // Even bytes of D66-06.IC48
+	ROM_LOAD32_BYTE("scr0-3.ic44", 0x000003, 0x080000, CRC(37bbdbb9) SHA1(6ea2a36005494c45d38c44ddfc6236b2efb40962) ) // Even bytes of D66-07.IC49
+	ROM_LOAD16_BYTE("scr0-4.ic36", 0x300000, 0x080000, CRC(4f073d71) SHA1(9ac80922310fd9e7a0e59b5e1979c3cfa8cbf78b) ) // Even bytes of D66-08.IC50 (Odd bytes of D66-08.IC50 == 0xFF)
+	ROM_FILL       (               0x200000, 0x100000, 0x00 )
+
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* 68000 code */
+	ROM_LOAD16_BYTE("d66-23.ic10", 0x100000, 0x40000, CRC(57fb7c49) SHA1(f8709fd1e9ea7cee10ee2288d13339f675a7d3ae) )
+	ROM_LOAD16_BYTE("d66-22.ic23", 0x100001, 0x40000, CRC(83dd7f9b) SHA1(dae21f64232d3e268f22b5e9899e0b726fdc9a9f) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("snd0.ic8", 0x000000, 0x080000, CRC(6a468f69) SHA1(77424ee26417e232a81a340cd192531cc59f1f50) )
+	ROM_LOAD16_BYTE("snd1.ic7", 0x100000, 0x080000, CRC(332827b5) SHA1(e1a75799e553ca3969e4aa52ec199c0bbdfcc02b) )
+	ROM_LOAD16_BYTE("snd2.ic6", 0x200000, 0x080000, CRC(b5e737dd) SHA1(a056ab589c35657580ea1d58e40ed2089e831112) )
+	ROM_LOAD16_BYTE("snd3.ic5", 0x300000, 0x080000, CRC(2ed54463) SHA1(2e5dc17fff6797d5c0b179b5472522e42356577e) )    // SND0-SND3 == D66-01.IC2 - C8 C9 CA CB
+	ROM_LOAD16_BYTE("snd4.ic4", 0x400000, 0x080000, CRC(1026ca37) SHA1(ceaafb0cf89943c75f4b065186acfd4c8ca110a1) )
+	ROM_LOAD16_BYTE("snd5.ic3", 0x500000, 0x080000, CRC(a916ac40) SHA1(207a87ebc64e2a9c0a791f15421b6edffdd8cd25) )
+	ROM_LOAD16_BYTE("snd6.ic2", 0x600000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
+	ROM_LOAD16_BYTE("snd7.ic1", 0x700000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // SND4-SND7 == D66-02.IC3 - CC CD -std
 ROM_END
 
 ROM_START( rayforce )
@@ -2035,7 +2074,7 @@ ROM_START( bublbob2 )
 	ROM_REGION( 0x1200, "plds", 0 )
 	ROM_LOAD("d77-14_palce16v8q-15.ic21.bin", 0x000, 0x117, CRC(2c798a1c) SHA1(e8ac31c3cd53eb61fedfd710c31356e8fa968cbc) )
 	ROM_LOAD("d77-12_palce16v8q-15.ic48.bin", 0x000, 0x117, CRC(b1cc6195) SHA1(629ef8416a2cb51fcbc48e5c306dd04c96902726) )
-	ROM_LOAD("d77-11_palce16v8q-15.ic37.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD("d77-11_palce16v8q-15.ic37.bin", 0x000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
 ROM_END
 
 
@@ -4315,6 +4354,7 @@ GAME( 1993, trstaroj, trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0
 GAME( 1993, prmtmfgt, trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (New Version)", 0 )
 GAME( 1993, prmtmfgto,trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (Old Version)", 0 )
 GAME( 1993, gunlock,  0,        f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito Corporation Japan",   "Gunlock (Ver 2.3O 1994/01/20)", 0 )
+GAME( 1993, gunlocko, gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT270, "Taito Corporation Japan",   "Gunlock (Ver 2.0O 1993/12/15)", 0 )
 GAME( 1993, rayforcej,gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
 GAME( 1993, rayforce, gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
 GAME( 1993, scfinals, 0,        f3_224a, f3, taito_f3_state, init_scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.2O 1994/01/13)", 0 )

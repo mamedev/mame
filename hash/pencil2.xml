@@ -8,7 +8,6 @@ Undumped known carts
 ~~~~~~~~~~~~~~~~~~~~
 SD-BASIC V1.0
 Le Jardin Magique (PEN-701)
-Le Plongeur a la Recherche du Tresor (PEN-702) / Treasure Hunter
 Alien Invader
 Big Foot Chase
 Mouse Trap
@@ -37,6 +36,21 @@ Reminder Calendar
 
 -->
 
+	<!-- Dumped using plgDavid's IZE80 board in a ColecoVision by the team at silicium.org -->
+	<software name="treasure">
+		<description>Treasure Hunt / Le Plongeur a la Recherche du Tresor</description>
+		<year>1983</year>
+		<publisher>Soundic Electronics</publisher>
+		<info name="serial" value="PEN-702"/>
+		<part name="cart" interface="pencil2_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pen702a.bin" size="8192" crc="9879e2ff" sha1="159b3d50abff42bd53351a13f316bef993b019e7" offset="0x0000" />
+				<rom name="pen702b.bin" size="4096" crc="ddfd95fc" sha1="8d33e7b2821d2e26af3b8721be3732455baeb757" offset="0x2000" />
+				<rom size="4096" offset="0x3000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!--
 
@@ -55,6 +69,7 @@ Therefore it is not known which rom "202" or "203" is which address range.
 		<description>SD-BASIC v2.0</description>
 		<year>1983</year>
 		<publisher>Soundic Electronics</publisher>
+		<info name="serial" value="PEN-700"/>
 		<part name="cart" interface="pencil2_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="203.bin" size="8192" crc="f502175c" sha1="cb2190e633e98586758008577265a7a2bc088233" offset="0x0000" />

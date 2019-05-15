@@ -36,7 +36,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x6000">
-				<rom name="adam demonstration cartridge (198x) (coleco).rom" size="0x6000" crc="20528799" sha1="4143ddbdb533fef88f5fcf6bc5206727740876c8" offset="0" />
+				<rom name="adam demonstration cartridge (198x) (coleco).rom" size="0x6000" crc="20528799" sha1="4143ddbdb533fef88f5fcf6bc5206727740876c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="adam diagnostics (1981) (coleco).rom" size="0x8000" crc="a44efda7" sha1="8336365697710834d8e678077e2e2d65ccd937d6" offset="0" />
+				<rom name="adam diagnostics (1981) (coleco).rom" size="0x8000" crc="a44efda7" sha1="8336365697710834d8e678077e2e2d65ccd937d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="adam diagnostics (1982) (coleco).rom" size="0x8000" crc="8a6ed2f0" sha1="4c00c5254317301e10593ad444578fe66d24dd0d" offset="0" />
+				<rom name="adam diagnostics (1982) (coleco).rom" size="0x8000" crc="8a6ed2f0" sha1="4c00c5254317301e10593ad444578fe66d24dd0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="adam final test (198x) (coleco).rom" size="0x4000" crc="5e5c5c2f" sha1="428bbc848ae14f5557c3577a8e9ee55b718e15cd" offset="0" />
+				<rom name="adam final test (198x) (coleco).rom" size="0x4000" crc="5e5c5c2f" sha1="428bbc848ae14f5557c3577a8e9ee55b718e15cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x6000">
-				<rom name="adam final test (198x) (alt) (coleco).rom" size="0x6000" crc="4e466142" sha1="bd30088fc848817fdb4df2b092eca8de158232db" offset="0" />
+				<rom name="adam final test (198x) (alt) (coleco).rom" size="0x6000" crc="4e466142" sha1="bd30088fc848817fdb4df2b092eca8de158232db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="adam printer 1 hour cycle burn-in test (198x) (coleco).rom" size="0x2000" crc="1394a166" sha1="8729374eb0cba74dc98f556e2d68298d2fae598f" offset="0" />
+				<rom name="adam printer 1 hour cycle burn-in test (198x) (coleco).rom" size="0x2000" crc="1394a166" sha1="8729374eb0cba74dc98f556e2d68298d2fae598f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -102,7 +102,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="data drive burn-in ddp test (198x) (coleco).rom" size="0x2000" crc="e1d79586" sha1="17cf4168f1f82204bd23e160c7451ff5dc69aa06" offset="0" />
+				<rom name="data drive burn-in ddp test (198x) (coleco).rom" size="0x2000" crc="e1d79586" sha1="17cf4168f1f82204bd23e160c7451ff5dc69aa06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="blank ddp restorer rev. 1.4 (198x) (coleco).rom" size="0x2000" crc="c63b6cb1" sha1="0aebe6ded955092cfbb13820ee1d07580dd1999f" offset="0" />
+				<rom name="blank ddp restorer rev. 1.4 (198x) (coleco).rom" size="0x2000" crc="c63b6cb1" sha1="0aebe6ded955092cfbb13820ee1d07580dd1999f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="buck rogers ddp restorer rev. 1.4 (198x) (coleco).rom" size="0x2000" crc="60e433e7" sha1="ae6ebb1b2d05e49e301a26098c9b5995f2291d43" offset="0" />
+				<rom name="buck rogers ddp restorer rev. 1.4 (198x) (coleco).rom" size="0x2000" crc="60e433e7" sha1="ae6ebb1b2d05e49e301a26098c9b5995f2291d43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="smartbasic ddp restorer rev. 1.4 (198x) (coleco).rom" size="0x2000" crc="e9ebff89" sha1="0e186358583b23eb6ca88f51bc67b3a568350748" offset="0" />
+				<rom name="smartbasic ddp restorer rev. 1.4 (198x) (coleco).rom" size="0x2000" crc="e9ebff89" sha1="0e186358583b23eb6ca88f51bc67b3a568350748"/>
 			</dataarea>
 		</part>
 	</software>
@@ -146,7 +146,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="adam tape util rev. 22 (1984) (coleco).rom" size="0x2000" crc="f235aba4" sha1="4db424c25c6ee010850e6783c844ad75bebf0359" offset="0" />
+				<rom name="adam tape util rev. 22 (1984) (coleco).rom" size="0x2000" crc="f235aba4" sha1="4db424c25c6ee010850e6783c844ad75bebf0359"/>
 			</dataarea>
 		</part>
 	</software>

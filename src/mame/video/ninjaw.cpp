@@ -7,7 +7,7 @@
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
+void ninjaw_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs, int chip)
 {
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -69,7 +69,7 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		cury = y;
 		code = tilenum;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode[chip]->gfx(0)->transpen(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				curx, cury, 0);
@@ -104,15 +104,15 @@ uint32_t ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap.fill(m_palette->black_pen(), cliprect);
+		bitmap.fill(m_tc0110pcr[chip]->black_pen(), cliprect);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
+	draw_sprites(bitmap, cliprect, 1, xoffs, 8, chip); // draw sprites with priority 1 which are under the mid layer
 
 	// draw middle layer
 	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 0);
 
-	draw_sprites(bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
+	draw_sprites(bitmap, cliprect, 0, xoffs, 8, chip); // draw sprites with priority 0 which are over the mid layer
 
 	// draw top(text) layer
 	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);

@@ -10,7 +10,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="245589">
-				<rom name="tes404.dsk" size="245589" crc="0a9f72a3" sha1="d3d24fde6dcc075584bd80c6419e1796323fb187" offset="0"/>
+				<rom name="tes404.dsk" size="245589" crc="0a9f72a3" sha1="d3d24fde6dcc075584bd80c6419e1796323fb187"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,18 +22,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="308152">
-				<rom name="dbase2_1.dsk" size="308152" crc="dba606be" sha1="2555ec4993fc182e94746215f7d11af9c31ea504" offset="0"/>
+				<rom name="dbase2_1.dsk" size="308152" crc="dba606be" sha1="2555ec4993fc182e94746215f7d11af9c31ea504"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="0">
-				<rom name="dbase2_2.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="dbase2_2.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Utilities" />
 			<dataarea name="flop" size="221134">
-				<rom name="dbase2_3.dsk" size="221134" crc="dd63b419" sha1="4eff40f47d6002dec76d8739805474a1ff5b4980" offset="0"/>
+				<rom name="dbase2_3.dsk" size="221134" crc="dd63b419" sha1="4eff40f47d6002dec76d8739805474a1ff5b4980"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="307631">
-				<rom name="demopics.dsk" size="307631" crc="7db75019" sha1="2b8f002588304c5ef23c13c9be9c167a7ceed0c9" offset="0"/>
+				<rom name="demopics.dsk" size="307631" crc="7db75019" sha1="2b8f002588304c5ef23c13c9be9c167a7ceed0c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,31 +58,31 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 (Manager &amp; Tools)" />
 			<dataarea name="flop" size="322937">
-				<rom name="1pcxu04p.dsk" size="322937" crc="cfe455a9" sha1="4f8ccfbe1161404a47d309bd139d321fb0013a1a" offset="0"/>
+				<rom name="1pcxu04p.dsk" size="322937" crc="cfe455a9" sha1="4f8ccfbe1161404a47d309bd139d321fb0013a1a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2 (Disk &amp; Editors)" />
 			<dataarea name="flop" size="321919">
-				<rom name="2pcxu04p.dsk" size="321919" crc="22a234ca" sha1="85a3a8d19f2d5357ac71ce8bbacf9512e93bed62" offset="0"/>
+				<rom name="2pcxu04p.dsk" size="321919" crc="22a234ca" sha1="85a3a8d19f2d5357ac71ce8bbacf9512e93bed62"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3 (SuperWriter)" />
 			<dataarea name="flop" size="277127">
-				<rom name="3pcxu04p.dsk" size="277127" crc="75f9f57d" sha1="40f083ab4a68d213635cc5c2ebb6cb8b202c6514" offset="0"/>
+				<rom name="3pcxu04p.dsk" size="277127" crc="75f9f57d" sha1="40f083ab4a68d213635cc5c2ebb6cb8b202c6514"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4 (Async &amp; MS-Basic)" />
 			<dataarea name="flop" size="279672">
-				<rom name="4pcxu04p.dsk" size="279672" crc="e1c34b89" sha1="84765d86784742ff1efc8f8fe4101d08703ea291" offset="0"/>
+				<rom name="4pcxu04p.dsk" size="279672" crc="e1c34b89" sha1="84765d86784742ff1efc8f8fe4101d08703ea291"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5 (SuperCalc &amp; SuperPlanner)" />
 			<dataarea name="flop" size="223173">
-				<rom name="5pcxu04p.dsk" size="223173" crc="ffc21ff2" sha1="0e332002f5be5e38b83f36789baac03b24289121" offset="0"/>
+				<rom name="5pcxu04p.dsk" size="223173" crc="ffc21ff2" sha1="0e332002f5be5e38b83f36789baac03b24289121"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,25 +95,25 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 (Activity &amp; Tutor)" />
 			<dataarea name="flop" size="326512">
-				<rom name="1pcxeu03p.dsk" size="326512" crc="a54c009f" sha1="85c6426042c5ac37a60e05eddcf499e71d051db6" offset="0"/>
+				<rom name="1pcxeu03p.dsk" size="326512" crc="a54c009f" sha1="85c6426042c5ac37a60e05eddcf499e71d051db6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2 (Activity &amp; Editors)" />
 			<dataarea name="flop" size="326513">
-				<rom name="2pcxeu03p.dsk" size="326513" crc="339a564a" sha1="e86466629af63f102568e80ddc924ba291e0ca5d" offset="0"/>
+				<rom name="2pcxeu03p.dsk" size="326513" crc="339a564a" sha1="e86466629af63f102568e80ddc924ba291e0ca5d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3 (Async &amp; Diary)" />
 			<dataarea name="flop" size="295460">
-				<rom name="3pcxeu03p.dsk" size="295460" crc="623b99e9" sha1="8c443772dcbbebb322abc5574605bdedac755266" offset="0"/>
+				<rom name="3pcxeu03p.dsk" size="295460" crc="623b99e9" sha1="8c443772dcbbebb322abc5574605bdedac755266"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4 (GW-Basic &amp; Sketch)" />
 			<dataarea name="flop" size="267468">
-				<rom name="4pcxeu03p.dsk" size="267468" crc="010b8617" sha1="b17692f58ed9060e5af25268e84d39695b3bbd1e" offset="0"/>
+				<rom name="4pcxeu03p.dsk" size="267468" crc="010b8617" sha1="b17692f58ed9060e5af25268e84d39695b3bbd1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -125,7 +125,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="123910">
-				<rom name="tes904.dsk" size="123910" crc="05c47f4a" sha1="2c58ba1da4f375aac0e26126471ad5de10869f19" offset="0"/>
+				<rom name="tes904.dsk" size="123910" crc="05c47f4a" sha1="2c58ba1da4f375aac0e26126471ad5de10869f19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -138,28 +138,28 @@
 			<feature name="part_id" value="System" />
 			<feature name="part_no" value="89115" />
 			<dataarea name="flop" size="275604">
-				<rom name="lotus123.dsk" size="275604" crc="b2452dff" sha1="30d91f467b574255e7b41ad4cf377d55265ea138" status="baddump" offset="0"/>
+				<rom name="lotus123.dsk" size="275604" crc="b2452dff" sha1="30d91f467b574255e7b41ad4cf377d55265ea138" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="tutorial" interface="floppy_3_5">
 			<feature name="part_id" value="Electronic Tutorial" />
 			<feature name="part_no" value="89117" />
 			<dataarea name="flop" size="290876">
-				<rom name="lotus123_tut.dsk" size="290876" crc="2bf9a187" sha1="1dc9240bea600601581feac8bc35130f862a0e25" offset="0"/>
+				<rom name="lotus123_tut.dsk" size="290876" crc="2bf9a187" sha1="1dc9240bea600601581feac8bc35130f862a0e25"/>
 			</dataarea>
 		</part>
 		<part name="utils" interface="floppy_3_5">
 			<feature name="part_id" value="Utilities" />
 			<feature name="part_no" value="89118" />
 			<dataarea name="flop" size="188057">
-				<rom name="lotus123_utils.dsk" size="188057" crc="04be60ff" sha1="2550118296ef38da8f5853476a3da98ba8bdaee7" offset="0"/>
+				<rom name="lotus123_utils.dsk" size="188057" crc="04be60ff" sha1="2550118296ef38da8f5853476a3da98ba8bdaee7"/>
 			</dataarea>
 		</part>
 		<part name="printgraph" interface="floppy_3_5">
 			<feature name="part_id" value="Printgraph" />
 			<feature name="part_no" value="89119" />
 			<dataarea name="flop" size="224243">
-				<rom name="lotus123_print.dsk" size="224243" crc="27b3f519" sha1="76e003e53165f2906a25975d64875f4571500397" offset="0"/>
+				<rom name="lotus123_print.dsk" size="224243" crc="27b3f519" sha1="76e003e53165f2906a25975d64875f4571500397"/>
 			</dataarea>
 		</part>
 	</software>
@@ -171,7 +171,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="190072">
-				<rom name="tes903.dsk" size="190072" crc="beba89b8" sha1="6bdb9b7f9956a32d03cc54ef233e534bf62a57a2" offset="0"/>
+				<rom name="tes903.dsk" size="190072" crc="beba89b8" sha1="6bdb9b7f9956a32d03cc54ef233e534bf62a57a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="213847">
-				<rom name="msd.dsk" size="213847" crc="fd321be4" sha1="0194728fe30f41564cee7337f9a9751423ab44bf" offset="0"/>
+				<rom name="msd.dsk" size="213847" crc="fd321be4" sha1="0194728fe30f41564cee7337f9a9751423ab44bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,31 +196,31 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="299044">
-				<rom name="anwkfu02p.dsk" size="299044" crc="ad1a424a" sha1="04c168448dc7ff4480a8f4b0f9236f9b0f73913b" offset="0"/>
+				<rom name="anwkfu02p.dsk" size="299044" crc="ad1a424a" sha1="04c168448dc7ff4480a8f4b0f9236f9b0f73913b"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="293462">
-				<rom name="bnwkfu02p.dsk" size="293462" crc="5bc3d29a" sha1="fa29b217a8ab44b21c98c4ffba47d2bb81886153" offset="0"/>
+				<rom name="bnwkfu02p.dsk" size="293462" crc="5bc3d29a" sha1="fa29b217a8ab44b21c98c4ffba47d2bb81886153"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (XEN/F-Series Workstation)" />
 			<dataarea name="flop" size="274633">
-				<rom name="cnwkfu02p.dsk" size="274633" crc="17bcd2cd" sha1="4fb8074686460d8a563d64af589d899a7b7cf849" offset="0"/>
+				<rom name="cnwkfu02p.dsk" size="274633" crc="17bcd2cd" sha1="4fb8074686460d8a563d64af589d899a7b7cf849"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="275636">
-				<rom name="dnwkfu02p.dsk" size="275636" crc="471bfbc5" sha1="f4acde4b143d258110c8f773cfc7947f1da98a59" offset="0"/>
+				<rom name="dnwkfu02p.dsk" size="275636" crc="471bfbc5" sha1="f4acde4b143d258110c8f773cfc7947f1da98a59"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
 			<dataarea name="flop" size="640299">
-				<rom name="enwkfu02p.dsk" size="640299" crc="f8874d8c" sha1="1c4152717efe7b33983ead98a5f82a34c92102d6" offset="0"/>
+				<rom name="enwkfu02p.dsk" size="640299" crc="f8874d8c" sha1="1c4152717efe7b33983ead98a5f82a34c92102d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -233,31 +233,31 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="190577">
-				<rom name="networks_13b_f_a.dsk" size="190577" crc="94cff25c" sha1="4418266eb94020c937bdb5282f4ade6ee2718d69" offset="0"/>
+				<rom name="networks_13b_f_a.dsk" size="190577" crc="94cff25c" sha1="4418266eb94020c937bdb5282f4ade6ee2718d69"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="208915">
-				<rom name="networks_13b_f_b.dsk" size="208915" crc="ca5b639b" sha1="61d8137db45c4bbb221dafd0767f93174238b2c4" offset="0"/>
+				<rom name="networks_13b_f_b.dsk" size="208915" crc="ca5b639b" sha1="61d8137db45c4bbb221dafd0767f93174238b2c4"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
 			<dataarea name="flop" size="183976">
-				<rom name="networks_13b_f_c.dsk" size="183976" crc="049d9464" sha1="d16ecc2d09b558df3278a435cc77b30cf40092d3" offset="0"/>
+				<rom name="networks_13b_f_c.dsk" size="183976" crc="049d9464" sha1="d16ecc2d09b558df3278a435cc77b30cf40092d3"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="196662">
-				<rom name="networks_13b_f_d.dsk" size="196662" crc="2754ce8b" sha1="ba42a7cb8608ca5cbec5ab07b728cfe11c8cacde" offset="0"/>
+				<rom name="networks_13b_f_d.dsk" size="196662" crc="2754ce8b" sha1="ba42a7cb8608ca5cbec5ab07b728cfe11c8cacde"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
 			<dataarea name="flop" size="0">
-				<rom name="networks_13b_f_e.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="networks_13b_f_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -272,21 +272,21 @@
 		<part name="master" interface="floppy_3_5">
 			<feature name="part_id" value="Network Transporter Card Test 1.0 (Master) (TES802)" />
 			<dataarea name="flop" size="296484">
-				<rom name="tes802m.dsk" size="296484" crc="05754105" sha1="174d080ed8832a01897242ff8fba0f7a87f14b24" offset="0"/>
+				<rom name="tes802m.dsk" size="296484" crc="05754105" sha1="174d080ed8832a01897242ff8fba0f7a87f14b24"/>
 			</dataarea>
 		</part>
 		<!-- Disk 3 of 4 -->
 		<part name="slave" interface="floppy_3_5">
 			<feature name="part_id" value="Network Transporter Card Test 1.1 (Slave) (TES802)" />
 			<dataarea name="flop" size="296483">
-				<rom name="tes802s.dsk" size="296483" crc="970339d9" sha1="99027c7e525c810cf741263b7012e673239c84fe" offset="0"/>
+				<rom name="tes802s.dsk" size="296483" crc="970339d9" sha1="99027c7e525c810cf741263b7012e673239c84fe"/>
 			</dataarea>
 		</part>
 		<!-- Disk 4 of 4 -->
 		<part name="utils" interface="floppy_3_5">
 			<feature name="part_id" value="Network Utitlies Disk" />
 			<dataarea name="flop" size="296477">
-				<rom name="netutils.dsk" size="296477" crc="eea4dce5" sha1="1ee7475aa51badc6733532c07ec3067db5eb6347" offset="0"/>
+				<rom name="netutils.dsk" size="296477" crc="eea4dce5" sha1="1ee7475aa51badc6733532c07ec3067db5eb6347"/>
 			</dataarea>
 		</part>
 	</software>
@@ -299,31 +299,31 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="303126">
-				<rom name="anwkpcxu04p.dsk" size="303126" crc="7110e4e1" sha1="d1a8c3e4db53e3b3a99cc064da8e0ccecf868727" offset="0"/>
+				<rom name="anwkpcxu04p.dsk" size="303126" crc="7110e4e1" sha1="d1a8c3e4db53e3b3a99cc064da8e0ccecf868727"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="293457">
-				<rom name="bnwkpcxu04p.dsk" size="293457" crc="b5c4e0f9" sha1="f412a46be109cbc930cb6b16602fa4df387b2c96" offset="0"/>
+				<rom name="bnwkpcxu04p.dsk" size="293457" crc="b5c4e0f9" sha1="f412a46be109cbc930cb6b16602fa4df387b2c96"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (XEN/F-Series Workstation)" />
 			<dataarea name="flop" size="274128">
-				<rom name="cnwkpcxu04p.dsk" size="274128" crc="4efa8697" sha1="1e5be1f342d0882b3f95cd289b3e73aebadc9cb4" offset="0"/>
+				<rom name="cnwkpcxu04p.dsk" size="274128" crc="4efa8697" sha1="1e5be1f342d0882b3f95cd289b3e73aebadc9cb4"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="276143">
-				<rom name="dnwkpcxu04p.dsk" size="276143" crc="f5c05f5d" sha1="842c8f2390bfe9dbe9fcdda38f66cd11794ee6a3" offset="0"/>
+				<rom name="dnwkpcxu04p.dsk" size="276143" crc="f5c05f5d" sha1="842c8f2390bfe9dbe9fcdda38f66cd11794ee6a3"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
 			<dataarea name="flop" size="640296">
-				<rom name="enwkpcxu04p.dsk" size="640296" crc="b0297882" sha1="1090b00afaec7f9ef84380a136ebbffc0c2a0fb1" offset="0"/>
+				<rom name="enwkpcxu04p.dsk" size="640296" crc="b0297882" sha1="1090b00afaec7f9ef84380a136ebbffc0c2a0fb1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -336,31 +336,31 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="0">
-				<rom name="networks_13b_xi_a.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="networks_13b_xi_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="208912">
-				<rom name="networks_13b_xi_b.dsk" size="208912" crc="bdd1bb92" sha1="e83d2fe396ce3ab748f69931208e892d8bb0222c" offset="0"/>
+				<rom name="networks_13b_xi_b.dsk" size="208912" crc="bdd1bb92" sha1="e83d2fe396ce3ab748f69931208e892d8bb0222c"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
 			<dataarea name="flop" size="183973">
-				<rom name="networks_13b_xi_c.dsk" size="183973" crc="08e52f5f" sha1="5a1f65a3891581443946adbadef16f81510605f4" offset="0"/>
+				<rom name="networks_13b_xi_c.dsk" size="183973" crc="08e52f5f" sha1="5a1f65a3891581443946adbadef16f81510605f4"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="222131">
-				<rom name="networks_13b_xi_d.dsk" size="222131" crc="827c630c" sha1="a519895fa36e2913ba487d26e901db63c1e33a7a" offset="0"/>
+				<rom name="networks_13b_xi_d.dsk" size="222131" crc="827c630c" sha1="a519895fa36e2913ba487d26e901db63c1e33a7a"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
 			<dataarea name="flop" size="0">
-				<rom name="networks_13b_xi_e.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="networks_13b_xi_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -373,25 +373,25 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_11_a.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_11_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="182478">
-				<rom name="point32_11_b.dsk" size="182478" crc="0b4c9387" sha1="b20d2b7542d9f95d0b914138cc01292e69a185eb" offset="0"/>
+				<rom name="point32_11_b.dsk" size="182478" crc="0b4c9387" sha1="b20d2b7542d9f95d0b914138cc01292e69a185eb"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_11_c.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_11_c.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_11_d.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_11_d.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -404,31 +404,31 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_12_a.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_12_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="252721">
-				<rom name="point32_12_b.dsk" size="252721" crc="9c937fa4" sha1="7d83b4fd9a93ae6e2db6edc4ac687c547e3861f1" offset="0"/>
+				<rom name="point32_12_b.dsk" size="252721" crc="9c937fa4" sha1="7d83b4fd9a93ae6e2db6edc4ac687c547e3861f1"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_12_c.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_12_c.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_12_d.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_12_d.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_12_e.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_12_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -441,31 +441,31 @@
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_12b_a.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_12b_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="b" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B (PC/Xi Workstation)" />
 			<dataarea name="flop" size="222157">
-				<rom name="point32_12b_b.dsk" size="222157" crc="48974c50" sha1="95443907104c1ed71a5fe506cc4d576911d7ef58" offset="0"/>
+				<rom name="point32_12b_b.dsk" size="222157" crc="48974c50" sha1="95443907104c1ed71a5fe506cc4d576911d7ef58"/>
 			</dataarea>
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
 			<dataarea name="flop" size="208925">
-				<rom name="point32_12b_c.dsk" size="208925" crc="ffaa8b5e" sha1="8bc02997cdcdf4682ff16c5fe805b4fcb0990a69" offset="0"/>
+				<rom name="point32_12b_c.dsk" size="208925" crc="ffaa8b5e" sha1="8bc02997cdcdf4682ff16c5fe805b4fcb0990a69"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
 			<dataarea name="flop" size="226729">
-				<rom name="point32_12b_d.dsk" size="226729" crc="5a5cb180" sha1="8903118e7224e73d71b21cfba93613eaa79fe1b9" offset="0"/>
+				<rom name="point32_12b_d.dsk" size="226729" crc="5a5cb180" sha1="8903118e7224e73d71b21cfba93613eaa79fe1b9"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
 			<dataarea name="flop" size="0">
-				<rom name="point32_12b_e.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="point32_12b_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -477,7 +477,7 @@
 		<publisher>Quest Automation Ltd</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="324909">
-				<rom name="quest.dsk" size="324909" crc="df11c592" sha1="989dc29d1dead78452b5b0afb9591356484c643d" offset="0"/>
+				<rom name="quest.dsk" size="324909" crc="df11c592" sha1="989dc29d1dead78452b5b0afb9591356484c643d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -488,12 +488,12 @@
 		<publisher>Sorcim</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="297962">
-				<rom name="supercalc3_1.dsk" size="297962" crc="3cdab25c" sha1="2c524518054c4abc9f177891259c9f4384708d6c" offset="0"/>
+				<rom name="supercalc3_1.dsk" size="297962" crc="3cdab25c" sha1="2c524518054c4abc9f177891259c9f4384708d6c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="0">
-				<rom name="supercalc3_2.dsk" size="0" status="nodump" offset="0"/>
+				<rom name="supercalc3_2.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -508,37 +508,37 @@
 		<part name="windows" interface="floppy_3_5">
 			<feature name="part_id" value="Windows" />
 			<dataarea name="flop" size="508524">
-				<rom name="windows.dsk" size="508524" crc="17867369" sha1="10dab3e9a923023544efc90bbb8a5817b92098bb" offset="0"/>
+				<rom name="windows.dsk" size="508524" crc="17867369" sha1="10dab3e9a923023544efc90bbb8a5817b92098bb"/>
 			</dataarea>
 		</part>
 		<part name="system" interface="floppy_3_5">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="103869">
-				<rom name="system.dsk" size="103869" crc="1c2210e6" sha1="594fc0188e7f9f66befe94089bc681acd85ed1c0" offset="0"/>
+				<rom name="system.dsk" size="103869" crc="1c2210e6" sha1="594fc0188e7f9f66befe94089bc681acd85ed1c0"/>
 			</dataarea>
 		</part>
 		<part name="fonts" interface="floppy_3_5">
 			<feature name="part_id" value="Fonts" />
 			<dataarea name="flop" size="420976">
-				<rom name="fonts.dsk" size="420976" crc="c5410ef4" sha1="9f78938ad1a4f6456ee0edd284a7f211b6959869" offset="0"/>
+				<rom name="fonts.dsk" size="420976" crc="c5410ef4" sha1="9f78938ad1a4f6456ee0edd284a7f211b6959869"/>
 			</dataarea>
 		</part>
 		<part name="applics" interface="floppy_3_5">
 			<feature name="part_id" value="Applications" />
 			<dataarea name="flop" size="652571">
-				<rom name="applics.dsk" size="652571" crc="5c6c08e2" sha1="b6a38eff3069ae771d24749346d6b1c040df50d3" offset="0"/>
+				<rom name="applics.dsk" size="652571" crc="5c6c08e2" sha1="b6a38eff3069ae771d24749346d6b1c040df50d3"/>
 			</dataarea>
 		</part>
 		<part name="drivers" interface="floppy_3_5">
 			<feature name="part_id" value="Drivers" />
 			<dataarea name="flop" size="511578">
-				<rom name="drivers.dsk" size="511578" crc="0ccec09a" sha1="2e5c73aa334c4a84b28c91663e19b6136c209b80" offset="0"/>
+				<rom name="drivers.dsk" size="511578" crc="0ccec09a" sha1="2e5c73aa334c4a84b28c91663e19b6136c209b80"/>
 			</dataarea>
 		</part>
 		<part name="wutils" interface="floppy_3_5">
 			<feature name="part_id" value="Utils" />
 			<dataarea name="flop" size="532447">
-				<rom name="wutils.dsk" size="532447" crc="a546a374" sha1="acc15f5ab457d2c31beec19ccfd9debd2db04b9f" offset="0"/>
+				<rom name="wutils.dsk" size="532447" crc="a546a374" sha1="acc15f5ab457d2c31beec19ccfd9debd2db04b9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +550,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="135639">
-				<rom name="tes004.dsk" size="135639" crc="107e70c6" sha1="203d42a4476e90943fa683f720138dd201648ac7" offset="0"/>
+				<rom name="tes004.dsk" size="135639" crc="107e70c6" sha1="203d42a4476e90943fa683f720138dd201648ac7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -562,7 +562,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="136129">
-				<rom name="tes002.dsk" size="136129" crc="283033df" sha1="7cec002bbaceecb82e991718a429db19f50271e6" offset="0"/>
+				<rom name="tes002.dsk" size="136129" crc="283033df" sha1="7cec002bbaceecb82e991718a429db19f50271e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -574,7 +574,7 @@
 		<publisher>ACT</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305108">
-				<rom name="wincheck.dsk" size="305108" crc="5ebd6524" sha1="198beba1cba8c8d55fc902e60ce27f04625bfd5c" offset="0"/>
+				<rom name="wincheck.dsk" size="305108" crc="5ebd6524" sha1="198beba1cba8c8d55fc902e60ce27f04625bfd5c"/>
 			</dataarea>
 		</part>
 	</software>

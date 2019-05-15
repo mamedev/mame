@@ -2,6 +2,34 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
+	<software name="poohstuck" supported="no">
+		<description>Disney's Pooh Gets Stuck (UK)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<!-- No serial on cart or book -->
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500 - Pooh Gets Stuck.bin" size="0x200000" crc="3cfcfdfe" sha1="ec91a563baa1939e99ff5ad6061fc1876be40f0d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rsblwbea" supported="no">
+		<description>Richard Scarry's Best Little Word Book Ever! (UK)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<!-- No serial on cart or book -->
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="u1" value="LeapFrog 2000 16Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500 - Richard Scarry's Best Little Word Book Ever.bin" size="0x200000" crc="d4dd4c2f" sha1="a5027d38a80135d0dc332e075e757c951b6c04bf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hititmstro" supported="no">
 		<description>Music - Hit it, Maestro! (UK)</description>
 		<year>2001</year>
@@ -10,7 +38,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MX23L3211B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-00090 RVB - Music - Hit it, Maestro!.bin" size="0x400000" crc="a2770684" sha1="4f389c6dbcd3ff2a647a6d18df86c472444074e4" offset="0" />
+				<rom name="500-00090 RVB - Music - Hit it, Maestro!.bin" size="0x400000" crc="a2770684" sha1="4f389c6dbcd3ff2a647a6d18df86c472444074e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -23,7 +51,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00104 - Pre Math - Tad goes shopping.bin" size="0x200000" crc="3535938c" sha1="77f32751db017c7980eacec48119c877314638d7" offset="0" />
+				<rom name="500-00104 - Pre Math - Tad goes shopping.bin" size="0x200000" crc="3535938c" sha1="77f32751db017c7980eacec48119c877314638d7" />
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +64,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="LeapFrog 2000 16Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00250 - Music - Mother Goose Songbook.bin" size="0x200000" crc="dcd2170b" sha1="f3d89f764d1b61a0085974ed3ca91dc3d20d36a4" offset="0" />
+				<rom name="500-00250 - Music - Mother Goose Songbook.bin" size="0x200000" crc="dcd2170b" sha1="f3d89f764d1b61a0085974ed3ca91dc3d20d36a4" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +79,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00254 - Leap 2 - Math - The Great Dune Buggy Race.bin" size="0x200000" crc="ad5c8d3b" sha1="78b1e206bfe17ec19042b2304d67bd2289b53c1e" offset="0" />
+				<rom name="500-00254 - Leap 2 - Math - The Great Dune Buggy Race.bin" size="0x200000" crc="ad5c8d3b" sha1="78b1e206bfe17ec19042b2304d67bd2289b53c1e" />
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +92,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="LeapFrog 2000 16Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00258 - Reading - Bounce, Tigger, Bounce.bin" size="0x200000" crc="73b7d409" sha1="0ef5d716be974329d5b4dff936599825d2e76570" offset="0" />
+				<rom name="500-00258 - Reading - Bounce, Tigger, Bounce.bin" size="0x200000" crc="73b7d409" sha1="0ef5d716be974329d5b4dff936599825d2e76570" />
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +105,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="LeapFrog 2000 8Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x100000">
-				<rom name="500-00260 - Vocabulary - Richard Scarry's Best Little Word Book Ever!.bin" size="0x100000" crc="8797ae77" sha1="fa24e718287a0e15f4ae3b371e9ee73c590abaf5" offset="0" />
+				<rom name="500-00260 - Vocabulary - Richard Scarry's Best Little Word Book Ever!.bin" size="0x100000" crc="8797ae77" sha1="fa24e718287a0e15f4ae3b371e9ee73c590abaf5" />
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +120,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00527 - Phonics Program - Lesson 10 - Compound Words - A Fisherman's Tale.bin" size="0x200000" crc="626a2a85" sha1="97af4f353fd533002269297aaafb7fcd7fab01d4" offset="0" />
+				<rom name="500-00527 - Phonics Program - Lesson 10 - Compound Words - A Fisherman's Tale.bin" size="0x200000" crc="626a2a85" sha1="97af4f353fd533002269297aaafb7fcd7fab01d4" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +133,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00531 - Pre Reading - Thomas the Really Useful Engine.bin" size="0x200000" crc="8122325d" sha1="f76b2e6c4d56fd8616c90bf86d720f267724723e" offset="0" />
+				<rom name="500-00531 - Pre Reading - Thomas the Really Useful Engine.bin" size="0x200000" crc="8122325d" sha1="f76b2e6c4d56fd8616c90bf86d720f267724723e" />
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +147,7 @@
 			<feature name="pcb_rev" value="REV.A"/>
 			<feature name="u1" value="LeapFrog 2002 32M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-00533 - FUN-damentals Series - Smart Guide to 3rd Grade.bin" size="0x400000" crc="344bbc10" sha1="c04d3f68e9e2e56d1b0ae4785732c60ffc17215a" offset="0" />
+				<rom name="500-00533 - FUN-damentals Series - Smart Guide to 3rd Grade.bin" size="0x400000" crc="344bbc10" sha1="c04d3f68e9e2e56d1b0ae4785732c60ffc17215a" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,13 +161,28 @@
 			<feature name="pcb_rev" value="REV.A"/>
 			<feature name="u1" value="LeapFrog 2002 32M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-00535 - FUN-damentals Series - Smart Guide to 5th Grade.bin" size="0x400000" crc="e2c74ace" sha1="f1291e9c845bc5dfc8b1e2a1ab650a69b9f22287" offset="0" />
+				<rom name="500-00535 - FUN-damentals Series - Smart Guide to 5th Grade.bin" size="0x400000" crc="e2c74ace" sha1="f1291e9c845bc5dfc8b1e2a1ab650a69b9f22287" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydonut" supported="no">
+		<description>Leap 1 - Reading - Cartoon Network Scooby-Doo! and the Disappearing Donuts (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00538"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00538 - Leap 1 - Reading - Scooby-Doo! and the Disappearing Donuts.bin" size="0x200000" crc="cd887b33" sha1="c51c83f0abe6ede9aa03abcc38fc3a3feb1f249c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dinobdark" supported="no">
-		<description>Great Reader Series - Dinosaurs Before Dark (UK)</description>
+		<description>- Great Reader Series - Dinosaurs Before Dark (UK)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-00696"/>
@@ -147,7 +190,7 @@
 			<feature name="pcb" value="PCBC FR4A"/>
 			<feature name="u1" value="MR27V3202E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-00696 - Great Reader Series - Dinosaurs Before Dark.bin" size="0x400000" crc="c4acf022" sha1="96e2b42f7c092b98fdad6aa36320dadc6c6a6ff8" offset="0" />
+				<rom name="500-00696 - Great Reader Series - Dinosaurs Before Dark.bin" size="0x400000" crc="c4acf022" sha1="96e2b42f7c092b98fdad6aa36320dadc6c6a6ff8" />
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +204,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="LeapFrog 2000 8M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x100000">
-				<rom name="500-00804 - Pre Reading - Leap's Friends From A to Z.bin" size="0x100000" crc="cea3f327" sha1="c49779322dd046ef67bef93d144d2d07251eeadf" offset="0" />
+				<rom name="500-00804 - Pre Reading - Leap's Friends From A to Z.bin" size="0x100000" crc="cea3f327" sha1="c49779322dd046ef67bef93d144d2d07251eeadf" />
 			</dataarea>
 		</part>
 	</software>
@@ -174,7 +217,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="LeapFrog 2002 32M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-00896-B - 5th Grade Math.bin" size="0x400000" crc="d9b18842" sha1="174461dd57b8446a03c324d3b84d660b18a8c231" offset="0" />
+				<rom name="500-00896-B - 5th Grade Math.bin" size="0x400000" crc="d9b18842" sha1="174461dd57b8446a03c324d3b84d660b18a8c231" />
 			</dataarea>
 		</part>
 	</software>
@@ -188,7 +231,7 @@
 			<feature name="pcb" value="335-13845-40"/>
 			<feature name="u1" value="MR27V1602E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-01148 - Reading - Finding Nemo.bin" size="0x200000" crc="b299286b" sha1="3e8c63486f5646f65b5f86efeee4a6ee9d979f32" offset="0" />
+				<rom name="500-01148 - Reading - Finding Nemo.bin" size="0x200000" crc="b299286b" sha1="3e8c63486f5646f65b5f86efeee4a6ee9d979f32" />
 			</dataarea>
 		</part>
 	</software>
@@ -202,7 +245,7 @@
 			<feature name="pcb" value="000-835040-101002V2"/>
 			<feature name="u1" value="MR27V3202E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-01346 - 4th Grade Math.bin" size="0x400000" crc="939efe79" sha1="66baa68aa13590ca4bd18d0dc8f329398bb12414" offset="0" />
+				<rom name="500-01346 - 4th Grade Math.bin" size="0x400000" crc="939efe79" sha1="66baa68aa13590ca4bd18d0dc8f329398bb12414" />
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +260,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-01512 - Leap's Pond.bin" size="0x200000" crc="124271ad" sha1="32a4ebc71d4e0965b36e379d72ee2534fda47f79" offset="0" />
+				<rom name="500-01512 - Leap's Pond.bin" size="0x200000" crc="124271ad" sha1="32a4ebc71d4e0965b36e379d72ee2534fda47f79" />
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +275,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="OKi 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10136 - Leap and the lost Dinosaur.bin" size="0x400000" crc="eb3b01c7" sha1="bdc3791199e8b04942459c09047202b048ef27dc" offset="0" />
+				<rom name="500-10136 - Leap and the lost Dinosaur.bin" size="0x400000" crc="eb3b01c7" sha1="bdc3791199e8b04942459c09047202b048ef27dc" />
 			</dataarea>
 		</part>
 	</software>
@@ -245,7 +288,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MR27V3202J-03-01"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10438 - Hop on Pop.bin" size="0x400000" crc="49308dc4" sha1="50864fdd604f6b88a0545df45663cae60e30c0e4" offset="0" />
+				<rom name="500-10438 - Hop on Pop.bin" size="0x400000" crc="49308dc4" sha1="50864fdd604f6b88a0545df45663cae60e30c0e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -259,7 +302,22 @@
 			<feature name="pcb" value="30004+003+37"/>
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10478 UBL - LeapPad - Libro Interactivo (SP).bin" size="0x400000" crc="6a85ec74" sha1="024927d8eae8c4327079dd7d752f483445b51f3e" offset="0" />
+				<rom name="500-10478 UBL - LeapPad - Libro Interactivo (SP).bin" size="0x400000" crc="6a85ec74" sha1="024927d8eae8c4327079dd7d752f483445b51f3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystory2" supported="no">
+		<description>Toy Story 2 (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10497 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2911"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10497 UBL - Toy Story 2.bin" size="0x400000" crc="a5e841e2" sha1="7dbb0f053cbf8e9459a964bec43a5013d84ae87b" />
 			</dataarea>
 		</part>
 	</software>
@@ -274,7 +332,7 @@
 			<feature name="pcb_rev" value="REV.00"/>
 			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10597 UBL - El Rey Leon (SP).bin" size="0x200000" crc="83f0e011" sha1="f543849090eedb8bec9d227e3634c9f5ee7f585c" offset="0" />
+				<rom name="500-10597 UBL - El Rey Leon (SP).bin" size="0x200000" crc="83f0e011" sha1="f543849090eedb8bec9d227e3634c9f5ee7f585c" />
 			</dataarea>
 		</part>
 	</software>
@@ -289,7 +347,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Matronix 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10635 - Leap und die Welt der Dinosaurier (GER).bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" offset="0" />
+				<rom name="500-10635 - Leap und die Welt der Dinosaurier (GER).bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" />
 			</dataarea>
 		</part>
 	</software>
@@ -303,7 +361,7 @@
 			<feature name="pcb" value="335-13845-31"/>
 			<feature name="u1" value="MR27V3202J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10649 UBL - LeapPad Interactive Book.bin" size="0x400000" crc="58d14b4e" sha1="6a2234b62c3a63b08329e848bc40a9e5cb42b051" offset="0" />
+				<rom name="500-10649 UBL - LeapPad Interactive Book.bin" size="0x400000" crc="58d14b4e" sha1="6a2234b62c3a63b08329e848bc40a9e5cb42b051" />
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +376,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10717 UBL - ABC-Abenteuer (GER).bin" size="0x400000" crc="6c5c0180" sha1="3cfacb759d3cac16e52aad4629f0759bb8817f1a" offset="0" />
+				<rom name="500-10717 UBL - ABC-Abenteuer (GER).bin" size="0x400000" crc="6c5c0180" sha1="3cfacb759d3cac16e52aad4629f0759bb8817f1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -333,7 +391,7 @@
 			<feature name="pcb_rev" value="REV.00"/>
 			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10756 UBL - Tad's Good Night.bin" size="0x200000" crc="dc872e63" sha1="ebd259e53849151434091a99455ca74db46528b1" offset="0" />
+				<rom name="500-10756 UBL - Tad's Good Night.bin" size="0x200000" crc="dc872e63" sha1="ebd259e53849151434091a99455ca74db46528b1" />
 			</dataarea>
 		</part>
 	</software>
@@ -348,7 +406,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10757 UBL - A Day at Moss Lake.bin" size="0x200000" crc="22c3c65d" sha1="b3c6f7de54552dd9b164b2f3a97f8565f8cc7879" offset="0" />
+				<rom name="500-10757 UBL - A Day at Moss Lake.bin" size="0x200000" crc="22c3c65d" sha1="b3c6f7de54552dd9b164b2f3a97f8565f8cc7879" />
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +421,7 @@
 			<feature name="pcb_rev" value="REV:00"/>
 			<feature name="u1" value="MX12L1611B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10760 - What will you be.bin" size="0x200000" crc="b6b36f74" sha1="5d017a501b7feabd8c4d90b8672af19c3d321f41" offset="0" />
+				<rom name="500-10760 - What will you be.bin" size="0x200000" crc="b6b36f74" sha1="5d017a501b7feabd8c4d90b8672af19c3d321f41" />
 			</dataarea>
 		</part>
 	</software>
@@ -378,7 +436,7 @@
 			<feature name="pcb_rev" value="REV:00"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10848 UBL - Cuentos de las Princesas (SP).bin" size="0x200000" crc="fc6ed25b" sha1="6bd357dca86a37fe1646d010d8bcf150e8d0a95e" offset="0" />
+				<rom name="500-10848 UBL - Cuentos de las Princesas (SP).bin" size="0x200000" crc="fc6ed25b" sha1="6bd357dca86a37fe1646d010d8bcf150e8d0a95e" />
 			</dataarea>
 		</part>
 	</software>
@@ -392,7 +450,22 @@
 			<feature name="pcb" value="30004+003+38"/>
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10875 UBL - Fiesta in the House! - Party en la Casa!.bin" size="0x400000" crc="0b058df5" sha1="06931683c181c04b967da63e9fab160f6596c5e3" offset="0" />
+				<rom name="500-10875 UBL - Fiesta in the House! - Party en la Casa!.bin" size="0x400000" crc="0b058df5" sha1="06931683c181c04b967da63e9fab160f6596c5e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princesstry" supported="no">
+		<description>Disney Princess - Princess Stories (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10900 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7210"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10900 UBL - Disney Princess - Princess Stories.bin" size="0x200000" crc="dfc09ce8" sha1="85645ade8b7a472b113e1ad2fecfd9cd2210665f" />
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +478,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="335-13845-40"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-11537-B - Das Angel-Abenteuer (GER).bin" size="0x200000" crc="c90b3a2d" sha1="48e08bbef6b1f4d4671b808ef5a35b954449d0d2" offset="0" />
+				<rom name="500-11537-B - Das Angel-Abenteuer (GER).bin" size="0x200000" crc="c90b3a2d" sha1="48e08bbef6b1f4d4671b808ef5a35b954449d0d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -420,7 +493,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-11538-B - Hupf, Tigger, hupf! (GER).bin" size="0x200000" crc="250db2f8" sha1="192721a38befb7be26f9c3c604cd2e5b87828b46" offset="0" />
+				<rom name="500-11538-B - Hupf, Tigger, hupf! (GER).bin" size="0x200000" crc="250db2f8" sha1="192721a38befb7be26f9c3c604cd2e5b87828b46" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +508,7 @@
 			<feature name="pcb_rev" value="Rev.00"/>
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11539 - Shrek (GER).bin" size="0x400000" crc="5ec0e776" sha1="fb5461049bee23bac2839f9c3ed951abba07f02d" offset="0" />
+				<rom name="500-11539 - Shrek (GER).bin" size="0x400000" crc="5ec0e776" sha1="fb5461049bee23bac2839f9c3ed951abba07f02d" />
 			</dataarea>
 		</part>
 	</software>
@@ -450,7 +523,7 @@
 			<feature name="pcb_rev" value="Rev.00"/>
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11540 - Spongebob Schwammkopf - Meeres-Geschichten (GER).bin" size="0x400000" crc="cf81398e" sha1="52c8cd56c49d53a20129b3870527f180e22683b4" offset="0" />
+				<rom name="500-11540 - Spongebob Schwammkopf - Meeres-Geschichten (GER).bin" size="0x400000" crc="cf81398e" sha1="52c8cd56c49d53a20129b3870527f180e22683b4" />
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +538,7 @@
 			<feature name="pcb_rev" value="REV : 01"/>
 			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11546 - Englisch Kurs - Let's go 1 (GER).bin" size="0x400000" crc="70eed726" sha1="fd425df0e9108dbc8e384ec566ed2b284aa7a7fe" offset="0" />
+				<rom name="500-11546 - Englisch Kurs - Let's go 1 (GER).bin" size="0x400000" crc="70eed726" sha1="fd425df0e9108dbc8e384ec566ed2b284aa7a7fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -480,7 +553,7 @@
 			<feature name="pcb_rev" value="REV : 01"/>
 			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11547 - Englisch Kurs - Let's go 2 (GER).bin" size="0x400000" crc="5a31e9e6" sha1="4c4020c2cf31f09dc910c7686250ea96a7bb12bf" offset="0" />
+				<rom name="500-11547 - Englisch Kurs - Let's go 2 (GER).bin" size="0x400000" crc="5a31e9e6" sha1="4c4020c2cf31f09dc910c7686250ea96a7bb12bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -494,7 +567,7 @@
 			<feature name="pcb" value="335-13545-32G"/>
 			<feature name="u1" value="MR27V3202L(WE)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11694 - LeapFrog Schoolhouse - Level 3 - Helping Others.bin" size="0x400000" crc="adae33be" sha1="ead14b0a6cb638d609f35932d3eaaac54ec93582" offset="0" />
+				<rom name="500-11694 - LeapFrog Schoolhouse - Level 3 - Helping Others.bin" size="0x400000" crc="adae33be" sha1="ead14b0a6cb638d609f35932d3eaaac54ec93582" />
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +582,7 @@
 			<feature name="pcb_rev" value="Rev.00"/>
 			<feature name="u1" value="OKI 32M(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11973 - Little Amadeus (GER).bin" size="0x400000" crc="bbb84550" sha1="2513a369cc08c6b9ffd118f095018a152994b14d" offset="0" />
+				<rom name="500-11973 - Little Amadeus (GER).bin" size="0x400000" crc="bbb84550" sha1="2513a369cc08c6b9ffd118f095018a152994b14d" />
 			</dataarea>
 		</part>
 	</software>
@@ -524,7 +597,7 @@
 			<feature name="pcb_rev" value="REV : 01"/>
 			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11974 - Englisch Kurs - Let's Go 4 (GER).bin" size="0x400000" crc="c4fd3c1f" sha1="7f7fc2a5c4d7596d840add14e89d45d64b0b4f2a" offset="0" />
+				<rom name="500-11974 - Englisch Kurs - Let's Go 4 (GER).bin" size="0x400000" crc="c4fd3c1f" sha1="7f7fc2a5c4d7596d840add14e89d45d64b0b4f2a" />
 			</dataarea>
 		</part>
 	</software>
@@ -539,7 +612,7 @@
 			<feature name="pcb_rev" value="REV : 01"/>
 			<feature name="u1" value="OKI 32M VER : J"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11976 - Englisch Kurs - Let's Go 3 (GER).bin" size="0x400000" crc="33c6ad28" sha1="023eb4a01a65df809f173f1d442d03c49ac5cd7a" offset="0" />
+				<rom name="500-11976 - Englisch Kurs - Let's Go 3 (GER).bin" size="0x400000" crc="33c6ad28" sha1="023eb4a01a65df809f173f1d442d03c49ac5cd7a" />
 			</dataarea>
 		</part>
 	</software>
@@ -552,7 +625,7 @@
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MR27V3202L (WE)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12153 - Yo aprendo ingles! - Mis Primeras 500 Palabras en Ingles (SP).bin" size="0x400000" crc="67602011" sha1="492304abf2670f4388d7e38b8d7a95c98e77f15d" offset="0" />
+				<rom name="500-12153 - Yo aprendo ingles! - Mis Primeras 500 Palabras en Ingles (SP).bin" size="0x400000" crc="67602011" sha1="492304abf2670f4388d7e38b8d7a95c98e77f15d" />
 			</dataarea>
 		</part>
 	</software>
@@ -567,7 +640,7 @@
 			<feature name="pcb_rev" value="Rev:00"/>
 			<feature name="u1" value="OKi 16M(Ver:L)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-12559-B - Prinzessinnen-Geschichten (GER).bin" size="0x200000" crc="e889e9bd" sha1="d6f6f1629f24db1a120d0c408028e4996c7468cb" offset="0" />
+				<rom name="500-12559-B - Prinzessinnen-Geschichten (GER).bin" size="0x200000" crc="e889e9bd" sha1="d6f6f1629f24db1a120d0c408028e4996c7468cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -582,12 +655,96 @@
 			<feature name="pcb_rev" value="Rev:00"/>
 			<feature name="u1" value="OKI 16M(Ver:L)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-12560 - Bob der Baumeister - Bob und Heppo - Alles im Griff! (GER).bin" size="0x200000" crc="4821cae5" sha1="80e9743ae8870e8ef03eb8c7c882fe42fdd545b2" offset="0" />
+				<rom name="500-12560 - Bob der Baumeister - Bob und Heppo - Alles im Griff! (GER).bin" size="0x200000" crc="4821cae5" sha1="80e9743ae8870e8ef03eb8c7c882fe42fdd545b2" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sedsaber1" supported="no">
+	<software name="sedsaber1e" supported="no">
+		<description>Sed de Saber - Libro 1 - Spanish as a second Language Edition (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13021-B UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13021-B UBL - Sed de Saber - Libro 1 - Spanish as a second Language Edition.bin" size="0x400000" crc="c3c457fa" sha1="d418e8a3f55af9790d25a0915d758aeef5f05e6b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber2e" supported="no">
+		<description>Sed de Saber - Libro 2 - Spanish as a second Language Edition (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13023 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13023 UBL - Sed de Saber - Libro 2 - Spanish as a second Language Edition.bin" size="0x400000" crc="addd050b" sha1="c0788a4616afa73cdc46019aba542769e00ff50b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber3e" supported="no">
+		<description>Sed de Saber - Libro 3 - Spanish as a second Language Edition (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13025 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13025 UBL - Sed de Saber - Libro 3 - Spanish as a second Language Edition.bin" size="0x400000" crc="6ccfc5d5" sha1="139b424abd1330d782cb17a67d9a6f14a5a202d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber4e" supported="no">
+		<description>Sed de Saber - Libro 4 - Spanish as a second Language Edition (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13027 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13027 UBL - Sed de Saber - Libro 4 - Spanish as a second Language Edition.bin" size="0x400000" crc="6e6331db" sha1="dc586acf2455e90268077d3ed89df23e4f2c4f29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber5e" supported="no">
+		<description>Sed de Saber - Libro 5 - Spanish as a second Language Edition (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13029 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13029 UBL - Sed de Saber - Libro 5 - Spanish as a second Language Edition.bin" size="0x400000" crc="8faa6a33" sha1="f2a57a04b8112d09d0cfe61f1597518411991302" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber6e" supported="no">
+		<description>Sed de Saber - Libro 6 - Spanish as a second Language Edition (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13031 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2111"/>
+			<feature name="u1" value="JS28F320"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13031 UBL - Sed de Saber - Libro 6 - Spanish as a second Language Edition.bin" size="0x400000" crc="a0a61f52" sha1="957c535a08d8f8ee42455aac699cd57d2d0223bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sedsaber1s" supported="no">
 		<description>Sed de Saber - English as a Second Language Edition - Book 1 - Getting Started (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -596,12 +753,12 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13034 UBL - Sed de Saber - English as a Second Language Edition - Book 1 - Getting Started.bin" size="0x400000" crc="6b9a4399" sha1="8559facabf94c6ffaf8a6e1868f0ab00fb28ce09" offset="0" />
+				<rom name="500-13034 UBL - Sed de Saber - English as a Second Language Edition - Book 1 - Getting Started.bin" size="0x400000" crc="6b9a4399" sha1="8559facabf94c6ffaf8a6e1868f0ab00fb28ce09" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sedsaber2" supported="no">
+	<software name="sedsaber2s" supported="no">
 		<description>Sed de Saber - English as a Second Language Edition - Book 2 - A New Job (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -610,12 +767,12 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13035 UBL - Sed de Saber - English as a Second Language Edition - Book 2 - A New Job.bin" size="0x400000" crc="95b1520c" sha1="25701bd15371cd463a801bd6ede7a9591c352680" offset="0" />
+				<rom name="500-13035 UBL - Sed de Saber - English as a Second Language Edition - Book 2 - A New Job.bin" size="0x400000" crc="95b1520c" sha1="25701bd15371cd463a801bd6ede7a9591c352680" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sedsaber3" supported="no">
+	<software name="sedsaber3s" supported="no">
 		<description>Sed de Saber - English as a Second Language Edition - Book 3 - Daily Activities (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -624,12 +781,12 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13038 UBL - Sed de Saber - English as a Second Language Edition - Book 3 - Daily Activities.bin" size="0x400000" crc="39f5b54b" sha1="eeb8849733bf856fe4f28503153d989a6a00cb11" offset="0" />
+				<rom name="500-13038 UBL - Sed de Saber - English as a Second Language Edition - Book 3 - Daily Activities.bin" size="0x400000" crc="39f5b54b" sha1="eeb8849733bf856fe4f28503153d989a6a00cb11" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sedsaber4" supported="no">
+	<software name="sedsaber4s" supported="no">
 		<description>Sed de Saber - English as a Second Language Edition - Book 4 - Health and Safety (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -638,12 +795,12 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13040 UBL - Sed de Saber - English as a Second Language Edition - Book 4 - Health and Safety.bin" size="0x400000" crc="efd55310" sha1="bbde3bc75337f8cfac60dd5dfaab2de756cfd6de" offset="0" />
+				<rom name="500-13040 UBL - Sed de Saber - English as a Second Language Edition - Book 4 - Health and Safety.bin" size="0x400000" crc="efd55310" sha1="bbde3bc75337f8cfac60dd5dfaab2de756cfd6de" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sedsaber5" supported="no">
+	<software name="sedsaber5s" supported="no">
 		<description>Sed de Saber - English as a Second Language Edition - Book 5 - Community Interactions (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -652,12 +809,12 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13041 UBL - Sed de Saber - English as a Second Language Edition - Book 5 - Community Interactions.bin" size="0x400000" crc="a3bb676b" sha1="ddab54976fd54b9ef140ee6b67414597a3a21ec9" offset="0" />
+				<rom name="500-13041 UBL - Sed de Saber - English as a Second Language Edition - Book 5 - Community Interactions.bin" size="0x400000" crc="a3bb676b" sha1="ddab54976fd54b9ef140ee6b67414597a3a21ec9" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sedsaber6" supported="no">
+	<software name="sedsaber6s" supported="no">
 		<description>Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
@@ -666,7 +823,7 @@
 			<feature name="pcb" value="57000-003-2111"/>
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" offset="0" />
+				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" />
 			</dataarea>
 		</part>
 	</software>

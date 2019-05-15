@@ -165,6 +165,11 @@ public:
 	void c64_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
+
+	offs_t dasm_zeropage(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t dasm_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t dasm_zeropage_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 
@@ -209,6 +214,175 @@ public:
 	void pal_gs(machine_config &config);
 };
 
+struct dasm_zeropage_data
+{
+	u8 addr;
+	const char *name;
+};
+
+struct dasm_vector_data
+{
+	u16 addr;
+	const char *name;
+};
+
+static const struct dasm_zeropage_data c64_zeropage_locations[] =
+{
+	{ 0x00, "D6510" }, { 0x01, "R6510" }, { 0x03, "ADRAY1" }, { 0x05, "ADRAY2" }, { 0x07, "CHARAC" }, { 0x08, "ENDCHR" }, { 0x09, "TRMPOS" }, { 0x0a, "VERCK" },
+	{ 0x0b, "COUNT" }, { 0x0c, "DIMFLG" }, { 0x0d, "VALTYP" }, { 0x0e, "INTFLG" }, { 0x0f, "GARBFL" }, { 0x10, "SUBFLG" }, { 0x11, "INPFLG" }, { 0x12, "TANSGN" },
+	{ 0x14, "LINNUM" }, { 0x16, "TEMPPT" }, { 0x17, "LASTPT" }, { 0x19, "TEMPST" }, { 0x22, "INDEX" }, { 0x26, "RESHO" }, { 0x2b, "TXTTAB" }, { 0x2d, "VARTAB" }, 
+	{ 0x2f, "ARYTAB" }, { 0x31, "STREND" }, { 0x33, "FRETOP" }, { 0x35, "FRESPC" }, { 0x37, "MEMSIZ" }, { 0x39, "CURLIN" }, { 0x3b, "OLDLIN" }, { 0x3d, "OLDTXT" }, 
+	{ 0x3f, "DATLIN" }, { 0x41, "DATPTR" }, { 0x43, "INPPTR" }, { 0x45, "VARNAM" }, { 0x47, "VARPNT" }, { 0x49, "FORPNT" }, { 0x61, "FACEXP" }, { 0x62, "FACHO" }, 
+	{ 0x66, "FACSGN" }, { 0x67, "SGNFLG" }, { 0x68, "BITS" }, { 0x69, "ARGEXP" }, { 0x6a, "ARGHO" }, { 0x6e, "ARGSGN" }, { 0x6f, "ARISGN" }, { 0x70, "FACOV" }, 
+	{ 0x71, "FBUFPT" }, { 0x73, "CHRGET" }, { 0x79, "CHRGOT" }, { 0x7a, "TXTPTR" }, { 0x8b, "RNDX" }, { 0x90, "STATUS" }, { 0x91, "STKEY" }, { 0x92, "SVXT" },
+	{ 0x93, "VERCK" }, { 0x94, "C3PO" }, { 0x95, "BSOUR" }, { 0x96, "SYNO" }, { 0x98, "LDTND" }, { 0x99, "DFLTN" }, { 0x9a, "DFLTO" }, { 0x9b, "PRTY" }, 
+	{ 0x9c, "DPSW" }, { 0x9d, "MSGFLG" }, { 0x9e, "PTR1" }, { 0x9f, "PTR2" }, { 0xa0, "TIME" }, { 0xa5, "CNTDN" }, { 0xa6, "BUFPNT" }, { 0xa7, "INBIT" }, 
+	{ 0xa8, "BITCI" }, { 0xa9, "RINONE" }, { 0xaa, "RIDATA" }, { 0xab, "RIPRTY" }, { 0xac, "SAL" }, { 0xae, "EAL" }, { 0xb0, "CMPO" }, { 0xb2, "TAPE1" }, 
+	{ 0xb4, "BITTS" }, { 0xb5, "NXTBIT" }, { 0xb6, "RODATA" }, { 0xb7, "FNLEN" }, { 0xb8, "LA" }, { 0xb9, "SA" }, { 0xba, "FA" }, { 0xbb, "FNADR" }, 
+	{ 0xbc, "ROPRTY" }, { 0xbe, "FSBLK" }, { 0xbf, "MYCH" }, { 0xc0, "CAS1" }, { 0xc1, "STAL" }, { 0xc3, "MEMUSS" }, { 0xc5, "LSTX" }, { 0xc6, "NDX" }, 
+	{ 0xc7, "RVS" }, { 0xc8, "INDX" }, { 0xc9, "LXSP" }, { 0xcb, "SFDX" }, { 0xcc, "BLNSW" }, { 0xcd, "BLNCT" }, { 0xce, "GDBLN" }, { 0xcf, "BLNON" }, 
+	{ 0xd0, "CRSW" }, { 0xd1, "PNT" }, { 0xd3, "PNTR" }, { 0xd4, "QTSW" }, { 0xd5, "LNMX" }, { 0xd6, "TBLX" }, { 0xd8, "INSRT" }, { 0xd9, "LDTB1" }, 
+	{ 0xf3, "USER" }, { 0xf5, "KEYTAB" }, { 0xf7, "RIBUF" }, { 0xf9, "ROBUF" }, { 0xfb, "FREKZB" }, { 0xff, "BASZPT" }
+};
+
+static const struct dasm_vector_data cbm_kernal_vectors[] =
+{
+	{ 0xff81, "CINT" }, { 0xff84, "IOINT" }, { 0xff87, "RAMTAS" }, { 0xff8a, "RESTOR" }, { 0xff8d, "VECTOR" }, { 0xff90, "SETMSG" }, { 0xff93, "SECOND" }, { 0xff96, "TKSA" },
+	{ 0xff99, "MEMTOP" }, { 0xff9c, "MEMBOT" }, { 0xff9f, "SCNKEY" }, { 0xffa2, "SETTMO" }, { 0xffa5, "ACPTR" }, { 0xffa8, "CIOUT" }, { 0xffab, "UNTALK" }, { 0xffae, "UNLSN" },
+	{ 0xffb1, "LISTEN" }, { 0xffb4, "TALK" }, { 0xffb7, "READST" }, { 0xffba, "SETLFS" }, { 0xffbd, "SETNAM" }, { 0xffc3, "CLOSE" }, { 0xffc6, "CHKIN" }, { 0xffc9, "CHKOUT" },
+	{ 0xffcc, "CLRCHN" }, { 0xffcf, "CHRIN" }, { 0xffd2, "CHROUT" }, { 0xffd5, "LOAD" }, { 0xffd8, "SAVE" }, { 0xffdb, "SETTIM" }, { 0xffde, "RDTIM" }, { 0xffe1, "STOP" },
+ 	{ 0xffe4, "GETIN" }, { 0xffe7, "CLALL" }, { 0xffea, "UDTIM" }, { 0xffed, "SCREEN" }, { 0xfff0, "PLOT" }, { 0xfff3, "IOBASE" }
+};
+
+offs_t c64_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	switch (opcodes.r8(pc))
+	{
+	case 0x20: return dasm_vector(stream, pc, opcodes, "jsr %s");
+	case 0x4c: return dasm_vector(stream, pc, opcodes, "jmp %s");
+	case 0x6c: return dasm_zeropage_vector(stream, pc, opcodes, "jmp (%s)");
+	case 0x65: return dasm_zeropage(stream, pc, opcodes, "adc %s");
+	case 0x75: return dasm_zeropage(stream, pc, opcodes, "adc %s, x");
+	case 0x61: return dasm_zeropage(stream, pc, opcodes, "adc (%s, x)");
+	case 0x71: return dasm_zeropage(stream, pc, opcodes, "adc (%s), y");
+	case 0x25: return dasm_zeropage(stream, pc, opcodes, "and %s");
+	case 0x35: return dasm_zeropage(stream, pc, opcodes, "and %s, x");
+	case 0x21: return dasm_zeropage(stream, pc, opcodes, "and (%s, x)");
+	case 0x31: return dasm_zeropage(stream, pc, opcodes, "and (%s), y");
+	case 0x06: return dasm_zeropage(stream, pc, opcodes, "asl %s");
+	case 0x16: return dasm_zeropage(stream, pc, opcodes, "asl %s, x");
+	case 0x24: return dasm_zeropage(stream, pc, opcodes, "bit %s");
+	case 0xc5: return dasm_zeropage(stream, pc, opcodes, "cmp %s");
+	case 0xd5: return dasm_zeropage(stream, pc, opcodes, "cmp %s, x");
+	case 0xc1: return dasm_zeropage(stream, pc, opcodes, "cmp (%s, x)");
+	case 0xd1: return dasm_zeropage(stream, pc, opcodes, "cmp (%s), y");
+	case 0xe4: return dasm_zeropage(stream, pc, opcodes, "cpx %s");
+	case 0xc4: return dasm_zeropage(stream, pc, opcodes, "cpy %s");
+	case 0xc6: return dasm_zeropage(stream, pc, opcodes, "dec %s");
+	case 0xd6: return dasm_zeropage(stream, pc, opcodes, "dec %s, x");
+	case 0x45: return dasm_zeropage(stream, pc, opcodes, "eor %s");
+	case 0x55: return dasm_zeropage(stream, pc, opcodes, "eor %s, x");
+	case 0x41: return dasm_zeropage(stream, pc, opcodes, "eor (%s, x)");
+	case 0x51: return dasm_zeropage(stream, pc, opcodes, "eor (%s), y");
+	case 0xe6: return dasm_zeropage(stream, pc, opcodes, "inc %s");
+	case 0xf6: return dasm_zeropage(stream, pc, opcodes, "inc %s, x");
+	case 0xa5: return dasm_zeropage(stream, pc, opcodes, "lda %s");
+	case 0xb5: return dasm_zeropage(stream, pc, opcodes, "lda %s, x");
+	case 0xa1: return dasm_zeropage(stream, pc, opcodes, "lda (%s, x)");
+	case 0xb1: return dasm_zeropage(stream, pc, opcodes, "lda (%s), y");
+	case 0xa6: return dasm_zeropage(stream, pc, opcodes, "ldx %s");
+	case 0xb6: return dasm_zeropage(stream, pc, opcodes, "ldx %s, y");
+	case 0xa4: return dasm_zeropage(stream, pc, opcodes, "ldy %s");
+	case 0xb4: return dasm_zeropage(stream, pc, opcodes, "ldy %s, x");
+	case 0x46: return dasm_zeropage(stream, pc, opcodes, "lsr %s");
+	case 0x56: return dasm_zeropage(stream, pc, opcodes, "lsr %s, x");
+	case 0x05: return dasm_zeropage(stream, pc, opcodes, "ora %s");
+	case 0x15: return dasm_zeropage(stream, pc, opcodes, "ora %s, x");
+	case 0x01: return dasm_zeropage(stream, pc, opcodes, "ora (%s, x)");
+	case 0x11: return dasm_zeropage(stream, pc, opcodes, "ora (%s), y");
+	case 0x26: return dasm_zeropage(stream, pc, opcodes, "rol %s");
+	case 0x36: return dasm_zeropage(stream, pc, opcodes, "rol %s, x");
+	case 0x66: return dasm_zeropage(stream, pc, opcodes, "ror %s");
+	case 0x76: return dasm_zeropage(stream, pc, opcodes, "ror %s, x");
+	case 0xe5: return dasm_zeropage(stream, pc, opcodes, "sbc %s");
+	case 0xf5: return dasm_zeropage(stream, pc, opcodes, "sbc %s, x");
+	case 0xe1: return dasm_zeropage(stream, pc, opcodes, "sbc (%s, x)");
+	case 0xf1: return dasm_zeropage(stream, pc, opcodes, "sbc (%s), y");
+	case 0x85: return dasm_zeropage(stream, pc, opcodes, "sta %s");
+	case 0x95: return dasm_zeropage(stream, pc, opcodes, "sta %s, x");
+	case 0x81: return dasm_zeropage(stream, pc, opcodes, "sta (%s, x)");
+	case 0x91: return dasm_zeropage(stream, pc, opcodes, "sta (%s), y");
+	case 0x86: return dasm_zeropage(stream, pc, opcodes, "stx %s");
+	case 0x96: return dasm_zeropage(stream, pc, opcodes, "stx (%s), y");
+	case 0x84: return dasm_zeropage(stream, pc, opcodes, "sty %s");
+	case 0x94: return dasm_zeropage(stream, pc, opcodes, "sty %s, x");
+	}
+
+	return 0;
+}
+
+offs_t c64_state::dasm_zeropage(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname)
+{
+	int item = 0;
+	u8 operand = opcodes.r8(pc+1);
+	
+	while (c64_zeropage_locations[item].addr != 0xff)
+	{
+		if (c64_zeropage_locations[item].addr == operand)
+		{
+			std::ostringstream buffer;
+			util::stream_format(buffer, opname, c64_zeropage_locations[item].name);
+			stream << buffer.str();
+			return 2 | util::disasm_interface::SUPPORTED;
+		}
+		item++;
+	}
+
+	return 0;
+}
+
+offs_t c64_state::dasm_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname)
+{
+	int item = 0;
+	u16 operand = opcodes.r16(pc+1);
+	
+	while (cbm_kernal_vectors[item].addr != 0xfff3)
+	{
+		if (cbm_kernal_vectors[item].addr == operand)
+		{
+			std::ostringstream buffer;
+			util::stream_format(buffer, opname, cbm_kernal_vectors[item].name);
+			stream << buffer.str();
+			return 3 | util::disasm_interface::SUPPORTED;
+		}
+		item++;
+	}
+
+	return 0;
+}
+
+offs_t c64_state::dasm_zeropage_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname)
+{
+	int item = 0;
+	u16 operand = opcodes.r16(pc+1);
+	
+	if (operand < 0x100)
+	{
+		while (c64_zeropage_locations[item].addr != 0xff)
+		{
+			if (c64_zeropage_locations[item].addr == operand)
+			{
+				std::ostringstream buffer;
+				util::stream_format(buffer, opname, c64_zeropage_locations[item].name);
+				stream << buffer.str();
+				return 3 | util::disasm_interface::SUPPORTED;
+			}
+			item++;
+		}
+	}
+
+	return 0;
+}
 
 
 //**************************************************************************
@@ -271,8 +445,8 @@ int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 	//int ba = m_vic->ba_r();
 	//int aec = !m_vic->aec_r();
 	int sphi2 = m_vic->phi0_r();
-	int game = m_exp->game_r(offset, sphi2, ba, rw, m_hiram);
-	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_hiram);
+	int game = m_exp->game_r(offset, sphi2, ba, rw, m_loram, m_hiram);
+	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_loram, m_hiram);
 	int cas = 0;
 
 	uint32_t input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 |
@@ -1272,6 +1446,7 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
+	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
@@ -1448,6 +1623,7 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
+	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
@@ -1600,6 +1776,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
+	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));

@@ -47,7 +47,7 @@ private:
 
 	void usgames_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void usg185_map(address_map &map);
 	void usgames_map(address_map &map);
 };

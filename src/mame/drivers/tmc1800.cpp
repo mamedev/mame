@@ -111,6 +111,18 @@ Notes:
     - tmc2000: TOOL-2000 rom banking
     - nano: correct time constant for EF4 RC circuit
 
+
+    Usage:
+    - Same as VIP except the machine begins in the stopped mode.
+    - So, to enter the monitor, hold C and press R
+    - The support for chip-8 is not yet written, due to missing roms.
+    - The screen for nano should be white not red (caused by using only the
+      red output of a colour crt controller)
+    - The monitor of the tmc1800 is difficult to read because the colour ram
+      contains random values.
+    - Both nano and tmc1800 seem to "work", but there's insufficient software
+      to test with.
+
 */
 
 #include "emu.h"

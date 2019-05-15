@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
-*
+
 * fidel_csc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity CSC(and derived) hardware

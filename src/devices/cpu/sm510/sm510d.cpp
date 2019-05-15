@@ -149,7 +149,7 @@ const u32 sm510_common_disassembler::s_flags[] =
 
 // common disasm
 
-offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, const u8 pclen)
+offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	// get raw opcode
 	u8 op = opcodes.r8(pc);
@@ -161,7 +161,7 @@ offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8
 	u16 param = mask;
 	if (bits >= 8)
 	{
-		pc = increment_pc(pc, pclen);
+		pc = increment_pc(pc, page_address_bits());
 		param = params.r8(pc);
 		len++;
 	}
@@ -226,7 +226,7 @@ const u8 sm510_disassembler::sm510_mnemonic[0x100] =
 
 offs_t sm510_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	return common_disasm(sm510_mnemonic, nullptr, stream, pc, opcodes, params, 6);
+	return common_disasm(sm510_mnemonic, nullptr, stream, pc, opcodes, params);
 }
 
 
@@ -268,7 +268,7 @@ offs_t sm511_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x30, sm511_extended, 0x10);
 
-	return common_disasm(sm511_mnemonic, ext, stream, pc, opcodes, params, 6);
+	return common_disasm(sm511_mnemonic, ext, stream, pc, opcodes, params);
 }
 
 
@@ -310,7 +310,7 @@ offs_t sm500_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm500_extended, 0x10);
 
-	return common_disasm(sm500_mnemonic, ext, stream, pc, opcodes, params, 6);
+	return common_disasm(sm500_mnemonic, ext, stream, pc, opcodes, params);
 }
 
 
@@ -352,7 +352,7 @@ offs_t sm5a_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm5a_extended, 0x10);
 
-	return common_disasm(sm5a_mnemonic, ext, stream, pc, opcodes, params, 6);
+	return common_disasm(sm5a_mnemonic, ext, stream, pc, opcodes, params);
 }
 
 
@@ -384,7 +384,7 @@ const u8 sm530_disassembler::sm530_mnemonic[0x100] =
 
 offs_t sm530_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	return common_disasm(sm530_mnemonic, nullptr, stream, pc, opcodes, params, 6);
+	return common_disasm(sm530_mnemonic, nullptr, stream, pc, opcodes, params);
 }
 
 
@@ -416,5 +416,5 @@ const u8 sm590_disassembler::sm590_mnemonic[0x100] =
 
 offs_t sm590_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	return common_disasm(sm590_mnemonic, nullptr, stream, pc, opcodes, params, 7);
+	return common_disasm(sm590_mnemonic, nullptr, stream, pc, opcodes, params);
 }

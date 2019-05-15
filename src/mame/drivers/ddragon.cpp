@@ -561,7 +561,7 @@ void ddragon_state::sub_map(address_map &map)
 
 void ddragon_state::ddragonba_sub_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
+	map(0x0100, 0x0fff).ram();
 	map(0x8000, 0x81ff).ram().share("comram");
 	map(0xc000, 0xffff).rom();
 }

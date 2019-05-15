@@ -673,7 +673,10 @@ void mips3_device::static_generate_tlb_mismatch()
 	alloc_handle(*m_drcuml, m_tlb_mismatch, "tlb_mismatch");
 	UML_HANDLE(block, *m_tlb_mismatch);                                         // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
-	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     <pc>,i0
+	// Need the current PC address for the instruction to do the TLB lookup
+	// so need to adjust I0 so it points to the true PC address in case this is a delay slot
+	UML_ADD(block, I0, I0, 3);                                                  // add     i1,i0,3
+	UML_AND(block, I0, I0, ~3);                                                 // and     i0,i0,~3
 	UML_SHR(block, I1, I0, 12);                                                 // shr     i1,i0,12
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);        // load    i1,[vtlb_table],i1,dword
 	if (PRINTF_MMU)
@@ -693,9 +696,11 @@ void mips3_device::static_generate_tlb_mismatch()
 	save_fast_iregs(block);
 
 	// the saved PC may be set 1 instruction back with the low bit set to indicate
-	// a delay slot; in this path we want the original instruction address, so recover it
-	UML_ADD(block, I0, mem(&m_core->pc), 3);                             // add     i0,<pc>,3
-	UML_AND(block, mem(&m_core->pc), I0, ~3);                                // and     <pc>,i0,~3
+	// a delay slot; in this path we want the previous instruction address, so recover it
+	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
+	UML_AND(block, I0, I0, ~3);                                                 // and     i0,i0,~3
+	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     i0,[pc]
+
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
 
 	block.end();
@@ -1236,7 +1241,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 	{
 		if (PRINTF_MMU)
 		{
-			static const char text[] = "Compiler page fault @ %08X";
+			static const char text[] = "Compiler page fault @ %08X\n";
 			UML_MOV(block, mem(&m_core->format), (uintptr_t)text);          // mov     [format],text
 			UML_MOV(block, mem(&m_core->arg0), desc->pc);              // mov     [arg0],desc->pc
 			UML_CALLC(block, cfunc_printf_debug, this);                            // callc   printf_debug

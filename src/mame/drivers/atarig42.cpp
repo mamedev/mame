@@ -336,11 +336,12 @@ void atarig42_state::main_map(address_map &map)
 	map(0xf80000, 0xf80003).w(m_asic65, FUNC(asic65_device::data_w));
 	map(0xfa0000, 0xfa0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0xfc0000, 0xfc0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
-	map(0xff2000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
-	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0xff7000, 0xff7001).w(FUNC(atarig42_state::mo_command_w)).share("mo_command");
+	map(0xff1000, 0xff1fff).ram();
+	map(0xff2000, 0xff5fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff7000, 0xff7001).ram().w(FUNC(atarig42_state::mo_command_w)).share("mo_command");
+	map(0xff7002, 0xffffff).ram();
 }
 
 

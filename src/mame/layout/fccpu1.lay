@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
-<!-- fccpu1.lay -->
-<!-- 2015-07-27: Initial version.  [JLE] -->
+<!--
+license:CC0
+copyright-holders:Joakim Larsson Edstrom
+Force Computers CPU-1 layout
+-->
 <mamelayout version="2">
-	<element name="front">
-				<image file="front.png" />
-	</element>
+	<element name="silver"> <rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+  
+	<group name="front">
+		<bezel element="silver"><bounds x="0" y="0" width="36" height="480" /></bezel>
+	</group>
+	
 	<view name="Force Computers SYS68K/CPU-1">
-		<screen index="0">
-			<bounds left="100" top="0" right="640" bottom="480" />
-		</screen>
-	<bezel name="frontpanel" element="front">
-		<bounds x="0" y="0" width="36" height="480" />
-	</bezel>
+		<screen index="0"><bounds x="50" y="0" width="640" height="480" /></screen>
+		<group ref="front"><bounds x="0" y="0" width="36" height="480" /></group>
 	</view>
 </mamelayout>
 

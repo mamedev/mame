@@ -220,6 +220,7 @@ void sgi_mc_device::dma_tick()
 		if (m_dma_mode & (1 << 3))
 		{   // Fill mode
 			m_space->write_dword(addr, m_dma_gio64_addr);
+			m_dma_mem_addr += 4;
 			m_dma_count -= 4;
 		}
 		else
@@ -233,6 +234,7 @@ void sgi_mc_device::dma_tick()
 			uint64_t data = m_space->read_qword(m_dma_gio64_addr);
 			for (uint32_t i = 0; i < length; i++)
 			{
+				logerror("Copy-mode DMA of %02x to %08x\n", (uint8_t)(data >> shift), addr);
 				m_space->write_byte(addr, (uint8_t)(data >> shift));
 				addr++;
 				shift -= 8;
@@ -277,7 +279,6 @@ void sgi_mc_device::dma_tick()
 				m_dma_run &= ~(1 << 6);
 				if (BIT(m_dma_control, 4))
 				{
-					logerror("Pixel DMA IRQ\n");
 					m_dma_int_cause |= (1 << 3);
 					m_hpc3->raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 				}

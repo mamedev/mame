@@ -14,7 +14,6 @@
 		<description>Action Force - International Heroes</description>
 		<year>1987</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3500 - action force - international heroes (europe).ipf" size="236460" crc="1a2bb165" sha1="9b9b44e1118c40bbb9c6a32d4ffc6e61f8c5fd3b" offset="0" />
@@ -27,7 +26,6 @@
 		<description>Action Force II - International Heroes</description>
 		<year>1988</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238175">
 				<rom name="3551 - action force ii - international heroes (europe).ipf" size="238175" crc="caa251a2" sha1="9c02f116d5a61d5d064d3a5643e70542f1e01bf9" offset="0" />
@@ -40,7 +38,6 @@
 		<description>Adidas Championship Tie-Break</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="123445">
 				<rom name="3501 - adidas championship tie break (europe).ipf" size="123445" crc="6e2e4951" sha1="a50e132cb68cc406e59485b617fc384288762d7f" offset="0" />
@@ -53,7 +50,6 @@
 		<description>Artura</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3552 - artura (europe).ipf" size="237460" crc="bcc6e00c" sha1="8781e6b1e1bf98a1fc6b8ffb77f5671780c5e402" offset="0" />
@@ -66,7 +62,6 @@
 		<description>Badlands</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3553 - badlands (europe).ipf" size="234180" crc="93f1c3b6" sha1="9da5ab7e607dad7fd5b605997929eff43c20abb7" offset="0" />
@@ -79,7 +74,6 @@
 		<description>Beverly Hills Cop</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3502 - beverly hills cop (europe).ipf" size="236460" crc="81fbf5ad" sha1="2022531eba845cfcd19a2fb2b69d54e007979592" offset="0" />
@@ -92,7 +86,6 @@
 		<description>Bloodwych</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3554 - bloodwych (europe).ipf" size="236460" crc="cb66aed6" sha1="b7bab317718a478e48a689a8ebd125a498504ebe" offset="0" />
@@ -105,7 +98,6 @@
 		<description>The Boggit - Bored Too</description>
 		<year>1986</year>
 		<publisher>CRL Group</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3555 - boggit, the - bored too (europe).ipf" size="236460" crc="c9dc8d41" sha1="ae1aff98a4e60bf6272c8955a224a7b0e890c40e" offset="0" />
@@ -118,7 +110,6 @@
 		<description>Book of the Dead</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3556 - book of the dead (europe).ipf" size="236460" crc="b1030311" sha1="6ddbe67cbba260b6ec80ee0bc7e557f88bf08a23" offset="0" />
@@ -132,7 +123,6 @@
 		<year>1989</year>
 		<publisher>Tynesoft</publisher>
 		<info name="alt_title" value="Buffalo Bill's Wild West Rodeo Show" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3503 - buffalo bill's rodeo games (unknown).ipf" size="234180" crc="74650740" sha1="cdf81f26af4e013726a288c3a27a1765b254c267" offset="0" />
@@ -145,7 +135,6 @@
 		<description>Butcher Hill</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3557 - butcher hill (europe).ipf" size="237460" crc="5ae072b5" sha1="96e89f1229f2d8306965b925145ae0ab454def6f" offset="0" />
@@ -158,7 +147,6 @@
 		<description>Carrier Command</description>
 		<year>1989</year>
 		<publisher>Rainbird Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236140">
 				<rom name="3504 - carrier command (europe).ipf" size="236140" crc="3596b16d" sha1="842715907902c7d15a28e92db6e66e2f435f8781" offset="0" />
@@ -171,7 +159,6 @@
 		<description>Chicago 30's</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266892">
 				<rom name="3558 - chicago 30's (unknown).ipf" size="266892" crc="50f0a090" sha1="a0be8b20605834f29e59ded94786ed90d07b235b" offset="0" />
@@ -184,7 +171,6 @@
 		<description>Combat School</description>
 		<year>1987</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238800">
 				<rom name="3559 - combat school (europe).ipf" size="238800" crc="ba69a18a" sha1="581b183c20d6cf33e0965ff00c5b077a9618d872" offset="0" />
@@ -197,7 +183,6 @@
 		<description>Corruption</description>
 		<year>1988</year>
 		<publisher>Rainbird Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3560 - corruption (europe).ipf" size="236460" crc="cfbb80af" sha1="ed489e12913c2bb7fbb48fed0c9644b7cfceb59e" offset="0" />
@@ -210,7 +195,6 @@
 		<description>Cybernoid - The Fighting Machine</description>
 		<year>1988</year>
 		<publisher>Hewson Consultants</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3561 - cybernoid - the fighting machine (europe).ipf" size="212085" crc="3733ffa8" sha1="2a0b2f4c29a568e6e4ac287e679f6b4a4e6ae742" offset="0" />
@@ -223,7 +207,6 @@
 		<description>Cybernoid II - The Revenge</description>
 		<year>1988</year>
 		<publisher>Hewson Consultants</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3562 - cybernoid ii - the revenge (europe).ipf" size="236460" crc="417b84f6" sha1="a2c8753121df65bd95a0d31e7ee6101a2d74ea61" offset="0" />
@@ -236,7 +219,6 @@
 		<description>Dan Dare III - The Escape</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="71100">
 				<rom name="3505 - dan dare iii - the escape (europe).ipf" size="71100" crc="e949bc77" sha1="6074056cd0ef8aaf103d36fde1e5a1fba356904f" offset="0" />
@@ -249,7 +231,6 @@
 		<description>Dark Fusion</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="260585">
 				<rom name="3563 - dark fusion (europe).ipf" size="260585" crc="9495182c" sha1="bb94b445a9909ba39f21119dcc43dbd1497aed20" offset="0" />
@@ -262,7 +243,6 @@
 		<description>The Deep</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266891">
 				<rom name="3506 - deep, the (europe).ipf" size="266891" crc="e4844d2b" sha1="95dee7ccae5613c9b04efdbde5e2bc6c69a1e735" offset="0" />
@@ -275,7 +255,6 @@
 		<description>Deflektor</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3564 - deflektor (europe).ipf" size="212085" crc="2483f8c7" sha1="032b18abb2eb903ded8b32a59b003a68d784d996" offset="0" />
@@ -288,7 +267,6 @@
 		<description>Dominator</description>
 		<year>1989</year>
 		<publisher>System 3 Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="250612">
 				<rom name="3507 - dominator (europe).ipf" size="250612" crc="e6c6f9eb" sha1="22d46cc0cabba10b0d58bba86b5123fdcf73a731" offset="0" />
@@ -301,7 +279,6 @@
 		<description>Echelon</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3565 - echelon (europe).ipf" size="237460" crc="94c24ad3" sha1="cae1aa9d3897ec2027120afd1e4d3370b78de3cf" offset="0" />
@@ -314,7 +291,6 @@
 		<description>Erik - The Phantom of the Opera</description>
 		<year>1987</year>
 		<publisher>Crysys</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3566 - erik - the phantom of the opera (europe).ipf" size="236460" crc="77098dc3" sha1="619babc59ea1816a4ea8e2d2030c25205fd65735" offset="0" />
@@ -327,7 +303,6 @@
 		<description>Escape from the Planet of the Robot Monsters</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3567 - escape from the planet of the robot monsters (europe).ipf" size="234180" crc="ba153a21" sha1="4bb529af057b9cc5ab547cf754a3e4c21d0f34c9" offset="0" />
@@ -341,7 +316,6 @@
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
 		<info name="alt_title" value="Espionage - The Computer Game (Box)" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="99180">
 				<rom name="3568 - espionage - the computer game (europe).ipf" size="99180" crc="893495d8" sha1="eac0b7dcd91d628bf85938327ec15b833dd6f1d9" offset="0" />
@@ -354,7 +328,6 @@
 		<description>F-16 Combat Pilot</description>
 		<year>1991</year>
 		<publisher>Digital Integration</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="161607">
 				<rom name="3508 - f-16 combat pilot (europe).ipf" size="161607" crc="49f2d22d" sha1="1336f27de5c4c1aad734f83aa6c2ffca9efe6747" offset="0" />
@@ -379,7 +352,6 @@
 		<description>Firefly</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238800">
 				<rom name="3570 - firefly (europe).ipf" size="238800" crc="e1961552" sha1="b3b3d1ebd5f6d5ce7ed104ffa63d1bac97b51db8" offset="0" />
@@ -392,7 +364,6 @@
 		<description>Fish!</description>
 		<year>1989</year>
 		<publisher>Rainbird Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3571 - fish! (europe).ipf" size="236460" crc="880592d1" sha1="7522893bfa42a8b25bf98af8b54a83568df72bd3" offset="0" />
@@ -405,7 +376,6 @@
 		<description>Football Director II</description>
 		<year>1987</year>
 		<publisher>D&amp;H Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3509 - football director ii (europe).ipf" size="234180" crc="f98bb0e1" sha1="0eab5d91a1ab220fbc22ae76485fa19beec36adb" offset="0" />
@@ -418,7 +388,6 @@
 		<description>Footballer of the Year 2</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259471">
 				<rom name="3572 - footballer of the year 2 (europe).ipf" size="259471" crc="96979e7f" sha1="a559adafcda492756da509ed22d62a53dbba2a16" offset="0" />
@@ -431,7 +400,6 @@
 		<description>Four Smash Hits From Hewson</description>
 		<year>198?</year>
 		<publisher>Hewson Consultants</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238800">
 				<rom name="3510 - four smash hits from hewson - exolon + zynaps + rana rama + uridium plus (europe).ipf" size="238800" crc="0e708293" sha1="85d7346aff7b7d63a290a828da0445ab73aa9855" offset="0" />
@@ -444,7 +412,6 @@
 		<description>Garfield - "Big, Fat, Hairy Deal."</description>
 		<year>1988</year>
 		<publisher>The Edge</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3511 - garfield - big, fat, hairy deal (europe).ipf" size="236460" crc="ffb8008d" sha1="f9f314b1d26c58340a962b7d6f35fdc5cf65768c" offset="0" />
@@ -457,7 +424,6 @@
 		<description>Gary Lineker's Hot-Shot!</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266892">
 				<rom name="3573 - gary lineker's hot-shot! (unknown).ipf" size="266892" crc="17963acf" sha1="22a8985076b7c1743e9431e071940c49efe217f5" offset="0" />
@@ -470,7 +436,6 @@
 		<description>Gary Lineker's Super Skills</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3574 - gary lineker's superskills (unknown).ipf" size="237460" crc="2f0ed1da" sha1="589cf6b337347218814a4a697353be4af5024c8a" offset="0" />
@@ -483,7 +448,6 @@
 		<description>Gary Lineker's Super Star Soccer</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3575 - gary lineker's superstar soccer (unknown).ipf" size="212085" crc="2a1c53f7" sha1="f4c24b1e01312d4f9b2241be14d243e723035499" offset="0" />
@@ -496,7 +460,6 @@
 		<description>Gauntlet</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3576 - gauntlet (europe).ipf" size="212085" crc="4c4c4cc2" sha1="c04e3233166fe888a96b2ea98a6a96f33fb19728" offset="0" />
@@ -509,7 +472,6 @@
 		<description>Gauntlet II</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3577 - gauntlet ii (europe).ipf" size="212085" crc="7d156d4d" sha1="0d296b611c817203bf59a3710c87d0d5d39c16cf" offset="0" />
@@ -522,7 +484,6 @@
 		<description>Gazza's Super Soccer</description>
 		<year>1990</year>
 		<publisher>Empire Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3579 - gazza's super soccer (unknown).ipf" size="236460" crc="3c8cb09d" sha1="19a06b4732fefb4d5a8898d415afde39aa8a8495" offset="0" />
@@ -535,7 +496,6 @@
 		<description>Gazza II</description>
 		<year>1990</year>
 		<publisher>Empire Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="225096">
 				<rom name="3578 - gazza ii (europe).ipf" size="225096" crc="59a83634" sha1="c43b421f8b0c32858d6bc9668b3b60ef4704f756" offset="0" />
@@ -548,7 +508,6 @@
 		<description>Ghouls 'n' Ghosts</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259471">
 				<rom name="ghouls'n'ghosts.ipf" size="259471" crc="5f056018" sha1="1d84d01a5d349843bcd4743bfb23c7a82ad9704c" offset="0" />
@@ -561,7 +520,6 @@
 		<description>H.A.T.E. - Hostile All Terrain Encounter</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266892">
 				<rom name="3580 - h.a.t.e. - hostile all terrain encounter (europe).ipf" size="266892" crc="2aa400b2" sha1="3d847b6f91d0264900e6f2d28bb30574806613ae" offset="0" />
@@ -574,7 +532,6 @@
 		<description>H.K.M. - Human Killing Machine</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266892">
 				<rom name="3581 - h.k.m. - human killing machine (europe).ipf" size="266892" crc="2793e98f" sha1="ef4b8fcfb530a6b1edcc8820a3fdc00dbc79ec9d" offset="0" />
@@ -587,7 +544,6 @@
 		<description>Heroes of the Lance</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237465">
 				<rom name="3513 - heroes of the lance (europe).ipf" size="237465" crc="d25d5414" sha1="2caf612f85dc9b790102df5f6a76d90c3408c8db" offset="0" />
@@ -600,7 +556,6 @@
 		<description>Hero Quest</description>
 		<year>1991</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="239805">
 				<rom name="3514 - heroquest (europe).ipf" size="239805" crc="fc8bb800" sha1="96538aa2fd28b7ae66916590479b0596afcc495c" offset="0" />
@@ -613,7 +568,6 @@
 		<description>Iron Lord</description>
 		<year>1989</year>
 		<publisher>Ubi Soft</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259180">
 				<rom name="3582 - iron lord (europe).ipf" size="259180" crc="de0e3c7f" sha1="792d58267e8ca7e00b0946a78b7c6b0574ccc942" offset="0" />
@@ -626,7 +580,6 @@
 		<description>Italia '90 - World Cup Soccer</description>
 		<year>1989</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="71100">
 				<rom name="3548 - italia '90 - world cup soccer (europe).ipf" size="71100" crc="78fa8fd0" sha1="ff5c8308544f24e428e877c3ea8c803f432468bb" offset="0" />
@@ -639,7 +592,6 @@
 		<description>Ivan 'Ironman' Stewart's Super Off Road</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="64845">
 				<rom name="3538 - ivan ironman stewart's super off road (unknown).ipf" size="64845" crc="38cb136b" sha1="5b633c7551b168d13d1c4d96637858fbcc027740" offset="0" />
@@ -652,7 +604,6 @@
 		<description>Jack the Ripper</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3583 - jack the ripper (europe).ipf" size="236460" crc="d2f3019f" sha1="30a0e536578ca62133666b2a710ceef505140215" offset="0" />
@@ -665,7 +616,6 @@
 		<description>Kenny Dalglish Soccer Match</description>
 		<year>1990</year>
 		<publisher>Impressions</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3515 - kenny dalglish soccer match (europe).ipf" size="234180" crc="faeb7b0f" sha1="263e1fcb8bb77632cd83ab1dd2ce8d960bed9270" offset="0" />
@@ -678,7 +628,6 @@
 		<description>Kick Off</description>
 		<year>1989</year>
 		<publisher>Anco Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3516 - kick off (europe).ipf" size="234180" crc="152e807b" sha1="855dc66c697484083c729d2183035dfb9166aacc" offset="0" />
@@ -691,7 +640,6 @@
 		<description>The Last Mohican</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3584 - last mohican, the (europe).ipf" size="236460" crc="ed3f624d" sha1="222b93b8e83987c8e5b83f4eb68dee8227bffc64" offset="0" />
@@ -704,7 +652,6 @@
 		<description>The Light Corridor</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="125316">
 				<rom name="3517 - light corridor, the (europe).ipf" size="125316" crc="ef3b80cd" sha1="568f29ba7d1a498432737543af07ba57c4adb26c" offset="0" />
@@ -717,7 +664,6 @@
 		<description>Loads of Midnight</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3518 - loads of midnight (europe).ipf" size="236460" crc="a74f1114" sha1="2ab72f52fa499be8810f67e14aa477a114d37c29" offset="0" />
@@ -730,7 +676,6 @@
 		<description>Lone Wolf - The Mirror of Death</description>
 		<year>1991</year>
 		<publisher>Aufiogenic Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3586 - lone wolf - the mirror of death (europe).ipf" size="236460" crc="8943aba3" sha1="c6c810341c40a099858678ea63d701feca7d611f" offset="0" />
@@ -743,7 +688,6 @@
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>1990</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="239805">
 				<rom name="3587 - lotus esprit turbo challenge (europe).ipf" size="239805" crc="7c19c332" sha1="9756acef2e504b898894eef464c2496d60fbc862" offset="0" />
@@ -757,7 +701,6 @@
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
 		<info name="game" value="Finders Keepers + Spellbound + Knight Tyme" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="463740">
 				<rom name="3629 - magic knight trilogy - finders keepers + spellbound + knight tyme (europe).ipf" size="463740" crc="079c89bd" sha1="d90d4d25300795b8cc4ba383c680784b3050ef40" offset="0" />
@@ -770,7 +713,6 @@
 		<description>Marauder</description>
 		<year>1988</year>
 		<publisher>Hewson Consultants</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3519 - marauder (europe).ipf" size="237460" crc="2b61f4db" sha1="6896d9424b64b0ce2239485f28da9d49c7952e84" offset="0" />
@@ -783,7 +725,6 @@
 		<description>Mask III - Venom Strikes Back</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3588 - mask iii - venom strikes back (europe).ipf" size="212085" crc="d36cea11" sha1="e4f73b8b32cf20802462997bc8f0adae38039e73" offset="0" />
@@ -796,7 +737,6 @@
 		<description>Masters of the Universe - The Movie</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3589 - masters of the universe - the movie (europe).ipf" size="212085" crc="dc32481a" sha1="66ebeed6e635b019f6cdea6c4b1a7f8305f5e7d3" offset="0" />
@@ -809,7 +749,6 @@
 		<description>MegaApocalypse</description>
 		<year>1988</year>
 		<publisher>Martech Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3590 - mega-apocalypse (europe).ipf" size="236460" crc="802fa03e" sha1="0db41124887381927e87c9b294de53b5b0e0443d" offset="0" />
@@ -822,7 +761,6 @@
 		<description>Mickey Mouse</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3591 - mickey mouse (europe).ipf" size="212085" crc="a788f7e3" sha1="9a89ba9da2a65acbe909e1be4ace922fb52ad28c" offset="0" />
@@ -835,7 +773,6 @@
 		<description>Midnight Resistance</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="146161">
 				<rom name="3520 - midnight resistance (europe).ipf" size="146161" crc="62943f46" sha1="369f6ed76e6b8c7d60949754b49f939d0747bd46" offset="0" />
@@ -848,7 +785,6 @@
 		<description>Monty Python's Flying Circus</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="262692">
 				<rom name="3521 - monty python's flying circus (europe).ipf" size="262692" crc="8d7630b6" sha1="31495c6cf185cb00ff83eb3dc8f8b126118cf1b4" offset="0" />
@@ -861,7 +797,6 @@
 		<description>The Ninja Warriors</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="241110">
 				<rom name="3522 - ninja warriors, the (europe).ipf" size="241110" crc="4eb0abeb" sha1="e1ef8de2788953c9399515796ee1309ea33ccd3f" offset="0" />
@@ -874,7 +809,6 @@
 		<description>North Star</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3592 - north star (europe).ipf" size="212085" crc="3c78a485" sha1="a8e47ac46b9d6396d422fee1ec91d753ccf66ec6" offset="0" />
@@ -887,7 +821,6 @@
 		<description>Obliterator</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3593 - obliterator (unknown).ipf" size="234180" crc="2ecaeee7" sha1="5e414ccba57f2fb0d384dac268b7f6f7b1fc48d8" offset="0" />
@@ -900,7 +833,6 @@
 		<description>P-47 Thunderbolt</description>
 		<year>1990</year>
 		<publisher>Firebird Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3594 - p-47 thunderbolt (europe).ipf" size="236460" crc="5e7c8a54" sha1="077718f2e94cef68e57114249e869d6cb897a616" offset="0" />
@@ -914,7 +846,6 @@
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="P.H.M. Pegasus - Patrol Hydrofoil Missile Craft Simulation (Box)" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238800">
 				<rom name="3596 - phm pegasus - patrol hydrofoil missile craft simulation (europe).ipf" size="238800" crc="ef9157eb" sha1="ae18a271c03fee31a70fa55b80ad4b991fab156e" offset="0" />
@@ -927,7 +858,6 @@
 		<description>Pac-Land</description>
 		<year>1989</year>
 		<publisher>Grandslam Entertainments</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="114805">
 				<rom name="3595 - pac-land (europe).ipf" size="114805" crc="93e4fc20" sha1="58a070edfbc9d28e9a1a25674867433e7e22e214" offset="0" />
@@ -940,7 +870,6 @@
 		<description>Pang</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="196735">
 				<rom name="3523 - pang (europe).ipf" size="196735" crc="604502ad" sha1="a7f22304e0deae1a25f23ea7f73570dbcfe2bbd5" offset="0" />
@@ -953,7 +882,6 @@
 		<description>Passing Shot</description>
 		<year>1989</year>
 		<publisher>Image Works</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="77364">
 				<rom name="3524 - passing shot (europe).ipf" size="77364" crc="f987b804" sha1="d5537ad6d7670725396d63022fe4fa3a4c3b6aa7" offset="0" />
@@ -966,7 +894,6 @@
 		<description>The Pawn</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3525 - pawn, the (europe).ipf" size="236460" crc="468012a2" sha1="1402a94935992789fdbffa1aa07140d56eeba435" offset="0" />
@@ -979,7 +906,6 @@
 		<description>Pipe Mania</description>
 		<year>1990</year>
 		<publisher>Empire Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3597 - pipe mania (europe).ipf" size="234180" crc="c42e0870" sha1="70623591fbef78e5562ac88418ad61df1ba9a811" offset="0" />
@@ -993,7 +919,6 @@
 		<year>1987</year>
 		<publisher>Pirate Software</publisher>
 		<info name="games" value="Holiday in Sumaria + Call Me Psycho + Smash Out!" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3598 - pirate 3+3 - holiday in sumaria + call me psycho + smash out! (europe).ipf" size="236460" crc="95e093a6" sha1="c6bb5c0c3fd92c8d666b3493ca8fdc55a8f1d35d" offset="0" />
@@ -1006,7 +931,6 @@
 		<description>Platoon</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="159198">
 				<rom name="3526 - platoon (europe).ipf" size="159198" crc="56fe10dc" sha1="d844dabecb043d8c16bd8864b7146de456cda369" offset="0" />
@@ -1019,7 +943,6 @@
 		<description>Predator 2</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3527 - predator 2 (europe).ipf" size="234180" crc="2cdff17b" sha1="c691b6cca52aced2790f7e99f27cc6b3e8040c4e" offset="0" />
@@ -1032,7 +955,6 @@
 		<description>Pro Tennis Tour</description>
 		<year>1990</year>
 		<publisher>Ubi Soft</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3599 - pro tennis tour (europe).ipf" size="236460" crc="e1e4448b" sha1="b8abc334bf1604934e293c133fdbe3946e744975" offset="0" />
@@ -1045,7 +967,6 @@
 		<description>A Question of Scruples - The Computer Edition</description>
 		<year>1987</year>
 		<publisher>Leisure Genius</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3529 - question of scruples, a - the computer edition (europe).ipf" size="236460" crc="34d8887c" sha1="2e402eb208ce6695930a8d7e042c4b1f0f7e6944" offset="0" />
@@ -1058,7 +979,6 @@
 		<description>A Question of Sport</description>
 		<year>1989</year>
 		<publisher>Elite Systems</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3601 - question of sport, a (europe).ipf" size="236460" crc="8402bbeb" sha1="0f47e7c7326ad484f2222579c6395e29031a0115" offset="0" />
@@ -1071,7 +991,6 @@
 		<description>R.B.I. Baseball 2</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3602 - r.b.i. baseball two (europe).ipf" size="234180" crc="87c57f24" sha1="5558cfb938091ab469bbec5a3323d69a73186bfd" offset="0" />
@@ -1084,7 +1003,6 @@
 		<description>Rainbow Islands</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="211680">
 				<rom name="3600 - rainbow islands (europe).ipf" size="211680" crc="d7db38ed" sha1="acfc70b4ecb3a4493321541a86585aaf85aed12c" offset="0" />
@@ -1097,7 +1015,6 @@
 		<description>Renegade</description>
 		<year>1987</year>
 		<publisher>Imagine Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3603 - renegade (europe).ipf" size="236460" crc="84a1fc8e" sha1="bcf794a5ab09f3febd58e26a4e4fa31f5e1941f9" offset="0" />
@@ -1110,7 +1027,6 @@
 		<description>Rex</description>
 		<year>1988</year>
 		<publisher>Martech Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3605 - rex (europe).ipf" size="236460" crc="ee04c2c3" sha1="8bd98191db385647c808453ec50813dd93d72b0c" offset="0" />
@@ -1123,7 +1039,6 @@
 		<description>Road Blasters</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="238800">
 				<rom name="3606 - road blasters (europe).ipf" size="238800" crc="95160028" sha1="f0359902f4687a30aa98a2b11e1eee1e170daa15" offset="0" />
@@ -1136,7 +1051,6 @@
 		<description>Robocop 2</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="139905">
 				<rom name="3528 - robocop 2 (europe).ipf" size="139905" crc="dcedfec7" sha1="80535591f4d93e2df41481df64673571d93b1809" offset="0" />
@@ -1149,7 +1063,6 @@
 		<description>Rolling Thunder</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3608 - rolling thunder (europe).ipf" size="237460" crc="ddd2f964" sha1="5a910fc46cef7b545bb817128048de41357e6991" offset="0" />
@@ -1162,7 +1075,6 @@
 		<description>Run the Gauntlet</description>
 		<year>1989</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3609 - run the gauntlet (europe).ipf" size="212085" crc="e1a23873" sha1="191d4c4f0beef6e4fd4cd47edda058092e2374a5" offset="0" />
@@ -1175,7 +1087,6 @@
 		<description>Saint &amp; Greavsie</description>
 		<year>1989</year>
 		<publisher>Grandslam Entertainments</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="267142">
 				<rom name="3610 - saint and greavsie (europe).ipf" size="267142" crc="8e3df69a" sha1="671ed674a6f05d0db8e3e437de87ee2298a43769" offset="0" />
@@ -1188,7 +1099,6 @@
 		<description>Scrabble Deluxe</description>
 		<year>1987</year>
 		<publisher>Leisure Genius</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="233852">
 				<rom name="3611 - scrabble deluxe (europe).ipf" size="233852" crc="fd27626b" sha1="06f09b5a89ddd32fff07eb5aeae40bad96d8275e" offset="0" />
@@ -1202,7 +1112,6 @@
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
 		<info name="game" value="Combat Zone, Firestorm, Dead or Alive" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3612 - shootacular disk 2 - combat zone + firestorm + dead or alive (europe).ipf" size="234180" crc="9fbe4d56" sha1="ce4ae2c4e57f68da942249b204ec28a23ae1760c" offset="0" />
@@ -1215,7 +1124,6 @@
 		<description>Sim City</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="12e901e">
 				<rom name="3530 - sim city (europe).ipf" size="126717" crc="12e901ee" sha1="7fd665f19a290994dfbf8ba02da19ac1905581be" offset="0" />
@@ -1228,7 +1136,6 @@
 		<description>Skateball</description>
 		<year>1988</year>
 		<publisher>Ubi Soft</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3613 - skateball (europe).ipf" size="236460" crc="00cb42ee" sha1="f3a0c02215f9ea679bcb338b9f5a9d7cc61ab235" offset="0" />
@@ -1241,7 +1148,6 @@
 		<description>Skull &amp; Crossbones</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="271685">
 				<rom name="3614 - skull &amp; crossbones (europe).ipf" size="271685" crc="a6c33f24" sha1="91c9b414d4ac1bd44657dd68d4ef2c8d911b45db" offset="0" />
@@ -1254,7 +1160,6 @@
 		<description>Snoopy - The Cool Computer Game</description>
 		<year>1991</year>
 		<publisher>The Edge</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195328">
 				<rom name="3531 - snoopy - the cool computer game (europe).ipf" size="236460" crc="acdfe6d4" sha1="4ab0bd91d893964d957bf8c7ab3fa79d534220dc" offset="0" />
@@ -1267,7 +1172,6 @@
 		<description>Soldier of Light</description>
 		<year>1988</year>
 		<publisher>ACE Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3532 - soldier of light (europe).ipf" size="236460" crc="bffdd16e" sha1="948cf81086d9093da6cd08be61f60d46caf4e933" offset="0" />
@@ -1280,7 +1184,6 @@
 		<description>Space Crusade</description>
 		<year>1992</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="239805">
 				<rom name="3533 - space crusade (europe).ipf" size="239805" crc="9c96fd7b" sha1="a1e5864217fe7f5617d21e005f53752af0238f92" offset="0" />
@@ -1294,7 +1197,6 @@
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
 		<info name="games" value="Soccer Boss, Olympic Spectacular, Indoor Soccer" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3534 - sportacular disk 1 - soccer boss + olympic spectacular + indoor soccer (europe).ipf" size="234180" crc="6945a61b" sha1="bf3f411cbb998a0af1274154f1761e753eb6a92f" offset="0" />
@@ -1307,7 +1209,6 @@
 		<description>The Spy Who Loved Me</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3615 - spy who loved me, the (europe).ipf" size="234180" crc="6d638747" sha1="30763ad2f43935d7b63fdec20e62858357742b77" offset="0" />
@@ -1320,7 +1221,6 @@
 		<description>Stalingrad</description>
 		<year>1988</year>
 		<publisher>CCS</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3535 - stalingrad (europe).ipf" size="236460" crc="cb347afc" sha1="cb584de6c08d12788e8ef8c2b5e74e06ffbb2c12" offset="0" />
@@ -1333,7 +1233,6 @@
 		<description>Star Wars</description>
 		<year>1987</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3617 - star wars (europe).ipf" size="236460" crc="f7406cf3" sha1="892d00becdc045a5289c4ae172291486e3107c76" offset="0" />
@@ -1346,7 +1245,6 @@
 		<description>Star Wars - Return of the Jedi</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3604 - star wars - return of the jedi (europe).ipf" size="236460" crc="6f6134a2" sha1="7f04c19c145dc216736d8daadba0641277170d4c" offset="0" />
@@ -1359,7 +1257,6 @@
 		<description>Starglider</description>
 		<year>1986</year>
 		<publisher>Rainbird Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3536 - starglider (europe).ipf" size="236460" crc="8bfbfec7" sha1="68b7e4ba0c50cb750926623f513d436a00f73581" offset="0" />
@@ -1372,7 +1269,6 @@
 		<description>Starring Charlie Chaplin</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3616 - starring charlie chaplin (europe).ipf" size="237460" crc="93bc0467" sha1="02bc05b02a6880deb03db12e658f65d9b46f9a6f" offset="0" />
@@ -1385,7 +1281,6 @@
 		<description>Subbuteo - The Computer Game</description>
 		<year>1990</year>
 		<publisher>Electronic Zoo</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3618 - subbuteo - the computer game (europe).ipf" size="236460" crc="2bc39232" sha1="b4933dd0e5420e1f8c977192cef1dc09dcc0ec81" offset="0" />
@@ -1398,7 +1293,6 @@
 		<description>The Sun Computer Crosswords Volume 1</description>
 		<year>1988</year>
 		<publisher>Akom</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3619 - sun computer crosswords volume 1, the (europe).ipf" size="236460" crc="e87a9910" sha1="5c3c7cc4c1d3ae851a1631bfb5a25ec324b33783" offset="0" />
@@ -1411,7 +1305,6 @@
 		<description>Super Cars</description>
 		<year>1990</year>
 		<publisher>Gremlin Graphics Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="212085">
 				<rom name="3537 - super cars (europe).ipf" size="212085" crc="20a43fbb" sha1="de410ab9d0fc172e58d523f4e22088694306f407" offset="0" />
@@ -1424,7 +1317,6 @@
 		<description>Super Cycle</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3620 - super cycle (europe).ipf" size="237460" crc="4349a0e1" sha1="297c1aedb313a8344f9e7489f7d282e1260506c6" offset="0" />
@@ -1437,7 +1329,6 @@
 		<description>Super Space Invaders</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3539 - super space invaders (europe).ipf" size="234180" crc="3f3b3a3e" sha1="eeed9c991f06819e3a1aed01d42cd0ec364fac6c" offset="0" />
@@ -1450,7 +1341,6 @@
 		<description>Tai-pan</description>
 		<year>1987</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3621 - tai-pan (europe).ipf" size="236460" crc="aef0bdf1" sha1="467dfa30fa1a1f7278b83d27bd9a1a1a9bfa0bdd" offset="0" />
@@ -1463,7 +1353,6 @@
 		<description>Teenage Mutant Hero Turtles</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3540 - teenage mutant hero turtles (europe).ipf" size="234180" crc="5cba9f99" sha1="920b8203c466a578d73aef39e0b54931e42b359d" offset="0" />
@@ -1476,7 +1365,6 @@
 		<description>Teenage Mutant Hero Turtles (3&quot;)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3541 - teenage mutant hero turtles (europe) (three inch).ipf" size="236460" crc="1125e88f" sha1="ee807ed179cb748403f94d7aa4b6e7ae8a9b033b" offset="0" />
@@ -1489,7 +1377,6 @@
 		<description>Terminator 2 - Judgment Day</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259185">
 				<rom name="3622 - terminator 2 - judgment day (europe).ipf" size="259185" crc="da207f08" sha1="04ae9ac360b9fbe23c76a4d380cde9ca9903b0e9" offset="0" />
@@ -1502,7 +1389,6 @@
 		<description>Thunder Blade</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="237460">
 				<rom name="3623 - thunder blade (europe).ipf" size="237460" crc="c83cc174" sha1="eba2cc3c53a1634e48098a431f73dee3169c78d3" offset="0" />
@@ -1515,7 +1401,6 @@
 		<description>Thundercats</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3624 - thundercats (europe).ipf" size="234180" crc="459999a2" sha1="af7f670ffaf05bc36bb7997849d446770ed7a4b3" offset="0" />
@@ -1528,7 +1413,6 @@
 		<description>Total Recall</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="184315">
 				<rom name="3543 - total recall (europe).ipf" size="184315" crc="9e5325a8" sha1="1748281e2a811580c3af086e59e9d5302c2c766b" offset="0" />
@@ -1541,7 +1425,6 @@
 		<description>Total Recall (Guild Home Video Advert)</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="184315">
 				<rom name="3542 - total recall (europe) (guild home video advert).ipf" size="184315" crc="48eb67ce" sha1="66005b0a98851cdd784798a94e25b3eee8e3007f" offset="0" />
@@ -1554,7 +1437,6 @@
 		<description>Trevor Brooking's World Cup Glory</description>
 		<year>1990</year>
 		<publisher>Challenge Software</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3544 - trevor brooking's world cup glory (europe).ipf" size="234180" crc="98358646" sha1="4ddc2a1dfb6e0c6c1e9d209f74d62dba6182f5e8" offset="0" />
@@ -1567,7 +1449,6 @@
 		<description>Vigilante</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266892">
 				<rom name="3626 - vigilante (europe).ipf" size="266892" crc="4df85c44" sha1="0f13d51918c0df0a07ef13e22b23f49c17007219" offset="0" />
@@ -1580,7 +1461,6 @@
 		<description>Vixen</description>
 		<year>1988</year>
 		<publisher>Martech Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3545 - vixen (europe).ipf" size="236460" crc="2ebf7637" sha1="8435d9b04b7fe9bcd04679022aa01c85461c3f75" offset="0" />
@@ -1594,7 +1474,6 @@
 		<year>1989</year>
 		<publisher>Krome Studios Melbourne</publisher>
 		<info name="alt_title" value="J.R.R. Tolkien's War in Middle Earth (Box)" />
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3546 - j.r.r. tolkien's war in middle earth (europe).ipf" size="234180" crc="f66db1bb" sha1="e3b62c9c01a49068a6f57abbdea93dd6013b6858" offset="0" />
@@ -1607,7 +1486,6 @@
 		<description>Welltris</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3547 - welltris (europe).ipf" size="236460" crc="18f7df7f" sha1="626b5fbef66aee9fab753eaf4ff95d844ae49efa" offset="0" />
@@ -1620,7 +1498,6 @@
 		<description>World Championship Boxing Manager</description>
 		<year>1990</year>
 		<publisher>Goliath Games</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3627 - world championship boxing manager (europe).ipf" size="234180" crc="20b95f60" sha1="ac43afcf09a27828b503328f236ce40c1842c2a8" offset="0" />
@@ -1633,7 +1510,6 @@
 		<description>X-Out</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259471">
 				<rom name="3550 - x-out (europe).ipf" size="259471" crc="12540648" sha1="4f3650e4739c1eca40d56360b16fd7460d37ac75" offset="0" />
@@ -1646,7 +1522,6 @@
 		<description>Xenon</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="234180">
 				<rom name="3549 - xenon (europe).ipf" size="234180" crc="01daebfa" sha1="5ae00774d2da999b95b29142d11a01311b2cf07c" offset="0" />
@@ -1659,7 +1534,6 @@
 		<description>Xybots</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
-
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="209805">
 				<rom name="3628 - xybots (europe).ipf" size="209805" crc="51a0d849" sha1="86461e526a4cf5c7731f1e1067433ca9c8d57dec" offset="0" />
@@ -2965,7 +2839,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1chqin">
-		<description>2 Por 1: Chase H.Q. + Indiana Jones y la Ultima Cruzada</description>
+		<description>2 por 1: Chase H.Q. + Indiana Jones y la Ultima Cruzada</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -2984,7 +2858,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1motfa">
-		<description>2 Por 1: Motor Massacre + Final Assault</description>
+		<description>2 por 1: Motor Massacre + Final Assault</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3041,7 +2915,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1rentr">
-		<description>2 Por 1: Renegade + Target Renegade</description>
+		<description>2 por 1: Renegade + Target Renegade</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3060,7 +2934,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1silmm">
-		<description>2 Por 1: Silent Shadow + Mad Mix Game</description>
+		<description>2 por 1: Silent Shadow + Mad Mix Game</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3079,7 +2953,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1silmma" cloneof="2x1silmm">
-		<description>2 Por 1: Silent Shadow + Mad Mix Game (alt)</description>
+		<description>2 por 1: Silent Shadow + Mad Mix Game (alt)</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3099,7 +2973,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1tecmm">
-		<description>2 Por 1: Techno Cop + Mickey Mouse</description>
+		<description>2 por 1: Techno Cop + Mickey Mouse</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3118,7 +2992,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1tdmun">
-		<description>2 Por 1: The Deep + The Muncher</description>
+		<description>2 por 1: The Deep + The Muncher</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3137,7 +3011,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1tblc2">
-		<description>2 Por 1: Thunder Blade + Cybernoid II</description>
+		<description>2 por 1: Thunder Blade + Cybernoid II</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -3156,7 +3030,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="2x1vsbns">
-		<description>2 Por 1: MASK III: VENOM Strikes Back + North Star</description>
+		<description>2 por 1: MASK III: VENOM Strikes Back + North Star</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -4481,7 +4355,7 @@
 	<software name="germmstr">
 		<description>The German Master</description>
 		<year>1993</year>
-		<publisher>Kosmos</publisher>
+		<publisher>Kosmos Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="german master, the (1993)(kosmos).dsk" size="194816" crc="f8eaac2a" sha1="6fe7928e0a35a1aec442eda354853d4b9ff1d593" offset="0" />
@@ -6817,7 +6691,7 @@
 	<software name="ansbacfa">
 		<description>Answer Back Factfile 500 - Arithmetic - Ages 6-11</description>
 		<year>1985</year>
-		<publisher>Kosmos</publisher>
+		<publisher>Kosmos Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="answer back factfile 500 - arithmetic - ages 6-11 (1985)(kosmos).dsk" size="194816" crc="02a79ba0" sha1="22a6681d3b1579da9795b39aad01bd396ab4a170" offset="0" />
@@ -6829,7 +6703,7 @@
 	<software name="ansbacjq">
 		<description>Answer Back Junior Quiz</description>
 		<year>1985</year>
-		<publisher>Kosmos</publisher>
+		<publisher>Kosmos Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="answer back junior quiz (1985)(kosmos).dsk" size="194816" crc="a00f2d25" sha1="a5ee4b4f142b0f0e46c6f71368dad1224a8db4c3" offset="0" />
@@ -6877,7 +6751,7 @@
 	<software name="funsc268">
 		<description>Fun School 2 for 6-8 Year Olds</description>
 		<year>1989</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fun school 2 for 6-8 year olds (1989)(database educational)[aka fun school 2 for 6 to 8 years].dsk" size="194816" crc="54456709" sha1="8ceeb4b62ed72e7f0efabf7f3c10b5347395ffbd" offset="0" />
@@ -6889,7 +6763,7 @@
 	<software name="funsc268a" cloneof="funsc268">
 		<description>Fun School 2 for 6-8 Year Olds (alt)</description>
 		<year>1989</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fun school 2 for 6-8 year olds (1989)(database educational)[a][aka fun school 2 for 6 to 8 years].dsk" size="194816" crc="91e7199e" sha1="29531481a5c28030b56669cd21e8a78d7196cb82" offset="0" />
@@ -6901,7 +6775,7 @@
 	<software name="funsc268b" cloneof="funsc268">
 		<description>Fun School 2 for 6-8 Year Olds (alt 2)</description>
 		<year>1989</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fun school 2 for 6-8 year olds (1989)(database educational)[a2][aka fun school 2 for 6 to 8 years].dsk" size="194816" crc="857a1482" sha1="85db0fc04d6a8da7e060262da05dd554930d0cba" offset="0" />
@@ -6913,7 +6787,7 @@
 	<software name="funsc268c" cloneof="funsc268">
 		<description>Fun School 2 for 6-8 Year Olds (alt 3)</description>
 		<year>1989</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="fun school 2 for 6-8 year olds (1989)(database educational)[a3][aka fun school 2 for 6 to 8 years].dsk" size="194816" crc="7bffa05e" sha1="5d844874bc517fe8f05823452c5ceda9125ef661" offset="0" />
@@ -6925,7 +6799,7 @@
 	<software name="funsc28">
 		<description>Fun School 2 for the Over-8s</description>
 		<year>1989</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195328">
 				<rom name="fun school 2 for the over-8s (1989)(database educational)[aka fun school 2 for ages 8 to 12].dsk" size="195328" crc="f724e19d" sha1="493e38ce4f4f83c2cfda6bc5dbc589167ce3e64f" offset="0" />
@@ -6937,7 +6811,7 @@
 	<software name="funsc357">
 		<description>Fun School 3 for 5-7 Year Olds</description>
 		<year>1991</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -6956,7 +6830,7 @@
 	<software name="funsc37">
 		<description>Fun School 3 for the Over-7s</description>
 		<year>1991</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -6975,7 +6849,7 @@
 	<software name="funsc35">
 		<description>Fun School 3 for the Under-5s</description>
 		<year>1991</year>
-		<publisher>Database Educational</publisher>
+		<publisher>Database Educational Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -6994,7 +6868,7 @@
 	<software name="funsc457">
 		<description>Fun School 4 for 5-7 Year Olds</description>
 		<year>1992</year>
-		<publisher>Europress</publisher>
+		<publisher>Europress Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
@@ -7013,7 +6887,7 @@
 	<software name="funsc4711">
 		<description>Fun School 4 for 7-11 Year Olds</description>
 		<year>1992</year>
-		<publisher>Europress</publisher>
+		<publisher>Europress Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="141312">
@@ -7044,7 +6918,7 @@
 	<software name="identeur">
 		<description>Identify Europe</description>
 		<year>1987</year>
-		<publisher>Kosmos</publisher>
+		<publisher>Kosmos Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="identify europe (1987)(kosmos).dsk" size="194816" crc="4f9dfb6f" sha1="bc632b6df0104e74af93bb2a2fd4ba338bf9d86a" offset="0" />
@@ -8074,7 +7948,7 @@
 	<software name="bedlam">
 		<description>Bedlam</description>
 		<year>1988</year>
-		<publisher>Go</publisher>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bedlam (1988)(go).dsk" size="194816" crc="a69e1974" sha1="be74fdc1b70756e405bfc53cf54ee7c790e96e36" offset="0" />
@@ -8132,19 +8006,19 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Spectrum, Side B: Amstrad) -->
+	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 	<software name="bestialw">
 		<description>Bestial Warrior</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A: Spectrum"/>
+			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="80384">
 				<rom name="bestial warrior (1989)(dinamic)(es)[a].dsk" size="80384" crc="208235f6" sha1="50d9a3bb79b82deb6c08253cfbffa460bb8abaa2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Amstrad"/>
+			<feature name="part_id" value="Side B: Amstrad CPC"/>
 			<dataarea name="flop" size="91136">
 				<rom name="bestial warrior (1989)(dinamic)(es)(side b).dsk" size="91136" crc="3fd882c2" sha1="977204c72ef1b1643e33516ffe904b35ad87c826" offset="0" />
 			</dataarea>
@@ -8322,7 +8196,7 @@
 	<software name="bravesta">
 		<description>BraveStarr</description>
 		<year>1987</year>
-		<publisher>Go</publisher>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="bravestarr (1987)(go).dsk" size="194816" crc="ebd6d548" sha1="585a027a2029675df07ea0e7786e9fdfbda60c9b" offset="0" />
@@ -12283,7 +12157,7 @@
 	<software name="ledstorm">
 		<description>LED Storm Rally 2011</description>
 		<year>1988</year>
-		<publisher>Go</publisher>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="led storm rally 2011 (1988)(go).dsk" size="194816" crc="1a675e8d" sha1="295acfddcdff4a98ea290d9a9b2cf2da1b97de94" offset="0" />
@@ -12375,7 +12249,7 @@
 	<software name="lazertag">
 		<description>Lazer Tag</description>
 		<year>1987</year>
-		<publisher>Go</publisher>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lazer tag (1987)(go).dsk" size="194816" crc="a9fbd8fa" sha1="6e58f24e163b1ca99c0d11992bf7c1fdf743a3d2" offset="0" />
@@ -12559,7 +12433,7 @@
 	<software name="lordsoch">
 		<description>Lords of Chaos</description>
 		<year>1990</year>
-		<publisher>Blade</publisher>
+		<publisher>Blade Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lords of chaos (1990)(blade).dsk" size="194816" crc="a53890ef" sha1="f62c1ea98f84544533ad9d9e7a887f1b7e1f2f41" offset="0" />
@@ -12571,7 +12445,7 @@
 	<software name="lordsocha" cloneof="lordsoch">
 		<description>Lords of Chaos (alt)</description>
 		<year>1990</year>
-		<publisher>Blade</publisher>
+		<publisher>Blade Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="lords of chaos (1990)(blade)[a].dsk" size="194816" crc="ffe27e16" sha1="522cb63098aad24516dd0e1d0acf8849f2db0a3c" offset="0" />
@@ -12834,7 +12708,7 @@
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="megatwin">
 		<description>Mega Twins</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -13369,18 +13243,18 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="navyseal">
-		<description>Navy SEALs</description>
+	<software name="navysealsp" cloneof="navyseal">
+		<description>Navy SEALs (Spa)</description>
 		<year>1991</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A: The Gulf of Oman"/>
 			<dataarea name="flop" size="155904">
 				<rom name="navy seals (1991)(erbe)(es)(en)(side a)[re-release].dsk" size="155904" crc="af3ffaf7" sha1="dbfdadcaecddfff4f33e2cc6edda386dc6e8a2d9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B: Beirut"/>
 			<dataarea name="flop" size="155904">
 				<rom name="navy seals (1991)(erbe)(es)(en)(side b)[re-release].dsk" size="155904" crc="66e8d525" sha1="bb0330e4dddb1904623c6c38ad92f938167fad95" offset="0" />
 			</dataarea>
@@ -15284,7 +15158,7 @@
 	<software name="sidearms">
 		<description>Side Arms</description>
 		<year>1988</year>
-		<publisher>Go</publisher>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="side arms (1988)(go).dsk" size="194816" crc="9199aa09" sha1="e23fdec7d476cfcef5754262541580ff40e76318" offset="0" />
@@ -15964,7 +15838,7 @@
 	<software name="strfight">
 		<description>Street Fighter</description>
 		<year>1988</year>
-		<publisher>Go</publisher>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="street fighter (1988)(go).dsk" size="194816" crc="867ed9cc" sha1="2aa9fc365e4434db2e9e54074b491fb730431862" offset="0" />
@@ -19802,19 +19676,19 @@
 		</part>
 	</software>
 
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Spectrum, Side B: Amstrad) -->
+	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 	<software name="navymovespa" cloneof="navymove">
 		<description>Navy Moves (Spa) (alt)</description>
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A: Spectrum"/>
+			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="166817">
 				<rom name="Navy Moves (Doble Edición) (side A).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Amstrad"/>
+			<feature name="part_id" value="Side B: Amstrad CPC"/>
 			<dataarea name="flop" size="214784">
 				<rom name="navy moves (1988)(dinamic)(es)(en)(side b).dsk" size="214784" crc="c32323a2" sha1="da30c11411368b22474b032f39e8f8b968f7903b" offset="0" />
 			</dataarea>
@@ -20077,4 +19951,743 @@
 		</part>
 	</software>
 
+	<software name="1943">
+		<description>1943</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="1943.dsk" size="194816" crc="6114264f" sha1="9dc7fd4495a122e5c462c87def0a1495060e0edc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dpool">
+		<description>3D Pool</description>
+		<year>1989</year>
+		<publisher>Firebird Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="3d pool.dsk" size="195635" crc="0aa42014" sha1="bd90b51b3258f6fae999b785b0090baac6b3da32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6pakv1">
+		<description>6-Pak Vol 1</description>
+		<year>1987</year>
+		<publisher>Hit-Pak</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Scooby Doo + Duet + 1943 + Jet Set Willy II"/>
+			<dataarea name="flop" size="214784">
+				<rom name="6-pak vol 1 - side a.dsk" size="214784" crc="8f7726ff" sha1="f575c8c738c472b3a4320d160b4586b23f09caf5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Antiriad + Split Personalities + Fighting Warrior"/>
+			<dataarea name="flop" size="214784">
+				<rom name="6-pak vol 1 - side b.dsk" size="214784" crc="f8c13c76" sha1="b9af7d14b6b559977bf45c3d9184040cfac558e5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abff500gs">
+		<description>Answer Back Factfile 500 - General Science</description>
+		<year>1985</year>
+		<publisher>Kosmos Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="answer back factfile 500 - general science.dsk" size="195635" crc="5419e409" sha1="a49d9c2c9d2117548129fbf4a1c9ec20d43d0135" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcamusc">
+		<description>Arcade Muscle</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Road Blasters + Street Fighter"/>
+			<dataarea name="flop" size="219136">
+				<rom name="arcade muscle - side a.dsk" size="219136" crc="bf535ce4" sha1="ef05e98aa405ced222bac7bf52a026c4787809d3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Side Arms + 1943 + Bionic Commando"/>
+			<dataarea name="flop" size="219136">
+				<rom name="arcade muscle - side b.dsk" size="219136" crc="ffa3de4b" sha1="f6142b01a64eda9f484a5f909aa13cc81e9cac94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballbrkr">
+		<description>Ball Breaker</description>
+		<year>1987</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="ball breaker.dsk" size="195635" crc="3f76f387" sha1="1ffb4e36894fd986d9ec4dcff57b08c34515c9a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bionicc">
+		<description>Bionic Commando</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="bionic commando.dsk" size="194816" crc="01b25e83" sha1="9dd19b0d3847e9de68ec303150f735e1136e124d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chartatt">
+		<description>Chart Attack</description>
+		<year>1992</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Disk 1, Side A: Loader + Impossamole + Ghouls 'n' Ghosts"/>
+			<dataarea name="flop" size="255232">
+				<rom name="chart attack disk 1 - side a.dsk" size="255232" crc="cf9d6616" sha1="0f258521d90c07e38983fe516722ec67c818513d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Disk 1, Side B: Super Cars + Lotus Esprit (data)"/>
+			<dataarea name="flop" size="232704">
+				<rom name="chart attack disk 1 - side b.dsk" size="232704" crc="96d92c59" sha1="602757ee05424ad02a62d22a08771efcf66bea7e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3">
+			<feature name="part_id" value="Disk 2, Side A: Shadow of the Beast (data)"/>
+			<dataarea name="flop" size="216320">
+				<rom name="chart attack disk 2 - side a.dsk" size="216320" crc="a41a7b1c" sha1="3a9f52911af3ed61527dc542f6f5cc925db15201" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3">
+			<feature name="part_id" value="Disk 2, Side B: Shadow of the Beast (data)"/>
+			<dataarea name="flop" size="174848">
+				<rom name="chart attack disk 2 - side b.dsk" size="174848" crc="8da92d88" sha1="823e9a7e8a26c9677c83a1986fd3f0a6742753b2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crkdownsp">
+		<description>Crack Down (Spa)</description>
+		<year>1990</year>
+		<publisher>Erbe Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Loader"/>
+			<dataarea name="flop" size="73585">
+				<rom name="crack down (erbe) - side a.dsk" size="73585" crc="2d3b5ec5" sha1="2004cc94991631afb8b5be69eb18afafe9d6c97e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Data"/>
+			<dataarea name="flop" size="195635">
+				<rom name="crack down (erbe) - side b.dsk" size="195635" crc="9b1b043b" sha1="e17a21103a89e59947415bc267a75e4ab5c9c8b8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dicev20" cloneof="dicev21">
+		<description>DICE v2.0</description>
+		<year>1988</year>
+		<publisher>Kobrahsoft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="19883">
+				<rom name="dice v2.0.dsk" size="19883" crc="f6709367" sha1="91bece9eacb7b30b62037f947001f73b55290e24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funsc45">
+		<description>Fun School 4 For The Under-5s</description>
+		<year>1992</year>
+		<publisher>Europress Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Addition + Teddy Paint + Fun Train"/>
+			<dataarea name="flop" size="194816">
+				<rom name="fun school 4 for the under-5s - side a.dsk" size="194816" crc="fb2bb1f1" sha1="338f03885a1849ca6bc942f8fedf0816778bbb5a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Teddy's House + Teddy's Karaoke + Teddy's Books"/>
+			<dataarea name="flop" size="194816">
+				<rom name="fun school 4 for the under-5s - side b.dsk" size="194816" crc="907652a6" sha1="4485d006519e785d7c5c026ee37358a06f212f87" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grangard">
+		<description>Granny's Garden</description>
+		<year>1983</year>
+		<publisher>4Mation Educational Resources</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="granny's garden.dsk" size="195635" crc="7665bb92" sha1="cc9c4b9daa2070b0e4e1bc16c2659a99f1fa8a06" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hercslay">
+		<description>Hercules - Slayer Of The Damned</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="175589">
+				<rom name="hercules - slayer of the damned.dsk" size="175589" crc="a1cff155" sha1="7b1dc7ed5b3771f817196092fcb3157cc2eee10c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="judgredd">
+		<description>Judge Dredd</description>
+		<year>1990</year>
+		<publisher>Virgin Games</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Game"/>
+			<dataarea name="flop" size="199203">
+				<rom name="judge dredd - side a.dsk" size="199203" crc="b8cf88f1" sha1="b8abcb3448c913801fe8c8c2f5ccc4ad16195e10" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Data"/>
+			<dataarea name="flop" size="195635">
+				<rom name="judge dredd - side b.dsk" size="195635" crc="b3ba03ad" sha1="935c99130624c5514fe4515479cadbb3320f1b5c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locexpk1a" cloneof="locexpk1">
+		<description>Lords Of Chaos Expansion Kit One (alt)</description>
+		<year>1991</year>
+		<publisher>Blade Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="lords of chaos expansion kit one - alternate.dsk" size="195635" crc="294d7247" sha1="68f011d94c3f5bc9e694e9c63a0af8c8f48890da" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locexpk1">
+		<description>Lords Of Chaos Expansion Kit One</description>
+		<year>1991</year>
+		<publisher>Blade Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195631">
+				<rom name="lords of chaos expansion kit one.dsk" size="195631" crc="ca897120" sha1="18f98c8789ba9b511b19cce3affe62478db54f40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="m3unlock">
+		<description>M3 Unlock</description>
+		<year>1990</year>
+		<publisher>TNYsoft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="195635">
+				<rom name="m3 unlock - side a.dsk" size="195635" crc="697babc5" sha1="9da3fcf3955c16ba37a5ba33b36e5ccda2605fd7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="195635">
+				<rom name="m3 unlock - side b.dsk" size="195635" crc="0672c960" sha1="17d8deebbafb8f00a4bf90151bc3315b3936b50d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
+	<software name="mercs">
+		<description>Mercs</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: ZX Spectrum"/>
+			<dataarea name="flop" size = "335301">
+				<rom name="mercs (1991)(us gold)(sidea)[samdisk].dsk" size="335301" crc="b8f67304" sha1="e79e7b4592c45ac2d99a835103628750709b56d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Amstrad CPC"/>
+			<dataarea name="flop" size = "335301">
+				<rom name="mercs (1991)(us gold)(sideb)[samdisk].dsk" size="335301" crc="cc917c2d" sha1="b71cad66a67778f825e727c50e916f433dac0ecf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motormas">
+		<description>Motor Massacre</description>
+		<year>1989</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="220067">
+				<rom name="motor massacre.dsk" size="220067" crc="ea7a9822" sha1="e22ac39502b4bfe10d2be6fb65f7f266a46c0790" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="navyseal">
+		<description>Navy SEALs</description>
+		<year>1991</year>
+		<publisher>Ocean Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: The Gulf of Oman"/>
+			<dataarea name="flop" size="335301">
+				<rom name="navy seals - side a.dsk" size="335301" crc="918b588a" sha1="70a362a73c49b3f9d1110a6f8b7fcdf46f587f42" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Beirut"/>
+			<dataarea name="flop" size="335301">
+				<rom name="navy seals - side b.dsk" size="335301" crc="1bfced20" sha1="a553cc4f42fd673a0309f97aa2a704114b32105d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
+	<software name="oblitera" cloneof="obliter">
+		<description>Obliterator (alt)</description>
+		<year>1989</year>
+		<publisher>Melbourne House</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Amstrad CPC"/>
+			<dataarea name="flop" size="194816">
+				<rom name="obliterator - side a.dsk" size="194816" crc="3f8060c0" sha1="ca0129af6b08bc2ae02d1e187f93ab40adf994af" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: ZX Spectrum"/>
+			<dataarea name="flop" size="194816">
+				<rom name="obliterator - side b.dsk" size="194816" crc="66d63c00" sha1="0995800014607ccd5c7b8fa88cb7d491a8732d30" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outcast">
+		<description>Outcast</description>
+		<year>1987</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="outcast.dsk" size="195635" crc="c5e5f863" sha1="a81b195673d5d9a9a54e4a94f90be9d1148570c8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle058">
+		<description>Outlet issue 058</description>
+		<year>1992</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 058) - side a.dsk" size="226048" crc="dee7b132" sha1="f60633b102b8ce48a9c5d10ef9c0d4d8bed7ec0b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 058) - side b.dsk" size="226048" crc="a7b4566c" sha1="ca9b20fbeb30642cd723bfdac7778b763d06a82e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle063">
+		<description>Outlet issue 063</description>
+		<year>1992</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 063) - side a.dsk" size="226048" crc="dba7fac1" sha1="ace397dd20c7d381d10e27766cbdfc149414847a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 063) - side b.dsk" size="226048" crc="7a075164" sha1="e458c89a54fbf56874c6e9715f21a957dda5f3be" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle075">
+		<description>Outlet issue 075</description>
+		<year>1993</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 075) - side a.dsk" size="226048" crc="4f5f459b" sha1="eefbea4d0cc1dec99f69c18389b9a0eef0f445f5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 075) - side b.dsk" size="226048" crc="9a11ad73" sha1="981df843b7ab2d862e915b2033ced57079af7e02" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle076">
+		<description>Outlet issue 076</description>
+		<year>1993</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 076) - side a.dsk" size="226048" crc="cafc5c29" sha1="6c643c9eb009a7a877c156d431684b63e2805c58" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 076) - side b.dsk" size="226048" crc="4299b372" sha1="15fadc1065e0c2bffc0319bad52a593203d28730" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle078">
+		<description>Outlet issue 078</description>
+		<year>1994</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 078) - side a.dsk" size="226048" crc="f16bbfce" sha1="747316147152963f6840dac314c3cf6678a64c21" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 078) - side b.dsk" size="226048" crc="d382a01a" sha1="90d9f199af54d05cf16b269cab4bfd5f714b115a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle085">
+		<description>Outlet issue 085</description>
+		<year>1994</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="215296">
+				<rom name="outlet (issue 085) - side a.dsk" size="215296" crc="862b8a1f" sha1="12de7458ad1016dc74a3e33a5b50885df24aa25f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="215296">
+				<rom name="outlet (issue 085) - side b.dsk" size="215296" crc="f182522b" sha1="95cfa466c40a562eacd172dea7e6a7947703075a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outle117">
+		<description>Outlet issue 117</description>
+		<year>1997</year>
+		<publisher>Outlet</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 117) - side a.dsk" size="226048" crc="2f0d5c99" sha1="e308c11470b482e9b650b7c304fbe1b14e124e6c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="226048">
+				<rom name="outlet (issue 117) - side b.dsk" size="226048" crc="73c08f93" sha1="c3fc1b1d215fb347f54c930011268ec0a31e3eea" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pirate">
+		<description>Pirate</description>
+		<year>1983</year>
+		<publisher>Chalksoft Ltd</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195117">
+				<rom name="pirate.dsk" size="195117" crc="6821ee57" sha1="25809452294b3c7327772f56411f0dad8c0d7c95" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="platinum">
+		<description>Platinum</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Forgotten Worlds + Ghouls 'n' Ghosts + LED Storm (loader)"/>
+			<dataarea name="flop" size="261632">
+				<rom name="platinum - side a.dsk" size="261632" crc="8fe61bfc" sha1="7e015d5237b1c45617435794911a8a45917d7c43" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Black Tiger + Strider + LED Storm (data)"/>
+			<dataarea name="flop" size="262656">
+				<rom name="platinum - side b.dsk" size="262656" crc="acdd5de3" sha1="2393abc8f2c63c302cea5e15b38b99f2c5ed5b90" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puffysag">
+		<description>Puffy's Saga</description>
+		<year>1989</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="puffy's saga.dsk" size="195635" crc="445cb693" sha1="1a98515555641a0271ccd7bd4c3e515b07ba7fa0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockhams">
+		<description>Rock Star Ate My Hamster</description>
+		<year>1989</year>
+		<publisher>Code Masters</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="rock star ate my hamster.dsk" size="194816" crc="ccb84693" sha1="74758d25ce915b3d1edbee0dc55bda8caa3a5363" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootout">
+		<description>Shoot-Out</description>
+		<year>1989</year>
+		<publisher>Erbe Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="shoot-out.dsk" size="195635" crc="f1d2de4a" sha1="b637f338f92e03742553f0400e12ab81874119de" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatcraz">
+		<description>Skate Crazy</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="175589">
+				<rom name="skate crazy.dsk" size="175589" crc="a8e4fca8" sha1="b8852dd108aafa74272b6a93ca2f6ac2dab3c675" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatedie">
+		<description>Skate or Die</description>
+		<year>1989</year>
+		<publisher>	Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="318661">
+				<rom name="skate or die.dsk" size="318661" crc="d64fff82" sha1="bfcef2a80c2505b6f40cb6edf72ac3e552214e8d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stquhelv">
+		<description>Starship Quest + Helvera - Mistress of the Park</description>
+		<year>199?</year>
+		<publisher>FSF Adventures</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Starship Quest 1 &amp; 2"/>
+			<dataarea name="flop" size="195631">
+				<rom name="starship quest &amp; helvera - side a.dsk" size="195631" crc="a05a60a1" sha1="e45fd8a18e32490d0d5532eb21b93322e8f43611" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Starship Quest Part 3 + Helvera - Mistress of the Park"/>
+			<dataarea name="flop" size="195631">
+				<rom name="starship quest &amp; helvera - side b.dsk" size="195631" crc="60f1abab" sha1="51b86b0a63bc91ce9f567978fcbecbc902c38445" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strider">
+		<description>Strider</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="255232">
+				<rom name="strider.dsk" size="255232" crc="3821de48" sha1="2c3dbeb0c2a6ea64e50e37acb9cf1f5e0cc5c868" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sunfnush">
+		<description>The Sunflower Number Show</description>
+		<year>1985</year>
+		<publisher>Macmillan Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195631">
+				<rom name="sunflower number show.dsk" size="195631" crc="3d21336c" sha1="0727876fc7dd661b06e6e07ee621342f9ab35cf4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="switchbl">
+		<description>Switchblade</description>
+		<year>1991</year>
+		<publisher>Gremlin Graphics Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="switchblade.dsk" size="195635" crc="c13685b7" sha1="e79801426af5bec5b281e26dfdec220446984c68" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swiv">
+		<description>SWIV</description>
+		<year>1991</year>
+		<publisher>Storm Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="171776">
+				<rom name="swiv.dsk" size="171776" crc="4cc73480" sha1="2e1b628d3f48413420f4593c8ee294160b972a73" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alkapr22">
+		<description>The Alkatraz Protection System v 2.2</description>
+		<year>1986</year>
+		<publisher>Appleby Associates</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="the alkatraz protection system.dsk" size="194816" crc="4340b8bf" sha1="6650b29d821084ab4502a078080ef5c47f3819c2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spatutor">
+		<description>The Spanish Tutor</description>
+		<year>1984</year>
+		<publisher>	Kosmos Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="the spanish tutor.dsk" size="195635" crc="f87e0da6" sha1="fd4ff5cba02cf2f8568810398b69f17816ee308e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stwarstr">
+		<description>The Star Wars Trilogy</description>
+		<year>1989</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Star Wars + The Empire Strikes Back"/>
+			<dataarea name="flop" size="195635">
+				<rom name="the star wars trilogy - side a.dsk" size="195635" crc="be1a7a2a" sha1="b21eb84dbb595c348e788bffb1422b7de5adf054" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Return of the Jedi"/>
+			<dataarea name="flop" size="195635">
+				<rom name="the star wars trilogy - side b.dsk" size="195635" crc="21bab025" sha1="d2b65b19db5203c2dd62f1944aadbd53e644ff68" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tigeroad">
+		<description>Tiger Road</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="219136">
+				<rom name="tiger road.dsk" size="219136" crc="b23208db" sha1="8f026abcfa037334d0747bfc366c870c2d7fc03d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topstail">
+		<description>Tops and Tails</description>
+		<year>1985</year>
+		<publisher>Macmillan Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195631">
+				<rom name="tops and tails.dsk" size="195631" crc="894e7ce6" sha1="627829479e6967ea0e7ed11c426050f48090d014" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultimtcw">
+		<description>Ultimate Play The Game: The Collected Works</description>
+		<year>1988</year>
+		<publisher>Ultimate Play The Game</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Disk 1, Side A: Pssst + Cookie + Tranz-Am + Atic Atac"/>
+			<dataarea name="flop" size="194816">
+				<rom name="ultimate the collected works - disk 1 - side a.dsk" size="194816" crc="d1bef3f5" sha1="54d7cf90f95b930d919b367fe8181127005e29d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Disk 1, Side B: Jetpac + Lunar Jetman"/>
+			<dataarea name="flop" size="194816">
+				<rom name="ultimate the collected works - disk 1 - side b.dsk" size="194816" crc="cfacf9ff" sha1="6421bdfe318cf8e5e58bc4762bb0bfe348553e86" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3">
+			<feature name="part_id" value="Disk 2, Side A: Sabre Wulf + Knight Lore + Alien 8"/>
+			<dataarea name="flop" size="194816">
+				<rom name="ultimate the collected works - disk 2 - side a.dsk" size="194816" crc="2c8f6b57" sha1="b6edf84958da43223f9ea948be4cba1b7d03c635" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3">
+			<feature name="part_id" value="Disk 2, Side B: Nightshade + Gunfright"/>
+			<dataarea name="flop" size="194816">
+				<rom name="ultimate the collected works - disk 2 - side b.dsk" size="194816" crc="4e9c767f" sha1="68200320fdaaac2e634d51bd48a5f41ecaf5f218" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winners">
+		<description>Winners</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Blasteroids + Indiana Jones and the Temple of Doom + LED Storm + Impossible Mission II + Thunder Blade (loader)"/>
+			<dataarea name="flop" size="340697">
+				<rom name="winners - side a.dsk" size="340697" crc="ca8a358f" sha1="255ef22b088ef0382adc6a98090a1b2e5a6d080a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Thunder Blade (data)"/>
+			<dataarea name="flop" size="343751">
+				<rom name="winners - side b.dsk" size="343751" crc="e8004dd7" sha1="196fa738cc286dfe892e9cd7ebb4a3cfd333a767" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxpakt30">
+		<description>G1WVN ZX Pak Term v3.0 Beta Test</description>
+		<year>1989</year>
+		<publisher>John Wilson</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195635">
+				<rom name="zx pak term v3.0.dsk" size="195635" crc="3604a715" sha1="ecea8ddc5bbe5b5df3f74bed0c638fe2c157e332" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4soccersspa" cloneof="4soccers">
+		<description>4 Soccer Simulators (Spa)</description>
+		<year>1988</year>
+		<publisher>MCM Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: 11-a-Side Soccer + Indoor Soccer"/>
+			<dataarea name="flop" size = "214528">
+				<rom name="4soccer (spain) side a.dsk" size="214528" crc="de6444fc" sha1="df1e44a19f78faaa1adfdc96bd12080f4f16eb93" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Street Soccer + Soccer Skills"/>
+			<dataarea name="flop" size = "214528">
+				<rom name="4soccer (spain) side b.dsk" size="214528" crc="2104ec4b" sha1="da607fa1be919d1d898921d699e448bf5ce347b9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	
 </softwarelist>

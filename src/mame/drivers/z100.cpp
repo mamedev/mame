@@ -145,12 +145,15 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/i8085/i8085.h"
+#include "cpu/mcs48/mcs48.h"
 //#include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/mc2661.h"
+#include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -171,6 +174,8 @@ public:
 		m_epci(*this, "epci%u", 0U),
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
+		m_vrmm(*this, "vrmm"),
+		m_vram_config(*this, "VRAM"),
 		m_floppy(nullptr)
 	{ }
 
@@ -184,22 +189,28 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	offs_t vram_map(offs_t offset) const;
 	DECLARE_READ8_MEMBER(z100_vram_r);
 	DECLARE_WRITE8_MEMBER(z100_vram_w);
 	DECLARE_READ8_MEMBER(keyb_data_r);
 	DECLARE_READ8_MEMBER(keyb_status_r);
 	DECLARE_WRITE8_MEMBER(keyb_command_w);
-	DECLARE_WRITE8_MEMBER(z100_6845_address_w);
-	DECLARE_WRITE8_MEMBER(z100_6845_data_w);
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE8_MEMBER(floppy_motor_w);
+	uint8_t tmr_status_r();
+	void tmr_status_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(timer_flipflop0_w);
+	DECLARE_WRITE_LINE_MEMBER(timer_flipflop1_w);
+	void sys_pia_A_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(vidint_w);
+
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(video_pia_A_w);
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(update_row);
 
 	void z100_io(address_map &map);
 	void z100_mem(address_map &map);
@@ -213,6 +224,8 @@ private:
 	required_device_array<mc2661_device, 2> m_epci;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
+	required_region_ptr<uint8_t> m_vrmm;
+	required_ioport m_vram_config;
 
 	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_keyb_press;
@@ -222,92 +235,72 @@ private:
 	uint8_t m_display_mask;
 	uint8_t m_flash;
 	uint8_t m_clr_val;
-	uint8_t m_crtc_vreg[0x100];
-	uint8_t m_crtc_index;
-	uint16_t m_start_addr;
+	uint8_t m_tmr_status;
+	uint8_t m_start_addr;
+	bool m_vidint_enable;
 
 	floppy_image_device *m_floppy;
 };
-
-#define mc6845_h_char_total     (m_crtc_vreg[0])
-#define mc6845_h_display        (m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (m_crtc_vreg[2])
-#define mc6845_sync_width       (m_crtc_vreg[3])
-#define mc6845_v_char_total     (m_crtc_vreg[4])
-#define mc6845_v_total_adj      (m_crtc_vreg[5])
-#define mc6845_v_display        (m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (m_crtc_vreg[8])
-#define mc6845_tile_height      (m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0xff00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0xff00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0xff00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0xff00) | (m_crtc_vreg[0x13] & 0xff))
 
 
 void z100_state::video_start()
 {
 	m_gvram = make_unique_clear<uint8_t[]>(0x30000);
+
+	m_vidint_enable = false;
 }
 
-uint32_t z100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW(z100_state::update_row)
 {
-	int x,y,xi,yi;
-	int dot;
-	int i;
+	uint32_t *const pix = &bitmap.pix32(y);
+	const uint16_t amask = m_vram_config->read() ? 0xfff : 0x7ff;
 
-	bitmap.fill(0, cliprect);
-
-	for(y=0;y<mc6845_v_display;y++)
+	for (int x = 0; x < x_count; x++)
 	{
-		for(x=0;x<mc6845_h_display;x++)
+		for (int xi = 0; xi < 8; xi++)
 		{
-			uint32_t base_offs;
-
-			for(yi=0;yi<mc6845_tile_height;yi++)
+			int dot = 0;
+			if (m_flash)
 			{
-				base_offs = y * 0x800 + yi * 0x80 + x;
-
-				for(xi=0;xi<8;xi++)
-				{
-					dot = 0;
-					for(i=0;i<3;i++)
-						dot |= ((m_gvram[(base_offs & 0xffff)+0x10000*i] >> (7-xi)) & 1) << i; // b, r, g
-
-					dot &= m_display_mask;
-
-					/* overwrite */
-					if(m_flash)
-						dot = m_display_mask;
-
-					if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(dot);
-				}
+				dot = m_display_mask;
 			}
+			else
+			{
+				for (int i = 0; i < 3; i++)
+					dot |= ((m_gvram[((x + ma) & amask) << 4 | (ra & 0xf) | (0x10000*i)] >> (7-xi)) & 1) << i; // b, r, g
+
+				if (x == cursor_x)
+					dot ^= 7;
+
+				dot &= m_display_mask;
+			}
+
+			pix[x*8+xi] = m_palette->pen(dot);
 		}
 	}
+}
 
-	return 0;
+offs_t z100_state::vram_map(offs_t offset) const
+{
+	return (offset & 0x30000) | (offset & 0x000f) << 4 | (offset & 0x0780) >> 7
+		| ((m_vrmm[(offset & 0xf800) >> 8 | (offset & 0x0070) >> 4] + m_start_addr) & (m_vram_config->read() ? 0xff : 0x7f)) << 8;
 }
 
 READ8_MEMBER( z100_state::z100_vram_r )
 {
-	return m_gvram[offset];
+	return m_gvram[vram_map(offset)];
 }
 
 WRITE8_MEMBER( z100_state::z100_vram_w )
 {
 	if(m_vram_enable)
 	{
-		int i;
-
+		offset = vram_map(offset);
 		m_gvram[offset] = data;
 
-		for(i=0;i<3;i++)
+		for (int i = 0; i < 3; i++)
 		{
-			if(m_gbank & (1 << i))
+			if (BIT(m_gbank, i))
 				m_gvram[((offset) & 0xffff)+0x10000*i] = data;
 		}
 	}
@@ -356,19 +349,6 @@ WRITE8_MEMBER( z100_state::keyb_command_w )
 	// ...
 }
 
-WRITE8_MEMBER( z100_state::z100_6845_address_w )
-{
-	data &= 0x1f;
-	m_crtc_index = data;
-	m_crtc->address_w(data);
-}
-
-WRITE8_MEMBER( z100_state::z100_6845_data_w )
-{
-	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(data);
-}
-
 // todo: side select?
 
 WRITE8_MEMBER( z100_state::floppy_select_w )
@@ -381,6 +361,49 @@ WRITE8_MEMBER( z100_state::floppy_motor_w )
 {
 	if (m_floppy)
 		m_floppy->mon_w(!BIT(data, 1));
+}
+
+uint8_t z100_state::tmr_status_r()
+{
+	return m_tmr_status;
+}
+
+void z100_state::tmr_status_w(uint8_t data)
+{
+	m_tmr_status &= data & 3;
+	if (m_tmr_status == 0)
+		m_picm->ir2_w(0);
+}
+
+WRITE_LINE_MEMBER(z100_state::timer_flipflop0_w)
+{
+	if (state)
+	{
+		m_tmr_status |= 1;
+		m_picm->ir2_w(1);
+	}
+}
+
+WRITE_LINE_MEMBER(z100_state::timer_flipflop1_w)
+{
+	if (state)
+	{
+		m_tmr_status |= 2;
+		m_picm->ir2_w(1);
+	}
+}
+
+void z100_state::sys_pia_A_w(uint8_t data)
+{
+	m_vidint_enable = BIT(data, 5);
+	if (!m_vidint_enable)
+		m_pia[1]->ca2_w(0);
+}
+
+WRITE_LINE_MEMBER(z100_state::vidint_w)
+{
+	if (state && m_vidint_enable)
+		m_pia[1]->ca2_w(1);
 }
 
 void z100_state::z100_io(address_map &map)
@@ -403,11 +426,11 @@ void z100_state::z100_io(address_map &map)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
 	map(0xd8, 0xdb).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
-	map(0xdc, 0xdc).w(FUNC(z100_state::z100_6845_address_w));
-	map(0xdd, 0xdd).w(FUNC(z100_state::z100_6845_data_w));
+	map(0xdc, 0xdc).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0xdd, 0xdd).w(m_crtc, FUNC(mc6845_device::register_w));
 //  AM_RANGE (0xde, 0xde) light pen
 	map(0xe0, 0xe3).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
-//  AM_RANGE (0xe4, 0xe7) 8253 PIT
+	map(0xe4, 0xe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw(m_epci[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xec, 0xef).rw(m_epci[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
@@ -415,7 +438,7 @@ void z100_state::z100_io(address_map &map)
 	map(0xf4, 0xf4).r(FUNC(z100_state::keyb_data_r)); // -> 8041 MCU
 	map(0xf5, 0xf5).rw(FUNC(z100_state::keyb_status_r), FUNC(z100_state::keyb_command_w));
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
-//  AM_RANGE (0xfb, 0xfb) timer irq status
+	map(0xfb, 0xfb).rw(FUNC(z100_state::tmr_status_r), FUNC(z100_state::tmr_status_w));
 //  AM_RANGE (0xfc, 0xfc) memory latch
 //  AM_RANGE (0xfd, 0xfd) Hi-address latch
 //  AM_RANGE (0xfe, 0xfe) Processor swap port
@@ -594,6 +617,11 @@ INPUT_PORTS_START( z100 )
 	PORT_CONFNAME( 0x01, 0x01, "Video Board" )
 	PORT_CONFSETTING( 0x00, "Monochrome" )
 	PORT_CONFSETTING( 0x01, "Color" )
+
+	PORT_START("VRAM")
+	PORT_DIPNAME( 0x01, 0x01, "Video Memory" ) PORT_DIPLOCATION("J307:1")
+	PORT_DIPSETTING( 0x00, "32K" )
+	PORT_DIPSETTING( 0x01, "64K" )
 INPUT_PORTS_END
 
 READ8_MEMBER( z100_state::get_slave_ack )
@@ -626,7 +654,7 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 
 WRITE8_MEMBER( z100_state::video_pia_B_w )
 {
-	m_start_addr = data << 4; //<- TODO
+	m_start_addr = data;
 }
 
 /* clear screen */
@@ -667,46 +695,61 @@ static void z100_floppies(device_slot_interface &device)
 void z100_state::z100(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 3);
+	I8088(config, m_maincpu, 15_MHz_XTAL / 3); // 5 MHz or 8 MHz depending on XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &z100_state::z100_mem);
 	m_maincpu->set_addrmap(AS_IO, &z100_state::z100_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	I8085A(config, "cpu85", 10_MHz_XTAL).set_disable();
+
+	I8041(config, "kbdc", 6_MHz_XTAL); // TODO: keyboard LLE
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(z100_state::screen_update));
-	screen.set_palette(m_palette);
+	screen.set_raw(14.112_MHz_XTAL, 912, 0, 640, 258, 0, 216);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette).set_entries(8);
 
 	/* devices */
-	MC6845(config, m_crtc, 14.318181_MHz_XTAL / 8);    /* unknown clock, hand tuned to get ~50/~60 fps */
+	MC6845(config, m_crtc, 14.112_MHz_XTAL / 8); // 68A45
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(z100_state::update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(z100_state::vidint_w));
 
-	PIC8259(config, m_picm, 0);
+	PIC8259(config, m_picm);
 	m_picm->out_int_callback().set_inputline(m_maincpu, 0);
 	m_picm->in_sp_callback().set_constant(1);
 	m_picm->read_slave_ack_callback().set(FUNC(z100_state::get_slave_ack));
 
-	PIC8259(config, m_pics, 0);
+	PIC8259(config, m_pics);
 	m_pics->out_int_callback().set(m_picm, FUNC(pic8259_device::ir3_w));
 	m_pics->in_sp_callback().set_constant(0);
 
-	PIA6821(config, m_pia[0], 0);
+	pit8253_device &pit(PIT8253(config, "pit"));
+	pit.set_clk<0>(4_MHz_XTAL / 16);
+	pit.out_handler<0>().set(FUNC(z100_state::timer_flipflop0_w));
+	pit.out_handler<0>().append("pit", FUNC(pit8253_device::write_clk1));
+	pit.set_clk<2>(4_MHz_XTAL / 16);
+	pit.out_handler<2>().set(FUNC(z100_state::timer_flipflop1_w));
+
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->writepa_handler().set(FUNC(z100_state::video_pia_A_w));
 	m_pia[0]->writepb_handler().set(FUNC(z100_state::video_pia_B_w));
 	m_pia[0]->ca2_handler().set(FUNC(z100_state::video_pia_CA2_w));
 	m_pia[0]->cb2_handler().set(FUNC(z100_state::video_pia_CB2_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
+	m_pia[1]->irqa_handler().set("keydspyint", FUNC(input_merger_device::in_w<1>));
+	m_pia[1]->irqb_handler().set(m_picm, FUNC(pic8259_device::ir7_w));
+	m_pia[1]->writepa_handler().set(FUNC(z100_state::sys_pia_A_w));
 
-	FD1797(config, m_fdc, 1_MHz_XTAL);
+	input_merger_device &keydspyint(INPUT_MERGER_ANY_HIGH(config, "keydspyint"));
+	keydspyint.output_handler().set(m_picm, FUNC(pic8259_device::ir6_w));
+
+	FD1797(config, m_fdc, 4_MHz_XTAL / 4);
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[1], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
@@ -730,11 +773,14 @@ void z100_state::z100(machine_config &config)
 
 /* ROM definition */
 ROM_START( z100 )
-	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "ipl", 0 )
 	ROM_LOAD( "intel-d27128-1.bin", 0x0000, 0x4000, CRC(b21f0392) SHA1(69e492891cceb143a685315efe0752981a2d8143))
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF ) //8041
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0400, "kbdc", ROMREGION_ERASE00 ) // 8041A keyboard controller
+	ROM_LOAD( "444-109.u204", 0x0000, 0x0400, CRC(45181029) SHA1(0e89649364d25cf2d8669d2a293ee162e274cb64) )
+
+	ROM_REGION( 0x0100, "vrmm", 0 ) // Video RAM Mapping Module
+	ROM_LOAD( "444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP ) // typed in from manual
 ROM_END
 
 void z100_state::driver_init()

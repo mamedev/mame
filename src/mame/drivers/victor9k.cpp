@@ -251,7 +251,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	if (m_hires != hires)
 	{
 		m_hires = hires;
-		m_crtc->set_clock(XTAL(30'000'000) / width);
+		m_crtc->set_unscaled_clock(XTAL(30'000'000) / width);
 		m_crtc->set_hpixels_per_column(width);
 	}
 

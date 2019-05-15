@@ -140,7 +140,7 @@ private:
 	DECLARE_WRITE8_MEMBER(banksel_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	void sanremo_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sanremo_map(address_map &map);
 	void sanremo_portmap(address_map &map);
 };
@@ -176,7 +176,7 @@ void sanremo_state::video_start()
 	save_item(NAME(m_banksel));
 }
 
-uint32_t sanremo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanremo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -372,7 +372,6 @@ void sanremo_state::sanremo(machine_config &config)
 	screen.set_size(70*8, 41*8);
 	screen.set_visarea(0, 48*8-1, 0, 38*8-1);
 	screen.set_screen_update(FUNC(sanremo_state::screen_update));
-	screen.set_palette("palette");
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	// *** MC6845 init ***

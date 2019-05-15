@@ -435,9 +435,6 @@ void thedeep_state::thedeep(machine_config &config)
 	PALETTE(config, m_palette, FUNC(thedeep_state::thedeep_palette), 512);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(0);
-	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
-	m_spritegen->set_ram_size(0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

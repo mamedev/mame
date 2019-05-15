@@ -36,7 +36,7 @@ GO (execute program at current address) is the X key.
 SHIFT - later monitor versions utilised an extra shift button. Hold
         it down and press another key (use Left Shift).
 
-Whenever a program listing mentions RESET, do a Soft Reset.
+Whenever a program listing mentions RESET, press Left-Alt key.
 
 Each key causes a beep to be heard. You may need to press more than once
 to get it to register.
@@ -103,6 +103,8 @@ public:
 
 	void tec1(machine_config &config);
 	void tecjmon(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -411,7 +413,15 @@ static INPUT_PORTS_START( tec1 )
 	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, tec1_state, reset_button, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tec1_state::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
 /***************************************************************************

@@ -34,7 +34,7 @@ typedef device_delegate<void (int irq)> wswan_video_irq_cb_delegate;
 typedef device_delegate<void (void)> wswan_video_dmasnd_cb_delegate;
 #define WSWAN_VIDEO_DMASND_CB_MEMBER(_name)   void _name(void)
 
-class wswan_video_device : public device_t
+class wswan_video_device : public device_t, public device_video_interface
 {
 public:
 	wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -67,8 +67,6 @@ protected:
 	void refresh_scanline();
 	void scanline_interrupt();
 	void common_save();
-
-	required_device<screen_device> m_screen;
 
 	bitmap_ind16 m_bitmap;
 	uint8_t m_layer_bg_enable;          /* Background layer on/off */

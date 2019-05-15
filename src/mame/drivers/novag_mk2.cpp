@@ -57,7 +57,7 @@ Usage:
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "mk2.lh"
+#include "novag_mk2.lh"
 
 
 class mk2_state : public driver_device
@@ -208,7 +208,7 @@ void mk2_state::mk2(machine_config &config)
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	config.set_default_layout(layout_mk2);
+	config.set_default_layout(layout_novag_mk2);
 
 	MOS6530(config, m_miot, 1000000);
 	m_miot->in_pa_callback().set(FUNC(mk2_state::mk2_read_a));

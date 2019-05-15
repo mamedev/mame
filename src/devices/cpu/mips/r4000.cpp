@@ -16,12 +16,10 @@
  *   - reworked address translation logic, including 64-bit modes
  *   - reworked softfloat3-based floating point
  *   - experimental primary instruction cache
- *   - memory tap based ll/sc
  *   - configurable endianness
  *   - it's very very very slow
  *
  * TODO
- *   - try to eliminate mode check in address calculations
  *   - find a better way to deal with software interrupts
  *   - enforce mode checks for cp1
  *   - cache instructions
@@ -79,7 +77,7 @@
 #define ODD_REGS 0x00010840U
 
 // address computation
-#define ADDR(r, o) (cp0_64() ? ((r) + (o)) : s64(s32((r) + (o))))
+#define ADDR(r, o) ((r) + (o))
 
 #define SR         m_cp0[CP0_Status]
 #define CAUSE      m_cp0[CP0_Cause]
@@ -92,7 +90,6 @@ r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
-	, m_ll_watch(nullptr)
 	, m_fcr0(0x00000500U)
 {
 	m_cp0[CP0_PRId] = prid;
@@ -201,11 +198,7 @@ void r4000_base_device::device_reset()
 
 	m_cp0_timer_zero = total_cycles();
 
-	if (m_ll_watch)
-	{
-		m_ll_watch->remove();
-		m_ll_watch = nullptr;
-	}
+	m_ll_active = false;
 
 	m_cp0[CP0_WatchLo] = 0;
 	m_cp0[CP0_WatchHi] = 0;
@@ -404,22 +397,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 					}
 				}
 				else if (SYSCALL_MASK & SYSCALL_WINNT4)
-				{
-					switch (m_r[2])
-					{
-					case 0x4f:
-						load<s32>(m_r[7] + 8,
-							[this](s64 string_pointer)
-							{
-								LOGMASKED(LOG_SYSCALL, "NtOpenFile(%s) (%s)\n", debug_string(string_pointer), machine().describe_context());
-							});
-						break;
-
-					default:
-						LOGMASKED(LOG_SYSCALL, "syscall 0x%x (%s)\n", m_r[2], machine().describe_context());
-						break;
-					}
-				}
+					LOGMASKED(LOG_SYSCALL, "syscall 0x%02x from 0x%08x (%s)\n", m_r[2], u32(m_r[31] - 8), machine().describe_context());
 			}
 			cpu_exception(EXCEPTION_SYS);
 			break;
@@ -457,7 +435,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				m_lo = s64(s32(product));
 				m_hi = s64(s32(product >> 32));
-				m_icount -= 3;
 			}
 			break;
 		case 0x19: // MULTU
@@ -466,7 +443,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				m_lo = s64(s32(product));
 				m_hi = s64(s32(product >> 32));
-				m_icount -= 3;
 			}
 			break;
 		case 0x1a: // DIV
@@ -475,7 +451,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = s64(s32(m_r[RSREG]) / s32(m_r[RTREG]));
 				m_hi = s64(s32(m_r[RSREG]) % s32(m_r[RTREG]));
 			}
-			m_icount -= 35;
 			break;
 		case 0x1b: // DIVU
 			if (m_r[RTREG])
@@ -483,15 +458,12 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = s64(s32(u32(m_r[RSREG]) / u32(m_r[RTREG])));
 				m_hi = s64(s32(u32(m_r[RSREG]) % u32(m_r[RTREG])));
 			}
-			m_icount -= 35;
 			break;
 		case 0x1c: // DMULT
 			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], reinterpret_cast<s64 *>(&m_hi));
-			m_icount -= 7;
 			break;
 		case 0x1d: // DMULTU
 			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], &m_hi);
-			m_icount -= 7;
 			break;
 		case 0x1e: // DDIV
 			if (m_r[RTREG])
@@ -499,7 +471,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = s64(m_r[RSREG]) / s64(m_r[RTREG]);
 				m_hi = s64(m_r[RSREG]) % s64(m_r[RTREG]);
 			}
-			m_icount -= 67;
 			break;
 		case 0x1f: // DDIVU
 			if (m_r[RTREG])
@@ -507,7 +478,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_lo = m_r[RSREG] / m_r[RTREG];
 				m_hi = m_r[RSREG] % m_r[RTREG];
 			}
-			m_icount -= 67;
 			break;
 		case 0x20: // ADD
 			{
@@ -908,14 +878,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 	//case 0x1e: // *
 	//case 0x1f: // *
 	case 0x20: // LB
-		load<s8>(ADDR(m_r[RSREG], s16(op)),
+		load<u8>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s8 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x21: // LH
-		load<s16>(ADDR(m_r[RSREG], s16(op)),
+		load<u16>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s16 data)
 			{
 				m_r[RTREG] = data;
@@ -925,14 +895,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 		cpu_lwl(op);
 		break;
 	case 0x23: // LW
-		load<s32>(ADDR(m_r[RSREG], s16(op)),
+		load<u32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](s32 data)
 			{
 				m_r[RTREG] = data;
 			});
 		break;
 	case 0x24: // LBU
-		load<s8>(ADDR(m_r[RSREG], s16(op)),
+		load<u8>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u8 data)
 			{
 				m_r[RTREG] = data;
@@ -1054,27 +1024,12 @@ void r4000_base_device::cpu_execute(u32 const op)
 		}
 		break;
 	case 0x30: // LL
-		load_linked<s32>(ADDR(m_r[RSREG], s16(op)),
+		load_linked<u32>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, s32 data)
 			{
-				// remove existing tap
-				if (m_ll_watch)
-					m_ll_watch->remove();
-
-				m_r[RTREG] = data;
+				m_r[RTREG] = s64(data);
 				m_cp0[CP0_LLAddr] = u32(address >> 4);
-
-				// install write tap
-				// FIXME: physical address truncation
-				m_ll_watch = space(0).install_write_tap(offs_t(address & ~7), offs_t(address | 7), "ll",
-					[this, hi(bool(BIT(address, 2)))](offs_t offset, u64 &data, u64 mem_mask)
-					{
-						if (hi ? ACCESSING_BITS_32_63 : ACCESSING_BITS_0_31)
-						{
-							m_ll_watch->remove();
-							m_ll_watch = nullptr;
-						}
-					});
+				m_ll_active = true;
 			});
 		break;
 	case 0x31: // LWC1
@@ -1088,21 +1043,9 @@ void r4000_base_device::cpu_execute(u32 const op)
 		load_linked<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, u64 data)
 			{
-				// remove existing tap
-				if (m_ll_watch)
-					m_ll_watch->remove();
-
 				m_r[RTREG] = data;
 				m_cp0[CP0_LLAddr] = u32(address >> 4);
-
-				// install write tap
-				// FIXME: address truncation
-				m_ll_watch = space(0).install_write_tap(offs_t(address & ~7), offs_t(address | 7), "lld",
-					[this](offs_t offset, u64 &data, u64 mem_mask)
-					{
-						m_ll_watch->remove();
-						m_ll_watch = nullptr;
-					});
+				m_ll_active = true;
 			});
 		break;
 	case 0x35: // LDC1
@@ -1119,13 +1062,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 			});
 		break;
 	case 0x38: // SC
-		if (m_ll_watch)
+		if (m_ll_active)
 		{
-			m_ll_watch->remove();
-			m_ll_watch = nullptr;
+			if (store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG])))
+				m_r[RTREG] = 1;
+			else
+				m_r[RTREG] = 0;
 
-			store<u32>(ADDR(m_r[RSREG], s16(op)), u32(m_r[RTREG]));
-			m_r[RTREG] = 1;
+			m_ll_active = false;
 		}
 		else
 			m_r[RTREG] = 0;
@@ -1138,13 +1082,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 		break;
 	//case 0x3b: // *
 	case 0x3c: // SCD
-		if (m_ll_watch)
+		if (m_ll_active)
 		{
-			m_ll_watch->remove();
-			m_ll_watch = nullptr;
+			if (store<u64>(ADDR(m_r[RSREG], s16(op)), m_r[RTREG]))
+				m_r[RTREG] = 1;
+			else
+				m_r[RTREG] = 0;
 
-			store<u64>(ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
-			m_r[RTREG] = 1;
+			m_ll_active = false;
 		}
 		else
 			m_r[RTREG] = 0;
@@ -1369,7 +1314,6 @@ void r4000_base_device::cp0_execute(u32 const op)
 		case 0x18: // ERET
 			if (SR & SR_ERL)
 			{
-				logerror("eret from error\n");
 				m_branch_state = EXCEPTION;
 				m_pc = m_cp0[CP0_ErrorEPC];
 				SR &= ~SR_ERL;
@@ -1381,11 +1325,7 @@ void r4000_base_device::cp0_execute(u32 const op)
 				SR &= ~SR_EXL;
 			}
 
-			if (m_ll_watch)
-			{
-				m_ll_watch->remove();
-				m_ll_watch = nullptr;
-			}
+			m_ll_active = false;
 			break;
 
 		default:
@@ -2598,7 +2538,7 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		else
 		{
 			// 32-bit user mode
-			if (address & 0xffff'ffff'8000'0000)
+			if (address & 0x8000'0000)
 				return ERROR; // exception
 			else
 				extended = false; // useg
@@ -2624,8 +2564,8 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		else
 		{
 			// 32-bit supervisor mode
-			if (address & 0xffff'ffff'8000'0000)
-				if ((address & 0xffff'ffff'e000'0000) == 0xffff'ffff'c000'0000)
+			if (address & 0x8000'0000)
+				if ((address & 0xe000'0000) == 0xc000'0000)
 					extended = false; // sseg
 				else
 					return ERROR; // exception
@@ -2680,14 +2620,13 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		else
 		{
 			// 32-bit kernel mode
-			if (address & 0xffff'ffff'8000'0000)
-				switch (address & 0xffff'ffff'e000'0000)
+			if (address & 0x8000'0000)
+				switch (address & 0xe000'0000)
 				{
-				case 0xffff'ffff'8000'0000: address &= 0x7fff'ffff; return CACHED;   // kseg0
-				case 0xffff'ffff'a000'0000: address &= 0x1fff'ffff; return UNCACHED; // kseg1
-				case 0xffff'ffff'c000'0000: extended = false; break; // ksseg
-				case 0xffff'ffff'e000'0000: extended = false; break; // kseg3
-				default: return ERROR; // exception
+				case 0x8000'0000: address &= 0x7fff'ffff; return CACHED;   // kseg0
+				case 0xa000'0000: address &= 0x1fff'ffff; return UNCACHED; // kseg1
+				case 0xc000'0000: extended = false; break; // ksseg
+				case 0xe000'0000: extended = false; break; // kseg3
 				}
 			else
 				if (SR & SR_ERL)
@@ -2894,7 +2833,7 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::va
 	// alignment error
 	if (address & (sizeof(T) - 1))
 	{
-		address_error(TRANSLATE_READ, address);
+		address_error(TRANSLATE_WRITE, address);
 		return false;
 	}
 
@@ -3042,14 +2981,14 @@ std::string r4000_base_device::debug_string_array(u64 array_pointer)
 	while (!done)
 	{
 		done = true;
-		load<s32>(array_pointer, [this, &done, &result](u64 string_pointer)
+		load<u32>(array_pointer, [this, &done, &result](s32 string_pointer)
 		{
 			if (string_pointer != 0)
 			{
 				if (!result.empty())
 					result += ", ";
 
-				result += '\"' + debug_string(string_pointer) + '\"';
+				result += '\"' + debug_string(s64(string_pointer)) + '\"';
 
 				done = false;
 			}

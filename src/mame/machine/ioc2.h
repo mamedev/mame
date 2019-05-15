@@ -32,7 +32,7 @@ public:
 	void raise_local_irq(int channel, uint8_t mask);
 	void lower_local_irq(int channel, uint8_t mask);
 
-	enum
+	enum : uint8_t
 	{
 		INT3_LOCAL0_FIFO      = 0x01,
 		INT3_LOCAL0_SCSI0     = 0x02,
@@ -44,7 +44,7 @@ public:
 		INT3_LOCAL0_MAPPABLE0 = 0x80,
 	};
 
-	enum
+	enum : uint8_t
 	{
 		INT3_LOCAL1_GP0       = 0x01,
 		INT3_LOCAL1_PANEL     = 0x02,
@@ -83,6 +83,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
 
 	void set_mappable_int(uint8_t mask, bool state);
+	void check_mappable_interrupt(int channel);
 
 	enum
 	{

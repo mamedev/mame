@@ -21,7 +21,7 @@
     ROW3  4 |           | 37 DATA IN            ROW3  4 |           | 37 CLOCK
     ROW4  5 |           | 36 _CS                ROW4  5 |           | 36 DATA IN
     ROW5  6 |           | 35 DATA OUT           ROW5  6 |           | 35 _CS
-    ROW6  7 |           | 34 COL25              ROW6  7 |           | 34 OSC OUT?
+    ROW6  7 |           | 34 COL25              ROW6  7 |           | 34 DATA OUT?
     ROW7  8 |           | 33 COL24              ROW7  8 |           | 33 COL24
     COL1  9 |           | 32 COL23              COL1  9 |           | 32 COL23
     COL2 10 | HLCD 0515 | 31 COL22              COL2 10 | HLCD 0569 | 31 COL22
@@ -48,11 +48,12 @@ public:
 
 	// configuration helpers
 	auto write_cols() { return m_write_cols.bind(); } // COL/ROW pins (offset for ROW)
-	auto write_data() { return m_write_data.bind(); } // DATA OUT pin, don't use on HLCD0569
+	auto write_data() { return m_write_data.bind(); } // DATA OUT pin
 
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
+	DECLARE_READ_LINE_MEMBER(data_r) { return m_dataout; }
 
 protected:
 	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax);
@@ -62,13 +63,14 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void set_control();
-	void clock_data(int col);
+	void clock_data(int col = 0);
 
 	const u8 m_colmax;    // number of column pins
 
 	int m_cs;       // input pin state
 	int m_clk;      // "
 	int m_data;     // "
+	int m_dataout;  // DATA OUT pin state
 	int m_count;
 	u8 m_control;
 	bool m_blank;   // display blank/visible
@@ -101,9 +103,16 @@ public:
 	hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hlcd0601_device : public hlcd0515_device
+{
+public:
+	hlcd0601_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 
 DECLARE_DEVICE_TYPE(HLCD0515, hlcd0515_device)
 DECLARE_DEVICE_TYPE(HLCD0569, hlcd0569_device)
 DECLARE_DEVICE_TYPE(HLCD0530, hlcd0530_device)
+DECLARE_DEVICE_TYPE(HLCD0601, hlcd0601_device)
 
 #endif // MAME_VIDEO_HLCD0515_H

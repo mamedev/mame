@@ -193,7 +193,7 @@ WRITE8_MEMBER(talkingbb_state::bank_w)
 {
 	// d0-d1: upper rom bank
 	// d2-d4: upper rom enable (bus conflict possible)
-	// d3: internal rom, cart slot 1, d4: cart slot 2
+	// d2: internal rom, d3: cart slot 1, d4: cart slot 2
 	m_bank = data;
 }
 

@@ -699,7 +699,6 @@ void twincobr_state::twincobr(machine_config &config)
 	m_screen->set_screen_update(FUNC(twincobr_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram16, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
-	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twincobr);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1792);

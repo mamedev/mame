@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 /******************************************************************************
-*
+
 * fidel_phantom.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 TODO:

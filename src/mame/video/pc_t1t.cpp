@@ -607,11 +607,11 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 	/* Determine mc6845 input clock */
 	if ( m_reg.data[0] & 0x01 )
 	{
-		m_mc6845->set_clock( XTAL(14'318'181)/8 );
+		m_mc6845->set_unscaled_clock( XTAL(14'318'181)/8 );
 	}
 	else
 	{
-		m_mc6845->set_clock( XTAL(14'318'181)/16 );
+		m_mc6845->set_unscaled_clock( XTAL(14'318'181)/16 );
 	}
 
 	/* color or b/w? */

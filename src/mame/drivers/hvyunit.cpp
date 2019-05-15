@@ -415,9 +415,10 @@ void hvyunit_state::slave_memory(address_map &map)
 	map(0x8000, 0xbfff).bankr("slave_bank");
 	map(0xc000, 0xc3ff).ram().w(FUNC(hvyunit_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).ram().w(FUNC(hvyunit_state::colorram_w)).share("colorram");
-	map(0xd000, 0xdfff).ram();
 	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd200, 0xd7ff).ram();
 	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xda00, 0xdfff).ram();
 	map(0xe000, 0xffff).ram().share("share1");
 }
 

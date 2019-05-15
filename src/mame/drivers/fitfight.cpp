@@ -208,8 +208,7 @@ void fitfight_state::bbprot_main_map(address_map &map)
 	map(0xb08000, 0xb0bfff).ram().w(FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
 	map(0xb0c000, 0xb0ffff).ram().w(FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
 
-	map(0xc00000, 0xc00fff).readonly();
-	map(0xc00000, 0xc03fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
 

@@ -35,17 +35,16 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(hdc_intrq_w);
-	DECLARE_READ8_MEMBER(hdc_data_r);
-	DECLARE_WRITE8_MEMBER(hdc_data_w);
-	DECLARE_READ8_MEMBER(int_r);
-	template<int N> DECLARE_WRITE8_MEMBER(head_w);
-	template<int N> DECLARE_WRITE8_MEMBER(drive_w);
-	DECLARE_WRITE8_MEMBER(xferd_w);
-	DECLARE_WRITE8_MEMBER(hbcr_w);
-	DECLARE_WRITE8_MEMBER(clksel_w);
-	DECLARE_WRITE8_MEMBER(drvsel2_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t hdc_data_r();
+	void hdc_data_w(uint8_t data);
+	uint8_t int_r();
+	template<int N> DECLARE_WRITE_LINE_MEMBER(head_w);
+	template<int N> DECLARE_WRITE_LINE_MEMBER(drive_w);
+	DECLARE_WRITE_LINE_MEMBER(xferd_w);
+	DECLARE_WRITE_LINE_MEMBER(hbcr_w);
+	DECLARE_WRITE_LINE_MEMBER(clksel_w);
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	void regs(address_map &map);
 

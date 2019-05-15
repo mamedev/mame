@@ -149,6 +149,27 @@
 		</part>
 	</software>
 
+	<software name="fcc"> <!-- optional -->
+		<description>The Final ChessCard</description>
+		<year>1990</year>
+		<publisher>Tasc</publisher>
+		<sharedfeat name="requirement" value="c64_cart:fcc"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/> <!-- book -->
+			<dataarea name="flop" size="174848">
+				<rom name="fcc_disk1.d64" size="174848" crc="c726ab83" sha1="9196fb222faf4b7c07e7814a25f65779ee35032d" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/> <!-- save disk -->
+			<dataarea name="flop" size="174848">
+				<rom name="fcc_disk2.d64" size="174848" crc="60042a32" sha1="c768a13201bdf78e1dd387ef9370dc10259d3f22" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grnberet">
 		<description>Green Beret</description>
 		<year>1986</year>

@@ -302,7 +302,6 @@ void mac128_state::machine_reset()
 	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
-	m_maincpu->reset();
 	m_screen_buffer = 1;
 #ifndef MAC_USE_EMULATED_KBD
 	m_keyboard_reply = 0;

@@ -20,6 +20,7 @@ class rastan_state : public driver_device
 public:
 	rastan_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_audiobank(*this, "audiobank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
@@ -36,6 +37,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	required_memory_bank m_audiobank;
+
 	/* video-related */
 	u16         m_sprite_ctrl;
 	u16         m_sprites_flipscreen;
@@ -53,15 +56,15 @@ private:
 	required_device<pc080sn_device> m_pc080sn;
 	required_device<pc090oj_device> m_pc090oj;
 
-	DECLARE_WRITE8_MEMBER(rastan_msm5205_address_w);
-	DECLARE_WRITE16_MEMBER(rastan_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(rastan_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(rastan_msm5205_start_w);
-	DECLARE_WRITE8_MEMBER(rastan_msm5205_stop_w);
-	uint32_t screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(rastan_msm5205_vck);
-	void rastan_map(address_map &map);
-	void rastan_s_map(address_map &map);
+	void msm5205_address_w(u8 data);
+	void spritectrl_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+	void msm5205_start_w(u8 data);
+	void msm5205_stop_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_RASTAN_H

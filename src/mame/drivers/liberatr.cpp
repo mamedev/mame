@@ -275,10 +275,10 @@ WRITE8_MEMBER( liberatr_state::earom_control_w )
 
 void liberatr_state::liberatr_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
 	map(0x0000, 0x0000).ram().share("xcoord");
 	map(0x0001, 0x0001).ram().share("ycoord");
 	map(0x0002, 0x0002).rw(FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
+	map(0x0003, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");
 	map(0x4000, 0x403f).r(FUNC(liberatr_state::earom_r));
 	map(0x5000, 0x5000).r(FUNC(liberatr_state::port0_r));
 	map(0x5001, 0x5001).portr("IN1");
@@ -306,10 +306,10 @@ void liberatr_state::liberatr_map(address_map &map)
 
 void liberatr_state::liberat2_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
 	map(0x0000, 0x0000).ram().share("xcoord");
 	map(0x0001, 0x0001).ram().share("ycoord");
 	map(0x0002, 0x0002).rw(FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
+	map(0x0003, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");
 	map(0x4000, 0x4000).r(FUNC(liberatr_state::port0_r));
 	map(0x4001, 0x4001).portr("IN1");
 	map(0x4002, 0x400f).nopr();

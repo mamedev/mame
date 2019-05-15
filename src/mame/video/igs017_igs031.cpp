@@ -32,7 +32,7 @@ void igs017_igs031_device::map(address_map &map)
 
 }
 
-READ8_MEMBER(igs017_igs031_device::i8255_r)
+u8 igs017_igs031_device::i8255_r(offs_t offset)
 {
 	if (m_i8255)
 		return m_i8255->read(offset);
@@ -54,28 +54,28 @@ static const gfx_layout layout_8x8x4 =
 };
 
 GFXDECODE_MEMBER( igs017_igs031_device::gfxinfo )
-	GFXDECODE_DEVICE( "^tilemaps", 0, layout_8x8x4, 0, 16 )
-//  GFXDECODE_DEVICE( DEVICE_SELF, 0, spritelayout, 0, 0x1000 )
+	GFXDECODE_DEVICE( "tilemaps", 0, layout_8x8x4, 0, 16 )
+//  GFXDECODE_DEVICE( "sprites",  0, spritelayout, 0,  8 )
 GFXDECODE_END
 
 
 DEFINE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device, "igs017_031", "IGS017_IGS031")
 
-igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IGS017_IGS031, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		device_video_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this)),
-		m_spriteram(*this, "spriteram", 0),
-		m_fg_videoram(*this, "fg_videoram", 0),
-		m_bg_videoram(*this, "bg_videoram", 0),
-		m_palram(*this, "palram", 0),
-		m_i8255(*this, "^ppi8255"),
-		m_palette(*this, "^palette")
+igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, IGS017_IGS031, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
+	, device_video_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this))
+	, m_spriteram(*this, "spriteram", 0)
+	, m_fg_videoram(*this, "fg_videoram", 0)
+	, m_bg_videoram(*this, "bg_videoram", 0)
+	, m_palram(*this, "palram", 0)
+	, m_i8255(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
 {
 	m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
-	m_revbits = 0;
+	m_revbits = false;
 }
 
 device_memory_interface::space_config_vector igs017_igs031_device::memory_space_config() const
@@ -85,9 +85,14 @@ device_memory_interface::space_config_vector igs017_igs031_device::memory_space_
 	};
 }
 
-uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr)
+u16 igs017_igs031_device::palette_callback_straight(u16 bgr) const
 {
 	return bgr;
+}
+
+void igs017_igs031_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400/2);
 }
 
 void igs017_igs031_device::device_start()
@@ -103,6 +108,10 @@ void igs017_igs031_device::device_start()
 	m_toggle = 0;
 	m_debug_addr = 0;
 	m_debug_width = 512;
+
+	save_item(NAME(m_video_disable));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_irq_enable));
 }
 
 void igs017_igs031_device::video_start()
@@ -112,8 +121,8 @@ void igs017_igs031_device::video_start()
 
 	if (m_revbits)
 	{
-		uint8_t *rom  =   memregion("^tilemaps")->base();
-		int size      =   memregion("^tilemaps")->bytes();
+		u8 *rom        = memregion("tilemaps")->base();
+		const u32 size = memregion("tilemaps")->bytes();
 
 		for (int i = 0; i < size ; i++)
 		{
@@ -125,33 +134,23 @@ void igs017_igs031_device::video_start()
 
 void igs017_igs031_device::device_reset()
 {
-	m_video_disable = 0;
-	m_nmi_enable = 0;
-	m_irq_enable = 0;
+	m_video_disable = false;
+	m_nmi_enable = false;
+	m_irq_enable = false;
 }
 
-READ8_MEMBER(igs017_igs031_device::read)
-{
-	return space_r(offset);
-}
-
-WRITE8_MEMBER(igs017_igs031_device::write)
-{
-	space_w(offset, data);
-}
-
-void igs017_igs031_device::space_w(int offset, uint8_t data)
+void igs017_igs031_device::write(offs_t offset, u8 data)
 {
 	space().write_byte(offset, data);
 }
 
-uint8_t igs017_igs031_device::space_r(int offset)
+u8 igs017_igs031_device::read(offs_t offset)
 {
 	return space().read_byte(offset);
 }
 
 
-WRITE8_MEMBER(igs017_igs031_device::video_disable_w)
+void igs017_igs031_device::video_disable_w(u8 data)
 {
 	m_video_disable = data & 1;
 	if (data & (~1))
@@ -159,13 +158,13 @@ WRITE8_MEMBER(igs017_igs031_device::video_disable_w)
 //  popmessage("VIDEO %02X",data);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::palram_w)
+void igs017_igs031_device::palram_w(offs_t offset, u8 data)
 {
 	m_palram[offset] = data;
 
 	offset &= ~1;
 
-	int bgr = (m_palram[offset+1] << 8) | (m_palram[offset]);
+	u16 bgr = (m_palram[offset+1] << 8) | (m_palram[offset]);
 
 	// bitswap (some games)
 	bgr = m_palette_scramble_cb(bgr);
@@ -174,29 +173,28 @@ WRITE8_MEMBER(igs017_igs031_device::palram_w)
 
 }
 
-
-#define COLOR(_X)   (((_X)>>2)&7)
+static inline const u32 COLOR(u16 x) { return (x >> 2) & 7; }
 
 TILE_GET_INFO_MEMBER(igs017_igs031_device::get_fg_tile_info)
 {
-	int code = m_fg_videoram[tile_index*4+0] + (m_fg_videoram[tile_index*4+1] << 8);
-	int attr = m_fg_videoram[tile_index*4+2] + (m_fg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
+	const u16 code = m_fg_videoram[tile_index * 4 + 0] + (m_fg_videoram[tile_index * 4 + 1] << 8);
+	const u16 attr = m_fg_videoram[tile_index * 4 + 2] + (m_fg_videoram[tile_index * 4 + 3] << 8);
+	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
 }
 TILE_GET_INFO_MEMBER(igs017_igs031_device::get_bg_tile_info)
 {
-	int code = m_bg_videoram[tile_index*4+0] + (m_bg_videoram[tile_index*4+1] << 8);
-	int attr = m_bg_videoram[tile_index*4+2] + (m_bg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
+	const u16 code = m_bg_videoram[tile_index * 4 + 0] + (m_bg_videoram[tile_index * 4 + 1] << 8);
+	const u16 attr = m_bg_videoram[tile_index * 4 + 2] + (m_bg_videoram[tile_index * 4 + 3] << 8);
+	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
 }
 
-WRITE8_MEMBER(igs017_igs031_device::fg_w)
+void igs017_igs031_device::fg_w(offs_t offset, u8 data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/4);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::bg_w)
+void igs017_igs031_device::bg_w(offs_t offset, u8 data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/4);
@@ -207,15 +205,15 @@ WRITE8_MEMBER(igs017_igs031_device::bg_w)
 // This routine expands each word into three bytes.
 void igs017_igs031_device::expand_sprites()
 {
-	uint8_t *rom  =   memregion("^sprites")->base();
-	int size      =   memregion("^sprites")->bytes();
+	u8 *rom        = memregion("sprites")->base();
+	const u32 size = memregion("sprites")->bytes();
 
 	m_sprites_gfx_size   =   size / 2 * 3;
-	m_sprites_gfx        =   std::make_unique<uint8_t[]>(m_sprites_gfx_size);
+	m_sprites_gfx        =   std::make_unique<u8[]>(m_sprites_gfx_size);
 
-	for (int i = 0; i < size / 2 ; i++)
+	for (int i = 0; i < size / 2; i++)
 	{
-		uint16_t pens = (rom[i*2+1] << 8) | rom[i*2];
+		const u16 pens = (rom[i*2+1] << 8) | rom[i*2];
 
 		m_sprites_gfx[i * 3 + 0] = (pens >>  0) & 0x1f;
 		m_sprites_gfx[i * 3 + 1] = (pens >>  5) & 0x1f;
@@ -256,51 +254,49 @@ void igs017_igs031_device::expand_sprites()
 
 ***************************************************************************/
 
-void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
+void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr)
 {
 	// prepare GfxElement on the fly
 
 	// Bounds checking
-	if ( addr + dimx * dimy >= m_sprites_gfx_size )
+	if (addr + dimx * dimy >= m_sprites_gfx_size)
 		return;
 
 	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
-	gfx.transpen(bitmap,cliprect,
+	gfx.transpen(bitmap, cliprect,
 				0, color,
 				flipx, flipy,
-				sx, sy, 0x1f    );
+				sx, sy, 0x1f);
 }
 
 void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint8_t *s    =   m_spriteram;
-	uint8_t *end  =   m_spriteram + 0x800;
+	u8 *s    =   m_spriteram;
+	u8 *end  =   m_spriteram + 0x800;
 
-	for ( ; s < end; s += 8 )
+	for (; s < end; s += 8)
 	{
-		int x,y, sx,sy, dimx,dimy, flipx,flipy, addr,color;
+		const int y     =   s[0] + (s[1] << 8);
+		int x           =   s[2] + (s[3] << 8);
+		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07) << 18);
+		addr            *=  3;
 
-		y       =   s[0] + (s[1] << 8);
-		x       =   s[2] + (s[3] << 8);
-		addr    =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07) << 18);
-		addr    *=  3;
+		const int flipx =   s[7] & 0x10;
+		const int flipy =   0;
 
-		flipx   =   s[7] & 0x10;
-		flipy   =   0;
+		const int dimx  =   ((((s[4] & 0x3f)<<2) | ((s[3] & 0xc0)>>6))+1) * 3;
+		const int dimy  =   ((y >> 10) | ((x & 0x03)<<6))+1;
 
-		dimx    =   ((((s[4] & 0x3f)<<2) | ((s[3] & 0xc0)>>6))+1) * 3;
-		dimy    =   ((y >> 10) | ((x & 0x03)<<6))+1;
-
-		x       >>= 3;
-		sx      =   (x & 0x1ff) - (x & 0x200);
-		sy      =   (y & 0x1ff) - (y & 0x200);
+		x               >>= 3;
+		const int sx    =   (x & 0x1ff) - (x & 0x200);
+		const int sy    =   (y & 0x1ff) - (y & 0x200);
 
 		// sprites list stop (used by mgdh & sdmg2 during don den)
 		if (sy == -0x200)
 			break;
 
-		color = (s[7] & 0xe0) >> 5;
+		u32 color = (s[7] & 0xe0) >> 5;
 
 		draw_sprite(bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
 	}
@@ -310,7 +306,7 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once(KEYCODE_T))   m_toggle = 1-m_toggle;
+	if (machine().input().code_pressed_once(KEYCODE_T))   m_toggle ^= 1;
 	if (m_toggle)    {
 		int h = 256, w = m_debug_width, a = m_debug_addr;
 
@@ -349,7 +345,7 @@ int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cli
 	return 0;
 }
 
-uint32_t igs017_igs031_device::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 igs017_igs031_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -381,14 +377,14 @@ uint32_t igs017_igs031_device::screen_update_igs017(screen_device &screen, bitma
 	return 0;
 }
 
-WRITE8_MEMBER(igs017_igs031_device::nmi_enable_w)
+void igs017_igs031_device::nmi_enable_w(u8 data)
 {
 	m_nmi_enable = data & 1;
 	if (data != 0 && data != 1 && data != 0xff)
 		logerror("%s: nmi_enable = %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::irq_enable_w)
+void igs017_igs031_device::irq_enable_w(u8 data)
 {
 	m_irq_enable = data & 1;
 	if (data != 0 && data != 1 && data != 0xff)

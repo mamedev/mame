@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
-*
+
 * fidel_elite.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Elite A/S series hardware (EAS, EAG, PC)

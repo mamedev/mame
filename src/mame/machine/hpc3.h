@@ -62,8 +62,11 @@ protected:
 	DECLARE_WRITE32_MEMBER(hd_enet_w);
 	template <uint32_t index> DECLARE_READ32_MEMBER(hd_r);
 	template <uint32_t index> DECLARE_WRITE32_MEMBER(hd_w);
+	DECLARE_READ32_MEMBER(intstat_r);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_READ32_MEMBER(volume_r);
+	DECLARE_WRITE32_MEMBER(volume_w);
 	DECLARE_READ32_MEMBER(pbus4_r);
 	DECLARE_WRITE32_MEMBER(pbus4_w);
 	DECLARE_READ32_MEMBER(pbusdma_r);
@@ -141,9 +144,12 @@ protected:
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 
+	uint32_t m_intstat;
 	uint32_t m_enetr_nbdp;
 	uint32_t m_enetr_cbp;
 	uint32_t m_cpu_aux_ctrl;
+	uint8_t m_volume_l;
+	uint8_t m_volume_r;
 
 	struct scsi_dma_t
 	{

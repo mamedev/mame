@@ -24,7 +24,7 @@ digit DP lights up).
 #include "machine/timer.h"
 
 // internal artwork
-#include "chesstrv.lh" // clickable
+#include "scisys_chesstrv.lh" // clickable
 
 
 namespace {
@@ -213,7 +213,7 @@ void chesstrv_state::chesstrv(machine_config &config)
 	for (int i = 0; i < 4; i++)
 		TIMER(config, m_delay_display[i]).configure_generic(FUNC(chesstrv_state::delay_display));
 
-	config.set_default_layout(layout_chesstrv);
+	config.set_default_layout(layout_scisys_chesstrv);
 }
 
 

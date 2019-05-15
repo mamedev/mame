@@ -228,6 +228,10 @@ public:
 
 	void miniboy7(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void ay_pa_w(uint8_t data);
 	void ay_pb_w(uint8_t data);
@@ -240,9 +244,6 @@ private:
 	void miniboy7_palette(palette_device &palette) const;
 
 	void miniboy7_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
@@ -746,7 +747,7 @@ ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this vers
 ROM_END
 
 /*
-  Bonaza's Super Mini Boy.
+  Bonanza's Super Mini Boy.
   PCB: MVX-001-02
 
   1x 6502
@@ -782,6 +783,6 @@ ROM_END
 ***********************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                     FULLNAME             FLAGS                LAYOUT
-GAME(  1984, sminiboy,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NOT_WORKING )
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+GAME(  1984, sminiboy,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )

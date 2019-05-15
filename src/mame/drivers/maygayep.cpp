@@ -62,7 +62,7 @@ void maygayep_state::maygayep_map(address_map &map)
 {
 	map.global_mask(0xffffff);
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0xfe0000, 0xffffff).ram(); // merln at least?
+	map(0xfe0000, 0xfffd0f).ram(); // merln at least?
 }
 
 static INPUT_PORTS_START( maygayep )

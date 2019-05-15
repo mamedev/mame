@@ -18,6 +18,7 @@ TODO:
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
+- confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
@@ -97,7 +98,7 @@ BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302*   mvs  SM511?  Donkey Kong 3
 HK-303*   mvs  SM511?  Donkey Kong Hockey
 YM-801*   cs   SM511   Super Mario Bros. (assume same ROM as nws version)
-DR-802*   cs   SM511   Climber            "
+DR-802    cs   SM511   Climber            "
 BF-803*   cs   SM511   Balloon Fight      "
 YM-901-S* x    SM511   Super Mario Bros.  "
 
@@ -3572,14 +3573,18 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Climber (model: see below)
-  * PCB label DR-106
-  * Sharp SM511 label DR-106 9038B (new wide screen version) (no decap)
+  Nintendo Game & Watch: Climber New Wide Screen (model DR-106),
+  Nintendo Game & Watch: Climber Crystal Screen (model DR-802)
+  * PCB label DR-106 (New Wide Screen), DR-802 (Crystal Screen)
+  * Sharp SM511
+     - label DR-106 9038B (new wide screen version) (no decap)
+     - label DR-802 8626A (crystal screen) (not dumped yet)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
   New Wide Screen in 1988 (model DR-106). The graphic LCD elements look the same
-  in both versions but the graphical background is slightly different.
+  in both versions but the display aspect ratio and the graphical background is
+  slightly different.
   Until further proof, it's assumed that the ROM is the same for both models.
 
 ***************************************************************************/
@@ -3592,6 +3597,7 @@ public:
 	{ }
 
 	void gnw_climber(machine_config &config);
+	void gnw_climbcs(machine_config &config);
 };
 
 // config
@@ -3647,6 +3653,16 @@ void gnw_climber_state::gnw_climber(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void gnw_climber_state::gnw_climbcs(machine_config &config)
+{
+	gnw_climber(config);
+
+	/* video hardware */
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(1756, 1080);
+	screen->set_visarea_full();
+}
+
 // roms
 
 ROM_START( gnw_climber )
@@ -3658,6 +3674,17 @@ ROM_START( gnw_climber )
 
 	ROM_REGION( 542332, "svg", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
+ROM_END
+
+ROM_START( gnw_climbcs )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) ) // dumped from NWS version
+
+	ROM_REGION( 564704, "svg", 0)
+	ROM_LOAD( "gnw_climbcs.svg", 0, 564704, CRC(60b25cc5) SHA1(1c101539a861257c5b0334ffdf9491c877759fa1) )
 ROM_END
 
 
@@ -8831,25 +8858,29 @@ ROM_END
 
 /***************************************************************************
 
-  Tronica Thief in Garden (model TG-18)
+  Tronica Shuttle Voyage (MG-8)
   * Sharp SM510 label 0019 238E TRONICA (no decap)
   * lcd screen with custom segments, 1-bit sound
 
+  Even though the serial is MG-8, the back of the game says 1983, newer than MG-9?
+  Thief in Garden (model TG-18) is the exact same MCU, but different graphics.
+
 ***************************************************************************/
 
-class tigarden_state : public hh_sm510_state
+class trshutvoy_state : public hh_sm510_state
 {
 public:
-	tigarden_state(const machine_config &mconfig, device_type type, const char *tag) :
+	trshutvoy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
+	void trshutvoy(machine_config &config);
 	void tigarden(machine_config &config);
 };
 
 // config
 
-static INPUT_PORTS_START( tigarden )
+static INPUT_PORTS_START( trshutvoy )
 	PORT_START("IN.0") // S1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
@@ -8901,7 +8932,7 @@ static INPUT_PORTS_START( tigarden )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 INPUT_PORTS_END
 
-void tigarden_state::tigarden(machine_config &config)
+void trshutvoy_state::trshutvoy(machine_config &config)
 {
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
@@ -8915,7 +8946,102 @@ void tigarden_state::tigarden(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
-	screen.set_size(1515, 1080);
+	screen.set_size(1496, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void trshutvoy_state::tigarden(machine_config &config)
+{
+	trshutvoy(config);
+
+	/* video hardware */
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(1515, 1080);
+	screen->set_visarea_full();
+}
+
+// roms
+
+ROM_START( trshutvoy )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
+
+	ROM_REGION( 221654, "svg", 0)
+	ROM_LOAD( "trshutvoy.svg", 0, 221654, CRC(470a7ff5) SHA1(b297601d8a5a9c4aef414605632849e0b1925caa) )
+ROM_END
+
+ROM_START( tigarden )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
+
+	ROM_REGION( 409084, "svg", 0)
+	ROM_LOAD( "tigarden.svg", 0, 409084, CRC(cfda5138) SHA1(1bc4ed65ae0cdca3e1e9458d68ca4d6e0fc0e901) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tronica Space Rescue (model MG-9)
+  * PCB label MG-9 080492
+  * Sharp SM510 label 0015 224B TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class trsrescue_state : public hh_sm510_state
+{
+public:
+	trsrescue_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trsrescue(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( trsrescue )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void trsrescue_state::trsrescue(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1533, 1080);
 	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
@@ -8928,12 +9054,12 @@ void tigarden_state::tigarden(machine_config &config)
 
 // roms
 
-ROM_START( tigarden )
+ROM_START( trsrescue )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
+	ROM_LOAD( "0015_224b", 0x0000, 0x1000, CRC(f58a3832) SHA1(2d843b3520de66463e628cea9344a04015d1f5f1) )
 
-	ROM_REGION( 409084, "svg", 0)
-	ROM_LOAD( "tigarden.svg", 0, 409084, CRC(cfda5138) SHA1(1bc4ed65ae0cdca3e1e9458d68ca4d6e0fc0e901) )
+	ROM_REGION( 178600, "svg", 0)
+	ROM_LOAD( "trsrescue.svg", 0, 178600, CRC(2fa7b2d9) SHA1(5d1fc88db3129c9126f0c05ea55fb5f117e02871) )
 ROM_END
 
 
@@ -9106,6 +9232,9 @@ CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,
 CONS( 1988, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
+// Nintendo G&W: crystal screen
+CONS( 1986, gnw_climbcs, gnw_climber,0, gnw_climbcs, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (crystal screen)", MACHINE_SUPPORTS_SAVE )
+
 // Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
 
@@ -9162,6 +9291,10 @@ CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state, 
 // Tiger 72-xxx models
 CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE )
 
+// Tronica
+CONS( 1983, trshutvoy,   0,          0, trshutvoy,   trshutvoy,   trshutvoy_state,   empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, tigarden,    trshutvoy,  0, tigarden,    trshutvoy,   trshutvoy_state,   empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, trsrescue,   0,          0, trsrescue,   trsrescue,   trsrescue_state,   empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE )
+
 // misc
-CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )

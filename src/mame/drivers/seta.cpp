@@ -1322,18 +1322,59 @@ Notes:
 /***************************************************************************
 
 Crazy Fight
+Subsino 1996
+Readme by Guru
+This game runs on Allumer-based hardware.
+It is a whack-a-mole type game using 6 buttons.
 
-x1-11
-x1-11
-x1-12
-x1-12
-x1-001a
-x1-002a
-x1-007
-Lattlice PLSI 1032 FPGA
-oki 6295
-ym3812
-68000
+PCB Layout
+----------
+
+186P010
+|--------------------------------------------------------------------|
+|    VOLUME               68000              ROM_U68                 |
+|TDA1519  LM358 LM324                                                |
+|              YM3014     ROM_U3             ROM_U67                 |
+|           YM3812                                                   |
+|4.43361875MHz            62256             X1-011  X1-012           |
+|                                 PLSI1032                           |
+|        M6295            ROM_U4                                     |
+|                                            ROM_U66                 |
+|                         62256                                      |
+|   ROM_U85                                  ROM_U65                 |
+|J                                16MHz                              |
+|A                                          X1-011  X1-012           |
+|M                                                                   |
+|M  X1-007        PAL                                                |
+|A                                           6164       X1-001A      |
+|    6164                                                            |
+|                                                                    |
+|    6164                                    6164       X1-002A      |
+|                DSW2(8)  DSW1(8)                                    |
+| TD62003                            PAL   ROM_U228     ROM_U226     |
+|    J2    DIP42                     PAL         ROM_U227    ROM_U225|
+|--------------------------------------------------------------------|
+Notes:
+      68000 clock  - 16.00MHz (DIP64)
+      YM3812 clock - 4.000MHz [16/4] (DIP24)
+      M6295 clock  - 1.108404688 [4.43361875/4]. Pin 7 HIGH (QFP44)
+      PLSI1032     - Lattice pLSI1032-80LJ Programmable Logic Device (PLCC84)
+      6164         - 8kx8 SRAM (SDIP28)
+      62256        - 32kx8 SRAM (SDIP28)
+      TD62003      - Toshiba TD62003 7-Channel Darlington Sink Driver (DIP16)
+      DIP42        - Unknown DIP42 IC. Note several pins have no connection.
+                     Pins 6-26 tied to inputs on JAMMA connector.
+                     Some other pins tied to logic.
+                     No pins have a clock so this chip is not a MCU.
+      J2           - 4 pin connector. Pin 2 tied to DIP42 IC pin 27
+                     and pin 3 tied to TD62003 pin 16
+      Custom Chips - X1-007
+                     X1-001A
+                     X1-002A
+                     X1-011 (2)
+                     X1-012 (2)
+      HSync        - 15.1433kHz
+      VSync        - 59.1851Hz
 
 ***************************************************************************/
 
@@ -2008,7 +2049,7 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();                             // ROM (up to 2MB)
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0x210000, 0x21ffff).ram();                             // RAM (gundhara)
-	map(0x300000, 0x30ffff).ram();                             // RAM (wrofaero only?)
+	map(0x300000, 0x30ffff).ram().share("nvram");              // actually 8K x8 SRAM in zombraid
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
@@ -2045,7 +2086,6 @@ void seta_state::wrofaero_map(address_map &map)
 void zombraid_state::zombraid_map(address_map &map)
 {
 	wrofaero_map(map);
-	map(0x300000, 0x30ffff).ram().share("nvram");           // actually 8K x8 SRAM
 	map(0xf00000, 0xf00001).w(FUNC(zombraid_state::gun_w));
 	map(0xf00002, 0xf00003).r(FUNC(zombraid_state::gun_r));
 }
@@ -2900,7 +2940,7 @@ uint16_t kiwame_state::input_r(offs_t offset)
 	switch( offset )
 	{
 		case 0x00/2:    return m_key[i]->read();
-		case 0x02/2:    return 0xffff;
+		case 0x02/2:    return m_key[i + 5]->read();
 		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
 		case 0x08/2:    return 0xffff;
@@ -5611,6 +5651,46 @@ bit 0       a   b   c   d   lc
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2  )
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY8")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY9")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -9759,7 +9839,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
 void seta_state::crazyfgt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::crazyfgt_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::crazyfgt_interrupt), "screen", 0, 1);
 
@@ -9769,7 +9849,7 @@ void seta_state::crazyfgt(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(59.1851);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
@@ -9784,10 +9864,10 @@ void seta_state::crazyfgt(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 16000000/4)); /* 4 MHz */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));   // clock?
+	okim6295_device &oki(OKIM6295(config, "oki", 4.433619_MHz_XTAL / 4, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

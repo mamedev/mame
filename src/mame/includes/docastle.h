@@ -85,9 +85,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void docastle_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(dorunrun);
-	uint32_t screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_docastle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void video_start_common( uint32_t tile_transmask );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(docastle_tint);
 	DECLARE_WRITE_LINE_MEMBER(idsoccer_adpcm_int);
 	void docastle_io_map(address_map &map);

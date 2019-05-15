@@ -26,6 +26,8 @@
 
 #include "netlist/nl_setup.h"
 
+// FIXME: Implement pure CMOS version
+
 #define CD4066_GATE(name)                                                       \
 		NET_REGISTER_DEV(CD4066_GATE, name)
 

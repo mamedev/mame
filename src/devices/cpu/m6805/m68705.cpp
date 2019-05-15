@@ -248,7 +248,7 @@ template <offs_t B> READ8_MEMBER(m68705_device::eprom_r)
 
 template <offs_t B> WRITE8_MEMBER(m68705_device::eprom_w)
 {
-	LOGEPROM("EPROM programming latch write%s%s: %04X = %02\n",
+	LOGEPROM("EPROM programming latch write%s%s: %04X = %02X\n",
 			!pcr_vpon() ? " [Vpp low]" : "", !pcr_ple() ? " [disabled]" : "", B + offset, data);
 
 	// programming latch enabled when /VPON and /PLE are asserted
@@ -417,7 +417,7 @@ void m6805_hmos_device::device_start()
 	add_port_latch_state<0>();
 	add_port_latch_state<1>();
 	add_port_latch_state<2>();
-	add_port_latch_state<3>(); // FIXME: only if present
+	// PORTD has no latch registered since it is either input-only or nonexistent
 	add_port_ddr_state<0>();
 	add_port_ddr_state<1>();
 	add_port_ddr_state<2>();
@@ -576,12 +576,14 @@ void m6805_hmos_device::burn_cycles(unsigned count)
 
 template <std::size_t N> void m6805_hmos_device::add_port_latch_state()
 {
-	state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N).c_str(), m_port_latch[N]).mask(~m_port_mask[N] & 0xff);
+	if (m_port_mask[N] != 0xff)
+		state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N).c_str(), m_port_latch[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
 }
 
 template <std::size_t N> void m6805_hmos_device::add_port_ddr_state()
 {
-	state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff);
+	if (m_port_mask[N] != 0xff)
+		state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
 }
 
 void m68705_device::internal_map(address_map &map)
@@ -915,7 +917,7 @@ void m6805_timer::update(unsigned count)
 		return;
 
 	// compute new prescaler value and counter decrements
-	unsigned const prescale = m_prescale + ((m_source == TIMER) ? m_timer_edges : count);
+	unsigned const prescale = (m_prescale & ((1 << m_divisor) - 1)) + ((m_source == TIMER) ? m_timer_edges : count);
 	unsigned const decrements(prescale >> m_divisor);
 
 	// check for zero crossing

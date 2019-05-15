@@ -8457,7 +8457,6 @@ void goldstar_state::goldstar(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldstar);
@@ -8491,7 +8490,6 @@ void goldstar_state::goldstbl(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bl);
@@ -8537,7 +8535,6 @@ void sanghopm_state::star100(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(sanghopm_state::screen_update_sangho));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -8576,7 +8573,6 @@ void goldstar_state::super9(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_super9);
@@ -8667,7 +8663,6 @@ void cb3_state::ncb3(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -8745,7 +8740,6 @@ void goldstar_state::wcherry(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb3e);
@@ -8790,7 +8784,6 @@ void cmaster_state::cm(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmbitmap);
@@ -8838,7 +8831,6 @@ void goldstar_state::cmast91(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmast91);
@@ -8893,7 +8885,6 @@ void wingco_state::lucky8(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -8945,7 +8936,6 @@ void wingco_state::bingowng(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(wingco_state::screen_update_bingowng));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -9067,7 +9057,6 @@ void wingco_state::magodds(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(wingco_state::screen_update_magical));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magodds);
@@ -9116,7 +9105,6 @@ void goldstar_state::kkotnoli(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -9153,7 +9141,6 @@ void goldstar_state::ladylinr(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -9201,7 +9188,6 @@ void wingco_state::wcat3(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -9249,7 +9235,6 @@ void cmaster_state::amcoe1(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
@@ -9304,7 +9289,6 @@ void cmaster_state::amcoe2(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
@@ -9354,7 +9338,6 @@ void unkch_state::unkch(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(unkch_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unkch);
@@ -9390,7 +9373,6 @@ void goldstar_state::pkrmast(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkrmast);
@@ -9426,7 +9408,6 @@ void unkch_state::megaline(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
@@ -9468,7 +9449,6 @@ void unkch_state::bonusch(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
@@ -9514,7 +9494,6 @@ void unkch_state::feverch(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
-	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);

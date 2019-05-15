@@ -161,9 +161,6 @@ void unixpc_state::machine_reset()
 {
 	// force ROM into lower mem on reset
 	m_ramrombank->set_bank(0);
-
-	// reset cpu so that it can pickup the new values
-	m_maincpu->reset();
 }
 
 WRITE_LINE_MEMBER(unixpc_state::error_enable_w)

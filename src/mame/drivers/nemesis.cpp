@@ -309,11 +309,12 @@ void nemesis_state::nemesis_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -339,11 +340,12 @@ void nemesis_state::gx400_map(address_map &map)
 	map(0x010000, 0x01ffff).ram();
 	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -372,11 +374,12 @@ void nemesis_state::bubsys_map(address_map &map)
 	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x040000, 0x040007).ram().w(FUNC(nemesis_state::bubsys_mcu_w)).share("bubsys_control"); // Shared with MCU
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -401,11 +404,12 @@ void nemesis_state::konamigt_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -432,11 +436,12 @@ void nemesis_state::rf2_gx400_map(address_map &map)
 	map(0x010000, 0x01ffff).ram();
 	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -526,11 +531,12 @@ void nemesis_state::salamand_map(address_map &map)
 	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x180fff).ram().share("spriteram");       /* more sprite ram ??? */
-	map(0x190000, 0x191fff).ram();
-	map(0x190000, 0x1903ff).share("xscroll2");
-	map(0x190400, 0x1907ff).share("xscroll1");
-	map(0x190f00, 0x190f7f).share("yscroll1");
-	map(0x190f80, 0x190fff).share("yscroll2");
+	map(0x190000, 0x1903ff).ram().share("xscroll2");
+	map(0x190400, 0x1907ff).ram().share("xscroll1");
+	map(0x190800, 0x190eff).ram();
+	map(0x190f00, 0x190f7f).ram().share("yscroll1");
+	map(0x190f80, 0x190fff).ram().share("yscroll2");
+	map(0x191000, 0x191fff).ram();
 }
 
 void nemesis_state::blkpnthr_map(address_map &map)
@@ -551,11 +557,12 @@ void nemesis_state::blkpnthr_map(address_map &map)
 	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
 	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x180000, 0x181fff).ram();
-	map(0x180000, 0x1803ff).share("xscroll1");
-	map(0x180400, 0x1807ff).share("xscroll2");
-	map(0x180f00, 0x180f7f).share("yscroll2");
-	map(0x180f80, 0x180fff).share("yscroll1");
+	map(0x180000, 0x1803ff).ram().share("xscroll1");
+	map(0x180400, 0x1807ff).ram().share("xscroll2");
+	map(0x180800, 0x180eff).ram();
+	map(0x180f00, 0x180f7f).ram().share("yscroll2");
+	map(0x180f80, 0x180fff).ram().share("yscroll1");
+	map(0x181000, 0x181fff).ram();
 	map(0x190000, 0x190fff).ram().share("spriteram");       /* more sprite ram ??? */
 }
 
@@ -579,11 +586,12 @@ void nemesis_state::citybomb_map(address_map &map)
 	map(0x211000, 0x211fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x212000, 0x212fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x213000, 0x213fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
-	map(0x300000, 0x301fff).ram();
-	map(0x300000, 0x3003ff).share("xscroll1");
-	map(0x300400, 0x3007ff).share("xscroll2");
-	map(0x300f00, 0x300f7f).share("yscroll2");
-	map(0x300f80, 0x300fff).share("yscroll1");
+	map(0x300000, 0x3003ff).ram().share("xscroll1");
+	map(0x300400, 0x3007ff).ram().share("xscroll2");
+	map(0x300800, 0x300eff).ram();
+	map(0x300f00, 0x300f7f).ram().share("yscroll2");
+	map(0x300f80, 0x300fff).ram().share("yscroll1");
+	map(0x301000, 0x301fff).ram();
 	map(0x310000, 0x310fff).ram().share("spriteram");       /* more sprite ram ??? */
 }
 
@@ -607,11 +615,12 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x203000, 0x203fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x210000, 0x21ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x300000, 0x300fff).ram().share("spriteram");       /* more sprite ram ??? */
-	map(0x310000, 0x311fff).ram();
-	map(0x310000, 0x3103ff).share("xscroll1");
-	map(0x310400, 0x3107ff).share("xscroll2");
-	map(0x310f00, 0x310f7f).share("yscroll2");
-	map(0x310f80, 0x310fff).share("yscroll1");
+	map(0x310000, 0x3103ff).ram().share("xscroll1");
+	map(0x310400, 0x3107ff).ram().share("xscroll2");
+	map(0x310800, 0x310eff).ram();
+	map(0x310f00, 0x310f7f).ram().share("yscroll2");
+	map(0x310f80, 0x310fff).ram().share("yscroll1");
+	map(0x311000, 0x311fff).ram();
 }
 
 READ8_MEMBER(nemesis_state::wd_r)
@@ -684,11 +693,12 @@ void nemesis_state::hcrash_map(address_map &map)
 	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x180fff).ram().share("spriteram");
-	map(0x190000, 0x191fff).ram();
-	map(0x190000, 0x1903ff).share("xscroll2");
-	map(0x190400, 0x1907ff).share("xscroll1");
-	map(0x190f00, 0x190f7f).share("yscroll1");
-	map(0x190f80, 0x190fff).share("yscroll2");
+	map(0x190000, 0x1903ff).ram().share("xscroll2");
+	map(0x190400, 0x1907ff).ram().share("xscroll1");
+	map(0x190800, 0x190eff).ram();
+	map(0x190f00, 0x190f7f).ram().share("yscroll1");
+	map(0x190f80, 0x190fff).ram().share("yscroll2");
+	map(0x191000, 0x191fff).ram();
 }
 
 /******************************************************************************/

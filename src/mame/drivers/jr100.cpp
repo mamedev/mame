@@ -1,15 +1,51 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic,Robbbert
 /***************************************************************************
 
-        JR-100 National / Panasonic
+JR-100 National / Panasonic
 
-        23/08/2010 Initial driver version
+2010-08-23 Initial driver version
 
-        TODO:
-        - beeper doesn't work correctly when a key is pressed (should have
-          more time but it's quickly shut off), presumably there are M6802
-          timing bugs that causes this quirk.
+CPU: User manual for JR100U states it is a MN1800 (==MC6802), but the photo
+shows it to be a Fujitsu MB8861H, which is a MC6800 with extra instructions.
+The manual also states the clock to be 890kHz but in fact it is 894kHz.
+MB14392 custom LSI generates the various clock signals for the computer.
+
+List of extra instructions:
+0x71 NIM And Immediate with memory    data & M -> M       Index, 8,3   71,data,index
+     V is reset; if result = 0, Z is set, N is reset; else Z is reset, N is set
+0x72 OIM Or Immediate with memory     data | M -> M       Index, 8,3   72,data,index
+     V is reset; if result = 0, Z is set, N is reset; else Z is reset, N is set
+0x75 XIM Xor Immediate with memory    data ^ M -> M       Index, 8,3   75,data,index
+     if result = 0, Z is set, N is reset; else Z is reset, N is set
+0x7B TMM Test under mask with memory  (data & M) ^ data   Index, 7,3   7B,data,index
+     flags not stated
+0xEC ADX Add Index Register           X + data -> X       Immed,4,2
+     "adds 1 byte to the index register"?  flags not stated
+0xFC ADX Add Index Register           X + (M) -> X        Extend,7,3
+     "adds 2 bytes to the index register"?  flags not stated. One page says result goes to M.
+
+There is also an MB8861 equivalent of the MC6802 which is called MB8871. Behaviour
+of undefined instructions is not the same as the Motorola parts. Variants:
+MB8861N : 1MHz
+MB8861E : 1.3MHz
+MB8861H : 2MHz
+
+Similar to MC6875, the MB8867 could be used as a clock oscillator and divide by 8
+circuit to drive the CPU directly.
+
+CC02 joystick input register (active high)
+bit 7,6: undefined
+bit 5: 0
+bit 4: button
+bit 3: down
+bit 2: up
+bit 1: left
+bit 0: right
+
+TODO:
+- Cassette loading doesn't work. Save is verified good.
+- Need software.
 
 ****************************************************************************/
 
@@ -19,7 +55,6 @@
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
 #include "machine/timer.h"
-#include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "emupal.h"
@@ -30,118 +65,68 @@
 class jr100_state : public driver_device
 {
 public:
-	jr100_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_ram(*this, "ram"),
-		m_pcg(*this, "pcg"),
-		m_vram(*this, "vram"),
-		m_via(*this, "via"),
-		m_cassette(*this, "cassette"),
-		m_beeper(*this, "beeper"),
-		m_speaker(*this, "speaker"),
-		m_region_maincpu(*this, "maincpu"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2"),
-		m_line3(*this, "LINE3"),
-		m_line4(*this, "LINE4"),
-		m_line5(*this, "LINE5"),
-		m_line6(*this, "LINE6"),
-		m_line7(*this, "LINE7"),
-		m_line8(*this, "LINE8") ,
-		m_maincpu(*this, "maincpu")
+	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_ram(*this, "ram")
+		, m_pcg(*this, "pcg")
+		, m_vram(*this, "vram")
+		, m_rom(*this, "rom")
+		, m_via(*this, "via")
+		, m_cassette(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_region_maincpu(*this, "maincpu")
+		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void jr100(machine_config &config);
 
 private:
-	required_shared_ptr<uint8_t> m_ram;
-	required_shared_ptr<uint8_t> m_pcg;
-	required_shared_ptr<uint8_t> m_vram;
 	uint8_t m_keyboard_line;
 	bool m_use_pcg;
-	uint8_t m_speaker_data;
-	uint16_t m_t1latch;
-	uint8_t m_beep_en;
-	DECLARE_WRITE8_MEMBER(jr100_via_w);
+	bool m_pb7;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_tick);
-	DECLARE_READ8_MEMBER(jr100_via_read_b);
-	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
-	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
-	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
+	DECLARE_READ8_MEMBER(pb_r);
+	DECLARE_WRITE8_MEMBER(pa_w);
+	DECLARE_WRITE8_MEMBER(pb_w);
+	DECLARE_WRITE_LINE_MEMBER(cb2_w);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
-	void jr100_mem(address_map &map);
+	void mem_map(address_map &map);
 
+	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_pcg;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_rom;
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
-	required_device<beep_device> m_beeper;
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
-	required_ioport m_line5;
-	required_ioport m_line6;
-	required_ioport m_line7;
-	required_ioport m_line8;
-	required_device<m6802_cpu_device> m_maincpu;
+	required_ioport_array<9> m_io_keyboard;
+	required_device<m6800_cpu_device> m_maincpu;
 
 	emu_timer *m_sound_timer;
 };
 
 
-WRITE8_MEMBER(jr100_state::jr100_via_w)
-{
-	/* ACR: beeper masking */
-	if(offset == 0x0b)
-	{
-		//printf("BEEP %s\n",((data & 0xe0) == 0xe0) ? "ON" : "OFF");
-		m_beep_en = ((data & 0xe0) == 0xe0);
-
-		if(!m_beep_en)
-			m_beeper->set_state(0);
-	}
-
-	/* T1L-L */
-	if(offset == 0x04)
-	{
-		m_t1latch = (m_t1latch & 0xff00) | (data & 0xff);
-		//printf("BEEP T1CL %02x\n",data);
-	}
-
-	/* T1L-H */
-	if(offset == 0x05)
-	{
-		m_t1latch = (m_t1latch & 0xff) | ((data & 0xff) << 8);
-		//printf("BEEP T1CH %02x\n",data);
-
-		/* writing here actually enables the beeper, if above masking condition is satisfied */
-		if(m_beep_en)
-		{
-			m_beeper->set_state(1);
-			m_beeper->set_clock(894886.25 / (double)(m_t1latch) / 2.0);
-		}
-	}
-	m_via->write(offset,data);
-}
-
-void jr100_state::jr100_mem(address_map &map)
+void jr100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).ram().share("ram");
-	map(0xc000, 0xc0ff).ram().share("pcg");
+	//map(0x4000, 0x7fff).ram();   expansion ram
+	//map(0x8000, 0xbfff).rom();   expansion rom
+	map(0xc000, 0xc0ff).ram().share("pcg").region("maincpu", 0xc000);
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(FUNC(jr100_state::jr100_via_w));
-	map(0xe000, 0xffff).rom();
+	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(m_via, FUNC(via6522_device::write));
+	//map(0xcc00, 0xcfff).;   expansion i/o
+	//map(0xd000, 0xd7ff).rom();   expansion rom for printer control
+	//map(0xd800, 0xdfff).rom();   expansion rom
+	map(0xe000, 0xffff).rom().share("rom");
 }
 
 /* Input ports */
@@ -223,46 +208,59 @@ void jr100_state::machine_reset()
 	m_sound_timer->adjust(timer_period, 0, timer_period);
 }
 
-void jr100_state::video_start()
-{
-}
-
 uint32_t jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,xi,yi;
+	bool attr;
+	u8 y,ra,gfx,chr;
+	u16 x,sy=0,ma=0;
 
-	uint8_t *rom_pcg = m_region_maincpu->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (ra = 0; ra < 8; ra++)
 		{
-			uint8_t tile = m_vram[x + y*32];
-			uint8_t attr = tile >> 7;
-			// ATTR is inverted for normal char or use PCG in case of CMODE1
-			uint8_t *gfx_data = rom_pcg;
-			if (m_use_pcg && attr) {
-				gfx_data = m_pcg;
-				attr = 0; // clear attr so bellow code stay same
-			}
-			tile &= 0x7f;
-			for(yi=0;yi<8;yi++)
+			uint16_t *p = &bitmap.pix16(sy++);
+			for (x = ma; x < ma + 32; x++)
 			{
-				for(xi=0;xi<8;xi++)
-				{
-					uint8_t pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1);
-					bitmap.pix16(y*8+yi, x*8+xi) = attr ^ pen;
-				}
+				chr = m_vram[x];
+				attr = BIT(chr, 7);
+				chr &= 0x7f;
+				// ATTR is inverted for normal char or use PCG in case of CMODE1
+				if (m_use_pcg && attr && (chr < 32))
+					gfx = m_pcg[(chr<<3) | ra];
+				else
+					gfx = m_rom[(chr<<3) | ra] ^ (attr ? 0xff : 0);
+
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
+		ma += 32;
 	}
 
 	return 0;
 }
 
-static const gfx_layout tiles8x8_layout =
+static const gfx_layout tilesrom_layout =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	128,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout tilesram_layout =
+{
+	8,8,
+	32,
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
@@ -271,53 +269,48 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( gfx_jr100 )
-	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0xe000, tilesrom_layout, 0, 1 )   // inside rom
+	GFXDECODE_ENTRY( "maincpu", 0xc000, tilesram_layout, 0, 1 )   // user defined
 GFXDECODE_END
 
-READ8_MEMBER(jr100_state::jr100_via_read_b)
+READ8_MEMBER(jr100_state::pb_r)
 {
-	uint8_t val = 0x1f;
-	switch ( m_keyboard_line )
-	{
-		case 0: val = m_line0->read(); break;
-		case 1: val = m_line1->read(); break;
-		case 2: val = m_line2->read(); break;
-		case 3: val = m_line3->read(); break;
-		case 4: val = m_line4->read(); break;
-		case 5: val = m_line5->read(); break;
-		case 6: val = m_line6->read(); break;
-		case 7: val = m_line7->read(); break;
-		case 8: val = m_line8->read(); break;
-	}
-	return val;
+	uint8_t data = 0x1f;
+	if (m_keyboard_line < 9)
+		data = m_io_keyboard[m_keyboard_line]->read() & 0xbf;
+	data |= (m_pb7 ? 0x40 : 0);
+	return data;
 }
 
-WRITE8_MEMBER(jr100_state::jr100_via_write_a)
+WRITE8_MEMBER(jr100_state::pa_w)
 {
 	m_keyboard_line = data & 0x0f;
 }
 
-WRITE8_MEMBER(jr100_state::jr100_via_write_b)
+WRITE8_MEMBER(jr100_state::pb_w)
 {
-	m_use_pcg = (data & 0x20) ? true : false;
-	m_speaker_data = data>>7;
+	m_use_pcg = BIT(data, 5);
+	m_pb7 = BIT(data, 7);
+	m_speaker->level_w(m_pb7);
+	m_via->write_pb6(m_pb7);
 }
 
-WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
+WRITE_LINE_MEMBER(jr100_state::cb2_w)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
+// not working; code doesn't seem right
 TIMER_CALLBACK_MEMBER(jr100_state::sound_tick)
 {
-	m_speaker->level_w(m_speaker_data);
-	m_speaker_data = 0;
-
 	double level = (m_cassette->input());
-	if (level > 0.0) {
+	if (level > 0.0)
+	{
 		m_via->write_ca1(0);
 		m_via->write_cb1(0);
-	} else {
+	}
+	else
+	{
 		m_via->write_ca1(1);
 		m_via->write_cb1(1);
 	}
@@ -340,15 +333,15 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	if (read_ != quick_length)
 		return image_init_result::FAIL;
 
-	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47) {
+	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47)
 		// this is not PRG
 		return image_init_result::FAIL;
-	}
+
 	int pos = 4;
-	if (readByLittleEndian(buf,pos)!=1) {
+	if (readByLittleEndian(buf,pos)!=1)
 		// not version 1 of PRG file
 		return image_init_result::FAIL;
-	}
+
 	pos += 4;
 	uint32_t len =readByLittleEndian(buf,pos); pos+= 4;
 	pos += len; // skip name
@@ -359,7 +352,8 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	uint32_t end_address = start_address + code_length - 1;
 	// copy code
 	memcpy(m_ram + start_address,buf + pos,code_length);
-	if (flag == 0) {
+	if (flag == 0)
+	{
 		m_ram[end_address + 1] =  0xdf;
 		m_ram[end_address + 2] =  0xdf;
 		m_ram[end_address + 3] =  0xdf;
@@ -379,8 +373,8 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 void jr100_state::jr100(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(14'318'181) / 4); // clock divided internally by 4
-	m_maincpu->set_addrmap(AS_PROGRAM, &jr100_state::jr100_mem);
+	M6800(config, m_maincpu, XTAL(14'318'181) / 16);  //actually MB8861
+	m_maincpu->set_addrmap(AS_PROGRAM, &jr100_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -394,16 +388,16 @@ void jr100_state::jr100(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jr100);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	VIA6522(config, m_via, XTAL(14'318'181) / 16);
-	m_via->readpb_handler().set(FUNC(jr100_state::jr100_via_read_b));
-	m_via->writepa_handler().set(FUNC(jr100_state::jr100_via_write_a));
-	m_via->writepb_handler().set(FUNC(jr100_state::jr100_via_write_b));
-	m_via->cb2_handler().set(FUNC(jr100_state::jr100_via_write_cb2));
+	VIA6522(config, m_via, XTAL(14'318'181) / 32);   // this divider produces the correct cassette save frequencies
+	m_via->readpb_handler().set(FUNC(jr100_state::pb_r));
+	m_via->writepa_handler().set(FUNC(jr100_state::pa_w));
+	m_via->writepb_handler().set(FUNC(jr100_state::pb_w));
+	m_via->cb2_handler().set(FUNC(jr100_state::cb2_w));
+	m_via->irq_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette, 0);
 	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
@@ -416,13 +410,13 @@ void jr100_state::jr100(machine_config &config)
 
 /* ROM definition */
 ROM_START( jr100 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "jr100.rom", 0xe000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jr100.ic5", 0xe000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
 ROM_END
 
 ROM_START( jr100u )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "jr100u.rom", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jr100u.ic5", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
 ROM_END
 
 /* Driver */

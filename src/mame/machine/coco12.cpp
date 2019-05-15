@@ -30,12 +30,13 @@ void coco12_state::device_start()
 void coco12_state::configure_sam()
 {
 	uint8_t *rom = memregion(MAINCPU_TAG)->base();
-	uint8_t *cart_rom = cococart().get_cart_base();
 
 	m_sam->configure_bank(0, ram().pointer(), ram().size(), false); // $0000-$7FFF
 	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);           // $8000-$9FFF
 	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);           // $A000-$BFFF
-	m_sam->configure_bank(3, cart_rom, 0x4000, true);               // $C000-$FEFF
+
+	// $C000-$FEFF
+	m_sam->configure_bank(3, read8_delegate(FUNC(cococart_slot_device::cts_read), m_cococart.target()), write8_delegate(FUNC(cococart_slot_device::cts_write), m_cococart.target()));
 
 	// $FF00-$FF1F
 	m_sam->configure_bank(4, read8_delegate(FUNC(coco12_state::ff00_read), this), write8_delegate(FUNC(coco12_state::ff00_write), this));

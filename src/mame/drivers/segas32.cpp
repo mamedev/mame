@@ -4845,6 +4845,13 @@ ROM_END
  **************************************************************************************************************************
     Spiderman (Export)
     not protected
+
+    Sega Game ID codes:
+     Game: 833-8331-05 SPIDER-MAN
+ROM board: 834-8332-02
+
+ ROM board type: 837-7429-01
+Input sub board: 837-7968
 */
 ROM_START( spidman )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4924,6 +4931,9 @@ ROM_END
 
      Game: 833-8331 SPIDER-MAN
 ROM board: 834-8332
+
+ ROM board type: 837-7429-01
+Input sub board: 837-7968
 
 */
 ROM_START( spidmanj )

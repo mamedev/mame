@@ -4,27 +4,25 @@
     SGI "Newport" graphics board used in the Indy and some Indigo2s
 */
 
-#ifndef MAME_VIDEO_NEWPORT_H
-#define MAME_VIDEO_NEWPORT_H
+#ifndef MAME_BUS_GIO_NEWPORT_H
+#define MAME_BUS_GIO_NEWPORT_H
 
 #pragma once
 
-#include "machine/hpc3.h"
+#include "gio.h"
+#include "screen.h"
 
 #define ENABLE_NEWVIEW_LOG      (0)
 
-class newport_video_device : public device_t, public device_palette_interface
+class newport_base_device : public device_t
+                          , public device_palette_interface
+                          , public device_gio_card_interface
 {
 public:
-	template <typename T, typename U>
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&hpc3_tag)
-		: newport_video_device(mconfig, tag, owner, (uint32_t)0) // TODO: Use actual pixel clock
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_hpc3.set_tag(std::forward<U>(hpc3_tag));
-	}
+	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask);
 
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// device_gio_slot_interface overrides
+	virtual void install_device() override;
 
 	DECLARE_READ64_MEMBER(rex3_r);
 	DECLARE_WRITE64_MEMBER(rex3_w);
@@ -34,11 +32,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual uint32_t palette_entries() const override { return 0x2000; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
+	void mem_map(address_map &map) override;
+
 	enum
 	{
 		DCR_CURSOR_FUNC_ENABLE_BIT = 4,
@@ -108,6 +108,10 @@ private:
 		int32_t m_y_start;
 		int32_t m_x_end;
 		int32_t m_y_end;
+        int16_t m_x_start_frac;
+        int16_t m_y_start_frac;
+        int16_t m_x_end_frac;
+        int16_t m_y_end_frac;
 		int16_t m_x_save;
 		uint32_t m_xy_move;
 		int16_t m_x_move;
@@ -158,7 +162,12 @@ private:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint8_t m_xfer_width;
-		bool m_read_active;
+		uint8_t m_plane_enable;
+		uint8_t m_plane_depth;
+		uint32_t m_store_shift;
+		uint8_t m_src_blend;
+		uint8_t m_dst_blend;
+		uint8_t m_logic_op;
 	};
 
 	struct cmap_t
@@ -187,33 +196,44 @@ private:
 	void write_y_end(int32_t val);
 
 	bool pixel_clip_pass(int16_t x, int16_t y);
-	void write_pixel(uint8_t color, bool shade);
-	void write_pixel(int16_t x, int16_t y, uint8_t color);
-	void store_pixel(uint8_t *dest_buf, uint8_t src);
+	void write_pixel(uint32_t color);
+	void write_pixel(int16_t x, int16_t y, uint32_t color);
+	void store_pixel(uint32_t *dest_buf, uint32_t src);
 
 	void iterate_shade();
 
-	uint8_t get_shade_color(int16_t x, int16_t y);
+	virtual uint32_t get_cmap_revision() = 0;
+	virtual uint32_t get_xmap_revision() = 0;
 
-	void do_v_iline(uint8_t color, bool skip_last, bool shade);
-	void do_h_iline(uint8_t color, bool skip_last, bool shade);
-	void do_iline(uint8_t color, bool skip_last, bool shade);
-	uint8_t do_pixel_read();
+	uint32_t get_rgb_color(int16_t x, int16_t y);
+
+    struct bresenham_octant_info_t
+    {
+        int16_t incrx1;
+        int16_t incrx2;
+        int16_t incry1;
+        int16_t incry2;
+        uint8_t loop;
+    };
+    uint8_t get_octant(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t dx, int16_t dy);
+    void do_fline(uint32_t color);
+	void do_iline(uint32_t color);
+
+	uint32_t do_pixel_read();
 	uint64_t do_pixel_word_read();
-	void do_rex3_command();
 
-	required_device<cpu_device> m_maincpu;
-	required_device<hpc3_device> m_hpc3;
+	void do_rex3_command();
 
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
 	rex3_t m_rex3;
-	std::unique_ptr<uint8_t[]> m_rgbci;
-	std::unique_ptr<uint8_t[]> m_olay;
-	std::unique_ptr<uint8_t[]> m_pup;
-	std::unique_ptr<uint8_t[]> m_cid;
+	std::unique_ptr<uint32_t[]> m_rgbci;
+	std::unique_ptr<uint32_t[]> m_olay;
+	std::unique_ptr<uint32_t[]> m_pup;
+	std::unique_ptr<uint32_t[]> m_cid;
 	cmap_t m_cmap0;
+	uint32_t m_global_mask;
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();
@@ -223,7 +243,27 @@ private:
 #endif
 };
 
-DECLARE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device)
+class gio_xl8_device : public newport_base_device
+{
+public:
+	gio_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
+protected:
+	virtual uint32_t get_cmap_revision() override;
+	virtual uint32_t get_xmap_revision() override;
+};
 
-#endif // MAME_VIDEO_NEWPORT_H
+class gio_xl24_device : public newport_base_device
+{
+public:
+	gio_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+
+protected:
+	virtual uint32_t get_cmap_revision() override;
+	virtual uint32_t get_xmap_revision() override;
+};
+
+DECLARE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device)
+DECLARE_DEVICE_TYPE(GIO_XL24, gio_xl24_device)
+
+#endif // MAME_BUS_GIO_NEWPORT_H

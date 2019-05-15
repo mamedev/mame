@@ -140,7 +140,6 @@ cgenie.cpp
 channelf.cpp
 chaos.cpp
 chessmst.cpp
-chesstrv.cpp
 cit101.cpp
 cit220.cpp
 cking_master.cpp
@@ -428,6 +427,7 @@ mac.cpp
 mac128.cpp
 macpci.cpp
 magnum.cpp
+mattelchess.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -471,9 +471,7 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
-mk1.cpp
 mk14.cpp
-mk2.cpp
 mk85.cpp
 mk90.cpp
 mkit09.cpp
@@ -501,6 +499,7 @@ multi16.cpp
 multi8.cpp
 mupid2.cpp
 mvme147.cpp
+mvme162.cpp
 mx2178.cpp
 myb3k.cpp
 mycom.cpp
@@ -534,6 +533,8 @@ notetaker.cpp
 novag_cforte.cpp
 novag_delta1.cpp
 novag_diablo.cpp
+novag_mk1.cpp
+novag_mk2.cpp
 novag_presto.cpp
 novag_scon.cpp
 novag_sexpert.cpp
@@ -690,6 +691,8 @@ savia84.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp
+scisys_chesstrv.cpp
+scisys_cp2000.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
@@ -772,6 +775,7 @@ tek405x.cpp
 tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
+telex274.cpp
 terak.cpp
 terco.cpp
 terminal.cpp
