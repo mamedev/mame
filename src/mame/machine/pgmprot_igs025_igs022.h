@@ -15,7 +15,7 @@ public:
 	void pgm_dw3_decrypt();
 	void pgm_killbld_decrypt();
 
-	required_shared_ptr<uint16_t> m_sharedprotram;
+	required_shared_ptr<u16> m_sharedprotram;
 
 	void init_killbld();
 	void init_drgw3();
