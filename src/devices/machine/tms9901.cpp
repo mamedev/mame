@@ -188,11 +188,18 @@ void tms9901_device::prioritize_interrupts()
 	// Skip the rightmost bit
 	uint16_t masked_ints = m_int_line;
 
-	// Do we have a timer interrupt?
-	if (m_clock_register != 0 && m_timer_int_pending)
+	// Is the clock enabled?
+	if (m_clock_register != 0)
 	{
-		masked_ints |= (1<<INT3);
-		LOGMASKED(LOG_INT, "INT3 (timer) asserted\n");
+		// Disable the actual INT3* input
+		masked_ints &= ~(1<<INT3);
+
+		// Do we have a clock interrupt?
+		if (m_timer_int_pending)
+		{
+			masked_ints |= (1<<INT3);
+			LOGMASKED(LOG_INT, "INT3 (timer) asserted\n");
+		}
 	}
 
 	m_int_level = 1;
