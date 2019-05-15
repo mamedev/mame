@@ -728,6 +728,7 @@ void z100_state::z100(machine_config &config)
 	TTL74123(config, m_keyclick, RES_K(150), CAP_U(.1));
 	m_keyclick->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_keyclick->set_a_pin_value(0);
+	m_keyclick->set_b_pin_value(1);
 	m_keyclick->set_clear_pin_value(1);
 	m_keyclick->out_cb().set(FUNC(z100_state::beep_update));
 
