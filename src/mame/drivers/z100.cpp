@@ -151,15 +151,19 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 //#include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "imagedev/floppy.h"
+#include "machine/74123.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/mc2661.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
+#include "sound/beep.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 class z100_state : public driver_device
 {
@@ -173,6 +177,9 @@ public:
 		m_fdc(*this, "z207_fdc"),
 		m_floppies(*this, "z207_fdc:%u", 0U),
 		m_epci(*this, "epci%u", 0U),
+		m_keyclick(*this, "keyclick"),
+		m_keybeep(*this, "keybeep"),
+		m_beeper(*this, "beeper"),
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
 		m_vrmm(*this, "vrmm"),
@@ -198,6 +205,7 @@ private:
 	void kbd_col_w(uint8_t data);
 	uint8_t kbd_rows_r();
 	DECLARE_READ_LINE_MEMBER(kbd_shift_row_r);
+	DECLARE_WRITE_LINE_MEMBER(beep_update);
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE8_MEMBER(floppy_motor_w);
 	uint8_t tmr_status_r();
@@ -225,6 +233,9 @@ private:
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 	required_device_array<mc2661_device, 2> m_epci;
+	required_device<ttl74123_device> m_keyclick;
+	required_device<ttl74123_device> m_keybeep;
+	required_device<beep_device> m_beeper;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_vrmm;
@@ -326,7 +337,8 @@ void z100_state::kbd_col_w(uint8_t data)
 {
 	m_kbd_col = data & 0x0f;
 
-	// TODO: key click
+	m_keyclick->b_w(BIT(data, 7));
+	m_keybeep->a_w((data & 0x82) == 0);
 }
 
 uint8_t z100_state::kbd_rows_r()
@@ -343,6 +355,11 @@ READ_LINE_MEMBER(z100_state::kbd_shift_row_r)
 		return m_keys[m_kbd_col]->read();
 
 	return 1;
+}
+
+WRITE_LINE_MEMBER(z100_state::beep_update)
+{
+	m_beeper->set_state(m_keyclick->q_r() | m_keybeep->q_r());
 }
 
 // todo: side select?
@@ -708,6 +725,22 @@ void z100_state::z100(machine_config &config)
 	kbdc.t0_in_cb().set_ioport("CTRL").bit(0);
 	kbdc.t1_in_cb().set(FUNC(z100_state::kbd_shift_row_r));
 
+	TTL74123(config, m_keyclick, RES_K(150), CAP_U(.1));
+	m_keyclick->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_keyclick->set_a_pin_value(0);
+	m_keyclick->set_clear_pin_value(1);
+	m_keyclick->out_cb().set(FUNC(z100_state::beep_update));
+
+	TTL74123(config, m_keybeep, RES_K(220), CAP_U(2.2));
+	m_keybeep->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_keybeep->set_b_pin_value(1);
+	m_keybeep->set_clear_pin_value(1);
+	m_keybeep->out_cb().set(FUNC(z100_state::beep_update));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 1'000'000'000 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(470), RES_K(470), CAP_U(.001)));
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14.112_MHz_XTAL, 912, 0, 640, 258, 0, 216);
@@ -796,7 +829,7 @@ ROM_START( z100 )
 	ROM_REGION( 0x4000, "ipl", 0 )
 	ROM_LOAD( "intel-d27128-1.bin", 0x0000, 0x4000, CRC(b21f0392) SHA1(69e492891cceb143a685315efe0752981a2d8143))
 
-	ROM_REGION( 0x0400, "kbdc", ROMREGION_ERASE00 ) // 8041A keyboard controller
+	ROM_REGION( 0x0400, "kbdc", 0 ) // 8041A keyboard controller
 	ROM_LOAD( "444-109.u204", 0x0000, 0x0400, CRC(45181029) SHA1(0e89649364d25cf2d8669d2a293ee162e274cb64) )
 
 	ROM_REGION( 0x0100, "vrmm", 0 ) // Video RAM Mapping Module
@@ -817,4 +850,4 @@ void z100_state::driver_init()
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY                FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING )
