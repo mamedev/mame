@@ -15,8 +15,8 @@
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_STDIO
 #define MINIMP3_IMPLEMENTATION
-#include "../../devices/sound/minimp3.h"
-#include "../../devices/sound/minimp3_ex.h"
+#include "minimp3/minimp3.h"
+#include "minimp3/minimp3_ex.h"
 
 k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
     device_t(mconfig, KONAMI_573_DIGITAL_FPGA, tag, owner, clock),
