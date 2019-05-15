@@ -446,10 +446,13 @@
 	</software>
 
 	<!-- No in-game HUD, scrolling problems-->
+	<!-- http://redump.org/disc/3293/ -->
 	<software name="banshee" supported="partial">
 		<description>Banshee</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
+		<info name="barcode" value="5 0207 17 200444 >" />
+		<info name="disc_matrix" value="CDD4103 BANSHEE ·   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="banshee (europe) (en,fr,de,da)" sha1="f10de2115430176776215aef8b239dccb54e34ec"/>
@@ -458,10 +461,12 @@
 	</software>
 
 	<!-- Appears to work? -->
+	<!-- http://redump.org/disc/3872/ -->
 	<software name="basejump" supported="partial">
 		<description>Base Jumpers</description>
 		<year>1995</year>
 		<publisher>Rasputin Software</publisher>
+		<info name="disc_matrix" value="CD PLANT AB BASEJUMPERS CDM01" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="base jumpers (europe)" sha1="9ef68bd83d199015dc3180333da79a8292908365"/>
@@ -469,11 +474,29 @@
 		</part>
 	</software>
 
+	<!-- Doesn't boot -->
+	<!-- http://redump.org/disc/3429/ -->
+	<software name="btoads" supported="no">
+		<description>Battletoads</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<info name="serial" value="/DP130018 [Box], /CS090030 [Disc]" />
+		<info name="disc_matrix" value="CDD3904 /CS090030 ·   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="battletoads (europe)" sha1="31278a9d639c93cc48f2780a682d3c86e6e6ab5d"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Works as far as tested -->
+	<!-- http://redump.org/disc/3053/ -->
 	<software name="beavers" supported="partial">
 		<description>Beavers</description>
 		<year>1994</year>
 		<publisher>Grandslam</publisher>
+		<info name="barcode" value="5 013248 004551 >" />
+		<info name="disc_matrix" value="CDR 00049 P.C.WISELTD." />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="beavers (europe)" sha1="5d7e7b4dcbacf92c6ec17632f124dcd27ab333fd"/>
@@ -482,10 +505,12 @@
 	</software>
 
 	<!-- Doesn't boot -->
+	<!-- http://redump.org/disc/3400/ -->
 	<software name="benefact" supported="no">
 		<description>Benefactor</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<info name="disc_matrix" value="DADC AUSTRIA   BENEFACTOR-CD32 13" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="benefactor (europe)" sha1="3a2add193cc9869a16a37090eaddc5ce98b36bc8"/>
@@ -494,10 +519,12 @@
 	</software>
 
 	<!-- Doesn't boot -->
+	<!-- http://redump.org/disc/3306/ -->
 	<software name="blkviper" supported="no">
 		<description>Black Viper</description>
 		<year>1996</year>
 		<publisher>Neo Software</publisher>
+		<info name="disc_matrix" value="SONOPRESS CD-ROM Q-0230 A   5" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="black viper (europe) (en,de,it)" sha1="9fffbfb004596330d5befd2011216c1640cfa5d5"/>
@@ -506,22 +533,13 @@
 	</software>
 
 	<!-- Doesn't boot -->
-	<software name="btoads" supported="no">
-		<description>Battletoads</description>
-		<year>1994</year>
-		<publisher>Mindscape</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="battletoads (europe)" sha1="31278a9d639c93cc48f2780a682d3c86e6e6ab5d"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Doesn't boot -->
+	<!-- http://redump.org/disc/16190/ -->
 	<software name="bubba" supported="no">
-		<description>Bubba 'N' Stix</description>
+		<description>Bubba 'n' Stix</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
+		<info name="barcode" value="5 020717 200345 >" />
+		<info name="disc_matrix" value="CDD3297 BUBBA :   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bubba n stix (europe)" sha1="32f0704bc31e357c9bc98c85d16718ae5302d569"/>
@@ -530,10 +548,12 @@
 	</software>
 
 	<!-- Doesn't boot -->
+	<!-- http://redump.org/disc/3371/ -->
 	<software name="bubblesq" supported="no">
-		<description>Bubble 'N Squeak</description>
+		<description>Bubble and Squeak</description>
 		<year>1994</year>
 		<publisher>Audiogenic</publisher>
+		<info name="disc_matrix" value="CDD4696 :   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bubble and squeak (europe)" sha1="fc9bc6d45a891a88c517870923bba0be6f5cb74e"/>
@@ -542,10 +562,13 @@
 	</software>
 
 	<!-- Freezes on high score screen? -->
+	<!-- http://redump.org/disc/3326/ -->
 	<software name="bumpburn" supported="partial">
-		<description>Bump 'N Burn</description>
+		<description>Bump 'n' Burn</description>
 		<year>1994</year>
 		<publisher>Grandslam</publisher>
+		<info name="barcode" value="5 013248 004650 >" />
+		<info name="disc_matrix" value="BUMP N BURN 10332211 01 &amp;   MADE IN U.K. BY PDO" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bump n burn (europe)" sha1="15c624de3acbbc6e23b45deefbe5b007e4eaf8ab"/>
