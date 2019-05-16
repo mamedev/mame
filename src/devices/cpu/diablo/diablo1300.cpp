@@ -15,13 +15,15 @@
 //  CONFIGURABLE LOGGING
 //**************************************************************************
 #define LOG_OP   (1U <<  1)
+#define LOG_TABLE   (1U <<  2)
 
-#define VERBOSE (LOG_GENERAL | LOG_OP)
+#define VERBOSE (LOG_GENERAL | LOG_OP | LOG_TABLE)
 //#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
-#define LOGOP(...) LOGMASKED(LOG_OP,   __VA_ARGS__)
+#define LOGOP(...)    LOGMASKED(LOG_OP,    __VA_ARGS__)
+#define LOGTABLE(...) LOGMASKED(LOG_TABLE, __VA_ARGS__)
 
 /*****************************************************************************/
 
@@ -62,6 +64,23 @@ inline void diablo1300_cpu_device::write_reg(uint16_t reg, uint8_t data)
 	data_write8(reg, data);
 }
 
+inline void diablo1300_cpu_device::write_port(uint16_t port, uint16_t data)
+{
+	// TODO: interact with mechanics/layout engine
+}
+
+inline uint8_t diablo1300_cpu_device::read_table(uint16_t offset)
+{
+	LOGTABLE("Read %02x from table ROM offset %04x[%04x]\n", m_table[offset & 0x1ff], offset & 0x1ff, offset);
+	return m_table[offset & 0x1ff];
+}
+
+inline uint16_t diablo1300_cpu_device::read_ibus()
+{
+	// TODO: get signals from other boards
+	return 0;
+}
+
 /*****************************************************************************/
 
 DEFINE_DEVICE_TYPE(DIABLO1300, diablo1300_cpu_device, "diablo1300", "DIABLO 1300")
@@ -82,6 +101,7 @@ diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, cons
 	, m_program(nullptr)
 	, m_data(nullptr)
 	, m_cache(nullptr)
+	, m_table(nullptr)
 
 {
 	// Allocate & setup
@@ -93,6 +113,7 @@ void diablo1300_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data    = &space(AS_DATA);
 	m_cache  = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	m_table = (uint8_t*) machine().root_device().memregion("trom")->base();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
