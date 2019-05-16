@@ -142,7 +142,11 @@
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout (Screen)">
+		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
+	</view>
+
+	<view name="Internal Layout (Full)">
 		<bounds left="-1" right="185" top="-1" bottom="96" />
 		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
 
@@ -151,10 +155,6 @@
 		<group ref="buttons"><bounds x="95" y="48.634" width="87.8" height="45.8" /></group>
 
 		<bezel element="text_switch" inputtag="IN.3" inputmask="0x01"><bounds x="95" y="38" width="24" height="2.7" /></bezel>
-	</view>
-
-	<view name="Screen Overlay">
-		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
 	</view>
 
 </mamelayout>
