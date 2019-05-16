@@ -16,10 +16,10 @@
 		<info name="release" value="SCG19" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="countdowntodoom_1.rom" size="16384" crc="f8720e7e" sha1="eb414b81760d38c0a0d58a34dc70c2462c12e23c" offset="0" />
+				<rom name="countdowntodoom_1.rom" size="16384" crc="f8720e7e" sha1="eb414b81760d38c0a0d58a34dc70c2462c12e23c"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="countdowntodoom_2.rom" size="16384" crc="bfad0059" sha1="421a4c6f1ecef42ebf7ddba9765e24eaeb8c20e2" offset="0" />
+				<rom name="countdowntodoom_2.rom" size="16384" crc="bfad0059" sha1="421a4c6f1ecef42ebf7ddba9765e24eaeb8c20e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<info name="release" value="SCG23" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="hopper.rom" size="16384" crc="18db837e" sha1="fa3c6b17fd1ce2efd0115e370f6f6e0b528a05e2" offset="0" />
+				<rom name="hopper.rom" size="16384" crc="18db837e" sha1="fa3c6b17fd1ce2efd0115e370f6f6e0b528a05e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +44,7 @@
 		<info name="release" value="SCG04" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="snapper.rom" size="16384" crc="08befbda" sha1="7db762c705f64e91ab7fe8797e14d1213bc90de1" offset="0" />
+				<rom name="snapper.rom" size="16384" crc="08befbda" sha1="7db762c705f64e91ab7fe8797e14d1213bc90de1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,10 +56,10 @@
 		<info name="release" value="SCG22" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="starshipcommand_1.rom" size="16384" crc="e39ada2d" sha1="9dfa6d622e37d5115cbeaae9c9a4e978f85f2683" offset="0" />
+				<rom name="starshipcommand_1.rom" size="16384" crc="e39ada2d" sha1="9dfa6d622e37d5115cbeaae9c9a4e978f85f2683"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="starshipcommand_2.rom" size="16384" crc="cc91f570" sha1="b51a49717d43676c6cfc14be80f54202b4875607" offset="0" />
+				<rom name="starshipcommand_2.rom" size="16384" crc="cc91f570" sha1="b51a49717d43676c6cfc14be80f54202b4875607"/>
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 		<publisher>Acorn</publisher>
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="electrondemonstrationcartridge.rom" size="16384" crc="4f4eb0be" sha1="c7514fc7204ab8ff34b4805cff1fdb187d87fe82" offset="0" />
+				<rom name="electrondemonstrationcartridge.rom" size="16384" crc="4f4eb0be" sha1="c7514fc7204ab8ff34b4805cff1fdb187d87fe82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -84,10 +84,10 @@
 		<info name="release" value="SCE04" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="treeofknowledge_1.rom" size="16384" crc="c09522e0" sha1="5b107be7a57a01b2719e9953e163f16825a026ab" offset="0" />
+				<rom name="treeofknowledge_1.rom" size="16384" crc="c09522e0" sha1="5b107be7a57a01b2719e9953e163f16825a026ab"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="treeofknowledge_2.rom" size="16384" crc="e21ea237" sha1="cc7b911e0e32866b8739144b198561753d0a89b4" offset="0" />
+				<rom name="treeofknowledge_2.rom" size="16384" crc="e21ea237" sha1="cc7b911e0e32866b8739144b198561753d0a89b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -101,10 +101,10 @@
 		<info name="release" value="SCL02" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="lorom" size="16384">
-				<rom name="lisp_1.rom" size="16384" crc="fda4c546" sha1="24c7062fc3666cd6814d72e417146e32eb995b04" offset="0" />
+				<rom name="lisp_1.rom" size="16384" crc="fda4c546" sha1="24c7062fc3666cd6814d72e417146e32eb995b04"/>
 			</dataarea>
 			<dataarea name="uprom" size="16384">
-				<rom name="lisp_2.rom" size="16384" crc="2eb56fc0" sha1="bdf09e553578d27a0cc202d409484dd8c2c3c085" offset="0" />
+				<rom name="lisp_2.rom" size="16384" crc="2eb56fc0" sha1="bdf09e553578d27a0cc202d409484dd8c2c3c085"/>
 			</dataarea>
 		</part>
 	</software>
@@ -116,10 +116,10 @@
 		<info name="release" value="SCL06" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="logo-v1.0e_1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae" offset="0" />
+				<rom name="logo-v1.0e_1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="logo-v1.0e_2.rom" size="16384" crc="753ab82e" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3" offset="0" />
+				<rom name="logo-v1.0e_2.rom" size="16384" crc="753ab82e" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,10 +131,10 @@
 		<info name="release" value="SCL18" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="pascal_1.rom" size="16384" crc="c4adeb8c" sha1="ed5226520136ffa1212317ad5ab9d09c2a04b88d" offset="0" />
+				<rom name="pascal_1.rom" size="16384" crc="c4adeb8c" sha1="ed5226520136ffa1212317ad5ab9d09c2a04b88d"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="pascal_2.rom" size="16384" crc="3c368f1c" sha1="1b226ba8bf7bcc63d3f454c47f4c009f9dcac280" offset="0" />
+				<rom name="pascal_2.rom" size="16384" crc="3c368f1c" sha1="1b226ba8bf7bcc63d3f454c47f4c009f9dcac280"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,10 +148,10 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="click" />
 			<dataarea name="rom" size="32768">
-				<rom name="click-1.00.rom" size="32768" crc="a47cfa73" sha1="d22a61a61cda401fe571f4741c53cfe61235ba00" offset="0" />
+				<rom name="click-1.00.rom" size="32768" crc="a47cfa73" sha1="d22a61a61cda401fe571f4741c53cfe61235ba00"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
-				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+				<rom value="0x00" size="32768" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -163,10 +163,10 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="click" />
 			<dataarea name="rom" size="32768">
-				<rom name="click-1.01.rom" size="32768" crc="7b864336" sha1="a46ecc9da40976eeeb95a8823f42078a3a4ae491" offset="0" />
+				<rom name="click-1.01.rom" size="32768" crc="7b864336" sha1="a46ecc9da40976eeeb95a8823f42078a3a4ae491"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
-				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+				<rom value="0x00" size="32768" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -178,10 +178,10 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="click" />
 			<dataarea name="rom" size="32768">
-				<rom name="click-1.03.rom" size="32768" crc="955b9d29" sha1="5fbe78d09b1b989c1ff3939a9d29f7597d0e66d9" offset="0" />
+				<rom name="click-1.03.rom" size="32768" crc="955b9d29" sha1="5fbe78d09b1b989c1ff3939a9d29f7597d0e66d9"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
-				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+				<rom value="0x00" size="32768" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -193,10 +193,10 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="click" />
 			<dataarea name="rom" size="32768">
-				<rom name="click-1.04.rom" size="32768" crc="aa16ba3d" sha1="03492c8cc0bfdb46ccb4a53caa28016b2d4e1cb2" offset="0" />
+				<rom name="click-1.04.rom" size="32768" crc="aa16ba3d" sha1="03492c8cc0bfdb46ccb4a53caa28016b2d4e1cb2"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
-				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+				<rom value="0x00" size="32768" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 		<publisher>Slogger</publisher>
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0" />
+				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,10 +218,10 @@
 		<publisher>Slogger</publisher>
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0" />
+				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="starword-1.01.rom" size="16384" crc="eee36568" sha1="ba9d6c11d3875a94ec76a529693ced34b283bd50" offset="0" />
+				<rom name="starword-1.01.rom" size="16384" crc="eee36568" sha1="ba9d6c11d3875a94ec76a529693ced34b283bd50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,10 +232,10 @@
 		<publisher>Slogger</publisher>
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0" />
+				<rom name="starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee" offset="0" />
+				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -246,10 +246,10 @@
 		<publisher>Slogger</publisher>
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="stoppress-1.9-1.rom" size="16384" crc="900716e1" sha1="1d6d219c51e8a2be305e69b8fecaa76d992d5ba2" offset="0" />
+				<rom name="stoppress-1.9-1.rom" size="16384" crc="900716e1" sha1="1d6d219c51e8a2be305e69b8fecaa76d992d5ba2"/>
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="stoppress-1.9-2.rom" size="16384" crc="559294a4" sha1="36645885d2fe2d5ec34453d944ccc4e72ee80a62" offset="0" />
+				<rom name="stoppress-1.9-2.rom" size="16384" crc="559294a4" sha1="36645885d2fe2d5ec34453d944ccc4e72ee80a62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="sp64" />
 			<dataarea name="rom" size="32768">
-				<rom name="stoppress64-1.00.rom" size="32768" crc="4918221c" sha1="f185873106e7e7225b2e0c718803dc1ec4ebc685" offset="0" />
+				<rom name="stoppress64-1.00.rom" size="32768" crc="4918221c" sha1="f185873106e7e7225b2e0c718803dc1ec4ebc685"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -275,7 +275,7 @@
 		<info name="release" value="SCB03" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee" offset="0" />
+				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -287,7 +287,7 @@
 		<info name="release" value="SCB07" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="viewsheet-v1.0e.rom" size="16384" crc="356fe589" sha1="146b3fb6cc9843a64c4e29a69f80db8980fab043" offset="0" />
+				<rom name="viewsheet-v1.0e.rom" size="16384" crc="356fe589" sha1="146b3fb6cc9843a64c4e29a69f80db8980fab043"/>
 			</dataarea>
 		</part>
 	</software>
@@ -301,7 +301,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="abr" />
 			<dataarea name="nvram" size="32768">
-				<rom name="pres-abr-utils-1.10.rom" size="16360" crc="e5aec5c1" sha1="b0066d9ee83a9144eb5942f106776174ae5df0d9" offset="0" />
+				<rom name="pres-abr-utils-1.10.rom" size="16360" crc="e5aec5c1" sha1="b0066d9ee83a9144eb5942f106776174ae5df0d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -313,7 +313,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="abr" />
 			<dataarea name="nvram" size="32768">
-				<rom name="pres-abr-utils-1.04.rom" size="16384" crc="2c009b06" sha1="be245a32bba1f18614963587a61bcb622f404c95" offset="0" />
+				<rom name="pres-abr-utils-1.04.rom" size="16384" crc="2c009b06" sha1="be245a32bba1f18614963587a61bcb622f404c95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="ap34" />
 			<dataarea name="uprom" size="16384">
-				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca" offset="0" />
+				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -337,7 +337,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="ap34" />
 			<dataarea name="lorom" size="16384">
-				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="c42ef768" sha1="666f5dc77724ae5c625d2134b34dcee78073f0e3" offset="0" />
+				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="c42ef768" sha1="666f5dc77724ae5c625d2134b34dcee78073f0e3"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -350,10 +350,10 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="ap34" />
 			<dataarea name="lorom" size="16384">
-				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="c42ef768" sha1="666f5dc77724ae5c625d2134b34dcee78073f0e3" offset="0" />
+				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="c42ef768" sha1="666f5dc77724ae5c625d2134b34dcee78073f0e3"/>
 			</dataarea>
 			<dataarea name="uprom" size="16384">
-				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca" offset="0" />
+				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -366,7 +366,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="ap5" />
 			<dataarea name="rom" size="8192">
-				<rom name="acp-tube-1.21.rom" size="8192" crc="63fb5a90" sha1="56c1f0ed4267ecd61f4e47ce9ac6954fc344bc3f" offset="0" />
+				<rom name="acp-tube-1.21.rom" size="8192" crc="63fb5a90" sha1="56c1f0ed4267ecd61f4e47ce9ac6954fc344bc3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -388,7 +388,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
-				<rom name="cumana-dfs-1.00.rom" size="16384" crc="3d351cee" sha1="d6f7af671bf78b3ea7b9a235d47ef8b22b9bee31" offset="0" />
+				<rom name="cumana-dfs-1.00.rom" size="16384" crc="3d351cee" sha1="d6f7af671bf78b3ea7b9a235d47ef8b22b9bee31"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048" />
 		</part>
@@ -401,7 +401,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
-				<rom name="cumana-dfs-1.01.rom" size="16384" crc="bc02e94a" sha1="8cbdbcc91516b4bbe6904db482f9fdaa34ca029d" offset="0" />
+				<rom name="cumana-dfs-1.01.rom" size="16384" crc="bc02e94a" sha1="8cbdbcc91516b4bbe6904db482f9fdaa34ca029d"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048" />
 		</part>
@@ -414,7 +414,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
-				<rom name="cumana-dfs-1.02.rom" size="16384" crc="44b21e47" sha1="1c5112d2e629f0e093a961c6348456e4ceac86e3" offset="0" />
+				<rom name="cumana-dfs-1.02.rom" size="16384" crc="44b21e47" sha1="1c5112d2e629f0e093a961c6348456e4ceac86e3"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048" />
 		</part>
@@ -427,7 +427,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="peg400" />
 			<dataarea name="rom" size="16384">
-				<rom name="pegasus400_dfs_slogger-v1.01.rom" size="16384" crc="54d79fa6" sha1="bd52bf5b741a760b5d20a753b217191d8958ca19" offset="0" />
+				<rom name="pegasus400_dfs_slogger-v1.01.rom" size="16384" crc="54d79fa6" sha1="bd52bf5b741a760b5d20a753b217191d8958ca19"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -440,7 +440,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="peg400" />
 			<dataarea name="rom" size="16384">
-				<rom name="pegasus400_dfs_slogger-v1.02.rom" size="16384" crc="52d4c45d" sha1="fb6c3adc719b1a2034ec15fc41ecc10345885449" offset="0" />
+				<rom name="pegasus400_dfs_slogger-v1.02.rom" size="16384" crc="52d4c45d" sha1="fb6c3adc719b1a2034ec15fc41ecc10345885449"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -453,7 +453,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="romp144" />
 			<dataarea name="rom" size="8192">
-				<rom name="romplus144-v3.00.rom" size="8192" crc="2f738bff" sha1="682603274a5f8b36c4b1a43e44ede5235a92383c" offset="0" />
+				<rom name="romplus144-v3.00.rom" size="8192" crc="2f738bff" sha1="682603274a5f8b36c4b1a43e44ede5235a92383c"/>
 			</dataarea>
 			<dataarea name="ram" size="32768" />
 		</part>
@@ -466,7 +466,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
-				<rom name="sedfs-1.00.rom" size="16384" crc="4f28b0a6" sha1="e94aa15b2884c1fd2f7bfe81acc5942aa1faceb5" offset="0" />
+				<rom name="sedfs-1.00.rom" size="16384" crc="4f28b0a6" sha1="e94aa15b2884c1fd2f7bfe81acc5942aa1faceb5"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048" />
 		</part>
@@ -479,7 +479,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
-				<rom name="sedfs-1.02.rom" size="16384" crc="0a9570f4" sha1="84072e99aa755bec32165b04f5f19f4499e0ba4b" offset="0" />
+				<rom name="sedfs-1.02.rom" size="16384" crc="0a9570f4" sha1="84072e99aa755bec32165b04f5f19f4499e0ba4b"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048" />
 		</part>
@@ -492,7 +492,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
-				<rom name="sedfs-1.03.rom" size="16384" crc="186e84dd" sha1="7cb350b3291447331aaaed2c590f719115a7bfed" offset="0" />
+				<rom name="sedfs-1.03.rom" size="16384" crc="186e84dd" sha1="7cb350b3291447331aaaed2c590f719115a7bfed"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048" />
 		</part>
@@ -505,7 +505,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="stlefs" />
 			<dataarea name="rom" size="32768">
-				<rom name="stl-adfs-2.1e.rom" size="32768" crc="8582c9d9" sha1="4ceda3b551ae0198638b07c2b40b3a5ebffb1314" offset="0" />
+				<rom name="stl-adfs-2.1e.rom" size="32768" crc="8582c9d9" sha1="4ceda3b551ae0198638b07c2b40b3a5ebffb1314"/>
 			</dataarea>
 			<dataarea name="ram" size="16384" />
 		</part>
@@ -518,7 +518,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="sndexp" />
 			<dataarea name="rom" size="8192">
-				<rom name="sound_expansion-v1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564" offset="0" />
+				<rom name="sound_expansion-v1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -531,7 +531,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="sndexp3" />
 			<dataarea name="rom" size="16384">
-				<rom name="sound_expansion-v3.00.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32" offset="0" />
+				<rom name="sound_expansion-v3.00.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -544,7 +544,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="tube" />
 			<dataarea name="rom" size="8192">
-				<rom name="elk-tube-1.21.rom" size="8192" crc="3f50b365" sha1="33f1ff07ba5feb8f6343de1db0d56f7adb2db856" offset="0" />
+				<rom name="elk-tube-1.21.rom" size="8192" crc="3f50b365" sha1="33f1ff07ba5feb8f6343de1db0d56f7adb2db856"/>
 			</dataarea>
 		</part>
 	</software>
@@ -559,7 +559,7 @@
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="mgc" />
 			<dataarea name="nvram" size="4194304">
-				<rom name="mgc.rom" size="4194304" crc="cfeb80bc" sha1="064a44e8ac9a31cb300bda568b36162f9c1134d2" offset="0" />
+				<rom name="mgc.rom" size="4194304" crc="cfeb80bc" sha1="064a44e8ac9a31cb300bda568b36162f9c1134d2"/>
 			</dataarea>
 		</part>
 	</software>

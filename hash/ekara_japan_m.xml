@@ -39,7 +39,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd" offset="0" />
+				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,7 +50,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54" offset="0" />
+				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61,7 +61,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f" offset="0" />
+				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72,7 +72,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3" offset="0" />
+				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="mc0013-ksm.u1" size="0x080000" crc="db05eafa" sha1="b58efcc41ad8d5571c319e0d88fa8a3d9badbe93" offset="0" />
+				<rom name="mc0013-ksm.u1" size="0x080000" crc="db05eafa" sha1="b58efcc41ad8d5571c319e0d88fa8a3d9badbe93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1" offset="0" />
+				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1"/>
 			</dataarea>
 		</part>
 	</software>
