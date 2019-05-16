@@ -74,12 +74,12 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="u" size="0x2000" crc="b0cc7564" sha1="59f7b3a9df26053fdcb720fe07a22f437a7a2241" offset="0x0000" />
+				<rom name="u" size="0x2000" crc="b0cc7564" sha1="59f7b3a9df26053fdcb720fe07a22f437a7a2241"/>
 				<rom name="3" size="0x2000" crc="ef80b1e7" sha1="80392a04bc9ca2fea006653a507f6f5338a10beb" offset="0x2000" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="2" size="0x2000" crc="32f2a5df" sha1="5f3e5d416eab59a75ba64131588861991fa571a5" offset="0x0000" />
+				<rom name="2" size="0x2000" crc="32f2a5df" sha1="5f3e5d416eab59a75ba64131588861991fa571a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@
 			<feature name="pcb" value="XM-2205-A" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="tdos 1.2" size="0x2000" crc="97311f3f" sha1="9ba758050ae77aa9ea189e4472fbf7fdde422615" offset="0x0000" />
+				<rom name="tdos 1.2" size="0x2000" crc="97311f3f" sha1="9ba758050ae77aa9ea189e4472fbf7fdde422615"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="778r01" size="0x2000" crc="e3f8abd0" sha1="dc9fc1ffb033531abec03b1a06a8d5064dd0ce61" offset="0x0000" />
+				<rom name="778r01" size="0x2000" crc="e3f8abd0" sha1="dc9fc1ffb033531abec03b1a06a8d5064dd0ce61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@
 			<feature name="pcb" value="Alkatresz oldal" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="unlabeled" size="0x2000" crc="e7894c43" sha1="bf76930b7073afe0dff134c9ea925f0b08a262d8" offset="0x0000" />
+				<rom name="unlabeled" size="0x2000" crc="e7894c43" sha1="bf76930b7073afe0dff134c9ea925f0b08a262d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="fastload_v2.bin" size="0x2000" crc="dbe0a98c" sha1="83f296bb4d49781ac369469e3b5e862d2e57c303" offset="0x0000" />
+				<rom name="fastload_v2.bin" size="0x2000" crc="dbe0a98c" sha1="83f296bb4d49781ac369469e3b5e862d2e57c303"/>
 			</dataarea>
 		</part>
 	</software>
@@ -176,7 +176,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="fastload_v1.bin" size="0x2000" crc="116ee31f" sha1="d1dd56a4e682c4726333f1bb7a7e783af617a750" offset="0x0000" />
+				<rom name="fastload_v1.bin" size="0x2000" crc="116ee31f" sha1="d1dd56a4e682c4726333f1bb7a7e783af617a750"/>
 			</dataarea>
 		</part>
 	</software>
@@ -192,7 +192,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="ps-64.bin" size="0x2000" crc="0613bd98" sha1="a255e3a42d65ffffe835d9ac06034caf371d6994" offset="0x0000" />
+				<rom name="ps-64.bin" size="0x2000" crc="0613bd98" sha1="a255e3a42d65ffffe835d9ac06034caf371d6994"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1" offset="0x0000" />
+				<rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -224,7 +224,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="79" size="0x8000" crc="58f8aeeb" sha1="0450d8f999d89b284b08118da5c1b82a491292e7" offset="0x0000" />
+				<rom name="79" size="0x8000" crc="58f8aeeb" sha1="0450d8f999d89b284b08118da5c1b82a491292e7"/>
 				<rom name="zs3" size="0x8000" crc="2967d75a" sha1="d11098168cbcb8b4260116ea723e6b9399153d29" offset="0x8000" />
 			</dataarea>
 
@@ -243,7 +243,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="1" size="0x8000" crc="6ae3976d" sha1="e704cb4ca1bfff2a9359a49dee8d89f12724980e" offset="0x0000" />
+				<rom name="1" size="0x8000" crc="6ae3976d" sha1="e704cb4ca1bfff2a9359a49dee8d89f12724980e"/>
 				<rom name="2" size="0x8000" crc="cc3a012b" sha1="2afd7efb282f7a8e19aebd36214fd0bb1fe19cd2" offset="0x8000" />
 			</dataarea>
 
@@ -262,7 +262,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="u1.bin" size="0x8000" crc="dd6c545a" sha1="d32005405cb944f77932901916608232e3c05a42" offset="0x0000" />
+				<rom name="u1.bin" size="0x8000" crc="dd6c545a" sha1="d32005405cb944f77932901916608232e3c05a42"/>
 				<rom name="u2.bin" size="0x8000" crc="3dc43ab1" sha1="1a21771e7bf61ca1771de450c8230bd5ac46b1c6" offset="0x8000" />
 			</dataarea>
 
@@ -281,11 +281,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="cr2001" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
+				<rom name="cr2001" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24"/>
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="cr3001" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8" offset="0x0000" />
+				<rom name="cr3001" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -302,11 +302,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="ecrblk" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
+				<rom name="ecrblk" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24"/>
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="ecrblu" size="0x2000" crc="db0b4295" sha1="557769a9b8b6d6f71d8450d55d669b8cbf499c4b" offset="0x0000" />
+				<rom name="ecrblu" size="0x2000" crc="db0b4295" sha1="557769a9b8b6d6f71d8450d55d669b8cbf499c4b"/>
 				<rom name="ecrgrn" size="0x2000" crc="ca7917c0" sha1="2b54658dcec78e365ace3d61cac26b82568fa03a" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -338,7 +338,7 @@
 			<feature name="pcb" value="SC041/1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="shelp-$8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
+				<rom name="shelp-$8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25"/>
 				<rom name="shelp-$9.ba2" size="0x1000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x1000" />
 			</dataarea>
 		</part>
@@ -354,7 +354,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="shelp$.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb" offset="0x0000" />
+				<rom name="shelp$.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb"/>
 				<rom size="0x1000" offset="0x1000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -393,7 +393,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="4040.bin" size="0x2000" crc="bab8bb5f" sha1="e1b602f476bf7baddd3b7f6964a5db4b44e7c7c1" offset="0x0000" />
+				<rom name="4040.bin" size="0x2000" crc="bab8bb5f" sha1="e1b602f476bf7baddd3b7f6964a5db4b44e7c7c1"/>
 				<rom name="hackem.bin" size="0x2000" crc="8edd53a5" sha1="ac1a159e27060aa1c95669eb510c3864032968e8" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -433,10 +433,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="T-40" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="l.u3" size="0x20000" crc="03765554" sha1="c87bd2ba565177a6668c49ae2b2a373924d2414b" offset="0x0000" />
+				<rom name="l.u3" size="0x20000" crc="03765554" sha1="c87bd2ba565177a6668c49ae2b2a373924d2414b"/>
 			</dataarea>
 			<dataarea name="romh" size="0x20000">
-				<rom name="h.u2" size="0x20000" crc="257d1d05" sha1="41d7e05d6210408b358196f220e4b6f438f5d11f" offset="0x0000" />
+				<rom name="h.u2" size="0x20000" crc="257d1d05" sha1="41d7e05d6210408b358196f220e4b6f438f5d11f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -452,11 +452,11 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="9433cs-0090.u3" size="0x1000" crc="aec58630" sha1="49fb99afcb419413be4b82babf022793362dd15b" offset="0x0000" />
+				<rom name="9433cs-0090.u3" size="0x1000" crc="aec58630" sha1="49fb99afcb419413be4b82babf022793362dd15b"/>
 			</dataarea>
 
 			<dataarea name="crtc" size="0x800">
-				<rom name="dtc.u14" size="0x800" crc="9edf5e58" sha1="4b244e6d94a7653a2e52c351589f0b469119fb04" offset="0x0000" />
+				<rom name="dtc.u14" size="0x800" crc="9edf5e58" sha1="4b244e6d94a7653a2e52c351589f0b469119fb04"/>
 			</dataarea>
 		</part>
 
@@ -479,7 +479,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="325221-02" size="0x4000" crc="bfcb5db8" sha1="423564293a25f7fdbfb36df6ab97a7f26959eecf" offset="0x0000" />
+				<rom name="325221-02" size="0x4000" crc="bfcb5db8" sha1="423564293a25f7fdbfb36df6ab97a7f26959eecf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x8000">
-				<rom name="v301113-c375-81-1" size="0x8000" crc="daad690a" sha1="913ec59d4959e532ebf7e8d02c2acf0ce4f9b7da" offset="0x0000" />
+				<rom name="v301113-c375-81-1" size="0x8000" crc="daad690a" sha1="913ec59d4959e532ebf7e8d02c2acf0ce4f9b7da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -513,7 +513,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x8000">
-				<rom name="v3.3" size="0x8000" crc="75283654" sha1="a5980bfe34300564069ca57eac8ae0e14a406891" offset="0x0000" />
+				<rom name="v3.3" size="0x8000" crc="75283654" sha1="a5980bfe34300564069ca57eac8ae0e14a406891"/>
 			</dataarea>
 		</part>
 	</software>
@@ -528,7 +528,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="capture (c)1985 j.ranheim" size="0x2000" crc="5063a31e" sha1="f7049545c657f7b8b302b84d71d2e8a0d6c37c53" offset="0x0000" />
+				<rom name="capture (c)1985 j.ranheim" size="0x2000" crc="5063a31e" sha1="f7049545c657f7b8b302b84d71d2e8a0d6c37c53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -543,7 +543,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="capture 2 (usa, europe) (program).bin" size="0x2000" crc="f25640c4" sha1="ebfa440401aebf3d09a43995dd87999d2982cb6a" offset="0x0000" />
+				<rom name="capture 2 (usa, europe) (program).bin" size="0x2000" crc="f25640c4" sha1="ebfa440401aebf3d09a43995dd87999d2982cb6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +558,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="expert.bin" size="0x2000" crc="f4162c86" sha1="5d0efb42aaa9002ea70facc1b3050ce6041455b7" offset="0x0000" />
+				<rom name="expert.bin" size="0x2000" crc="f4162c86" sha1="5d0efb42aaa9002ea70facc1b3050ce6041455b7"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -619,7 +619,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="251476" size="0x4000" crc="c741fa77" sha1="2044028d42def60df79b8ab57d005721b41190fa" offset="0x0000" />
+				<rom name="251476" size="0x4000" crc="c741fa77" sha1="2044028d42def60df79b8ab57d005721b41190fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -634,7 +634,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="speedsaver.c000.bin" size="0x1000" crc="a4dfd70d" sha1="5ec699e70dc8aa3c52f8167f1d22f9be61d78f44" offset="0x0000" />
+				<rom name="speedsaver.c000.bin" size="0x1000" crc="a4dfd70d" sha1="5ec699e70dc8aa3c52f8167f1d22f9be61d78f44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -649,7 +649,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="speedsaver.combi.bin" size="0x2000" crc="74567cd6" sha1="8ac3899514307ff469a0f117d6017fa84a9346c0" offset="0x0000" />
+				<rom name="speedsaver.combi.bin" size="0x2000" crc="74567cd6" sha1="8ac3899514307ff469a0f117d6017fa84a9346c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +663,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="superexpander64.bin" size="0x2000" crc="41aa1b1e" sha1="67c36dec74154838f0a029785fbaa5ee22d4a1f1" offset="0x0000" />
+				<rom name="superexpander64.bin" size="0x2000" crc="41aa1b1e" sha1="67c36dec74154838f0a029785fbaa5ee22d4a1f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -679,7 +679,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="superexplode.bin" size="0x4000" crc="365cca2c" sha1="79b3a5b44978bfb4c1a2cae9083db770b0beffa7" offset="0x0000" />
+				<rom name="superexplode.bin" size="0x4000" crc="365cca2c" sha1="79b3a5b44978bfb4c1a2cae9083db770b0beffa7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -694,7 +694,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="videomate.bin" size="0x4000" crc="f7a18c23" sha1="08784738026ec1525d45d5c9b4ee029fbcf6bc37" offset="0x0000" />
+				<rom name="videomate.bin" size="0x4000" crc="f7a18c23" sha1="08784738026ec1525d45d5c9b4ee029fbcf6bc37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -707,7 +707,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="x1.bin" size="0x2000" crc="fe9c2b6e" sha1="c03110096b8408bb55361712728c426cbb1c09d7" offset="0x0000" />
+				<rom name="x1.bin" size="0x2000" crc="fe9c2b6e" sha1="c03110096b8408bb55361712728c426cbb1c09d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -720,7 +720,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="x2.bin" size="0x2000" crc="c1fe3c8e" sha1="a9c680268eb4310e5ca5dfb38be4bac8ba383a8b" offset="0x0000" />
+				<rom name="x2.bin" size="0x2000" crc="c1fe3c8e" sha1="a9c680268eb4310e5ca5dfb38be4bac8ba383a8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -735,7 +735,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="gamekiller.bin" size="0x2000" crc="bdee8a63" sha1="75e44ed5fa34921af924d2b8ee27585bfdb331c4" offset="0x0000" />
+				<rom name="gamekiller.bin" size="0x2000" crc="bdee8a63" sha1="75e44ed5fa34921af924d2b8ee27585bfdb331c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +750,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_5_v1a.bin" size="0x2000" crc="46c0a547" sha1="fb30893f80abb0e7463adbda979e0ebe386022e8" offset="0x0000" />
+				<rom name="mach_5_v1a.bin" size="0x2000" crc="46c0a547" sha1="fb30893f80abb0e7463adbda979e0ebe386022e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -765,7 +765,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_5_v1b_v1.bin" size="0x1000" crc="f1444e48" sha1="4236ad371a5df7046e770b858291b42fe14b8a18" offset="0x0000" />
+				<rom name="mach_5_v1b_v1.bin" size="0x1000" crc="f1444e48" sha1="4236ad371a5df7046e770b858291b42fe14b8a18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -780,7 +780,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_5_v1b_v2.bin" size="0x2000" crc="c320e154" sha1="59de7347b61d39cfd0b89306e9e898b1452d3a20" offset="0x0000" />
+				<rom name="mach_5_v1b_v2.bin" size="0x2000" crc="c320e154" sha1="59de7347b61d39cfd0b89306e9e898b1452d3a20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +795,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_5_v2a.bin" size="0x2000" crc="8d5b2d06" sha1="2b53dd5d6cf46fd7c90f4e2c4300d5d5bb970014" offset="0x0000" />
+				<rom name="mach_5_v2a.bin" size="0x2000" crc="8d5b2d06" sha1="2b53dd5d6cf46fd7c90f4e2c4300d5d5bb970014"/>
 			</dataarea>
 		</part>
 	</software>
@@ -810,7 +810,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_5_v3a.bin" size="0x2000" crc="c2449aea" sha1="99b702275373480269cde747e774d54ca5d2e1dd" offset="0x0000" />
+				<rom name="mach_5_v3a.bin" size="0x2000" crc="c2449aea" sha1="99b702275373480269cde747e774d54ca5d2e1dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -826,7 +826,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="halm128.bin" size="0x2000" crc="ea6b27c0" sha1="63a69db5f64228d51a49d656d52360006382ee1e" offset="0x0000" />
+				<rom name="halm128.bin" size="0x2000" crc="ea6b27c0" sha1="63a69db5f64228d51a49d656d52360006382ee1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -842,7 +842,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="stardos.bin" size="0x4000" crc="feda3c5d" sha1="8a6851ae17f99d2b76f7548119c20eb7f68326da" offset="0x0000" />
+				<rom name="stardos.bin" size="0x4000" crc="feda3c5d" sha1="8a6851ae17f99d2b76f7548119c20eb7f68326da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -859,7 +859,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="bi80.bin" size="0x1000" crc="6bd582c7" sha1="0d9eecbaaad06aa95e8907379dea62d89bf8254a" offset="0x0000" />
+				<rom name="bi80.bin" size="0x1000" crc="6bd582c7" sha1="0d9eecbaaad06aa95e8907379dea62d89bf8254a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -875,7 +875,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x10000">
-				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91" offset="0x0000" />
+				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91"/>
 				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
 			</dataarea>
 		</part>
@@ -904,7 +904,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" offset="0x0000" />
+				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f"/>
 			</dataarea>
 		</part>
 
@@ -932,7 +932,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7" offset="0x0000" />
+				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7"/>
 			</dataarea>
 		</part>
 
@@ -982,7 +982,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="grap.u6" size="0x1000" crc="7d26ca10" sha1="7c21199ec71ee691b9e67f1e1103c801123e75a5" offset="0x0000" />
+				<rom name="grap.u6" size="0x1000" crc="7d26ca10" sha1="7c21199ec71ee691b9e67f1e1103c801123e75a5"/>
 				<rom name="grap.u5" size="0x1000" crc="899467df" sha1="71ff1989b792dc027872c7a688102427d12d7c81" offset="0x1000" />
 			</dataarea>
 		</part>
@@ -998,7 +998,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rex9505.bin" size="0x2000" crc="fa9d4ac3" sha1="c1fc837228e7be3ee2f8961e57bd6b6f3d48334a" offset="0x0000" />
+				<rom name="rex9505.bin" size="0x2000" crc="fa9d4ac3" sha1="c1fc837228e7be3ee2f8961e57bd6b6f3d48334a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1013,7 +1013,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rex9510.bin" size="0x2000" crc="46b3ee3d" sha1="699846aa90609c38a18603ba8c420360e1112066" offset="0x0000" />
+				<rom name="rex9510.bin" size="0x2000" crc="46b3ee3d" sha1="699846aa90609c38a18603ba8c420360e1112066"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1028,7 +1028,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rex9513.bin" size="0x2000" crc="eb7342aa" sha1="6c2ecd59522fa3035388c66eec6a4ecbb2106d6a" offset="0x0000" />
+				<rom name="rex9513.bin" size="0x2000" crc="eb7342aa" sha1="6c2ecd59522fa3035388c66eec6a4ecbb2106d6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1043,7 +1043,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rex9545.bin" size="0x2000" crc="a51817c2" sha1="5540931a04002951c3eb316d106054a365097f23" offset="0x0000" />
+				<rom name="rex9545.bin" size="0x2000" crc="a51817c2" sha1="5540931a04002951c3eb316d106054a365097f23"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1058,7 +1058,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rex9510.bin" size="0x2000" crc="f5aba609" sha1="3296ab9fd47183d193dcbf4d793e400bd1801372" offset="0x0000" />
+				<rom name="rex9510.bin" size="0x2000" crc="f5aba609" sha1="3296ab9fd47183d193dcbf4d793e400bd1801372"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1075,7 +1075,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="rex9600.bin" size="0x4000" crc="81adb366" sha1="7d065e0b45258f3b3e3398090f428587c1eec466" offset="0x0000" />
+				<rom name="rex9600.bin" size="0x4000" crc="81adb366" sha1="7d065e0b45258f3b3e3398090f428587c1eec466"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1090,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="quickbyte2_rex.bin" size="0x4000" crc="e177fe30" sha1="f87b396348b3bb36d14d7593925c9f164db27f2b" offset="0x0000" />
+				<rom name="quickbyte2_rex.bin" size="0x4000" crc="e177fe30" sha1="f87b396348b3bb36d14d7593925c9f164db27f2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1105,7 +1105,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="quickbyte2_jann.bin" size="0x4000" crc="ca40950d" sha1="c6aa067d5c32f7dace4e79e3b73421651ff93d41" offset="0x0000" />
+				<rom name="quickbyte2_jann.bin" size="0x4000" crc="ca40950d" sha1="c6aa067d5c32f7dace4e79e3b73421651ff93d41"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1120,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rex9629.bin" size="0x2000" crc="b2accac5" sha1="5f10917fa99ef0b4898c829873c0f7c7dbabce4c" offset="0x0000" />
+				<rom name="rex9629.bin" size="0x2000" crc="b2accac5" sha1="5f10917fa99ef0b4898c829873c0f7c7dbabce4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1134,7 +1134,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="rom" size="0x8000">
-				<rom name="rex9629.bin" size="0x8000" crc="3c4fb703" sha1="6608127419ded5909f3fd9aa871146b8c26d438a" offset="0x0000" />
+				<rom name="rex9629.bin" size="0x8000" crc="3c4fb703" sha1="6608127419ded5909f3fd9aa871146b8c26d438a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1148,8 +1148,8 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dams.bin" size="0x1000" crc="0af8f00a" sha1="d6282daabd08af8aa83815efe41712b270519d50" offset="0x0000" /> <!-- scrambled address/data -->
-				<rom name="dams_decoded.bin" size="0x1000" crc="21ca0eba" sha1="9d6477332c4c49267f7d105e63fa35e585311254" offset="0x0000" status="baddump" /> <!-- decoded -->
+				<rom name="dams.bin" size="0x1000" crc="0af8f00a" sha1="d6282daabd08af8aa83815efe41712b270519d50"/> <!-- scrambled address/data -->
+				<rom name="dams_decoded.bin" size="0x1000" crc="21ca0eba" sha1="9d6477332c4c49267f7d105e63fa35e585311254" status="baddump" /> <!-- decoded -->
 			</dataarea>
 		</part>
 	</software>
@@ -1163,7 +1163,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x400">
-				<rom name="msd cie (telesys) ieee interface.bin" size="0x400" crc="2ff6de42" sha1="f43654fc264d0a6f8229119bf149f1443024d0f5" offset="0x0000" />
+				<rom name="msd cie (telesys) ieee interface.bin" size="0x400" crc="2ff6de42" sha1="f43654fc264d0a6f8229119bf149f1443024d0f5"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -1182,7 +1182,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="stack ieee cartridge.bin" size="0x1000" crc="7457922c" sha1="4c1a22121a6af76ed4d2f45dd4e417bc7682c0e0" offset="0x0000" />
+				<rom name="stack ieee cartridge.bin" size="0x1000" crc="7457922c" sha1="4c1a22121a6af76ed4d2f45dd4e417bc7682c0e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1196,7 +1196,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="commodore ieee-488 cartridge.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
+				<rom name="commodore ieee-488 cartridge.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1210,7 +1210,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="technofor ieee interface.bin" size="0x1000" crc="0be30815" sha1="40b76f38259a69d02867e51492ab279dddbbd380" offset="0x0000" />
+				<rom name="technofor ieee interface.bin" size="0x1000" crc="0be30815" sha1="40b76f38259a69d02867e51492ab279dddbbd380"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1224,7 +1224,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="hobbi elektronika.bin" size="0x4000" crc="a4ab3bdc" sha1="884cacee1b1a7f811db97fb11c59c797d16b3602" offset="0x0000" />
+				<rom name="hobbi elektronika.bin" size="0x4000" crc="a4ab3bdc" sha1="884cacee1b1a7f811db97fb11c59c797d16b3602"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1238,7 +1238,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dela_7x8k-eprom-bank.bin" size="0x2000" crc="546d7ea8" sha1="6ab7a279144bcaaa20e7b2d12d67d3ed5cc3f6b6" offset="0x0000" />
+				<rom name="dela_7x8k-eprom-bank.bin" size="0x2000" crc="546d7ea8" sha1="6ab7a279144bcaaa20e7b2d12d67d3ed5cc3f6b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1252,7 +1252,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rtclink1.bin" size="0x1000" crc="07a33c49" sha1="5ec53bc279afecb74bc65f3f008a2694bc78f2f1" offset="0x0000" />
+				<rom name="rtclink1.bin" size="0x1000" crc="07a33c49" sha1="5ec53bc279afecb74bc65f3f008a2694bc78f2f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1266,7 +1266,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rtclink2.bin" size="0x2000" crc="fdf72b67" sha1="3b9cd0f52170ca2ad38789af094ed4f15bd83a11" offset="0x0000" />
+				<rom name="rtclink2.bin" size="0x2000" crc="fdf72b67" sha1="3b9cd0f52170ca2ad38789af094ed4f15bd83a11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1283,7 +1283,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="c64anabalt_encore.bin" size="0x4000" crc="3569502b" sha1="99fdeb4a4d51a7455e8922f82c99940169404a20" offset="0x0000" />
+				<rom name="c64anabalt_encore.bin" size="0x4000" crc="3569502b" sha1="99fdeb4a4d51a7455e8922f82c99940169404a20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1300,7 +1300,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="c64anabalt_ghormak.bin" size="0x4000" crc="b5a86ee0" sha1="a870a3feab469917e01892fbb587392e48b0b844" offset="0x0000" />
+				<rom name="c64anabalt_ghormak.bin" size="0x4000" crc="b5a86ee0" sha1="a870a3feab469917e01892fbb587392e48b0b844"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1334,7 +1334,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="blok_copy.bin" size="0x4000" crc="99ef3840" sha1="81c779c0fd748ce90666d1bcfaa110a16c99ab61" offset="0x0000" />
+				<rom name="blok_copy.bin" size="0x4000" crc="99ef3840" sha1="81c779c0fd748ce90666d1bcfaa110a16c99ab61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1351,7 +1351,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="edge_grinder.bin" size="0x4000" crc="e5a73b59" sha1="febd424843c19d862dd9d31469a4225da160d097" offset="0x0000" />
+				<rom name="edge_grinder.bin" size="0x4000" crc="e5a73b59" sha1="febd424843c19d862dd9d31469a4225da160d097"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1421,7 +1421,7 @@
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4" offset="0x0000" />
+				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4"/>
 				<rom name="3" size="0x2000" crc="407a8273" sha1="971ca48cd6e80cc77f166709207e68b0b5d0d8c1" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -1442,7 +1442,7 @@
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="2122" size="0x2000" crc="635407a5" sha1="b174c20153032307560707e4f73997fb3633deae" offset="0x0000" />
+				<rom name="2122" size="0x2000" crc="635407a5" sha1="b174c20153032307560707e4f73997fb3633deae"/>
 				<rom name="3121" size="0x2000" crc="8de1d013" sha1="8052819719b0234b999ac8af18116bdbb0463013" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -1496,7 +1496,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mikro assembler.80" size="0x2000" crc="fb6092a3" sha1="833545f69cdfd22ab188658b9a1ab5d4cb96504f" offset="0x0000" />
+				<rom name="mikro assembler.80" size="0x2000" crc="fb6092a3" sha1="833545f69cdfd22ab188658b9a1ab5d4cb96504f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1513,7 +1513,7 @@
 			<feature name="game" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="315102-01.u1" size="0x8000" crc="2fe1c208" sha1="d037d867244221ea8f5f05e3048d9e2af39e2cc9" offset="0x0000" />
+				<rom name="315102-01.u1" size="0x8000" crc="2fe1c208" sha1="d037d867244221ea8f5f05e3048d9e2af39e2cc9"/>
 				<rom name="315103-01.u2" size="0x8000" crc="f8b7adf0" sha1="02a7640b69b09663df988ba0d1674d63d2f76616" offset="0x8000" />
 			</dataarea>
 		</part>
@@ -1528,7 +1528,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="mmcrbios.bin" size="0x10000" crc="63e35ca8" sha1="165934cee24fe6bcddefd370288b58e01ac985d8" offset="0x0000" />
+				<rom name="mmcrbios.bin" size="0x10000" crc="63e35ca8" sha1="165934cee24fe6bcddefd370288b58e01ac985d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1542,7 +1542,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mmc64v1b.bin" size="0x2000" crc="c6255ad9" sha1="0fc4516ae9fc24da1a4e008ccdb876e765aaf640" offset="0x0000" />
+				<rom name="mmc64v1b.bin" size="0x2000" crc="c6255ad9" sha1="0fc4516ae9fc24da1a4e008ccdb876e765aaf640"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1557,7 +1557,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="rr38ppal.bin" size="0x10000" crc="fa52afac" sha1="48381d924a20978319ead8de7c904c91f270cc65" offset="0x0000" />
+				<rom name="rr38ppal.bin" size="0x10000" crc="fa52afac" sha1="48381d924a20978319ead8de7c904c91f270cc65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1572,7 +1572,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="romh" size="0x2000">
-				<rom name="exos_v3.bin" size="0x2000" crc="4e54d020" sha1="f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9" offset="0x0000" />
+				<rom name="exos_v3.bin" size="0x2000" crc="4e54d020" sha1="f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1586,7 +1586,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="romh" size="0x2000">
-				<rom name="exos_v4.bin" size="0x2000" crc="d5cf83a9" sha1="d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7" offset="0x0000" />
+				<rom name="exos_v4.bin" size="0x2000" crc="d5cf83a9" sha1="d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1602,7 +1602,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="adventure creator (1984)(spinnaker software).80" size="0x4000" crc="6d61e6ab" sha1="2971ff05b42471c9e9f430e8349183a5fd8e9fd8" offset="0x0000" />
+				<rom name="adventure creator (1984)(spinnaker software).80" size="0x4000" crc="6d61e6ab" sha1="2971ff05b42471c9e9f430e8349183a5fd8e9fd8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1615,7 +1615,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="adventure series - viking raider (1984)(interphase).80" size="0x4000" crc="ed963ee9" sha1="d47a46efa1210ae503e16dd711b5235dccd4f70f" offset="0x0000" />
+				<rom name="adventure series - viking raider (1984)(interphase).80" size="0x4000" crc="ed963ee9" sha1="d47a46efa1210ae503e16dd711b5235dccd4f70f"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -1635,7 +1635,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="aegean voyage (1984)(spinnaker software).80" size="0x4000" crc="7a9df99f" sha1="230f243e932391980b0ba75682aba4a885473a54" offset="0x0000" />
+				<rom name="aegean voyage (1984)(spinnaker software).80" size="0x4000" crc="7a9df99f" sha1="230f243e932391980b0ba75682aba4a885473a54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1650,7 +1650,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="alf in the color caves (1984)(spinnaker software).80" size="0x4000" crc="f06cd220" sha1="0fc963c41b2e748f7001c976d5a86231d8e61294" offset="0x0000" />
+				<rom name="alf in the color caves (1984)(spinnaker software).80" size="0x4000" crc="f06cd220" sha1="0fc963c41b2e748f7001c976d5a86231d8e61294"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1663,7 +1663,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="alien sidestep (19xx)(mr. computer).80" size="0x2000" crc="66dc8008" sha1="ba9ddcf0cdeca1335227a790fa086a64d77529bd" offset="0x0000" />
+				<rom name="alien sidestep (19xx)(mr. computer).80" size="0x2000" crc="66dc8008" sha1="ba9ddcf0cdeca1335227a790fa086a64d77529bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1678,7 +1678,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="alpha build (1984)(fisher price).80" size="0x2000" crc="a8b0c429" sha1="729c0670f97cb2d0514c4be0ad78b1cf680142e2" offset="0x0000" />
+				<rom name="alpha build (1984)(fisher price).80" size="0x2000" crc="a8b0c429" sha1="729c0670f97cb2d0514c4be0ad78b1cf680142e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1692,7 +1692,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="alphabet zoo (1983)(spinnaker software).80" size="0x4000" crc="25110243" sha1="7bd6a648e1d1c84270e785d0759746b2d7a4ea44" offset="0x0000" />
+				<rom name="alphabet zoo (1983)(spinnaker software).80" size="0x4000" crc="25110243" sha1="7bd6a648e1d1c84270e785d0759746b2d7a4ea44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1705,7 +1705,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="amazing maze (1983)(mr. computer).80" size="0x2000" crc="0115017e" sha1="7671aaae276e50c537f3ccf8ea91bfed71692452" offset="0x0000" />
+				<rom name="amazing maze (1983)(mr. computer).80" size="0x2000" crc="0115017e" sha1="7671aaae276e50c537f3ccf8ea91bfed71692452"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1718,7 +1718,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="arnie armchairs howzat cricket game (1984)(armchair entertainment).80" size="0x4000" crc="313a8cd0" sha1="7dd412c1a15d2864b9df4c7936592f2351a4c9b6" offset="0x0000" />
+				<rom name="arnie armchairs howzat cricket game (1984)(armchair entertainment).80" size="0x4000" crc="313a8cd0" sha1="7dd412c1a15d2864b9df4c7936592f2351a4c9b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1731,7 +1731,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="astroblitz (1983)(creative software).80" size="0x2000" crc="a5e4f18e" sha1="3967977ccf53742e132c8e238f2e5596f949d9d1" offset="0x0000" />
+				<rom name="astroblitz (1983)(creative software).80" size="0x2000" crc="a5e4f18e" sha1="3967977ccf53742e132c8e238f2e5596f949d9d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1745,7 +1745,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="attack of the mutant camels (1983)(hesware).80" size="0x2000" crc="fff380d8" sha1="70eaf6bcf7f374aeedb088480d8a35eb7bd83570" offset="0x0000" />
+				<rom name="attack of the mutant camels (1983)(hesware).80" size="0x2000" crc="fff380d8" sha1="70eaf6bcf7f374aeedb088480d8a35eb7bd83570"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1759,7 +1759,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="battlezone (1983)(atarisoft).80" size="0x4000" crc="322f61c8" sha1="1755ba9a1a9b04190a85083be71ca6c7de48fcf4" offset="0x0000" />
+				<rom name="battlezone (1983)(atarisoft).80" size="0x4000" crc="322f61c8" sha1="1755ba9a1a9b04190a85083be71ca6c7de48fcf4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1773,7 +1773,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="bc's quest for tires (1983)(sierra online).80" size="0x4000" crc="1800fa34" sha1="976b5090b500b3dd951640eaa107aff8cef3f7e0" offset="0x0000" />
+				<rom name="bc's quest for tires (1983)(sierra online).80" size="0x4000" crc="1800fa34" sha1="976b5090b500b3dd951640eaa107aff8cef3f7e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1787,7 +1787,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="beamrider (1984)(activision).80" size="0x4000" crc="8658a49d" sha1="6d43734e80b5e27678721faa8574a6d8831236e7" offset="0x0000" />
+				<rom name="beamrider (1984)(activision).80" size="0x4000" crc="8658a49d" sha1="6d43734e80b5e27678721faa8574a6d8831236e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1801,7 +1801,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="big bird's funhouse (1984)(cbs software).80" size="0x4000" crc="31eb66d6" sha1="6bd7e5d52ecab833065a86d492f6c399699d68f4" offset="0x0000" />
+				<rom name="big bird's funhouse (1984)(cbs software).80" size="0x4000" crc="31eb66d6" sha1="6bd7e5d52ecab833065a86d492f6c399699d68f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1815,7 +1815,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="big bird's special delivery (1984)(cbs software).80" size="0x4000" crc="d2fcb282" sha1="5ba4be39f46004beec0b65a2f2128b5bc0d4ecf2" offset="0x0000" />
+				<rom name="big bird's special delivery (1984)(cbs software).80" size="0x4000" crc="d2fcb282" sha1="5ba4be39f46004beec0b65a2f2128b5bc0d4ecf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1828,7 +1828,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="block hopper (1983)(fantasy soft).80" size="0x4000" crc="78a39290" sha1="ec68464dd01498317ca14c80c4139b6ceec492b7" offset="0x0000" />
+				<rom name="block hopper (1983)(fantasy soft).80" size="0x4000" crc="78a39290" sha1="ec68464dd01498317ca14c80c4139b6ceec492b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1842,7 +1842,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="blue print (1983)(commodore).80" size="0x4000" crc="b929eb5c" sha1="0acd28c13074ab0af4e6437ae4612cecad5c3133" offset="0x0000" />
+				<rom name="blue print (1983)(commodore).80" size="0x4000" crc="b929eb5c" sha1="0acd28c13074ab0af4e6437ae4612cecad5c3133"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1855,7 +1855,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="bridge 64 (1983)(handic software).80" size="0x4000" crc="df3cbb0f" sha1="6a00991eb13203da3f4f3e3b1b723adf225e1b42" offset="0x0000" />
+				<rom name="bridge 64 (1983)(handic software).80" size="0x4000" crc="df3cbb0f" sha1="6a00991eb13203da3f4f3e3b1b723adf225e1b42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1870,7 +1870,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="bubble burst (1984)(spinnaker software).80" size="0x4000" crc="ea72c865" sha1="5f743628e7b0d5d540052ac057b760a92750f77d" offset="0x0000" />
+				<rom name="bubble burst (1984)(spinnaker software).80" size="0x4000" crc="ea72c865" sha1="5f743628e7b0d5d540052ac057b760a92750f77d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1884,7 +1884,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="buck rogers - planet of zoom (1983)(sega).80" size="0x4000" crc="d4484f3f" sha1="47d362551debaa7954b24910fee6350066b7895a" offset="0x0000" />
+				<rom name="buck rogers - planet of zoom (1983)(sega).80" size="0x4000" crc="d4484f3f" sha1="47d362551debaa7954b24910fee6350066b7895a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1897,7 +1897,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="bug crusher (1983)(mr. computer).80" size="0x2000" crc="869e95ee" sha1="1a25a1b729e78773b49bf2d6b04cb0bcfc4ae67d" offset="0x0000" />
+				<rom name="bug crusher (1983)(mr. computer).80" size="0x2000" crc="869e95ee" sha1="1a25a1b729e78773b49bf2d6b04cb0bcfc4ae67d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1910,7 +1910,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="castle hassle (1983)(roklan).80" size="0x4000" crc="d02d546a" sha1="3d964c36d191f464f9288068e6aace2143226be3" offset="0x0000" />
+				<rom name="castle hassle (1983)(roklan).80" size="0x4000" crc="d02d546a" sha1="3d964c36d191f464f9288068e6aace2143226be3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1923,7 +1923,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="centipede (1983)(atarisoft).80" size="0x2000" crc="ad4e4d45" sha1="f2f76f9c53ced827aac2428e4e672b54617d0fac" offset="0x0000" />
+				<rom name="centipede (1983)(atarisoft).80" size="0x2000" crc="ad4e4d45" sha1="f2f76f9c53ced827aac2428e4e672b54617d0fac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1937,7 +1937,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="checkers (1984)(micro-distributors).80" size="0x2000" crc="5a327b8c" sha1="630c054c90fd5d8e2442adb6146b0306d8587cbb" offset="0x0000" />
+				<rom name="checkers (1984)(micro-distributors).80" size="0x2000" crc="5a327b8c" sha1="630c054c90fd5d8e2442adb6146b0306d8587cbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1951,7 +1951,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="choplifter! (1982)(broderbund).80" size="0x4000" crc="a16862ec" sha1="a020bddb7ae847ea10186072d308d03e02127206" offset="0x0000" />
+				<rom name="choplifter! (1982)(broderbund).80" size="0x4000" crc="a16862ec" sha1="a020bddb7ae847ea10186072d308d03e02127206"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1964,7 +1964,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="close encounters of the worst kind (1994)(mr. computer).80" size="0x2000" crc="0c4a4426" sha1="f28e65a47e9d9ece3a2347afadfd37b047048df4" offset="0x0000" />
+				<rom name="close encounters of the worst kind (1994)(mr. computer).80" size="0x2000" crc="0c4a4426" sha1="f28e65a47e9d9ece3a2347afadfd37b047048df4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1977,7 +1977,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="coccinelle cherche dessinateur (1983)(spinnaker software)(fr).80" size="0x2000" crc="3471b080" sha1="b70c3fcaa87daa4647cf391b10a7a11af0aff73e" offset="0x0000" />
+				<rom name="coccinelle cherche dessinateur (1983)(spinnaker software)(fr).80" size="0x2000" crc="3471b080" sha1="b70c3fcaa87daa4647cf391b10a7a11af0aff73e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1992,7 +1992,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="coco-notes featuring... the jazz scats! (1984)(cbs software).80" size="0x4000" crc="2350e33c" sha1="ead7b91509492ba8b820aacfa9223523ba6d42ce" offset="0x0000" />
+				<rom name="coco-notes featuring... the jazz scats! (1984)(cbs software).80" size="0x4000" crc="2350e33c" sha1="ead7b91509492ba8b820aacfa9223523ba6d42ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2006,7 +2006,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="congo bongo (1983)(sega).80" size="0x4000" crc="0ae6ec18" sha1="0b4c426c53b8b123808d88e368cefb94931c593d" offset="0x0000" />
+				<rom name="congo bongo (1983)(sega).80" size="0x4000" crc="0ae6ec18" sha1="0b4c426c53b8b123808d88e368cefb94931c593d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2020,7 +2020,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="cosmic life (1983)(spinnaker software).80" size="0x2000" crc="4eb150c9" sha1="30d4fa3f93b3ffaae3c8bdc9c9b02a325cb663f1" offset="0x0000" />
+				<rom name="cosmic life (1983)(spinnaker software).80" size="0x2000" crc="4eb150c9" sha1="30d4fa3f93b3ffaae3c8bdc9c9b02a325cb663f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2033,7 +2033,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="crisis mountain (1983)(creative software).80" size="0x4000" crc="92445475" sha1="919b0471e431eff249024e0bfcba5bf0eb6030e4" offset="0x0000" />
+				<rom name="crisis mountain (1983)(creative software).80" size="0x4000" crc="92445475" sha1="919b0471e431eff249024e0bfcba5bf0eb6030e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2046,7 +2046,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="crystal castles (1984)(atarisoft).80" size="0x4000" crc="cecfb225" sha1="8d14f2a22655dd92ff72b129fc124e986681a98d" offset="0x0000" />
+				<rom name="crystal castles (1984)(atarisoft).80" size="0x4000" crc="cecfb225" sha1="8d14f2a22655dd92ff72b129fc124e986681a98d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2061,7 +2061,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dance fantasy (1984)(fisher price).80" size="0x2000" crc="0add70d0" sha1="92a686f4cc8cde367648c1f9decc40866d0aa613" offset="0x0000" />
+				<rom name="dance fantasy (1984)(fisher price).80" size="0x2000" crc="0add70d0" sha1="92a686f4cc8cde367648c1f9decc40866d0aa613"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2074,7 +2074,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dancing feats (1983)(romox).80" size="0x4000" crc="9cdc27af" sha1="8cbb88e3ca9bbb7da04f7e179545c52e1df16aae" offset="0x0000" />
+				<rom name="dancing feats (1983)(romox).80" size="0x4000" crc="9cdc27af" sha1="8cbb88e3ca9bbb7da04f7e179545c52e1df16aae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2088,7 +2088,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="decathlon (1983)(activision).80" size="0x4000" crc="d8fc4b32" sha1="c8f6ceb56f6bf402db7d11e39c91f979abb9c10a" offset="0x0000" />
+				<rom name="decathlon (1983)(activision).80" size="0x4000" crc="d8fc4b32" sha1="c8f6ceb56f6bf402db7d11e39c91f979abb9c10a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2101,7 +2101,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="defender (1983)(atarisoft).80" size="0x4000" crc="d9b8c765" sha1="151698a22c710b9b3f47328e07a05a51b0a0d9ce" offset="0x0000" />
+				<rom name="defender (1983)(atarisoft).80" size="0x4000" crc="d9b8c765" sha1="151698a22c710b9b3f47328e07a05a51b0a0d9ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2114,7 +2114,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="diamond mine (1983)(roklan).80" size="0x4000" crc="5f56e1dd" sha1="4f9aacd2e07cd729f1be61ccaa3b3232c04c797b" offset="0x0000" />
+				<rom name="diamond mine (1983)(roklan).80" size="0x4000" crc="5f56e1dd" sha1="4f9aacd2e07cd729f1be61ccaa3b3232c04c797b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2127,7 +2127,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dig dug (1983)(atarisoft).80" size="0x4000" crc="d2fd42ba" sha1="94f24f034badb8f05e26c38b7f253a05e964c86d" offset="0x0000" />
+				<rom name="dig dug (1983)(atarisoft).80" size="0x4000" crc="d2fd42ba" sha1="94f24f034badb8f05e26c38b7f253a05e964c86d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2140,7 +2140,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dig dug (1983)(atarisoft)[a].80" size="0x4000" crc="4486176d" sha1="3565a8a33907fa32f92d701bf67b6f9fcc951b64" offset="0x0000" />
+				<rom name="dig dug (1983)(atarisoft)[a].80" size="0x4000" crc="4486176d" sha1="3565a8a33907fa32f92d701bf67b6f9fcc951b64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2153,7 +2153,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="donkey kong (1983)(atarisoft).80" size="0x4000" crc="0f10ee9f" sha1="9392ec70548a73c9e027591eb0fe5358618eeb1b" offset="0x0000" />
+				<rom name="donkey kong (1983)(atarisoft).80" size="0x4000" crc="0f10ee9f" sha1="9392ec70548a73c9e027591eb0fe5358618eeb1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2166,7 +2166,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dot gobbler v2 (1983)(mr. computer).80" size="0x2000" crc="cde79a43" sha1="3b1dec6049be3101ebfb422b557e5b2fcd2175bc" offset="0x0000" />
+				<rom name="dot gobbler v2 (1983)(mr. computer).80" size="0x2000" crc="cde79a43" sha1="3b1dec6049be3101ebfb422b557e5b2fcd2175bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2179,7 +2179,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dot gobbler (1983)(mr. computer).80" size="0x2000" crc="87e0c2b6" sha1="22c913970a4224785070ca11a818100e98c3c777" offset="0x0000" />
+				<rom name="dot gobbler (1983)(mr. computer).80" size="0x2000" crc="87e0c2b6" sha1="22c913970a4224785070ca11a818100e98c3c777"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2193,7 +2193,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dragon's den (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899" offset="0x0000" />
+				<rom name="dragon's den (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2208,7 +2208,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="ducks ahoy! (1984)(cbs software).80" size="0x4000" crc="6cae58e6" sha1="b2942757f94a28a9c0fab3a9583721ce649883ff" offset="0x0000" />
+				<rom name="ducks ahoy! (1984)(cbs software).80" size="0x4000" crc="6cae58e6" sha1="b2942757f94a28a9c0fab3a9583721ce649883ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2222,7 +2222,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="ernie's magic shapes (1984)(cbs software).80" size="0x4000" crc="36242abc" sha1="56a17956c73bb42f41cbe5e9021bbbc242b55248" offset="0x0000" />
+				<rom name="ernie's magic shapes (1984)(cbs software).80" size="0x4000" crc="36242abc" sha1="56a17956c73bb42f41cbe5e9021bbbc242b55248"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2235,7 +2235,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="espial (1984)(tigervision).80" size="0x4000" crc="bd10ad0c" sha1="cb271eda6382ca2fa415fb9129005f0d0e4cfca1" offset="0x0000" />
+				<rom name="espial (1984)(tigervision).80" size="0x4000" crc="bd10ad0c" sha1="cb271eda6382ca2fa415fb9129005f0d0e4cfca1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2249,7 +2249,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="facemaker (1983)(spinnaker software).80" size="0x2000" crc="7f6f21d0" sha1="fc60d78f8b5ef436c6375a7119ebcb9acc86d180" offset="0x0000" />
+				<rom name="facemaker (1983)(spinnaker software).80" size="0x2000" crc="7f6f21d0" sha1="fc60d78f8b5ef436c6375a7119ebcb9acc86d180"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2263,7 +2263,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="falconian invaders (1983)(turbo software).80" size="0x2000" crc="0ecad673" sha1="c9381665ccb991d0fb8e03c8e9c4ae448bd7fef4" offset="0x0000" />
+				<rom name="falconian invaders (1983)(turbo software).80" size="0x2000" crc="0ecad673" sha1="c9381665ccb991d0fb8e03c8e9c4ae448bd7fef4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2276,7 +2276,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="fourth sarcophagus, the (1983)(handic software).80" size="0x2000" crc="d279bdd7" sha1="473d9a4e31a82af1669e21c2f57b0742658d321f" offset="0x0000" />
+				<rom name="fourth sarcophagus, the (1983)(handic software).80" size="0x2000" crc="d279bdd7" sha1="473d9a4e31a82af1669e21c2f57b0742658d321f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2290,7 +2290,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="fraction fever (1983)(spinnaker software).80" size="0x2000" crc="88af6a05" sha1="2a64735b4ee63740202db0b8cf2c15a4cf6f4ab4" offset="0x0000" />
+				<rom name="fraction fever (1983)(spinnaker software).80" size="0x2000" crc="88af6a05" sha1="2a64735b4ee63740202db0b8cf2c15a4cf6f4ab4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2304,7 +2304,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="frog master (1983)(commodore).80" size="0x2000" crc="8bf36a9f" sha1="f92e1b04b04b6bf193739bc45384aa2655ca81b0" offset="0x0000" />
+				<rom name="frog master (1983)(commodore).80" size="0x2000" crc="8bf36a9f" sha1="f92e1b04b04b6bf193739bc45384aa2655ca81b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2317,7 +2317,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="frogger (1983)(parker brothers).80" size="0x2000" crc="dbf8d391" sha1="b848a1a812e81ded93e4e443436ca440cc90e9f7" offset="0x0000" />
+				<rom name="frogger (1983)(parker brothers).80" size="0x2000" crc="dbf8d391" sha1="b848a1a812e81ded93e4e443436ca440cc90e9f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2330,7 +2330,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="frogger ii - threeedeep! (1984)(parker brothers).80" size="0x4000" crc="f662f748" sha1="bb7c51bc09c534b5ac690dd3036c6cd6438c4ad3" offset="0x0000" />
+				<rom name="frogger ii - threeedeep! (1984)(parker brothers).80" size="0x4000" crc="f662f748" sha1="bb7c51bc09c534b5ac690dd3036c6cd6438c4ad3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2343,7 +2343,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="galaxian (1983)(atarisoft).80" size="0x2000" crc="e81954c7" sha1="dec2dd4da4a366902273437c7eb622eb28356ae3" offset="0x0000" />
+				<rom name="galaxian (1983)(atarisoft).80" size="0x2000" crc="e81954c7" sha1="dec2dd4da4a366902273437c7eb622eb28356ae3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2356,7 +2356,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="galaxions &amp; munch man (1983)(solar software).80" size="0x4000" crc="e878d3e5" sha1="fe36f815f5ab6b9c3120f9509121ca3fa44038a3" offset="0x0000" />
+				<rom name="galaxions &amp; munch man (1983)(solar software).80" size="0x4000" crc="e878d3e5" sha1="fe36f815f5ab6b9c3120f9509121ca3fa44038a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2370,7 +2370,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="gateway to apshai (1983)(epyx).80" size="0x4000" crc="9ff745b7" sha1="43917484bd975aeb6c07fda784da174c4a97aee2" offset="0x0000" />
+				<rom name="gateway to apshai (1983)(epyx).80" size="0x4000" crc="9ff745b7" sha1="43917484bd975aeb6c07fda784da174c4a97aee2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2385,7 +2385,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="gorf (1983)(commodore).80" size="0x4000" crc="33812a19" sha1="4d24d5ed3d8b38235d9ae5965b675ffece0981cc" offset="0x0000" />
+				<rom name="gorf (1983)(commodore).80" size="0x4000" crc="33812a19" sha1="4d24d5ed3d8b38235d9ae5965b675ffece0981cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2399,7 +2399,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="gridrunner (1983)(hesware).80" size="0x2000" crc="12f36a09" sha1="218625325984ebdef88a5b56bc81bcff229d61db" offset="0x0000" />
+				<rom name="gridrunner (1983)(hesware).80" size="0x2000" crc="12f36a09" sha1="218625325984ebdef88a5b56bc81bcff229d61db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2412,7 +2412,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="gyruss (1984)(parker brothers).80" size="0x4000" crc="e8ea9a85" sha1="a287f078e7a6026b217b5a166ebb3eaeff081211" offset="0x0000" />
+				<rom name="gyruss (1984)(parker brothers).80" size="0x4000" crc="e8ea9a85" sha1="a287f078e7a6026b217b5a166ebb3eaeff081211"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2426,7 +2426,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="h.e.r.o. (1984)(activision).80" size="0x4000" crc="b4023a40" sha1="bbd882e0666eb01d27ee97c98ac9f7f53793e8b5" offset="0x0000" />
+				<rom name="h.e.r.o. (1984)(activision).80" size="0x4000" crc="b4023a40" sha1="bbd882e0666eb01d27ee97c98ac9f7f53793e8b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2441,7 +2441,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="halftime battlin' bands (1984)(cbs software).80" size="0x4000" crc="2c142cc9" sha1="834a9acde6b44082c917084f3d9a7c72f9842762" offset="0x0000" />
+				<rom name="halftime battlin' bands (1984)(cbs software).80" size="0x4000" crc="2c142cc9" sha1="834a9acde6b44082c917084f3d9a7c72f9842762"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2455,7 +2455,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hop along counting (1984)(fisher price).80" size="0x2000" crc="14d446b8" sha1="40cc4d384a44baf301e0337246b624dffe267a2f" offset="0x0000" />
+				<rom name="hop along counting (1984)(fisher price).80" size="0x2000" crc="14d446b8" sha1="40cc4d384a44baf301e0337246b624dffe267a2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2468,7 +2468,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="human skeleton tutorial (1984)(s.m. thorpe).80" size="0x2000" crc="04f30cd4" sha1="3f1891f363b38c6566a11a36a717ddce8d5d5522" offset="0x0000" />
+				<rom name="human skeleton tutorial (1984)(s.m. thorpe).80" size="0x2000" crc="04f30cd4" sha1="3f1891f363b38c6566a11a36a717ddce8d5d5522"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2501,11 +2501,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="317017-01.u1" size="0x2000" crc="4639431d" sha1="983c91a88dea4d0f05b6ff69ed7692b2651cb3fa" offset="0x0000" />
+				<rom name="317017-01.u1" size="0x2000" crc="4639431d" sha1="983c91a88dea4d0f05b6ff69ed7692b2651cb3fa"/>
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="317018-01.u2" size="0x2000" crc="c98d99bf" sha1="aeb865b3e8bcd76b5526c847c77278f94232d380" offset="0x0000" />
+				<rom name="317018-01.u2" size="0x2000" crc="c98d99bf" sha1="aeb865b3e8bcd76b5526c847c77278f94232d380"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2538,11 +2538,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="317038-01.u1" size="0x2000" crc="63e6daf6" sha1="deff113bed94119880643ba34966527d9fc55909" offset="0x0000" />
+				<rom name="317038-01.u1" size="0x2000" crc="63e6daf6" sha1="deff113bed94119880643ba34966527d9fc55909"/>
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="317039-01.u2" size="0x2000" crc="50797bbd" sha1="2c2c9eb4fed9b7df2f8c21198f2f3db0cef526a1" offset="0x0000" />
+				<rom name="317039-01.u2" size="0x2000" crc="50797bbd" sha1="2c2c9eb4fed9b7df2f8c21198f2f3db0cef526a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2555,7 +2555,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="james bond (1984)(parker brothers).80" size="0x4000" crc="ca5fa4bb" sha1="084cc5828b298601d90edf2c7e4a93d35428e510" offset="0x0000" />
+				<rom name="james bond (1984)(parker brothers).80" size="0x4000" crc="ca5fa4bb" sha1="084cc5828b298601d90edf2c7e4a93d35428e510"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2568,7 +2568,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="jaw breaker (1983)(sierra online).80" size="0x2000" crc="c5ea2b53" sha1="c92bd2c0bd0dd67f2deb4856b20fe1d76986e641" offset="0x0000" />
+				<rom name="jaw breaker (1983)(sierra online).80" size="0x2000" crc="c5ea2b53" sha1="c92bd2c0bd0dd67f2deb4856b20fe1d76986e641"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2581,7 +2581,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="juice! (1983)(tronix).80" size="0x4000" crc="126834a0" sha1="95b19e6bbbe850db4650383e5d5359262edc1106" offset="0x0000" />
+				<rom name="juice! (1983)(tronix).80" size="0x4000" crc="126834a0" sha1="95b19e6bbbe850db4650383e5d5359262edc1106"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2596,7 +2596,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="juke box (1984)(spinnaker software).80" size="0x2000" crc="d71551a8" sha1="ecfeeb111c95ca8b0ef105e29b22411ca071dde8" offset="0x0000" />
+				<rom name="juke box (1984)(spinnaker software).80" size="0x2000" crc="d71551a8" sha1="ecfeeb111c95ca8b0ef105e29b22411ca071dde8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2609,7 +2609,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="jumpman junior (1983)(epyx).80" size="0x4000" crc="6e89d59c" sha1="274ed5c2ea2ddc855f67d4c4e61c9d9b7eb68403" offset="0x0000" />
+				<rom name="jumpman junior (1983)(epyx).80" size="0x4000" crc="6e89d59c" sha1="274ed5c2ea2ddc855f67d4c4e61c9d9b7eb68403"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2622,7 +2622,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="jungle hunt (1983)(atarisoft).80" size="0x4000" crc="ea9c9082" sha1="5a199a3ab4ac8ace8b6c87a31b4010ad15950f40" offset="0x0000" />
+				<rom name="jungle hunt (1983)(atarisoft).80" size="0x4000" crc="ea9c9082" sha1="5a199a3ab4ac8ace8b6c87a31b4010ad15950f40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2636,7 +2636,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="kids on keys (1983)(spinnaker software).80" size="0x2000" crc="11e656d0" sha1="63e46798a6e481ad554027847bd4ae9e0d333c85" offset="0x0000" />
+				<rom name="kids on keys (1983)(spinnaker software).80" size="0x2000" crc="11e656d0" sha1="63e46798a6e481ad554027847bd4ae9e0d333c85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2650,7 +2650,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="kindercomp (1983)(spinnaker software).80" size="0x2000" crc="866e5934" sha1="4dc54fa35630073108f7225f9b444a9c358a9ca3" offset="0x0000" />
+				<rom name="kindercomp (1983)(spinnaker software).80" size="0x2000" crc="866e5934" sha1="4dc54fa35630073108f7225f9b444a9c358a9ca3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2664,7 +2664,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="lazarian (1983)(commodore).80" size="0x4000" crc="aa5d27d4" sha1="cf3dedd23375d51c11dbac60167031e6fb8a6a08" offset="0x0000" />
+				<rom name="lazarian (1983)(commodore).80" size="0x4000" crc="aa5d27d4" sha1="cf3dedd23375d51c11dbac60167031e6fb8a6a08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2678,7 +2678,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="lazer zone (1983)(hesware).80" size="0x2000" crc="bfa69d6d" sha1="d4aa23205f71d205fb7e4e7cbba0693e2cc20ef3" offset="0x0000" />
+				<rom name="lazer zone (1983)(hesware).80" size="0x2000" crc="bfa69d6d" sha1="d4aa23205f71d205fb7e4e7cbba0693e2cc20ef3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2692,7 +2692,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="learning with leeper (1983)(sierra online).80" size="0x4000" crc="2709d977" sha1="894a601aca0fbbbf294215459345c53f6c3d2909" offset="0x0000" />
+				<rom name="learning with leeper (1983)(sierra online).80" size="0x4000" crc="2709d977" sha1="894a601aca0fbbbf294215459345c53f6c3d2909"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2706,7 +2706,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="linking logic (1984)(fisher price).80" size="0x2000" crc="6554f9d6" sha1="d47ed3b07eae329a45a150ea3b249015b6dc13ae" offset="0x0000" />
+				<rom name="linking logic (1984)(fisher price).80" size="0x2000" crc="6554f9d6" sha1="d47ed3b07eae329a45a150ea3b249015b6dc13ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2720,7 +2720,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="lode runner (1983)(broderbund).80" size="0x4000" crc="2eafc768" sha1="b2392459f04a1987dbeebbac89d7f8c1833af0b5" offset="0x0000" />
+				<rom name="lode runner (1983)(broderbund).80" size="0x4000" crc="2eafc768" sha1="b2392459f04a1987dbeebbac89d7f8c1833af0b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2734,7 +2734,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="logic levels (1984)(fisher price).80" size="0x2000" crc="23889a3e" sha1="02802875d6126ec0badad53e67acece7a8de7e40" offset="0x0000" />
+				<rom name="logic levels (1984)(fisher price).80" size="0x2000" crc="23889a3e" sha1="02802875d6126ec0badad53e67acece7a8de7e40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2747,7 +2747,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="lunar leeper (1982)(sierra online).80" size="0x4000" crc="ea2d9c6d" sha1="0b24f17bbd85eecce49bfe069893e609f711adb0" offset="0x0000" />
+				<rom name="lunar leeper (1982)(sierra online).80" size="0x4000" crc="ea2d9c6d" sha1="0b24f17bbd85eecce49bfe069893e609f711adb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2760,7 +2760,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mario's brewery (1983)(mr. computer).80" size="0x2000" crc="250942d0" sha1="3d2773247aa9b82a634cbf0cfa7dca5f127522a7" offset="0x0000" />
+				<rom name="mario's brewery (1983)(mr. computer).80" size="0x2000" crc="250942d0" sha1="3d2773247aa9b82a634cbf0cfa7dca5f127522a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2773,7 +2773,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="mastertype (1983)(lightning software).80" size="0x4000" crc="a71db74c" sha1="070fef929a757cecf4dfd823e0cb0a2ccea97a23" offset="0x0000" />
+				<rom name="mastertype (1983)(lightning software).80" size="0x4000" crc="a71db74c" sha1="070fef929a757cecf4dfd823e0cb0a2ccea97a23"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2787,7 +2787,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="math mileage (1984)(cbs software).80" size="0x4000" crc="ab835e21" sha1="c7341f6324cf4393ec0afc5fdf9144f2ac8bff08" offset="0x0000" />
+				<rom name="math mileage (1984)(cbs software).80" size="0x4000" crc="ab835e21" sha1="c7341f6324cf4393ec0afc5fdf9144f2ac8bff08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2800,7 +2800,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="maze man (1983)(turbo software).80" size="0x2000" crc="7d939a7f" sha1="7d225481319f75c4649a72330d22b9bbfc1b9b80" offset="0x0000" />
+				<rom name="maze man (1983)(turbo software).80" size="0x2000" crc="7d939a7f" sha1="7d225481319f75c4649a72330d22b9bbfc1b9b80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2813,7 +2813,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="maze master (1983)(hesware).80" size="0x4000" crc="a3f01773" sha1="82d6b9fcd1ef20118deff3445f4d41627b391b91" offset="0x0000" />
+				<rom name="maze master (1983)(hesware).80" size="0x4000" crc="a3f01773" sha1="82d6b9fcd1ef20118deff3445f4d41627b391b91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2827,7 +2827,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="memory manor (1984)(fisher price).80" size="0x2000" crc="aa9ee63b" sha1="ea6a98fbb34d1aca11bbc23880ae942aa8c6e761" offset="0x0000" />
+				<rom name="memory manor (1984)(fisher price).80" size="0x2000" crc="aa9ee63b" sha1="ea6a98fbb34d1aca11bbc23880ae942aa8c6e761"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2840,7 +2840,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="miner 2049er (1982)(big five software).80" size="0x4000" crc="4515169b" sha1="d19f086399fb37c562ec624feb11052c58c1c625" offset="0x0000" />
+				<rom name="miner 2049er (1982)(big five software).80" size="0x4000" crc="4515169b" sha1="d19f086399fb37c562ec624feb11052c58c1c625"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2853,7 +2853,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="minnesota fat's pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4" offset="0x0000" />
+				<rom name="minnesota fat's pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2866,7 +2866,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="moon dust (1983)(creative software).80" size="0x2000" crc="fdc559ef" sha1="d5ba1fbbbdaa3ef9ef4076f12d8ffb03257167a2" offset="0x0000" />
+				<rom name="moon dust (1983)(creative software).80" size="0x2000" crc="fdc559ef" sha1="d5ba1fbbbdaa3ef9ef4076f12d8ffb03257167a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2880,7 +2880,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="moon patrol (1983)(atarisoft).80" size="0x4000" crc="a649c655" sha1="618be92e8603c2babcb4b9926c59539db9b1056c" offset="0x0000" />
+				<rom name="moon patrol (1983)(atarisoft).80" size="0x4000" crc="a649c655" sha1="618be92e8603c2babcb4b9926c59539db9b1056c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2893,7 +2893,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="motor mania (1982)(umi).80" size="0x4000" crc="e10dee77" sha1="cacc8eec388b4b754db18410e3eddc00e0323f21" offset="0x0000" />
+				<rom name="motor mania (1982)(umi).80" size="0x4000" crc="e10dee77" sha1="cacc8eec388b4b754db18410e3eddc00e0323f21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2906,7 +2906,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="mountain king (1983)(beyond software).80" size="0x4000" crc="e1248010" sha1="b258e7d019645257f5a95fdf8a4c20ec711e184d" offset="0x0000" />
+				<rom name="mountain king (1983)(beyond software).80" size="0x4000" crc="e1248010" sha1="b258e7d019645257f5a95fdf8a4c20ec711e184d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2921,7 +2921,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="movie musical madness (1984)(cbs software).80" size="0x4000" crc="2d570f44" sha1="f6864543f492b98f5aa589ac3722ab51b63aa663" offset="0x0000" />
+				<rom name="movie musical madness (1984)(cbs software).80" size="0x4000" crc="2d570f44" sha1="f6864543f492b98f5aa589ac3722ab51b63aa663"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2934,7 +2934,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mr. cool (1983)(sierra online).80" size="0x2000" crc="0609655c" sha1="29ff6f733083b5ac6372700ab6bfc660a85297cf" offset="0x0000" />
+				<rom name="mr. cool (1983)(sierra online).80" size="0x2000" crc="0609655c" sha1="29ff6f733083b5ac6372700ab6bfc660a85297cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2948,7 +2948,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mr. tnt (1984)(hesware).80" size="0x2000" crc="ea5c0043" sha1="8d7097859b3e67cfb616297ecf94c7ffddf9aa48" offset="0x0000" />
+				<rom name="mr. tnt (1984)(hesware).80" size="0x2000" crc="ea5c0043" sha1="8d7097859b3e67cfb616297ecf94c7ffddf9aa48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2979,11 +2979,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mspacmnau2" size="0x2000" crc="d43eba17" sha1="28f8fc76197f0043536b008ac480e3bfafb26c00" offset="0x0000" />
+				<rom name="mspacmnau2" size="0x2000" crc="d43eba17" sha1="28f8fc76197f0043536b008ac480e3bfafb26c00"/>
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="mspacmnbu1" size="0x2000" crc="d126526e" sha1="fb1198e97f0a1b84a1e0ebf968c3288f57e9c4ba" offset="0x0000" />
+				<rom name="mspacmnbu1" size="0x2000" crc="d126526e" sha1="fb1198e97f0a1b84a1e0ebf968c3288f57e9c4ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2996,7 +2996,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mutant spiders, the (1983)(handic software).80" size="0x2000" crc="a58c67ab" sha1="dc68392548c834786148aae0d46718cee7e7cb65" offset="0x0000" />
+				<rom name="mutant spiders, the (1983)(handic software).80" size="0x2000" crc="a58c67ab" sha1="dc68392548c834786148aae0d46718cee7e7cb65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3009,7 +3009,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="nova blast (1984)(imagic).80" size="0x4000" crc="f13cdc0a" sha1="b7ea720fdf225968e172967426bbd6a6ae8a3ce7" offset="0x0000" />
+				<rom name="nova blast (1984)(imagic).80" size="0x4000" crc="f13cdc0a" sha1="b7ea720fdf225968e172967426bbd6a6ae8a3ce7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3023,7 +3023,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="number nabber - shape grabber (1983)(commodore).80" size="0x2000" crc="1717ae07" sha1="f3980eb10c51f5df03ac9f27cba1c81893dcbd3d" offset="0x0000" />
+				<rom name="number nabber - shape grabber (1983)(commodore).80" size="0x2000" crc="1717ae07" sha1="f3980eb10c51f5df03ac9f27cba1c81893dcbd3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3038,7 +3038,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="number tumbler (1984)(fisher price).80" size="0x2000" crc="5fcff459" sha1="2cd75cd711bed42814937d8e6ce6c9a1b9106a7e" offset="0x0000" />
+				<rom name="number tumbler (1984)(fisher price).80" size="0x2000" crc="5fcff459" sha1="2cd75cd711bed42814937d8e6ce6c9a1b9106a7e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3052,7 +3052,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="oils well (1983)(sierra online).80" size="0x4000" crc="fd3f2b16" sha1="aa327a6a42fef6d95b37cf2db9337f88dcf0c7af" offset="0x0000" />
+				<rom name="oils well (1983)(sierra online).80" size="0x4000" crc="fd3f2b16" sha1="aa327a6a42fef6d95b37cf2db9337f88dcf0c7af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3066,7 +3066,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="omega race (1982)(commodore).80" size="0x2000" crc="b6e99657" sha1="7931433edba8e9ca1ea85b84351cea0760f7aabf" offset="0x0000" />
+				<rom name="omega race (1982)(commodore).80" size="0x2000" crc="b6e99657" sha1="7931433edba8e9ca1ea85b84351cea0760f7aabf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3079,7 +3079,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="pac-man (1983)(atarisoft).80" size="0x2000" crc="f665ecc0" sha1="961ffc1cfbfdf47ff115c323b4af8f20d48925aa" offset="0x0000" />
+				<rom name="pac-man (1983)(atarisoft).80" size="0x2000" crc="f665ecc0" sha1="961ffc1cfbfdf47ff115c323b4af8f20d48925aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3094,7 +3094,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="paint brush (1983)(hesware).80" size="0x4000" crc="4c880095" sha1="88c0faff4617270d3d6ff0e8084b796abe94f31b" offset="0x0000" />
+				<rom name="paint brush (1983)(hesware).80" size="0x4000" crc="4c880095" sha1="88c0faff4617270d3d6ff0e8084b796abe94f31b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3107,7 +3107,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pancho (1984)(romox)(fr).80" size="0x4000" crc="f649ddf5" sha1="a6b79cdd74e3d705a85f0dfb5b3045863d609d40" offset="0x0000" />
+				<rom name="pancho (1984)(romox)(fr).80" size="0x4000" crc="f649ddf5" sha1="a6b79cdd74e3d705a85f0dfb5b3045863d609d40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3121,7 +3121,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pastfinder (1984)(activision).80" size="0x4000" crc="3bdbcbaf" sha1="e9bbc2a8b2f06d3da59ed22b3d40c0f648ef218d" offset="0x0000" />
+				<rom name="pastfinder (1984)(activision).80" size="0x4000" crc="3bdbcbaf" sha1="e9bbc2a8b2f06d3da59ed22b3d40c0f648ef218d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3135,7 +3135,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="peanut butter panic (1984)(cbs software).80" size="0x4000" crc="707997b2" sha1="83811cc8a78c9a1cc8fbeee998e1cc230c209071" offset="0x0000" />
+				<rom name="peanut butter panic (1984)(cbs software).80" size="0x4000" crc="707997b2" sha1="83811cc8a78c9a1cc8fbeee998e1cc230c209071"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3148,7 +3148,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="pipes (1983)(creative software).80" size="0x2000" crc="fe6b76c6" sha1="a63249303967a67bde3e0333952a5970a6dea1d3" offset="0x0000" />
+				<rom name="pipes (1983)(creative software).80" size="0x2000" crc="fe6b76c6" sha1="a63249303967a67bde3e0333952a5970a6dea1d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3161,7 +3161,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="pit, the (1983)(hesware).80" size="0x2000" crc="4ce5a0a7" sha1="12214f05fd7d37d4e3f26591e52789dd4fc6f258" offset="0x0000" />
+				<rom name="pit, the (1983)(hesware).80" size="0x2000" crc="4ce5a0a7" sha1="12214f05fd7d37d4e3f26591e52789dd4fc6f258"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3175,7 +3175,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pitfall 2 - lost caverns (1984)(activision).80" size="0x4000" crc="da4a6595" sha1="3e1095203fb8b4e1890784dac70e075e568634c8" offset="0x0000" />
+				<rom name="pitfall 2 - lost caverns (1984)(activision).80" size="0x4000" crc="da4a6595" sha1="3e1095203fb8b4e1890784dac70e075e568634c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3189,7 +3189,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pitfall 2 - lost caverns (1984)(activision)[a].80" size="0x4000" crc="ad311f76" sha1="2ea7cf19d86fbeb9d57416f97c4eca435adedd37" offset="0x0000" />
+				<rom name="pitfall 2 - lost caverns (1984)(activision)[a].80" size="0x4000" crc="ad311f76" sha1="2ea7cf19d86fbeb9d57416f97c4eca435adedd37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3203,7 +3203,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="pitfall! (1984)(activision).80" size="0x2000" crc="fe349f64" sha1="b44ce22bafff6aab73698ee4c4ed06bacdcc7ac9" offset="0x0000" />
+				<rom name="pitfall! (1984)(activision).80" size="0x2000" crc="fe349f64" sha1="b44ce22bafff6aab73698ee4c4ed06bacdcc7ac9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3216,7 +3216,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pitstop (1983)(epyx).80" size="0x4000" crc="e522c35f" sha1="c88b2904969a0761d709755ca9492e50987b0d78" offset="0x0000" />
+				<rom name="pitstop (1983)(epyx).80" size="0x4000" crc="e522c35f" sha1="c88b2904969a0761d709755ca9492e50987b0d78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3229,7 +3229,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pitstop (1983)(epyx)[a].80" size="0x4000" crc="aec160a2" sha1="9deff1add86939c19fde5bc4948ddbb209023ed4" offset="0x0000" />
+				<rom name="pitstop (1983)(epyx)[a].80" size="0x4000" crc="aec160a2" sha1="9deff1add86939c19fde5bc4948ddbb209023ed4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3243,7 +3243,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="pole position (1983)(atarisoft).80" size="0x4000" crc="8897e451" sha1="ca89a850ad6f78e48a4891a89ccd37f0705ea54e" offset="0x0000" />
+				<rom name="pole position (1983)(atarisoft).80" size="0x4000" crc="8897e451" sha1="ca89a850ad6f78e48a4891a89ccd37f0705ea54e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3256,7 +3256,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="popeye (1983)(parker brothers).80" size="0x4000" crc="766f3e74" sha1="2ad9c1b76b09a4739f5e0fe51e423e8d2b21413d" offset="0x0000" />
+				<rom name="popeye (1983)(parker brothers).80" size="0x4000" crc="766f3e74" sha1="2ad9c1b76b09a4739f5e0fe51e423e8d2b21413d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3269,7 +3269,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="princess and the frog (1983)(romox).80" size="0x2000" crc="a5bea91b" sha1="1d62097f2eee39f8b784983f5841fa7fff7c26ec" offset="0x0000" />
+				<rom name="princess and the frog (1983)(romox).80" size="0x2000" crc="a5bea91b" sha1="1d62097f2eee39f8b784983f5841fa7fff7c26ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3283,7 +3283,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="q-bert (1983)(parker brothers).80" size="0x4000" crc="1485c6b5" sha1="db432445661a07dbda71c1644777410f2d3e05a6" offset="0x0000" />
+				<rom name="q-bert (1983)(parker brothers).80" size="0x4000" crc="1485c6b5" sha1="db432445661a07dbda71c1644777410f2d3e05a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3297,7 +3297,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="q-bert (1983)(parker brothers)[a].80" size="0x4000" crc="c2855857" sha1="d8a8e69a4f6bb650f95f1fb8e3fdc88f3152750c" offset="0x0000" />
+				<rom name="q-bert (1983)(parker brothers)[a].80" size="0x4000" crc="c2855857" sha1="d8a8e69a4f6bb650f95f1fb8e3fdc88f3152750c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3311,7 +3311,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="q-bert (1983)(parker brothers)[a2].80" size="0x4000" crc="941b8fe4" sha1="073a06d599553117423698f01e7c4886342e6362" offset="0x0000" />
+				<rom name="q-bert (1983)(parker brothers)[a2].80" size="0x4000" crc="941b8fe4" sha1="073a06d599553117423698f01e7c4886342e6362"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3324,7 +3324,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rack 'em up (1983)(roklan).80" size="0x4000" crc="4167bb7d" sha1="50da7890674ad80deea2a5b5a55120cd9e7d8ef5" offset="0x0000" />
+				<rom name="rack 'em up (1983)(roklan).80" size="0x4000" crc="4167bb7d" sha1="50da7890674ad80deea2a5b5a55120cd9e7d8ef5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3338,7 +3338,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="ranch (1984)(spinnaker software).80" size="0x4000" crc="140c655b" sha1="c07d0dd8faf4f7c52e4221ccec1809bfc90b7ff1" offset="0x0000" />
+				<rom name="ranch (1984)(spinnaker software).80" size="0x4000" crc="140c655b" sha1="c07d0dd8faf4f7c52e4221ccec1809bfc90b7ff1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3373,7 +3373,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rechenlowe, der - fit in addition und subtraktion - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="720dfed1" sha1="9979ef9013ff88d463f6ee73b59b795b7036a029" offset="0x0000" />
+				<rom name="rechenlowe, der - fit in addition und subtraktion - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="720dfed1" sha1="9979ef9013ff88d463f6ee73b59b795b7036a029"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3387,7 +3387,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rechenlowe, der - fit in geometrie - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="b5337be9" sha1="12c171790e6ed908d9c76eb9ce6a02bf2b000720" offset="0x0000" />
+				<rom name="rechenlowe, der - fit in geometrie - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="b5337be9" sha1="12c171790e6ed908d9c76eb9ce6a02bf2b000720"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3422,7 +3422,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rechenlowe, der - fit in multiplikation und division - 2.-3. schuljahr (1984)(commodore)(ger).80" size="0x4000" crc="8ccb58f8" sha1="1a92741a30aafd2daca74438050969e317dc07bf" offset="0x0000" />
+				<rom name="rechenlowe, der - fit in multiplikation und division - 2.-3. schuljahr (1984)(commodore)(ger).80" size="0x4000" crc="8ccb58f8" sha1="1a92741a30aafd2daca74438050969e317dc07bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3436,7 +3436,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rechenlowe, der - fit in multiplikation und division - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="9da8c279" sha1="50d12edd1a96fcf9392f213d85308492a4b75b64" offset="0x0000" />
+				<rom name="rechenlowe, der - fit in multiplikation und division - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="9da8c279" sha1="50d12edd1a96fcf9392f213d85308492a4b75b64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3450,7 +3450,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rechtschreiblowe, der - fit in rechtschreibung - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="8cda713b" sha1="ea28884bf4965a7fabc8b965e1ef6b75a85ea7cd" offset="0x0000" />
+				<rom name="rechtschreiblowe, der - fit in rechtschreibung - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="8cda713b" sha1="ea28884bf4965a7fabc8b965e1ef6b75a85ea7cd"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -3479,7 +3479,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="retro ball (1982)(hesware).80" size="0x2000" crc="a7c8c517" sha1="5d17c8753deb393f423132d1d00ee03deddf2820" offset="0x0000" />
+				<rom name="retro ball (1982)(hesware).80" size="0x2000" crc="a7c8c517" sha1="5d17c8753deb393f423132d1d00ee03deddf2820"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3492,7 +3492,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="river raid (1984)(activision).80" size="0x4000" crc="7768abf8" sha1="519b56b3ce7f1274bba3e5ff0ac59564361fbe31" offset="0x0000" />
+				<rom name="river raid (1984)(activision).80" size="0x4000" crc="7768abf8" sha1="519b56b3ce7f1274bba3e5ff0ac59564361fbe31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3505,7 +3505,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="robotron 2084 (1983)(atarisoft).80" size="0x4000" crc="e51d8cd2" sha1="a628fad356acc3f496c297120e0b46e33268d968" offset="0x0000" />
+				<rom name="robotron 2084 (1983)(atarisoft).80" size="0x4000" crc="e51d8cd2" sha1="a628fad356acc3f496c297120e0b46e33268d968"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3518,7 +3518,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rootin' tootin' (1983)(hesware).80" size="0x4000" crc="2d0b53d9" sha1="bc0dcf610a7aaf810c678b8eaa6d18c22d5e39dd" offset="0x0000" />
+				<rom name="rootin' tootin' (1983)(hesware).80" size="0x4000" crc="2d0b53d9" sha1="bc0dcf610a7aaf810c678b8eaa6d18c22d5e39dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3531,7 +3531,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="sales cartridge (usa, europe).80" size="0x4000" crc="ebbbbf03" sha1="8c1b70b3b275d61e61193b6802aa88d2df2cf64e" offset="0x0000" />
+				<rom name="sales cartridge (usa, europe).80" size="0x4000" crc="ebbbbf03" sha1="8c1b70b3b275d61e61193b6802aa88d2df2cf64e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3544,7 +3544,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="sammy lightfoot (1983)(sierra online).80" size="0x4000" crc="ae56786c" sha1="7d9da792e152d45e9fc698fa72fc219be7305924" offset="0x0000" />
+				<rom name="sammy lightfoot (1983)(sierra online).80" size="0x4000" crc="ae56786c" sha1="7d9da792e152d45e9fc698fa72fc219be7305924"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3557,7 +3557,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="save new york (1983)(creative software).80" size="0x2000" crc="bfaa0d5f" sha1="9e555c8fd0e71e30730bbbd7b4bc694c8f1c1386" offset="0x0000" />
+				<rom name="save new york (1983)(creative software).80" size="0x2000" crc="bfaa0d5f" sha1="9e555c8fd0e71e30730bbbd7b4bc694c8f1c1386"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3571,7 +3571,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="sea speller (1984)(fisher price).80" size="0x2000" crc="e7858752" sha1="4aa0de7eebf46d3ead0441cb4b08d3521b7ca20e" offset="0x0000" />
+				<rom name="sea speller (1984)(fisher price).80" size="0x2000" crc="e7858752" sha1="4aa0de7eebf46d3ead0441cb4b08d3521b7ca20e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3585,7 +3585,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="seafox (1982)(broderbund).80" size="0x4000" crc="6e944474" sha1="24d169e7531c9e278c94ce2a0ff85bb981c4dde3" offset="0x0000" />
+				<rom name="seafox (1982)(broderbund).80" size="0x4000" crc="6e944474" sha1="24d169e7531c9e278c94ce2a0ff85bb981c4dde3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3600,7 +3600,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="seahorse hide'n seek (1984)(cbs software).80" size="0x4000" crc="89f7fc07" sha1="06e257129b3310dad8cd0b72870682d1be7e0e46" offset="0x0000" />
+				<rom name="seahorse hide'n seek (1984)(cbs software).80" size="0x4000" crc="89f7fc07" sha1="06e257129b3310dad8cd0b72870682d1be7e0e46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3613,7 +3613,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="serpentine (1982)(broderbund).80" size="0x4000" crc="518027b8" sha1="2dc1d9f6d4e051b46aa8783ea372e5291bfddcf2" offset="0x0000" />
+				<rom name="serpentine (1982)(broderbund).80" size="0x4000" crc="518027b8" sha1="2dc1d9f6d4e051b46aa8783ea372e5291bfddcf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3626,7 +3626,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="sesame street letter-go-round (1984)(cbs software).80" size="0x4000" crc="bead6f3f" sha1="8c9fa30b0b45adf85ef5282541df23d099f8789f" offset="0x0000" />
+				<rom name="sesame street letter-go-round (1984)(cbs software).80" size="0x4000" crc="bead6f3f" sha1="8c9fa30b0b45adf85ef5282541df23d099f8789f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3640,7 +3640,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="solar fox (1983)(commodore).80" size="0x4000" crc="99afd39f" sha1="ebf948b3b88f8ee347b8647ea69bdc60f8771dcd" offset="0x0000" />
+				<rom name="solar fox (1983)(commodore).80" size="0x4000" crc="99afd39f" sha1="ebf948b3b88f8ee347b8647ea69bdc60f8771dcd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3654,7 +3654,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="song maker (1985)(fisher price).80" size="0x2000" crc="29e8e748" sha1="d7124d576e035119d1a2c7d36e19170ba4790d4a" offset="0x0000" />
+				<rom name="song maker (1985)(fisher price).80" size="0x2000" crc="29e8e748" sha1="d7124d576e035119d1a2c7d36e19170ba4790d4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3667,7 +3667,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="space action (1983)(handic software).80" size="0x2000" crc="ceb483e9" sha1="f1cb7333701a96c080ab90d7d30740c43e4089d7" offset="0x0000" />
+				<rom name="space action (1983)(handic software).80" size="0x2000" crc="ceb483e9" sha1="f1cb7333701a96c080ab90d7d30740c43e4089d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3680,7 +3680,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="space ric-o-shay (1983)(mr. computer).80" size="0x2000" crc="6ce1de20" sha1="0f86121dc91dcaf2b0d7ed9c89232b2856a041cf" offset="0x0000" />
+				<rom name="space ric-o-shay (1983)(mr. computer).80" size="0x2000" crc="6ce1de20" sha1="0f86121dc91dcaf2b0d7ed9c89232b2856a041cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3693,7 +3693,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="space shuttle - a journey into space (1983)(activision).80" size="0x4000" crc="2cff7843" sha1="7f22aa665721bf8b6bdcc75c9a4871bed7112cc1" offset="0x0000" />
+				<rom name="space shuttle - a journey into space (1983)(activision).80" size="0x4000" crc="2cff7843" sha1="7f22aa665721bf8b6bdcc75c9a4871bed7112cc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3707,7 +3707,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="spitball (1983)(creative software).80" size="0x2000" crc="825c0bc2" sha1="0a78aa0f77ece40f2c9393ca91dc59e6c1695927" offset="0x0000" />
+				<rom name="spitball (1983)(creative software).80" size="0x2000" crc="825c0bc2" sha1="0a78aa0f77ece40f2c9393ca91dc59e6c1695927"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3720,7 +3720,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="spy hunter (1983)(u.s. gold).80" size="0x4000" crc="9273469b" sha1="e113fb2e78c333ca6abfa25c939b2935bbdd9676" offset="0x0000" />
+				<rom name="spy hunter (1983)(u.s. gold).80" size="0x4000" crc="9273469b" sha1="e113fb2e78c333ca6abfa25c939b2935bbdd9676"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3734,7 +3734,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="star post (1983)(commodore).80" size="0x2000" crc="86b3ad6d" sha1="0de3db9208c15f6e2c2beb175b583c473e6b0726" offset="0x0000" />
+				<rom name="star post (1983)(commodore).80" size="0x2000" crc="86b3ad6d" sha1="0de3db9208c15f6e2c2beb175b583c473e6b0726"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3748,7 +3748,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="star ranger (1983)(commodore).80" size="0x4000" crc="6305847e" sha1="a4e63c7c130f3e6ef3b89ec86888b8dda7ec28a4" offset="0x0000" />
+				<rom name="star ranger (1983)(commodore).80" size="0x4000" crc="6305847e" sha1="a4e63c7c130f3e6ef3b89ec86888b8dda7ec28a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3762,7 +3762,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="star trek - strategic operations simulator (1983)(sega).80" size="0x4000" crc="40f0167b" sha1="82fa19bc575b9fd93051e9fbcbd955e393b625f4" offset="0x0000" />
+				<rom name="star trek - strategic operations simulator (1983)(sega).80" size="0x4000" crc="40f0167b" sha1="82fa19bc575b9fd93051e9fbcbd955e393b625f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3775,7 +3775,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="star wars - the arcade game (1983)(parker brothers).80" size="0x4000" crc="9650d9ea" sha1="f689c113312e1dad36d23871269d394ae67d70ce" offset="0x0000" />
+				<rom name="star wars - the arcade game (1983)(parker brothers).80" size="0x4000" crc="9650d9ea" sha1="f689c113312e1dad36d23871269d394ae67d70ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3788,7 +3788,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="states and capitals tutorial (1984)(s.m. thorpe).80" size="0x2000" crc="d9ad8f75" sha1="23007a1b7008413b268b09ab1a189a40aa5e9930" offset="0x0000" />
+				<rom name="states and capitals tutorial (1984)(s.m. thorpe).80" size="0x2000" crc="d9ad8f75" sha1="23007a1b7008413b268b09ab1a189a40aa5e9930"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3801,7 +3801,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="stix (1983)(supersoft).80" size="0x2000" crc="5fbe5c3a" sha1="9872ebf0183f2d5fa1f9d3cf970ba5547b0f1291" offset="0x0000" />
+				<rom name="stix (1983)(supersoft).80" size="0x2000" crc="5fbe5c3a" sha1="9872ebf0183f2d5fa1f9d3cf970ba5547b0f1291"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3815,7 +3815,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="story machine (1983)(spinnaker).80" size="0x4000" crc="1a6a8a2d" sha1="4800a7815d91b1703f647140e8578f8e34d0ca20" offset="0x0000" />
+				<rom name="story machine (1983)(spinnaker).80" size="0x4000" crc="1a6a8a2d" sha1="4800a7815d91b1703f647140e8578f8e34d0ca20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3829,7 +3829,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="super smash (1983)(commodore).80" size="0x2000" crc="13c7d30f" sha1="0b282a187766b457395a3e287e826664c7000cb8" offset="0x0000" />
+				<rom name="super smash (1983)(commodore).80" size="0x2000" crc="13c7d30f" sha1="0b282a187766b457395a3e287e826664c7000cb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3842,7 +3842,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tank wars (1983)(mr. computer).80" size="0x2000" crc="7d6f3603" sha1="de21f955e58bea6c363e1a9f27097ffc4e330727" offset="0x0000" />
+				<rom name="tank wars (1983)(mr. computer).80" size="0x2000" crc="7d6f3603" sha1="de21f955e58bea6c363e1a9f27097ffc4e330727"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3855,7 +3855,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="tapper (1984)(u.s. gold).80" size="0x4000" crc="b002b920" sha1="e1c21df18ccc35f7289c40df4663342eccd5d9f5" offset="0x0000" />
+				<rom name="tapper (1984)(u.s. gold).80" size="0x4000" crc="b002b920" sha1="e1c21df18ccc35f7289c40df4663342eccd5d9f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3868,7 +3868,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tenpins (1989)(entertainment software).80" size="0x2000" crc="2dedb7f4" sha1="7bd4dd908319651af16817ff7a68d9e39755674d" offset="0x0000" />
+				<rom name="tenpins (1989)(entertainment software).80" size="0x2000" crc="2dedb7f4" sha1="7bd4dd908319651af16817ff7a68d9e39755674d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3881,7 +3881,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="threshold (1983)(sierra online).80" size="0x2000" crc="f66076b8" sha1="8f577f3174c67b69dc74402bdd52f43fd7ef8f86" offset="0x0000" />
+				<rom name="threshold (1983)(sierra online).80" size="0x2000" crc="f66076b8" sha1="8f577f3174c67b69dc74402bdd52f43fd7ef8f86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3894,7 +3894,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="timebound (1984)(cbs software).80" size="0x4000" crc="00b287b4" sha1="457c8d9178888f966b61106b4245f36c155557c2" offset="0x0000" />
+				<rom name="timebound (1984)(cbs software).80" size="0x4000" crc="00b287b4" sha1="457c8d9178888f966b61106b4245f36c155557c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3911,11 +3911,11 @@
 			<feature name="game" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="325426-01.u1" size="0x2000" crc="06ae3f28" sha1="5f85f3b88bf686c917a1e529527a3f811841d496" offset="0x0000" />
+				<rom name="325426-01.u1" size="0x2000" crc="06ae3f28" sha1="5f85f3b88bf686c917a1e529527a3f811841d496"/>
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="325427-01.u2" size="0x2000" crc="31479d4a" sha1="fef92e461a8d2cc0be46e263d6d510bf197bc8f3" offset="0x0000" />
+				<rom name="325427-01.u2" size="0x2000" crc="31479d4a" sha1="fef92e461a8d2cc0be46e263d6d510bf197bc8f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3929,7 +3929,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="toy bizarre (1984)(activision).80" size="0x4000" crc="140a30a5" sha1="db6d3df88ecaebd35ac1656998beff0bd37714af" offset="0x0000" />
+				<rom name="toy bizarre (1984)(activision).80" size="0x4000" crc="140a30a5" sha1="db6d3df88ecaebd35ac1656998beff0bd37714af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3942,7 +3942,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="trashman (1983)(creative software).80" size="0x2000" crc="a4dba36a" sha1="d30cc143c0101a836f0e1f34376f305da494d2da" offset="0x0000" />
+				<rom name="trashman (1983)(creative software).80" size="0x2000" crc="a4dba36a" sha1="d30cc143c0101a836f0e1f34376f305da494d2da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3955,7 +3955,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tsi cycles (1983)(turbo software).80" size="0x2000" crc="424637ec" sha1="d168a81e36da5f1d0e05f0a5cf69c59e67b252fc" offset="0x0000" />
+				<rom name="tsi cycles (1983)(turbo software).80" size="0x2000" crc="424637ec" sha1="d168a81e36da5f1d0e05f0a5cf69c59e67b252fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3968,7 +3968,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="turbo maze man (1983)(turbo software).80" size="0x2000" crc="e64df519" sha1="eeeebb1128fafb848c12bfc3aed5fba53ef84d0a" offset="0x0000" />
+				<rom name="turbo maze man (1983)(turbo software).80" size="0x2000" crc="e64df519" sha1="eeeebb1128fafb848c12bfc3aed5fba53ef84d0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3981,7 +3981,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tyler's dungeon (1984)(turbo software).80" size="0x2000" crc="002d1ff6" sha1="1f005dca57a8004a45eb797e49dde0740ef8ed16" offset="0x0000" />
+				<rom name="tyler's dungeon (1984)(turbo software).80" size="0x2000" crc="002d1ff6" sha1="1f005dca57a8004a45eb797e49dde0740ef8ed16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3994,7 +3994,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="ultrex quadro maze (1983)(turbo software).80" size="0x2000" crc="f9b70373" sha1="6f15f0b7548d05331ca1028fe18dc02c4537c17d" offset="0x0000" />
+				<rom name="ultrex quadro maze (1983)(turbo software).80" size="0x2000" crc="f9b70373" sha1="6f15f0b7548d05331ca1028fe18dc02c4537c17d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4009,7 +4009,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="up 'n add 'em (1984)(fisher price).80" size="0x2000" crc="b302c395" sha1="6ae46da8e59c2be2289175f0e453b2ad8c0425c7" offset="0x0000" />
+				<rom name="up 'n add 'em (1984)(fisher price).80" size="0x2000" crc="b302c395" sha1="6ae46da8e59c2be2289175f0e453b2ad8c0425c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4023,7 +4023,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="up 'n down (1984)(sega).80" size="0x4000" crc="4a15edd9" sha1="2e594571cd4535bbd99235d2f885c305ad2c7b79" offset="0x0000" />
+				<rom name="up 'n down (1984)(sega).80" size="0x4000" crc="4a15edd9" sha1="2e594571cd4535bbd99235d2f885c305ad2c7b79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4036,7 +4036,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="up for grabs (1983)(spinnaker software).80" size="0x2000" crc="a9051f96" sha1="27b3a532fdc3b164c0e577a61d31186acf01500e" offset="0x0000" />
+				<rom name="up for grabs (1983)(spinnaker software).80" size="0x2000" crc="a9051f96" sha1="27b3a532fdc3b164c0e577a61d31186acf01500e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4049,7 +4049,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="utah counties tutorial (1984)(s.m. thorpe).80" size="0x2000" crc="7b7d06c6" sha1="62e270e33d3aafdf13b62dac246f727e1a5320cc" offset="0x0000" />
+				<rom name="utah counties tutorial (1984)(s.m. thorpe).80" size="0x2000" crc="7b7d06c6" sha1="62e270e33d3aafdf13b62dac246f727e1a5320cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4064,7 +4064,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="viduzzles - computerized jigsaw puzzles (1983)(commodore).80" size="0x4000" crc="f062806b" sha1="0a19ed2bd40fc3933e707f3b725edfe75ce68abd" offset="0x0000" />
+				<rom name="viduzzles - computerized jigsaw puzzles (1983)(commodore).80" size="0x4000" crc="f062806b" sha1="0a19ed2bd40fc3933e707f3b725edfe75ce68abd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4078,7 +4078,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="webster - the word game (1983)(cbs software).80" size="0x4000" crc="6a6e08ff" sha1="4da3191229a3b27f03acd8bce9523af38325abb8" offset="0x0000" />
+				<rom name="webster - the word game (1983)(cbs software).80" size="0x4000" crc="6a6e08ff" sha1="4da3191229a3b27f03acd8bce9523af38325abb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4092,7 +4092,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="wizard of id's wiztype, the (1984)(sierra online).80" size="0x4000" crc="62ae5d16" sha1="34d6b54dc4811beb713e2d79afcda81b734d5f04" offset="0x0000" />
+				<rom name="wizard of id's wiztype, the (1984)(sierra online).80" size="0x4000" crc="62ae5d16" sha1="34d6b54dc4811beb713e2d79afcda81b734d5f04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4107,7 +4107,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="wizard of wor (1984)(commodore).80" size="0x4000" crc="2717b789" sha1="1dc18920c9c3869f321da3fec1e29e7483487808" offset="0x0000" />
+				<rom name="wizard of wor (1984)(commodore).80" size="0x4000" crc="2717b789" sha1="1dc18920c9c3869f321da3fec1e29e7483487808"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4121,7 +4121,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="zenji (1984)(activision).80" size="0x4000" crc="4969f343" sha1="d6fb969bfdbd4a150189845665258ca099a52e05" offset="0x0000" />
+				<rom name="zenji (1984)(activision).80" size="0x4000" crc="4969f343" sha1="d6fb969bfdbd4a150189845665258ca099a52e05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4135,7 +4135,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="zone ranger (1984)(activision).80" size="0x4000" crc="2beb55aa" sha1="2a620fb4c2daeee7927e65032d11ca0131368269" offset="0x0000" />
+				<rom name="zone ranger (1984)(activision).80" size="0x4000" crc="2beb55aa" sha1="2a620fb4c2daeee7927e65032d11ca0131368269"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4149,7 +4149,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="after the war (1990)(dinamic).80" size="0x20000" crc="2f060e57" sha1="a43d134afcdf323b8508fb6cbd976f79626a1f1c" offset="0x0000" />
+				<rom name="after the war (1990)(dinamic).80" size="0x20000" crc="2f060e57" sha1="a43d134afcdf323b8508fb6cbd976f79626a1f1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4163,7 +4163,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="aspar gp master (1989)(dinamic software) .80" size="0x20000" crc="95791415" sha1="4ad046b9e89c58d5e28c8f6a9fced2f2ff098443" offset="0x0000" />
+				<rom name="aspar gp master (1989)(dinamic software) .80" size="0x20000" crc="95791415" sha1="4ad046b9e89c58d5e28c8f6a9fced2f2ff098443"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4177,7 +4177,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="arcade classic pak (1984) (hes australia).80" size="0x10000" crc="6ca49853" sha1="a666a60cd420c5a92eedcd5f2033eb80b839e88d" offset="0x0000" />
+				<rom name="arcade classic pak (1984) (hes australia).80" size="0x10000" crc="6ca49853" sha1="a666a60cd420c5a92eedcd5f2033eb80b839e88d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4191,7 +4191,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="badlands (1990)(domark).80" size="0x10000" crc="9a925fa1" sha1="f245d21afd77f9ed8175d5de9126f5ba1528ba87" offset="0x0000" />
+				<rom name="badlands (1990)(domark).80" size="0x10000" crc="9a925fa1" sha1="f245d21afd77f9ed8175d5de9126f5ba1528ba87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4205,7 +4205,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="batman - the movie (1989)(ocean).80" size="0x20000" crc="6dbd768d" sha1="c74aaeb5b7f92eee7a8e8e2bb6091516d62adf21" offset="0x0000" />
+				<rom name="batman - the movie (1989)(ocean).80" size="0x20000" crc="6dbd768d" sha1="c74aaeb5b7f92eee7a8e8e2bb6091516d62adf21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4219,7 +4219,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="battle command (1991)(ocean).80" size="0x20000" crc="17755bb7" sha1="e3bbfc7b6759d749d9731e88ff2e6f844ab58aa0" offset="0x0000" />
+				<rom name="battle command (1991)(ocean).80" size="0x20000" crc="17755bb7" sha1="e3bbfc7b6759d749d9731e88ff2e6f844ab58aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4234,7 +4234,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
-				<rom name="commodore 64 game system (1990)(commodore).80" size="0x80000" crc="7f018fd9" sha1="9b8481051c067fa028f81fd6a79e2edd30ca0371" offset="0x0000" />
+				<rom name="commodore 64 game system (1990)(commodore).80" size="0x80000" crc="7f018fd9" sha1="9b8481051c067fa028f81fd6a79e2edd30ca0371"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4248,7 +4248,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="cyberball - football in the 21st century (1990)(domark).80" size="0x20000" crc="3b395125" sha1="dedaa36c9524b46340b2dd496f9267f4623a17e7" offset="0x0000" />
+				<rom name="cyberball - football in the 21st century (1990)(domark).80" size="0x20000" crc="3b395125" sha1="dedaa36c9524b46340b2dd496f9267f4623a17e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4262,7 +4262,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="double dragon (1991)(ocean).80" size="0x20000" crc="8a6f28de" sha1="4004f4f7e27d4c54590fc5c0b404936914507c78" offset="0x0000" />
+				<rom name="double dragon (1991)(ocean).80" size="0x20000" crc="8a6f28de" sha1="4004f4f7e27d4c54590fc5c0b404936914507c78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4276,7 +4276,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="double dragon (1989)(melbourne house).80" size="0x20000" crc="c6768215" sha1="28a71db9115a342c5853df499d25dd5a7a0cf6c2" offset="0x0000" />
+				<rom name="double dragon (1989)(melbourne house).80" size="0x20000" crc="c6768215" sha1="28a71db9115a342c5853df499d25dd5a7a0cf6c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4290,7 +4290,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="fort apocalypse (1982)(synapse)[pirate].80" size="0x4000" crc="72699f23" sha1="dd83317c27d57354cffde40fea3002064684ca98" offset="0x0000" />
+				<rom name="fort apocalypse (1982)(synapse)[pirate].80" size="0x4000" crc="72699f23" sha1="dd83317c27d57354cffde40fea3002064684ca98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4304,7 +4304,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="fun play - 3-in-1 (1990)(the disc company &amp; codemasters).80" size="0x20000" crc="e64a6bb3" sha1="ac5f224fc8ec602632ac8b26670c5fe044a9728d" offset="0x0000" />
+				<rom name="fun play - 3-in-1 (1990)(the disc company &amp; codemasters).80" size="0x20000" crc="e64a6bb3" sha1="ac5f224fc8ec602632ac8b26670c5fe044a9728d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4318,7 +4318,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="ghostbusters (1984)(activision).80" size="0x8000" crc="f56b3baf" sha1="d7f03289d8a81025aa3f3d9d72fe3ebc849dcdbf" offset="0x0000" />
+				<rom name="ghostbusters (1984)(activision).80" size="0x8000" crc="f56b3baf" sha1="d7f03289d8a81025aa3f3d9d72fe3ebc849dcdbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4332,7 +4332,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="kung-fu master (1985)(data east).80" size="0x8000" crc="49244d56" sha1="762e1876bf277e09be80b5a3b648560c4f029a8d" offset="0x0000" />
+				<rom name="kung-fu master (1985)(data east).80" size="0x8000" crc="49244d56" sha1="762e1876bf277e09be80b5a3b648560c4f029a8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4346,7 +4346,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
-				<rom name="last ninja remix, the (1990)(system 3).80" size="0x80000" crc="9e0be015" sha1="dc83c6228e287ae7d7320762c9898da0059fb84a" offset="0x0000" />
+				<rom name="last ninja remix, the (1990)(system 3).80" size="0x80000" crc="9e0be015" sha1="dc83c6228e287ae7d7320762c9898da0059fb84a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4360,7 +4360,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="leaderboard golf (1986)(access).80" size="0x8000" crc="c7b78d7c" sha1="a4d699cfae124817c3fcc51a2578eb2ea380ac7d" offset="0x0000" />
+				<rom name="leaderboard golf (1986)(access).80" size="0x8000" crc="c7b78d7c" sha1="a4d699cfae124817c3fcc51a2578eb2ea380ac7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4374,7 +4374,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
-				<rom name="megafun (2004)(entertainment software).80" size="0x8000" crc="51836cca" sha1="3d763d4a9bd4b366a411ec797bfda1bb77214147" offset="0x0000" />
+				<rom name="megafun (2004)(entertainment software).80" size="0x8000" crc="51836cca" sha1="3d763d4a9bd4b366a411ec797bfda1bb77214147"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4388,7 +4388,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
-				<rom name="myth - history in the making (1990)(system 3).80" size="0x80000" crc="15197217" sha1="9a621b0c76d32765387fca990924be73b98bedea" offset="0x0000" />
+				<rom name="myth - history in the making (1990)(system 3).80" size="0x80000" crc="15197217" sha1="9a621b0c76d32765387fca990924be73b98bedea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4402,7 +4402,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="narco police (19xx)(dinamic software).80" size="0x20000" crc="2913e971" sha1="f2fdfa3fae140dd88d8505aa9467d42921345bcc" offset="0x0000" />
+				<rom name="narco police (19xx)(dinamic software).80" size="0x20000" crc="2913e971" sha1="f2fdfa3fae140dd88d8505aa9467d42921345bcc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4416,7 +4416,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="navy seals (1990)(ocean).80" size="0x20000" crc="e9b35896" sha1="0ccab1900df683d7f467fed49f92e98f03c3e393" offset="0x0000" />
+				<rom name="navy seals (1990)(ocean).80" size="0x20000" crc="e9b35896" sha1="0ccab1900df683d7f467fed49f92e98f03c3e393"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4430,7 +4430,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="pang (1991)(ocean).80" size="0x20000" crc="2c06b009" sha1="879f85bdcfd115599f18ee7e4718aae9d1e4ba8b" offset="0x0000" />
+				<rom name="pang (1991)(ocean).80" size="0x20000" crc="2c06b009" sha1="879f85bdcfd115599f18ee7e4718aae9d1e4ba8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4444,7 +4444,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="park patrol (1984)(activision).80" size="0x8000" crc="25ba6582" sha1="35f5c4dbdc01f6ebfd438009ee7d607be3af86cd" offset="0x0000" />
+				<rom name="park patrol (1984)(activision).80" size="0x8000" crc="25ba6582" sha1="35f5c4dbdc01f6ebfd438009ee7d607be3af86cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4458,7 +4458,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="power play (1990)(the disc company &amp; microprose).80" size="0x20000" crc="0fb42a34" sha1="48a8112b575e9b267af96d1157d3274317dc4049" offset="0x0000" />
+				<rom name="power play (1990)(the disc company &amp; microprose).80" size="0x20000" crc="0fb42a34" sha1="48a8112b575e9b267af96d1157d3274317dc4049"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4472,10 +4472,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="robocop 2 (1990)(ocean).80" size="0x20000" crc="30185781" sha1="6a57a9a796a63fc572ab69fdc566d7ba767f1507" offset="0x0000" />
+				<rom name="robocop 2 (1990)(ocean).80" size="0x20000" crc="30185781" sha1="6a57a9a796a63fc572ab69fdc566d7ba767f1507"/>
 			</dataarea>
 			<dataarea name="romh" size="0x20000">
-				<rom name="robocop 2 (1990)(ocean).a0" size="0x20000" crc="a0c2d4dc" sha1="d7980460855d77edaf6ceb05e0bdc04a12caf551" offset="0x0000" />
+				<rom name="robocop 2 (1990)(ocean).a0" size="0x20000" crc="a0c2d4dc" sha1="d7980460855d77edaf6ceb05e0bdc04a12caf551"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4489,7 +4489,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="robocop 3 (1992)(ocean software).80" size="0x20000" crc="ed9a36df" sha1="a15178958bd8c0503edd6caa631feb7b4b386fda" offset="0x0000" />
+				<rom name="robocop 3 (1992)(ocean software).80" size="0x20000" crc="ed9a36df" sha1="a15178958bd8c0503edd6caa631feb7b4b386fda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4503,7 +4503,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="satan (1990)(dinamic software).80" size="0x20000" crc="2412a3bc" sha1="32f269247413dd73a4dc9efa29c21a2d5c910020" offset="0x0000" />
+				<rom name="satan (1990)(dinamic software).80" size="0x20000" crc="2412a3bc" sha1="32f269247413dd73a4dc9efa29c21a2d5c910020"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4517,10 +4517,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="shadow of the beast (1990)(ocean).80" size="0x20000" crc="ed86ca65" sha1="8bfc1099b47636828dfe6377128fef00ec377a6d" offset="0x0000" />
+				<rom name="shadow of the beast (1990)(ocean).80" size="0x20000" crc="ed86ca65" sha1="8bfc1099b47636828dfe6377128fef00ec377a6d"/>
 			</dataarea>
 			<dataarea name="romh" size="0x20000">
-				<rom name="shadow of the beast (1990)(ocean).a0" size="0x20000" crc="ac9c5ea0" sha1="861939c5d0859b85f9569b6533d37f427c7ca9ab" offset="0x0000" />
+				<rom name="shadow of the beast (1990)(ocean).a0" size="0x20000" crc="ac9c5ea0" sha1="861939c5d0859b85f9569b6533d37f427c7ca9ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4534,7 +4534,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="space gun (1992)(ocean).80" size="0x20000" crc="3eeddf3f" sha1="afe673ead1eaa947b94942b420f87960e0db4641" offset="0x0000" />
+				<rom name="space gun (1992)(ocean).80" size="0x20000" crc="3eeddf3f" sha1="afe673ead1eaa947b94942b420f87960e0db4641"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4548,10 +4548,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x1000">
-				<rom name="super zaxxon (1984)(hesware).80" size="0x1000" crc="bf888d1c" sha1="49d639e18b0a18978a7718c8e0cc5a8ba562c561" offset="0x0000" />
+				<rom name="super zaxxon (1984)(hesware).80" size="0x1000" crc="bf888d1c" sha1="49d639e18b0a18978a7718c8e0cc5a8ba562c561"/>
 			</dataarea>
 			<dataarea name="romh" size="0x4000">
-				<rom name="super zaxxon (1984)(hesware).a0" size="0x4000" crc="85c3e5b7" sha1="dfb582dd3beeb56a1298a3a800a4d13905104b7b" offset="0x0000" />
+				<rom name="super zaxxon (1984)(hesware).a0" size="0x4000" crc="85c3e5b7" sha1="dfb582dd3beeb56a1298a3a800a4d13905104b7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4565,7 +4565,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
-				<rom name="terminator 2 multicart (1991)(-).80" size="0x80000" crc="c0114678" sha1="bde34a5aa004b66cab4be9d770629f795c1d5644" offset="0x0000" />
+				<rom name="terminator 2 multicart (1991)(-).80" size="0x80000" crc="c0114678" sha1="bde34a5aa004b66cab4be9d770629f795c1d5644"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4579,7 +4579,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
-				<rom name="toki (1991)(ocean).80" size="0x20000" crc="1f148c97" sha1="123cd6768de4c4406e1026c41c9ba441d42fe966" offset="0x0000" />
+				<rom name="toki (1991)(ocean).80" size="0x20000" crc="1f148c97" sha1="123cd6768de4c4406e1026c41c9ba441d42fe966"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4593,7 +4593,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="tournament tennis (1984)(imagic).80" size="0x8000" crc="ff4bed62" sha1="5d03f693ef82e067324dcf23d446fff83868d043" offset="0x0000" />
+				<rom name="tournament tennis (1984)(imagic).80" size="0x8000" crc="ff4bed62" sha1="5d03f693ef82e067324dcf23d446fff83868d043"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4607,7 +4607,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="vindicators (1990)(domark).80" size="0x10000" crc="86f69114" sha1="455c43cfba50af7ecf277cd77dbdd9d11fad72d2" offset="0x0000" />
+				<rom name="vindicators (1990)(domark).80" size="0x10000" crc="86f69114" sha1="455c43cfba50af7ecf277cd77dbdd9d11fad72d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4621,7 +4621,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="wonderboy (1987)(activision).80" size="0x10000" crc="9de80450" sha1="5e5599a7fde0e290ab1f9f2e28e11103570833f1" offset="0x0000" />
+				<rom name="wonderboy (1987)(activision).80" size="0x10000" crc="9de80450" sha1="5e5599a7fde0e290ab1f9f2e28e11103570833f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4635,10 +4635,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x1000">
-				<rom name="zaxxon (1984)(synapse).80" size="0x1000" crc="499ea478" sha1="da15b8a9f92e26b5650a1950abafc498cc6f78fb" offset="0x0000" />
+				<rom name="zaxxon (1984)(synapse).80" size="0x1000" crc="499ea478" sha1="da15b8a9f92e26b5650a1950abafc498cc6f78fb"/>
 			</dataarea>
 			<dataarea name="romh" size="0x4000">
-				<rom name="zaxxon (1984)(synapse).a0" size="0x4000" crc="9890c4e1" sha1="0beda1c7d08b797a76cbb7d7c92bbcc137633715" offset="0x0000" />
+				<rom name="zaxxon (1984)(synapse).a0" size="0x4000" crc="9890c4e1" sha1="0beda1c7d08b797a76cbb7d7c92bbcc137633715"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4653,7 +4653,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="128er quickload (19xx)(conrad eletronics).80" size="0x2000" crc="25e3e811" sha1="7a3ab3f8f00cf2c82f31bdce264f9384ce4dfd8d" offset="0x0000" />
+				<rom name="128er quickload (19xx)(conrad eletronics).80" size="0x2000" crc="25e3e811" sha1="7a3ab3f8f00cf2c82f31bdce264f9384ce4dfd8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4667,7 +4667,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="256k eprom system rev 5 (19xx)(dela elektronik)(ger).80" size="0x2000" crc="0a3c1ab6" sha1="4f7c10b284f78a3af502460a84b3fcfbe7ef92fe" offset="0x0000" />
+				<rom name="256k eprom system rev 5 (19xx)(dela elektronik)(ger).80" size="0x2000" crc="0a3c1ab6" sha1="4f7c10b284f78a3af502460a84b3fcfbe7ef92fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4681,7 +4681,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dela-ep64.bin" size="0x2000" crc="9c431173" sha1="a28a4d902f7e03bc7e3ee638620d5467c0dd2ddd" offset="0x0000" />
+				<rom name="dela-ep64.bin" size="0x2000" crc="9c431173" sha1="a28a4d902f7e03bc7e3ee638620d5467c0dd2ddd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4694,7 +4694,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="64 doctor (1988)(trilogic).80" size="0x2000" crc="c17c2ee6" sha1="17d1b82b8dbdcf6b9e599ab1113f767dd4f39bf7" offset="0x0000" />
+				<rom name="64 doctor (1988)(trilogic).80" size="0x2000" crc="c17c2ee6" sha1="17d1b82b8dbdcf6b9e599ab1113f767dd4f39bf7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4707,7 +4707,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="64-diary (1983)(handic software).80" size="0x2000" crc="5ab59be4" sha1="010f9a3f43eb15eea1ed325a16756378b55aec69" offset="0x0000" />
+				<rom name="64-diary (1983)(handic software).80" size="0x2000" crc="5ab59be4" sha1="010f9a3f43eb15eea1ed325a16756378b55aec69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4720,7 +4720,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="64forth v1.2 (1983)(hesware).80" size="0x4000" crc="2a529b6d" sha1="8bac0271e6743de3d8726c7395cad876ea0c9630" offset="0x0000" />
+				<rom name="64forth v1.2 (1983)(hesware).80" size="0x4000" crc="2a529b6d" sha1="8bac0271e6743de3d8726c7395cad876ea0c9630"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4733,7 +4733,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="64mon v1.03 (19xx)(-).80" size="0x2000" crc="548a5f53" sha1="1b626cc055e5c59e852cb89ab3d6eefb57f78efd" offset="0x0000" />
+				<rom name="64mon v1.03 (19xx)(-).80" size="0x2000" crc="548a5f53" sha1="1b626cc055e5c59e852cb89ab3d6eefb57f78efd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4746,7 +4746,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="basex (1989)(peter finch).80" size="0x2000" crc="447f02ee" sha1="a33d1a5a9baeba2909153191cb9315fd89991cf8" offset="0x0000" />
+				<rom name="basex (1989)(peter finch).80" size="0x2000" crc="447f02ee" sha1="a33d1a5a9baeba2909153191cb9315fd89991cf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4759,7 +4759,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="black copy box (19xx)(-).80" size="0x2000" crc="4ff6d1db" sha1="7b44bc4b34be177319da89eed93f7c18aae4ed02" offset="0x0000" />
+				<rom name="black copy box (19xx)(-).80" size="0x2000" crc="4ff6d1db" sha1="7b44bc4b34be177319da89eed93f7c18aae4ed02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4772,7 +4772,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="0" />
 			<dataarea name="romh" size="0x2000">
-				<rom name="c64_dead_test_cartridge.bin" size="0x2000" crc="459fc13e" sha1="3bc1222252faa645f2485cbe16352fe23039cac3" offset="0x0000" />
+				<rom name="c64_dead_test_cartridge.bin" size="0x2000" crc="459fc13e" sha1="3bc1222252faa645f2485cbe16352fe23039cac3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4785,7 +4785,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="c-64 diagnostic rev 586220 (19xx)(commodore).80" size="0x2000" crc="9d22776e" sha1="b166bf4bfb82bfba5b2f9f5a1c38ee3ae40e2bf6" offset="0x0000" />
+				<rom name="c-64 diagnostic rev 586220 (19xx)(commodore).80" size="0x2000" crc="9d22776e" sha1="b166bf4bfb82bfba5b2f9f5a1c38ee3ae40e2bf6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4798,7 +4798,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="c-64 import test diag (198x)(-).80" size="0x2000" crc="7f4db81f" sha1="9961fc09b8452bfc8288991b47852b9fde1f9c46" offset="0x0000" />
+				<rom name="c-64 import test diag (198x)(-).80" size="0x2000" crc="7f4db81f" sha1="9961fc09b8452bfc8288991b47852b9fde1f9c46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4813,7 +4813,7 @@
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dei-356nr-wrpiida1.u2" size="0x4000" crc="c5dd7720" sha1="062ea091bf085b09ce8ea85a9a498734b9138906" offset="0x0000" />
+				<rom name="dei-356nr-wrpiida1.u2" size="0x4000" crc="c5dd7720" sha1="062ea091bf085b09ce8ea85a9a498734b9138906"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4828,7 +4828,7 @@
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="c-64 warpspeed! v1.0 (1987)(alien technology).80" size="0x4000" crc="986f61b8" sha1="31d7b7f864904deb947db3658d7da691b4db4fc2" offset="0x0000" />
+				<rom name="c-64 warpspeed! v1.0 (1987)(alien technology).80" size="0x4000" crc="986f61b8" sha1="31d7b7f864904deb947db3658d7da691b4db4fc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4841,7 +4841,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="c.c.s. mon (1986)(h. sundell).80" size="0x2000" crc="16c3a0cd" sha1="c27eb2b111f96752af6ca8d13a2124db259a08fe" offset="0x0000" />
+				<rom name="c.c.s. mon (1986)(h. sundell).80" size="0x2000" crc="16c3a0cd" sha1="c27eb2b111f96752af6ca8d13a2124db259a08fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4855,7 +4855,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="c64 diagnostic (19xx)(commodore).80" size="0x2000" crc="5376a162" sha1="86f968606edca8edc2036462eb06f51ebc8f66f9" offset="0x0000" />
+				<rom name="c64 diagnostic (19xx)(commodore).80" size="0x2000" crc="5376a162" sha1="86f968606edca8edc2036462eb06f51ebc8f66f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4868,7 +4868,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="commodorediagrev410.bin" size="0x2000" crc="9d1a9181" sha1="5800219da86c00e583f7100e91febe528208ec46" offset="0x0000" />
+				<rom name="commodorediagrev410.bin" size="0x2000" crc="9d1a9181" sha1="5800219da86c00e583f7100e91febe528208ec46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4881,7 +4881,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="calc result (1983)(handic software).80" size="0x2000" crc="18fb50c0" sha1="d5a1c81357d4867e5179dec617a8eaff8f8dc38b" offset="0x0000" />
+				<rom name="calc result (1983)(handic software).80" size="0x2000" crc="18fb50c0" sha1="d5a1c81357d4867e5179dec617a8eaff8f8dc38b"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -4899,7 +4899,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="cbm 64 stat (1983)(handic software).80" size="0x2000" crc="6f3cdd2e" sha1="c8083baea27d0c2afb00fe682aae1d736ff7751e" offset="0x0000" />
+				<rom name="cbm 64 stat (1983)(handic software).80" size="0x2000" crc="6f3cdd2e" sha1="c8083baea27d0c2afb00fe682aae1d736ff7751e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4912,7 +4912,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="cbm 64 stat (1982)(handic software)(ger).80" size="0x2000" crc="4e32d607" sha1="e253ee39446125af87a0e85fa70ae709cee2a12e" offset="0x0000" />
+				<rom name="cbm 64 stat (1982)(handic software)(ger).80" size="0x2000" crc="4e32d607" sha1="e253ee39446125af87a0e85fa70ae709cee2a12e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4925,7 +4925,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="cbm-64 muistio (19xx)(handic software)(fin).80" size="0x2000" crc="158376e7" sha1="d0f51f99693ac26b7f31cdf46880d94d752d8a2d" offset="0x0000" />
+				<rom name="cbm-64 muistio (19xx)(handic software)(fin).80" size="0x2000" crc="158376e7" sha1="d0f51f99693ac26b7f31cdf46880d94d752d8a2d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4938,7 +4938,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="conrad disk booster (19xx)(-)(ger).80" size="0x2000" crc="942d703e" sha1="707b0b121eaf249b9fa5d778bf5e6b254d2608e1" offset="0x0000" />
+				<rom name="conrad disk booster (19xx)(-)(ger).80" size="0x2000" crc="942d703e" sha1="707b0b121eaf249b9fa5d778bf5e6b254d2608e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4952,7 +4952,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="copy card (1988)(puma-sharks).80" size="0x2000" crc="a2df70e1" sha1="cbe987a48a9c288cb1384e17a9faabe851ba8416" offset="0x0000" />
+				<rom name="copy card (1988)(puma-sharks).80" size="0x2000" crc="a2df70e1" sha1="cbe987a48a9c288cb1384e17a9faabe851ba8416"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4965,7 +4965,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dela s4 modul (19xx)(dela elektronik).80" size="0x2000" crc="f3988344" sha1="0d373df666f6cbb013a4fc97f6dade84f73407e5" offset="0x0000" />
+				<rom name="dela s4 modul (19xx)(dela elektronik).80" size="0x2000" crc="f3988344" sha1="0d373df666f6cbb013a4fc97f6dade84f73407e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4978,10 +4978,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dela_80_steuerprogram.bin" size="0x2000" crc="3033f87a" sha1="f5dbeee929a5b168ba43ea0e1a8b621ba944c32e" offset="0x0000" />
+				<rom name="dela_80_steuerprogram.bin" size="0x2000" crc="3033f87a" sha1="f5dbeee929a5b168ba43ea0e1a8b621ba944c32e"/>
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="dela_80_zeichensatz.bin" size="0x2000" crc="8b6b24ae" sha1="beb85d8c22a1430aaed9884af16b429f7ff123e0" offset="0x0000" />
+				<rom name="dela_80_zeichensatz.bin" size="0x2000" crc="8b6b24ae" sha1="beb85d8c22a1430aaed9884af16b429f7ff123e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4994,7 +4994,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="delta drawing v3.23 (1983)(spinnaker software).80" size="0x4000" crc="2b3224a8" sha1="b8e1186d1b01e98836adb458cca929079db07c98" offset="0x0000" />
+				<rom name="delta drawing v3.23 (1983)(spinnaker software).80" size="0x4000" crc="2b3224a8" sha1="b8e1186d1b01e98836adb458cca929079db07c98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5007,7 +5007,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="designer's pencil, the (1984)(activision).80" size="0x4000" crc="0814b3ca" sha1="aefc9809610d9eda9827a05f9a5c5882d2000e03" offset="0x0000" />
+				<rom name="designer's pencil, the (1984)(activision).80" size="0x4000" crc="0814b3ca" sha1="aefc9809610d9eda9827a05f9a5c5882d2000e03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5020,7 +5020,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="doc '64 v2.2 (19xx)(n. heusler).80" size="0x2000" crc="d58a6007" sha1="04bbb9deefdf77fa938545c04f2dd3f00dad38bf" offset="0x0000" />
+				<rom name="doc '64 v2.2 (19xx)(n. heusler).80" size="0x2000" crc="d58a6007" sha1="04bbb9deefdf77fa938545c04f2dd3f00dad38bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5033,7 +5033,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dolphin dos copy rom (19xx)(-).80" size="0x2000" crc="bbd31b15" sha1="dea4313493412c9fbde3befdd67617009a67ed66" offset="0x0000" />
+				<rom name="dolphin dos copy rom (19xx)(-).80" size="0x2000" crc="bbd31b15" sha1="dea4313493412c9fbde3befdd67617009a67ed66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5046,7 +5046,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="electronic mailbox-64 (1984)(eastern house software).80" size="0x2000" crc="449dcb06" sha1="956ab17b1432823ac7ab7e49e77a6ce463c89ed5" offset="0x0000" />
+				<rom name="electronic mailbox-64 (1984)(eastern house software).80" size="0x2000" crc="449dcb06" sha1="956ab17b1432823ac7ab7e49e77a6ce463c89ed5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5060,7 +5060,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="emon v2.3 (1988)(cia).80" size="0x2000" crc="b45511f4" sha1="bcee8a9c78f3b94174ed1c047a59e12b1a959250" offset="0x0000" />
+				<rom name="emon v2.3 (1988)(cia).80" size="0x2000" crc="b45511f4" sha1="bcee8a9c78f3b94174ed1c047a59e12b1a959250"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5073,7 +5073,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="exbasic level ii v64.1 (1988)(markt &amp; technik).80" size="0x2000" crc="8962dd6e" sha1="4112b98795c02c4db93741bc6546a823eec5bed5" offset="0x0000" />
+				<rom name="exbasic level ii v64.1 (1988)(markt &amp; technik).80" size="0x2000" crc="8962dd6e" sha1="4112b98795c02c4db93741bc6546a823eec5bed5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5087,7 +5087,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="final coder, the (19xx)(-).80" size="0x2000" crc="2ae572b1" sha1="1f3c0b8825090805febe3c4449690a02b6c77244" offset="0x0000" />
+				<rom name="final coder, the (19xx)(-).80" size="0x2000" crc="2ae572b1" sha1="1f3c0b8825090805febe3c4449690a02b6c77244"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5100,7 +5100,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="financial advisor (1983)(commodore).80" size="0x2000" crc="cb1e6a4a" sha1="2da69234b4d60ae41453f8f6dcc118539f715267" offset="0x0000" />
+				<rom name="financial advisor (1983)(commodore).80" size="0x2000" crc="cb1e6a4a" sha1="2da69234b4d60ae41453f8f6dcc118539f715267"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5114,7 +5114,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="format und hardcopy module (19xx)(rex datentechnik)(ger).80" size="0x2000" crc="f8951609" sha1="17333af5e48ca3e76c0f151270d4b6d8f7623683" offset="0x0000" />
+				<rom name="format und hardcopy module (19xx)(rex datentechnik)(ger).80" size="0x2000" crc="f8951609" sha1="17333af5e48ca3e76c0f151270d4b6d8f7623683"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5127,7 +5127,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="graf 64 (19xx)(handic software).80" size="0x2000" crc="55d50bb8" sha1="aa480962cc486e2d6270005df6ca06b1514707f0" offset="0x0000" />
+				<rom name="graf 64 (19xx)(handic software).80" size="0x2000" crc="55d50bb8" sha1="aa480962cc486e2d6270005df6ca06b1514707f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5141,7 +5141,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="happy-packer (1987)(peter arndt)(ger).80" size="0x2000" crc="246959a4" sha1="c4f111d84f5d0bae1fb7163a393c97b2cc039f09" offset="0x0000" />
+				<rom name="happy-packer (1987)(peter arndt)(ger).80" size="0x2000" crc="246959a4" sha1="c4f111d84f5d0bae1fb7163a393c97b2cc039f09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5154,7 +5154,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hes mon 64 (1983)(hesware).80" size="0x2000" crc="fdcdc0a4" sha1="1055bd169c0de0b5ff0f351eaad0a0d6a159bd31" offset="0x0000" />
+				<rom name="hes mon 64 (1983)(hesware).80" size="0x2000" crc="fdcdc0a4" sha1="1055bd169c0de0b5ff0f351eaad0a0d6a159bd31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5167,7 +5167,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hes mon (prototype) (1983)(hesware).80" size="0x2000" crc="cf901afb" sha1="ebe57c03a53e46ece7e5210328c50e7c16a116b5" offset="0x0000" />
+				<rom name="hes mon (prototype) (1983)(hesware).80" size="0x2000" crc="cf901afb" sha1="ebe57c03a53e46ece7e5210328c50e7c16a116b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5180,7 +5180,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hes writer 64 (1982)(hesware).80" size="0x2000" crc="00d06822" sha1="d04cb8c29efe84c5ac556f88a725a7046fd44609" offset="0x0000" />
+				<rom name="hes writer 64 (1982)(hesware).80" size="0x2000" crc="00d06822" sha1="d04cb8c29efe84c5ac556f88a725a7046fd44609"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5193,7 +5193,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hes writer 64 (1982)(hesware)[a].80" size="0x2000" crc="8195c52c" sha1="ff6943367fb3f96d97ea83f7d8551cf76640c6e8" offset="0x0000" />
+				<rom name="hes writer 64 (1982)(hesware)[a].80" size="0x2000" crc="8195c52c" sha1="ff6943367fb3f96d97ea83f7d8551cf76640c6e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5206,7 +5206,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="high speed sektor backup v3.0 (1987)(rossmoeller)(ger).80" size="0x2000" crc="b7fbc466" sha1="a2618a93fa0fdc234acedad9cfff42531662c69e" offset="0x0000" />
+				<rom name="high speed sektor backup v3.0 (1987)(rossmoeller)(ger).80" size="0x2000" crc="b7fbc466" sha1="a2618a93fa0fdc234acedad9cfff42531662c69e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5220,7 +5220,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hires ripper v1.1 (19xx)(-).80" size="0x2000" crc="836c73ca" sha1="f24fc1fa9fe18a6f35818e8bb1e57eb5246d51de" offset="0x0000" />
+				<rom name="hires ripper v1.1 (19xx)(-).80" size="0x2000" crc="836c73ca" sha1="f24fc1fa9fe18a6f35818e8bb1e57eb5246d51de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5233,7 +5233,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hypra disk ii modul v3.0 (19xx)(rex datentechnik)(ger).80" size="0x2000" crc="373fe548" sha1="2f9bbe4c044a115b9773a434c8037b36272b7b0e" offset="0x0000" />
+				<rom name="hypra disk ii modul v3.0 (19xx)(rex datentechnik)(ger).80" size="0x2000" crc="373fe548" sha1="2f9bbe4c044a115b9773a434c8037b36272b7b0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5246,7 +5246,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="magic-mon (19xx)(champ-rocky).80" size="0x2000" crc="52c17bde" sha1="de66439779874d215aaf18433d0761a2eac84cdf" offset="0x0000" />
+				<rom name="magic-mon (19xx)(champ-rocky).80" size="0x2000" crc="52c17bde" sha1="de66439779874d215aaf18433d0761a2eac84cdf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5260,10 +5260,10 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="power cartridge (1985)(kcs dordecht).80" size="0x2000" crc="614df199" sha1="95cb3a44a686210e3c267fc7bcd91e4d85a7a1b7" offset="0x0000" />
+				<rom name="power cartridge (1985)(kcs dordecht).80" size="0x2000" crc="614df199" sha1="95cb3a44a686210e3c267fc7bcd91e4d85a7a1b7"/>
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="power cartridge (1985)(kcs dordecht).a0" size="0x2000" crc="4cfdd91d" sha1="ea4b8da879ff3f97b3c4a4ffecfe0a26d257ccad" offset="0x0000" />
+				<rom name="power cartridge (1985)(kcs dordecht).a0" size="0x2000" crc="4cfdd91d" sha1="ea4b8da879ff3f97b3c4a4ffecfe0a26d257ccad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5276,7 +5276,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="ram floppy v4.0 (1988)(rex datentechnik).80" size="0x2000" crc="92709ded" sha1="0db25a8400a755c552f5e74ab1d4b921d1b3b660" offset="0x0000" />
+				<rom name="ram floppy v4.0 (1988)(rex datentechnik).80" size="0x2000" crc="92709ded" sha1="0db25a8400a755c552f5e74ab1d4b921d1b3b660"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5290,10 +5290,10 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="317008-02" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d" offset="0x0000" />
+				<rom name="317008-02" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d"/>
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="317009-02" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9" offset="0x0000" />
+				<rom name="317009-02" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5306,7 +5306,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="super_basic_ram.bin" size="0x2000" crc="f92fe027" sha1="b0fd39d030244a1932031f1bb8f67cbf375b0b15" offset="0x0000" />
+				<rom name="super_basic_ram.bin" size="0x2000" crc="f92fe027" sha1="b0fd39d030244a1932031f1bb8f67cbf375b0b15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5319,7 +5319,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="speed dos copy rom (19xx)(-).80" size="0x2000" crc="b8cc5def" sha1="e49d7f791eeac016d3cedaa3ad325bce48d11ede" offset="0x0000" />
+				<rom name="speed dos copy rom (19xx)(-).80" size="0x2000" crc="b8cc5def" sha1="e49d7f791eeac016d3cedaa3ad325bce48d11ede"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5332,7 +5332,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="super hard-copy-modul, das (1987)(schlumph)(ger).80" size="0x2000" crc="37d57fd4" sha1="006e303095c1f969eef5ed89da5b4b11db4188c1" offset="0x0000" />
+				<rom name="super hard-copy-modul, das (1987)(schlumph)(ger).80" size="0x2000" crc="37d57fd4" sha1="006e303095c1f969eef5ed89da5b4b11db4188c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5345,7 +5345,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="super sketch (1984)(personal peripherals).80" size="0x2000" crc="831f8238" sha1="b9f792431b58a7a85f6db4324b1c20f53c033a8a" offset="0x0000" />
+				<rom name="super sketch (1984)(personal peripherals).80" size="0x2000" crc="831f8238" sha1="b9f792431b58a7a85f6db4324b1c20f53c033a8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5358,7 +5358,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="system-m1.0 (1993)(mousesoft)(ger).80" size="0x2000" crc="3a218fef" sha1="4fd2b2ef5a88e3423fae6da0eff4aeef27f19d6e" offset="0x0000" />
+				<rom name="system-m1.0 (1993)(mousesoft)(ger).80" size="0x2000" crc="3a218fef" sha1="4fd2b2ef5a88e3423fae6da0eff4aeef27f19d6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5371,7 +5371,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="teledata (1983)(handic software)(swe).80" size="0x2000" crc="c0db65d4" sha1="da38721734f60cfd871dec67f7d581edc7976c12" offset="0x0000" />
+				<rom name="teledata (1983)(handic software)(swe).80" size="0x2000" crc="c0db65d4" sha1="da38721734f60cfd871dec67f7d581edc7976c12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5385,7 +5385,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tfg module (1986)(t.f.g. software).80" size="0x2000" crc="19c9cc58" sha1="8e32db328bccbd03c614a16e81c26cea3b5d5c94" offset="0x0000" />
+				<rom name="tfg module (1986)(t.f.g. software).80" size="0x2000" crc="19c9cc58" sha1="8e32db328bccbd03c614a16e81c26cea3b5d5c94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5398,7 +5398,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tool-64 (1983)(micro application).80" size="0x2000" crc="d0ef6950" sha1="be85babeb7727a0c37e10d9939907736429c44ea" offset="0x0000" />
+				<rom name="tool-64 (1983)(micro application).80" size="0x2000" crc="d0ef6950" sha1="be85babeb7727a0c37e10d9939907736429c44ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5412,7 +5412,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tsi-eprom module (19xx)(-).80" size="0x2000" crc="7c7d67a4" sha1="a7378a793f8293b071bd2a0b13e2eeedc9bae98c" offset="0x0000" />
+				<rom name="tsi-eprom module (19xx)(-).80" size="0x2000" crc="7c7d67a4" sha1="a7378a793f8293b071bd2a0b13e2eeedc9bae98c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5425,7 +5425,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tysim 64 (1987)(kaudelka o.)(ger).80" size="0x2000" crc="8b73a429" sha1="f6a7f1fffc75a6e74a5630e97a477d36ba54666d" offset="0x0000" />
+				<rom name="tysim 64 (1987)(kaudelka o.)(ger).80" size="0x2000" crc="8b73a429" sha1="f6a7f1fffc75a6e74a5630e97a477d36ba54666d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5438,7 +5438,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="vic-text 64 (1983)(handic software)(swe).80" size="0x4000" crc="c2fa2bbb" sha1="2bfa4ea67be337de2762ca89452eb9134e75d6de" offset="0x0000" />
+				<rom name="vic-text 64 (1983)(handic software)(swe).80" size="0x4000" crc="c2fa2bbb" sha1="2bfa4ea67be337de2762ca89452eb9134e75d6de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5451,7 +5451,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="videotex (1984)(handic software).80" size="0x2000" crc="618e8643" sha1="48a33d43ff6ce039278af6aa02bebaca02475f60" offset="0x0000" />
+				<rom name="videotex (1984)(handic software).80" size="0x2000" crc="618e8643" sha1="48a33d43ff6ce039278af6aa02bebaca02475f60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5464,7 +5464,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="write now! 64 (1983)(computer applications).80" size="0x4000" crc="9a35343d" sha1="b5ad016343635b17f3f8ffdb37ad6bd7cf682702" offset="0x0000" />
+				<rom name="write now! 64 (1983)(computer applications).80" size="0x4000" crc="9a35343d" sha1="b5ad016343635b17f3f8ffdb37ad6bd7cf682702"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5478,7 +5478,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="one-pass backup v1.3 (19xx)(datel electronics).80" size="0x8000" crc="db145c61" sha1="e6f30726271d80754966b4a9ea241554faef06f4" offset="0x0000" />
+				<rom name="one-pass backup v1.3 (19xx)(datel electronics).80" size="0x8000" crc="db145c61" sha1="e6f30726271d80754966b4a9ea241554faef06f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5493,7 +5493,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="action_replay_mk2_1986_pal_v1.bin" size="0x4000" crc="3e4e14b3" sha1="72db456a8ef95c7e8d161c57438f210265910826" offset="0x0000" />
+				<rom name="action_replay_mk2_1986_pal_v1.bin" size="0x4000" crc="3e4e14b3" sha1="72db456a8ef95c7e8d161c57438f210265910826"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5508,7 +5508,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="action_replay_mk2_1986_pal_v2.bin" size="0x4000" crc="35e6fdf7" sha1="4bfa05e4036dc40e37f8b8e6fe089b3d5faacf5f" offset="0x0000" />
+				<rom name="action_replay_mk2_1986_pal_v2.bin" size="0x4000" crc="35e6fdf7" sha1="4bfa05e4036dc40e37f8b8e6fe089b3d5faacf5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5523,7 +5523,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="action_replay_mk3_1987_pal_v1.bin" size="0x4000" crc="a34ae7b4" sha1="9b1d88b4023f0b4d747e492dd691f934b7f02802" offset="0x0000" />
+				<rom name="action_replay_mk3_1987_pal_v1.bin" size="0x4000" crc="a34ae7b4" sha1="9b1d88b4023f0b4d747e492dd691f934b7f02802"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5538,7 +5538,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="action_replay_mk3_1987_pal_v2.bin" size="0x4000" crc="bc06a876" sha1="480847ac10ff5389ebfc0bcfdef2bdf53ee6fca9" offset="0x0000" />
+				<rom name="action_replay_mk3_1987_pal_v2.bin" size="0x4000" crc="bc06a876" sha1="480847ac10ff5389ebfc0bcfdef2bdf53ee6fca9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5553,7 +5553,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="action_replay_mk3_1987_pal_v2_diskmate.bin" size="0x4000" crc="af1044f5" sha1="4125421688ed431072c30adf04676f2c63eef77b" offset="0x0000" />
+				<rom name="action_replay_mk3_1987_pal_v2_diskmate.bin" size="0x4000" crc="af1044f5" sha1="4125421688ed431072c30adf04676f2c63eef77b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5568,7 +5568,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="niki_cartridge_fast-disktool.bin" size="0x4000" crc="b61a5f2d" sha1="c109a82744ad549293672875449e16db3c5c055b" offset="0x0000" />
+				<rom name="niki_cartridge_fast-disktool.bin" size="0x4000" crc="b61a5f2d" sha1="c109a82744ad549293672875449e16db3c5c055b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5583,7 +5583,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_mk4_1988_pal.bin" size="0x8000" crc="6bb818c3" sha1="1d7d781e2ee5d07b9c5401b930d3a932ec910eee" offset="0x0000" />
+				<rom name="action_replay_mk4_1988_pal.bin" size="0x8000" crc="6bb818c3" sha1="1d7d781e2ee5d07b9c5401b930d3a932ec910eee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5598,7 +5598,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="captain_miky_ii.bin" size="0x8000" crc="f1d41ce5" sha1="85463a016193759c08b293d169dd06114aa6e4aa" offset="0x0000" />
+				<rom name="captain_miky_ii.bin" size="0x8000" crc="f1d41ce5" sha1="85463a016193759c08b293d169dd06114aa6e4aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5613,7 +5613,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="captain_miky_ii_niki2_rename.bin" size="0x8000" crc="79221d63" sha1="958936df5f252cc47c4571a9b6fc2892fdac0b58" offset="0x0000" />
+				<rom name="captain_miky_ii_niki2_rename.bin" size="0x8000" crc="79221d63" sha1="958936df5f252cc47c4571a9b6fc2892fdac0b58"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5628,7 +5628,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v4.1_4.1_1988_pal.bin" size="0x8000" crc="9da71744" sha1="4fe322fb280333e009be146383b1d13c21536f58" offset="0x0000" />
+				<rom name="action_replay_v4.1_4.1_1988_pal.bin" size="0x8000" crc="9da71744" sha1="4fe322fb280333e009be146383b1d13c21536f58"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5643,7 +5643,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v4.2_4.0_1988_pal_v1.bin" size="0x8000" crc="befdaf75" sha1="477f5eebe4f3313256649bfc20c5cd52e5c6b059" offset="0x0000" />
+				<rom name="action_replay_v4.2_4.0_1988_pal_v1.bin" size="0x8000" crc="befdaf75" sha1="477f5eebe4f3313256649bfc20c5cd52e5c6b059"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5658,7 +5658,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v4.2_4.0_1988_pal_v2.bin" size="0x8000" crc="27c242f4" sha1="e05a57850f4031e0a0dc17e56bbb75573980d38a" offset="0x0000" />
+				<rom name="action_replay_v4.2_4.0_1988_pal_v2.bin" size="0x8000" crc="27c242f4" sha1="e05a57850f4031e0a0dc17e56bbb75573980d38a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5673,7 +5673,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v4.2_5.0_1988_pal_v1.bin" size="0x8000" crc="4b2e7d3a" sha1="6c384308290febf5ca4eedaf326d646f15a13c51" offset="0x0000" />
+				<rom name="action_replay_v4.2_5.0_1988_pal_v1.bin" size="0x8000" crc="4b2e7d3a" sha1="6c384308290febf5ca4eedaf326d646f15a13c51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5688,7 +5688,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v4.2_5.0_1988_pal_v2.bin" size="0x8000" crc="8a314329" sha1="5cd20a8cd30074da68d29df4a04ddd3add16a17a" offset="0x0000" />
+				<rom name="action_replay_v4.2_5.0_1988_pal_v2.bin" size="0x8000" crc="8a314329" sha1="5cd20a8cd30074da68d29df4a04ddd3add16a17a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5763,7 +5763,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v5.0_5.0_1988_pal.bin" size="0x8000" crc="55efec24" sha1="7ed920b9fa3865e2dc72ab1aac233e88a9dac439" offset="0x0000" />
+				<rom name="action_replay_v5.0_5.0_1988_pal.bin" size="0x8000" crc="55efec24" sha1="7ed920b9fa3865e2dc72ab1aac233e88a9dac439"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5778,7 +5778,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v5.0_5.0_1988_ntsc.bin" size="0x8000" crc="b08bed2a" sha1="894ab49f13e70203987e54b87f60b047ef910845" offset="0x0000" />
+				<rom name="action_replay_v5.0_5.0_1988_ntsc.bin" size="0x8000" crc="b08bed2a" sha1="894ab49f13e70203987e54b87f60b047ef910845"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5793,7 +5793,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v5.0_5.1a_pal_1988.bin" size="0x8000" crc="6c916f80" sha1="7ef39f320987d4bfddb499708795dfe8aebbce3b" offset="0x0000" />
+				<rom name="action_replay_v5.0_5.1a_pal_1988.bin" size="0x8000" crc="6c916f80" sha1="7ef39f320987d4bfddb499708795dfe8aebbce3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5808,7 +5808,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_cartridge_plus_v7.0_tkit90-derko_1991_pal.bin" size="0x8000" crc="2939b479" sha1="81a939c6e26e07fc6dd65080415d91fb9017bc6e" offset="0x0000" />
+				<rom name="action_cartridge_plus_v7.0_tkit90-derko_1991_pal.bin" size="0x8000" crc="2939b479" sha1="81a939c6e26e07fc6dd65080415d91fb9017bc6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5823,7 +5823,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_cartridge_plus_v7.0_tkit90-triumwyrat_1990_pal.bin" size="0x8000" crc="9103b894" sha1="3a778f256197cc0450357e2c5c11f90854515572" offset="0x0000" />
+				<rom name="action_cartridge_plus_v7.0_tkit90-triumwyrat_1990_pal.bin" size="0x8000" crc="9103b894" sha1="3a778f256197cc0450357e2c5c11f90854515572"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5838,7 +5838,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v7.5_7.5_1989_pal.bin" size="0x8000" crc="2fdc011f" sha1="564952475b92f0a452c5b58acd6a03ae85342297" offset="0x0000" />
+				<rom name="action_replay_v7.5_7.5_1989_pal.bin" size="0x8000" crc="2fdc011f" sha1="564952475b92f0a452c5b58acd6a03ae85342297"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5853,7 +5853,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v8.4_8.4_1990_pal.bin" size="0x8000" crc="ddc38bfc" sha1="431b46bd6303b3dc75714eb539a346bc25906cb5" offset="0x0000" />
+				<rom name="action_replay_v8.4_8.4_1990_pal.bin" size="0x8000" crc="ddc38bfc" sha1="431b46bd6303b3dc75714eb539a346bc25906cb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5868,7 +5868,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v5.0_bacchus_flt_1989_pal.bin" size="0x8000" crc="c37e1781" sha1="6b8b02eef0cfca2b1b470355b5614cceb9632cff" offset="0x0000" />
+				<rom name="action_replay_v5.0_bacchus_flt_1989_pal.bin" size="0x8000" crc="c37e1781" sha1="6b8b02eef0cfca2b1b470355b5614cceb9632cff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5883,7 +5883,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v6.0_triad_1993_pal.bin" size="0x8000" crc="795b50c4" sha1="4541bc60c04930c9de53ffb99e355c5cf0dbc5cb" offset="0x0000" />
+				<rom name="action_replay_v6.0_triad_1993_pal.bin" size="0x8000" crc="795b50c4" sha1="4541bc60c04930c9de53ffb99e355c5cf0dbc5cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5898,7 +5898,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v6.0_6.0_1989_pal.bin" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96" offset="0x0000" />
+				<rom name="action_replay_v6.0_6.0_1989_pal.bin" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6014,7 +6014,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="comal 80 (1985)(commodore).80" size="0x10000" crc="60f5b3c7" sha1="e51df2b88445b2a33bf77a021c9fb7d8872254ce" offset="0x0000" />
+				<rom name="comal 80 (1985)(commodore).80" size="0x10000" crc="60f5b3c7" sha1="e51df2b88445b2a33bf77a021c9fb7d8872254ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6028,7 +6028,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="comal 80 (1985)(commodore)[a].80" size="0x10000" crc="5b198f00" sha1="afb9ee78bb07444cdfd58eef75a33ec4026e3be1" offset="0x0000" />
+				<rom name="comal 80 (1985)(commodore)[a].80" size="0x10000" crc="5b198f00" sha1="afb9ee78bb07444cdfd58eef75a33ec4026e3be1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6042,7 +6042,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_1_v4_1986.bin" size="0x4000" crc="fb4c9356" sha1="d6391d5e3da908f53905f86190ad30dfaa615d39" offset="0x0000" />
+				<rom name="final_cartridge_1_v4_1986.bin" size="0x4000" crc="fb4c9356" sha1="d6391d5e3da908f53905f86190ad30dfaa615d39"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6071,7 +6071,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_1_v1_1986.bin" size="0x4000" crc="913036be" sha1="b2669cdc8de64d4311b44e49f5895c4887d2a9e1" offset="0x0000" />
+				<rom name="final_cartridge_1_v1_1986.bin" size="0x4000" crc="913036be" sha1="b2669cdc8de64d4311b44e49f5895c4887d2a9e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6085,7 +6085,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_1_v2_1986.bin" size="0x4000" crc="bfbe6ee6" sha1="b08216a5fde0866053ea255eb8ac65ad020f8c32" offset="0x0000" />
+				<rom name="final_cartridge_1_v2_1986.bin" size="0x4000" crc="bfbe6ee6" sha1="b08216a5fde0866053ea255eb8ac65ad020f8c32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6099,7 +6099,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_1_v3_1986.bin" size="0x4000" crc="30081860" sha1="28af9c1641301d9be02d589d3084e6ff551371ec" offset="0x0000" />
+				<rom name="final_cartridge_1_v3_1986.bin" size="0x4000" crc="30081860" sha1="28af9c1641301d9be02d589d3084e6ff551371ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6113,7 +6113,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_1_1986_killercart_texthack.bin" size="0x4000" crc="1dcb6380" sha1="c7815de1277a864e03307e7d5138c7167da46bd4" offset="0x0000" />
+				<rom name="final_cartridge_1_1986_killercart_texthack.bin" size="0x4000" crc="1dcb6380" sha1="c7815de1277a864e03307e7d5138c7167da46bd4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6127,7 +6127,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="the_ice_machine_1986.bin" size="0x4000" crc="585e053f" sha1="38e41fda8fa154217a05d7ef637edf68ba7f4ce4" offset="0x0000" />
+				<rom name="the_ice_machine_1986.bin" size="0x4000" crc="585e053f" sha1="38e41fda8fa154217a05d7ef637edf68ba7f4ce4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6141,7 +6141,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="final_cartridge_plus_v2_1987.bin" size="0x8000" crc="15427023" sha1="4afd9465bab6fcc59dc589212f0381f721117404" offset="0x0000" />
+				<rom name="final_cartridge_plus_v2_1987.bin" size="0x8000" crc="15427023" sha1="4afd9465bab6fcc59dc589212f0381f721117404"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6155,7 +6155,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="final_cartridge_plus_v1_1987.bin" size="0x8000" crc="c372eac4" sha1="53fc6552dea71a05051d83675c7d5469bf93abe4" offset="0x0000" />
+				<rom name="final_cartridge_plus_v1_1987.bin" size="0x8000" crc="c372eac4" sha1="53fc6552dea71a05051d83675c7d5469bf93abe4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6169,7 +6169,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="final_cartridge_plus_v1.bin" size="0x8000" crc="a089670c" sha1="f9be25b9f9809941411af7b6c72e882a1c41ed96" offset="0x0000" />
+				<rom name="final_cartridge_plus_v1.bin" size="0x8000" crc="a089670c" sha1="f9be25b9f9809941411af7b6c72e882a1c41ed96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6183,7 +6183,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_2_1987.bin" size="0x4000" crc="57717f60" sha1="07315ec80a0c67907c3f3803bce733b3dc722981" offset="0x0000" />
+				<rom name="final_cartridge_2_1987.bin" size="0x4000" crc="57717f60" sha1="07315ec80a0c67907c3f3803bce733b3dc722981"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6197,7 +6197,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="final_cartridge_2_1986_polish.bin" size="0x4000" crc="99303e17" sha1="4114d1fee4e5db18ad5df188a0f16e4646698b98" offset="0x0000" />
+				<rom name="final_cartridge_2_1986_polish.bin" size="0x4000" crc="99303e17" sha1="4114d1fee4e5db18ad5df188a0f16e4646698b98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6211,7 +6211,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="final_cartridge_3_1988-12.bin" size="0x10000" crc="83e54062" sha1="f1ee8d32ad5deeb3c3ebb516382a6c94090353e6" offset="0x0000" />
+				<rom name="final_cartridge_3_1988-12.bin" size="0x10000" crc="83e54062" sha1="f1ee8d32ad5deeb3c3ebb516382a6c94090353e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6225,7 +6225,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1" offset="0x0000" />
+					<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6239,7 +6239,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0" offset="0x0000" />
+					<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6253,7 +6253,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5" offset="0x0000" />
+					<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6269,7 +6269,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="317004-01.u1" size="0x2000" crc="3b47e9f0" sha1="19fde6707a4c60fdc3bb9df07e2f3ddf28a94900" offset="0x0000" />
+				<rom name="317004-01.u1" size="0x2000" crc="3b47e9f0" sha1="19fde6707a4c60fdc3bb9df07e2f3ddf28a94900"/>
 				<rom name="317005-01.u2" size="0x2000" crc="9f3e210d" sha1="c78af8d162e19d09770d4df1c154c4e95418a7c0" offset="0x2000" />
 				<rom name="317006-01.u3" size="0x2000" crc="ef1323fa" sha1="a7238a85b9f65720164dcd9278b9550670e00394" offset="0x4000" />
 				<rom name="317007-01.u4" size="0x2000" crc="e5c87f9d" sha1="2df19a613646de7cc5c5545a5004ae7568dd5b50" offset="0x6000" />
@@ -6286,7 +6286,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="romh" size="0x20000">
-				<rom name="magic_formel_v1.1_1986_ori.bin" size="0x10000" crc="71dc4e30" sha1="329c4e73150e4520cc11924e220210cec3bf78f6" offset="0x0000" />
+				<rom name="magic_formel_v1.1_1986_ori.bin" size="0x10000" crc="71dc4e30" sha1="329c4e73150e4520cc11924e220210cec3bf78f6"/>
 			</dataarea>
 			<dataarea name="ram" size="0x2000"/>
 		</part>
@@ -6301,7 +6301,7 @@
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="romh" size="0x20000">
-				<rom name="magic_formel_v1.2_1986_ori.bin" size="0x10000" crc="dfc8b7f3" sha1="7c2e12ee2836157af9f811e1c9017bff542c8cfa" offset="0x0000" />
+				<rom name="magic_formel_v1.2_1986_ori.bin" size="0x10000" crc="dfc8b7f3" sha1="7c2e12ee2836157af9f811e1c9017bff542c8cfa"/>
 			</dataarea>
 			<dataarea name="ram" size="0x2000"/>
 		</part>
@@ -6332,7 +6332,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="nordic power - action cartridge v7.2 (1991)(gameworks ltd).80" size="0x8000" crc="2056575f" sha1="ad6a924f8d163f3a506aa49cc8d4e3de3267e6d9" offset="0x0000" />
+				<rom name="nordic power - action cartridge v7.2 (1991)(gameworks ltd).80" size="0x8000" crc="2056575f" sha1="ad6a924f8d163f3a506aa49cc8d4e3de3267e6d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6346,7 +6346,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="atomic power cartridge v1.1 (1990)(frank &amp; joe).80" size="0x8000" crc="174c7c48" sha1="2c6f5d22e279f1f197d4cc9607a1f9fca3223774" offset="0x0000" />
+				<rom name="atomic power cartridge v1.1 (1990)(frank &amp; joe).80" size="0x8000" crc="174c7c48" sha1="2c6f5d22e279f1f197d4cc9607a1f9fca3223774"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6360,7 +6360,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="nordic power v1.0 (1989)(d&amp;e, venlo).80" size="0x8000" crc="cefb038d" sha1="da6af5c52db7c8d2d5ca86b5d3939b5603d289cc" offset="0x0000" />
+				<rom name="nordic power v1.0 (1989)(d&amp;e, venlo).80" size="0x8000" crc="cefb038d" sha1="da6af5c52db7c8d2d5ca86b5d3939b5603d289cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6635,7 +6635,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="rom" size="0x800">
-				<rom name="turbomst.bin" size="0x8000" status="nodump" offset="0x0000" />
+				<rom name="turbomst.bin" size="0x8000" status="nodump"/>
 			</dataarea>
 		</part>
 
@@ -7061,7 +7061,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="micro doctor 64 mw-203.u6" size="0x2000" crc="8dbf3c3b" sha1="8a14829eb9b92e8c6d0588357074363a75cda886" offset="0x0000" />
+				<rom name="micro doctor 64 mw-203.u6" size="0x2000" crc="8dbf3c3b" sha1="8a14829eb9b92e8c6d0588357074363a75cda886"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7074,7 +7074,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="koalapainter" size="0x4000" crc="cc75a06d" sha1="4707fe57b0575415a2c258392355941c130fcc80" offset="0x0000" />
+				<rom name="koalapainter" size="0x4000" crc="cc75a06d" sha1="4707fe57b0575415a2c258392355941c130fcc80"/>
 			</dataarea>
 		</part>
 	</software>
