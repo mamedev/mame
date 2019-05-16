@@ -73,7 +73,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
-#include "audio/midway.h"
+#include "audio/bally.h"
 #include "render.h"
 #include "speaker.h"
 
