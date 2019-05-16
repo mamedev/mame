@@ -423,12 +423,13 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	int16_t y = m_spriteram[base_addr + 2];
 	uint16_t attr = m_spriteram[base_addr + 3];
 
-	tile |= m_spriteextra[base_addr / 4] << 16;
 
-	if (!tile)
+	if (!tile) // this check needs to come before the additional attribute bits are added in? (smartfp title)
 	{
 		return;
 	}
+
+	tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
 	{
