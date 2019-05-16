@@ -227,7 +227,7 @@ void cave_state::vh_start(int num, u16 sprcol_base, u16 sprcol_granularity)
 			break;
 	}
 
-	sprite_init(0);
+	sprite_init();
 
 	m_layers_offs_x = 0x13;
 	m_layers_offs_y = -0x12;
@@ -378,6 +378,9 @@ void cave_state::get_sprite_info_cave(int chip)
 	const u8 *base_gfx = m_spriteregion[chip]->base();
 	const int code_max = m_spriteregion[chip]->bytes() / (16*16);
 
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	sprite_cave *sprite = m_sprite[chip].get();
 
 	const int glob_flipx = m_videoregs[chip][0] & 0x8000;
@@ -498,6 +501,9 @@ void cave_state::get_sprite_info_donpachi(int chip)
 	const u8 *base_gfx = m_spriteregion[chip]->base();
 	const int code_max = m_spriteregion[chip]->bytes() / (16*16);
 
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	sprite_cave *sprite = m_sprite[chip].get();
 
 	const int glob_flipx = m_videoregs[chip][0] & 0x8000;
@@ -570,15 +576,8 @@ void cave_state::get_sprite_info_donpachi(int chip)
 }
 
 
-void cave_state::sprite_init(int chip)
+void cave_state::sprite_init()
 {
-	m_screen[chip]->register_screen_bitmap(m_sprite_zbuf[chip]);
-
-	save_item(NAME(m_sprite_zbuf[chip]), chip);
-
-	if (chip != 0)
-		return;
-
 	if (m_spritetype[0] == 0 || m_spritetype[0] == 2) // most of the games
 	{
 		m_get_sprite_info = &cave_state::get_sprite_info_cave;
@@ -591,11 +590,28 @@ void cave_state::sprite_init(int chip)
 	}
 
 	m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
+	for (int screen = 0; screen < 4; screen++)
+	{
+		if (m_screen[screen])
+		{
+			m_screen[screen]->register_screen_bitmap(m_sprite_zbuf[screen]);
+
+			save_item(NAME(m_sprite_zbuf[screen]), screen);
+		}
+	}
 
 	for (int chip = 0; chip < 4; chip++)
 	{
-		m_num_sprites[chip] = m_spriteram[chip].bytes() / 0x10 / 2;
-		m_sprite[chip] = std::make_unique<sprite_cave []>(m_num_sprites[chip]);
+		if (m_videoregs[chip])
+		{
+			m_num_sprites[chip] = m_spriteram[chip].bytes() / 0x10 / 2;
+			m_sprite[chip] = std::make_unique<sprite_cave []>(m_num_sprites[chip]);
+		}
+		else
+		{
+			m_num_sprites[chip] = 0;
+			m_sprite[chip] = nullptr;
+		}
 		for (auto &prio : m_sprite_table[chip])
 			for (sprite_cave *&spr : prio)
 				spr = nullptr;
@@ -615,8 +631,11 @@ void cave_state::sprite_init(int chip)
 	save_item(NAME(m_blit.clip_bottom));
 }
 
-void cave_state::sprite_check(int chip, screen_device &screen, const rectangle &clip)
+void cave_state::sprite_check(int chip, int screen_no, screen_device &screen, const rectangle &clip)
 {
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	{   /* set clip */
 		const int left = clip.min_x;
 		const int top = clip.min_y;
@@ -671,7 +690,7 @@ void cave_state::sprite_check(int chip, screen_device &screen, const rectangle &
 				if (clip.min_y == visarea.min_y)
 				{
 					if (!(m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						m_sprite_zbuf[chip].fill(0, visarea);
+						m_sprite_zbuf[screen_no].fill(0, visarea);
 				}
 				break;
 
@@ -680,7 +699,7 @@ void cave_state::sprite_check(int chip, screen_device &screen, const rectangle &
 				if (clip.min_y == visarea.min_y)
 				{
 					if (!(m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						m_sprite_zbuf[chip].fill(0, visarea);
+						m_sprite_zbuf[screen_no].fill(0, visarea);
 				}
 				break;
 
@@ -1143,6 +1162,9 @@ void cave_state::do_blit_32_zb(int chip, const sprite_cave *sprite)
 
 void cave_state::sprite_draw_cave(int chip, int priority)
 {
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	int i = 0;
 	while (m_sprite_table[chip][priority][i])
 	{
@@ -1156,6 +1178,9 @@ void cave_state::sprite_draw_cave(int chip, int priority)
 
 void cave_state::sprite_draw_cave_zbuf(int chip, int priority)
 {
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	int i = 0;
 	while (m_sprite_table[chip][priority][i])
 	{
@@ -1169,6 +1194,9 @@ void cave_state::sprite_draw_cave_zbuf(int chip, int priority)
 
 void cave_state::sprite_draw_donpachi(int chip, int priority)
 {
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	int i = 0;
 	while (m_sprite_table[chip][priority][i])
 		do_blit_32(chip, m_sprite_table[chip][priority][i++]);
@@ -1176,6 +1204,9 @@ void cave_state::sprite_draw_donpachi(int chip, int priority)
 
 void cave_state::sprite_draw_donpachi_zbuf(int chip, int priority)
 {
+	if (m_sprite[chip] == nullptr)
+		return;
+
 	int i = 0;
 	while (m_sprite_table[chip][priority][i])
 		do_blit_32_zb(chip, m_sprite_table[chip][priority][i++]);
@@ -1433,7 +1464,7 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 #endif
 
-	sprite_check(0, screen, cliprect);
+	sprite_check(0, 0, screen, cliprect);
 
 	bitmap.fill(m_palette[0]->pen_color(m_background_pen[0]), cliprect);
 
@@ -1514,7 +1545,7 @@ u32 cave_state::screen_update_ppsatan_core(screen_device &screen, bitmap_rgb32 &
 		m_tilemap[chip]->mark_all_dirty();
 	m_old_tiledim[chip] = m_tiledim[chip];
 
-	sprite_check(chip, screen, cliprect);
+	sprite_check(chip, chip, screen, cliprect);
 
 	bitmap.fill(m_palette[chip]->pen_color(m_background_pen[chip]), cliprect);
 
