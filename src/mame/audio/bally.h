@@ -16,7 +16,9 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/discrete.h"
 #include "sound/hc55516.h"
 
 
@@ -24,6 +26,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+DECLARE_DEVICE_TYPE(BALLY_AS2888,      bally_as2888_device)
 DECLARE_DEVICE_TYPE(BALLY_AS3022,      bally_as3022_device)
 DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS, bally_sounds_plus_device)
 
@@ -31,6 +34,63 @@ DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS, bally_sounds_plus_device)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// ======================> bally_as2888_device
+
+class bally_as2888_device : public device_t, public device_mixer_interface
+{
+public:
+	bally_as2888_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock = 3'579'545) :
+		bally_as2888_device(mconfig, BALLY_AS2888, tag, owner, clock)
+	{ }
+
+	// read/write
+	DECLARE_WRITE8_MEMBER(sound_select);
+	DECLARE_WRITE_LINE_MEMBER(sound_int);
+
+	void as2888_map(address_map &map);
+
+protected:
+	bally_as2888_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock) :
+	        device_t(mconfig, type, tag, owner, clock),
+                device_mixer_interface(mconfig, *this),
+		m_snd_prom(*this, "sound"),
+                m_discrete(*this, "discrete"),
+                m_timer_s_freq(*this, "timer_s_freq"),
+                m_snd_sustain_timer(*this, "timer_as2888")
+	{ }
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	uint8_t m_sound_select;
+        uint8_t m_snd_sel;
+        uint8_t m_snd_tone_gen;
+        uint8_t m_snd_div;
+        required_region_ptr<uint8_t> m_snd_prom;
+        required_device<discrete_sound_device> m_discrete;
+        required_device<timer_device> m_timer_s_freq;
+        required_device<timer_device> m_snd_sustain_timer;
+
+
+	// internal communications
+	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	TIMER_CALLBACK_MEMBER(sound_int_sync);
+        TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+        TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+};
+
 
 // ======================> bally_as3022_device
 

@@ -72,7 +72,6 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "sound/discrete.h"
 #include "audio/bally.h"
 #include "render.h"
 #include "speaker.h"
@@ -211,27 +210,15 @@ public:
 protected:
 	as2888_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
 		: by35_state(mconfig, type, tag, solenoid_features)
-		, m_snd_prom(*this, "sound1")
-		, m_discrete(*this, "discrete")
-		, m_timer_s_freq(*this, "timer_s_freq")
-		, m_snd_sustain_timer(*this, "timer_as2888")
+		, m_as2888(*this, "as2888")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(u11_a_as2888_w);
 	DECLARE_WRITE8_MEMBER(u11_b_as2888_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as2888_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
-
-	void as2888_audio(machine_config &config);
 
 private:
-	uint8_t m_snd_sel;
-	uint8_t m_snd_tone_gen;
-	uint8_t m_snd_div;
-	required_region_ptr<uint8_t> m_snd_prom;
-	required_device<discrete_device> m_discrete;
-	required_device<timer_device> m_timer_s_freq;
-	required_device<timer_device> m_snd_sustain_timer;
+	required_device<bally_as2888_device> m_as2888;
 };
 
 
@@ -1151,15 +1138,23 @@ WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
+WRITE8_MEMBER( as2888_state::u11_a_as2888_w )
+{
+	int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
+	m_as2888->sound_select(machine().dummy_space(), 0, sound);
+	u11_a_w( space, offset, data );
+}
+
+WRITE8_MEMBER( as2888_state::u11_b_as2888_w )
+{
+	int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
+	m_as2888->sound_select(machine().dummy_space(), 0, sound);
+	u11_b_w( space, offset, data );
+}
+
 WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
 {
-	if (state)
-	{
-		m_snd_sustain_timer->adjust(attotime::from_msec(5));
-
-		m_discrete->write(NODE_08, 11);  // 11 volt pulse
-	}
-
+	m_as2888->sound_int(state);
 	u11_cb2_w(state);
 }
 
@@ -1406,11 +1401,6 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 	m_u11b = data;
 }
 
-WRITE8_MEMBER( as2888_state::u11_b_as2888_w )
-{
-	u11_b_w( space, offset, data );
-}
-
 
 // zero-cross detection
 TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_freq )
@@ -1462,42 +1452,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
 	m_u11_ca1 = false;
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
-
-TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
-{
-	m_snd_tone_gen--;
-
-	if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
-	{
-		m_snd_tone_gen = m_snd_sel;
-		m_snd_div++;
-
-		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
-		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
-
-		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
-{
-	offs_t offs = (m_u11b & 0x0f);
-	if ((m_u11a & 0x02) == 0) offs |= 0x10;
-	{
-		m_snd_sel = m_snd_prom[offs];
-		LOG("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
-		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
-
-		m_snd_tone_gen = m_snd_sel;
-		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
-	}
-
-	m_discrete->write(NODE_08, 0);
-	m_snd_sustain_timer->adjust(attotime::never);
-
-	LOG("Sustain off\n");
-}
-
 
 
 by35_state::solenoid_feature_data const by35_state::s_solenoid_features_default =
@@ -1583,67 +1537,6 @@ void by35_state::machine_reset()
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
 }
 
-static const discrete_mixer_desc as2888_digital_mixer_info =
-{
-		DISC_MIXER_IS_RESISTOR,                       /* type */
-		{RES_K(33), RES_K(3.9)},                      /* r{} */
-		{0, 0, 0, 0},                                 /* r_node */
-		{0, 0},                                       /* c{} */
-		0,                                            /* rI  */
-//      RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(360)),   /* rF  */
-		RES_K(10),                                    /* rF  */   // not really
-		CAP_U(0.01),                                  /* cF  */
-		0,                                            /* cAmp */
-		0,                                            /* vRef */
-		0.00002                                       /* gain */
-};
-
-static const discrete_op_amp_filt_info as2888_preamp_info = {
-		RES_K(10), 0, RES_R(470), 0,      /* r1 .. r4 */
-		RES_K(10),                        /* rF */
-		CAP_U(1),                         /* C1 */
-		0,                                /* C2 */
-		0,                                /* C3 */
-		0.0,                              /* vRef */
-		12.0,                             /* vP */
-		-12.0,                            /* vN */
-};
-
-
-static DISCRETE_SOUND_START(as2888_discrete)
-
-	DISCRETE_INPUT_DATA(NODE_08)        // Start Sustain Attenuation from 555 circuit
-	DISCRETE_INPUT_LOGIC(NODE_01)       // Binary Counter B output (divide by 1) T2
-	DISCRETE_INPUT_LOGIC(NODE_04)       // Binary Counter D output (divide by 4) T3
-
-	DISCRETE_DIVIDE(NODE_11, 1, NODE_01, 1) // 2
-	DISCRETE_DIVIDE(NODE_14, 1, NODE_04, 1)
-
-
-	DISCRETE_RCFILTER(NODE_06, NODE_14, RES_K(15), CAP_U(0.1))      // T4 filter
-#if 0
-	DISCRETE_RCFILTER(NODE_05, NODE_11, RES_K(33), CAP_U(0.01))     // T1 filter
-	DISCRETE_ADDER2(NODE_07, 1, NODE_05, NODE_06)
-#else
-
-	DISCRETE_MIXER2(NODE_07, 1, NODE_11, NODE_06, &as2888_digital_mixer_info)   // Mix and filter T1 and T4 together
-#endif
-	DISCRETE_RCDISC5(NODE_87, 1, NODE_08, RES_K(150), CAP_U(1.0))
-
-	DISCRETE_RCFILTER_VREF(NODE_88,NODE_87,RES_M(1),CAP_U(0.01),2)
-	DISCRETE_MULTIPLY(NODE_09, NODE_07, NODE_88)    // Apply sustain
-
-	DISCRETE_OP_AMP_FILTER(NODE_20, 1, NODE_09, 0, DISC_OP_AMP_FILTER_IS_HIGH_PASS_1, &as2888_preamp_info)
-
-	DISCRETE_CRFILTER(NODE_25, NODE_20, RES_M(100), CAP_U(0.05))    // Resistor is fake. Capacitor in series between pre-amp and output amp.
-
-	DISCRETE_GAIN(NODE_30, NODE_25, 50) // Output amplifier LM380 fixed inbuilt gain of 50
-
-	DISCRETE_OUTPUT(NODE_30, 10000000)  //  17000000
-DISCRETE_SOUND_END
-
-
-
 void by35_state::by35(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1687,23 +1580,17 @@ void by35_state::by35(machine_config &config)
 	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
 }
 
-void as2888_state::as2888_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, as2888_discrete).add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
-	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
-
-	TIMER(config, "timer_s_freq").configure_periodic(FUNC(as2888_state::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
-	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(as2888_state::timer_as2888));
-}
-
-
 void as2888_state::as2888(machine_config &config)
 {
 	by35(config);
-	as2888_audio(config);
+
+	/* basic machine hardware */
+	BALLY_AS2888(config, m_as2888);
+	SPEAKER(config, "mono").front_center();
+	m_as2888->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
+	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
 }
 
 
@@ -1755,7 +1642,7 @@ ROM_START(sst)
 	ROM_LOAD( "741-08_2.716", 0x5000, 0x0800, CRC(2789cbe6) SHA1(8230657cb5ee793354a5d4a80a9348639ec9af8f))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1768,7 +1655,7 @@ ROM_START(playboy)
 	ROM_LOAD( "743-12_2.716", 0x5000, 0x0800, CRC(6fa66664) SHA1(4943220942ce74d4620eb5fbbab8f8a763f65a2e))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1781,7 +1668,7 @@ ROM_START(lostwrlp)
 	ROM_LOAD( "729-48_2.716", 0x5000, 0x0800, CRC(963bffd8) SHA1(5144092d019132946b396fd7134866a878b3ca62))
 	ROM_LOAD( "720-28_6.716", 0x5800, 0x0800, CRC(f24cce3e) SHA1(0dfeaeb5b1cf4c950ff530ee56966ac0f2257111))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1794,7 +1681,7 @@ ROM_START(smman)
 	ROM_LOAD( "742-18_2.716", 0x5000, 0x0800, CRC(5365d36c) SHA1(1db651d31e28cf3fda00bef5289bb14d3b37b3c1))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1807,7 +1694,7 @@ ROM_START(voltan)
 	ROM_LOAD( "744-04_2.716", 0x5000, 0x0800, CRC(dbf58b83) SHA1(2d5e1c42fb8987eec81d89a4fe758ff0b88a1889))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1820,7 +1707,7 @@ ROM_START(startrep)
 	ROM_LOAD( "745-12_2.716", 0x5000, 0x0800, CRC(f683210a) SHA1(6120909d97269d9abfcc34eef2c79b56a9cf53bc))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1833,7 +1720,7 @@ ROM_START(kiss)
 	ROM_LOAD( "746-14_2.716", 0x5000, 0x0800, CRC(0fc8922d) SHA1(dc6bd4d2d744df69b33ec69896cf71ac10c14a35))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1874,7 +1761,7 @@ ROM_START(hglbtrtr)
 	ROM_LOAD( "750-08_2.716", 0x5000, 0x0800, CRC(3c783931) SHA1(ee260511063aff1b72e18b3bc5a5be81aecf10c9))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1887,7 +1774,7 @@ ROM_START(dollyptn)
 	ROM_LOAD( "777-13_2.716", 0x5000, 0x0800, CRC(7fc93ea3) SHA1(534ac5ed34397fe622dcf7cc90eaf38a311fa871))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1900,7 +1787,7 @@ ROM_START(paragon)
 	ROM_LOAD( "748-15_2.716", 0x5000, 0x0800, CRC(26cc05c1) SHA1(6e11a0f2327dbf15f6c149ddd873d9af96597d9d))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 

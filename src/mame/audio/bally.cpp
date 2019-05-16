@@ -16,13 +16,161 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+DEFINE_DEVICE_TYPE(BALLY_AS2888,      bally_as2888_device,      "as2888",      "Bally AS2888 Sound Board")
 DEFINE_DEVICE_TYPE(BALLY_AS3022,      bally_as3022_device,      "as3022",      "Bally AS3022 Sound Board")
 DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS, bally_sounds_plus_device, "sounds_plus", "Bally Sounds Plus w/ Vocalizer Board")
 
 
 //**************************************************************************
+//  AS2888
+//**************************************************************************
+
+static const discrete_mixer_desc as2888_digital_mixer_info =
+{
+		DISC_MIXER_IS_RESISTOR,                       /* type */
+		{RES_K(33), RES_K(3.9)},                      /* r{} */
+		{0, 0, 0, 0},                                 /* r_node */
+		{0, 0},                                       /* c{} */
+		0,                                            /* rI  */
+//      RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(360)),   /* rF  */
+		RES_K(10),                                    /* rF  */   // not really
+		CAP_U(0.01),                                  /* cF  */
+		0,                                            /* cAmp */
+		0,                                            /* vRef */
+		0.00002                                       /* gain */
+};
+
+static const discrete_op_amp_filt_info as2888_preamp_info = {
+		RES_K(10), 0, RES_R(470), 0,      /* r1 .. r4 */
+		RES_K(10),                        /* rF */
+		CAP_U(1),                         /* C1 */
+		0,                                /* C2 */
+		0,                                /* C3 */
+		0.0,                              /* vRef */
+		12.0,                             /* vP */
+		-12.0,                            /* vN */
+};
+
+static DISCRETE_SOUND_START(as2888_discrete)
+
+	DISCRETE_INPUT_DATA(NODE_08)        // Start Sustain Attenuation from 555 circuit
+	DISCRETE_INPUT_LOGIC(NODE_01)       // Binary Counter B output (divide by 1) T2
+	DISCRETE_INPUT_LOGIC(NODE_04)       // Binary Counter D output (divide by 4) T3
+
+	DISCRETE_DIVIDE(NODE_11, 1, NODE_01, 1) // 2
+	DISCRETE_DIVIDE(NODE_14, 1, NODE_04, 1)
+
+
+	DISCRETE_RCFILTER(NODE_06, NODE_14, RES_K(15), CAP_U(0.1))      // T4 filter
+#if 0
+	DISCRETE_RCFILTER(NODE_05, NODE_11, RES_K(33), CAP_U(0.01))     // T1 filter
+	DISCRETE_ADDER2(NODE_07, 1, NODE_05, NODE_06)
+#else
+
+	DISCRETE_MIXER2(NODE_07, 1, NODE_11, NODE_06, &as2888_digital_mixer_info)   // Mix and filter T1 and T4 together
+#endif
+	DISCRETE_RCDISC5(NODE_87, 1, NODE_08, RES_K(150), CAP_U(1.0))
+
+	DISCRETE_RCFILTER_VREF(NODE_88,NODE_87,RES_M(1),CAP_U(0.01),2)
+	DISCRETE_MULTIPLY(NODE_09, NODE_07, NODE_88)    // Apply sustain
+
+	DISCRETE_OP_AMP_FILTER(NODE_20, 1, NODE_09, 0, DISC_OP_AMP_FILTER_IS_HIGH_PASS_1, &as2888_preamp_info)
+
+	DISCRETE_CRFILTER(NODE_25, NODE_20, RES_M(100), CAP_U(0.05))    // Resistor is fake. Capacitor in series between pre-amp and output amp.
+
+	DISCRETE_GAIN(NODE_30, NODE_25, 50) // Output amplifier LM380 fixed inbuilt gain of 50
+
+	DISCRETE_OUTPUT(NODE_30, 10000000)  //  17000000
+DISCRETE_SOUND_END
+
+//-------------------------------------------------
+//  sound_select - handle an external write to the board
+//-------------------------------------------------
+
+WRITE8_MEMBER(bally_as2888_device::sound_select)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_select_sync), this), data);
+}
+
+
+TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_select_sync)
+{
+	m_sound_select = param;
+}
+
+//-------------------------------------------------
+//
+//  sound_int - handle an external sound interrupt to the board
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(bally_as2888_device::sound_int)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_int_sync), this), state);
+}
+
+TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_int_sync)
+{
+        if (param)
+        {
+                m_snd_sustain_timer->adjust(attotime::from_msec(5));
+                m_discrete->write(NODE_08, 11);  // 11 volt pulse
+        }
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void bally_as2888_device::device_add_mconfig(machine_config &config)
+{
+	DISCRETE(config, m_discrete, as2888_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
+
+        TIMER(config, "timer_s_freq").configure_periodic(FUNC(bally_as2888_device::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
+        TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(bally_as2888_device::timer_as2888));
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void bally_as2888_device::device_start()
+{
+        save_item(NAME(m_sound_select));
+        save_item(NAME(m_snd_sel));
+        save_item(NAME(m_snd_tone_gen));
+        save_item(NAME(m_snd_div));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_s)
+{
+        m_snd_tone_gen--;
+
+        if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
+        {
+                m_snd_tone_gen = m_snd_sel;
+                m_snd_div++;
+
+                m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+                m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
+        }
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
+{
+        m_snd_sel = m_snd_prom[m_sound_select];
+        m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
+        m_snd_tone_gen = m_snd_sel;
+
+        m_discrete->write(NODE_08, 0);
+        m_snd_sustain_timer->adjust(attotime::never);
+}
+
+
+//**************************************************************************
 //  AS3022
 //**************************************************************************
+
 
 //**************************************************************************
 //  IO ports
