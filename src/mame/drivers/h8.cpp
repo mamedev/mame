@@ -369,5 +369,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT        COMPANY        FULLNAME       FLAGS */
-COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT        COMPANY          FULLNAME                        FLAGS */
+COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath Company", "Heathkit H8 Digital Computer", MACHINE_NOT_WORKING )
