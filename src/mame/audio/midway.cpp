@@ -20,34 +20,39 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BALLY_AS3022,              bally_as3022_device,              "as3022",  "Bally AS3022 Sound Board")
-DEFINE_DEVICE_TYPE(MIDWAY_SSIO,               midway_ssio_device,               "midssio", "Midway SSIO Sound Board")
-DEFINE_DEVICE_TYPE(MIDWAY_SOUNDS_GOOD,        midway_sounds_good_device,        "midsg",   "Midway Sounds Good Sound Board")
-DEFINE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device, "midtcs",  "Midway Turbo Cheap Squeak Sound Board")
-DEFINE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device,      "midsnt",  "Midway Squawk 'n' Talk Sound Board")
-
+DEFINE_DEVICE_TYPE(BALLY_AS3022,              bally_as3022_device,              "as3022",      "Bally AS3022 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,         bally_sounds_plus_device,         "sounds_plus", "Bally Sounds Plus w/ Vocalizer Board")
+DEFINE_DEVICE_TYPE(MIDWAY_SSIO,               midway_ssio_device,               "midssio",     "Midway SSIO Sound Board")
+DEFINE_DEVICE_TYPE(MIDWAY_SOUNDS_GOOD,        midway_sounds_good_device,        "midsg",       "Midway Sounds Good Sound Board")
+DEFINE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device, "midtcs",      "Midway Turbo Cheap Squeak Sound Board")
+DEFINE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device,      "midsnt",      "Midway Squawk 'n' Talk Sound Board")
 
 
 //**************************************************************************
 //  AS3022
 //**************************************************************************
 
-//-------------------------------------------------
-//  bally_as3022_device - constructor
-//-------------------------------------------------
 
-bally_as3022_device::bally_as3022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BALLY_AS3022, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia(*this, "pia"),
-		m_ay(*this, "ay")
+//**************************************************************************
+//  IO ports
+//**************************************************************************
+static INPUT_PORTS_START(as3022)
+        PORT_START("SW1")
+        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
+INPUT_PORTS_END
+
+ioport_constructor bally_as3022_device::device_input_ports() const
 {
+        return INPUT_PORTS_NAME(as3022);
 }
 
+INPUT_CHANGED_MEMBER(bally_as3022_device::sw1)
+{
+        if (newval != oldval)
+                m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+}
 
 //-------------------------------------------------
-
 //  sound_select - handle an external write to the board
 //-------------------------------------------------
 
@@ -97,9 +102,10 @@ WRITE_LINE_MEMBER(bally_as3022_device::irq_w)
 void bally_as3022_device::as3022_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).mirror(0xef00).ram();
-	map(0x0080, 0x0083).mirror(0xef7c).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x17ff).mirror(0xe800).rom();
+	map.global_mask(0x1fff);  // A13-15 are unconnected
+	map(0x0000, 0x007f).mirror(0x0f00).ram();
+	map(0x0080, 0x0083).mirror(0x0f7c).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1fff).rom();  // 4k RAM space, but could be jumpered for 2k
 }
 
 
@@ -136,8 +142,12 @@ void bally_as3022_device::device_start()
 	m_ay->set_volume(0, 0);
 	m_ay->set_volume(1, 0);
 	m_ay->set_volume(2, 0);
-}
 
+	save_item(NAME(m_bc1));
+        save_item(NAME(m_bdir));
+        save_item(NAME(m_sound_select));
+        save_item(NAME(m_ay_data));
+}
 
 
 //-------------------------------------------------
@@ -233,6 +243,52 @@ void bally_as3022_device::update_sound_selects()
 		m_ay->data_w(m_ay_data);
 	}
 }
+
+//**************************************************************************
+//  SOUNDS PLUS WITH VOCALIZER
+//**************************************************************************
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void bally_sounds_plus_device::device_add_mconfig(machine_config &config)
+{
+	bally_as3022_device::device_add_mconfig(config);
+
+	m_cpu->set_addrmap(AS_PROGRAM, &bally_sounds_plus_device::sounds_plus_map);
+	m_pia->writepb_handler().set(FUNC(bally_sounds_plus_device::vocalizer_pia_portb_w));
+
+	MC3417(config, m_mc3417, 0);
+	// A gain of 2.2 is a guess. It sounds about loud enough and doesn't clip.
+	m_mc3417->add_route(ALL_OUTPUTS, *this, 2.2, AUTO_ALLOC_INPUT, 0);
+}
+
+//-------------------------------------------------
+//  CPU map, from schematics
+//-------------------------------------------------
+
+void bally_sounds_plus_device::sounds_plus_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).mirror(0x7f00).ram();
+	map(0x0080, 0x0083).mirror(0x7f7c).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
+
+//-------------------------------------------------
+//  pia_portb_w - PIA port B writes
+//-------------------------------------------------
+
+WRITE8_MEMBER(bally_sounds_plus_device::vocalizer_pia_portb_w)
+{
+	bool speech_clock = BIT(data, 6);
+	bool speech_data = BIT(data, 7);
+	m_mc3417->clock_w(speech_clock ? 1 : 0);
+	m_mc3417->digit_w(speech_data ? 1 : 0);
+	pia_portb_w(space, offset, data);
+}
+
 
 //**************************************************************************
 //  SUPER SOUND I/O BOARD (SSIO)
