@@ -544,7 +544,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
             memcpy(((int8_t*)channel_l_pcm) + (last_copied_samples * sizeof(mp3d_sample_t)), ((int8_t*)mp3_info.buffer) + (last_copied_samples * sizeof(mp3d_sample_t)), (buffer_size - last_copied_samples) * sizeof(mp3d_sample_t));
             memcpy(((int8_t*)channel_r_pcm) + (last_copied_samples * sizeof(mp3d_sample_t)), ((int8_t*)mp3_info.buffer) + (last_copied_samples * sizeof(mp3d_sample_t)), (buffer_size - last_copied_samples) * sizeof(mp3d_sample_t));
         } else {
-            for (size_t i = last_copied_samples; i <= buffer_size; i++) {
+            for (size_t i = last_copied_samples; i < buffer_size; i++) {
                 channel_l_pcm[i] = mp3_info.buffer[i * sizeof(mp3d_sample_t)];
                 channel_r_pcm[i] = mp3_info.buffer[i * sizeof(mp3d_sample_t) + 1];
             }
