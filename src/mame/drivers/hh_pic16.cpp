@@ -44,6 +44,7 @@
   - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg of the
     other? Or are they both made by the same subcontractor? I presume Toytronic.
+  - uspbball and pabball internal artwork
 
 ***************************************************************************/
 
@@ -1672,7 +1673,7 @@ INPUT_PORTS_END
 void uspbball_state::uspbball(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1650(config, m_maincpu, 1000000); // approximation - RC osc. R=22K, C=47pF
+	PIC1650(config, m_maincpu, 900000); // approximation - RC osc. R=22K, C=47pF
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_a().set(FUNC(uspbball_state::write_a));
 	m_maincpu->read_b().set_constant(0xff);
@@ -1683,7 +1684,7 @@ void uspbball_state::uspbball(machine_config &config)
 	m_maincpu->write_d().set(FUNC(uspbball_state::write_d));
 
 	// PIC CLKOUT, tied to RTCC
-	CLOCK(config, "clock", 1000000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
+	CLOCK(config, "clock", 900000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_pic16_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_hh_pic16_test);

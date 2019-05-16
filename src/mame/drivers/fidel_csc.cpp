@@ -372,7 +372,7 @@ WRITE8_MEMBER(csc_state::pia1_pb_w)
 	m_speech->start_w(data >> 1 & 1);
 
 	// d4: lower TSI volume
-	m_speech->set_output_gain(0, (data & 0x10) ? 0.5 : 1.0);
+	m_speech->set_output_gain(0, (data & 0x10) ? 0.25 : 1.0);
 }
 
 READ8_MEMBER(csc_state::pia1_pb_r)
