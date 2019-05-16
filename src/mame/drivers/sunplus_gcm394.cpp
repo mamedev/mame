@@ -253,7 +253,7 @@ ROM_START(wrlshunt)
 	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
 ROM_END
 
-ROM_START(smartfp) // this has data in the area that would usually be covered by the SPG, is it accessible somehow this time?
+ROM_START(smartfp)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
@@ -261,5 +261,5 @@ ROM_END
 
 CONS(2011, wrlshunt, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
