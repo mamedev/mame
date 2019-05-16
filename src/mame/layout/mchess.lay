@@ -3,7 +3,7 @@
 
 <!-- define elements -->
 
-	<element name="white"><rect><color red="0.75" green="0.75" blue="0.77" /></rect></element>
+	<element name="white"><rect><color red="0.65" green="0.65" blue="0.65" /></rect></element>
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="cb_mask"><rect><color red="0.9" green="0.87" blue="0.9" /></rect></element>
 	<element name="cb_overlay"><rect><color red="0.65" green="0.70" blue="0.65" /></rect></element>
