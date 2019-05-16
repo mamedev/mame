@@ -14,10 +14,12 @@
 
 
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/hc55516.h"
 
@@ -26,9 +28,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(BALLY_AS2888,      bally_as2888_device)
-DECLARE_DEVICE_TYPE(BALLY_AS3022,      bally_as3022_device)
-DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS, bally_sounds_plus_device)
+DECLARE_DEVICE_TYPE(BALLY_AS2888,       bally_as2888_device)
+DECLARE_DEVICE_TYPE(BALLY_AS3022,       bally_as3022_device)
+DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,  bally_sounds_plus_device)
+DECLARE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK, bally_cheap_squeak_device)
 
 
 //**************************************************************************
@@ -182,6 +185,66 @@ protected:
 private:
 	// internal communications
 	DECLARE_WRITE8_MEMBER(vocalizer_pia_portb_w);
+};
+
+
+// ======================> bally_cheap_squeak_device
+
+class bally_cheap_squeak_device : public device_t, public device_mixer_interface
+{
+public:
+	bally_cheap_squeak_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock = 3'579'545) :
+		bally_cheap_squeak_device(mconfig, BALLY_CHEAP_SQUEAK, tag, owner, clock)
+	{ }
+
+	auto sound_ack_w_handler() { return m_sound_ack_w_handler.bind(); }
+
+	// read/write
+	DECLARE_INPUT_CHANGED_MEMBER(sw1);
+	DECLARE_WRITE8_MEMBER(sound_select);
+	DECLARE_WRITE_LINE_MEMBER(sound_int);
+
+	void cheap_squeak_map(address_map &map);
+
+protected:
+	bally_cheap_squeak_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock) :
+	        device_t(mconfig, type, tag, owner, clock),
+                device_mixer_interface(mconfig, *this),
+                m_cpu(*this, "cpu"),
+		m_dac(*this, "dac"),
+		m_sound_ack_w_handler(*this)
+	{ }
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	// devices
+	required_device<m6803_cpu_device> m_cpu;
+        required_device<dac_byte_interface> m_dac;
+
+private:
+	uint8_t m_sound_select;
+	bool m_sound_int;
+
+	devcb_write_line m_sound_ack_w_handler;
+
+	// internal communications
+	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	TIMER_CALLBACK_MEMBER(sound_int_sync);
+	DECLARE_WRITE8_MEMBER(out_p1_cb);
+	DECLARE_READ8_MEMBER(in_p2_cb);
+	DECLARE_WRITE8_MEMBER(out_p2_cb);
 };
 
 #endif // MAME_AUDIO_BALLY_H

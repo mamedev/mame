@@ -10,15 +10,17 @@
 
 #include "emu.h"
 #include "audio/bally.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BALLY_AS2888,      bally_as2888_device,      "as2888",      "Bally AS2888 Sound Board")
-DEFINE_DEVICE_TYPE(BALLY_AS3022,      bally_as3022_device,      "as3022",      "Bally AS3022 Sound Board")
-DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS, bally_sounds_plus_device, "sounds_plus", "Bally Sounds Plus w/ Vocalizer Board")
+DEFINE_DEVICE_TYPE(BALLY_AS2888,       bally_as2888_device,       "as2888",       "Bally AS2888 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_AS3022,       bally_as3022_device,       "as3022",       "Bally AS3022 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,  bally_sounds_plus_device,  "sounds_plus",  "Bally Sounds Plus w/ Vocalizer Board")
+DEFINE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK, bally_cheap_squeak_device, "cheap_squeak", "Bally Cheap Squeak Board")
 
 
 //**************************************************************************
@@ -170,7 +172,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 //**************************************************************************
 //  AS3022
 //**************************************************************************
-
 
 //**************************************************************************
 //  IO ports
@@ -426,4 +427,131 @@ WRITE8_MEMBER(bally_sounds_plus_device::vocalizer_pia_portb_w)
 	m_mc3417->clock_w(speech_clock ? 1 : 0);
 	m_mc3417->digit_w(speech_data ? 1 : 0);
 	pia_portb_w(space, offset, data);
+}
+
+
+//**************************************************************************
+//  Cheap Squeak
+//**************************************************************************
+
+//**************************************************************************
+//  IO ports
+//**************************************************************************
+static INPUT_PORTS_START(cheap_squeak)
+        PORT_START("SW1")
+        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
+INPUT_PORTS_END
+
+ioport_constructor bally_cheap_squeak_device::device_input_ports() const
+{
+        return INPUT_PORTS_NAME(cheap_squeak);
+}
+
+INPUT_CHANGED_MEMBER(bally_cheap_squeak_device::sw1)
+{
+        if (newval != oldval)
+                m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+}
+
+//-------------------------------------------------
+//  sound_select - handle an external write to the board
+//-------------------------------------------------
+
+WRITE8_MEMBER(bally_cheap_squeak_device::sound_select)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_select_sync), this), data);
+}
+
+TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_select_sync)
+{
+	m_sound_select = param;
+}
+
+//-------------------------------------------------
+//
+//  sound_int - handle an external sound interrupt to the board
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(bally_cheap_squeak_device::sound_int)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_int_sync), this), state);
+}
+
+TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_int_sync)
+{
+	m_sound_int = param;
+	m_cpu->set_input_line(M6801_TIN_LINE, (m_sound_int ? ASSERT_LINE : CLEAR_LINE));
+}
+
+//-------------------------------------------------
+//  CPU map, from schematics
+//-------------------------------------------------
+
+void bally_cheap_squeak_device::cheap_squeak_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0080, 0x00ff).ram();
+	map(0x8000, 0x9fff).mirror(0x2000).rom();
+	map(0xc000, 0xdfff).mirror(0x2000).rom();
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
+{
+	M6803(config, m_cpu, DERIVED_CLOCK(1, 1));
+	m_cpu->set_addrmap(AS_PROGRAM, &bally_cheap_squeak_device::cheap_squeak_map);
+	m_cpu->out_p1_cb().set(FUNC(bally_cheap_squeak_device::out_p1_cb));
+	m_cpu->in_p2_cb().set(FUNC(bally_cheap_squeak_device::in_p2_cb));
+	m_cpu->out_p2_cb().set(FUNC(bally_cheap_squeak_device::out_p2_cb));
+
+	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
+        voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+        vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+        vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void bally_cheap_squeak_device::device_start()
+{
+	m_sound_ack_w_handler.resolve();
+        save_item(NAME(m_sound_select));
+        save_item(NAME(m_sound_int));
+}
+
+//-------------------------------------------------
+//  out_p1_cb - IO port 1 write
+//-------------------------------------------------
+
+WRITE8_MEMBER(bally_cheap_squeak_device::out_p1_cb)
+{
+	m_dac->write(data);
+}
+
+//-------------------------------------------------
+//  in_p2_cb - IO port 2 read
+//-------------------------------------------------
+
+READ8_MEMBER(bally_cheap_squeak_device::in_p2_cb)
+{
+  int sound_int_bit = m_sound_int ? 1 : 0;
+  return 0x40 | (m_sound_select & 0x0f) << 1 | sound_int_bit;
+}
+
+//-------------------------------------------------
+//  out_p2_cb - IO port 2 write
+//-------------------------------------------------
+
+WRITE8_MEMBER(bally_cheap_squeak_device::out_p2_cb)
+{
+	bool sound_ack = data & 0x01;
+	if (!m_sound_ack_w_handler.isnull())
+	{
+		m_sound_ack_w_handler(sound_ack);
+	}
 }

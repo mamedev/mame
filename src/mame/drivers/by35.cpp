@@ -280,6 +280,31 @@ private:
 	required_device<bally_sounds_plus_device> m_sounds_plus;
 };
 
+class cheap_squeak_state : public by35_state
+{
+public:
+	cheap_squeak_state(machine_config const &mconfig, device_type type, char const *tag)
+		: cheap_squeak_state(mconfig, type, tag, s_solenoid_features_default)
+	{ }
+
+	void cheap_squeak(machine_config &config);
+
+	DECLARE_WRITE_LINE_MEMBER(sound_ack_w);
+
+protected:
+	cheap_squeak_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
+		: by35_state(mconfig, type, tag, solenoid_features)
+		, m_cheap_squeak(*this, "cheap_squeak")
+	{ }
+
+	DECLARE_WRITE8_MEMBER(u11_a_cheap_squeak_w);
+	DECLARE_WRITE8_MEMBER(u11_b_cheap_squeak_w);
+	DECLARE_WRITE_LINE_MEMBER(u11_cb2_cheap_squeak_w);
+
+private:
+	required_device<bally_cheap_squeak_device> m_cheap_squeak;
+};
+
 void by35_state::by35_map(address_map &map)
 {
 	map.global_mask(0x7fff);     // A15 is not connected
@@ -1198,6 +1223,31 @@ WRITE_LINE_MEMBER( sounds_plus_state::u11_cb2_sounds_plus_w )
 	u11_cb2_w(state);
 }
 
+WRITE_LINE_MEMBER(cheap_squeak_state::sound_ack_w)
+{
+	m_pia_u11->cb2_w(state);
+}
+
+WRITE8_MEMBER(cheap_squeak_state::u11_a_cheap_squeak_w)
+{
+	int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
+	m_cheap_squeak->sound_select(machine().dummy_space(), 0, sound);
+	u11_a_w( space, offset, data );
+}
+
+WRITE8_MEMBER(cheap_squeak_state::u11_b_cheap_squeak_w)
+{
+	int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
+	m_cheap_squeak->sound_select(machine().dummy_space(), 0, sound);
+	u11_b_w( space, offset, data );
+}
+
+WRITE_LINE_MEMBER(cheap_squeak_state::u11_cb2_cheap_squeak_w)
+{
+	m_cheap_squeak->sound_int(state);
+	u11_cb2_w(state);
+}
+
 READ8_MEMBER( by35_state::u10_a_r )
 {
 	return m_u10a;
@@ -1593,7 +1643,6 @@ void as2888_state::as2888(machine_config &config)
 	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
 }
 
-
 void as3022_state::as3022(machine_config &config)
 {
 	by35(config);
@@ -1607,7 +1656,6 @@ void as3022_state::as3022(machine_config &config)
 	m_pia_u11->writepb_handler().set(FUNC(as3022_state::u11_b_as3022_w));
 	m_pia_u11->cb2_handler().set(FUNC(as3022_state::u11_cb2_as3022_w));
 }
-
 
 void sounds_plus_state::sounds_plus(machine_config &config)
 {
@@ -1623,6 +1671,21 @@ void sounds_plus_state::sounds_plus(machine_config &config)
 	m_pia_u11->cb2_handler().set(FUNC(sounds_plus_state::u11_cb2_sounds_plus_w));
 }
 
+void cheap_squeak_state::cheap_squeak(machine_config &config)
+{
+	by35(config);
+
+	/* basic machine hardware */
+	BALLY_CHEAP_SQUEAK(config, m_cheap_squeak);
+	SPEAKER(config, "mono").front_center();
+	m_cheap_squeak->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_cheap_squeak->sound_ack_w_handler().set(FUNC(cheap_squeak_state::sound_ack_w));
+
+
+	m_pia_u11->writepa_handler().set(FUNC(cheap_squeak_state::u11_a_cheap_squeak_w));
+	m_pia_u11->writepb_handler().set(FUNC(cheap_squeak_state::u11_b_cheap_squeak_w));
+	m_pia_u11->cb2_handler().set(FUNC(cheap_squeak_state::u11_cb2_cheap_squeak_w));
+}
 
 void by35_state::nuovo(machine_config &config)
 {
@@ -2316,15 +2379,11 @@ ROM_START(kosteel)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("kngsu4.snd", 0x8000, 0x1000, CRC(f3e4d2f6) SHA1(93f4e9e1348b1225bc02db38c994e3338afb175c))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("kngsu3.snd", 0xc000, 0x1000, CRC(11b02dca) SHA1(464eee1aa1fd9b6e26d4ba635777fffad0222106))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2337,9 +2396,8 @@ ROM_START(xsandos)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("720_u3.snd", 0xc000, 0x2000, CRC(5d8e2adb) SHA1(901a26f5e598386295a1298ee3a634941bd58b3e))
-	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2352,15 +2410,11 @@ ROM_START(spyhuntr)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("spy_u4.532", 0x8000, 0x1000, CRC(a43887d0) SHA1(6bbc55943fa9f0cd97f946767f21652e19d85265))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("spy_u3.532", 0xc000, 0x1000, CRC(95ffc1b8) SHA1(28f058f74abbbee120dca06f7321bcb588bef3c6))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*-------------------------------------
@@ -2373,15 +2427,11 @@ ROM_START(fbclass)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("fbcu4.snd", 0x8000, 0x1000, CRC(697ab16f) SHA1(7beed02e6cb042f90d2048778408b1f744ffe242))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("fbcu3.snd", 0xc000, 0x1000, CRC(1ad71775) SHA1(ddb885730deaf315fe7f3c1803628c06eedc8350))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2394,15 +2444,11 @@ ROM_START(blakpyra)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("bp_u4.532", 0x8000, 0x1000, CRC(57978b4a) SHA1(4995837790d81b02325d39b548fb882a591769c5))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("bp_u3.532", 0xc000, 0x1000, CRC(a5005067) SHA1(bd460a20a6e8f33746880d72241d6776b85126cf))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2415,9 +2461,8 @@ ROM_START(cybrnaut)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("cybu3.snd", 0xc000, 0x2000, CRC(a3c1f6e7) SHA1(35a5e828a6f2dd9009e165328a005fa079bad6cb))
-	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2901,12 +2946,12 @@ GAME( 1982, rapidfip,  0,        by35,        by35,      by35_state,        init
 GAME( 1982, m_mpac,    0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_IS_SKELETON_MECHANICAL)
 
 // Cheap Squeak sound
-GAME( 1984, kosteel,  0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, xsandos,  0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, spyhuntr, 0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, fbclass,  0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, blakpyra, 0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, cybrnaut, 0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, cheap_squeak_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, xsandos,  0, cheap_squeak, by35_os5x, cheap_squeak_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, spyhuntr, 0, cheap_squeak, by35_os5x, cheap_squeak_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, fbclass,  0, cheap_squeak, by35_os5x, cheap_squeak_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, blakpyra, 0, cheap_squeak, by35_os5x, cheap_squeak_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1985, cybrnaut, 0, cheap_squeak, by35_os5x, cheap_squeak_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Other manufacturers
 GAME( 1984, suprbowl, xsandos,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL)
