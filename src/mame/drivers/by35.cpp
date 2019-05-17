@@ -2895,16 +2895,16 @@ ROM_START(suprbowl)
 ROM_END
 
 // AS-2888 sound
-GAME( 1979, sst,      0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, sst,      0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAMEL(1978, playboy,  0, as2888, playboy,   playboy_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
-GAME( 1978, lostwrlp, 0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, smman,    0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, voltan,   0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, startrep, 0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, kiss,     0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, hglbtrtr, 0, as2888, by35_os35, as2888_state,  init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, dollyptn, 0, as2888, by35_os35, as2888_state,  init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, paragon,  0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, lostwrlp, 0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, smman,    0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, voltan,   0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, startrep, 0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, kiss,     0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, hglbtrtr, 0, as2888, by35_os35, as2888_state,  init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, dollyptn, 0, as2888, by35_os35, as2888_state,  init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, paragon,  0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // AS-3022 sound
 GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
