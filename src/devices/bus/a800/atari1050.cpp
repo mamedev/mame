@@ -37,7 +37,7 @@ void atari1050_device::mem_map(address_map &map)
 	map(0x0000, 0x007f).mirror(0x0900).ram(); // MCM6810
 	map(0x0080, 0x00ff).mirror(0x0900).m(m_pia, FUNC(mos6532_new_device::ram_map));
 	map(0x0280, 0x029f).mirror(0x0960).m(m_pia, FUNC(mos6532_new_device::io_map));
-	map(0x0400, 0x0403).mirror(0x087c).rw(m_fdc, FUNC(wd2793_device::read), FUNC(fd1771_device::write));
+	map(0x0400, 0x0403).mirror(0x087c).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x1000, 0x1fff).rom().region("rom", 0);
 }
 
