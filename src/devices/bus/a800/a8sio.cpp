@@ -32,6 +32,8 @@
 
 #include "emu.h"
 #include "a8sio.h"
+#include "atari810.h"
+#include "atari1050.h"
 #include "cassette.h"
 
 
@@ -99,7 +101,10 @@ a8sio_device::a8sio_device(const machine_config &mconfig, device_type type, cons
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_clock_in_cb(*this)
 	, m_out_data_in_cb(*this)
-	, m_out_audio_in_cb(*this), m_device(nullptr)
+	, m_out_proceed_cb(*this)
+	, m_out_audio_in_cb(*this)
+	, m_out_interrupt_cb(*this)
+	, m_device(nullptr)
 {
 }
 
@@ -112,7 +117,9 @@ void a8sio_device::device_start()
 	// resolve callbacks
 	m_out_clock_in_cb.resolve_safe();
 	m_out_data_in_cb.resolve_safe();
+	m_out_proceed_cb.resolve_safe();
 	m_out_audio_in_cb.resolve_safe();
+	m_out_interrupt_cb.resolve_safe();
 
 	// clear slot
 	m_device = nullptr;
@@ -141,22 +148,48 @@ WRITE_LINE_MEMBER( a8sio_device::clock_in_w )
 	m_out_clock_in_cb(state);
 }
 
+WRITE_LINE_MEMBER( a8sio_device::clock_out_w )
+{
+	if (m_device)
+		m_device->clock_out_w(state);
+}
+
 WRITE_LINE_MEMBER( a8sio_device::data_in_w )
 {
 	m_out_data_in_cb(state);
 }
 
+WRITE_LINE_MEMBER( a8sio_device::data_out_w )
+{
+	if (m_device)
+		m_device->data_out_w(state);
+}
+
+WRITE_LINE_MEMBER( a8sio_device::command_w )
+{
+	if (m_device)
+		m_device->command_w(state);
+}
+
 WRITE_LINE_MEMBER( a8sio_device::motor_w )
 {
 	if (m_device)
-	{
 		m_device->motor_w(state);
-	}
+}
+
+WRITE_LINE_MEMBER( a8sio_device::proceed_w )
+{
+	m_out_proceed_cb(state);
 }
 
 WRITE8_MEMBER( a8sio_device::audio_in_w )
 {
 	m_out_audio_in_cb(data);
+}
+
+WRITE_LINE_MEMBER( a8sio_device::interrupt_w )
+{
+	m_out_interrupt_cb(state);
 }
 
 
@@ -190,13 +223,31 @@ void device_a8sio_card_interface::set_a8sio_device()
 	m_a8sio->add_a8sio_card(this);
 }
 
+WRITE_LINE_MEMBER( device_a8sio_card_interface::clock_out_w )
+{
+}
+
+WRITE_LINE_MEMBER( device_a8sio_card_interface::data_out_w )
+{
+}
+
+WRITE_LINE_MEMBER( device_a8sio_card_interface::command_w )
+{
+}
+
 WRITE_LINE_MEMBER( device_a8sio_card_interface::motor_w )
 {
 	//printf("device_a8sio_card_interface::motor_w %d\n", state);
 }
 
+WRITE_LINE_MEMBER( device_a8sio_card_interface::ready_w )
+{
+}
+
 
 void a8sio_cards(device_slot_interface &device)
 {
+	device.option_add("a810", ATARI810);
+	device.option_add("a1050", ATARI1050);
 	device.option_add("cassette", A8SIO_CASSETTE);
 }

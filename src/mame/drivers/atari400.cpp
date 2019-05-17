@@ -2131,8 +2131,13 @@ void a400_state::atari_common_nodac(machine_config &config)
 	m_pia->readpb_handler().set_ioport("djoy_2_3");
 	m_pia->ca2_handler().set("a8sio", FUNC(a8sio_device::motor_w));
 	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
+	m_pia->cb2_handler().append("a8sio", FUNC(a8sio_device::command_w));
 
-	A8SIO(config, "a8sio", 0).data_in().set("pokey", FUNC(pokey_device::sid_w));
+	a8sio_device &a8sio(A8SIO(config, "a8sio", 0));
+	//a8sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
+	a8sio.data_in().set("pokey", FUNC(pokey_device::sid_w));
+	a8sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
+	a8sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
 	A8SIO_SLOT(config, "sio", nullptr).set_a8sio_slot("a8sio", "sio");
 
 	/* sound hardware */
@@ -2148,6 +2153,8 @@ void a400_state::atari_common_nodac(machine_config &config)
 	m_pokey->pot_r<7>().set_ioport("analog_7");
 	m_pokey->serin_r().set("fdc", FUNC(atari_fdc_device::serin_r));
 	m_pokey->serout_w().set("fdc", FUNC(atari_fdc_device::serout_w));
+	//m_pokey->oclk_w().set("a8sio", FUNC(a8sio_device::clock_out_w));
+	//m_pokey->sod_w().set("a8sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
 	m_pokey->set_interrupt_callback(FUNC(a400_state::interrupt_cb));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
