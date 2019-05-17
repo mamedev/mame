@@ -306,8 +306,8 @@ private:
 	void vh_start(int num, u16 sprcol_base, u16 sprcol_granularity);
 	void get_sprite_info_cave(int chip);
 	void get_sprite_info_donpachi(int chip);
-	void sprite_init(int chip);
-	void sprite_check(int chip, screen_device &screen, const rectangle &clip);
+	void sprite_init();
+	void sprite_check(int chip, int screen_no, screen_device &screen, const rectangle &clip);
 	void do_blit_zoom32(int chip, const sprite_cave *sprite);
 	void do_blit_zoom32_zb(int chip, const sprite_cave *sprite);
 	void do_blit_32(int chip, const sprite_cave *sprite);
