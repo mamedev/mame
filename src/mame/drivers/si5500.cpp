@@ -93,7 +93,7 @@ u8 si5500_state::gpibpsi_input_r(offs_t offset)
 	case tms9901_device::P6:
 		return BIT(m_gpib_data, offset-tms9901_device::P0);
 	case tms9901_device::INT15_P7:
-		return BIT(m_gpib_data, 8);
+		return BIT(m_gpib_data, 7);
 	default:
 		return 1;
 	}

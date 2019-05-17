@@ -77,8 +77,8 @@ private:
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
 	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void acrnsys1_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -87,7 +87,7 @@ private:
 	output_finder<9> m_display;
 	uint8_t m_digit;
 	uint8_t m_cass_data[4];
-	bool m_cass_state;
+	bool m_cassbit;
 	bool m_cassold;
 };
 
@@ -99,7 +99,7 @@ void acrnsys1_state::machine_start()
 
 	save_item(NAME(m_digit));
 	save_item(NAME(m_cass_data));
-	save_item(NAME(m_cass_state));
+	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
 }
 
@@ -131,26 +131,26 @@ WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
 {
 	m_digit = data & 0x47;
 	m_ttl74145->write(m_digit & 7);
-	m_cass_state = BIT(data, 6);
+	m_cassbit = BIT(data, 6);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_c)
+TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::kansas_w)
 {
 	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
+TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -286,8 +286,8 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 
 	CASSETTE(config, m_cass);
 
-	TIMER(config, "acrnsys1_c").configure_periodic(FUNC(acrnsys1_state::acrnsys1_c), attotime::from_hz(4800));
-	TIMER(config, "acrnsys1_p").configure_periodic(FUNC(acrnsys1_state::acrnsys1_p), attotime::from_hz(40000));
+	TIMER(config, "kansas_w").configure_periodic(FUNC(acrnsys1_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(acrnsys1_state::kansas_r), attotime::from_hz(40000));
 }
 
 

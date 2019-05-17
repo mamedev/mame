@@ -71,13 +71,6 @@ void k573fpga_device::device_reset()
     position_diff = 0;
 }
 
-static const char *const k573fpga_sample_names[] =
-{
-    "*k573fpga",
-    "audio",
-    nullptr
-};
-
 void k573fpga_device::device_add_mconfig(machine_config &config)
 {
     MAS3507D(config, "mpeg");
@@ -87,7 +80,6 @@ void k573fpga_device::device_add_mconfig(machine_config &config)
     SPEAKER(config, "rspeaker").front_right();
     SAMPLES(config, m_samples);
     m_samples->set_channels(2);
-    m_samples->set_samples_names(k573fpga_sample_names);
     m_samples->set_samples_update_callback(FUNC(k573fpga_device::k573fpga_stream_update));
     m_samples->add_route(0, "lspeaker", 1.0);
     m_samples->add_route(1, "rspeaker", 1.0);

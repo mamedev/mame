@@ -80,7 +80,6 @@ private:
 	DECLARE_WRITE8_MEMBER(portf1_w);
 	DECLARE_WRITE8_MEMBER(h8_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -93,7 +92,7 @@ private:
 	uint8_t m_irq_ctl;
 	bool m_ff_b;
 	uint8_t m_cass_data[4];
-	bool m_cass_state;
+	bool m_cassbit;
 	bool m_cassold;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -242,7 +241,7 @@ void h8_state::machine_reset()
 {
 	output().set_value("pwr_led", 0);
 	m_irq_ctl = 1;
-	m_cass_state = 1;
+	m_cassbit = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
 	m_uart->write_cts(0);
@@ -290,22 +289,17 @@ But, all of this can only occur if bit 4 of port F0 is low. */
 	output().set_value("run_led", state);
 }
 
-WRITE_LINE_MEMBER( h8_state::txdata_callback )
-{
-	m_cass_state = state;
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::kansas_w)
 {
 	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
@@ -344,14 +338,14 @@ void h8_state::h8(machine_config &config)
 
 	/* Devices */
 	I8251(config, m_uart, 0);
-	m_uart->txd_handler().set(FUNC(h8_state::txdata_callback));
+	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	clock_device &cassette_clock(CLOCK(config, "cassette_clock", 4800));
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 	m_cass->set_interface("h8_cass");
 
 	TIMER(config, "kansas_w").configure_periodic(FUNC(h8_state::kansas_w), attotime::from_hz(4800));
