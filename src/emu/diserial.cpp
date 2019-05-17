@@ -315,12 +315,12 @@ void device_serial_interface::receive_register_extract()
 	switch (m_df_parity)
 	{
 	case PARITY_ODD:
-		if (parity_received != serial_helper_get_parity(data))
+		if (parity_received == serial_helper_get_parity(data))
 			m_rcv_parity_error = true;
 		break;
 
 	case PARITY_EVEN:
-		if (parity_received == serial_helper_get_parity(data))
+		if (parity_received != serial_helper_get_parity(data))
 			m_rcv_parity_error = true;
 		break;
 
