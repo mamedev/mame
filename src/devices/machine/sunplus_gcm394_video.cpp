@@ -73,7 +73,7 @@ void gcm394_base_video_device::device_start()
 			16 * 16 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (16 * 16 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
 		gfxelement++;
 	}
 
@@ -90,7 +90,7 @@ void gcm394_base_video_device::device_start()
 			16 * 32 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (16 * 32 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
 		gfxelement++;
 	}
 
@@ -107,7 +107,7 @@ void gcm394_base_video_device::device_start()
 			32 * 16 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (32 * 16 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
 		gfxelement++;
 	}
 
@@ -124,7 +124,7 @@ void gcm394_base_video_device::device_start()
 			32 * 32 * 4
 		};
 		obj_layout.total = m_gfxregionsize / (32 * 32 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
 		gfxelement++;
 	}
 
@@ -141,14 +141,14 @@ void gcm394_base_video_device::device_start()
 			8 * 16 * 2
 		};
 		obj_layout.total = m_gfxregionsize / (8 * 16 * 2 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40 * 0x10, 0));
 		gfxelement++;
 	}
 
 	if (1)
 	{
 		const uint32_t texlayout_xoffset[64] = { STEP64(0,2) };
-		const uint32_t texlayout_yoffset[32] = { STEP32(0,2*64) };
+		const uint32_t texlayout_yoffset[32] = { STEP32(0,2 * 64) };
 
 		gfx_layout obj_layout =
 		{
@@ -163,7 +163,7 @@ void gcm394_base_video_device::device_start()
 			texlayout_yoffset
 		};
 		obj_layout.total = m_gfxregionsize / (16 * 32 * 2 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40, 0));
+		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40 * 0x10, 0));
 		gfxelement++;
 	}
 	save_item(NAME(m_spriteextra));
@@ -339,18 +339,22 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	{
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
-		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
-		uint16_t palette = 0;
+		uint32_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+		
+		uint16_t palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+		if (x0 & 1)
+			palette >>= 8;
+
+		tile |= (palette & 0x0003) << 16;
 
 		if (!tile)
 			continue;
 
-		palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
-		if (x0 & 1)
-			palette >>= 8;
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
+
+#if 0
 		if ((ctrl & 2) == 0)
 		{   // -(1) bld(1) flip(2) pal(4)
 			tileattr &= ~0x000c;
@@ -362,7 +366,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			tilectrl &= ~0x0100;
 			tilectrl |= (palette << 2) & 0x0100;    // blend
 		}
-
+#endif
 		const bool blend = (tileattr & 0x4000 || tilectrl & 0x0100);
 		const bool row_scroll = (tilectrl & 0x0010);
 		const bool flip_x = (tileattr & TILE_X_FLIP);
@@ -419,12 +423,13 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	int16_t y = m_spriteram[base_addr + 2];
 	uint16_t attr = m_spriteram[base_addr + 3];
 
-	tile |= m_spriteextra[base_addr / 4] << 16;
 
-	if (!tile)
+	if (!tile) // this check needs to come before the additional attribute bits are added in? (smartfp title)
 	{
 		return;
 	}
+
+	tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
 	{
