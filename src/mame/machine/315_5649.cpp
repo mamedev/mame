@@ -70,6 +70,16 @@ void sega_315_5649_device::device_start()
 	save_item(NAME(m_analog_channel));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sega_315_5649_device::device_reset()
+{
+	// set all ports to input on reset
+	m_port_config = 0xff;
+}
+
 
 //**************************************************************************
 //  INTERFACE
@@ -89,17 +99,10 @@ READ8_MEMBER( sega_315_5649_device::read )
 	case 0x04:
 	case 0x05:
 	case 0x06:
-		// ignore port config for now. games seem to read and write without
-		// setting it first?
-		data = m_in_port_cb[offset](0);
-
-#if 0
 		if (BIT(m_port_config, offset))
 			data = m_in_port_cb[offset](0);
 		else
 			data = m_port_value[offset];
-#endif
-
 		break;
 
 	// serial channel 1/2 input
