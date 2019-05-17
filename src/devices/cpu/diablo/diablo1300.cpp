@@ -71,8 +71,8 @@ inline void diablo1300_cpu_device::write_port(uint16_t port, uint16_t data)
 
 inline uint8_t diablo1300_cpu_device::read_table(uint16_t offset)
 {
-	LOGTABLE("Read %02x from table ROM offset %04x[%04x]\n", m_table[offset & 0x1ff], offset & 0x1ff, offset);
-	return m_table[offset & 0x1ff];
+	LOGTABLE("Read %02x from table ROM offset %04x[%04x]\n", m_table->base()[offset & 0x1ff], offset & 0x1ff, offset);
+	return m_table->base()[offset & 0x1ff];
 }
 
 inline uint16_t diablo1300_cpu_device::read_ibus()
@@ -102,7 +102,6 @@ diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, cons
 	, m_data(nullptr)
 	, m_cache(nullptr)
 	, m_table(nullptr)
-
 {
 	// Allocate & setup
 }
@@ -112,8 +111,8 @@ void diablo1300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data    = &space(AS_DATA);
-	m_cache  = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
-	m_table = (uint8_t*) machine().root_device().memregion("trom")->base();
+	m_cache   = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	m_table   = memregion("trom");
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -122,11 +121,13 @@ void diablo1300_cpu_device::device_start()
 	state_add(DIABLO_PC,         "PC",        m_pc).mask(0x1ff);
 	state_add(DIABLO_A,          "A",         m_a).mask(0xff);
 	state_add(DIABLO_B,          "B",         m_b).mask(0xff);
+	state_add(DIABLO_CARRY,      "CARRY",     m_carry).formatstr("%1u");
 
 	/* setup regtable */
 	save_item(NAME(m_pc));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
+	save_item(NAME(m_carry));
 	save_item(NAME(m_power_on));
 
 	// set our instruction counter

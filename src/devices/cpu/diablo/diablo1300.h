@@ -77,7 +77,7 @@ protected:
 	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 
 	// rom regions
-	uint8_t *m_table;
+	memory_region *m_table;
 
 #if 0
 	// Callbacks and set methods
@@ -100,7 +100,8 @@ enum
 {
 	DIABLO_PC = 1,
 	DIABLO_A,
-	DIABLO_B
+	DIABLO_B,
+	DIABLO_CARRY
 };
 
 #endif // MAME_CPU_DIABLO_DIABLO1300_H
