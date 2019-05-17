@@ -72,8 +72,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "sound/discrete.h"
-#include "audio/midway.h"
+#include "audio/bally.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -102,6 +101,10 @@ public:
 
 	void by35(machine_config &config);
 	void nuovo(machine_config &config);
+	void as2888(machine_config &config);
+	void as3022(machine_config &config);
+	void sounds_plus(machine_config &config);
+	void cheap_squeak(machine_config &config);
 
 protected:
 	typedef uint8_t solenoid_feature_data[20][4];
@@ -128,6 +131,12 @@ protected:
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_digits(*this, "digit%u%u", 1U, 1U)
 		, m_solenoids(*this, "solenoid%u", 0U)
+		, m_as2888(*this, "as2888")
+		, m_as3022(*this, "as3022")
+		, m_sounds_plus(*this, "sounds_plus")
+		, m_cheap_squeak(*this, "cheap_squeak")
+		, m_sound_select_handler(*this)
+		, m_sound_int_handler(*this)
 	{ }
 
 	DECLARE_READ8_MEMBER(u10_a_r);
@@ -153,6 +162,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
+	DECLARE_WRITE_LINE_MEMBER(sound_ack_w);
 
 	void by35_map(address_map &map);
 	void nuovo_map(address_map &map);
@@ -164,7 +174,7 @@ protected:
 
 	static solenoid_feature_data const s_solenoid_features_default;
 
-protected:
+private:
 	bool m_u10_ca2;
 	bool m_u10_cb1;
 	bool m_u10_cb2;
@@ -194,103 +204,23 @@ protected:
 	output_finder<15 * 4> m_lamps;
 	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
+	optional_device<bally_as2888_device> m_as2888;
+	optional_device<bally_as3022_device> m_as3022;
+	optional_device<bally_sounds_plus_device> m_sounds_plus;
+	optional_device<bally_cheap_squeak_device> m_cheap_squeak;
+        devcb_write8 m_sound_select_handler;
+        devcb_write_line m_sound_int_handler;
 };
 
-
-class as2888_state : public by35_state
-{
-public:
-	as2888_state(machine_config const &mconfig, device_type type, char const *tag)
-		: as2888_state(mconfig, type, tag, s_solenoid_features_default)
-	{ }
-
-	void init_playboy();
-
-	void as2888(machine_config &config);
-
-protected:
-	as2888_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
-		: by35_state(mconfig, type, tag, solenoid_features)
-		, m_snd_prom(*this, "sound1")
-		, m_discrete(*this, "discrete")
-		, m_timer_s_freq(*this, "timer_s_freq")
-		, m_snd_sustain_timer(*this, "timer_as2888")
-	{ }
-
-	DECLARE_WRITE8_MEMBER(u11_b_as2888_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as2888_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
-
-	void as2888_audio(machine_config &config);
-
-private:
-	uint8_t m_snd_sel;
-	uint8_t m_snd_tone_gen;
-	uint8_t m_snd_div;
-	required_region_ptr<uint8_t> m_snd_prom;
-	required_device<discrete_device> m_discrete;
-	required_device<timer_device> m_timer_s_freq;
-	required_device<timer_device> m_snd_sustain_timer;
-};
-
-
-class playboy_state : public as2888_state
+class playboy_state : public by35_state
 {
 public:
 	playboy_state(machine_config const &mconfig, device_type type, char const *tag)
-		: as2888_state(mconfig, type, tag, s_solenoid_features_playboy)
+		: by35_state(mconfig, type, tag, s_solenoid_features_playboy)
 	{ }
 
 protected:
 	static solenoid_feature_data const s_solenoid_features_playboy;
-};
-
-class as3022_state : public by35_state
-{
-public:
-	as3022_state(machine_config const &mconfig, device_type type, char const *tag)
-		: as3022_state(mconfig, type, tag, s_solenoid_features_default)
-	{ }
-
-	void as3022(machine_config &config);
-
-protected:
-	as3022_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
-		: by35_state(mconfig, type, tag, solenoid_features)
-		, m_as3022(*this, "as3022")
-	{ }
-
-	DECLARE_WRITE8_MEMBER(u11_a_as3022_w);
-	DECLARE_WRITE8_MEMBER(u11_b_as3022_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as3022_w);
-
-private:
-	required_device<bally_as3022_device> m_as3022;
-};
-
-// TODO: refactor these into a single base class
-class sounds_plus_state : public by35_state
-{
-public:
-	sounds_plus_state(machine_config const &mconfig, device_type type, char const *tag)
-		: sounds_plus_state(mconfig, type, tag, s_solenoid_features_default)
-	{ }
-
-	void sounds_plus(machine_config &config);
-
-protected:
-	sounds_plus_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
-		: by35_state(mconfig, type, tag, solenoid_features)
-		, m_sounds_plus(*this, "sounds_plus")
-	{ }
-
-	DECLARE_WRITE8_MEMBER(u11_a_sounds_plus_w);
-	DECLARE_WRITE8_MEMBER(u11_b_sounds_plus_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_sounds_plus_w);
-
-private:
-	required_device<bally_sounds_plus_device> m_sounds_plus;
 };
 
 void by35_state::by35_map(address_map &map)
@@ -1016,7 +946,6 @@ static INPUT_PORTS_START( frontier )
 INPUT_PORTS_END
 
 
-
 CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 {
 	int bit_shift = ((uintptr_t)param & 0x07);
@@ -1108,11 +1037,11 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 	{
 		for (int digit=0; digit<8; digit++)
 		{
-			m_digits[0][digit] = 0
-			m_digits[1][digit] = 0
-			m_digits[2][digit] = 0
-			m_digits[3][digit] = 0
-			m_digits[4][digit] = 0
+			m_digits[0][digit] = 0;
+			m_digits[1][digit] = 0;
+			m_digits[2][digit] = 0;
+			m_digits[3][digit] = 0;
+			m_digits[4][digit] = 0;
 		}
 	}
 #endif
@@ -1148,59 +1077,13 @@ READ_LINE_MEMBER( by35_state::u11_cb1_r )
 
 WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 {
-	m_u11_cb2 = state;
-}
-
-WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
-{
-	if (state)
+	// Handle sound
+	if (!m_sound_int_handler.isnull())
 	{
-		m_snd_sustain_timer->adjust(attotime::from_msec(5));
-
-		m_discrete->write(NODE_08, 11);  // 11 volt pulse
+		m_sound_int_handler(state);
 	}
 
-	u11_cb2_w(state);
-}
-
-WRITE8_MEMBER( as3022_state::u11_a_as3022_w )
-{
-	int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
-	m_as3022->sound_select(machine().dummy_space(), 0, sound);
-	u11_a_w( space, offset, data );
-}
-
-WRITE8_MEMBER( as3022_state::u11_b_as3022_w )
-{
-	int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
-	m_as3022->sound_select(machine().dummy_space(), 0, sound);
-	u11_b_w( space, offset, data );
-}
-
-WRITE_LINE_MEMBER( as3022_state::u11_cb2_as3022_w )
-{
-	m_as3022->sound_int(state);
-	u11_cb2_w(state);
-}
-
-WRITE8_MEMBER( sounds_plus_state::u11_a_sounds_plus_w )
-{
-	int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
-	m_sounds_plus->sound_select(machine().dummy_space(), 0, sound);
-	u11_a_w( space, offset, data );
-}
-
-WRITE8_MEMBER( sounds_plus_state::u11_b_sounds_plus_w )
-{
-	int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
-	m_sounds_plus->sound_select(machine().dummy_space(), 0, sound);
-	u11_b_w( space, offset, data );
-}
-
-WRITE_LINE_MEMBER( sounds_plus_state::u11_cb2_sounds_plus_w )
-{
-	m_sounds_plus->sound_int(state);
-	u11_cb2_w(state);
+	m_u11_cb2 = state;
 }
 
 READ8_MEMBER( by35_state::u10_a_r )
@@ -1328,6 +1211,13 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 		m_digits[4][digit - 1] = patterns[m_segment[5]];
 	}
 
+	// Handle sound
+	if (!m_sound_select_handler.isnull())
+	{
+		int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
+		m_sound_select_handler(sound);
+	}
+
 	m_u11a = data;
 }
 
@@ -1403,12 +1293,14 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][2]);
 	}
 
-	m_u11b = data;
-}
+	// Handle sound
+	if (!m_sound_select_handler.isnull())
+	{
+		int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
+		m_sound_select_handler(sound);
+	}
 
-WRITE8_MEMBER( as2888_state::u11_b_as2888_w )
-{
-	u11_b_w( space, offset, data );
+	m_u11b = data;
 }
 
 
@@ -1463,41 +1355,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
+WRITE_LINE_MEMBER( by35_state::sound_ack_w )
 {
-	m_snd_tone_gen--;
-
-	if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
-	{
-		m_snd_tone_gen = m_snd_sel;
-		m_snd_div++;
-
-		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
-		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
-
-		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
-	}
+	m_pia_u11->cb2_w(state);
 }
-
-TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
-{
-	offs_t offs = (m_u11b & 0x0f);
-	if ((m_u11a & 0x02) == 0) offs |= 0x10;
-	{
-		m_snd_sel = m_snd_prom[offs];
-		LOG("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
-		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
-
-		m_snd_tone_gen = m_snd_sel;
-		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
-	}
-
-	m_discrete->write(NODE_08, 0);
-	m_snd_sustain_timer->adjust(attotime::never);
-
-	LOG("Sustain off\n");
-}
-
 
 
 by35_state::solenoid_feature_data const by35_state::s_solenoid_features_default =
@@ -1564,6 +1425,8 @@ void by35_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 	m_solenoids.resolve();
+	m_sound_select_handler.resolve();
+	m_sound_int_handler.resolve();
 }
 
 void by35_state::machine_reset()
@@ -1582,67 +1445,6 @@ void by35_state::machine_reset()
 	m_io_hold_x[0] = 0x80;  // Put ball in Outhole on startup
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
 }
-
-static const discrete_mixer_desc as2888_digital_mixer_info =
-{
-		DISC_MIXER_IS_RESISTOR,                       /* type */
-		{RES_K(33), RES_K(3.9)},                      /* r{} */
-		{0, 0, 0, 0},                                 /* r_node */
-		{0, 0},                                       /* c{} */
-		0,                                            /* rI  */
-//      RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(360)),   /* rF  */
-		RES_K(10),                                    /* rF  */   // not really
-		CAP_U(0.01),                                  /* cF  */
-		0,                                            /* cAmp */
-		0,                                            /* vRef */
-		0.00002                                       /* gain */
-};
-
-static const discrete_op_amp_filt_info as2888_preamp_info = {
-		RES_K(10), 0, RES_R(470), 0,      /* r1 .. r4 */
-		RES_K(10),                        /* rF */
-		CAP_U(1),                         /* C1 */
-		0,                                /* C2 */
-		0,                                /* C3 */
-		0.0,                              /* vRef */
-		12.0,                             /* vP */
-		-12.0,                            /* vN */
-};
-
-
-static DISCRETE_SOUND_START(as2888_discrete)
-
-	DISCRETE_INPUT_DATA(NODE_08)        // Start Sustain Attenuation from 555 circuit
-	DISCRETE_INPUT_LOGIC(NODE_01)       // Binary Counter B output (divide by 1) T2
-	DISCRETE_INPUT_LOGIC(NODE_04)       // Binary Counter D output (divide by 4) T3
-
-	DISCRETE_DIVIDE(NODE_11, 1, NODE_01, 1) // 2
-	DISCRETE_DIVIDE(NODE_14, 1, NODE_04, 1)
-
-
-	DISCRETE_RCFILTER(NODE_06, NODE_14, RES_K(15), CAP_U(0.1))      // T4 filter
-#if 0
-	DISCRETE_RCFILTER(NODE_05, NODE_11, RES_K(33), CAP_U(0.01))     // T1 filter
-	DISCRETE_ADDER2(NODE_07, 1, NODE_05, NODE_06)
-#else
-
-	DISCRETE_MIXER2(NODE_07, 1, NODE_11, NODE_06, &as2888_digital_mixer_info)   // Mix and filter T1 and T4 together
-#endif
-	DISCRETE_RCDISC5(NODE_87, 1, NODE_08, RES_K(150), CAP_U(1.0))
-
-	DISCRETE_RCFILTER_VREF(NODE_88,NODE_87,RES_M(1),CAP_U(0.01),2)
-	DISCRETE_MULTIPLY(NODE_09, NODE_07, NODE_88)    // Apply sustain
-
-	DISCRETE_OP_AMP_FILTER(NODE_20, 1, NODE_09, 0, DISC_OP_AMP_FILTER_IS_HIGH_PASS_1, &as2888_preamp_info)
-
-	DISCRETE_CRFILTER(NODE_25, NODE_20, RES_M(100), CAP_U(0.05))    // Resistor is fake. Capacitor in series between pre-amp and output amp.
-
-	DISCRETE_GAIN(NODE_30, NODE_25, 50) // Output amplifier LM380 fixed inbuilt gain of 50
-
-	DISCRETE_OUTPUT(NODE_30, 10000000)  //  17000000
-DISCRETE_SOUND_END
-
-
 
 void by35_state::by35(machine_config &config)
 {
@@ -1687,62 +1489,61 @@ void by35_state::by35(machine_config &config)
 	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
 }
 
-void as2888_state::as2888_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, as2888_discrete).add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
-	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
-
-	TIMER(config, "timer_s_freq").configure_periodic(FUNC(as2888_state::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
-	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(as2888_state::timer_as2888));
-}
-
-
-void as2888_state::as2888(machine_config &config)
-{
-	by35(config);
-	as2888_audio(config);
-}
-
-
-void as3022_state::as3022(machine_config &config)
-{
-	by35(config);
-
-	/* basic machine hardware */
-	BALLY_AS3022(config, m_as3022);
-	SPEAKER(config, "mono").front_center();
-	m_as3022->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_pia_u11->writepa_handler().set(FUNC(as3022_state::u11_a_as3022_w));
-	m_pia_u11->writepb_handler().set(FUNC(as3022_state::u11_b_as3022_w));
-	m_pia_u11->cb2_handler().set(FUNC(as3022_state::u11_cb2_as3022_w));
-}
-
-
-void sounds_plus_state::sounds_plus(machine_config &config)
-{
-	by35(config);
-
-	/* basic machine hardware */
-	BALLY_SOUNDS_PLUS(config, m_sounds_plus);
-	SPEAKER(config, "mono").front_center();
-	m_sounds_plus->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_pia_u11->writepa_handler().set(FUNC(sounds_plus_state::u11_a_sounds_plus_w));
-	m_pia_u11->writepb_handler().set(FUNC(sounds_plus_state::u11_b_sounds_plus_w));
-	m_pia_u11->cb2_handler().set(FUNC(sounds_plus_state::u11_cb2_sounds_plus_w));
-}
-
-
 void by35_state::nuovo(machine_config &config)
 {
 	by35(config);
 
 	M6802(config.replace(), m_maincpu, 2000000); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
 	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+}
+
+void by35_state::as2888(machine_config &config)
+{
+	by35(config);
+
+	BALLY_AS2888(config, m_as2888);
+	SPEAKER(config, "mono").front_center();
+	m_as2888->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_sound_select_handler.bind().set(m_as2888, FUNC(bally_as2888_device::sound_select));
+	m_sound_int_handler.bind().set(m_as2888, FUNC(bally_as2888_device::sound_int));
+}
+
+void by35_state::as3022(machine_config &config)
+{
+	by35(config);
+
+	BALLY_AS3022(config, m_as3022);
+	SPEAKER(config, "mono").front_center();
+	m_as3022->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_sound_select_handler.bind().set(m_as3022, FUNC(bally_as3022_device::sound_select));
+	m_sound_int_handler.bind().set(m_as3022, FUNC(bally_as3022_device::sound_int));
+}
+
+void by35_state::sounds_plus(machine_config &config)
+{
+	by35(config);
+
+	BALLY_SOUNDS_PLUS(config, m_sounds_plus);
+	SPEAKER(config, "mono").front_center();
+	m_sounds_plus->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_sound_select_handler.bind().set(m_sounds_plus, FUNC(bally_sounds_plus_device::sound_select));
+	m_sound_int_handler.bind().set(m_sounds_plus, FUNC(bally_sounds_plus_device::sound_int));
+}
+
+void by35_state::cheap_squeak(machine_config &config)
+{
+	by35(config);
+
+	BALLY_CHEAP_SQUEAK(config, m_cheap_squeak);
+	SPEAKER(config, "mono").front_center();
+	m_cheap_squeak->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_sound_select_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_select));
+	m_sound_int_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_int));
+	m_cheap_squeak->sound_ack_w_handler().set(FUNC(by35_state::sound_ack_w));
 }
 
 
@@ -1755,7 +1556,7 @@ ROM_START(sst)
 	ROM_LOAD( "741-08_2.716", 0x5000, 0x0800, CRC(2789cbe6) SHA1(8230657cb5ee793354a5d4a80a9348639ec9af8f))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1768,7 +1569,7 @@ ROM_START(playboy)
 	ROM_LOAD( "743-12_2.716", 0x5000, 0x0800, CRC(6fa66664) SHA1(4943220942ce74d4620eb5fbbab8f8a763f65a2e))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1781,7 +1582,7 @@ ROM_START(lostwrlp)
 	ROM_LOAD( "729-48_2.716", 0x5000, 0x0800, CRC(963bffd8) SHA1(5144092d019132946b396fd7134866a878b3ca62))
 	ROM_LOAD( "720-28_6.716", 0x5800, 0x0800, CRC(f24cce3e) SHA1(0dfeaeb5b1cf4c950ff530ee56966ac0f2257111))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1794,7 +1595,7 @@ ROM_START(smman)
 	ROM_LOAD( "742-18_2.716", 0x5000, 0x0800, CRC(5365d36c) SHA1(1db651d31e28cf3fda00bef5289bb14d3b37b3c1))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1807,7 +1608,7 @@ ROM_START(voltan)
 	ROM_LOAD( "744-04_2.716", 0x5000, 0x0800, CRC(dbf58b83) SHA1(2d5e1c42fb8987eec81d89a4fe758ff0b88a1889))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1820,7 +1621,7 @@ ROM_START(startrep)
 	ROM_LOAD( "745-12_2.716", 0x5000, 0x0800, CRC(f683210a) SHA1(6120909d97269d9abfcc34eef2c79b56a9cf53bc))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1833,7 +1634,7 @@ ROM_START(kiss)
 	ROM_LOAD( "746-14_2.716", 0x5000, 0x0800, CRC(0fc8922d) SHA1(dc6bd4d2d744df69b33ec69896cf71ac10c14a35))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1874,7 +1675,7 @@ ROM_START(hglbtrtr)
 	ROM_LOAD( "750-08_2.716", 0x5000, 0x0800, CRC(3c783931) SHA1(ee260511063aff1b72e18b3bc5a5be81aecf10c9))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1887,7 +1688,7 @@ ROM_START(dollyptn)
 	ROM_LOAD( "777-13_2.716", 0x5000, 0x0800, CRC(7fc93ea3) SHA1(534ac5ed34397fe622dcf7cc90eaf38a311fa871))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1900,7 +1701,7 @@ ROM_START(paragon)
 	ROM_LOAD( "748-15_2.716", 0x5000, 0x0800, CRC(26cc05c1) SHA1(6e11a0f2327dbf15f6c149ddd873d9af96597d9d))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "sound1", 0)
+	ROM_REGION(0x0020, "as2888:sound", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -2429,15 +2230,11 @@ ROM_START(kosteel)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("kngsu4.snd", 0x8000, 0x1000, CRC(f3e4d2f6) SHA1(93f4e9e1348b1225bc02db38c994e3338afb175c))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("kngsu3.snd", 0xc000, 0x1000, CRC(11b02dca) SHA1(464eee1aa1fd9b6e26d4ba635777fffad0222106))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2450,9 +2247,8 @@ ROM_START(xsandos)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("720_u3.snd", 0xc000, 0x2000, CRC(5d8e2adb) SHA1(901a26f5e598386295a1298ee3a634941bd58b3e))
-	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2465,15 +2261,11 @@ ROM_START(spyhuntr)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("spy_u4.532", 0x8000, 0x1000, CRC(a43887d0) SHA1(6bbc55943fa9f0cd97f946767f21652e19d85265))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("spy_u3.532", 0xc000, 0x1000, CRC(95ffc1b8) SHA1(28f058f74abbbee120dca06f7321bcb588bef3c6))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*-------------------------------------
@@ -2486,15 +2278,11 @@ ROM_START(fbclass)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("fbcu4.snd", 0x8000, 0x1000, CRC(697ab16f) SHA1(7beed02e6cb042f90d2048778408b1f744ffe242))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("fbcu3.snd", 0xc000, 0x1000, CRC(1ad71775) SHA1(ddb885730deaf315fe7f3c1803628c06eedc8350))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2507,15 +2295,11 @@ ROM_START(blakpyra)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("bp_u4.532", 0x8000, 0x1000, CRC(57978b4a) SHA1(4995837790d81b02325d39b548fb882a591769c5))
 	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("bp_u3.532", 0xc000, 0x1000, CRC(a5005067) SHA1(bd460a20a6e8f33746880d72241d6776b85126cf))
 	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2528,9 +2312,8 @@ ROM_START(cybrnaut)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
 	ROM_LOAD("cybu3.snd", 0xc000, 0x2000, CRC(a3c1f6e7) SHA1(35a5e828a6f2dd9009e165328a005fa079bad6cb))
-	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2963,63 +2746,63 @@ ROM_START(suprbowl)
 ROM_END
 
 // AS-2888 sound
-GAME( 1979, sst,      0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL(1978, playboy,  0, as2888, playboy,   playboy_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
-GAME( 1978, lostwrlp, 0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, smman,    0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, voltan,   0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, startrep, 0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, kiss,     0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, hglbtrtr, 0, as2888, by35_os35, as2888_state,  init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, dollyptn, 0, as2888, by35_os35, as2888_state,  init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1979, paragon,  0, as2888, by35,      as2888_state,  init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, sst,      0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAMEL(1978, playboy,  0, as2888, playboy,   by35_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
+GAME( 1978, lostwrlp, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, smman,    0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, voltan,   0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, startrep, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, kiss,     0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, hglbtrtr, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, dollyptn, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, paragon,  0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // AS-3022 sound
-GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, slbmania,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, futurspa,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, spaceinv,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, rollston,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, mystic,     0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, xenon,      0,        sounds_plus, by35_os40, sounds_plus_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, sounds_plus_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, viking,     0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Viking",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, hotdoggn,   0,        as3022,      by35_os35, as3022_state,      init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, skatebll,   0,        as3022,      by35_os40, as3022_state,      init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, frontier,   0,        as3022,      frontier,  as3022_state,      init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy,   0,        as3022,      by35_os5x, as3022_state,      init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy4p, speakesy, as3022,      by35_os5x, as3022_state,      init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, bmx,        0,        as3022,      by35_os5x, as3022_state,      init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, granslam,   0,        as3022,      by35_os5x, as3022_state,      init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, granslam4,  granslam, as3022,      by35_os5x, as3022_state,      init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, goldball,   0,        as3022,      by35,      as3022_state,      init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, goldballn,  goldball, as3022,      by35,      as3022_state,      init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, slbmania,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, futurspa,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, spaceinv,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, mystic,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, xenon,      0,        sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, viking,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Viking",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, hotdoggn,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, skatebll,   0,        as3022,      by35_os40, by35_state, init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, frontier,   0,        as3022,      frontier,  by35_state, init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, speakesy,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, speakesy4p, speakesy, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, bmx,        0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, granslam,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, granslam4,  granslam, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, goldball,   0,        as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, goldballn,  goldball, as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Squawk & Talk sound
-GAME( 1981, flashgdn,  0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnf, flashgdn, by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnv, flashgdn, sounds_plus, by35_os5x, sounds_plus_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fball_ii,  0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlx,  0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballd14,  eballdlx, by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, embryon,   0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, fathom,    0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, centaur,   0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, medusa,    0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, vector,    0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, elektra,   0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm,   0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm4,  spectrm,  by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, rapidfip,  0,        by35,        by35,      by35_state,        init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, m_mpac,    0,        by35,        by35_os5x, by35_state,        init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdn,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnf, flashgdn, by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnv, flashgdn, sounds_plus, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, fball_ii,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, eballdlx,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, eballd14,  eballdlx, by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, embryon,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, fathom,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, centaur,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, medusa,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, vector,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, elektra,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, spectrm,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, spectrm4,  spectrm,  by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, rapidfip,  0,        by35,        by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, m_mpac,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_IS_SKELETON_MECHANICAL)
 
 // Cheap Squeak sound
-GAME( 1984, kosteel,  0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1983, xsandos,  0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, spyhuntr, 0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, fbclass,  0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, blakpyra, 0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, cybrnaut, 0, by35, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1983, xsandos,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, spyhuntr, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, fbclass,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, blakpyra, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1985, cybrnaut, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Other manufacturers
 GAME( 1984, suprbowl, xsandos,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL)
