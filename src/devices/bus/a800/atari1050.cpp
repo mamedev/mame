@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(atari1050_device::ready_w)
 
 
 static INPUT_PORTS_START(atari1050)
-	PORT_NAME("SELECT") // values not verified
+	PORT_START("SELECT") // values not verified
 	PORT_DIPNAME(0x03, 0x00, "Drive Code") PORT_DIPLOCATION("S2:1,2")
 	PORT_DIPSETTING(0x00, "No. 1")
 	PORT_DIPSETTING(0x01, "No. 2")

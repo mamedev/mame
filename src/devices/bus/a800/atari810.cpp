@@ -38,7 +38,7 @@ void atari810_device::mem_map(address_map &map)
 	map(0x0080, 0x00ff).mirror(0x1400).ram(); // MCM6810
 	map(0x0100, 0x017f).mirror(0x1480).m(m_pia, FUNC(mos6532_new_device::ram_map));
 	map(0x0300, 0x031f).mirror(0x14e0).m(m_pia, FUNC(mos6532_new_device::io_map));
-	map(0x0800, 0x0fff).mirror(0x1800).rom().region("rom", 0);
+	map(0x0800, 0x0fff).mirror(0x1000).rom().region("rom", 0);
 }
 
 
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(atari810_device::ready_w)
 
 
 static INPUT_PORTS_START(atari810)
-	PORT_NAME("SELECT") // values not verified
+	PORT_START("SELECT") // values not verified
 	PORT_DIPNAME(0x05, 0x00, "Drive Code") PORT_DIPLOCATION("S101:1,2")
 	PORT_DIPSETTING(0x00, "No. 1")
 	PORT_DIPSETTING(0x01, "No. 2")
