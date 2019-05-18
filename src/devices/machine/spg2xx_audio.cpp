@@ -1299,12 +1299,37 @@ WRITE16_MEMBER(spg110_audio_device::audio_w)
 	spg2xx_audio_device::audio_w(space,offset,data,mem_mask);
 }
 
+uint16_t sunplus_gcm394_audio_device::control_group16_r(uint8_t group, uint8_t offset)
+{
+	LOGMASKED(LOG_SPU_WRITES, "sunplus_gcm394_audio_device::control_group16_r (group %d) offset %02x\n", group, offset);
+	return m_control[group][offset];
+}
+
 void sunplus_gcm394_audio_device::control_group16_w(uint8_t group, uint8_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_SPU_WRITES, "sunplus_gcm394_audio_device::control_group16_w (group %d) offset %02x data %04x\n", group, offset, data);
+	m_control[group][offset] = data;
+
+	// offset 0x0b = triggers?
 }
+
+READ16_MEMBER(sunplus_gcm394_audio_device::control_r)
+{
+	return control_group16_r(offset & 0x20 ? 1 : 0, offset & 0x1f);
+}
+
 
 WRITE16_MEMBER(sunplus_gcm394_audio_device::control_w)
 {
 	control_group16_w(offset & 0x20 ? 1 : 0, offset & 0x1f, data);
+}
+
+void sunplus_gcm394_audio_device::device_start()
+{
+	spg2xx_audio_device::device_start();
+
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 0x20; j++)
+			m_control[i][j] = 0x0000;
+
 }

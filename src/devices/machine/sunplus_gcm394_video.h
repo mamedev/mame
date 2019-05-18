@@ -23,6 +23,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
+	auto space_read_callback() { return m_space_read_cb.bind(); }
+
 	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
@@ -192,11 +194,9 @@ protected:
 	uint16_t m_spriteextra[0x100];
 	uint16_t m_paletteram[0x100*0x10];
 
-	uint16_t read_data(uint32_t offset);
-
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	devcb_read16 m_space_read_cb;
 };
 
 class gcm394_video_device : public gcm394_base_video_device

@@ -31,6 +31,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	, m_video_irq_cb(*this)
 	, m_palette(*this, "palette")
 	, m_gfxdecode(*this, "gfxdecode")
+	, m_space_read_cb(*this)
 {
 }
 
@@ -167,6 +168,7 @@ void gcm394_base_video_device::device_start()
 		gfxelement++;
 	}
 	save_item(NAME(m_spriteextra));
+	m_space_read_cb.resolve_safe(0);
 }
 
 void gcm394_base_video_device::device_reset()
@@ -217,13 +219,6 @@ void gcm394_base_video_device::device_reset()
 *     Video Hardware     *
 *************************/
 
-inline uint16_t gcm394_base_video_device::read_data(uint32_t offset)
-{
-	uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-	return b;
-}
-
-
 template<gcm394_base_video_device::blend_enable_t Blend, gcm394_base_video_device::rowscroll_enable_t RowScroll, gcm394_base_video_device::flipx_t FlipX>
 void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset)
 {
@@ -263,7 +258,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = read_data((m++ & 0x3fffff));
+			uint16_t b = m_space_read_cb((m++ & 0x3fffff));
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;
