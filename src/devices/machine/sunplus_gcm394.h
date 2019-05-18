@@ -15,6 +15,8 @@
 #include "screen.h"
 #include "emupal.h"
 #include "sunplus_gcm394_video.h"
+#include "spg2xx_audio.h"
+
 
 class sunplus_gcm394_base_device : public device_t, public device_mixer_interface
 {
@@ -25,6 +27,7 @@ public:
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_spg_video(*this, "spgvideo")
+	, m_spg_audio(*this, "spgaudio")
 	, m_porta_in(*this)
 	{
 	}
@@ -47,6 +50,7 @@ protected:
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
+	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 
 	devcb_read16 m_porta_in;
 
@@ -155,8 +159,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7860_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7860_w);
+	DECLARE_READ16_MEMBER(ioport_a_r);
+	DECLARE_WRITE16_MEMBER(ioport_a_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7861_r);
 
@@ -206,11 +210,16 @@ private:
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
 
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
+	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
 	void checkirq6();
 
 	emu_timer *m_unk_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	uint8_t* m_gfxregion;
+	uint32_t m_gfxregionsize;
+	uint16_t read_space(uint32_t offset);
 
 };
 
