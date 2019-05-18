@@ -24,7 +24,7 @@ Known to exist but not dumped:
 	*Cruis'n USA L1.2
 	*Cruis'n World L2.6 (update to the Hyperdrive kit L2.5)
 	*Cruis'n World L1.0
-    *Off Road Challenge v1.00 (Mon 07-28-97)
+	*Off Road Challenge v1.00 (Mon 07-28-97)
 	
 
 **************************************************************************/
@@ -37,7 +37,9 @@ Known to exist but not dumped:
 #include "includes/midvunit.h"
 #include "crusnusa.lh"
 
+
 #define CPU_CLOCK       50000000
+
 
 /*************************************
  *
@@ -60,6 +62,7 @@ void midvunit_state::machine_start()
 	m_optional_drivers.resolve();
 }
 
+
 void midvunit_state::machine_reset()
 {
 	m_dcs->reset_w(1);
@@ -68,6 +71,7 @@ void midvunit_state::machine_reset()
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
 }
+
 
 MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 {
@@ -79,6 +83,8 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 
 	m_ata->reset();
 }
+
+
 
 /*************************************
  *
@@ -107,6 +113,7 @@ READ32_MEMBER(midvunit_state::port0_r)
 	return (val << 16) | val;
 }
 
+
 /*************************************
  *
  *  ADC input ports
@@ -131,6 +138,8 @@ WRITE32_MEMBER( midvunit_state::adc_w )
 		logerror("adc_w without enabling writes!\n");
 }
 
+
+
 /*************************************
  *
  *  CMOS access
@@ -142,16 +151,20 @@ WRITE32_MEMBER(midvunit_state::midvunit_cmos_protect_w)
 	m_cmos_protected = ((data & 0xc00) != 0xc00);
 }
 
+
 WRITE32_MEMBER(midvunit_state::midvunit_cmos_w)
 {
 	if (!m_cmos_protected)
 		COMBINE_DATA(m_nvram + offset);
 }
 
+
 READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 {
 	return m_nvram[offset];
 }
+
+
 
 /*************************************
  *
@@ -178,6 +191,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 		logerror("midvunit_control_w: old=%04X new=%04X diff=%04X\n", olddata, m_control_data, olddata ^ m_control_data);
 }
 
+
 WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 {
 	uint16_t olddata = m_control_data;
@@ -197,11 +211,14 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 		logerror("crusnwld_control_w: old=%04X new=%04X diff=%04X\n", olddata, m_control_data, olddata ^ m_control_data);
 }
 
+
 WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
 {
 	logerror("Sound W = %02X\n", data);
 	m_dcs->data_w(data & 0xff);
 }
+
+
 
 /*************************************
  *
@@ -227,6 +244,7 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 
 	return m_tms32031_control[offset];
 }
+
 
 WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 {
@@ -254,6 +272,8 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
+
+
 /*************************************
  *
  *  Serial number access
@@ -266,10 +286,12 @@ READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 	return in1 | in1 << 16;
 }
 
+
 READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
 	return m_midway_serial_pic->read() << 16;
 }
+
 
 WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 {
@@ -280,6 +302,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 	}
 	m_midway_serial_pic->write(data >> 16);
 }
+
 
 /*************************************
  *
@@ -297,6 +320,7 @@ static const uint32_t bit_data[0x10] =
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636
 };
 
+
 READ32_MEMBER(midvunit_state::bit_data_r)
 {
 	int bit = (bit_data[m_bit_index / 32] >> (31 - (m_bit_index % 32))) & 1;
@@ -304,10 +328,13 @@ READ32_MEMBER(midvunit_state::bit_data_r)
 	return bit ? m_nvram[offset] : ~m_nvram[offset];
 }
 
+
 WRITE32_MEMBER(midvunit_state::bit_reset_w)
 {
 	m_bit_index = 0;
 }
+
+
 
 /*************************************
  *
@@ -321,10 +348,12 @@ READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 	return in1 | in1 << 16;
 }
 
+
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
 	return m_midway_serial_pic2->read() << 16;
 }
+
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
@@ -358,6 +387,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 		m_wheel_board_u8_latch |= BIT(data, 2) << 4; // WA2; C for U9
 		m_wheel_board_u8_latch |= BIT(data, 3) << 3; // WA3; G2B for U9
 	}
+
 	if (!BIT(data, 9))
 	{
 		logerror("Wheel board (U13 74HC245; DCS) = %02X\n", data & 0xFF);
@@ -455,7 +485,9 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 			}
 		}
 	}
+
 	m_wheel_board_last = data;
+
 }
 
 DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
@@ -468,6 +500,7 @@ DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
 	}
 	return 0;
 }
+
 
 /*************************************
  *
@@ -499,6 +532,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 	return result;
 }
 
+
 WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
 	uint32_t olddata = m_midvplus_misc[offset];
@@ -526,6 +560,8 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 		logerror("%06X:midvplus_misc_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
+
+
 /*************************************
  *
  *  War Gods RAM grossness
@@ -541,6 +577,8 @@ WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
 
 	m_lastval = data;
 }
+
+
 
 /*************************************
  *
@@ -578,6 +616,7 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0xc00000, 0xffffff).rom().region("user1", 0);
 }
 
+
 void midvunit_state::midvplus_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("ram_base");
@@ -600,6 +639,8 @@ void midvunit_state::midvplus_map(address_map &map)
 	map(0xa00000, 0xbfffff).rw(FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
 	map(0xc00000, 0xcfffff).ram();
 }
+
+
 
 /*************************************
  *
@@ -645,6 +686,7 @@ static INPUT_PORTS_START( midvunit )
 	PORT_START("BRAKE")     /* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( crusnusa )
 	PORT_INCLUDE( midvunit )
@@ -754,6 +796,7 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( crusnwld )
 	PORT_INCLUDE( midvunit )
 
@@ -839,6 +882,7 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( offroadc )
 	PORT_INCLUDE( midvunit )
 
@@ -889,6 +933,7 @@ static INPUT_PORTS_START( offroadc )
 	PORT_DIPSETTING(      0x7000, "Denmark 1" )
 	PORT_DIPSETTING(      0x6800, "Hungary 1" )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( wargods )
 	PORT_START("DIPS")
@@ -1003,6 +1048,7 @@ static INPUT_PORTS_START( wargodsa ) /* For Medium Res only versions */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Machine drivers
@@ -1031,6 +1077,7 @@ void midvunit_state::midvcommon(machine_config &config)
 	m_screen->set_palette(m_palette);
 }
 
+
 void midvunit_state::midvunit(machine_config &config)
 {
 	midvcommon(config);
@@ -1044,6 +1091,7 @@ void midvunit_state::midvunit(machine_config &config)
 	/* sound hardware */
 	DCS_AUDIO_2K(config, "dcs", 0);
 }
+
 
 void midvunit_state::crusnwld(machine_config &config)
 {
@@ -1085,6 +1133,8 @@ void midvunit_state::midvplus(machine_config &config)
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
 }
+
+
 
 /*************************************
  *
@@ -1221,6 +1271,7 @@ ROM_START( crusnusa ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cusa.u2",  0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) )
@@ -1262,6 +1313,7 @@ ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1305,6 +1357,7 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( crusnwld ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
@@ -1342,6 +1395,7 @@ ROM_START( crusnwld ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 ROM_START( crusnwld25 ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 Conversion kit for Hyperdrive*/
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1381,6 +1435,7 @@ ROM_START( crusnwld25 ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 Conversion ki
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( crusnwld23 ) /* Version 2.3, Fri Jan 09 1998 - 10:25:49 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
@@ -1418,6 +1473,7 @@ ROM_START( crusnwld23 ) /* Version 2.3, Fri Jan 09 1998 - 10:25:49 */
 	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 ROM_START( crusnwld20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1457,6 +1513,7 @@ ROM_START( crusnwld20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( crusnwld19 ) /* Version 1.9, Sat Mar 08 1997 - 14:48:17 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
@@ -1494,6 +1551,7 @@ ROM_START( crusnwld19 ) /* Version 1.9, Sat Mar 08 1997 - 14:48:17 */
 	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 ROM_START( crusnwld17 ) /* Version 1.7, Fri Jan 24 1997 - 16:23:59 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1533,6 +1591,7 @@ ROM_START( crusnwld17 ) /* Version 1.7, Fri Jan 24 1997 - 16:23:59 */
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( crusnwld13 ) /* Version 1.3, Mon Nov 25 1996 - 23:22:45 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
@@ -1570,6 +1629,7 @@ ROM_START( crusnwld13 ) /* Version 1.3, Mon Nov 25 1996 - 23:22:45 */
 	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 ROM_START( offroadc ) /* Version 1.63, Tue 03-03-98 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1609,6 +1669,7 @@ ROM_START( offroadc ) /* Version 1.63, Tue 03-03-98 */
 	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( offroadc5 ) /* Version 1.50, Tue 10-21-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "offroadc.u2",  0x000000, 0x80000, CRC(69976e9d) SHA1(63c886ac2563c43a10840f49f929f8613cd94de2) )
@@ -1646,6 +1707,7 @@ ROM_START( offroadc5 ) /* Version 1.50, Tue 10-21-97 */
 	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 ROM_START( offroadc4 ) /* Version 1.40, Mon 10-06-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
@@ -1685,6 +1747,7 @@ ROM_START( offroadc4 ) /* Version 1.40, Mon 10-06-97 */
 	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( offroadc3 ) /* Version 1.30, Mon 09-15-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "offroadc.u2",  0x000000, 0x80000, CRC(69976e9d) SHA1(63c886ac2563c43a10840f49f929f8613cd94de2) )
@@ -1723,6 +1786,7 @@ ROM_START( offroadc3 ) /* Version 1.30, Mon 09-15-97 */
 	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
+
 ROM_START( offroadc1 ) /* Version 1.10, Mon 08-18-97 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "offroadc.u2",  0x000000, 0x80000, CRC(69976e9d) SHA1(63c886ac2563c43a10840f49f929f8613cd94de2) )
@@ -1760,6 +1824,7 @@ ROM_START( offroadc1 ) /* Version 1.10, Mon 08-18-97 */
 	ROM_LOAD("a-21173.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 	ROM_LOAD("a-21884.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
+
 
 /*
 War Gods
@@ -1840,6 +1905,8 @@ ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	DISK_IMAGE( "wargods_12-11-1995", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
 ROM_END
 
+
+
 /*************************************
  *
  *  Driver init
@@ -1852,6 +1919,7 @@ READ32_MEMBER(midvunit_state::generic_speedup_r)
 	return m_generic_speedup[offset];
 }
 
+
 void midvunit_state::init_crusnusa_common(offs_t speedup)
 {
 	m_adc_shift = 24;
@@ -1863,6 +1931,7 @@ void midvunit_state::init_crusnusa_common(offs_t speedup)
 void midvunit_state::init_crusnusa()  { init_crusnusa_common(0xc93e); }
 void midvunit_state::init_crusnu40()  { init_crusnusa_common(0xc957); }
 void midvunit_state::init_crusnu21()  { init_crusnusa_common(0xc051); }
+
 
 void midvunit_state::init_crusnwld_common(offs_t speedup)
 {
@@ -1906,6 +1975,7 @@ void midvunit_state::init_offroadc()
 	m_generic_speedup = m_ram_base + 0x195aa;
 }
 
+
 void midvunit_state::init_wargods()
 {
 	uint8_t default_nvram[256];
@@ -1925,6 +1995,8 @@ void midvunit_state::init_wargods()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
 	m_generic_speedup = m_ram_base + 0x2f4c;
 }
+
+
 
 /*************************************
  *
