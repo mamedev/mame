@@ -25,7 +25,7 @@ public:
 	required_device<mas3507d_device> mas3507d;
 	required_device<samples_device> m_samples;
 
-	void set_fake_fpga(bool flag) { use_fake_fpga = flag; }
+	void set_ddrsbm_fpga(bool flag) { use_ddrsbm_fpga = flag; }
 
 	void set_ram(uint16_t *v) { ram = v; }
 
@@ -63,7 +63,7 @@ private:
 	uint8_t crypto_key3, orig_crypto_key3;
 
 	uint32_t mp3_start_adr, mp3_end_adr, mpeg_ctrl_flag;
-	bool use_fake_fpga;
+	bool use_ddrsbm_fpga;
 
 	uint32_t mp3_last_frame, mp3_last_adr, mp3_next_sync, mp3_last_decrypt_adr;
 	int16_t *channel_l_pcm, *channel_r_pcm;
@@ -82,7 +82,7 @@ private:
 	int32_t find_enc_key();
 
 	uint16_t fpga_decrypt_byte_real(uint16_t data);
-	uint16_t fpga_decrypt_byte_fake(uint16_t data, uint32_t crypto_idx);
+	uint16_t fpga_decrypt_byte_ddrsbm(uint16_t data, uint32_t crypto_idx);
 
 	SAMPLES_UPDATE_CB_MEMBER(k573fpga_stream_update);
 };

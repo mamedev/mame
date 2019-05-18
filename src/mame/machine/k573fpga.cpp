@@ -4,7 +4,6 @@
 #include "speaker.h"
 
 #include "k573fpga.h"
-#include "k573enc.h"
 
 // TODO: Check if this is optimal
 #define MINIMUM_BUFFER 1
@@ -22,7 +21,7 @@ k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag,
     device_t(mconfig, KONAMI_573_DIGITAL_FPGA, tag, owner, clock),
     mas3507d(*this, "mpeg"),
     m_samples(*this, "samples"),
-    use_fake_fpga(false)
+    use_ddrsbm_fpga(false)
 {
 }
 
@@ -178,15 +177,6 @@ void k573fpga_device::set_mpeg_ctrl(uint16_t data)
     }
 }
 
-int32_t k573fpga_device::find_enc_key()
-{
-    if (k573enc_lookup.find(crypto_key1) == k573enc_lookup.end()) {
-        return -1;
-    }
-
-    return k573enc_lookup[crypto_key1];
-}
-
 inline uint16_t k573fpga_device::fpga_decrypt_byte_real(uint16_t v)
 {
     uint16_t m = crypto_key1 ^ crypto_key2;
@@ -231,16 +221,33 @@ inline uint16_t k573fpga_device::fpga_decrypt_byte_real(uint16_t v)
     return (v >> 8) | ((v & 0xff) << 8);
 }
 
-inline uint16_t k573fpga_device::fpga_decrypt_byte_fake(uint16_t data, uint32_t crypto_idx)
+inline uint16_t k573fpga_device::fpga_decrypt_byte_ddrsbm(uint16_t data, uint32_t crypto_idx)
 {
-    // Not the real algorithm. Only used for DDR Solo Bass Mix (ddrsbm)
-    int32_t crypto_enc_idx = find_enc_key();
+    uint8_t key[16] = {0};
 
-    if (crypto_enc_idx == -1) {
-        return data;
+    uint16_t key_state = BIT(crypto_key1, 0x0d) << 15 |
+        BIT(crypto_key1, 0x0b) << 14 |
+        BIT(crypto_key1, 0x09) << 13 |
+        BIT(crypto_key1, 0x07) << 12 |
+        BIT(crypto_key1, 0x05) << 11 |
+        BIT(crypto_key1, 0x03) << 10 |
+        BIT(crypto_key1, 0x01) << 9 |
+        BIT(crypto_key1, 0x0f) << 8 |
+        BIT(crypto_key1, 0x0e) << 7 |
+        BIT(crypto_key1, 0x0c) << 6 |
+        BIT(crypto_key1, 0x0a) << 5 |
+        BIT(crypto_key1, 0x08) << 4 |
+        BIT(crypto_key1, 0x06) << 3 |
+        BIT(crypto_key1, 0x04) << 2 |
+        BIT(crypto_key1, 0x02) << 1 |
+        BIT(crypto_key1, 0x00) << 0;
+
+    for (int i = 0; i < 8; i++) {
+        key[i * 2] = key_state & 0xff;
+        key[i * 2 + 1] = (key_state >> 8) & 0xff;
+        key_state = (((((key_state >> 8) >> 7) & 1) | (((key_state >> 8) << 1) & 0xff)) << 8) |
+            (((key_state & 0xff) >> 7) & 1) | (((key_state & 0xff) << 1) & 0xff);
     }
-
-    uint8_t *key = k573enc_keys[crypto_enc_idx];
 
     uint16_t output_word = 0;
     for (int cur_bit = 0; cur_bit < 8; cur_bit++) {
@@ -277,7 +284,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 
     int new_samples = 0;
 
-    if (!use_fake_fpga && mp3_start_adr != mp3_dynamic_base) {
+    if (!use_ddrsbm_fpga && mp3_start_adr != mp3_dynamic_base) {
         // Base addresses are kind of a "hack" and should be dealt with eventually.
         // Files that are loaded at he base address are dynamic, meaning the data constantly changes.
         // Data will not get loaded outside of the base address region past the boot sequence, however.
@@ -295,13 +302,13 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         crypto_key3 = orig_crypto_key3;
 
         for (int32_t cur_idx = mp3_start_adr; cur_idx < mp3_end_adr; cur_idx += 2) {
-            if (use_fake_fpga) {
-                ram_swap[cur_idx >> 1] = fpga_decrypt_byte_fake(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
+            if (use_ddrsbm_fpga) {
+                ram_swap[cur_idx >> 1] = fpga_decrypt_byte_ddrsbm(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
             } else {
                 ram_swap[cur_idx >> 1] = fpga_decrypt_byte_real(ram[cur_idx >> 1]);
             }
 
-            if (!use_fake_fpga) {
+            if (!use_ddrsbm_fpga) {
                 crypto_key1 = (crypto_key1 & 0x8000) | ((crypto_key1 << 1) & 0x7FFE) | ((crypto_key1 >> 14) & 1);
 
                 if ((((crypto_key1 >> 15) ^ crypto_key1) & 1) != 0) {
@@ -355,13 +362,13 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
             int32_t cur_idx;
 
             for (cur_idx = mp3_last_decrypt_adr; cur_idx - mp3_last_decrypt_adr < decrypt_buffer_speed * decrypt_buffer && cur_idx < mp3_end_adr; cur_idx += 2) {
-                if (use_fake_fpga) {
-                    ram_swap[cur_idx >> 1] = fpga_decrypt_byte_fake(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
+                if (use_ddrsbm_fpga) {
+                    ram_swap[cur_idx >> 1] = fpga_decrypt_byte_ddrsbm(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
                 } else {
                     ram_swap[cur_idx >> 1] = fpga_decrypt_byte_real(ram[cur_idx >> 1]);
                 }
 
-                if (!use_fake_fpga) {
+                if (!use_ddrsbm_fpga) {
                     crypto_key1 = (crypto_key1 & 0x8000) | ((crypto_key1 << 1) & 0x7FFE) | ((crypto_key1 >> 14) & 1);
 
                     if ((((crypto_key1 >> 15) ^ crypto_key1) & 1) != 0) {

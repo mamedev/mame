@@ -2350,7 +2350,7 @@ void ksys573_state::ddrsbm(machine_config &config)
 {
 	k573d(config);
 	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::ddrsolo_output_callback));
-	subdevice<k573dio_device>("k573dio")->set_fake_fpga(true);
+	subdevice<k573dio_device>("k573dio")->set_ddrsbm_fpga(true);
 
 	cassyi(config);
 }
