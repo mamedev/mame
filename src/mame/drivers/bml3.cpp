@@ -37,7 +37,7 @@
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
-#define MASTER_CLOCK ( 32256000 )   // Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
+#define MASTER_CLOCK ( 32.256_MHz_XTAL )   // Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
 
 #define D80_CLOCK ( MASTER_CLOCK / 2 )  // Graphics dot clock in 80-column mode. ~16 MHz.
 #define D40_CLOCK ( D80_CLOCK / 2 )     // Graphics dot clock in 40-column mode.  ~8 MHz.

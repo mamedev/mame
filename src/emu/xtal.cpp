@@ -332,6 +332,7 @@ const double XTAL::known_xtals[] = {
 	 32'000'000, /* 32_MHz_XTAL            - */
 	 32'147'000, /* 32.147_MHz_XTAL        Ampex 210+ 132-column display clock */
 	 32'220'000, /* 32.22_MHz_XTAL         Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz */
+	 32'256'000, /* 32.256_MHz_XTAL        Hitachi MB-6890 */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
 	 32'530'400, /* 32.5304_MHz_XTAL       Seta 2 */
 	 33'000'000, /* 33_MHz_XTAL            Sega Model 3 video board */
