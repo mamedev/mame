@@ -224,23 +224,13 @@ inline uint16_t k573fpga_device::fpga_decrypt_byte_real(uint16_t v)
 inline uint16_t k573fpga_device::fpga_decrypt_byte_ddrsbm(uint16_t data, uint32_t crypto_idx)
 {
     uint8_t key[16] = {0};
-
-    uint16_t key_state = BIT(crypto_key1, 0x0d) << 15 |
-        BIT(crypto_key1, 0x0b) << 14 |
-        BIT(crypto_key1, 0x09) << 13 |
-        BIT(crypto_key1, 0x07) << 12 |
-        BIT(crypto_key1, 0x05) << 11 |
-        BIT(crypto_key1, 0x03) << 10 |
-        BIT(crypto_key1, 0x01) << 9 |
-        BIT(crypto_key1, 0x0f) << 8 |
-        BIT(crypto_key1, 0x0e) << 7 |
-        BIT(crypto_key1, 0x0c) << 6 |
-        BIT(crypto_key1, 0x0a) << 5 |
-        BIT(crypto_key1, 0x08) << 4 |
-        BIT(crypto_key1, 0x06) << 3 |
-        BIT(crypto_key1, 0x04) << 2 |
-        BIT(crypto_key1, 0x02) << 1 |
-        BIT(crypto_key1, 0x00);
+    uint16_t key_state = bitswap<16>(
+        crypto_key1,
+        13, 11, 9, 7,
+        5, 3, 1, 15,
+        14, 12, 10, 8,
+        6, 4, 2, 0
+    );
 
     for (int i = 0; i < 8; i++) {
         key[i * 2] = key_state & 0xff;
