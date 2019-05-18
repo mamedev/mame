@@ -238,7 +238,7 @@ void ip22_state::ip22_base(machine_config &config)
 
 	// GIO
 	GIO(config, m_gio, m_maincpu, m_hpc3);
-	GIO_SLOT(config, m_gio_gfx, m_gio, gio_cards, nullptr);
+	GIO_SLOT(config, m_gio_gfx, m_gio, gio_cards, "xl24");
 	GIO_SLOT(config, m_gio_exp0, m_gio, gio_cards, nullptr);
 	GIO_SLOT(config, m_gio_exp1, m_gio, gio_cards, nullptr);
 }
