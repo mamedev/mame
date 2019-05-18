@@ -85,24 +85,20 @@ void k573fpga_device::device_add_mconfig(machine_config &config)
 }
 
 uint32_t k573fpga_device::get_mp3_playback() {
-    if (mp3_start_adr == 0) {
-        if (m_samples->get_position(0) == 0 && decrypt_finished) {
-            // The game is still requesting position updates after the song has ended.
-            // This happens in some games like DDR 4th Mix Plus where it uses
-            // the position in song for actual game engine timings.
-            // The counter will properly end when the game signals to the FPGA to stop playback.
-            last_position_update += position_diff;
-        } else {
-            position_diff = m_samples->get_position(0) - last_position_update;
-            last_position_update = m_samples->get_position(0);
-        }
-
+    if (m_samples->get_position(0) == 0 && decrypt_finished) {
+        // The game is still requesting position updates after the song has ended.
+        // This happens in some games like DDR 4th Mix Plus where it uses
+        // the position in song for actual game engine timings.
+        // The counter will properly end when the game signals to the FPGA to stop playback.
+        last_position_update += position_diff;
+    } else {
+        position_diff = m_samples->get_position(0) - last_position_update;
         last_position_update = m_samples->get_position(0);
-
-        return last_position_update;
     }
 
-    return 0;
+    last_position_update = m_samples->get_position(0);
+
+    return last_position_update;
 }
 
 uint16_t k573fpga_device::i2c_read()
@@ -121,12 +117,12 @@ void k573fpga_device::i2c_write(uint16_t data)
 
 uint16_t k573fpga_device::get_mpeg_ctrl()
 {
-    if (mpeg_ctrl_flag == 0xe000 || (m_samples->get_position(0) > 0 && mp3_decrypt_mode)) {
+    if (mp3_decrypt_mode && m_samples->get_position(0) > 0) {
         // This has been tested with real hardware, but this flag is always held 0x1000 when the audio is being played
-        return mpeg_ctrl_flag | 0x1000;
+        return 0x1000;
     }
 
-    return mpeg_ctrl_flag;
+    return 0x0000;
 }
 
 void k573fpga_device::set_mpeg_ctrl(uint16_t data)
@@ -268,7 +264,12 @@ inline uint16_t k573fpga_device::fpga_decrypt_byte_ddrsbm(uint16_t data, uint32_
 
 SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 {
-    if ((mpeg_ctrl_flag & 0xe000) != 0xe000 || mp3_last_adr >= mp3_end_adr || (m_samples->get_position(0) < mp3_next_sync && mp3_next_sync != 0)) {
+    if (mp3_last_adr >= mp3_end_adr) {
+        mp3_next_sync = 0;
+        return;
+    }
+
+    if ((mpeg_ctrl_flag & 0xe000) != 0xe000 || (m_samples->get_position(0) < mp3_next_sync && mp3_next_sync != 0)) {
         return;
     }
 
@@ -397,6 +398,11 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         }
 
         mp3_last_frame = 0;
+
+        if (mp3_last_adr >= mp3_end_adr) {
+            mp3_next_sync = 0;
+            return;
+        }
 
         if (mp3_next_sync == 0) {
             // For the first iteration, we need to set up the MP3 state and such
