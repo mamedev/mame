@@ -487,7 +487,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 	}
 
 	m_wheel_board_last = data;
-
 }
 
 DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
