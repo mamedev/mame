@@ -199,6 +199,12 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_w %04x\n", machine().describe_context(), data); m_7936 = data; }
 
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7960_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7960_w %04x\n", machine().describe_context(), data); m_7960 = data; }
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7961_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7961_r\n", machine().describe_context()); return m_7961; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7961_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7961_w %04x\n", machine().describe_context(), data); m_7961 = data; }
+
+
 // **************************************** fallthrough logger etc. *************************************************
 
 READ16_MEMBER(sunplus_gcm394_base_device::unk_r)
@@ -362,6 +368,9 @@ void sunplus_gcm394_base_device::map(address_map &map)
 	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));	
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
+	map(0x007960, 0x007960).w(FUNC(sunplus_gcm394_base_device::unkarea_7960_w));
+	map(0x007961, 0x007961).rw(FUNC(sunplus_gcm394_base_device::unkarea_7961_r), FUNC(sunplus_gcm394_base_device::unkarea_7961_w));
+
 	// ######################################################################################################################################################################################
 	// 7axx region = system (including dma)
 	// ######################################################################################################################################################################################
@@ -452,6 +461,10 @@ void sunplus_gcm394_base_device::device_reset()
 	m_7934 = 0x0000;
 	m_7935 = 0x0000;
 	m_7936 = 0x0000;
+
+	m_7960 = 0x0000;
+	m_7961 = 0x0000;
+
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 

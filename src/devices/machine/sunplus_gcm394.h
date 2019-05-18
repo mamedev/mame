@@ -119,6 +119,8 @@ protected:
 	uint16_t m_7935;
 	uint16_t m_7936;
 
+	uint16_t m_7960;
+	uint16_t m_7961;
 
 private:
 	DECLARE_READ16_MEMBER(unk_r);
@@ -208,6 +210,11 @@ private:
 
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
+
+	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
+	DECLARE_READ16_MEMBER(unkarea_7961_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7961_w);
+
 
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
