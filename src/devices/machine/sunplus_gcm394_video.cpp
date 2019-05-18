@@ -229,8 +229,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 {
 	uint32_t nc_bpp = ((bpp) + 1) << 1;
 
-	palette_offset >>= nc_bpp;
-	palette_offset <<= nc_bpp;
+	// probably don't do this here as this SoC has extended palette for higher bpp modes
+	//palette_offset >>= nc_bpp;
+	//palette_offset <<= nc_bpp;
 
 	uint32_t bits_per_row = nc_bpp * w / 16;
 	//uint32_t words_per_tile = bits_per_row * h;
@@ -269,7 +270,31 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		}
 		nbits -= nc_bpp;
 
-		uint32_t pal = palette_offset + (bits >> 16);
+		int pen = bits >> 16;
+
+		int current_palette_offset = palette_offset;
+
+		// for planes above 4bpp palette ends up being pulled from different places?
+		if (nc_bpp < 6)
+		{
+			// 2bpp
+			// 4bpp
+
+			current_palette_offset |= 0x0800;
+
+		}
+		else if (nc_bpp < 8)
+		{
+			// 6bpp
+
+		}
+		else
+		{
+			pen = machine().rand() & 0x1f;
+			// 8bpp
+		}
+
+		uint32_t pal = current_palette_offset + pen;
 		bits &= 0xffff;
 
 		if (RowScroll)
@@ -345,7 +370,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		if (x0 & 1)
 			palette >>= 8;
 
-		tile |= (palette & 0x0003) << 16;
+		tile |= (palette & 0x0007) << 16;
 
 		if (!tile)
 			continue;
@@ -373,7 +398,8 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		const uint32_t yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
 		uint32_t palette_offset = (tileattr & 0x0f00) >> 4;
 
-		palette_offset |= 0x0900;
+		//palette_offset |= 0x0900;
+		palette_offset |= 0x0100;
 
 		const uint8_t bpp = tileattr & 0x0003;
 
@@ -466,7 +492,8 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 
-	palette_offset |= 0x0d00;
+	//palette_offset |= 0x0d00;
+	palette_offset |= 0x0500;
 
 	if (blend)
 	{
@@ -746,7 +773,18 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_w) { LOGMASKED(LOG_GCM394_VI
 READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7063_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_w %04x\n", machine().describe_context(), data); m_7063 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7063_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_w %04x\n", machine().describe_context(), data);
+	m_7063 = data;
+
+	// ack or enable? happens near start of the IRQ
+	if (data & 0x01)
+	{
+		m_video_irq_status &= ~1;
+		check_video_irq();
+	}
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
 
