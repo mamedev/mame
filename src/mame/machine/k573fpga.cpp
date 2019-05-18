@@ -240,7 +240,7 @@ inline uint16_t k573fpga_device::fpga_decrypt_byte_ddrsbm(uint16_t data, uint32_
         BIT(crypto_key1, 0x06) << 3 |
         BIT(crypto_key1, 0x04) << 2 |
         BIT(crypto_key1, 0x02) << 1 |
-        BIT(crypto_key1, 0x00) << 0;
+        BIT(crypto_key1, 0x00);
 
     for (int i = 0; i < 8; i++) {
         key[i * 2] = key_state & 0xff;
