@@ -370,7 +370,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		if (x0 & 1)
 			palette >>= 8;
 
-		tile |= (palette & 0x0003) << 16;
+		tile |= (palette & 0x0007) << 16;
 
 		if (!tile)
 			continue;
