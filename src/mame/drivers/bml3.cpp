@@ -194,7 +194,8 @@ WRITE8_MEMBER( bml3_state::mc6845_w )
 READ8_MEMBER( bml3_state::keyboard_r )
 {
 	u8 ret = m_keyb_scancode;
-	m_keyb_scancode &= 0x7f;
+	if (!machine().side_effects_disabled())
+		m_keyb_scancode &= 0x7f;
 	return ret;
 }
 
@@ -210,14 +211,14 @@ WRITE8_MEMBER( bml3_state::keyboard_w )
 
 void bml3_state::m6845_change_clock(u8 setting)
 {
-	int m6845_clock = CPU_CLOCK;    // CRTC and MPU are synchronous by default
+	int m6845_clock = CPU_CLOCK.value();    // CRTC and MPU are synchronous by default
 
 	switch(setting & 0x88)
 	{
-		case 0x00: m6845_clock = C40_CLOCK; break; //320 x 200
-		case 0x08: m6845_clock = C40_CLOCK; break; //320 x 200, interlace
-		case 0x80: m6845_clock = C80_CLOCK; break; //640 x 200
-		case 0x88: m6845_clock = C80_CLOCK; break; //640 x 200, interlace
+		case 0x00: m6845_clock = C40_CLOCK.value(); break; //320 x 200
+		case 0x08: m6845_clock = C40_CLOCK.value(); break; //320 x 200, interlace
+		case 0x80: m6845_clock = C80_CLOCK.value(); break; //640 x 200
+		case 0x88: m6845_clock = C80_CLOCK.value(); break; //640 x 200, interlace
 	}
 
 	m_crtc->set_unscaled_clock(m6845_clock);
