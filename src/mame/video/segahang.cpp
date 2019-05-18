@@ -21,7 +21,7 @@ void segahang_state::video_start()
 	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_HANGON, 0x000, 0, 2);
 
 	// initialize the road
-	m_segaic16road->segaic16_road_init(machine(), 0, m_sharrier_video ? segaic16_road_device::ROAD_SHARRIER : segaic16_road_device::ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
+	m_segaic16road->segaic16_road_init(0, m_sharrier_video ? segaic16_road_device::ROAD_SHARRIER : segaic16_road_device::ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
 }
 
 

@@ -26,7 +26,7 @@ void segaxbd_state::video_start()
 	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_16B, 0x1c00, 0, 2);
 
 	// initialize the road
-	m_segaic16road->segaic16_road_init(machine(), 0, segaic16_road_device::ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
+	m_segaic16road->segaic16_road_init(0, segaic16_road_device::ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
 }
 
 

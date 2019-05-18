@@ -23,7 +23,7 @@ void segaorun_state::video_start()
 		m_segaic16vid->tilemap_init(0, segaic16_video_device::TILEMAP_16B_ALT, 0x000, 0, 2);
 
 		// initialize the road
-		m_segaic16road->segaic16_road_init(machine(), 0, segaic16_road_device::ROAD_OUTRUN, 0x7f6, 0x7c0, 0x7c0, 0);
+		m_segaic16road->segaic16_road_init(0, segaic16_road_device::ROAD_OUTRUN, 0x7f6, 0x7c0, 0x7c0, 0);
 	}
 	else
 	{
@@ -31,7 +31,7 @@ void segaorun_state::video_start()
 		m_segaic16vid->tilemap_init(0, segaic16_video_device::TILEMAP_16B, 0x000, 0, 2);
 
 		// initialize the road
-		m_segaic16road->segaic16_road_init(machine(), 0, segaic16_road_device::ROAD_OUTRUN, 0x400, 0x420, 0x780, 0);
+		m_segaic16road->segaic16_road_init(0, segaic16_road_device::ROAD_OUTRUN, 0x400, 0x420, 0x780, 0);
 	}
 }
 
