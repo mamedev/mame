@@ -257,11 +257,11 @@ int gain_to_db(double val) {
 }
 
 float gain_to_percentage(int val) {
-	double db = gain_to_db(val);
-
-	if (db == 0) {
+	if (val == 0) {
 		return 0; // Special case for muting it seems
 	}
+
+	double db = gain_to_db(val);
 
 	return powf(10.0, (db + 6) / 20.0);
 }
