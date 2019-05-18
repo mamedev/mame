@@ -57,7 +57,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<hpc3_device> m_hpc3;
+	optional_device<hpc3_base_device> m_hpc3;
 
 	address_space *m_space;
 

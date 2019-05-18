@@ -212,7 +212,7 @@ public:
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	uint8_t get_system_id() override { return 0x01; }
+	uint8_t get_system_id() override { return 0x26; }
 };
 
 class ioc2_full_house_device : public ioc2_device
@@ -228,7 +228,7 @@ public:
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	uint8_t get_system_id() override { return 0x20; }
+	uint8_t get_system_id() override { return 0x11; }
 };
 
 DECLARE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device)

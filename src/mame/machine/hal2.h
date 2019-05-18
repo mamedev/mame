@@ -57,6 +57,7 @@ protected:
 		INDIRECT_DATA3_REG   = 0x0070/4,
 	};
 
+	uint32_t m_isr;
 	uint32_t m_iar;
 	uint32_t m_idr[4];
 };

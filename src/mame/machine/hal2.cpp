@@ -28,12 +28,14 @@ hal2_device::hal2_device(const machine_config &mconfig, const char *tag, device_
 
 void hal2_device::device_start()
 {
+	save_item(NAME(m_isr));
 	save_item(NAME(m_iar));
 	save_item(NAME(m_idr));
 }
 
 void hal2_device::device_reset()
 {
+	m_isr = 0;
 	m_iar = 0;
 	memset(m_idr, 0, sizeof(uint32_t) * 4);
 }
@@ -43,8 +45,8 @@ READ32_MEMBER(hal2_device::read)
 	switch (offset)
 	{
 	case STATUS_REG:
-		LOGMASKED(LOG_READS, "%s: HAL2 Status Read: 0x0004\n", machine().describe_context());
-		return 0x0004;
+		LOGMASKED(LOG_READS, "%s: HAL2 Status Read: %08x\n", machine().describe_context(), m_isr);
+		return m_isr;
 	case REVISION_REG:
 		LOGMASKED(LOG_READS, "%s: HAL2 Revision Read: 0x4011\n", machine().describe_context());
 		return 0x4011;
@@ -59,14 +61,10 @@ WRITE32_MEMBER(hal2_device::write)
 	{
 	case STATUS_REG:
 		LOGMASKED(LOG_WRITES, "%s: HAL2 Status Write: 0x%08x (%08x)\n", machine().describe_context(), data, mem_mask);
-		if (data & ISR_GLOBAL_RESET)
-		{
-			LOGMASKED(LOG_WRITES, "    HAL2 Global Reset\n");
-		}
-		if (data & ISR_CODEC_RESET)
-		{
-			LOGMASKED(LOG_WRITES, "    HAL2 Codec Reset\n");
-		}
+		LOGMASKED(LOG_WRITES, "    HAL2 Global Reset %s\n", (data & ISR_GLOBAL_RESET) ? "Inactive" : "Active");
+		LOGMASKED(LOG_WRITES, "    HAL2 Codec Reset %s\n", (data & ISR_CODEC_RESET) ? "Inactive" : "Active");
+		m_isr &= ~0x1c;
+		m_isr |= data & 0x1c;
 		break;
 	case INDIRECT_ADDRESS_REG:
 		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Address Register Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -165,6 +163,9 @@ WRITE32_MEMBER(hal2_device::write)
 		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 3 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_idr[3] = data;
 		return;
+
+	default:
+		LOGMASKED(LOG_WRITES, "%s: Unknown HAL2 Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd8000 + offset*4, data, mem_mask);
+		break;
 	}
-	LOGMASKED(LOG_WRITES, "%s: Unknown HAL2 Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd8000 + offset*4, data, mem_mask);
 }
