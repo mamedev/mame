@@ -4,6 +4,14 @@
 
     Atari 810 Disk Drive
 
+    The 810 is the original 5¼" floppy disk interface for the Atari 400/800
+    computer, supporting only a 709-sector single density format.
+
+    The built-in drive mechanism uses a four-phase stepper motor which is
+    controlled by outputs to a PIA port rather than by the WD1771-01 FDC.
+    The PIA also generates a synthetic index pulse for the FDC. (The format
+    defines the undersized 19th sector of each track as the index area.)
+
 ***************************************************************************/
 
 #include "emu.h"

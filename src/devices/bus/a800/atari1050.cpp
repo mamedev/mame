@@ -4,6 +4,16 @@
 
     Atari 1050 Dual Density Disk Drive
 
+    This SIO peripheral device controls one 5¼" floppy disk drive. Two
+    soft-sectored data formats are supported:
+    * Single density: FM, 40 tracks, 18 sectors/track (88K bytes)
+    * Double density: MFM, 40 tracks, 26 sectors/track (133K bytes;
+      requires DOS3)
+
+    As with the 810, the 1050 uses parallel port outputs to operate the
+    drive mechanism's four-phase stepper motor at 288 RPM. The FDC's own
+    stepping outputs are not used, and its index pulse is synthesized.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -37,7 +47,7 @@ void atari1050_device::mem_map(address_map &map)
 	map(0x0000, 0x007f).mirror(0x0900).ram(); // MCM6810
 	map(0x0080, 0x00ff).mirror(0x0900).m(m_pia, FUNC(mos6532_new_device::ram_map));
 	map(0x0280, 0x029f).mirror(0x0960).m(m_pia, FUNC(mos6532_new_device::io_map));
-	map(0x0400, 0x0403).mirror(0x087c).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0x0400, 0x0403).mirror(0x0bfc).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x1000, 0x1fff).rom().region("rom", 0);
 }
 
