@@ -207,8 +207,6 @@ void hpc3_base_device::do_pbus_dma(uint32_t channel)
 			m_ldac->write(stemp16);
 		else if (channel == 2)
 			m_rdac->write(stemp16);
-		else
-			printf("Channel %d\n", channel);
 
 		dma.m_cur_ptr += 4;
 		dma.m_bytes_left -= 4;
