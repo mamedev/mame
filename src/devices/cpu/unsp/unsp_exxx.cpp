@@ -164,7 +164,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			return;
 
 		case 0x02:
-			logerror("%s = %s lsl %s\n", regs[rd], regs[rd], regs[rs]);
+			logerror("pc:%06x: %s = %s lsl %s (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			m_core->m_r[rd] = m_core->m_r[rd] << m_core->m_r[rs];
 			return;
 
@@ -175,13 +175,13 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 
 		case 0x04:
 			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
-			logerror("%s = %s lsr %s  (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			logerror("pc:%06x: %s = %s lsr %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			m_core->m_r[rd] = m_core->m_r[rd] >> m_core->m_r[rs];
 			return;
 
 		case 0x05:
 		{
-			logerror("%s = %s lsror %s  (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			logerror("pc:%06x: %s = %s lsror %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			uint16_t tmp = m_core->m_r[rd];
 			m_core->m_r[rd] = m_core->m_r[rd] >> m_core->m_r[rs];
 			m_core->m_r[rd] |= tmp; // guess
