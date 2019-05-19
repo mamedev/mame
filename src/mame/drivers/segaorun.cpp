@@ -487,7 +487,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 		return m_custom_io_r(space, offset, mem_mask);
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -662,7 +662,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -745,7 +745,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 	}
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space,0,mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1175,7 +1175,7 @@ void segaorun_state::outrun_base(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaorun);
-	PALETTE(config, m_palette).set_entries(4096*3);
+	PALETTE(config, m_palette).set_entries(4096*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);

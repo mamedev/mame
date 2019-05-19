@@ -913,10 +913,12 @@ WRITE16_MEMBER( segaxbd_state::paletteram_w )
 	int g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
 	int b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
-	// normal colors
+	// shadow / hilight toggle bit in palette RAM
+	rgb_t effects = (newval & 0x8000) ?
+				rgb_t(m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]) :
+				rgb_t(m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
 	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
-	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
-	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
 }
 
 //**************************************************************************
@@ -1713,7 +1715,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
-	PALETTE(config, m_palette).set_entries(8192*3);
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224);
