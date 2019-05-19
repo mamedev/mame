@@ -3501,6 +3501,7 @@ files {
 	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_pci.cpp",
 	MAME_DIR .. "src/mame/drivers/flashbeats.cpp",
+	MAME_DIR .. "src/mame/drivers/segaatom.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")

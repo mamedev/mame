@@ -34398,6 +34398,9 @@ beena                           //
 @source:sega_sawatte.cpp
 sawatte                         //
 
+@source:segaatom.cpp
+spongbob                        // (c) 200? Sega
+
 @source:segac2.cpp
 anpanman                        // (c) 1993 Sega
 bloxeedc                        // (c) 1989 Sega / Elorg
