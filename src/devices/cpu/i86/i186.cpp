@@ -587,41 +587,40 @@ void i80186_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
-	// Most of these mnemonics are borrowed from the Intel 80C186EB/80C188EB Microprocessor User's Manual.
-	// (The 80C186EB/80C188EB's peripheral block is mapped incompatibly but mostly functionally analogous.)
-	// The DMA register mnemonics are not official and only chosen as convenient shorthand.
+	// Most of these mnemonics are borrowed from the Intel 80C186EA/80C188EA User's Manual.
+	// (The 80C186EA/80C188EA's peripheral block is mapped incompatibly but mostly functionally analogous.)
 	state_add( I80186_RELREG, "RELREG", m_reloc ).formatstr("%04X");
 	state_add( I80186_UMCS, "UMCS", m_mem.upper ).formatstr("%04X");
 	state_add( I80186_LMCS, "LMCS", m_mem.lower ).formatstr("%04X");
 	state_add( I80186_PACS, "PACS", m_mem.peripheral ).formatstr("%04X");
 	state_add( I80186_MMCS, "MMCS", m_mem.middle ).formatstr("%04X");
 	state_add( I80186_MPCS, "MPCS", m_mem.middle_size ).formatstr("%04X");
-	state_add( I80186_DMA_SP + 0, "DMA0SP", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_DP + 0, "DMA0DP", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_TC + 0, "DMA0TC", m_dma[0].count ).formatstr("%04X");
-	state_add( I80186_DMA_CR + 0, "DMA0CR", m_dma[0].control ).formatstr("%04X");
-	state_add( I80186_DMA_SP + 1, "DMA1SP", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_DP + 1, "DMA1DP", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_TC + 1, "DMA1TC", m_dma[1].count ).formatstr("%04X");
-	state_add( I80186_DMA_CR + 1, "DMA1CR", m_dma[1].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 0, "T0CNT", m_timer[0].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 0, "T0CMPA", m_timer[0].maxA ).formatstr("%04X");
-	state_add( I80186_T_MAX_B + 0, "T0CMPB", m_timer[0].maxB ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 0, "T0CON", m_timer[0].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 1, "T1CNT", m_timer[1].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 1, "T1CMPA", m_timer[1].maxA ).formatstr("%04X");
-	state_add( I80186_T_MAX_B + 1, "T1CMPB", m_timer[1].maxB ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 1, "T1CON", m_timer[1].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 2, "T2CNT", m_timer[2].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 2, "T2CMPA", m_timer[2].maxA ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 2, "T2CON", m_timer[2].control ).formatstr("%04X");
+	state_add( I80186_DxSRC + 0, "D0SRC", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxDST + 0, "D0DST", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxTC + 0, "D0TC", m_dma[0].count ).formatstr("%04X");
+	state_add( I80186_DxCON + 0, "D0CON", m_dma[0].control ).formatstr("%04X");
+	state_add( I80186_DxSRC + 1, "D1SRC", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxDST + 1, "D1DST", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxTC + 1, "D1TC", m_dma[1].count ).formatstr("%04X");
+	state_add( I80186_DxCON + 1, "D1CON", m_dma[1].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 0, "T0CNT", m_timer[0].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 0, "T0CMPA", m_timer[0].maxA ).formatstr("%04X");
+	state_add( I80186_TxCMPB + 0, "T0CMPB", m_timer[0].maxB ).formatstr("%04X");
+	state_add( I80186_TxCON + 0, "T0CON", m_timer[0].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 1, "T1CNT", m_timer[1].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 1, "T1CMPA", m_timer[1].maxA ).formatstr("%04X");
+	state_add( I80186_TxCMPB + 1, "T1CMPB", m_timer[1].maxB ).formatstr("%04X");
+	state_add( I80186_TxCON + 1, "T1CON", m_timer[1].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 2, "T2CNT", m_timer[2].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 2, "T2CMPA", m_timer[2].maxA ).formatstr("%04X");
+	state_add( I80186_TxCON + 2, "T2CON", m_timer[2].control ).formatstr("%04X");
 	state_add( I80186_INSERV, "INSERV", m_intr.in_service ).formatstr("%04X");
 	state_add( I80186_REQST, "REQST", m_intr.request ).formatstr("%04X");
 	state_add( I80186_PRIMSK, "PRIMSK", m_intr.priority_mask ).formatstr("%04X");
 	state_add( I80186_INTSTS, "INTSTS", m_intr.status ).formatstr("%04X");
 	state_add( I80186_TCUCON, "TCUCON", m_intr.timer ).formatstr("%04X");
-	state_add( I80186_D0CON, "D0CON", m_intr.dma[0] ).formatstr("%04X");
-	state_add( I80186_D1CON, "D1CON", m_intr.dma[1] ).formatstr("%04X");
+	state_add( I80186_DMA0CON, "DMA0CON", m_intr.dma[0] ).formatstr("%04X");
+	state_add( I80186_DMA1CON, "DMA1CON", m_intr.dma[1] ).formatstr("%04X");
 	state_add( I80186_I0CON, "I0CON", m_intr.ext[0] ).formatstr("%04X");
 	state_add( I80186_I1CON, "I1CON", m_intr.ext[1] ).formatstr("%04X");
 	state_add( I80186_I2CON, "I2CON", m_intr.ext[2] ).formatstr("%04X");
