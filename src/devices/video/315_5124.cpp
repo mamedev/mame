@@ -174,6 +174,15 @@ void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) co
 		palette.set_pen_color(i + (512 * 1), level[r], level[g], level[b]); // shadow
 		palette.set_pen_color(i + (512 * 2), level[7 + r], level[7 + g], level[7 + b]); // hilight
 	}
+	// seperated SMS compatible mode color (reference : http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
+	static const u8 sms_level[4] = {0,99,162,255};
+	for (int i = 0; i < 64; i++)
+	{
+		const u8 r = (i & 0x0003) >> 0;
+		const u8 g = (i & 0x000c) >> 2;
+		const u8 b = (i & 0x0030) >> 4;
+		palette.set_pen_color(i + (512 * 3), sms_level[r], sms_level[g], sms_level[b]); // normal
+	}
 }
 
 
@@ -1791,7 +1800,7 @@ void sega315_5313_mode4_device::update_palette()
 
 	for (int i = 0; i < 32; i++)
 	{
-		m_current_palette[i] = ((m_CRAM[i] & 0x30) << 3) | ((m_CRAM[i] & 0x0c ) << 2) | ((m_CRAM[i] & 0x03) << 1);
+		m_current_palette[i] = (512 * 3) + (m_CRAM[i] & 0x3f);
 	}
 }
 
@@ -2006,6 +2015,6 @@ void sega315_5313_mode4_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5246_device::device_add_mconfig(config);
 
-	m_palette->set_entries(512 * 3);
+	m_palette->set_entries((512 * 3) + 64);
 	m_palette->set_init(FUNC(sega315_5313_mode4_device::sega315_5313_palette));
 }
