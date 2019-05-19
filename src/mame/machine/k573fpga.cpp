@@ -267,7 +267,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
     int decrypt_buffer = MINIMUM_BUFFER;
     int decrypt_buffer_speed = buffer_speed;
 
-    if (mp3_next_sync == 0) {
+    if (mp3_next_sync == 0 && last_copied_samples == 0) {
         crypto_key1 = orig_crypto_key1;
         crypto_key2 = orig_crypto_key2;
         crypto_key3 = orig_crypto_key3;
@@ -315,7 +315,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
     uint8_t *buf = (uint8_t*)ram_swap.get() + mp3_last_adr;
 
     // Detect first frame in MP3 data
-    if (mp3_next_sync == 0) {
+    if (mp3_next_sync == 0 && last_copied_samples == 0) {
         buf_size = 0x2000;
 
         // Everything on the System 573 has a header 0x600 or less from what I've seen, but just ot be sure, check the first 0x2000 bytes
@@ -332,7 +332,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         return;
     }
 
-    if (mp3_next_sync == 0) {
+    if (mp3_next_sync == 0 && last_copied_samples == 0) {
         // For the first iteration, we need to set up the MP3 state and such
         if (mp3_info.buffer != NULL) {
             free(mp3_info.buffer);
@@ -473,10 +473,12 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 
         last_copied_samples = buffer_size;
 
-        m_samples->update_raw(0, channel_l_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
-        m_samples->update_raw(1, channel_r_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
+        if (last_copied_samples > 11520 * 3) {
+            m_samples->update_raw(0, channel_l_pcm, buffer_size, mp3_info.hz, true);
+            m_samples->update_raw(1, channel_r_pcm, buffer_size, mp3_info.hz, true);
 
-        mp3_next_sync = buffer_size - (buffer_size / 4); // Grab more data sometime before the current buffer ends. This is arbitrary and kinda hacky, but it worked best between various games in my testing.
+            mp3_next_sync = buffer_size - (buffer_size / 4); // Grab more data sometime before the current buffer ends. This is arbitrary and kinda hacky, but it worked best between various games in my testing.
+        }
     }
 
     if (mp3_last_adr >= mp3_end_adr) {

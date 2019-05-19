@@ -124,7 +124,6 @@ void k573dio_device::device_start()
 
 	k573fpga->set_ram(ram.get());
 	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
-	k573fpga->set_mp3_dynamic_base(mp3_dynamic_base);
 
 	device_reset();
 }
