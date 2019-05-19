@@ -149,7 +149,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w) { LOGMASKED(LOG_GCM39
 
 // similar read/write pattern to above, 2nd group?
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7870_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7870_r\n", machine().describe_context()); return m_7870; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7870_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7870_r\n", machine().describe_context()); return m_portb_in(); }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7870_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7870_w %04x\n", machine().describe_context(), data); m_7870 = data; }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7871_r) {	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7871_r\n", machine().describe_context()); return m_7871; }
@@ -390,6 +390,7 @@ void sunplus_gcm394_base_device::map(address_map &map)
 void sunplus_gcm394_base_device::device_start()
 {
 	m_porta_in.resolve_safe(0);
+	m_portb_in.resolve_safe(0);
 
 	m_unk_timer = timer_alloc(0);
 	m_unk_timer->adjust(attotime::never);

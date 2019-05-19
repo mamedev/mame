@@ -29,6 +29,7 @@ public:
 	, m_spg_video(*this, "spgvideo")
 	, m_spg_audio(*this, "spgaudio")
 	, m_porta_in(*this)
+	, m_portb_in(*this)
 	{
 	}
 
@@ -37,6 +38,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 	auto porta_in() { return m_porta_in.bind(); }
+	auto portb_in() { return m_portb_in.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
@@ -53,6 +55,7 @@ protected:
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 
 	devcb_read16 m_porta_in;
+	devcb_read16 m_portb_in;
 
 	uint16_t m_dma_params[7];
 
