@@ -47,7 +47,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_cpu3;
-	required_device<h46505_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	optional_device<msm5205_device> m_msm;
 	required_device_array<tms1025_device, 2> m_inp;
 

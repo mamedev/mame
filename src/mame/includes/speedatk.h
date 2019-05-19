@@ -25,7 +25,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<h46505_device> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

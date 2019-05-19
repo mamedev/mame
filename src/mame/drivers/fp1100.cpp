@@ -655,7 +655,7 @@ void fp1100_state::fp1100(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea_full();
-	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette).set_entries(8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
@@ -665,7 +665,7 @@ void fp1100_state::fp1100(machine_config &config)
 			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
 	/* CRTC */
-	H46505(config, m_crtc, MAIN_CLOCK/8);   /* hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, MAIN_CLOCK/8);   /* unknown variant; hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

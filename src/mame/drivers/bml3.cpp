@@ -933,7 +933,7 @@ void bml3_state::bml3_common(machine_config &config)
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	H46505(config, m_crtc, CPU_CLOCK);
+	HD6845S(config, m_crtc, CPU_CLOCK); // HD46505SP
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

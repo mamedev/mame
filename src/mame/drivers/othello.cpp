@@ -415,11 +415,11 @@ void othello_state::othello(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*6, 64*8);
 	screen.set_visarea(0*8, 64*6-1, 0*8, 64*8-1);
-	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(othello_state::othello_palette), 0x10);
 
-	h46505_device &crtc(H46505(config, "crtc", 1000000 /* ? MHz */));   /* H46505 @ CPU clock */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 1000000 /* ? MHz */));   /* HD46505SP @ CPU clock */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(TILE_WIDTH);

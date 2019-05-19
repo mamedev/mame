@@ -610,7 +610,7 @@ void docastle_state::docastle(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	H46505(config, m_crtc, XTAL(9'828'000) / 16);
+	HD6845S(config, m_crtc, XTAL(9'828'000) / 16);
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of

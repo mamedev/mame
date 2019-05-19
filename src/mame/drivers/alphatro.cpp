@@ -759,7 +759,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	HD6845(config, m_crtc, 16_MHz_XTAL / 8);
+	HD6845S(config, m_crtc, 16_MHz_XTAL / 8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
