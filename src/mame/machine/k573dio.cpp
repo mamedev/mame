@@ -76,13 +76,12 @@ void k573dio_device::amap(address_map &map)
 	map(0x0a, 0x0b).r(FUNC(k573dio_device::a0a_r));
 	map(0x10, 0x11).w(FUNC(k573dio_device::a10_w));
 	map(0x80, 0x81).r(FUNC(k573dio_device::a80_r));
-	map(0xa8, 0xa9).r(FUNC(k573dio_device::aa8_r));
 	map(0xc4, 0xc5).r(FUNC(k573dio_device::ac4_r));
 	map(0xa0, 0xa1).w(FUNC(k573dio_device::mpeg_start_adr_high_w));
 	map(0xa2, 0xa3).w(FUNC(k573dio_device::mpeg_start_adr_low_w));
 	map(0xa4, 0xa5).w(FUNC(k573dio_device::mpeg_end_adr_high_w));
 	map(0xa6, 0xa7).w(FUNC(k573dio_device::mpeg_end_adr_low_w));
-	map(0xa8, 0xa9).w(FUNC(k573dio_device::mpeg_key_1_w));
+	map(0xa8, 0xa9).rw(FUNC(k573dio_device::mpeg_key_1_r), FUNC(k573dio_device::mpeg_key_1_w));
 	map(0xac, 0xad).rw(FUNC(k573dio_device::mas_i2c_r), FUNC(k573dio_device::mas_i2c_w));
 	map(0xae, 0xaf).rw(FUNC(k573dio_device::mpeg_ctrl_r), FUNC(k573dio_device::mpeg_ctrl_w));
 	map(0xb0, 0xb1).w(FUNC(k573dio_device::ram_write_adr_high_w));
@@ -195,12 +194,6 @@ WRITE16_MEMBER(k573dio_device::a10_w)
 	logerror("%s: a10_w (%s)\n", tag(), machine().describe_context());
 }
 
-READ16_MEMBER(k573dio_device::aa8_r)
-{
-	logerror("%s: aa8_r (%s)\n", tag(), machine().describe_context());
-	return 1;
-}
-
 READ16_MEMBER(k573dio_device::ac4_r)
 {
 	// What is this?
@@ -237,10 +230,16 @@ WRITE16_MEMBER(k573dio_device::mpeg_end_adr_low_w)
 	k573fpga->set_mp3_end_adr((k573fpga->get_mp3_end_adr() & 0xffff0000) | data); // low
 }
 
+READ16_MEMBER(k573dio_device::mpeg_key_1_r)
+{
+	return crypto_key1;
+}
+
 WRITE16_MEMBER(k573dio_device::mpeg_key_1_w)
 {
 	logerror("FPGA MPEG key 1/3 %04x\n", data);
 	k573fpga->set_crypto_key1(data);
+	crypto_key1 = data;
 }
 
 READ16_MEMBER(k573dio_device::mas_i2c_r)

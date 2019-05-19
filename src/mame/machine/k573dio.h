@@ -30,13 +30,13 @@ public:
 	DECLARE_READ16_MEMBER(a0a_r);
 	DECLARE_WRITE16_MEMBER(a10_w);
 	DECLARE_READ16_MEMBER(a80_r);
-	DECLARE_READ16_MEMBER(aa8_r);
 	DECLARE_READ16_MEMBER(ac4_r);
 
 	DECLARE_WRITE16_MEMBER(mpeg_start_adr_high_w);
 	DECLARE_WRITE16_MEMBER(mpeg_start_adr_low_w);
 	DECLARE_WRITE16_MEMBER(mpeg_end_adr_high_w);
 	DECLARE_WRITE16_MEMBER(mpeg_end_adr_low_w);
+	DECLARE_READ16_MEMBER(mpeg_key_1_r);
 	DECLARE_WRITE16_MEMBER(mpeg_key_1_w);
 	DECLARE_READ16_MEMBER(mas_i2c_r);
 	DECLARE_WRITE16_MEMBER(mas_i2c_w);
@@ -85,6 +85,7 @@ private:
 
 	bool is_ddrsbm_fpga;
 	uint32_t buffer_speed, mp3_dynamic_base;
+	uint16_t crypto_key1;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
