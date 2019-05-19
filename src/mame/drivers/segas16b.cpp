@@ -999,13 +999,13 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			// multiply registers
-			return m_multiplier->read(space, offset, mem_mask);
+			return m_multiplier->read(offset);
 
 		case 0x1000/2:
 			// compare registers
-			return m_cmptimer_1->read(space, offset, mem_mask);
+			return m_cmptimer_1->read(offset);
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1021,12 +1021,12 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			// multiply registers
-			m_multiplier->write(space, offset, data, mem_mask);
+			m_multiplier->write(offset, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			// compare registers
-			m_cmptimer_1->write(space, offset, data, mem_mask);
+			m_cmptimer_1->write(offset, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1045,7 +1045,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return m_cmptimer_2->read(space, offset, mem_mask);
+	return m_cmptimer_2->read(offset);
 }
 
 
@@ -1057,7 +1057,7 @@ READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	m_cmptimer_2->write(space, offset, data, mem_mask);
+	m_cmptimer_2->write(offset, data, mem_mask);
 }
 
 
@@ -1080,7 +1080,7 @@ READ16_MEMBER( segas16b_state::standard_io_r )
 			return ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -3743,7 +3743,7 @@ void segas16b_state::system16b(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
-	PALETTE(config, m_palette).set_entries(2048*3);
+	PALETTE(config, m_palette).set_entries(2048*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
@@ -3942,7 +3942,7 @@ void segas16b_state::lockonph(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockonph);
-	PALETTE(config, m_palette).set_entries(0x2000*4);
+	PALETTE(config, m_palette).set_entries(4096*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?

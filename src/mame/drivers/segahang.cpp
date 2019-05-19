@@ -183,7 +183,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 	}
 
 	//logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -241,7 +241,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 	}
 
 	//logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -404,7 +404,7 @@ void segahang_state::hangon_map(address_map &map)
 	map(0x400000, 0x403fff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x600000, 0x6007ff).ram().share("sprites");
-	map(0xa00000, 0xa00fff).ram().w(FUNC(segahang_state::paletteram_w)).share("paletteram");
+	map(0xa00000, 0xa00fff).ram().w(FUNC(segahang_state::hangon_paletteram_w)).share("paletteram");
 	map(0xc00000, 0xc3ffff).rom().region("subcpu", 0);
 	map(0xc68000, 0xc68fff).ram().share("segaic16road:roadram");
 	map(0xc7c000, 0xc7ffff).ram().share("subram");
@@ -812,6 +812,7 @@ void segahang_state::sharrier_base(machine_config &config)
 
 	// video hardware
 	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
+	m_palette->set_entries(2048*2);
 }
 
 void segahang_state::enduror_base(machine_config &config)

@@ -113,7 +113,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 						{
 							// if shadow bit is 0 and pix data is 0xa, this triggers shadow/hilight
 							if ((pix & 0x80f) == 0x00a)
-								dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+								dest[x] += m_palette_entries;
 
 							// otherwise, just add in sprite palette base
 							else
