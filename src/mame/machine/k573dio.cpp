@@ -112,7 +112,7 @@ k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, d
 	k573fpga(*this, "k573fpga"),
 	digital_id(*this, "digital_id"),
 	output_cb(*this),
-	is_fake_fpga(false),
+	is_ddrsbm_fpga(false),
 	buffer_speed(0x400)
 {
 }
@@ -125,7 +125,7 @@ void k573dio_device::device_start()
 	save_pointer(NAME(ram), 32 * 1024 * 1024 );
 
 	k573fpga->set_ram(ram.get());
-	k573fpga->set_fake_fpga(is_fake_fpga);
+	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
 	k573fpga->set_buffer_speed(buffer_speed);
 	k573fpga->set_mp3_dynamic_base(mp3_dynamic_base);
 

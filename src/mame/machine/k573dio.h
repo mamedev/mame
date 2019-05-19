@@ -19,7 +19,7 @@ public:
 	required_device<ds2401_device> digital_id;
 
 	void amap(address_map &map);
-	void set_fake_fpga(bool flag) { is_fake_fpga = flag; }
+	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 	void set_buffer_speed(uint32_t speed) { buffer_speed = speed; }
 	void set_mp3_dynamic_base(uint32_t base) { mp3_dynamic_base = base; }
 
@@ -83,7 +83,7 @@ private:
 
 	void output(int offset, uint16_t data);
 
-	bool is_fake_fpga;
+	bool is_ddrsbm_fpga;
 	uint32_t buffer_speed, mp3_dynamic_base;
 };
 
