@@ -12,6 +12,9 @@
     SPG110 Beat interrupt frequency might be different too, seems to
     trigger an FIQ, but music is very slow in jak_spdmo
 
+	GCM394 has 32 channels, and potentially a different register layout
+	it looks close but might be different enough to split off
+
 **********************************************************************/
 
 #include "emu.h"
@@ -19,6 +22,7 @@
 
 DEFINE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device, "spg2xx_audio", "SPG2xx-series System-on-a-Chip Audio")
 DEFINE_DEVICE_TYPE(SPG110_AUDIO, spg110_audio_device, "spg110_audio", "SPG110-series System-on-a-Chip Audio")
+DEFINE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device, "gcm394_audio", "SunPlus GCM394 System-on-a-Chip (Audio)")
 
 #define LOG_SPU_READS       (1U << 0)
 #define LOG_SPU_WRITES      (1U << 1)
@@ -57,6 +61,10 @@ spg110_audio_device::spg110_audio_device(const machine_config &mconfig, const ch
 {
 }
 
+sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: spg2xx_audio_device(mconfig, SUNPLUS_GCM394_AUDIO, tag, owner, clock)
+{
+}
 
 
 void spg2xx_audio_device::device_start()
@@ -287,7 +295,7 @@ READ16_MEMBER(spg2xx_audio_device::audio_ctrl_r)
 
 READ16_MEMBER(spg2xx_audio_device::audio_r)
 {
-	const uint16_t channel = (offset & 0x00f0) >> 4;
+	const uint16_t channel = (offset & 0x01f0) >> 4;
 	uint16_t data = m_audio_regs[offset];
 
 
@@ -365,7 +373,7 @@ READ16_MEMBER(spg2xx_audio_device::audio_r)
 
 READ16_MEMBER(spg2xx_audio_device::audio_phase_r)
 {
-	const uint16_t channel = (offset & 0x00f0) >> 4;
+	const uint16_t channel = (offset & 0x01f0) >> 4;
 	uint16_t data = m_audio_phase_regs[offset];
 
 	switch (offset & AUDIO_CHAN_OFFSET_MASK)
@@ -675,7 +683,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 WRITE16_MEMBER(spg2xx_audio_device::audio_phase_w)
 {
-	const uint16_t channel = (offset & 0x00f0) >> 4;
+	const uint16_t channel = (offset & 0x01f0) >> 4;
 
 	switch (offset & AUDIO_CHAN_OFFSET_MASK)
 	{
@@ -734,7 +742,7 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_phase_w)
 
 WRITE16_MEMBER(spg2xx_audio_device::audio_w)
 {
-	const uint16_t channel = (offset & 0x00f0) >> 4;
+	const uint16_t channel = (offset & 0x01f0) >> 4;
 
 	switch (offset & AUDIO_CHAN_OFFSET_MASK)
 	{
@@ -1289,4 +1297,39 @@ WRITE16_MEMBER(spg110_audio_device::audio_w)
 	}
 
 	spg2xx_audio_device::audio_w(space,offset,data,mem_mask);
+}
+
+uint16_t sunplus_gcm394_audio_device::control_group16_r(uint8_t group, uint8_t offset)
+{
+	LOGMASKED(LOG_SPU_WRITES, "sunplus_gcm394_audio_device::control_group16_r (group %d) offset %02x\n", group, offset);
+	return m_control[group][offset];
+}
+
+void sunplus_gcm394_audio_device::control_group16_w(uint8_t group, uint8_t offset, uint16_t data)
+{
+	LOGMASKED(LOG_SPU_WRITES, "sunplus_gcm394_audio_device::control_group16_w (group %d) offset %02x data %04x\n", group, offset, data);
+	m_control[group][offset] = data;
+
+	// offset 0x0b = triggers?
+}
+
+READ16_MEMBER(sunplus_gcm394_audio_device::control_r)
+{
+	return control_group16_r(offset & 0x20 ? 1 : 0, offset & 0x1f);
+}
+
+
+WRITE16_MEMBER(sunplus_gcm394_audio_device::control_w)
+{
+	control_group16_w(offset & 0x20 ? 1 : 0, offset & 0x1f, data);
+}
+
+void sunplus_gcm394_audio_device::device_start()
+{
+	spg2xx_audio_device::device_start();
+
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 0x20; j++)
+			m_control[i][j] = 0x0000;
+
 }

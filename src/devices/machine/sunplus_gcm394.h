@@ -15,6 +15,8 @@
 #include "screen.h"
 #include "emupal.h"
 #include "sunplus_gcm394_video.h"
+#include "spg2xx_audio.h"
+
 
 class sunplus_gcm394_base_device : public device_t, public device_mixer_interface
 {
@@ -25,7 +27,9 @@ public:
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_spg_video(*this, "spgvideo")
+	, m_spg_audio(*this, "spgaudio")
 	, m_porta_in(*this)
+	, m_portb_in(*this)
 	{
 	}
 
@@ -34,6 +38,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 	auto porta_in() { return m_porta_in.bind(); }
+	auto portb_in() { return m_portb_in.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
@@ -47,8 +52,10 @@ protected:
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
+	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 
 	devcb_read16 m_porta_in;
+	devcb_read16 m_portb_in;
 
 	uint16_t m_dma_params[7];
 
@@ -115,6 +122,8 @@ protected:
 	uint16_t m_7935;
 	uint16_t m_7936;
 
+	uint16_t m_7960;
+	uint16_t m_7961;
 
 private:
 	DECLARE_READ16_MEMBER(unk_r);
@@ -155,8 +164,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7860_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7860_w);
+	DECLARE_READ16_MEMBER(ioport_a_r);
+	DECLARE_WRITE16_MEMBER(ioport_a_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7861_r);
 
@@ -205,12 +214,22 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
 
+	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
+	DECLARE_READ16_MEMBER(unkarea_7961_r);
+	DECLARE_WRITE16_MEMBER(unkarea_7961_w);
+
+
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
+	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
 	void checkirq6();
 
 	emu_timer *m_unk_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	uint8_t* m_gfxregion;
+	uint32_t m_gfxregionsize;
+	uint16_t read_space(uint32_t offset);
 
 };
 
