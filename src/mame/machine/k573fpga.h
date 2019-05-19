@@ -69,7 +69,7 @@ private:
 	int16_t *channel_l_pcm, *channel_r_pcm;
 	size_t last_buffer_size_channel_l, last_buffer_size_channel_r, last_copied_samples;
 	uint32_t last_position_update, position_diff;
-	bool mp3_decrypt_mode, decrypt_finished;
+	bool decrypt_finished;
 
 	mp3d_sample_t mp3_pcm[MINIMP3_MAX_SAMPLES_PER_FRAME];
 	mp3dec_file_info_t mp3_info;

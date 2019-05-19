@@ -96,8 +96,6 @@ uint32_t k573fpga_device::get_mp3_playback() {
         last_position_update = m_samples->get_position(0);
     }
 
-    last_position_update = m_samples->get_position(0);
-
     return last_position_update;
 }
 
@@ -117,7 +115,7 @@ void k573fpga_device::i2c_write(uint16_t data)
 
 uint16_t k573fpga_device::get_mpeg_ctrl()
 {
-    if (mp3_decrypt_mode && m_samples->get_position(0) > 0) {
+    if (mpeg_ctrl_flag == 0xe000 || m_samples->get_position(0) > 0) {
         // This has been tested with real hardware, but this flag is always held 0x1000 when the audio is being played
         return 0x1000;
     }
@@ -164,12 +162,6 @@ void k573fpga_device::set_mpeg_ctrl(uint16_t data)
             free(channel_r_pcm);
             channel_r_pcm = nullptr;
         }
-    }
-
-    if ((data & 0xe000) == 0xe000) {
-        mp3_decrypt_mode = true;
-    } else {
-        mp3_decrypt_mode = false;
     }
 }
 
