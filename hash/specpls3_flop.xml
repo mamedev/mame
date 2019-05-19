@@ -20669,22 +20669,23 @@
 		</part>
 	</software>
 
-	<!-- This dump included a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release. -->
+	<!-- This dump includes a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release. -->
 	<software name="lc10pr11">
 		<description>LC-10 Colour Screen printer v 1.1 (+2a/+3)</description>
 		<year>1990</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: LC-10 Colour Screen printer v 1.1 (+2a/+3)"/>
 			<dataarea name="flop" size="195631">
 				<rom name="colour printer driver - side a.dsk" size="195631" crc="f06d6c7a" sha1="23da89539c6de4f47b2b6afc959a027ff27887a9" offset="0"/>
 			</dataarea>
 		</part>
-<!--		<part name="flop2" interface="floppy_3">
+		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Trivial Pursuit Genus Edition (questions)"/>
 			<dataarea name="flop" size="195631">
 				<rom name="colour printer driver - side b.dsk" size="195631" crc="1651571b" sha1="ff320f1c51e1b16651ae26c932c6793e5b5a222b" offset="0"/>
 			</dataarea>
-		</part>-->
+		</part>
 	</software>
 
 </softwarelist>
