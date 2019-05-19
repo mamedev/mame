@@ -3136,25 +3136,6 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="4soccers">
-		<description>4 Soccer Simulators</description>
-		<year>1988</year>
-		<publisher>Code Masters Gold</publisher>
-		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A: 11-a-Side Soccer + Indoor Soccer"/>
-			<dataarea name="flop" size="213760">
-				<rom name="4 soccer simulators (1988)(code masters gold)(side a)[aka four soccer simulators][aka pro soccer simulator].dsk" size="213760" crc="db963a7f" sha1="fc3875238c36e5adb7072ae3775a396f282b942e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Street Soccer + Soccer Skills"/>
-			<dataarea name="flop" size="213760">
-				<rom name="4 soccer simulators (1988)(code masters gold)(side b)[aka four soccer simulators][aka pro soccer simulator].dsk" size="213760" crc="6591918b" sha1="fc8ac07175243156415f49b22c5e3a7c5fc127c4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="4topgame">
 		<description>4 Top Games - Pulsator + Slaine - The Celtic Barbarian</description>
 		<year>1987</year>
@@ -17391,7 +17372,7 @@
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="welltrissp">
+	<software name="welltrissp" cloneof="welltris">
 		<description>Welltris (Spa)</description>
 		<year>1991</year>
 		<publisher>Erbe Software</publisher>
@@ -19820,7 +19801,7 @@
 
 	<software name="prayoftw">
 	<!-- Game recovered from the original developer's archives -->
-		<description>The Prayer Of The Warrior</description>
+		<description>The Prayer of the Warrior</description>
 		<year>1992</year>
 		<publisher>Zigurat Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -20199,21 +20180,21 @@
 		</part>
 	</software>
 
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
+	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
 	<software name="mercs">
 		<description>Mercs</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A: ZX Spectrum"/>
+			<feature name="part_id" value="Side A: Amstrad CPC"/>
 			<dataarea name="flop" size = "335301">
-				<rom name="mercs (1991)(us gold)(sidea)[samdisk].dsk" size="335301" crc="b8f67304" sha1="e79e7b4592c45ac2d99a835103628750709b56d7" offset="0"/>
+				<rom name="mercs (1991)(us gold)(side a)[samdisk].dsk" size="335301" crc="cc917c2d" sha1="b71cad66a67778f825e727c50e916f433dac0ecf" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Amstrad CPC"/>
+			<feature name="part_id" value="Side B: ZX Spectrum"/>
 			<dataarea name="flop" size = "335301">
-				<rom name="mercs (1991)(us gold)(sideb)[samdisk].dsk" size="335301" crc="cc917c2d" sha1="b71cad66a67778f825e727c50e916f433dac0ecf" offset="0"/>
+				<rom name="mercs (1991)(us gold)(side b)[samdisk].dsk" size="335301" crc="b8f67304" sha1="e79e7b4592c45ac2d99a835103628750709b56d7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20670,24 +20651,41 @@
 		</part>
 	</software>
 
-	<software name="4soccersspa" cloneof="4soccers">
+	<software name="4soccerssp">
 		<description>4 Soccer Simulators (Spa)</description>
 		<year>1988</year>
 		<publisher>MCM Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: 11-a-Side Soccer + Indoor Soccer"/>
-			<dataarea name="flop" size = "214528">
-				<rom name="4soccer (spain) side a.dsk" size="214528" crc="de6444fc" sha1="df1e44a19f78faaa1adfdc96bd12080f4f16eb93" offset="0"/>
+			<dataarea name="flop" size="213760">
+				<rom name="4 soccer simulator (mcm)_a.dsk" size="213760" crc="db963a7f" sha1="fc3875238c36e5adb7072ae3775a396f282b942e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Street Soccer + Soccer Skills"/>
-			<dataarea name="flop" size = "214528">
-				<rom name="4soccer (spain) side b.dsk" size="214528" crc="2104ec4b" sha1="da607fa1be919d1d898921d699e448bf5ce347b9" offset="0"/>
+			<dataarea name="flop" size="213760">
+				<rom name="4 soccer simulator (mcm)_b.dsk" size="213760" crc="6591918b" sha1="fc8ac07175243156415f49b22c5e3a7c5fc127c4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- This dump includes a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release. -->
+	<software name="lc10pr11">
+		<description>LC-10 Colour Screen printer v 1.1 (+2a/+3)</description>
+		<year>1990</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: LC-10 Colour Screen printer v 1.1 (+2a/+3)"/>
+			<dataarea name="flop" size="195631">
+				<rom name="colour printer driver - side a.dsk" size="195631" crc="f06d6c7a" sha1="23da89539c6de4f47b2b6afc959a027ff27887a9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Trivial Pursuit Genus Edition (questions)"/>
+			<dataarea name="flop" size="195631">
+				<rom name="colour printer driver - side b.dsk" size="195631" crc="1651571b" sha1="ff320f1c51e1b16651ae26c932c6793e5b5a222b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
-	
 </softwarelist>
