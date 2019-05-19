@@ -40,7 +40,6 @@ void k573fpga_device::device_reset()
     crypto_key1 = 0;
     crypto_key2 = 0;
     crypto_key3 = 0;
-    mp3_last_frame = 0;
     mp3_last_adr = 0;
     mp3_last_decrypt_adr = 0;
     mp3_next_sync = 0;
@@ -141,7 +140,6 @@ void k573fpga_device::set_mpeg_ctrl(uint16_t data)
 
     if ((data & 0xa000) == 0xa000) {
         // Reset playback state for start and stop events
-        mp3_last_frame = 0;
         mp3_next_sync = 0;
         mp3_last_adr = mp3_start_adr;
         mp3_last_decrypt_adr = mp3_start_adr;
@@ -265,26 +263,31 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         return;
     }
 
-    int new_samples = 0;
+    int new_samples = mp3_info.samples;
+    int decrypt_buffer = MINIMUM_BUFFER;
+    int decrypt_buffer_speed = buffer_speed;
 
-    if (!use_ddrsbm_fpga && mp3_start_adr != mp3_dynamic_base) {
-        // Base addresses are kind of a "hack" and should be dealt with eventually.
-        // Files that are loaded at he base address are dynamic, meaning the data constantly changes.
-        // Data will not get loaded outside of the base address region past the boot sequence, however.
-        // As such, it's possible to decrypt and play the full file if it's not at the designated base address.
-        // Only 4 games seem to use a base address that is non-0: GF11DM10 (0x00540000) and GF10DM9 (0x00500000).
-        // This way of doing things seems kind of arbitrary, so it most likely doesn't need to be handled in a
-        // specific case like this, but this leads to much better performance overall since the data is usually
-        // small (<1mb).
-        // Another interesting thing about base addresses is that non-base address files are almost always looped
-        // in-game, with the exception of the Konami logo sound. Without looping non-base address sounds, things
-        // like system BGMs and song wheel previews will stop looping.
-
+    if (mp3_next_sync == 0) {
         crypto_key1 = orig_crypto_key1;
         crypto_key2 = orig_crypto_key2;
         crypto_key3 = orig_crypto_key3;
 
-        for (int32_t cur_idx = mp3_start_adr; cur_idx < mp3_end_adr; cur_idx += 2) {
+        mp3_last_decrypt_adr = mp3_start_adr;
+
+        // Cover a large chunk of ID3 or junk at the beginning of a file when decrypting first frame
+        decrypt_buffer = 1;
+        decrypt_buffer_speed = buffer_speed = 0x2000;
+
+        last_position_update = 0;
+        position_diff = 0;
+        decrypt_finished = false;
+    }
+
+    // Decrypt chunk of data
+    if (mp3_last_decrypt_adr < mp3_end_adr && mp3_last_adr + decrypt_buffer_speed * decrypt_buffer >= mp3_last_decrypt_adr) {
+        int32_t cur_idx;
+
+        for (cur_idx = mp3_last_decrypt_adr; cur_idx - mp3_last_decrypt_adr < decrypt_buffer_speed * decrypt_buffer && cur_idx < mp3_end_adr; cur_idx += 2) {
             if (use_ddrsbm_fpga) {
                 ram_swap[cur_idx >> 1] = fpga_decrypt_byte_ddrsbm(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
             } else {
@@ -302,140 +305,72 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
             crypto_key3++;
         }
 
-        // Decrypt entire block of memory
+        mp3_last_decrypt_adr = cur_idx;
+    }
+
+    int samples;
+    int free_format_bytes = 0, frame_size = 0;
+    int buf_size = decrypt_buffer_speed * decrypt_buffer;
+
+    uint8_t *buf = (uint8_t*)ram_swap.get() + mp3_last_adr;
+
+    // Detect first frame in MP3 data
+    if (mp3_next_sync == 0) {
+        buf_size = 0x2000;
+
+        // Everything on the System 573 has a header 0x600 or less from what I've seen, but just ot be sure, check the first 0x2000 bytes
+        uint32_t first_frame = mp3d_find_frame(buf, buf_size, &free_format_bytes, &frame_size);
+        buf += first_frame;
+        mp3_last_adr += first_frame;
+        buf_size -= first_frame;
+
+        buffer_speed = hdr_frame_bytes(buf, free_format_bytes) * 2;
+    }
+
+    if (mp3_last_adr >= mp3_end_adr) {
+        mp3_next_sync = 0;
+        return;
+    }
+
+    if (mp3_next_sync == 0) {
+        // For the first iteration, we need to set up the MP3 state and such
         if (mp3_info.buffer != NULL) {
             free(mp3_info.buffer);
         }
 
-        mp3dec_load_buf(&mp3_dec, ((uint8_t*)ram_swap.get()) + mp3_start_adr, mp3_end_adr - mp3_start_adr, &mp3_info, NULL, NULL);
-        new_samples = mp3_info.samples;
-        last_copied_samples = 0;
-        mp3_last_adr += mp3_end_adr - mp3_start_adr;
-    } else {
-        // For base address files, decrypt in a streaming manner.
-        // By the time the play flag is set, there's usually enough data to decode the first frame or two.
-        // Some files (specifcially GFDM's audio) has a large 0x600 byte ID3 header, so in order to guarantee that
-        // the first frame is found, I've found it best to decrypt 0x2000 bytes in the first go and then a smaller
-        // amount after that for every subsequent update.
+        memset(&mp3_info, 0, sizeof(mp3_info));
+        memset(&mp3_frame_info, 0, sizeof(mp3_frame_info));
+        new_samples = 0;
 
-        new_samples = mp3_info.samples;
+        /* try to make allocation size assumption by first frame */
+        mp3dec_init(&mp3_dec);
 
+        samples = mp3dec_decode_frame(&mp3_dec, buf, buf_size, mp3_pcm, &mp3_frame_info);
 
-        int decrypt_buffer = MINIMUM_BUFFER;
-        int decrypt_buffer_speed = buffer_speed;
-
-        if (mp3_next_sync == 0) {
-            crypto_key1 = orig_crypto_key1;
-            crypto_key2 = orig_crypto_key2;
-            crypto_key3 = orig_crypto_key3;
-
-            mp3_last_decrypt_adr = mp3_start_adr;
-
-            // Cover a large chunk of ID3 or junk at the beginning of a file when decrypting first frame
-            decrypt_buffer = 1;
-            decrypt_buffer_speed = 0x2000;
-
-            last_position_update = 0;
-            position_diff = 0;
-            decrypt_finished = false;
-        }
-
-        // Decrypt chunk of data
-        if (mp3_last_decrypt_adr < mp3_end_adr && mp3_last_adr + decrypt_buffer_speed * decrypt_buffer >= mp3_last_decrypt_adr) {
-            int32_t cur_idx;
-
-            for (cur_idx = mp3_last_decrypt_adr; cur_idx - mp3_last_decrypt_adr < decrypt_buffer_speed * decrypt_buffer && cur_idx < mp3_end_adr; cur_idx += 2) {
-                if (use_ddrsbm_fpga) {
-                    ram_swap[cur_idx >> 1] = fpga_decrypt_byte_ddrsbm(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
-                } else {
-                    ram_swap[cur_idx >> 1] = fpga_decrypt_byte_real(ram[cur_idx >> 1]);
-                }
-
-                if (!use_ddrsbm_fpga) {
-                    crypto_key1 = (crypto_key1 & 0x8000) | ((crypto_key1 << 1) & 0x7FFE) | ((crypto_key1 >> 14) & 1);
-
-                    if ((((crypto_key1 >> 15) ^ crypto_key1) & 1) != 0) {
-                        crypto_key2 = (crypto_key2 << 1) | (crypto_key2 >> 15);
-                    }
-                }
-
-                crypto_key3++;
-            }
-
-            mp3_last_decrypt_adr = cur_idx;
-        }
-
-        int samples;
-        int free_format_bytes = 0, frame_size = 0;
-        int buf_size = decrypt_buffer_speed * decrypt_buffer;
-
-        uint8_t *buf = (uint8_t*)ram_swap.get() + mp3_last_adr;
-
-        // Detect first frame in MP3 data
-        if (mp3_next_sync == 0) {
-            buf_size = 0x2000;
-
-            // Everything on the System 573 has a header 0x600 or less from what I've seen, but just ot be sure, check the first 0x2000 bytes
-            uint32_t first_frame = mp3d_find_frame(buf, buf_size, &free_format_bytes, &frame_size);
-            buf += first_frame;
-            mp3_last_adr += first_frame;
-            buf_size -= first_frame;
-        }
-
-        // Skip x amount of samples previously read (this fixes some weird glitches)
-        for (int frame_skip = 0; frame_skip < mp3_last_frame && buf < (uint8_t*)ram_swap.get() + mp3_end_adr; frame_skip++) {
-            mp3d_find_frame(buf, buf_size, &free_format_bytes, &frame_size);
-            buf += frame_size;
-            mp3_last_adr += frame_size;
-        }
-
-        mp3_last_frame = 0;
-
-        if (mp3_last_adr >= mp3_end_adr) {
-            mp3_next_sync = 0;
+        if (!samples) {
             return;
         }
 
-        if (mp3_next_sync == 0) {
-            // For the first iteration, we need to set up the MP3 state and such
-            if (mp3_info.buffer != NULL) {
-                free(mp3_info.buffer);
-            }
+        samples *= mp3_frame_info.channels;
 
-            memset(&mp3_info, 0, sizeof(mp3_info));
-            memset(&mp3_frame_info, 0, sizeof(mp3_frame_info));
-            new_samples = 0;
+        mp3_allocated = (buf_size / mp3_frame_info.frame_bytes) * samples * sizeof(mp3d_sample_t) + MINIMP3_MAX_SAMPLES_PER_FRAME * sizeof(mp3d_sample_t);
+        mp3_info.buffer = (mp3d_sample_t*)malloc(mp3_allocated);
 
-            /* try to make allocation size assumption by first frame */
-            mp3dec_init(&mp3_dec);
-
-            samples = mp3dec_decode_frame(&mp3_dec, buf, buf_size, mp3_pcm, &mp3_frame_info);
-
-            if (!samples) {
-                return;
-            }
-
-            samples *= mp3_frame_info.channels;
-
-            mp3_allocated = (buf_size / mp3_frame_info.frame_bytes) * samples * sizeof(mp3d_sample_t) + MINIMP3_MAX_SAMPLES_PER_FRAME * sizeof(mp3d_sample_t);
-            mp3_info.buffer = (mp3d_sample_t*)malloc(mp3_allocated);
-
-            if (!mp3_info.buffer) {
-                return;
-            }
-
-            mp3_info.samples = samples;
-            memcpy(mp3_info.buffer, mp3_pcm, mp3_info.samples * sizeof(mp3d_sample_t));
-
-            /* save info */
-            mp3_info.channels = mp3_frame_info.channels;
-            mp3_info.hz       = mp3_frame_info.hz;
-            mp3_info.layer    = mp3_frame_info.layer;
-            mp3_last_frame = 0;
-
-            decrypt_buffer = 8;
+        if (!mp3_info.buffer) {
+            return;
         }
 
+        mp3_info.samples = samples;
+        memcpy(mp3_info.buffer, mp3_pcm, mp3_info.samples * sizeof(mp3d_sample_t));
+
+        /* save info */
+        mp3_info.channels = mp3_frame_info.channels;
+        mp3_info.hz       = mp3_frame_info.hz;
+        mp3_info.layer    = mp3_frame_info.layer;
+        mp3_last_adr += mp3_frame_info.frame_bytes;
+
+        decrypt_buffer = 8;
+    } else {
         /* decode rest frames */
         buf_size = decrypt_buffer_speed * 2;
 
@@ -472,13 +407,12 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
                 break;
             }
 
-            buf += mp3_frame_info.frame_bytes;
+            mp3_last_adr += mp3_frame_info.frame_bytes;
             mp3_info.samples += samples * mp3_frame_info.channels;
-            mp3_last_frame++;
         }
-
-        new_samples = mp3_info.samples - new_samples;
     }
+
+    new_samples = mp3_info.samples - new_samples;
 
     if (new_samples > 0) {
         size_t buffer_size = 0;
@@ -542,7 +476,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         m_samples->update_raw(0, channel_l_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
         m_samples->update_raw(1, channel_r_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
 
-        mp3_next_sync = buffer_size - (buffer_size / 3); // Grab more data sometime before the current buffer ends. This is arbitrary and kinda hacky, but it worked best between various games in my testing.
+        mp3_next_sync = buffer_size - (buffer_size / 4); // Grab more data sometime before the current buffer ends. This is arbitrary and kinda hacky, but it worked best between various games in my testing.
     }
 
     if (mp3_last_adr >= mp3_end_adr) {

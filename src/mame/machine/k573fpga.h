@@ -47,7 +47,6 @@ public:
 	uint16_t get_mpeg_ctrl();
 	void set_mpeg_ctrl(uint16_t data);
 
-	void set_buffer_speed(uint32_t speed) { buffer_speed = speed; }
 	void set_mp3_dynamic_base(uint32_t base) { mp3_dynamic_base = base; }
 
 protected:
@@ -65,7 +64,7 @@ private:
 	uint32_t mp3_start_adr, mp3_end_adr, mpeg_ctrl_flag;
 	bool use_ddrsbm_fpga;
 
-	uint32_t mp3_last_frame, mp3_last_adr, mp3_next_sync, mp3_last_decrypt_adr;
+	uint32_t mp3_last_adr, mp3_next_sync, mp3_last_decrypt_adr;
 	int16_t *channel_l_pcm, *channel_r_pcm;
 	size_t last_buffer_size_channel_l, last_buffer_size_channel_r, last_copied_samples;
 	uint32_t last_position_update, position_diff;
