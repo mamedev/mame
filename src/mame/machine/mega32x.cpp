@@ -225,6 +225,7 @@ DEFINE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device,  "sega_32x_pal",  "Sega 3
 
 sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 	, m_sh2_shared(*this, "sh2_shared")
 	, m_main_cpu(*this, finder_base::DUMMY_TAG)
 	, m_master_cpu(*this, "32x_master_sh2")
@@ -232,7 +233,6 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_scan_timer(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -253,20 +253,7 @@ READ16_MEMBER( sega_32x_device::_32x_68k_palette_r )
 
 WRITE16_MEMBER( sega_32x_device::_32x_68k_palette_w )
 {
-	int r,g,b, p;
-
 	COMBINE_DATA(&m_32x_palette[offset]);
-	data = m_32x_palette[offset];
-
-	r = ((data >> 0)  & 0x1f);
-	g = ((data >> 5)  & 0x1f);
-	b = ((data >> 10) & 0x1f);
-	p = ((data >> 15) & 0x01); // priority 'through' bit
-
-	m_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0) | (p << 15);
-
-	m_palette->set_pen_color(offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
-
 }
 
 READ16_MEMBER( sega_32x_device::_32x_68k_dram_r )
@@ -1637,14 +1624,14 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 				{
 					if (x>=0)
 					{
-						m_32x_linerender[x] = m_32x_palette_lookup[(coldata & 0xff00)>>8];
+						m_32x_linerender[x] = m_32x_palette[(coldata & 0xff00)>>8];
 					}
 
 					x++;
 
 					if (x>=0)
 					{
-						m_32x_linerender[x] = m_32x_palette_lookup[(coldata & 0x00ff)];
+						m_32x_linerender[x] = m_32x_palette[(coldata & 0x00ff)];
 					}
 				}
 
@@ -1673,7 +1660,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 				{
 					if (x>=0)
 					{
-						m_32x_linerender[x] = m_32x_palette_lookup[(coldata)];
+						m_32x_linerender[x] = m_32x_palette[(coldata)];
 					}
 					x++;
 				}
@@ -1695,22 +1682,8 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 			x = start;
 			while (x<320)
 			{
-				uint16_t coldata;
-				coldata = m_32x_display_dram[lineoffs&0xffff];
-
-				// need to swap red and blue around for MAME
-				{
-					int r = ((coldata >> 0)  & 0x1f);
-					int g = ((coldata >> 5)  & 0x1f);
-					int b = ((coldata >> 10) & 0x1f);
-					int p = ((coldata >> 15) & 0x01); // priority 'through' bit
-
-					coldata = (r << 10) | (g << 5) | (b << 0) | (p << 15);
-
-				}
-
 				if (x>=0)
-					m_32x_linerender[x] = coldata;
+					m_32x_linerender[x] = m_32x_display_dram[lineoffs&0xffff];
 
 				x++;
 				lineoffs++;
@@ -1719,23 +1692,23 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 	}
 }
 
-void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint16_t &lineptr)
+void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr)
 {
 	if (m_32x_displaymode != 0)
 	{
 		if (!m_32x_videopriority)
 		{
 			if (priority && !(m_32x_linerender[x] & 0x8000))
-				lineptr = m_32x_linerender[x] & 0x7fff;
+				lineptr = pen(m_32x_linerender[x] & 0x7fff);
 			if (m_32x_linerender[x] & 0x8000)
-				lineptr = m_32x_linerender[x] & 0x7fff;
+				lineptr = pen(m_32x_linerender[x] & 0x7fff);
 		}
 		else
 		{
 			if (priority && m_32x_linerender[x] & 0x8000)
-				lineptr = m_32x_linerender[x] & 0x7fff;
+				lineptr = pen(m_32x_linerender[x] & 0x7fff);
 			if (!(m_32x_linerender[x] & 0x8000))
-				lineptr = m_32x_linerender[x] & 0x7fff;
+				lineptr = pen(m_32x_linerender[x] & 0x7fff);
 		}
 	}
 }
@@ -1814,6 +1787,15 @@ void sega_32x_pal_device::device_add_mconfig(machine_config &config)
 
 void sega_32x_device::device_start()
 {
+	for (int i = 0; i < 32*32*32/**2*/; i++)
+	{
+		int r = (i >> 0) & 0x1f;
+		int g = (i >> 5) & 0x1f;
+		int b = (i >> 10) & 0x1f;
+		//int p = (i >> 15) & 0x01; // priority 'through' bit
+		set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+
 	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
 
 	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);
@@ -1822,10 +1804,8 @@ void sega_32x_device::device_start()
 	memset(m_32x_dram0.get(), 0x00, 0x40000);
 	memset(m_32x_dram1.get(), 0x00, 0x40000);
 
-	m_32x_palette_lookup = std::make_unique<uint16_t[]>(0x200/2);
 	m_32x_palette = std::make_unique<uint16_t[]>(0x200/2);
 
-	memset(m_32x_palette_lookup.get(), 0x00, 0x200);
 	memset(m_32x_palette.get(), 0x00, 0x200);
 
 	m_32x_display_dram = m_32x_dram0.get();
