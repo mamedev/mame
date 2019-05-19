@@ -238,7 +238,7 @@ void diablo1300_cpu_device::execute_run()
 				write_port((op & 0x0070) >> 4, m_a);
 				break;
 			case 1:
-				/* JNC Addr: Set PC to address H AAAA AAAA, reg B and carry are cleared
+				/* JNC Addr: If carry not set: set PC to address H AAAA AAAA, reg B and carry are cleared
 				   AAAA AAAA 0000 HIII
 				   AAAA AAAA           = 8 low bits in Destination Address
 				                  H    = The 9th hi address bit
@@ -247,8 +247,11 @@ void diablo1300_cpu_device::execute_run()
 				LOGOP("JNC    %03X\n", ((op & 0xff00) >> 8) + ((op & 0x0008) ? 0x100 : 0));
 				m_a = (op & 0xff00) >> 8;
 				m_b = 0;
+				if (m_carry == 0)
+				{
+					m_pc = ((op & 0x0008) + m_a);
+				}
 				m_carry = 0;
-				m_pc = ((op & 0x0008) + m_a);
 				break;
 			case 2:
 				/* RST Dport : Reset Port
@@ -290,7 +293,7 @@ void diablo1300_cpu_device::execute_run()
 					*/
 					LOGOP("XLAT   r%02X\n",
 						((op & 0x00f0) >> 4) + ((op & 0x0008) ? 0x10 : 0));
-					m_a = read_table(m_b + m_carry);
+					m_a = read_table(m_b + (m_carry != 0 ? 0x100 : 0x000));
 					m_b = 0;
 					m_carry = 0;
 					write_reg(((op & 0x0008) != 0 ? 0x10 : 0) + ((op & 0x00f0) >> 4), m_a);
