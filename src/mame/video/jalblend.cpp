@@ -24,9 +24,8 @@
 
 DEFINE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device, "jaleco_blend", "Jaleco Blending Device")
 
-jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, JALECO_BLEND, tag, owner, clock)
-	, m_table(nullptr)
 {
 }
 
@@ -36,9 +35,6 @@ jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const ch
 
 void jaleco_blend_device::device_start()
 {
-	m_table = make_unique_clear<uint8_t[]>(0xc00);
-
-	save_pointer(NAME(m_table), 0xc00);
 }
 
 //-------------------------------------------------
@@ -47,12 +43,6 @@ void jaleco_blend_device::device_start()
 
 void jaleco_blend_device::device_reset()
 {
-	memset(m_table.get(), 0, 0xc00);
-}
-
-void jaleco_blend_device::set(int color, uint8_t val)
-{
-	m_table[color] = val;
 }
 
 /*
@@ -67,19 +57,26 @@ void jaleco_blend_device::set(int color, uint8_t val)
  *  -------x | blue add/subtract
  */
 
-/* basically an add/subtract function with clamping */
-rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, uint8_t alpha)
+rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe)
 {
-	int r, g, b;
-	int ir, ig, ib;
+	// Comp with clamp
+	if (addMe.a() & 8)
+		return func(dest, addMe, addMe.a());
 
-	r = (int)dest.r();
-	g = (int)dest.g();
-	b = (int)dest.b();
+	// Skip the costly alpha step altogether
+	return addMe;
+}
 
-	ir = (int)addMe.r();
-	ig = (int)addMe.g();
-	ib = (int)addMe.b();
+/* basically an add/subtract function with clamping */
+rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, u8 alpha)
+{
+	int r = (int)dest.r();
+	int g = (int)dest.g();
+	int b = (int)dest.b();
+
+	const u8 ir = addMe.r();
+	const u8 ig = addMe.g();
+	const u8 ib = addMe.b();
 
 	if (alpha & 4)
 		{ r -= ir; if (r < 0) r = 0; }
@@ -99,77 +96,64 @@ rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, uint8_t alpha)
 
 template<class _BitmapClass>
 void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
-							int transparent_color)
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color)
 {
 	/* Start drawing */
 	const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const uint8_t *alpha = &m_table[gfx->granularity() * (color % gfx->colors())];
-	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
-	int x_index_base, y_index, sx, sy, ex, ey;
-	int xinc, yinc;
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 
-	xinc = flipx ? -1 : 1;
-	yinc = flipy ? -1 : 1;
+	const int xinc = flipx ? -1 : 1;
+	const int yinc = flipy ? -1 : 1;
 
-	x_index_base = flipx ? gfx->width()-1 : 0;
-	y_index = flipy ? gfx->height()-1 : 0;
+	int x_index_base = flipx ? gfx->width() - 1 : 0;
+	int y_index = flipy ? gfx->height() - 1 : 0;
 
 	// start coordinates
-	sx = offsx;
-	sy = offsy;
+	int sx = offsx;
+	int sy = offsy;
 
 	// end coordinates
-	ex = sx + gfx->width();
-	ey = sy + gfx->height();
+	int ex = sx + gfx->width();
+	int ey = sy + gfx->height();
 
 	if (sx < clip.min_x)
 	{ // clip left
-		int pixels = clip.min_x-sx;
+		int pixels = clip.min_x - sx;
 		sx += pixels;
-		x_index_base += xinc*pixels;
+		x_index_base += xinc * pixels;
 	}
 	if (sy < clip.min_y)
 	{ // clip top
-		int pixels = clip.min_y-sy;
+		int pixels = clip.min_y - sy;
 		sy += pixels;
-		y_index += yinc*pixels;
+		y_index += yinc * pixels;
 	}
 	// NS 980211 - fixed incorrect clipping
-	if (ex > clip.max_x+1)
+	if (ex > clip.max_x + 1)
 	{ // clip right
-		ex = clip.max_x+1;
+		ex = clip.max_x + 1;
 	}
-	if (ey > clip.max_y+1)
+	if (ey > clip.max_y + 1)
 	{ // clip bottom
-		ey = clip.max_y+1;
+		ey = clip.max_y + 1;
 	}
 
 	if (ex > sx)
 	{ // skip if inner loop doesn't draw anything
-		int x, y;
 
-		// taken from case 7: TRANSPARENCY_ALPHARANGE
-		for (y = sy; y < ey; y++)
+		// taken from case : TRANSPARENCY_ALPHARANGE
+		for (int y = sy; y < ey; y++)
 		{
-			const uint8_t *source = source_base + y_index*gfx->rowbytes();
+			const u8 *source = source_base + y_index*gfx->rowbytes();
 			typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 			int x_index = x_index_base;
-			for (x = sx; x < ex; x++)
+			for (int x = sx; x < ex; x++)
 			{
-				int c = source[x_index];
+				const u8 c = source[x_index];
 				if (c != transparent_color)
 				{
-					if (alpha[c] & 8)
-					{
-						// Comp with clamp
-						dest[x] = jaleco_blend_device::func(dest[x], pal[c], alpha[c]);
-					}
-					else
-					{
-						// Skip the costly alpha step altogether
-						dest[x] = pal[c];
-					}
+					dest[x] = jaleco_blend_device::func(dest[x], pal[c]);
 				}
 				x_index += xinc;
 			}
@@ -179,10 +163,10 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &d
 }
 
 void jaleco_blend_device::drawgfx(palette_device &palette,bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
-							int transparent_color)
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color)
 { jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
 void jaleco_blend_device::drawgfx(palette_device &palette,bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
-							int transparent_color)
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color)
 { jaleco_blend_device::drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
