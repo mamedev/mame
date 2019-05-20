@@ -479,7 +479,7 @@ void hitpoker_state::hitpoker(machine_config &config)
 	screen.set_visarea(0, 648-1, 0, 240-1);
 	screen.set_screen_update(FUNC(hitpoker_state::screen_update_hitpoker));
 
-	h46505_device &crtc(H46505(config, "crtc", CRTC_CLOCK/2));  /* hand tuned to get ~60 fps */
+	hd6845s_device &crtc(HD6845S(config, "crtc", CRTC_CLOCK/2));  /* hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

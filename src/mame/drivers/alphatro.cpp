@@ -103,12 +103,11 @@ private:
 	void port30_w(uint8_t data);
 	uint8_t portf0_r();
 	void portf0_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	void alphatro_palette(palette_device &palette) const;
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
@@ -129,7 +128,7 @@ private:
 	u8 m_flashcnt;
 	u8 m_cass_data[4];
 	u8 m_port_10, m_port_20, m_port_30, m_port_f0;
-	bool m_cass_state;
+	bool m_cassbit;
 	bool m_cassold, m_fdc_irq;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cpu_device> m_maincpu;
@@ -279,7 +278,7 @@ void alphatro_state::port10_w(uint8_t data)
 	m_cass->change_state( BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (BIT(data,2))
-		m_cass_state = 1;
+		m_cassbit = 1;
 
 	update_banking();
 }
@@ -351,11 +350,6 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	default:
 		assert_always(false, "Unknown id in alphatro_state::device_timer");
 	}
-}
-
-WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
-{
-	m_cass_state = state;
 }
 
 MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
@@ -617,7 +611,7 @@ void alphatro_state::machine_start()
 	save_item(NAME(m_port_10));
 	save_item(NAME(m_port_20));
 	save_item(NAME(m_cass_data));
-	save_item(NAME(m_cass_state));
+	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
 }
 
@@ -629,7 +623,7 @@ void alphatro_state::machine_reset()
 	update_banking();
 
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-	m_cass_state = 0;
+	m_cassbit = 0;
 	m_cassold = 0;
 	m_fdc_irq = 0;
 	m_usart->write_rxd(0);
@@ -676,23 +670,23 @@ void alphatro_state::alphatro_palette(palette_device &palette) const
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_c)
+TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::kansas_w)
 {
 	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
+TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -765,14 +759,14 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	HD6845(config, m_crtc, 16_MHz_XTAL / 8);
+	HD6845S(config, m_crtc, 16_MHz_XTAL / 8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(alphatro_state::crtc_update_row), this);
 
 	I8251(config, m_usart, 16_MHz_XTAL / 4);
-	m_usart->txd_handler().set(FUNC(alphatro_state::txdata_callback));
+	m_usart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", /*16_MHz_XTAL / 4 / 13 / 16*/ 19218)); // 19218 to load a real tape, 19222 to load a tape made by this driver
 	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
@@ -783,8 +777,8 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	m_cass->set_interface("alphatro_cass");
 	SOFTWARE_LIST(config, "cass_list").set_original("alphatro_cass");
 
-	TIMER(config, "timer_c").configure_periodic(FUNC(alphatro_state::timer_c), attotime::from_hz(4800));
-	TIMER(config, "timer_p").configure_periodic(FUNC(alphatro_state::timer_p), attotime::from_hz(40000));
+	TIMER(config, "kansas_w").configure_periodic(FUNC(alphatro_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(alphatro_state::kansas_r), attotime::from_hz(40000));
 
 	RAM(config, "ram").set_default_size("64K");
 

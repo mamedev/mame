@@ -32,6 +32,7 @@ To Do:
 
 #include "emu.h"
 #include "cpu/z8000/z8000.h"
+#include "cpu/m6502/m6510.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/z8536.h"
@@ -46,6 +47,7 @@ public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_fdcpu(*this, "fdcpu")
 		, m_spkrdev(*this, "speaker")
 	{ }
 
@@ -56,8 +58,12 @@ private:
 
 	void data_map(address_map &map);
 	void io_map(address_map &map);
+	void special_io_map(address_map &map);
 	void mem_map(address_map &map);
+	void fdc_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_fdcpu;
 	required_device<speaker_sound_device> m_spkrdev;
 };
 
@@ -82,6 +88,17 @@ void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	map(0x0100, 0x013f).rw("scc", FUNC(scc8030_device::zbus_r), FUNC(scc8030_device::zbus_w)).umask16(0x00ff);
+}
+
+void c900_state::special_io_map(address_map &map)
+{
+	// TODO: Z8010 MMU
+}
+
+void c900_state::fdc_map(address_map &map)
+{
+	map(0x0000, 0x01ff).noprw(); // internal
+	map(0xe000, 0xffff).rom().region("fdc", 0);
 }
 
 static INPUT_PORTS_START( c900 )
@@ -112,6 +129,10 @@ void c900_state::c900(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c900_state::mem_map);
 	m_maincpu->set_addrmap(AS_DATA, &c900_state::data_map);
 	m_maincpu->set_addrmap(AS_IO, &c900_state::io_map);
+	m_maincpu->set_addrmap(z8001_device::AS_SIO, &c900_state::special_io_map);
+
+	M6508(config, m_fdcpu, 12_MHz_XTAL / 8); // PH1/PH2 = 1.5 MHz
+	m_fdcpu->set_addrmap(AS_PROGRAM, &c900_state::fdc_map);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_c900);
 	PALETTE(config, "palette", palette_device::MONOCHROME);

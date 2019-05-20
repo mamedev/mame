@@ -23,7 +23,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="uk-e001.u1" size="0x100000" crc="fc0ea770" sha1="47e2ef544cbb35431dd138b74d1f9b7290eba02d" offset="0" />
+				<rom name="uk-e001.u1" size="0x100000" crc="fc0ea770" sha1="47e2ef544cbb35431dd138b74d1f9b7290eba02d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="uk-e002.u1" size="0x100000" crc="ab011ea3" sha1="dd5c9cc330956861b0d172c5a07a72eb315009a2" offset="0" />
+				<rom name="uk-e002.u1" size="0x100000" crc="ab011ea3" sha1="dd5c9cc330956861b0d172c5a07a72eb315009a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="uk-e003.u1" size="0x100000" crc="ee16321c" sha1="cc6d22e164164dc678c75a65e13397fb29024b14" offset="0" />
+				<rom name="uk-e003.u1" size="0x100000" crc="ee16321c" sha1="cc6d22e164164dc678c75a65e13397fb29024b14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="uk-e006.u1" size="0x100000" crc="fad51dc4" sha1="522adfab98c2634bfaa9a01e3b7aebba2f867c1f" offset="0" />
+				<rom name="uk-e006.u1" size="0x100000" crc="fad51dc4" sha1="522adfab98c2634bfaa9a01e3b7aebba2f867c1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="uk-e007.u1" size="0x100000" crc="753ce591" sha1="e12ac98470f1dbc470f2e3d957f1b72f0a90bee1" offset="0" />
+				<rom name="uk-e007.u1" size="0x100000" crc="753ce591" sha1="e12ac98470f1dbc470f2e3d957f1b72f0a90bee1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="ger-m001.u1" size="0x080000" crc="ff2881f3" sha1="3470fc1ed81da5e2c929205fcd290da82d031c4c" offset="0" />
+				<rom name="ger-m001.u1" size="0x080000" crc="ff2881f3" sha1="3470fc1ed81da5e2c929205fcd290da82d031c4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@
 		<publisher>Takara / newgent</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5" offset="0" />
+				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@
 		<publisher>Takara / newgent</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a" offset="0" />
+				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a"/>
 			</dataarea>
 		</part>
 	</software>

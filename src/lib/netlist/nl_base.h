@@ -551,9 +551,9 @@ namespace netlist
 
 			using list_t = std::vector<core_terminal_t *>;
 
-			static constexpr const auto INP_HL_SHIFT = 0;
-			static constexpr const auto INP_LH_SHIFT = 1;
-			static constexpr const auto INP_ACTIVE_SHIFT = 2;
+			static constexpr const unsigned int INP_HL_SHIFT = 0;
+			static constexpr const unsigned int INP_LH_SHIFT = 1;
+			static constexpr const unsigned int INP_ACTIVE_SHIFT = 2;
 
 			enum state_e {
 				STATE_INP_PASSIVE = 0,

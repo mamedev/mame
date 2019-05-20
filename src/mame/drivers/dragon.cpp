@@ -306,11 +306,11 @@ void d64plus_state::d64plus(machine_config &config)
 	plus_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	plus_screen.set_size(640, 264);
 	plus_screen.set_visarea_full();
-	plus_screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	plus_screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc
-	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
+	HD6845S(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
 	m_crtc->set_screen("plus_screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

@@ -407,7 +407,7 @@ ROM_END
 
 void ti_fdc_device::device_add_mconfig(machine_config& config)
 {
-	FD1771(config, m_fd1771, 1_MHz_XTAL);
+	FD1771(config, m_fd1771, 2_MHz_XTAL / 2);
 	m_fd1771->intrq_wr_callback().set(FUNC(ti_fdc_device::fdc_irq_w));
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
 	m_fd1771->hld_wr_callback().set(FUNC(ti_fdc_device::fdc_hld_w));

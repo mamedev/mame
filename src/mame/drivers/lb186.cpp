@@ -134,7 +134,7 @@ FLOPPY_FORMATS_END
 
 void lb186_state::lb186(machine_config &config)
 {
-	I80186(config, m_maincpu, 16_MHz_XTAL / 2);
+	I80186(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lb186_state::lb186_map);
 	m_maincpu->set_addrmap(AS_IO, &lb186_state::lb186_io);
 
@@ -170,8 +170,12 @@ void lb186_state::lb186(machine_config &config)
 
 ROM_START( lb186 )
 	ROM_REGION(0x4000, "bios", 0)
-	ROM_LOAD16_BYTE("a75515_v3.35.rom", 0x0000, 0x2000, CRC(245824fb) SHA1(b39ed91d421513f5912fdbc290aaa3f1b7d4f1e0))
-	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
+	ROM_SYSTEM_BIOS(0, "v335", "BIOS Version 3.35") // 28 January 1987
+	ROMX_LOAD("a75515_v3.35.rom", 0x0000, 0x2000, CRC(245824fb) SHA1(b39ed91d421513f5912fdbc290aaa3f1b7d4f1e0), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "ramdisk", "RAM Disk BIOS Version 1.00")
+	ROMX_LOAD("a75523.rom", 0x0000, 0x2000, CRC(2d22e826) SHA1(e366e489f580b440131ad5212722391b60af90cd), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("a75524.rom", 0x0001, 0x2000, CRC(9c9b249c) SHA1(e988e92d9fa6fe66f89ef748021e9a0501d2807e), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, empty_init, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )

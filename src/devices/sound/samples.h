@@ -26,6 +26,7 @@ DECLARE_DEVICE_TYPE(SAMPLES, samples_device)
 //**************************************************************************
 
 #define SAMPLES_START_CB_MEMBER(_name) void _name()
+#define SAMPLES_UPDATE_CB_MEMBER(_name) void _name()
 
 // ======================> samples_device
 
@@ -34,6 +35,7 @@ class samples_device :  public device_t,
 {
 public:
 	typedef device_delegate<void ()> start_cb_delegate;
+	typedef device_delegate<void ()> update_cb_delegate;
 
 	// construction/destruction
 	samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -53,13 +55,30 @@ public:
 		set_samples_start_callback(start_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
+	// update callback helpers
+	void set_samples_update_callback(update_cb_delegate callback) {
+		m_samples_update_cb = callback;
+		m_samples_update_cb.bind_relative_to(*owner());
+	}
+
+	template <class FunctionClass> void set_samples_update_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
+	{
+		set_samples_update_callback(update_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_samples_update_callback(void (FunctionClass::*callback)(), const char *name)
+	{
+		set_samples_update_callback(update_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	// getters
 	bool playing(uint8_t channel) const;
 	uint32_t base_frequency(uint8_t channel) const;
+	uint32_t get_position(uint8_t channel);
 
 	// start/stop helpers
 	void start(uint8_t channel, uint32_t samplenum, bool loop = false);
 	void start_raw(uint8_t channel, const int16_t *sampledata, uint32_t samples, uint32_t frequency, bool loop = false);
+	void update_raw(uint8_t channel, const int16_t *sampledata, uint32_t samples, uint32_t frequency, bool loop = false);
 	void pause(uint8_t channel, bool pause = true);
 	void stop(uint8_t channel);
 	void stop_all();
@@ -116,6 +135,7 @@ protected:
 	bool load_samples();
 
 	start_cb_delegate m_samples_start_cb; // optional callback
+	start_cb_delegate m_samples_update_cb; // optional callback
 
 	// internal state
 	std::vector<channel_t>    m_channel;

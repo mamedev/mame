@@ -68,7 +68,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<mb8866_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -123,8 +123,8 @@ void multi16_state::multi16_io(address_map &map)
 //	map(0x07, 0x07) // ?
 //	map(0x08, 0x0b) // ?
 	map(0x0c, 0x0f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x40, 0x40).w(m_crtc, FUNC(hd6845_device::address_w));
-	map(0x41, 0x41).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0x40, 0x40).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0x41, 0x41).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 //	map(0x42, 0x44) // ?
 //	map(0x48, 0x48) // ?
 //	map(0x4e, 0x4e) // ?
@@ -165,11 +165,11 @@ void multi16_state::multi16(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16000000, 848, 0, 640, 518, 0, 400); // unknown clock
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	HD6845(config, m_crtc, 2000000); // unknown clock
+	HD6845S(config, m_crtc, 2000000); // unknown clock
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

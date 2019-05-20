@@ -225,7 +225,7 @@ void mpu4dealem_state::dealem(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(mpu4dealem_state::dealem_palette), 32);
 
-	hd6845_device &crtc(HD6845(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
+	hd6845s_device &crtc(HD6845S(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

@@ -13598,6 +13598,7 @@ redufob2                        // bootleg
 scobra                          // GX316 (c) 1981 Konami
 scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
 scobrae                         // GX316 (c) 1981 Stern
+scobrae2                        //
 scobrag                         // AVG by Zaccaria (bootleg?)
 scobraggi                       // bootleg (Cocamatic)
 scobras                         // GX316 (c) 1981 Stern
@@ -18129,6 +18130,7 @@ konam80u                        // 1998 - Konami 80's AC Special (GC826 VER. UAA
 mamboagg                        // 2001 - Mambo A Go-Go (GQA40 VER. JAB)
 mamboagga                       // 2001 - Mambo A Go-Go e-Amusement (GQA40 VER. JRB)
 mrtlbeat                        // 2002 - Martial Beat (Martial Beat (G*B47 VER. JBA)
+pcnfrk2m                        // 2000 - Percussion Freaks 2nd Mix (GE912 VER. KAA)
 pcnfrk3m                        // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA)
 pcnfrk4m                        // 2000 - Percussion Freaks 4rd Mix (G*A25 VER. AAA)
 pcnfrk5m                        // 2001 - Percussion Freaks 5th Mix (G*B05 VER. KAA)
@@ -29421,6 +29423,8 @@ dunkmniajc                      // 1996.05 Dunk Mania (Japan, DM1/VER.C)
 myangel3                        // 1998.03 Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)
 pocketrc                        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
 primglex                        // 1996.03 Prime Goal EX (Japan, PG1/VER.A)
+ptblank2a                       // 1999.?? Point Blank 2 (World, GNB2/VER.A)
+ptblank2b                       // 1999.?? Point Blank 2 (World, GNB2/VER.A alt)
 ptblank2ua                      // 1999.?? Point Blank 2 (US, GNB3/VER.A)
 souledge                        // 1996.05 Soul Edge Ver. II (Asia, SO4/VER.C)
 souledgea                       // 1996.02 Soul Edge (World, SO2/VER.A)
@@ -34394,6 +34398,9 @@ beena                           //
 @source:sega_sawatte.cpp
 sawatte                         //
 
+@source:segaatom.cpp
+spongbob                        // (c) 200? Sega
+
 @source:segac2.cpp
 anpanman                        // (c) 1993 Sega
 bloxeedc                        // (c) 1989 Sega / Elorg
@@ -35892,6 +35899,7 @@ iqunlimz                        // 1991 IQ Unlimited (Z80)
 profweis                        // 1988 (Yeno) Professor Weiss-Alles (Germany)
 socrates                        // 1988 Socrates Educational Video System (USA)
 socratfc                        // 1988 Socrates SAITOUT (French Canada)
+vpainter                        // 1991 Video Painter
 
 @source:softbox.cpp
 softbox                         //
@@ -36294,8 +36302,8 @@ starfirea                       // Exidy [1979?]
 spcship                         //
 whtforce                        //
 
-@source:starrider.cpp           //
-starridr
+@source:starrider.cpp
+starridr                        //
 
 @source:starshp1.cpp
 starshp1                        // 007513-007531    1977/07 [6502]
@@ -40472,7 +40480,7 @@ sfchampj                        // Super Football Champ (Ver 2.4J)
 sfchampo                        // Super Football Champ (Ver 2.4O)
 sfchampu                        // Super Football Champ (Ver 2.4A)
 sfex                            // Street Fighter EX (EURO 961219)
-sfex2                           // Street Fighter EX 2 (USA 980526)
+sfex2                           // Street Fighter EX 2 (EURO 980312)
 sfex2a                          // Street Fighter EX 2 (ASIA 980312)
 sfex2h                          // Street Fighter EX 2 (HISPANIC 980312)
 sfex2j                          // Street Fighter EX 2 (JAPAN 980312)
@@ -40481,6 +40489,7 @@ sfex2pa                         // Street Fighter EX 2 Plus (ASIA 990611)
 sfex2ph                         // Street Fighter EX 2 Plus (HISPANIC 990611)
 sfex2pj                         // Street Fighter EX 2 Plus (JAPAN 990611)
 sfex2pu                         // Street Fighter EX 2 Plus (USA 990611)
+sfex2u                          // Street Fighter EX 2 (USA 980526)
 sfex2u1                         // Street Fighter EX 2 (USA 980312)
 sfexa                           // Street Fighter EX (ASIA 961219)
 sfexj                           // Street Fighter EX (JAPAN 961130)

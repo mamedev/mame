@@ -20,7 +20,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Mark Data Products" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="astroblast (1982) (dragon data).rom" size="8192" crc="61143386" sha1="64e103c787d551d9504a6e2c5d70fb2c676c92e1" offset="0" />
+				<rom name="astroblast (1982) (dragon data).rom" size="8192" crc="61143386" sha1="64e103c787d551d9504a6e2c5d70fb2c676c92e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Computerware" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="doodle bug (1982) (dragon data).rom" size="8192" crc="410a0332" sha1="637d37bffb6ebfd4441ea356904d71989df87b3f" status="baddump" offset="0" />
+				<rom name="doodle bug (1982) (dragon data).rom" size="8192" crc="410a0332" sha1="637d37bffb6ebfd4441ea356904d71989df87b3f" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +44,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="dosplus v4.9b (1989)(3s).rom" size="8192" crc="7c6dfca8" sha1="73ae74978a78ec2b97ebb1b0c808238779529bfa" offset="0" />
+				<rom name="dosplus v4.9b (1989)(3s).rom" size="8192" crc="7c6dfca8" sha1="73ae74978a78ec2b97ebb1b0c808238779529bfa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="dosplus v4.8 (1989)(3s).rom" size="8192" crc="402b0617" sha1="c9209d3c042d61e8ef984915fc277816d62a25f1" offset="0" />
+				<rom name="dosplus v4.8 (1989)(3s).rom" size="8192" crc="402b0617" sha1="c9209d3c042d61e8ef984915fc277816d62a25f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Compusense</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="dasm-demon (1983)(compusense).rom" size="8192" crc="f602f497" sha1="fe8ded4fcc529571f6d07cc02c5089638613e164" offset="0" />
+				<rom name="dasm-demon (1983)(compusense).rom" size="8192" crc="f602f497" sha1="fe8ded4fcc529571f6d07cc02c5089638613e164"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Compusense</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="edit+ (1983)(compusense).rom" size="8192" crc="135f1aba" sha1="90e67516d3fb3995e7a69649b14063551c1d63ef" offset="0" />
+				<rom name="edit+ (1983)(compusense).rom" size="8192" crc="135f1aba" sha1="90e67516d3fb3995e7a69649b14063551c1d63ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -90,7 +90,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="16128">
-				<rom name="cumana dos v2.0 (198x)(cumana).rom" size="16128" crc="32910d47" sha1="9fd99441d32344b1a64c8c0a61c61714761a88f9" status="baddump" offset="0" />
+				<rom name="cumana dos v2.0 (198x)(cumana).rom" size="16128" crc="32910d47" sha1="9fd99441d32344b1a64c8c0a61c61714761a88f9" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0516" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="alldream (1984)(grosvenor software).rom" size="8192" crc="af91e6ff" sha1="7c6b769510a5472c970597528850db9d0ee19f5a" offset="0" />
+				<rom name="alldream (1984)(grosvenor software).rom" size="8192" crc="af91e6ff" sha1="7c6b769510a5472c970597528850db9d0ee19f5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0100" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="berserk (1982)(a0100)(mark data products).rom" size="8192" crc="7901a633" sha1="aa2265ff9215b019b4f0a0d65a13ed66fbe660fe" offset="0" />
+				<rom name="berserk (1982)(a0100)(mark data products).rom" size="8192" crc="7901a633" sha1="aa2265ff9215b019b4f0a0d65a13ed66fbe660fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="author" value="Ron Krebs" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="cave hunter (1982)(mark data products).rom" size="4096" crc="8bcaed11" sha1="5fd9605b5f68830d7531a22adc6d59b5af5c95df" offset="0" />
+				<rom name="cave hunter (1982)(mark data products).rom" size="4096" crc="8bcaed11" sha1="5fd9605b5f68830d7531a22adc6d59b5af5c95df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0102" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cosmic invaders (1982)(a0102)(spectral associates).rom" size="8192" crc="2ad2f4e0" sha1="0d75e7f849a1c0407f566342dfde2e8a15317839" offset="0" />
+				<rom name="cosmic invaders (1982)(a0102)(spectral associates).rom" size="8192" crc="2ad2f4e0" sha1="0d75e7f849a1c0407f566342dfde2e8a15317839"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,7 +158,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0108" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cyrus chess (1982)(a0108)(dragon data).rom" size="8192" crc="d4c36a96" sha1="953f35586b0fc7c5b1f5ccb9fd20e0e6e1041d9c" offset="0" />
+				<rom name="cyrus chess (1982)(a0108)(dragon data).rom" size="8192" crc="d4c36a96" sha1="953f35586b0fc7c5b1f5ccb9fd20e0e6e1041d9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0109" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="democart (1982)(a0109)(dragon data).rom" size="8192" crc="7e1cc4b3" sha1="42e07d3ccdb4099720701a0ec39f4e6958922912" offset="0" />
+				<rom name="democart (1982)(a0109)(dragon data).rom" size="8192" crc="7e1cc4b3" sha1="42e07d3ccdb4099720701a0ec39f4e6958922912"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,7 +182,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="author" value="M.J. Kerry" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="dos-dream (1986)(dragon data).rom" size="8192" crc="480032e2" sha1="7a93df2eb0ea672112caa356c4bbec01d1f942ee" offset="0" />
+				<rom name="dos-dream (1986)(dragon data).rom" size="8192" crc="480032e2" sha1="7a93df2eb0ea672112caa356c4bbec01d1f942ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,7 +193,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Dragon Data</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="quick diagnostic rom (1982)(dragon data).rom" size="8192" crc="863cfcfc" sha1="c87b096bbec260ce7230bf2f8d4e27c5b0752038" offset="0" />
+				<rom name="quick diagnostic rom (1982)(dragon data).rom" size="8192" crc="863cfcfc" sha1="c87b096bbec260ce7230bf2f8d4e27c5b0752038"/>
 			</dataarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="dragondos 1.0 (1983)(dragon data).rom" size="8192" crc="b44536f6" sha1="a8918c71d319237c1e3155bb38620acb114a80bc" offset="0" />
+				<rom name="dragondos 1.0 (1983)(dragon data).rom" size="8192" crc="b44536f6" sha1="a8918c71d319237c1e3155bb38620acb114a80bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +217,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="dragondos 4.0 (1985)(dragon data).rom" size="8192" crc="14f4c54a" sha1="89f38825ddf72b9863c04d8066d5ab8cabb9197a" offset="0" />
+				<rom name="dragondos 4.0 (1985)(dragon data).rom" size="8192" crc="14f4c54a" sha1="89f38825ddf72b9863c04d8066d5ab8cabb9197a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="dragondos 4.0 (es)(1985)(dragon data).rom" size="8192" crc="3d31cae8" sha1="9cb2da08b25ea10112ae15bf2e9a827c01e99b61" offset="0" />
+				<rom name="dragondos 4.0 (es)(1985)(dragon data).rom" size="8192" crc="3d31cae8" sha1="9cb2da08b25ea10112ae15bf2e9a827c01e99b61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="dragondos 4.1 (1985)(dragon data).rom" size="8192" crc="16d25658" sha1="ef44a5a0f2f1d9e52a9082e87f9975485f6f0d7d" offset="0" />
+				<rom name="dragondos 4.1 (1985)(dragon data).rom" size="8192" crc="16d25658" sha1="ef44a5a0f2f1d9e52a9082e87f9975485f6f0d7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0103" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="ghost attack (1982)(a0103)(computerware).rom" size="8192" crc="45c089f6" sha1="4447fa2c441415e781a0f47f50b65e81f5798ae3" offset="0" />
+				<rom name="ghost attack (1982)(a0103)(computerware).rom" size="8192" crc="45c089f6" sha1="4447fa2c441415e781a0f47f50b65e81f5798ae3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +267,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Spectral Associates" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="meteors (1982)(spectral associates).rom" size="4096" crc="64aba2b0" sha1="cd6970056b4c56fc1599228574f0c1419f61176a" offset="0" />
+				<rom name="meteors (1982)(spectral associates).rom" size="4096" crc="64aba2b0" sha1="cd6970056b4c56fc1599228574f0c1419f61176a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +278,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Dragon Data</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="prestel for dragon alpha (198x)(dragon data).rom" size="8192" crc="c6820601" sha1="ae0d1833ab644e9c85cb21e75fc2007714f8bbfd" offset="0" />
+				<rom name="prestel for dragon alpha (198x)(dragon data).rom" size="8192" crc="c6820601" sha1="ae0d1833ab644e9c85cb21e75fc2007714f8bbfd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -292,7 +292,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0111" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="rail runner (1982)(a0111)(computerware).rom" size="8192" crc="53e4be03" sha1="4167a3e2add6d90b30911b6ad32f52163142345c" offset="0" />
+				<rom name="rail runner (1982)(a0111)(computerware).rom" size="8192" crc="53e4be03" sha1="4167a3e2add6d90b30911b6ad32f52163142345c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -306,7 +306,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="A0106" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="starship chameleon (1982)(a0106)(computerware).rom" size="8192" crc="06c9b4e7" sha1="3f44baf761162d9ba66c8d32f41f5ea10be83aa1" offset="0" />
+				<rom name="starship chameleon (1982)(a0106)(computerware).rom" size="8192" crc="06c9b4e7" sha1="3f44baf761162d9ba66c8d32f41f5ea10be83aa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -317,7 +317,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="cash planner.1" size="8192" crc="29309592" sha1="8b230ef1a234e9c24d6a322366a84270259cf244" offset="0x0000" />
+				<rom name="cash planner.1" size="8192" crc="29309592" sha1="8b230ef1a234e9c24d6a322366a84270259cf244"/>
 				<rom name="cash planner.2" size="8192" crc="d41465b3" sha1="bc368a31d8e30c56749c783b181f83b70fd50fad" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -329,7 +329,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="dairy prediction.1" size="8192" crc="bb3d1a7e" sha1="d79850fabda1fae61bd4ade5af6f4b545e4f96ed" offset="0x0000" />
+				<rom name="dairy prediction.1" size="8192" crc="bb3d1a7e" sha1="d79850fabda1fae61bd4ade5af6f4b545e4f96ed"/>
 				<rom name="dairy prediction.2" size="8192" crc="7858d11c" sha1="e13384ab1bb6f47deb5def36e488873720cce059" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -341,7 +341,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="rotation formulation dairy.1" size="8192" crc="fd0dda29" sha1="c2f67e2cb89cf7d7dd4a7346e0e19c54f7f5e7d4" offset="0x0000" />
+				<rom name="rotation formulation dairy.1" size="8192" crc="fd0dda29" sha1="c2f67e2cb89cf7d7dd4a7346e0e19c54f7f5e7d4"/>
 				<rom name="rotation formulation dairy.2" size="8192" crc="d0de8e62" sha1="2adf61728c272c09277637ee28c2b7b586d3c01f" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -353,7 +353,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="trainer.rom" size="8192" crc="9fa36a89" sha1="aacfcba60e976807917340ee4f5af47c17fe8d43" offset="0" />
+				<rom name="trainer.rom" size="8192" crc="9fa36a89" sha1="aacfcba60e976807917340ee4f5af47c17fe8d43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="premier_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="deltados (1983)(premier micros).rom" size="8192" crc="149eb4dd" sha1="eb686ce6afe63e4d4011b333a882ca812c69307f" offset="0" />
+				<rom name="deltados (1983)(premier micros).rom" size="8192" crc="149eb4dd" sha1="eb686ce6afe63e4d4011b333a882ca812c69307f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -378,7 +378,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
-				<rom name="superdos e6 (198x)(pnp).rom" size="8192" crc="8c1d6c45" sha1="ef157016386ed463374de6bac84d1f8ce654ed80" offset="0" />
+				<rom name="superdos e6 (198x)(pnp).rom" size="8192" crc="8c1d6c45" sha1="ef157016386ed463374de6bac84d1f8ce654ed80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +390,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="author" value="S.J Purdy" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="toolkit (1983) (premier microsystems) [!].rom" size="8192" crc="82ef981a" sha1="b9c0d29382ae1d685f196ab4b53fb75156e12404" offset="0" />
+				<rom name="toolkit (1983) (premier microsystems) [!].rom" size="8192" crc="82ef981a" sha1="b9c0d29382ae1d685f196ab4b53fb75156e12404"/>
 			</dataarea>
 		</part>
 	</software>
@@ -404,7 +404,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<!-- <feature name="slot" value="epromprg" /> -->
 			<dataarea name="rom" size="4096">
-				<rom name="eprom_mkII_v21.rom" size="4096" crc="310bc0a0" sha1="4aba041033410ab912753407ae29e5fe89925440" offset="0" />
+				<rom name="eprom_mkII_v21.rom" size="4096" crc="310bc0a0" sha1="4aba041033410ab912753407ae29e5fe89925440"/>
 			</dataarea>
 		</part>
 	</software>
@@ -416,7 +416,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<!-- <feature name="slot" value="soaktest" /> -->
 			<dataarea name="rom" size="4096">
-				<rom name="d32soaktest.rom" size="4096" crc="41c61438" sha1="6db94922a458ae292d7a5c3333d86f2d935212b6" offset="0" />
+				<rom name="d32soaktest.rom" size="4096" crc="41c61438" sha1="6db94922a458ae292d7a5c3333d86f2d935212b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -428,7 +428,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="jcbsnd" />
 			<dataarea name="rom" size="4096">
-				<rom name="D32SEM.ROM" size="4096" crc="4cd0f30b" sha1="d07bb9272e3d3928059853730ff656905a80b68e" offset="0" />
+				<rom name="D32SEM.ROM" size="4096" crc="4cd0f30b" sha1="d07bb9272e3d3928059853730ff656905a80b68e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -440,7 +440,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<!-- <feature name="slot" value="jcbspch" /> -->
 			<dataarea name="rom" size="4096">
-				<rom name="jcb-speech.rom" size="4096" crc="e88dfe36" sha1="df3f64a7a3beeb91469932035af5e4f8a7872aad" offset="0" />
+				<rom name="jcb-speech.rom" size="4096" crc="e88dfe36" sha1="df3f64a7a3beeb91469932035af5e4f8a7872aad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -452,7 +452,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<!-- <feature name="slot" value="ultradrv" /> -->
 			<dataarea name="rom" size="4096">
-				<rom name="Dragonfly Tape system v1.3.rom" size="4096" crc="72618948" sha1="12cc90afc7eb1c0b0b720d4722f8d47e39932893" offset="0" />
+				<rom name="Dragonfly Tape system v1.3.rom" size="4096" crc="72618948" sha1="12cc90afc7eb1c0b0b720d4722f8d47e39932893"/>
 			</dataarea>
 		</part>
 	</software>

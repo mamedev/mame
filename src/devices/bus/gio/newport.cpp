@@ -51,6 +51,7 @@ newport_base_device::newport_base_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_gio_card_interface(mconfig, *this)
+	, m_screen(*this, "screen")
 	, m_global_mask(global_mask)
 {
 }
@@ -75,6 +76,7 @@ void newport_base_device::device_start()
 	m_olay = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 	m_pup = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 	m_cid = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
+	m_vt_table = make_unique_clear<uint32_t[]>(2048 * 2048);
 
 	save_pointer(NAME(m_rgbci), (1280+64) * (1024+64));
 	save_pointer(NAME(m_olay), (1280+64) * (1024+64));
@@ -195,6 +197,11 @@ void newport_base_device::device_start()
 
 	save_item(NAME(m_cmap0.m_palette_idx));
 	save_item(NAME(m_cmap0.m_palette));
+
+	save_item(NAME(m_readout_x0));
+	save_item(NAME(m_readout_y0));
+	save_item(NAME(m_readout_x1));
+	save_item(NAME(m_readout_y1));
 }
 
 //-------------------------------------------------
@@ -217,6 +224,11 @@ void newport_base_device::device_reset()
 
 	m_xmap0.m_entries = 0x2;
 	m_xmap1.m_entries = 0x2;
+
+	m_readout_x0 = 0;
+	m_readout_y0 = 0;
+	m_readout_x1 = 0;
+	m_readout_y1 = 0;
 
 #if ENABLE_NEWVIEW_LOG
 	m_newview_log = nullptr;
@@ -302,12 +314,14 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 	const uint16_t popup_msb = (uint16_t)m_xmap0.m_popup_cmap << 5;
 
 	/* loop over rows and copy to the destination */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y, sy = m_readout_y0; y <= cliprect.max_y && sy < m_readout_y1; y++, sy++)
+	//for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		//uint32_t *src = &m_vt_table[y * 2048];
 		uint32_t *src_ci = &m_rgbci[1344 * y];
 		uint32_t *src_pup = &m_pup[1344 * y];
 		uint32_t *src_olay = &m_pup[1344 * y];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		m_vc2.m_did_frame_ptr = m_vc2.m_did_entry + (uint16_t)y;
 		m_vc2.m_did_line_ptr = m_vc2.m_ram[m_vc2.m_did_frame_ptr];
@@ -332,9 +346,10 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 		m_vc2.m_did_line_ptr++;
 		curr_did_entry = m_vc2.m_ram[m_vc2.m_did_line_ptr];
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
+			//*dest++ = *src++;
 			if ((uint16_t)x == (curr_did_entry >> 5))
 			{
 				table_entry = m_xmap0.m_mode_table[curr_did_entry & 0x1f];
@@ -922,6 +937,116 @@ uint32_t newport_base_device::vc2_read()
 	}
 }
 
+void newport_base_device::decode_vt_line(uint32_t line, uint32_t line_seq_ptr)
+{
+	bool eol_sa = false;
+	bool eol_sb = false;
+	uint32_t vt_entry = 0;
+	uint32_t i = 0;
+	do
+	{
+		vt_entry &= ~(0x7f << 14);
+		vt_entry |= (m_vc2.m_ram[line_seq_ptr] & 0x7f) << 14;
+		eol_sa = BIT(m_vc2.m_ram[line_seq_ptr], 15);
+		if (!BIT(m_vc2.m_ram[line_seq_ptr], 7))
+		{
+			eol_sb = BIT(m_vc2.m_ram[line_seq_ptr + 1], 15);
+			vt_entry &= (0x7f << 14);
+			vt_entry |= (m_vc2.m_ram[line_seq_ptr + 1] & 0x7f00) >> 1;
+			vt_entry |= m_vc2.m_ram[line_seq_ptr + 1] & 0x7f;
+			line_seq_ptr += 2;
+		}
+		else
+		{
+			eol_sb = true;
+			line_seq_ptr++;
+		}
+		for (uint32_t j = 0; j < ((m_vc2.m_ram[line_seq_ptr] & 0x7f00) >> 7); i++, j++)
+		{
+			const uint8_t sa = ((vt_entry >> 14) & 0x7f) << 1;
+			const uint8_t sb = ((vt_entry >> 7) & 0x7f) << 1;
+			const uint8_t sc = ((vt_entry >> 0) & 0x7f) << 1;
+			//m_vt_table[line * 2048 + i] = vt_entry;
+			m_vt_table[line * 2048 + i] = 0xff000000 | (sa << 16) | (sb << 8) | sc;
+		}
+	} while (!(eol_sa && eol_sb));
+}
+
+void newport_base_device::decode_vt_table()
+{
+	memset(&m_vt_table[0], 0, sizeof(uint32_t) * 2048 * 2048);
+	uint32_t curr_vt_entry = m_vc2.m_vid_entry;
+	uint32_t line_counter = 0;
+	uint32_t line_seq_len = 0;
+	do
+	{
+		const uint32_t line_seq_ptr = m_vc2.m_ram[curr_vt_entry];
+		line_seq_len = m_vc2.m_ram[curr_vt_entry + 1];
+		if (line_seq_len)
+		{
+			for (uint32_t i = 0; i < line_seq_len; i++, line_counter++)
+			{
+				decode_vt_line(line_counter, line_seq_ptr);
+			}
+		}
+		curr_vt_entry += 2;
+	} while (line_seq_len != 0);
+}
+
+void newport_base_device::update_screen_size()
+{
+	decode_vt_table();
+
+	bool x_started = false;
+	bool y_started = false;
+	bool x_done = false;
+	bool y_done = false;
+	bool done = false;
+	m_readout_x0 = 0;
+	m_readout_y0 = 0;
+	m_readout_x1 = 0;
+	m_readout_y1 = 0;
+
+	for (int y = 0; y < 2048 && !done; y++)
+	{
+		uint32_t *src = &m_vt_table[y * 2048];
+		for (int x = 0; x < 2048 && !done; x++)
+		{
+			if (BIT(*src, 7))
+			{
+				if (!x_started)
+				{
+					x_started = true;
+					m_readout_x0 = x;
+				}
+				if (!y_started)
+				{
+					y_started = true;
+					m_readout_y0 = y;
+				}
+			}
+			else
+			{
+				if (x_started && !x_done)
+				{
+					m_readout_x1 = x;
+					x_done = true;
+				}
+				if (y_started && !y_done && x == m_readout_x0)
+				{
+					m_readout_y1 = y;
+					y_done = true;
+				}
+			}
+			done = x_done && y_done;
+			src++;
+		}
+	}
+
+	m_screen->set_size((uint16_t)(m_readout_x1 - m_readout_x0), (uint16_t)(m_readout_y1 - m_readout_y0));
+	m_screen->set_visarea_full();
+}
+
 void newport_base_device::vc2_write(uint32_t data)
 {
 	switch (m_rex3.m_xfer_width)
@@ -967,6 +1092,7 @@ void newport_base_device::vc2_write(uint32_t data)
 				case 0x00:
 					m_vc2.m_vid_entry = m_vc2.m_reg_data;
 					LOGMASKED(LOG_VC2, "VC2 Register Write: Video Entry Pointer, %04x\n", m_vc2.m_vid_entry);
+					update_screen_size();
 					break;
 				case 0x01:
 					m_vc2.m_cursor_entry = m_vc2.m_reg_data;
@@ -3573,11 +3699,13 @@ void newport_base_device::install_device()
 void newport_base_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(1280+64, 1024+64);
-	screen.set_visarea(0, 1279, 0, 1023);
-	screen.set_screen_update(FUNC(newport_base_device::screen_update));
-	screen.screen_vblank().set(FUNC(newport_base_device::vblank_w));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	//m_screen->set_size(2048, 2048);
+	//m_screen->set_visarea(0, 2047, 0, 2047);
+	m_screen->set_size(1280+64, 1024+64);
+	m_screen->set_visarea(0, 1279, 0, 1023);
+	m_screen->set_screen_update(FUNC(newport_base_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(newport_base_device::vblank_w));
 }

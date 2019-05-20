@@ -7,15 +7,17 @@
     The following variations exist that are different in
     functionality and not just in speed rating(1):
         * Motorola 6845, 6845-1
-        * Hitachi 46505
+        * Hitachi 6845 (= 46505R), 6845S (= 46505S), 6345/6445
         * Rockwell 6545, 6545-1 (= Synertek SY6545-1)
         * MOS Technology 6545-1
 
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
 
-    The various speed rated devices are identified by a letter,
-    for example M68A45, M68B45, etc.
+    The various speed rated devices are usually identified by a
+    letter, e.g. MC68A45, MC68B45. Hitachi's older HD46505 numbering
+    identifies speed by numerical suffixes (-1, -2), which other
+    manufacturers use to identify functional variants instead.
 
     The chip is originally designed by Hitachi, not by Motorola.
 
@@ -54,8 +56,7 @@ DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC"
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
 DEFINE_DEVICE_TYPE(R6545_1,  r6545_1_device,  "r6545_1",  "Rockwell R6545-1 CRTC")
 DEFINE_DEVICE_TYPE(C6545_1,  c6545_1_device,  "c6545_1",  "C6545-1 CRTC")
-DEFINE_DEVICE_TYPE(H46505,   h46505_device,   "h46505",   "Hitachi HD46505 CRTC")
-DEFINE_DEVICE_TYPE(HD6845,   hd6845_device,   "hd6845",   "Hitachi HD6845 CRTC")
+DEFINE_DEVICE_TYPE(HD6845S,  hd6845s_device,  "hd6845s",  "Hitachi HD6845S CRTC") // same as HD46505S
 DEFINE_DEVICE_TYPE(SY6545_1, sy6545_1_device, "sy6545_1", "Synertek SY6545-1 CRTC")
 DEFINE_DEVICE_TYPE(SY6845E,  sy6845e_device,  "sy6845e",  "Synertek SY6845E CRTC")
 DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC")
@@ -1196,20 +1197,7 @@ void r6545_1_device::device_start()
 }
 
 
-void h46505_device::device_start()
-{
-	mc6845_device::device_start();
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = false;
-	m_supports_status_reg_d5 = false;
-	m_supports_status_reg_d6 = false;
-	m_supports_status_reg_d7 = false;
-	m_supports_transparent = false;
-}
-
-
-void hd6845_device::device_start()
+void hd6845s_device::device_start()
 {
 	mc6845_device::device_start();
 
@@ -1417,9 +1405,8 @@ void mc6845_device::device_reset()
 
 
 void r6545_1_device::device_reset() { mc6845_device::device_reset(); }
-void h46505_device::device_reset() { mc6845_device::device_reset(); }
 void mc6845_1_device::device_reset() { mc6845_device::device_reset(); }
-void hd6845_device::device_reset() { mc6845_device::device_reset(); }
+void hd6845s_device::device_reset() { mc6845_device::device_reset(); }
 void c6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
@@ -1463,20 +1450,14 @@ r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-h46505_device::h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, H46505, tag, owner, clock)
-{
-}
-
-
 mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
 {
 }
 
 
-hd6845_device::hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6845, tag, owner, clock)
+hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
 {
 }
 

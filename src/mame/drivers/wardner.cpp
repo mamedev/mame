@@ -415,7 +415,7 @@ void wardner_state::wardner(machine_config &config)
 	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
-	hd6845_device &crtc(HD6845(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);

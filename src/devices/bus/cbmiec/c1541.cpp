@@ -174,6 +174,12 @@ DEFINE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_t,  "c1
 DEFINE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_t, "c1541pdc", "Commodore 1541 ProLogic-DOS Classic Disk Drive")
 DEFINE_DEVICE_TYPE(INDUS_GT,                   indus_gt_t,                   "indusgt",  "Indus GT Disk Drive")
 DEFINE_DEVICE_TYPE(TECHNICA,                   technica_t,                   "technica", "Westfalia Technica Disk Drive")
+DEFINE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_t,                  "bluechip", "Amtech Blue Chip Disk Drive")
+DEFINE_DEVICE_TYPE(COMMANDER_C2,               commander_c2_t,               "cmdrc2",   "Commander C-II Disk Drive")
+DEFINE_DEVICE_TYPE(ENHANCER_2000,              enhancer_2000_t,              "enh2000",  "Enhancer 2000 Disk Drive")
+DEFINE_DEVICE_TYPE(FD148,                      fd148_t,                      "fd148",    "Rapid Access FD-148 Disk Drive")
+DEFINE_DEVICE_TYPE(MSD_SD1,                    msd_sd1_t,                    "msdsd1",   "MSD SD-1 Disk Drive")
+DEFINE_DEVICE_TYPE(MSD_SD2,                    msd_sd2_t,                    "msdsd2",   "MSD SD-2 Disk Drive")
 
 
 //-------------------------------------------------
@@ -495,6 +501,132 @@ ROM_END
 const tiny_rom_entry *technica_t::device_rom_region() const
 {
     return ROM_NAME( technica );
+}
+
+
+//-------------------------------------------------
+//  ROM( bluechip )
+//-------------------------------------------------
+
+ROM_START( bluechip )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_SYSTEM_BIOS( 0, "1", "1" )
+    ROMX_LOAD( "bluechip_fd_stockrom.bin", 0x0000, 0x4000, CRC(d4293619) SHA1(18b3dc4c2f919ac8f288d0199e29993a0b53a9bd), ROM_BIOS(0) )
+    ROM_SYSTEM_BIOS( 1, "2", "2" )
+    ROMX_LOAD( "amtech_bluechip_rom.bin", 0x0000, 0x4000, CRC(3733ccea) SHA1(c11317cb9370e722950579a610a3effda313aeee), ROM_BIOS(1) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *blue_chip_t::device_rom_region() const
+{
+    return ROM_NAME( bluechip );
+}
+
+
+//-------------------------------------------------
+//  ROM( cmdrc2 )
+//-------------------------------------------------
+
+ROM_START( cmdrc2 )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "commander_c-ii_8k_rom1.bin", 0x0000, 0x2000, CRC(cb19daf3) SHA1(9fab414451af54d0bed9d4c9fd5fab1b8720c269) )
+    ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *commander_c2_t::device_rom_region() const
+{
+    return ROM_NAME( cmdrc2 );
+}
+
+
+//-------------------------------------------------
+//  ROM( enh2000 )
+//-------------------------------------------------
+
+ROM_START( enh2000 )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "enhancer 2000 comtel 2.6.bin", 0x0000, 0x4000, CRC(20353d3b) SHA1(473dd2e06037799e6f562c443165d9b2b9f4a368) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *enhancer_2000_t::device_rom_region() const
+{
+    return ROM_NAME( enh2000 );
+}
+
+
+//-------------------------------------------------
+//  ROM( fd148 )
+//-------------------------------------------------
+
+ROM_START( fd148 )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "rapid access fd148.bin", 0x0000, 0x4000, CRC(3733ccea) SHA1(c11317cb9370e722950579a610a3effda313aeee) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *fd148_t::device_rom_region() const
+{
+    return ROM_NAME( fd148 );
+}
+
+
+//-------------------------------------------------
+//  ROM( msdsd1 )
+//-------------------------------------------------
+
+ROM_START( msdsd1 )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "sd-1-1.3-c000.bin", 0x0000, 0x2000, CRC(f399778d) SHA1(c0d939c354d84018038c60a231fc43fb9279d8a4) )
+    ROM_LOAD( "sd-1-1.3-e000.bin", 0x2000, 0x2000, CRC(7ac80da4) SHA1(99dd15c6d97938eba73880b18986a037e90742ab) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *msd_sd1_t::device_rom_region() const
+{
+    return ROM_NAME( msdsd1 );
+}
+
+
+//-------------------------------------------------
+//  ROM( msdsd2 )
+//-------------------------------------------------
+
+ROM_START( msdsd2 )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "sd-2-2.3-c000.bin", 0x0000, 0x2000, CRC(2207560e) SHA1(471e9b4a4ac09ceee9acc1774534510396f98b9a) )
+    ROM_LOAD( "sd-2-2.3-e000.bin", 0x2000, 0x2000, CRC(4efd87a2) SHA1(4beec0b7ce2349add3b0a5bceee60826637df8d9) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *msd_sd2_t::device_rom_region() const
+{
+    return ROM_NAME( msdsd2 );
 }
 
 
@@ -1076,6 +1208,54 @@ indus_gt_t::indus_gt_t(const machine_config &mconfig, const char *tag, device_t 
 
 technica_t::technica_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : c1541_base_t(mconfig, TECHNICA, tag, owner, clock) { }
+
+
+//-------------------------------------------------
+//  blue_chip_t - constructor
+//-------------------------------------------------
+
+blue_chip_t::blue_chip_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : c1541_base_t(mconfig, BLUE_CHIP, tag, owner, clock) { }
+
+
+//-------------------------------------------------
+//  commander_c2_t - constructor
+//-------------------------------------------------
+
+commander_c2_t::commander_c2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : c1541_base_t(mconfig, COMMANDER_C2, tag, owner, clock) { }
+
+
+//-------------------------------------------------
+//  enhancer_2000_t - constructor
+//-------------------------------------------------
+
+enhancer_2000_t::enhancer_2000_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : c1541_base_t(mconfig, ENHANCER_2000, tag, owner, clock) { }
+
+
+//-------------------------------------------------
+//  fd148_t - constructor
+//-------------------------------------------------
+
+fd148_t::fd148_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : c1541_base_t(mconfig, FD148, tag, owner, clock) { }
+
+
+//-------------------------------------------------
+//  msd_sd1_t - constructor
+//-------------------------------------------------
+
+msd_sd1_t::msd_sd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : c1541_base_t(mconfig, MSD_SD1, tag, owner, clock) { }
+
+
+//-------------------------------------------------
+//  msd_sd2_t - constructor
+//-------------------------------------------------
+
+msd_sd2_t::msd_sd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : c1541_base_t(mconfig, MSD_SD2, tag, owner, clock) { }
 
 
 //-------------------------------------------------

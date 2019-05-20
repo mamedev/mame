@@ -3650,7 +3650,7 @@ void royalmah_state::janyoup2(machine_config &config)
 	m_maincpu->set_clock(XTAL(18'432'000)/4); // unknown divider
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::janyoup2_iomap);
 
-	h46505_device &crtc(H46505(config, "crtc", XTAL(18'432'000)/12)); // unknown divider
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(18'432'000)/12)); // unknown divider
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);

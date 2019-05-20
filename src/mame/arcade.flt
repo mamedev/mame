@@ -1044,6 +1044,7 @@ sderby2.cpp
 seabattl.cpp
 sealy.cpp
 seattle.cpp
+segaatom.cpp
 segac2.cpp
 segacoin.cpp
 segae.cpp
@@ -1167,6 +1168,7 @@ stadhero.cpp
 starcrus.cpp
 starfire.cpp
 stargame.cpp
+starrider.cpp
 starshp1.cpp
 starwars.cpp
 statriv2.cpp

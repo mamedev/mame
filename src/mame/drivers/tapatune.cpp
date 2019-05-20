@@ -552,7 +552,7 @@ void tapatune_state::tapatune(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("videocpu");
 
-	h46505_device &crtc(H46505(config, "crtc", XTAL(24'000'000) / 16));
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(24'000'000) / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(5);
@@ -563,7 +563,7 @@ void tapatune_state::tapatune(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240);
-	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }
 
 /*************************************

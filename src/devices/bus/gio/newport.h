@@ -200,6 +200,10 @@ protected:
 	void write_pixel(int16_t x, int16_t y, uint32_t color);
 	void store_pixel(uint32_t *dest_buf, uint32_t src);
 
+	void decode_vt_line(uint32_t line, uint32_t line_seq_ptr);
+	void decode_vt_table();
+	void update_screen_size();
+
 	void iterate_shade();
 
 	virtual uint32_t get_cmap_revision() = 0;
@@ -224,6 +228,7 @@ protected:
 
 	void do_rex3_command();
 
+	required_device<screen_device> m_screen;
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
@@ -232,8 +237,14 @@ protected:
 	std::unique_ptr<uint32_t[]> m_olay;
 	std::unique_ptr<uint32_t[]> m_pup;
 	std::unique_ptr<uint32_t[]> m_cid;
+	std::unique_ptr<uint32_t[]> m_vt_table;
 	cmap_t m_cmap0;
 	uint32_t m_global_mask;
+
+	int m_readout_x0;
+	int m_readout_y0;
+	int m_readout_x1;
+	int m_readout_y1;
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();

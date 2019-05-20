@@ -313,6 +313,90 @@ protected:
 };
 
 
+// ======================> blue_chip_t
+
+class blue_chip_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	blue_chip_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
+// ======================> commander_c2_t
+
+class commander_c2_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	commander_c2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
+// ======================> enhancer_2000_t
+
+class enhancer_2000_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	enhancer_2000_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
+// ======================> fd148_t
+
+class fd148_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	fd148_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
+// ======================> msd_sd1_t
+
+class msd_sd1_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	msd_sd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
+// ======================> msd_sd2_t
+
+class msd_sd2_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	msd_sd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(C1540,                      c1540_t)
 DECLARE_DEVICE_TYPE(C1541,                      c1541_t)
@@ -327,7 +411,12 @@ DECLARE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_t)
 DECLARE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_t)
 DECLARE_DEVICE_TYPE(INDUS_GT,                   indus_gt_t)
 DECLARE_DEVICE_TYPE(TECHNICA,                   technica_t)
-
+DECLARE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_t)
+DECLARE_DEVICE_TYPE(COMMANDER_C2,               commander_c2_t)
+DECLARE_DEVICE_TYPE(ENHANCER_2000,              enhancer_2000_t)
+DECLARE_DEVICE_TYPE(FD148,                      fd148_t)
+DECLARE_DEVICE_TYPE(MSD_SD1,                    msd_sd1_t)
+DECLARE_DEVICE_TYPE(MSD_SD2,                    msd_sd2_t)
 
 
 #endif // MAME_BUS_CBMIEC_C1541_H

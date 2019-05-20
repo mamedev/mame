@@ -21,13 +21,13 @@
 #include "sound/tms5220.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/hc55516.h"
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(BALLY_AS3022,              bally_as3022_device)
 DECLARE_DEVICE_TYPE(MIDWAY_SSIO,               midway_ssio_device)
 DECLARE_DEVICE_TYPE(MIDWAY_SOUNDS_GOOD,        midway_sounds_good_device)
 DECLARE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device)
@@ -38,51 +38,6 @@ DECLARE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> bally_as3022_device
-
-class bally_as3022_device : public device_t,
-									public device_mixer_interface
-{
-public:
-	// construction/destruction
-	bally_as3022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 3'579'545);
-
-	// read/write
-	DECLARE_WRITE8_MEMBER(sound_select);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
-
-	void as3022_map(address_map &map);
-
-protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-private:
-	bool m_bc1;
-	bool m_bdir;
-	uint8 m_sound_select;
-	uint8 m_ay_data;
-
-	// devices
-	// The schematics list an optional 555, but it never seemed to be used
-	required_device<m6808_cpu_device> m_cpu;
-	required_device<pia6821_device> m_pia;
-	required_device<ay8910_device> m_ay;
-
-	// internal communications
-	TIMER_CALLBACK_MEMBER(sound_select_sync);
-	TIMER_CALLBACK_MEMBER(sound_int_sync);
-	DECLARE_READ8_MEMBER(pia_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_portb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_READ8_MEMBER(ay_io_r);
-
-	void update_sound_selects();
-};
 
 // ======================> midway_ssio_device
 

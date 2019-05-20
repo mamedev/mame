@@ -47,7 +47,7 @@ private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w);
 	DECLARE_READ8_MEMBER(kp_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void pro80_io(address_map &map);
 	void pro80_mem(address_map &map);
@@ -64,7 +64,7 @@ private:
 
 // This can read the first few bytes correctly, but after that bit slippage occurs.
 // Needs to be reworked
-TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
+TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 {
 	m_cass_data[1]++;
 	uint8_t cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_in = ((m_cass_data[1] < 0x0d) ? 0x10 : 0); // data bit
+		m_cass_in = ((m_cass_data[1] < 12) ? 0x10 : 0); // data bit
 		m_cass_data[1] = 0;
 	}
 	if (m_cass_data[1] < 5)
@@ -192,7 +192,7 @@ void pro80_state::pro80(machine_config &config)
 	/* Devices */
 	CASSETTE(config, m_cass);
 	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
-	TIMER(config, "timer_p").configure_periodic(FUNC(pro80_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "kansas_r").configure_periodic(FUNC(pro80_state::kansas_r), attotime::from_hz(40000)); // cass read
 }
 
 /* ROM definition */

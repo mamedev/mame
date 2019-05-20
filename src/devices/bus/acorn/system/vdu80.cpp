@@ -97,7 +97,7 @@ void acorn_vdu80_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_acorn_vdu80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	H46505(config, m_crtc, 2_MHz_XTAL);
+	HD6845S(config, m_crtc, 2_MHz_XTAL); // "46505" on schematics (variant not verified)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(6);

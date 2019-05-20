@@ -594,7 +594,7 @@ void multi8_state::multi8(machine_config &config)
 	/* devices */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(multi8_state::keyboard_callback), attotime::from_hz(240/32));
 
-	H46505(config, m_crtc, XTAL(3'579'545)/2);    /* unknown clock, hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, XTAL(3'579'545)/2);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

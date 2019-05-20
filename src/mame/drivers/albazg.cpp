@@ -384,7 +384,7 @@ void albazg_state::yumefuda(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(albazg_state::screen_update_yumefuda));
 
-	h46505_device &crtc(H46505(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
+	hd6845s_device &crtc(HD6845S(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

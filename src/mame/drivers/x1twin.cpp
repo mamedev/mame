@@ -466,7 +466,7 @@ void x1twin_state::x1twin(machine_config &config)
 	pce_screen.set_raw(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242);
 	pce_screen.set_screen_update(FUNC(x1twin_state::screen_update_x1pce));
 
-	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider (TODO: verify chip type)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);

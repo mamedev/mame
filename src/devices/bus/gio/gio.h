@@ -129,7 +129,7 @@ public:
 			fatalerror("Invalid SGIO GIO expansion slot index: %d\n", index);
 	}
 
-	hpc3_device* get_hpc3() { return m_hpc3.target(); }
+	hpc3_base_device* get_hpc3() { return m_hpc3.target(); }
 
 	DECLARE_READ64_MEMBER(read);
 	DECLARE_WRITE64_MEMBER(write);
@@ -143,7 +143,7 @@ protected:
 
 	// internal state
 	required_device<r4000_base_device> m_maincpu;
-	required_device<hpc3_device> m_hpc3;
+	required_device<hpc3_base_device> m_hpc3;
 	address_space *m_space;
 
 	device_gio_card_interface *m_device_list[3];

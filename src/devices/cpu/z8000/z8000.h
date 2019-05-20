@@ -40,6 +40,12 @@ public:
 		NMI_LINE = INPUT_LINE_NMI
 	};
 
+	enum
+	{
+		AS_STACK = AS_OPCODES + 1,
+		AS_SIO = AS_OPCODES + 2
+	};
+
 	// construction/destruction
 	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~z8002_device();
@@ -72,10 +78,15 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	void init_spaces();
 	void init_tables();
 
 	address_space_config m_program_config;
+	address_space_config m_data_config;
 	address_space_config m_io_config;
+	address_space_config m_opcodes_config;
+	address_space_config m_stack_config;
+	address_space_config m_sio_config;
 	devcb_write_line m_mo_out;
 
 	uint32_t  m_op[4];      /* opcodes/data of current instruction */
@@ -102,8 +113,11 @@ protected:
 	int m_mi;
 	address_space *m_program;
 	address_space *m_data;
+	address_space *m_stack;
 	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_opcache;
 	address_space *m_io;
+	address_space *m_sio;
 	int m_icount;
 	int m_vector_mult;
 
@@ -118,12 +132,12 @@ protected:
 	inline uint32_t get_addr_operand(int opnum);
 	inline uint32_t get_raw_addr_operand(int opnum);
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr);
-	inline uint8_t RDMEM_B(int spacenum, uint32_t addr);
-	inline uint16_t RDMEM_W(int spacenum, uint32_t addr);
-	inline uint32_t RDMEM_L(int spacenum, uint32_t addr);
-	inline void WRMEM_B(int spacenum, uint32_t addr, uint8_t value);
-	inline void WRMEM_W(int spacenum, uint32_t addr, uint16_t value);
-	inline void WRMEM_L(int spacenum, uint32_t addr, uint32_t value);
+	inline uint8_t RDMEM_B(address_space &space, uint32_t addr);
+	inline uint16_t RDMEM_W(address_space &space, uint32_t addr);
+	inline uint32_t RDMEM_L(address_space &space, uint32_t addr);
+	inline void WRMEM_B(address_space &space, uint32_t addr, uint8_t value);
+	inline void WRMEM_W(address_space &space, uint32_t addr, uint16_t value);
+	inline void WRMEM_L(address_space &space, uint32_t addr, uint32_t value);
 	inline uint8_t RDPORT_B(int mode, uint16_t addr);
 	virtual uint16_t RDPORT_W(int mode, uint16_t addr);
 	inline void WRPORT_B(int mode, uint16_t addr, uint8_t value);
@@ -139,6 +153,18 @@ protected:
 	inline void add_to_addr_reg(int regno, uint16_t addend);
 	inline void sub_from_addr_reg(int regno, uint16_t subtrahend);
 	inline void set_pc(uint32_t addr);
+	inline uint8_t RDIR_B(uint8_t reg);
+	inline uint16_t RDIR_W(uint8_t reg);
+	inline uint32_t RDIR_L(uint8_t reg);
+	inline void WRIR_B(uint8_t reg, uint8_t value);
+	inline void WRIR_W(uint8_t reg, uint16_t value);
+	inline void WRIR_L(uint8_t reg, uint32_t value);
+	inline uint8_t RDBX_B(uint8_t reg, uint16_t idx);
+	inline uint16_t RDBX_W(uint8_t reg, uint16_t idx);
+	inline uint32_t RDBX_L(uint8_t reg, uint16_t idx);
+	inline void WRBX_B(uint8_t reg, uint16_t idx, uint8_t value);
+	inline void WRBX_W(uint8_t reg, uint16_t idx, uint16_t value);
+	inline void WRBX_L(uint8_t reg, uint16_t idx, uint32_t value);
 	inline void PUSHW(uint8_t dst, uint16_t value);
 	inline uint16_t POPW(uint8_t src);
 	inline void PUSHL(uint8_t dst, uint32_t value);
@@ -649,13 +675,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-	address_space_config m_data_config;
 
 	virtual bool get_segmented_mode() const override;
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr) override;

@@ -425,7 +425,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 				util::stream_format(title_buf, " = %X", paldev->read_entry(index));
 
 			rgb_t col = state.palette.which ? palette->indirect_color(index) : raw_color[index];
-			util::stream_format(title_buf, " (R:%X G:%X B:%X)", col.r(), col.g(), col.b());
+			util::stream_format(title_buf, " (A:%X R:%X G:%X B:%X)", col.a(), col.r(), col.g(), col.b());
 		}
 	}
 

@@ -29,7 +29,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekaraa1.bin" size="0x200000" crc="5f69a977" sha1="33e7b453e1e78ac5e4a20c81c00f5c0c1260c6b0" offset="0" />
+				<rom name="ekaraa1.bin" size="0x200000" crc="5f69a977" sha1="33e7b453e1e78ac5e4a20c81c00f5c0c1260c6b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekaraa4.bin" size="0x200000" crc="03dcc45a" sha1="ae884128c09b4fc7521f0010bbe9624419a3d0b8" offset="0" />
+				<rom name="ekaraa4.bin" size="0x200000" crc="03dcc45a" sha1="ae884128c09b4fc7521f0010bbe9624419a3d0b8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraa5.bin" size="0x100000" crc="6cec888a" sha1="5cb4abefb4a5aaec8827bf2d6abc2dfda8099136" offset="0" />
+				<rom name="ekaraa5.bin" size="0x100000" crc="6cec888a" sha1="5cb4abefb4a5aaec8827bf2d6abc2dfda8099136"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekaraa7.bin" size="0x200000" crc="5b59900e" sha1="fdb8148211f00d0119b9ad082bf8fd348d509800" offset="0" />
+				<rom name="ekaraa7.bin" size="0x200000" crc="5b59900e" sha1="fdb8148211f00d0119b9ad082bf8fd348d509800"/>
 			</dataarea>
 		</part>
 	</software>

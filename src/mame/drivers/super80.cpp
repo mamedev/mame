@@ -759,7 +759,7 @@ void super80_state::super80(machine_config &config)
 	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 	m_cassette->set_interface("super80_cass");
 
-	TIMER(config, "timer_p").configure_periodic(FUNC(super80_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "kansas_r").configure_periodic(FUNC(super80_state::kansas_r), attotime::from_hz(40000)); // cass read
 	TIMER(config, "timer_k").configure_periodic(FUNC(super80_state::timer_k), attotime::from_hz(300)); // keyb scan
 	TIMER(config, "timer_h").configure_periodic(FUNC(super80_state::timer_h), attotime::from_hz(100)); // half-speed
 
@@ -853,7 +853,7 @@ void super80_state::super80v(machine_config &config)
 	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 	m_cassette->set_interface("super80_cass");
 
-	TIMER(config, "timer_p").configure_periodic(FUNC(super80_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "kansas_r").configure_periodic(FUNC(super80_state::kansas_r), attotime::from_hz(40000)); // cass read
 	TIMER(config, "timer_k").configure_periodic(FUNC(super80_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	// software list

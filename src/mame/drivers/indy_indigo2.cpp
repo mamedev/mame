@@ -108,7 +108,7 @@ protected:
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
-	required_device<hpc3_device> m_hpc3;
+	required_device<hpc3_base_device> m_hpc3;
 	optional_device<vino_device> m_vino;
 	optional_device<gio_device> m_gio;
 	optional_device<gio_slot_device> m_gio_gfx;
@@ -167,7 +167,7 @@ void ip22_state::ip22_base_map(address_map &map)
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f000000, 0x1f9fffff).rw(m_gio, FUNC(gio_device::read), FUNC(gio_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
-	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
+	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_base_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
 	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));
 }
@@ -210,8 +210,8 @@ INPUT_PORTS_END
 void ip22_state::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
-	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi0_irq));
+	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi0_drq));
 }
 
 void ip22_state::scsi_devices(device_slot_interface &device)
@@ -238,7 +238,7 @@ void ip22_state::ip22_base(machine_config &config)
 
 	// GIO
 	GIO(config, m_gio, m_maincpu, m_hpc3);
-	GIO_SLOT(config, m_gio_gfx, m_gio, gio_cards, nullptr);
+	GIO_SLOT(config, m_gio_gfx, m_gio, gio_cards, "xl24");
 	GIO_SLOT(config, m_gio_exp0, m_gio, gio_cards, nullptr);
 	GIO_SLOT(config, m_gio_exp1, m_gio, gio_cards, nullptr);
 }
@@ -252,7 +252,7 @@ void ip22_state::ip225015(machine_config &config)
 	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
-	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+	SGI_HPC3_GUINNESS(config, m_hpc3, m_maincpu, m_scsi_ctrl);
 
 	VINO(config, m_vino);
 }
@@ -266,7 +266,7 @@ void ip22_state::ip224613(machine_config &config)
 	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
-	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+	SGI_HPC3_GUINNESS(config, m_hpc3, m_maincpu, m_scsi_ctrl);
 
 	VINO(config, m_vino);
 }
@@ -274,8 +274,8 @@ void ip22_state::ip224613(machine_config &config)
 void ip24_state::wd33c93_2(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
-	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi1_irq));
+	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi1_drq));
 }
 
 void ip24_state::ip244415(machine_config &config)
@@ -298,7 +298,7 @@ void ip24_state::ip244415(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus2:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
-	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
+	SGI_HPC3_FULL_HOUSE(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
 }
 
 /* SCC init ip225015

@@ -123,9 +123,9 @@ void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 64; i++)
 	{
-		const int r = i & 0x03;
-		const int g = (i & 0x0c) >> 2;
-		const int b = (i & 0x30) >> 4;
+		const u8 r = i & 0x03;
+		const u8 g = (i & 0x0c) >> 2;
+		const u8 b = (i & 0x30) >> 4;
 		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	// sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette
@@ -153,10 +153,35 @@ void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4096; i++)
 	{
-		const int r = i & 0x000f;
-		const int g = (i & 0x00f0) >> 4;
-		const int b = (i & 0x0f00) >> 8;
+		const u8 r = i & 0x000f;
+		const u8 g = (i & 0x00f0) >> 4;
+		const u8 b = (i & 0x0f00) >> 8;
 		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
+	}
+}
+
+
+void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) const
+{
+	// non-linear (reference : http://gendev.spritesmind.net/forum/viewtopic.php?f=22&t=2188)
+	static const u8 level[15] = {0,29,52,70,87,101,116,130,144,158,172,187,206,228,255};
+	for (int i = 0; i < 512; i++)
+	{
+		const u8 r = (i & 0x0007) >> 0;
+		const u8 g = (i & 0x0038) >> 3;
+		const u8 b = (i & 0x01c0) >> 6;
+		palette.set_pen_color(i + (512 * 0), level[r << 1], level[g << 1], level[b << 1]); // normal
+		palette.set_pen_color(i + (512 * 1), level[r], level[g], level[b]); // shadow
+		palette.set_pen_color(i + (512 * 2), level[7 + r], level[7 + g], level[7 + b]); // hilight
+	}
+	// seperated SMS compatible mode color (reference : http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
+	static const u8 sms_level[4] = {0,99,162,255};
+	for (int i = 0; i < 64; i++)
+	{
+		const u8 r = (i & 0x0003) >> 0;
+		const u8 g = (i & 0x000c) >> 2;
+		const u8 b = (i & 0x0030) >> 4;
+		palette.set_pen_color(i + (512 * 3), sms_level[r], sms_level[g], sms_level[b]); // normal
 	}
 }
 
@@ -1759,6 +1784,27 @@ void sega315_5377_device::update_palette()
 }
 
 
+void sega315_5313_mode4_device::update_palette()
+{
+	/* Exit if palette has no changes */
+	if (!m_cram_dirty)
+	{
+		return;
+	}
+	m_cram_dirty = false;
+
+	if (m_vdp_mode != 4)
+	{
+		return;
+	}
+
+	for (int i = 0; i < 32; i++)
+	{
+		m_current_palette[i] = (512 * 3) + (m_CRAM[i] & 0x3f);
+	}
+}
+
+
 void sega315_5124_device::cram_write(u8 data)
 {
 	u16 address = m_addr & m_cram_mask;
@@ -1959,4 +2005,16 @@ void sega315_5377_device::device_add_mconfig(machine_config &config)
 	GAMEGEAR(config.replace(), m_snsnd, DERIVED_CLOCK(1, 3));
 	m_snsnd->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_snsnd->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+
+void sega315_5313_mode4_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5246_device::device_add_mconfig(config);
+
+	m_palette->set_entries((512 * 3) + 64);
+	m_palette->set_init(FUNC(sega315_5313_mode4_device::sega315_5313_palette));
 }
