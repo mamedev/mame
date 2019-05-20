@@ -2397,9 +2397,19 @@ at                              // 1987 AMI Bios and Diagnostics
 at386                           // 19?? IBM AT 386
 ecs38632                        // Elitegroup ECS-386/32 mainboard
 ecsum386                        // Elitegroup UM386 mainboard
+fu340                           // Abit FU340
+smih0107                        //
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
+a433cc                          // J-Bond A433C-C/A450C-C
+a486ap4                         // ASUS PVI-486AP4
+a486sp3                         // ASUS PVI-486SP3
+a486sp3g                        // ASUS PCI/I-486SP3G
+aa486s                          // ASUS PCI/I-A486S
+a486sv1                         // ASUS VL/EISA-486SV1
+a486sv2g                        // ASUS VL/I-486SV2G
+mb8433uud                       // Biostar MB8433UUD-A
 c286lt                          // 1990 Commodore Laptop 286-LT
 csl286                          // Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
