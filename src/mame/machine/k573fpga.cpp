@@ -280,7 +280,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         mp3_last_decrypt_adr = mp3_start_adr;
 
         // Cover a large chunk of ID3 or junk at the beginning of a file when decrypting first frame
-        decrypt_buffer_speed = buffer_speed = 0x2000;
+        decrypt_buffer_speed = buffer_speed = 0xe00;
 
         last_position_update = 0;
         position_diff = 0;
@@ -320,9 +320,9 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 
     // Detect first frame in MP3 data
     if (mp3_next_sync == 0 && last_copied_samples == 0) {
-        buf_size = 0x2000;
+        buf_size = 0xe00;
 
-        // Everything on the System 573 has a header 0x600 or less from what I've seen, but just ot be sure, check the first 0x2000 bytes
+        // Everything on the System 573 has a header 0x600 or less from what I've seen, but just ot be sure, check the first 0xe00 bytes
         uint32_t first_frame = mp3d_find_frame(buf, buf_size, &free_format_bytes, &frame_size);
         buf += first_frame;
         mp3_last_adr += first_frame;
