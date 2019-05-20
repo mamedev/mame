@@ -1026,86 +1026,62 @@ ROM_START( at )
 	ROM_SYSTEM_BIOS(14, "ami_200960", "AMI 200960")
 	ROMX_LOAD( "ami_286_bios_sn200960_even.bin", 0x10000, 0x8000, CRC(67745815) SHA1(ca6886c7a0716a92a8720fc71ff2d95328c467a5), ROM_SKIP(1) | ROM_BIOS(14) )
 	ROMX_LOAD( "ami_286_bios_sn200960_odd.bin", 0x10001, 0x8000, CRC(360a5f73) SHA1(1b1980fd99779d0cdc4764928a641e081b35ee9f), ROM_SKIP(1) | ROM_BIOS(14) )
-	// 15: BIOS-String: DSUN-1105-043089-K0
-	ROM_SYSTEM_BIOS(15, "magitronic_b233", "Magitronic B233") // SUNTAC Chipset, http://toastytech.com/manuals/Magitronic%20B233%20Manual.pdf
-	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_even_sa027343.bin", 0x10000, 0x8000, CRC(d4a18444) SHA1(d95242104fc9b51cf26de72ef5b6c52d99ccce30), ROM_SKIP(1) | ROM_BIOS(15) )
-	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_odd_sa027343.bin", 0x10001, 0x8000, CRC(7ac3db56) SHA1(4340140450c4f8b4f6a19eae50a5dc5449edfdf6), ROM_SKIP(1) | ROM_BIOS(15) )
-	// ROM_LOAD("magitronic_b233_ami_1986_keyboard_bios_plus_a025352.bin", 0x0000, 0x1000), CRC(84fd28fd) SHA1(43da0f49e52c921844e60b6f3d22f2a316d865cc) )
-	// 16: BIOS-String: D286-1234-121589-K0
-	ROM_SYSTEM_BIOS(16, "ls103s", "LS-103S") // Headland Chipset
-	ROMX_LOAD( "ami_lm103-s_lo.bin", 0x10000, 0x8000, CRC(a24be20b) SHA1(ffc5faf6d773154bf2f037556d2e381e81a28a58), ROM_SKIP(1) | ROM_BIOS(16) )
-	ROMX_LOAD( "ami_lm103-s_hi.bin", 0x10001, 0x8000, CRC(7b63e60c) SHA1(da78b95b12051b6d4701a412fdc5e7874595c188), ROM_SKIP(1) | ROM_BIOS(16) )
-	// 17
-	ROM_SYSTEM_BIOS(17, "ev1806", "Everex EV-1806") // continuous beeps (RAM not detected?)
-	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_even_u62.bin", 0x18000, 0x4000, CRC(7364e49b) SHA1(e8f5f41514005da0e36792e009cf3eae51c19c20), ROM_SKIP(1) | ROM_BIOS(17) )
-	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_odd_u61.bin", 0x18001, 0x4000, CRC(05c87bf7) SHA1(8c2243d9ee3d2af1517dc1134a22a7d1ed11262f), ROM_SKIP(1) | ROM_BIOS(17) )
-	// 18: Award 286 Modular BIOS Version 3.03 - GCH
-	ROM_SYSTEM_BIOS(18, "ev1815303", "Everex EV-1815 V3.03")
-	ROMX_LOAD( "award_v3.03_ev1815_even.bin", 0x18000, 0x4000, CRC(dd64bdd6) SHA1(b3108b692d2aa03701ac894602e9418ae0779702), ROM_SKIP(1) | ROM_BIOS(18) )
-	ROMX_LOAD( "award_v3.03_ev1815_odd.bin", 0x18001, 0x4000, CRC(29f023fb) SHA1(873561bb7087483c0c763ef9cd32c1adf0f7cb5e), ROM_SKIP(1) | ROM_BIOS(18) )
-	// 19: Award 286 Modular BIOS Version 3.03GS 
-	ROM_SYSTEM_BIOS(19, "ev1815303gs", "Everex EV-1815 V3.03GS")
-	ROMX_LOAD( "award_v3.03gs_ev1815_even.bin", 0x10000, 0x8000, CRC(59489ec2) SHA1(b3c13ba53d4c4ee75a15703236a748121102ce84), ROM_SKIP(1) | ROM_BIOS(19) )
-	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(19) )
-	// 20: BIOS-String: DVL2-1160-040990-K0
-	ROM_SYSTEM_BIOS(20, "dvl2", "DVL2")
-	ROMX_LOAD( "ami_dvl2-1160-040990-k8_even.bin", 0x10000, 0x8000, CRC(86093016) SHA1(f60b2679c8c23a34bdd64f25d83cb5a5a337bd57), ROM_SKIP(1) | ROM_BIOS(20) )
-	ROMX_LOAD( "ami_dvl2-1160-040990-k8_odd.bin", 0x10001, 0x8000, CRC(4e1c944a) SHA1(0763a0a1002baced071fea301f627d2e550878b8), ROM_SKIP(1) | ROM_BIOS(20) )
-	// 21: DTK 286 BIOS Ver 3.18 07/01/88
-	ROM_SYSTEM_BIOS(21, "dtk318", "DTK v3.18") 
-	ROMX_LOAD( "dtk_286_bios_ver3.18.bin", 0x18000, 0x8000, CRC(b4b8b59a) SHA1(73c12222f5003fdc8bbfee178b20c8dda2fe5cb4), ROM_BIOS(21) )
-	// 22: BIOS-String: D286-6061-040990-K0
-	ROM_SYSTEM_BIOS(22, "d286-k0", "AMI D286-K0") 
-	ROMX_LOAD( "ami_d286-6061-040990-k0.bin", 0x10000, 0x10000, CRC(1679c1b5) SHA1(9d95da3b40c5f13d096823f383aba099b3a77183), ROM_BIOS(22) )
-	// 23: BIOS-String: S286-1169-030389-K0 for ACHIEVE MICROSYSTEMS
-	ROM_SYSTEM_BIOS(23, "s286-k0", "Achieve S286-K0")
-	ROMX_LOAD( "ach_s286-1169-030389-k0_ev.bin", 0x10000, 0x8000, CRC(58f1f29c) SHA1(42f5189d12b75fad5e53ff472b4603c6fcbd46cd), ROM_SKIP(1) | ROM_BIOS(23) )
-	ROMX_LOAD( "ach_s286-1169-030389-k0_od.bin", 0x10001, 0x8000, CRC(84bfc180) SHA1(2daa51b09c449712c9a737793b83754951e53a41), ROM_SKIP(1) | ROM_BIOS(23) )
-	// 24: BIOS-String: DH12-1343-061390-K0
-	ROM_SYSTEM_BIOS(24, "dh12-k0", "AMI DH12-K0")
-	ROMX_LOAD( "ami286lo.rom", 0x10000, 0x8000, CRC(a2530914) SHA1(1aca289240caa6d4bf811d301c338c157b6902a1), ROM_SKIP(1) | ROM_BIOS(24) )
-	ROMX_LOAD( "ami286hi.rom", 0x10001, 0x8000, CRC(b5f69002) SHA1(ee9ceef1fc7a328ee82006cd504e72e16f21b3c8), ROM_SKIP(1) | ROM_BIOS(24) )
-	// 25: Award BIOS Version 3.01B
-	ROM_SYSTEM_BIOS(25, "awa301b", "Award BIOS Version 3.01B")
-	ROMX_LOAD( "aw286lo.rom", 0x18000, 0x4000, CRC(5afbb4a2) SHA1(513fd75d90720820484fdd280e4a6c22a0ef238c), ROM_SKIP(1) | ROM_BIOS(25) )
-	ROMX_LOAD( "aw286hi.rom", 0x18001, 0x4000, CRC(b2551251) SHA1(0c8bd12a3d54ae6d2ad0210b9ca4deca94be10ed), ROM_SKIP(1) | ROM_BIOS(25) )
-	// 26
-	ROM_SYSTEM_BIOS(26, "awa286", "awa286") // no screen display
-	ROMX_LOAD( "awd286lo.rom", 0x18000, 0x4000, CRC(d1a9c01f) SHA1(9123c6f76d85725036a0f8b9c6480142abea478f), ROM_SKIP(1) | ROM_BIOS(26) )
-	ROMX_LOAD( "awd286hi.rom", 0x18001, 0x4000, CRC(b0bde4cc) SHA1(9c3fd2c0f69dde905d4e8f3be421374ef99682df), ROM_SKIP(1) | ROM_BIOS(26) )
-	// 27: DTK 286 BIOS Ver. 3.01 07/24/87
-	ROM_SYSTEM_BIOS(27, "dtk286", "dtk286") // no screen display
-	ROMX_LOAD( "dtk286lo.rom", 0x18000, 0x4000, CRC(dfc70856) SHA1(39158e6ed50236d371277631e77d06f77fb0531e), ROM_SKIP(1) | ROM_BIOS(27) )
-	ROMX_LOAD( "dtk286hi.rom", 0x18001, 0x4000, CRC(a98fc743) SHA1(fb9e330148cb5584f61c1febea71c53b6f9d61b7), ROM_SKIP(1) | ROM_BIOS(27) )
-	// 28: Phoenix 80286 ROM BIOS Version 3.07 (R04)
-	ROM_SYSTEM_BIOS(28, "mitph307", "Mitac Phoenix v3.07")
-	ROMX_LOAD( "mitac_phoenix_v3.07_even.bin", 0x10000, 0x8000, CRC(1c4becc9) SHA1(bfdea3f2a248312ed8cf4765a1a7dc1a2f7cecd8), ROM_SKIP(1) | ROM_BIOS(28) )
-	ROMX_LOAD( "mitac_phoenix_v3.07_odd.bin", 0x10001, 0x8000, CRC(3ee16ed1) SHA1(b77e18e10e9187a01cb55c05b2a6e5311981ab56), ROM_SKIP(1) | ROM_BIOS(28) )
-	// 29: BIOS-String: Pyramid Software Development Personal Computer AT Bios Version 2.14
-	ROM_SYSTEM_BIOS(29, "precise", "Precise")
-	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(29) )
-	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(29) )
+	// 15: Award 286 Modular BIOS Version 3.03 - GCH
+	ROM_SYSTEM_BIOS(15, "ev1815303", "Everex EV-1815 V3.03")
+	ROMX_LOAD( "award_v3.03_ev1815_even.bin", 0x18000, 0x4000, CRC(dd64bdd6) SHA1(b3108b692d2aa03701ac894602e9418ae0779702), ROM_SKIP(1) | ROM_BIOS(15) )
+	ROMX_LOAD( "award_v3.03_ev1815_odd.bin", 0x18001, 0x4000, CRC(29f023fb) SHA1(873561bb7087483c0c763ef9cd32c1adf0f7cb5e), ROM_SKIP(1) | ROM_BIOS(15) )
+	// 16: Award 286 Modular BIOS Version 3.03GS
+	ROM_SYSTEM_BIOS(16, "ev1815303gs", "Everex EV-1815 V3.03GS")
+	ROMX_LOAD( "award_v3.03gs_ev1815_even.bin", 0x10000, 0x8000, CRC(59489ec2) SHA1(b3c13ba53d4c4ee75a15703236a748121102ce84), ROM_SKIP(1) | ROM_BIOS(16) )
+	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(16) )
+	// 17: BIOS-String: DVL2-1160-040990-K0
+	ROM_SYSTEM_BIOS(17, "dvl2", "DVL2")
+	ROMX_LOAD( "ami_dvl2-1160-040990-k8_even.bin", 0x10000, 0x8000, CRC(86093016) SHA1(f60b2679c8c23a34bdd64f25d83cb5a5a337bd57), ROM_SKIP(1) | ROM_BIOS(17) )
+	ROMX_LOAD( "ami_dvl2-1160-040990-k8_odd.bin", 0x10001, 0x8000, CRC(4e1c944a) SHA1(0763a0a1002baced071fea301f627d2e550878b8), ROM_SKIP(1) | ROM_BIOS(17) )
+	// 18: DTK 286 BIOS Ver 3.18 07/01/88
+	ROM_SYSTEM_BIOS(18, "dtk318", "DTK v3.18")
+	ROMX_LOAD( "dtk_286_bios_ver3.18.bin", 0x18000, 0x8000, CRC(b4b8b59a) SHA1(73c12222f5003fdc8bbfee178b20c8dda2fe5cb4), ROM_BIOS(18) )
+	// 19: BIOS-String: D286-6061-040990-K0
+	ROM_SYSTEM_BIOS(19, "d286-k0", "AMI D286-K0")
+	ROMX_LOAD( "ami_d286-6061-040990-k0.bin", 0x10000, 0x10000, CRC(1679c1b5) SHA1(9d95da3b40c5f13d096823f383aba099b3a77183), ROM_BIOS(19) )
+	// 20: BIOS-String: S286-1169-030389-K0 for ACHIEVE MICROSYSTEMS
+	ROM_SYSTEM_BIOS(20, "s286-k0", "Achieve S286-K0")
+	ROMX_LOAD( "ach_s286-1169-030389-k0_ev.bin", 0x10000, 0x8000, CRC(58f1f29c) SHA1(42f5189d12b75fad5e53ff472b4603c6fcbd46cd), ROM_SKIP(1) | ROM_BIOS(20) )
+	ROMX_LOAD( "ach_s286-1169-030389-k0_od.bin", 0x10001, 0x8000, CRC(84bfc180) SHA1(2daa51b09c449712c9a737793b83754951e53a41), ROM_SKIP(1) | ROM_BIOS(20) )
+	// 21: BIOS-String: DH12-1343-061390-K0
+	ROM_SYSTEM_BIOS(21, "dh12-k0", "AMI DH12-K0")
+	ROMX_LOAD( "ami286lo.rom", 0x10000, 0x8000, CRC(a2530914) SHA1(1aca289240caa6d4bf811d301c338c157b6902a1), ROM_SKIP(1) | ROM_BIOS(21) )
+	ROMX_LOAD( "ami286hi.rom", 0x10001, 0x8000, CRC(b5f69002) SHA1(ee9ceef1fc7a328ee82006cd504e72e16f21b3c8), ROM_SKIP(1) | ROM_BIOS(21) )
+	// 22: Award BIOS Version 3.01B
+	ROM_SYSTEM_BIOS(22, "awa301b", "Award BIOS Version 3.01B")
+	ROMX_LOAD( "aw286lo.rom", 0x18000, 0x4000, CRC(5afbb4a2) SHA1(513fd75d90720820484fdd280e4a6c22a0ef238c), ROM_SKIP(1) | ROM_BIOS(22) )
+	ROMX_LOAD( "aw286hi.rom", 0x18001, 0x4000, CRC(b2551251) SHA1(0c8bd12a3d54ae6d2ad0210b9ca4deca94be10ed), ROM_SKIP(1) | ROM_BIOS(22) )
+	// 23
+	ROM_SYSTEM_BIOS(23, "awa286", "awa286") // no screen display
+	ROMX_LOAD( "awd286lo.rom", 0x18000, 0x4000, CRC(d1a9c01f) SHA1(9123c6f76d85725036a0f8b9c6480142abea478f), ROM_SKIP(1) | ROM_BIOS(23) )
+	ROMX_LOAD( "awd286hi.rom", 0x18001, 0x4000, CRC(b0bde4cc) SHA1(9c3fd2c0f69dde905d4e8f3be421374ef99682df), ROM_SKIP(1) | ROM_BIOS(23) )
+	// 24: DTK 286 BIOS Ver. 3.01 07/24/87
+	ROM_SYSTEM_BIOS(24, "dtk286", "dtk286") // no screen display
+	ROMX_LOAD( "dtk286lo.rom", 0x18000, 0x4000, CRC(dfc70856) SHA1(39158e6ed50236d371277631e77d06f77fb0531e), ROM_SKIP(1) | ROM_BIOS(24) )
+	ROMX_LOAD( "dtk286hi.rom", 0x18001, 0x4000, CRC(a98fc743) SHA1(fb9e330148cb5584f61c1febea71c53b6f9d61b7), ROM_SKIP(1) | ROM_BIOS(24) )
+	// 25: Phoenix 80286 ROM BIOS Version 3.07 (R04)
+	ROM_SYSTEM_BIOS(25, "mitph307", "Mitac Phoenix v3.07")
+	ROMX_LOAD( "mitac_phoenix_v3.07_even.bin", 0x10000, 0x8000, CRC(1c4becc9) SHA1(bfdea3f2a248312ed8cf4765a1a7dc1a2f7cecd8), ROM_SKIP(1) | ROM_BIOS(25) )
+	ROMX_LOAD( "mitac_phoenix_v3.07_odd.bin", 0x10001, 0x8000, CRC(3ee16ed1) SHA1(b77e18e10e9187a01cb55c05b2a6e5311981ab56), ROM_SKIP(1) | ROM_BIOS(25) )
+	// 26: BIOS-String: Pyramid Software Development Personal Computer AT Bios Version 2.14
+	ROM_SYSTEM_BIOS(26, "precise", "Precise")
+	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(26) )
+	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(26) )
 	// ROM_LOAD( "precise_860407_keyboard_mcu.bin", 0x0000, 0x800, CRC(d1faad5c) SHA1(cb315a3da632c969012c298bb8e1cf8883b70501))
-	// 30: BIOS-String: D286-1149-083090-K0 - WIN 286 BIOS
-	ROM_SYSTEM_BIOS(30, "6wb5", "KT216WB5-HI Rev.2")
-	ROMX_LOAD( "kt216wb5_even.bin", 0x10000, 0x8000, CRC(6b5509c0) SHA1(73b303b90cc0cd23b7e13362019193c938a2e502), ROM_SKIP(1) | ROM_BIOS(30) )
-	ROMX_LOAD( "kt216wb5_odd.bin", 0x10001, 0x8000, CRC(af541ada) SHA1(26d2617dbe8c15f1b0d4782375bcb291a7923703), ROM_SKIP(1) | ROM_BIOS(30) )
-	// 31: BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS
-	ROM_SYSTEM_BIOS(31, "mat286revd", "MAT 286 Rev.D")
-	ROMX_LOAD( "mat286revd.bin", 0x10000, 0x10000, CRC(deeea2da) SHA1(c9186f835c7c12b28befa75851cb8ac7e1f95cbb), ROM_BIOS(31) )
-	// 32: BIOS-String: D286-1295-091589-K0
-	ROM_SYSTEM_BIOS(32, "topvlsi", "Toptek VLSI")
-	ROMX_LOAD( "toptek_vlsi.bin", 0x10000, 0x10000, CRC(f1d05c2e) SHA1(05540f6af6a3209107a7fd29e526e61d12c32b6e), ROM_BIOS(32) )
-	// 33: DTK Corp. 286 Computer - DTK 286 Chipset ROM BIOS Version 3.26 - #24062890N
-	ROM_SYSTEM_BIOS(33, "ptm1632c", "UNIT PTM1632C DTK V.3.26")
-	ROMX_LOAD( "ptm1632c_l.bin", 0x10000, 0x8000, CRC(df0bc27c) SHA1(f94e2decd13c285c23b6a61c035cab88fa00ba6e), ROM_SKIP(1) | ROM_BIOS(33))
-	ROMX_LOAD( "ptm1632c_h.bin", 0x10001, 0x8000, CRC(a80136e0) SHA1(5edc2d387efb42cf70361197de808ce1b06d8aec), ROM_SKIP(1) | ROM_BIOS(33))
-	// 34: BIOS-String: DH12-1343-061390-K0
-	ROM_SYSTEM_BIOS(34, "headland", "Headland")
-	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(34) )
-	// 35: BIOS-String: 20-0300-00834-00101111-050591-SARC286 / [80286 Standard System 2V1]
-	ROM_SYSTEM_BIOS(35, "sarcrev12", "SARC Rev. 1.2")
-	ROMX_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654), ROM_BIOS(35) )
+	// 27: BIOS-String: D286-1295-091589-K0
+	ROM_SYSTEM_BIOS(27, "topvlsi", "Toptek VLSI")
+	ROMX_LOAD( "toptek_vlsi.bin", 0x10000, 0x10000, CRC(f1d05c2e) SHA1(05540f6af6a3209107a7fd29e526e61d12c32b6e), ROM_BIOS(27) )
+	// 28: BIOS-String: DH12-1343-061390-K0
+	ROM_SYSTEM_BIOS(28, "headland", "Headland")
+	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(28) )
+	// 29: BIOS-String: 20-0300-00834-00101111-050591-SARC286 / [80286 Standard System 2V1]
+	ROM_SYSTEM_BIOS(29, "sarcrev12", "SARC Rev. 1.2")
+	ROMX_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654), ROM_BIOS(29) )
 ROM_END
 
 
@@ -1200,6 +1176,7 @@ ROM_START( xb42664a )
 	ROM_LOAD16_BYTE( "10217.hi", 0x10001, 0x8000, CRC(111725cf) SHA1(f6018a45bda4476d40c5881fb0a506ff75ec1688))
 ROM_END
 
+// Chips & Technologies CS8221 NEAT chipset: P82C211 + P82C212 + P82C215 + P82C206
 ROM_START( neat )
 	ROM_REGION(0x20000,"bios", 0)
 	// 0: BIOS-String: ENET-1131-030389-K0
@@ -1210,6 +1187,10 @@ ROM_START( neat )
 	ROM_SYSTEM_BIOS(1, "pb800", "Packard Bell PB800")
 	ROMX_LOAD( "3.10.12-1.bin", 0x10001, 0x8000, CRC(e6bb54c5) SHA1(fa5a376dd44696c78dcc8994e18938b5e1b3e45a),ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "3.10.12-2.bin", 0x10000, 0x8000, CRC(bde46933) SHA1(c7221192f48d6f2f5b773c3c7d2a52b635cb473e),ROM_SKIP(1) | ROM_BIOS(1))
+	// 2: DTK Corp. 286 Computer - DTK 286 Chipset ROM BIOS Version 3.26 - #24062890N
+	ROM_SYSTEM_BIOS(2, "ptm1632c", "UNIT PTM1632C DTK V.3.26")
+	ROMX_LOAD( "ptm1632c_l.bin", 0x10000, 0x8000, CRC(df0bc27c) SHA1(f94e2decd13c285c23b6a61c035cab88fa00ba6e), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "ptm1632c_h.bin", 0x10001, 0x8000, CRC(a80136e0) SHA1(5edc2d387efb42cf70361197de808ce1b06d8aec), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
 ROM_START( at386sx )
@@ -1454,10 +1435,10 @@ ROM_END
 ROM_START( a486sp3 )
 	ROM_REGION(0x20000, "bios", 0) // Winbond W29EE011-15
 	// 0: BIOS-String: 07/22/94-SATURN-P/I-4SP3-00 / #401A0-0207
-	ROM_SYSTEM_BIOS(27, "v207", "ASUS PVI-486SP3 V2.07")
+	ROM_SYSTEM_BIOS(0, "v207", "ASUS PVI-486SP3 V2.07")
 	ROMX_LOAD( "awsi0207.bin", 0x00000, 0x20000, CRC(0cb862aa) SHA1(7ffead05c1df47ec36afba395191145279c5e789), ROM_BIOS(0))
 	// 1: BIOS-String: 07/22/94-SATURN-P/I-4SP3-00 / #401A0-0207
-	ROM_SYSTEM_BIOS(28, "v2737", "ASUS PVI-486SP3 V2.07 #2")
+	ROM_SYSTEM_BIOS(1, "v2737", "ASUS PVI-486SP3 V2.07 #2")
 	ROMX_LOAD( "awsi2737.bin", 0x00000, 0x20000, CRC(8cd9a89c) SHA1(6c68c23cc5e8ae66261e9fe931f2ce07efe767b6), ROM_BIOS(1))
 ROM_END
 
@@ -1467,10 +1448,10 @@ ROM_END
 ROM_START( a486sp3g )
 	ROM_REGION(0x20000, "bios", 0)
 	// 0: BIOS-String: 10/21/94-SATURN-II-P/I-SP3G-00 / #401A0-302
-	ROM_SYSTEM_BIOS(29, "v302", "ASUS PCI/I-486SP3G V3.02")
+	ROM_SYSTEM_BIOS(0, "v302", "ASUS PCI/I-486SP3G V3.02")
 	ROMX_LOAD( "awsg0302.bin", 0x00000, 0x20000, CRC(21e918a0) SHA1(c7f937e3e90a43d7c7f867e686625b28a9c2484c), ROM_BIOS(0))
 	// 1: BIOS-String: 08/15/95-SATURN-II-P/I-SP3G-00 / #401A0-304
-	ROM_SYSTEM_BIOS(30, "v304", "ASUS PCI/I-486SP3G V3.04")
+	ROM_SYSTEM_BIOS(1, "v304", "ASUS PCI/I-486SP3G V3.04")
 	ROMX_LOAD( "awsg0304.bin", 0x00000, 0x20000, CRC(f4d830d2) SHA1(086ccd14c7b0c521be1958d58b3539c4bfe4721f), ROM_BIOS(1))
 ROM_END
 
@@ -2014,6 +1995,52 @@ ROM_START( ews286 ) // Computer is brown/yellow-ish with Ericsson logo
 	ROM_LOAD16_BYTE( "rys_103_1003_r8a_8600_ic-pos_69.bin", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
 ROM_END
 
+// Everex EV-1806 (6 16-bit ISA, 1 8-bit ISA)
+// Everex IC-00121-0 + IC-00122-0; CHIPS P82C206; Intel 8272A(?); 146818A RTC
+ROM_START( ev1806 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_even_u62.bin", 0x18000, 0x4000, CRC(7364e49b) SHA1(e8f5f41514005da0e36792e009cf3eae51c19c20), ROM_SKIP(1) )
+	ROMX_LOAD( "everex_ev-1806_rev-f1a-21_odd_u61.bin", 0x18001, 0x4000, CRC(05c87bf7) SHA1(8c2243d9ee3d2af1517dc1134a22a7d1ed11262f), ROM_SKIP(1) )
+ROM_END
+
+// KT216WB5-HI Rev.2 (1 8-bit ISA, 5 16-bit ISA)
+// Winbond W83C201P + W83C202AP + W83C203AP + W83C204P + W83C205AP; MC146818AP RTC; JETkey keyboard BIOS
+ROM_START( kt216wb5 )
+	ROM_REGION(0x20000, "bios", 0)
+	// BIOS-String: D286-1149-083090-K0 - WIN 286 BIOS
+	ROMX_LOAD( "kt216wb5_even.bin", 0x10000, 0x8000, CRC(6b5509c0) SHA1(73b303b90cc0cd23b7e13362019193c938a2e502), ROM_SKIP(1) )
+	ROMX_LOAD( "kt216wb5_odd.bin", 0x10001, 0x8000, CRC(af541ada) SHA1(26d2617dbe8c15f1b0d4782375bcb291a7923703), ROM_SKIP(1) )
+ROM_END
+
+// LS-103S (1 8-bit ISA, 6 16-bit ISA, 4 memory slots)
+// Headland Technology G2 chipset: HT101A + 2x HT102; HM6818P RTC; AMI keyboard BIOS
+ROM_START( ls103s )
+	ROM_REGION(0x20000, "bios", 0)
+	// BIOS-String: D286-1234-121589-K0
+	ROMX_LOAD( "ami_lm103-s_lo.bin", 0x10000, 0x8000, CRC(a24be20b) SHA1(ffc5faf6d773154bf2f037556d2e381e81a28a58), ROM_SKIP(1) )
+	ROMX_LOAD( "ami_lm103-s_hi.bin", 0x10001, 0x8000, CRC(7b63e60c) SHA1(da78b95b12051b6d4701a412fdc5e7874595c188), ROM_SKIP(1) )
+ROM_END
+
+// Magictronic B233 (8 ISA slots)
+// SUNTAC Chipset, http://toastytech.com/manuals/Magitronic%20B233%20Manual.pdf
+ROM_START( magb233 )
+	ROM_REGION(0x20000, "bios", 0)
+	// BIOS-String: DSUN-1105-043089-K0
+	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_even_sa027343.bin", 0x10000, 0x8000, CRC(d4a18444) SHA1(d95242104fc9b51cf26de72ef5b6c52d99ccce30), ROM_SKIP(1) )
+	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_odd_sa027343.bin", 0x10001, 0x8000, CRC(7ac3db56) SHA1(4340140450c4f8b4f6a19eae50a5dc5449edfdf6), ROM_SKIP(1) )
+	// ROM_LOAD("magitronic_b233_ami_1986_keyboard_bios_plus_a025352.bin", 0x0000, 0x1000), CRC(84fd28fd) SHA1(43da0f49e52c921844e60b6f3d22f2a316d865cc) )
+ROM_END
+
+// MAT286 REV.D (5 16-bit ISA, 1 8-bit ISA, 2 memory slots)
+// Headland Technology HT12P-16/A; HM6818P RTC; JETkey keyboard BIOS; unmarked 40-pin DIP
+ROM_START( mat286 )
+	ROM_REGION(0x20000, "bios", 0)
+	// BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS
+	// Files separated from single 64K dump (PCB photo shows split ROMs are used)
+	ROMX_LOAD( "9221fkf_imp23256_ami-l.bin", 0x10000, 0x08000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1), ROM_SKIP(1) )
+	ROMX_LOAD( "9221gjf_imp23256_ami-h.bin", 0x10001, 0x08000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8), ROM_SKIP(1) )
+ROM_END
+
 //  NCR, probably PC-8 - should get a "NGA" extended CGA graphics card once it's emulated
 ROM_START( ncrpc8 )
 	ROM_REGION(0x20000, "bios", 0) 
@@ -2158,8 +2185,8 @@ COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at
 COMP( 1987, atvga,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<generic>",   "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
 COMP( 1988, at386,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<generic>",   "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1988, ecs38632,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "ECS-386/32", MACHINE_NOT_WORKING )
-COMP( 19??, ecsum386,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "UM386 (Rev 1.1)", MACHINE_NOT_WORKING )
-COMP( 19??, fu340,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Abit",        "FU340", MACHINE_NOT_WORKING )
+COMP( 1992, ecsum386,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "UM386 (Rev 1.1)", MACHINE_NOT_WORKING )
+COMP( 1991, fu340,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Abit",        "FU340", MACHINE_NOT_WORKING )
 COMP( 19??, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Forex Computer Company", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING )
 COMP( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,     at_state,     init_at,        "<generic>",   "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1988, at386sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<generic>",   "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
@@ -2191,7 +2218,7 @@ COMP( 1989, xb42664,   ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1990, xb42664a,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
 COMP( 1993, apxena1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
 COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
-COMP( 199?, a433cc,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "J-Bond",      "A433C-C/A450C-C", MACHINE_NOT_WORKING )
+COMP( 1992, a433cc,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "J-Bond",      "A433C-C/A450C-C", MACHINE_NOT_WORKING )
 COMP( 1994, a486ap4,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PVI-486AP4", MACHINE_NOT_WORKING )
 COMP( 1994, a486sp3,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PVI-486SP3", MACHINE_NOT_WORKING )
 COMP( 1994, a486sp3g,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PCI/I-486SP3G", MACHINE_NOT_WORKING )
@@ -2215,7 +2242,7 @@ COMP( 199?, comt386,   ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, comt486,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines",  "Tower 486", MACHINE_NOT_WORKING )
 COMP( 1988, dsys200,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Dell Computer Corporation",    "System 200", MACHINE_NOT_WORKING )
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "First International Computer", "486-PIO-2", MACHINE_NOT_WORKING )
-COMP( 199?, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
+COMP( 1994, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
 COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
@@ -2231,6 +2258,11 @@ COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at
 COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
+COMP( 198?, ev1806,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Everex Systems", "EV-1806", MACHINE_NOT_WORKING ) // continuous beeps (RAM not detected?)
+COMP( 19??, kt216wb5,  ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "KT Technology", "KT216WB5-HI Rev.2", MACHINE_NOT_WORKING )
+COMP( 198?, ls103s,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "unknown",     "LS-103S", MACHINE_NOT_WORKING )
+COMP( 198?, magb233,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Magitronic Technology", "Magitronic B233", MACHINE_NOT_WORKING )
+COMP( 19??, mat286,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "unknown",     "MAT286 Rev.D", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
 COMP( 198?, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
 COMP( 198?, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )

@@ -2437,6 +2437,7 @@ pcd4nd                          // Siemens-Nixdorf 486 notebook
 ct386sx                         //
 ec1842                          //
 ec1849                          //
+ev1806                          // Everex EV-1806
 ews286                          // 1986 Ericsson WS286
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
@@ -2447,7 +2448,11 @@ ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
+kt216wb5                        // KT216WB5-HI Rev.2
+ls103s                          //
 m290                            // Olivetti M290
+magb233                         // Magitronic B233
+mat286                          //
 megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
