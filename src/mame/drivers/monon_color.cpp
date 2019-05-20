@@ -80,15 +80,15 @@ void monon_color_state::machine_start()
 	    no code to map at 0x9000 in address space (possible BIOS?)
 	    no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
 
-	    there are 4 different 'versions' of the code in the dumped ROMs, where the code is the same the roms match up until 0x50000 after which the game specific data starts
+	    there are 5 different 'versions' of the code in the dumped ROMs, where the code is the same the roms match up until 0x50000 after which the game specific data starts
 
 	    by game number:
 
-		103alt                       (earliest? doesn't have bank9)
-	    101,102,103,104,105          (1st revision)
-	    106,107                      (2nd revision)
-	    201                          (3rd revision)
-	    202,203,204,205,301,303,304  (4th revision)
+		103alt                           (earliest? doesn't have bank9)
+	    101,102,103,104,105              (1st revision)
+	    106,107                          (2nd revision)
+	    201                              (3rd revision)
+	    202,203,204,205,301,302,303,304  (4th revision)
 	*/
 }
 
