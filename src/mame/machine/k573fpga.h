@@ -47,6 +47,8 @@ public:
 	uint16_t get_mpeg_ctrl();
 	void set_mpeg_ctrl(uint16_t data);
 
+	void set_mp3_dynamic_base(uint32_t base) { mp3_dynamic_base = base; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -74,7 +76,7 @@ private:
 	mp3dec_frame_info_t mp3_frame_info;
 	size_t mp3_allocated;
 
-	uint32_t buffer_speed;
+	uint32_t buffer_speed, mp3_dynamic_base;
 
 	int32_t find_enc_key();
 

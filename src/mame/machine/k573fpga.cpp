@@ -474,8 +474,8 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         last_copied_samples = buffer_size;
 
         if (last_copied_samples > 11520 * 3) {
-            m_samples->update_raw(0, channel_l_pcm, buffer_size, mp3_info.hz, true);
-            m_samples->update_raw(1, channel_r_pcm, buffer_size, mp3_info.hz, true);
+            m_samples->update_raw(0, channel_l_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
+            m_samples->update_raw(1, channel_r_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
 
             mp3_next_sync = buffer_size - (buffer_size / 4); // Grab more data sometime before the current buffer ends. This is arbitrary and kinda hacky, but it worked best between various games in my testing.
         }

@@ -20,6 +20,7 @@ public:
 
 	void amap(address_map &map);
 	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
+	void set_mp3_dynamic_base(uint32_t base) { mp3_dynamic_base = base; }
 
 	DECLARE_READ16_MEMBER(a00_r);
 	DECLARE_READ16_MEMBER(a02_r);
@@ -82,6 +83,7 @@ private:
 	void output(int offset, uint16_t data);
 
 	bool is_ddrsbm_fpga;
+	uint32_t mp3_dynamic_base;
 	uint16_t crypto_key1;
 };
 
