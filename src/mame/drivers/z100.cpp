@@ -11,6 +11,7 @@
 
     TODO:
     - implement S-100 bus features;
+    - memory test hangs on the first pass;
 
 ============================================================================
 
@@ -338,6 +339,7 @@ MC6845_UPDATE_ROW(z100_state::update_row)
 
 offs_t z100_state::vram_map(offs_t offset) const
 {
+	// Translate logical address to physical address
 	return (offset & 0x30000) | (offset & 0x000f) << 4 | (offset & 0x0780) >> 7
 		| ((m_vrmm[(offset & 0xf800) >> 8 | (offset & 0x0070) >> 4] + m_start_addr) & (m_vram_config->read() ? 0xff : 0x7f)) << 8;
 }
@@ -870,14 +872,30 @@ void z100_state::z100(machine_config &config)
 
 /* ROM definition */
 ROM_START( z100 )
-	ROM_REGION( 0x4000, "ipl", 0 )
-	ROM_LOAD( "intel-d27128-1.bin", 0x0000, 0x4000, CRC(b21f0392) SHA1(69e492891cceb143a685315efe0752981a2d8143))
+	ROM_REGION(0x4000, "ipl", 0)
+	ROM_LOAD("intel-d27128-1.bin", 0x0000, 0x4000, CRC(b21f0392) SHA1(69e492891cceb143a685315efe0752981a2d8143))
 
-	ROM_REGION( 0x0400, "kbdc", 0 ) // 8041A keyboard controller
-	ROM_LOAD( "444-109.u204", 0x0000, 0x0400, CRC(45181029) SHA1(0e89649364d25cf2d8669d2a293ee162e274cb64) )
+	ROM_REGION(0x0400, "kbdc", 0) // 8041A keyboard controller
+	ROM_LOAD("444-109.u204", 0x0000, 0x0400, CRC(45181029) SHA1(0e89649364d25cf2d8669d2a293ee162e274cb64))
 
-	ROM_REGION( 0x0100, "vrmm", 0 ) // Video RAM Mapping Module
-	ROM_LOAD( "444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP ) // typed in from manual
+	// All PROMs are typed in from Zenith technical manual listings rather than dumped from real devices, and are accordingly marked BAD_DUMP
+	ROM_REGION(0x0100, "iodec", 0) // 82S129 I/O Decoder PROM
+	ROM_LOAD("444-101.u179", 0x0000, 0x0100, CRC(c952be82) SHA1(0edf9265d302f8478a310858eb6a9352f0cda17b) BAD_DUMP)
+
+	ROM_REGION(0x0100, "memdec", 0) // 82S129 Memory Decoder PROM
+	ROM_LOAD("444-104.u111", 0x0000, 0x0100, CRC(46edd69d) SHA1(5d4bafeaa4593e419bf94dba9e44c8b2be58727b) BAD_DUMP)
+
+	ROM_REGION(0x0020, "status", 0) // 82S123 CPU Status Decode PROM
+	ROM_LOAD("444-105.u226", 0x0000, 0x0020, CRC(98b084e9) SHA1(d968b9a1b1d2ba3ed40036c2192c9960a6c15e99) BAD_DUMP)
+
+	ROM_REGION(0x0100, "vramsel", 0) // 82S129 Video RAM Select PROM
+	ROM_LOAD("444-102.u371", 0x0000, 0x0100, CRC(4558f540) SHA1(55c9bad87b111537a6d386a6eb405169fb47304c) BAD_DUMP)
+
+	ROM_REGION(0x0100, "viosel", 0) // 82S129 Video I/O Select PROM
+	ROM_LOAD("444-103.u369", 0x0000, 0x0100, CRC(854cef15) SHA1(836b244dac0085bcfe8006fde0c5f19982969236) BAD_DUMP)
+
+	ROM_REGION(0x0100, "vrmm", 0) // TBP18S22 Video RAM Mapping Module
+	ROM_LOAD("444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP)
 ROM_END
 
 
