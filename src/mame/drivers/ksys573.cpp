@@ -2460,7 +2460,7 @@ void ksys573_state::gtfrk10m(machine_config &config)
 void ksys573_state::gtfrk10mb(machine_config &config)
 {
 	gtrfrk7m(config);
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00500000);
+	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
 
 	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
