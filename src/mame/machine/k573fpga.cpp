@@ -91,7 +91,10 @@ uint32_t k573fpga_device::get_mp3_playback() {
         // The counter will properly end when the game signals to the FPGA to stop playback.
         last_position_update += position_diff;
     } else {
-        position_diff = m_samples->get_position(0) - last_position_update;
+        if (m_samples->get_position(0) - last_position_update > 0) {
+            position_diff = m_samples->get_position(0) - last_position_update;
+        }
+
         last_position_update = m_samples->get_position(0);
     }
 
