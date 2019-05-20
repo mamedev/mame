@@ -181,6 +181,10 @@ public:
 		, m_sprregs(*this, "sprregs_%u", 1)
 		, m_mainsub_shared_ram(*this, "mainsub_shared")
 		, m_ctrl(*this, "ctrl")
+		, m_io_p1(*this, "P1")
+		, m_io_p2(*this, "P2")
+		, m_io_system(*this, "SYSTEM")
+		, m_io_extra(*this, "EXTRA")
 	{ }
 
 	void jchan(machine_config &config);
@@ -194,26 +198,30 @@ private:
 	required_device_array<sknsspr_device, 2> m_spritegen;
 	required_device<kaneko_view2_tilemap_device> m_view2;
 
-	required_shared_ptr_array<uint16_t, 2> m_spriteram;
-	required_shared_ptr_array<uint16_t, 2> m_sprregs;
-	required_shared_ptr<uint16_t> m_mainsub_shared_ram;
-	required_shared_ptr<uint16_t> m_ctrl;
+	required_shared_ptr_array<u16, 2> m_spriteram;
+	required_shared_ptr_array<u16, 2> m_sprregs;
+	required_shared_ptr<u16> m_mainsub_shared_ram;
+	required_shared_ptr<u16> m_ctrl;
+
+	required_ioport m_io_p1;
+	required_ioport m_io_p2;
+	required_ioport m_io_system;
+	required_ioport m_io_extra;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap[2];
-	std::unique_ptr<uint32_t[]> m_sprite_ram32[2];
-	std::unique_ptr<uint32_t[]> m_sprite_regs32[2];
+	std::unique_ptr<u32[]> m_sprite_ram32[2];
+	std::unique_ptr<u32[]> m_sprite_regs32[2];
 	int m_irq_sub_enable;
 
-	DECLARE_WRITE16_MEMBER(ctrl_w);
-	DECLARE_READ16_MEMBER(ctrl_r);
+	void ctrl_w(u16 data);
+	u16 ctrl_r(offs_t offset);
 	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
 	DECLARE_WRITE16_MEMBER(sub2main_cmd_w);
-	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
-	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
+	template<int Chip> void sknsspr_sprite32regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
 	void jchan_main(address_map &map);
@@ -240,21 +248,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 {
 	int scanline = param;
 
-	if(scanline == 240)
+	if (scanline == 240)
+	{
+		for (int chip = 0; chip < 2; chip++) // sprites are 1 frame delayed
+		{
+			for (int i = 0; i < m_spriteram[chip].bytes() / 4; i++)
+				m_sprite_ram32[chip][i] = (m_spriteram[chip][i * 2 + 1] << 16) | (m_spriteram[chip][i * 2]);
+		}
 		m_maincpu->set_input_line(1, HOLD_LINE);
+	}
 
-	if(scanline == 11)
+	if (scanline == 11)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if (m_irq_sub_enable)
 	{
-		if(scanline == 240)
+		if (scanline == 240)
 			m_subcpu->set_input_line(1, HOLD_LINE);
 
-		if(scanline == 249)
+		if (scanline == 249)
 			m_subcpu->set_input_line(2, HOLD_LINE);
 
-		if(scanline == 11)
+		if (scanline == 11)
 			m_subcpu->set_input_line(3, HOLD_LINE);
 	}
 }
@@ -263,11 +278,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 void jchan_state::video_start()
 {
 	/* so we can use sknsspr.cpp */
-	m_sprite_ram32[0] = std::make_unique<uint32_t[]>(0x4000/4);
-	m_sprite_ram32[1] = std::make_unique<uint32_t[]>(0x4000/4);
+	for (int chip = 0; chip < 2; chip++)
+	{
+		const u32 size = m_spriteram[chip].bytes() / 4;
+		m_sprite_ram32[chip] = std::make_unique<u32[]>(size);
+		save_pointer(NAME(m_sprite_ram32[chip]), size, chip);
+	}
 
-	m_sprite_regs32[0] = std::make_unique<uint32_t[]>(0x40/4);
-	m_sprite_regs32[1] = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32[0] = std::make_unique<u32[]>(0x40/4);
+	m_sprite_regs32[1] = std::make_unique<u32[]>(0x40/4);
 
 	m_sprite_bitmap[0] = std::make_unique<bitmap_ind16>(1024,1024);
 	m_sprite_bitmap[1] = std::make_unique<bitmap_ind16>(1024,1024);
@@ -276,25 +295,13 @@ void jchan_state::video_start()
 	m_spritegen[1]->skns_sprite_kludge(0,0);
 
 	save_item(NAME(m_irq_sub_enable));
-	save_pointer(NAME(m_sprite_ram32[0]), 0x4000/4);
-	save_pointer(NAME(m_sprite_ram32[1]), 0x4000/4);
 	save_pointer(NAME(m_sprite_regs32[0]), 0x40/4);
 	save_pointer(NAME(m_sprite_regs32[1]), 0x40/4);
 }
 
 
-uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	uint16_t* src1;
-	uint16_t* src2;
-	uint16_t* dst;
-	uint16_t pixdata1, pixdata2;
-	uint16_t pridata1, pridata2;
-
-	uint8_t *tilepri;
-	uint8_t bgpridata;
-
 	bitmap.fill(0x7f00, cliprect); // verified
 
 	screen.priority().fill(0, cliprect);
@@ -308,27 +315,27 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (int chip = 0; chip < 2; chip++)
 	{
-		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_sprite_regs32[chip].get() );
+		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_sprite_regs32[chip].get());
 	}
 
 	bitmap_ind8 *tile_primap = &screen.priority();
 
 	// TODO : verify sprite-tile priorities from real hardware, Check what 15 bit of palette actually working
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		src1 = &m_sprite_bitmap[0]->pix16(y);
-		src2 = &m_sprite_bitmap[1]->pix16(y);
-		tilepri = &tile_primap->pix8(y);
-		dst =  &bitmap.pix16(y);
+		const u16* src1 = &m_sprite_bitmap[0]->pix16(y);
+		const u16* src2 = &m_sprite_bitmap[1]->pix16(y);
+		u8 *tilepri = &tile_primap->pix8(y);
+		u16* dst =  &bitmap.pix16(y);
 
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			pixdata1 = src1[x];
-			pixdata2 = src2[x];
-			pridata1 = (pixdata1 >> 14) & 3;
-			pridata2 = (pixdata2 >> 14) & 3;
+			const u16 pixdata1 = src1[x];
+			const u16 pixdata2 = src2[x];
+			const u16 pridata1 = (pixdata1 >> 14) & 3;
+			const u16 pridata2 = (pixdata2 >> 14) & 3;
 
-			bgpridata = tilepri[x] >> 1;
+			const u8 bgpridata = tilepri[x] >> 1;
 
 			if (pridata1 >= bgpridata)
 			{
@@ -338,12 +345,12 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					{
 						if (pixdata2 & 0xff)
 						{
-							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+							dst[x] = (pixdata2 & 0x3fff) | 0x4000;
 							tilepri[x] = (pridata2 << 1);
 						}
 						else if (pixdata1 & 0xff)
 						{
-							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+							dst[x] = (pixdata1 & 0x3fff) | 0x4000;
 							tilepri[x] = (pridata1 << 1);
 						}
 					}
@@ -351,12 +358,12 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					{
 						if (pixdata1 & 0xff)
 						{
-							dst[x] = (pixdata1 & 0x3fff)|0x4000;
+							dst[x] = (pixdata1 & 0x3fff) | 0x4000;
 							tilepri[x] = (pridata1 << 1);
 						}
 						else if (pixdata2 & 0xff)
 						{
-							dst[x] = (pixdata2 & 0x3fff)|0x4000;
+							dst[x] = (pixdata2 & 0x3fff) | 0x4000;
 							tilepri[x] = (pridata2 << 1);
 						}
 					}
@@ -365,7 +372,7 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					if (pixdata1 & 0xff)
 					{
-						dst[x] = (pixdata1 & 0x3fff)|0x4000;
+						dst[x] = (pixdata1 & 0x3fff) | 0x4000;
 						tilepri[x] = (pridata1 << 1);
 					}
 				}
@@ -374,7 +381,7 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				if (pixdata2 & 0xff)
 				{
-					dst[x] = (pixdata2 & 0x3fff)|0x4000;
+					dst[x] = (pixdata2 & 0x3fff) | 0x4000;
 					tilepri[x] = (pridata2 << 1);
 				}
 			}
@@ -396,19 +403,19 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
     $f00000 is the only location also written
 */
 
-WRITE16_MEMBER(jchan_state::ctrl_w)
+void jchan_state::ctrl_w(u16 data)
 {
 	m_irq_sub_enable = data & 0x8000; // hack / guess!
 }
 
-READ16_MEMBER(jchan_state::ctrl_r)
+u16 jchan_state::ctrl_r(offs_t offset)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0/2: return ioport("P1")->read();
-		case 2/2: return ioport("P2")->read();
-		case 4/2: return ioport("SYSTEM")->read();
-		case 6/2: return ioport("EXTRA")->read();
+		case 0/2: return m_io_p1->read();
+		case 2/2: return m_io_p2->read();
+		case 4/2: return m_io_system->read();
+		case 6/2: return m_io_extra->read();
 		default: logerror("ctrl_r unknown!"); break;
 	}
 	return m_ctrl[offset];
@@ -436,19 +443,11 @@ WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 
 /* ram convert for suprnova (requires 32-bit stuff) */
 template<int Chip>
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_w)
-{
-	COMBINE_DATA(&m_spriteram[Chip][offset]);
-	offset>>=1;
-	m_sprite_ram32[Chip][offset]=(m_spriteram[Chip][offset*2+1]<<16) | (m_spriteram[Chip][offset*2]);
-}
-
-template<int Chip>
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_w)
+void jchan_state::sknsspr_sprite32regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprregs[Chip][offset]);
-	offset>>=1;
-	m_sprite_regs32[Chip][offset]=(m_sprregs[Chip][offset*2+1]<<16) | (m_sprregs[Chip][offset*2]);
+	offset >>= 1;
+	m_sprite_regs32[Chip][offset] = (m_sprregs[Chip][offset * 2 + 1] << 16) | (m_sprregs[Chip][offset * 2]);
 }
 
 
@@ -467,7 +466,7 @@ void jchan_state::jchan_main(address_map &map)
 	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* 1st sprite layer */
-	map(0x500000, 0x503fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
+	map(0x500000, 0x503fff).ram().share("spriteram_1");
 	map(0x600000, 0x60003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
 
 	map(0x700000, 0x70ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette
@@ -490,7 +489,7 @@ void jchan_state::jchan_sub(address_map &map)
 	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 
 	/* background sprites */
-	map(0x700000, 0x703fff).ram().w(FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
+	map(0x700000, 0x703fff).ram().share("spriteram_2");
 	map(0x780000, 0x78003f).ram().w(FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
 
 	map(0x800000, 0x800003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff); // sound
