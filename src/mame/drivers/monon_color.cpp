@@ -65,15 +65,16 @@ void monon_color_state::machine_start()
 
 	// there are a whole bunch of blocks that map at 0x5e00 (boot code jumps straight to 0x5e00)
 
-	memcpy(maincpu+0x1e00, flash+0x2000, 0x1000); // clears RAM, sets up stack etc. but then jumps to 0x9xxx where we have nothing (probably the correct initial block tho)
-//  memcpy(maincpu+0x1e00, flash+0x4200, 0x1000); // just set register + a jump (to function that writes to UART)
-//  memcpy(maincpu+0x1e00, flash+0x4c00, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x5600, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x6000, 0x1000); // ends up reting with nothing on the stack
-//  memcpy(maincpu+0x1e00, flash+0x6a00, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x7e00, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x8800, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x9200, 0x1000);
+	memcpy(maincpu+0x1e00, flash+0x2000, 0x1000); // BANK0 - clears RAM, sets up stack etc. but then jumps to 0x9xxx where we have nothing (probably the correct initial block tho)
+//  memcpy(maincpu+0x1e00, flash+0x4200, 0x0a00); // BANK1 - just set register + a jump (to function that writes to UART)
+//  memcpy(maincpu+0x1e00, flash+0x4c00, 0x0a00); // BANK2
+//  memcpy(maincpu+0x1e00, flash+0x5600, 0x0a00); // BANK3
+//  memcpy(maincpu+0x1e00, flash+0x6000, 0x0a00); // BANK4 - ends up reting with nothing on the stack
+//  memcpy(maincpu+0x1e00, flash+0x6a00, 0x0a00); // BANK5
+//  memcpy(maincpu+0x1e00, flash+0x7400, 0x0a00); // BANK6
+//  memcpy(maincpu+0x1e00, flash+0x7e00, 0x0a00); // BANK7
+//  memcpy(maincpu+0x1e00, flash+0x8800, 0x0a00); // BANK8
+//  memcpy(maincpu+0x1e00, flash+0x9200, 0x0a00); // BANK9
 
 	/*  block starting at e000 in flash is not code? (or encrypted?)
 	    no code to map at 0x9000 in address space (possible BIOS?)
