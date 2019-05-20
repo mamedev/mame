@@ -5,15 +5,18 @@
 
 #include "k573fpga.h"
 
-// TODO: Check if this is optimal
-#define MINIMUM_BUFFER 1
-
-// TODO: Is this really needed? Confirm
-#define MAX_FRAME_SYNC_MATCHES 1
+// This will delay playback until there are SAMPLES_BUFFER samples in the buffer.
+// This fixes some timing issues. Increase value to delay playback.
+// The current value was decided by finding a delay that allowed the Konami logo
+// to playback on the Drummania 10th Mix loading sequence, but finish just in time
+// for the game to send the stop playback command before it looped again.
+// TODO: Verify this with real hardware somehow.
+#define SAMPLES_BUFFER 1152 * 30
 
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_STDIO
 #define MINIMP3_IMPLEMENTATION
+#define MAX_FRAME_SYNC_MATCHES 1
 #include "minimp3/minimp3.h"
 #include "minimp3/minimp3_ex.h"
 
@@ -28,7 +31,7 @@ k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag,
 void k573fpga_device::device_start()
 {
     ram_swap = std::make_unique<uint16_t[]>(32 * 1024 * 1024);
-    save_pointer(NAME(ram_swap), 32 * 1024 * 1024 );
+    save_pointer(NAME(ram_swap), 32 * 1024 * 1024);
 
     device_reset();
 }
@@ -60,7 +63,7 @@ void k573fpga_device::device_reset()
     channel_r_pcm = nullptr;
     last_buffer_size_channel_r = 0;
 
-    memset((void*)ram_swap.get(), 0, 12 * 1024 * 1024 * 2);
+    memset((void*)ram_swap.get(), 0, 32 * 1024 * 1024 * 2);
     memset(&mp3_info, 0, sizeof(mp3_info));
 
     mas3507d->set_samples(m_samples);
@@ -267,7 +270,6 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
     }
 
     int new_samples = mp3_info.samples;
-    int decrypt_buffer = MINIMUM_BUFFER;
     int decrypt_buffer_speed = buffer_speed;
 
     if (mp3_next_sync == 0 && last_copied_samples == 0) {
@@ -278,7 +280,6 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         mp3_last_decrypt_adr = mp3_start_adr;
 
         // Cover a large chunk of ID3 or junk at the beginning of a file when decrypting first frame
-        decrypt_buffer = 1;
         decrypt_buffer_speed = buffer_speed = 0x2000;
 
         last_position_update = 0;
@@ -287,10 +288,10 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
     }
 
     // Decrypt chunk of data
-    if (mp3_last_decrypt_adr < mp3_end_adr && mp3_last_adr + decrypt_buffer_speed * decrypt_buffer >= mp3_last_decrypt_adr) {
+    if (mp3_last_decrypt_adr < mp3_end_adr && mp3_last_adr + decrypt_buffer_speed >= mp3_last_decrypt_adr) {
         int32_t cur_idx;
 
-        for (cur_idx = mp3_last_decrypt_adr; cur_idx - mp3_last_decrypt_adr < decrypt_buffer_speed * decrypt_buffer && cur_idx < mp3_end_adr; cur_idx += 2) {
+        for (cur_idx = mp3_last_decrypt_adr; cur_idx - mp3_last_decrypt_adr < decrypt_buffer_speed && cur_idx < mp3_end_adr; cur_idx += 2) {
             if (use_ddrsbm_fpga) {
                 ram_swap[cur_idx >> 1] = fpga_decrypt_byte_ddrsbm(ram[cur_idx >> 1], (cur_idx - mp3_start_adr) / 2);
             } else {
@@ -313,7 +314,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 
     int samples;
     int free_format_bytes = 0, frame_size = 0;
-    int buf_size = decrypt_buffer_speed * decrypt_buffer;
+    int buf_size = decrypt_buffer_speed;
 
     uint8_t *buf = (uint8_t*)ram_swap.get() + mp3_last_adr;
 
@@ -371,13 +372,11 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
         mp3_info.hz       = mp3_frame_info.hz;
         mp3_info.layer    = mp3_frame_info.layer;
         mp3_last_adr += mp3_frame_info.frame_bytes;
-
-        decrypt_buffer = 8;
     } else {
         /* decode rest frames */
         buf_size = decrypt_buffer_speed * 2;
 
-        for (int frame_skip = 0; frame_skip < decrypt_buffer && buf < (uint8_t*)ram_swap.get() + mp3_end_adr; frame_skip++) {
+        if (buf < (uint8_t*)ram_swap.get() + mp3_end_adr) {
             if (buf + buf_size > (uint8_t*)ram_swap.get() + mp3_end_adr) {
                 buf_size = ((uint8_t*)ram_swap.get() + mp3_end_adr) - buf;
             }
@@ -388,30 +387,20 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 
             samples = mp3dec_decode_frame(&mp3_dec, buf, buf_size, mp3_info.buffer + mp3_info.samples, &mp3_frame_info);
 
-            if (buf + buf_size >= (uint8_t*)ram_swap.get() + mp3_end_adr) {
-                // Some songs have a weird frame at the very end of the song which can be skipped usually.
-                mp3_last_adr += buf_size;
-                break;
-            }
-
             if (!samples) {
                 mp3_last_decrypt_adr = mp3_start_adr; // Force it to redecrypt everything in case the previous decrypt was too fast to find a full frame
                 crypto_key1 = orig_crypto_key1;
                 crypto_key2 = orig_crypto_key2;
                 crypto_key3 = orig_crypto_key3;
-                break;
-            }
 
-            if (mp3_info.hz != mp3_frame_info.hz || mp3_info.layer != mp3_frame_info.layer) {
-                break;
+                if (buf + buf_size >= (uint8_t*)ram_swap.get() + mp3_end_adr) {
+                    // Some songs have a weird frame at the very end of the song which can be skipped usually.
+                    mp3_last_adr += buf_size;
+                }
+            } else if (mp3_info.hz == mp3_frame_info.hz && mp3_info.layer == mp3_frame_info.layer && mp3_info.channels && mp3_info.channels == mp3_frame_info.channels) {
+                mp3_last_adr += mp3_frame_info.frame_bytes;
+                mp3_info.samples += samples * mp3_frame_info.channels;
             }
-
-            if (mp3_info.channels && mp3_info.channels != mp3_frame_info.channels) {
-                break;
-            }
-
-            mp3_last_adr += mp3_frame_info.frame_bytes;
-            mp3_info.samples += samples * mp3_frame_info.channels;
         }
     }
 
@@ -476,7 +465,7 @@ SAMPLES_UPDATE_CB_MEMBER(k573fpga_device::k573fpga_stream_update)
 
         last_copied_samples = buffer_size;
 
-        if (last_copied_samples > 11520 * 3) {
+        if (last_copied_samples > SAMPLES_BUFFER) {
             m_samples->update_raw(0, channel_l_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
             m_samples->update_raw(1, channel_r_pcm, buffer_size, mp3_info.hz, mp3_start_adr != mp3_dynamic_base);
 
