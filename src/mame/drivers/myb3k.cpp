@@ -928,6 +928,7 @@ static void stepone_isa_cards(device_slot_interface &device)
 	device.option_add("myb3k_com", ISA8_MYB3K_COM);
 	device.option_add("myb3k_fdc4710", ISA8_MYB3K_FDC4710);
 	device.option_add("myb3k_fdc4711", ISA8_MYB3K_FDC4711);
+	device.option_add("myb3k_fdc4712", ISA8_MYB3K_FDC4712);
 }
 
 void myb3k_state::myb3k(machine_config &config)
