@@ -265,6 +265,14 @@ local function handle_button_menu(index, event)
 	return false
 end
 
+function lib:init_menu(buttons)
+	header_height = 0
+	content_height = 0
+	menu_stack = { MENU_TYPES.MAIN }
+	current_button = {}
+	inputs = {}
+end
+
 function lib:populate_menu(buttons)
 	local current_menu = menu_stack[#menu_stack]
 	if current_menu == MENU_TYPES.MAIN then

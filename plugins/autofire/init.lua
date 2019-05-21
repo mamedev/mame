@@ -21,6 +21,8 @@ function autofire.startplugin()
 	--   'counter' - position in autofire cycle
 	local buttons = {}
 
+	local current_rom = nil
+
 	local function process_button(button)
 		local pressed = manager:machine():input():code_pressed(button.key)
 		if pressed then
@@ -54,10 +56,26 @@ function autofire.startplugin()
 		end
 	end
 
+	local function reinit_buttons()
+		for i, button in ipairs(buttons) do
+			button.counter = 0
+			button.button = manager:machine():ioport().ports[button.port].fields[button.field]
+		end
+	end
+
 	local function load_settings()
-		local loader = require('autofire/autofire_save')
-		if loader then
-			buttons = loader:load_settings()
+		if current_rom == emu.romname() then
+			reinit_buttons()
+		else
+			local loader = require('autofire/autofire_save')
+			if loader then
+				buttons = loader:load_settings()
+			end
+		end
+		current_rom = emu.romname()
+		local menu_handler = require('autofire/autofire_menu')
+		if menu_handler then
+			menu_handler:init_menu(buttons)
 		end
 	end
 
