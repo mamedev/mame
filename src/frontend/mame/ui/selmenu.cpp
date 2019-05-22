@@ -1465,10 +1465,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		}
 
 		if (selected_index() < visible_items && !m_ui_error)
-		{
-			set_selected_index(0);
-			top_line = 0;
-		}
+			select_first_item();
 	}
 
 	// end goes to the last

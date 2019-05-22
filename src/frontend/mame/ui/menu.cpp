@@ -1010,8 +1010,13 @@ void menu::handle_events(uint32_t flags, event &ev)
 							top_line -= local_menu_event.num_lines;
 							return;
 						}
-						is_first_selected() ? m_selected = top_line = m_items.size() - 1 : m_selected -= local_menu_event.num_lines;
-						validate_selection(-1);
+						if (is_first_selected())
+							select_last_item();
+						else
+						{
+							m_selected -= local_menu_event.num_lines;
+							validate_selection(-1);
+						}
 						top_line -= (m_selected <= top_line && top_line != 0);
 						if (m_selected <= top_line && m_visible_items != m_visible_lines)
 							top_line -= local_menu_event.num_lines;
@@ -1023,8 +1028,13 @@ void menu::handle_events(uint32_t flags, event &ev)
 							top_line += local_menu_event.num_lines;
 							return;
 						}
-						is_last_selected() ? m_selected = top_line = 0 : m_selected += local_menu_event.num_lines;
-						validate_selection(1);
+						if (is_last_selected())
+							select_first_item();
+						else
+						{
+							m_selected += local_menu_event.num_lines;
+							validate_selection(1);
+						}
 						top_line += (m_selected >= top_line + m_visible_items + (top_line != 0));
 						if (m_selected >= (top_line + m_visible_items + (top_line != 0)))
 							top_line += local_menu_event.num_lines;
@@ -1108,8 +1118,13 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 			top_line--;
 			return;
 		}
-		is_first_selected() ? m_selected = top_line = m_items.size() - 1 : --m_selected;
-		validate_selection(-1);
+		if (is_first_selected())
+			select_last_item();
+		else
+		{
+			--m_selected;
+			validate_selection(-1);
+		}
 		top_line -= (m_selected <= top_line && top_line != 0);
 		if (m_selected <= top_line && m_visible_items != m_visible_lines)
 			top_line--;
@@ -1123,8 +1138,13 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 			top_line++;
 			return;
 		}
-		is_last_selected() ? m_selected = top_line = 0 : ++m_selected;
-		validate_selection(1);
+		if (is_last_selected())
+			select_first_item();
+		else
+		{
+			++m_selected;
+			validate_selection(1);
+		}
 		top_line += (m_selected >= top_line + m_visible_items + (top_line != 0));
 		if (m_selected >= (top_line + m_visible_items + (top_line != 0)))
 			top_line++;
@@ -1153,17 +1173,11 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 
 	// home goes to the start
 	if (exclusive_input_pressed(iptkey, IPT_UI_HOME, 0))
-	{
-		m_selected = top_line = 0;
-		validate_selection(1);
-	}
+		select_first_item();
 
 	// end goes to the last
 	if (exclusive_input_pressed(iptkey, IPT_UI_END, 0))
-	{
-		m_selected = top_line = m_items.size() - 1;
-		validate_selection(-1);
-	}
+		select_last_item();
 
 	// pause enables/disables pause
 	if (!ignorepause && exclusive_input_pressed(iptkey, IPT_UI_PAUSE, 0))
@@ -1189,6 +1203,30 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 				break;
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  select_first_item - select the first item in
+//  the menu
+//-------------------------------------------------
+
+void menu::select_first_item()
+{
+	m_selected = top_line = 0;
+	validate_selection(1);
+}
+
+
+//-------------------------------------------------
+//  select_last_item - select the last item in the
+//  menu
+//-------------------------------------------------
+
+void menu::select_last_item()
+{
+	m_selected = top_line = m_items.size() - 1;
+	validate_selection(-1);
 }
 
 

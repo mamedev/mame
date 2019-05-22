@@ -175,6 +175,8 @@ protected:
 	// changes the index of the currently selected menu item
 	void set_selection(void *selected_itemref);
 	void set_selected_index(int index) { m_selected = index; }
+	void select_first_item();
+	void select_last_item();
 
 	int hover() const { return m_hover; }
 	void set_hover(int index) { m_hover = index; }
