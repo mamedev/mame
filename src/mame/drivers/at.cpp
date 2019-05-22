@@ -2152,17 +2152,27 @@ ROM_START( pcd4nd )
 ROM_END
 
 // Triumph-Adler Walkstation 386 SX - German version of the Olivetti S20
-// SiS TOPCAT chipset
+// VLSI VL82C320 + VL82C331; DP8473V
 ROM_START( walk386sx )
 	ROM_REGION( 0x20000, "bios", 0 ) // contains Cirrus Logic VGA BIOS
 	ROM_LOAD( "cthj01_1014.bin", 0x00000, 0x20000, CRC(805084b9) SHA1(a92d78050844ccbcce53109c42603639aedd2335) )
+
+	ROM_REGION( 0x2000, "mcu", 0 ) // MC68HC805B6FN
+	ROM_LOAD( "cthj02_08_76.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x1000, "cop888", 0 ) // COPCL888-RDT/V
+	ROM_LOAD( "s9124ab_c4_e904-34162_00.bin", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 // Triumph-Adler Walkstation 386DX - German version of the Olivetti D33
-// SiS TOPCAT chipset
+// VLSI TOPCAT chipset: VL82C330 + VL82C331 + VL82C332 + VL82C106; Austek A38202C; DP8473V
+// Video board: Cirrus Logic CL-GD610 + CL-GD620 + CL-GD63
 ROM_START( walk386dx )
 	ROM_REGION( 0x20000, "bios", 0 ) // contains Cirrus Logic VGA BIOS
 	ROM_LOAD( "am28f010_ctaa060125rc.bin", 0x00000, 0x20000, CRC(6cc540fe) SHA1(9853793d5433bbc5efc09c7f31c4a8a8f78d4549) )	
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "cthj02_03_76.bin", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 // Nokia Data WS286
