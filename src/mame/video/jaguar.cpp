@@ -547,7 +547,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 		m_blitter_status = 0;
 		int inner_count = m_blitter_regs[B_COUNT] & 0xffff;
 		int outer_count = m_blitter_regs[B_COUNT] >> 16;
-		timer_set(attotime::from_ticks(inner_count * outer_count, JAGUAR_CLOCK), TID_BLITTER_DONE);
+		timer_set(attotime::from_ticks(inner_count * outer_count, m_gpu->clock()), TID_BLITTER_DONE);
 		blitter_run();
 	}
 
@@ -611,7 +611,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 			case PIT1:
 				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
-					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
+					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
 					timer_set(sample_period, TID_PIT);
 				}
 				break;
@@ -724,7 +724,7 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			}
 			if (m_gpu_regs[PIT0] != 0)
 			{
-				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
+				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
 				timer_set(sample_period, TID_PIT);
 			}
 			break;
