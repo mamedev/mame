@@ -5002,7 +5002,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234663">
-				<rom name="Firebug.woz" size="234663" crc="7a8589a3" sha1="9a17562f0aed6654fe91c7a4c0c3c6fe7586e13e" offset="0x0000" />
+				<rom name="Firebug.woz" size="234663" crc="7a8589a3" sha1="9a17562f0aed6654fe91c7a4c0c3c6fe7586e13e" />
 			</dataarea>
 		</part>
 	</software>
@@ -5018,7 +5018,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="146126">
-				<rom name="The Sands of Egypt.woz" size="146126" crc="ca5a619f" sha1="de22ad7c12cd880749ed97fed815043c396feac1" offset="0x0000" />
+				<rom name="The Sands of Egypt.woz" size="146126" crc="ca5a619f" sha1="de22ad7c12cd880749ed97fed815043c396feac1" />
 			</dataarea>
 		</part>
 	</software>
@@ -5033,7 +5033,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="81684">
-				<rom name="Buzzard Bait.woz" size="81684" crc="521d7005" sha1="3b3855d1cea58548ad503baa933639c961ec15b4" offset="0x0000" />
+				<rom name="Buzzard Bait.woz" size="81684" crc="521d7005" sha1="3b3855d1cea58548ad503baa933639c961ec15b4" />
 			</dataarea>
 		</part>
 	</software>
@@ -5050,13 +5050,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234757">
-				<rom name="Heavy Barrel side A.woz" size="234757" crc="6df81830" sha1="a764646f1da9e2355702b6104aab0d15c1828a59" offset="0x0000" />
+				<rom name="Heavy Barrel side A.woz" size="234757" crc="6df81830" sha1="a764646f1da9e2355702b6104aab0d15c1828a59" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234757">
-				<rom name="Heavy Barrel side B.woz" size="234757" crc="0148e4f3" sha1="2d61d85912b8cf670c79b6e7e2d8c3a801519638" offset="0x0000" />
+				<rom name="Heavy Barrel side B.woz" size="234757" crc="0148e4f3" sha1="2d61d85912b8cf670c79b6e7e2d8c3a801519638" />
 			</dataarea>
 		</part>
 	</software>
@@ -5072,13 +5072,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="327972">
-				<rom name="The Arcade Machine side A.woz" size="327972" crc="2734531d" sha1="ba2a60fc646710f4d5d1cf46a6bd8f22a0828fab" offset="0x0000" />
+				<rom name="The Arcade Machine side A.woz" size="327972" crc="2734531d" sha1="ba2a60fc646710f4d5d1cf46a6bd8f22a0828fab" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234642">
-				<rom name="The Arcade Machine side B.woz" size="234642" crc="ffa3c0a0" sha1="8ebb8f3d339ee0767eee306db63b80eccdc11941" offset="0x0000" />
+				<rom name="The Arcade Machine side B.woz" size="234642" crc="ffa3c0a0" sha1="8ebb8f3d339ee0767eee306db63b80eccdc11941" />
 			</dataarea>
 		</part>
 	</software>
@@ -5093,7 +5093,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233449">
-				<rom name="Battlezone.woz" size="233449" crc="c2842b0f" sha1="b466c5e38944ff0b74d46b43178611278f2fd785" offset="0x0000" />
+				<rom name="Battlezone.woz" size="233449" crc="c2842b0f" sha1="b466c5e38944ff0b74d46b43178611278f2fd785" />
 			</dataarea>
 		</part>
 	</software>
@@ -5108,7 +5108,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="108291">
-				<rom name="Locksmith 4.1.woz" size="108291" crc="fa9116e7" sha1="6f6528a640bd4a5643b339e59a5ba99f8fba2d01" offset="0x0000" />
+				<rom name="Locksmith 4.1.woz" size="108291" crc="fa9116e7" sha1="6f6528a640bd4a5643b339e59a5ba99f8fba2d01" />
 			</dataarea>
 		</part>
 	</software>
@@ -5125,7 +5125,57 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241457">
-				<rom name="Magic Spells.woz" size="241457" crc="81351a7b" sha1="9b7aa0a41629a182a90871c638268c50adebde34" offset="0x0000" />
+				<rom name="Magic Spells.woz" size="241457" crc="81351a7b" sha1="9b7aa0a41629a182a90871c638268c50adebde34" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutthr23">
+		<description>Cutthroats (Release 23)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-05-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234802">
+				<rom name="Cutthroats.woz" size="234802" crc="34602a0d" sha1="da517b9cbd99f917b8efd6f9c0cfc69a09aa5e16" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trinr11">
+		<description>Trinity (Release 11)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-05-22"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234744">
+				<rom name="Trinity side A.woz" size="234744" crc="1b9bf646" sha1="dfcb84e4b61bf958fa838e7556c46e36c32e15d6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234744">
+				<rom name="Trinity side B.woz" size="234744" crc="6b814a97" sha1="4e6ae3a33788e47bac09a7d8f6e160d879f8b263" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfall107">
+		<description>Stationfall (Release 107)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-05-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="Stationfall.woz" size="234780" crc="838e69ae" sha1="40d7512e921b76d79a28d03cce744854971583e6" />
 			</dataarea>
 		</part>
 	</software>
