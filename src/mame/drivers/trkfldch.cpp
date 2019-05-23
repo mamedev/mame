@@ -289,6 +289,15 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
+	case 0x02: // ends up being read as a side effect of reading a 16-bit word at 0x1, but also directly too?
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x03: // ends up being read as a side effect of reading a 16-bit word at 0x2, any other purpose?
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+
 	case 0x04:
 		ret = 0xff;
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
@@ -298,6 +307,40 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 		ret = 0xff;
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
+
+	case 0x06:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+
+	case 0x42:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x43:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x44:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+
+
+	case 0x54:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x55:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x56: // side effect of reading 55
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+
+
 
 	case 0x70: // read in irq (inputs?)
 		ret = ioport("IN0")->read();
@@ -316,6 +359,28 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 	case 0x74:
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
+
+	case 0x75:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x76:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x77:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x7f:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x80: // only read as a side-effect of reading 0x7f?
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+
 
 	case 0xb6:
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
