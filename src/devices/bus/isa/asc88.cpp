@@ -5,6 +5,10 @@
     ASC-88 SCSI Adapter
     © 1985 Advanced Storage Concepts, Inc.
 
+    This is a rather basic 8-bit SCSI host adapter on a quarter-size card.
+    IRQ and DMA channels are software-selectable. There is a 2K HM6116P-2
+    SRAM on board, but not all of it seems to be addressable.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -103,11 +107,11 @@ void asc88_device::control_w(u8 data)
 
 	if (m_irq)
 	{
-		if (BIT(m_control, 3))
+		if (BIT(changing_bits, 3))
 			m_isa->irq2_w(BIT(data, 3));
-		if (BIT(m_control, 4))
+		if (BIT(changing_bits, 4))
 			m_isa->irq3_w(BIT(data, 4));
-		if (BIT(m_control, 5))
+		if (BIT(changing_bits, 5))
 			m_isa->irq5_w(BIT(data, 5));
 	}
 
