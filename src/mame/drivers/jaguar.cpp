@@ -1849,6 +1849,8 @@ void jaguar_state::cojagr3k(machine_config &config)
 	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
+	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
+
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1903,6 +1905,8 @@ void jaguar_state::jaguar(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
+
+	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
