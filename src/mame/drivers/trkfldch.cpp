@@ -201,7 +201,7 @@ GFXDECODE_END
 	   0010 used in irq 0x08
 	   0020 used in irq 0x0a
 	   0x40 used in irq 0x0c
-	   0x80 used in irq 0x0e
+	   0x80 used in irq 0x0e (and by code accessing other ports in the main execution?!)
 
 7801 : 0001 used in irq 0x10
      : 0002 used in irq 0x12
