@@ -155,7 +155,7 @@ READ8_MEMBER(trkfldch_state::read_vector)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::nmk16_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::scanline)
 {
 	int scanline = param;
 
@@ -236,7 +236,7 @@ void trkfldch_state::trkfldch(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trkfldch_state::trkfldch_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &trkfldch_state::vectors_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(trkfldch_state::nmk16_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(trkfldch_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
