@@ -59,9 +59,6 @@ private:
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(unk_7804_read);
-	DECLARE_READ8_MEMBER(unk_7805_read);
-
 	DECLARE_READ8_MEMBER(read_vector);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -85,15 +82,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 }
 
 
-READ8_MEMBER(trkfldch_state::unk_7804_read)
-{
-	return 0xff;
-}
 
-READ8_MEMBER(trkfldch_state::unk_7805_read)
-{
-	return 0xff;
-}
 
 void trkfldch_state::trkfldch_map(address_map &map)
 {
@@ -105,8 +94,6 @@ void trkfldch_state::trkfldch_map(address_map &map)
 
 	// 7800 - 78xx look like registers?
 	map(0x007800, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
-	map(0x007804, 0x007804).r(FUNC(trkfldch_state::unk_7804_read));
-	map(0x007805, 0x007805).r(FUNC(trkfldch_state::unk_7805_read));
 
 	map(0x008000, 0x3fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
@@ -206,7 +193,33 @@ GFXDECODE_END
 READ8_MEMBER(trkfldch_state::unkregs_r)
 {
 	uint8_t ret = m_unkregs[offset];
-	logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+
+	switch (offset)
+	{
+	case 0x0: // IO maybe?
+		ret = machine().rand();
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x1: // IO maybe?
+		ret = machine().rand();
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x4:
+		ret = 0xff;
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0x5:
+		ret = 0xff;
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	default:
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+	}
 	return ret;
 }
 
