@@ -220,25 +220,31 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 	switch (offset)
 	{
-	case 0x0: // IRQ status?, see above
+	case 0x00: // IRQ status?, see above
 		ret = machine().rand();
-		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x1: // IRQ status?, see above
+	case 0x01: // IRQ status?, see above
 		ret = machine().rand();
-		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x4:
+	case 0x04:
 		ret = 0xff;
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x5:
+	case 0x05: // only read as a side effect of reading port 0x4 in 16-bit mode?
 		ret = 0xff;
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
+
+	case 0x70: // read in irq (inputs?)
+		ret = machine().rand();
+		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
 
 	default:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
@@ -251,16 +257,331 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 {
 	switch (offset)
 	{
-	case 0x0: // IRQ ack/force?, see above
-		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x00: // IRQ ack/force?, see above
+	//	logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x1: // IRQ maybe status, see above
-		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x01: // IRQ maybe status, see above
+	//	logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
+
+	case 0x02: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x03: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x04: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x05: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+	// is it significant that 0x10 goes up to 0x1a, 0x20 to 0x2b, 0x30 to 0x3b could be 3 sets of similar things?
+
+	case 0x10:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x11:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x12: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x13:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x14: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x15:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x16:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x17:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x18:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x19:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x1a:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+
+	case 0x20: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x21: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x22: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+	
+	case 0x23: // after a long time
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x24: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x25: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x26:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x27:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x28:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x29:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x2a:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x2b:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+
+	case 0x30:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x31:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x32: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x33: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x34: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x36: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x37: // rarely
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x3a:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x3b:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+
+	case 0x42:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x43:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+
+	case 0x54: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x55: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x56: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+	case 0x60:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x61:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x62:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x63:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x64:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x65:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x66:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x67: // after a long time
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x68: // rarely (my1stddr)
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x69: // after a long time
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x6b: // after a long time
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x6c: // rarely (my1stddr)
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x6d: // after a long time
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+	// 7x = I/O area?
+
+
+	case 0x71: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x72: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x73: // some kind of serial device?
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x74: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x75: // some kind of serial device? (used with 73?)
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x76: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x77: // every second or so
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+	
+	case 0x78: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x79: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x7a: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x7f: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+	case 0x81: // startup (my1stddr)
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x82: // startup (my1stddr)
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x83:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x84:
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+	case 0xb5: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0xb6: // significant data transfer shortly after boot
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+
+
+	case 0xca: // startup
+		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
 
 	default:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		//printf("%s: unkregs_w %04x %02x\n", machine().describe_context().c_str(), offset, data);
 		break;
 	}
 
