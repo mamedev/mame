@@ -348,7 +348,6 @@ void pgm_022_025_state::init_killbld()
 
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
-	m_igs022->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = killbld_source_data;
 }
 
@@ -359,7 +358,6 @@ void pgm_022_025_state::init_drgw3()
 
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
-	m_igs022->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = dw3_source_data;
 }
 
@@ -368,7 +366,7 @@ void pgm_022_025_state::killbld_mem(address_map &map)
 {
 	pgm_mem(map);
 	map(0x100000, 0x2fffff).bankr("bank1"); /* Game ROM */
-	map(0x300000, 0x303fff).ram().share("sharedprotram"); // Shared with protection device
+	map(0x300000, 0x303fff).ram().share("igs022:sharedprotram"); // Shared with protection device
 }
 
 
