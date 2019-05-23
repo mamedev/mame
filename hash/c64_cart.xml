@@ -6664,7 +6664,7 @@
 	<software name="fcc">
 		<description>The Final ChessCard (Eng, v0.9/v1.0)</description>
 		<year>1989</year>
-		<publisher>Tasc</publisher>
+		<publisher>TASC</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="fcc" />
@@ -6685,7 +6685,7 @@
 	<software name="fccg">
 		<description>The Final ChessCard (Ger, v1.3/v1.5)</description>
 		<year>1990</year>
-		<publisher>Tasc</publisher>
+		<publisher>TASC</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="fcc" />
@@ -6706,7 +6706,7 @@
 	<software name="fccgo">
 		<description>The Final ChessCard (Ger, v0.9/v1.0)</description>
 		<year>1989</year>
-		<publisher>Tasc</publisher>
+		<publisher>TASC</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="fcc" />

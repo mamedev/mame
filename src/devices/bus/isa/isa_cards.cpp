@@ -159,6 +159,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dectalk", ISA8_DECTALK);
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
+	device.option_add("finalchs", ISA8_FINALCHS);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);
