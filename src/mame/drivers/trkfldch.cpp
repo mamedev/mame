@@ -15,21 +15,10 @@ TV0002 R1.0       Track & Field
 
 DDR & TF PCBs look identical, all the parts are in the same place, the traces are the same, and the silkscreened part # for resistors and caps are the same.
 
-currently dies after call at
+Some of m_unkregs must retain value (or return certain things) or RAM containing vectors gets blanked and game crashes.
+The G65816 code on these is VERY ugly and difficult to follow, many redundant statements, excessive mode switching, accessing things via pointers to pointers etc.
 
-00:AE85: LDA $0b
-00:AE87: TAX
-00:AE88: LDA $0d
-00:AE8A: JSL $00a044
-
-00:A044: SEP #$20
-00:A046: PHA
-00:A047: REP #$20
-00:A049: DEX
-00:A04A: PHX
-00:A04B: RTL
-
-which pushes some values onto the stack, then RTLs to them (but the values at $0b and $0d at both 00, so it jumps to 0 and dies)
+One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM or some debug trap for development?
 
 */
 
@@ -40,6 +29,8 @@ which pushes some values onto the stack, then RTLs to them (but the values at $0
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/timer.h"
+
 
 class trkfldch_state : public driver_device
 {
@@ -52,6 +43,7 @@ public:
 	{ }
 
 	void trkfldch(machine_config &config);
+	void vectors_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -69,6 +61,18 @@ private:
 
 	DECLARE_READ8_MEMBER(unk_7804_read);
 	DECLARE_READ8_MEMBER(unk_7805_read);
+
+	DECLARE_READ8_MEMBER(read_vector);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+
+	uint8_t m_which_vector;
+
+	DECLARE_READ8_MEMBER(unkregs_r);
+	DECLARE_WRITE8_MEMBER(unkregs_w);
+
+	uint8_t m_unkregs[0x100];
+
 };
 
 void trkfldch_state::video_start()
@@ -100,11 +104,85 @@ void trkfldch_state::trkfldch_map(address_map &map)
 	map(0x007000, 0x0072ff).ram();
 
 	// 7800 - 78xx look like registers?
+	map(0x007800, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
 	map(0x007804, 0x007804).r(FUNC(trkfldch_state::unk_7804_read));
 	map(0x007805, 0x007805).r(FUNC(trkfldch_state::unk_7805_read));
 
 	map(0x008000, 0x3fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
+
+void trkfldch_state::vectors_map(address_map &map)
+{
+	map(0x00, 0x1f).r(FUNC(trkfldch_state::read_vector));
+}
+
+READ8_MEMBER(trkfldch_state::read_vector)
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	/* what appears to be a table of vectors apepars at the START of ROM, maybe this gets copied to RAM, maybe used directly?
+	00 : (invalid)
+	02 : (invalid)
+	04 : 0xA2C6  (dummy)
+	06 : 0xA334  (real function - vbl?)
+	08 : 0xA300  (dummy)
+	0a : 0xA2E0  (dummy)
+	0c : 0xA2B9  (dummy)
+	0e : 0xA2ED  (dummy)
+	10 : 0xA2D3  (dummy)
+	12 : 0xA327  (dummy)
+	14 : 0xA30D  (real function)
+	16 : 0x6000  (points at ram? or some internal ROM? we have nothing mapped here, not cleared as RAM either)
+	18 : 0xA31A  (dummy)
+	1a : 0xA2AC  (dummy)
+	1c : 0xA341  (boot vector)
+	1e : (invalid)
+	*/
+
+	logerror("reading vector offset %02x\n", offset);
+
+	if (offset == 0x0b)
+	{	// NMI
+		return rom[m_which_vector+1];
+	}
+	else if (offset == 0x0a)
+	{	// NMI
+		return rom[m_which_vector];
+	}
+
+	// boot vector
+	return rom[offset];
+}
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::nmk16_scanline)
+{
+	int scanline = param;
+
+	if (scanline == 200)
+	{
+		m_which_vector = 0x06;
+		m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+	}
+	else if (scanline == 201)
+	{
+		m_which_vector = 0x06;
+		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+	}
+
+	if (scanline == 20)
+	{
+		m_which_vector = 0x14;
+		m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+	}
+	else if (scanline == 21)
+	{
+		m_which_vector = 0x14;
+		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+	}
+
+}
+
 
 static INPUT_PORTS_START( trkfldch )
 INPUT_PORTS_END
@@ -125,46 +203,40 @@ static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
+READ8_MEMBER(trkfldch_state::unkregs_r)
+{
+	uint8_t ret = m_unkregs[offset];
+	logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+WRITE8_MEMBER(trkfldch_state::unkregs_w)
+{
+	logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+	m_unkregs[offset] = data;
+}
+
 void trkfldch_state::machine_start()
 {
 }
 
 void trkfldch_state::machine_reset()
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	m_which_vector = 0x06;
 
-	int vector = 0xe;
-
-	/* what appears to be a table of vectors apepars at the START of ROM, maybe this gets copied to RAM, maybe used directly?
-	0: (invalid)
-	1: (invalid)
-	2: 0xA2C6
-	3: 0xA334
-	4: 0xA300
-	5: 0xA2E0
-	6: 0xA2B9
-	7: 0xA2ED   // possible irq vector pointer, THIS IS NOT THE BOOT CODE!
-	8: 0xA2D3
-	9: 0xA327
-	a: 0xA30D
-	b: 0x6000
-	c: 0xA31A
-	d: 0xA2AC
-	e: 0xA341
-	f: (invalid)
-	*/
-
-	uint16_t addr = (rom[vector * 2 + 1] << 8) | (rom[vector * 2]);
-
-	m_maincpu->set_state_int(1, addr);
+	for (int i = 0; i < 0x100; i++)
+		m_unkregs[i] = 0x00;
 }
 
 void trkfldch_state::trkfldch(machine_config &config)
 {
 	/* basic machine hardware */
 	G65816(config, m_maincpu, 20000000);
-	//m_maincpu->set_addrmap(AS_DATA, &tv965_state::mem_map);
+	//m_maincpu->set_addrmap(AS_DATA, &trkfldch_state::mem_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trkfldch_state::trkfldch_map);
+	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &trkfldch_state::vectors_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(trkfldch_state::nmk16_scanline), "screen", 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
