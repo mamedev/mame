@@ -199,7 +199,7 @@ void pmmu_atc_flush_fc_ea(const u16 modes)
 {
 	const int fcmask = (modes >> 5) & 7;
 	const int fc = fc_from_modes(modes) & fcmask;
-	const int ps = (m_mmu_tc >> 16) & 0xf;
+	const int ps = (m_mmu_tc >> 20) & 0xf;
 	const int mode = (modes >> 10) & 7;
 	u32 ea;
 
