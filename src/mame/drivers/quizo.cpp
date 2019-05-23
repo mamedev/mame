@@ -39,6 +39,8 @@ public:
 	quizo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_vrambank(*this, "vram")
 	{ }
 
 	void quizo(machine_config &config);
@@ -47,18 +49,18 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_memory_bank m_vrambank;
 
-	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t m_port60;
-	uint8_t m_port70;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(port70_w);
+	DECLARE_WRITE8_MEMBER(vrambank_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 
 	void quizo_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -96,44 +98,29 @@ void quizo_state::quizo_palette(palette_device &palette) const
 	}
 }
 
-uint32_t quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for(int y = 0; y < 200; y++)
+	for (int y = 0; y < 200; y++)
 	{
-		for(int x = 0; x < 80; x++)
+		for (int x = 0; x < 80; x++)
 		{
-			int data=m_videoram[y*80+x];
-			int data1=m_videoram[y*80+x+0x4000];
-			int pix;
+			uint8_t data1 = m_vram[y * 80 + x];
+			uint8_t data2 = m_vram[y * 80 + x + 0x4000];
 
-			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			bitmap.pix16(y, x*4+3) = pix;
-			data>>=1;
-			data1>>=1;
-			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			bitmap.pix16(y, x*4+2) = pix;
-			data>>=1;
-			data1>>=1;
-			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			bitmap.pix16(y, x*4+1) = pix;
-			data>>=1;
-			data1>>=1;
-			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			bitmap.pix16(y, x*4+0) = pix;
+			// draw 4 pixels
+			bitmap.pix32(y, x * 4 + 0) = m_palette->pen((BIT(data2, 7) << 3) | (BIT(data2, 3) << 2) | (BIT(data1, 7) << 1) | BIT(data1, 3));
+			bitmap.pix32(y, x * 4 + 1) = m_palette->pen((BIT(data2, 6) << 3) | (BIT(data2, 2) << 2) | (BIT(data1, 6) << 1) | BIT(data1, 2));
+			bitmap.pix32(y, x * 4 + 2) = m_palette->pen((BIT(data2, 5) << 3) | (BIT(data2, 1) << 2) | (BIT(data1, 5) << 1) | BIT(data1, 1));
+			bitmap.pix32(y, x * 4 + 3) = m_palette->pen((BIT(data2, 4) << 3) | (BIT(data2, 0) << 2) | (BIT(data1, 4) << 1) | BIT(data1, 0));
 		}
 	}
+
 	return 0;
 }
 
-WRITE8_MEMBER(quizo_state::vram_w)
+WRITE8_MEMBER(quizo_state::vrambank_w)
 {
-	int bank=(m_port70&8)?1:0;
-	m_videoram[offset+bank*0x4000]=data;
-}
-
-WRITE8_MEMBER(quizo_state::port70_w)
-{
-	m_port70=data;
+	m_vrambank->set_entry(BIT(data, 3));
 }
 
 WRITE8_MEMBER(quizo_state::port60_w)
@@ -152,7 +139,7 @@ void quizo_state::memmap(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xffff).w(FUNC(quizo_state::vram_w));
+	map(0xc000, 0xffff).bankw("vram");
 
 }
 
@@ -164,7 +151,7 @@ void quizo_state::portmap(address_map &map)
 	map(0x40, 0x40).portr("IN2");
 	map(0x50, 0x51).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x60, 0x60).w(FUNC(quizo_state::port60_w));
-	map(0x70, 0x70).w(FUNC(quizo_state::port70_w));
+	map(0x70, 0x70).w(FUNC(quizo_state::vrambank_w));
 }
 
 static INPUT_PORTS_START( quizo )
@@ -232,9 +219,8 @@ void quizo_state::quizo(machine_config &config)
 	screen.set_size(320, 200);
 	screen.set_visarea(0*8, 320-1, 0*8, 200-1);
 	screen.set_screen_update(FUNC(quizo_state::screen_update));
-	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(quizo_state::quizo_palette), 16);
+	PALETTE(config, m_palette, FUNC(quizo_state::quizo_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -275,12 +261,13 @@ ROM_END
 
 void quizo_state::init_quizo()
 {
-	m_videoram=std::make_unique<uint8_t[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
 
-	save_pointer(NAME(m_videoram), 0x4000*2);
+	m_vram = std::make_unique<uint8_t[]>(0x8000);
+	m_vrambank->configure_entries(0, 2, &m_vram[0], 0x4000);
+
+	save_pointer(NAME(m_vram), 0x8000);
 	//save_item(NAME(m_port60));
-	save_item(NAME(m_port70));
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state, init_quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", MACHINE_SUPPORTS_SAVE )
