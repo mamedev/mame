@@ -301,20 +301,28 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 	case 0x70: // read in irq (inputs?)
 		ret = ioport("IN0")->read();
-		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x71:
 		ret = ioport("IN1")->read();
-		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x73:
-		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x74:
-		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0xb6:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		break;
+
+	case 0xb7:
+		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
