@@ -85,7 +85,9 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	// at e9c in trkfldch
+	// at 0x1189 in my1stddr
+	// at 0xe9c (actually 0x0d0c when fully populated) in trkfldch
+	// 7861 / 7860 point here most of the time in both games (so maybe DMA source, or just uses a direct pointer)
 
 	for (int i = 0x1189; i < 0x1600; i += 5)
 	{
