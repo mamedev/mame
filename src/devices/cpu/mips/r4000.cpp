@@ -2928,7 +2928,7 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 		if (invalid || modify || (SR & SR_EXL))
 			cpu_exception(modify ? EXCEPTION_MOD : (intention & TRANSLATE_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL);
 		else
-			cpu_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL, extended ? 0x000 : 0x080);
+			cpu_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL, extended ? 0x080 : 0x000);
 	}
 
 	return MISS;
