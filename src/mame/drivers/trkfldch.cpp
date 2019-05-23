@@ -64,7 +64,7 @@ private:
 
 	DECLARE_READ8_MEMBER(read_vector);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	uint8_t m_which_vector;
 
