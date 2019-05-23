@@ -152,7 +152,7 @@
 	<software name="fcc"> <!-- optional -->
 		<description>The Final ChessCard</description>
 		<year>1990</year>
-		<publisher>TASC</publisher>
+		<publisher>Tasc</publisher>
 		<sharedfeat name="requirement" value="c64_cart:fcc"/>
 
 		<part name="flop1" interface="floppy_5_25">

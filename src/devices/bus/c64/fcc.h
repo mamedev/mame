@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder, hap
 /**********************************************************************
 
-    TASC Final ChessCard cartridge emulation
+    Tasc Final ChessCard cartridge emulation
 
 **********************************************************************/
 

@@ -2,11 +2,13 @@
 // copyright-holders:hap
 /*
 
-Final ChessCard by TASC
+The Final ChessCard by Tasc
 
 8-bit ISA card, comes with its own CPU (G65SC02P-4 @ 5MHz), and chess engine on 32KB ROM.
 It is similar to the C64 version, actually not as impressive since a PC from around 1989
 should be able to run a good chess game by itself.
+
+Tasc later released The ChessMachine ISA card, not emulated yet.
 
 */
 
@@ -66,7 +68,7 @@ void isa8_finalchs_device::device_reset()
 
 ROM_START( finalchs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098) )
+	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098) ) // v2.0
 ROM_END
 
 const tiny_rom_entry *isa8_finalchs_device::device_rom_region() const

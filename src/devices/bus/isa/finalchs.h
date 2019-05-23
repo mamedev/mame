@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Final ChessCard by TASC
+  The Final ChessCard by Tasc
 
 */
 
