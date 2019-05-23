@@ -190,20 +190,44 @@ static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
+/*
+
+7800 / 7801 seem to be IRQ related
+
+7800 : 0001 - ? (there is no irq 0x00)
+       0002 - ? (there is no irq 0x02)
+       0004 used in irq 0x04
+       0008 used in irq 0x06
+	   0010 used in irq 0x08
+	   0020 used in irq 0x0a
+	   0x40 used in irq 0x0c
+	   0x80 used in irq 0x0e
+
+7801 : 0001 used in irq 0x10
+     : 0002 used in irq 0x12
+	 : 0004 used in irq 0x14
+	 : 0008 - ? (there is no irq 0x016, it points to unknown area? and we have no code touching this bit)
+	 : 0010 used in irq 0x18
+	 : 0020 used in irq 0x1a and 0x06?! (used with OR instead of EOR in 0x06, force IRQ?)
+	 : 0x40 - ? (there is no irq 0x1c - it's the boot vector)
+	 : 0x80 - ? (there is no irq 0x1e)
+
+*/
+
 READ8_MEMBER(trkfldch_state::unkregs_r)
 {
 	uint8_t ret = m_unkregs[offset];
 
 	switch (offset)
 	{
-	case 0x0: // IO maybe?
+	case 0x0: // IRQ status?, see above
 		ret = machine().rand();
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x1: // IO maybe?
+	case 0x1: // IRQ status?, see above
 		ret = machine().rand();
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x4:
@@ -225,7 +249,21 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 WRITE8_MEMBER(trkfldch_state::unkregs_w)
 {
-	logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+	switch (offset)
+	{
+	case 0x0: // IRQ ack/force?, see above
+		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x1: // IRQ maybe status, see above
+		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	default:
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+	}
+
 	m_unkregs[offset] = data;
 }
 
