@@ -481,6 +481,7 @@ TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_int_sync)
 {
 	m_sound_int = param;
 	m_cpu->set_input_line(M6801_TIN_LINE, (m_sound_int ? ASSERT_LINE : CLEAR_LINE));
+	update_led();
 }
 
 //-------------------------------------------------
@@ -549,9 +550,17 @@ READ8_MEMBER(bally_cheap_squeak_device::in_p2_cb)
 
 WRITE8_MEMBER(bally_cheap_squeak_device::out_p2_cb)
 {
-	bool sound_ack = data & 0x01;
+	m_sound_ack = BIT(data, 0);
 	if (!m_sound_ack_w_handler.isnull())
 	{
-		m_sound_ack_w_handler(sound_ack);
+		m_sound_ack_w_handler(m_sound_ack);
 	}
+	update_led();
+}
+
+void bally_cheap_squeak_device::update_led()
+{
+	// Either input or output can pull the led line high
+	bool led_state = m_sound_int || m_sound_ack;
+	machine().output().set_value("sound_led0", led_state);
 }

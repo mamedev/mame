@@ -236,6 +236,7 @@ protected:
 private:
 	uint8_t m_sound_select;
 	bool m_sound_int;
+	bool m_sound_ack;
 
 	devcb_write_line m_sound_ack_w_handler;
 
@@ -245,6 +246,8 @@ private:
 	DECLARE_WRITE8_MEMBER(out_p1_cb);
 	DECLARE_READ8_MEMBER(in_p2_cb);
 	DECLARE_WRITE8_MEMBER(out_p2_cb);
+
+	void update_led();
 };
 
 #endif // MAME_AUDIO_BALLY_H
