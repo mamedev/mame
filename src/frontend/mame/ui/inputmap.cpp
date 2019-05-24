@@ -160,12 +160,10 @@ menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container 
 void menu_input_specific::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
-	int port_count = 0;
 
 	/* iterate over the input ports and add menu items */
 	for (auto &port : machine().ioport().ports())
 	{
-		port_count++;
 		for (ioport_field &field : port.second->fields())
 		{
 			ioport_type_class type_class = field.type_class();
