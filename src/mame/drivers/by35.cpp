@@ -208,8 +208,8 @@ private:
 	optional_device<bally_as3022_device> m_as3022;
 	optional_device<bally_sounds_plus_device> m_sounds_plus;
 	optional_device<bally_cheap_squeak_device> m_cheap_squeak;
-		devcb_write8 m_sound_select_handler;
-		devcb_write_line m_sound_int_handler;
+	devcb_write8 m_sound_select_handler;
+	devcb_write_line m_sound_int_handler;
 };
 
 class playboy_state : public by35_state
