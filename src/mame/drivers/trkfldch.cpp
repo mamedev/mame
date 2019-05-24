@@ -95,10 +95,8 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 	//	printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
 	//	int tilegfxbase = 0x1f80; // select mode 
 	//	int tilegfxbase = 0x2780; // 2nd demo (+0x800 from above)
-		int tilegfxbase = 0x3780; // 1st demo (+0x1000 from above)
-
-		
-
+		int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
+	
 		int y = m_mainram[i + 1];
 		int x = m_mainram[i + 3];
 		int tile = m_mainram[i + 2];
@@ -231,9 +229,9 @@ static INPUT_PORTS_START( trkfldch )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("O") // selects / forward
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY // directions correct based on 'letters' minigame
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("X") // goes back
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
