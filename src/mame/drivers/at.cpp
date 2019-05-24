@@ -1201,17 +1201,14 @@ ROM_START( at386sx )
 	// 1: BIOS-String: 30-0400-428027-00101111-070791-SCMPSX-0 / VLSI SCAMP 386SX 16/20/25MHz
 	ROM_SYSTEM_BIOS(1, "scamp", "VLSI SCAMPSX")
 	ROMX_LOAD( "ami_386sx_vlsi_scamp_070791.bin", 0x10000, 0x10000, CRC(082d071c) SHA1(69af9a951f138146036b3c9ac3761cc6589b6cf5), ROM_BIOS(1))
-	// 2: BIOS-String: 03/25/93-SARC_RC2016A-219v0000 / CX 386SX System
-	ROM_SYSTEM_BIOS(2, "cxsxd", "CX SXD")
-	ROMX_LOAD( "award_cx-sxd_v4.50.srd.bin", 0x10000, 0x10000, CRC(ef1c74d7) SHA1(b40b1cb7143c4e352798bdf3b488d9342a4029a7), ROM_BIOS(2))
-	// 3: NCR 386 CPU card
-	ROM_SYSTEM_BIOS(3, "ncr386sx", "NCR 386sx card") // Upgrade card for e.g. NCR PC-8 - Setup Version 2.7.1
-	ROMX_LOAD( "ncr_386sx_u12-19_7.3.bin", 0x10001, 0x8000, CRC(9e4c9a2a) SHA1(0a45d9f04f03b7ae39734916af7786bc52e5e917), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "ncr_386sx_u46-17_7.3.bin", 0x10000, 0x8000, CRC(73ad83a2) SHA1(bf6704fb4a0da37251f192cea3af2bc8cc2e9cdb), ROM_SKIP(1) | ROM_BIOS(3))
+	// 2: NCR 386 CPU card
+	ROM_SYSTEM_BIOS(2, "ncr386sx", "NCR 386sx card") // Upgrade card for e.g. NCR PC-8 - Setup Version 2.7.1
+	ROMX_LOAD( "ncr_386sx_u12-19_7.3.bin", 0x10001, 0x8000, CRC(9e4c9a2a) SHA1(0a45d9f04f03b7ae39734916af7786bc52e5e917), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "ncr_386sx_u46-17_7.3.bin", 0x10000, 0x8000, CRC(73ad83a2) SHA1(bf6704fb4a0da37251f192cea3af2bc8cc2e9cdb), ROM_SKIP(1) | ROM_BIOS(2))
 	// ROM_LOAD( "ncr_386sx_card_150-0004508_u1_v1.1.bin", 0x0000, 0x800, CRC(dd591ac1) SHA1(5bc40ca7340fa57aaf5d707be45a288f14085807))
-	// 4: BIOS-String: 30-0501-D81105-00101111-070791-ACER1217-0 - 386SX NPM/33,40-A0(2) 05/12/1993
-	ROM_SYSTEM_BIOS(4, "m919a00", "PC-Chips M919")
-	ROMX_LOAD( "m919a00_npm-40.bin", 0x10000, 0x10000, CRC(4f330d82) SHA1(08224c7bcfb2a859b682bf44ac1ac7fd9f2ade78),ROM_BIOS(4))
+	// 3: BIOS-String: 30-0501-D81105-00101111-070791-ACER1217-0 - 386SX NPM/33,40-A0(2) 05/12/1993
+	ROM_SYSTEM_BIOS(3, "m919a00", "PC-Chips M919")
+	ROMX_LOAD( "m919a00_npm-40.bin", 0x10000, 0x10000, CRC(4f330d82) SHA1(08224c7bcfb2a859b682bf44ac1ac7fd9f2ade78),ROM_BIOS(3))
 ROM_END
 
 ROM_START( ct386sx )
@@ -1222,6 +1219,14 @@ ROM_START( ct386sx )
 	ROMX_LOAD( "012h-u24.bin", 0x10001, 0x8000, CRC(17472521) SHA1(7588c148fe53d9dc4cb2d0ab6e0fd51a39bb5d1a),ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_FILL(0x1e2c9, 1, 0x00) // skip incompatible keyboard controller test
 	ROM_FILL(0x1e2cb, 1, 0xbb) // fix checksum
+ROM_END
+
+// CX Technology, Inc. Model SXD (4x SIMM, 4x 16-bit ISA)
+// SARC RC2016A5; HM6818P; CX109; LT38C41 © Lance Corp. (keyboard controller?)
+ROM_START( cxsxd )
+	ROM_REGION(0x20000,"bios", 0)
+	// BIOS-String: 03/25/93-SARC_RC2016A-219v0000 / CX 386SX System
+	ROM_LOAD( "award_cx-sxd_v4.50.srd.bin", 0x10000, 0x10000, CRC(ef1c74d7) SHA1(b40b1cb7143c4e352798bdf3b488d9342a4029a7))
 ROM_END
 
 ROM_START( at386 )
@@ -2202,6 +2207,7 @@ COMP( 1991, fu340,     ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 19??, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Forex Computer Company", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING )
 COMP( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,     at_state,     init_at,        "<generic>",   "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1988, at386sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<generic>",   "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1993, cxsxd,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "CX Technology", "CX SXD", MACHINE_NOT_WORKING )
 COMP( 1990, at486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "<generic>",   "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1989, neat,      ibm5170, 0,       neat,      0,     at_state,     init_at,        "<generic>",   "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1989, ec1842,    ibm5150, 0,       ec1842,    0,     at_state,     init_at,        "<unknown>",   "EC-1842", MACHINE_NOT_WORKING )
