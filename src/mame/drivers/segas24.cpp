@@ -2065,6 +2065,11 @@ void segas24_state::system24_floppy_dcclub(machine_config &config)
  *
  *************************************/
 
+//*************************************************************************************************************************
+//  Hot Rod, Sega System 24
+//   Sega game ID: 833-6570-01 HOT ROD
+//     Main board: 837-6571
+// I/O Controller: 834-6510
 ROM_START( hotrod )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
