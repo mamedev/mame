@@ -43,14 +43,14 @@ Game list (* denotes not emulated yet)
 
 Serial  Series MCU     Title
 ---------------------------------------------
-AC-01*    s    ?       Ball (aka Toss-Up)
-FL-02*    s    ?       Flagman
-MT-03*    s    ?       Vermin (aka The Exterminator)
-RC-04*    s    ?       Fire (aka Fireman Fireman)
-IP-05*    g    ?       Judge
-MN-06*    g    ?       Manhole
-CN-07*    g    ?       Helmet (aka Headache)
-LN-08*    g    ?       Lion
+AC-01*    s    SM5A?   Ball (aka Toss-Up)
+FL-02*    s    SM5A?   Flagman
+MT-03*    s    SM5A?   Vermin (aka The Exterminator)
+RC-04*    s    SM5A?   Fire (aka Fireman Fireman)
+IP-05*    g    SM5A?   Judge
+MN-06*    g    SM5A?   Manhole
+CN-07*    g    SM5A?   Helmet (aka Headache)
+LN-08*    g    SM5A?   Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
