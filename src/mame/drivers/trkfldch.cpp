@@ -95,9 +95,19 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 
 		int y = m_mainram[i + 1];
 		int x = m_mainram[i + 3];
+		int tile = m_mainram[i + 2];
 
-		gfx_element *gfx = m_gfxdecode->gfx(0);
-		gfx->transpen(bitmap,cliprect,0x1000,0,0,0,x,y,0);
+		int xhigh = m_mainram[i + 4] & 0x01;
+		int yhigh = m_mainram[i + 0] & 0x01; // or enable bit?
+
+		x = x | (xhigh << 8);
+		y = y | (yhigh << 8);
+
+		y -= 0x100;
+		y -= 16;
+
+		gfx_element *gfx = m_gfxdecode->gfx(1);
+		gfx->transpen(bitmap,cliprect,tile+0x3880,0,0,0,x,y,0);
 	}
 
 	return 0;
@@ -247,8 +257,20 @@ static const gfx_layout tiles8x8_layout =
 	64*8
 };
 
+static const gfx_layout tiles16x16_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0, 1, 32, 33, 64, 65, 96, 97 },
+	{ 8,10,12,14, 0,2,4,6, 24,26,28,30, 16,18,20,22,},
+	{ STEP16(0,128) },
+	128*16,
+};
+
 static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16_layout, 0, 1 )
 GFXDECODE_END
 
 /*
