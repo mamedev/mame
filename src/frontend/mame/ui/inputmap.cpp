@@ -93,12 +93,6 @@ menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &c
 void menu_input_general::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
-	int suborder[SEQ_TYPE_TOTAL];
-
-	/* create a mini lookup table for sort order based on sequence type */
-	suborder[SEQ_TYPE_STANDARD] = 0;
-	suborder[SEQ_TYPE_DECREMENT] = 1;
-	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
 	for (input_type_entry &entry : machine().ioport().types())
@@ -166,13 +160,7 @@ menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container 
 void menu_input_specific::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
-	int suborder[SEQ_TYPE_TOTAL];
 	int port_count = 0;
-
-	/* create a mini lookup table for sort order based on sequence type */
-	suborder[SEQ_TYPE_STANDARD] = 0;
-	suborder[SEQ_TYPE_DECREMENT] = 1;
-	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
 	for (auto &port : machine().ioport().ports())

@@ -152,7 +152,7 @@ WRITE8_MEMBER(isa8_finalchs_device::finalchs_w)
 void isa8_finalchs_device::finalchs_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x7f00, 0x7f00).mirror(0x00ff).r(m_sublatch, FUNC(generic_latch_8_device::read)).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 	//map(0x6000, 0x6000).noprw(); // ?
+	map(0x7f00, 0x7f00).mirror(0x00ff).r(m_sublatch, FUNC(generic_latch_8_device::read)).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 	map(0x8000, 0xffff).rom();
 }
