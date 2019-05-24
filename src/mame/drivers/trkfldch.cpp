@@ -95,8 +95,9 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 	//	printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
 	//	int tilegfxbase = 0x1f80; // select mode 
 	//	int tilegfxbase = 0x2780; // 2nd demo (+0x800 from above)
-		int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
-	
+	//	int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
+		int tilegfxbase = (m_unkregs[0x15] * 0x800) - 0x80;
+
 		int y = m_mainram[i + 1];
 		int x = m_mainram[i + 3];
 		int tile = m_mainram[i + 2];
