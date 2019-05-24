@@ -1079,9 +1079,6 @@ ROM_START( at )
 	// 28: BIOS-String: DH12-1343-061390-K0
 	ROM_SYSTEM_BIOS(28, "headland", "Headland")
 	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(28) )
-	// 29: BIOS-String: 20-0300-00834-00101111-050591-SARC286 / [80286 Standard System 2V1]
-	ROM_SYSTEM_BIOS(29, "sarcrev12", "SARC Rev. 1.2")
-	ROMX_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654), ROM_BIOS(29) )
 ROM_END
 
 
@@ -1932,10 +1929,19 @@ ROM_START( k286i )
 ROM_END
 
 // Sanyo MBC-28
-ROM_START( mbc28 ) // Complains about missing mouse hardware
+ROM_START( mbc28 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_low_din_checksum,454f00,27c256-15.bin", 0x10000, 0x8000, CRC(423b4693) SHA1(08e877baa59ebd9a1817dcdd27138c638edcbb84) )
 	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_high_din_checksum,45ae00,27c256-15.bin", 0x10001, 0x8000, CRC(557b7346) SHA1(c0dca88627f8451211172441fefb4020839fb87f) )
+ROM_END
+
+// Unknown 80C286 motherboard (4 SIMM, 6 16-bit ISA)
+// SARC RC2015; HM6818P; 82C042 or JETkey Keyboard BIOS; 1MB onboard RAM (8x LH64256AD-80)
+ROM_START( sarcpc )
+	ROM_REGION(0x20000,"bios", 0) // 27C512
+	// BIOS-String: 20-0300-00834-00101111-050591-SARC286 / [80286 Standard System 2V1]
+	//ROM_SYSTEM_BIOS(0, "sarcrev12", "SARC Rev. 1.2")
+	ROM_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654) )
 ROM_END
 
 // Siemens PCD-2
@@ -2264,7 +2270,8 @@ COMP( 1994, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
-COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING )
+COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING ) // Complains about missing mouse hardware
+COMP( 199?, sarcpc,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<unknown>",   "80286 Standard System (SARC RC2015 chipset)", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
 COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
