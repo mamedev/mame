@@ -10,7 +10,7 @@
     - IRQs
     - Target mode
     - NMOS/CMOS functional differences
-    - 5380 has no actual input clock
+    - Timings should not be clock-based (5380 has no clock input)
 
     40801766 - IIx ROM waiting point for "next read fails"
 
