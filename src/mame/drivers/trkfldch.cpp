@@ -92,10 +92,26 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 	for (int i = 0x1189; i < 0x1600; i += 5)
 	{
 	//	printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
+		int tilegfxbase = 0x3780;
 
 		int y = m_mainram[i + 1];
 		int x = m_mainram[i + 3];
 		int tile = m_mainram[i + 2];
+
+		int tilehigh = m_mainram[i + 4] & 0x04;
+		int tilehigh2 = m_mainram[i + 0] & 0x04;
+		int tilehigh3 = m_mainram[i + 0] & 0x08;
+
+
+		if (tilehigh)
+			tile += 0x100;
+
+		if (tilehigh2)
+			tile += 0x200;
+
+		if (tilehigh3)
+			tile += 0x400;
+
 
 		int xhigh = m_mainram[i + 4] & 0x01;
 		int yhigh = m_mainram[i + 0] & 0x01; // or enable bit?
@@ -105,9 +121,10 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 
 		y -= 0x100;
 		y -= 16;
+		x -= 16;
 
 		gfx_element *gfx = m_gfxdecode->gfx(1);
-		gfx->transpen(bitmap,cliprect,tile+0x3880,0,0,0,x,y,0);
+		gfx->transpen(bitmap,cliprect,tile+tilegfxbase,0,0,0,x,y,0);
 	}
 
 	return 0;
