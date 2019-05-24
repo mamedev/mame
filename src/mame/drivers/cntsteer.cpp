@@ -138,23 +138,10 @@ void cntsteer_state::cntsteer_palette(palette_device &palette) const
 	const uint8_t *color_prom = memregion("proms")->base();
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2;
-
-		// red component
-		bit0 = ((color_prom[i + 0x000] >> 0) & 0x01);
-		bit1 = ((color_prom[i + 0x100] >> 0) & 0x01);
-		bit2 = ((color_prom[i + 0x200] >> 0) & 0x01);
-		int const g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		// green component
-		bit0 = ((color_prom[i + 0x000] >> 1) & 0x01);
-		bit1 = ((color_prom[i + 0x100] >> 1) & 0x01);
-		bit2 = ((color_prom[i + 0x200] >> 1) & 0x01);
-		int const r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		// blue component
-		bit0 = ((color_prom[i + 0x000] >> 2) & 0x01);
-		bit1 = ((color_prom[i + 0x100] >> 2) & 0x01);
-		bit2 = ((color_prom[i + 0x200] >> 2) & 0x01);
-		int const b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		// same as Chanbara
+		int const r = pal4bit((color_prom[i + 0x000] & 7) << 1);
+		int const g = pal4bit((color_prom[i + 0x100] & 7) << 1);
+		int const b = pal4bit((color_prom[i + 0x200] & 7) << 1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -251,7 +238,7 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 1] & 0xc0) << 2);
 		sx = (m_spriteram[offs + 2]);
 		sy = 0xf0 - m_spriteram[offs];
-		color = 0x10 + ((m_spriteram[offs + 1] & 0x20) >> 4) + ((m_spriteram[offs + 1] & 0x8)>>3);
+		color = 0x00 + ((m_spriteram[offs + 1] & 0x20) >> 4) + ((m_spriteram[offs + 1] & 0x8)>>3);
 
 		fx = !(m_spriteram[offs + 1] & 0x04);
 		fy = (m_spriteram[offs + 1] & 0x02);
@@ -308,7 +295,7 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		code = m_spriteram[offs + 1] + ((m_spriteram[offs + 0x80] & 0x03) << 8);
 		sx = 0x100 - m_spriteram[offs + 3];
 		sy = 0x100 - m_spriteram[offs + 2];
-		color = 0x10 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
+		color = 0x00 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
 
 		fx = (m_spriteram[offs + 0] & 0x04);
 		fy = (m_spriteram[offs + 0] & 0x02);
@@ -486,11 +473,12 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 	{
 		case 0: m_scrolly = data; break;
 		case 1: m_scrollx = data; break;
-		case 2: m_bg_bank = (data & 0x01) << 8;
-				m_bg_color_bank = (data & 6) >> 1;
-				// TODO: of course this just inibits bus request for master.
-				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
-
+		case 2: m_bg_bank = (data & 0x01) << 9;
+				// TODO: this may be shuffled 
+				// 4 -> title screen (correct?)
+				// 0 -> gameplay (supposedly a 2 is better)
+				// needs to know what it tries to write after stage 1 ...
+				m_bg_color_bank = (data & 7);
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
@@ -526,6 +514,8 @@ READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 {
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
+
+// TODO: on write prolly selects bit 8 of tile bank (which needs better decoding too)
 
 /*************************************
  *
@@ -1084,9 +1074,9 @@ ROM_START( cntsteer )
 
 	 /* All 82s129 or equivalent */
 	ROM_REGION( 0x300, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "by21.j4",  0x0000, 0x100, CRC(10e2cab4) SHA1(c266cb26b9aa3df9385605bd75a37a66ab946051) )
+	ROM_LOAD( "by21.j4",  0x0200, 0x100, CRC(10e2cab4) SHA1(c266cb26b9aa3df9385605bd75a37a66ab946051) )
 	ROM_LOAD( "by22.j5",  0x0100, 0x100, CRC(8676ad80) SHA1(891c85a88fda27e7a984eec1011ef931605a443f) )
-	ROM_LOAD( "by23.j6",  0x0200, 0x100, CRC(08dfd511) SHA1(45d107533864bd21d0c4bad9f16cf75bc5e5e6a2) )
+	ROM_LOAD( "by23.j6",  0x0000, 0x100, CRC(08dfd511) SHA1(45d107533864bd21d0c4bad9f16cf75bc5e5e6a2) )
 ROM_END
 
 ROM_START( zerotrgt )
