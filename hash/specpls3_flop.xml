@@ -8773,12 +8773,12 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="chasehq2">
-		<description>Chase H.Q. II - Special Criminal Investigations</description>
+		<description>Chase H.Q. II - Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="127232">
-				<rom name="chase h.q. ii - special criminal investigations (1990)(ocean).dsk" size="127232" crc="3b77b2ad" sha1="82ca5734e13e42347f3c6ca182049d45d5cc6bad" offset="0" />
+				<rom name="chase h.q. ii - special criminal investigation (1990)(ocean).dsk" size="127232" crc="3b77b2ad" sha1="82ca5734e13e42347f3c6ca182049d45d5cc6bad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
