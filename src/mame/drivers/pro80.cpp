@@ -70,7 +70,7 @@ private:
 TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 {
 	m_cass_data[1]++;
-	uint8_t cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
