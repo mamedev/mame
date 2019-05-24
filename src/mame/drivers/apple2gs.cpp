@@ -63,6 +63,7 @@
 #include "bus/a2bus/a2cffa.h"
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2scsi.h"
+#include "bus/a2bus/a2hsscsi.h"
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2videoterm.h"
@@ -4526,6 +4527,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  /* Focus Drive IDE card */
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
+	device.option_add("hsscsi", A2BUS_HSSCSI);  /* Apple II High-Speed SCSI Card */
 	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
 	device.option_add("aesms", A2BUS_AESMS);    /* Applied Engineering Super Music Synthesizer */
 	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */

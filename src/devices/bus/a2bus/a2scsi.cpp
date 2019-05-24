@@ -81,7 +81,6 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
-		device->set_clock(10000000);
 		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
 	});
 }

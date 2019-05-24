@@ -9,6 +9,8 @@
     IRQ and DMA channels are software-selectable. There is a 2K HM6116P-2
     SRAM on board, but not all of it seems to be addressable.
 
+    The BIOS was designed to accommodate either a NMOS 5380 or a 53C80-40.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -156,7 +158,6 @@ static void asc88_scsi_devices(device_slot_interface &device)
 
 void asc88_device::scsic_config(device_t *device)
 {
-	device->set_clock(10'000'000); // FIXME: this clock is fake
 	downcast<ncr5380n_device &>(*device).irq_handler().set("^^", FUNC(asc88_device::irq_w));
 	downcast<ncr5380n_device &>(*device).drq_handler().set("^^", FUNC(asc88_device::drq_w));
 }
