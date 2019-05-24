@@ -96,14 +96,6 @@ void vic20_expansion_slot_device::device_start()
 	m_write_irq.resolve_safe();
 	m_write_nmi.resolve_safe();
 	m_write_res.resolve_safe();
-
-	// inherit bus clock
-	if (clock() == 0)
-	{
-		vic20_expansion_slot_device *root = machine().device<vic20_expansion_slot_device>(VIC20_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 

@@ -56,9 +56,9 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "speaker.h"
 
 
-WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
+void momoko_state::bg_read_bank_w(u8 data)
 {
-	membank("bank1")->set_entry(data & 0x1f);
+	m_bgbank->set_entry(data & 0x1f);
 }
 
 /****************************************************************************/
@@ -69,23 +69,23 @@ void momoko_state::momoko_map(address_map &map)
 	map(0xc000, 0xcfff).ram();
 	map(0xd064, 0xd0ff).ram().share("spriteram");
 	map(0xd400, 0xd400).portr("IN0").nopw(); /* interrupt ack? */
-	map(0xd402, 0xd402).portr("IN1").w(FUNC(momoko_state::momoko_flipscreen_w));
+	map(0xd402, 0xd402).portr("IN1").w(FUNC(momoko_state::flipscreen_w));
 	map(0xd404, 0xd404).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xd406, 0xd406).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd407, 0xd407).portr("DSW1");
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xdc00, 0xdc00).w(FUNC(momoko_state::momoko_fg_scrolly_w));
-	map(0xdc01, 0xdc01).w(FUNC(momoko_state::momoko_fg_scrollx_w));
-	map(0xdc02, 0xdc02).w(FUNC(momoko_state::momoko_fg_select_w));
+	map(0xdc00, 0xdc00).w(FUNC(momoko_state::fg_scrolly_w));
+	map(0xdc01, 0xdc01).w(FUNC(momoko_state::fg_scrollx_w));
+	map(0xdc02, 0xdc02).w(FUNC(momoko_state::fg_select_w));
 	map(0xe000, 0xe3ff).ram().share("videoram");
-	map(0xe800, 0xe800).w(FUNC(momoko_state::momoko_text_scrolly_w));
-	map(0xe801, 0xe801).w(FUNC(momoko_state::momoko_text_mode_w));
-	map(0xf000, 0xffff).bankr("bank1");
-	map(0xf000, 0xf001).w(FUNC(momoko_state::momoko_bg_scrolly_w)).share("bg_scrolly");
-	map(0xf002, 0xf003).w(FUNC(momoko_state::momoko_bg_scrollx_w)).share("bg_scrollx");
-	map(0xf004, 0xf004).w(FUNC(momoko_state::momoko_bg_read_bank_w));
-	map(0xf006, 0xf006).w(FUNC(momoko_state::momoko_bg_select_w));
-	map(0xf007, 0xf007).w(FUNC(momoko_state::momoko_bg_priority_w));
+	map(0xe800, 0xe800).w(FUNC(momoko_state::text_scrolly_w));
+	map(0xe801, 0xe801).w(FUNC(momoko_state::text_mode_w));
+	map(0xf000, 0xffff).bankr("bgbank");
+	map(0xf000, 0xf001).w(FUNC(momoko_state::bg_scrolly_w)).share("bg_scrolly");
+	map(0xf002, 0xf003).w(FUNC(momoko_state::bg_scrollx_w)).share("bg_scrollx");
+	map(0xf004, 0xf004).w(FUNC(momoko_state::bg_read_bank_w));
+	map(0xf006, 0xf006).w(FUNC(momoko_state::bg_select_w));
+	map(0xf007, 0xf007).w(FUNC(momoko_state::bg_priority_w));
 }
 
 void momoko_state::momoko_sound_map(address_map &map)
@@ -215,19 +215,17 @@ static const gfx_layout charlayout1 =
 };
 
 static GFXDECODE_START( gfx_momoko )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout1,      0,  24 ) /* TEXT */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, tilelayout,     256,  16 ) /* BG */
-	GFXDECODE_ENTRY( "gfx3", 0x0000, charlayout,       0,   1 ) /* FG */
-	GFXDECODE_ENTRY( "gfx4", 0x0000, spritelayout,   128,   8 ) /* sprite */
+	GFXDECODE_ENTRY( "text",    0x0000, charlayout1,      0,  24 ) /* TEXT */
+	GFXDECODE_ENTRY( "bg_gfx",  0x0000, tilelayout,     256,  16 ) /* BG */
+	GFXDECODE_ENTRY( "fg_gfx",  0x0000, charlayout,       0,   1 ) /* FG */
+	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout,   128,   8 ) /* sprite */
 GFXDECODE_END
 
 /****************************************************************************/
 
 void momoko_state::machine_start()
 {
-	uint8_t *BG_MAP = memregion("user1")->base();
-
-	membank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
+	m_bgbank->configure_entries(0, 32, &m_bg_map[0x0000], 0x1000);
 
 	save_item(NAME(m_fg_scrollx));
 	save_item(NAME(m_fg_scrolly));
@@ -273,7 +271,7 @@ void momoko_state::momoko(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(1*8, 31*8-1, 2*8, 29*8-1);
-	screen.set_screen_update(FUNC(momoko_state::screen_update_momoko));
+	screen.set_screen_update(FUNC(momoko_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_momoko);
@@ -309,32 +307,32 @@ ROM_START( momoko )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
 	ROM_LOAD( "momoko01.u4", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
+	ROM_REGION( 0x2000, "text", 0 ) /* text */
 	ROM_LOAD( "momoko13.u4", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) ) // On the FP-8631 PCB
 
-	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
+	ROM_REGION( 0x2000, "fg_gfx", 0 ) /* FG */
 	ROM_LOAD( "momoko14.p2", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
+	ROM_REGION( 0x10000, "spr_gfx", 0 ) /* sprite */
 	ROM_LOAD16_BYTE( "momoko16.e5", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) ) // On the FP-8631 PCB
 	ROM_LOAD16_BYTE( "momoko17.e6", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) ) // On the FP-8631 PCB
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
+	ROM_REGION( 0x20000, "bg_gfx", 0 ) /* BG */
 	ROM_LOAD16_BYTE( "momoko09.e8", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
 	ROM_LOAD16_BYTE( "momoko11.c8", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
 	ROM_LOAD16_BYTE( "momoko10.d8", 0x10000, 0x8000, CRC(ae17e74b) SHA1(f52657ea6b6ac518b70fd7b811d9699da27f67d9) )
 	ROM_LOAD16_BYTE( "momoko12.a8", 0x10001, 0x8000, CRC(1e29c9c4) SHA1(d78f102cefc9852b529dd317a76c7003ec2ad3d5) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
+	ROM_REGION( 0x20000, "bg_map", 0 ) /* BG map */
 	ROM_LOAD( "momoko04.r8", 0x0000,  0x8000, CRC(3ab3c2c3) SHA1(d4a0d7f83bf64769e90a2c264c6114ac308cb8b5) )
 	ROM_LOAD( "momoko05.p8", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
 	ROM_LOAD( "momoko06.n8", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
 	ROM_LOAD( "momoko07.l8", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
+	ROM_REGION( 0x2000, "bg_col_map", 0 ) /* BG color/priority table */
 	ROM_LOAD( "momoko08.h8", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
 
-	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
+	ROM_REGION( 0x4000, "fg_map", 0 ) /* FG map */
 	ROM_LOAD( "momoko15.k2", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) ) // On the FP-8631 PCB
 
 	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */
@@ -350,32 +348,32 @@ ROM_START( momokoe )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
 	ROM_LOAD( "momoko01.u4", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
+	ROM_REGION( 0x2000, "text", 0 ) /* text */
 	ROM_LOAD( "momoko13.u4", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) ) // On the FP-8631 PCB
 
-	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
+	ROM_REGION( 0x2000, "fg_gfx", 0 ) /* FG */
 	ROM_LOAD( "momoko14.p2", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
+	ROM_REGION( 0x10000, "spr_gfx", 0 ) /* sprite */
 	ROM_LOAD16_BYTE( "momoko16.e5", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) ) // On the FP-8631 PCB
 	ROM_LOAD16_BYTE( "momoko17.e6", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) ) // On the FP-8631 PCB
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
+	ROM_REGION( 0x20000, "bg_gfx", 0 ) /* BG */
 	ROM_LOAD16_BYTE( "momoko09.e8", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
 	ROM_LOAD16_BYTE( "momoko11.c8", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
 	ROM_LOAD16_BYTE( "momoko10.d8", 0x10000, 0x8000, CRC(ae17e74b) SHA1(f52657ea6b6ac518b70fd7b811d9699da27f67d9) )
 	ROM_LOAD16_BYTE( "momoko12.a8", 0x10001, 0x8000, CRC(1e29c9c4) SHA1(d78f102cefc9852b529dd317a76c7003ec2ad3d5) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
+	ROM_REGION( 0x20000, "bg_map", 0 ) /* BG map */
 	ROM_LOAD( "momoko04.r8", 0x0000,  0x8000, CRC(3ab3c2c3) SHA1(d4a0d7f83bf64769e90a2c264c6114ac308cb8b5) )
 	ROM_LOAD( "momoko05.p8", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
 	ROM_LOAD( "momoko06.n8", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
 	ROM_LOAD( "momoko07.l8", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
+	ROM_REGION( 0x2000, "bg_col_map", 0 ) /* BG color/priority table */
 	ROM_LOAD( "momoko08.h8", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
 
-	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
+	ROM_REGION( 0x4000, "fg_map", 0 ) /* FG map */
 	ROM_LOAD( "momoko15.k2", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) ) // On the FP-8631 PCB
 
 	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */
@@ -391,32 +389,32 @@ ROM_START( momokob ) // bootleg board, almost exact copy of an original one
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
 	ROM_LOAD( "momoko01.u4", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
+	ROM_REGION( 0x2000, "text", 0 ) /* text */
 	ROM_LOAD( "momoko13.u4", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) )
 
-	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
+	ROM_REGION( 0x2000, "fg_gfx", 0 ) /* FG */
 	ROM_LOAD( "momoko14.p2", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
+	ROM_REGION( 0x10000, "spr_gfx", 0 ) /* sprite */
 	ROM_LOAD16_BYTE( "16.bin", 0x0000,  0x8000, CRC(49de49a1) SHA1(b4954286cba50332d4366a8160e9fbfd574c60ed) )
 	ROM_LOAD16_BYTE( "17.bin", 0x0001,  0x8000, CRC(f06a3d1a) SHA1(f377ffad958fdc9cff2baee70ce4ba9080b5fe0d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
+	ROM_REGION( 0x20000, "bg_gfx", 0 ) /* BG */
 	ROM_LOAD16_BYTE( "momoko09.e8", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
 	ROM_LOAD16_BYTE( "momoko11.c8", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
 	ROM_LOAD16_BYTE( "10.bin",      0x10000, 0x8000, CRC(68b9156d) SHA1(e157434d7ee33837ba35e720d221bf1eb21b7020) )
 	ROM_LOAD16_BYTE( "12.bin",      0x10001, 0x8000, CRC(c32f5e19) SHA1(488da565e20bf002ff3dffca1efedbdf29e6e559) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
+	ROM_REGION( 0x20000, "bg_map", 0 ) /* BG map */
 	ROM_LOAD( "4.bin",       0x0000,  0x8000, CRC(1f0226d5) SHA1(6411e85c51e23dfe6c643692987dc7eeef37538f) )
 	ROM_LOAD( "momoko05.p8", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
 	ROM_LOAD( "momoko06.n8", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
 	ROM_LOAD( "momoko07.l8", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
+	ROM_REGION( 0x2000, "bg_col_map", 0 ) /* BG color/priority table */
 	ROM_LOAD( "momoko08.h8", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
 
-	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
+	ROM_REGION( 0x4000, "fg_map", 0 ) /* FG map */
 	ROM_LOAD( "momoko15.k2", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) )
 
 	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */

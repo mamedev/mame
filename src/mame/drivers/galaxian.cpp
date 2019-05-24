@@ -1723,7 +1723,7 @@ void galaxian_state::zigzag_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x2fff).bankr("bank1");
 	map(0x3000, 0x3fff).bankr("bank2");
-	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4000, 0x47ff).ram(); // needs a full 2K of RAM
 	map(0x4800, 0x4fff).w(FUNC(galaxian_state::zigzag_ay8910_w));
 	map(0x5000, 0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x5800, 0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");

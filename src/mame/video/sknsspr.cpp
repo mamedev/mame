@@ -12,6 +12,9 @@
    - Get rid of sprite position kludges
    - Fix zooming precision/rounding (most noticeable on jchan backgrounds)
    - RLE uses fifo7200 chips
+   
+   reference 
+   - jchan : https://youtu.be/PJijmhRwMUk
 
 */
 

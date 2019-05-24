@@ -2,7 +2,7 @@
   "plugin": {
 	"name": "autofire",
 	"description": "Autofire plugin",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"author": "Jack Li",
 	"type": "plugin",
 	"start": "false"

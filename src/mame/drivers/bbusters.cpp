@@ -8,9 +8,7 @@
     Beast Busters is a large dedicated (non-jamma) triple machine gun game,
     the gun positions values are read in an interrupt routine that must be
     called for each position (X and Y for 3 guns, so at least 6 times a
-    frame).  However I can't make it work reliably..  So for the moment
-    I'm writing the gun positions directly to memory and bypassing
-    the IRQ routine.
+    frame).
 
     Mechanized Attack (A8002) is an earlier design, it only has one sprite
     chip, no eeprom, and only 2 machine guns, but the tilemaps are twice
@@ -184,6 +182,10 @@ If you calibrate the guns correctly the game runs as expected:
 2) Using P2 controls fire at the indicated spots.
 3) Using P3 controls fire at the indicated spots.
 
+
+TODO: MT07333 - once the guns are calibrated, attract mode shows the 3 players only shooting at the bottom right
+of the screen.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -265,7 +267,7 @@ READ16_MEMBER(bbusters_state::control_3_r)
 
 WRITE16_MEMBER(bbusters_state::gun_select_w)
 {
-	logerror("%08x: gun r\n",m_maincpu->pc());
+	//logerror("%08x: gun r\n",m_maincpu->pc());
 
 	m_maincpu->set_input_line(2, HOLD_LINE);
 
@@ -289,6 +291,12 @@ WRITE16_MEMBER(bbusters_state_base::pf_w)
 {
 	COMBINE_DATA(&m_pf_data[Layer][offset]);
 	m_pf_tilemap[Layer]->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(bbusters_state_base::coin_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 /*******************************************************************************/
@@ -316,7 +324,7 @@ void bbusters_state::bbusters_map(address_map &map)
 	map(0x0e0019, 0x0e0019).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x0e8000, 0x0e8001).rw(FUNC(bbusters_state::kludge_r), FUNC(bbusters_state::gun_select_w));
 	map(0x0e8002, 0x0e8003).r(FUNC(bbusters_state::control_3_r));
-	/* map(0x0f0008, 0x0f0009).nopw(); */
+	map(0x0f0000, 0x0f0001).w(FUNC(bbusters_state::coin_counter_w));
 	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::three_gun_output_w));
 	map(0x0f0019, 0x0f0019).w(FUNC(bbusters_state::sound_cpu_w));
 	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share("eeprom"); /* Eeprom */
@@ -360,7 +368,7 @@ void mechatt_state::mechatt_map(address_map &map)
 	map(0x0e0000, 0x0e0001).portr("IN0");
 	map(0x0e0002, 0x0e0003).portr("DSW1");
 	map(0x0e0004, 0x0e0007).r(FUNC(mechatt_state::mechatt_gun_r));
-	/* map(0x0e4002, 0x0e4003).nopw();  Gun force feedback? */
+	map(0x0e4000, 0x0e4001).w(FUNC(mechatt_state::coin_counter_w));
 	map(0x0e4002, 0x0e4003).w(FUNC(mechatt_state::two_gun_output_w));
 	map(0x0e8001, 0x0e8001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(FUNC(mechatt_state::sound_cpu_w));
 }
@@ -644,7 +652,7 @@ void bbusters_state::bbusters(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bbusters_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &bbusters_state::sound_portmap);
 
-	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0); // actually 28C04 parallel EEPROM
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

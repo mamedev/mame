@@ -2395,9 +2395,21 @@ apxenp2                         // 1993 Apricot XEN PC (P2 Motherboard)
 apxlsam                         // 1993 Apricot XEN-LS II (Samurai Motherboard)
 at                              // 1987 AMI Bios and Diagnostics
 at386                           // 19?? IBM AT 386
+ecs38632                        // Elitegroup ECS-386/32 mainboard
+ecsum386                        // Elitegroup UM386 mainboard
+fu340                           // Abit FU340
+smih0107                        //
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
+a433cc                          // J-Bond A433C-C/A450C-C
+a486ap4                         // ASUS PVI-486AP4
+a486sp3                         // ASUS PVI-486SP3
+a486sp3g                        // ASUS PCI/I-486SP3G
+aa486s                          // ASUS PCI/I-A486S
+a486sv1                         // ASUS VL/EISA-486SV1
+a486sv2g                        // ASUS VL/I-486SV2G
+mb8433uud                       // Biostar MB8433UUD-A
 c286lt                          // 1990 Commodore Laptop 286-LT
 csl286                          // Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
@@ -2423,17 +2435,26 @@ pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops
 pcd4nl                          // Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd                          // Siemens-Nixdorf 486 notebook
 ct386sx                         //
+cxsxd                           //
 ec1842                          //
 ec1849                          //
+ev1806                          // Everex EV-1806
 ews286                          // 1986 Ericsson WS286
 ficpio2                         // 1995 FIC 486-PIO-2
+ficvipio                        // FIC 486-VIP-IO
+ficvipio2                       // FIC 486-VIP-IO2
 ftsserv                         // 1991 Apricot FTs (Scorpion)
+hot409                          // Shuttle HOT-409
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
 ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
+kt216wb5                        // KT216WB5-HI Rev.2
+lm103s                          //
 m290                            // Olivetti M290
+magb233                         // Magitronic B233
+mat286                          //
 megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
@@ -2448,6 +2469,7 @@ n8810m55                        // 1986 Nixdorf 8810 M55
 pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
+sarcpc                          //
 t2000sx                         //
 walk386sx                       // Triumph-Adler Walkstation 386 SX
 walk386dx                       // Triumph-Adler Walkstation 386 DX
@@ -11230,6 +11252,7 @@ mnfb_c29                        //
 play_a24                        //
 poto_a29                        //
 poto_a32                        //
+poto_a31                        //
 robo_a30                        //
 robo_a34                        //
 simp_a20                        //
@@ -15145,6 +15168,7 @@ exospace                        // Elektronika
 gnw_bfight                      // Nintendo
 gnw_bjack                       // Nintendo
 gnw_boxing                      // Nintendo
+gnw_chef                        // Nintendo
 gnw_climber                     // Nintendo
 gnw_climbcs                     // Nintendo
 gnw_dkjr                        // Nintendo
@@ -15182,6 +15206,7 @@ kloneran                        // Konami
 knfl                            // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
+merrycook                       // Elektronika
 nummunch                        // VTech
 nupogodi                        // Elektronika
 taddams                         // Tiger
@@ -31130,6 +31155,7 @@ mspacmanbg2                     // bootleg
 mspacmanbgd                     // bootleg
 mspacmanblt                     // bootleg
 mspacmanbhe                     // bootleg
+mspacmanbi                      // bootleg
 mspacmancr                      // bootleg on Crush Roller board
 mspacmat                        // hack
 mspacmbe                        // bootleg
@@ -31314,6 +31340,7 @@ mpc1600                         // Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
 ncrpc4i                         // NCR PC4i
+nixpc01							// Nixdorf 8810/25 - PC01
 olivm15                         // Olivetti M15
 olytext30                       // AEG Olympia Olytext 30
 pc7000                          // 1985 Sharp PC-7000

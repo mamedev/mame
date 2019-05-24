@@ -114,6 +114,7 @@ public:
 	DECLARE_MACHINE_START(zerotrgt);
 	DECLARE_MACHINE_RESET(zerotrgt);
 	DECLARE_VIDEO_START(zerotrgt);
+	void cntsteer_palette(palette_device &palette) const;
 	void zerotrgt_palette(palette_device &palette) const;
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -131,6 +132,20 @@ public:
 	void sound_map(address_map &map);
 };
 
+
+void cntsteer_state::cntsteer_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		// same as Chanbara
+		int const r = pal4bit((color_prom[i + 0x000] & 7) << 1);
+		int const g = pal4bit((color_prom[i + 0x100] & 7) << 1);
+		int const b = pal4bit((color_prom[i + 0x200] & 7) << 1);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
 
 void cntsteer_state::zerotrgt_palette(palette_device &palette) const
 {
@@ -458,11 +473,12 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 	{
 		case 0: m_scrolly = data; break;
 		case 1: m_scrollx = data; break;
-		case 2: m_bg_bank = (data & 0x01) << 8;
-				m_bg_color_bank = (data & 6) >> 1;
-				// TODO: of course this just inibits bus request for master.
-				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
-
+		case 2: m_bg_bank = (data & 0x01) << 9;
+				// TODO: this may be shuffled 
+				// 4 -> title screen (correct?)
+				// 0 -> gameplay (supposedly a 2 is better)
+				// needs to know what it tries to write after stage 1 ...
+				m_bg_color_bank = (data & 7);
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
@@ -498,6 +514,8 @@ READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 {
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
+
+// TODO: on write prolly selects bit 8 of tile bank (which needs better decoding too)
 
 /*************************************
  *
@@ -860,16 +878,16 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_cntsteer )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 256 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,             0, 0x20 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,          0, 0x20 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( gfx_zerotrgt )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,             0, 0x20 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,          0, 0x20 )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -951,8 +969,7 @@ void cntsteer_state::cntsteer(machine_config &config)
 	config.m_perfect_cpu_quantum = subtag("subcpu");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cntsteer);
-	PALETTE(config, m_palette).set_entries(256);
-//  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
+	PALETTE(config, m_palette, FUNC(cntsteer_state::cntsteer_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
@@ -1055,10 +1072,11 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by18", 0x20000, 0x2000, CRC(1e9ce047) SHA1(7579ba6b401eb1bfc7d2d9311ebab623bd1095a2) )
 	ROM_LOAD( "by20", 0x30000, 0x2000, CRC(e2198c9e) SHA1(afea262db9154301f4b9e53e1fc91985dd934170) )
 
+	 /* All 82s129 or equivalent */
 	ROM_REGION( 0x300, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "by21.j4",  0x0000, 0x100, NO_DUMP ) /* All 82s129 or equivalent */
-	ROM_LOAD( "by22.j5",  0x0100, 0x100, NO_DUMP )
-	ROM_LOAD( "by23.j6",  0x0200, 0x100, NO_DUMP )
+	ROM_LOAD( "by21.j4",  0x0200, 0x100, CRC(10e2cab4) SHA1(c266cb26b9aa3df9385605bd75a37a66ab946051) )
+	ROM_LOAD( "by22.j5",  0x0100, 0x100, CRC(8676ad80) SHA1(891c85a88fda27e7a984eec1011ef931605a443f) )
+	ROM_LOAD( "by23.j6",  0x0000, 0x100, CRC(08dfd511) SHA1(45d107533864bd21d0c4bad9f16cf75bc5e5e6a2) )
 ROM_END
 
 ROM_START( zerotrgt )

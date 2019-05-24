@@ -1382,7 +1382,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xa30000, 0xa30003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0xa40000, 0xa40003).w(FUNC(jaguar_state::eeprom_enable_w));
 	map(0xb70000, 0xb70003).rw(FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
-	map(0xc00000, 0xdfffff).bankr("mainsndbank");
+//	map(0xc00000, 0xdfffff).bankr("mainsndbank");
 	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::config_r), FUNC(vt83c461_device::config_w));
 	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
 	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
@@ -1394,7 +1394,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
 	map(0xf17000, 0xf17003).lr16("f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
-//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
+//  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPI04
 	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
@@ -1849,6 +1849,8 @@ void jaguar_state::cojagr3k(machine_config &config)
 	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
+	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
+
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1903,6 +1905,8 @@ void jaguar_state::jaguar(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
+
+	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

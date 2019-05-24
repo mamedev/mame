@@ -23,6 +23,7 @@
 +--------------------------------------+
 
   CPU: Z180 (surface scratched)
+       PIC16C5x (surface scratched, exact model unknown)
 Sound: YM2203C
   OSC: 14.31818MHz, 12.288MHz
   DSW: 8 position DSW
@@ -34,14 +35,16 @@ Sound: YM2203C
 Actual Measured Clocks     Derived
      Z180 - 6.14522MHz  (12.288000MHz/2)
   YM2203C - 3.57543MHz  (14.318181MHz/4)
+ PIC16C5x - 3.07252MHz  (12.288000MHz/4)
 
-Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on PCB)
+NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/mosaic.h"
 
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/z180/z180.h"
 #include "sound/2203intf.h"
 #include "emupal.h"
@@ -49,7 +52,7 @@ Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on P
 #include "speaker.h"
 
 
-WRITE8_MEMBER(mosaic_state::protection_w)
+WRITE8_MEMBER(mosaic_state::protection_w) // TODO: hook up PIC dump and remove this simulation (PIC dump contains the exact values in this jumptable)
 {
 	if (!BIT(data, 7))
 	{
@@ -245,7 +248,7 @@ static INPUT_PORTS_START( gfire2 )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x02, 0x02, "Bonus Time" )
 	PORT_DIPSETTING(    0x00, "*2 +30" )
 	PORT_DIPSETTING(    0x02, "*2 +50" )
@@ -289,6 +292,13 @@ void mosaic_state::mosaic(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));
 
+	PIC16C55(config, "pic", XTAL(12'288'000)/4);  /* 3.072MHz - Verified */
+	//read_a().set(FUNC(mosaic_state::));
+	//write_a().set(FUNC(mosaic_state::));
+	//read_b().set(FUNC(mosaic_state::));
+	//write_b().set(FUNC(mosaic_state::));
+	//read_c().set(FUNC(mosaic_state::));
+	//write_c().set(FUNC(mosaic_state::));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -317,6 +327,8 @@ void mosaic_state::gfire2(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::gfire2_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::gfire2_io_map);
+
+	subdevice<pic16c55_device>("pic")->set_disable(); // no PIC decap yet
 }
 
 
@@ -330,6 +342,9 @@ void mosaic_state::gfire2(machine_config &config)
 ROM_START( mosaic )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
 	ROM_LOAD( "9.ua02", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) ) /* at PCB location 7F */
+
+	ROM_REGION( 0x400, "pic", 0 )
+	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, CRC(62d1d85d) SHA1(167e1f39e85f0bbecc4374f3975aa0c41173f070) ) // decapped, presumed to be 16C55
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) /* at PCB location 1L */
@@ -348,6 +363,9 @@ ROM_START( mosaica )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
 	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) ) /* at PCB location 7F */
 
+	ROM_REGION( 0x400, "pic", 0 )
+	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, CRC(62d1d85d) SHA1(167e1f39e85f0bbecc4374f3975aa0c41173f070) ) // decapped, presumed to be 16C55
+
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) /* at PCB location 1L */
 	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) /* at PCB location 1K */
@@ -364,6 +382,9 @@ ROM_END
 ROM_START( gfire2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
 	ROM_LOAD( "goldf2_i.7e",         0x00000, 0x10000, CRC(a102f7d0) SHA1(cfde51d0e9e69e9653fdfd70d4e4f4649b662005) )
+
+	ROM_REGION( 0x400, "pic", 0 )
+	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, NO_DUMP ) // same sanded off chip as mosaic, verified on PCB pic
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "goldf2_a.1k",         0x00000, 0x40000, CRC(1f086472) SHA1(c776a734869b6bab317627bd15457a9fb18e1159) )

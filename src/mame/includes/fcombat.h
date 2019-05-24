@@ -37,6 +37,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_bgdata_rom(*this, "bgdata"),
+		m_user2_region(*this, "user2"),
+		m_io_in(*this, "IN%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -50,15 +53,19 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_spriteram;
+	required_region_ptr<u8> m_bgdata_rom;
+	required_region_ptr<u8> m_user2_region;
+
+	required_ioport_array<2> m_io_in;
 
 	/* video-related */
 	tilemap_t    *m_bgmap;
-	uint8_t      m_cocktail_flip;
-	uint8_t      m_char_palette;
-	uint8_t      m_sprite_palette;
-	uint8_t      m_char_bank;
+	u8      m_cocktail_flip;
+	u8      m_char_palette;
+	u8      m_sprite_palette;
+	u8      m_char_bank;
 
 	/* misc */
 	int        m_fcombat_sh;
@@ -71,22 +78,22 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(fcombat_protection_r);
-	DECLARE_READ8_MEMBER(fcombat_port01_r);
-	DECLARE_WRITE8_MEMBER(e900_w);
-	DECLARE_WRITE8_MEMBER(ea00_w);
-	DECLARE_WRITE8_MEMBER(eb00_w);
-	DECLARE_WRITE8_MEMBER(ec00_w);
-	DECLARE_WRITE8_MEMBER(ed00_w);
-	DECLARE_READ8_MEMBER(e300_r);
-	DECLARE_WRITE8_MEMBER(ee00_w);
-	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
+	u8 protection_r();
+	u8 port01_r();
+	void e900_w(u8 data);
+	void ea00_w(u8 data);
+	void eb00_w(u8 data);
+	void ec00_w(u8 data);
+	void ed00_w(u8 data);
+	u8 e300_r();
+	void ee00_w(u8 data);
+	void videoreg_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void fcombat_palette(palette_device &palette) const;
-	uint32_t screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };

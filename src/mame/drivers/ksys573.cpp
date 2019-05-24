@@ -405,6 +405,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void drmn9m(machine_config &config);
+	void drmn10m(machine_config &config);
+	void gtfrk10m(machine_config &config);
+	void gtfrk11m(machine_config &config);
 	void gtfrk10mb(machine_config &config);
 	void ddr(machine_config &config);
 	void pnchmn(machine_config &config);
@@ -432,7 +436,6 @@ public:
 	void gtrfrks(machine_config &config);
 	void gchgchmp(machine_config &config);
 	void ddr5m(machine_config &config);
-	void ddrmax(machine_config &config);
 	void drmn4m(machine_config &config);
 	void fbaitbc(machine_config &config);
 	void ddr4ms(machine_config &config);
@@ -2295,16 +2298,6 @@ void ksys573_state::ddr5m(machine_config &config)
 	casszi(config);
 }
 
-void ksys573_state::ddrmax(machine_config &config)
-{
-	k573d(config);
-	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::ddr_output_callback));
-	subdevice<k573dio_device>("k573dio")->set_buffer_speed(0x4000);
-
-	pccard2_32mb(config);
-	casszi(config);
-}
-
 // Dancing Stage
 
 void ksys573_state::dsfdcta(machine_config &config)
@@ -2398,6 +2391,28 @@ void ksys573_state::drmn4m(machine_config &config)
 	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
 }
 
+void ksys573_state::drmn9m(machine_config &config)
+{
+	k573d(config);
+	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::drmn_output_callback));
+	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
+
+	casszi(config);
+
+	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+}
+
+void ksys573_state::drmn10m(machine_config &config)
+{
+	k573d(config);
+	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::drmn_output_callback));
+	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00500000);
+
+	casszi(config);
+
+	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+}
+
 // Guitar Freaks
 
 void ksys573_state::gtrfrks(machine_config &config)
@@ -2434,12 +2449,28 @@ void ksys573_state::gtrfrk7m(machine_config &config)
 	pccard1_32mb(config);
 }
 
+void ksys573_state::gtfrk10m(machine_config &config)
+{
+	k573d(config);
+	casszi(config);
+	pccard1_32mb(config);
+	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
+}
+
 void ksys573_state::gtfrk10mb(machine_config &config)
 {
 	gtrfrk7m(config);
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00500000);
+	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
 
 	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+}
+
+void ksys573_state::gtfrk11m(machine_config &config)
+{
+	k573d(config);
+	casszi(config);
+	pccard1_32mb(config);
+	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00500000);
 }
 
 // Miscellaneous
@@ -5074,8 +5105,8 @@ GAME( 2001, drmn5m,    pcnfrk5m, drmn4m,     drmn,      ksys573_state, empty_ini
 GAME( 2001, gtrfrk6m,  sys573,   gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, drmn6m,    sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 6th Mix (G*B16 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, gtrfrk7m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2001, ddrmax,    sys573,   ddrmax,     ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2002, ddrmax2,   sys573,   ddrmax,     ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, ddrmax,    sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2002, ddrmax2,   sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, mrtlbeat,  sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Martial Beat (G*B47 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2002, drmn7m,    sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 7th Mix power-up ver. (G*C07 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, drmn7ma,   drmn7m,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 7th Mix (G*C07 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
@@ -5085,9 +5116,9 @@ GAME( 2002, dsem2,     sys573,   ddr5m,      ddr,       ksys573_state, empty_ini
 GAME( 2002, ddrextrm,  sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, drmn8m,    sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 8th Mix (G*C07 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtrfrk9m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 9th Mix (G*C39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, drmn9m,    sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, gtfrk10m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, gtfrk10ma, gtfrk10m, gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, drmn9m,    sys573,   drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, gtfrk10m,  sys573,   gtfrk10m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, gtfrk10ma, gtfrk10m, gtfrk10m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10mb, gtfrk10m, gtfrk10mb,  gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix eAmusement (G*D10 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, gtfrk11m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, drmn10m,   sys573,   drmn4m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 10th Mix (G*D40 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, gtfrk11m,  sys573,   gtfrk11m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, drmn10m,   sys573,   drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 10th Mix (G*D40 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */

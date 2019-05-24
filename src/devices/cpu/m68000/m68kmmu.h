@@ -126,7 +126,7 @@ void pmmu_atc_add(u32 logical, u32 physical, int fc, const int rw)
 {
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
-	const u32 atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
+	const u32 atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((logical >> ps) << (ps - 8));
 	u32 atc_data = (physical >> ps) << (ps - 8);
 
 	if (m_mmu_tmp_sr & (M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY))
@@ -199,7 +199,7 @@ void pmmu_atc_flush_fc_ea(const u16 modes)
 {
 	const int fcmask = (modes >> 5) & 7;
 	const int fc = fc_from_modes(modes) & fcmask;
-	const int ps = (m_mmu_tc >> 16) & 0xf;
+	const int ps = (m_mmu_tc >> 20) & 0xf;
 	const int mode = (modes >> 10) & 7;
 	u32 ea;
 

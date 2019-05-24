@@ -93,13 +93,6 @@ menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &c
 void menu_input_general::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
-	int suborder[SEQ_TYPE_TOTAL];
-	int sortorder = 1;
-
-	/* create a mini lookup table for sort order based on sequence type */
-	suborder[SEQ_TYPE_STANDARD] = 0;
-	suborder[SEQ_TYPE_DECREMENT] = 1;
-	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
 	for (input_type_entry &entry : machine().ioport().types())
@@ -110,7 +103,6 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 			input_seq_type seqtype;
 
 			/* loop over all sequence types */
-			sortorder++;
 			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
 				/* build an entry for the standard sequence */
@@ -122,7 +114,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 				item->seqtype = seqtype;
 				item->seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
 				item->defseq = &entry.defseq(seqtype);
-				item->sortorder = sortorder * 4 + suborder[seqtype];
+				item->group = entry.group();
 				item->type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 				item->is_optional = false;
 				item->name = entry.name();
@@ -136,8 +128,20 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 			}
 		}
 
-	/* sort and populate the menu in a standard fashion */
-	populate_and_sort(itemlist);
+
+	// first count the number of items
+	int numitems = 0;
+	for (input_item_data const *item = itemlist; item != nullptr; item = item->next)
+		numitems++;
+
+	// now allocate an array of items and fill it up
+	std::vector<input_item_data *> itemarray(numitems);
+	int curitem = numitems;
+	for (input_item_data *item = itemlist; item != nullptr; item = item->next)
+		itemarray[--curitem] = item;
+
+	// populate the menu in a standard fashion
+	populate_sorted(std::move(itemarray));
 }
 
 menu_input_general::~menu_input_general()
@@ -156,18 +160,10 @@ menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container 
 void menu_input_specific::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
-	int suborder[SEQ_TYPE_TOTAL];
-	int port_count = 0;
-
-	/* create a mini lookup table for sort order based on sequence type */
-	suborder[SEQ_TYPE_STANDARD] = 0;
-	suborder[SEQ_TYPE_DECREMENT] = 1;
-	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
 	for (auto &port : machine().ioport().ports())
 	{
-		port_count++;
 		for (ioport_field &field : port.second->fields())
 		{
 			ioport_type_class type_class = field.type_class();
@@ -175,21 +171,8 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 			/* add if we match the group and we have a valid name */
 			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC || type_class == INPUT_CLASS_KEYBOARD))
 			{
-				input_seq_type seqtype;
-				uint32_t sortorder;
-
-				/* determine the sorting order */
-				if (type_class == INPUT_CLASS_CONTROLLER)
-				{
-					sortorder = (field.type() << 2) | (field.player() << 12);
-					if (field.device().owner() != nullptr)
-						sortorder |= (port_count & 0xfff) * 0x10000;
-				}
-				else
-					sortorder = field.type() | 0xf000;
-
 				/* loop over all sequence types */
-				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
 					/* build an entry for the standard sequence */
 					input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
@@ -200,7 +183,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						pollingitem = item;
 					item->seq = field.seq(seqtype);
 					item->defseq = &field.defseq(seqtype);
-					item->sortorder = sortorder + suborder[seqtype];
+					item->group = machine().ioport().type_group(field.type(), field.player());
 					item->type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->is_optional = field.optional();
 					item->name = field.name();
@@ -216,8 +199,50 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 		}
 	}
 
-	/* sort and populate the menu in a standard fashion */
-	populate_and_sort(itemlist);
+	// first count the number of items
+	int numitems = 0;
+	for (input_item_data const *item = itemlist; item != nullptr; item = item->next)
+		numitems++;
+
+	// now allocate an array of items and fill it up
+	std::vector<input_item_data *> itemarray(numitems);
+	int curitem = 0;
+	for (input_item_data *item = itemlist; item != nullptr; item = item->next)
+		itemarray[curitem++] = item;
+
+	// sort it
+	std::sort(itemarray.begin(), itemarray.end(), [](const input_item_data *i1, const input_item_data *i2) {
+		int cmp = strcmp(i1->owner_name, i2->owner_name);
+		if (cmp < 0)
+			return true;
+		if (cmp > 0)
+			return false;
+		if (i1->group < i2->group)
+			return true;
+		if (i1->group > i2->group)
+			return false;
+		const ioport_field &field1 = *reinterpret_cast<const ioport_field *>(i1->ref);
+		const ioport_field &field2 = *reinterpret_cast<const ioport_field *>(i2->ref);
+		if (field1.type() < field2.type())
+			return true;
+		if (field1.type() > field2.type())
+			return false;
+		std::vector<char32_t> codes1 = field1.keyboard_codes(0);
+		std::vector<char32_t> codes2 = field2.keyboard_codes(0);
+		if (!codes1.empty() && (codes2.empty() || codes1[0] < codes2[0]))
+			return true;
+		if (!codes2.empty() && (codes1.empty() || codes1[0] > codes2[0]))
+			return false;
+		cmp = strcmp(i1->name, i2->name);
+		if (cmp < 0)
+			return true;
+		if (cmp > 0)
+			return false;
+		return i1->type < i2->type;
+	});
+
+	// populate the menu in a standard fashion
+	populate_sorted(std::move(itemarray));
 }
 
 menu_input_specific::~menu_input_specific()
@@ -227,8 +252,9 @@ menu_input_specific::~menu_input_specific()
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-menu_input::menu_input(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_sortorder(0), record_next(false)
+menu_input::menu_input(mame_ui_manager &mui, render_container &container) : menu(mui, container), record_next(false)
 {
+	lastitem = nullptr;
 	pollingitem = nullptr;
 	pollingref = nullptr;
 	pollingseq = SEQ_TYPE_STANDARD;
@@ -296,7 +322,7 @@ void menu_input::handle()
 			/* an item was selected: begin polling */
 			case IPT_UI_SELECT:
 				pollingitem = item;
-				last_sortorder = item->sortorder;
+				lastitem = item;
 				starting_seq = item->seq;
 				machine().input().seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, record_next ? &item->seq : nullptr);
 				invalidate = true;
@@ -311,9 +337,9 @@ void menu_input::handle()
 		}
 
 		/* if the selection changed, reset the "record next" flag */
-		if (item->sortorder != last_sortorder)
+		if (item != lastitem)
 			record_next = false;
-		last_sortorder = item->sortorder;
+		lastitem = item;
 	}
 
 	/* if the sequence changed, update it */
@@ -354,17 +380,15 @@ void menu_input_specific::update_input(struct input_item_data *seqchangeditem)
 }
 
 
-/*-------------------------------------------------
-    menu_input_populate_and_sort - take a list
-    of input_item_data objects and build up the
-    menu from them
--------------------------------------------------*/
+//-------------------------------------------------
+//  populate_sorted - take a sorted list of
+//  input_item_data objects and build up the
+//  menu from them
+//-------------------------------------------------
 
-void menu_input::populate_and_sort(input_item_data *itemlist)
+void menu_input::populate_sorted(std::vector<input_item_data *> &&itemarray)
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
-	input_item_data *item;
-	int numitems = 0, curitem;
 	std::string subtext;
 	std::string prev_owner;
 	bool first_entry = true;
@@ -375,27 +399,12 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 	nameformat[INPUT_TYPE_ANALOG_INC] = "%s Analog Inc";
 	nameformat[INPUT_TYPE_ANALOG_DEC] = "%s Analog Dec";
 
-	/* first count the number of items */
-	for (item = itemlist; item != nullptr; item = item->next)
-		numitems++;
-
-	/* now allocate an array of items and fill it up */
-	std::vector<input_item_data *> itemarray(numitems);
-	for (item = itemlist, curitem = 0; item != nullptr; item = item->next)
-		itemarray[curitem++] = item;
-
-	/* sort it */
-	std::sort(itemarray.begin(), itemarray.end(), [](const input_item_data *i1, const input_item_data *i2) {
-		return i1->sortorder < i2->sortorder;
-	});
-
 	/* build the menu */
-	for (curitem = 0; curitem < numitems; curitem++)
+	for (input_item_data *item : itemarray)
 	{
 		uint32_t flags = 0;
 
 		/* generate the name of the item itself, based off the base name and the type */
-		item = itemarray[curitem];
 		assert(nameformat[item->type] != nullptr);
 
 		if (item->owner_name && strcmp(item->owner_name, prev_owner.c_str()) != 0)

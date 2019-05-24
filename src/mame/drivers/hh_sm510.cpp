@@ -18,6 +18,8 @@ TODO:
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
+- scan and identify lcd segments for gnw_chef
+- confirm gnw_chef rom (dumped from Soviet clone but should be the same)
 - confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
@@ -41,14 +43,14 @@ Game list (* denotes not emulated yet)
 
 Serial  Series MCU     Title
 ---------------------------------------------
-AC-01*    s    ?       Ball (aka Toss-Up)
-FL-02*    s    ?       Flagman
-MT-03*    s    ?       Vermin (aka The Exterminator)
-RC-04*    s    ?       Fire (aka Fireman Fireman)
-IP-05*    g    ?       Judge
-MN-06*    g    ?       Manhole
-CN-07*    g    ?       Helmet (aka Headache)
-LN-08*    g    ?       Lion
+AC-01*    s    SM5A?   Ball (aka Toss-Up)
+FL-02*    s    SM5A?   Flagman
+MT-03*    s    SM5A?   Vermin (aka The Exterminator)
+RC-04*    s    SM5A?   Fire (aka Fireman Fireman)
+IP-05*    g    SM5A?   Judge
+MN-06*    g    SM5A?   Manhole
+CN-07*    g    SM5A?   Helmet (aka Headache)
+LN-08*    g    SM5A?   Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
@@ -1502,6 +1504,121 @@ ROM_START( gnw_popeye )
 
 	ROM_REGION( 218428, "svg", 0)
 	ROM_LOAD( "gnw_popeye.svg", 0, 218428, CRC(b2c3fdf2) SHA1(5e782f25f9ff432a292e67efc7f5653cf2a81b60) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Chef (model FP-24)
+  * Sharp SM5A label ?
+  * lcd screen with custom segments, 1-bit sound
+
+  In 1989, Elektronika(USSR) released a clone: Merry Cook. This game most
+  likely shares the same ROM (to be verified) and the graphics is slightly
+  different.
+
+***************************************************************************/
+
+class gnw_chef_state : public hh_sm510_state
+{
+public:
+	gnw_chef_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void merrycook(machine_config &config);
+	void gnw_chef(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_chef )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND, only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_chef_state::gnw_chef(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // assuming same as merry cook
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void gnw_chef_state::merrycook(machine_config & config)
+{
+	gnw_chef(config);
+
+	/* basic machine hardware */
+	KB1013VK12(config.replace(), m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
+
+	/* video hardware */
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(1679, 1080);
+	screen->set_visarea_full();
+}
+
+// roms
+
+ROM_START( gnw_chef )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "fp-24.bin", 0x0000, 0x0740, BAD_DUMP CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) ) // dumped from Soviet clone
+
+	ROM_REGION( 100000, "svg", 0)
+	ROM_LOAD( "gnw_chef.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+ROM_START( merrycook )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "merrycook.bin", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
+
+	ROM_REGION( 143959, "svg", 0)
+	ROM_LOAD( "merrycook.svg", 0, 143959, CRC(5601535e) SHA1(7b8818ce3523cccff4adcade9603b7f719d8ab48) )
 ROM_END
 
 
@@ -9201,6 +9318,8 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )

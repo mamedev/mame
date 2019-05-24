@@ -20,7 +20,7 @@ It was also released for IBM PC, with an ISA card.
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "Final ChessCard")
+DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "C64 Final ChessCard")
 
 
 //-------------------------------------------------
