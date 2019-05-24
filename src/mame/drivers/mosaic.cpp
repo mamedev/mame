@@ -23,6 +23,7 @@
 +--------------------------------------+
 
   CPU: Z180 (surface scratched)
+       PIC16C5x (surface scratched, exact model unknown)
 Sound: YM2203C
   OSC: 14.31818MHz, 12.288MHz
   DSW: 8 position DSW
@@ -34,8 +35,9 @@ Sound: YM2203C
 Actual Measured Clocks     Derived
      Z180 - 6.14522MHz  (12.288000MHz/2)
   YM2203C - 3.57543MHz  (14.318181MHz/4)
+ PIC16C5x - 3.07252MHz  (12.288000MHz/4)
 
-Unknown 28 pin protection chip (PIC, probably PIC16C55) at 5A (UC02 as silkscreened on PCB)
+NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 
 ***************************************************************************/
 
@@ -290,7 +292,7 @@ void mosaic_state::mosaic(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));
 
-	PIC16C55(config, "pic", 12288000/3);  // not confirmed
+	PIC16C55(config, "pic", XTAL(12'288'000)/4);  /* 3.072MHz - Verified */
 	//read_a().set(FUNC(mosaic_state::));
 	//write_a().set(FUNC(mosaic_state::));
 	//read_b().set(FUNC(mosaic_state::));
