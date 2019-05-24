@@ -238,7 +238,7 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 1] & 0xc0) << 2);
 		sx = (m_spriteram[offs + 2]);
 		sy = 0xf0 - m_spriteram[offs];
-		color = 0x00 + ((m_spriteram[offs + 1] & 0x20) >> 4) + ((m_spriteram[offs + 1] & 0x8)>>3);
+		color = 0x10 + ((m_spriteram[offs + 1] & 0x20) >> 4) + ((m_spriteram[offs + 1] & 0x8)>>3);
 
 		fx = !(m_spriteram[offs + 1] & 0x04);
 		fy = (m_spriteram[offs + 1] & 0x02);
@@ -295,7 +295,7 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		code = m_spriteram[offs + 1] + ((m_spriteram[offs + 0x80] & 0x03) << 8);
 		sx = 0x100 - m_spriteram[offs + 3];
 		sy = 0x100 - m_spriteram[offs + 2];
-		color = 0x00 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
+		color = 0x10 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
 
 		fx = (m_spriteram[offs + 0] & 0x04);
 		fy = (m_spriteram[offs + 0] & 0x02);
