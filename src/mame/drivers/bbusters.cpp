@@ -652,7 +652,7 @@ void bbusters_state::bbusters(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bbusters_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &bbusters_state::sound_portmap);
 
-	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0); // actually 27C040 parallel EEPROM
+	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0); // actually 28C04 parallel EEPROM
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
