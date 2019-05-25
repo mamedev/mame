@@ -518,9 +518,9 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
 								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
-								const uint8_t r = 0xff * BIT(pix_in, 3);
+								const uint8_t r = 0xff * BIT(pix_in, 0);
 								const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
-								const uint8_t b = 0xff * BIT(pix_in, 0);
+								const uint8_t b = 0xff * BIT(pix_in, 3);
 								*dest++ = (r << 16) | (g << 8) | b;
 								break;
 							}
@@ -2673,14 +2673,12 @@ void newport_base_device::do_rex3_command()
 						{
 							case 0: // 4bpp
 								color = m_rex3.m_color_vram & 0xf;
-								color |= color << 4;
 								break;
 							case 1: // 8bpp
 								color = m_rex3.m_color_vram & 0xff;
 								break;
 							case 2: // 12bpp
 								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-								color |= color << 12;
 								break;
 							case 3: // 24bpp
 								color = m_rex3.m_color_vram & 0xffffff;
