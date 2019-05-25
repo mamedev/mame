@@ -18042,6 +18042,9 @@ kopunch                         // 834-0103 (c) 1981 Sega
 @source:kramermc.cpp
 kramermc                        // 1987 Kramer MC
 
+@source:krokha.cpp
+krokha                          // 1990 SKB Kontur, USSR
+
 @source:kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
