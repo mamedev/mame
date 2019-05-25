@@ -1966,7 +1966,7 @@ ROM_END
 ROM_START( toptek286 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: D286-1295-091589-K0
-	// Original dump split into even and odd bytes based on available PCB info
+	// Original BIOS64 dump split into even and odd bytes based on available PCB info
 	ROM_LOAD16_BYTE( "toptek_vlsi_even.bin", 0x10000, 0x8000, CRC(f35465e8) SHA1(c85afc2168e355120c63b68d5c11fce7770fe1b7) )
 	ROM_LOAD16_BYTE( "toptek_vlsi_odd.bin", 0x10001, 0x8000, CRC(b7272729) SHA1(686c976b9b7989862846a79d00f1f9116f03bc17) )
 ROM_END
@@ -2062,7 +2062,7 @@ ROM_END
 ROM_START( mat286 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS
-	// Files separated from single 64K dump (PCB photo shows split ROMs are used)
+	// Files separated from single BIOS64 dump (PCB photo shows split ROMs are used)
 	ROMX_LOAD( "9221fkf_imp23256_ami-l.bin", 0x10000, 0x08000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1), ROM_SKIP(1) )
 	ROMX_LOAD( "9221gjf_imp23256_ami-h.bin", 0x10001, 0x08000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8), ROM_SKIP(1) )
 ROM_END
