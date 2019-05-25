@@ -1186,7 +1186,7 @@ WRITE_LINE_MEMBER(newport_base_device::vblank_w)
 		if (BIT(m_vc2.m_display_ctrl, 0))
 		{
 			m_rex3.m_status |= 0x20;
-			m_gio->get_hpc3()->raise_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+			m_gio->get_hpc3()->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 		}
 	}
 }
@@ -1609,7 +1609,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 			LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
 			uint32_t old_status = m_rex3.m_status;
 			m_rex3.m_status = 0;
-			m_gio->get_hpc3()->lower_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+			m_gio->get_hpc3()->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 			ret |= (uint64_t)(old_status | 3) << 32;
 		}
 		if (ACCESSING_BITS_0_31)
@@ -1720,11 +1720,10 @@ bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
 
 void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 {
-	const uint32_t fast_mask = BIT(m_rex3.m_draw_mode1, 17) ? m_rex3.m_write_mask : 0xffffffff;
+	const uint32_t fast_mask = m_rex3.m_write_mask;//BIT(m_rex3.m_draw_mode1, 17) ? 0xffffffff : m_rex3.m_write_mask;
 	const uint32_t write_mask = fast_mask & m_global_mask;
-	const uint32_t dst = *dest_buf;
+	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
 	*dest_buf &= ~write_mask;
-
 
 	if (BIT(m_rex3.m_draw_mode1, 18)) // Blending
 	{
@@ -1891,26 +1890,26 @@ void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 	}
 	else
 	{
-		src <<= m_rex3.m_store_shift;
+		//src <<= m_rex3.m_store_shift;
 
 		switch (m_rex3.m_logic_op)
 		{
 			case 0:                                                break;
-			case 1:     *dest_buf |= (src & dst) & write_mask;     break;
-			case 2:     *dest_buf |= (src & ~dst) & write_mask;    break;
-			case 3:     *dest_buf |= (src) & write_mask;           break;
-			case 4:     *dest_buf |= (~src & dst) & write_mask;    break;
-			case 5:     *dest_buf |= (dst) & write_mask;           break;
-			case 6:     *dest_buf |= (src ^ dst) & write_mask;     break;
-			case 7:     *dest_buf |= (src | dst) & write_mask;     break;
-			case 8:     *dest_buf |= ~(src | dst) & write_mask;    break;
-			case 9:     *dest_buf |= ~(src ^ dst) & write_mask;    break;
-			case 10:    *dest_buf |= ~(dst) & write_mask;          break;
-			case 11:    *dest_buf |= (src | ~dst) & write_mask;    break;
-			case 12:    *dest_buf |= ~(src) & write_mask;          break;
-			case 13:    *dest_buf |= (~src | dst) & write_mask;    break;
-			case 14:    *dest_buf |= ~(src & dst) & write_mask;    break;
-			case 15:    *dest_buf |= 0xffffff & write_mask;        break;
+			case 1:     *dest_buf |= ((src & dst) << m_rex3.m_store_shift) & write_mask;     break;
+			case 2:     *dest_buf |= ((src & ~dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 3:     *dest_buf |= ((src) << m_rex3.m_store_shift) & write_mask;           break;
+			case 4:     *dest_buf |= ((~src & dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 5:     *dest_buf |= ((dst) << m_rex3.m_store_shift) & write_mask;           break;
+			case 6:     *dest_buf |= ((src ^ dst) << m_rex3.m_store_shift) & write_mask;     break;
+			case 7:     *dest_buf |= ((src | dst) << m_rex3.m_store_shift) & write_mask;     break;
+			case 8:     *dest_buf |= (~(src | dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 9:     *dest_buf |= (~(src ^ dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 10:    *dest_buf |= (~(dst) << m_rex3.m_store_shift) & write_mask;          break;
+			case 11:    *dest_buf |= ((src | ~dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 12:    *dest_buf |= (~(src) << m_rex3.m_store_shift) & write_mask;          break;
+			case 13:    *dest_buf |= ((~src | dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 14:    *dest_buf |= (~(src & dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 15:    *dest_buf |= (0xffffff << m_rex3.m_store_shift) & write_mask;        break;
 		}
 	}
 }
@@ -2563,14 +2562,14 @@ void newport_base_device::do_rex3_command()
 						{
 							case 0: // 4bpp
 								color = m_rex3.m_color_vram & 0xf;
-								color |= color << 4;
+								//color |= color << 4;
 								break;
 							case 1: // 8bpp
 								color = m_rex3.m_color_vram & 0xff;
 								break;
 							case 2: // 12bpp
 								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-								color |= color << 12;
+								//color |= color << 12;
 								break;
 							case 3: // 24bpp
 								color = m_rex3.m_color_vram & 0xffffff;
@@ -3493,9 +3492,9 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_i = (uint32_t)data;
-			m_rex3.m_color_red = ((m_rex3.m_color_i >> 0) & 0xff) << 11;
-			m_rex3.m_color_green = ((m_rex3.m_color_i >> 8) & 0xff) << 11;
-			m_rex3.m_color_blue = ((m_rex3.m_color_i >> 16) & 0xff) << 11;
+			//m_rex3.m_color_red = ((m_rex3.m_color_i >> 0) & 0xff) << 11;
+			//m_rex3.m_color_green = ((m_rex3.m_color_i >> 8) & 0xff) << 11;
+			//m_rex3.m_color_blue = ((m_rex3.m_color_i >> 16) & 0xff) << 11;
 		}
 		break;
 	case 0x0228/8:

@@ -200,10 +200,6 @@ protected:
 	void write_pixel(int16_t x, int16_t y, uint32_t color);
 	void store_pixel(uint32_t *dest_buf, uint32_t src);
 
-	void decode_vt_line(uint32_t line, uint32_t line_seq_ptr);
-	void decode_vt_table();
-	void update_screen_size();
-
 	void iterate_shade();
 
 	virtual uint32_t get_cmap_revision() = 0;
@@ -228,7 +224,12 @@ protected:
 
 	void do_rex3_command();
 
+	void decode_vt_line(uint32_t line, uint32_t line_seq_ptr);
+	void decode_vt_table();
+	void update_screen_size();
+
 	required_device<screen_device> m_screen;
+
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;
