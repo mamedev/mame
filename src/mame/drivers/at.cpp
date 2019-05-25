@@ -1073,12 +1073,9 @@ ROM_START( at )
 	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(26) )
 	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(26) )
 	// ROM_LOAD( "precise_860407_keyboard_mcu.bin", 0x0000, 0x800, CRC(d1faad5c) SHA1(cb315a3da632c969012c298bb8e1cf8883b70501))
-	// 27: BIOS-String: D286-1295-091589-K0
-	ROM_SYSTEM_BIOS(27, "topvlsi", "Toptek VLSI")
-	ROMX_LOAD( "toptek_vlsi.bin", 0x10000, 0x10000, CRC(f1d05c2e) SHA1(05540f6af6a3209107a7fd29e526e61d12c32b6e), ROM_BIOS(27) )
-	// 28: BIOS-String: DH12-1343-061390-K0
-	ROM_SYSTEM_BIOS(28, "headland", "Headland")
-	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(28) )
+	// 27: BIOS-String: DH12-1343-061390-K0
+	ROM_SYSTEM_BIOS(27, "headland", "Headland")
+	ROMX_LOAD( "286_headland.bin", 0x10000, 0x10000, CRC(06ea67ae) SHA1(d827f14c4307b76f727bf2a8323330992b74dd89), ROM_BIOS(27) )
 ROM_END
 
 
@@ -1964,6 +1961,16 @@ ROM_START( pcd2 )
 	ROM_LOAD( "kbd_8742_award_upi_1.61_rev_1.01.bin", 0x000, 0x800, CRC(bb8a1979) SHA1(43d35ecf76e5e8d5ddf6c32b0f6f628a7542d6e4) ) // 8742 keyboard controller
 ROM_END
 
+// Toptek 286 Turbo (board name somewhat uncertain; 5x 8-bit ISA, 3x 16-bit ISA, 2 banks of onboard RAM + 2 banks expansion RAM)
+// VLSI VL82C100 + VL82C101B + VL82C102A + VL82C103A + VL82C104; MC146818 or HM6818P RTC; unidentified keyboard controller
+ROM_START( toptek286 )
+	ROM_REGION(0x20000, "bios", 0)
+	// BIOS-String: D286-1295-091589-K0
+	// Original BIOS64 dump split into even and odd bytes based on available PCB info
+	ROM_LOAD16_BYTE( "toptek_vlsi_even.bin", 0x10000, 0x8000, CRC(f35465e8) SHA1(c85afc2168e355120c63b68d5c11fce7770fe1b7) )
+	ROM_LOAD16_BYTE( "toptek_vlsi_odd.bin", 0x10001, 0x8000, CRC(b7272729) SHA1(686c976b9b7989862846a79d00f1f9116f03bc17) )
+ROM_END
+
 // Compaq Portable II
 ROM_START( comportii )
 	ROM_REGION(0x20000,"bios", 0)
@@ -2055,7 +2062,7 @@ ROM_END
 ROM_START( mat286 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS
-	// Files separated from single 64K dump (PCB photo shows split ROMs are used)
+	// Files separated from single BIOS64 dump (PCB photo shows split ROMs are used)
 	ROMX_LOAD( "9221fkf_imp23256_ami-l.bin", 0x10000, 0x08000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1), ROM_SKIP(1) )
 	ROMX_LOAD( "9221gjf_imp23256_ami-h.bin", 0x10001, 0x08000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8), ROM_SKIP(1) )
 ROM_END
@@ -2286,6 +2293,7 @@ COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
+COMP( 19??, toptek286, ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Toptek Micro Computer", "286 Turbo", MACHINE_NOT_WORKING )
 COMP( 199?, walk386sx, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386 SX", MACHINE_NOT_WORKING ) // screen remains blank
 COMP( 199?, walk386dx, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386DX", MACHINE_NOT_WORKING ) // screen remains blank
 COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )

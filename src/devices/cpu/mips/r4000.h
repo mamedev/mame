@@ -42,6 +42,8 @@ public:
 			COMBINE_DATA(&m_cp0[CP0_Config]);
 	}
 
+	void bus_error() { m_bus_error = true; }
+
 protected:
 	enum cache_size_t
 	{
@@ -401,6 +403,7 @@ protected:
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
 	bool m_ll_active;
+	bool m_bus_error;
 	struct tlb_entry_t
 	{
 		u64 mask;

@@ -199,6 +199,7 @@ void r4000_base_device::device_reset()
 	m_cp0_timer_zero = total_cycles();
 
 	m_ll_active = false;
+	m_bus_error = false;
 
 	m_cp0[CP0_WatchLo] = 0;
 	m_cp0[CP0_WatchHi] = 0;
@@ -2988,12 +2989,23 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 
 	// TODO: cache lookup
 
+	T value = 0;
 	switch (sizeof(T))
 	{
-	case 1: apply(T(space(0).read_byte(address))); break;
-	case 2: apply(T(space(0).read_word(address))); break;
-	case 4: apply(T(space(0).read_dword(address))); break;
-	case 8: apply(T(space(0).read_qword(address))); break;
+	case 1: value = T(space(0).read_byte(address)); break;
+	case 2: value = T(space(0).read_word(address)); break;
+	case 4: value = T(space(0).read_dword(address)); break;
+	case 8: value = T(space(0).read_qword(address)); break;
+	}
+
+	if (m_bus_error)
+	{
+		m_bus_error = false;
+		cpu_exception(EXCEPTION_DBE);
+	}
+	else
+	{
+		apply(value);
 	}
 
 	return true;
@@ -3121,7 +3133,17 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 	{
 		if (t == UNCACHED)
 		{
-			apply(space(0).read_dword(address));
+			const u32 insn = space(0).read_dword(address);
+
+			if (m_bus_error)
+			{
+				m_bus_error = false;
+				cpu_exception(EXCEPTION_IBE);
+			}
+			else
+			{
+				apply(insn);
+			}
 
 			return true;
 		}
@@ -3153,7 +3175,19 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 		apply(m_icache_data[cache_address >> 2]);
 	}
 	else
-		apply(space(0).read_dword(address));
+	{
+		const u32 insn = space(0).read_dword(address);
+
+		if (m_bus_error)
+		{
+			m_bus_error = false;
+			cpu_exception(EXCEPTION_IBE);
+		}
+		else
+		{
+			apply(insn);
+		}
+	}
 
 	return true;
 }

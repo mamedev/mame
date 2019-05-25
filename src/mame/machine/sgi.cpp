@@ -234,7 +234,6 @@ void sgi_mc_device::dma_tick()
 			uint64_t data = m_space->read_qword(m_dma_gio64_addr);
 			for (uint32_t i = 0; i < length; i++)
 			{
-				logerror("Copy-mode DMA of %02x to %08x\n", (uint8_t)(data >> shift), addr);
 				m_space->write_byte(addr, (uint8_t)(data >> shift));
 				addr++;
 				shift -= 8;
@@ -373,10 +372,10 @@ READ32_MEMBER(sgi_mc_device::read)
 		LOGMASKED(LOG_READS, "%s: EISA Lock Read: %08x & %08x\n", machine().describe_context(), m_eisa_lock, mem_mask);
 		return m_eisa_lock;
 	case 0x0150/4:
-		LOGMASKED(LOG_READS, "%s: GIO64 Translation Address Mask Read: %08x & %08x\n", machine().describe_context(), m_gio64_translate_mask, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: GIO64 Translation Address Mask Read: %08x & %08x\n", machine().describe_context(), m_gio64_translate_mask, mem_mask);
 		return m_gio64_translate_mask;
 	case 0x0158/4:
-		LOGMASKED(LOG_READS, "%s: GIO64 Translation Address Substitution Bits Read: %08x & %08x\n", machine().describe_context(), m_gio64_substitute_bits, mem_mask);
+		LOGMASKED(LOG_READS | LOG_DMA, "%s: GIO64 Translation Address Substitution Bits Read: %08x & %08x\n", machine().describe_context(), m_gio64_substitute_bits, mem_mask);
 		return m_gio64_substitute_bits;
 	case 0x0160/4:
 		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA Interrupt Cause: %08x & %08x\n", machine().describe_context(), m_dma_int_cause, mem_mask);
@@ -571,11 +570,11 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		m_eisa_lock = data;
 		break;
 	case 0x0150/4:
-		LOGMASKED(LOG_WRITES, "%s: GIO64 Translation Address Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: GIO64 Translation Address Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_gio64_translate_mask = data;
 		break;
 	case 0x0158/4:
-		LOGMASKED(LOG_WRITES, "%s: GIO64 Translation Address Substitution Bits Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: GIO64 Translation Address Substitution Bits Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_gio64_substitute_bits = data;
 		break;
 	case 0x0160/4:

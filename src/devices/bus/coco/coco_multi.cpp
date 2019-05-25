@@ -102,6 +102,8 @@ namespace
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_reset() override;
+		virtual READ8_MEMBER(cts_read) override;
+		virtual WRITE8_MEMBER(cts_write) override;
 		virtual READ8_MEMBER(scs_read) override;
 		virtual WRITE8_MEMBER(scs_write) override;
 		virtual void set_sound_enable(bool sound_enable) override;
@@ -355,12 +357,7 @@ void coco_multipak_device::set_select(uint8_t new_select)
 	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(line::CART);
 
 	// change value
-	uint8_t xorval = m_select ^ new_select;
 	m_select = new_select;
-
-	// did the cartridge base change?
-	if (xorval & 0x03)
-		cart_base_changed();
 
 	// did the CART line change?
 	line_value new_cart = active_cts_slot().get_line_value(line::CART);
@@ -451,6 +448,26 @@ uint8_t* coco_multipak_device::get_cart_base()
 uint32_t coco_multipak_device::get_cart_size()
 {
 	return active_cts_slot().get_cart_size();
+}
+
+
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_multipak_device::cts_read)
+{
+	return active_cts_slot().cts_read(space, offset);
+}
+
+
+//-------------------------------------------------
+//  cts_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_multipak_device::cts_write)
+{
+	active_cts_slot().cts_write(space, offset, data);
 }
 
 

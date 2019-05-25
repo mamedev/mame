@@ -90,10 +90,28 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 
 	PC_LPT(config, m_pi1);
 
+#if IOC2_NEW_KBDC
+	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	kbdc.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	kbdc.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+
+	// keyboard port
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
+	pc_at_keyboards(kbd);
+	kbd.set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	kbd.set_pc_kbdc_slot(&kbdc);
+
+	// keyboard controller
+	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
+	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_irq().set(FUNC(ioc2_device::kbdc_int_w));
+#else
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->input_buffer_full_callback().set(FUNC(ioc2_device::kbdc_int_w));
+#endif
 
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(0);
@@ -211,7 +229,9 @@ WRITE_LINE_MEMBER(ioc2_device::pit_clock2_out)
 {
 	m_pit->write_clk0(state);
 	m_pit->write_clk1(state);
+#if !IOC2_NEW_KBDC
 	m_kbdc->write_out2(state);
+#endif
 }
 
 WRITE_LINE_MEMBER(ioc2_device::kbdc_int_w)
@@ -338,13 +358,21 @@ READ32_MEMBER(ioc2_device::read)
 
 		case KBD_MOUSE_REGS1:
 		{
+#if IOC2_NEW_KBDC
+			const uint8_t data = m_kbdc->data_r();
+#else
 			const uint8_t data = m_kbdc->data_r(space, 0);
+#endif
 			LOGMASKED(LOG_MOUSEKBD, "%s: Read Keyboard/Mouse Register 1: %02x\n", machine().describe_context(), data);
 			return data;
 		}
 		case KBD_MOUSE_REGS2:
 		{
+#if IOC2_NEW_KBDC
+			const uint8_t data = m_kbdc->status_r();
+#else
 			const uint8_t data = m_kbdc->data_r(space, 4);
+#endif
 			LOGMASKED(LOG_MOUSEKBD, "%s: Read Keyboard/Mouse Register 2: %02x\n", machine().describe_context(), data);
 			return data;
 		}
@@ -519,11 +547,19 @@ WRITE32_MEMBER( ioc2_device::write )
 
 		case KBD_MOUSE_REGS1:
 			LOGMASKED(LOG_MOUSEKBD, "%s: Write Keyboard/Mouse Register 1: %02x\n", machine().describe_context(), (uint8_t)data);
+#if IOC2_NEW_KBDC
+			m_kbdc->data_w(data & 0xff);
+#else
 			m_kbdc->data_w(space, 0, data & 0xff);
+#endif
 			return;
 		case KBD_MOUSE_REGS2:
 			LOGMASKED(LOG_MOUSEKBD, "%s: Write Keyboard/Mouse Register 2: %02x\n", machine().describe_context(), (uint8_t)data);
+#if IOC2_NEW_KBDC
+			m_kbdc->command_w(data & 0xff);
+#else
 			m_kbdc->data_w(space, 4, data & 0xff);
+#endif
 			return;
 
 		case PANEL_REG:
@@ -658,7 +694,9 @@ void ioc2_device::handle_reset_reg_write(uint8_t data)
 	// guinness/fullhouse-specific implementations can handle bit 3 being used for ISDN reset on Indy only and bit 2 for EISA reset on Indigo 2 only, but for now we do nothing with it
 	if (BIT(data, 1))
 	{
+#if !IOC2_NEW_KBDC
 		m_kbdc->reset();
+#endif
 	}
 	m_reset_reg = 0;
 }

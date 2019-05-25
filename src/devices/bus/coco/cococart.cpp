@@ -532,13 +532,7 @@ void device_cococart_interface::interface_pre_start()
 
 READ8_MEMBER(device_cococart_interface::cts_read)
 {
-	memory_region *cart_mem = get_cart_memregion();
-	offs_t cart_length = cart_mem->bytes();
-
-	if (cart_mem)
-		return cart_mem->base()[offset & (cart_length - 1)];
-	else
-		return 0x00;
+	return 0x00;
 }
 
 

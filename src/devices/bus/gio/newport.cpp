@@ -46,6 +46,7 @@
 DEFINE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device,  "gio_xl8",  "SGI 8-bit XL board")
 DEFINE_DEVICE_TYPE(GIO_XL24, gio_xl24_device, "gio_xl24", "SGI 24-bit XL board")
 
+/*static*/ const uint32_t newport_base_device::s_host_shifts[4] = { 8, 8, 16, 32 };
 
 newport_base_device::newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -120,7 +121,17 @@ void newport_base_device::device_start()
 	save_item(NAME(m_xmap1.m_mode_table));
 
 	save_item(NAME(m_rex3.m_draw_mode0));
+	save_item(NAME(m_rex3.m_color_host));
 	save_item(NAME(m_rex3.m_draw_mode1));
+	save_item(NAME(m_rex3.m_plane_enable));
+	save_item(NAME(m_rex3.m_plane_depth));
+	save_item(NAME(m_rex3.m_rwpacked));
+	save_item(NAME(m_rex3.m_hostdepth));
+	save_item(NAME(m_rex3.m_rwdouble));
+	save_item(NAME(m_rex3.m_sfactor));
+	save_item(NAME(m_rex3.m_dfactor));
+	save_item(NAME(m_rex3.m_logicop));
+	save_item(NAME(m_rex3.m_store_shift));
 	save_item(NAME(m_rex3.m_write_width));
 	save_item(NAME(m_rex3.m_ls_mode));
 	save_item(NAME(m_rex3.m_ls_pattern));
@@ -190,10 +201,6 @@ void newport_base_device::device_start()
 	save_item(NAME(m_rex3.m_config));
 	save_item(NAME(m_rex3.m_status));
 	save_item(NAME(m_rex3.m_xfer_width));
-	save_item(NAME(m_rex3.m_store_shift));
-	save_item(NAME(m_rex3.m_logic_op));
-	save_item(NAME(m_rex3.m_src_blend));
-	save_item(NAME(m_rex3.m_dst_blend));
 
 	save_item(NAME(m_cmap0.m_palette_idx));
 	save_item(NAME(m_cmap0.m_palette));
@@ -511,9 +518,9 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
 								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
-								const uint8_t r = 0xff * BIT(pix_in, 3);
+								const uint8_t r = 0xff * BIT(pix_in, 0);
 								const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
-								const uint8_t b = 0xff * BIT(pix_in, 0);
+								const uint8_t b = 0xff * BIT(pix_in, 3);
 								*dest++ = (r << 16) | (g << 8) | b;
 								break;
 							}
@@ -1186,7 +1193,7 @@ WRITE_LINE_MEMBER(newport_base_device::vblank_w)
 		if (BIT(m_vc2.m_display_ctrl, 0))
 		{
 			m_rex3.m_status |= 0x20;
-			m_gio->get_hpc3()->raise_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+			m_gio->get_hpc3()->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 		}
 	}
 }
@@ -1609,7 +1616,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 			LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
 			uint32_t old_status = m_rex3.m_status;
 			m_rex3.m_status = 0;
-			m_gio->get_hpc3()->lower_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+			m_gio->get_hpc3()->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 			ret |= (uint64_t)(old_status | 3) << 32;
 		}
 		if (ACCESSING_BITS_0_31)
@@ -1625,11 +1632,27 @@ READ64_MEMBER(newport_base_device::rex3_r)
 	return ret;
 }
 
+uint32_t newport_base_device::get_host_color()
+{
+    static const uint32_t s_color_masks[4] = { 0xf, 0xff, 0xfff, 0xffffff };
+    const uint32_t color = (uint32_t)(m_rex3.m_host_dataport >> m_rex3.m_host_shift) & s_color_masks[m_rex3.m_hostdepth];
+    if (m_rex3.m_rwpacked)
+    {
+        if ((m_rex3.m_rwdouble && m_rex3.m_host_shift > 0) || m_rex3.m_host_shift > 32)
+            m_rex3.m_host_shift -= s_host_shifts[m_rex3.m_hostdepth];
+        else
+            m_rex3.m_host_shift = 64 - s_host_shifts[m_rex3.m_hostdepth];
+    }
+    return color;
+}
+
 void newport_base_device::write_pixel(uint32_t color)
 {
 	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
 	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
-	if (shade || rgbmode)
+	if (m_rex3.m_color_host)
+		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_host_color());
+	else if (shade || rgbmode)
 		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_rgb_color(m_rex3.m_x_start_i, m_rex3.m_y_start_i));
 	else
 		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, color);
@@ -1720,11 +1743,9 @@ bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
 
 void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 {
-	const uint32_t fast_mask = BIT(m_rex3.m_draw_mode1, 17) ? m_rex3.m_write_mask : 0xffffffff;
-	const uint32_t write_mask = fast_mask & m_global_mask;
-	const uint32_t dst = *dest_buf;
+	const uint32_t write_mask = m_rex3.m_write_mask & m_global_mask;
+	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
 	*dest_buf &= ~write_mask;
-
 
 	if (BIT(m_rex3.m_draw_mode1, 18)) // Blending
 	{
@@ -1792,7 +1813,7 @@ void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 			break;
 		}
 
-		switch (m_rex3.m_src_blend)
+		switch (m_rex3.m_sfactor)
 		{
 		case 0: // 0
 		default:
@@ -1836,7 +1857,7 @@ void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 			break;
 		}
 
-		switch (m_rex3.m_dst_blend)
+		switch (m_rex3.m_dfactor)
 		{
 		case 0: // 0
 		default:
@@ -1891,26 +1912,24 @@ void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
 	}
 	else
 	{
-		src <<= m_rex3.m_store_shift;
-
-		switch (m_rex3.m_logic_op)
+		switch (m_rex3.m_logicop)
 		{
 			case 0:                                                break;
-			case 1:     *dest_buf |= (src & dst) & write_mask;     break;
-			case 2:     *dest_buf |= (src & ~dst) & write_mask;    break;
-			case 3:     *dest_buf |= (src) & write_mask;           break;
-			case 4:     *dest_buf |= (~src & dst) & write_mask;    break;
-			case 5:     *dest_buf |= (dst) & write_mask;           break;
-			case 6:     *dest_buf |= (src ^ dst) & write_mask;     break;
-			case 7:     *dest_buf |= (src | dst) & write_mask;     break;
-			case 8:     *dest_buf |= ~(src | dst) & write_mask;    break;
-			case 9:     *dest_buf |= ~(src ^ dst) & write_mask;    break;
-			case 10:    *dest_buf |= ~(dst) & write_mask;          break;
-			case 11:    *dest_buf |= (src | ~dst) & write_mask;    break;
-			case 12:    *dest_buf |= ~(src) & write_mask;          break;
-			case 13:    *dest_buf |= (~src | dst) & write_mask;    break;
-			case 14:    *dest_buf |= ~(src & dst) & write_mask;    break;
-			case 15:    *dest_buf |= 0xffffff & write_mask;        break;
+			case 1:     *dest_buf |= ((src & dst) << m_rex3.m_store_shift) & write_mask;     break;
+			case 2:     *dest_buf |= ((src & ~dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 3:     *dest_buf |= ((src) << m_rex3.m_store_shift) & write_mask;           break;
+			case 4:     *dest_buf |= ((~src & dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 5:     *dest_buf |= ((dst) << m_rex3.m_store_shift) & write_mask;           break;
+			case 6:     *dest_buf |= ((src ^ dst) << m_rex3.m_store_shift) & write_mask;     break;
+			case 7:     *dest_buf |= ((src | dst) << m_rex3.m_store_shift) & write_mask;     break;
+			case 8:     *dest_buf |= (~(src | dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 9:     *dest_buf |= (~(src ^ dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 10:    *dest_buf |= (~(dst) << m_rex3.m_store_shift) & write_mask;          break;
+			case 11:    *dest_buf |= ((src | ~dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 12:    *dest_buf |= (~(src) << m_rex3.m_store_shift) & write_mask;          break;
+			case 13:    *dest_buf |= ((~src | dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 14:    *dest_buf |= (~(src & dst) << m_rex3.m_store_shift) & write_mask;    break;
+			case 15:    *dest_buf |= (0xffffff << m_rex3.m_store_shift) & write_mask;        break;
 		}
 	}
 }
@@ -2409,7 +2428,7 @@ uint32_t newport_base_device::do_pixel_read()
 			ret = m_cid[src_addr];
 			break;
 	}
-	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, src_x, src_y);
+	LOGMASKED(LOG_COMMANDS, "Read %08x (%08x) from %04x, %04x\n", ret, m_rgbci[src_addr], src_x, src_y);
 	m_rex3.m_x_start_i++;
 	if (m_rex3.m_x_start_i > m_rex3.m_x_end_i)
 	{
@@ -2540,19 +2559,29 @@ void newport_base_device::do_rex3_command()
 					if (BIT(mode0, 19) && dx < 0) // LROnly
 						break;
 
-					if (!BIT(mode0, 8))
-						end_x = start_x;
+                    end_x += dx;
 
-					end_x += dx;
+					int16_t prim_end_x = end_x;
+                    bool stop_on_x = BIT(mode0, 8);
 
 					if (BIT(mode0, 15) && abs(end_x - start_x) > 32)
-						end_x = start_x + 32 * dx;
+						prim_end_x = start_x + 32 * dx;
 
-					const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
-					const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
+                    if (m_rex3.m_color_host && m_rex3.m_rwpacked)
+                    {
+                        stop_on_x = true;
+                        static const int16_t s_max_host_lengths[2][4] = { { 4, 4, 2, 1 }, { 8, 8, 4, 2 } };
+                        const int16_t max_length = s_max_host_lengths[m_rex3.m_rwdouble ? 1 : 0][m_rex3.m_hostdepth];
+                        int16_t length = abs(prim_end_x - start_x);
+                        if (length > max_length)
+                            prim_end_x = start_x + dx * max_length;
+                    }
+
 					const bool shade = BIT(mode0, 18);
 					const bool rgbmode = BIT(mode1, 15);
+					const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
 					const bool fastclear = BIT(mode1, 17);
+					const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
 
 					LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, pattern);
 
@@ -2563,14 +2592,14 @@ void newport_base_device::do_rex3_command()
 						{
 							case 0: // 4bpp
 								color = m_rex3.m_color_vram & 0xf;
-								color |= color << 4;
+								//color |= color << 4;
 								break;
 							case 1: // 8bpp
 								color = m_rex3.m_color_vram & 0xff;
 								break;
 							case 2: // 12bpp
 								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-								color |= color << 12;
+								//color |= color << 12;
 								break;
 							case 3: // 24bpp
 								color = m_rex3.m_color_vram & 0xffffff;
@@ -2579,11 +2608,13 @@ void newport_base_device::do_rex3_command()
 					}
 
 					uint32_t bit = 31;
-					for (; start_x != end_x; start_x += dx)
+					do
 					{
 						if (BIT(pattern, bit))
 						{
-							if ((shade || rgbmode) && !fastclear)
+							if (m_rex3.m_color_host)
+								write_pixel(start_x, start_y, get_host_color());
+							else if ((shade || rgbmode) && !fastclear)
 								write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
 							else
 								write_pixel(start_x, start_y, color);
@@ -2597,178 +2628,101 @@ void newport_base_device::do_rex3_command()
 							iterate_shade();
 
 						bit = (bit - 1) & 0x1f;
-					}
+						start_x += dx;
+					} while (start_x != prim_end_x && start_x != end_x && stop_on_x);
 
 					write_x_start(start_x << 11);
 					break;
 				}
 
 				case 1: // Block
+				{
 					if (BIT(mode0, 19) && dx < 0) // LROnly
 						break;
 
-					end_x += dx;
+                    end_x += dx;
 					end_y += dy;
 
-					if (BIT(mode0, 6)) // ColorHost
+					int16_t prim_end_x = end_x;
+                    bool stop_on_x = BIT(mode0, 8);
+					const bool stop_on_y = BIT(mode0, 9);
+
+					if (BIT(mode0, 15) && (end_x - start_x) >= 32)
+						prim_end_x = start_x + 32 * dx;
+
+                    if (m_rex3.m_color_host && m_rex3.m_rwpacked)
+                    {
+                        stop_on_x = true;
+                        static const int16_t s_max_host_lengths[2][4] = { { 4, 4, 2, 1 }, { 8, 8, 4, 2 } };
+                        const int16_t max_length = s_max_host_lengths[m_rex3.m_rwdouble ? 1 : 0][m_rex3.m_hostdepth];
+                        int16_t length = abs(prim_end_x - start_x);
+                        if (length > max_length)
+                            prim_end_x = start_x + dx * max_length;
+                    }
+
+					const bool shade = BIT(mode0, 18);
+					const bool rgbmode = BIT(mode1, 15);
+					const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
+					const bool fastclear = BIT(mode1, 17);
+					const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
+
+					uint32_t color = m_rex3.m_color_i;
+					if (fastclear)
 					{
-						if (BIT(mode1, 7)) // Packed
+						switch (m_rex3.m_plane_depth)
 						{
-							const bool doubleword = BIT(mode1, 10);
-							LOGMASKED(LOG_COMMANDS, "%04x, %04x = %08x%08x\n", start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> 32), (uint32_t)m_rex3.m_host_dataport);
+							case 0: // 4bpp
+								color = m_rex3.m_color_vram & 0xf;
+								break;
+							case 1: // 8bpp
+								color = m_rex3.m_color_vram & 0xff;
+								break;
+							case 2: // 12bpp
+								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+								break;
+							case 3: // 24bpp
+								color = m_rex3.m_color_vram & 0xffffff;
+								break;
+						}
+					}
 
-							uint16_t width = end_x - start_x;
-							uint64_t shift = 0;
-							switch ((m_rex3.m_draw_mode1 >> 8) & 3)
+					do
+					{
+						uint32_t bit = 31;
+						do
+						{
+							if (BIT(pattern, bit))
 							{
-								case 0: // 4bpp
-								{
-									const uint16_t max_width = doubleword ? 16 : 8;
-									if (width > max_width)
-										width = max_width;
-
-									shift = 60;
-									for (uint16_t i = 0; i < width; i++)
-									{
-										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-										start_x++;
-										shift -= 4;
-									}
-									break;
-								}
-
-								case 1: // 8bpp
-								{
-									const uint16_t max_width = doubleword ? 8 : 4;
-									if (width > max_width)
-										width = max_width;
-
-									shift = 56;
-									for (uint16_t i = 0; i < width; i++)
-									{
-										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-										start_x++;
-										shift -= 8;
-									}
-									break;
-								}
-
-								case 2: // 12bpp
-								{
-									const uint16_t max_width = doubleword ? 4 : 2;
-									if (width > max_width)
-										width = max_width;
-
-									shift = 48;
-									for (uint16_t i = 0; i < width; i++)
-									{
-										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-										start_x++;
-										shift -= 16;
-									}
-									break;
-								}
-
-								case 3: // 32bpp
-								{
-									const uint16_t max_width = doubleword ? 2 : 1;
-									if (width > max_width)
-										width = max_width;
-
-									shift = 32;
-									for (uint16_t i = 0; i < width; i++)
-									{
-										write_pixel(start_x, start_y, (uint32_t)(m_rex3.m_host_dataport >> shift));
-										start_x++;
-										shift -= 32;
-									}
-									break;
-								}
+								if (m_rex3.m_color_host)
+									write_pixel(start_x, start_y, get_host_color());
+								else if ((shade || rgbmode) && !fastclear)
+									write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
+								else
+									write_pixel(start_x, start_y, color);
 							}
-						}
-						else
-						{
-							LOGMASKED(LOG_COMMANDS, "%04x, %04x = %02x\n", start_x, start_y, (uint8_t)(m_rex3.m_host_dataport >> 56));
-							write_pixel(start_x, start_y, m_rex3.m_host_dataport >> 56);
-							start_x++;
-						}
+							else if (opaque)
+							{
+								write_pixel(start_x, start_y, m_rex3.m_color_back);
+							}
+
+							if (shade)
+								iterate_shade();
+
+							bit = (bit - 1) & 0x1f;
+							start_x += dx;
+						} while (start_x != prim_end_x && start_x != end_x && stop_on_x);
 
 						if (start_x == end_x)
 						{
-							start_y += dy;
 							start_x = m_rex3.m_x_save;
+							start_y += dy;
 						}
-					}
-					else
-					{
-						const bool stop_on_x = BIT(mode0, 8);
-						const bool stop_on_y = BIT(mode0, 9);
-						const bool shade = BIT(mode0, 18);
-						const bool rgbmode = BIT(mode1, 15);
-						const bool opaque = BIT(mode0, 16) || BIT(mode0, 17);
-						const bool fastclear = BIT(mode1, 17);
-						const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
-
-						if (BIT(mode0, 15) && (end_x - start_x) >= 32)
-							end_x = start_x + 32 * dx;
-
-						uint32_t color = m_rex3.m_color_i;
-						if (fastclear)
-						{
-							switch (m_rex3.m_plane_depth)
-							{
-								case 0: // 4bpp
-									color = m_rex3.m_color_vram & 0xf;
-									color |= color << 4;
-									break;
-								case 1: // 8bpp
-									color = m_rex3.m_color_vram & 0xff;
-									break;
-								case 2: // 12bpp
-									color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-									color |= color << 12;
-									break;
-								case 3: // 24bpp
-									color = m_rex3.m_color_vram & 0xffffff;
-									break;
-							}
-						}
-
-						do
-						{
-							uint32_t bit = 31;
-							do
-							{
-								if (BIT(pattern, bit))
-								{
-									if ((shade || rgbmode) && !fastclear)
-										write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
-									else
-										write_pixel(start_x, start_y, color);
-								}
-								else if (opaque)
-								{
-									write_pixel(start_x, start_y, m_rex3.m_color_back);
-								}
-
-								if (shade)
-									iterate_shade();
-
-								bit = (bit - 1) & 0x1f;
-								start_x += dx;
-							} while (start_x != end_x && stop_on_x);
-
-							if (start_x == end_x)
-							{
-								start_x = m_rex3.m_x_save;
-								start_y += dy;
-							}
-						} while (start_y != end_y && stop_on_y);
-					}
+					} while (start_y != end_y && stop_on_y);
 
 					write_x_start(start_x << 11);
 					write_y_start(start_y << 11);
 					break;
+				}
 
 				case 2: // I_Line
 					do_iline(m_rex3.m_color_i);
@@ -3081,10 +3035,16 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			static const uint32_t s_store_shift[4] = { 4, 0, 12, 0 };
 			m_rex3.m_plane_enable = m_rex3.m_draw_mode1 & 7;
 			m_rex3.m_plane_depth = (m_rex3.m_draw_mode1 >> 3) & 3;
+			m_rex3.m_rwpacked = BIT(m_rex3.m_draw_mode1, 7);
+			m_rex3.m_hostdepth = (m_rex3.m_draw_mode1 >> 8) & 3;
+			m_rex3.m_rwdouble = BIT(m_rex3.m_draw_mode1, 10);
+			m_rex3.m_sfactor = (m_rex3.m_draw_mode1 >> 19) & 7;
+			m_rex3.m_dfactor = (m_rex3.m_draw_mode1 >> 22) & 7;
+			m_rex3.m_logicop = (m_rex3.m_draw_mode1 >> 28) & 15;
+
 			m_rex3.m_store_shift = BIT(m_rex3.m_draw_mode1, 5) ? s_store_shift[m_rex3.m_plane_depth] : 0;
-			m_rex3.m_logic_op = (m_rex3.m_draw_mode1 >> 28) & 15;
-			m_rex3.m_src_blend = (m_rex3.m_draw_mode1 >> 19) & 7;
-			m_rex3.m_dst_blend = (m_rex3.m_draw_mode1 >> 22) & 7;
+
+			m_rex3.m_host_shift = 64 - s_host_shifts[m_rex3.m_hostdepth];
 		}
 		if (ACCESSING_BITS_0_31)
 		{
@@ -3146,6 +3106,8 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			LOGMASKED(LOG_REX3, "    Enable End Filter:  %d\n", BIT(data32, 22));
 			LOGMASKED(LOG_REX3, "    Enable Y+2 Stride:  %d\n", BIT(data32, 23));
 			m_rex3.m_draw_mode0 = data32;
+
+			m_rex3.m_color_host = BIT(m_rex3.m_draw_mode0, 6);
 		}
 		break;
 	case 0x0008/8:
@@ -3493,9 +3455,9 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_i = (uint32_t)data;
-			m_rex3.m_color_red = ((m_rex3.m_color_i >> 0) & 0xff) << 11;
-			m_rex3.m_color_green = ((m_rex3.m_color_i >> 8) & 0xff) << 11;
-			m_rex3.m_color_blue = ((m_rex3.m_color_i >> 16) & 0xff) << 11;
+			//m_rex3.m_color_red = ((m_rex3.m_color_i >> 0) & 0xff) << 11;
+			//m_rex3.m_color_green = ((m_rex3.m_color_i >> 8) & 0xff) << 11;
+			//m_rex3.m_color_blue = ((m_rex3.m_color_i >> 16) & 0xff) << 11;
 		}
 		break;
 	case 0x0228/8:
@@ -3513,6 +3475,7 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 	case 0x0230/8:
 		LOGMASKED(LOG_REX3, "REX3 Host Data Port Write: %08x%08x & %08x%08x\n", (uint32_t)(data >> 32), (uint32_t)data, (uint64_t)(mem_mask >> 32), (uint32_t)mem_mask);
 		COMBINE_DATA(&m_rex3.m_host_dataport);
+		m_rex3.m_host_shift = 64 - s_host_shifts[m_rex3.m_hostdepth];
 		break;
 	case 0x0238/8:
 		if (ACCESSING_BITS_32_63)

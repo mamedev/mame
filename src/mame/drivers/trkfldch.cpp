@@ -89,15 +89,46 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 	// at 0xe9c (actually 0x0d0c when fully populated) in trkfldch
 	// 7861 / 7860 point here most of the time in both games (so maybe DMA source, or just uses a direct pointer)
 
-	for (int i = 0x1189; i < 0x1600; i += 5)
+	//for (int i = 0x0d0c+0x100*5; i >= 0x0d0c; i -= 5)
+	for (int i = 0x1189+0x100*5; i >= 0x1189; i -= 5)
 	{
 	//	printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
+	//	int tilegfxbase = 0x1f80; // select mode 
+	//	int tilegfxbase = 0x2780; // 2nd demo (+0x800 from above)
+	//	int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
+		int tilegfxbase = (m_unkregs[0x15] * 0x800) - 0x80;
 
 		int y = m_mainram[i + 1];
 		int x = m_mainram[i + 3];
+		int tile = m_mainram[i + 2];
 
-		gfx_element *gfx = m_gfxdecode->gfx(0);
-		gfx->transpen(bitmap,cliprect,0x1000,0,0,0,x,y,0);
+		int tilehigh = m_mainram[i + 4] & 0x04;
+		int tilehigh2 = m_mainram[i + 0] & 0x04;
+		int tilehigh3 = m_mainram[i + 0] & 0x08;
+
+
+		if (tilehigh)
+			tile += 0x100;
+
+		if (tilehigh2)
+			tile += 0x200;
+
+		if (tilehigh3)
+			tile += 0x400;
+
+
+		int xhigh = m_mainram[i + 4] & 0x01;
+		int yhigh = m_mainram[i + 0] & 0x01; // or enable bit?
+
+		x = x | (xhigh << 8);
+		y = y | (yhigh << 8);
+
+		y -= 0x100;
+		y -= 16;
+		x -= 16;
+
+		gfx_element *gfx = m_gfxdecode->gfx(1);
+		gfx->transpen(bitmap,cliprect,tile+tilegfxbase,0,0,0,x,y,0);
 	}
 
 	return 0;
@@ -198,12 +229,12 @@ static INPUT_PORTS_START( trkfldch )
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O") // selects / forward
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("X") // goes back
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("O") // selects / forward
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY // directions correct based on 'letters' minigame
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("X") // goes back
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -247,8 +278,20 @@ static const gfx_layout tiles8x8_layout =
 	64*8
 };
 
+static const gfx_layout tiles16x16_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0, 1, 32, 33, 64, 65, 96, 97 },
+	{ 8,10,12,14, 0,2,4,6, 24,26,28,30, 16,18,20,22,},
+	{ STEP16(0,128) },
+	128*16,
+};
+
 static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16_layout, 0, 1 )
 GFXDECODE_END
 
 /*

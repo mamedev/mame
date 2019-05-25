@@ -6424,13 +6424,13 @@
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A: Platoon + Arkanoid II: Revenge of Doh + Combat School"/>
+			<feature name="part_id" value="Side A: Loader + Platoon + Arkanoid II: Revenge of Doh + Combat School (loader)"/>
 			<dataarea name="flop" size="215296">
 				<rom name="total - platoon + arkanoid ii - revenge of doh + combat school (1989)(erbe)(es)(en)(side a)[b].dsk" size="215296" crc="90fe6396" sha1="d721e1aac28c159b7463acc0e165316a19091699" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Target Renegade"/>
+			<feature name="part_id" value="Side B: Target Renegade (data) + Combat School (data)"/>
 			<dataarea name="flop" size="204544">
 				<rom name="total - renegade ii - target renegade (1989)(erbe)(es)(en)(side b).dsk" size="204544" crc="8ee50a77" sha1="6794e5e61a5a08a69141001e60b6ed5ec5e95a85" offset="0" />
 			</dataarea>
@@ -6585,7 +6585,7 @@
 	<software name="worldcup">
 		<description>World Cup Year 90 Compilation</description>
 		<year>1990</year>
-		<publisher>Empire</publisher>
+		<publisher>Empire Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Gary Lineker's Hot-Shot"/>
 			<dataarea name="flop" size="219136">
@@ -6696,7 +6696,7 @@
 	<software name="castclow">
 		<description>Castles and Clowns</description>
 		<year>1985</year>
-		<publisher>Macmillan</publisher>
+		<publisher>Macmillan Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="castles and clowns (1985)(macmillan).dsk" size="194816" crc="b79676fd" sha1="8561af217f3b00ef56bfa452bca3b67e2dbe2c04" offset="0" />
@@ -6708,7 +6708,7 @@
 	<software name="castclowa" cloneof="castclow">
 		<description>Castles and Clowns (alt)</description>
 		<year>1985</year>
-		<publisher>Macmillan</publisher>
+		<publisher>Macmillan Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="castles and clowns (1985)(macmillan)[a].dsk" size="194816" crc="0764b8fa" sha1="37a2931cdfd5813ec859126c5e0f445a389660d2" offset="0" />
@@ -7262,7 +7262,7 @@
 	<software name="aliensyn">
 		<description>Alien Syndrome</description>
 		<year>1988</year>
-		<publisher>ACE</publisher>
+		<publisher>ACE Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="alien syndrome (1988)(ace).dsk" size="194816" crc="f7cb4c52" sha1="6aa692ebce02b84c803debeb610f4eb0d313707d" offset="0" />
@@ -7324,7 +7324,7 @@
 	<software name="spmandoom">
 		<description>The Amazing Spider-Man and Captain America in Dr. Doom's Revenge</description>
 		<year>1989</year>
-		<publisher>Empire</publisher>
+		<publisher>Empire Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="amazing spider-man and captain america in dr. doom's revenge, the (1989)(empire).dsk" size="194816" crc="ad142fd9" sha1="a7fa82a92bf1db333065c0a74115c5990033e6d8" offset="0" />
@@ -7766,7 +7766,7 @@
 	<software name="barbari2">
 		<description>Barbarian II - The Dungeon of Drax</description>
 		<year>1988</year>
-		<publisher>Palace</publisher>
+		<publisher>Palace Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="254720">
 				<rom name="barbarian ii - the dungeon of drax (1988)(palace).dsk" size="254720" crc="c34122e2" sha1="85aaa95586f4c72940dcbb4c172344a5cf65347c" offset="0" />
@@ -7778,7 +7778,7 @@
 	<software name="barbari2a" cloneof="barbari2">
 		<description>Barbarian II - The Dungeon of Drax (alt)</description>
 		<year>1988</year>
-		<publisher>Palace</publisher>
+		<publisher>Palace Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="144384">
 				<rom name="barbarian ii - the dungeon of drax (1988)(palace)[a].dsk" size="144384" crc="7f0aecdc" sha1="960844cba76d42f6ff1a37ecbb1a2cce8568368f" offset="0" />
@@ -8773,12 +8773,12 @@
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="chasehq2">
-		<description>Chase H.Q. II - Special Criminal Investigations</description>
+		<description>Chase H.Q. II - Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="127232">
-				<rom name="chase h.q. ii - special criminal investigations (1990)(ocean).dsk" size="127232" crc="3b77b2ad" sha1="82ca5734e13e42347f3c6ca182049d45d5cc6bad" offset="0" />
+				<rom name="chase h.q. ii - special criminal investigation (1990)(ocean).dsk" size="127232" crc="3b77b2ad" sha1="82ca5734e13e42347f3c6ca182049d45d5cc6bad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9921,7 +9921,7 @@
 	<software name="emilbutr">
 		<description>Emilio Butragueno Futbol</description>
 		<year>1988</year>
-		<publisher>Ocean Software - Topo Soft</publisher>
+		<publisher>Topo Soft, Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="58624">
 				<rom name="emilio butragueno futbol (1988)(ocean software - topo soft)(gb)(es).dsk" size="58624" crc="94d830d3" sha1="e1778ad33325399f2c9c3f9a5d788f374ac1098f" offset="0" />
@@ -9933,7 +9933,7 @@
 	<software name="emilbutra" cloneof="emilbutr">
 		<description>Emilio Butragueno Futbol (alt)</description>
 		<year>1988</year>
-		<publisher>Ocean Software - Topo Soft</publisher>
+		<publisher>Topo Soft, Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="116992">
 				<rom name="emilio butragueno futbol (1988)(ocean software - topo soft)(gb)(es)[a].dsk" size="116992" crc="a6184800" sha1="6bbfc0bc81082d1719b932b96128d362b3c7730f" offset="0" />
@@ -10703,7 +10703,7 @@
 	<software name="gazza2a" cloneof="gazza2">
 		<description>Gazza II (alt)</description>
 		<year>1990</year>
-		<publisher>Empire</publisher>
+		<publisher>Empire Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="185088">
 				<rom name="gazza ii (1990)(empire).dsk" size="185088" crc="21159d93" sha1="5854e7aff0623135f9347a9a52512dd5e3c6c2c2" offset="0" />
@@ -11980,7 +11980,7 @@
 	<software name="kickoffa" cloneof="kickoff">
 		<description>Kick Off (alt)</description>
 		<year>1989</year>
-		<publisher>Anco</publisher>
+		<publisher>Anco Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="kick off (1989)(anco).dsk" size="194816" crc="6e2d2e18" sha1="d54e7dbc333ed5b99be8507169bffd6c0c2505da" offset="0" />
@@ -11992,7 +11992,7 @@
 	<software name="kickoff2">
 		<description>Kick Off 2</description>
 		<year>1990</year>
-		<publisher>Anco</publisher>
+		<publisher>Anco Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="160256">
 				<rom name="kick off 2 (1990)(anco).dsk" size="160256" crc="36135461" sha1="9f6ff7abb598322a77708e335d2bb4d981011d44" offset="0" />
@@ -14040,7 +14040,7 @@
 	<software name="pipmaniaa" cloneof="pipmania">
 		<description>Pipe Mania (alt)</description>
 		<year>1990</year>
-		<publisher>Empire</publisher>
+		<publisher>Empire Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="pipe mania (1990)(empire).dsk" size="194816" crc="456edf8c" sha1="1b93a1c85477b9e482832d0230743ac23dfe90ce" offset="0" />
@@ -15410,7 +15410,7 @@
 	<software name="soldlghta" cloneof="soldlght">
 		<description>Soldier of Light (alt)</description>
 		<year>1988</year>
-		<publisher>ACE</publisher>
+		<publisher>ACE Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="soldier of light (1988)(ace).dsk" size="194816" crc="8de198b1" sha1="dde86e28951db167097e08ee6989f17380d3f62a" offset="0" />
@@ -17747,7 +17747,7 @@
 	<software name="emilbut2">
 		<description>Emilio Butragueno 2</description>
 		<year>1989</year>
-		<publisher>Erbe Software - Ocean</publisher>
+		<publisher>Erbe Software, Ocean Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="emilio butragueno 2 (1989)(erbe software - ocean)(es)[aka emilio butragueno futbol 2].dsk" size="194816" crc="0ac224b8" sha1="7d3df2ca6721a3d5bd225ae64c66faf6da709bb0" offset="0" />
@@ -19399,7 +19399,7 @@
 	<software name="clschss4sp" cloneof="clschss4">
 		<description>Colossus Chess 4 (Spa)</description>
 		<year>1986</year>
-		<publisher>Proein</publisher>
+		<publisher>Proein Soft Line</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "194816">
 				<rom name="Colossus 4 Chess (Proein).dsk" size="194816" crc="6fc03840" sha1="462dbf4f71e984448de7638ade421eb9355a4bc7" offset="0"/>
@@ -19761,7 +19761,7 @@
 	<!-- No good dump known of Side B, but Side A seems to include everything. -->
 		<description>Simulation Hits (Spa)</description>
 		<year>1989</year>
-		<publisher>Proein</publisher>
+		<publisher>Proein Soft Line</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size = "200517">
 				<rom name="Simulation Hits - Side 1 (Proein).dsk" size="200517" crc="ddeb37da" sha1="25d6beb79a898ffa503551556cd4ccaa20f7f0a5" offset="0"/>
@@ -20387,7 +20387,7 @@
 	<software name="pirate">
 		<description>Pirate</description>
 		<year>1983</year>
-		<publisher>Chalksoft Ltd</publisher>
+		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195117">
 				<rom name="pirate.dsk" size="195117" crc="6821ee57" sha1="25809452294b3c7327772f56411f0dad8c0d7c95" offset="0"/>
@@ -20460,7 +20460,7 @@
 	<software name="skatedie">
 		<description>Skate or Die</description>
 		<year>1989</year>
-		<publisher>	Electronic Arts</publisher>
+		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="318661">
 				<rom name="skate or die.dsk" size="318661" crc="d64fff82" sha1="bfcef2a80c2505b6f40cb6edf72ac3e552214e8d" offset="0"/>
@@ -20544,7 +20544,7 @@
 	<software name="spatutor">
 		<description>The Spanish Tutor</description>
 		<year>1984</year>
-		<publisher>	Kosmos Software</publisher>
+		<publisher>Kosmos Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195635">
 				<rom name="the spanish tutor.dsk" size="195635" crc="f87e0da6" sha1="fd4ff5cba02cf2f8568810398b69f17816ee308e" offset="0"/>
@@ -20684,6 +20684,24 @@
 			<feature name="part_id" value="Side B: Trivial Pursuit Genus Edition (questions)"/>
 			<dataarea name="flop" size="195631">
 				<rom name="colour printer driver - side b.dsk" size="195631" crc="1651571b" sha1="ff320f1c51e1b16651ae26c932c6793e5b5a222b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coinophi">
+		<description>Coin-Op Hits</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Loader + Out Run + Thunder Blade + Spy Hunter + Bionic Commando"/>
+			<dataarea name="flop" size="282311">
+				<rom name="coin-ophits[spectrum+3]_a.dsk" size="282311" crc="3b6588f0" sha1="368c50ecd00ae7fe557d00dfdcf426d95a92a53b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Road Blasters (data)"/>
+			<dataarea name="flop" size="290743">
+				<rom name="coin-ophits[spectrum+3]_b.dsk" size="290743" crc="4ff52ed3" sha1="6d639e09d286526d500ddbc17cb6b5f61f42da66" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

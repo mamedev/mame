@@ -105,14 +105,3 @@ void coco12_state::pia1_pb_changed(uint8_t data)
 	m_vdg->gm2_w(data & 0x40);
 	m_vdg->ag_w(data & 0x80);
 }
-
-
-
-//-------------------------------------------------
-//  update_cart_base
-//-------------------------------------------------
-
-void coco12_state::update_cart_base(uint8_t *cart_base)
-{
-	m_sam->configure_bank(3, cart_base, 0x4000, true);      // $C000-$FEFF
-}
