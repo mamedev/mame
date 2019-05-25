@@ -106,6 +106,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 		int tilehigh2 = m_mainram[i + 0] & 0x04;
 		int tilehigh3 = m_mainram[i + 0] & 0x08;
 
+		//int unk = m_mainram[i + 4] & 0x20;
 
 		if (tilehigh)
 			tile += 0x100;
@@ -115,6 +116,9 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 
 		if (tilehigh3)
 			tile += 0x400;
+
+		//if (unk)
+		//	tile = machine().rand();
 
 
 		int xhigh = m_mainram[i + 4] & 0x01;
@@ -272,10 +276,13 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
+	{ 0, 1, 16, 17, 32, 33, 48, 49 },
+	{  8,10,12, 14, 0,2,4,6  },
+	{ 0,0 + 64,
+	128,128 + 64,
+	256,256 + 64,
+	384, 384 + 64 },
+	512,
 };
 
 static const gfx_layout tiles16x16_layout =
@@ -284,7 +291,7 @@ static const gfx_layout tiles16x16_layout =
 	RGN_FRAC(1,1),
 	8,
 	{ 0, 1, 32, 33, 64, 65, 96, 97 },
-	{ 8,10,12,14, 0,2,4,6, 24,26,28,30, 16,18,20,22,},
+	{ 8,10,12,14, 0,2,4,6, 24,26,28,30, 16,18,20,22 },
 	{ STEP16(0,128) },
 	128*16,
 };
