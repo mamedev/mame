@@ -35,7 +35,7 @@ Sound: YM2203C
 Actual Measured Clocks     Derived
      Z180 - 6.14522MHz  (12.288000MHz/2)
   YM2203C - 3.57543MHz  (14.318181MHz/4)
- PIC16C5x - 3.07252MHz  (12.288000MHz/4)
+ PIC16C5x - 3.07262MHz  (12.288000MHz/4)
 
 NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 
