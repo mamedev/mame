@@ -680,7 +680,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 
-	case 0x60:
+	case 0x60: // sprite list location (dma source?)
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
@@ -688,7 +688,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x62: // sprite list location (dma source?)
+	case 0x62: 
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
