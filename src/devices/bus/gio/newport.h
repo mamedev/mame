@@ -93,7 +93,20 @@ protected:
 	struct rex3_t
 	{
 		uint32_t m_draw_mode0;
+		bool m_color_host;
 		uint32_t m_draw_mode1;
+		uint8_t m_plane_enable;
+		uint8_t m_plane_depth;
+    	bool m_rwpacked;
+    	bool m_rwdouble;
+    	uint8_t m_hostdepth;
+		uint8_t m_sfactor;
+		uint8_t m_dfactor;
+		uint8_t m_logicop;
+
+		uint32_t m_store_shift;
+		uint32_t m_host_shift;
+
 		uint32_t m_write_width;
 		uint32_t m_ls_mode;
 		uint32_t m_ls_pattern;
@@ -162,12 +175,6 @@ protected:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint8_t m_xfer_width;
-		uint8_t m_plane_enable;
-		uint8_t m_plane_depth;
-		uint32_t m_store_shift;
-		uint8_t m_src_blend;
-		uint8_t m_dst_blend;
-		uint8_t m_logic_op;
 	};
 
 	struct cmap_t
@@ -205,6 +212,7 @@ protected:
 	virtual uint32_t get_cmap_revision() = 0;
 	virtual uint32_t get_xmap_revision() = 0;
 
+	uint32_t get_host_color();
 	uint32_t get_rgb_color(int16_t x, int16_t y);
 
     struct bresenham_octant_info_t
@@ -253,6 +261,8 @@ protected:
 
 	FILE *m_newview_log;
 #endif
+
+	static const uint32_t s_host_shifts[4];
 };
 
 class gio_xl8_device : public newport_base_device
