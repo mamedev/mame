@@ -83,6 +83,7 @@ uint8_t nes_zapper_device::read_bit34()
 	uint8_t ret = m_trigger->read();
 
 	// get the pixel at the gun position
+	m_port->m_screen->update_now();
 	rgb_t pix = m_port->m_screen->pixel(m_lightx->read(), m_lighty->read());
 
 	// check if the cursor is over a bright pixel
