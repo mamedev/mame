@@ -62,8 +62,8 @@ protected:
 	DECLARE_WRITE32_MEMBER(hd_enet_w);
 	template <uint32_t index> DECLARE_READ32_MEMBER(hd_r);
 	template <uint32_t index> DECLARE_WRITE32_MEMBER(hd_w);
-	template <fifo_type_t type> DECLARE_READ32_MEMBER(fifo_r);
-	template <fifo_type_t type> DECLARE_WRITE32_MEMBER(fifo_w);
+	template <fifo_type_t Type> DECLARE_READ32_MEMBER(fifo_r);
+	template <fifo_type_t Type> DECLARE_WRITE32_MEMBER(fifo_w);
 	DECLARE_READ32_MEMBER(intstat_r);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);

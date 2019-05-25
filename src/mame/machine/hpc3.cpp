@@ -525,37 +525,37 @@ WRITE32_MEMBER(hpc3_base_device::hd_enet_w)
 	}
 }
 
-template<hpc3_base_device::fifo_type_t type>
+template<hpc3_base_device::fifo_type_t Type>
 READ32_MEMBER(hpc3_base_device::fifo_r)
 {
 	uint32_t ret = 0;
-	if (type == FIFO_PBUS)
+	if (Type == FIFO_PBUS)
 		ret = m_pbus_fifo[offset >> 1];
-	else if (type == FIFO_SCSI0)
+	else if (Type == FIFO_SCSI0)
 		ret = m_scsi_fifo[0][offset >> 1];
-	else if (type == FIFO_SCSI1)
+	else if (Type == FIFO_SCSI1)
 		ret = m_scsi_fifo[1][offset >> 1];
-	else if (type == FIFO_ENET_RECV)
+	else if (Type == FIFO_ENET_RECV)
 		ret = m_enet_fifo[ENET_RECV][offset >> 1];
-	else if (type == FIFO_ENET_XMIT)
+	else if (Type == FIFO_ENET_XMIT)
 		ret = m_enet_fifo[ENET_XMIT][offset >> 1];
-	logerror("Reading %08x from %d FIFO offset %08x (%08x)\n", ret, type, offset, offset >> 1);
+	logerror("Reading %08x from %d FIFO offset %08x (%08x)\n", ret, Type, offset, offset >> 1);
 	return ret;
 }
 
-template<hpc3_base_device::fifo_type_t type>
+template<hpc3_base_device::fifo_type_t Type>
 WRITE32_MEMBER(hpc3_base_device::fifo_w)
 {
-	logerror("Writing %08x to %d FIFO offset %08x (%08x)\n", data, type, offset, offset >> 2);
-	if (type == FIFO_PBUS)
+	logerror("Writing %08x to %d FIFO offset %08x (%08x)\n", data, Type, offset, offset >> 2);
+	if (Type == FIFO_PBUS)
 		m_pbus_fifo[offset >> 2] = data;
-	else if (type == FIFO_SCSI0)
+	else if (Type == FIFO_SCSI0)
 		m_scsi_fifo[0][offset >> 1] = data;
-	else if (type == FIFO_SCSI1)
+	else if (Type == FIFO_SCSI1)
 		m_scsi_fifo[1][offset >> 1] = data;
-	else if (type == FIFO_ENET_RECV)
+	else if (Type == FIFO_ENET_RECV)
 		m_enet_fifo[ENET_RECV][offset >> 2] = data;
-	else if (type == FIFO_ENET_XMIT)
+	else if (Type == FIFO_ENET_XMIT)
 		m_enet_fifo[ENET_XMIT][offset >> 2] = data;
 }
 
