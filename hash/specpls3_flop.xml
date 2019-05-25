@@ -6424,13 +6424,13 @@
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A: Platoon + Arkanoid II: Revenge of Doh + Combat School"/>
+			<feature name="part_id" value="Side A: Loader + Platoon + Arkanoid II: Revenge of Doh + Combat School (loader)"/>
 			<dataarea name="flop" size="215296">
 				<rom name="total - platoon + arkanoid ii - revenge of doh + combat school (1989)(erbe)(es)(en)(side a)[b].dsk" size="215296" crc="90fe6396" sha1="d721e1aac28c159b7463acc0e165316a19091699" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Target Renegade"/>
+			<feature name="part_id" value="Side B: Target Renegade (data) + Combat School (data)"/>
 			<dataarea name="flop" size="204544">
 				<rom name="total - renegade ii - target renegade (1989)(erbe)(es)(en)(side b).dsk" size="204544" crc="8ee50a77" sha1="6794e5e61a5a08a69141001e60b6ed5ec5e95a85" offset="0" />
 			</dataarea>
