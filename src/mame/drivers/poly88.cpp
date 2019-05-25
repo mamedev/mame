@@ -11,8 +11,7 @@ ToDo:
 - POLY88 - MT 06231: Cassette saving hangs. Also, the system has different
   formats depending on a switch. Only one format is currently emulated.
 - POLY8813 - Schematic shows a 8251 on the main board.
-- POLY8813 - Schematic of FDC shows a UART and a PIO (perhaps 8251 and 8255?)
-  no dedicated fdc chip.
+- POLY8813 - Schematic of FDC shows a mc6852 and i8255, no dedicated fdc chip.
 
 
 Poly-8813 is a disk-based computer with 3 mini-floppy drives.
