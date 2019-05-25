@@ -1249,7 +1249,7 @@ void screen_device::reset_partial_updates()
 
 u32 screen_device::pixel(s32 x, s32 y)
 {
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	if (!curbitmap.valid())
 		return 0;
 
@@ -1289,7 +1289,7 @@ u32 screen_device::pixel(s32 x, s32 y)
 
 void screen_device::pixels(u32 *buffer)
 {
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	if (!curbitmap.valid())
 		return;
 
