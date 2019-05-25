@@ -226,6 +226,7 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 		ret |= 0x08;
 
 		/* get the pixel at the gun position */
+		m_ppu->screen().update_now();
 		rgb_t pix = m_ppu->screen().pixel(x, y);
 
 		/* look at the screen and see if the cursor is over a bright pixel */
