@@ -27,7 +27,7 @@
 
 // ======================> interpod_t
 
-class interpod_t : public device_t, 
+class interpod_t : public device_t,
 				   public device_cbm_iec_interface
 {
 public:

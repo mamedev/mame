@@ -841,10 +841,10 @@ uint64_t athlonxp_device::opcode_rdmsr(bool &valid_msr)
 			/* Access to the ASeg (a0000-bffff) depends on bit 0 of smm_mask
 			   if the bit is 0 use the associated fixed mtrr
 			   if the bit is 1
-				   if smm is active
-					   access goes to dram (wrmem 1 rdmem 1)
-				   if smm not active
-					   access goes to mmio (wrmem 0 rdmem 0) */
+			       if smm is active
+			           access goes to dram (wrmem 1 rdmem 1)
+			       if smm not active
+			           access goes to mmio (wrmem 0 rdmem 0) */
 			ret = m_msr_smm_mask;
 			break;
 	}

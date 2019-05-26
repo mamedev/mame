@@ -63,12 +63,12 @@ uint8_t bbc_pmsgenie_device::read(offs_t offset)
 			break;
 		case 0x1f:
 			/* &9F00-&9FFF - Bank select latch
-         Bit
-         0-2: RAM bank select
-           3: Not used
-         4-5: ROM bank select
-           6: Not used
-           7: Read / NOT Write for internal RAM */
+		 Bit
+		 0-2: RAM bank select
+		   3: Not used
+		 4-5: ROM bank select
+		   6: Not used
+		   7: Read / NOT Write for internal RAM */
 			m_bank_latch = offset & 0xff;
 			break;
 		}

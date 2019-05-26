@@ -60,10 +60,10 @@ Notes:
     DIPSW2  -
 
 ROM checksum program:
-	10 FOR I%=0% TO 16383%
-	20 A%=A%+PEEK(I%)
-	30 NEXT I%
-	40 ;A%; I%
+    10 FOR I%=0% TO 16383%
+    20 A%=A%+PEEK(I%)
+    30 NEXT I%
+    40 ;A%; I%
 */
 
 /*

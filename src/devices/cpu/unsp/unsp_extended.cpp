@@ -57,10 +57,10 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			size -= 1;
 
 			if ((rx-size) >= 0)
-				logerror("(Ext) push %s, %s to [%s]\n",
-					   extregs[rx-size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			    logerror("(Ext) push %s, %s to [%s]\n",
+			           extregs[rx-size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			else
-				logerror("(Ext) push <BAD>\n");
+			    logerror("(Ext) push <BAD>\n");
 			*/
 			//unimplemented_opcode(op, ximm);
 			return;
@@ -78,10 +78,10 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 
 			if ((rx-size) >= 0)
-				logerror("(Ext) pop %s, %s from [%s]\n",
-					   extregs[rx-size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			    logerror("(Ext) pop %s, %s from [%s]\n",
+			           extregs[rx-size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			else
-				logerror("(Ext) pop <BAD>\n");
+			    logerror("(Ext) pop <BAD>\n");
 			*/
 			//unimplemented_opcode(op, ximm);
 			return;

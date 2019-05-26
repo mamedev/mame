@@ -112,11 +112,11 @@ WRITE_LINE_MEMBER(bally_as2888_device::sound_int)
 
 TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_int_sync)
 {
-        if (param)
-        {
-                m_snd_sustain_timer->adjust(attotime::from_msec(5));
-                m_discrete->write(NODE_08, 11);  // 11 volt pulse
-        }
+		if (param)
+		{
+				m_snd_sustain_timer->adjust(attotime::from_msec(5));
+				m_discrete->write(NODE_08, 11);  // 11 volt pulse
+		}
 }
 
 //-------------------------------------------------
@@ -128,8 +128,8 @@ void bally_as2888_device::device_add_mconfig(machine_config &config)
 	DISCRETE(config, m_discrete, as2888_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
 
-        TIMER(config, "timer_s_freq").configure_periodic(FUNC(bally_as2888_device::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
-        TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(bally_as2888_device::timer_as2888));
+		TIMER(config, "timer_s_freq").configure_periodic(FUNC(bally_as2888_device::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
+		TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(bally_as2888_device::timer_as2888));
 }
 
 //-------------------------------------------------
@@ -138,34 +138,34 @@ void bally_as2888_device::device_add_mconfig(machine_config &config)
 
 void bally_as2888_device::device_start()
 {
-        save_item(NAME(m_sound_select));
-        save_item(NAME(m_snd_sel));
-        save_item(NAME(m_snd_tone_gen));
-        save_item(NAME(m_snd_div));
+		save_item(NAME(m_sound_select));
+		save_item(NAME(m_snd_sel));
+		save_item(NAME(m_snd_tone_gen));
+		save_item(NAME(m_snd_div));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_s)
 {
-        m_snd_tone_gen--;
+		m_snd_tone_gen--;
 
-        if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
-        {
-                m_snd_tone_gen = m_snd_sel;
-                m_snd_div++;
+		if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
+		{
+				m_snd_tone_gen = m_snd_sel;
+				m_snd_div++;
 
-                m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
-                m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
-        }
+				m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+				m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
+		}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 {
-        m_snd_sel = m_snd_prom[m_sound_select];
-        m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
-        m_snd_tone_gen = m_snd_sel;
+		m_snd_sel = m_snd_prom[m_sound_select];
+		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
+		m_snd_tone_gen = m_snd_sel;
 
-        m_discrete->write(NODE_08, 0);
-        m_snd_sustain_timer->adjust(attotime::never);
+		m_discrete->write(NODE_08, 0);
+		m_snd_sustain_timer->adjust(attotime::never);
 }
 
 
@@ -177,19 +177,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 //  IO ports
 //**************************************************************************
 static INPUT_PORTS_START(as3022)
-        PORT_START("SW1")
-        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
+		PORT_START("SW1")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_as3022_device::device_input_ports() const
 {
-        return INPUT_PORTS_NAME(as3022);
+		return INPUT_PORTS_NAME(as3022);
 }
 
 INPUT_CHANGED_MEMBER(bally_as3022_device::sw1)
 {
-        if (newval != oldval)
-                m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+		if (newval != oldval)
+				m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 //-------------------------------------------------
@@ -284,9 +284,9 @@ void bally_as3022_device::device_start()
 	m_ay->set_volume(2, 0);
 
 	save_item(NAME(m_bc1));
-        save_item(NAME(m_bdir));
-        save_item(NAME(m_sound_select));
-        save_item(NAME(m_ay_data));
+		save_item(NAME(m_bdir));
+		save_item(NAME(m_sound_select));
+		save_item(NAME(m_ay_data));
 }
 
 
@@ -438,19 +438,19 @@ WRITE8_MEMBER(bally_sounds_plus_device::vocalizer_pia_portb_w)
 //  IO ports
 //**************************************************************************
 static INPUT_PORTS_START(cheap_squeak)
-        PORT_START("SW1")
-        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
+		PORT_START("SW1")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_cheap_squeak_device::device_input_ports() const
 {
-        return INPUT_PORTS_NAME(cheap_squeak);
+		return INPUT_PORTS_NAME(cheap_squeak);
 }
 
 INPUT_CHANGED_MEMBER(bally_cheap_squeak_device::sw1)
 {
-        if (newval != oldval)
-                m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+		if (newval != oldval)
+				m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 //-------------------------------------------------
@@ -508,9 +508,9 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_p2_cb().set(FUNC(bally_cheap_squeak_device::out_p2_cb));
 
 	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
-        voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-        vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-        vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+		voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+		vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+		vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 //-------------------------------------------------
@@ -520,8 +520,8 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 void bally_cheap_squeak_device::device_start()
 {
 	m_sound_ack_w_handler.resolve();
-        save_item(NAME(m_sound_select));
-        save_item(NAME(m_sound_int));
+		save_item(NAME(m_sound_select));
+		save_item(NAME(m_sound_int));
 }
 
 //-------------------------------------------------

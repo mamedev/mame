@@ -102,7 +102,7 @@ ROM_END
 /* Daryde Cricket PCB
  __________________________________________________
  |    ___________________  ___________________     |
- |    |_CN13 (12 pins)__|  |___CN (12 pins)__|     | 
+ |    |_CN13 (12 pins)__|  |___CN (12 pins)__|     |
  |                            ___               __ |
  |                _______    |H606016   ____    |C||
  |__              |74LS273N             |XTAL   |N||
@@ -137,8 +137,8 @@ ROM_START(cricket)
 	ROM_REGION(0x22e, "pal", 0)
 	ROM_LOAD("a_palce16v8h.ic4", 0x000, 0x117, NO_DUMP)
 	ROM_LOAD("b_palce16v8h.ic5", 0x117, 0x117, NO_DUMP)
-	
-        ROM_REGION(0x2000, "nvram", 0)
+
+		ROM_REGION(0x2000, "nvram", 0)
 	ROM_LOAD("ds1225y.ic7", 0x0000, 0x2000, BAD_DUMP CRC(3a7f0f6f) SHA1(b672859399db854bc049c75beea482b5afb3d2bb)) // NVRAM dumped from a working machine, but may not be the default
 ROM_END
 

@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE16_MEMBER(video_7088_w);
 
 	DECLARE_READ16_MEMBER(video_7083_r);
-	
+
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 
@@ -151,7 +151,7 @@ protected:
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
-//	required_shared_ptr<uint16_t> m_scrollram;
+//  required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	uint16_t m_page1_addr;

@@ -1547,7 +1547,7 @@
 		<publisher>Mindscape</publisher>
 		<!-- No compatibility data known at this time. -->
 		<!-- Tink Tonk side B needs to be redumped as the existing image is
-	 	a duplicate of Hugga Bunch side A. -->
+		a duplicate of Hugga Bunch side A. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk"/>
@@ -2458,7 +2458,7 @@
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 		<!-- No compatibility data known at this time. -->
 		<!-- On May 10th, 2019, updated disk image from new source to fix some
-		minor data corruption	on side A, track $1C -->
+		minor data corruption   on side A, track $1C -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>

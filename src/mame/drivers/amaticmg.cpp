@@ -610,7 +610,7 @@ READ8_MEMBER( amaticmg_state::touchm_r )
 
 WRITE8_MEMBER( amaticmg_state::touchm_w )
 {
-	m_tch->write(data & 1); 
+	m_tch->write(data & 1);
 }
 
 WRITE8_MEMBER( amaticmg_state::rombank_w )
@@ -993,7 +993,7 @@ ROM_START( am_mg24 )
 	ROM_REGION( 0x4000, "proms", 0 )
 	ROM_LOAD( "m2061295.bin", 0x0000, 0x1c00, CRC(05f4a6af) SHA1(b14e9c80d3313fa5bf076d129a509a711d80f982) )
 	ROM_LOAD( "m2080196.bin", 0x2000, 0x1c00, CRC(8cf6c3a6) SHA1(6454077c2ab94093e878cbc1c0102bbb6c4bc367) )
-	
+
 	ROM_REGION( 0x0248, "touch_m", 0 )
 	ROM_LOAD( "ds1994.bin", 0x0000, 0x0248, CRC(7f581301) SHA1(33b2652f053a5e09442ccaa078b5d245255bb415) )
 ROM_END

@@ -64,12 +64,12 @@ protected:
 			const char *tag,
 			device_t *owner,
 			uint32_t clock) :
-	        device_t(mconfig, type, tag, owner, clock),
-                device_mixer_interface(mconfig, *this),
+			device_t(mconfig, type, tag, owner, clock),
+				device_mixer_interface(mconfig, *this),
 		m_snd_prom(*this, "sound"),
-                m_discrete(*this, "discrete"),
-                m_timer_s_freq(*this, "timer_s_freq"),
-                m_snd_sustain_timer(*this, "timer_as2888")
+				m_discrete(*this, "discrete"),
+				m_timer_s_freq(*this, "timer_s_freq"),
+				m_snd_sustain_timer(*this, "timer_as2888")
 	{ }
 
 	// device-level overrides
@@ -78,20 +78,20 @@ protected:
 
 private:
 	uint8_t m_sound_select;
-        uint8_t m_snd_sel;
-        uint8_t m_snd_tone_gen;
-        uint8_t m_snd_div;
-        required_region_ptr<uint8_t> m_snd_prom;
-        required_device<discrete_sound_device> m_discrete;
-        required_device<timer_device> m_timer_s_freq;
-        required_device<timer_device> m_snd_sustain_timer;
+		uint8_t m_snd_sel;
+		uint8_t m_snd_tone_gen;
+		uint8_t m_snd_div;
+		required_region_ptr<uint8_t> m_snd_prom;
+		required_device<discrete_sound_device> m_discrete;
+		required_device<timer_device> m_timer_s_freq;
+		required_device<timer_device> m_snd_sustain_timer;
 
 
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
-        TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-        TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+		TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+		TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
 };
 
 
@@ -122,11 +122,11 @@ protected:
 			const char *tag,
 			device_t *owner,
 			uint32_t clock) :
-	        device_t(mconfig, type, tag, owner, clock),
-                device_mixer_interface(mconfig, *this),
-                m_cpu(*this, "cpu"),
-                m_pia(*this, "pia"),
-                m_ay(*this, "ay"),
+			device_t(mconfig, type, tag, owner, clock),
+				device_mixer_interface(mconfig, *this),
+				m_cpu(*this, "cpu"),
+				m_pia(*this, "pia"),
+				m_ay(*this, "ay"),
 		m_mc3417(*this, "mc3417")
 	{ }
 
@@ -217,9 +217,9 @@ protected:
 			const char *tag,
 			device_t *owner,
 			uint32_t clock) :
-	        device_t(mconfig, type, tag, owner, clock),
-                device_mixer_interface(mconfig, *this),
-                m_cpu(*this, "cpu"),
+			device_t(mconfig, type, tag, owner, clock),
+				device_mixer_interface(mconfig, *this),
+				m_cpu(*this, "cpu"),
 		m_dac(*this, "dac"),
 		m_sound_ack_w_handler(*this)
 	{ }
@@ -231,7 +231,7 @@ protected:
 
 	// devices
 	required_device<m6803_cpu_device> m_cpu;
-        required_device<dac_byte_interface> m_dac;
+		required_device<dac_byte_interface> m_dac;
 
 private:
 	uint8_t m_sound_select;

@@ -70,7 +70,7 @@ Notes:
 #define R6532_TAG       "u3"
 #define R6522_TAG       "u4"
 #define MC6850_TAG      "u5"
-#define RS232_TAG		"rs232"
+#define RS232_TAG       "rs232"
 
 
 //**************************************************************************
@@ -135,7 +135,7 @@ void interpod_t::device_add_mconfig(machine_config &config)
 	VIA6522(config, m_via, 1000000);
 
 	MOS6532_NEW(config, m_riot, 1000000);
-	
+
 	ACIA6850(config, m_acia, 0);
 
 	ieee488_device::add_cbm_devices(config, nullptr);

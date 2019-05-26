@@ -1556,11 +1556,11 @@ namespace netlist
 
 		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
-		bool								m_stats;
+		bool                                m_stats;
 
 		// performance
-		nperftime_t<true>     				m_stat_mainloop;
-		nperfcount_t<true>    				m_perf_out_processed;
+		nperftime_t<true>                   m_stat_mainloop;
+		nperfcount_t<true>                  m_perf_out_processed;
 };
 
 	// -----------------------------------------------------------------------------

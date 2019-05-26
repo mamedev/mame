@@ -474,7 +474,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 		case 0: m_scrolly = data; break;
 		case 1: m_scrollx = data; break;
 		case 2: m_bg_bank = (data & 0x01) << 9;
-				// TODO: this may be shuffled 
+				// TODO: this may be shuffled
 				// 4 -> title screen (correct?)
 				// 0 -> gameplay (supposedly a 2 is better)
 				// needs to know what it tries to write after stage 1 ...

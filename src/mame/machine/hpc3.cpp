@@ -17,7 +17,7 @@
 #define LOG_ETHERNET    (1 << 5)
 #define LOG_PBUS4       (1 << 6)
 #define LOG_CHAIN       (1 << 7)
-#define LOG_EEPROM		(1 << 8)
+#define LOG_EEPROM      (1 << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_SCSI_IRQ | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN | LOG_EEPROM)
 
 #define VERBOSE         (0)

@@ -19,11 +19,11 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define I8255_TAG		"u2"
+#define I8255_TAG       "u2"
 #define DS75160A_TAG    "u3"
 #define DS75161A_TAG    "u4"
-#define CENTRONICS_TAG	"p4"
-#define EXPANSION_TAG	"exp"
+#define CENTRONICS_TAG  "p4"
+#define EXPANSION_TAG   "exp"
 
 
 
@@ -142,10 +142,10 @@ WRITE8_MEMBER( buscard_t::ppi_pb_w )
 
 	    PB0     BASIC ROM bank bit 0
 	    PB1     BASIC ROM bank bit 1
-	    PB2     
+	    PB2
 	    PB3     BASIC ROM enable
-	    PB4     
-	    PB5     
+	    PB4
+	    PB5
 	    PB6     STROBE
 	    PB7     DIP switch select
 
@@ -153,7 +153,7 @@ WRITE8_MEMBER( buscard_t::ppi_pb_w )
 
 	m_bank = data & 0x03;
 	m_basic = BIT(data, 3);
-	
+
 	m_centronics->write_strobe(BIT(data, 6));
 
 	m_dipsw = BIT(data, 7);
@@ -166,10 +166,10 @@ READ8_MEMBER( buscard_t::ppi_pc_r )
 	    bit     description
 
 	    PC0     BUSY
-	    PC1     
+	    PC1
 	    PC2     DAV
 	    PC3     EOI
-	    PC4     
+	    PC4
 	    PC5     ATN
 	    PC6     NRFD
 	    PC7     NDAC
@@ -195,12 +195,12 @@ WRITE8_MEMBER( buscard_t::ppi_pc_w )
 
 	    bit     description
 
-	    PC0     
+	    PC0
 	    PC1     ATN
 	    PC2     DAV
 	    PC3     EOI
 	    PC4     TE
-	    PC5     
+	    PC5
 	    PC6     NRFD
 	    PC7     NDAC
 
@@ -329,7 +329,7 @@ void buscard_t::device_start()
 void buscard_t::device_reset()
 {
 	m_ppi->reset();
-	
+
 	m_ieee2->ifc_w(0);
 	m_ieee2->ifc_w(1);
 }
@@ -342,7 +342,7 @@ void buscard_t::device_reset()
 uint8_t buscard_t::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	int cs = BIT(offset, 6) && BIT(offset, 7);
-	
+
 	if (sphi2 && !io1 && cs)
 	{
 		data = m_ppi->read(offset & 0x03);

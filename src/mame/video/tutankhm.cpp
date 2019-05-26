@@ -12,8 +12,8 @@
 #include "includes/tutankhm.h"
 #include "video/resnet.h"
 
-#define STAR_RNG_PERIOD     	((1 << 17) - 1)
-#define RGB_MAXIMUM         	224
+#define STAR_RNG_PERIOD         ((1 << 17) - 1)
+#define RGB_MAXIMUM             224
 
 /*************************************
  *

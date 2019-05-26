@@ -26,7 +26,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
-//	, m_scrollram(*this, "scrollram")
+//  , m_scrollram(*this, "scrollram")
 	, m_spriteram(*this, "^spriteram")
 	, m_video_irq_cb(*this)
 	, m_palette(*this, "palette")
@@ -190,7 +190,7 @@ void gcm394_base_video_device::device_reset()
 	m_703a = 0x0000;
 	m_7062 = 0x0000;
 	m_7063 = 0x0000;
-	
+
 	m_702a = 0x0000;
 	m_7030 = 0x0000;
 	m_703c = 0x0000;
@@ -311,8 +311,8 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 				{
 					/*
 					m_screenbuf[pix_index] = (mix_channel((uint8_t)(m_screenbuf[pix_index] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
-											 (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
-											 (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
+					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
+					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
 					*/
 					m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
 				}
@@ -360,7 +360,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
 		uint32_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
-		
+
 		uint16_t palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
 			palette >>= 8;
@@ -463,8 +463,8 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	/*
 	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 	{
-		x = (160 + x) - w / 2;
-		y = (120 - y) - (h / 2) + 8;
+	    x = (160 + x) - w / 2;
+	    y = (120 - y) - (h / 2) + 8;
 	}
 	*/
 
@@ -802,7 +802,7 @@ READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VID
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context().c_str(), offset, data, m_703a); 
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context().c_str(), offset, data, m_703a);
 
 	if (m_703a & 0xfff0)
 	{

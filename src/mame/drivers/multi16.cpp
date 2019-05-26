@@ -4,31 +4,31 @@
 
     Mitsubishi MULTI-16 series
 
-	MULTI-16 (1982, 1983 for S models)
-	- 8088, 4 MHz
-	- 8041 (MCU), 8253 (PIT), 8259A (PIC), MB8866 (FDC)
-	- MP-1601 (128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
-	- MP-1602 (192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
-	- MP-1605 (256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
-	- MP-1601S (8087, 128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
-	- MP-1602S (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
-	- MP-1605S (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
-	- MP-1622 (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 8")
-	- MP-1625 (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 8")
+    MULTI-16 (1982, 1983 for S models)
+    - 8088, 4 MHz
+    - 8041 (MCU), 8253 (PIT), 8259A (PIC), MB8866 (FDC)
+    - MP-1601 (128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
+    - MP-1602 (192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
+    - MP-1605 (256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
+    - MP-1601S (8087, 128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
+    - MP-1602S (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
+    - MP-1605S (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
+    - MP-1622 (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 8")
+    - MP-1625 (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 8")
 
-	MULTI-16 II (1984)
-	- 8086, 8 MHz
-	- MP-1642 (256 KB RAM, 64 KB VRAM, monochrome, 2x 5.25")
-	- MP-1645 (256 KB RAM, 192 KB VRAM, 8 colors, 2x 5.25")
+    MULTI-16 II (1984)
+    - 8086, 8 MHz
+    - MP-1642 (256 KB RAM, 64 KB VRAM, monochrome, 2x 5.25")
+    - MP-1645 (256 KB RAM, 192 KB VRAM, 8 colors, 2x 5.25")
 
-	MULTI-16 IV (1986)
-	- 80286, 8 MHz
-	- MP-1652-A20 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25")
-	- MP-1652-A22 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25", 20 MB HDD)
-	- MP-1655-A20 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25")
-	- MP-1655-A22 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25", 20 MB HDD)
+    MULTI-16 IV (1986)
+    - 80286, 8 MHz
+    - MP-1652-A20 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25")
+    - MP-1652-A22 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25", 20 MB HDD)
+    - MP-1655-A20 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25")
+    - MP-1655-A22 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25", 20 MB HDD)
 
-	The IPL dump we currently have seems to be from the MP-1645.
+    The IPL dump we currently have seems to be from the MP-1645.
 
 ****************************************************************************/
 
@@ -118,18 +118,18 @@ void multi16_state::multi16_map(address_map &map)
 void multi16_state::multi16_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x02, 0x03) // ?
-//	map(0x06, 0x06) // ?
-//	map(0x07, 0x07) // ?
-//	map(0x08, 0x0b) // ?
+//  map(0x02, 0x03) // ?
+//  map(0x06, 0x06) // ?
+//  map(0x07, 0x07) // ?
+//  map(0x08, 0x0b) // ?
 	map(0x0c, 0x0f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x40, 0x40).w(m_crtc, FUNC(hd6845s_device::address_w));
 	map(0x41, 0x41).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
-//	map(0x42, 0x44) // ?
-//	map(0x48, 0x48) // ?
-//	map(0x4e, 0x4e) // ?
-//	map(0x82, 0x82) // ?
-//	map(0x92, 0x92) // ?
+//  map(0x42, 0x44) // ?
+//  map(0x48, 0x48) // ?
+//  map(0x4e, 0x4e) // ?
+//  map(0x82, 0x82) // ?
+//  map(0x92, 0x92) // ?
 }
 
 /* Input ports */

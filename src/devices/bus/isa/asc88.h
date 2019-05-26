@@ -47,7 +47,7 @@ private:
 	u8 m_control;
 	bool m_irq;
 	bool m_drq;
-	std::unique_ptr<u8[]> m_ram;	
+	std::unique_ptr<u8[]> m_ram;
 };
 
 // device type declaration

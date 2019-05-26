@@ -48,7 +48,7 @@ protected:
 	required_device<sunplus_gcm394_device> m_spg;
 
 	optional_memory_bank m_bank;
-	
+
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 

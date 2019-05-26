@@ -489,8 +489,8 @@ const tiny_rom_entry *indus_gt_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( technica )
-    ROM_REGION( 0x4000, M6502_TAG, 0 ) // data lines should be scrambled
-    ROM_LOAD( "technica dos plus.bin", 0x0000, 0x4000, BAD_DUMP CRC(6a1ef3ff) SHA1(1aaa52ed4a3f120ec8664bcefec890c7f9aaecf2) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 ) // data lines should be scrambled
+	ROM_LOAD( "technica dos plus.bin", 0x0000, 0x4000, BAD_DUMP CRC(6a1ef3ff) SHA1(1aaa52ed4a3f120ec8664bcefec890c7f9aaecf2) )
 ROM_END
 
 
@@ -500,7 +500,7 @@ ROM_END
 
 const tiny_rom_entry *technica_t::device_rom_region() const
 {
-    return ROM_NAME( technica );
+	return ROM_NAME( technica );
 }
 
 
@@ -509,11 +509,11 @@ const tiny_rom_entry *technica_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( bluechip )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_SYSTEM_BIOS( 0, "1", "1" )
-    ROMX_LOAD( "bluechip_fd_stockrom.bin", 0x0000, 0x4000, CRC(d4293619) SHA1(18b3dc4c2f919ac8f288d0199e29993a0b53a9bd), ROM_BIOS(0) )
-    ROM_SYSTEM_BIOS( 1, "2", "2" )
-    ROMX_LOAD( "amtech_bluechip_rom.bin", 0x0000, 0x4000, CRC(3733ccea) SHA1(c11317cb9370e722950579a610a3effda313aeee), ROM_BIOS(1) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_SYSTEM_BIOS( 0, "1", "1" )
+	ROMX_LOAD( "bluechip_fd_stockrom.bin", 0x0000, 0x4000, CRC(d4293619) SHA1(18b3dc4c2f919ac8f288d0199e29993a0b53a9bd), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "2", "2" )
+	ROMX_LOAD( "amtech_bluechip_rom.bin", 0x0000, 0x4000, CRC(3733ccea) SHA1(c11317cb9370e722950579a610a3effda313aeee), ROM_BIOS(1) )
 ROM_END
 
 
@@ -523,7 +523,7 @@ ROM_END
 
 const tiny_rom_entry *blue_chip_t::device_rom_region() const
 {
-    return ROM_NAME( bluechip );
+	return ROM_NAME( bluechip );
 }
 
 
@@ -532,9 +532,9 @@ const tiny_rom_entry *blue_chip_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( cmdrc2 )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_LOAD( "commander_c-ii_8k_rom1.bin", 0x0000, 0x2000, CRC(cb19daf3) SHA1(9fab414451af54d0bed9d4c9fd5fab1b8720c269) )
-    ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "commander_c-ii_8k_rom1.bin", 0x0000, 0x2000, CRC(cb19daf3) SHA1(9fab414451af54d0bed9d4c9fd5fab1b8720c269) )
+	ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
 ROM_END
 
 
@@ -544,7 +544,7 @@ ROM_END
 
 const tiny_rom_entry *commander_c2_t::device_rom_region() const
 {
-    return ROM_NAME( cmdrc2 );
+	return ROM_NAME( cmdrc2 );
 }
 
 
@@ -553,8 +553,8 @@ const tiny_rom_entry *commander_c2_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( enh2000 )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_LOAD( "enhancer 2000 comtel 2.6.bin", 0x0000, 0x4000, CRC(20353d3b) SHA1(473dd2e06037799e6f562c443165d9b2b9f4a368) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "enhancer 2000 comtel 2.6.bin", 0x0000, 0x4000, CRC(20353d3b) SHA1(473dd2e06037799e6f562c443165d9b2b9f4a368) )
 ROM_END
 
 
@@ -564,7 +564,7 @@ ROM_END
 
 const tiny_rom_entry *enhancer_2000_t::device_rom_region() const
 {
-    return ROM_NAME( enh2000 );
+	return ROM_NAME( enh2000 );
 }
 
 
@@ -573,8 +573,8 @@ const tiny_rom_entry *enhancer_2000_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( fd148 )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_LOAD( "rapid access fd148.bin", 0x0000, 0x4000, CRC(3733ccea) SHA1(c11317cb9370e722950579a610a3effda313aeee) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "rapid access fd148.bin", 0x0000, 0x4000, CRC(3733ccea) SHA1(c11317cb9370e722950579a610a3effda313aeee) )
 ROM_END
 
 
@@ -584,7 +584,7 @@ ROM_END
 
 const tiny_rom_entry *fd148_t::device_rom_region() const
 {
-    return ROM_NAME( fd148 );
+	return ROM_NAME( fd148 );
 }
 
 
@@ -593,9 +593,9 @@ const tiny_rom_entry *fd148_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( msdsd1 )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_LOAD( "sd-1-1.3-c000.bin", 0x0000, 0x2000, CRC(f399778d) SHA1(c0d939c354d84018038c60a231fc43fb9279d8a4) )
-    ROM_LOAD( "sd-1-1.3-e000.bin", 0x2000, 0x2000, CRC(7ac80da4) SHA1(99dd15c6d97938eba73880b18986a037e90742ab) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "sd-1-1.3-c000.bin", 0x0000, 0x2000, CRC(f399778d) SHA1(c0d939c354d84018038c60a231fc43fb9279d8a4) )
+	ROM_LOAD( "sd-1-1.3-e000.bin", 0x2000, 0x2000, CRC(7ac80da4) SHA1(99dd15c6d97938eba73880b18986a037e90742ab) )
 ROM_END
 
 
@@ -605,7 +605,7 @@ ROM_END
 
 const tiny_rom_entry *msd_sd1_t::device_rom_region() const
 {
-    return ROM_NAME( msdsd1 );
+	return ROM_NAME( msdsd1 );
 }
 
 
@@ -614,9 +614,9 @@ const tiny_rom_entry *msd_sd1_t::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( msdsd2 )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_LOAD( "sd-2-2.3-c000.bin", 0x0000, 0x2000, CRC(2207560e) SHA1(471e9b4a4ac09ceee9acc1774534510396f98b9a) )
-    ROM_LOAD( "sd-2-2.3-e000.bin", 0x2000, 0x2000, CRC(4efd87a2) SHA1(4beec0b7ce2349add3b0a5bceee60826637df8d9) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "sd-2-2.3-c000.bin", 0x0000, 0x2000, CRC(2207560e) SHA1(471e9b4a4ac09ceee9acc1774534510396f98b9a) )
+	ROM_LOAD( "sd-2-2.3-e000.bin", 0x2000, 0x2000, CRC(4efd87a2) SHA1(4beec0b7ce2349add3b0a5bceee60826637df8d9) )
 ROM_END
 
 
@@ -626,7 +626,7 @@ ROM_END
 
 const tiny_rom_entry *msd_sd2_t::device_rom_region() const
 {
-    return ROM_NAME( msdsd2 );
+	return ROM_NAME( msdsd2 );
 }
 
 
@@ -1207,7 +1207,7 @@ indus_gt_t::indus_gt_t(const machine_config &mconfig, const char *tag, device_t 
 //-------------------------------------------------
 
 technica_t::technica_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, TECHNICA, tag, owner, clock) { }
+	: c1541_base_t(mconfig, TECHNICA, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1215,7 +1215,7 @@ technica_t::technica_t(const machine_config &mconfig, const char *tag, device_t 
 //-------------------------------------------------
 
 blue_chip_t::blue_chip_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, BLUE_CHIP, tag, owner, clock) { }
+	: c1541_base_t(mconfig, BLUE_CHIP, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1223,7 +1223,7 @@ blue_chip_t::blue_chip_t(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 commander_c2_t::commander_c2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, COMMANDER_C2, tag, owner, clock) { }
+	: c1541_base_t(mconfig, COMMANDER_C2, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1231,7 +1231,7 @@ commander_c2_t::commander_c2_t(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 enhancer_2000_t::enhancer_2000_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, ENHANCER_2000, tag, owner, clock) { }
+	: c1541_base_t(mconfig, ENHANCER_2000, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1239,7 +1239,7 @@ enhancer_2000_t::enhancer_2000_t(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 fd148_t::fd148_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, FD148, tag, owner, clock) { }
+	: c1541_base_t(mconfig, FD148, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1247,7 +1247,7 @@ fd148_t::fd148_t(const machine_config &mconfig, const char *tag, device_t *owner
 //-------------------------------------------------
 
 msd_sd1_t::msd_sd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, MSD_SD1, tag, owner, clock) { }
+	: c1541_base_t(mconfig, MSD_SD1, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -1255,7 +1255,7 @@ msd_sd1_t::msd_sd1_t(const machine_config &mconfig, const char *tag, device_t *o
 //-------------------------------------------------
 
 msd_sd2_t::msd_sd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : c1541_base_t(mconfig, MSD_SD2, tag, owner, clock) { }
+	: c1541_base_t(mconfig, MSD_SD2, tag, owner, clock) { }
 
 
 //-------------------------------------------------

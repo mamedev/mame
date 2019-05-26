@@ -559,7 +559,7 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 		m_bw_palette[i] = black_and_white(s_palette[i]);
 	}
 
-    m_artifacter.create_color_blend_table( s_palette );
+	m_artifacter.create_color_blend_table( s_palette );
 }
 
 
@@ -1684,7 +1684,7 @@ ioport_constructor mc6847_base_device::device_input_ports() const
 
 mc6847_base_device::artifacter::artifacter()
 {
-    m_palartifacting = false;
+	m_palartifacting = false;
 	m_config = nullptr;
 	m_artifacting = 0;
 	m_saved_artifacting = 0;
@@ -1808,7 +1808,7 @@ mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double fac
 void mc6847_base_device::artifacter::create_color_blend_table( const pixel_t *palette )
 {
 	// PAL color blend map
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[3],palette[2]),rgb_t(0x7c, 0x2e, 0x81))); /* RED-BLUE */ 
+	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[3],palette[2]),rgb_t(0x7c, 0x2e, 0x81))); /* RED-BLUE */
 	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[2],palette[3]),rgb_t(0x6b, 0x3e, 0x6b))); /* BLUE-RED */
 	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[7],palette[6]),rgb_t(0xbe, 0x73, 0x65))); /* ORANGE-MAGENTA */
 	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[6],palette[7]),rgb_t(0xde, 0x5f, 0x6a))); /* MAGENTA-ORANGE */

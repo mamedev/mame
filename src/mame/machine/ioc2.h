@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define IOC2_NEW_KBDC	(0)
+#define IOC2_NEW_KBDC   (0)
 
 #if IOC2_NEW_KBDC
 #include "machine/at_keybc.h"

@@ -20,7 +20,7 @@
  * D-9926 Image ROM board (ROM)
  * D-9930 Video Expander board (EXP)
  * D-9941 Sound System board (Sound)
- 
+
  C-9928 PIF:
  -----------
  Handles communication with the LaserDisc player.  Uses a 68029E CPU

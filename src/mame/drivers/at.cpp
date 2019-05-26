@@ -858,16 +858,16 @@ void at_state::comportii(machine_config &config)
 void at_state::n8810m15(machine_config &config)
 {
 	ibm5170(config);
-	m_maincpu->set_clock(6000000); 
-	subdevice<isa16_slot_device>("isa1")->set_default_option("cga"); 
+	m_maincpu->set_clock(6000000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("cga");
 }
 
 // Nixdorf 8810 M55
 void at_state::n8810m55(machine_config &config)
 {
 	ibm5170(config);
-	m_maincpu->set_clock(6000000); 
-	subdevice<isa16_slot_device>("isa1")->set_default_option("ega"); 
+	m_maincpu->set_clock(6000000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("ega");
 }
 
 //**************************************************************************
@@ -969,13 +969,13 @@ ROM_START( ibmps1es )
 ROM_END
 
 ROM_START( at )
-	ROM_REGION(0x20000,"bios", 0) 
+	ROM_REGION(0x20000,"bios", 0)
 	// 0: BIOS-String: ENET-1107-040990-K0
 	ROM_SYSTEM_BIOS(0, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(0))
 	// 1: BIOS-String: D286-0011-110387
 	ROM_SYSTEM_BIOS(1, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
-	ROMX_LOAD( "at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) ) 
+	ROMX_LOAD( "at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
 	// 2: BIOS-String: S286-6181-101590-K0
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
@@ -1077,7 +1077,7 @@ ROM_START( atvga )
 	// 0: BIOS-String: 20-0001-001223-00101111-050591-KB-8042--0
 	ROM_SYSTEM_BIOS(0, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
 	ROMX_LOAD( "2vlm001.bin",     0x10000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(0) )
-	// 1: same as BIOS '0' in at 
+	// 1: same as BIOS '0' in at
 	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(1))
 	// 2: same as BIOS '2' in at
@@ -1565,7 +1565,7 @@ ROM_END
 // Commodore SL 386SX
 ROM_START( c386sx16 )
 	ROM_REGION(0x20000, "bios", 0)
-	// actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php 
+	// actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php
 	// complains "Time-of-day clock stopped"
 	ROM_SYSTEM_BIOS(0, "c386sxv100", "SL 386SX V1.00") // Commodore 80386SX BIOS Rev. 1.00 - 390914-01/390915-01 - continuous beeps after POST
 	ROMX_LOAD( "cbm-sl386sx-bios-lo-v1.0-390914-01.bin", 0x10000, 0x8000, CRC(03e00583) SHA1(8be8478cabd9de3d547a08207ffdcd39bf1bcd94), ROM_SKIP(1) | ROM_BIOS(0))
@@ -1576,10 +1576,10 @@ ROM_START( c386sx16 )
 	ROM_SYSTEM_BIOS(2, "c386sxv102", "SL 386SX V1.02") // Rev. 1.02 - 390914-03/390914-03/390915-03
 	ROMX_LOAD( "cbm-sl386sx-bios-lo-v1.02-390914-03-0300.bin", 0x10000, 0x8000, CRC(301eb832) SHA1(6c599792b254b6d98dc130040d4f7858fd504f15), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "cbm-sl386sx-bios-hi-v1.02-390915-03-3800.bin", 0x10001, 0x8000, CRC(01815d9d) SHA1(0af291626e71ed65ff6dfee2fe4776a29f2bbb97), ROM_SKIP(1) | ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "c386sxv103", "SL 386SX V1.03") // Commodore 80386SX BIOS Rev. 1.03 - 
+	ROM_SYSTEM_BIOS(3, "c386sxv103", "SL 386SX V1.03") // Commodore 80386SX BIOS Rev. 1.03 -
 	// this was replaced with the consistently named ROMs from http://www.zimmers.net/cbmpics/cpcs3.html, the 'hi' ROM looks like a bad dump, with its alternative the POST comes up
 	// ROMX_LOAD( "390914-01.u39", 0x10000, 0x8000, CRC(8f849198) SHA1(550b04bac0d0807d6e95ec25391a81272779b41b), ROM_SKIP(1) | ROM_BIOS(3)) /* 390914-01 V1.03 CS-2100 U39 Copyright (C) 1990 CBM */
-	// ROMX_LOAD( "390915-01.u38", 0x10001, 0x8000, CRC(ee4bad92) SHA1(6e02ef97a7ce336485814c06a1693bc099ce5cfb), ROM_SKIP(1) | ROM_BIOS(3)) /* 390915-01 V1.03 CS-2100 U38 Copyright (C) 1990 CBM */	
+	// ROMX_LOAD( "390915-01.u38", 0x10001, 0x8000, CRC(ee4bad92) SHA1(6e02ef97a7ce336485814c06a1693bc099ce5cfb), ROM_SKIP(1) | ROM_BIOS(3)) /* 390915-01 V1.03 CS-2100 U38 Copyright (C) 1990 CBM */
 	ROMX_LOAD( "cbm-sl386sx-bios-lo-v1.03-390914-03.bin", 0x10000, 0x8000, CRC(8f849198) SHA1(550b04bac0d0807d6e95ec25391a81272779b41b), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD( "cbm-sl386sx-bios-hi-v1.03-390915-03.bin", 0x10001, 0x8000, CRC(ebdd5097) SHA1(2e4d2375efb9c1ebc0ccf3bb1ff2bb64c449af32), ROM_SKIP(1) | ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "c386sxv104", "SL 386SX V1.04") // Rev. 1.04 - 390914-04/390915-04
@@ -1588,7 +1588,7 @@ ROM_START( c386sx16 )
 ROM_END
 
 // Commodore Laptop C386SX-LT -  screen remains blank
-ROM_START( c386sxlt ) 
+ROM_START( c386sxlt )
 	ROM_REGION(0x20000, "bios", 0) // BIOS contains Cirrus Logic VGA firmware, rebadged Sanyo MBC-18NB, but different versions exist
 	ROM_SYSTEM_BIOS(0, "c386sxlt_b400", "C386SX-LT V1.2 B400")
 	ROMX_LOAD( "cbm-386lt-bios-v1.2-390981-03-b400.bin", 0x00000, 0x20000, CRC(b84f6883) SHA1(3f31060726c7c49a891b35ab024524a4239eb4d0), ROM_BIOS(0))
@@ -1669,14 +1669,14 @@ ROM_START( pc50ii )
 	ROMX_LOAD( "cbm-pc50b-bios-lo-u32-v1.02-609200-03o-9e00.bin", 0x10001, 0x8000, CRC(57225c22) SHA1(3b2ded119480ce2dd5bb7c113c5814ce47e17d4c),ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "cbm-pc50b-bios-hi-u27-v1.02-609200-03e-c400.bin", 0x10000, 0x8000, CRC(4ec903af) SHA1(fb70e22c0538d7310c9034626d4d9c0e4f63dfd7),ROM_SKIP(1) | ROM_BIOS(2))
 
- 	// VGA BIOS
+	// VGA BIOS
 	// ROM_LOAD( "m_pc50-ii_1bad_pvgadk_odd.bin", 0x00000, 0x8000, CRC(f36eca7e) SHA1(4335fa4a4567cbc010ff2ffeb97a536ed93b0219))
 	// ROM_LOAD( "m_pc50-ii_54e3_pvgadk_even.bin", 0x00001, 0x8000, CRC(01f6b964) SHA1(799a84ddde8a7672a6df9439bad6198ec3ff98ec))
 ROM_END
 
 // Commodore PC-60-III - complaining "time-of-day-clock stopped"
 ROM_START( pc60iii )
-    ROM_REGION(0x20000, "bios", 0)
+	ROM_REGION(0x20000, "bios", 0)
 	// 0: Commodore PC60-III 80386 BIOS Rev. 1.2 - 390473-01/390474-01
 	ROM_SYSTEM_BIOS(0, "pc60iiiv12", "PC60-III V1.2")
 	ROMX_LOAD( "cbm-pc60c-bios-lo_u73-v1.2-390473-01.bin", 0x00000, 0x10000, CRC(ff2cd8b3) SHA1(62e95f818c5016f4be2741872dc644999dee33ce),ROM_SKIP(1) | ROM_BIOS(0) )
@@ -1704,7 +1704,7 @@ ROM_START( pc60iii )
 ROM_END
 
 // Commodore PC-70-III - complaining "time-of-day-clock stopped"
-ROM_START( pc70iii ) 
+ROM_START( pc70iii )
 	ROM_REGION(0x20000, "bios", 0)
 	// 0: Commodore 80486 BIOS Rev.1.00 - 390934-01/390935-01
 	ROM_SYSTEM_BIOS(0, "pc70v100", "PC70 V1.00")
@@ -1993,17 +1993,17 @@ ROM_END
 // Compaq SLT/286 - complains about "102 - System board failure"
 ROM_START( comslt286 )
    ROM_REGION(0x20000,"bios", 0)
-   	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
+	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
 	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-odd.bin", 0x10001, 0x8000, CRC(4a0febac) SHA1(7da5ac4bc50f25063a1d1e382b8cff9b297976f8))
 ROM_END
 
 // Dell System 200 - complains about "memory overlap at 400000" but seems to work otherwise
 ROM_START( dsys200 )
 	ROM_REGION( 0x20000, "bios", 0 )
-   	ROM_LOAD16_BYTE( "version_3.10_a12_even.bin", 0x10000, 0x8000, CRC(5aa81939) SHA1(d9029d3708c49e72f57ae2a340429c28ec39acab))
+	ROM_LOAD16_BYTE( "version_3.10_a12_even.bin", 0x10000, 0x8000, CRC(5aa81939) SHA1(d9029d3708c49e72f57ae2a340429c28ec39acab))
 	ROM_LOAD16_BYTE( "version_3.10_a12_odd.bin", 0x10001, 0x8000, CRC(942416cb) SHA1(b321704471e159030af82556ff25ac46c27a807e))
 
-	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "20575_b47-00.bin", 0x000, 0x0800, CRC(148187db) SHA1(0d7542dd0b2bc3d6724ae3618a8543cb84a30e92) )
 ROM_END
 
@@ -2076,22 +2076,22 @@ ROM_END
 
 //  NCR, probably PC-8 - should get a "NGA" extended CGA graphics card once it's emulated
 ROM_START( ncrpc8 )
-	ROM_REGION(0x20000, "bios", 0) 
+	ROM_REGION(0x20000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "pc8main", "NCR PC-8 mainboard") // large full size AT mainboard - Setup Version 2.3
 	ROMX_LOAD( "ncr_35117_u127_vers.4-2.bin", 0x10000, 0x8000, CRC(f4338669) SHA1(c1d6e714591c8d7ab966acfdbc3b463e06fbd073), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "ncr_35116_u113_vers.4-2.bin", 0x10001, 0x8000, CRC(b1b6a2e2) SHA1(5b2c0a2be59e064076ed757d84f61bf955ceca08), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "pc8card", "NCR PC-8 CPU card") // passive backplane and CPU card - Setup Version 2.1
 	ROMX_LOAD( "ncr_u127-30_v.4.bin", 0x10000, 0x8000, CRC(33121525) SHA1(11f8d8af4dad432f558c646d7d0ff23eb642a815), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "ncr_u113-27_v.4.bin", 0x10001, 0x8000, CRC(87424492) SHA1(5b7aba5678fe55c81fee2e07730b8ae03a23160f), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD ("ncr_keyboard_mcu_35091.bin", 0x0000, 0x800, CRC(632556cc) SHA1(b35f30bd0664fc1c2775a594f248d1e30237900a))
 ROM_END
 
 // Nixdorf 8810 M15 Laptop - PC07 - boot from harddisk doesn't work
 ROM_START( n8810m15 )
 	// ROM_LOAD("charagene_v1.1_daft2c2.bin", 0x00000, 0x4000, CRC(dd324efd) SHA1(67fd91277733596bfad8506dc92d9f776e563dda)) // CGA chargen
-	
-    ROM_REGION(0x20000, "bios", 0 )
+
+	ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD16_BYTE( "rbios_even_daft2a3.bin", 0x10000, 0x8000, CRC(790abf68) SHA1(fbdb5e628ee9a605c8c1485a3fbb67736ff03153))
 	ROM_LOAD16_BYTE( "rbios_odd_daft2b3.bin", 0x10001, 0x8000, CRC(b09a812a) SHA1(c1b3321715260f9cd8c810325dc10c674ea05174))
 ROM_END
@@ -2099,20 +2099,20 @@ ROM_END
 // Nixdorf 8810 M16 Laptop - PC17 - CGA version - boot from harddisk doesn't work
 ROM_START( n8810m16c )
 	// ROM_LOAD("201cg rev 1.0.u78", 0x00000, 0x4000, CRC(3e31143b) SHA1(489da357e0ab8a469a3fb81cce160637486c87bc)) // CGA chargen
-    ROM_REGION(0x20000, "bios", 0 )
+	ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD16_BYTE( "nmc27c256.u35", 0x10000, 0x8000, CRC(51acd116) SHA1(1a0bf24af4eba48d0deb0132a523e131902d2bcd))
 	ROM_LOAD16_BYTE( "nmc27c256.u36", 0x10001, 0x8000, CRC(fb47f9da) SHA1(d9bd4aea850a83764454a5c86c8da09f7c640fd6))
-	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "d8749h.u69", 0x000, 0x0800, CRC(030051da) SHA1(91b60228452cd1d6af99786402bd3b4d3efc2f05) )
 ROM_END
 
 // Nixdorf 8810 M16 Laptop - PC17 - VGA version - boot from harddisk doesn't work
 ROM_START( n8810m16v )
 	// ROM_LOAD("8810m16vga_27c256_221vb_123g1.bin", 0x00000, 0x4000, CRC(3bc80739) SHA1(3d6d7fb01681eccbc0b560818654d5aa1e3c5230)) // C&T VGA BIOS for 82C455
-    ROM_REGION(0x20000, "bios", 0 )
+	ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD16_BYTE( "8810m16vga_27c256_286bios_a2531511_a.bin", 0x10000, 0x8000, CRC(1de5e49b) SHA1(759878e13801278de96700bbef318a49cca68054))
 	ROM_LOAD16_BYTE( "8810m16vga_27c256_286bios_a2531511_b.bin", 0x10001, 0x8000, CRC(a65cf1f8) SHA1(30d46b49e87f272540e24a278848122b3c40bdaf))
-	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "8810m16vga_8749_201kb_rev3a.bin", 0x000, 0x0800, CRC(030051da) SHA1(91b60228452cd1d6af99786402bd3b4d3efc2f05) )
 ROM_END
 
@@ -2124,7 +2124,7 @@ ROM_END
 
 // Nixdorf 8810 M55
 ROM_START( n8810m55 )
-    ROM_REGION(0x20000, "bios", 0 )
+	ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD16_BYTE( "150-3872_u113_27_4.5.1.bin", 0x10001, 0x8000, CRC(35ff4fba) SHA1(557f0f98c27af76f6fa6990592e7150f5fc1fc02))
 	ROM_LOAD16_BYTE( "150-3873_u127_30_4.5.1.bin", 0x10000, 0x8000, CRC(5a7e6643) SHA1(f3890919a772eead7232bd227b2c8677377f6e24))
 ROM_END
@@ -2132,9 +2132,9 @@ ROM_END
 // Olivetti M290 - has an Olivetti branded Paradise VGA - locks up with "Error 2" and a key symbol
 ROM_START( m290 )
 	ROM_REGION( 0x20000, "bios", 0 )
-   	ROM_LOAD( "m290_pep3_1.25.bin", 0x10000, 0x10000, CRC(cb57d677) SHA1(4bdf5c52567c129b413c866c63b5fb3562fccd23))
+	ROM_LOAD( "m290_pep3_1.25.bin", 0x10000, 0x10000, CRC(cb57d677) SHA1(4bdf5c52567c129b413c866c63b5fb3562fccd23))
 
-	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "m290_csl0_1.10.bin", 0x000, 0x0800, CRC(d767d496) SHA1(84246f7b39e0a005425948931cf93624b831e121) )
 ROM_END
 
@@ -2170,7 +2170,7 @@ ROM_END
 // complains about "Pointer device failure" and "Memory failure at 00100000, read AA55 expecting 002C
 ROM_START( pcd4nl )
 	ROM_REGION( 0x20000, "bios", 0 )
-	ROM_LOAD( "pcd4nl.bin", 0x00000, 0x20000, CRC(8adb4900) SHA1(a01c665fed769ff815bc2e5ae30901f7e12d721b) )	
+	ROM_LOAD( "pcd4nl.bin", 0x00000, 0x20000, CRC(8adb4900) SHA1(a01c665fed769ff815bc2e5ae30901f7e12d721b) )
 ROM_END
 
 // Siemens-Nixdorf PCD-4ND 486 notebook - display remains blank
@@ -2202,7 +2202,7 @@ ROM_END
 // Video board: Cirrus Logic CL-GD610 + CL-GD620 + CL-GD63
 ROM_START( walk386dx )
 	ROM_REGION( 0x20000, "bios", 0 ) // contains Cirrus Logic VGA BIOS
-	ROM_LOAD( "am28f010_ctaa060125rc.bin", 0x00000, 0x20000, CRC(6cc540fe) SHA1(9853793d5433bbc5efc09c7f31c4a8a8f78d4549) )	
+	ROM_LOAD( "am28f010_ctaa060125rc.bin", 0x00000, 0x20000, CRC(6cc540fe) SHA1(9853793d5433bbc5efc09c7f31c4a8a8f78d4549) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "cthj02_03_76.bin", 0x0000, 0x2000, NO_DUMP )

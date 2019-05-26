@@ -1465,12 +1465,12 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Developer: Sega
-               -Pressing start at the Sega screen brings up a debug menu.
-               -Contains two test maps for the action stages, and two test levels for the special stages.
-               -The debug menu contains different level names for various zones, but the zones themselves have the final names in their title cards.
-               -Some aspects of levels have collision problems (i.e the springs in Casino, and the rotating platforms in King Relics).
-               -The boss in Death Egg Act 2 doesn't spawn a capsule upon defeat.
-               -Some sound effects are missing from the prototype.
+	           -Pressing start at the Sega screen brings up a debug menu.
+	           -Contains two test maps for the action stages, and two test levels for the special stages.
+	           -The debug menu contains different level names for various zones, but the zones themselves have the final names in their title cards.
+	           -Some aspects of levels have collision problems (i.e the springs in Casino, and the rotating platforms in King Relics).
+	           -The boss in Death Egg Act 2 doesn't spawn a capsule upon defeat.
+	           -Some sound effects are missing from the prototype.
 	-->
 	<software name="sonicp2" cloneof="sonic">
 		<description>Sonic the Hedgehog - Pocket Adventure (World, Oct 22 1999 Prototype)</description>

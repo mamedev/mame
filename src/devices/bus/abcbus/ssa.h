@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Luxor ABC-80 Owoco Super Smartaid cartridge emulation
+    Luxor ABC-80 Owoco Super Smartaid cartridge emulation
 
 *********************************************************************/
 

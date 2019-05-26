@@ -619,13 +619,13 @@ static NETLIST_START(TTL_74107_DIP)
 
 	DIPPINS(    /*          +--------------+        */
 		A.J,    /*       1J |1     ++    14| VCC    */ A.VCC,
-	    A.QQ,   /*      1QQ |2           13| 1CLRQ  */ A.CLRQ,
-	    A.Q,    /*       1Q |3           12| 1CLK   */ A.CLK,
-	    A.K,    /*       1K |4    74107  11| 2K     */ B.K,
-	    B.Q,    /*       2Q |5           10| 2CLRQ  */ B.CLRQ,
-	    B.QQ,   /*      2QQ |6            9| 2CLK   */ B.CLK,
-	    B.GND,  /*      GND |7            8| 2J     */ B.J
-	            /*          +--------------+        */
+		A.QQ,   /*      1QQ |2           13| 1CLRQ  */ A.CLRQ,
+		A.Q,    /*       1Q |3           12| 1CLK   */ A.CLK,
+		A.K,    /*       1K |4    74107  11| 2K     */ B.K,
+		B.Q,    /*       2Q |5           10| 2CLRQ  */ B.CLRQ,
+		B.QQ,   /*      2QQ |6            9| 2CLK   */ B.CLK,
+		B.GND,  /*      GND |7            8| 2J     */ B.J
+				/*          +--------------+        */
 	)
 
 NETLIST_END()

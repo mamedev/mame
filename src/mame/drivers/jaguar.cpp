@@ -1382,7 +1382,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xa30000, 0xa30003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0xa40000, 0xa40003).w(FUNC(jaguar_state::eeprom_enable_w));
 	map(0xb70000, 0xb70003).rw(FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
-//	map(0xc00000, 0xdfffff).bankr("mainsndbank");
+//  map(0xc00000, 0xdfffff).bankr("mainsndbank");
 	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::config_r), FUNC(vt83c461_device::config_w));
 	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
 	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));

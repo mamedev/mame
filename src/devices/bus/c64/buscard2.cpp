@@ -19,10 +19,10 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define R6532_TAG		"riot"
-#define MC6821_TAG    	"pia"
-#define CENTRONICS_TAG	"centronics"
-#define EXPANSION_TAG	"exp"
+#define R6532_TAG       "riot"
+#define MC6821_TAG      "pia"
+#define CENTRONICS_TAG  "centronics"
+#define EXPANSION_TAG   "exp"
 
 
 

@@ -98,16 +98,16 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 	spritelistend &= 0x3fff;
 
 	gfx_element* gfx;
-	
+
 
 	if (spritelistend >= spritelistbase)
 	{
 		for (int i = spritelistend; i >= spritelistbase; i -= 5)
 		{
-			//	printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
-			//	int tilegfxbase = 0x1f80; // select mode 
-			//	int tilegfxbase = 0x2780; // 2nd demo (+0x800 from above)
-			//	int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
+			//  printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
+			//  int tilegfxbase = 0x1f80; // select mode
+			//  int tilegfxbase = 0x2780; // 2nd demo (+0x800 from above)
+			//  int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
 			int tilegfxbase = (m_unkregs[0x15] * 0x800);
 
 			int y = m_mainram[i + 1];
@@ -130,7 +130,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 				tile += 0x400;
 
 			//if (unk) // set on score + 'press start' in ddr, priority? palette select?
-			//	tile = machine().rand();
+			//  tile = machine().rand();
 
 
 			int xhigh = m_mainram[i + 4] & 0x01;
@@ -209,11 +209,11 @@ READ8_MEMBER(trkfldch_state::read_vector)
 	logerror("reading vector offset %02x\n", offset);
 
 	if (offset == 0x0b)
-	{	// NMI
+	{   // NMI
 		return rom[m_which_vector+1];
 	}
 	else if (offset == 0x0a)
-	{	// NMI
+	{   // NMI
 		return rom[m_which_vector];
 	}
 
@@ -346,19 +346,19 @@ GFXDECODE_END
        0002 - ? (there is no irq 0x02)
        0004 used in irq 0x04
        0008 used in irq 0x06
-	   0010 used in irq 0x08
-	   0020 used in irq 0x0a
-	   0x40 used in irq 0x0c
-	   0x80 used in irq 0x0e (and by code accessing other ports in the main execution?!)
+       0010 used in irq 0x08
+       0020 used in irq 0x0a
+       0x40 used in irq 0x0c
+       0x80 used in irq 0x0e (and by code accessing other ports in the main execution?!)
 
 7801 : 0001 used in irq 0x10
      : 0002 used in irq 0x12
-	 : 0004 used in irq 0x14
-	 : 0008 - ? (there is no irq 0x016, it points to unknown area? and we have no code touching this bit)
-	 : 0010 used in irq 0x18
-	 : 0020 used in irq 0x1a and 0x06?! (used with OR instead of EOR in 0x06, force IRQ?)
-	 : 0x40 - ? (there is no irq 0x1c - it's the boot vector)
-	 : 0x80 - ? (there is no irq 0x1e)
+     : 0004 used in irq 0x14
+     : 0008 - ? (there is no irq 0x016, it points to unknown area? and we have no code touching this bit)
+     : 0010 used in irq 0x18
+     : 0020 used in irq 0x1a and 0x06?! (used with OR instead of EOR in 0x06, force IRQ?)
+     : 0x40 - ? (there is no irq 0x1c - it's the boot vector)
+     : 0x80 - ? (there is no irq 0x1e)
 
 */
 
@@ -492,11 +492,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 	switch (offset)
 	{
 	case 0x00: // IRQ ack/force?, see above
-	//	logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+	//  logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x01: // IRQ maybe status, see above
-	//	logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+	//  logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x02: // startup
@@ -576,7 +576,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 	case 0x22: // rarely
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
-	
+
 	case 0x23: // after a long time
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
@@ -688,7 +688,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x62: 
+	case 0x62:
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
@@ -764,7 +764,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 	case 0x77: // every second or so
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
-	
+
 	case 0x78: // startup
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
@@ -804,8 +804,8 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0xb6: // significant data transfer shortly after boot, seems to clock writes with 0073 writing  d0 / c0? (then writes 2 bytes here)
-		       // values are coming from a structure in RAM
-		       // how does it reset?
+			   // values are coming from a structure in RAM
+			   // how does it reset?
 
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		m_unkdata[m_unkdata_addr] = data;
@@ -850,7 +850,7 @@ void trkfldch_state::machine_reset()
 
 	for (int i = 0; i < 0x100000; i++)
 		m_unkdata[i] = 0;
- 
+
 	m_unkdata_addr = 0;
 
 }

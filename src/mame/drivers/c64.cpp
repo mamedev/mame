@@ -230,18 +230,18 @@ static const struct dasm_zeropage_data c64_zeropage_locations[] =
 {
 	{ 0x00, "D6510" }, { 0x01, "R6510" }, { 0x03, "ADRAY1" }, { 0x05, "ADRAY2" }, { 0x07, "CHARAC" }, { 0x08, "ENDCHR" }, { 0x09, "TRMPOS" }, { 0x0a, "VERCK" },
 	{ 0x0b, "COUNT" }, { 0x0c, "DIMFLG" }, { 0x0d, "VALTYP" }, { 0x0e, "INTFLG" }, { 0x0f, "GARBFL" }, { 0x10, "SUBFLG" }, { 0x11, "INPFLG" }, { 0x12, "TANSGN" },
-	{ 0x14, "LINNUM" }, { 0x16, "TEMPPT" }, { 0x17, "LASTPT" }, { 0x19, "TEMPST" }, { 0x22, "INDEX" }, { 0x26, "RESHO" }, { 0x2b, "TXTTAB" }, { 0x2d, "VARTAB" }, 
-	{ 0x2f, "ARYTAB" }, { 0x31, "STREND" }, { 0x33, "FRETOP" }, { 0x35, "FRESPC" }, { 0x37, "MEMSIZ" }, { 0x39, "CURLIN" }, { 0x3b, "OLDLIN" }, { 0x3d, "OLDTXT" }, 
-	{ 0x3f, "DATLIN" }, { 0x41, "DATPTR" }, { 0x43, "INPPTR" }, { 0x45, "VARNAM" }, { 0x47, "VARPNT" }, { 0x49, "FORPNT" }, { 0x61, "FACEXP" }, { 0x62, "FACHO" }, 
-	{ 0x66, "FACSGN" }, { 0x67, "SGNFLG" }, { 0x68, "BITS" }, { 0x69, "ARGEXP" }, { 0x6a, "ARGHO" }, { 0x6e, "ARGSGN" }, { 0x6f, "ARISGN" }, { 0x70, "FACOV" }, 
+	{ 0x14, "LINNUM" }, { 0x16, "TEMPPT" }, { 0x17, "LASTPT" }, { 0x19, "TEMPST" }, { 0x22, "INDEX" }, { 0x26, "RESHO" }, { 0x2b, "TXTTAB" }, { 0x2d, "VARTAB" },
+	{ 0x2f, "ARYTAB" }, { 0x31, "STREND" }, { 0x33, "FRETOP" }, { 0x35, "FRESPC" }, { 0x37, "MEMSIZ" }, { 0x39, "CURLIN" }, { 0x3b, "OLDLIN" }, { 0x3d, "OLDTXT" },
+	{ 0x3f, "DATLIN" }, { 0x41, "DATPTR" }, { 0x43, "INPPTR" }, { 0x45, "VARNAM" }, { 0x47, "VARPNT" }, { 0x49, "FORPNT" }, { 0x61, "FACEXP" }, { 0x62, "FACHO" },
+	{ 0x66, "FACSGN" }, { 0x67, "SGNFLG" }, { 0x68, "BITS" }, { 0x69, "ARGEXP" }, { 0x6a, "ARGHO" }, { 0x6e, "ARGSGN" }, { 0x6f, "ARISGN" }, { 0x70, "FACOV" },
 	{ 0x71, "FBUFPT" }, { 0x73, "CHRGET" }, { 0x79, "CHRGOT" }, { 0x7a, "TXTPTR" }, { 0x8b, "RNDX" }, { 0x90, "STATUS" }, { 0x91, "STKEY" }, { 0x92, "SVXT" },
-	{ 0x93, "VERCK" }, { 0x94, "C3PO" }, { 0x95, "BSOUR" }, { 0x96, "SYNO" }, { 0x98, "LDTND" }, { 0x99, "DFLTN" }, { 0x9a, "DFLTO" }, { 0x9b, "PRTY" }, 
-	{ 0x9c, "DPSW" }, { 0x9d, "MSGFLG" }, { 0x9e, "PTR1" }, { 0x9f, "PTR2" }, { 0xa0, "TIME" }, { 0xa5, "CNTDN" }, { 0xa6, "BUFPNT" }, { 0xa7, "INBIT" }, 
-	{ 0xa8, "BITCI" }, { 0xa9, "RINONE" }, { 0xaa, "RIDATA" }, { 0xab, "RIPRTY" }, { 0xac, "SAL" }, { 0xae, "EAL" }, { 0xb0, "CMPO" }, { 0xb2, "TAPE1" }, 
-	{ 0xb4, "BITTS" }, { 0xb5, "NXTBIT" }, { 0xb6, "RODATA" }, { 0xb7, "FNLEN" }, { 0xb8, "LA" }, { 0xb9, "SA" }, { 0xba, "FA" }, { 0xbb, "FNADR" }, 
-	{ 0xbc, "ROPRTY" }, { 0xbe, "FSBLK" }, { 0xbf, "MYCH" }, { 0xc0, "CAS1" }, { 0xc1, "STAL" }, { 0xc3, "MEMUSS" }, { 0xc5, "LSTX" }, { 0xc6, "NDX" }, 
-	{ 0xc7, "RVS" }, { 0xc8, "INDX" }, { 0xc9, "LXSP" }, { 0xcb, "SFDX" }, { 0xcc, "BLNSW" }, { 0xcd, "BLNCT" }, { 0xce, "GDBLN" }, { 0xcf, "BLNON" }, 
-	{ 0xd0, "CRSW" }, { 0xd1, "PNT" }, { 0xd3, "PNTR" }, { 0xd4, "QTSW" }, { 0xd5, "LNMX" }, { 0xd6, "TBLX" }, { 0xd8, "INSRT" }, { 0xd9, "LDTB1" }, 
+	{ 0x93, "VERCK" }, { 0x94, "C3PO" }, { 0x95, "BSOUR" }, { 0x96, "SYNO" }, { 0x98, "LDTND" }, { 0x99, "DFLTN" }, { 0x9a, "DFLTO" }, { 0x9b, "PRTY" },
+	{ 0x9c, "DPSW" }, { 0x9d, "MSGFLG" }, { 0x9e, "PTR1" }, { 0x9f, "PTR2" }, { 0xa0, "TIME" }, { 0xa5, "CNTDN" }, { 0xa6, "BUFPNT" }, { 0xa7, "INBIT" },
+	{ 0xa8, "BITCI" }, { 0xa9, "RINONE" }, { 0xaa, "RIDATA" }, { 0xab, "RIPRTY" }, { 0xac, "SAL" }, { 0xae, "EAL" }, { 0xb0, "CMPO" }, { 0xb2, "TAPE1" },
+	{ 0xb4, "BITTS" }, { 0xb5, "NXTBIT" }, { 0xb6, "RODATA" }, { 0xb7, "FNLEN" }, { 0xb8, "LA" }, { 0xb9, "SA" }, { 0xba, "FA" }, { 0xbb, "FNADR" },
+	{ 0xbc, "ROPRTY" }, { 0xbe, "FSBLK" }, { 0xbf, "MYCH" }, { 0xc0, "CAS1" }, { 0xc1, "STAL" }, { 0xc3, "MEMUSS" }, { 0xc5, "LSTX" }, { 0xc6, "NDX" },
+	{ 0xc7, "RVS" }, { 0xc8, "INDX" }, { 0xc9, "LXSP" }, { 0xcb, "SFDX" }, { 0xcc, "BLNSW" }, { 0xcd, "BLNCT" }, { 0xce, "GDBLN" }, { 0xcf, "BLNON" },
+	{ 0xd0, "CRSW" }, { 0xd1, "PNT" }, { 0xd3, "PNTR" }, { 0xd4, "QTSW" }, { 0xd5, "LNMX" }, { 0xd6, "TBLX" }, { 0xd8, "INSRT" }, { 0xd9, "LDTB1" },
 	{ 0xf3, "USER" }, { 0xf5, "KEYTAB" }, { 0xf7, "RIBUF" }, { 0xf9, "ROBUF" }, { 0xfb, "FREKZB" }, { 0xff, "BASZPT" }
 };
 
@@ -251,7 +251,7 @@ static const struct dasm_vector_data cbm_kernal_vectors[] =
 	{ 0xff99, "MEMTOP" }, { 0xff9c, "MEMBOT" }, { 0xff9f, "SCNKEY" }, { 0xffa2, "SETTMO" }, { 0xffa5, "ACPTR" }, { 0xffa8, "CIOUT" }, { 0xffab, "UNTALK" }, { 0xffae, "UNLSN" },
 	{ 0xffb1, "LISTEN" }, { 0xffb4, "TALK" }, { 0xffb7, "READST" }, { 0xffba, "SETLFS" }, { 0xffbd, "SETNAM" }, { 0xffc3, "CLOSE" }, { 0xffc6, "CHKIN" }, { 0xffc9, "CHKOUT" },
 	{ 0xffcc, "CLRCHN" }, { 0xffcf, "CHRIN" }, { 0xffd2, "CHROUT" }, { 0xffd5, "LOAD" }, { 0xffd8, "SAVE" }, { 0xffdb, "SETTIM" }, { 0xffde, "RDTIM" }, { 0xffe1, "STOP" },
- 	{ 0xffe4, "GETIN" }, { 0xffe7, "CLALL" }, { 0xffea, "UDTIM" }, { 0xffed, "SCREEN" }, { 0xfff0, "PLOT" }, { 0xfff3, "IOBASE" }
+	{ 0xffe4, "GETIN" }, { 0xffe7, "CLALL" }, { 0xffea, "UDTIM" }, { 0xffed, "SCREEN" }, { 0xfff0, "PLOT" }, { 0xfff3, "IOBASE" }
 };
 
 offs_t c64_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
@@ -325,7 +325,7 @@ offs_t c64_state::dasm_zeropage(std::ostream &stream, offs_t pc, const util::dis
 {
 	int item = 0;
 	u8 operand = opcodes.r8(pc+1);
-	
+
 	while (c64_zeropage_locations[item].addr != 0xff)
 	{
 		if (c64_zeropage_locations[item].addr == operand)
@@ -345,7 +345,7 @@ offs_t c64_state::dasm_vector(std::ostream &stream, offs_t pc, const util::disas
 {
 	int item = 0;
 	u16 operand = opcodes.r16(pc+1);
-	
+
 	while (cbm_kernal_vectors[item].addr != 0xfff3)
 	{
 		if (cbm_kernal_vectors[item].addr == operand)
@@ -365,7 +365,7 @@ offs_t c64_state::dasm_zeropage_vector(std::ostream &stream, offs_t pc, const ut
 {
 	int item = 0;
 	u16 operand = opcodes.r16(pc+1);
-	
+
 	if (operand < 0x100)
 	{
 		while (c64_zeropage_locations[item].addr != 0xff)

@@ -384,33 +384,33 @@ void galaga_state::galaga_palette(palette_device &palette) const
 
 /***************************************************************************
 
-	Star field documentation
+    Star field documentation
 
-	Couriersud, May 2019:
+    Couriersud, May 2019:
 
-	The code below was manually applied based on a pull request from
-	Jindřich Makovička. He based his work on information published by
-	Wolfgang Scherr about the 05XX on pin4.at.
+    The code below was manually applied based on a pull request from
+    Jindřich Makovička. He based his work on information published by
+    Wolfgang Scherr about the 05XX on pin4.at.
 
-	Wolfgang shared is VHDL implementation with the MAME team. I have
-	created a spreadsheet implementation for his decode logic.
+    Wolfgang shared is VHDL implementation with the MAME team. I have
+    created a spreadsheet implementation for his decode logic.
 
-	Both implementations use the same Galois type LFSR( tap 15,12,10,5).
-	Using the same seed value, the following holds true:
+    Both implementations use the same Galois type LFSR( tap 15,12,10,5).
+    Using the same seed value, the following holds true:
 
-	Decode_W(lfsr[t-4]) = Decode_J(lfsr[t])
+    Decode_W(lfsr[t-4]) = Decode_J(lfsr[t])
 
-	The two decoding algorithm (Wolfgang, Jindřich) thus deliver the same
-	results but with a 4 clock difference.
+    The two decoding algorithm (Wolfgang, Jindřich) thus deliver the same
+    results but with a 4 clock difference.
 
-	Jindřich's code filters out stars with y<4. This matches the starfield
-	measurements documented above. Wolfgang states that his code matches his
-	measurements and there are stars with y<4.
-	We need to have a closer look at this.
+    Jindřich's code filters out stars with y<4. This matches the starfield
+    measurements documented above. Wolfgang states that his code matches his
+    measurements and there are stars with y<4.
+    We need to have a closer look at this.
 
-	Both implementations are complex compared to other star field gnerators
-	used in the industry. We thus now have two decoding solutions matching
-	the output. I wonder if there is a simpler one.
+    Both implementations are complex compared to other star field gnerators
+    used in the industry. We thus now have two decoding solutions matching
+    the output. I wonder if there is a simpler one.
 
 ***************************************************************************/
 
@@ -433,11 +433,11 @@ void galaga_state::starfield_init()
 			uint16_t xor2 = xor1 ^ (i >> 2);
 			uint16_t oe = (sf1 ? 0 : 0x4000) | ((sf1 ^ sf2) ? 0 : 0x1000);
 			if ((i & 0x8007) == 0x8007
-			    && (~i & 0x2008) == 0x2008
-			    && (xor1 & 0x0100) == (sf1 ? 0 : 0x0100)
-			    && (xor2 & 0x0040) == (sf2 ? 0 : 0x0040)
-			    && (i & 0x5000) == oe
-			    && cnt >= 256 * 4)
+				&& (~i & 0x2008) == 0x2008
+				&& (xor1 & 0x0100) == (sf1 ? 0 : 0x0100)
+				&& (xor2 & 0x0040) == (sf2 ? 0 : 0x0040)
+				&& (i & 0x5000) == oe
+				&& cnt >= 256 * 4)
 			{
 				// color lookup
 				uint16_t xor3 = (i >> 1) ^ (i >> 6);

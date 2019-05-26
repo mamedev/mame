@@ -208,8 +208,8 @@ private:
 	optional_device<bally_as3022_device> m_as3022;
 	optional_device<bally_sounds_plus_device> m_sounds_plus;
 	optional_device<bally_cheap_squeak_device> m_cheap_squeak;
-        devcb_write8 m_sound_select_handler;
-        devcb_write_line m_sound_int_handler;
+		devcb_write8 m_sound_select_handler;
+		devcb_write_line m_sound_int_handler;
 };
 
 class playboy_state : public by35_state
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( by35 )
 INPUT_PORTS_END
 
 /*
-	Dips for os35 - Harlem Globetrotters, Dolly, Future Spa, Nitro Ground Shaker, Silverball Mania, Space Invaders, Rolling Stones, Mystic, Hotdoggin', Viking
+    Dips for os35 - Harlem Globetrotters, Dolly, Future Spa, Nitro Ground Shaker, Silverball Mania, Space Invaders, Rolling Stones, Mystic, Hotdoggin', Viking
 */
 static INPUT_PORTS_START ( by35_os35 )
 	PORT_INCLUDE( by35 )
@@ -521,7 +521,7 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x1f, "2 Coins/15 Credits")
 	PORT_DIPNAME( 0x20, 0x00, "S14 (game specific)")    PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))	
+	PORT_DIPSETTING(    0x20, DEF_STR( On ))
 	PORT_DIPNAME( 0x40, 0x00, "S15 (game specific)")    PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x40, DEF_STR( On ))
@@ -585,7 +585,7 @@ static INPUT_PORTS_START ( by35_os35 )
 INPUT_PORTS_END
 
 /*
-	Dips for os40 - Skateball, Frontier, Xenon
+    Dips for os40 - Skateball, Frontier, Xenon
 */
 static INPUT_PORTS_START( by35_os40 )
 	PORT_INCLUDE( by35 )
@@ -716,10 +716,10 @@ static INPUT_PORTS_START( by35_os40 )
 	PORT_DIPSETTING(    0x02, "25")
 	PORT_DIPSETTING(    0x03, "40")
 	PORT_DIPNAME( 0xc0, 0x00, "Balls Per Game")         PORT_DIPLOCATION("SW3:!7,!8")
-	PORT_DIPSETTING(	0x40, "5")
-	PORT_DIPSETTING(	0x80, "4")
-	PORT_DIPSETTING(	0x00, "3")
-	PORT_DIPSETTING(	0xc0, "2")
+	PORT_DIPSETTING(    0x40, "5")
+	PORT_DIPSETTING(    0x80, "4")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0xc0, "2")
 	PORT_DIPNAME( 0x08, 0x08, "Match Feature")          PORT_DIPLOCATION("SW3:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x08, DEF_STR( On ))
@@ -735,9 +735,9 @@ static INPUT_PORTS_START( by35_os40 )
 INPUT_PORTS_END
 
 /*
-	Dips for os5x - Flash Gordon to Cybernaut
+    Dips for os5x - Flash Gordon to Cybernaut
 */
-static INPUT_PORTS_START( by35_os5x ) 
+static INPUT_PORTS_START( by35_os5x )
 	PORT_INCLUDE( by35_os40 )
 
 	PORT_MODIFY("DSW0")

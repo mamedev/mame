@@ -5,14 +5,14 @@
     Known cartridges (*=dumped) (#=sourced)
 
     *Guitar Favorites (K7357)
-	
+
     *Barbie Guitar Party (K9901)
     *Hot Wheels Road Tunes (K9902)
     *Spongebob Squarepants Surf's Up (K9903)
-	
+
      (is there a K9904?)
-    
-	*Nashville Hits (K9905)
+
+    *Nashville Hits (K9905)
     *Rock 101 (K9906)
     *American Idol Guitar Greats (K9907)
 
@@ -101,7 +101,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rock101" supported="no">
 		<description>Rock 101 (K9906)</description>
 		<year>2007</year>
@@ -111,8 +111,8 @@
 				<rom name="icpgrock101.bin" size="0x800000" crc="74b81353" sha1="d2cc03d043242e7fc6595dacfb2cde36612bb44a"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="ggreats" supported="no">
 		<description>American Idol - Guitar Greats (K9907)</description>
 		<year>2007</year>
@@ -122,6 +122,6 @@
 				<rom name="icpgguitargreats.bin" size="0x800000" crc="5a4daf19" sha1="4f673c39fe95399ebfd02257c7b6b80ec44ed14f"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>

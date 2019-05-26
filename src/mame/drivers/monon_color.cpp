@@ -84,7 +84,7 @@ void monon_color_state::machine_start()
 
 	    by game number:
 
-		103alt                           (earliest? doesn't have bank9)
+	    103alt                           (earliest? doesn't have bank9)
 	    101,102,103,104,105              (1st revision)
 	    106,107                          (2nd revision)
 	    201                              (3rd revision)

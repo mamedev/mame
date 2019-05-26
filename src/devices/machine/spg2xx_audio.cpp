@@ -12,8 +12,8 @@
     SPG110 Beat interrupt frequency might be different too, seems to
     trigger an FIQ, but music is very slow in jak_spdmo
 
-	GCM394 has 32 channels, and potentially a different register layout
-	it looks close but might be different enough to split off
+    GCM394 has 32 channels, and potentially a different register layout
+    it looks close but might be different enough to split off
 
 **********************************************************************/
 

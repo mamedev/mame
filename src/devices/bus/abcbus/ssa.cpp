@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Luxor ABC-80 Owoco Super Smartaid cartridge emulation
+    Luxor ABC-80 Owoco Super Smartaid cartridge emulation
 
     New BASIC commands:
 
@@ -25,34 +25,34 @@ PCB Layout
 Super Smartaid / Super Smartaid Magnum 4
 
 [---------------------------------------------------|
-|						PROM 	LS155	LS08		|
-|													|
-||-----------CN1----------|		LS74	HC32		|
-|													|
-|		ROM1 		RAM 							|
-|													|
-|LS245			LS126	LS393	LS00		BAT		|
-|		ROM2										|
-|			 	LS260	LS74	LS32				|
+|                       PROM    LS155   LS08        |
+|                                                   |
+||-----------CN1----------|     LS74    HC32        |
+|                                                   |
+|       ROM1        RAM                             |
+|                                                   |
+|LS245          LS126   LS393   LS00        BAT     |
+|       ROM2                                        |
+|               LS260   LS74    LS32                |
 |---------------------------------------------------|
 
 Notes:
     All IC's shown.
 
-    RAM     - Hitachi HM6116LP-3 / Fujitsu MB8416A-15 2Kx8 SRAM 
+    RAM     - Hitachi HM6116LP-3 / Fujitsu MB8416A-15 2Kx8 SRAM
     ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM
     ROM2    - SGS M2716F1 2Kx8 EPROM / NEC D27128D 16Kx8 EPROM
-    PROM 	- Signetics N82S131N 512x4 bipolar PROM
+    PROM    - Signetics N82S131N 512x4 bipolar PROM
     CN1     - ABC bus connector
-    BAT 	- Varta 3/V150H 3.6V 140mAh Ni-MH battery
+    BAT     - Varta 3/V150H 3.6V 140mAh Ni-MH battery
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- entering a bad command locks up the system
+    - entering a bad command locks up the system
 
 */
 

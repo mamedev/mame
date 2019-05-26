@@ -1726,7 +1726,7 @@ void lua_engine::initialize()
  * manager:machine():ioport().ports[port_tag].fields[field_name]
  *
  * field:set_value(value)
- * 
+ *
  * field.device - get associated device_t
  * field.live - get ioport_field_live
 
