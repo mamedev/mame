@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Harris
+// copyright-holders:Mike Harris, Quench
 /***************************************************************************
 
     bally.cpp
@@ -97,7 +97,7 @@ WRITE8_MEMBER(bally_as2888_device::sound_select)
 
 TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_select_sync)
 {
-	m_sound_select = param;
+	m_sound_select = param ^ 0x10;
 }
 
 //-------------------------------------------------
@@ -178,7 +178,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 //**************************************************************************
 static INPUT_PORTS_START(as3022)
 		PORT_START("SW1")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_as3022_device::device_input_ports() const
@@ -439,7 +439,7 @@ WRITE8_MEMBER(bally_sounds_plus_device::vocalizer_pia_portb_w)
 //**************************************************************************
 static INPUT_PORTS_START(cheap_squeak)
 		PORT_START("SW1")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_cheap_squeak_device::device_input_ports() const
