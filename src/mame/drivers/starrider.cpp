@@ -138,6 +138,9 @@
  Q      ______------------____________------------____________------------______
  LATCH  ______________--------________________--------________________--------__
         __----__----__----__----__----__----__----__----__----__----__----__----
+ /SRL   --------____--------------------____--------------------____------------
+ 4MHz   ___---___---___---___---___---___---___---___---___---___---___---___---
+ 2MHz   ______------______------______------______------______------______------
 
  Video RAM consists of 6 4416 16k*4 DRAMs at U25, U26, U41, U42, U55 and
  U56.  The CPU and DMA chips have their addressing mangled by the 6349
@@ -170,10 +173,13 @@
 
  U14.6 (active low)        1111x xxxx xxxxxxxx xxxxxxxx
 
+ U15.13 (active high)      xxxxx xx11 xxxxxxxx xxxxxxxx (W)
+
  U18.8 (active low)        xxxxx xx10 xxxxxxxx xxxxxxxx (CPU access)
 
  U46.3   /1E               11110 xxxx xxxxxxxx xxxxxxxx
  U46.8   /1F               11111 xxxx xxxxxxxx xxxxxxxx
+ U46.11 (active low)       11110 xx01 xxxxxxxx xxxxxxxx
 
  U33.8 (active low)        11001011 xxxxxxxx      0xcb00-0xcbff
 
@@ -613,6 +619,8 @@ u16 sr_state::vgg_drams_map(u16 a) const
 
 void sr_state::vgg_drams_w(offs_t offset, u8 data)
 {
+	if (((m_main_page & 0x03) == 0x03) || (((m_main_page & 0x03) == 0x01) && ((m_vgg_image_page & 0x1f) == 0x1e)))
+		offset ^= 0x8000;
 	u16 const addr(vgg_drams_map(offset));
 	if ((offset & 0xc000) != 0xc000)
 		m_vgg_drams[addr] = data;
@@ -621,7 +629,7 @@ void sr_state::vgg_drams_w(offs_t offset, u8 data)
 void sr_state::vgg_impg_w(u8 data)
 {
 	// 6 bits latched by U13 (74LS173) but only 5 bits used
-	m_vgg_image_page = data & 0x1f;
+	m_vgg_image_page = data & 0x3f;
 }
 
 void sr_state::vgg_xlate_w(u8 data)
@@ -640,7 +648,7 @@ void sr_state::vgg_disable_w(u8 data)
 void sr_state::vgg_color_palet_w(u8 data)
 {
 	// all 8 bits latched by U94 (74LS374) but only 6 bits used
-	m_vgg_color_palet = data & 0x3f;
+	m_vgg_color_palet = data;
 }
 
 
