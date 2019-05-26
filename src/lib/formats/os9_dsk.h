@@ -4,11 +4,7 @@
 
     formats/os9_dsk.h
 
-<<<<<<< HEAD
-    TRD disk images
-=======
     OS-9 disk images
->>>>>>> upstream/master
 
 *********************************************************************/
 #ifndef MAME_FORMATS_OS9_DSK_H
