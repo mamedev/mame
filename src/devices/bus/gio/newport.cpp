@@ -40,7 +40,7 @@
 #define LOG_REJECTS     (1 << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
 
-#define VERBOSE         (0)//(LOG_UNKNOWN | LOG_REX3 | LOG_COMMANDS)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device,  "gio_xl8",  "SGI 8-bit XL board")
@@ -518,30 +518,21 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
 								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
-								const uint8_t r = 0xff * BIT(pix_in, 0);
-								const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
-								const uint8_t b = 0xff * BIT(pix_in, 3);
-								*dest++ = (r << 16) | (g << 8) | b;
+								*dest++ = convert_4bpp_bgr_to_24bpp_rgb(pix_in);
 								break;
 							}
 							case 1: // 8bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 8 : 0;
 								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
-								const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
-								const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
-								const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
-								*dest++ = (r << 16) | (g << 8) | b;
+								*dest++ = convert_8bpp_bgr_to_24bpp_rgb(pix_in);
 								break;
 							}
 							case 2: // 12bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 12 : 0;
 								const uint16_t pix_in = (uint16_t)(*src_ci >> shift);
-								const uint8_t r = 0x11 * ((pix_in >> 0) & 0xf);
-								const uint8_t g = 0x11 * ((pix_in >> 4) & 0xf);
-								const uint8_t b = 0x11 * ((pix_in >> 8) & 0xf);
-								*dest++ = (r << 16) | (g << 8) | b;
+								*dest++ = convert_12bpp_bgr_to_24bpp_rgb(pix_in);
 								break;
 							}
 							case 3: // 24bpp
@@ -583,6 +574,125 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 	return 0;
 }
 
+uint32_t newport_base_device::convert_4bpp_bgr_to_8bpp(uint8_t pix_in)
+{
+    const uint8_t r = 0xff * BIT(pix_in, 0);
+    const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
+    const uint8_t b = 0xff * BIT(pix_in, 3);
+    return (b & 0xc0) | ((g & 0xe0) >> 2) | ((r & 0xe0) >> 5);
+}
+
+uint32_t newport_base_device::convert_4bpp_bgr_to_12bpp(uint8_t pix_in)
+{
+    const uint32_t r = 0xff * BIT(pix_in, 0);
+    const uint32_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
+    const uint32_t b = 0xff * BIT(pix_in, 3);
+    return ((b & 0xf0) << 4) | (g & 0xf0) | ((r & 0xf0) >> 4);
+}
+
+uint32_t newport_base_device::convert_4bpp_bgr_to_24bpp(uint8_t pix_in)
+{
+    const uint8_t r = 0xff * BIT(pix_in, 0);
+    const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
+    const uint8_t b = 0xff * BIT(pix_in, 3);
+    return (b << 16) | (g << 8) | r;
+}
+
+uint32_t newport_base_device::convert_8bpp_bgr_to_4bpp(uint8_t pix_in)
+{
+    const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
+    const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
+    const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
+    return (BIT(b, 7) << 3) | ((g & 0xc0) >> 5) | BIT(r, 7);
+}
+
+uint32_t newport_base_device::convert_8bpp_bgr_to_12bpp(uint8_t pix_in)
+{
+    const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
+    const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
+    const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
+    return ((b & 0xf0) << 4) | (g & 0xf0) | ((r & 0xf0) >> 4);
+}
+
+uint32_t newport_base_device::convert_8bpp_bgr_to_24bpp(uint8_t pix_in)
+{
+    const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
+    const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
+    const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
+    return (b << 16) | (g << 8) | r;
+}
+
+uint32_t newport_base_device::convert_12bpp_bgr_to_4bpp(uint16_t pix_in)
+{
+    const uint8_t r = 0x11 * ((pix_in >> 0) & 0xf);
+    const uint8_t g = 0x11 * ((pix_in >> 4) & 0xf);
+    const uint8_t b = 0x11 * ((pix_in >> 8) & 0xf);
+    return (BIT(b, 7) << 3) | ((g & 0xc0) >> 5) | BIT(r, 7);
+}
+
+uint32_t newport_base_device::convert_12bpp_bgr_to_8bpp(uint16_t pix_in)
+{
+    const uint8_t r = 0x11 * ((pix_in >> 0) & 0xf);
+    const uint8_t g = 0x11 * ((pix_in >> 4) & 0xf);
+    const uint8_t b = 0x11 * ((pix_in >> 8) & 0xf);
+    return (b & 0xc0) | ((g & 0xe0) >> 2) | ((r & 0xe0) >> 5);
+}
+
+uint32_t newport_base_device::convert_12bpp_bgr_to_24bpp(uint16_t pix_in)
+{
+    const uint8_t r = 0x11 * ((pix_in >> 0) & 0xf);
+    const uint8_t g = 0x11 * ((pix_in >> 4) & 0xf);
+    const uint8_t b = 0x11 * ((pix_in >> 8) & 0xf);
+    return (b << 16) | (g << 8) | r;
+}
+
+uint32_t newport_base_device::convert_24bpp_bgr_to_4bpp(uint32_t pix_in)
+{
+    const uint8_t r = (uint8_t)(pix_in >> 0);
+    const uint8_t g = (uint8_t)(pix_in >> 8);
+    const uint8_t b = (uint8_t)(pix_in >> 16);
+    return (BIT(b, 7) << 3) | ((g & 0xc0) >> 5) | BIT(r, 7);
+}
+
+uint32_t newport_base_device::convert_24bpp_bgr_to_8bpp(uint32_t pix_in)
+{
+    const uint8_t r = (uint8_t)(pix_in >> 0);
+    const uint8_t g = (uint8_t)(pix_in >> 8);
+    const uint8_t b = (uint8_t)(pix_in >> 16);
+    return (b & 0xc0) | ((g & 0xe0) >> 2) | ((r & 0xe0) >> 5);
+}
+
+uint32_t newport_base_device::convert_24bpp_bgr_to_12bpp(uint32_t pix_in)
+{
+    const uint8_t r = (uint8_t)(pix_in >> 0);
+    const uint8_t g = (uint8_t)(pix_in >> 8);
+    const uint8_t b = (uint8_t)(pix_in >> 16);
+    return ((b & 0xf0) << 4) | (g & 0xf0) | ((r & 0xf0) >> 4);
+}
+
+uint32_t newport_base_device::convert_4bpp_bgr_to_24bpp_rgb(uint8_t pix_in)
+{
+    const uint8_t r = 0xff * BIT(pix_in, 0);
+    const uint8_t g = (0xaa * BIT(pix_in, 2)) | (0x55 * BIT(pix_in, 1));
+    const uint8_t b = 0xff * BIT(pix_in, 3);
+    return (r << 16) | (g << 8) | b;
+}
+
+uint32_t newport_base_device::convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in)
+{
+    const uint8_t r = (0x92 * BIT(pix_in, 2)) | (0x49 * BIT(pix_in, 1)) | (0x24 * BIT(pix_in, 0));
+    const uint8_t g = (0x92 * BIT(pix_in, 5)) | (0x49 * BIT(pix_in, 4)) | (0x24 * BIT(pix_in, 3));
+    const uint8_t b = (0xaa * BIT(pix_in, 7)) | (0x55 * BIT(pix_in, 6));
+    return (r << 16) | (g << 8) | b;
+}
+
+uint32_t newport_base_device::convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in)
+{
+    const uint8_t r = 0x11 * ((pix_in >> 0) & 0xf);
+    const uint8_t g = 0x11 * ((pix_in >> 4) & 0xf);
+    const uint8_t b = 0x11 * ((pix_in >> 8) & 0xf);
+    return (r << 16) | (g << 8) | b;
+}
 
 void newport_base_device::cmap0_write(uint32_t data)
 {
@@ -1486,8 +1596,6 @@ READ64_MEMBER(newport_base_device::rex3_r)
 		}
 		break;
 	case 0x0230/8:
-		if ((m_rex3.m_draw_mode0 & 3) == 1)
-			m_rex3.m_host_dataport = do_pixel_word_read();
 		LOGMASKED(LOG_REX3, "%s: REX3 Host Data Port Read: %08x%08x\n", machine().describe_context(), (uint32_t)(m_rex3.m_host_dataport >> 32),
 			(uint32_t)m_rex3.m_host_dataport);
 		ret = m_rex3.m_host_dataport;
@@ -1629,6 +1737,12 @@ READ64_MEMBER(newport_base_device::rex3_r)
 		LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "Unknown REX3 Read: %08x (%08x%08x)\n", 0x1f0f0000 + (offset << 2), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 		return 0;
 	}
+
+	if (offset & 0x00000100)
+	{
+		do_rex3_command();
+	}
+
 	return ret;
 }
 
@@ -1642,7 +1756,38 @@ uint32_t newport_base_device::get_host_color()
             m_rex3.m_host_shift -= s_host_shifts[m_rex3.m_hostdepth];
         else
             m_rex3.m_host_shift = 64 - s_host_shifts[m_rex3.m_hostdepth];
-    }
+	}
+	uint8_t convert_index = (m_rex3.m_hostdepth << 2) | m_rex3.m_plane_depth;
+    switch (convert_index & 15)
+    {
+	default:
+		// No conversion needed
+		return color;
+	case 1: 	// 4bpp -> 8bpp
+		return convert_4bpp_bgr_to_8bpp((uint8_t)color);
+	case 2: 	// 4bpp -> 12bpp
+		return convert_4bpp_bgr_to_12bpp((uint8_t)color);
+	case 3: 	// 4bpp -> 24bpp
+		return convert_4bpp_bgr_to_24bpp((uint8_t)color);
+	case 4: 	// 8bpp -> 4bpp
+		return convert_8bpp_bgr_to_4bpp((uint8_t)color);
+	case 6: 	// 8bpp -> 12bpp
+		return convert_8bpp_bgr_to_12bpp((uint8_t)color);
+	case 7:		// 8bpp -> 24bpp
+		return convert_8bpp_bgr_to_24bpp((uint8_t)color);
+	case 8: 	// 12bpp -> 4bpp
+		return convert_12bpp_bgr_to_4bpp((uint16_t)color);
+	case 9: 	// 12bpp -> 8bpp
+		return convert_12bpp_bgr_to_8bpp((uint16_t)color);
+	case 11:	// 12bpp -> 24bpp
+		return convert_12bpp_bgr_to_24bpp((uint16_t)color);
+	case 12: 	// 32bpp -> 4bpp
+		return convert_24bpp_bgr_to_4bpp(color);
+	case 13: 	// 32bpp -> 8bpp
+		return convert_24bpp_bgr_to_8bpp(color);
+	case 14: 	// 32bpp -> 12bpp
+		return convert_24bpp_bgr_to_12bpp(color);
+	}
     return color;
 }
 
@@ -1741,197 +1886,202 @@ bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
 	return true;
 }
 
-void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t src)
+void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 {
-	const uint32_t write_mask = m_rex3.m_write_mask & m_global_mask;
 	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
-	*dest_buf &= ~write_mask;
 
-	if (BIT(m_rex3.m_draw_mode1, 18)) // Blending
+	float sa = 0.0f;
+	float sb = 0.0f;
+	float sg = 0.0f;
+	float sr = 0.0f;
+
+	float db = 0.0f;
+	float dg = 0.0f;
+	float dr = 0.0f;
+
+	float sbb = 0.0f;
+	float sgb = 0.0f;
+	float srb = 0.0f;
+
+	float dbb = 0.0f;
+	float dgb = 0.0f;
+	float drb = 0.0f;
+
+	switch (m_rex3.m_plane_depth)
 	{
-		float sa = 0.0f;
-		float sb = 0.0f;
-		float sg = 0.0f;
-		float sr = 0.0f;
+	case 0: // 4bpp (not supported)
+	case 1: // 8bpp (not supported)
+		break;
+	case 2: // 12bpp
+		sa = (((src >> 12) & 15) * 0x11) / 255.0f;
+		sr = (((src >> 8) & 15) * 0x11) / 255.0f;
+		sg = (((src >> 4) & 15) * 0x11) / 255.0f;
+		sb = (((src >> 0) & 15) * 0x11) / 255.0f;
 
-		float db = 0.0f;
-		float dg = 0.0f;
-		float dr = 0.0f;
-
-		float sbb = 0.0f;
-		float sgb = 0.0f;
-		float srb = 0.0f;
-
-		float dbb = 0.0f;
-		float dgb = 0.0f;
-		float drb = 0.0f;
-
-		switch (m_rex3.m_plane_depth)
+		if (BIT(m_rex3.m_draw_mode1, 25))
 		{
-		case 0: // 4bpp (not supported)
-		case 1: // 8bpp (not supported)
-			break;
-		case 2: // 12bpp
-			sa = (((src >> 12) & 15) * 0x11) / 255.0f;
-			sr = (((src >> 8) & 15) * 0x11) / 255.0f;
-			sg = (((src >> 4) & 15) * 0x11) / 255.0f;
-			sb = (((src >> 0) & 15) * 0x11) / 255.0f;
-
-			if (BIT(m_rex3.m_draw_mode1, 25))
-			{
-				db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
-				dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
-				dr = (uint8_t)(m_rex3.m_color_back >>  0) / 255.0f;
-			}
-			else
-			{
-				const uint32_t dstc = (dst >> m_rex3.m_store_shift) & 0xfff;
-				dr = (((dstc >> 8) & 15) * 0x11) / 255.0f;
-				dg = (((dstc >> 4) & 15) * 0x11) / 255.0f;
-				db = (((dstc >> 0) & 15) * 0x11) / 255.0f;
-			}
-			break;
-		case 3: // 24bpp
-			sa = (uint8_t)(src >> 24) / 255.0f;
-			sr = (uint8_t)(src >> 16) / 255.0f;
-			sg = (uint8_t)(src >>  8) / 255.0f;
-			sb = (uint8_t)(src >>  0) / 255.0f;
-
-			if (BIT(m_rex3.m_draw_mode1, 25))
-			{
-				db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
-				dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
-				dr = (uint8_t)(m_rex3.m_color_back >>  0) / 255.0f;
-			}
-			else
-			{
-				const uint32_t dstc = dst;
-				dr = (uint8_t)(dstc >> 16) / 255.0f;
-				dg = (uint8_t)(dstc >>  8) / 255.0f;
-				db = (uint8_t)(dstc >>  0) / 255.0f;
-			}
-			break;
+			db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
+			dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
+			dr = (uint8_t)(m_rex3.m_color_back >>  0) / 255.0f;
 		}
-
-		switch (m_rex3.m_sfactor)
+		else
 		{
-		case 0: // 0
-		default:
-			break;
-		case 1: // 1
+			const uint32_t dstc = (dst >> m_rex3.m_store_shift) & 0xfff;
+			dr = (((dstc >> 8) & 15) * 0x11) / 255.0f;
+			dg = (((dstc >> 4) & 15) * 0x11) / 255.0f;
+			db = (((dstc >> 0) & 15) * 0x11) / 255.0f;
+		}
+		break;
+	case 3: // 24bpp
+		sa = (uint8_t)(src >> 24) / 255.0f;
+		sr = (uint8_t)(src >> 16) / 255.0f;
+		sg = (uint8_t)(src >>  8) / 255.0f;
+		sb = (uint8_t)(src >>  0) / 255.0f;
+
+		if (BIT(m_rex3.m_draw_mode1, 25))
+		{
+			db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
+			dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
+			dr = (uint8_t)(m_rex3.m_color_back >>  0) / 255.0f;
+		}
+		else
+		{
+			const uint32_t dstc = dst;
+			dr = (uint8_t)(dstc >> 16) / 255.0f;
+			dg = (uint8_t)(dstc >>  8) / 255.0f;
+			db = (uint8_t)(dstc >>  0) / 255.0f;
+		}
+		break;
+	}
+
+	switch (m_rex3.m_sfactor)
+	{
+	case 0: // 0
+	default:
+		break;
+	case 1: // 1
+		sbb = sb;
+		sgb = sg;
+		srb = sr;
+		break;
+	case 2: // dstc
+		sbb = sb * db;
+		sgb = sg * dg;
+		srb = sr * dr;
+		break;
+	case 3: // 1 - dstc
+		sbb = sb * (1.0f - db);
+		sgb = sg * (1.0f - dg);
+		srb = sr * (1.0f - dr);
+		break;
+	case 4: // srca
+		if (BIT(m_rex3.m_draw_mode1, 27))
+		{
+			sbb = sb * sa;
+			sgb = sg * sa;
+			srb = sr * sa;
+		}
+		else
+		{
 			sbb = sb;
 			sgb = sg;
 			srb = sr;
-			break;
-		case 2: // dstc
-			sbb = sb * db;
-			sgb = sg * dg;
-			srb = sr * dr;
-			break;
-		case 3: // 1 - dstc
-			sbb = sb * (1.0f - db);
-			sgb = sg * (1.0f - dg);
-			srb = sr * (1.0f - dr);
-			break;
-		case 4: // srca
-			if (BIT(m_rex3.m_draw_mode1, 27))
-			{
-				sbb = sb * sa;
-				sgb = sg * sa;
-				srb = sr * sa;
-			}
-            else
-            {
-                sbb = sb;
-                sgb = sg;
-                srb = sr;
-            }
-			break;
-		case 5: // 1 - srca
-			if (BIT(m_rex3.m_draw_mode1, 27))
-			{
-				sbb = sb * (1.0f - sa);
-				sgb = sg * (1.0f - sa);
-				srb = sr * (1.0f - sa);
-			}
-			break;
 		}
-
-		switch (m_rex3.m_dfactor)
+		break;
+	case 5: // 1 - srca
+		if (BIT(m_rex3.m_draw_mode1, 27))
 		{
-		case 0: // 0
-		default:
-			break;
-		case 1: // 1
-			dbb = db;
-			dgb = dg;
-			drb = dr;
-			break;
-		case 2: // srcc
-			dbb = db * sb;
-			dgb = dg * sg;
-			drb = dr * sr;
-			break;
-		case 3: // 1 - srcc
-			dbb = db * (1.0f - sb);
-			dgb = dg * (1.0f - sg);
-			drb = dr * (1.0f - sr);
-			break;
-		case 4: // srca
-			dbb = db * sa;
-			dgb = dg * sa;
-			drb = dr * sa;
-			break;
-		case 5: // 1 - srca
-			dbb = db * (1.0f - sa);
-			dgb = dg * (1.0f - sa);
-			drb = dr * (1.0f - sa);
-			break;
+			sbb = sb * (1.0f - sa);
+			sgb = sg * (1.0f - sa);
+			srb = sr * (1.0f - sa);
 		}
-
-		const float b_blend = sbb + dbb;
-		const float g_blend = sgb + dgb;
-		const float r_blend = srb + drb;
-
-		const uint8_t b_blend_i = b_blend > 1.0f ? 255 : (b_blend < 0.0f ? 0 : (uint8_t)(b_blend * 255.0f));
-		const uint8_t g_blend_i = g_blend > 1.0f ? 255 : (g_blend < 0.0f ? 0 : (uint8_t)(g_blend * 255.0f));
-		const uint8_t r_blend_i = r_blend > 1.0f ? 255 : (r_blend < 0.0f ? 0 : (uint8_t)(r_blend * 255.0f));
-
-		switch (m_rex3.m_plane_depth)
-		{
-		case 0: // 4bpp (not supported)
-		case 1: // 8bpp (not supported)
-			break;
-		case 2: // 12bpp
-			*dest_buf |= ((((r_blend_i & 0xf0) << 4) | (g_blend_i & 0xf0) | ((b_blend_i & 0xf0) >> 4)) << m_rex3.m_store_shift) & write_mask;
-			break;
-		case 3: // 24bpp
-			*dest_buf |= ((r_blend_i << 16) | (g_blend_i << 8) | b_blend_i) & write_mask;
-			break;
-		}
+		break;
 	}
-	else
+
+	switch (m_rex3.m_dfactor)
 	{
-		switch (m_rex3.m_logicop)
-		{
-			case 0:                                                break;
-			case 1:     *dest_buf |= ((src & dst) << m_rex3.m_store_shift) & write_mask;     break;
-			case 2:     *dest_buf |= ((src & ~dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 3:     *dest_buf |= ((src) << m_rex3.m_store_shift) & write_mask;           break;
-			case 4:     *dest_buf |= ((~src & dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 5:     *dest_buf |= ((dst) << m_rex3.m_store_shift) & write_mask;           break;
-			case 6:     *dest_buf |= ((src ^ dst) << m_rex3.m_store_shift) & write_mask;     break;
-			case 7:     *dest_buf |= ((src | dst) << m_rex3.m_store_shift) & write_mask;     break;
-			case 8:     *dest_buf |= (~(src | dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 9:     *dest_buf |= (~(src ^ dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 10:    *dest_buf |= (~(dst) << m_rex3.m_store_shift) & write_mask;          break;
-			case 11:    *dest_buf |= ((src | ~dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 12:    *dest_buf |= (~(src) << m_rex3.m_store_shift) & write_mask;          break;
-			case 13:    *dest_buf |= ((~src | dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 14:    *dest_buf |= (~(src & dst) << m_rex3.m_store_shift) & write_mask;    break;
-			case 15:    *dest_buf |= (0xffffff << m_rex3.m_store_shift) & write_mask;        break;
-		}
+	case 0: // 0
+	default:
+		break;
+	case 1: // 1
+		dbb = db;
+		dgb = dg;
+		drb = dr;
+		break;
+	case 2: // srcc
+		dbb = db * sb;
+		dgb = dg * sg;
+		drb = dr * sr;
+		break;
+	case 3: // 1 - srcc
+		dbb = db * (1.0f - sb);
+		dgb = dg * (1.0f - sg);
+		drb = dr * (1.0f - sr);
+		break;
+	case 4: // srca
+		dbb = db * sa;
+		dgb = dg * sa;
+		drb = dr * sa;
+		break;
+	case 5: // 1 - srca
+		dbb = db * (1.0f - sa);
+		dgb = dg * (1.0f - sa);
+		drb = dr * (1.0f - sa);
+		break;
 	}
+
+	const float b_blend = sbb + dbb;
+	const float g_blend = sgb + dgb;
+	const float r_blend = srb + drb;
+
+	const uint8_t b_blend_i = b_blend > 1.0f ? 255 : (b_blend < 0.0f ? 0 : (uint8_t)(b_blend * 255.0f));
+	const uint8_t g_blend_i = g_blend > 1.0f ? 255 : (g_blend < 0.0f ? 0 : (uint8_t)(g_blend * 255.0f));
+	const uint8_t r_blend_i = r_blend > 1.0f ? 255 : (r_blend < 0.0f ? 0 : (uint8_t)(r_blend * 255.0f));
+
+	switch (m_rex3.m_plane_depth)
+	{
+	case 0: // 4bpp (not supported)
+	case 1: // 8bpp (not supported)
+		break;
+	case 2: // 12bpp
+		store_pixel(dest_buf, ((r_blend_i & 0xf0) << 4) | (g_blend_i & 0xf0) | ((b_blend_i & 0xf0) >> 4));
+		break;
+	case 3: // 24bpp
+		store_pixel(dest_buf, (r_blend_i << 16) | (g_blend_i << 8) | b_blend_i);
+		break;
+	}
+}
+
+void newport_base_device::logic_pixel(uint32_t *dest_buf, uint32_t src)
+{
+	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
+
+	switch (m_rex3.m_logicop)
+	{
+		case 0:     store_pixel(dest_buf, 0x000000);		break;
+		case 1:     store_pixel(dest_buf, src & dst);		break;
+		case 2:     store_pixel(dest_buf, src & ~dst);		break;
+		case 3:     store_pixel(dest_buf, src);				break;
+		case 4:     store_pixel(dest_buf, ~src & dst);		break;
+		case 5:     store_pixel(dest_buf, dst);				break;
+		case 6:     store_pixel(dest_buf, src ^ dst);		break;
+		case 7:     store_pixel(dest_buf, src | dst);		break;
+		case 8:     store_pixel(dest_buf, ~(src | dst));	break;
+		case 9:     store_pixel(dest_buf, ~(src ^ dst));	break;
+		case 10:    store_pixel(dest_buf, ~dst);			break;
+		case 11:    store_pixel(dest_buf, src | ~dst);		break;
+		case 12:    store_pixel(dest_buf, ~src);			break;
+		case 13:    store_pixel(dest_buf, ~src | dst);		break;
+		case 14:    store_pixel(dest_buf, ~(src & dst));	break;
+		case 15:    store_pixel(dest_buf, 0xffffff);		break;
+	}
+}
+
+void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t value)
+{
+	const uint32_t write_mask = m_rex3.m_write_mask & m_global_mask;
+	*dest_buf &= ~write_mask;
+	*dest_buf |= (value << m_rex3.m_store_shift) & write_mask;
 }
 
 void newport_base_device::write_pixel(int16_t x, int16_t y, uint32_t color)
@@ -1946,24 +2096,31 @@ void newport_base_device::write_pixel(int16_t x, int16_t y, uint32_t color)
 	x -= 0x1000;
 	y -= 0x1000;
 
+	uint32_t *dest_buf = nullptr;
 	switch (m_rex3.m_plane_enable)
 	{
 		case 1: // RGB/CI planes
-			store_pixel(&m_rgbci[y * (1280 + 64) + x], color);
+			dest_buf = &m_rgbci[y * (1280 + 64) + x];
 			break;
 		case 2: // RGBA planes
 			// Not yet handled
 			break;
 		case 4: // Overlay planes
-			store_pixel(&m_olay[y * (1280 + 64) + x], color);
+			dest_buf = &m_olay[y * (1280 + 64) + x];
 			break;
 		case 5: // Popup planes
-			store_pixel(&m_pup[y * (1280 + 64) + x], (color << 2) | (color << 6));
+			dest_buf = &m_pup[y * (1280 + 64) + x];
+			color = (color << 2) | (color << 6);
 			break;
 		case 6: // CID planes
-			store_pixel(&m_cid[y * (1280 + 64) + x], color);
+			dest_buf = &m_cid[y * (1280 + 64) + x];
 			break;
 	}
+
+	if (BIT(m_rex3.m_draw_mode1, 18))
+		blend_pixel(dest_buf, color);
+	else
+		logic_pixel(dest_buf, color);
 }
 
 uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
@@ -2414,19 +2571,64 @@ uint32_t newport_base_device::do_pixel_read()
 	uint32_t ret = 0;
 	switch (m_rex3.m_plane_enable)
 	{
-		case 1: // RGB/CI planes
-		case 2: // RGBA planes
-			ret = m_rgbci[src_addr];
+	case 1: // RGB/CI planes
+	case 2: // RGBA planes
+	{
+		ret = m_rgbci[src_addr];
+		uint8_t convert_index = (m_rex3.m_plane_depth << 2) | m_rex3.m_hostdepth;
+		switch (convert_index & 15)
+		{
+		default:
+			// No conversion needed
 			break;
-		case 4: // Overlay planes
-			ret = m_olay[src_addr];
+		case 1: 	// 4bpp -> 8bpp
+			ret = convert_4bpp_bgr_to_8bpp((uint8_t)ret);
 			break;
-		case 5: // Popup planes
-			ret = m_pup[src_addr];
+		case 2: 	// 4bpp -> 12bpp
+			ret = convert_4bpp_bgr_to_12bpp((uint8_t)ret);
 			break;
-		case 6: // CID planes
-			ret = m_cid[src_addr];
+		case 3: 	// 4bpp -> 24bpp
+			ret = convert_4bpp_bgr_to_24bpp((uint8_t)ret);
 			break;
+		case 4: 	// 8bpp -> 4bpp
+			ret = convert_8bpp_bgr_to_4bpp((uint8_t)ret);
+			break;
+		case 6: 	// 8bpp -> 12bpp
+			ret = convert_8bpp_bgr_to_12bpp((uint8_t)ret);
+			break;
+		case 7:		// 8bpp -> 24bpp
+			ret = convert_8bpp_bgr_to_24bpp((uint8_t)ret);
+			break;
+		case 8: 	// 12bpp -> 4bpp
+			ret = convert_12bpp_bgr_to_4bpp((uint16_t)ret);
+			break;
+		case 9: 	// 12bpp -> 8bpp
+			ret = convert_12bpp_bgr_to_8bpp((uint16_t)ret);
+			break;
+		case 11:	// 12bpp -> 24bpp
+			ret = convert_12bpp_bgr_to_24bpp((uint16_t)ret);
+			break;
+		case 12: 	// 32bpp -> 4bpp
+			ret = convert_24bpp_bgr_to_4bpp(ret);
+			break;
+		case 13: 	// 32bpp -> 8bpp
+			ret = convert_24bpp_bgr_to_8bpp(ret);
+			break;
+		case 14: 	// 32bpp -> 12bpp
+			ret = convert_24bpp_bgr_to_12bpp(ret);
+			break;
+		}
+		break;
+	}
+	case 4: // Overlay planes
+		ret = m_olay[src_addr];
+		break;
+	case 5: // Popup planes
+		ret = m_pup[src_addr];
+		break;
+	case 6: // CID planes
+		ret = m_cid[src_addr];
+		break;
 	}
 	LOGMASKED(LOG_COMMANDS, "Read %08x (%08x) from %04x, %04x\n", ret, m_rgbci[src_addr], src_x, src_y);
 	m_rex3.m_x_start_i++;
@@ -2549,7 +2751,7 @@ void newport_base_device::do_rex3_command()
 		case 0: // NoOp
 			break;
 		case 1: // Read
-			// Handled on HOSTRW read
+			m_rex3.m_host_dataport = do_pixel_word_read();
 			break;
 		case 2: // Draw
 			switch (adrmode)
@@ -2592,14 +2794,12 @@ void newport_base_device::do_rex3_command()
 						{
 							case 0: // 4bpp
 								color = m_rex3.m_color_vram & 0xf;
-								//color |= color << 4;
 								break;
 							case 1: // 8bpp
 								color = m_rex3.m_color_vram & 0xff;
 								break;
 							case 2: // 12bpp
 								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-								//color |= color << 12;
 								break;
 							case 3: // 24bpp
 								color = m_rex3.m_color_vram & 0xffffff;

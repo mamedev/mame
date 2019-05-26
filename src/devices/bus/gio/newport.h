@@ -107,7 +107,7 @@ protected:
 		uint32_t m_store_shift;
 		uint32_t m_host_shift;
 
-		uint32_t m_write_width;
+        uint32_t m_write_width;
 		uint32_t m_ls_mode;
 		uint32_t m_ls_pattern;
 		uint32_t m_ls_pattern_saved;
@@ -148,14 +148,14 @@ protected:
 		int16_t m_x_end_i;
 		int16_t m_y_end_i;
 		uint32_t m_x_start_end_i;
-		int32_t m_color_red;
-		int32_t m_color_alpha;
-		int32_t m_color_green;
-		int32_t m_color_blue;
-		int32_t m_slope_red;
-		int32_t m_slope_alpha;
-		int32_t m_slope_green;
-		int32_t m_slope_blue;
+		uint32_t m_color_red;
+		uint32_t m_color_alpha;
+		uint32_t m_color_green;
+		uint32_t m_color_blue;
+		uint32_t m_slope_red;
+		uint32_t m_slope_alpha;
+		uint32_t m_slope_green;
+		uint32_t m_slope_blue;
 		uint32_t m_write_mask;
 		uint32_t m_color_i;
 		uint32_t m_zero_overflow;
@@ -175,7 +175,7 @@ protected:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint8_t m_xfer_width;
-	};
+    };
 
 	struct cmap_t
 	{
@@ -205,6 +205,8 @@ protected:
 	bool pixel_clip_pass(int16_t x, int16_t y);
 	void write_pixel(uint32_t color);
 	void write_pixel(int16_t x, int16_t y, uint32_t color);
+	void blend_pixel(uint32_t *dest_buf, uint32_t src);
+	void logic_pixel(uint32_t *dest_buf, uint32_t src);
 	void store_pixel(uint32_t *dest_buf, uint32_t src);
 
 	void iterate_shade();
@@ -214,6 +216,23 @@ protected:
 
 	uint32_t get_host_color();
 	uint32_t get_rgb_color(int16_t x, int16_t y);
+
+    uint32_t convert_4bpp_bgr_to_8bpp(uint8_t pix_in);
+    uint32_t convert_4bpp_bgr_to_12bpp(uint8_t pix_in);
+    uint32_t convert_4bpp_bgr_to_24bpp(uint8_t pix_in);
+    uint32_t convert_8bpp_bgr_to_4bpp(uint8_t pix_in);
+    uint32_t convert_8bpp_bgr_to_12bpp(uint8_t pix_in);
+    uint32_t convert_8bpp_bgr_to_24bpp(uint8_t pix_in);
+    uint32_t convert_12bpp_bgr_to_4bpp(uint16_t pix_in);
+    uint32_t convert_12bpp_bgr_to_8bpp(uint16_t pix_in);
+    uint32_t convert_12bpp_bgr_to_24bpp(uint16_t pix_in);
+    uint32_t convert_24bpp_bgr_to_4bpp(uint32_t pix_in);
+    uint32_t convert_24bpp_bgr_to_8bpp(uint32_t pix_in);
+    uint32_t convert_24bpp_bgr_to_12bpp(uint32_t pix_in);
+
+    uint32_t convert_4bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
+    uint32_t convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
+    uint32_t convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in);
 
     struct bresenham_octant_info_t
     {
