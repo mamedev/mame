@@ -41,6 +41,8 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_palram(*this, "palram"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -58,6 +60,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
 
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -83,81 +87,89 @@ void trkfldch_state::video_start()
 {
 }
 
-uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	bitmap.fill(0, cliprect);
 
-	// at 0x1189 in my1stddr
-	// at 0xe9c (actually 0x0d0c when fully populated) in trkfldch
-	// 7861 / 7860 point here most of the time in both games (so maybe DMA source, or just uses a direct pointer)
-
-	int spritelistbase = (m_unkregs[0x61] << 8) | (m_unkregs[0x60] << 0);
-	int spritelistend = spritelistbase+0x100*5;
-
-	spritelistbase &= 0x3fff;
-	spritelistend &= 0x3fff;
-
-	gfx_element* gfx;
-
-
-	if (spritelistend >= spritelistbase)
+	// 3 lots of 0x100 values, but maybe not rgb, seems to be yuv (borrowed from tetrisp2.cpp)
+	for (int i = 0; i < 256; i++)
 	{
-		for (int i = spritelistend; i >= spritelistbase; i -= 5)
-		{
-			//  printf("entry %02x %02x %02x %02x %02x\n", m_mainram[i + 0], m_mainram[i + 1], m_mainram[i + 2], m_mainram[i + 3], m_mainram[i + 4]);
-			//  int tilegfxbase = 0x1f80; // select mode
-			//  int tilegfxbase = 0x2780; // 2nd demo (+0x800 from above)
-			//  int tilegfxbase = 0x3780; // 1st demo and 'letters' minigame (+0x1000 from above)
-			int tilegfxbase = (m_unkregs[0x15] * 0x800);
+		uint8_t u =  m_palram[0x000 + i] & 0xff;
+		uint8_t y1 = m_palram[0x100 + i] & 0xff;
+		uint8_t v =  m_palram[0x200 + i] & 0xff;
+		double bf = y1+1.772*(u - 128);
+		double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
+		double rf = y1+1.772*(v - 128);
+		// clamp to 0-255 range
+		rf = std::min(rf,255.0);
+		rf = std::max(rf,0.0);
+		gf = std::min(gf,255.0);
+		gf = std::max(gf,0.0);
+		bf = std::min(bf,255.0);
+		bf = std::max(bf,0.0);
 
-			int y = m_mainram[i + 1];
-			int x = m_mainram[i + 3];
-			int tile = m_mainram[i + 2];
+		uint8_t r = (uint8_t)rf;
+		uint8_t g = (uint8_t)gf;
+		uint8_t b = (uint8_t)bf;
 
-			int tilehigh = m_mainram[i + 4] & 0x04;
-			int tilehigh2 = m_mainram[i + 0] & 0x04;
-			int tilehigh3 = m_mainram[i + 0] & 0x08;
-
-			//int unk = m_mainram[i + 4] & 0x20;
-
-			if (tilehigh)
-				tile += 0x100;
-
-			if (tilehigh2)
-				tile += 0x200;
-
-			if (tilehigh3)
-				tile += 0x400;
-
-			//if (unk) // set on score + 'press start' in ddr, priority? palette select?
-			//  tile = machine().rand();
-
-
-			int xhigh = m_mainram[i + 4] & 0x01;
-			int yhigh = m_mainram[i + 0] & 0x01; // or enable bit?
-
-			x = x | (xhigh << 8);
-			y = y | (yhigh << 8);
-
-			y -= 0x100;
-			y -= 16;
-			x -= 16;
-
-			if (m_unkregs[0x10] & 1) // seems to change something at least (trkfldch events)
-			{
-				gfx = m_gfxdecode->gfx(1);
-				tilegfxbase -= 0x80;
-			}
-			else
-			{
-				gfx = m_gfxdecode->gfx(2);
-				tilegfxbase -= 0x80;
-			}
-
-
-			gfx->transpen(bitmap, cliprect, tile + tilegfxbase, 0, 0, 0, x, y, 0);
-		}
+		m_palette->set_pen_color(i, r, g, b);
 	}
+
+	for (int i = 0x500 - 5; i >= 0; i -= 5)
+	{
+		//  printf("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
+		int tilegfxbase = (m_unkregs[0x15] * 0x800);
+
+		int y = m_spriteram[i + 1];
+		int x = m_spriteram[i + 3];
+		int tile = m_spriteram[i + 2];
+
+		int tilehigh = m_spriteram[i + 4] & 0x04;
+		int tilehigh2 = m_spriteram[i + 0] & 0x04;
+		int tilehigh3 = m_spriteram[i + 0] & 0x08;
+
+		//int unk = m_spriteram[i + 4] & 0x20;
+
+		if (tilehigh)
+			tile += 0x100;
+
+		if (tilehigh2)
+			tile += 0x200;
+
+		if (tilehigh3)
+			tile += 0x400;
+
+		//if (unk) // set on score + 'press start' in ddr, priority? palette select?
+		//  tile = machine().rand();
+
+
+		int xhigh = m_spriteram[i + 4] & 0x01;
+		int yhigh = m_spriteram[i + 0] & 0x01; // or enable bit?
+
+		x = x | (xhigh << 8);
+		y = y | (yhigh << 8);
+
+		y -= 0x100;
+		y -= 16;
+		x -= 16;
+
+		gfx_element* gfx;
+
+		if (m_unkregs[0x10] & 1) // seems to change something at least (trkfldch events)
+		{
+			gfx = m_gfxdecode->gfx(1);
+			tilegfxbase -= 0x80;
+		}
+		else
+		{
+			gfx = m_gfxdecode->gfx(2);
+			tilegfxbase -= 0x80;
+		}
+
+
+		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, 0, 0, 0, x, y, 0);
+	}
+
 	return 0;
 }
 
@@ -168,9 +180,9 @@ void trkfldch_state::trkfldch_map(address_map &map)
 {
 	map(0x000000, 0x003fff).ram().share("mainram");
 
-	map(0x006800, 0x006cff).ram();
+	map(0x006800, 0x006cff).ram().share("spriteram");
 
-	map(0x007000, 0x0072ff).ram();
+	map(0x007000, 0x0072ff).ram().share("palram");
 
 	// 7800 - 78xx look like registers?
 	map(0x007800, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
@@ -313,7 +325,7 @@ static const gfx_layout tiles16x16x8_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	8,
-	{ 0, 1, 32, 33, 64, 65, 96, 97 },
+	{ 96, 97, 64, 65, 32, 33, 0, 1  },
 	{ 8,10,12,14, 0,2,4,6, 24,26,28,30, 16,18,20,22 },
 	{ STEP16(0,128) },
 	128*16,
@@ -359,6 +371,15 @@ GFXDECODE_END
      : 0020 used in irq 0x1a and 0x06?! (used with OR instead of EOR in 0x06, force IRQ?)
      : 0x40 - ? (there is no irq 0x1c - it's the boot vector)
      : 0x80 - ? (there is no irq 0x1e)
+
+
+42/43 = y scroll on one layer?
+
+26/27 = x xcroll (top racer on track field)
+28/29 = x scroll (bottom racer on track field)
+
+2a/2b = ?? throwing event (paired with below)
+3a/3b = ?? throwing event (paired with below)
 
 */
 
@@ -489,6 +510,8 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 WRITE8_MEMBER(trkfldch_state::unkregs_w)
 {
+	m_unkregs[offset] = data;
+
 	switch (offset)
 	{
 	case 0x00: // IRQ ack/force?, see above
@@ -681,55 +704,68 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x60: // sprite list location (dma source?)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source low )\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x61: // sprite list location (dma source?)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source med )\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x62:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source high)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x63:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest low )\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x64:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest high)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x65:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma length low ) (and trigger)\n", machine().describe_context(), offset, data);
+		{
+			address_space &mem = m_maincpu->space(AS_PROGRAM);
+			uint16_t dmalength = (m_unkregs[0x66] << 8) | m_unkregs[0x65];
+			uint32_t dmasource = (m_unkregs[0x62] << 16) | (m_unkregs[0x61] << 8) | m_unkregs[0x60];
+			uint16_t dmadest = (m_unkregs[0x64] << 8) | m_unkregs[0x63];
+
+			for (uint32_t j = 0; j < dmalength; j++)
+			{
+				uint8_t byte = mem.read_byte(dmasource+j);
+				mem.write_byte(dmadest+j, byte);
+			}
+
+		}
 		break;
 
 	case 0x66:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma length high)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x67: // after a long time
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x68: // rarely (my1stddr)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x69: // after a long time
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6b: // after a long time
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6c: // rarely (my1stddr)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6d: // after a long time
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -822,11 +858,10 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	default:
-		//printf("%s: unkregs_w %04x %02x\n", machine().describe_context().c_str(), offset, data);
+		//printf("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 	}
 
-	m_unkregs[offset] = data;
 }
 
 void trkfldch_state::machine_start()
@@ -874,9 +909,9 @@ void trkfldch_state::trkfldch(machine_config &config)
 	m_screen->set_screen_update(FUNC(trkfldch_state::screen_update_trkfldch));
 	m_screen->set_palette("palette");
 
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_trkfldch);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_trkfldch); // dummy
-	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG); // dummy
+	PALETTE(config, m_palette, palette_device::BLACK, 256);
 }
 
 ROM_START( trkfldch )
