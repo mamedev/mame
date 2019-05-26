@@ -376,6 +376,7 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		uint8_t realy = (int)y;
 
 		/* get the pixel at the gun position */
+		m_ppu1->screen().update_now();
 		rgb_t col = m_ppu1->screen().pixel(x, realy);
 		uint8_t bright = col.brightness();
 		// todo, calculate how bright it is with pix.r * 0.3 + pix.g * 0.59 + pix.b * 0.11 ?
