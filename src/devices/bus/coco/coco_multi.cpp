@@ -363,6 +363,8 @@ void coco_multipak_device::set_select(uint8_t new_select)
 	line_value new_cart = active_cts_slot().get_line_value(line::CART);
 	if (new_cart != old_cart)
 		update_line(active_cts_slot_number(), line::CART);
+
+	cart_base_changed();
 }
 
 
