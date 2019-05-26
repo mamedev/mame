@@ -121,11 +121,11 @@ public:
 	void init_kt();
 
 private:
-	required_device<m68ec020_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
 	required_device<scn2681_device> m_duart;
-	required_device<esqpanel2x16_sq1_device> m_sq1panel;
+	required_device<esqpanel_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
 	virtual void machine_start() override;
@@ -144,15 +144,14 @@ private:
 	void es5506_clock_changed(u32 data);
 	void kt_map(address_map &map);
 	void ts_map(address_map &map);
-	void ts_cpu_space_map(address_map &map);
 
-	u32  *m_rom, *m_ram;
+	u16  *m_rom, *m_ram;
 };
 
 void esqkt_state::machine_start()
 {
-	m_rom = (u32 *)(void *)memregion("osrom")->base();
-	m_ram = (u32 *)(void *)memshare("osram")->ptr();
+	m_rom = (u16 *)(void *)memregion("osrom")->base();
+	m_ram = (u16 *)(void *)memshare("osram")->ptr();
 }
 
 void esqkt_state::machine_reset()
@@ -173,10 +172,13 @@ void esqkt_state::kt_map(address_map &map)
 
 void esqkt_state::ts_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("osram");
-	map(0x200000, 0x20003f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
-	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask32(0x00ff00ff);
-	map(0x280000, 0x28003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0x00ff00ff);
+	map(0x000000, 0x01ffff).ram().share("osram");
+	map(0x200000, 0x20001f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	// 280001/280003 = FDC uPD72065?
+	// 2c0001 = ?
+	map(0x300000, 0x30007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);
+	map(0x380000, 0x3801ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
+	map(0x400000, 0xbfffff).ram();  // user sample RAM
 	map(0xc00000, 0xcfffff).rom().region("osrom", 0);
 	map(0xff0000, 0xffffff).ram();
 }
@@ -305,22 +307,14 @@ void esqkt_state::kt(machine_config &config)
 	es5506b.add_route(7, "rspeaker", 1.0);
 }
 
-void esqkt_state::ts_cpu_space_map(address_map &map)
-{
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff7, 0xfffff7).r(m_duart, FUNC(mc68681_device::get_irq_vector));
-}
-
 void esqkt_state::ts(machine_config &config)
 {
-	M68EC020(config, m_maincpu, 16_MHz_XTAL);
+	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esqkt_state::ts_map);
-//  m_maincpu->set_addrmap(m68ec020_device::AS_CPU_SPACE, &esqkt_state::ts_cpu_space_map);
-
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	auto &panel(ESQPANEL2X16_SQ1(config, "sq1panel"));
+	auto &panel(ESQPANEL2X40_VFX(config, "sq1panel"));
 	panel.write_tx().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	SCN2681(config, m_duart, 4000000);
@@ -383,7 +377,7 @@ ROM_START( kt76 )
 ROM_END
 
 ROM_START( ts10 )
-	ROM_REGION32_BE(0x100000, "osrom", ROMREGION_ERASE00)
+	ROM_REGION16_BE(0x100000, "osrom", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS( 0, "v310", "V310" )
 	ROMX_LOAD( "ts10_310h.bin", 0x000000, 0x040000, CRC(cc04aa4f) SHA1(56761d29680bc99cfd625af3f92db836dfacdf31), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "ts10_310l.bin", 0x000001, 0x080000, CRC(51df8987) SHA1(294cde504a36752041deb0c09741153a797f2f28), ROM_SKIP(1) | ROM_BIOS(0) )
@@ -401,7 +395,7 @@ ROM_START( ts10 )
 ROM_END
 
 ROM_START( ts12 )
-	ROM_REGION32_BE(0x100000, "osrom", 0)
+	ROM_REGION16_BE(0x100000, "osrom", 0)
 	ROM_LOAD16_BYTE( "ts12-v310-hig.bin", 0x000000, 0x040000, CRC(99823433) SHA1(bd39a5d27824988cb531d90b91685a2362a98b3e) )
 	ROM_LOAD16_BYTE( "ts12-v310-low.bin", 0x000001, 0x080000, CRC(7e64a659) SHA1(c567c2d349e5a58928a74ac22473896c6814bda8) )
 
