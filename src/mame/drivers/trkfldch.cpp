@@ -126,6 +126,9 @@ void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16&
 	// it is needed for the 'good' 'perfect' 'miss' text on DDR ingame
 	if (0)
 	{
+		// guess, but it fits with where the other tilegfxbase registers are, and is only written on my1stddr when this layer is enabled
+		int tilegfxbase = (m_unkregs[0x17] * 0x80) - 0x100;
+
 		int offs = 0;
 		for (int y = 0; y < 4; y++)
 		{
@@ -136,7 +139,7 @@ void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16&
 				uint8_t byte = mem.read_byte(base + offs);
 				offs++;
 
-				int tile = 0x3f00 | byte;
+				int tile = tilegfxbase | byte;
 
 				gfx_element* gfx = m_gfxdecode->gfx(4);
 
