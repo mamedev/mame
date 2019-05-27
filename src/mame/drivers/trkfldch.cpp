@@ -621,11 +621,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 	switch (offset)
 	{
 	case 0x00: // IRQ ack/force?, see above
-	//  logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x01: // IRQ maybe status, see above
-	//  logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x02: // startup
@@ -837,21 +837,47 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 			uint32_t dmasource = (m_unkregs[0x62] << 16) | (m_unkregs[0x61] << 8) | m_unkregs[0x60];
 			uint16_t dmadest = (m_unkregs[0x64] << 8) | m_unkregs[0x63];
 
+			//if (dmadest != 0x6800)
 			logerror("%s: performing dma src: %06x dst %04x len %04x and extra params %02x %02x %02x %02x %02x %02x\n", machine().describe_context(), dmasource, dmadest, dmalength, m_unkregs[0x67], m_unkregs[0x68], m_unkregs[0x69], m_unkregs[0x6b], m_unkregs[0x6c], m_unkregs[0x6d]);
 
+			int writeoffset = 0;
+			int writedo = m_unkregs[0x6d];
+
+			int readoffset = 0;
+			int readdo = m_unkregs[0x69];
+
+			if ((m_unkregs[0x68] != 0x00) || (m_unkregs[0x6c] != 0x00))
+			{
+				fatalerror("unhandled dma params\n");
+			}
 
 			for (uint32_t j = 0; j < dmalength; j++)
 			{
-				uint8_t byte = mem.read_byte(dmasource+j);
-				mem.write_byte(dmadest+j, byte);
-			}
+				uint8_t byte = mem.read_byte(dmasource+readoffset);
+				readdo--;
+				if (readdo < 0)
+				{
+					readdo = m_unkregs[0x69];
+					readoffset += m_unkregs[0x67];
+				}
+				else
+				{
+					readoffset++;
+				}
 
-			// maybe
-			for (int i = 0x0; i < 0x10; i++)
-			{
-				m_unkregs[0x60 + i] = 0;
-			}
+				mem.write_byte(dmadest+writeoffset, byte);
+				writedo--;
+				if (writedo < 0)
+				{
+					writedo = m_unkregs[0x6d];
+					writeoffset += m_unkregs[0x6b];
+				}
+				else
+				{
+					writeoffset++;
+				}
 
+			}
 		}
 		break;
 
@@ -859,33 +885,28 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		logerror("%s: unkregs_w %04x %02x (dma length high)\n", machine().describe_context(), offset, data);
 		break;
 
-	// the rest of these 60 range registers seem to control some kind of on/off step for source and destination, allowing rectangles to be copied from rom to ram
-	// but they don't get reset properly even if I clear them after an op (see above) so maybe I'm using the wrong trigger?  DMA operations prior to them
-	// being used don't set them at all
-
-
 	case 0x67: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source read skip size)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x68: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source unknown)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x69: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source read group size)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6b: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest write skip size)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6c: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest unknown)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6d: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest write group size)\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -1007,6 +1028,15 @@ void trkfldch_state::machine_reset()
 		m_unkdata[i] = 0;
 
 	m_unkdata_addr = 0;
+
+	// the game code doesn't set the DMA step / skip params to default values until after it's used them with other values, so assume they reset to these
+	m_unkregs[0x67] = 0x01;
+	m_unkregs[0x68] = 0x00;
+	m_unkregs[0x69] = 0x00;
+
+	m_unkregs[0x6b] = 0x01;
+	m_unkregs[0x6c] = 0x00;
+	m_unkregs[0x6d] = 0x00;
 
 }
 
