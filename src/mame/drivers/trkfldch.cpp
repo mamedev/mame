@@ -120,6 +120,15 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 	}
 }
 
+
+// regs                        11 13 15 17
+// 
+// DDR Title = 5000            03 03 05 00
+// DDR Ingame Girl 1 = 7000    04 05 06 80
+// DDR Music Select  = 9000    05 03 04 00
+// trkfldch logos    = b000    06 07 06 00
+// trkfldch ingame uses different bpp so different addressing here too?
+
 uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	bitmap.fill(0, cliprect);
@@ -149,13 +158,15 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 	}
 
 	{
-		int base;
+		int base, gfxbase;
 		
 		base = (m_unkregs[0x54] << 8);
-		render_tile_layer(screen, bitmap, cliprect, base, 0x5e00);
+		gfxbase = (m_unkregs[0x11]*0x2000) - 0x200;
+		render_tile_layer(screen, bitmap, cliprect, base, gfxbase);
 
 		base = (m_unkregs[0x55] << 8);
-		render_tile_layer(screen, bitmap, cliprect, base, 0x5e00);
+		gfxbase = (m_unkregs[0x13]*0x2000) - 0x200;
+		render_tile_layer(screen, bitmap, cliprect, base, gfxbase);
 
 	}
 
