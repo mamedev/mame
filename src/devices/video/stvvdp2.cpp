@@ -4,6 +4,11 @@
 
 /*
 
+-------------------------- WARNING WARNING WARNING --------------------------
+This is a legacy core, all game based notes are for a future device rewrite.
+Please don't remove them if for no reason you truly want to mess with this.
+-------------------------- WARNING WARNING WARNING --------------------------
+
 the dirty marking stuff and tile decoding will probably be removed in the end anyway as we'll need custom
 rendering code since mame's drawgfx / tilesytem don't offer everything st-v needs
 
