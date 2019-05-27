@@ -21,17 +21,21 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/discrete.h"
+#include "sound/flt_rc.h"
 #include "sound/hc55516.h"
+#include "sound/tms5220.h"
+
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(BALLY_AS2888,       bally_as2888_device)
-DECLARE_DEVICE_TYPE(BALLY_AS3022,       bally_as3022_device)
-DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,  bally_sounds_plus_device)
-DECLARE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK, bally_cheap_squeak_device)
+DECLARE_DEVICE_TYPE(BALLY_AS2888,        bally_as2888_device)
+DECLARE_DEVICE_TYPE(BALLY_AS3022,        bally_as3022_device)
+DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,   bally_sounds_plus_device)
+DECLARE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,  bally_cheap_squeak_device)
+DECLARE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK, bally_squawk_n_talk_device)
 
 
 //**************************************************************************
@@ -253,5 +257,74 @@ private:
 
 	void update_led();
 };
+
+// ======================> bally_squawk_n_talk_device
+
+// This board comes in different configurations
+
+class bally_squawk_n_talk_device : public device_t, public device_mixer_interface
+{
+public:
+	bally_squawk_n_talk_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock = 3'579'545) :
+		bally_squawk_n_talk_device(mconfig, BALLY_SQUAWK_N_TALK, tag, owner, clock)
+	{ }
+
+	// read/write
+	DECLARE_INPUT_CHANGED_MEMBER(sw1);
+	DECLARE_WRITE8_MEMBER(sound_select);
+	DECLARE_WRITE_LINE_MEMBER(sound_int);
+
+	void squawk_n_talk_map(address_map &map);
+
+protected:
+	bally_squawk_n_talk_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock) :
+	        device_t(mconfig, type, tag, owner, clock),
+                device_mixer_interface(mconfig, *this),
+                m_cpu(*this, "cpu"),
+                m_pia1(*this, "pia1"),
+                m_pia2(*this, "pia2"),
+		m_dac(*this, "dac"),
+		m_dac_filter(*this, "dac_filter"),
+		m_speech_filter(*this, "speech_filter"),
+		m_tms5200(*this, "tms5200")
+	{ }
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	// devices
+	required_device<m6802_cpu_device> m_cpu;
+	required_device<pia6821_device> m_pia1;
+	required_device<pia6821_device> m_pia2;
+        required_device<dac_byte_interface> m_dac;
+        required_device<filter_rc_device> m_dac_filter;
+        required_device<filter_rc_device> m_speech_filter;
+        required_device<tms5200_device> m_tms5200;
+
+private:
+	uint8_t m_sound_select;
+
+	// internal communications
+	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	TIMER_CALLBACK_MEMBER(sound_int_sync);
+	DECLARE_READ8_MEMBER(pia1_porta_r);
+	DECLARE_WRITE8_MEMBER(pia1_porta_w);
+	DECLARE_WRITE8_MEMBER(pia1_portb_w);
+	DECLARE_READ8_MEMBER(pia2_porta_r);
+	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
+};
+
 
 #endif // MAME_AUDIO_BALLY_H

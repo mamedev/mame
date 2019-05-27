@@ -105,6 +105,7 @@ public:
 	void as3022(machine_config &config);
 	void sounds_plus(machine_config &config);
 	void cheap_squeak(machine_config &config);
+	void squawk_n_talk(machine_config &config);
 
 protected:
 	typedef uint8_t solenoid_feature_data[20][4];
@@ -135,6 +136,7 @@ protected:
 		, m_as3022(*this, "as3022")
 		, m_sounds_plus(*this, "sounds_plus")
 		, m_cheap_squeak(*this, "cheap_squeak")
+		, m_squawk_n_talk(*this, "squawk_n_talk")
 		, m_sound_select_handler(*this)
 		, m_sound_int_handler(*this)
 	{ }
@@ -208,6 +210,7 @@ private:
 	optional_device<bally_as3022_device> m_as3022;
 	optional_device<bally_sounds_plus_device> m_sounds_plus;
 	optional_device<bally_cheap_squeak_device> m_cheap_squeak;
+	optional_device<bally_squawk_n_talk_device> m_squawk_n_talk;
 	devcb_write8 m_sound_select_handler;
 	devcb_write_line m_sound_int_handler;
 };
@@ -1546,6 +1549,17 @@ void by35_state::cheap_squeak(machine_config &config)
 	m_cheap_squeak->sound_ack_w_handler().set(FUNC(by35_state::sound_ack_w));
 }
 
+void by35_state::squawk_n_talk(machine_config &config)
+{
+	by35(config);
+
+	BALLY_SQUAWK_N_TALK(config, m_squawk_n_talk);
+	SPEAKER(config, "mono").front_center();
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_sound_select_handler.bind().set(m_squawk_n_talk, FUNC(bally_squawk_n_talk_device::sound_select));
+	m_sound_int_handler.bind().set(m_squawk_n_talk, FUNC(bally_squawk_n_talk_device::sound_int));
+}
 
 /*--------------------------------
 / Supersonic #1106
@@ -1975,10 +1989,10 @@ ROM_START(embryon)
 	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("841-01_4.716", 0xe000, 0x0800, CRC(e8b234e3) SHA1(584e553748b1c6571491150e346d815005948b68))
-	ROM_RELOAD(0xe800, 0x0800)
-	ROM_LOAD("841-02_5.532", 0xf000, 0x1000, CRC(9cd8c04e) SHA1(7d74d8f33a98c9832fda1054187eb7300dbf5f5e))
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("841-01_4.716", 0xa000, 0x0800, CRC(e8b234e3) SHA1(584e553748b1c6571491150e346d815005948b68))
+	ROM_RELOAD(0xa800, 0x0800)
+	ROM_LOAD("841-02_5.532", 0xb000, 0x1000, CRC(9cd8c04e) SHA1(7d74d8f33a98c9832fda1054187eb7300dbf5f5e))
 ROM_END
 
 /*--------------------------------
@@ -1991,9 +2005,9 @@ ROM_START(fathom)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("842-01_4.532", 0xe000, 0x1000, CRC(2ac02093) SHA1(a89c1d24f4f3e1f58ca4e476f408835efb368a90))
-	ROM_LOAD("842-02_5.532", 0xf000, 0x1000, CRC(736800bc) SHA1(2679d4d76e7258ad18ffe05cf333f21c35adfe0e))
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("842-01_4.532", 0xa000, 0x1000, CRC(2ac02093) SHA1(a89c1d24f4f3e1f58ca4e476f408835efb368a90))
+	ROM_LOAD("842-02_5.532", 0xb000, 0x1000, CRC(736800bc) SHA1(2679d4d76e7258ad18ffe05cf333f21c35adfe0e))
 ROM_END
 
 /*--------------------------------
@@ -2006,11 +2020,11 @@ ROM_START(centaur)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("848-01_3.532", 0xd000, 0x1000, CRC(88322c8a) SHA1(424fd2b107f5fbc3ab8b58e3fa8c285170b1f09a))
-	ROM_LOAD("848-02_4.532", 0xe000, 0x1000, CRC(d6dbd0e4) SHA1(62e4c8c1a747c5f6a3a4bf4d0bc80b06a1f70d13))
-	ROM_LOAD("848-05_5.716", 0xf000, 0x0800, CRC(cbd765ba) SHA1(bdfae28af46c805f253f02d449dd81575aa9305b))
-	ROM_RELOAD(0xf800, 0x0800)
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("848-01_3.532", 0x9000, 0x1000, CRC(88322c8a) SHA1(424fd2b107f5fbc3ab8b58e3fa8c285170b1f09a))
+	ROM_LOAD("848-02_4.532", 0xa000, 0x1000, CRC(d6dbd0e4) SHA1(62e4c8c1a747c5f6a3a4bf4d0bc80b06a1f70d13))
+	ROM_LOAD("848-05_5.716", 0xb000, 0x0800, CRC(cbd765ba) SHA1(bdfae28af46c805f253f02d449dd81575aa9305b))
+	ROM_RELOAD(0xb800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -2023,11 +2037,11 @@ ROM_START(medusa)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("845-01_3.532", 0xd000, 0x1000, CRC(32200e02) SHA1(e75356a20f81a68e6b27d2fa04b8cc9b17f3976a))
-	ROM_LOAD("845-02_4.532", 0xe000, 0x1000, CRC(ab95885a) SHA1(fa91cef2a244d25d408585d1e14e1ed8fdc8c845))
-	ROM_LOAD("845-05_5.716", 0xf000, 0x0800, CRC(3792a812) SHA1(5c7cc43e57d8e8ded1cc109aa65c4f08052899b9))
-	ROM_RELOAD(0xf800, 0x0800)
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("845-01_3.532", 0x9000, 0x1000, CRC(32200e02) SHA1(e75356a20f81a68e6b27d2fa04b8cc9b17f3976a))
+	ROM_LOAD("845-02_4.532", 0xa000, 0x1000, CRC(ab95885a) SHA1(fa91cef2a244d25d408585d1e14e1ed8fdc8c845))
+	ROM_LOAD("845-05_5.716", 0xb000, 0x0800, CRC(3792a812) SHA1(5c7cc43e57d8e8ded1cc109aa65c4f08052899b9))
+	ROM_RELOAD(0xb800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -2074,11 +2088,11 @@ ROM_START(spectrm)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("868-01_3.532", 0xd000, 0x1000, CRC(c3a16c66) SHA1(8c0a8b50fac0e218515b471621e80000ae475296))
-	ROM_LOAD("868-02_4.532", 0xe000, 0x1000, CRC(6b441399) SHA1(aae9e805f76cd6bc264bf69dd2d57629ee58bfc2))
-	ROM_LOAD("868-03_5.716", 0xf000, 0x0800, CRC(4a5ac3b8) SHA1(288feba40efd65f4eec5c0b2fcf013904e3dc24e))
-	ROM_RELOAD(0xf800, 0x0800)
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("868-01_3.532", 0x9000, 0x1000, CRC(c3a16c66) SHA1(8c0a8b50fac0e218515b471621e80000ae475296))
+	ROM_LOAD("868-02_4.532", 0xa000, 0x1000, CRC(6b441399) SHA1(aae9e805f76cd6bc264bf69dd2d57629ee58bfc2))
+	ROM_LOAD("868-03_5.716", 0xb000, 0x0800, CRC(4a5ac3b8) SHA1(288feba40efd65f4eec5c0b2fcf013904e3dc24e))
+	ROM_RELOAD(0xb800, 0x0800)
 ROM_END
 
 ROM_START(spectrm4)
@@ -2088,11 +2102,11 @@ ROM_START(spectrm4)
 	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("868-01_3.532", 0xd000, 0x1000, CRC(c3a16c66) SHA1(8c0a8b50fac0e218515b471621e80000ae475296))
-	ROM_LOAD("868-02_4.532", 0xe000, 0x1000, CRC(6b441399) SHA1(aae9e805f76cd6bc264bf69dd2d57629ee58bfc2))
-	ROM_LOAD("868-03_5.716", 0xf000, 0x0800, CRC(4a5ac3b8) SHA1(288feba40efd65f4eec5c0b2fcf013904e3dc24e))
-	ROM_RELOAD(0xf800, 0x0800)
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("868-01_3.532", 0x9000, 0x1000, CRC(c3a16c66) SHA1(8c0a8b50fac0e218515b471621e80000ae475296))
+	ROM_LOAD("868-02_4.532", 0xa000, 0x1000, CRC(6b441399) SHA1(aae9e805f76cd6bc264bf69dd2d57629ee58bfc2))
+	ROM_LOAD("868-03_5.716", 0xb000, 0x0800, CRC(4a5ac3b8) SHA1(288feba40efd65f4eec5c0b2fcf013904e3dc24e))
+	ROM_RELOAD(0xb800, 0x0800)
 ROM_END
 
 /*--------------------------------------------------
@@ -2146,8 +2160,8 @@ ROM_START(rapidfip)
 	ROM_LOAD( "869-03_6.732", 0x1800, 0x0800, CRC(f6af5e8d) SHA1(3cf782d4a0ca38e3953a20d23d0eb01af87ba445))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("869-02_5.532", 0xf000, 0x1000, CRC(5a74cb86) SHA1(4fd09b0bc4257cb7b48cd8087b8b15fe768f7ddf))
+	ROM_REGION(0x10000, "squawk_n_talk:cpu", 0)
+	ROM_LOAD("869-02_5.532", 0xb000, 0x1000, CRC(5a74cb86) SHA1(4fd09b0bc4257cb7b48cd8087b8b15fe768f7ddf))
 ROM_END
 
 /*--------------------------------------
@@ -2779,22 +2793,22 @@ GAME( 1983, goldball,   0,        as3022,      by35,      by35_state, init_by35_
 GAME( 1983, goldballn,  goldball, as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Squawk & Talk sound
-GAME( 1981, flashgdn,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnf, flashgdn, by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnv, flashgdn, sounds_plus, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fball_ii,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlx,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballd14,  eballdlx, by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, embryon,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, fathom,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, centaur,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, medusa,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, vector,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, elektra,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm4,  spectrm,  by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, rapidfip,  0,        by35,        by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, m_mpac,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdn,  0,        by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, flashgdnf, flashgdn, by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, flashgdnv, flashgdn, sounds_plus,   by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, fball_ii,  0,        by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, eballdlx,  0,        by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, eballd14,  eballdlx, by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, embryon,   0,        squawk_n_talk, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, fathom,    0,        squawk_n_talk, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, centaur,   0,        squawk_n_talk, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, medusa,    0,        squawk_n_talk, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, vector,    0,        by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, elektra,   0,        by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, spectrm,   0,        squawk_n_talk, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, spectrm4,  spectrm,  squawk_n_talk, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, rapidfip,  0,        squawk_n_talk, by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, m_mpac,    0,        by35,          by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Cheap Squeak sound
 GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
