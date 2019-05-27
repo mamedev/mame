@@ -6,6 +6,11 @@ STV - VDP1
 
 the vdp1 draws to the FRAMEBUFFER which is mapped in memory
 
+-------------------------- WARNING WARNING WARNING --------------------------
+This is a legacy core, all game based notes are for a future device rewrite.
+Please don't remove them if for no reason you truly want to mess with this.
+-------------------------- WARNING WARNING WARNING --------------------------
+
 Framebuffer todo:
 - finish manual erase
 - add proper framebuffer erase
@@ -957,6 +962,9 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				pix = raw+(stv2_current_sprite.CMDCOLR&0xffc0);
 				transpen = 0;
 				endcode = 0xff;
+				// Notes of interest:
+				// Scud: the disposable assassin wants transparent pen on 0
+				// sasissu: racing stage background clouds
 				break;
 			case 0x0018: // mode 3 128 colour bank mode (8bits) (little characters on hanagumi use this mode)
 				raw = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff] & 0xff;
