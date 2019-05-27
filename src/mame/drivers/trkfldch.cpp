@@ -221,7 +221,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		else
 		{
 			pal = (m_spriteram[i + 0] & 0x30)>>4;
-			gfx = m_gfxdecode->gfx(2);
+			gfx = m_gfxdecode->gfx(3);
 			tilegfxbase -= 0x40;
 			tilegfxbase -= 0x6b;
 
@@ -373,11 +373,8 @@ static const gfx_layout tiles8x8x8_layout =
 	RGN_FRAC(1,1),
 	8,
 	{ 48,49, 32,33, 16,17, 0, 1 },
-	{  8,10,12, 14, 0,2,4,6  },
-	{ 0,0 + 64,
-	128,128 + 64,
-	256,256 + 64,
-	384, 384 + 64 },
+	{ 8,10,12, 14, 0,2,4,6  },
+	{ STEP8(0,64) },
 	512,
 };
 
@@ -395,6 +392,18 @@ static const gfx_layout tiles16x16x8_layout =
 
 // TODO: if we're going to use gfxdecode then allocate this manually with the correct number of tiles
 //  might be we have to use manual drawing tho, the base offset is already strange
+static const gfx_layout tiles8x8x6_layout =
+{
+	8,8,
+	0x5500*4,
+	6,
+	{ 32, 33, 16, 17, 0, 1  },
+	{ 8,10,12,14, 0,2,4,6 },
+	{ STEP8(0,48) },
+	48*8,
+};
+
+
 static const gfx_layout tiles16x16x6_layout =
 {
 	16,16,
@@ -410,6 +419,7 @@ static const gfx_layout tiles16x16x6_layout =
 static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8x8_layout, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x40, tiles8x8x6_layout, 0, 4 )
 	GFXDECODE_ENTRY( "maincpu", 0x40, tiles16x16x6_layout, 0, 4 )
 GFXDECODE_END
 
