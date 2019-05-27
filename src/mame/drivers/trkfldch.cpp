@@ -64,7 +64,7 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
 
-
+	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
 	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
@@ -120,6 +120,34 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 	}
 }
 
+void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base)
+{
+	// this isn't correct, it doesn't seem like a 'real' tilemap, maybe some kind of sprite / tile hybrid, or something with end of line markers?
+	// it is needed for the 'good' 'perfect' 'miss' text on DDR ingame
+	if (0)
+	{
+		int offs = 0;
+		for (int y = 0; y < 4; y++)
+		{
+			for (int x = 0; x < 32; x++)
+			{
+				address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+				uint8_t byte = mem.read_byte(base + offs);
+				offs++;
+
+				int tile = 0x3f00 | byte;
+
+				gfx_element* gfx = m_gfxdecode->gfx(4);
+
+				gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 16, 0);
+
+			}
+		}
+	}
+}
+
+
 
 // regs                        11 13 15 17
 // 
@@ -160,7 +188,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 	{
 		int base, gfxbase, gfxregion, tilexsize;
-		
+
 		base = (m_unkregs[0x54] << 8);
 		gfxbase = (m_unkregs[0x11] * 0x2000);
 		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
@@ -196,6 +224,11 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
 		}
 
+		if (m_unkregs[0x10] & 0x20)
+		{
+			base = (m_unkregs[0x56] << 8);
+			render_text_tile_layer(screen, bitmap, cliprect, base);
+		}
 	}
 
 
@@ -406,6 +439,18 @@ static const gfx_layout tiles8x8x8_layout =
 	512,
 };
 
+static const gfx_layout tiles8x16x8_layout =
+{
+	8,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 48,49, 32,33, 16,17, 0, 1 },
+	{ 8,10,12, 14, 0,2,4,6  },
+	{ STEP16(0,64) },
+	1024,
+};
+
+
 static const gfx_layout tiles16x16x8_layout =
 {
 	16,16,
@@ -449,6 +494,7 @@ static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16x8_layout, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x40, tiles8x8x6_layout, 0, 4 )
 	GFXDECODE_ENTRY( "maincpu", 0x40, tiles16x16x6_layout, 0, 4 )
+	GFXDECODE_ENTRY( "maincpu", 0, tiles8x16x8_layout, 0, 1 )
 GFXDECODE_END
 
 /*
