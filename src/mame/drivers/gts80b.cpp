@@ -43,6 +43,10 @@ public:
 
 	void init_gts80b();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+
 private:
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
@@ -60,8 +64,7 @@ private:
 	uint8_t m_swrow;
 	bool m_in_cmd_mode[2];
 	uint8_t m_digit[2];
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
@@ -80,6 +83,7 @@ void gts80b_state::gts80b_map(address_map &map)
 	map(0x2000, 0x2fff).rom();
 	map(0x3000, 0x3fff).rom();
 }
+
 
 static INPUT_PORTS_START( gts80b )
 	PORT_START("DSW.0")
@@ -1742,6 +1746,36 @@ ROM_START(s80btest)
 	ROM_LOAD("testd.snd", 0x8000, 0x2000, CRC(5d04a6d9) SHA1(f83bd8692146af7d234c1a32d0b688e76d1b2b85))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Master (ManilaMatic)
+/
+/ Notes from one of the PinMAME devs:
+/ It's a Gottlieb System 80B clone of "Genesis" more or less;
+/ they only swapped in Italian texts and maybe changed some game rules.
+/ The main CPU board is using a 6502 CPU with all 16 address lines
+/ (System 80B only used 14), 2K of static RAM, and a 27256 EPROM.
+/ 
+/ Obviously they forgot to adjust the ROM checksums of the game
+/ because it reports an error when running the memory test.
+/ The game works just fine however, and when comparing the game code
+/ to the Genesis one, it's identical for the most part.
+/
+/ TODO: implement different memory map
+/-------------------------------------------------------------------*/
+
+ROM_START(mmmaster)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom.cpu", 0x0000, 0x8000, CRC(0ffacb1d) SHA1(c609f49e0933ceb3d7eb1725a3ba0f1486978bd6))
+	ROM_RELOAD(0x8000, 0x8000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd",0xe000,0x2000, CRC(758e1743) SHA1(6df3011c044796afcd88e52d1ca69692cb489ff4))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd",0xe000,0x2000, CRC(4869b0ec) SHA1(b8a56753257205af56e06105515b8a700bb1935b))
+	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(0528c024) SHA1(d24ff7e088b08c1f35b54be3c806f8a8757d96c7))
+ROM_END
+
 GAME(1985, bountyh,   0,        gts80b_s,  gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Bounty Hunter",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985, bountyhg,  bountyh,  gts80b_s,  gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Bounty Hunter (German)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985, triplay,   0,        gts80b_s,  gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Chicago Cubs' Triple Play",                 MACHINE_IS_SKELETON_MECHANICAL)
@@ -1810,3 +1844,4 @@ GAME(1989, nmoves,    0,        gts80b_s2, gts80b, gts80b_state, init_gts80b, RO
 GAME(1987, amazonh3,  0,        gts80b_s1, gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Amazon Hunt III (French)",                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, amazonh3a, amazonh3, gts80b_s1, gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "Amazon Hunt III (rev. 1, French)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?, s80btest,  0,        gts80b_s2, gts80b, gts80b_state, init_gts80b, ROT0, "Gottlieb",               "System 80B Test",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988, mmmaster,  0,        gts80b_s1, gts80b, gts80b_state, init_gts80b, ROT0, "ManilaMatic",            "Master",                                    MACHINE_IS_SKELETON_MECHANICAL)
