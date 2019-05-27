@@ -18,7 +18,6 @@ TODO:
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
-- scan and identify lcd segments for gnw_chef
 - confirm gnw_chef rom (dumped from Soviet clone but should be the same)
 - confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
@@ -54,7 +53,7 @@ LN-08*    g    SM5A?   Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
-FP-24*    ws   SM5A    Chef
+FP-24     ws   SM5A    Chef
 MC-25     ws   SM5A    Mickey Mouse
 EG-26     ws   SM5A    Egg (near-certainly same ROM as MC-25, but LCD differs)
 FR-27     ws   SM5A    Fire
@@ -1513,7 +1512,8 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Chef (model FP-24)
-  * Sharp SM5A label ?
+  * PCB label FP-24
+  * Sharp SM5A label FP-24 51YB
   * lcd screen with custom segments, 1-bit sound
 
   In 1989, Elektronika(USSR) released a clone: Merry Cook. This game most
@@ -1574,7 +1574,7 @@ void gnw_chef_state::gnw_chef(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
-	screen.set_size(1920, 1080);
+	screen.set_size(1666, 1080);
 	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
@@ -1607,10 +1607,10 @@ void gnw_chef_state::merrycook(machine_config & config)
 
 ROM_START( gnw_chef )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "fp-24.bin", 0x0000, 0x0740, BAD_DUMP CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) ) // dumped from Soviet clone
+	ROM_LOAD( "fp-24", 0x0000, 0x0740, BAD_DUMP CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) ) // dumped from Soviet clone
 
-	ROM_REGION( 100000, "svg", 0)
-	ROM_LOAD( "gnw_chef.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 199453, "svg", 0)
+	ROM_LOAD( "gnw_chef.svg", 0, 199453, CRC(97aacb9a) SHA1(1d4b2cc70a541ad09bc13c09ce26a8c14c03c526) )
 ROM_END
 
 ROM_START( merrycook )
@@ -9318,7 +9318,7 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
