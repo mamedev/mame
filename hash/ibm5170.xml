@@ -9610,14 +9610,27 @@
 	</software>
 
 	<software name="finalchs">
-		<!-- uses Final ChessCard ISA card, ROM v2.0 (incompatible with newer version) -->
-		<description>The Final ChessCard</description>
+		<!-- uses Final ChessCard ISA card, ROM v3.6 (incompatible with older version) -->
+		<description>The Final ChessCard (Installer v2.0/Program v1.9)</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>
 		<info name="usage" value="Final ChessCard ISA card required" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="finalchs.img" size="1474560" crc="3428d309" sha1="ea345d6828ffd9ff9be3ac4e037e80491bb7ce74"/>
+			<dataarea name="flop" size="737280">
+				<rom name="finalchs.img" size="737280" crc="300958e4" sha1="8ba33b8022f26462873ec5df6b3562e268b6019d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finalchso">
+		<!-- uses Final ChessCard ISA card, ROM v2.0 (incompatible with newer version) -->
+		<description>The Final ChessCard (Program v1.5)</description>
+		<year>1989</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="Final ChessCard ISA card required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="finalchso.img" size="737280" crc="4988a9c7" sha1="27483b574e73ca1bbd3984f7d1318ecc313a8b3e"/>
 			</dataarea>
 		</part>
 	</software>

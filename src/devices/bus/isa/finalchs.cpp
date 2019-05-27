@@ -72,10 +72,10 @@ void isa8_finalchs_device::device_reset()
 
 ROM_START( finalchs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "v20", "ROM v2.0") // 01-11-89
-	ROMX_LOAD("fcc_v20.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v36", "ROM v3.6") // 22-05-90
-	ROMX_LOAD("fcc_v36.bin", 0x8000, 0x8000, CRC(70800e6c) SHA1(fa8170606313adeaadad3bbf1ca18cae567e4207), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "v36", "ROM v3.6") // 22-05-90
+	ROMX_LOAD("fcc_v36.bin", 0x8000, 0x8000, CRC(70800e6c) SHA1(fa8170606313adeaadad3bbf1ca18cae567e4207), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v20", "ROM v2.0") // 01-11-89
+	ROMX_LOAD("fcc_v20.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *isa8_finalchs_device::device_rom_region() const
