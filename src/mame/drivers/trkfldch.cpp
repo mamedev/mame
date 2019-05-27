@@ -803,23 +803,27 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0x32: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 19
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 19 / 00
 		break;
 
 	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 04
 		break;
 
 	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 19
 		break;
 
+
+	// gap
+
+
 	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 25  possible yscroll split position (my1stddr) 
 		break;
 
 	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 29  possible yscroll split position (my1stddr) 
 		break;
 
 	case 0x3a:
@@ -834,11 +838,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x42:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 2 low)\n", machine().describe_context(), offset, data); // my1stddr text scroller on right
 		break;
 
 	case 0x43:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 2 high)\n", machine().describe_context(), offset, data); // my1stddr text scroller on right
 		break;
 
 
