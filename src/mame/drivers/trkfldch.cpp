@@ -65,7 +65,7 @@ private:
 	required_device<palette_device> m_palette;
 
 
-	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd);
+	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
@@ -89,7 +89,7 @@ void trkfldch_state::video_start()
 {
 }
 
-void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd)
+void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize)
 {
 	int offs = 0;
 	for (int y = 0; y < 30; y++)
@@ -103,18 +103,18 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 			uint8_t attr = mem.read_byte(base + offs);
 			offs++;
 
-			uint16_t tile = (attr << 8) | byte;
+			int tile = (attr << 8) | byte;
 
 			int flipx = (tile & 0x8000) >> 15;
-			// flipy is probably 0x4000
+			int pal =   (tile & 0x6000) >> 13;
 
-			tile &= 0x3fff;
+			tile &= 0x1fff;
 
 			tile += tileadd;
 
-			gfx_element* gfx = m_gfxdecode->gfx(0);
+			gfx_element* gfx = m_gfxdecode->gfx(gfxregion);
 
-			gfx->transpen(bitmap, cliprect,tile, 0, flipx, 0, x*8, y*8, 0);
+			gfx->transpen(bitmap, cliprect,tile, pal, flipx, 0, x*tilexsize, y*8, 0);
 
 		}
 	}
@@ -128,6 +128,7 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 // DDR Music Select  = 9000    05 03 04 00
 // trkfldch logos    = b000    06 07 06 00
 // trkfldch ingame uses different bpp so different addressing here too?
+
 
 uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
@@ -158,22 +159,49 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 	}
 
 	{
-		int base, gfxbase;
+		int base, gfxbase, gfxregion, tilexsize;
 		
 		base = (m_unkregs[0x54] << 8);
-		gfxbase = (m_unkregs[0x11]*0x2000) - 0x200;
-		render_tile_layer(screen, bitmap, cliprect, base, gfxbase);
+		gfxbase = (m_unkregs[0x11] * 0x2000);
+		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+		{
+			gfxbase -= 0x200;
+			gfxregion = 0;
+			tilexsize = 8;
+		}
+		else
+		{
+			gfxbase -= 0x2ac;
+			gfxregion = 2;
+			tilexsize = 8;
+		}
+		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
 
-		base = (m_unkregs[0x55] << 8);
-		gfxbase = (m_unkregs[0x13]*0x2000) - 0x200;
-		render_tile_layer(screen, bitmap, cliprect, base, gfxbase);
+		if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
+		{
+			base = (m_unkregs[0x55] << 8);
+			gfxbase = (m_unkregs[0x13] * 0x2000);
+			if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+			{
+				gfxbase -= 0x200;
+				gfxregion = 0;
+				tilexsize = 8;
+			}
+			else
+			{
+				gfxbase -= 0x2ac;
+				gfxregion = 2;
+				tilexsize = 8;
+			}
+			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
+		}
 
 	}
 
 
 	for (int i = 0x500 - 5; i >= 0; i -= 5)
 	{
-		//  printf("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
+		//  logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_unkregs[0x15] * 0x800);
 
 		int y = m_spriteram[i + 1];
@@ -213,7 +241,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 		gfx_element* gfx;
 
-		if (m_unkregs[0x10] & 1) // seems to change something at least (trkfldch events)
+		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
 		{
 			gfx = m_gfxdecode->gfx(1);
 			tilegfxbase -= 0x80;
@@ -221,7 +249,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		else
 		{
 			pal = (m_spriteram[i + 0] & 0x30)>>4;
-			gfx = m_gfxdecode->gfx(2);
+			gfx = m_gfxdecode->gfx(3);
 			tilegfxbase -= 0x40;
 			tilegfxbase -= 0x6b;
 
@@ -373,11 +401,8 @@ static const gfx_layout tiles8x8x8_layout =
 	RGN_FRAC(1,1),
 	8,
 	{ 48,49, 32,33, 16,17, 0, 1 },
-	{  8,10,12, 14, 0,2,4,6  },
-	{ 0,0 + 64,
-	128,128 + 64,
-	256,256 + 64,
-	384, 384 + 64 },
+	{ 8,10,12, 14, 0,2,4,6  },
+	{ STEP8(0,64) },
 	512,
 };
 
@@ -395,6 +420,18 @@ static const gfx_layout tiles16x16x8_layout =
 
 // TODO: if we're going to use gfxdecode then allocate this manually with the correct number of tiles
 //  might be we have to use manual drawing tho, the base offset is already strange
+static const gfx_layout tiles8x8x6_layout =
+{
+	8,8,
+	0x5500*4,
+	6,
+	{ 32, 33, 16, 17, 0, 1  },
+	{ 8,10,12,14, 0,2,4,6 },
+	{ STEP8(0,48) },
+	48*8,
+};
+
+
 static const gfx_layout tiles16x16x6_layout =
 {
 	16,16,
@@ -410,6 +447,7 @@ static const gfx_layout tiles16x16x6_layout =
 static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8x8_layout, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x40, tiles8x8x6_layout, 0, 4 )
 	GFXDECODE_ENTRY( "maincpu", 0x40, tiles16x16x6_layout, 0, 4 )
 GFXDECODE_END
 
@@ -459,62 +497,62 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 	{
 	case 0x00: // IRQ status?, see above
 		ret = machine().rand();
-		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x01: // IRQ status?, see above
 		ret = machine().rand();
-		//logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x02: // ends up being read as a side effect of reading a 16-bit word at 0x1, but also directly too?
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x03: // ends up being read as a side effect of reading a 16-bit word at 0x2, any other purpose?
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
 	case 0x04:
 		ret = 0xff;
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x05: // only read as a side effect of reading port 0x4 in 16-bit mode?
 		ret = 0xff;
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x06:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
 	case 0x42:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x43:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x44:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
 
 	case 0x54: // tilebase 1
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x55: // tilebase 2
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x56: // tilebase 3
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
@@ -522,50 +560,50 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 	case 0x70: // read in irq (inputs?)
 		ret = ioport("IN0")->read();
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x71:
 		ret = ioport("IN1")->read();
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x73:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x74:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x75:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x76:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x77:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x7f:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x80: // only read as a side-effect of reading 0x7f?
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
 
 	case 0xb6:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0xb7:
-		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
@@ -591,182 +629,182 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0x02: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x03: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x04: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x05: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 	// is it significant that 0x10 goes up to 0x1a, 0x20 to 0x2b, 0x30 to 0x3b could be 3 sets of similar things?
 
 	case 0x10: // gfxmode select (4bpp / 8bpp) for sprites? maybe
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w (bpp select) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x11:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x11: // tilegfx base 1
+		logerror("%s: unkregs_w (tilegfx base 1) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x12: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x13:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x13: // tilegfx base 2
+		logerror("%s: unkregs_w (tilegfx base 2) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x14: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x15: // gfxbank select for sprites
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w (spritegfx base 1) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x16:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x17:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x18:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x19:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x1a:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 
 
 	case 0x20: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x21: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x22: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x23: // after a long time
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x24: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x25: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x26:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x27:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x28:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x29:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x2a:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x2b:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 
 
 	case 0x30:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x31:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x32: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x33: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x34: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x36: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x37: // rarely
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x3a:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x3b:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 
 
 	case 0x42:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x43:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 
 
 	case 0x54: // tilebase 1
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x55: // tilebase 2
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x56: // tilebase 3
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -799,10 +837,19 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 			uint32_t dmasource = (m_unkregs[0x62] << 16) | (m_unkregs[0x61] << 8) | m_unkregs[0x60];
 			uint16_t dmadest = (m_unkregs[0x64] << 8) | m_unkregs[0x63];
 
+			logerror("%s: performing dma src: %06x dst %04x len %04x and extra params %02x %02x %02x %02x %02x %02x\n", machine().describe_context(), dmasource, dmadest, dmalength, m_unkregs[0x67], m_unkregs[0x68], m_unkregs[0x69], m_unkregs[0x6b], m_unkregs[0x6c], m_unkregs[0x6d]);
+
+
 			for (uint32_t j = 0; j < dmalength; j++)
 			{
 				uint8_t byte = mem.read_byte(dmasource+j);
 				mem.write_byte(dmadest+j, byte);
+			}
+
+			// maybe
+			for (int i = 0x0; i < 0x10; i++)
+			{
+				m_unkregs[0x60 + i] = 0;
 			}
 
 		}
@@ -812,28 +859,33 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		logerror("%s: unkregs_w %04x %02x (dma length high)\n", machine().describe_context(), offset, data);
 		break;
 
+	// the rest of these 60 range registers seem to control some kind of on/off step for source and destination, allowing rectangles to be copied from rom to ram
+	// but they don't get reset properly even if I clear them after an op (see above) so maybe I'm using the wrong trigger?  DMA operations prior to them
+	// being used don't set them at all
+
+
 	case 0x67: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x68: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x69: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6b: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6c: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6d: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -842,76 +894,76 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x71: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x72: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x73: // some kind of serial device?
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x74: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x75: // some kind of serial device? (used with 73?)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x76: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x77: // every second or so
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x78: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x79: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x7a: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x7f: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 	case 0x81: // startup (my1stddr)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x82: // startup (my1stddr)
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x83:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x84:
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 	case 0xb5: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0xb6: // significant data transfer shortly after boot, seems to clock writes with 0073 writing  d0 / c0? (then writes 2 bytes here)
 			   // values are coming from a structure in RAM
 			   // how does it reset?
 
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		m_unkdata[m_unkdata_addr] = data;
 
 		m_unkdata_addr++;
@@ -921,12 +973,12 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0xca: // startup
-		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
 	default:
-		//printf("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 	}
 
