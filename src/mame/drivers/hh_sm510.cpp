@@ -1618,7 +1618,7 @@ ROM_START( merrycook )
 	ROM_LOAD( "merrycook.bin", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
 
 	ROM_REGION( 143959, "svg", 0)
-	ROM_LOAD( "merrycook.svg", 0, 143959, CRC(5601535e) SHA1(7b8818ce3523cccff4adcade9603b7f719d8ab48) )
+	ROM_LOAD( "merrycook.svg", 0, 143959, CRC(36f41ff0) SHA1(47a7886f7825b781e1cf54215c86f5105d6c3b0e) )
 ROM_END
 
 
