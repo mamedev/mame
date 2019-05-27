@@ -52,8 +52,24 @@ protected:
 	static const device_timer_id TIMER_DMA = 1;
 
 private:
+	enum
+	{
+		MODE_TO_HOST	= (1 << 1),
+		MODE_SYNC		= (1 << 2),
+		MODE_FILL		= (1 << 3),
+		MODE_DIR		= (1 << 4),
+		MODE_SNOOP		= (1 << 5)
+	};
+
 	uint32_t dma_translate(uint32_t address);
-	void dma_tick();
+	void dma_immediate();
+
+	uint32_t get_line_count() { return m_dma_size >> 16; }
+	uint32_t get_line_width() { return (uint16_t)m_dma_size; }
+	uint32_t get_line_zoom() { return (m_dma_stride >> 16) & 0x3ff; }
+	int16_t get_stride() { return (int16_t)m_dma_stride; }
+	uint32_t get_zoom_count() { return (m_dma_count >> 16) & 0x3ff; }
+	uint32_t get_byte_count() { return (uint16_t)m_dma_count; }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

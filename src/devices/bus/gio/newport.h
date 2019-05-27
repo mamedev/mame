@@ -32,12 +32,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual uint32_t palette_entries() const override { return 0x2000; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	void mem_map(address_map &map) override;
+
+	static constexpr device_timer_id DCB_TIMEOUT = 0;
 
 	enum
 	{
@@ -51,6 +54,35 @@ protected:
 		DCR_CURSOR_SIZE_BIT = 9,
 		DCR_CURSOR_SIZE_32 = 0,
 		DCR_CURSOR_SIZE_64 = 1
+	};
+
+	enum
+	{
+		DCB_ADDR_VC2,
+		DCB_ADDR_CMAP01,
+		DCB_ADDR_CMAP0,
+		DCB_ADDR_CMAP1,
+		DCB_ADDR_XMAP01,
+		DCB_ADDR_XMAP0,
+		DCB_ADDR_XMAP1,
+		DCB_ADDR_RAMDAC,
+		DCB_ADDR_CC1,
+		DCB_ADDR_AB1,
+		DCB_ADDR_PCD = 12
+	};
+
+	enum
+	{
+		STATUS_GFXBUSY			= (1 << 3),
+		STATUS_BACKBUSY			= (1 << 4),
+		STATUS_VRINT			= (1 << 5),
+		STATUS_VIDEOINT			= (1 << 6),
+		STATUS_GFIFOLEVEL_SHIFT	= 7,
+		STATUS_GFIFOLEVEL_MASK	= (0x3f << STATUS_GFIFOLEVEL_SHIFT),
+		STATUS_BFIFOLEVEL_SHIFT	= 13,
+		STATUS_BFIFOLEVEL_MASK	= (0x1f << STATUS_BFIFOLEVEL_SHIFT),
+		STATUS_BFIFO_INT		= 18,
+		STATUS_GFIFO_INT		= 19
 	};
 
 	struct vc2_t
@@ -268,6 +300,7 @@ protected:
 	std::unique_ptr<uint32_t[]> m_vt_table;
 	cmap_t m_cmap0;
 	uint32_t m_global_mask;
+	emu_timer *m_dcb_timeout_timer;
 
 	int m_readout_x0;
 	int m_readout_y0;

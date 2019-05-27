@@ -40,7 +40,7 @@
 #define LOG_REJECTS     (1 << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
 
-#define VERBOSE         (0)
+#define VERBOSE         (0)//(LOG_REX3 | LOG_COMMANDS)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device,  "gio_xl8",  "SGI 8-bit XL board")
@@ -78,6 +78,8 @@ void newport_base_device::device_start()
 	m_pup = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 	m_cid = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 	m_vt_table = make_unique_clear<uint32_t[]>(2048 * 2048);
+
+	m_dcb_timeout_timer = timer_alloc(DCB_TIMEOUT);
 
 	save_pointer(NAME(m_rgbci), (1280+64) * (1024+64));
 	save_pointer(NAME(m_olay), (1280+64) * (1024+64));
@@ -282,6 +284,14 @@ void newport_base_device::stop_logging()
 	m_newview_log = nullptr;
 }
 #endif
+
+void newport_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == DCB_TIMEOUT)
+	{
+		m_rex3.m_status &= ~STATUS_BACKBUSY;
+	}
+}
 
 uint8_t newport_base_device::get_cursor_pixel(int x, int y)
 {
@@ -1302,7 +1312,7 @@ WRITE_LINE_MEMBER(newport_base_device::vblank_w)
 	{
 		if (BIT(m_vc2.m_display_ctrl, 0))
 		{
-			m_rex3.m_status |= 0x20;
+			m_rex3.m_status |= STATUS_VRINT;
 			m_gio->get_hpc3()->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 		}
 	}
@@ -1612,20 +1622,35 @@ READ64_MEMBER(newport_base_device::rex3_r)
 		{
 			switch (m_rex3.m_dcb_slave_select)
 			{
-			case 0x00:
+			case DCB_ADDR_VC2:
 				ret |= (uint64_t)vc2_read() << 32;
 				break;
-			case 0x02:
+			case DCB_ADDR_CMAP0:
 				ret |= (uint64_t)cmap0_read() << 32;
 				break;
-			case 0x03:
+			case DCB_ADDR_CMAP1:
 				ret |= (uint64_t)cmap1_read() << 32;
 				break;
-			case 0x05:
+			case DCB_ADDR_XMAP0:
 				ret |= (uint64_t)xmap0_read() << 32;
 				break;
-			case 0x06:
+			case DCB_ADDR_XMAP1:
 				ret |= (uint64_t)xmap1_read() << 32;
+				break;
+			case DCB_ADDR_RAMDAC:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read from RAMDAC (not yet implemented)\n");
+				break;
+			case DCB_ADDR_CC1:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read from CC1 (not yet implemented)\n");
+				break;
+			case DCB_ADDR_AB1:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read from AB1 (not yet implemented)\n");
+				break;
+			case DCB_ADDR_PCD:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read from PCD (not yet implemented)\n");
+				// Presenter not connected; simulate a bus timeout
+				m_rex3.m_status |= STATUS_BACKBUSY;
+				m_dcb_timeout_timer->adjust(attotime::from_msec(1));
 				break;
 			default:
 				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Read: %08x\n", m_rex3.m_dcb_data_msw);
@@ -1723,7 +1748,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
 			uint32_t old_status = m_rex3.m_status;
-			m_rex3.m_status = 0;
+			m_rex3.m_status &= ~STATUS_VRINT;
 			m_gio->get_hpc3()->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 			ret |= (uint64_t)(old_status | 3) << 32;
 		}
@@ -3727,21 +3752,43 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			m_rex3.m_dcb_data_msw = data32;
 			switch (m_rex3.m_dcb_slave_select)
 			{
-			case 0x00:
+			case DCB_ADDR_VC2:
 				vc2_write(data32);
 				break;
-			case 0x01:
+			case DCB_ADDR_CMAP01:
+				cmap0_write(data32);
+				//cmap1_write(data32);
+				break;
+			case DCB_ADDR_CMAP0:
 				cmap0_write(data32);
 				break;
-			case 0x04:
+			case DCB_ADDR_CMAP1:
+				//cmap1_write(data32);
+				break;
+			case DCB_ADDR_XMAP01:
 				xmap0_write(data32);
 				xmap1_write(data32);
 				break;
-			case 0x05:
+			case DCB_ADDR_XMAP0:
 				xmap0_write(data32);
 				break;
-			case 0x06:
+			case DCB_ADDR_XMAP1:
 				xmap1_write(data32);
+				break;
+			case DCB_ADDR_RAMDAC:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Write to RAMDAC (not yet implemented): %08x\n", data32);
+				break;
+			case DCB_ADDR_CC1:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Write to CC1 (not yet implemented): %08x\n", data32);
+				break;
+			case DCB_ADDR_AB1:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Write to AB1 (not yet implemented): %08x\n", data32);
+				break;
+			case DCB_ADDR_PCD:
+				LOGMASKED(LOG_REX3, "REX3 Display Control Bus Data MSW Write to PCD (not yet implemented): %08x\n", data32);
+				// Presenter not connected; simulate a bus timeout
+				m_rex3.m_status |= STATUS_BACKBUSY;
+				m_dcb_timeout_timer->adjust(attotime::from_msec(1));
 				break;
 			default:
 				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "REX3 Display Control Bus Data MSW Write: %08x\n", data32);

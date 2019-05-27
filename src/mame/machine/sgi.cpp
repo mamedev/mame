@@ -23,7 +23,7 @@
 #define LOG_DMA         (1 << 8)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_DMA)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_MC, sgi_mc_device, "sgi_mc", "SGI Memory Controller")
@@ -196,9 +196,9 @@ uint32_t sgi_mc_device::dma_translate(uint32_t address)
 {
 	for (int entry = 0; entry < 4; entry++)
 	{
-		if ((address & 0xffe00000) == (m_dma_tlb_entry_hi[entry] & 0xffe00000))
+		if ((address & 0xffc00000) == (m_dma_tlb_entry_hi[entry] & 0xffc00000))
 		{
-			const uint32_t vpn_lo = (address & 0x001ff000) >> 12;
+			const uint32_t vpn_lo = (address & 0x003ff000) >> 12;
 			const uint32_t pte = m_space->read_dword(((m_dma_tlb_entry_lo[entry] & 0x003fffc0) << 6) + (vpn_lo << 2));
 			const uint32_t offset = address & 0xfff;
 			return ((pte & 0x03ffffc0) << 6) + offset;
@@ -207,91 +207,103 @@ uint32_t sgi_mc_device::dma_translate(uint32_t address)
 	return 0;
 }
 
-void sgi_mc_device::dma_tick()
+void sgi_mc_device::dma_immediate()
 {
-	uint32_t addr = m_dma_mem_addr;
-	if (m_dma_control & (1 << 8))
-	{   // Enable virtual address translation
-		addr = dma_translate(addr);
-	}
-
-	if (m_dma_mode & (1 << 1))
-	{   // Graphics to host
-		if (m_dma_mode & (1 << 3))
-		{   // Fill mode
-			m_space->write_dword(addr, m_dma_gio64_addr);
-			m_dma_mem_addr += 4;
-			m_dma_count -= 4;
-		}
-		else
+	uint32_t memory_addr = m_dma_mem_addr;
+	uint32_t linecount = get_line_count();
+	uint32_t zoomcount = get_zoom_count();
+	uint32_t bytecount = get_byte_count();
+	const uint32_t gio_addr = m_dma_gio64_addr;
+	const uint32_t linewidth = get_line_width();
+	const uint32_t linezoom = get_line_zoom();
+	const uint32_t stride = get_stride();
+	m_dma_size &= 0x0000ffff;
+	m_dma_count = 0;
+	while (linecount > 0)
+	{
+		linecount--;
+		while (zoomcount > 0)
 		{
-			const uint32_t remaining = m_dma_count & 0x0000ffff;
-			uint32_t length = 8;
-			uint64_t shift = 56;
-			if (remaining < 8)
-				length = remaining;
-
-			uint64_t data = m_space->read_qword(m_dma_gio64_addr);
-			for (uint32_t i = 0; i < length; i++)
+			zoomcount--;
+			while (bytecount > 0)
 			{
-				m_space->write_byte(addr, (uint8_t)(data >> shift));
-				addr++;
-				shift -= 8;
-			}
-
-			m_dma_mem_addr += length;
-			m_dma_count -= length;
-		}
-	}
-	else
-	{   // Host to graphics
-		const uint32_t remaining = m_dma_count & 0x0000ffff;
-		uint32_t length = 8;
-		uint64_t shift = 56;
-		if (remaining < 8)
-			length = remaining;
-
-		uint64_t data = 0;
-		for (uint32_t i = 0; i < length; i++)
-		{
-			data |= (uint64_t)m_space->read_byte(addr) << shift;
-			addr++;
-			shift -= 8;
-		}
-
-		m_space->write_qword(m_dma_gio64_addr, data);
-		m_dma_mem_addr += length;
-		m_dma_count -= length;
-	}
-
-	if ((m_dma_count & 0x0000ffff) == 0)
-	{   // If remaining byte count is 0, deduct zoom count
-		m_dma_count -= 0x00010000;
-		if (m_dma_count == 0)
-		{   // If remaining zoom count is also 0, move to next line
-			m_dma_mem_addr += m_dma_stride & 0x0000ffff;
-			m_dma_size -= 0x00010000;
-			if ((m_dma_size & 0xffff0000) == 0)
-			{   // If no remaining lines, DMA is done.
-				m_dma_timer->adjust(attotime::never);
-				m_dma_run |= (1 << 3);
-				m_dma_run &= ~(1 << 6);
-				if (BIT(m_dma_control, 4))
+				if (m_dma_mode & MODE_TO_HOST)
 				{
-					m_dma_int_cause |= (1 << 3);
-					m_hpc3->raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
+					if (m_dma_mode & MODE_FILL)
+					{   // Fill mode
+						m_space->write_dword(dma_translate(memory_addr), m_dma_gio64_addr);
+						if (m_dma_mode & MODE_DIR)
+							memory_addr += 4;
+						else
+							memory_addr -= 4;
+						bytecount -= 4;
+					}
+					else
+					{
+						uint32_t length = 8;
+						uint64_t shift = 56;
+						if (bytecount < 8)
+							length = bytecount;
+
+						uint64_t data = m_space->read_qword(gio_addr);
+						for (uint32_t i = 0; i < length; i++)
+						{
+							m_space->write_byte(dma_translate(memory_addr), (uint8_t)(data >> shift));
+							if (m_dma_mode & MODE_DIR)
+								memory_addr++;
+							else
+								memory_addr--;
+							shift -= 8;
+						}
+
+						bytecount -= length;
+					}
+				}
+				else
+				{
+					uint32_t length = 8;
+					uint64_t shift = 56;
+					if (bytecount < 8)
+						length = bytecount;
+
+					uint64_t data = 0;
+					for (uint32_t i = 0; i < length; i++)
+					{
+						data |= (uint64_t)m_space->read_byte(dma_translate(memory_addr)) << shift;
+						if (m_dma_mode & MODE_DIR)
+							memory_addr++;
+						else
+							memory_addr--;
+						shift -= 8;
+					}
+
+					m_space->write_qword(gio_addr, data);
+					bytecount -= length;
 				}
 			}
-			else
+			bytecount = linewidth;
+
+			if (zoomcount > 0)
 			{
-				m_dma_count = (m_dma_stride & 0x03ff0000) | (m_dma_size & 0x0000ffff);
+				if (m_dma_mode & MODE_DIR)
+					memory_addr -= linewidth;
+				else
+					memory_addr += linewidth;
 			}
 		}
-		else
-		{   // If remaining zoom count is non-zero, reload byte count and return source address to the beginning of the line.
-			m_dma_count |= m_dma_size & 0x0000ffff;
-			m_dma_mem_addr -= m_dma_size & 0x0000ffff;
-		}
+		zoomcount = linezoom;
+		memory_addr += stride;
+	}
+
+	m_dma_mem_addr = memory_addr;
+
+	m_dma_timer->adjust(attotime::never);
+	m_dma_run |= (1 << 3);
+	m_dma_run &= ~(1 << 6);
+	if (BIT(m_dma_control, 4))
+	{
+		m_dma_int_cause |= (1 << 3);
+		m_hpc3->raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 	}
 }
 
@@ -720,9 +732,6 @@ void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 	else if (id == TIMER_DMA)
 	{
-		while (m_dma_run & (1 << 6))
-		{
-			dma_tick();
-		}
+		dma_immediate();
 	}
 }
