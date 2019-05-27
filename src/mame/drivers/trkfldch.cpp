@@ -64,6 +64,8 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
 
+
+	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
@@ -85,6 +87,37 @@ private:
 
 void trkfldch_state::video_start()
 {
+}
+
+void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd)
+{
+	int offs = 0;
+	for (int y = 0; y < 30; y++)
+	{
+		for (int x = 0; x < 41; x++)
+		{
+			address_space &mem = m_maincpu->space(AS_PROGRAM);
+
+			uint8_t byte = mem.read_byte(base + offs);
+			offs++;
+			uint8_t attr = mem.read_byte(base + offs);
+			offs++;
+
+			uint16_t tile = (attr << 8) | byte;
+
+			int flipx = (tile & 0x8000) >> 15;
+			// flipy is probably 0x4000
+
+			tile &= 0x3fff;
+
+			tile += tileadd;
+
+			gfx_element* gfx = m_gfxdecode->gfx(0);
+
+			gfx->transpen(bitmap, cliprect,tile, 0, flipx, 0, x*8, y*8, 0);
+
+		}
+	}
 }
 
 uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
@@ -115,6 +148,18 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		m_palette->set_pen_color(i, r, g, b);
 	}
 
+	{
+		int base;
+		
+		base = (m_unkregs[0x54] << 8);
+		render_tile_layer(screen, bitmap, cliprect, base, 0x5e00);
+
+		base = (m_unkregs[0x55] << 8);
+		render_tile_layer(screen, bitmap, cliprect, base, 0x5e00);
+
+	}
+
+
 	for (int i = 0x500 - 5; i >= 0; i -= 5)
 	{
 		//  printf("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
@@ -127,6 +172,8 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		int tilehigh = m_spriteram[i + 4] & 0x04;
 		int tilehigh2 = m_spriteram[i + 0] & 0x04;
 		int tilehigh3 = m_spriteram[i + 0] & 0x08;
+
+		int pal = 0;
 
 		//int unk = m_spriteram[i + 4] & 0x20;
 
@@ -162,12 +209,15 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		}
 		else
 		{
+			pal = (m_spriteram[i + 0] & 0x30)>>4;
 			gfx = m_gfxdecode->gfx(2);
-			tilegfxbase -= 0x80;
+			tilegfxbase -= 0x40;
+			tilegfxbase -= 0x6b;
+
 		}
 
 
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, 0, 0, 0, x, y, 0);
+		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, 0, 0, x, y, 0);
 	}
 
 	return 0;
@@ -305,13 +355,13 @@ static INPUT_PORTS_START( trkfldch )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-// dummy, doesn't appear to be tile based
+
 static const gfx_layout tiles8x8x8_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0, 1, 16, 17, 32, 33, 48, 49 },
+	{ 48,49, 32,33, 16,17, 0, 1 },
 	{  8,10,12, 14, 0,2,4,6  },
 	{ 0,0 + 64,
 	128,128 + 64,
@@ -331,23 +381,25 @@ static const gfx_layout tiles16x16x8_layout =
 	128*16,
 };
 
-// not correct
-static const gfx_layout tiles16x16x4_layout =
+
+// TODO: if we're going to use gfxdecode then allocate this manually with the correct number of tiles
+//  might be we have to use manual drawing tho, the base offset is already strange
+static const gfx_layout tiles16x16x6_layout =
 {
 	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 32, 33 },
+	0x5500,
+	6,
+	{ 64, 65, 32, 33, 0, 1  },
 	{ 8,10,12,14, 0,2,4,6, 24,26,28,30, 16,18,20,22 },
-	{ STEP16(0,64) },
-	64*16,
+	{ STEP16(0,96) },
+	96*16,
 };
 
 
 static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8x8_layout, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16x8_layout, 0, 1 )
-	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16x4_layout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x40, tiles16x16x6_layout, 0, 4 )
 GFXDECODE_END
 
 /*
@@ -380,6 +432,11 @@ GFXDECODE_END
 
 2a/2b = ?? throwing event (paired with below)
 3a/3b = ?? throwing event (paired with below)
+
+54 = 18 (layer base?) (tiles are at 1800 trkfldch)
+55 = 22 (layer base?) (tiles are at 2200 trkfldch)
+56 = 2c (layer base?) (tiles are at 2c00 trkfldch)
+
 
 */
 
@@ -437,15 +494,15 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 
 
 
-	case 0x54:
+	case 0x54: // tilebase 1
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x55:
+	case 0x55: // tilebase 2
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x56: // side effect of reading 55
+	case 0x56: // tilebase 3
 		//logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
@@ -689,15 +746,15 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 
-	case 0x54: // startup
+	case 0x54: // tilebase 1
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x55: // startup
+	case 0x55: // tilebase 2
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x56: // startup
+	case 0x56: // tilebase 3
 		//logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
