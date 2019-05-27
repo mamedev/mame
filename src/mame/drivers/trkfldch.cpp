@@ -65,7 +65,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
-	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize);
+	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
@@ -89,7 +89,7 @@ void trkfldch_state::video_start()
 {
 }
 
-void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize)
+void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize)
 {
 	int offs = 0;
 	for (int y = 0; y < 30; y++)
@@ -724,7 +724,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x17:
+	case 0x17: // gfxbank for weird layer
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
@@ -744,90 +744,90 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x20: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);  // trkfldch possible xscroll split position (0f)
 		break;
 
 	case 0x21: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // trkfldch possible xscroll split position (1f)
 		break;
 
 	case 0x22: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1f
 		break;
 
 	case 0x23: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
 		break;
 
 	case 0x24: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
 		break;
 
 	case 0x25: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
 		break;
 
 	case 0x26:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 low) upper\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x27:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 high) upper\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x28:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 low) lower\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x29:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 high) lower\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x2a:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 1 low)\n", machine().describe_context(), offset, data); // trkfldch jav
 		break;
 
 	case 0x2b:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 1 high)\n", machine().describe_context(), offset, data); // trkfldch jav
 		break;
 
 
 
 
 	case 0x30:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 1 low)\n", machine().describe_context(), offset, data); // trkfldch jav, hammer
 		break;
 
 	case 0x31:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 1 high)\n", machine().describe_context(), offset, data); // trkfldch jav, hammer
 		break;
 
 	case 0x32: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 19
 		break;
 
 	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
 		break;
 
 	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
 		break;
 
 	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
 		break;
 
 	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
 		break;
 
 	case 0x3a:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 low)\n", machine().describe_context(), offset, data);  // trkfldch jav
 		break;
 
 	case 0x3b:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 high)\n", machine().describe_context(), offset, data);  // trkfldch jav
 		break;
 
 
