@@ -8,7 +8,11 @@ The Final ChessCard by Tasc
 It is similar to the C64 version, actually not as impressive since a PC from around 1989
 should be able to run a good chess game by itself.
 
-Tasc later released The ChessMachine ISA card, not emulated yet.
+Tasc later released The ChessMachine ISA card, see chessm.cpp.
+
+TODO:
+- ChessMachine software(which claims to support this card too) does not detect it,
+  maybe it expects a newer ROM revision?
 
 */
 
@@ -84,7 +88,7 @@ const tiny_rom_entry *isa8_finalchs_device::device_rom_region() const
 
 static INPUT_PORTS_START( finalchs )
 	PORT_START("DSW") // DIP switch on the ISA card PCB
-	PORT_DIPNAME( 0x0f, 0x07, "I/O Port Address" ) PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
+	PORT_DIPNAME( 0x0f, 0x08, "I/O Port Address" ) PORT_DIPLOCATION("FCC_SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "0x100" )
 	PORT_DIPSETTING(    0x01, "0x110" )
 	PORT_DIPSETTING(    0x02, "0x120" )
@@ -137,7 +141,7 @@ READ8_MEMBER(isa8_finalchs_device::finalchs_r)
 	if (offset == 0)
 		return m_mainlatch->read();
 	else
-		return !m_mainlatch->pending_r();
+		return m_mainlatch->pending_r() ? 0 : 1;
 }
 
 WRITE8_MEMBER(isa8_finalchs_device::finalchs_w)
@@ -147,7 +151,7 @@ WRITE8_MEMBER(isa8_finalchs_device::finalchs_w)
 }
 
 
-// internal (on-card CPU)
+// Internal (on-card CPU)
 
 void isa8_finalchs_device::finalchs_mem(address_map &map)
 {
