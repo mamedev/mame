@@ -64,8 +64,8 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
 
-
-	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize);
+	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
+	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
@@ -89,7 +89,7 @@ void trkfldch_state::video_start()
 {
 }
 
-void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, uint16_t tileadd, int gfxregion, int tilexsize)
+void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize)
 {
 	int offs = 0;
 	for (int y = 0; y < 30; y++)
@@ -119,6 +119,37 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 		}
 	}
 }
+
+void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base)
+{
+	// this isn't correct, it doesn't seem like a 'real' tilemap, maybe some kind of sprite / tile hybrid, or something with end of line markers?
+	// it is needed for the 'good' 'perfect' 'miss' text on DDR ingame
+	if (0)
+	{
+		// guess, but it fits with where the other tilegfxbase registers are, and is only written on my1stddr when this layer is enabled
+		int tilegfxbase = (m_unkregs[0x17] * 0x80) - 0x100;
+
+		int offs = 0;
+		for (int y = 0; y < 4; y++)
+		{
+			for (int x = 0; x < 32; x++)
+			{
+				address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+				uint8_t byte = mem.read_byte(base + offs);
+				offs++;
+
+				int tile = tilegfxbase | byte;
+
+				gfx_element* gfx = m_gfxdecode->gfx(4);
+
+				gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 16, 0);
+
+			}
+		}
+	}
+}
+
 
 
 // regs                        11 13 15 17
@@ -160,7 +191,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 	{
 		int base, gfxbase, gfxregion, tilexsize;
-		
+
 		base = (m_unkregs[0x54] << 8);
 		gfxbase = (m_unkregs[0x11] * 0x2000);
 		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
@@ -196,6 +227,11 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
 		}
 
+		if (m_unkregs[0x10] & 0x20)
+		{
+			base = (m_unkregs[0x56] << 8);
+			render_text_tile_layer(screen, bitmap, cliprect, base);
+		}
 	}
 
 
@@ -406,6 +442,18 @@ static const gfx_layout tiles8x8x8_layout =
 	512,
 };
 
+static const gfx_layout tiles8x16x8_layout =
+{
+	8,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 48,49, 32,33, 16,17, 0, 1 },
+	{ 8,10,12, 14, 0,2,4,6  },
+	{ STEP16(0,64) },
+	1024,
+};
+
+
 static const gfx_layout tiles16x16x8_layout =
 {
 	16,16,
@@ -449,6 +497,7 @@ static GFXDECODE_START( gfx_trkfldch )
 	GFXDECODE_ENTRY( "maincpu", 0, tiles16x16x8_layout, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x40, tiles8x8x6_layout, 0, 4 )
 	GFXDECODE_ENTRY( "maincpu", 0x40, tiles16x16x6_layout, 0, 4 )
+	GFXDECODE_ENTRY( "maincpu", 0, tiles8x16x8_layout, 0, 1 )
 GFXDECODE_END
 
 /*
@@ -621,11 +670,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 	switch (offset)
 	{
 	case 0x00: // IRQ ack/force?, see above
-	//  logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x01: // IRQ maybe status, see above
-	//  logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x02: // startup
@@ -675,7 +724,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x17:
+	case 0x17: // gfxbank for weird layer
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
@@ -695,101 +744,105 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x20: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);  // trkfldch possible xscroll split position (0f)
 		break;
 
 	case 0x21: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // trkfldch possible xscroll split position (1f)
 		break;
 
 	case 0x22: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1f
 		break;
 
 	case 0x23: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
 		break;
 
 	case 0x24: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
 		break;
 
 	case 0x25: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
 		break;
 
 	case 0x26:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 low) upper\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x27:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 high) upper\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x28:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 low) lower\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x29:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 high) lower\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
 		break;
 
 	case 0x2a:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 1 low)\n", machine().describe_context(), offset, data); // trkfldch jav
 		break;
 
 	case 0x2b:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 1 high)\n", machine().describe_context(), offset, data); // trkfldch jav
 		break;
 
 
 
 
 	case 0x30:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 1 low)\n", machine().describe_context(), offset, data); // trkfldch jav, hammer
 		break;
 
 	case 0x31:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 1 high)\n", machine().describe_context(), offset, data); // trkfldch jav, hammer
 		break;
 
 	case 0x32: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 19 / 00
 		break;
 
 	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 04
 		break;
 
 	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 19
 		break;
 
+
+	// gap
+
+
 	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 25  possible yscroll split position (my1stddr) 
 		break;
 
 	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 29  possible yscroll split position (my1stddr) 
 		break;
 
 	case 0x3a:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 low)\n", machine().describe_context(), offset, data);  // trkfldch jav
 		break;
 
 	case 0x3b:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (x scroll 2 high)\n", machine().describe_context(), offset, data);  // trkfldch jav
 		break;
 
 
 
 
 	case 0x42:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 2 low)\n", machine().describe_context(), offset, data); // my1stddr text scroller on right
 		break;
 
 	case 0x43:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (y scroll 2 high)\n", machine().describe_context(), offset, data); // my1stddr text scroller on right
 		break;
 
 
@@ -837,21 +890,47 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 			uint32_t dmasource = (m_unkregs[0x62] << 16) | (m_unkregs[0x61] << 8) | m_unkregs[0x60];
 			uint16_t dmadest = (m_unkregs[0x64] << 8) | m_unkregs[0x63];
 
+			//if (dmadest != 0x6800)
 			logerror("%s: performing dma src: %06x dst %04x len %04x and extra params %02x %02x %02x %02x %02x %02x\n", machine().describe_context(), dmasource, dmadest, dmalength, m_unkregs[0x67], m_unkregs[0x68], m_unkregs[0x69], m_unkregs[0x6b], m_unkregs[0x6c], m_unkregs[0x6d]);
 
+			int writeoffset = 0;
+			int writedo = m_unkregs[0x6d];
+
+			int readoffset = 0;
+			int readdo = m_unkregs[0x69];
+
+			if ((m_unkregs[0x68] != 0x00) || (m_unkregs[0x6c] != 0x00))
+			{
+				fatalerror("unhandled dma params\n");
+			}
 
 			for (uint32_t j = 0; j < dmalength; j++)
 			{
-				uint8_t byte = mem.read_byte(dmasource+j);
-				mem.write_byte(dmadest+j, byte);
-			}
+				uint8_t byte = mem.read_byte(dmasource+readoffset);
+				readdo--;
+				if (readdo < 0)
+				{
+					readdo = m_unkregs[0x69];
+					readoffset += m_unkregs[0x67];
+				}
+				else
+				{
+					readoffset++;
+				}
 
-			// maybe
-			for (int i = 0x0; i < 0x10; i++)
-			{
-				m_unkregs[0x60 + i] = 0;
-			}
+				mem.write_byte(dmadest+writeoffset, byte);
+				writedo--;
+				if (writedo < 0)
+				{
+					writedo = m_unkregs[0x6d];
+					writeoffset += m_unkregs[0x6b];
+				}
+				else
+				{
+					writeoffset++;
+				}
 
+			}
 		}
 		break;
 
@@ -859,33 +938,28 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		logerror("%s: unkregs_w %04x %02x (dma length high)\n", machine().describe_context(), offset, data);
 		break;
 
-	// the rest of these 60 range registers seem to control some kind of on/off step for source and destination, allowing rectangles to be copied from rom to ram
-	// but they don't get reset properly even if I clear them after an op (see above) so maybe I'm using the wrong trigger?  DMA operations prior to them
-	// being used don't set them at all
-
-
 	case 0x67: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source read skip size)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x68: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source unknown)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x69: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma source read group size)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6b: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest write skip size)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6c: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest unknown)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x6d: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma related)\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (dma dest write group size)\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -1007,6 +1081,15 @@ void trkfldch_state::machine_reset()
 		m_unkdata[i] = 0;
 
 	m_unkdata_addr = 0;
+
+	// the game code doesn't set the DMA step / skip params to default values until after it's used them with other values, so assume they reset to these
+	m_unkregs[0x67] = 0x01;
+	m_unkregs[0x68] = 0x00;
+	m_unkregs[0x69] = 0x00;
+
+	m_unkregs[0x6b] = 0x01;
+	m_unkregs[0x6c] = 0x00;
+	m_unkregs[0x6d] = 0x00;
 
 }
 
