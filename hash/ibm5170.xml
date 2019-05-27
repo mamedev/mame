@@ -8544,13 +8544,13 @@
 	</software>
 
 	<software name="chessm" supported="no">
-		<!-- uses ChessMachine ISA card -->
-		<description>The ChessMachine (Installer V3.0)</description>
+		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
+		<description>The ChessMachine (Installer v3.0)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
 		<info name="version" value="3.0" />
 		<info name="serial" value="WR.887.68.354" />
-		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine ISA card required." />
+		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine/Final ChessCard ISA card required." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
@@ -8572,13 +8572,13 @@
 	</software>
 
 	<software name="chessm22" supported="no">
-		<!-- uses ChessMachine ISA card -->
-		<description>The ChessMachine (Installer V2.2)</description>
+		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
+		<description>The ChessMachine (Installer v2.2)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
 		<info name="version" value="2.2" />
 		<info name="serial" value="50677" />
-		<info name="usage" value="ChessMachine ISA card required" />
+		<info name="usage" value="ChessMachine/Final ChessCard ISA card required" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
@@ -9610,7 +9610,7 @@
 	</software>
 
 	<software name="finalchs">
-		<!-- uses Final ChessCard ISA card -->
+		<!-- uses Final ChessCard ISA card, ROM v2.0 (incompatible with newer version) -->
 		<description>The Final ChessCard</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>

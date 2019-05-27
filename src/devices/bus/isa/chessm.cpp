@@ -14,7 +14,8 @@ Also seen with VY86C061PSTC (ARM6) @ 32MHz, very rare or prototype.
 TODO:
 - It doesn't work. Card detection routine works, comms test works, RAM test works,
   program checksum works. But after it's done with tests and needs to start the chess
-  game, it doesn't acknowledge IRQ and locks up.
+  game, it doesn't acknowledge IRQ and locks up. The client software works fine with
+  finalchs (chess.exe 6502 180).
 - add RAM/CPU configuration
 
 */

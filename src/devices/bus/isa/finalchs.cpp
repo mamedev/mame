@@ -10,9 +10,9 @@ should be able to run a good chess game by itself.
 
 Tasc later released The ChessMachine ISA card, see chessm.cpp.
 
-TODO:
-- ChessMachine software(which claims to support this card too) does not detect it,
-  maybe it expects a newer ROM revision?
+Multiple ROM revisions were made. Version 2.0 is compatible with the initial 1989
+software version. Version 3.6 works with the newer software package, including the
+one that came with The ChessMachine.
 
 */
 
@@ -72,7 +72,10 @@ void isa8_finalchs_device::device_reset()
 
 ROM_START( finalchs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098) ) // v2.0
+	ROM_SYSTEM_BIOS(0, "v20", "ROM v2.0") // 01-11-89
+	ROMX_LOAD("fcc_v20.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v36", "ROM v3.6") // 22-05-90
+	ROMX_LOAD("fcc_v36.bin", 0x8000, 0x8000, CRC(70800e6c) SHA1(fa8170606313adeaadad3bbf1ca18cae567e4207), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *isa8_finalchs_device::device_rom_region() const
@@ -87,7 +90,7 @@ const tiny_rom_entry *isa8_finalchs_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( finalchs )
-	PORT_START("DSW") // DIP switch on the ISA card PCB
+	PORT_START("DSW") // DIP switch on the ISA card PCB, this range is for the 1st release
 	PORT_DIPNAME( 0x0f, 0x08, "I/O Port Address" ) PORT_DIPLOCATION("FCC_SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "0x100" )
 	PORT_DIPSETTING(    0x01, "0x110" )
