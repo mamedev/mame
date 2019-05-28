@@ -85,6 +85,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	drq_cb(*this),
 	hld_cb(*this),
 	enp_cb(*this),
+	ready_cb(*this), // actually output by the drive, not by the FDC
 	enmf_cb(*this)
 {
 	force_ready = false;
@@ -107,6 +108,7 @@ void wd_fdc_device_base::device_start()
 	drq_cb.resolve();
 	hld_cb.resolve();
 	enp_cb.resolve();
+	ready_cb.resolve();
 	enmf_cb.resolve();
 
 	if (!has_enmf && !enmf_cb.isnull())
@@ -1277,6 +1279,8 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
+	ready_cb(state);
+
 	// why is this even possible?
 	if (!floppy)
 		return;
