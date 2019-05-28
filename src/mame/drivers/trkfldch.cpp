@@ -96,30 +96,43 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 
 //	tilemap 1=  my1stddr HUD layer
 
-//	why does this use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
-//	uint16_t xscroll = (m_unkregs[0x26] << 0) | (m_unkregs[0x27] << 8); // trkfld tilemap 0, race top
-//	uint16_t xscroll = (m_unkregs[0x28] << 0) | (m_unkregs[0x29] << 8); // trkfld tilemap 0, race bot (window?)
 
+// first group of tile scroll registers
+
+//  none of these written by hammer throw in trkfld or ddr
+//	uint8_t unk20 = m_unkregs[0x20]; // 0f - 100 meters  00 - javelin, long jump, triple  00 after events, 1e high jump  -- hurdle holes -- ddr    (assume default of 00?)
+//	uint8_t unk21 = m_unkregs[0x21]; // 1f - 100 meters  00 - javelin, long jump, triple  00 after events, 00 high jump  00 hurdle holes -- ddr    (assume default of 00?)
+//	uint8_t unk22 = m_unkregs[0x22]; // 1f - 100 meters  1e - javelin, long jump, triple  1e after events, 1e high jump  1e hurdle holes -- ddr    (assume default of 1e?)
+//	uint8_t unk23 = m_unkregs[0x23]; // -- - 100 meters, 1e - javelin, long jump, triple  -- after events, -- high jump  -- hurdle holes -- ddr    (assume default of 1e?)
+//	uint8_t unk24 = m_unkregs[0x24]; //                                                   00 after events                00 hurdle holes -- ddr    (assume default of 00?)
+//	uint8_t unk25 = m_unkregs[0x25]; //                                                   28 after events                14 hurdle holes -- ddr    (assume default of 28?)
+
+//	uint16_t xscroll = (m_unkregs[0x26] << 0) | (m_unkregs[0x27] << 8); // trkfld tilemap 0, race top            //	why do the split screen races use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
+//	uint16_t xscroll = (m_unkregs[0x28] << 0) | (m_unkregs[0x29] << 8); // trkfld tilemap 0, race bot (window?)
 //	uint16_t xscroll = (m_unkregs[0x2a] << 0) | (m_unkregs[0x2b] << 8); // trkfld tilemap 0?, javelin
+//  2c,2d,2e,2f never written
 //	uint16_t yscroll = (m_unkregs[0x30] << 0) | (m_unkregs[0x31] << 8); // trkfld tilemap 0, javelin, holes, hammer throw
+//  30,31 never written
+
+// second group of tile scroll registers?
+
+//  32 never written                                                                                                                                        (assume default of 00? to fit 20-25 pattern?)
+//	uint8_t windowtop    = m_unkregs[0x33]; // 0x00 - on trkfld hurdle the holes (also resets to 0x00 &  after event - possible default values)             (assume default of 00?)
+//	uint8_t windowbottom = m_unkregs[0x34]; // 0x1e   ^                                          0x1e                                                       (assume default of 1e?)
+//  uint8_t unk35        = m_unkregs[0x35];  set to 1e (30) (30*8=240) by trkfld high jump otherwise uninitialized always - something to do with bottom     (assume default of 1e?)
+//  for left / right on tilemap 1
+//	uint8_t windowleft   = m_unkregs[0x36];  //0x29  when unused on my1stddr, 0x25 when used   14 when used on hurdle holes, resets to 00 after event       (assume default of 00?)
+//	uint8_t windowright  = m_unkregs[0x37];  //0x29                           0x29             28 when used on hurdle holes, resets to 28 after event       (assume default of 28?)
+//  38/39 never written
 //	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
+//  3c,3d,3e,3f,40,41 never written
 //	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
 
-// for left / right on tilemap 1
-//	0x14 & 0x28  (20 and 40) on trkfld hurdle the holes (resets to 0x00 & 0x28 after event - possible default values)
-//	0x29 & 0x29 when unused on my1stddr, 0x25 & 0x29 when used
-//	uint8_t windowleft = m_unkregs[0x36];
-//	uint8_t windowright = m_unkregs[0x37];
 
-//  for top/bottom on tilemap 1
-//	uint8_t windowtop = m_unkregs[0x33];
-//	uint8_t windowbottom = m_unkregs[0x34];
-
-
+//	printf("window %02x %02x  %02x %02x  %02x %02x\n", unk20, unk21, unk22, unk23, unk24, unk25);
 //	printf("xscroll %04x\n", xscroll);
 //	printf("yscroll %04x\n", yscroll);
 //	printf("window left/right %02x %02x\n", windowleft, windowright);
-
 //	printf("window top/bottom %02x %02x\n", windowtop, windowbottom);
 
 
@@ -911,7 +924,9 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 
-	// gap
+	case 0x35: // rarely
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // set to 1e by trkfld high jump
+		break;
 
 
 	case 0x36: // rarely
@@ -1187,8 +1202,8 @@ void trkfldch_state::machine_reset()
 	m_unkregs[0x6d] = 0x00;
 
 	// maybe, these get reset to this value after actual use in trkfield
-	m_unkregs[0x36] = 0x00;
-	m_unkregs[0x37] = 0x28;
+	m_unkregs[0x36] = 0xde;// 0x00;
+	m_unkregs[0x37] = 0xad;// 0x28;
 
 	// trkfld sets these to 1e/1e on javelin, but leaves then uninitizlied before that
 	// it also sets them to 00 / 1e on 'hurdle the hole' (window use)
@@ -1196,6 +1211,15 @@ void trkfldch_state::machine_reset()
 	// high jump sets it to 00 / 16 on height select screen
 	m_unkregs[0x33] = 0xde;
 	m_unkregs[0x34] = 0xad;
+
+	m_unkregs[0x35] = 0x1e; // trkfld sets this after high jump
+
+	m_unkregs[0x20] = 0xde;
+	m_unkregs[0x21] = 0xad;
+	m_unkregs[0x22] = 0xde;
+	m_unkregs[0x23] = 0xad;
+	m_unkregs[0x24] = 0xde; // gets set to 0x00 (00) on trkfld results screens
+	m_unkregs[0x25] = 0xad; // gets set to 0x28 (40) on trkfld resutls screens
 }
 
 void trkfldch_state::trkfldch(machine_config &config)
