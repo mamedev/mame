@@ -99,7 +99,7 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 			// fppt tttt   tttt tttt
 
 			rectangle clip;
-			clip.set(x*8, (x*8)+8, y*8, (y*8)+8);
+			clip.set(x*8, (x*8)+7, y*8, (y*8)+7);
 
 			clip &= cliprect;
 
