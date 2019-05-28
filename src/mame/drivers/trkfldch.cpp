@@ -192,21 +192,24 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 	{
 		int base, gfxbase, gfxregion, tilexsize;
 
-		base = (m_unkregs[0x54] << 8);
-		gfxbase = (m_unkregs[0x11] * 0x2000);
-		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+		if (1)
 		{
-			gfxbase -= 0x200;
-			gfxregion = 0;
-			tilexsize = 8;
+			base = (m_unkregs[0x54] << 8);
+			gfxbase = (m_unkregs[0x11] * 0x2000);
+			if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+			{
+				gfxbase -= 0x200;
+				gfxregion = 0;
+				tilexsize = 8;
+			}
+			else
+			{
+				gfxbase -= 0x2ac;
+				gfxregion = 2;
+				tilexsize = 8;
+			}
+			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
 		}
-		else
-		{
-			gfxbase -= 0x2ac;
-			gfxregion = 2;
-			tilexsize = 8;
-		}
-		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
 
 		if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
 		{
@@ -240,6 +243,8 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		//  logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_unkregs[0x15] * 0x800);
 
+		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --?f -t-x
+
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
 		int tile = m_spriteram[i + 2];
@@ -251,6 +256,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		int pal = 0;
 
 		//int unk = m_spriteram[i + 4] & 0x20;
+		int flipx = m_spriteram[i + 4] & 0x10;
 
 		if (tilehigh)
 			tile += 0x100;
@@ -292,7 +298,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		}
 
 
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, 0, 0, x, y, 0);
+		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, 0, x, y, 0);
 	}
 
 	return 0;
@@ -744,11 +750,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x20: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);  // trkfldch possible xscroll split position (0f)
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);  // trkfldch possible scroll window 0 top (0f)
 		break;
 
 	case 0x21: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // trkfldch possible xscroll split position (1f)
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // trkfldch possible scroll window 0 bottom (1f)
 		break;
 
 	case 0x22: // rarely
@@ -807,11 +813,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 04
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 04 possible scroll window 1 top
 		break;
 
 	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 19
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 19 possible scroll window 1 bottom
 		break;
 
 
@@ -819,11 +825,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 25  possible yscroll split position (my1stddr) 
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 25  possible scroll window 1 left
 		break;
 
 	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 29  possible yscroll split position (my1stddr) 
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 29  possible scroll window 1 right
 		break;
 
 	case 0x3a:
