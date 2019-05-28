@@ -64,8 +64,9 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
 
+	void draw_sprites(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int pri);
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
-	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize);
+	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int which);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
@@ -89,19 +90,84 @@ void trkfldch_state::video_start()
 {
 }
 
-void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize)
+void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int which)
 {
-	int offs = 0;
+//	tilemap 0 = trkfld events, my1stddr background 
+
+//	tilemap 1=  my1stddr HUD layer
+
+//	why does this use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
+//	uint16_t xscroll = (m_unkregs[0x26] << 0) | (m_unkregs[0x27] << 8); // trkfld tilemap 0, race top
+//	uint16_t xscroll = (m_unkregs[0x28] << 0) | (m_unkregs[0x29] << 8); // trkfld tilemap 0, race bot (window?)
+
+//	uint16_t xscroll = (m_unkregs[0x2a] << 0) | (m_unkregs[0x2b] << 8); // trkfld tilemap 0?, javelin
+//	uint16_t yscroll = (m_unkregs[0x30] << 0) | (m_unkregs[0x31] << 8); // trkfld tilemap 0, javelin, holes, hammer throw
+//	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
+//	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
+
+// for left / right on tilemap 1
+//	0x14 & 0x28  (20 and 40) on trkfld hurdle the holes (resets to 0x00 & 0x28 after event - possible default values)
+//	0x29 & 0x29 when unused on my1stddr, 0x25 & 0x29 when used
+//	uint8_t windowleft = m_unkregs[0x36];
+//	uint8_t windowright = m_unkregs[0x37];
+
+//  for top/bottom on tilemap 1
+//	uint8_t windowtop = m_unkregs[0x33];
+//	uint8_t windowbottom = m_unkregs[0x34];
+
+
+//	printf("xscroll %04x\n", xscroll);
+//	printf("yscroll %04x\n", yscroll);
+//	printf("window left/right %02x %02x\n", windowleft, windowright);
+
+//	printf("window top/bottom %02x %02x\n", windowtop, windowbottom);
+
+
+	int base, gfxbase, gfxregion;
+	int tilexsize = 8;
+
+	if (which == 0)
+	{
+		base = (m_unkregs[0x54] << 8);
+		gfxbase = (m_unkregs[0x11] * 0x2000);
+	}
+	else //if (which == 1)
+	{
+		base = (m_unkregs[0x55] << 8);
+		gfxbase = (m_unkregs[0x13] * 0x2000);
+	}
+
+	if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+	{
+		gfxbase -= 0x200;
+		gfxregion = 0;
+	}
+	else
+	{
+		gfxbase -= 0x2ac;
+		gfxregion = 2;
+	}
+
+
+
 	for (int y = 0; y < 30; y++)
 	{
 		for (int x = 0; x < 41; x++)
 		{
+			// fppt tttt   tttt tttt
+
+			rectangle clip;
+			clip.set(x*8, (x*8)+7, y*8, (y*8)+7);
+
+			clip &= cliprect;
+
+
 			address_space &mem = m_maincpu->space(AS_PROGRAM);
 
-			uint8_t byte = mem.read_byte(base + offs);
-			offs++;
-			uint8_t attr = mem.read_byte(base + offs);
-			offs++;
+			int tile_address = (y * 41) + x;
+
+			uint8_t byte = mem.read_byte(base+((tile_address * 2)));
+			uint8_t attr = mem.read_byte(base+((tile_address * 2)+1));
 
 			int tile = (attr << 8) | byte;
 
@@ -110,11 +176,11 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 
 			tile &= 0x1fff;
 
-			tile += tileadd;
+			tile += gfxbase;
 
 			gfx_element* gfx = m_gfxdecode->gfx(gfxregion);
 
-			gfx->transpen(bitmap, cliprect,tile, pal, flipx, 0, x*tilexsize, y*8, 0);
+			gfx->transpen(bitmap, clip,tile, pal, flipx, 0, x*tilexsize, y*8, 0);
 
 		}
 	}
@@ -161,84 +227,20 @@ void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16&
 // trkfldch ingame uses different bpp so different addressing here too?
 
 
-uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int pri)
 {
-	bitmap.fill(0, cliprect);
-
-	// 3 lots of 0x100 values, but maybe not rgb, seems to be yuv (borrowed from tetrisp2.cpp)
-	for (int i = 0; i < 256; i++)
-	{
-		uint8_t u =  m_palram[0x000 + i] & 0xff;
-		uint8_t y1 = m_palram[0x100 + i] & 0xff;
-		uint8_t v =  m_palram[0x200 + i] & 0xff;
-		double bf = y1+1.772*(u - 128);
-		double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
-		double rf = y1+1.772*(v - 128);
-		// clamp to 0-255 range
-		rf = std::min(rf,255.0);
-		rf = std::max(rf,0.0);
-		gf = std::min(gf,255.0);
-		gf = std::max(gf,0.0);
-		bf = std::min(bf,255.0);
-		bf = std::max(bf,0.0);
-
-		uint8_t r = (uint8_t)rf;
-		uint8_t g = (uint8_t)gf;
-		uint8_t b = (uint8_t)bf;
-
-		m_palette->set_pen_color(i, r, g, b);
-	}
-
-	{
-		int base, gfxbase, gfxregion, tilexsize;
-
-		base = (m_unkregs[0x54] << 8);
-		gfxbase = (m_unkregs[0x11] * 0x2000);
-		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
-		{
-			gfxbase -= 0x200;
-			gfxregion = 0;
-			tilexsize = 8;
-		}
-		else
-		{
-			gfxbase -= 0x2ac;
-			gfxregion = 2;
-			tilexsize = 8;
-		}
-		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
-
-		if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
-		{
-			base = (m_unkregs[0x55] << 8);
-			gfxbase = (m_unkregs[0x13] * 0x2000);
-			if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
-			{
-				gfxbase -= 0x200;
-				gfxregion = 0;
-				tilexsize = 8;
-			}
-			else
-			{
-				gfxbase -= 0x2ac;
-				gfxregion = 2;
-				tilexsize = 8;
-			}
-			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
-		}
-
-		if (m_unkregs[0x10] & 0x20)
-		{
-			base = (m_unkregs[0x56] << 8);
-			render_text_tile_layer(screen, bitmap, cliprect, base);
-		}
-	}
-
-
 	for (int i = 0x500 - 5; i >= 0; i -= 5)
 	{
-		//  logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
+		int priority = (m_spriteram[i + 4] & 0x20)>>5;
+		
+		// list is NOT drawn but instead z sorted, see shadows in trkfldch
+		if (priority != pri)
+			continue;
+
+		// logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_unkregs[0x15] * 0x800);
+
+		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --zf -t-x
 
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
@@ -250,7 +252,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 		int pal = 0;
 
-		//int unk = m_spriteram[i + 4] & 0x20;
+		int flipx = m_spriteram[i + 4] & 0x10;
 
 		if (tilehigh)
 			tile += 0x100;
@@ -260,10 +262,6 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 		if (tilehigh3)
 			tile += 0x400;
-
-		//if (unk) // set on score + 'press start' in ddr, priority? palette select?
-		//  tile = machine().rand();
-
 
 		int xhigh = m_spriteram[i + 4] & 0x01;
 		int yhigh = m_spriteram[i + 0] & 0x01; // or enable bit?
@@ -292,7 +290,56 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		}
 
 
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, 0, 0, x, y, 0);
+		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, 0, x, y, 0);
+	}
+}
+
+uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+{
+	bitmap.fill(0, cliprect);
+
+	// 3 lots of 0x100 values, but maybe not rgb, seems to be yuv (borrowed from tetrisp2.cpp)
+	for (int i = 0; i < 256; i++)
+	{
+		uint8_t u =  m_palram[0x000 + i] & 0xff;
+		uint8_t y1 = m_palram[0x100 + i] & 0xff;
+		uint8_t v =  m_palram[0x200 + i] & 0xff;
+		double bf = y1+1.772*(u - 128);
+		double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
+		double rf = y1+1.772*(v - 128);
+		// clamp to 0-255 range
+		rf = std::min(rf,255.0);
+		rf = std::max(rf,0.0);
+		gf = std::min(gf,255.0);
+		gf = std::max(gf,0.0);
+		bf = std::min(bf,255.0);
+		bf = std::max(bf,0.0);
+
+		uint8_t r = (uint8_t)rf;
+		uint8_t g = (uint8_t)gf;
+		uint8_t b = (uint8_t)bf;
+
+		m_palette->set_pen_color(i, r, g, b);
+	}
+
+	if (1) // one of the m_unkregs[0x10] bits almost certainly would enable / disable this
+	{
+		render_tile_layer(screen, bitmap, cliprect, 0);
+	}
+
+	draw_sprites(screen, bitmap, cliprect, 0);
+
+	if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
+	{
+		render_tile_layer(screen, bitmap, cliprect, 1);
+	}
+
+	draw_sprites(screen, bitmap, cliprect, 1);
+
+	if (m_unkregs[0x10] & 0x20) // this layer is buggy and not currently drawn
+	{
+		int base = (m_unkregs[0x56] << 8);
+		render_text_tile_layer(screen, bitmap, cliprect, base);
 	}
 
 	return 0;
@@ -387,8 +434,55 @@ TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::scanline)
 
 }
 
-
 static INPUT_PORTS_START( trkfldch )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( my1stddr )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -694,44 +788,46 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 
-	// is it significant that 0x10 goes up to 0x1a, 0x20 to 0x2b, 0x30 to 0x3b could be 3 sets of similar things?
 
-	case 0x10: // gfxmode select (4bpp / 8bpp) for sprites? maybe
-		logerror("%s: unkregs_w (bpp select) %04x %02x\n", machine().describe_context(), offset, data);
+
+
+	case 0x10: // gfxmode select (4bpp / 8bpp) and layer enables
+		logerror("%s: unkregs_w (enable, bpp select) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x11: // tilegfx base 1
-		logerror("%s: unkregs_w (tilegfx base 1) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x11: // tilegfxbank 1
+		logerror("%s: unkregs_w %04x %02x (tilegfxbank 1)\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x12: // startup
+	case 0x12: // 00 - startup (probably more tilegfxbank 1 bits)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x13: // tilegfx base 2
-		logerror("%s: unkregs_w (tilegfx base 2) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x13: // tilegfxbank 2
+		logerror("%s: unkregs_w %04x %02x (tilegfxbank 2)\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x14: // startup
+	case 0x14: // 00 - startup (probably more tilegfxbank 2 bits)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x15: // gfxbank select for sprites
-		logerror("%s: unkregs_w (spritegfx base 1) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x15: // spritegfxbank
+		logerror("%s: unkregs_w  %04x %02x (spritegfxbank)\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x16:
+	case 0x16: // 00 (probably more spritegfxbank bits)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x17: // gfxbank for weird layer
+		logerror("%s: unkregs_w %04x %02x (weird gfx bank)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x18: // more gfxbank for weird layer?
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x18:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
+	// unknowns? another unknown layer?
 	case 0x19:
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
@@ -744,11 +840,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x20: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);  // trkfldch possible xscroll split position (0f)
+		logerror("%s: unkregs_w %04x %02x (window 0 top?)\n", machine().describe_context(), offset, data);  // trkfldch possible scroll window 0 top (0f)
 		break;
 
 	case 0x21: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // trkfldch possible xscroll split position (1f)
+		logerror("%s: unkregs_w %04x %02x (window 0 bottom?)\n", machine().describe_context(), offset, data); // trkfldch possible scroll window 0 bottom (1f)
 		break;
 
 	case 0x22: // rarely
@@ -807,11 +903,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 04
+		logerror("%s: unkregs_w %04x %02x (window 1 top?)\n", machine().describe_context(), offset, data); // 1e / 04 possible scroll window 1 top
 		break;
 
 	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 19
+		logerror("%s: unkregs_w %04x %02x (window 1 bottom?)\n", machine().describe_context(), offset, data); // 1e / 19 possible scroll window 1 bottom
 		break;
 
 
@@ -819,11 +915,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 25  possible yscroll split position (my1stddr) 
+		logerror("%s: unkregs_w %04x %02x (window 1 left)\n", machine().describe_context(), offset, data); // 25  possible scroll window 1 left
 		break;
 
 	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 29  possible yscroll split position (my1stddr) 
+		logerror("%s: unkregs_w %04x %02x (window 1 right)\n", machine().describe_context(), offset, data); // 29  possible scroll window 1 right
 		break;
 
 	case 0x3a:
@@ -849,15 +945,15 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x54: // tilebase 1
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (tilebase 1)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x55: // tilebase 2
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (tilebase 2)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x56: // tilebase 3
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (weird layer base)\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -1034,8 +1130,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0xb6: // significant data transfer shortly after boot, seems to clock writes with 0073 writing  d0 / c0? (then writes 2 bytes here)
-			   // values are coming from a structure in RAM
-			   // how does it reset?
+			   // is this sending song patterns to another CPU?
 
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		m_unkdata[m_unkdata_addr] = data;
@@ -1091,6 +1186,16 @@ void trkfldch_state::machine_reset()
 	m_unkregs[0x6c] = 0x00;
 	m_unkregs[0x6d] = 0x00;
 
+	// maybe, these get reset to this value after actual use in trkfield
+	m_unkregs[0x36] = 0x00;
+	m_unkregs[0x37] = 0x28;
+
+	// trkfld sets these to 1e/1e on javelin, but leaves then uninitizlied before that
+	// it also sets them to 00 / 1e on 'hurdle the hole' (window use)
+	// it also sets them to 00 / 1e on 'hammer throw' (reason unclear)
+	// high jump sets it to 00 / 16 on height select screen
+	m_unkregs[0x33] = 0xde;
+	m_unkregs[0x34] = 0xad;
 }
 
 void trkfldch_state::trkfldch(machine_config &config)
@@ -1129,5 +1234,5 @@ ROM_END
 
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 2006, my1stddr,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 
