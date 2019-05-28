@@ -76,10 +76,27 @@ private:
 
 	uint8_t m_which_vector;
 
+	uint8_t tilemap_scroll_window_r(int which, uint8_t reg, uint16_t real_base);
+
+	DECLARE_READ8_MEMBER(tmap0_scroll_window_r);
+	DECLARE_READ8_MEMBER(tmap1_scroll_window_r);
+
+	void tilemap_scroll_window_w(int which, uint8_t reg, uint8_t data, uint16_t real_base);
+
+	DECLARE_WRITE8_MEMBER(tmap0_scroll_window_w);
+	DECLARE_WRITE8_MEMBER(tmap1_scroll_window_w);
+
+	uint8_t m_dmaregs[0xe];
+
+	DECLARE_READ8_MEMBER(dmaregs_r);
+	DECLARE_WRITE8_MEMBER(dmaregs_w);
+
+	uint8_t m_unkregs[0x100];
+
 	DECLARE_READ8_MEMBER(unkregs_r);
 	DECLARE_WRITE8_MEMBER(unkregs_w);
 
-	uint8_t m_unkregs[0x100];
+	uint8_t m_tmapscroll_window[2][0x12];
 
 	uint8_t m_unkdata[0x100000];
 	int m_unkdata_addr;
@@ -97,39 +114,39 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 //	tilemap 1=  my1stddr HUD layer
 
 
-// first group of tile scroll registers
+// first group of tile scroll registers starting at 7820
 
 //  none of these written by hammer throw in trkfld or ddr
-//	uint8_t unk20 = m_unkregs[0x20]; // 0f - 100 meters  00 - javelin, long jump, triple  00 after events, 1e high jump  -- hurdle holes -- ddr    (assume default of 00?)
-//	uint8_t unk21 = m_unkregs[0x21]; // 1f - 100 meters  00 - javelin, long jump, triple  00 after events, 00 high jump  00 hurdle holes -- ddr    (assume default of 00?)
-//	uint8_t unk22 = m_unkregs[0x22]; // 1f - 100 meters  1e - javelin, long jump, triple  1e after events, 1e high jump  1e hurdle holes -- ddr    (assume default of 1e?)
-//	uint8_t unk23 = m_unkregs[0x23]; // -- - 100 meters, 1e - javelin, long jump, triple  -- after events, -- high jump  -- hurdle holes -- ddr    (assume default of 1e?)
-//	uint8_t unk24 = m_unkregs[0x24]; //                                                   00 after events                00 hurdle holes -- ddr    (assume default of 00?)
-//	uint8_t unk25 = m_unkregs[0x25]; //                                                   28 after events                14 hurdle holes -- ddr    (assume default of 28?)
+//	uint8_t unk20 = m_tmapscroll_window[0][0x00]; // 0f - 100 meters  00 - javelin, long jump, triple  00 after events, 1e high jump  -- hurdle holes -- ddr    (assume default of 00?)
+//	uint8_t unk21 = m_tmapscroll_window[0][0x01]; // 1f - 100 meters  00 - javelin, long jump, triple  00 after events, 00 high jump  00 hurdle holes -- ddr    (assume default of 00?)
+//	uint8_t unk22 = m_tmapscroll_window[0][0x02]; // 1f - 100 meters  1e - javelin, long jump, triple  1e after events, 1e high jump  1e hurdle holes -- ddr    (assume default of 1e?)
+//	uint8_t unk23 = m_tmapscroll_window[0][0x03]; // -- - 100 meters, 1e - javelin, long jump, triple  -- after events, -- high jump  -- hurdle holes -- ddr    (assume default of 1e?)
+//	uint8_t unk24 = m_tmapscroll_window[0][0x04]; //                                                   00 after events                00 hurdle holes -- ddr    (assume default of 00?)
+//	uint8_t unk25 = m_tmapscroll_window[0][0x05]; //                                                   28 after events                14 hurdle holes -- ddr    (assume default of 28?)
 
-//	uint16_t xscroll = (m_unkregs[0x26] << 0) | (m_unkregs[0x27] << 8); // trkfld tilemap 0, race top            //	why do the split screen races use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
-//	uint16_t xscroll = (m_unkregs[0x28] << 0) | (m_unkregs[0x29] << 8); // trkfld tilemap 0, race bot (window?)
-//	uint16_t xscroll = (m_unkregs[0x2a] << 0) | (m_unkregs[0x2b] << 8); // trkfld tilemap 0?, javelin
-//  2c,2d never written
-//  2e,2f never written
-//	uint16_t yscroll = (m_unkregs[0x30] << 0) | (m_unkregs[0x31] << 8); // trkfld tilemap 0, javelin, holes, hammer throw
+//	uint16_t xscroll = (m_tmapscroll_window[0][0x06] << 0) | (m_tmapscroll_window[0][0x07] << 8); // trkfld tilemap 0, race top            //	why do the split screen races use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
+//	uint16_t xscroll = (m_tmapscroll_window[0][0x08] << 0) | (m_tmapscroll_window[0][0x09] << 8); // trkfld tilemap 0, race bot (window?)
+//	uint16_t xscroll = (m_tmapscroll_window[0][0x0a] << 0) | (m_tmapscroll_window[0][0x0b] << 8); // trkfld tilemap 0?, javelin
+//  0c,0d never written
+//  0e,0f never written
+//	uint16_t yscroll = (m_tmapscroll_window[0][0x10] << 0) | (m_tmapscroll_window[0][0x11] << 8); // trkfld tilemap 0, javelin, holes, hammer throw
 
-// second group of tile scroll registers?
+// second group of tile scroll registers starting at 7832
 
 //  32 never written                                                                                                                                        (assume default of 00? to fit 20-25 pattern?)
-//	uint8_t windowtop    = m_unkregs[0x33]; // 0x00 - on trkfld hurdle the holes (also resets to 0x00 &  after event - possible default values)             (assume default of 00?)
-//	uint8_t windowbottom = m_unkregs[0x34]; // 0x1e   ^                                          0x1e                                                       (assume default of 1e?)
-//  uint8_t unk35        = m_unkregs[0x35];  set to 1e (30) (30*8=240) by trkfld high jump otherwise uninitialized always - something to do with bottom     (assume default of 1e?)
+//	uint8_t windowtop    = m_tmapscroll_window[1][0x01]; // 0x00 - on trkfld hurdle the holes (also resets to 0x00 &  after event - possible default values)             (assume default of 00?)
+//	uint8_t windowbottom = m_tmapscroll_window[1][0x02]; // 0x1e   ^                                          0x1e                                                       (assume default of 1e?)
+//  uint8_t unk35        = m_tmapscroll_window[1][0x03];  set to 1e (30) (30*8=240) by trkfld high jump otherwise uninitialized always - something to do with bottom     (assume default of 1e?)
 //  for left / right on tilemap 1
-//	uint8_t windowleft   = m_unkregs[0x36];  //0x29  when unused on my1stddr, 0x25 when used   14 when used on hurdle holes, resets to 00 after event       (assume default of 00?)
-//	uint8_t windowright  = m_unkregs[0x37];  //0x29                           0x29             28 when used on hurdle holes, resets to 28 after event       (assume default of 28?)
+//	uint8_t windowleft   = m_tmapscroll_window[1][0x04];  //0x29  when unused on my1stddr, 0x25 when used   14 when used on hurdle holes, resets to 00 after event       (assume default of 00?)
+//	uint8_t windowright  = m_tmapscroll_window[1][0x05];  //0x29                           0x29             28 when used on hurdle holes, resets to 28 after event       (assume default of 28?)
 
-//  38,39 never written
-// 	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
-//  3c,3d never written
-//  3e,3f never written
-//  40,41 never written
-//	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
+//  06,076never written
+// 	uint16_t xscroll = (m_tmapscroll_window[1][0x08] << 0) | (m_tmapscroll_window[1][0x09] << 8); // trkfld tilemap 1?, javelin
+//  0a,0b never written
+//  0c,0d never written
+//  0e,0f never written
+//	uint16_t yscroll = (m_tmapscroll_window[1][0x10] << 0) | (m_tmapscroll_window[1][0x11] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
 
 //	printf("window %02x %02x  %02x %02x  %02x %02x\n", unk20, unk21, unk22, unk23, unk24, unk25);
 //	printf("xscroll %04x\n", xscroll);
@@ -360,7 +377,242 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 	return 0;
 }
 
+uint8_t trkfldch_state::tilemap_scroll_window_r(int which, uint8_t reg, uint16_t real_base)
+{
+	uint8_t ret = m_tmapscroll_window[which][reg];
+	logerror("%s: tilemap_scroll_window_r (tilemap %d) reg: %02x (returning %02x) (real address %04x)\n", machine().describe_context(), which, reg, ret, real_base + reg);
+	return ret;
+}
 
+READ8_MEMBER(trkfldch_state::tmap0_scroll_window_r)
+{
+	uint8_t ret = tilemap_scroll_window_r(0, offset, 0x7820);
+	return ret;
+}
+
+READ8_MEMBER(trkfldch_state::tmap1_scroll_window_r)
+{
+	uint8_t ret = tilemap_scroll_window_r(1, offset, 0x7832);
+	return ret;
+}
+
+void trkfldch_state::tilemap_scroll_window_w(int which, uint8_t reg, uint8_t data, uint16_t real_base)
+{
+	m_tmapscroll_window[which][reg] = data;
+
+	switch (reg)
+	{
+	case 0x00:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window top reg0?) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x01:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window top reg1?) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x02:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window bottom reg0?) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x03:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window bottom reg1?) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x04:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window left reg) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x05:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window right reg) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x06:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (non-window X scroll low) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x07:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (non-window X scroll high) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x08:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window X scroll low) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x09:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window X scroll high) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x0a:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (another X scroll low) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x0b:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (another X scroll high) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x0c:
+		// unused, probably unknown Y scroll low
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (unknown) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x0d:
+		// unused, probably unknown Y scroll low
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (unknown) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x0e:
+		// unused, probably unknown Y scroll low
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (unknown) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x0f:
+		// unused, probably unknown Y scroll low
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (unknown) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x10:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window Y scroll low) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+
+	case 0x11:
+		logerror("%s: tilemap_scroll_window_w (tilemap %d) reg: %02x (window Y scroll high) (data %02x) (real address %04x)\n", machine().describe_context(), which, reg, data, real_base + reg);
+		break;
+	}
+}
+
+WRITE8_MEMBER(trkfldch_state::tmap0_scroll_window_w)
+{
+	tilemap_scroll_window_w(0, offset, data, 0x7820);
+}
+
+WRITE8_MEMBER(trkfldch_state::tmap1_scroll_window_w)
+{
+	tilemap_scroll_window_w(1, offset, data, 0x7832);
+}
+
+
+
+
+READ8_MEMBER(trkfldch_state::dmaregs_r)
+{
+	uint8_t ret = m_dmaregs[offset];
+	logerror("%s: dmaregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+WRITE8_MEMBER(trkfldch_state::dmaregs_w)
+{
+	m_dmaregs[offset] = data;
+
+	switch (offset)
+	{
+
+	case 0x00: // sprite list location (dma source?)
+		logerror("%s: dmaregs_w %04x %02x (dma source low )\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x01: // sprite list location (dma source?)
+		logerror("%s: dmaregs_w %04x %02x (dma source med )\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x02:
+		logerror("%s: dmaregs_w %04x %02x (dma source high)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x03:
+		logerror("%s: dmaregs_w %04x %02x (dma dest low )\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x04:
+		logerror("%s: dmaregs_w %04x %02x (dma dest high)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x05:
+		logerror("%s: dmaregs_w %04x %02x (dma length low ) (and trigger)\n", machine().describe_context(), offset, data);
+		{
+			address_space& mem = m_maincpu->space(AS_PROGRAM);
+			uint16_t dmalength = (m_dmaregs[0x06] << 8) | m_dmaregs[0x05];
+			uint32_t dmasource = (m_dmaregs[0x02] << 16) | (m_dmaregs[0x01] << 8) | m_dmaregs[0x00];
+			uint16_t dmadest = (m_dmaregs[0x04] << 8) | m_dmaregs[0x03];
+
+			//if (dmadest != 0x6800)
+			logerror("%s: performing dma src: %06x dst %04x len %04x and extra params %02x %02x %02x %02x %02x %02x\n", machine().describe_context(), dmasource, dmadest, dmalength, m_dmaregs[0x07], m_dmaregs[0x08], m_dmaregs[0x09], m_dmaregs[0x0b], m_dmaregs[0x0c], m_dmaregs[0x0d]);
+
+			int writeoffset = 0;
+			int writedo = m_dmaregs[0x0d];
+
+			int readoffset = 0;
+			int readdo = m_dmaregs[0x09];
+
+			if ((m_dmaregs[0x08] != 0x00) || (m_dmaregs[0x0c] != 0x00))
+			{
+				fatalerror("unhandled dma params\n");
+			}
+
+			for (uint32_t j = 0; j < dmalength; j++)
+			{
+				uint8_t byte = mem.read_byte(dmasource + readoffset);
+				readdo--;
+				if (readdo < 0)
+				{
+					readdo = m_dmaregs[0x09];
+					readoffset += m_dmaregs[0x07];
+				}
+				else
+				{
+					readoffset++;
+				}
+
+				mem.write_byte(dmadest + writeoffset, byte);
+				writedo--;
+				if (writedo < 0)
+				{
+					writedo = m_dmaregs[0x0d];
+					writeoffset += m_dmaregs[0xb];
+				}
+				else
+				{
+					writeoffset++;
+				}
+
+			}
+		}
+		break;
+
+	case 0x06:
+		logerror("%s: dmaregs_w %04x %02x (dma length high)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x07: // after a long time
+		logerror("%s: dmaregs_w %04x %02x (dma source read skip size)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x08: // rarely (my1stddr)
+		logerror("%s: dmaregs_w %04x %02x (dma source unknown)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x09: // after a long time
+		logerror("%s: dmaregs_w %04x %02x (dma source read group size)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0a: // unused?
+		logerror("%s: dmaregs_w %04x %02x (dma unused)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0b: // after a long time
+		logerror("%s: dmaregs_w %04x %02x (dma dest write skip size)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0c: // rarely (my1stddr)
+		logerror("%s: dmaregs_w %04x %02x (dma dest unknown)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0d: // after a long time
+		logerror("%s: dmaregs_w %04x %02x (dma dest write group size)\n", machine().describe_context(), offset, data);
+		break;
+
+	}
+}
 
 
 void trkfldch_state::trkfldch_map(address_map &map)
@@ -373,6 +625,11 @@ void trkfldch_state::trkfldch_map(address_map &map)
 
 	// 7800 - 78xx look like registers?
 	map(0x007800, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
+
+	map(0x007820, 0x007831).rw(FUNC(trkfldch_state::tmap0_scroll_window_r), FUNC(trkfldch_state::tmap0_scroll_window_w));
+	map(0x007832, 0x007843).rw(FUNC(trkfldch_state::tmap1_scroll_window_r), FUNC(trkfldch_state::tmap1_scroll_window_w));
+
+	map(0x007860, 0x00786d).rw(FUNC(trkfldch_state::dmaregs_r), FUNC(trkfldch_state::dmaregs_w));
 
 	map(0x008000, 0x3fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
@@ -854,113 +1111,6 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 
-	case 0x20: // rarely
-		logerror("%s: unkregs_w %04x %02x (window 0 top?)\n", machine().describe_context(), offset, data);  // trkfldch possible scroll window 0 top (0f)
-		break;
-
-	case 0x21: // rarely
-		logerror("%s: unkregs_w %04x %02x (window 0 bottom?)\n", machine().describe_context(), offset, data); // trkfldch possible scroll window 0 bottom (1f)
-		break;
-
-	case 0x22: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1f
-		break;
-
-	case 0x23: // after a long time
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e
-		break;
-
-	case 0x24: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
-		break;
-
-	case 0x25: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 00
-		break;
-
-	case 0x26:
-		logerror("%s: unkregs_w %04x %02x (x scroll 2 low) upper\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
-		break;
-
-	case 0x27:
-		logerror("%s: unkregs_w %04x %02x (x scroll 2 high) upper\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
-		break;
-
-	case 0x28:
-		logerror("%s: unkregs_w %04x %02x (x scroll 2 low) lower\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
-		break;
-
-	case 0x29:
-		logerror("%s: unkregs_w %04x %02x (x scroll 2 high) lower\n", machine().describe_context(), offset, data); // trkfldch running (split screen)
-		break;
-
-	case 0x2a:
-		logerror("%s: unkregs_w %04x %02x (x scroll 1 low)\n", machine().describe_context(), offset, data); // trkfldch jav
-		break;
-
-	case 0x2b:
-		logerror("%s: unkregs_w %04x %02x (x scroll 1 high)\n", machine().describe_context(), offset, data); // trkfldch jav
-		break;
-
-
-
-
-	case 0x30:
-		logerror("%s: unkregs_w %04x %02x (y scroll 1 low)\n", machine().describe_context(), offset, data); // trkfldch jav, hammer
-		break;
-
-	case 0x31:
-		logerror("%s: unkregs_w %04x %02x (y scroll 1 high)\n", machine().describe_context(), offset, data); // trkfldch jav, hammer
-		break;
-
-	case 0x32: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 19 / 00
-		break;
-
-	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x (window 1 top?)\n", machine().describe_context(), offset, data); // 1e / 04 possible scroll window 1 top
-		break;
-
-	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x (window 1 bottom?)\n", machine().describe_context(), offset, data); // 1e / 19 possible scroll window 1 bottom
-		break;
-
-
-	case 0x35: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // set to 1e by trkfld high jump
-		break;
-
-
-	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x (window 1 left)\n", machine().describe_context(), offset, data); // 25  possible scroll window 1 left
-		break;
-
-	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x (window 1 right)\n", machine().describe_context(), offset, data); // 29  possible scroll window 1 right
-		break;
-
-	case 0x3a:
-		logerror("%s: unkregs_w %04x %02x (x scroll 2 low)\n", machine().describe_context(), offset, data);  // trkfldch jav
-		break;
-
-	case 0x3b:
-		logerror("%s: unkregs_w %04x %02x (x scroll 2 high)\n", machine().describe_context(), offset, data);  // trkfldch jav
-		break;
-
-
-
-
-	case 0x42:
-		logerror("%s: unkregs_w %04x %02x (y scroll 2 low)\n", machine().describe_context(), offset, data); // my1stddr text scroller on right
-		break;
-
-	case 0x43:
-		logerror("%s: unkregs_w %04x %02x (y scroll 2 high)\n", machine().describe_context(), offset, data); // my1stddr text scroller on right
-		break;
-
-
-
-
 	case 0x54: // tilebase 1
 		logerror("%s: unkregs_w %04x %02x (tilebase 1)\n", machine().describe_context(), offset, data);
 		break;
@@ -974,106 +1124,6 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 
-
-	case 0x60: // sprite list location (dma source?)
-		logerror("%s: unkregs_w %04x %02x (dma source low )\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x61: // sprite list location (dma source?)
-		logerror("%s: unkregs_w %04x %02x (dma source med )\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x62:
-		logerror("%s: unkregs_w %04x %02x (dma source high)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x63:
-		logerror("%s: unkregs_w %04x %02x (dma dest low )\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x64:
-		logerror("%s: unkregs_w %04x %02x (dma dest high)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x65:
-		logerror("%s: unkregs_w %04x %02x (dma length low ) (and trigger)\n", machine().describe_context(), offset, data);
-		{
-			address_space &mem = m_maincpu->space(AS_PROGRAM);
-			uint16_t dmalength = (m_unkregs[0x66] << 8) | m_unkregs[0x65];
-			uint32_t dmasource = (m_unkregs[0x62] << 16) | (m_unkregs[0x61] << 8) | m_unkregs[0x60];
-			uint16_t dmadest = (m_unkregs[0x64] << 8) | m_unkregs[0x63];
-
-			//if (dmadest != 0x6800)
-			logerror("%s: performing dma src: %06x dst %04x len %04x and extra params %02x %02x %02x %02x %02x %02x\n", machine().describe_context(), dmasource, dmadest, dmalength, m_unkregs[0x67], m_unkregs[0x68], m_unkregs[0x69], m_unkregs[0x6b], m_unkregs[0x6c], m_unkregs[0x6d]);
-
-			int writeoffset = 0;
-			int writedo = m_unkregs[0x6d];
-
-			int readoffset = 0;
-			int readdo = m_unkregs[0x69];
-
-			if ((m_unkregs[0x68] != 0x00) || (m_unkregs[0x6c] != 0x00))
-			{
-				fatalerror("unhandled dma params\n");
-			}
-
-			for (uint32_t j = 0; j < dmalength; j++)
-			{
-				uint8_t byte = mem.read_byte(dmasource+readoffset);
-				readdo--;
-				if (readdo < 0)
-				{
-					readdo = m_unkregs[0x69];
-					readoffset += m_unkregs[0x67];
-				}
-				else
-				{
-					readoffset++;
-				}
-
-				mem.write_byte(dmadest+writeoffset, byte);
-				writedo--;
-				if (writedo < 0)
-				{
-					writedo = m_unkregs[0x6d];
-					writeoffset += m_unkregs[0x6b];
-				}
-				else
-				{
-					writeoffset++;
-				}
-
-			}
-		}
-		break;
-
-	case 0x66:
-		logerror("%s: unkregs_w %04x %02x (dma length high)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x67: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma source read skip size)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x68: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x (dma source unknown)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x69: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma source read group size)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x6b: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma dest write skip size)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x6c: // rarely (my1stddr)
-		logerror("%s: unkregs_w %04x %02x (dma dest unknown)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x6d: // after a long time
-		logerror("%s: unkregs_w %04x %02x (dma dest write group size)\n", machine().describe_context(), offset, data);
-		break;
 
 
 
@@ -1192,36 +1242,42 @@ void trkfldch_state::machine_reset()
 	for (int i = 0; i < 0x100000; i++)
 		m_unkdata[i] = 0;
 
+	for (int j = 0; j < 2; j++)
+		for (int i = 0; i < 0x12; i++)
+			m_tmapscroll_window[j][i] = 0x00;
+
+	for (int i = 0; i < 0xe; i++)
+		m_dmaregs[i] = 0x00;
+
 	m_unkdata_addr = 0;
 
 	// the game code doesn't set the DMA step / skip params to default values until after it's used them with other values, so assume they reset to these
-	m_unkregs[0x67] = 0x01;
-	m_unkregs[0x68] = 0x00;
-	m_unkregs[0x69] = 0x00;
+	m_dmaregs[0x07] = 0x01;
+	m_dmaregs[0x08] = 0x00;
+	m_dmaregs[0x09] = 0x00;
 
-	m_unkregs[0x6b] = 0x01;
-	m_unkregs[0x6c] = 0x00;
-	m_unkregs[0x6d] = 0x00;
-
-	// maybe, these get reset to this value after actual use in trkfield
-	m_unkregs[0x36] = 0xde;// 0x00;
-	m_unkregs[0x37] = 0xad;// 0x28;
+	m_dmaregs[0x0b] = 0x01;
+	m_dmaregs[0x0c] = 0x00;
+	m_dmaregs[0x0d] = 0x00;
 
 	// trkfld sets these to 1e/1e on javelin, but leaves then uninitizlied before that
 	// it also sets them to 00 / 1e on 'hurdle the hole' (window use)
 	// it also sets them to 00 / 1e on 'hammer throw' (reason unclear)
 	// high jump sets it to 00 / 16 on height select screen
-	m_unkregs[0x33] = 0xde;
-	m_unkregs[0x34] = 0xad;
+	m_tmapscroll_window[1][0x01] = 0xde;
+	m_tmapscroll_window[1][0x02] = 0xad;
+	m_tmapscroll_window[1][0x03] = 0x1e; // trkfld sets this after high jump
 
-	m_unkregs[0x35] = 0x1e; // trkfld sets this after high jump
+	// maybe, these get reset to this value after actual use in trkfield
+	m_tmapscroll_window[1][0x04] = 0xde;// 0x00;
+	m_tmapscroll_window[1][0x05] = 0xad;// 0x28;
 
-	m_unkregs[0x20] = 0xde;
-	m_unkregs[0x21] = 0xad;
-	m_unkregs[0x22] = 0xde;
-	m_unkregs[0x23] = 0xad;
-	m_unkregs[0x24] = 0xde; // gets set to 0x00 (00) on trkfld results screens
-	m_unkregs[0x25] = 0xad; // gets set to 0x28 (40) on trkfld resutls screens
+	m_tmapscroll_window[0][0x00] = 0xde;
+	m_tmapscroll_window[0][0x01] = 0xad;
+	m_tmapscroll_window[0][0x02] = 0xde;
+	m_tmapscroll_window[0][0x03] = 0xad;
+	m_tmapscroll_window[0][0x04] = 0xde; // gets set to 0x00 (00) on trkfld results screens
+	m_tmapscroll_window[0][0x05] = 0xad; // gets set to 0x28 (40) on trkfld resutls screens
 }
 
 void trkfldch_state::trkfldch(machine_config &config)
