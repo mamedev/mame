@@ -82,13 +82,8 @@ protected:
 private:
 	required_shared_ptr<uint16_t> m_eprom_data;
 
-	int m_gun_select;
-
 	DECLARE_READ16_MEMBER(eprom_r);
-	DECLARE_READ16_MEMBER(control_3_r);
-	DECLARE_WRITE16_MEMBER(gun_select_w);
 	DECLARE_WRITE16_MEMBER(three_gun_output_w);
-	DECLARE_READ16_MEMBER(kludge_r);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bbusters_map(address_map &map);
