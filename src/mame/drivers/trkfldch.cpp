@@ -1147,7 +1147,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	default:
-		printf("%s: unkregs_w %04x %02x\n", machine().describe_context().c_str(), offset, data);
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 	}
 
