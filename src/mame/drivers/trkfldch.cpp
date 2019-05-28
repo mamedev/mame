@@ -1009,35 +1009,35 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 	{
 	case 0x00: // IRQ status?, see above
 		ret = machine().rand();
-		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x01: // IRQ status?, see above
 		ret = machine().rand();
-		logerror("%s: unkregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x02: // ends up being read as a side effect of reading a 16-bit word at 0x1, but also directly too?
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x03: // ends up being read as a side effect of reading a 16-bit word at 0x2, any other purpose?
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
 	case 0x04:
 		ret = 0xff;
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x05: // only read as a side effect of reading port 0x4 in 16-bit mode?
 		ret = 0xff;
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x06:
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 	}
 
