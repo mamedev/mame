@@ -105,15 +105,23 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 //	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
 //	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
 
+// for left / right on tilemap 1
 //	0x14 & 0x28  (20 and 40) on trkfld hurdle the holes (resets to 0x00 & 0x28 after event - possible default values)
 //	0x29 & 0x29 when unused on my1stddr, 0x25 & 0x29 when used
 //	uint8_t windowleft = m_unkregs[0x36];
 //	uint8_t windowright = m_unkregs[0x37];
 
+//  for top/bottom on tilemap 1
+//	uint8_t windowtop = m_unkregs[0x33];
+//	uint8_t windowbottom = m_unkregs[0x34];
+
 
 //	printf("xscroll %04x\n", xscroll);
 //	printf("yscroll %04x\n", yscroll);
 //	printf("window left/right %02x %02x\n", windowleft, windowright);
+
+//	printf("window top/bottom %02x %02x\n", windowtop, windowbottom);
+
 
 	int base, gfxbase, gfxregion;
 	int tilexsize = 8;
@@ -426,8 +434,55 @@ TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::scanline)
 
 }
 
-
 static INPUT_PORTS_START( trkfldch )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( my1stddr )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1135,7 +1190,12 @@ void trkfldch_state::machine_reset()
 	m_unkregs[0x36] = 0x00;
 	m_unkregs[0x37] = 0x28;
 
-
+	// trkfld sets these to 1e/1e on javelin, but leaves then uninitizlied before that
+	// it also sets them to 00 / 1e on 'hurdle the hole' (window use)
+	// it also sets them to 00 / 1e on 'hammer throw' (reason unclear)
+	// high jump sets it to 00 / 16 on height select screen
+	m_unkregs[0x33] = 0xde;
+	m_unkregs[0x34] = 0xad;
 }
 
 void trkfldch_state::trkfldch(machine_config &config)
@@ -1174,5 +1234,5 @@ ROM_END
 
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 2006, my1stddr,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 
