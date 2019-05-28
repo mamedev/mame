@@ -66,7 +66,7 @@ private:
 
 	void draw_sprites(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int pri);
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
-	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize);
+	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int which);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
 
@@ -90,8 +90,58 @@ void trkfldch_state::video_start()
 {
 }
 
-void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize)
+void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int which)
 {
+//	tilemap 0 = trkfld events, my1stddr background 
+
+//	tilemap 1=  my1stddr HUD layer
+
+//	why does this use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
+//	uint16_t xscroll = (m_unkregs[0x26] << 0) | (m_unkregs[0x27] << 8); // trkfld tilemap 0, race top
+//	uint16_t xscroll = (m_unkregs[0x28] << 0) | (m_unkregs[0x29] << 8); // trkfld tilemap 0, race bot (window?)
+
+//	uint16_t xscroll = (m_unkregs[0x2a] << 0) | (m_unkregs[0x2b] << 8); // trkfld tilemap 0?, javelin
+//	uint16_t yscroll = (m_unkregs[0x30] << 0) | (m_unkregs[0x31] << 8); // trkfld tilemap 0, javelin, holes, hammer throw
+//	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
+//	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
+
+//	0x14 & 0x28  (20 and 40) on trkfld hurdle the holes (resets to 0x00 & 0x28 after event - possible default values)
+//	0x29 & 0x29 when unused on my1stddr, 0x25 & 0x29 when used
+//	uint8_t windowleft = m_unkregs[0x36];
+//	uint8_t windowright = m_unkregs[0x37];
+
+
+//	printf("xscroll %04x\n", xscroll);
+//	printf("yscroll %04x\n", yscroll);
+//	printf("window left/right %02x %02x\n", windowleft, windowright);
+
+	int base, gfxbase, gfxregion;
+	int tilexsize = 8;
+
+	if (which == 0)
+	{
+		base = (m_unkregs[0x54] << 8);
+		gfxbase = (m_unkregs[0x11] * 0x2000);
+	}
+	else //if (which == 1)
+	{
+		base = (m_unkregs[0x55] << 8);
+		gfxbase = (m_unkregs[0x13] * 0x2000);
+	}
+
+	if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+	{
+		gfxbase -= 0x200;
+		gfxregion = 0;
+	}
+	else
+	{
+		gfxbase -= 0x2ac;
+		gfxregion = 2;
+	}
+
+
+
 	for (int y = 0; y < 30; y++)
 	{
 		for (int x = 0; x < 41; x++)
@@ -118,7 +168,7 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 
 			tile &= 0x1fff;
 
-			tile += tileadd;
+			tile += gfxbase;
 
 			gfx_element* gfx = m_gfxdecode->gfx(gfxregion);
 
@@ -266,45 +316,14 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 	if (1) // one of the m_unkregs[0x10] bits almost certainly would enable / disable this
 	{
-		int base = (m_unkregs[0x54] << 8);
-		int gfxbase = (m_unkregs[0x11] * 0x2000);
-		int tilexsize = 8;
-		int gfxregion;
-		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
-		{
-			gfxbase -= 0x200;
-			gfxregion = 0;
-			tilexsize = 8;
-		}
-		else
-		{
-			gfxbase -= 0x2ac;
-			gfxregion = 2;
-			tilexsize = 8;
-		}
-		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
+		render_tile_layer(screen, bitmap, cliprect, 0);
 	}
 
 	draw_sprites(screen, bitmap, cliprect, 0);
 
 	if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
 	{
-		int base = (m_unkregs[0x55] << 8);
-		int gfxbase = (m_unkregs[0x13] * 0x2000);
-		int tilexsize = 8;
-		int gfxregion;
-
-		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
-		{
-			gfxbase -= 0x200;
-			gfxregion = 0;
-		}
-		else
-		{
-			gfxbase -= 0x2ac;
-			gfxregion = 2;
-		}
-		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
+		render_tile_layer(screen, bitmap, cliprect, 1);
 	}
 
 	draw_sprites(screen, bitmap, cliprect, 1);
@@ -314,7 +333,6 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		int base = (m_unkregs[0x56] << 8);
 		render_text_tile_layer(screen, bitmap, cliprect, base);
 	}
-
 
 	return 0;
 }
@@ -715,44 +733,46 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 
-	// is it significant that 0x10 goes up to 0x1a, 0x20 to 0x2b, 0x30 to 0x3b could be 3 sets of similar things?
 
-	case 0x10: // gfxmode select (4bpp / 8bpp) for sprites? maybe
-		logerror("%s: unkregs_w (bpp select) %04x %02x\n", machine().describe_context(), offset, data);
+
+
+	case 0x10: // gfxmode select (4bpp / 8bpp) and layer enables
+		logerror("%s: unkregs_w (enable, bpp select) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x11: // tilegfx base 1
-		logerror("%s: unkregs_w (tilegfx base 1) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x11: // tilegfxbank 1
+		logerror("%s: unkregs_w %04x %02x (tilegfxbank 1)\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x12: // startup
+	case 0x12: // 00 - startup (probably more tilegfxbank 1 bits)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x13: // tilegfx base 2
-		logerror("%s: unkregs_w (tilegfx base 2) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x13: // tilegfxbank 2
+		logerror("%s: unkregs_w %04x %02x (tilegfxbank 2)\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x14: // startup
+	case 0x14: // 00 - startup (probably more tilegfxbank 2 bits)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x15: // gfxbank select for sprites
-		logerror("%s: unkregs_w (spritegfx base 1) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x15: // spritegfxbank
+		logerror("%s: unkregs_w  %04x %02x (spritegfxbank)\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x16:
+	case 0x16: // 00 (probably more spritegfxbank bits)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x17: // gfxbank for weird layer
+		logerror("%s: unkregs_w %04x %02x (weird gfx bank)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x18: // more gfxbank for weird layer?
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x18:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
+	// unknowns? another unknown layer?
 	case 0x19:
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
@@ -765,11 +785,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x20: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);  // trkfldch possible scroll window 0 top (0f)
+		logerror("%s: unkregs_w %04x %02x (window 0 top?)\n", machine().describe_context(), offset, data);  // trkfldch possible scroll window 0 top (0f)
 		break;
 
 	case 0x21: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // trkfldch possible scroll window 0 bottom (1f)
+		logerror("%s: unkregs_w %04x %02x (window 0 bottom?)\n", machine().describe_context(), offset, data); // trkfldch possible scroll window 0 bottom (1f)
 		break;
 
 	case 0x22: // rarely
@@ -828,11 +848,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0x33: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 04 possible scroll window 1 top
+		logerror("%s: unkregs_w %04x %02x (window 1 top?)\n", machine().describe_context(), offset, data); // 1e / 04 possible scroll window 1 top
 		break;
 
 	case 0x34: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 1e / 19 possible scroll window 1 bottom
+		logerror("%s: unkregs_w %04x %02x (window 1 bottom?)\n", machine().describe_context(), offset, data); // 1e / 19 possible scroll window 1 bottom
 		break;
 
 
@@ -840,11 +860,11 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x36: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 25  possible scroll window 1 left
+		logerror("%s: unkregs_w %04x %02x (window 1 left)\n", machine().describe_context(), offset, data); // 25  possible scroll window 1 left
 		break;
 
 	case 0x37: // rarely
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data); // 29  possible scroll window 1 right
+		logerror("%s: unkregs_w %04x %02x (window 1 right)\n", machine().describe_context(), offset, data); // 29  possible scroll window 1 right
 		break;
 
 	case 0x3a:
@@ -870,15 +890,15 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	case 0x54: // tilebase 1
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (tilebase 1)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x55: // tilebase 2
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (tilebase 2)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x56: // tilebase 3
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unkregs_w %04x %02x (weird layer base)\n", machine().describe_context(), offset, data);
 		break;
 
 
@@ -1072,7 +1092,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 
 
 	default:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		printf("%s: unkregs_w %04x %02x\n", machine().describe_context().c_str(), offset, data);
 		break;
 	}
 
@@ -1110,6 +1130,11 @@ void trkfldch_state::machine_reset()
 	m_unkregs[0x6b] = 0x01;
 	m_unkregs[0x6c] = 0x00;
 	m_unkregs[0x6d] = 0x00;
+
+	// maybe, these get reset to this value after actual use in trkfield
+	m_unkregs[0x36] = 0x00;
+	m_unkregs[0x37] = 0x28;
+
 
 }
 
