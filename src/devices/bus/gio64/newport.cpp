@@ -43,27 +43,27 @@
 #define VERBOSE         (0)//(LOG_REX3 | LOG_COMMANDS)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device,  "gio_xl8",  "SGI 8-bit XL board")
-DEFINE_DEVICE_TYPE(GIO_XL24, gio_xl24_device, "gio_xl24", "SGI 24-bit XL board")
+DEFINE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device,  "gio64_xl8",  "SGI 8-bit XL board")
+DEFINE_DEVICE_TYPE(GIO64_XL24, gio64_xl24_device, "gio64_xl24", "SGI 24-bit XL board")
 
 /*static*/ const uint32_t newport_base_device::s_host_shifts[4] = { 8, 8, 16, 32 };
 
 newport_base_device::newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
-	, device_gio_card_interface(mconfig, *this)
+	, device_gio64_card_interface(mconfig, *this)
 	, m_screen(*this, "screen")
 	, m_global_mask(global_mask)
 {
 }
 
-gio_xl8_device::gio_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: newport_base_device(mconfig, GIO_XL8, tag, owner, clock, 0x000000ff)
+gio64_xl8_device::gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: newport_base_device(mconfig, GIO64_XL8, tag, owner, clock, 0x000000ff)
 {
 }
 
-gio_xl24_device::gio_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: newport_base_device(mconfig, GIO_XL24, tag, owner, clock, 0xffffffff)
+gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: newport_base_device(mconfig, GIO64_XL24, tag, owner, clock, 0xffffffff)
 {
 }
 
@@ -762,12 +762,12 @@ uint32_t newport_base_device::cmap1_read()
 	}
 }
 
-uint32_t gio_xl8_device::get_cmap_revision()
+uint32_t gio64_xl8_device::get_cmap_revision()
 {
 	return 0xa1;
 }
 
-uint32_t gio_xl24_device::get_cmap_revision()
+uint32_t gio64_xl24_device::get_cmap_revision()
 {
 	return 0x02;
 }
@@ -972,12 +972,12 @@ void newport_base_device::xmap1_write(uint32_t data)
 	}
 }
 
-uint32_t gio_xl8_device::get_xmap_revision()
+uint32_t gio64_xl8_device::get_xmap_revision()
 {
 	return 1;
 }
 
-uint32_t gio_xl24_device::get_xmap_revision()
+uint32_t gio64_xl24_device::get_xmap_revision()
 {
 	return 3;
 }
@@ -1313,7 +1313,7 @@ WRITE_LINE_MEMBER(newport_base_device::vblank_w)
 		if (BIT(m_vc2.m_display_ctrl, 0))
 		{
 			m_rex3.m_status |= STATUS_VRINT;
-			m_gio->get_hpc3()->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+			m_gio64->get_hpc3()->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 		}
 	}
 }
@@ -1749,7 +1749,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 			LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
 			uint32_t old_status = m_rex3.m_status;
 			m_rex3.m_status &= ~STATUS_VRINT;
-			m_gio->get_hpc3()->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+			m_gio64->get_hpc3()->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 			ret |= (uint64_t)(old_status | 3) << 32;
 		}
 		if (ACCESSING_BITS_0_31)
@@ -3907,7 +3907,7 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 
 void newport_base_device::install_device()
 {
-	m_gio->install_graphics(*this, &newport_base_device::mem_map);
+	m_gio64->install_graphics(*this, &newport_base_device::mem_map);
 }
 
 void newport_base_device::device_add_mconfig(machine_config &config)

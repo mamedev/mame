@@ -9,14 +9,14 @@
 
 #pragma once
 
-#include "gio.h"
+#include "gio64.h"
 #include "screen.h"
 
 #define ENABLE_NEWVIEW_LOG      (0)
 
 class newport_base_device : public device_t
 						  , public device_palette_interface
-						  , public device_gio_card_interface
+						  , public device_gio64_card_interface
 {
 public:
 	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask);
@@ -317,27 +317,27 @@ protected:
 	static const uint32_t s_host_shifts[4];
 };
 
-class gio_xl8_device : public newport_base_device
+class gio64_xl8_device : public newport_base_device
 {
 public:
-	gio_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 protected:
 	virtual uint32_t get_cmap_revision() override;
 	virtual uint32_t get_xmap_revision() override;
 };
 
-class gio_xl24_device : public newport_base_device
+class gio64_xl24_device : public newport_base_device
 {
 public:
-	gio_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 protected:
 	virtual uint32_t get_cmap_revision() override;
 	virtual uint32_t get_xmap_revision() override;
 };
 
-DECLARE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device)
-DECLARE_DEVICE_TYPE(GIO_XL24, gio_xl24_device)
+DECLARE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device)
+DECLARE_DEVICE_TYPE(GIO64_XL24, gio64_xl24_device)
 
 #endif // MAME_BUS_GIO_NEWPORT_H
