@@ -245,10 +245,9 @@ void esqmr_state::mr_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
 	map(0x00300000, 0x0037ffff).rom().region("maincpu", 0x80000);   // MR-61 needs this
-//  AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
-//  AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
-//    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 	map(0x00c00000, 0x00c7ffff).ram();
+	map(0x00dc0000, 0x00dc003f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x00de0000, 0x00de003f).rw("ensoniq2", FUNC(es5506_device::read), FUNC(es5506_device::write));
 }
 
 WRITE_LINE_MEMBER(esqmr_state::duart_tx_a)
