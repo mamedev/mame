@@ -969,15 +969,15 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/gio/gio.h,BUSES["GIO"] = true
+--@src/devices/bus/gio64/gio64.h,BUSES["GIO64"] = true
 ---------------------------------------------------
 
-if (BUSES["GIO"]~=null) then
+if (BUSES["GIO64"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/gio/gio.cpp",
-		MAME_DIR .. "src/devices/bus/gio/gio.h",
-		MAME_DIR .. "src/devices/bus/gio/newport.cpp",
-		MAME_DIR .. "src/devices/bus/gio/newport.h",
+		MAME_DIR .. "src/devices/bus/gio64/gio64.cpp",
+		MAME_DIR .. "src/devices/bus/gio64/gio64.h",
+		MAME_DIR .. "src/devices/bus/gio64/newport.cpp",
+		MAME_DIR .. "src/devices/bus/gio64/newport.h",
 	}
 end
 
