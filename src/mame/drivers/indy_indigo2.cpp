@@ -17,9 +17,9 @@
 *  000a0000 - 07ffffff      EISA Memory
 *  08000000 - 17ffffff      Low System Memory
 *  18000000 - 1effffff      RESERVED - Unused
-*  1f000000 - 1f3fffff      GIO - GFX
-*  1f400000 - 1f5fffff      GIO - EXP0
-*  1f600000 - 1f9fffff      GIO - EXP1 - Unused
+*  1f000000 - 1f3fffff      GIO64 - GFX
+*  1f400000 - 1f5fffff      GIO64 - EXP0
+*  1f600000 - 1f9fffff      GIO64 - EXP1 - Unused
 *  1fa00000 - 1fa1ffff      Memory Controller
 *  1fb00000 - 1fb1a7ff      HPC3 CHIP1
 *  1fb80000 - 1fb9a7ff      HPC3 CHIP0
@@ -54,7 +54,7 @@
 
 #include "emu.h"
 
-#include "bus/gio/gio.h"
+#include "bus/gio64/gio64.h"
 
 #include "cpu/mips/r4000.h"
 
@@ -81,10 +81,10 @@ public:
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
 		, m_hpc3(*this, "hpc3")
 		, m_vino(*this, "vino")
-		, m_gio(*this, "gio")
-		, m_gio_gfx(*this, "gio_gfx")
-		, m_gio_exp0(*this, "gio_exp0")
-		, m_gio_exp1(*this, "gio_exp1")
+		, m_gio64(*this, "gio64")
+		, m_gio64_gfx(*this, "gio64_gfx")
+		, m_gio64_exp0(*this, "gio64_exp0")
+		, m_gio64_exp1(*this, "gio64_exp1")
 	{
 	}
 
@@ -111,10 +111,10 @@ protected:
 	required_device<wd33c93b_device> m_scsi_ctrl;
 	required_device<hpc3_base_device> m_hpc3;
 	optional_device<vino_device> m_vino;
-	optional_device<gio_device> m_gio;
-	optional_device<gio_slot_device> m_gio_gfx;
-	optional_device<gio_slot_device> m_gio_exp0;
-	optional_device<gio_slot_device> m_gio_exp1;
+	optional_device<gio64_device> m_gio64;
+	optional_device<gio64_slot_device> m_gio64_gfx;
+	optional_device<gio64_slot_device> m_gio64_exp0;
+	optional_device<gio64_slot_device> m_gio64_exp1;
 };
 
 class ip24_state : public ip22_state
@@ -172,7 +172,7 @@ void ip22_state::ip22_base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));     /* 128 MB of main RAM */
-	map(0x1f000000, 0x1f9fffff).rw(m_gio, FUNC(gio_device::read), FUNC(gio_device::write));
+	map(0x1f000000, 0x1f9fffff).rw(m_gio64, FUNC(gio64_device::read), FUNC(gio64_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb00000, 0x1fb7ffff).r(FUNC(ip22_state::bus_error));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_base_device::map));
@@ -244,11 +244,11 @@ void ip22_state::ip22_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 
-	// GIO
-	GIO(config, m_gio, m_maincpu, m_hpc3);
-	GIO_SLOT(config, m_gio_gfx, m_gio, gio_cards, "xl24");
-	GIO_SLOT(config, m_gio_exp0, m_gio, gio_cards, nullptr);
-	GIO_SLOT(config, m_gio_exp1, m_gio, gio_cards, nullptr);
+	// GIO64
+	GIO64(config, m_gio64, m_maincpu, m_hpc3);
+	GIO64_SLOT(config, m_gio64_gfx, m_gio64, gio64_cards, "xl24");
+	GIO64_SLOT(config, m_gio64_exp0, m_gio64, gio64_cards, nullptr);
+	GIO64_SLOT(config, m_gio64_exp1, m_gio64, gio64_cards, nullptr);
 }
 
 void ip22_state::ip225015(machine_config &config)
