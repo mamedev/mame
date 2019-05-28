@@ -1824,16 +1824,16 @@ CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT
 CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
 // Bundled as "VT03 Demo" on the V.R. Technology VT SDK
-CONS( 200?, pinkjelly, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "Pink Jelly", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pinkjelly, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Bundled as "C-Compiler Demo Program 2" on the V.R. Technology VT SDK
-CONS( 200?, vtpinball, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "Pinball", MACHINE_NOT_WORKING )
+CONS( 200?, vtpinball, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
 
 // Bundled as "Sound Generator FMDemo" on the V.R. Technology VT SDK
-CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "VT03 Sound Test", MACHINE_IMPERFECT_CONTROLS )
+CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
 
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
-CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "Boxing", MACHINE_NOT_WORKING )
+CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
