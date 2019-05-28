@@ -198,10 +198,6 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		if (tilehigh3)
 			tile += 0x400;
 
-		//if (unk) // set on score + 'press start' in ddr, priority? palette select?
-		//  tile = machine().rand();
-
-
 		int xhigh = m_spriteram[i + 4] & 0x01;
 		int yhigh = m_spriteram[i + 0] & 0x01; // or enable bit?
 
