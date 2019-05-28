@@ -92,17 +92,18 @@ void trkfldch_state::video_start()
 
 void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize)
 {
-	int offs = 0;
 	for (int y = 0; y < 30; y++)
 	{
 		for (int x = 0; x < 41; x++)
 		{
+			// fppt tttt   tttt tttt
+
 			address_space &mem = m_maincpu->space(AS_PROGRAM);
 
-			uint8_t byte = mem.read_byte(base + offs);
-			offs++;
-			uint8_t attr = mem.read_byte(base + offs);
-			offs++;
+			int tile_address = (y * 41) + x;
+
+			uint8_t byte = mem.read_byte(base+((tile_address * 2)));
+			uint8_t attr = mem.read_byte(base+((tile_address * 2)+1));
 
 			int tile = (attr << 8) | byte;
 
