@@ -2253,7 +2253,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 	}
 }
 
-uint8_t newport_base_device::get_octant(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t dx, int16_t dy)
+uint8_t newport_base_device::get_octant(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t dx, uint16_t dy)
 {
 	if (x1 < x2)
 	{
@@ -2273,15 +2273,15 @@ uint8_t newport_base_device::get_octant(int16_t x1, int16_t y1, int16_t x2, int1
 
 void newport_base_device::do_fline(uint32_t color)
 {
-	const int32_t x1 = m_rex3.m_x_start >> 7;
-	const int32_t y1 = m_rex3.m_y_start >> 7;
-	const int32_t x2 = m_rex3.m_x_end >> 7;
-	const int32_t y2 = m_rex3.m_y_end >> 7;
+	const uint32_t x1 = m_rex3.m_x_start >> 7;
+	const uint32_t y1 = m_rex3.m_y_start >> 7;
+	const uint32_t x2 = m_rex3.m_x_end >> 7;
+	const uint32_t y2 = m_rex3.m_y_end >> 7;
 
-	const int16_t x10 = x1 & ~0xf;
-	const int16_t y10 = y1 & ~0xf;
-	const int16_t x20 = x2 & ~0xf;
-	const int16_t y20 = y2 & ~0xf;
+	const uint16_t x10 = x1 & ~0xf;
+	const uint16_t y10 = y1 & ~0xf;
+	const uint16_t x20 = x2 & ~0xf;
+	const uint16_t y20 = y2 & ~0xf;
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
 	const bool skip_first = BIT(m_rex3.m_draw_mode0, 10);
@@ -2289,14 +2289,14 @@ void newport_base_device::do_fline(uint32_t color)
 	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
 	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
-	int16_t x = x10;
-	int16_t y = y10;
+	uint16_t x = x10;
+	uint16_t y = y10;
 
-	int16_t x1_fract = m_rex3.m_x_start_frac;
-	int16_t y1_fract = m_rex3.m_y_start_frac;
+	uint16_t x1_fract = m_rex3.m_x_start_frac;
+	uint16_t y1_fract = m_rex3.m_y_start_frac;
 
-	int32_t dx = abs(x1 - x2);
-	int32_t dy = abs(y1 - y2);
+	int32_t dx = abs((int32_t)x1 - (int32_t)x2);
+	int32_t dy = abs((int32_t)y1 - (int32_t)y2);
 
 	const int16_t dx_i = abs(x10 - x20) - 1;
 	const int16_t dy_i = abs(y10 - y20) - 1;
@@ -2470,10 +2470,10 @@ void newport_base_device::do_fline(uint32_t color)
 
 void newport_base_device::do_iline(uint32_t color)
 {
-	int16_t x1 = m_rex3.m_x_start_i;
-	int16_t y1 = m_rex3.m_y_start_i;
-	int16_t x2 = m_rex3.m_x_end_i;
-	int16_t y2 = m_rex3.m_y_end_i;
+	uint16_t x1 = m_rex3.m_x_start_i;
+	uint16_t y1 = m_rex3.m_y_start_i;
+	uint16_t x2 = m_rex3.m_x_end_i;
+	uint16_t y2 = m_rex3.m_y_end_i;
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
 	const bool skip_first = BIT(m_rex3.m_draw_mode0, 10);
@@ -2481,11 +2481,10 @@ void newport_base_device::do_iline(uint32_t color)
 	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
 	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
-	int16_t x = x1;
-	int16_t y = y1;
-	int16_t dx = abs(x1 - x2);
-	int16_t dy = abs(y1 - y2);
-	//const uint8_t coverage = 1;
+	uint16_t x = x1;
+	uint16_t y = y1;
+	uint16_t dx = abs(x1 - x2);
+	uint16_t dy = abs(y1 - y2);
 
 	static const bresenham_octant_info_t s_bresenham_infos[8] =
 	{
@@ -2504,7 +2503,7 @@ void newport_base_device::do_iline(uint32_t color)
 	const int16_t incrx2 = s_bresenham_infos[octant].incrx2;
 	const int16_t incry1 = s_bresenham_infos[octant].incry1;
 	const int16_t incry2 = s_bresenham_infos[octant].incry2;
-	int16_t loop = s_bresenham_infos[octant].loop ? dy : dx;
+	uint16_t loop = s_bresenham_infos[octant].loop ? dy : dx;
 	if (BIT(m_rex3.m_draw_mode0, 15) && loop > 32)
 		loop = 32;
 
@@ -2815,22 +2814,29 @@ void newport_base_device::do_rex3_command()
 					uint32_t color = m_rex3.m_color_i;
 					if (fastclear)
 					{
-						switch (m_rex3.m_plane_depth)
+						if (rgbmode)
 						{
-							case 0: // 4bpp
-								color = m_rex3.m_color_vram & 0xf;
-								color |= color << 4;
-								break;
-							case 1: // 8bpp
-								color = m_rex3.m_color_vram & 0xff;
-								break;
-							case 2: // 12bpp
-								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-								color |= color << 12;
-								break;
-							case 3: // 24bpp
-								color = m_rex3.m_color_vram & 0xffffff;
-								break;
+							switch (m_rex3.m_plane_depth)
+							{
+								case 0: // 4bpp
+									color = m_rex3.m_color_vram & 0xf;
+									color |= color << 4;
+									break;
+								case 1: // 8bpp
+									color = m_rex3.m_color_vram & 0xff;
+									break;
+								case 2: // 12bpp
+									color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+									color |= color << 12;
+									break;
+								case 3: // 24bpp
+									color = m_rex3.m_color_vram & 0xffffff;
+									break;
+							}
+						}
+						else
+						{
+							color = m_rex3.m_color_vram;
 						}
 					}
 
@@ -2896,22 +2902,29 @@ void newport_base_device::do_rex3_command()
 					uint32_t color = m_rex3.m_color_i;
 					if (fastclear)
 					{
-						switch (m_rex3.m_plane_depth)
+						if (rgbmode)
 						{
-							case 0: // 4bpp
-								color = m_rex3.m_color_vram & 0xf;
-								color |= color << 4;
-								break;
-							case 1: // 8bpp
-								color = m_rex3.m_color_vram & 0xff;
-								break;
-							case 2: // 12bpp
-								color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-								color |= color << 12;
-								break;
-							case 3: // 24bpp
-								color = m_rex3.m_color_vram & 0xffffff;
-								break;
+							switch (m_rex3.m_plane_depth)
+							{
+								case 0: // 4bpp
+									color = m_rex3.m_color_vram & 0xf;
+									color |= color << 4;
+									break;
+								case 1: // 8bpp
+									color = m_rex3.m_color_vram & 0xff;
+									break;
+								case 2: // 12bpp
+									color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+									color |= color << 12;
+									break;
+								case 3: // 24bpp
+									color = m_rex3.m_color_vram & 0xffffff;
+									break;
+							}
+						}
+						else
+						{
+							color = m_rex3.m_color_vram;
 						}
 					}
 
@@ -3579,7 +3592,7 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", (uint32_t)(data >> 32));
 			m_rex3.m_color_red = (int32_t)((data >> 32) & 0xffffff);
-			m_rex3.m_color_i = (uint32_t)(m_rex3.m_color_red >> 11) & 0x00000fff;
+			m_rex3.m_color_i = (uint32_t)(m_rex3.m_color_red >> 9) & 0x00000fff;
 		}
 		if (ACCESSING_BITS_0_31)
 		{

@@ -274,7 +274,7 @@ protected:
 		int16_t incry2;
 		uint8_t loop;
 	};
-	uint8_t get_octant(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t dx, int16_t dy);
+	uint8_t get_octant(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t dx, uint16_t dy);
 	void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
 
