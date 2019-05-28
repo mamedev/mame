@@ -2027,6 +2027,23 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="thestars">
+		<description>The Stars</description>
+		<year>1983</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="ザ・スターズ"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="1203520">
+				<rom name="the stars side a.t77" size="1203520" crc="2696d903" sha1="50be050f25faa886478ce9dc1f0fa6fc918c8dc2"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="fm7_cass">
+			<dataarea name="cass" size="1156262">
+				<rom name="the stars side b.t77" size="1156262" crc="33dc0a40" sha1="13211A17706B2258604EF4AD18A6E10C3267437E"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strhouse">
 		<description>Strange House</description>
 		<year>1984</year>
