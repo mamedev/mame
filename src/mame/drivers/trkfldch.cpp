@@ -64,6 +64,7 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
 
+	void draw_sprites(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int pri);
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
 	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base, int tileadd, int gfxregion, int tilexsize);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -161,89 +162,20 @@ void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16&
 // trkfldch ingame uses different bpp so different addressing here too?
 
 
-uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int pri)
 {
-	bitmap.fill(0, cliprect);
-
-	// 3 lots of 0x100 values, but maybe not rgb, seems to be yuv (borrowed from tetrisp2.cpp)
-	for (int i = 0; i < 256; i++)
-	{
-		uint8_t u =  m_palram[0x000 + i] & 0xff;
-		uint8_t y1 = m_palram[0x100 + i] & 0xff;
-		uint8_t v =  m_palram[0x200 + i] & 0xff;
-		double bf = y1+1.772*(u - 128);
-		double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
-		double rf = y1+1.772*(v - 128);
-		// clamp to 0-255 range
-		rf = std::min(rf,255.0);
-		rf = std::max(rf,0.0);
-		gf = std::min(gf,255.0);
-		gf = std::max(gf,0.0);
-		bf = std::min(bf,255.0);
-		bf = std::max(bf,0.0);
-
-		uint8_t r = (uint8_t)rf;
-		uint8_t g = (uint8_t)gf;
-		uint8_t b = (uint8_t)bf;
-
-		m_palette->set_pen_color(i, r, g, b);
-	}
-
-	{
-		int base, gfxbase, gfxregion, tilexsize;
-
-		if (1)
-		{
-			base = (m_unkregs[0x54] << 8);
-			gfxbase = (m_unkregs[0x11] * 0x2000);
-			if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
-			{
-				gfxbase -= 0x200;
-				gfxregion = 0;
-				tilexsize = 8;
-			}
-			else
-			{
-				gfxbase -= 0x2ac;
-				gfxregion = 2;
-				tilexsize = 8;
-			}
-			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
-		}
-
-		if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
-		{
-			base = (m_unkregs[0x55] << 8);
-			gfxbase = (m_unkregs[0x13] * 0x2000);
-			if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
-			{
-				gfxbase -= 0x200;
-				gfxregion = 0;
-				tilexsize = 8;
-			}
-			else
-			{
-				gfxbase -= 0x2ac;
-				gfxregion = 2;
-				tilexsize = 8;
-			}
-			render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
-		}
-
-		if (m_unkregs[0x10] & 0x20)
-		{
-			base = (m_unkregs[0x56] << 8);
-			render_text_tile_layer(screen, bitmap, cliprect, base);
-		}
-	}
-
-
 	for (int i = 0x500 - 5; i >= 0; i -= 5)
 	{
-		//  logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
+		int priority = (m_spriteram[i + 4] & 0x20)>>5;
+		
+		// list is NOT drawn but instead z sorted, see shadows in trkfldch
+		if (priority != pri)
+			continue;
+
+		// logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_unkregs[0x15] * 0x800);
 
-		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --?f -t-x
+		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --zf -t-x
 
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
@@ -255,7 +187,6 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 		int pal = 0;
 
-		//int unk = m_spriteram[i + 4] & 0x20;
 		int flipx = m_spriteram[i + 4] & 0x10;
 
 		if (tilehigh)
@@ -300,6 +231,87 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 
 		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, 0, x, y, 0);
 	}
+}
+
+uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+{
+	bitmap.fill(0, cliprect);
+
+	// 3 lots of 0x100 values, but maybe not rgb, seems to be yuv (borrowed from tetrisp2.cpp)
+	for (int i = 0; i < 256; i++)
+	{
+		uint8_t u =  m_palram[0x000 + i] & 0xff;
+		uint8_t y1 = m_palram[0x100 + i] & 0xff;
+		uint8_t v =  m_palram[0x200 + i] & 0xff;
+		double bf = y1+1.772*(u - 128);
+		double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
+		double rf = y1+1.772*(v - 128);
+		// clamp to 0-255 range
+		rf = std::min(rf,255.0);
+		rf = std::max(rf,0.0);
+		gf = std::min(gf,255.0);
+		gf = std::max(gf,0.0);
+		bf = std::min(bf,255.0);
+		bf = std::max(bf,0.0);
+
+		uint8_t r = (uint8_t)rf;
+		uint8_t g = (uint8_t)gf;
+		uint8_t b = (uint8_t)bf;
+
+		m_palette->set_pen_color(i, r, g, b);
+	}
+
+	if (1) // one of the m_unkregs[0x10] bits almost certainly would enable / disable this
+	{
+		int base = (m_unkregs[0x54] << 8);
+		int gfxbase = (m_unkregs[0x11] * 0x2000);
+		int tilexsize = 8;
+		int gfxregion;
+		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+		{
+			gfxbase -= 0x200;
+			gfxregion = 0;
+			tilexsize = 8;
+		}
+		else
+		{
+			gfxbase -= 0x2ac;
+			gfxregion = 2;
+			tilexsize = 8;
+		}
+		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
+	}
+
+	draw_sprites(screen, bitmap, cliprect, 0);
+
+	if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
+	{
+		int base = (m_unkregs[0x55] << 8);
+		int gfxbase = (m_unkregs[0x13] * 0x2000);
+		int tilexsize = 8;
+		int gfxregion;
+
+		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+		{
+			gfxbase -= 0x200;
+			gfxregion = 0;
+		}
+		else
+		{
+			gfxbase -= 0x2ac;
+			gfxregion = 2;
+		}
+		render_tile_layer(screen, bitmap, cliprect, base, gfxbase, gfxregion, tilexsize);
+	}
+
+	draw_sprites(screen, bitmap, cliprect, 1);
+
+	if (m_unkregs[0x10] & 0x20) // this layer is buggy and not currently drawn
+	{
+		int base = (m_unkregs[0x56] << 8);
+		render_text_tile_layer(screen, bitmap, cliprect, base);
+	}
+
 
 	return 0;
 }
