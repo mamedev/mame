@@ -98,6 +98,12 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 		{
 			// fppt tttt   tttt tttt
 
+			rectangle clip;
+			clip.set(x*8, (x*8)+8, y*8, (y*8)+8);
+
+			clip &= cliprect;
+
+
 			address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 			int tile_address = (y * 41) + x;
@@ -116,7 +122,7 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 
 			gfx_element* gfx = m_gfxdecode->gfx(gfxregion);
 
-			gfx->transpen(bitmap, cliprect,tile, pal, flipx, 0, x*tilexsize, y*8, 0);
+			gfx->transpen(bitmap, clip,tile, pal, flipx, 0, x*tilexsize, y*8, 0);
 
 		}
 	}
