@@ -91,7 +91,22 @@ private:
 	DECLARE_READ8_MEMBER(dmaregs_r);
 	DECLARE_WRITE8_MEMBER(dmaregs_w);
 
-	uint8_t m_unkregs[0x100];
+	uint8_t m_modebank[0xb];
+
+	DECLARE_READ8_MEMBER(modebankregs_r);
+	DECLARE_WRITE8_MEMBER(modebankregs_w);
+
+	uint8_t m_tilemapbase[0x3];
+
+	DECLARE_READ8_MEMBER(tilemapbase_r);
+	DECLARE_WRITE8_MEMBER(tilemapbase_w);
+
+	uint8_t m_sysregs[0x10];
+
+	DECLARE_READ8_MEMBER(sysregs_r);
+	DECLARE_WRITE8_MEMBER(sysregs_w);
+
+	uint8_t m_unkregs[0x90];
 
 	DECLARE_READ8_MEMBER(unkregs_r);
 	DECLARE_WRITE8_MEMBER(unkregs_w);
@@ -160,16 +175,16 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 
 	if (which == 0)
 	{
-		base = (m_unkregs[0x54] << 8);
-		gfxbase = (m_unkregs[0x11] * 0x2000);
+		base = (m_tilemapbase[0x00] << 8);
+		gfxbase = (m_modebank[0x01] * 0x2000);
 	}
 	else //if (which == 1)
 	{
-		base = (m_unkregs[0x55] << 8);
-		gfxbase = (m_unkregs[0x13] * 0x2000);
+		base = (m_tilemapbase[0x01] << 8);
+		gfxbase = (m_modebank[0x03] * 0x2000);
 	}
 
-	if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+	if (m_modebank[0x00] & 1) // seems like it might be a global control for bpp?
 	{
 		gfxbase -= 0x200;
 		gfxregion = 0;
@@ -225,7 +240,7 @@ void trkfldch_state::render_text_tile_layer(screen_device& screen, bitmap_ind16&
 	if (0)
 	{
 		// guess, but it fits with where the other tilegfxbase registers are, and is only written on my1stddr when this layer is enabled
-		int tilegfxbase = (m_unkregs[0x17] * 0x80) - 0x100;
+		int tilegfxbase = (m_modebank[0x07] * 0x80) - 0x100;
 
 		int offs = 0;
 		for (int y = 0; y < 4; y++)
@@ -270,7 +285,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 			continue;
 
 		// logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
-		int tilegfxbase = (m_unkregs[0x15] * 0x800);
+		int tilegfxbase = (m_modebank[0x05] * 0x800);
 
 		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --zf -t-x
 
@@ -307,7 +322,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 
 		gfx_element* gfx;
 
-		if (m_unkregs[0x10] & 1) // seems like it might be a global control for bpp?
+		if (m_modebank[0x00] & 1) // seems like it might be a global control for bpp?
 		{
 			gfx = m_gfxdecode->gfx(1);
 			tilegfxbase -= 0x80;
@@ -354,23 +369,23 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device& screen, bitmap_in
 		m_palette->set_pen_color(i, r, g, b);
 	}
 
-	if (1) // one of the m_unkregs[0x10] bits almost certainly would enable / disable this
+	if (1) // one of the m_modebank[0x00] bits almost certainly would enable / disable this
 	{
 		render_tile_layer(screen, bitmap, cliprect, 0);
 	}
 
 	draw_sprites(screen, bitmap, cliprect, 0);
 
-	if (m_unkregs[0x10] & 0x10) // definitely looks like layer enable
+	if (m_modebank[0x00] & 0x10) // definitely looks like layer enable
 	{
 		render_tile_layer(screen, bitmap, cliprect, 1);
 	}
 
 	draw_sprites(screen, bitmap, cliprect, 1);
 
-	if (m_unkregs[0x10] & 0x20) // this layer is buggy and not currently drawn
+	if (m_modebank[0x00] & 0x20) // this layer is buggy and not currently drawn
 	{
-		int base = (m_unkregs[0x56] << 8);
+		int base = (m_tilemapbase[0x02] << 8);
 		render_text_tile_layer(screen, bitmap, cliprect, base);
 	}
 
@@ -615,6 +630,80 @@ WRITE8_MEMBER(trkfldch_state::dmaregs_w)
 }
 
 
+READ8_MEMBER(trkfldch_state::modebankregs_r)
+{
+	uint8_t ret = m_modebank[offset];
+	logerror("%s: modebankregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+WRITE8_MEMBER(trkfldch_state::modebankregs_w)
+{
+	m_modebank[offset] = data;
+
+	switch (offset)
+	{
+	case 0x00: // gfxmode select (4bpp / 8bpp) and layer enables
+		logerror("%s: unkregs_w (enable, bpp select) %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x01: // tilegfxbank 1
+		logerror("%s: unkregs_w %04x %02x (tilegfxbank 1)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x02: // 00 - startup (probably more tilegfxbank 1 bits)
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x03: // tilegfxbank 2
+		logerror("%s: unkregs_w %04x %02x (tilegfxbank 2)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x04: // 00 - startup (probably more tilegfxbank 2 bits)
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x05: // spritegfxbank
+		logerror("%s: unkregs_w  %04x %02x (spritegfxbank)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x06: // 00 (probably more spritegfxbank bits)
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x07: // gfxbank for weird layer
+		logerror("%s: unkregs_w %04x %02x (weird gfx bank)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x08: // more gfxbank for weird layer?
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x09: 	// unknowns? another unknown layer?
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0a:	// unknowns? another unknown layer?
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+	}
+}
+
+
+READ8_MEMBER(trkfldch_state::tilemapbase_r)
+{
+	uint8_t ret = m_tilemapbase[offset];
+	logerror("%s: tilemapbase_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+WRITE8_MEMBER(trkfldch_state::tilemapbase_w)
+{
+	m_tilemapbase[offset] = data;
+	logerror("%s: tilemapbase_w %04x %02x (tilebase %d)\n", machine().describe_context(), offset, data, offset);
+}
+
+
 void trkfldch_state::trkfldch_map(address_map &map)
 {
 	map(0x000000, 0x003fff).ram().share("mainram");
@@ -624,12 +713,20 @@ void trkfldch_state::trkfldch_map(address_map &map)
 	map(0x007000, 0x0072ff).ram().share("palram");
 
 	// 7800 - 78xx look like registers?
-	map(0x007800, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
+
+	map(0x007800, 0x00780f).rw(FUNC(trkfldch_state::sysregs_r), FUNC(trkfldch_state::sysregs_w));
+
+
+	map(0x007810, 0x00781a).rw(FUNC(trkfldch_state::modebankregs_r), FUNC(trkfldch_state::modebankregs_w));
 
 	map(0x007820, 0x007831).rw(FUNC(trkfldch_state::tmap0_scroll_window_r), FUNC(trkfldch_state::tmap0_scroll_window_w));
 	map(0x007832, 0x007843).rw(FUNC(trkfldch_state::tmap1_scroll_window_r), FUNC(trkfldch_state::tmap1_scroll_window_w));
 
+	map(0x007854, 0x007856).rw(FUNC(trkfldch_state::tilemapbase_r), FUNC(trkfldch_state::tilemapbase_w));
+
 	map(0x007860, 0x00786d).rw(FUNC(trkfldch_state::dmaregs_r), FUNC(trkfldch_state::dmaregs_w));
+
+	map(0x007870, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
 
 	map(0x008000, 0x3fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
@@ -904,9 +1001,9 @@ GFXDECODE_END
 
 */
 
-READ8_MEMBER(trkfldch_state::unkregs_r)
+READ8_MEMBER(trkfldch_state::sysregs_r)
 {
-	uint8_t ret = m_unkregs[offset];
+	uint8_t ret = m_sysregs[offset];
 
 	switch (offset)
 	{
@@ -942,85 +1039,103 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 	case 0x06:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
+	}
+
+	return ret;
+}
 
 
-	case 0x42:
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+WRITE8_MEMBER(trkfldch_state::sysregs_w)
+{
+	m_sysregs[offset] = data;
+
+	switch (offset)
+	{
+	case 0x00: // IRQ ack/force?, see above
+		logerror("%s: sysregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x43:
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	case 0x01: // IRQ maybe status, see above
+		logerror("%s: sysregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x44:
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	case 0x02: // startup
+		logerror("%s: sysregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-
-
-	case 0x54: // tilebase 1
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	case 0x03: // startup
+		logerror("%s: sysregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x55: // tilebase 2
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	case 0x04: // startup
+		logerror("%s: sysregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x56: // tilebase 3
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+	case 0x05: // startup
+		logerror("%s: sysregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
+	default:
+		logerror("%s: sysregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	}
+}
 
 
 
-	case 0x70: // read in irq (inputs?)
+READ8_MEMBER(trkfldch_state::unkregs_r)
+{
+	uint8_t ret = m_unkregs[offset];
+
+	switch (offset)
+	{
+
+	case 0x00: // read in irq (inputs?)
 		ret = ioport("IN0")->read();
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x71:
+	case 0x01:
 		ret = ioport("IN1")->read();
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x73:
+	case 0x03:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x74:
+	case 0x04:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x75:
+	case 0x05:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x76:
+	case 0x06:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x77:
+	case 0x07:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x7f:
+	case 0x0f:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x80: // only read as a side-effect of reading 0x7f?
+	case 0x10: // only read as a side-effect of reading 0x7f?
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-
-
-	case 0xb6:
+	case 0x46: // 0x70
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0xb7:
+	case 0x47:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
-
 
 	default:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
@@ -1029,25 +1144,25 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 	return ret;
 }
 
+
+
 WRITE8_MEMBER(trkfldch_state::unkregs_w)
 {
 	m_unkregs[offset] = data;
 
 	switch (offset)
 	{
-	case 0x00: // IRQ ack/force?, see above
-		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
-		break;
+	// 7x = I/O area?
 
-	case 0x01: // IRQ maybe status, see above
-		logerror("%s: unkregs_w (IRQ ack/force?) %04x %02x\n", machine().describe_context(), offset, data);
+	case 0x01: // startup
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x02: // startup
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x03: // startup
+	case 0x03: // some kind of serial device?
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
@@ -1055,150 +1170,58 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x05: // startup
+	case 0x05: // some kind of serial device? (used with 73?)
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x06: // startup
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x07: // every second or so
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x08: // startup
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x09: // startup
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0a: // startup
+		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x0f: // startup
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
-
-
-
-	case 0x10: // gfxmode select (4bpp / 8bpp) and layer enables
-		logerror("%s: unkregs_w (enable, bpp select) %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x11: // tilegfxbank 1
-		logerror("%s: unkregs_w %04x %02x (tilegfxbank 1)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x12: // 00 - startup (probably more tilegfxbank 1 bits)
+	case 0x11: // startup (my1stddr)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x13: // tilegfxbank 2
-		logerror("%s: unkregs_w %04x %02x (tilegfxbank 2)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x14: // 00 - startup (probably more tilegfxbank 2 bits)
+	case 0x12: // startup (my1stddr)
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x15: // spritegfxbank
-		logerror("%s: unkregs_w  %04x %02x (spritegfxbank)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x16: // 00 (probably more spritegfxbank bits)
+	case 0x13:
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x17: // gfxbank for weird layer
-		logerror("%s: unkregs_w %04x %02x (weird gfx bank)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x18: // more gfxbank for weird layer?
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	// unknowns? another unknown layer?
-	case 0x19:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x1a:
+	case 0x14:
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
 
-
-
-	case 0x54: // tilebase 1
-		logerror("%s: unkregs_w %04x %02x (tilebase 1)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x55: // tilebase 2
-		logerror("%s: unkregs_w %04x %02x (tilebase 2)\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x56: // tilebase 3
-		logerror("%s: unkregs_w %04x %02x (weird layer base)\n", machine().describe_context(), offset, data);
-		break;
-
-
-
-
-
-	// 7x = I/O area?
-
-
-	case 0x71: // startup
+	case 0x45: // (real address 78b5) startup
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
 
-	case 0x72: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x73: // some kind of serial device?
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x74: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x75: // some kind of serial device? (used with 73?)
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x76: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x77: // every second or so
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x78: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x79: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x7a: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x7f: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-
-	case 0x81: // startup (my1stddr)
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x82: // startup (my1stddr)
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x83:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0x84:
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-
-	case 0xb5: // startup
-		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
-		break;
-
-	case 0xb6: // significant data transfer shortly after boot, seems to clock writes with 0073 writing  d0 / c0? (then writes 2 bytes here)
+	case 0x46: // significant data transfer shortly after boot, seems to clock writes with 0073 writing  d0 / c0? (then writes 2 bytes here)
 			   // is this sending song patterns to another CPU?
-
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		m_unkdata[m_unkdata_addr] = data;
 
@@ -1206,12 +1229,9 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		m_unkdata_addr &= 0xfffff;
 		break;
 
-
-
-	case 0xca: // startup
+	case 0x5a: // (real address 78ca)  startup
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		break;
-
 
 	default:
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
@@ -1236,8 +1256,8 @@ void trkfldch_state::machine_reset()
 {
 	m_which_vector = 0x06;
 
-	for (int i = 0; i < 0x100; i++)
-		m_unkregs[i] = 0x00;
+	for (int i = 0; i < 0x90; i++)
+		m_unkregs[i] = 0x90;
 
 	for (int i = 0; i < 0x100000; i++)
 		m_unkdata[i] = 0;
@@ -1246,8 +1266,30 @@ void trkfldch_state::machine_reset()
 		for (int i = 0; i < 0x12; i++)
 			m_tmapscroll_window[j][i] = 0x00;
 
+	// these don't always get initialized by the code, these appear to be reasonable default values based on what they get reset to by the games after first use
+	for (int j = 0; j < 2; j++)
+	{
+		m_tmapscroll_window[j][0x00] = 0x00;
+		m_tmapscroll_window[j][0x01] = 0x00;
+		m_tmapscroll_window[j][0x02] = 0x1e;
+		m_tmapscroll_window[j][0x03] = 0x1e;
+		m_tmapscroll_window[j][0x04] = 0x00;
+		m_tmapscroll_window[j][0x05] = 0x28;
+	}
+
 	for (int i = 0; i < 0xe; i++)
 		m_dmaregs[i] = 0x00;
+
+	for (int i = 0; i < 0xb; i++)
+		m_modebank[i] = 0x00;
+
+	for (int i = 0; i < 0x10; i++)
+		m_sysregs[i] = 0x00;
+
+	m_tilemapbase[0x00] = 0x00;
+	m_tilemapbase[0x01] = 0x00;
+	m_tilemapbase[0x02] = 0x00;
+
 
 	m_unkdata_addr = 0;
 
@@ -1259,25 +1301,6 @@ void trkfldch_state::machine_reset()
 	m_dmaregs[0x0b] = 0x01;
 	m_dmaregs[0x0c] = 0x00;
 	m_dmaregs[0x0d] = 0x00;
-
-	// trkfld sets these to 1e/1e on javelin, but leaves then uninitizlied before that
-	// it also sets them to 00 / 1e on 'hurdle the hole' (window use)
-	// it also sets them to 00 / 1e on 'hammer throw' (reason unclear)
-	// high jump sets it to 00 / 16 on height select screen
-	m_tmapscroll_window[1][0x01] = 0xde;
-	m_tmapscroll_window[1][0x02] = 0xad;
-	m_tmapscroll_window[1][0x03] = 0x1e; // trkfld sets this after high jump
-
-	// maybe, these get reset to this value after actual use in trkfield
-	m_tmapscroll_window[1][0x04] = 0xde;// 0x00;
-	m_tmapscroll_window[1][0x05] = 0xad;// 0x28;
-
-	m_tmapscroll_window[0][0x00] = 0xde;
-	m_tmapscroll_window[0][0x01] = 0xad;
-	m_tmapscroll_window[0][0x02] = 0xde;
-	m_tmapscroll_window[0][0x03] = 0xad;
-	m_tmapscroll_window[0][0x04] = 0xde; // gets set to 0x00 (00) on trkfld results screens
-	m_tmapscroll_window[0][0x05] = 0xad; // gets set to 0x28 (40) on trkfld resutls screens
 }
 
 void trkfldch_state::trkfldch(machine_config &config)
