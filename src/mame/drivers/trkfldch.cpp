@@ -110,9 +110,9 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 //	uint16_t xscroll = (m_unkregs[0x26] << 0) | (m_unkregs[0x27] << 8); // trkfld tilemap 0, race top            //	why do the split screen races use a different set of scroll registers? maybe global (applies to both layers?) as only one is enabled at this point.
 //	uint16_t xscroll = (m_unkregs[0x28] << 0) | (m_unkregs[0x29] << 8); // trkfld tilemap 0, race bot (window?)
 //	uint16_t xscroll = (m_unkregs[0x2a] << 0) | (m_unkregs[0x2b] << 8); // trkfld tilemap 0?, javelin
-//  2c,2d,2e,2f never written
+//  2c,2d never written
+//  2e,2f never written
 //	uint16_t yscroll = (m_unkregs[0x30] << 0) | (m_unkregs[0x31] << 8); // trkfld tilemap 0, javelin, holes, hammer throw
-//  30,31 never written
 
 // second group of tile scroll registers?
 
@@ -123,11 +123,13 @@ void trkfldch_state::render_tile_layer(screen_device& screen, bitmap_ind16& bitm
 //  for left / right on tilemap 1
 //	uint8_t windowleft   = m_unkregs[0x36];  //0x29  when unused on my1stddr, 0x25 when used   14 when used on hurdle holes, resets to 00 after event       (assume default of 00?)
 //	uint8_t windowright  = m_unkregs[0x37];  //0x29                           0x29             28 when used on hurdle holes, resets to 28 after event       (assume default of 28?)
-//  38/39 never written
-//	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
-//  3c,3d,3e,3f,40,41 never written
-//	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
 
+//  38,39 never written
+// 	uint16_t xscroll = (m_unkregs[0x3a] << 0) | (m_unkregs[0x3b] << 8); // trkfld tilemap 1?, javelin
+//  3c,3d never written
+//  3e,3f never written
+//  40,41 never written
+//	uint16_t yscroll = (m_unkregs[0x42] << 0) | (m_unkregs[0x43] << 8); // my1stddr tilemap 1 scroller, trkfld tilemap 1 holes (both window)
 
 //	printf("window %02x %02x  %02x %02x  %02x %02x\n", unk20, unk21, unk22, unk23, unk24, unk25);
 //	printf("xscroll %04x\n", xscroll);
