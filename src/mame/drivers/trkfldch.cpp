@@ -1048,8 +1048,7 @@ WRITE8_MEMBER(trkfldch_state::unkregs_w)
 		break;
 
 	case 0xb6: // significant data transfer shortly after boot, seems to clock writes with 0073 writing  d0 / c0? (then writes 2 bytes here)
-			   // values are coming from a structure in RAM
-			   // how does it reset?
+			   // is this sending song patterns to another CPU?
 
 		logerror("%s: unkregs_w %04x %02x\n", machine().describe_context(), offset, data);
 		m_unkdata[m_unkdata_addr] = data;
