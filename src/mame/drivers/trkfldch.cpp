@@ -751,9 +751,9 @@ READ8_MEMBER(trkfldch_state::read_vector)
 	0e : 0xA2ED  (dummy)
 	10 : 0xA2D3  (dummy)
 	12 : 0xA327  (dummy)
-	14 : 0xA30D  (real function)
+	14 : 0xA30D  (real function) (dummy in trkfld?) (controls arrow speed in ddr?)
 	16 : 0x6000  (points at ram? or some internal ROM? we have nothing mapped here, not cleared as RAM either)
-	18 : 0xA31A  (dummy)
+	18 : 0xA31A  (dummy) (not dummy in trkfld? - timer interrupt?)
 	1a : 0xA2AC  (dummy)
 	1c : 0xA341  (boot vector)
 	1e : (invalid)
@@ -801,6 +801,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::scanline)
 		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
 	}
 
+	// this is clearly a timer interrupt, trkfldch needs it to count
+	if ((scanline >= 80) && (scanline < 120))
+	{
+		if ((scanline & 1) == 0)
+		{
+			m_which_vector = 0x18;
+			m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+		}
+		else
+		{
+			m_which_vector = 0x18;
+			m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+		}
+	}
 }
 
 static INPUT_PORTS_START( trkfldch )
