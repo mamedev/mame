@@ -2395,7 +2395,6 @@ void ksys573_state::drmn9m(machine_config &config)
 {
 	k573d(config);
 	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::drmn_output_callback));
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
 
 	casszi(config);
 
@@ -2406,7 +2405,6 @@ void ksys573_state::drmn10m(machine_config &config)
 {
 	k573d(config);
 	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::drmn_output_callback));
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00500000);
 
 	casszi(config);
 
@@ -2454,13 +2452,11 @@ void ksys573_state::gtfrk10m(machine_config &config)
 	k573d(config);
 	casszi(config);
 	pccard1_32mb(config);
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
 }
 
 void ksys573_state::gtfrk10mb(machine_config &config)
 {
 	gtrfrk7m(config);
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00540000);
 
 	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
@@ -2470,7 +2466,6 @@ void ksys573_state::gtfrk11m(machine_config &config)
 	k573d(config);
 	casszi(config);
 	pccard1_32mb(config);
-	subdevice<k573dio_device>("k573dio")->set_mp3_dynamic_base(0x00500000);
 }
 
 // Miscellaneous

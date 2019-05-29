@@ -119,27 +119,6 @@ void samples_device::start_raw(uint8_t channel, const int16_t *sampledata, uint3
 	chan.loop = loop;
 }
 
-void samples_device::update_raw(uint8_t channel, const int16_t *sampledata, uint32_t samples, uint32_t frequency, bool loop)
-{
-	assert(channel < m_channels);
-
-	// update the parameters
-	channel_t &chan = m_channel[channel];
-	bool is_update = chan.source != nullptr;
-
-	chan.source = sampledata;
-	chan.source_length = samples;
-	chan.basefreq = frequency;
-	chan.step = (int64_t(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
-	chan.loop = loop;
-
-	if (!is_update) {
-		chan.source_num = -1;
-		chan.pos = 0;
-		chan.frac = 0;
-	}
-}
-
 
 //-------------------------------------------------
 //  set_frequency - set the playback frequency of
@@ -342,13 +321,8 @@ void samples_device::device_post_load()
 
 void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (!m_samples_update_cb.isnull()) {
-		m_samples_update_cb();
-	}
-
 	// find the channel with this stream
 	for (int channel = 0; channel < m_channels; channel++)
-	{
 		if (&stream == m_channel[channel].stream)
 		{
 			channel_t &chan = m_channel[channel];
@@ -381,9 +355,7 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					if (pos >= sample_length)
 					{
 						if (chan.loop)
-						{
 							pos %= sample_length;
-						}
 						else
 						{
 							chan.source = nullptr;
@@ -403,7 +375,6 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				memset(buffer, 0, samples * sizeof(*buffer));
 			break;
 		}
-	}
 }
 
 
@@ -666,17 +637,4 @@ bool samples_device::load_samples()
 		}
 	}
 	return ok;
-}
-
-uint32_t samples_device::get_position(uint8_t channel)
-{
-	assert(channel < m_channels);
-
-	channel_t &chan = m_channel[channel];
-
-	if (chan.source == nullptr) {
-		return 0;
-	}
-
-	return chan.pos;
 }

@@ -7,20 +7,31 @@
 #include "emu.h"
 #include "mas3507d.h"
 
+#define MINIMP3_ONLY_MP3
+#define MINIMP3_NO_STDIO
+#define MINIMP3_IMPLEMENTATION
+#define MAX_FRAME_SYNC_MATCHES 1
+#include "minimp3/minimp3.h"
+#include "minimp3/minimp3_ex.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "MAS 3507D MPEG decoder")
 
 mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, cb_sample(*this)
 	, i2c_bus_state(), i2c_bus_address(), i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false)
 	, i2c_bus_curbit(0), i2c_bus_curval(0), i2c_subdest(), i2c_command(), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)
-	, m_samples(nullptr)
 {
 }
 
 void mas3507d_device::device_start()
 {
+	current_rate = 44100;
+	stream = stream_alloc(0, 2, current_rate);
+	mp3dec_init(&mp3_dec);
+	cb_sample.resolve();
 }
 
 void mas3507d_device::device_reset()
@@ -31,6 +42,7 @@ void mas3507d_device::device_reset()
 	i2c_bus_address = UNKNOWN;
 	i2c_bus_curbit = -1;
 	i2c_bus_curval = 0;
+	total_sample_count = 0;
 }
 
 void mas3507d_device::i2c_scl_w(bool line)
@@ -272,11 +284,6 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 	case 0x0032f: logerror("MAS3507D: OutputConfig = %05x\n", val); break;
 	case 0x107f8:
 		logerror("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
-
-		if (m_samples != nullptr) {
-			m_samples->set_volume(0, gain_to_percentage(val));
-		}
-
 		break;
 	case 0x107f9:
 		logerror("MAS3507D: left->right  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
@@ -286,11 +293,6 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 		break;
 	case 0x107fb:
 		logerror("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
-
-		if (m_samples != nullptr) {
-			m_samples->set_volume(1, gain_to_percentage(val));
-		}
-
 		break;
 	default: logerror("MAS3507D: %d:%04x = %05x\n", bank, adr, val); break;
 	}
@@ -317,6 +319,94 @@ void mas3507d_device::run_program(uint32_t adr)
 	}
 }
 
+void mas3507d_device::fill_buffer()
+{
+	while(mp3_count < mp3data.size()) {
+		u16 v = cb_sample();
+		mp3data[mp3_count++] = v >> 8;
+		mp3data[mp3_count++] = v;
+	}
+
+	int scount = mp3dec_decode_frame(&mp3_dec, mp3data.begin(), mp3_count, samples.begin(), &mp3_info);
+
+	if(!scount) {
+		int to_drop = mp3_info.frame_bytes;
+		// At 1MHz, we can transfer around 2082 bytes/video frame.  So
+		// that puts a boundary on how much we're ready to drop
+		if(to_drop > 2082 || !to_drop)
+			to_drop = 2082;
+		std::copy(mp3data.begin() + to_drop, mp3data.end(), mp3data.begin());
+		mp3_count -= to_drop;
+		return;
+	}
+
+	std::copy(mp3data.begin() + mp3_info.frame_bytes, mp3data.end(), mp3data.begin());
+	mp3_count -= mp3_info.frame_bytes;
+
+	if(mp3_info.channels == 1)
+		sample_count = scount;
+	else
+		sample_count = scount;
+
+	if(mp3_info.hz != current_rate) {
+		current_rate = mp3_info.hz;
+		stream->set_sample_rate(current_rate);
+	}
+}
+
+void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int scount)
+{
+	if(!sample_count)
+		return;
+
+	int s1 = scount - pos;
+	if(s1 > sample_count)
+		s1 = sample_count;
+
+	if(mp3_info.channels == 1) {
+		for(int i=0; i<s1; i++) {
+			stream_sample_t v = samples[i];
+			outputs[0][i+pos] = v;
+			outputs[1][i+pos] = v;
+		}
+	} else {
+		for(int i=0; i<s1; i++) {
+			outputs[0][i+pos] = samples[i*2];
+			outputs[1][i+pos] = samples[i*2+1];
+		}
+	}
+
+	if(s1 == sample_count) {
+		pos += s1;
+		sample_count = 0;
+		return;
+	}
+
+	if(mp3_info.channels == 1)
+		std::copy(samples.begin() + s1, samples.begin() + sample_count, samples.begin());
+	else
+		std::copy(samples.begin() + s1*2, samples.begin() + sample_count*2, samples.begin());
+
+	pos += s1;
+	sample_count -= s1;
+}
+
 void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	int pos = 0;
+	total_sample_count += samples;
+	append_buffer(outputs, pos, samples);
+	for(;;) {
+		if(pos == samples)
+			return;
+		fill_buffer();
+		if(!sample_count) {
+			for(int i=pos; i != samples; i++) {
+				outputs[0][i] = 0;
+				outputs[1][i] = 0;
+			}
+			return;
+		}
+		append_buffer(outputs, pos, samples);
+	}
 }
