@@ -1986,7 +1986,7 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 		}
 		else
 		{
-			const uint32_t dstc = (dst >> m_rex3.m_store_shift) & 0xfff;
+			const uint32_t dstc = dst & 0xfff;
 			dr = (((dstc >> 8) & 15) * 0x11) / 255.0f;
 			dg = (((dstc >> 4) & 15) * 0x11) / 255.0f;
 			db = (((dstc >> 0) & 15) * 0x11) / 255.0f;
@@ -2229,7 +2229,8 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 			if (dg > 3) dg = 3;
 			if (db > 1) db = 1;
 
-			return (db << 3) | (dg << 1) | dr;
+			uint32_t color = (db << 3) | (dg << 1) | dr;
+			return (color << 4) | color;
 		}
 
 		case 1: // 8bpp
@@ -2271,7 +2272,8 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 			if (dg > 15) dg = 15;
 			if (db > 15) db = 15;
 
-			return (db << 8) | (dg << 4) | dr;
+			uint32_t color = (db << 8) | (dg << 4) | dr;
+			return (color << 12) | color;
 		}
 
 		case 3: // 24bpp
