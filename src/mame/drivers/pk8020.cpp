@@ -249,6 +249,14 @@ void pk8020_state::pk8020(machine_config &config)
 	iop1.out_pc_callback().set(FUNC(pk8020_state::video_page_w));
 
 	i8255_device &iop2(I8255(config, "iop2")); // КР580ВВ55А (D16)
+	iop2.out_pa_callback().set(m_printer, FUNC(centronics_device::write_data0)).bit(0).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data1)).bit(1).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data2)).bit(2).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data3)).bit(3).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data4)).bit(4).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data5)).bit(5).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data6)).bit(6).invert();
+	iop2.out_pa_callback().append(m_printer, FUNC(centronics_device::write_data7)).bit(7).invert();
 	iop2.out_pc_callback().set(FUNC(pk8020_state::ppi_2_portc_w));
 
 	I8255(config, "iop3"); // КР580ВВ55А (D2)
@@ -300,6 +308,9 @@ void pk8020_state::pk8020(machine_config &config)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, "cassette").set_default_state(CASSETTE_PLAY);
+
+	CENTRONICS(config, m_printer, centronics_devices, nullptr);
+	m_printer->busy_handler().set(m_inr, FUNC(pic8259_device::ir6_w)).invert();
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258

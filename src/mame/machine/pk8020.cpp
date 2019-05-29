@@ -126,8 +126,10 @@ void pk8020_state::floppy_control_w(uint8_t data)
 void pk8020_state::ppi_2_portc_w(uint8_t data)
 {
 	m_sound_gate = BIT(data,3);
-
 	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
+
+	m_printer->write_select(!BIT(data, 4));
+	m_printer->write_strobe(!BIT(data, 5));
 }
 
 WRITE_LINE_MEMBER(pk8020_state::pit_out0)

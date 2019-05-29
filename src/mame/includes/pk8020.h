@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
@@ -37,6 +38,7 @@ public:
 		m_floppy(*this, "fdc:%u", 0U),
 		m_inr(*this, "inr"),
 		m_speaker(*this, "speaker"),
+		m_printer(*this, "printer"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
 		m_io_port(*this, "LINE%u", 0U),
@@ -102,6 +104,7 @@ private:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<pic8259_device> m_inr;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<centronics_device> m_printer;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<uint8_t> m_region_gfx1;
 	required_ioport_array<16> m_io_port;
