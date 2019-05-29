@@ -254,10 +254,10 @@ void ampro_state::ampro(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	//NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, "ncr", true).set_option_machine_config("ncr", [this] (device_t *device) {
+	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, "ncr", true).set_option_machine_config("ncr", [] (device_t *device) {
 		//downcast<ncr5380n_device &>(*device).irq_handler().set(m_ctc, FUNC(z80ctc_device::trg2)); // only if JMP3 shorted
 		//downcast<ncr5380n_device &>(*device).drq_handler().set(m_dart, FUNC(z80dart_device::dcda_w)); // only if JMP8 shorted
-	//});
+	});
 }
 
 /* ROM definition */
