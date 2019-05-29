@@ -969,21 +969,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/gio64/gio64.h,BUSES["GIO64"] = true
----------------------------------------------------
-
-if (BUSES["GIO64"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/gio64/gio64.cpp",
-		MAME_DIR .. "src/devices/bus/gio64/gio64.h",
-		MAME_DIR .. "src/devices/bus/gio64/newport.cpp",
-		MAME_DIR .. "src/devices/bus/gio64/newport.h",
-	}
-end
-
-
----------------------------------------------------
---
 --@src/devices/bus/hp_hil/hp_hil.h,BUSES["HPHIL"] = true
 ---------------------------------------------------
 
@@ -3274,30 +3259,6 @@ if (BUSES["SUNMOUSE"]~=null) then
 		MAME_DIR .. "src/devices/bus/sunmouse/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/sunmouse/sunmouse.cpp",
 		MAME_DIR .. "src/devices/bus/sunmouse/sunmouse.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/bus/sbus/sbus.h,BUSES["SBUS"] = true
----------------------------------------------------
-
-if (BUSES["SBUS"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/sbus/artecon.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/artecon.h",
-		MAME_DIR .. "src/devices/bus/sbus/bwtwo.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/bwtwo.h",
-		MAME_DIR .. "src/devices/bus/sbus/cgsix.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/cgsix.h",
-		MAME_DIR .. "src/devices/bus/sbus/cgthree.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/cgthree.h",
-		MAME_DIR .. "src/devices/bus/sbus/hme.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/hme.h",
-		MAME_DIR .. "src/devices/bus/sbus/sunpc.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/sunpc.h",
-		MAME_DIR .. "src/devices/bus/sbus/sbus.cpp",
-		MAME_DIR .. "src/devices/bus/sbus/sbus.h",
 	}
 end
 
