@@ -228,6 +228,7 @@ protected:
 	void xmap1_write(uint32_t data);
 	uint32_t vc2_read();
 	void vc2_write(uint32_t data);
+	void ramdac_write(uint32_t data);
 
 	void write_x_start(int32_t val);
 	void write_y_start(int32_t val);
@@ -287,7 +288,14 @@ protected:
 	void decode_vt_table();
 	void update_screen_size();
 
+	void ramdac_remap(uint32_t *dest);
+
 	required_device<screen_device> m_screen;
+
+	uint32_t m_ramdac_lut_r[256];
+	uint32_t m_ramdac_lut_g[256];
+	uint32_t m_ramdac_lut_b[256];
+	uint8_t m_ramdac_lut_index;
 
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
