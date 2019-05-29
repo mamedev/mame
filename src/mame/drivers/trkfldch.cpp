@@ -985,20 +985,6 @@ GFXDECODE_END
      : 0x40 - ? (there is no irq 0x1c - it's the boot vector)
      : 0x80 - ? (there is no irq 0x1e)
 
-
-42/43 = y scroll on one layer?
-
-26/27 = x xcroll (top racer on track field)
-28/29 = x scroll (bottom racer on track field)
-
-2a/2b = ?? throwing event (paired with below)
-3a/3b = ?? throwing event (paired with below)
-
-54 = 18 (layer base?) (tiles are at 1800 trkfldch)
-55 = 22 (layer base?) (tiles are at 2200 trkfldch)
-56 = 2c (layer base?) (tiles are at 2c00 trkfldch)
-
-
 */
 
 READ8_MEMBER(trkfldch_state::sysregs_r)
@@ -1017,7 +1003,7 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 		logerror("%s: sysregs_r (IRQ state?) %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x02: // ends up being read as a side effect of reading a 16-bit word at 0x1, but also directly too?
+	case 0x02: // code to write 0x7f here during startup, also code to read port, mask with 0x7f and rewrite (clear top bit, probably gets set by hw?)
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
@@ -1036,7 +1022,7 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x06:
+	case 0x06: // no real reads, only side-effect of reading 7805
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 	}
