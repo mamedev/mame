@@ -253,7 +253,14 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 	m_pia->irqa_handler().set(FUNC(bally_as3022_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(bally_as3022_device::irq_w));
 
+        for (required_device<filter_rc_device> &filter : m_ay_filters)
+		// TODO: Calculate exact filter values. An AC filter is good enough for now
+		// and required as the chip likes to output a DC offset at idle.
+                FILTER_RC(config, filter).set_ac().add_route(ALL_OUTPUTS, *this, 1.0);
 	AY8910(config, m_ay, DERIVED_CLOCK(1, 4));
+	m_ay->add_route(0, "ay_filter0", 0.33);
+	m_ay->add_route(1, "ay_filter1", 0.33);
+	m_ay->add_route(2, "ay_filter2", 0.33);
 	m_ay->port_a_read_callback().set(FUNC(bally_as3022_device::ay_io_r));
 	m_ay->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
 }
@@ -376,9 +383,13 @@ void bally_sounds_plus_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &bally_sounds_plus_device::sounds_plus_map);
 	m_pia->writepb_handler().set(FUNC(bally_sounds_plus_device::vocalizer_pia_portb_w));
 
+	// TODO: Calculate exact filter values. An AC filter is good enough for now
+	// and required as the chip likes to output a DC offset at idle.
+	FILTER_RC(config, m_mc3417_filter).set_ac();
+        m_mc3417_filter->add_route(ALL_OUTPUTS, *this, 1.0);
 	MC3417(config, m_mc3417, 0);
 	// A gain of 2.2 is a guess. It sounds about loud enough and doesn't clip.
-	m_mc3417->add_route(ALL_OUTPUTS, *this, 2.2, AUTO_ALLOC_INPUT, 0);
+	m_mc3417->add_route(ALL_OUTPUTS, "mc3417_filter", 2.2);
 }
 
 //-------------------------------------------------

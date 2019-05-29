@@ -122,11 +122,13 @@ protected:
 			const char *tag,
 			device_t *owner,
 			uint32_t clock) :
-			device_t(mconfig, type, tag, owner, clock),
+		device_t(mconfig, type, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
+		m_ay_filters(*this, "ay_filter%u", 0),
 		m_ay(*this, "ay"),
+		m_mc3417_filter(*this, "mc3417_filter"),
 		m_mc3417(*this, "mc3417")
 	{ }
 
@@ -139,7 +141,9 @@ protected:
 	// The schematics list an optional 555, but it never seemed to be used
 	required_device<m6808_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia;
+	required_device_array<filter_rc_device, 3> m_ay_filters;
 	required_device<ay8910_device> m_ay;
+	optional_device<filter_rc_device> m_mc3417_filter;
 	optional_device<mc3417_device> m_mc3417;
 
 	// overwridden by children
