@@ -357,10 +357,10 @@ void mc68340_timer_module_device::do_timer_tick()
 	{
 		if (m_timer_counter & 1) // Raising flank, copy shadow to register
 		{
-		  // Shadow the counter only if we are NOT in the ICOC mode WHILE the TG bit is set
-		  if (!((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC &&
+			// Shadow the counter only if we are NOT in the ICOC mode WHILE the TG bit is set
+			if (!((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC &&
 			(m_sr & REG_SR_TG) != 0))
-			m_cntr_reg = m_cntr;
+				m_cntr_reg = m_cntr;
 			return;
 		}
 
