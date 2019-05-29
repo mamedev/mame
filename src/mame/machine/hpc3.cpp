@@ -45,8 +45,6 @@ hpc3_base_device::hpc3_base_device(const machine_config &mconfig, device_type ty
 	, m_rtc(*this, "rtc")
 	, m_ioc2(*this, "ioc2")
 	, m_hal2(*this, "hal2")
-	, m_ldac(*this, "ldac")
-	, m_rdac(*this, "rdac")
 {
 }
 
@@ -148,21 +146,6 @@ void hpc3_base_device::device_reset()
 
 void hpc3_base_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0);
-	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
-	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-
-	voltage_regulator_device &vreg = VOLTAGE_REGULATOR(config, "vref");
-	vreg.add_route(0, "ldac",  1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "rdac",  1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vreg.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-
 	SGI_HAL2(config, m_hal2);
 
 	DS1386_8K(config, m_rtc, 32768);
@@ -237,10 +220,7 @@ void hpc3_base_device::do_pbus_dma(uint32_t channel)
 		uint16_t temp16 = m_cpu_space->read_dword(dma.m_cur_ptr) >> 16;
 		int16_t stemp16 = (int16_t)((temp16 >> 8) | (temp16 << 8));
 
-		if (channel == 1)
-			m_ldac->write(stemp16);
-		else if (channel == 2)
-			m_rdac->write(stemp16);
+		m_hal2->dma_write(channel, stemp16);
 
 		dma.m_cur_ptr += 4;
 		dma.m_bytes_left -= 4;
@@ -266,7 +246,7 @@ void hpc3_base_device::do_pbus_dma(uint32_t channel)
 				return;
 			}
 		}
-		dma.m_timer->adjust(attotime::from_hz(44100));
+		dma.m_timer->adjust(m_hal2->get_rate(channel));
 	}
 	else
 	{
@@ -646,12 +626,12 @@ WRITE32_MEMBER(hpc3_base_device::volume_w)
 	if (offset == 0)
 	{
 		m_volume_r = (uint8_t)data;
-		m_rdac->set_output_gain(ALL_OUTPUTS, m_volume_r / 255.0f);
+		m_hal2->set_right_volume((uint8_t)data);
 	}
 	else
 	{
 		m_volume_l = (uint8_t)data;
-		m_ldac->set_output_gain(ALL_OUTPUTS, m_volume_l / 255.0f);
+		m_hal2->set_left_volume((uint8_t)data);
 	}
 }
 
@@ -765,7 +745,6 @@ WRITE32_MEMBER(hpc3_base_device::pbus4_w)
 READ32_MEMBER(hpc3_base_device::pbusdma_r)
 {
 	uint32_t channel = offset / (0x2000/4);
-	LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Read: %08x & %08x\n", machine().describe_context(), channel, 0x1fb80000 + offset*4, mem_mask);
 	pbus_dma_t &dma = m_pbus_dma[channel];
 
 	uint32_t ret = 0;
@@ -836,8 +815,12 @@ WRITE32_MEMBER(hpc3_base_device::pbusdma_w)
 		if (((data & PBUS_CTRL_DMASTART) && (data & PBUS_CTRL_LOAD_EN)) && channel < 4)
 		{
 			LOGMASKED(LOG_PBUS_DMA, "    Starting DMA\n");
-			dma.m_timer->adjust(attotime::from_hz(44100));
-			dma.m_active = true;
+			attotime rate = m_hal2->get_rate(channel);
+			if (rate != attotime::zero)
+			{
+				dma.m_timer->adjust(rate);
+				dma.m_active = true;
+			}
 		}
 		break;
 	default:

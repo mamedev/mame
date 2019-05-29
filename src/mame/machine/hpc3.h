@@ -16,9 +16,6 @@
 #include "machine/hal2.h"
 #include "machine/ioc2.h"
 #include "machine/wd33c9x.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
-#include "speaker.h"
 
 class hpc3_base_device : public device_t
 {
@@ -149,8 +146,6 @@ protected:
 	required_device<ds1386_device> m_rtc;
 	required_device<ioc2_device> m_ioc2;
 	required_device<hal2_device> m_hal2;
-	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
-	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 
 	uint32_t m_intstat;
 	uint32_t m_cpu_aux_ctrl;
