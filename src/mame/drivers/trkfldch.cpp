@@ -1031,8 +1031,8 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x05: // only read as a side effect of reading port 0x4 in 16-bit mode?
-		ret = 0xff;
+	case 0x05: // bit 0x20 is checked and looped on right after DMA trigger (assuming DMA trigger is correct)
+		ret = 0x20;
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
