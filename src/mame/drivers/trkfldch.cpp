@@ -1021,13 +1021,13 @@ READ8_MEMBER(trkfldch_state::sysregs_r)
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
-	case 0x03: // ends up being read as a side effect of reading a 16-bit word at 0x2, any other purpose?
+	case 0x03: // there is code to read, set bit 0x04 and write back out as well as code to clear to 0x00 (no other uses?)
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
 
-	case 0x04:
-		ret = 0xff;
+	case 0x04: // bit 0x80 is checked and looped on after writes to 78b6 (the 'large amount of data upload' port)
+		ret = 0x80;
 		logerror("%s: sysregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
