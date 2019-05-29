@@ -414,6 +414,8 @@
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "bus/sunmouse/sunmouse.h"
+#include "bus/sbus/sbus.h"
+#include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
 #include "imagedev/floppy.h"
 #include "machine/am79c90.h"
@@ -539,6 +541,8 @@ public:
 		, m_lance(*this, LANCE_TAG)
 		, m_scsibus(*this, "scsibus")
 		, m_scsi(*this, "scsibus:7:ncr53c90a")
+		, m_sbus(*this, "sbus")
+		, m_sbus_slot(*this, "slot%u", 1U)
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
@@ -654,6 +658,7 @@ private:
 
 	void type0space_map(address_map &map);
 	void type1space_map(address_map &map);
+	void type1space_sbus_map(address_map &map);
 	void type1space_s4_map(address_map &map);
 
 	enum sun4_arch
@@ -676,6 +681,8 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c90a_device> m_scsi;
 
+	optional_device<sbus_device> m_sbus;
+	optional_device_array<sbus_slot_device, 3> m_sbus_slot;
 	optional_device<address_map_bank_device> m_type0space;
 	optional_device<address_map_bank_device> m_type1space;
 	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_type1_cache;
@@ -1150,6 +1157,12 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
 	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
 	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+}
+
+void sun4_state::type1space_sbus_map(address_map &map)
+{
+	type1space_map(map);
+	map(0x0a000000, 0x0fffffff).rw(m_sbus, FUNC(sbus_device::read), FUNC(sbus_device::write));
 }
 
 void sun4_state::type1space_s4_map(address_map &map)
@@ -1949,7 +1962,7 @@ void sun4_state::sun4c(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_type0space).set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
 	AM79C90(config, m_lance);
@@ -2001,6 +2014,12 @@ void sun4_state::sun4c(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
+
+	// SBus
+	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
+	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, sbus_cards, nullptr);
 }
 
 void sun4_state::sun4_20(machine_config &config)
@@ -2008,6 +2027,11 @@ void sun4_state::sun4_20(machine_config &config)
 	sun4c(config);
 
 	m_ram->set_extra_options("4M,8M,12M,16M");
+
+	m_sbus_slot[0]->set_fixed(true);
+	m_sbus_slot[1]->set_fixed(true);
+	m_sbus_slot[2]->set_default_option("bwtwo");
+	m_sbus_slot[2]->set_fixed(true);
 }
 
 void sun4_state::sun4_40(machine_config &config)
@@ -2018,6 +2042,13 @@ void sun4_state::sun4_40(machine_config &config)
 
 	m_mmu->set_clock(25'000'000);
 	m_maincpu->set_clock(25'000'000);
+
+	m_sbus->set_clock(25'000'000);
+	m_sbus_slot[0]->set_clock(25'000'000);
+	m_sbus_slot[1]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_default_option("bwtwo");
+	m_sbus_slot[2]->set_fixed(true);
 }
 
 void sun4_state::sun4_50(machine_config &config)
@@ -2029,6 +2060,13 @@ void sun4_state::sun4_50(machine_config &config)
 
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);
+
+	m_sbus->set_clock(20'000'000);
+	m_sbus_slot[0]->set_clock(20'000'000);
+	m_sbus_slot[1]->set_clock(20'000'000);
+	m_sbus_slot[2]->set_clock(20'000'000);
+	m_sbus_slot[2]->set_default_option("turbogx"); // not accurate, should be gxp, not turbogx
+	m_sbus_slot[2]->set_fixed(true);
 }
 
 void sun4_state::sun4_60(machine_config &config)
@@ -2042,6 +2080,12 @@ void sun4_state::sun4_65(machine_config &config)
 
 	m_mmu->set_clock(25'000'000);
 	m_maincpu->set_clock(25'000'000);
+
+	m_sbus->set_clock(25'000'000);
+	m_sbus_slot[0]->set_clock(25'000'000);
+	m_sbus_slot[1]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_default_option("bwtwo");
 }
 
 void sun4_state::sun4_75(machine_config &config)
