@@ -30,11 +30,15 @@ gio64_slot_device::gio64_slot_device(const machine_config &mconfig, device_type 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_gio64(*this, finder_base::DUMMY_TAG)
+	, m_slot_type(GIO64_SLOT_COUNT)
 {
 }
 
 void gio64_slot_device::device_validity_check(validity_checker &valid) const
 {
+	if (m_slot_type == GIO64_SLOT_COUNT)
+		osd_printf_error("Slot type not defined\n");
+
 	device_t *const card(get_card_device());
 	if (card && !dynamic_cast<device_gio64_card_interface *>(card))
 		osd_printf_error("Card device %s (%s) does not implement device_gio64_card_interface\n", card->tag(), card->name());
@@ -44,7 +48,7 @@ void gio64_slot_device::device_resolve_objects()
 {
 	device_gio64_card_interface *const gio64_card(dynamic_cast<device_gio64_card_interface *>(get_card_device()));
 	if (gio64_card)
-		gio64_card->set_gio64(m_gio64, tag());
+		gio64_card->set_gio64(m_gio64, m_slot_type);
 }
 
 void gio64_slot_device::device_start()
@@ -74,12 +78,14 @@ gio64_device::gio64_device(const machine_config &mconfig, device_type type, cons
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("GIO64 Space", ENDIANNESS_BIG, 64, 32, 0, address_map_constructor())
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_hpc3(*this, finder_base::DUMMY_TAG)
+	, m_interrupt_cb{{*this}, {*this}, {*this}}
 {
 }
 
 void gio64_device::device_resolve_objects()
 {
+	for (auto &cb : m_interrupt_cb)
+		cb.resolve_safe();
 }
 
 void gio64_device::device_start()
@@ -124,8 +130,9 @@ device_gio64_card_interface *gio64_device::get_gio64_card(int slot)
 	return nullptr;
 }
 
-void gio64_device::add_gio64_card(device_gio64_card_interface::gio64_slot_type_t slot_type, device_gio64_card_interface *card)
+void gio64_device::add_gio64_card(gio64_slot_device::slot_type_t slot_type, device_gio64_card_interface *card)
 {
+	assert(slot_type >= 0 && slot_type < gio64_slot_device::GIO64_SLOT_COUNT);
 	m_device_list[slot_type] = card;
 	card->install_device();
 }
@@ -136,7 +143,7 @@ device_gio64_card_interface::device_gio64_card_interface(const machine_config &m
 	: device_slot_card_interface(mconfig, device)
 	, m_gio64(nullptr)
 	, m_gio64_slottag(nullptr)
-	, m_slot_type(GIO64_SLOT_COUNT)
+	, m_slot_type(gio64_slot_device::GIO64_SLOT_COUNT)
 {
 }
 
@@ -157,26 +164,17 @@ void device_gio64_card_interface::interface_pre_start()
 		fatalerror("Can't find SGI GIO64 device\n");
 	}
 
-	if (GIO64_SLOT_COUNT == m_slot_type)
-	{
-		if (!m_gio64->started())
-			throw device_missing_dependencies();
-
-		if (strcmp(m_gio64_slottag, ":gio64_gfx") == 0)
-			m_slot_type = GIO64_SLOT_GFX;
-		else if (strcmp(m_gio64_slottag, ":gio64_exp0") == 0)
-			m_slot_type = GIO64_SLOT_EXP0;
-		else if (strcmp(m_gio64_slottag, ":gio64_exp1") == 0)
-			m_slot_type = GIO64_SLOT_EXP1;
-		else
-			fatalerror("Slot %s incorrectly named for SGI GIO64 graphics slot\n", m_gio64_slottag);
-
-		m_gio64->add_gio64_card(m_slot_type, this);
-	}
+	if (!m_gio64->started())
+		throw device_missing_dependencies();
 }
 
-void device_gio64_card_interface::set_gio64(gio64_device *gio64, const char *slottag)
+void device_gio64_card_interface::interface_post_start()
+{
+	m_gio64->add_gio64_card(m_slot_type, this);
+}
+
+void device_gio64_card_interface::set_gio64(gio64_device *gio64, gio64_slot_device::slot_type_t slot_type)
 {
 	m_gio64 = gio64;
-	m_gio64_slottag = slottag;
+	m_slot_type = slot_type;
 }

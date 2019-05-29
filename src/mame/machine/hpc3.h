@@ -36,6 +36,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsi1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
 
+	DECLARE_WRITE_LINE_MEMBER(gio_int0);
+	DECLARE_WRITE_LINE_MEMBER(gio_int1);
+	DECLARE_WRITE_LINE_MEMBER(gio_int2);
+
 protected:
 	hpc3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

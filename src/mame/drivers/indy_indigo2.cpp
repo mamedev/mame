@@ -245,10 +245,13 @@ void ip22_state::ip22_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 
 	// GIO64
-	GIO64(config, m_gio64, m_maincpu, m_hpc3);
-	GIO64_SLOT(config, m_gio64_gfx, m_gio64, gio64_cards, "xl24");
-	GIO64_SLOT(config, m_gio64_exp0, m_gio64, gio64_cards, nullptr);
-	GIO64_SLOT(config, m_gio64_exp1, m_gio64, gio64_cards, nullptr);
+	GIO64(config, m_gio64, m_maincpu);
+	m_gio64->interrupt_cb<0>().set(m_hpc3, FUNC(hpc3_base_device::gio_int0));
+	m_gio64->interrupt_cb<1>().set(m_hpc3, FUNC(hpc3_base_device::gio_int1));
+	m_gio64->interrupt_cb<2>().set(m_hpc3, FUNC(hpc3_base_device::gio_int2));
+	GIO64_SLOT(config, m_gio64_gfx, m_gio64, gio64_slot_device::GIO64_SLOT_GFX, gio64_cards, "xl24");
+	GIO64_SLOT(config, m_gio64_exp0, m_gio64, gio64_slot_device::GIO64_SLOT_EXP0, gio64_cards, nullptr);
+	GIO64_SLOT(config, m_gio64_exp1, m_gio64, gio64_slot_device::GIO64_SLOT_EXP1, gio64_cards, nullptr);
 }
 
 void ip22_state::ip225015(machine_config &config)

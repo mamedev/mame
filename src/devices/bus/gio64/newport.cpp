@@ -1348,7 +1348,7 @@ WRITE_LINE_MEMBER(newport_base_device::vblank_w)
 		if (BIT(m_vc2.m_display_ctrl, 0))
 		{
 			m_rex3.m_status |= STATUS_VRINT;
-			m_gio64->get_hpc3()->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+			m_gio64->interrupt<2>(ASSERT_LINE);
 		}
 	}
 }
@@ -1784,7 +1784,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 			LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
 			uint32_t old_status = m_rex3.m_status;
 			m_rex3.m_status &= ~STATUS_VRINT;
-			m_gio64->get_hpc3()->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+			m_gio64->interrupt<2>(CLEAR_LINE);
 			ret |= (uint64_t)(old_status | 3) << 32;
 		}
 		if (ACCESSING_BITS_0_31)

@@ -1055,3 +1055,27 @@ WRITE32_MEMBER(hpc3_base_device::eeprom_w)
 	m_eeprom->cs_write(BIT(data, 1));
 	m_eeprom->clk_write(BIT(data, 2));
 }
+
+WRITE_LINE_MEMBER(hpc3_base_device::gio_int0)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
+}
+
+WRITE_LINE_MEMBER(hpc3_base_device::gio_int1)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+}
+
+WRITE_LINE_MEMBER(hpc3_base_device::gio_int2)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+	else
+		lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+}
