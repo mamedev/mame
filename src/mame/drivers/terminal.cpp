@@ -120,6 +120,16 @@ ROM_START( teleguide ) // order unknown // i8051, i8031 (layout very similar to 
 	ROM_LOAD( "module_19315-051_349-01173.bin",    0x20000, 0x08000, CRC(29c4b49d) SHA1(9bf37616eb130cb6bf86954b4a4952ea99d43ce8) )
 ROM_END
 
+ROM_START( telex277d ) // D8085A, P8155. bank of 8 dips between these 2 chips. xtals on cpu board = 6.144,14.286MHz; xtal on other board = 15.414? (too blurry to read)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15834.bin",    0x0000, 0x0800, CRC(364602ed) SHA1(574b1052ab000cfb9e7f194454de65f5255c250e) )
+	ROM_LOAD( "15835.bin",    0x0800, 0x0800, CRC(b587d005) SHA1(de38b1dcbb871dc5f7dcbc177dfcbc25ecc743c4) )
+	ROM_LOAD( "15836.bin",    0x1000, 0x0800, CRC(33a7179f) SHA1(c4b2a8f9d2b3e2f97c7d9b5458cad314fc8c79c1) )
+	ROM_LOAD( "15837.bin",    0x1800, 0x0800, CRC(6d726662) SHA1(cff3ea2f06b802b94acfb780014d0e389cb61c42) )
+
+	ROM_REGION( 0x0400, "chargen", 0 )
+	ROM_LOAD( "15181_font.bin", 0x0000, 0x0400, CRC(2a7abd0b) SHA1(4456723c59307671dd0615723e6439f6532df531) )
+ROM_END
 
 
 /* Driver */
@@ -133,3 +143,4 @@ COMP( 1986, t3210,     0,      0,      terminal, terminal, terminal_state, empty
 COMP( 1986, feap90,    0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Multitel Fe Ap 90-1.1",  MACHINE_IS_SKELETON )
 COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )
+COMP( 1979, telex277d, 0,      0,      terminal, terminal, terminal_state, empty_init, "Telex",              "Telex 277-D",            MACHINE_IS_SKELETON )
