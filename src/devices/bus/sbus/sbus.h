@@ -146,6 +146,7 @@ protected:
 
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
 	virtual void install_device() = 0;
 
 	sbus_device &sbus() { assert(m_sbus); return *m_sbus; }

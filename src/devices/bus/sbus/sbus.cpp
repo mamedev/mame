@@ -199,14 +199,14 @@ void device_sbus_card_interface::interface_pre_start()
 			fatalerror("Can't find Sun SBus device %s\n", m_sbus_finder.finder_tag());
 	}
 
-	if (0 > m_slot)
-	{
-		if (!m_sbus->started())
-			throw device_missing_dependencies();
+	if (!m_sbus->started())
+		throw device_missing_dependencies();
+}
 
-		m_base = m_slot << 25;
-		m_sbus->add_sbus_card(m_slot, this);
-	}
+void device_sbus_card_interface::interface_post_start()
+{
+	m_base = m_slot << 25;
+	m_sbus->add_sbus_card(m_slot, this);
 }
 
 void device_sbus_card_interface::set_sbus(sbus_device *sbus, int slot)
