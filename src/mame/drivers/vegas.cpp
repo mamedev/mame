@@ -7,21 +7,18 @@
     driver by Aaron Giles
 
     Games supported:
-        * Gauntlet Legends [200MHz R5000, 8MB RAM, Vegas + Vegas SIO + Voodoo 2, 2-TMU * 4MB]
-        * War: Final Assault [250MHz R5000, 8MB RAM, Vegas + Vegas SIO + Voodoo 2, 2-TMU * 4MB]
-        * NBA on NBC
-        * Tenth Degree/ Juko Threat
-        * NBA Showtime Gold + NFL Blitz 2000 Gold
+        * Gauntlet Legends [Vegas CPU, Vegas SIO, Voodoo 2]
+        * Tenth Degree/ Juko Threat [Vegas CPU, Vegas SIO, Voodoo 2]
+        * Gauntlet Dark Legacy [Vegas/Durango CPU, Vegas SIO, Voodoo 2]
+        * War: Final Assault [Vegas/Durango CPU, Vegas SIO, Voodoo 2, 2-TMU 8 4MB]
+        * NBA Showtime: NBA on NBC/ NFL Blitz 2000 Gold [Vegas/Durango CPU, Vegas SIO, Voodoo Banshee]
+        * Road Burners [Durango CPU, DSIO, Voodoo 2]
+        * CART Fury [Durango CPU, Vegas SIO, Voodoo 3]
+        * San Francisco Rush 2049 [Durango CPU, Denver SIO, Voodoo 3]
 
-    Durango PCB (uses an RM7000 or RM5271 @ 250MHz):
-        * Gauntlet Dark Legacy [Atari, 200MHz]
-        * Road Burners [250MHz QED5271, 32MB RAM, Durango + DSIO + Voodoo 2, 2-TMU * 4MB]
-        * San Francisco Rush 2049 [250MHz RM7000, 32MB RAM, Durango + Denver + Voodoo 3, 16MB]
-        * San Francisco Rush 2049 Tournament Edition (PIC ID = 348)
-        * CART Fury
-
-    Known bugs:
-        * not working yet
+    Todo:
+        * nbanfl and nbagold reset if accessing one test mode after the other. For example, if NFL Blitz's test mode
+		was accessed first, accessing NBA Showtime's test mode will reset the game.
 
 ***************************************************************************
 
@@ -72,25 +69,21 @@
     Three boards per game. CPU board, sound I/O board, and a video board.
 
     CPU boards:
-        Vegas    - R5000 @ 200-250MHz, 8MB RAM
-        Vegas32  - R5000 @ 200-250MHz, 32MB RAM
-        Durango  - RM7000 or RM5271 @ 250-300MHz, 8-32MB RAM
+        Vegas    - R5000 @ 200MHz, 8MB RAM
+        Durango  - RM7000, RM5271 or QED5271LE @ 250MHz, 32MB RAM
 
     Sound I/O boards:
         Vegas SIO  - ADSP2104 @ 16MHz, boot ROM, 4MB RAM
         Deluxe SIO - ADSP2181 @ 32MHz, no ROM, 4MB RAM
-        Denver SIO - ADSP2181 @ 33MHz, no ROM, 4MB RAM
+        Denver SIO - ADSP2181 @ 33MHz, no ROM, 8MB RAM
 
     Video boards:
-        Voodoo 2
-        Voodoo Banshee
-        Voodoo 3
+        Voodoo 2, 2-TMU RAM, 4MB FB RAM
+        Voodoo Banshee, 16MB FB RAM
+        Voodoo 3, 16 MB FB RAM
 
 
 ***************************************************************************
-
- Gauntlet Legends info:
-
 
  CPU PCB:  Vegas CPU  Midway no.5770-15563-06
  --------------------------------------------
@@ -110,6 +103,8 @@
  U10  MPC948            Motorola low voltage clock distribution chip
  U21  PC1646U2          CMD EIDE Controller
 
+Note: Gauntlet Legends and Tenth Degree can only run on a Vegas CPU board because the Durango board
+is "too fast" to run these two games.
 
  Sound I/O PCB: Vegas 7-7-7 SIO-4 PCB  Midway no.5770-15534-04
  -------------------------------------------------------------
@@ -167,13 +162,7 @@
  U59   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
  U60   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
 
-
-***************************************************************************
-
- Gauntlet Dark Legacy Info:
-
-
- CPU board: Durango 5770-15982-00    sticker with RM5271 on it
+ CPU board: Durango 5770-15982-00 sticker with RM5271 on it
  --------------------------------
  1x RM5271 CPU(assuming this is correct...don't want to remove the heatsink from my good board)
  1x medium sized BGA, has heatsink
@@ -198,80 +187,8 @@
    P5 9 pin marked "Serial"
    Non-designated connector marked "EXP CONN" Standard PCI connector found on PC motherboards(custom mounted on the side of the PCB), SIO connects here
 
-
-
- SIO board: Vegas777 5770-15534-05
- ---------------------------------
- 1x Midway 5410-14589-00 IO chip
- 1x ADSP-2104  (16MHz crystal attached to clock pins)
- 1x ADC0848CCN analog input chip
- 1x ST M4t28-br12sh1  timekeeper
- 1x Altera Flex epf6016tc144   pld
- 1x Midway security PIC Gauntlet DL 27" 346xxxxxx (4MHz crystal attached)
- 2x KM416C1200CJ-6  RAM
- 1x SMSC LAN91C94 ethernet
- 1x Midway 5410-14590-00 ???
- 3x CY7C199-15VC  32Kx8 SRAM
- 1x AD1866 DAC
- 20MHz crystal attached to LAN chip
- other misc parts
- SIO ROM 1.0
-
-
-
- Voodoo card: Quantum3D Obsidian2 PCI 650-0818-03D
- -------------------------------------------------
- (SLI pin holes filled with solder, no connector, has no VGA input/passthrough connector, only VGA out)
-
- 1x XC9572 label 546-0014-02
- 20x silicon magic 100MHz   sm81c256k16cj-25   RAM (8MB for texture RAM, 2MB for framebuffer?)
- 2x 3dfx 500-0010-01 texelfx
- 1x 3dfx 500-0009-01 pixelfx
- 1x 14.318MHz crystal
- 1 x 3384q 10bit bus switch(i think)
- 1x ICS GenDAC ICS5342-3
- other misc IC's
-
-
-***************************************************************************
-
- Gauntlet Legends versus Gauntlet Dark Legacy
-
-
- CPU board: Vegas 5770-15563-06
- ------------------------------
- 4x NEC D4516161A65-A10-9NF 8MB RAM  (other difference here...this PCB only has spots for these chips, the Durango has alternate positions for RAM, I assume for larger chips)
- 1x 33.3333MHz crystal (in addition to the 100MHz crystal, on Durango this spot is present but unpopulated)
- 1x Atmel ATF1500A  PLD A-22560 (replaces A-22912 on Durango)
- 1x 93lc46b (A-22545 config EEPROM, dump is mostly FF and 00)
- Boot ROM "Gauntlet Update Boot v1.5 A-5343-30022-7"
-
-
-
- SIO board: Vegas777 5770-15534-05 (same as Legacy)
- --------------------------------------------------
- Security PIC "Gauntlet 27" 322xxxxxx"
- Sound ROM "Gauntlet 3D U44 Sound 1.0"
- 2x TMS418160ADZ RAM instead of 2x KM416C1200CJ-6 on Legacy
- 20MHz crystal attached to LAN chip
- 1x Valor  SF1012 ethernet physical interface(also on other board)
-
- Connectors:
-   P1 5 pin marked "Snd Line In"
-   P5 5 pin marked "Snd Line Out"
-   unmarked 4 pin PC style power connector(for hard drive)
-   standard JAMMA connection
-   P7 14 pin marked "PLYR4"
-   P14 14 pin marked "PLYR3"
-   P23 10 pin marked "Coin DR"
-   P10 unmarked 10 pin connector (no idea)
-   P21 99 pin unmarked -right on top of PCI edge connection to CPU board
-   P15 20 pin marked "Aux Latched Out"
-   P8 14 pin unmarked
-   P2 11 pin marked "Gun 2 I/O"
-   P4 11 pin marked "Gun 1 I/O"
-   P 18 standard ethernet connector
-
+Note: Gauntlet Dark Legacy, War: Final Assault and the NBA Showtime games all came factory supplied with a Vegas CPU board
+but these games can run on a Durango CPU board for additional performance.
 
 **************************************************************************/
 
@@ -338,39 +255,37 @@ public:
 		m_a2d_shift(0)
 	{ }
 
-	void vegascore(machine_config &config);
 	void vegas(machine_config &config);
-	void vegas250(machine_config &config);
-	void vegas32m(machine_config &config);
+	void durango(machine_config &config);
 	void vegasban(machine_config &config);
 	void vegasv3(machine_config &config);
 	void denver(machine_config &config);
 
+	void gauntleg(machine_config &config);
+	void gauntdl(machine_config &config);
+	void tenthdeg(machine_config &config);
+	void warfa(machine_config &config);
+	void roadburn(machine_config &config);
+	void nbashowt(machine_config &config);
 	void nbanfl(machine_config &config);
+	void nbagold(machine_config &config);
+	void sf2049(machine_config &config);
 	void sf2049te(machine_config &config);
 	void sf2049se(machine_config &config);
-	void nbashowt(machine_config &config);
-	void gauntdl(machine_config &config);
-	void sf2049(machine_config &config);
-	void gauntleg(machine_config &config);
 	void cartfury(machine_config &config);
-	void tenthdeg(machine_config &config);
-	void nbagold(machine_config &config);
-	void roadburn(machine_config &config);
-	void warfa(machine_config &config);
 
 	void init_gauntleg();
-	void init_cartfury();
+	void init_gauntdl();
 	void init_tenthdeg();
-	void init_nbashowt();
-	void init_nbagold();
 	void init_warfa();
 	void init_roadburn();
-	void init_sf2049te();
-	void init_gauntdl();
+	void init_nbashowt();
 	void init_nbanfl();
+	void init_nbagold();
 	void init_sf2049();
 	void init_sf2049se();
+	void init_sf2049te();
+	void init_cartfury();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
@@ -1747,7 +1662,7 @@ void vegas_state::vegas_cs8_map(address_map &map)
  *
  *************************************/
 
-void vegas_state::vegascore(machine_config &config)
+void vegas_state::vegas(machine_config &config)
 {
 	/* basic machine hardware */
 	R5000LE(config, m_maincpu, vegas_state::SYSTEM_CLOCK * 2);
@@ -1794,52 +1709,9 @@ void vegas_state::vegascore(machine_config &config)
 }
 
 
-void vegas_state::vegas(machine_config &config)
+void vegas_state::durango(machine_config &config)
 {
-	vegascore(config);
-}
-
-
-void vegas_state::vegas250(machine_config &config)
-{
-	vegascore(config);
-	m_maincpu->set_clock(vegas_state::SYSTEM_CLOCK*2.5);
-}
-
-
-void vegas_state::vegas32m(machine_config &config)
-{
-	vegas250(config);
-	m_nile->set_sdram_size(0, 0x02000000);
-}
-
-
-void vegas_state::vegasban(machine_config &config)
-{
-	vegas32m(config);
-	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
-	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
-}
-
-
-void vegas_state::vegasv3(machine_config &config)
-{
-	vegas32m(config);
-	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
-	m_maincpu->set_icache_size(16384);
-	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
-
-	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
-	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
-}
-
-
-void vegas_state::denver(machine_config &config)
-{
-	vegascore(config);
+	vegas(config);
 	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
 
 	m_maincpu->set_icache_size(16384);
@@ -1847,10 +1719,6 @@ void vegas_state::denver(machine_config &config)
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 	m_nile->set_sdram_size(0, 0x02000000);
 	m_nile->set_map(8, address_map_constructor(&vegas_state::vegas_cs8_map, "vegas_cs8_map", this), this);
-
-	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
-	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
 	NS16550(config, m_uart1, XTAL(1'843'200));
@@ -1878,10 +1746,29 @@ void vegas_state::denver(machine_config &config)
 	ttys02.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
 	ttys02.ri_handler().set(m_uart2, FUNC(ins8250_uart_device::ri_w));
 	ttys02.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
-
 }
 
-// Per driver configs
+
+void vegas_state::vegasban(machine_config &config)
+{
+	vegas(config);
+//	durango(config);
+	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(16);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+}
+
+
+void vegas_state::vegasv3(machine_config &config)
+{
+	durango(config);
+
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(16);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+}
+
+// Per game configs
 
 void vegas_state::gauntleg(machine_config &config)
 {
@@ -1901,6 +1788,7 @@ void vegas_state::gauntleg(machine_config &config)
 void vegas_state::gauntdl(machine_config &config)
 {
 	vegas(config);
+//	durango(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -1908,21 +1796,6 @@ void vegas_state::gauntdl(machine_config &config)
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(346/* 347, others? */);
-	m_ioasic->set_yearoffs(80);
-	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
-	m_ioasic->set_auto_ack(1);
-}
-
-void vegas_state::warfa(machine_config &config)
-{
-	vegas250(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
-	dcs.set_dram_in_mb(4);
-	dcs.set_polling_offset(0x0b5d);
-
-	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
-	m_ioasic->set_upper(337/* others? */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
@@ -1943,9 +1816,25 @@ void vegas_state::tenthdeg(machine_config &config)
 	m_ioasic->set_auto_ack(1);
 }
 
+void vegas_state::warfa(machine_config &config)
+{
+	vegas(config);
+//	durango(config);
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_dram_in_mb(4);
+	dcs.set_polling_offset(0x0b5d);
+
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
+	m_ioasic->set_upper(337/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
+}
+
 void vegas_state::roadburn(machine_config &config)
 {
-	vegas32m(config);
+	durango(config);
 	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0ddd);
@@ -1994,11 +1883,6 @@ void vegas_state::nbanfl(machine_config &config)
 void vegas_state::nbagold(machine_config &config)
 {
 	vegasban(config);
-	QED5271LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
-	m_maincpu->set_icache_size(32768);
-	m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
-	m_nile->set_sdram_size(0, 0x00800000);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2009,12 +1893,12 @@ void vegas_state::nbagold(machine_config &config)
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
 	//m_ioasic->set_auto_ack(1)
-	 m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::i40_w));
 }
 
 void vegas_state::sf2049(machine_config &config)
 {
-	denver(config);
+	vegasv3(config);
 	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
@@ -2030,7 +1914,7 @@ void vegas_state::sf2049(machine_config &config)
 
 void vegas_state::sf2049se(machine_config &config)
 {
-	denver(config);
+	vegasv3(config);
 	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
@@ -2046,7 +1930,7 @@ void vegas_state::sf2049se(machine_config &config)
 
 void vegas_state::sf2049te(machine_config &config)
 {
-	denver(config);
+	vegasv3(config);
 	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
@@ -2155,6 +2039,21 @@ ROM_START( gauntdl24 )
 ROM_END
 
 
+ROM_START( tenthdeg )
+	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
+	ROM_LOAD( "tenthdeg.bio", 0x000000, 0x80000, CRC(1cd2191b) SHA1(a40c48f3d6a9e2760cec809a79a35abe762da9ce) )
+
+	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
+
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Guts 5/26/1998 Main 8/25/1998 */
+	DISK_IMAGE( "tenthdeg", 0, SHA1(41a1a045a2d118cf6235be2cc40bf16dbb8be5d1) )
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
+	ROM_LOAD16_BYTE( "tenthdeg.snd", 0x000000, 0x8000, CRC(1c75c1c1) SHA1(02ac1419b0fd4acc3f39676e7dce879e926d998b) )
+ROM_END
+
+
 ROM_START( warfa )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* EPROM 1.9 3/25/1999 */
 	ROM_LOAD( "warboot.v19", 0x000000, 0x80000, CRC(b0c095cd) SHA1(d3b8cccdca83f0ecb49aa7993864cfdaa4e5c6f0) )
@@ -2210,20 +2109,6 @@ ROM_START( warfac )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
-ROM_END
-
-ROM_START( tenthdeg )
-	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
-	ROM_LOAD( "tenthdeg.bio", 0x000000, 0x80000, CRC(1cd2191b) SHA1(a40c48f3d6a9e2760cec809a79a35abe762da9ce) )
-
-	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
-
-
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Guts 5/26/1998 Main 8/25/1998 */
-	DISK_IMAGE( "tenthdeg", 0, SHA1(41a1a045a2d118cf6235be2cc40bf16dbb8be5d1) )
-
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
-	ROM_LOAD16_BYTE( "tenthdeg.snd", 0x000000, 0x8000, CRC(1c75c1c1) SHA1(02ac1419b0fd4acc3f39676e7dce879e926d998b) )
 ROM_END
 
 
@@ -2290,9 +2175,8 @@ ROM_START( nbanfl )
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
-// I'm not sure if NBA Showtime: NBA on NBC Gold was a standalone release, or the version with NBA Showtime: NBA on NBC Gold is actually 'Sports Station'
-// it's possible the boot rom and CHD are mismatched here
-ROM_START( nbagold )
+
+ROM_START( nbagold ) //Also known as SportsStation
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
 	ROM_LOAD( "nbagold_jan10_2000.u27", 0x000000, 0x80000, CRC(6768e802) SHA1(d994e3efe14f57e261841134ddd1489fa67d418b) ) // 11:29:11 Jan 10 2000. BIOS FOR NBAGOLD USING BANSHEE / 11:23:58 Jan 10 2000. POST FOR NBAGOLD USING BANSHEE
 
@@ -2306,15 +2190,13 @@ ROM_START( nbagold )
 	//BUILD DATE:Feb 17 2000 (game?)
 	//BUILD DATE:Feb 10 2000 (something else?)
 	DISK_IMAGE( "nbanfl3", 0,  SHA1(19a51346ce5ae4e06e8dff3eb4bed59ec1ee855f))
-	// these both contain the same strings / build dates, same thing with different user data / drive sizes?
+	// these both contain the same strings / build dates, same thing with different user data. May remove eventually.
 //  DISK_IMAGE( "nbanfl27", 0, SHA1(da371d27e2fbceec493e2203055e0c1399eaf3b9) )
 //  DISK_IMAGE( "sportstn", 0, SHA1(9442feefaeb5ae4a090422e937615f8a2d8e8f31) )
 
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
-
-	// also a PIC?
 ROM_END
 
 
@@ -2490,7 +2372,7 @@ GAME( 1998, gauntleg,   0,        gauntleg, gauntleg, vegas_state, init_gauntleg
 GAME( 1998, gauntleg12, gauntleg, gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tenthdeg,   0,        tenthdeg, tenthdeg, vegas_state, init_tenthdeg, ROT0, "Atari Games",   "Tenth Degree (prototype)", MACHINE_SUPPORTS_SAVE )
 
-/* Durango + Vegas SIO + Voodoo 2 */
+/* Vegas/Durango + Vegas SIO + Voodoo 2 */
 GAME( 1999, gauntdl,    0,        gauntdl,  gauntdl,  vegas_state, init_gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, gauntdl24,  gauntdl,  gauntdl,  gauntdl,  vegas_state, init_gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, warfa,      0,        warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_SUPPORTS_SAVE )
@@ -2499,21 +2381,21 @@ GAME( 1999, warfab,     warfa,    warfa,    warfa,    vegas_state, init_warfa,  
 GAME( 1999, warfac,     warfa,    warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.91 Apr 13 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 
-/* Durango + DSIO + Voodoo 2 */
+/* Durango + Deluxe SIO + Voodoo 2 */
 GAME( 1999, roadburn,   0,        roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.04)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.0)", MACHINE_SUPPORTS_SAVE )
 
-/* Durango + DSIO? + Voodoo banshee */
-GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random freezes on the 3d parts
-GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) //attempting to run blitz on either v2.1 or v3.0 wlil reset the machine
-GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/* Vegas/Durango + Vegas SIO + Voodoo Banshee */
+GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (SportsStation)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) //always boots NBA Showtime regardless of DIP setting; bug on actual hardware
 
 
 /* Durango + Denver SIO + Voodoo 3 */
-GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2003, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2000, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2001, sf2049tea,  sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 1999, sf2049,    0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049 (EPROM 1.02 Jul 9 1999, GUTS 1.03 Sep 3 1999, GAME Sep 8 1999)", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2003, sf2049se,  0,        sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition (GUTS 1.61 Sep 16 2003, GAME Sep 16 2003)", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2000, sf2049te,  0,        sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition (EPROM 0.56 Apr 17 2000)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2000, sf2049tea, sf2049te, sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 /* Durango + Vegas SIO + Voodoo 3 */
-GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games",  "Cart Fury", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games",  "Cart Fury Championship Racing (v1.00 Jun 22 2000)", MACHINE_SUPPORTS_SAVE )

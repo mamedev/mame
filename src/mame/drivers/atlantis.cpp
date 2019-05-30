@@ -4,11 +4,11 @@
 
     Midway "Atlantis" hardware
 
-    skeleton by R. Belmont
+    Preliminary driver by R. Belmont
 
     Games supported:
         * Midway Skins Game
-        * Midway Skins Game Tournament Edition (not dumped)
+        * Midway Skins Game Tournament Edition
         * Midway Swingers Tour (not dumped)
 
     Hardware overview:
@@ -30,6 +30,9 @@
 
     TODO:
         * PCI peripherals
+		* Many of the issues here are related to the Zeus 2 graphic chip emulation (see midzeus.cpp).
+		Speed/timing is even worse here compared to midzeus.cpp.
+		
 
     NOTES:
         * Skins Game is Linux based; the kernel is a customized 2.2.10 build of Linux-MIPS with Midway PCBs
@@ -948,8 +951,8 @@ void atlantis_state::init_mwskins()
  *  Game driver(s)
  *
  *************************************/
-
-GAME( 2000, mwskins,  0,       mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.06)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mwskinsa, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.06, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, mwskinso, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, mwskinst, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game Tournament Edition", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mwskins,  0,       mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.06)", GAME_FLAGS )
+GAME( 2000, mwskinsa, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.06, alt)", GAME_FLAGS)
+GAME( 2000, mwskinso, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.04)", GAME_FLAGS)
+GAME( 2000, mwskinst, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game Tournament Edition", GAME_FLAGS)
