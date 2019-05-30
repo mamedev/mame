@@ -8544,11 +8544,26 @@
 	</software>
 
 	<software name="chessm">
+		<!-- uses ChessMachine ISA card, not compatible with Final ChessCard -->
+		<!-- installer v3.3a, program v3.1, chess engine v2.20(The King) -->
+		<description>The ChessMachine (v3.1, The King v2.20)</description>
+		<year>1993</year>
+		<publisher>Tasc</publisher>
+		<info name="serial" value="WR.887.68.354" />
+		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine ISA card required." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="theking22.img" size="737280" crc="a93939a6" sha1="2f3927e50dd82b93ca3fa1436f5b664abc18d061"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessm23">
 		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
-		<description>The ChessMachine (Installer v3.0)</description>
+		<!-- installer v3.0, program v2.3, chess engine v2.1(Gideon) -->
+		<description>The ChessMachine (v2.3, Gideon v2.1)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
-		<info name="version" value="3.0" />
 		<info name="serial" value="WR.887.68.354" />
 		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine/Final ChessCard ISA card required." />
 		<part name="flop1" interface="floppy_3_5">
@@ -8571,12 +8586,13 @@
 		</part>
 	</software>
 
-	<software name="chessm22">
+	<software name="chessm21">
 		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
-		<description>The ChessMachine (Installer v2.2)</description>
+		<!-- installer v2.2, program v2.1, chess engine v2.1(Gideon) -->
+		<!-- also includes optional older chess engine v0.5(The King) -->
+		<description>The ChessMachine (v2.1, Gideon v2.1)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
-		<info name="version" value="2.2" />
 		<info name="serial" value="50677" />
 		<info name="usage" value="ChessMachine/Final ChessCard ISA card required" />
 		<part name="flop1" interface="floppy_3_5">
@@ -9611,8 +9627,9 @@
 
 	<software name="finalchs">
 		<!-- uses Final ChessCard ISA card, ROM v3.6 (incompatible with older version) -->
-		<description>The Final ChessCard (Installer v2.0/Program v1.9)</description>
-		<year>1989</year>
+		<!-- installer v2.0, program v1.9 -->
+		<description>The Final ChessCard (v1.9)</description>
+		<year>1990</year>
 		<publisher>Tasc</publisher>
 		<info name="usage" value="Final ChessCard ISA card required" />
 		<part name="flop1" interface="floppy_3_5">
@@ -9622,15 +9639,16 @@
 		</part>
 	</software>
 
-	<software name="finalchso">
+	<software name="finalchs15">
 		<!-- uses Final ChessCard ISA card, ROM v2.0 (incompatible with newer version) -->
-		<description>The Final ChessCard (Program v1.5)</description>
+		<!-- installer v(none), program v1.5, install.exe and setup.exe are in Dutch -->
+		<description>The Final ChessCard (v1.5)</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>
 		<info name="usage" value="Final ChessCard ISA card required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="finalchso.img" size="737280" crc="4988a9c7" sha1="27483b574e73ca1bbd3984f7d1318ecc313a8b3e"/>
+				<rom name="finalchs15.img" size="737280" crc="4988a9c7" sha1="27483b574e73ca1bbd3984f7d1318ecc313a8b3e"/>
 			</dataarea>
 		</part>
 	</software>
