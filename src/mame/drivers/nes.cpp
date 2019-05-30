@@ -65,6 +65,7 @@ void nes_state::nes(machine_config &config)
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nes_state::screen_update_nes));
+	m_screen->screen_vblank().set(FUNC(nes_state::screen_vblank_nes));
 
 	PPU_2C02(config, m_ppu);
 	m_ppu->set_cpu_tag(m_maincpu);
