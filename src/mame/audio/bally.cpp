@@ -17,11 +17,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BALLY_AS2888,        bally_as2888_device,        "as2888",        "Bally AS2888 Sound Board")
-DEFINE_DEVICE_TYPE(BALLY_AS3022,        bally_as3022_device,        "as3022",        "Bally AS3022 Sound Board")
-DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,   bally_sounds_plus_device,   "sounds_plus",   "Bally Sounds Plus w/ Vocalizer Board")
-DEFINE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,  bally_cheap_squeak_device,  "cheap_squeak",  "Bally Cheap Squeak Board")
-DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK, bally_squawk_n_talk_device, "squawk_n_talk", "Bally Squawk & Talk Board")
+DEFINE_DEVICE_TYPE(BALLY_AS2888,           bally_as2888_device,           "as2888",           "Bally AS2888 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_AS3022,           bally_as3022_device,           "as3022",           "Bally AS3022 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,      bally_sounds_plus_device,      "sounds_plus",      "Bally Sounds Plus w/ Vocalizer Board")
+DEFINE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,     bally_cheap_squeak_device,     "cheap_squeak",     "Bally Cheap Squeak Board")
+DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK,    bally_squawk_n_talk_device,    "squawk_n_talk",    "Bally Squawk & Talk Board")
+DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK_AY, bally_squawk_n_talk_ay_device, "squawk_n_talk_ay", "Bally Squawk & Talk w/ AY8910 Board")
 
 
 //**************************************************************************
@@ -686,4 +687,124 @@ WRITE_LINE_MEMBER(bally_squawk_n_talk_device::pia_irq_w)
 {
 	int combined_state = m_pia1->irq_a_state() | m_pia1->irq_b_state() | m_pia2->irq_a_state() | m_pia2->irq_b_state();
 	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+void bally_squawk_n_talk_ay_device::device_add_mconfig(machine_config &config)
+{
+	bally_squawk_n_talk_device::device_add_mconfig(config);
+
+	m_pia2->writepa_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_porta_w));
+	m_pia2->readpa_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_porta_r));
+	m_pia2->writepb_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_portb_w));
+	m_pia2->cb2_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_cb2_w));
+
+	for (optional_device<filter_rc_device> &filter : m_ay_filters)
+		// TODO: Calculate exact filter values. An AC filter is good enough for now
+		// and required as the chip likes to output a DC offset at idle.
+		FILTER_RC(config, filter).set_ac().add_route(ALL_OUTPUTS, *this, 1.0);
+	AY8910(config, m_ay, DERIVED_CLOCK(1, 4));
+	m_ay->add_route(0, "ay_filter0", 0.33);
+	m_ay->add_route(1, "ay_filter1", 0.33);
+	m_ay->add_route(2, "ay_filter2", 0.33);
+	m_ay->port_a_read_callback().set(FUNC(bally_squawk_n_talk_ay_device::ay_io_r));
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void bally_squawk_n_talk_ay_device::device_start()
+{
+	// Set volumes to a sane default.
+	m_ay->set_volume(0, 0);
+	m_ay->set_volume(1, 0);
+	m_ay->set_volume(2, 0);
+
+	save_item(NAME(m_bc1));
+	save_item(NAME(m_bdir));
+	save_item(NAME(m_ay_data));
+}
+
+//-------------------------------------------------
+//  pia2_porta_r - PIA 2 port A reads
+//-------------------------------------------------
+READ8_MEMBER(bally_squawk_n_talk_ay_device::pia2_porta_r)
+{
+	if (m_bc1 && !m_bdir)
+	{
+		m_ay_data = m_ay->data_r();
+	}
+	// This should return the open bus, but this method is called even if the PIA
+	// is in output mode. Self test expects to see the same value.
+	return m_ay_data;
+}
+
+//-------------------------------------------------
+//  pia2_porta_w - PIA 2 port A writes
+//-------------------------------------------------
+WRITE8_MEMBER(bally_squawk_n_talk_ay_device::pia2_porta_w)
+{
+	if (m_bc1 && !m_bdir)
+	{
+		logerror("PIA2 port A bus contention!\n");
+	}
+	m_ay_data = data;
+	update_ay_bus();
+}
+
+//-------------------------------------------------
+//  pia2_portb_w - PIA 2 port B writes
+//-------------------------------------------------
+WRITE8_MEMBER(bally_squawk_n_talk_ay_device::pia2_portb_w)
+{
+	m_bc1 = BIT(data, 0);
+	m_bdir = BIT(data, 1);
+	if (m_bc1 && !m_bdir)
+	{
+		m_ay_data = m_ay->data_r();
+	}
+	update_ay_bus();
+}
+
+//-------------------------------------------------
+//  pia2_cb2_w - PIA 2 CB2 writes
+//-------------------------------------------------
+WRITE_LINE_MEMBER(bally_squawk_n_talk_ay_device::pia2_cb2_w)
+{
+	// This pin is hooked up to the amp, and disables sounds when hi
+	if (state)
+	{
+		m_ay->set_volume(0, 0);
+		m_ay->set_volume(1, 0);
+		m_ay->set_volume(2, 0);
+	}
+	else
+	{
+		m_ay->set_volume(0, 0xff);
+		m_ay->set_volume(1, 0xff);
+		m_ay->set_volume(2, 0xff);
+	}
+}
+
+//-------------------------------------------------
+//  ay_io_r - AY8910 read
+//-------------------------------------------------
+READ8_MEMBER(bally_squawk_n_talk_ay_device::ay_io_r)
+{
+	// 5 lines and they go through inverters
+	return ~m_sound_select & 0x1f;
+}
+
+void bally_squawk_n_talk_ay_device::update_ay_bus()
+{
+	if (m_bc1 && m_bdir)
+	{
+		m_ay->address_w(m_ay_data);
+	}
+	else if (!m_bc1 && m_bdir)
+	{
+		m_ay->data_w(m_ay_data);
+	}
 }

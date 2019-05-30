@@ -31,11 +31,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(BALLY_AS2888,        bally_as2888_device)
-DECLARE_DEVICE_TYPE(BALLY_AS3022,        bally_as3022_device)
-DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,   bally_sounds_plus_device)
-DECLARE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,  bally_cheap_squeak_device)
-DECLARE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK, bally_squawk_n_talk_device)
+DECLARE_DEVICE_TYPE(BALLY_AS2888,           bally_as2888_device)
+DECLARE_DEVICE_TYPE(BALLY_AS3022,           bally_as3022_device)
+DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,      bally_sounds_plus_device)
+DECLARE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,     bally_cheap_squeak_device)
+DECLARE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK,    bally_squawk_n_talk_device)
+DECLARE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK_AY, bally_squawk_n_talk_ay_device)
 
 
 //**************************************************************************
@@ -260,7 +261,7 @@ private:
 
 // ======================> bally_squawk_n_talk_device
 
-// This board comes in different configurations
+// This board comes in different configurations, with or without the DAC and/or AY8910.
 
 class bally_squawk_n_talk_device : public device_t, public device_mixer_interface
 {
@@ -287,15 +288,17 @@ protected:
 			const char *tag,
 			device_t *owner,
 			uint32_t clock) :
-	        device_t(mconfig, type, tag, owner, clock),
-                device_mixer_interface(mconfig, *this),
-                m_cpu(*this, "cpu"),
-                m_pia1(*this, "pia1"),
-                m_pia2(*this, "pia2"),
-		m_dac(*this, "dac"),
+		device_t(mconfig, type, tag, owner, clock),
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_pia1(*this, "pia1"),
+		m_pia2(*this, "pia2"),
 		m_dac_filter(*this, "dac_filter"),
+		m_dac(*this, "dac"),
 		m_speech_filter(*this, "speech_filter"),
-		m_tms5200(*this, "tms5200")
+		m_tms5200(*this, "tms5200"),
+		m_ay_filters(*this, "ay_filter%u", 0),
+		m_ay(*this, "ay")
 	{ }
 
 	// device-level overrides
@@ -307,23 +310,56 @@ protected:
 	required_device<m6802_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
-        required_device<dac_byte_interface> m_dac;
-        required_device<filter_rc_device> m_dac_filter;
-        required_device<filter_rc_device> m_speech_filter;
-        required_device<tms5200_device> m_tms5200;
+	required_device<filter_rc_device> m_dac_filter;
+	required_device<dac_byte_interface> m_dac;
+	required_device<filter_rc_device> m_speech_filter;
+	required_device<tms5200_device> m_tms5200;
+	optional_device_array<filter_rc_device, 3> m_ay_filters;
+	optional_device<ay8910_device> m_ay;
 
-private:
 	uint8_t m_sound_select;
 
+	DECLARE_READ8_MEMBER(pia2_porta_r);
+
+private:
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
-	DECLARE_READ8_MEMBER(pia1_porta_r);
-	DECLARE_WRITE8_MEMBER(pia1_porta_w);
 	DECLARE_WRITE8_MEMBER(pia1_portb_w);
-	DECLARE_READ8_MEMBER(pia2_porta_r);
 	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
+};
+
+
+class bally_squawk_n_talk_ay_device : public bally_squawk_n_talk_device
+{
+public:
+	bally_squawk_n_talk_ay_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock = 3'579'545) :
+		bally_squawk_n_talk_device(mconfig, BALLY_SQUAWK_N_TALK_AY, tag, owner, clock)
+	{ }
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	DECLARE_READ8_MEMBER(pia2_porta_r);
+
+private:
+	bool m_bc1;
+	bool m_bdir;
+	uint8_t m_ay_data;
+
+	DECLARE_WRITE8_MEMBER(pia2_porta_w);
+	DECLARE_WRITE8_MEMBER(pia2_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia2_cb2_w);
+	DECLARE_READ8_MEMBER(ay_io_r);
+
+	void update_ay_bus();
 };
 
 
