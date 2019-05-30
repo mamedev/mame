@@ -149,12 +149,20 @@ function osdmodulestargetconf()
 			"oleaut32",
 		}
 	elseif _OPTIONS["targetos"]=="macosx" then
-		links {
-			"AudioUnit.framework",
-			"AudioToolbox.framework",
-			"CoreAudio.framework",
-			"CoreServices.framework",
-		}
+		if _OPTIONS["LIBRETRO_IOS"]=="1" then
+			links {
+				"AudioToolbox.framework",
+				"CoreAudio.framework",
+				"CoreServices.framework",
+			}
+		else
+			links {
+				"AudioUnit.framework",
+				"AudioToolbox.framework",
+				"CoreAudio.framework",
+				"CoreServices.framework",
+			}
+		end
 	end
 
 end
@@ -234,6 +242,11 @@ newoption {
 newoption {
 	trigger = "QT_HOME",
 	description = "QT lib location",
+}
+
+newoption {
+	trigger = "LIBRETRO_IOS",
+	description = "Specify iOS target when building using libretro"
 }
 
 
