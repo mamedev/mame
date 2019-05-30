@@ -13,7 +13,6 @@
 
 #include "isa.h"
 #include "cpu/arm/arm.h"
-#include "machine/ram.h"
 #include "machine/gen_latch.h"
 
 
@@ -37,7 +36,6 @@ protected:
 
 private:
 	required_device<arm_cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 

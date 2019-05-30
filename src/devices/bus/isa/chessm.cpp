@@ -30,7 +30,6 @@ isa8_chessm_device::isa8_chessm_device(const machine_config &mconfig, const char
 	device_t(mconfig, ISA8_CHESSM, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_ram(*this, "ram"),
 	m_mainlatch(*this, "mainlatch"),
 	m_sublatch(*this, "sublatch")
 { }
@@ -43,11 +42,6 @@ isa8_chessm_device::isa8_chessm_device(const machine_config &mconfig, const char
 
 void isa8_chessm_device::device_start()
 {
-	if (!m_ram->started())
-		throw device_missing_dependencies();
-
-	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
-
 	set_isa_device();
 	m_installed = false;
 }
@@ -120,9 +114,6 @@ void isa8_chessm_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &isa8_chessm_device::chessm_mem);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
-	RAM(config, m_ram).set_extra_options("128K, 512K, 1M");
-	m_ram->set_default_size("512K");
-
 	GENERIC_LATCH_8(config, m_mainlatch);
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->data_pending_callback().set_inputline(m_maincpu, ARM_FIRQ_LINE);
@@ -168,5 +159,6 @@ WRITE8_MEMBER(isa8_chessm_device::chessm_w)
 
 void isa8_chessm_device::chessm_mem(address_map &map)
 {
+	map(0x00000000, 0x0007ffff).ram();
 	map(0x00380000, 0x00380000).r(m_sublatch, FUNC(generic_latch_8_device::read)).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 }
