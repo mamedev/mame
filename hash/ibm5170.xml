@@ -8543,7 +8543,7 @@
 		</part>
 	</software>
 
-	<software name="chessm" supported="no">
+	<software name="chessm">
 		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
 		<description>The ChessMachine (Installer v3.0)</description>
 		<year>1991</year>
@@ -8571,7 +8571,7 @@
 		</part>
 	</software>
 
-	<software name="chessm22" supported="no">
+	<software name="chessm22">
 		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
 		<description>The ChessMachine (Installer v2.2)</description>
 		<year>1991</year>

@@ -488,17 +488,11 @@ void arm_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case ARM_IRQ_LINE: /* IRQ */
-		if (state && (R15&0x3)!=eARM_MODE_IRQ) /* Don't allow nested IRQs */
-			m_pendingIrq=1;
-		else
-			m_pendingIrq=0;
+		m_pendingIrq = state ? 1 : 0;
 		break;
 
 	case ARM_FIRQ_LINE: /* FIRQ */
-		if (state && (R15&0x3)!=eARM_MODE_FIQ) /* Don't allow nested FIRQs */
-			m_pendingFiq=1;
-		else
-			m_pendingFiq=0;
+		m_pendingFiq = state ? 1 : 0;
 		break;
 	}
 
