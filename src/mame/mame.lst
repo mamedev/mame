@@ -30543,6 +30543,10 @@ nespal                          // Nintendo Entertainment System PAL
 @source:nes_vt.cpp
 vdogdeme
 vdogdemo
+pinkjelly                       // From V.R. Technology VT SDK
+vtpinball                       // From V.R. Technology VT SDK
+vtsndtest                       // From V.R. Technology VT SDK
+vtboxing                        // From V.R. Technology VT SDK
 mc_dgear
 dgun2500
 dgun2561
