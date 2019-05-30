@@ -124,30 +124,17 @@ uint32_t tutankhm_state::screen_update_tutankhm_scramble(screen_device &screen, 
 
 uint32_t tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	ioport_port *port = ioport("STARS");
-	if (port != nullptr)
+	u8 mode = m_stars_config.read_safe(m_star_mode);
+	if (mode != m_star_mode)
 	{
-		int newset = port->read();
-		if (newset != m_star_mode)
-		{
-			m_star_mode = newset;
-			switch (newset)
-			{
-				case 0:
-					stars_init_bootleg();
-					break;
-				case 1:
-					stars_init();
-					break;
-			}
-		}
+		m_star_mode = mode;
+		stars_init();
 	}
 
 	if (m_star_mode)
 		return screen_update_tutankhm_scramble(screen, bitmap, cliprect);
 	else
 		return screen_update_tutankhm_bootleg(screen, bitmap, cliprect);
-
 }
 
 /*************************************
@@ -270,42 +257,38 @@ void tutankhm_state::galaxian_palette(palette_device &palette)
 		// set the RGB color
 		m_star_color[i] = rgb_t(r, g, b);
 	}
-
 }
 
 
 void tutankhm_state::video_start()
 {
-
 	/* initialize globals */
 	m_flipscreen_x = 0;
 	m_flipscreen_y = 0;
 
+	/* initialize stars */
 	m_stars_enabled = 0;
 	m_stars_blink_state = 0;
-
-	/* initialize stars */
-	if (m_star_mode)
-		stars_init();
-	else
-		stars_init_bootleg();
+	stars_init();
 
 	galaxian_palette(*m_palette);
 }
 
+void tutankhm_state::stars_init()
+{
+	(m_star_mode) ? stars_init_scramble() : stars_init_bootleg();
+}
+
 void tutankhm_state::stars_init_bootleg()
 {
-	uint32_t shiftreg;
-	int i;
-
 	/* reset the blink and enabled states */
 	m_stars_enabled = false;
 	m_stars_blink_state = 0;
 
 	/* precalculate the RNG */
 	m_stars = std::make_unique<uint8_t[]>(STAR_RNG_PERIOD);
-	shiftreg = 0;
-	for (i = 0; i < STAR_RNG_PERIOD; i++)
+	uint32_t shiftreg = 0;
+	for (int i = 0; i < STAR_RNG_PERIOD; i++)
 	{
 		int newbit = ((shiftreg >> 12) ^ ~shiftreg) & 1;
 
@@ -324,16 +307,12 @@ void tutankhm_state::stars_init_bootleg()
 	}
 }
 
-void tutankhm_state::stars_init()
+void tutankhm_state::stars_init_scramble()
 {
-	uint32_t shiftreg;
-	int i;
-
-
 	/* precalculate the RNG */
 	m_stars = std::make_unique<uint8_t[]>(STAR_RNG_PERIOD);
-	shiftreg = 0;
-	for (i = 0; i < STAR_RNG_PERIOD; i++)
+	uint32_t shiftreg = 0;
+	for (int i = 0; i < STAR_RNG_PERIOD; i++)
 	{
 		const uint8_t shift = 12;
 		/* stars are enabled if the upper 8 bits are 1 and the low bit is 0 */
@@ -366,14 +345,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tutankhm_state::scramble_stars_blink_timer)
 
 void tutankhm_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs)
 {
-	int x;
 	uint8_t flipxor = (m_flipscreen_x ? 0xC0 : 0x00);
 
 	/* ensure our star offset is valid */
 	star_offs %= STAR_RNG_PERIOD;
 
 	/* iterate over the specified number of 6MHz pixels */
-	for (x = 0; x < maxx; x++)
+	for (int x = 0; x < maxx; x++)
 	{
 		uint8_t h8q = ((x>>3) & 1) ^ 1; // H8 signal is inverted.
 		/* stars are suppressed unless V1 ^ H8 == 1 */
@@ -436,10 +414,8 @@ void tutankhm_state::scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 	/* render stars if enabled */
 	if (m_stars_enabled)
 	{
-		int y;
-
 		/* iterate over scanlines */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			stars_draw_row(bitmap, maxx, y, y * 512);
 		}

@@ -34,7 +34,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_timeplt_audio(*this, "timeplt_audio")
+		m_timeplt_audio(*this, "timeplt_audio"),
+		m_stars_config(*this, "STARS")
 	{
 	}
 
@@ -77,10 +78,12 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
+	optional_ioport m_stars_config;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	DECLARE_WRITE8_MEMBER(galaxian_stars_enable_w);
 	void stars_init();
+	void stars_init_scramble();
 	void stars_init_bootleg();
 	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs);
 	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
@@ -91,7 +94,6 @@ protected:
 	std::unique_ptr<uint8_t[]> m_stars;
 	uint8_t m_stars_enabled;
 	uint8_t m_stars_blink_state;
-
 };
 
 #endif // MAME_INCLUDES_TUTANKHM_H

@@ -250,7 +250,6 @@ static INPUT_PORTS_START( tutankhm )
 	PORT_CONFNAME( 0x01, 0x01, "Starfield selection" )
 	PORT_CONFSETTING(    0x00, "Konami HW bootleg (6MHz stars)" )
 	PORT_CONFSETTING(    0x01, "Scramble implementation" )
-
 INPUT_PORTS_END
 
 
@@ -313,7 +312,6 @@ void tutankhm_state::tutankhm(machine_config &config)
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
 	TIMER(config, "stars").configure_periodic(FUNC(tutankhm_state::scramble_stars_blink_timer), PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001));
-
 }
 
 
