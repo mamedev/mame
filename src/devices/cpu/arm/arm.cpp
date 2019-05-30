@@ -7,7 +7,7 @@
       - Get rid of m_nested_irq_hack, interrupts don't work like that but several MAME
         drivers rely on it since it's been in arm.cpp for so long
       - Interrupts are currently implemented like HOLD_LINE for everything, with the way it
-        resets pending interrupts when taken, again wrong
+        resets pending interrupts when taken
       - Timing - Currently very approximated, nothing relies on proper timing so far.
       - IRQ timing not yet correct (again, nothing is affected by this so far).
 
@@ -247,7 +247,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)
 	, m_copro_type(copro_type::UNKNOWN_CP15)
-	, m_nested_irq_hack(true)
+	, m_nested_irq_hack(false)
 {
 	std::fill(std::begin(m_sArmRegister), std::end(m_sArmRegister), 0);
 }
