@@ -662,7 +662,7 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA GIO64 Address Write + Start DMA: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_gio64_addr = data;
 		m_dma_run |= 0x40;
-		m_dma_timer->adjust(attotime::from_hz(33333333), 0, attotime::from_hz(33333333));
+		m_dma_timer->adjust(attotime::from_ticks(4, 33333333), 0, attotime::from_hz(33333333));
 		break;
 	}
 	case 0x2030/4:
