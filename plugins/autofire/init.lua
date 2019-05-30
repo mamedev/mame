@@ -2,19 +2,12 @@
 -- copyright-holders:Jack Li
 local exports = {}
 exports.name = 'autofire'
-exports.version = '0.0.2'
+exports.version = '0.0.3'
 exports.description = 'Autofire plugin'
 exports.license = 'The BSD 3-Clause License'
 exports.author = { name = 'Jack Li' }
 
 local autofire = exports
-
-function autofire.set_folder(path)
-	local loader = require('autofire/autofire_save')
-	if loader then
-		loader:set_plugin_path(path)
-	end
-end
 
 function autofire.startplugin()
 

@@ -1,9 +1,7 @@
 local lib = {}
 
-local plugin_path = ''
-
 local function get_settings_path()
-	return plugin_path .. '/cfg/'
+	return lfs.env_replace(manager:machine():options().entries.homepath:value():match('([^;]+)')) .. '/autofire/'
 end
 
 local function get_settings_filename()
@@ -45,10 +43,6 @@ local function serialize_settings(button_list)
 		settings[#settings + 1] = setting
 	end
 	return settings
-end
-
-function lib:set_plugin_path(path)
-	plugin_path = path
 end
 
 function lib:load_settings()
