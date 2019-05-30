@@ -8553,7 +8553,7 @@
 		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine ISA card required." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="theking22.img" size="737280" crc="a93939a6" sha1="2f3927e50dd82b93ca3fa1436f5b664abc18d061"/>
+				<rom name="theking22.img" size="737280" crc="88fd76e8" sha1="518d4e662e6d1cba624fb04870eb292a8c44a1c3"/>
 			</dataarea>
 		</part>
 	</software>
