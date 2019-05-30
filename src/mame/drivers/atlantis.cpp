@@ -30,8 +30,8 @@
 
     TODO:
         * PCI peripherals
-		* Many of the issues here are related to the Zeus 2 graphic chip emulation (see midzeus.cpp).
-		Speed/timing is even worse here compared to midzeus.cpp.
+	* Many of the issues here are related to the Zeus 2 graphic chip emulation (see midzeus.cpp).
+	Speed/timing is even worse here compared to midzeus.cpp.
 		
 
     NOTES:
