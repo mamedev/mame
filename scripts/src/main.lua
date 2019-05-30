@@ -217,7 +217,7 @@ end
 			linkoptions {
 				 "-s DISABLE_EXCEPTION_CATCHING=2",
 				 "-s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\",\"__ZN12cli_frontend7executeEiPPc\"]'",			}
-		elseif _OPTIONS["targetos"]=="ios-arm" then
+		elseif _OPTIONS["targetos"]=="ios-arm" or _OPTIONS["LIBRETRO_IOS"]=="1" then
 			targetsuffix "_libretro_ios"
 			targetextension ".dylib"
 		elseif _OPTIONS["targetos"]=="windows" then

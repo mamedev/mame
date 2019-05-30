@@ -14,6 +14,15 @@ endif
 CC  = gcc
 CXX = g++
 
+MAKE_CC = $(CC)
+MAKE_CXX = $(CXX)
+ifeq (ios-arm64,$(LIBRETRO_OS))
+  # For iOS, use the host (macOS) compiler since we want to build this on the host, not the target os
+  MAKE_CC = cc
+  MAKE_CXX = c++
+endif
+
+
 .PHONY: all clean
 
 all : m68kmake$(EXE) m68kops.cpp
@@ -25,11 +34,11 @@ clean:
 	-@rm -f m68kops.*
 
 m68kmake.o: m68kmake.cpp
-	$(SILENT) $(CC) -x c++ -std=c++11 -o "$@" -c "$<"
+	$(SILENT) $(MAKE_CC) -x c++ -std=c++11 -o "$@" -c "$<"
 
 m68kmake$(EXE) : m68kmake.o
 	@echo Linking $@...
-	$(SILENT) $(CXX) -lstdc++ $^ -o $@
+	$(SILENT) $(MAKE_CXX) -lstdc++ $^ -o $@
 
 m68kops.cpp: m68kmake$(EXE)     m68k_in.cpp
 	@echo Generating M68K source files...

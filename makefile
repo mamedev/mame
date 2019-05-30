@@ -1035,6 +1035,11 @@ PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
 PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
+APPLE_EXTRA_FLAGS=
+ifeq (ios-arm64,$(LIBRETRO_OS))
+APPLE_EXTRA_FLAGS += --NOASM=1 --DONT_USE_NETWORK=1  --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --LIBRETRO_IOS=1
+endif
+
 .PHONY: all clean regenie generate FORCE
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
 regenie:
@@ -1352,10 +1357,13 @@ macosx_x86: generate $(PROJECTDIR)/$(MAKETYPE)-osx/Makefile
 
 #-------------------------------------------------
 # gmake-osx-clang
+# (also used for ios-arm64)
+# For Libretro, building for iOS will override CC,
+# CXX - so just use the osx-clang target
 #-------------------------------------------------
 
 $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) $(APPLE_EXTRA_FLAGS) $(MAKETYPE)
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
