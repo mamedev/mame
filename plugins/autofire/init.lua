@@ -9,13 +9,6 @@ exports.author = { name = 'Jack Li' }
 
 local autofire = exports
 
-function autofire.set_folder(path)
-	local loader = require('autofire/autofire_save')
-	if loader then
-		loader:set_plugin_path(path)
-	end
-end
-
 function autofire.startplugin()
 
 	-- List of autofire buttons, each being a table with keys:
