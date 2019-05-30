@@ -9,10 +9,8 @@ No ROM on the card this time, the chess program is sent to RAM instead.
 
 VLSI VY86C010-12QC (ARM2), seen with 30MHz XTAL, but XTAL label usually scratched off.
 128KB, 512KB, or 1MB RAM. 512KB version probably the most common.
+It looks like Gideon 2.1 only sees up to 512KB RAM, The King up to 2MB RAM.
 Also seen with VY86C061PSTC (ARM6) @ 32MHz, very rare or prototype.
-
-TODO:
-- add RAM/CPU configuration
 
 */
 
@@ -31,7 +29,8 @@ isa8_chessm_device::isa8_chessm_device(const machine_config &mconfig, const char
 	device_isa8_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_mainlatch(*this, "mainlatch"),
-	m_sublatch(*this, "sublatch")
+	m_sublatch(*this, "sublatch"),
+	m_ram(*this, "ram")
 { }
 
 
@@ -59,6 +58,13 @@ void isa8_chessm_device::device_reset()
 		// MAME doesn't allow reading ioport at device_start
 		u16 port = ioport("DSW")->read() * 0x40 + 0x10;
 		m_isa->install_device(port, port+1, read8_delegate(FUNC(isa8_chessm_device::chessm_r), this), write8_delegate(FUNC(isa8_chessm_device::chessm_w), this));
+
+		m_maincpu->set_unscaled_clock(ioport("CPU")->read() ? (32_MHz_XTAL) : (30_MHz_XTAL/2));
+
+		// install RAM
+		u32 ramsize = 1 << ioport("RAM")->read();
+		m_ram.allocate(ramsize / 4);
+		m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram);
 
 		m_installed = true;
 	}
@@ -95,6 +101,18 @@ static INPUT_PORTS_START( chessm )
 	PORT_DIPSETTING(    0x0d, "0x350" )
 	PORT_DIPSETTING(    0x0e, "0x390" )
 	PORT_DIPSETTING(    0x0f, "0x3D0 (Invalid)" )
+
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Type" )
+	PORT_CONFSETTING(    0x00, "ARM2 @ 15MHz" )
+	PORT_CONFSETTING(    0x01, "ARM6 @ 32MHz" )
+
+	PORT_START("RAM") // setting in 2^x
+	PORT_CONFNAME( 0xff, 19, "RAM Size" )
+	PORT_CONFSETTING(    17, "128KB" )
+	PORT_CONFSETTING(    19, "512KB" )
+	PORT_CONFSETTING(    20, "1MB" )
+	PORT_CONFSETTING(    21, "2MB" ) // unofficial
 INPUT_PORTS_END
 
 ioport_constructor isa8_chessm_device::device_input_ports() const
@@ -159,6 +177,5 @@ WRITE8_MEMBER(isa8_chessm_device::chessm_w)
 
 void isa8_chessm_device::chessm_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram();
 	map(0x00380000, 0x00380000).r(m_sublatch, FUNC(generic_latch_8_device::read)).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 }
