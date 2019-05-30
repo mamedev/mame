@@ -30,6 +30,7 @@ public:
 	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_copro_type(copro_type type) { m_copro_type = type; }
+	void set_nested_irq_hack(bool enable) { m_nested_irq_hack = enable; }
 
 protected:
 	enum
@@ -74,6 +75,7 @@ protected:
 	std::function<u32 (offs_t)> m_pr32;
 	endianness_t m_endian;
 	copro_type m_copro_type;
+	bool m_nested_irq_hack;
 
 	void cpu_write32( int addr, uint32_t data );
 	void cpu_write8( int addr, uint8_t data );

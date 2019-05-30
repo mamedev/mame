@@ -4,8 +4,12 @@
     ARM 2/3/6 Emulation (26 bit address bus)
 
     Todo:
-      Timing - Currently very approximated, nothing relies on proper timing so far.
-      IRQ timing not yet correct (again, nothing is affected by this so far).
+      - Get rid of m_nested_irq_hack, interrupts don't work like that but several MAME
+        drivers rely on it since it's been in arm.cpp for so long
+      - Interrupts are currently implemented like HOLD_LINE for everything, with the way it
+        resets pending interrupts when taken, again wrong
+      - Timing - Currently very approximated, nothing relies on proper timing so far.
+      - IRQ timing not yet correct (again, nothing is affected by this so far).
 
     Recent changes (2005):
       Fixed software interrupts
@@ -243,6 +247,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)
 	, m_copro_type(copro_type::UNKNOWN_CP15)
+	, m_nested_irq_hack(true)
 {
 	std::fill(std::begin(m_sArmRegister), std::end(m_sArmRegister), 0);
 }
@@ -488,11 +493,17 @@ void arm_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case ARM_IRQ_LINE: /* IRQ */
-		m_pendingIrq = state ? 1 : 0;
+		if (state && (!m_nested_irq_hack || (R15&0x3)!=eARM_MODE_IRQ)) /* Don't allow nested IRQs */
+			m_pendingIrq=1;
+		else
+			m_pendingIrq=0;
 		break;
 
 	case ARM_FIRQ_LINE: /* FIRQ */
-		m_pendingFiq = state ? 1 : 0;
+		if (state && (!m_nested_irq_hack || (R15&0x3)!=eARM_MODE_FIQ)) /* Don't allow nested FIRQs */
+			m_pendingFiq=1;
+		else
+			m_pendingFiq=0;
 		break;
 	}
 
