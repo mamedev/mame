@@ -15840,9 +15840,10 @@ indigo3k                        // IP12: Indigo 1, R3000, 33MHz
 indigo4k                        // IP20: Indigo 1, R4400, 150MHz
 
 @source:indy_indigo2.cpp
-ip224613                        // IP22: Indy, R4600, 133MHz
-ip225015                        // IP22: Indy, R5000, 150MHz
-ip244415                        // IP24: Indigo 2, R4400, 150MHz
+indy_4610                       // IP22: Indy, R4600, 100MHz
+indy_4613                       // IP22: Indy, R4600, 133MHz
+indy_5015                       // IP22: Indy, R5000, 150MHz
+indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
 
 @source:instantm.cpp
 instantm                        //

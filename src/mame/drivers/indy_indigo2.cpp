@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************\
 *
-*   SGI IP22 Indigo2/Indy workstation
+*   SGI IP22/IP24 Indigo2/Indy workstation
 *
 *  Known Issues:
 *  - The proper hookup for the MAC address is unknown, requiring
@@ -28,7 +28,7 @@
 *  30000000 - 7fffffff      Reserved
 *  80000000 - ffffffff      EISA Memory
 *
-*  IP22/24 has 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
+*  IP22/IP24 has 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 *  interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
 *
 *  References used:
@@ -70,10 +70,10 @@
 #include "emupal.h"
 #include "screen.h"
 
-class ip22_state : public driver_device
+class ip24_state : public driver_device
 {
 public:
-	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
+	ip24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mainram(*this, "mainram")
@@ -88,9 +88,11 @@ public:
 	{
 	}
 
-	void ip22_base(machine_config &config);
-	void ip225015(machine_config &config);
-	void ip224613(machine_config &config);
+	void ip24_base(machine_config &config);
+	void ip24(machine_config &config);
+	void indy_5015(machine_config &config);
+	void indy_4613(machine_config &config);
+	void indy_4610(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -98,8 +100,8 @@ protected:
 	DECLARE_WRITE64_MEMBER(write_ram);
 	DECLARE_READ32_MEMBER(bus_error);
 
-	void ip22_map(address_map &map);
-	void ip22_base_map(address_map &map);
+	void ip24_map(address_map &map);
+	void ip24_base_map(address_map &map);
 
 	void wd33c93(device_t *device);
 
@@ -117,40 +119,40 @@ protected:
 	optional_device<gio64_slot_device> m_gio64_exp1;
 };
 
-class ip24_state : public ip22_state
+class ip22_state : public ip24_state
 {
 public:
-	ip24_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ip22_state(mconfig, type, tag)
+	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ip24_state(mconfig, type, tag)
 		, m_scsi_ctrl2(*this, "scsibus2:0:wd33c93")
 	{
 	}
 
-	void ip244415(machine_config &config);
+	void indigo2_4415(machine_config &config);
 
 private:
 	DECLARE_READ32_MEMBER(eisa_io_r);
 
 	void wd33c93_2(device_t *device);
 
-	void ip24_map(address_map &map);
+	void ip22_map(address_map &map);
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
 
-READ32_MEMBER(ip22_state::bus_error)
+READ32_MEMBER(ip24_state::bus_error)
 {
 	m_maincpu->bus_error();
 	return 0;
 }
 
-READ32_MEMBER(ip24_state::eisa_io_r)
+READ32_MEMBER(ip22_state::eisa_io_r)
 {
 	return 0xffffffff;
 }
 
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-WRITE64_MEMBER(ip22_state::write_ram)
+WRITE64_MEMBER(ip24_state::write_ram)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
 	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)
@@ -168,31 +170,31 @@ WRITE64_MEMBER(ip22_state::write_ram)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-void ip22_state::ip22_base_map(address_map &map)
+void ip24_state::ip24_base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
-	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));     /* 128 MB of main RAM */
+	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f000000, 0x1f9fffff).rw(m_gio64, FUNC(gio64_device::read), FUNC(gio64_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
-	map(0x1fb00000, 0x1fb7ffff).r(FUNC(ip22_state::bus_error));
+	map(0x1fb00000, 0x1fb7ffff).r(FUNC(ip24_state::bus_error));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_base_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
-	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));
-}
-
-void ip22_state::ip22_map(address_map &map)
-{
-	ip22_base_map(map);
-	map(0x00080000, 0x0009ffff).rw(m_vino, FUNC(vino_device::read), FUNC(vino_device::write));
+	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));
 }
 
 void ip24_state::ip24_map(address_map &map)
 {
-	ip22_base_map(map);
-	map(0x00080000, 0x0009ffff).r(FUNC(ip24_state::eisa_io_r));
+	ip24_base_map(map);
+	map(0x00080000, 0x0009ffff).rw(m_vino, FUNC(vino_device::read), FUNC(vino_device::write));
 }
 
-void ip22_state::machine_reset()
+void ip22_state::ip22_map(address_map &map)
+{
+	ip22_state::ip24_base_map(map);
+	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
+}
+
+void ip24_state::machine_reset()
 {
 	// set up low RAM mirror
 	membank("bank1")->set_base(m_mainram);
@@ -200,36 +202,25 @@ void ip22_state::machine_reset()
 	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
-static INPUT_PORTS_START( ip225015 )
-	PORT_START("IN0")   // unused IN0
-	PORT_START("DSW0")  // unused IN1
-	PORT_START("DSW1")  // unused IN2
-	PORT_START("DSW2")  // unused IN3
-	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
+static INPUT_PORTS_START( ip24 )
+	PORT_INCLUDE( at_keyboard )
 INPUT_PORTS_END
 
-//static void cdrom_config(device_t *device)
-//{
-//  cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-//  cdda->add_route(0, ":hpc3:lspeaker", 1.0);
-//  cdda->add_route(1, ":hpc3:rspeaker", 1.0);
-//}
-
-void ip22_state::wd33c93(device_t *device)
+void ip24_state::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
 	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi0_irq));
 	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi0_drq));
 }
 
-void ip22_state::scsi_devices(device_slot_interface &device)
+void ip24_state::scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM_SGI);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	//device.set_option_machine_config("cdrom", cdrom_config);
 }
 
-void ip22_state::ip22_base(machine_config &config)
+void ip24_state::ip24_base(machine_config &config)
 {
 	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom", m_hpc3);
 
@@ -254,49 +245,59 @@ void ip22_state::ip22_base(machine_config &config)
 	GIO64_SLOT(config, m_gio64_exp1, m_gio64, gio64_slot_device::GIO64_SLOT_EXP1, gio64_cards, nullptr);
 }
 
-void ip22_state::ip225015(machine_config &config)
+void ip24_state::ip24(machine_config &config)
 {
-	ip22_base(config);
+	ip24_base(config);
+
+	SGI_HPC3_GUINNESS(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+	VINO(config, m_vino);
+}
+
+void ip24_state::indy_5015(machine_config &config)
+{
+	ip24(config);
 
 	R4000(config, m_maincpu, 50000000*3);
 	//m_maincpu->set_icache_size(32768);
 	//m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
-
-	SGI_HPC3_GUINNESS(config, m_hpc3, m_maincpu, m_scsi_ctrl);
-
-	VINO(config, m_vino);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
-void ip22_state::ip224613(machine_config &config)
+void ip24_state::indy_4613(machine_config &config)
 {
-	ip22_base(config);
+	ip24(config);
 
 	R4600(config, m_maincpu, 33333333*4);
-	//m_maincpu->set_icache_size(32768);
-	//m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
-
-	SGI_HPC3_GUINNESS(config, m_hpc3, m_maincpu, m_scsi_ctrl);
-
-	VINO(config, m_vino);
+	//m_maincpu->set_icache_size(16384);
+	//m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
-void ip24_state::wd33c93_2(device_t *device)
+void ip24_state::indy_4610(machine_config &config)
+{
+	ip24(config);
+
+	R4600(config, m_maincpu, 33333333*3);
+	//m_maincpu->set_icache_size(16384);
+	//m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
+}
+
+void ip22_state::wd33c93_2(device_t *device)
 {
 	device->set_clock(10000000);
 	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi1_irq));
 	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi1_drq));
 }
 
-void ip24_state::ip244415(machine_config &config)
+void ip22_state::indigo2_4415(machine_config &config)
 {
-	ip22_base(config);
-
 	R4400(config, m_maincpu, 50000000*3);
 	//m_maincpu->set_icache_size(32768);
 	//m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
+
+	ip24_base(config);
 
 	NSCSI_BUS(config, "scsibus2", 0);
 	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
@@ -311,6 +312,19 @@ void ip24_state::ip244415(machine_config &config)
 
 	SGI_HPC3_FULL_HOUSE(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
 }
+
+#define INDY_BIOS_FLAGS(bios) ROM_GROUPDWORD | ROM_BIOS(bios)
+
+#define INDY_BIOS_R5K \
+	ROM_SYSTEM_BIOS( 0, "b10", "Version 5.3 Rev B10 R4X00/R5000 Feb 12, 1996" ) \
+	ROMX_LOAD( "ip24prom.070-9101-011.bin", 0x000000, 0x080000, CRC(5e7f7e3a) SHA1(ac663a4db68528e400487e98cbf901f620fb30ce), INDY_BIOS_FLAGS(0) )
+
+#define INDY_BIOS_R4K \
+	INDY_BIOS_R5K \
+	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
+	ROMX_LOAD( "ip24prom.070-9101-005.bin", 0x000000, 0x080000, CRC(f5e41008) SHA1(28b769b28218a1fcd0400dceef9a284dcfbdda5b), INDY_BIOS_FLAGS(1) ) \
+	ROM_SYSTEM_BIOS( 2, "b6", "Version 5.0 Rev B6 Sep 28, 1994" ) \
+	ROMX_LOAD( "ip24prom.070-9101-007.bin", 0x000000, 0x080000, CRC(70d8d1b1) SHA1(ade54cd2ecb7064957f8602894f05685e2f4e8fb), INDY_BIOS_FLAGS(2) )
 
 /* SCC init ip225015
  * Channel A
@@ -341,22 +355,32 @@ void ip24_state::ip244415(machine_config &config)
  * 05 <- ea Transmitter: as above + Transmitetr enable
  * 00 <- 10 Reset External/status IE
 */
-ROM_START( ip225015 )
+
+ROM_START( indy_4610 )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROMX_LOAD( "ip225015.bin", 0x000000, 0x080000, CRC(aee5502e) SHA1(9243fef0a3508790651e0d6d2705c887629b1280), ROM_GROUPDWORD | ROM_REVERSE )
+	INDY_BIOS_R4K
 ROM_END
 
-ROM_START( ip224613 )
+ROM_START( indy_4613 )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROMX_LOAD( "ip224613.bin", 0x000000, 0x080000, CRC(f1868b5b) SHA1(0dcbbd776e671785b9b65f3c6dbd609794a40157), ROM_GROUPDWORD | ROM_REVERSE )
+	INDY_BIOS_R4K
 ROM_END
 
-ROM_START( ip244415 )
+ROM_START( indy_5015 )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROMX_LOAD( "ip244415.bin", 0x000000, 0x080000, CRC(2f37825a) SHA1(0d48c573b53a307478820b85aacb57b868297ca3), ROM_GROUPDWORD | ROM_REVERSE )
+	INDY_BIOS_R5K
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
-COMP( 1993, ip225015, 0,      0,      ip225015, ip225015, ip22_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
-COMP( 1993, ip224613, 0,      0,      ip224613, ip225015, ip22_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
-COMP( 1994, ip244415, 0,      0,      ip244415, ip225015, ip24_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )
+ROM_START( indigo2_4415 )
+	ROM_REGION64_BE( 0x80000, "user1", 0 )
+	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" ) \
+	ROMX_LOAD( "ip22prom.070-1367-012.bin", 0x000000, 0x080000, CRC(54460c16) SHA1(330d87b3a02a05fb49c85a569f6f84904587cb35), ROM_GROUPDWORD | ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
+	ROMX_LOAD( "ip22prom.070-1367-002.bin", 0x000000, 0x080000, CRC(ae5ecd08) SHA1(422568ae95282ee23b2fe123267f9b915a1dc3dc), ROM_GROUPDWORD | ROM_BIOS(1) )
+ROM_END
+
+//    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
+COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_NOT_WORKING )
+COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
+COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
+COMP( 1993, indigo2_4415, 0,         0,      indigo2_4415, ip24, ip22_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )
