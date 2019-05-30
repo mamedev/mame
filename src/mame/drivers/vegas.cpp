@@ -18,7 +18,7 @@
 
     Todo:
         * nbanfl and nbagold reset if accessing one test mode after the other. For example, if NFL Blitz's test mode
-		was accessed first, accessing NBA Showtime's test mode will reset the game.
+	was accessed first, accessing NBA Showtime's test mode will reset the game.
 
 ***************************************************************************
 
@@ -2394,7 +2394,7 @@ GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,
 /* Durango + Denver SIO + Voodoo 3 */
 GAMEL( 1999, sf2049,    0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049 (EPROM 1.02 Jul 9 1999, GUTS 1.03 Sep 3 1999, GAME Sep 8 1999)", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 GAMEL( 2003, sf2049se,  0,        sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition (GUTS 1.61 Sep 16 2003, GAME Sep 16 2003)", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2000, sf2049te,  0,        sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition (EPROM 0.56 Apr 17 2000)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2000, sf2049te,  0,        sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition (EPROM 0.56 Apr 17 2000)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 ) //resets when entering test mode
 GAMEL( 2000, sf2049tea, sf2049te, sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 /* Durango + Vegas SIO + Voodoo 3 */
