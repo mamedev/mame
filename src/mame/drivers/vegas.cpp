@@ -2386,7 +2386,7 @@ GAME( 1999, roadburn,   0,        roadburn, roadburn, vegas_state, init_roadburn
 GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.0)", MACHINE_SUPPORTS_SAVE )
 
 /* Vegas/Durango + Vegas SIO + Voodoo Banshee */
-GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (SportsStation)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) //always boots NBA Showtime regardless of DIP setting; bug on actual hardware
 
