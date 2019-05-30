@@ -14,11 +14,11 @@
 
 *********************************************************************/
 
-#include <assert.h>
 #include "emu.h"
+#include "formats/os9_dsk.h"
+
 #include "formats/imageutl.h"
 
-#include "formats/os9_dsk.h"
 
 os9_format::os9_format() : wd177x_format(formats)
 {
@@ -64,19 +64,14 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
 
 		// now let's see if we have valid info
 		if ((os9_tracks * os9_heads * os9_sectors * 256) == size) {
-			for(int i=0; formats[i].form_factor; i++) {
+			for (int i=0; formats[i].form_factor; i++) {
 				const format &f = formats[i];
 
-				if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
+				if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 					continue;
 
-				if(os9_tracks == f.track_count) {
-					if( os9_heads == f.head_count ) {
-						if(os9_sectors == f.sector_count ) {
-							return i;
-						}
-					}
-				}
+				if ((os9_tracks == f.track_count) && (os9_heads == f.head_count) && (os9_sectors == f.sector_count))
+					return i;
 			}
 		}
 	}

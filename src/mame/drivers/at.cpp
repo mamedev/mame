@@ -1611,7 +1611,7 @@ ROM_START( dt386 )
 	// BIOS-String: 40-0501-DG1112-00101111-070791-SOLUTION-0 / Commodore 386DX-33 BIOS Rev. 1.01 391560-02
 	ROM_SYSTEM_BIOS(3, "dt386v101", "DT386 V.1.01")
 	ROMX_LOAD( "cbm-dt386dx-33c-bios-hi-v1.01-391560-02.bin", 0x10000, 0x10000, CRC(b3157f57) SHA1(a1a96c8d111e3c1da8f655b4b7e1c5be4af140e9), ROM_BIOS(3))
-	ROM_END
+ROM_END
 
 // Commodore DT486 - BIOS contains VGA ROM - Keyboard error
 ROM_START( dt486 ) // BIOS string: 41-0102-001283-00111111-060692-SYM_486-0 - Commodore 486DX-33 BIOS Version 1.01 391521-02
@@ -1992,7 +1992,7 @@ ROM_END
 
 // Compaq SLT/286 - complains about "102 - System board failure"
 ROM_START( comslt286 )
-   ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
 	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-odd.bin", 0x10001, 0x8000, CRC(4a0febac) SHA1(7da5ac4bc50f25063a1d1e382b8cff9b297976f8))
 ROM_END
