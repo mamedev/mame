@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+#include "machine/input_merger.h"
 #include "machine/ioc2.h"
 
 #define LOG_PI1         (1 << 0)
@@ -115,7 +116,11 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(FUNC(ioc2_device::kbdc_int_w));
+
+	input_merger_device &kbdc_irq(INPUT_MERGER_ANY_HIGH(config, "kbdc_irq"));
+	kbdc_irq.output_handler().set(FUNC(ioc2_device::kbdc_int_w));
+	m_kbdc->kbd_irq().set(kbdc_irq, FUNC(input_merger_device::in_w<0>));
+	m_kbdc->aux_irq().set(kbdc_irq, FUNC(input_merger_device::in_w<1>));
 #else
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
