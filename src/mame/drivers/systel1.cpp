@@ -28,26 +28,54 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dmac(*this, "dmac")
+		, m_rom(*this, "bootrom")
 		, m_chargen(*this, "chargen")
 	{
 	}
 
 	void systel1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
+	u8 m1_r(offs_t offset);
 
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mem_map(address_map &map);
+	void m1_map(address_map &map);
 	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dmac;
+	required_region_ptr<u8> m_rom;
 	required_region_ptr<u8> m_chargen;
+
+	std::unique_ptr<u8[]> m_ram;
+
+	bool m_boot_read;
+	bool m_boot_execute;
 };
+
+void systel1_state::machine_start()
+{
+	m_ram = make_unique_clear<u8[]>(0x10000);
+
+	save_item(NAME(m_boot_read));
+	save_item(NAME(m_boot_execute));
+	save_pointer(NAME(m_ram), 0x10000);
+}
+
+void systel1_state::machine_reset()
+{
+	m_boot_read = true;
+	m_boot_execute = true;
+}
 
 WRITE_LINE_MEMBER(systel1_state::hrq_w)
 {
@@ -57,12 +85,29 @@ WRITE_LINE_MEMBER(systel1_state::hrq_w)
 
 u8 systel1_state::memory_r(offs_t offset)
 {
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	if (m_boot_read && offset < 0x4000)
+		return m_rom[offset & 0x7ff];
+	else
+		return m_ram[offset];
 }
 
 void systel1_state::memory_w(offs_t offset, u8 data)
 {
-	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+	m_ram[offset] = data;
+}
+
+u8 systel1_state::m1_r(offs_t offset)
+{
+	if (offset < 0x4000)
+	{
+		if (!m_boot_execute && !machine().side_effects_disabled())
+			m_boot_read = false;
+		if (m_boot_read)
+			return m_rom[offset & 0x7ff];
+	}
+	else if (!machine().side_effects_disabled())
+		m_boot_execute = false;
+	return m_ram[offset];
 }
 
 I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
@@ -71,8 +116,12 @@ I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 
 void systel1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom().region("program", 0);
-	map(0x4000, 0xffff).ram();
+	map(0x0000, 0xffff).rw(FUNC(systel1_state::memory_r), FUNC(systel1_state::memory_w));
+}
+
+void systel1_state::m1_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(systel1_state::m1_r));
 }
 
 void systel1_state::io_map(address_map &map)
@@ -81,6 +130,7 @@ void systel1_state::io_map(address_map &map)
 	map(0x00, 0x00).portr("JUMPERS");
 	map(0x10, 0x11).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x29).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x30, 0x33).rw("fdc", FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0x40, 0x41).rw("crtc", FUNC(i8276_device::read), FUNC(i8276_device::write));
 }
 
@@ -95,6 +145,7 @@ void systel1_state::systel1(machine_config &config)
 {
 	Z80(config, m_maincpu, 2_MHz_XTAL); // Z8400A; clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &systel1_state::mem_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &systel1_state::m1_map);
 	m_maincpu->set_addrmap(AS_IO, &systel1_state::io_map);
 
 	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint"));
@@ -104,6 +155,8 @@ void systel1_state::systel1(machine_config &config)
 	m_dmac->out_hrq_cb().set(FUNC(systel1_state::hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(systel1_state::memory_r));
 	m_dmac->out_memw_cb().set(FUNC(systel1_state::memory_w));
+	m_dmac->in_ior_cb<1>().set("fdc", FUNC(fd1797_device::data_r));
+	m_dmac->out_iow_cb<1>().set("fdc", FUNC(fd1797_device::data_w));
 	m_dmac->out_iow_cb<2>().set("crtc", FUNC(i8276_device::dack_w));
 
 	i8251_device &usart(I8251(config, "usart", 2_MHz_XTAL)); // AMD P8251A
@@ -124,13 +177,15 @@ void systel1_state::systel1(machine_config &config)
 	crtc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 	crtc.irq_wr_callback().set("mainint", FUNC(input_merger_device::in_w<1>));
 
-	FD1797(config, "fdc", 2_MHz_XTAL);
+	fd1797_device &fdc(FD1797(config, "fdc", 2_MHz_XTAL));
+	fdc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq1_w));
 }
 
+// RAM: 8x MCM6665AP20
 // XTALs: 10.8864 (Y1), 2.000 (Y2)
 // Silkscreened on PCB: "SYSTEL / SYSTEM 1 / 1031-3101-00 REV H"
 ROM_START(systel100)
-	ROM_REGION(0x800, "program", 0) // TMS2716JL-45
+	ROM_REGION(0x800, "bootrom", 0) // TMS2716JL-45
 	ROM_LOAD("u11.bin", 0x000, 0x800, CRC(29f1414a) SHA1(c87adfaaec45d0e5f4cf5946d2f04de0332b3413))
 
 	ROM_REGION(0x800, "chargen", 0) // TMS2516JL-45
