@@ -41,7 +41,7 @@
 /*static*/ const XTAL ioc2_device::SCC_RXB_CLK = 3.6864_MHz_XTAL; // Needs verification
 /*static*/ const XTAL ioc2_device::SCC_TXB_CLK = XTAL(0);
 
-DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IOC2 (Guiness)")
+DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IOC2 (Guinness)")
 DEFINE_DEVICE_TYPE(SGI_IOC2_FULL_HOUSE, ioc2_full_house_device, "ioc2f", "SGI IOC2 (Full House)")
 
 ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -742,4 +742,44 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
 
 	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
 		raise_local_irq(1, INT3_LOCAL1_PANEL);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::gio_int0_w)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::gio_int1_w)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::gio_int2_w)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+	else
+		lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::hpc_dma_done_w)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
+	else
+		lower_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::mc_dma_done_w)
+{
+	if (state == ASSERT_LINE)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 }

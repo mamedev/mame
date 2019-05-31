@@ -58,12 +58,15 @@
 
 #include "cpu/mips/r4000.h"
 
+#include "machine/ds1386.h"
+#include "machine/eepromser.h"
 #include "machine/hpc3.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 #include "machine/sgi.h"
 #include "machine/vino.h"
+#include "machine/wd33c9x.h"
 
 #include "sound/cdda.h"
 
@@ -79,7 +82,11 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
+		, m_eeprom(*this, "eeprom")
+		, m_hal2(*this, "hal2")
 		, m_hpc3(*this, "hpc3")
+		, m_ioc2(*this, "ioc2")
+		, m_rtc(*this, "rtc")
 		, m_vino(*this, "vino")
 		, m_gio64(*this, "gio64")
 		, m_gio64_gfx(*this, "gio64_gfx")
@@ -111,7 +118,11 @@ protected:
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
-	required_device<hpc3_base_device> m_hpc3;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<hal2_device> m_hal2;
+	required_device<hpc3_device> m_hpc3;
+	required_device<ioc2_device> m_ioc2;
+	required_device<ds1386_device> m_rtc;
 	optional_device<vino_device> m_vino;
 	optional_device<gio64_device> m_gio64;
 	optional_device<gio64_slot_device> m_gio64_gfx;
@@ -177,7 +188,7 @@ void ip24_state::ip24_base_map(address_map &map)
 	map(0x1f000000, 0x1f9fffff).rw(m_gio64, FUNC(gio64_device::read), FUNC(gio64_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb00000, 0x1fb7ffff).r(FUNC(ip24_state::bus_error));
-	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_base_device::map));
+	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
 	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));
 }
@@ -209,8 +220,8 @@ INPUT_PORTS_END
 void ip24_state::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi0_irq));
-	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi0_drq));
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
+	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
 }
 
 void ip24_state::scsi_devices(device_slot_interface &device)
@@ -222,7 +233,8 @@ void ip24_state::scsi_devices(device_slot_interface &device)
 
 void ip24_state::ip24_base(machine_config &config)
 {
-	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom", m_hpc3);
+	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	m_mem_ctrl->int_dma_done_cb().set(m_ioc2, FUNC(ioc2_device::mc_dma_done_w));
 
 	NSCSI_BUS(config, "scsibus", 0);
 	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
@@ -237,19 +249,39 @@ void ip24_state::ip24_base(machine_config &config)
 
 	// GIO64
 	GIO64(config, m_gio64, m_maincpu);
-	m_gio64->interrupt_cb<0>().set(m_hpc3, FUNC(hpc3_base_device::gio_int0));
-	m_gio64->interrupt_cb<1>().set(m_hpc3, FUNC(hpc3_base_device::gio_int1));
-	m_gio64->interrupt_cb<2>().set(m_hpc3, FUNC(hpc3_base_device::gio_int2));
+	m_gio64->interrupt_cb<0>().set(m_ioc2, FUNC(ioc2_device::gio_int0_w));
+	m_gio64->interrupt_cb<1>().set(m_ioc2, FUNC(ioc2_device::gio_int1_w));
+	m_gio64->interrupt_cb<2>().set(m_ioc2, FUNC(ioc2_device::gio_int2_w));
 	GIO64_SLOT(config, m_gio64_gfx, m_gio64, gio64_slot_device::GIO64_SLOT_GFX, gio64_cards, "xl24");
 	GIO64_SLOT(config, m_gio64_exp0, m_gio64, gio64_slot_device::GIO64_SLOT_EXP0, gio64_cards, nullptr);
 	GIO64_SLOT(config, m_gio64_exp1, m_gio64, gio64_slot_device::GIO64_SLOT_EXP1, gio64_cards, nullptr);
+
+	SGI_HPC3(config, m_hpc3, m_ioc2, m_hal2);
+	m_hpc3->set_gio64_space(m_maincpu, AS_PROGRAM);
+	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
+	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
+	m_hpc3->hd_dma_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::dma_r));
+	m_hpc3->hd_dma_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::dma_w));
+	m_hpc3->hd_reset_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::reset_w));
+	m_hpc3->bbram_rd_cb().set(m_rtc, FUNC(ds1386_device::data_r));
+	m_hpc3->bbram_wr_cb().set(m_rtc, FUNC(ds1386_device::data_w));
+	m_hpc3->eeprom_dati_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
+	m_hpc3->eeprom_dato_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
+	m_hpc3->eeprom_clk_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
+	m_hpc3->eeprom_cs_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
+	//m_hpc3->eeprom_pre_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::pre_write));
+	m_hpc3->dma_complete_int_cb().set(m_ioc2, FUNC(ioc2_device::hpc_dma_done_w));
+
+	SGI_HAL2(config, m_hal2);
+	EEPROM_93C56_16BIT(config, m_eeprom);
+	DS1386_8K(config, m_rtc, 32768);
 }
 
 void ip24_state::ip24(machine_config &config)
 {
 	ip24_base(config);
 
-	SGI_HPC3_GUINNESS(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
 	VINO(config, m_vino);
 }
 
@@ -286,8 +318,8 @@ void ip24_state::indy_4610(machine_config &config)
 void ip22_state::wd33c93_2(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi1_irq));
-	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_base_device::scsi1_drq));
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
+	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
 }
 
 void ip22_state::indigo2_4415(machine_config &config)
@@ -310,7 +342,13 @@ void ip22_state::indigo2_4415(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus2:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
-	SGI_HPC3_FULL_HOUSE(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
+	m_hpc3->hd_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_r));
+	m_hpc3->hd_wr_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_w));
+	m_hpc3->hd_dma_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::dma_r));
+	m_hpc3->hd_dma_wr_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::dma_w));
+	m_hpc3->hd_reset_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::reset_w));
+
+	SGI_IOC2_FULL_HOUSE(config, m_ioc2, m_maincpu);
 }
 
 #define INDY_BIOS_FLAGS(bios) ROM_GROUPDWORD | ROM_BIOS(bios)

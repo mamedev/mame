@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "sgi.h"
-#include "ioc2.h"
 
 #define LOG_UNKNOWN     (1 << 0)
 #define LOG_READS       (1 << 1)
@@ -32,7 +31,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, SGI_MC, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
-	, m_hpc3(*this, finder_base::DUMMY_TAG)
+	, m_int_dma_done_cb(*this)
 	, m_rpss_timer(nullptr)
 	, m_dma_timer(nullptr)
 	, m_watchdog(0)
@@ -69,6 +68,11 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_rpss_divide_count(0)
 	, m_rpss_increment(0)
 {
+}
+
+void sgi_mc_device::device_resolve_objects()
+{
+	m_int_dma_done_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -303,7 +307,7 @@ void sgi_mc_device::dma_immediate()
 	if (BIT(m_dma_control, 4))
 	{
 		m_dma_int_cause |= (1 << 3);
-		m_hpc3->raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
+		m_int_dma_done_cb(ASSERT_LINE);
 	}
 }
 
@@ -592,10 +596,8 @@ WRITE32_MEMBER( sgi_mc_device::write )
 	case 0x0160/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Interrupt Cause Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_dma_int_cause = data;
-		if (m_dma_int_cause == 0 && m_hpc3)
-		{
-			m_hpc3->lower_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
-		}
+		if (m_dma_int_cause == 0)
+			m_int_dma_done_cb(CLEAR_LINE);
 		break;
 	case 0x0168/4:
 		LOGMASKED(LOG_WRITES | LOG_DMA, "%s: DMA Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);

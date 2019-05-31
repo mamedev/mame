@@ -23,32 +23,50 @@
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(SGI_HPC3_GUINNESS, hpc3_guinness_device, "hpc3g", "SGI HPC3 (Guinness)")
-DEFINE_DEVICE_TYPE(SGI_HPC3_FULL_HOUSE, hpc3_full_house_device, "hpc3f", "SGI HPC3 (Full House)")
+DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")
 
-hpc3_guinness_device::hpc3_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hpc3_base_device(mconfig, SGI_HPC3_GUINNESS, tag, owner, clock)
+hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SGI_HPC3, tag, owner, clock)
+	, m_gio64_space(*this, finder_base::DUMMY_TAG, -1)
+	, m_ioc2(*this, finder_base::DUMMY_TAG)
+	, m_hal2(*this, finder_base::DUMMY_TAG)
+	, m_hd_rd_cb{{*this}, {*this}}
+	, m_hd_wr_cb{{*this}, {*this}}
+	, m_hd_dma_rd_cb{{*this}, {*this}}
+	, m_hd_dma_wr_cb{{*this}, {*this}}
+	, m_hd_reset_cb{{*this}, {*this}}
+	, m_bbram_rd_cb(*this)
+	, m_bbram_wr_cb(*this)
+	, m_eeprom_dati_cb(*this)
+	, m_eeprom_dato_cb(*this)
+	, m_eeprom_clk_cb(*this)
+	, m_eeprom_cs_cb(*this)
+	, m_eeprom_pre_cb(*this)
+	, m_dma_complete_int_cb(*this)
 {
 }
 
-hpc3_full_house_device::hpc3_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hpc3_base_device(mconfig, SGI_HPC3_FULL_HOUSE, tag, owner, clock)
+void hpc3_device::device_resolve_objects()
 {
+	for (int index = 0; index < 2; index++)
+	{
+		m_hd_rd_cb[index].resolve();
+		m_hd_wr_cb[index].resolve();
+		m_hd_dma_rd_cb[index].resolve_safe(0);
+		m_hd_dma_wr_cb[index].resolve_safe();
+		m_hd_reset_cb[index].resolve_safe();
+	}
+	m_bbram_rd_cb.resolve_safe(0);
+	m_bbram_wr_cb.resolve_safe();
+	m_eeprom_dati_cb.resolve_safe(0);
+	m_eeprom_dato_cb.resolve_safe();
+	m_eeprom_clk_cb.resolve_safe();
+	m_eeprom_cs_cb.resolve_safe();
+	m_eeprom_pre_cb.resolve_safe();
+	m_dma_complete_int_cb.resolve_safe();
 }
 
-hpc3_base_device::hpc3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_wd33c93(*this, finder_base::DUMMY_TAG)
-	, m_wd33c93_2(*this, finder_base::DUMMY_TAG)
-	, m_eeprom(*this, "eeprom")
-	, m_rtc(*this, "rtc")
-	, m_ioc2(*this, "ioc2")
-	, m_hal2(*this, "hal2")
-{
-}
-
-void hpc3_base_device::device_start()
+void hpc3_device::device_start()
 {
 	save_item(NAME(m_intstat));
 	save_item(NAME(m_cpu_aux_ctrl));
@@ -112,7 +130,7 @@ void hpc3_base_device::device_start()
 	save_pointer(NAME(m_enet_fifo[ENET_XMIT]), 40);
 }
 
-void hpc3_base_device::device_reset()
+void hpc3_device::device_reset()
 {
 	m_cpu_aux_ctrl = 0;
 
@@ -140,57 +158,34 @@ void hpc3_base_device::device_reset()
 		m_pbus_dma[i].m_active = false;
 		m_pbus_dma[i].m_timer->adjust(attotime::never);
 	}
-
-	m_cpu_space = &m_maincpu->space(AS_PROGRAM);
 }
 
-void hpc3_base_device::device_add_mconfig(machine_config &config)
+void hpc3_device::map(address_map &map)
 {
-	SGI_HAL2(config, m_hal2);
-
-	DS1386_8K(config, m_rtc, 32768);
-
-	EEPROM_93C56_16BIT(config, m_eeprom);
-}
-
-void hpc3_guinness_device::device_add_mconfig(machine_config &config)
-{
-	hpc3_base_device::device_add_mconfig(config);
-	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
-}
-
-void hpc3_full_house_device::device_add_mconfig(machine_config &config)
-{
-	hpc3_base_device::device_add_mconfig(config);
-	SGI_IOC2_FULL_HOUSE(config, m_ioc2, m_maincpu);
-}
-
-void hpc3_base_device::map(address_map &map)
-{
-	map(0x00000000, 0x0000ffff).rw(FUNC(hpc3_base_device::pbusdma_r), FUNC(hpc3_base_device::pbusdma_w));
-	map(0x00010000, 0x0001ffff).rw(FUNC(hpc3_base_device::hd_enet_r), FUNC(hpc3_base_device::hd_enet_w));
-	map(0x00020000, 0x000202ff).rw(FUNC(hpc3_base_device::fifo_r<FIFO_PBUS>), FUNC(hpc3_base_device::fifo_w<FIFO_PBUS>)); // PBUS FIFO
-	map(0x00028000, 0x000282ff).rw(FUNC(hpc3_base_device::fifo_r<FIFO_SCSI0>), FUNC(hpc3_base_device::fifo_w<FIFO_SCSI0>)); // SCSI0 FIFO
-	map(0x0002a000, 0x0002a2ff).rw(FUNC(hpc3_base_device::fifo_r<FIFO_SCSI1>), FUNC(hpc3_base_device::fifo_w<FIFO_SCSI1>)); // SCSI1 FIFO
-	map(0x0002c000, 0x0002c0ff).rw(FUNC(hpc3_base_device::fifo_r<FIFO_ENET_RECV>), FUNC(hpc3_base_device::fifo_w<FIFO_ENET_RECV>)); // ENET Recv FIFO
-	map(0x0002e000, 0x0002e13f).rw(FUNC(hpc3_base_device::fifo_r<FIFO_ENET_XMIT>), FUNC(hpc3_base_device::fifo_w<FIFO_ENET_XMIT>)); // ENET Xmit FIFO
-	map(0x00030000, 0x00030003).r(FUNC(hpc3_base_device::intstat_r));
-	map(0x00030008, 0x0003000b).rw(FUNC(hpc3_base_device::eeprom_r), FUNC(hpc3_base_device::eeprom_w));
-	map(0x0003000c, 0x0003000f).r(FUNC(hpc3_base_device::intstat_r));
-	map(0x00040000, 0x00047fff).rw(FUNC(hpc3_base_device::hd_r<0>), FUNC(hpc3_base_device::hd_w<0>));
-	map(0x00048000, 0x0004ffff).rw(FUNC(hpc3_base_device::hd_r<1>), FUNC(hpc3_base_device::hd_w<1>));
-	map(0x00054000, 0x000544ff).rw(FUNC(hpc3_base_device::enet_r), FUNC(hpc3_base_device::enet_w));
+	map(0x00000000, 0x0000ffff).rw(FUNC(hpc3_device::pbusdma_r), FUNC(hpc3_device::pbusdma_w));
+	map(0x00010000, 0x0001ffff).rw(FUNC(hpc3_device::hd_enet_r), FUNC(hpc3_device::hd_enet_w));
+	map(0x00020000, 0x000202ff).rw(FUNC(hpc3_device::fifo_r<FIFO_PBUS>), FUNC(hpc3_device::fifo_w<FIFO_PBUS>)); // PBUS FIFO
+	map(0x00028000, 0x000282ff).rw(FUNC(hpc3_device::fifo_r<FIFO_SCSI0>), FUNC(hpc3_device::fifo_w<FIFO_SCSI0>)); // SCSI0 FIFO
+	map(0x0002a000, 0x0002a2ff).rw(FUNC(hpc3_device::fifo_r<FIFO_SCSI1>), FUNC(hpc3_device::fifo_w<FIFO_SCSI1>)); // SCSI1 FIFO
+	map(0x0002c000, 0x0002c0ff).rw(FUNC(hpc3_device::fifo_r<FIFO_ENET_RECV>), FUNC(hpc3_device::fifo_w<FIFO_ENET_RECV>)); // ENET Recv FIFO
+	map(0x0002e000, 0x0002e13f).rw(FUNC(hpc3_device::fifo_r<FIFO_ENET_XMIT>), FUNC(hpc3_device::fifo_w<FIFO_ENET_XMIT>)); // ENET Xmit FIFO
+	map(0x00030000, 0x00030003).r(FUNC(hpc3_device::intstat_r));
+	map(0x00030008, 0x0003000b).rw(FUNC(hpc3_device::eeprom_r), FUNC(hpc3_device::eeprom_w));
+	map(0x0003000c, 0x0003000f).r(FUNC(hpc3_device::intstat_r));
+	map(0x00040000, 0x00047fff).rw(FUNC(hpc3_device::hd_r<0>), FUNC(hpc3_device::hd_w<0>));
+	map(0x00048000, 0x0004ffff).rw(FUNC(hpc3_device::hd_r<1>), FUNC(hpc3_device::hd_w<1>));
+	map(0x00054000, 0x000544ff).rw(FUNC(hpc3_device::enet_r), FUNC(hpc3_device::enet_w));
 	map(0x00058000, 0x000583ff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
 	map(0x00058400, 0x000587ff).ram(); // hack
-	map(0x00058800, 0x00058807).rw(FUNC(hpc3_base_device::volume_r), FUNC(hpc3_base_device::volume_w));
-	map(0x00059000, 0x000593ff).rw(FUNC(hpc3_base_device::pbus4_r), FUNC(hpc3_base_device::pbus4_w));
+	map(0x00058800, 0x00058807).rw(FUNC(hpc3_device::volume_r), FUNC(hpc3_device::volume_w));
+	map(0x00059000, 0x000593ff).rw(FUNC(hpc3_device::pbus4_r), FUNC(hpc3_device::pbus4_w));
 	map(0x00059800, 0x00059bff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write));
-	map(0x0005c000, 0x0005cfff).rw(FUNC(hpc3_base_device::dma_config_r), FUNC(hpc3_base_device::dma_config_w));
-	map(0x0005d000, 0x0005dfff).rw(FUNC(hpc3_base_device::pio_config_r), FUNC(hpc3_base_device::pio_config_w));
-	map(0x00060000, 0x000604ff).rw(m_rtc, FUNC(ds1386_device::data_r), FUNC(ds1386_device::data_w)).umask32(0x000000ff);
+	map(0x0005c000, 0x0005cfff).rw(FUNC(hpc3_device::dma_config_r), FUNC(hpc3_device::dma_config_w));
+	map(0x0005d000, 0x0005dfff).rw(FUNC(hpc3_device::pio_config_r), FUNC(hpc3_device::pio_config_w));
+	map(0x00060000, 0x0007ffff).rw(FUNC(hpc3_device::bbram_r), FUNC(hpc3_device::bbram_w));
 }
 
-void hpc3_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -207,17 +202,17 @@ void hpc3_base_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		LOGMASKED(LOG_UNKNOWN, "HPC3: Ignoring active PBUS DMA on channel %d\n", id - TIMER_PBUS_DMA);
 		break;
 	default:
-		assert_always(false, "Unknown id in hpc3_base_device::device_timer");
+		assert_always(false, "Unknown id in hpc3_device::device_timer");
 	}
 }
 
-void hpc3_base_device::do_pbus_dma(uint32_t channel)
+void hpc3_device::do_pbus_dma(uint32_t channel)
 {
 	pbus_dma_t &dma = m_pbus_dma[channel];
 
 	if (dma.m_active && channel < 4)
 	{
-		uint16_t temp16 = m_cpu_space->read_dword(dma.m_cur_ptr) >> 16;
+		uint16_t temp16 = m_gio64_space->read_dword(dma.m_cur_ptr) >> 16;
 		int16_t stemp16 = (int16_t)((temp16 >> 8) | (temp16 << 8));
 
 		m_hal2->dma_write(channel, stemp16);
@@ -231,10 +226,10 @@ void hpc3_base_device::do_pbus_dma(uint32_t channel)
 			{
 				dma.m_desc_ptr = dma.m_next_ptr;
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_DescPtr = %08x\n", channel, dma.m_desc_ptr); fflush(stdout);
-				dma.m_cur_ptr = m_cpu_space->read_dword(dma.m_desc_ptr);
-				dma.m_desc_flags = m_cpu_space->read_dword(dma.m_desc_ptr + 4);
+				dma.m_cur_ptr = m_gio64_space->read_dword(dma.m_desc_ptr);
+				dma.m_desc_flags = m_gio64_space->read_dword(dma.m_desc_ptr + 4);
 				dma.m_bytes_left = dma.m_desc_flags & 0x7fffffff;
-				dma.m_next_ptr = m_cpu_space->read_dword(dma.m_desc_ptr + 8);
+				dma.m_next_ptr = m_gio64_space->read_dword(dma.m_desc_ptr + 8);
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_CurPtr = %08x\n", channel, dma.m_cur_ptr); fflush(stdout);
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_BytesLeft = %08x\n", channel, dma.m_bytes_left); fflush(stdout);
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_NextPtr = %08x\n", channel, dma.m_next_ptr); fflush(stdout);
@@ -254,7 +249,7 @@ void hpc3_base_device::do_pbus_dma(uint32_t channel)
 	}
 }
 
-READ32_MEMBER(hpc3_base_device::enet_r)
+READ32_MEMBER(hpc3_device::enet_r)
 {
 	switch (offset)
 	{
@@ -267,7 +262,7 @@ READ32_MEMBER(hpc3_base_device::enet_r)
 	}
 }
 
-WRITE32_MEMBER(hpc3_base_device::enet_w)
+WRITE32_MEMBER(hpc3_device::enet_w)
 {
 	switch (offset)
 	{
@@ -277,7 +272,7 @@ WRITE32_MEMBER(hpc3_base_device::enet_w)
 	}
 }
 
-READ32_MEMBER(hpc3_base_device::hd_enet_r)
+READ32_MEMBER(hpc3_device::hd_enet_r)
 {
 	switch (offset)
 	{
@@ -388,7 +383,7 @@ READ32_MEMBER(hpc3_base_device::hd_enet_r)
 	}
 }
 
-WRITE32_MEMBER(hpc3_base_device::hd_enet_w)
+WRITE32_MEMBER(hpc3_device::hd_enet_w)
 {
 	switch (offset)
 	{
@@ -415,15 +410,7 @@ WRITE32_MEMBER(hpc3_base_device::hd_enet_w)
 		{
 			fetch_chain(channel);
 		}
-		if (channel)
-		{
-			if (m_wd33c93_2)
-				m_wd33c93_2->reset_w(BIT(data, 6));
-		}
-		else
-		{
-			m_wd33c93->reset_w(BIT(data, 6));
-		}
+		m_hd_reset_cb[channel](BIT(data, 6));
 		if (m_scsi_dma[channel].m_drq && m_scsi_dma[channel].m_active)
 		{
 			do_scsi_dma(channel);
@@ -505,8 +492,8 @@ WRITE32_MEMBER(hpc3_base_device::hd_enet_w)
 	}
 }
 
-template<hpc3_base_device::fifo_type_t Type>
-READ32_MEMBER(hpc3_base_device::fifo_r)
+template<hpc3_device::fifo_type_t Type>
+READ32_MEMBER(hpc3_device::fifo_r)
 {
 	uint32_t ret = 0;
 	if (Type == FIFO_PBUS)
@@ -523,8 +510,8 @@ READ32_MEMBER(hpc3_base_device::fifo_r)
 	return ret;
 }
 
-template<hpc3_base_device::fifo_type_t Type>
-WRITE32_MEMBER(hpc3_base_device::fifo_w)
+template<hpc3_device::fifo_type_t Type>
+WRITE32_MEMBER(hpc3_device::fifo_w)
 {
 	logerror("Writing %08x to %d FIFO offset %08x (%08x)\n", data, Type, offset, offset >> 2);
 	if (Type == FIFO_PBUS)
@@ -539,81 +526,50 @@ WRITE32_MEMBER(hpc3_base_device::fifo_w)
 		m_enet_fifo[ENET_XMIT][offset >> 2] = data;
 }
 
-template READ32_MEMBER(hpc3_base_device::fifo_r<hpc3_base_device::FIFO_PBUS>);
-template READ32_MEMBER(hpc3_base_device::fifo_r<hpc3_base_device::FIFO_SCSI0>);
-template READ32_MEMBER(hpc3_base_device::fifo_r<hpc3_base_device::FIFO_SCSI1>);
-template READ32_MEMBER(hpc3_base_device::fifo_r<hpc3_base_device::FIFO_ENET_RECV>);
-template READ32_MEMBER(hpc3_base_device::fifo_r<hpc3_base_device::FIFO_ENET_XMIT>);
-template WRITE32_MEMBER(hpc3_base_device::fifo_w<hpc3_base_device::FIFO_PBUS>);
-template WRITE32_MEMBER(hpc3_base_device::fifo_w<hpc3_base_device::FIFO_SCSI0>);
-template WRITE32_MEMBER(hpc3_base_device::fifo_w<hpc3_base_device::FIFO_SCSI1>);
-template WRITE32_MEMBER(hpc3_base_device::fifo_w<hpc3_base_device::FIFO_ENET_RECV>);
-template WRITE32_MEMBER(hpc3_base_device::fifo_w<hpc3_base_device::FIFO_ENET_XMIT>);
+template READ32_MEMBER(hpc3_device::fifo_r<hpc3_device::FIFO_PBUS>);
+template READ32_MEMBER(hpc3_device::fifo_r<hpc3_device::FIFO_SCSI0>);
+template READ32_MEMBER(hpc3_device::fifo_r<hpc3_device::FIFO_SCSI1>);
+template READ32_MEMBER(hpc3_device::fifo_r<hpc3_device::FIFO_ENET_RECV>);
+template READ32_MEMBER(hpc3_device::fifo_r<hpc3_device::FIFO_ENET_XMIT>);
+template WRITE32_MEMBER(hpc3_device::fifo_w<hpc3_device::FIFO_PBUS>);
+template WRITE32_MEMBER(hpc3_device::fifo_w<hpc3_device::FIFO_SCSI0>);
+template WRITE32_MEMBER(hpc3_device::fifo_w<hpc3_device::FIFO_SCSI1>);
+template WRITE32_MEMBER(hpc3_device::fifo_w<hpc3_device::FIFO_ENET_RECV>);
+template WRITE32_MEMBER(hpc3_device::fifo_w<hpc3_device::FIFO_ENET_XMIT>);
 
 template<uint32_t index>
-READ32_MEMBER(hpc3_base_device::hd_r)
+READ32_MEMBER(hpc3_device::hd_r)
 {
-	if (index && !m_wd33c93_2)
-		return 0;
-
-	switch (offset)
+	if (ACCESSING_BITS_0_7 && !m_hd_rd_cb[index].isnull())
 	{
-	case 0x0000/4:
-	case 0x4000/4:
-		if (ACCESSING_BITS_0_7)
-		{
-			const uint8_t ret = index ? m_wd33c93_2->indir_addr_r() : m_wd33c93->indir_addr_r();
-			LOGMASKED(LOG_SCSI, "%s: SCSI%d Read 0: %02x\n", machine().describe_context(), index, ret);
-			return ret;
-		}
-		break;
-	case 0x0004/4:
-	case 0x4004/4:
-		if (ACCESSING_BITS_0_7)
-		{
-			const uint8_t ret = index ? m_wd33c93_2->indir_reg_r() : m_wd33c93->indir_reg_r();
-			LOGMASKED(LOG_SCSI, "%s: SCSI%d Read 1: %02x\n", machine().describe_context(), index, ret);
-			return ret;
-		}
-		break;
-	default:
-		LOGMASKED(LOG_SCSI | LOG_UNKNOWN, "%s: %s: Unknown HPC3 HD%d Read: %08x & %08x\n", machine().describe_context(), machine().describe_context(),
+		const uint8_t ret = m_hd_rd_cb[index](offset);
+		LOGMASKED(LOG_SCSI, "%s: SCSI%d Read %02x: %02x\n", machine().describe_context(), index, offset, ret);
+		return ret;
+	}
+	else
+	{
+		LOGMASKED(LOG_SCSI | LOG_UNKNOWN, "%s: Unknown HPC3 HD%d Read: %08x & %08x\n", machine().describe_context(),
 			index, 0x1fbc4000 + (offset << 2) + index * 0x8000, mem_mask);
-		break;
+		return 0;
 	}
-	return 0;
 }
 
 template<uint32_t index>
-WRITE32_MEMBER(hpc3_base_device::hd_w)
+WRITE32_MEMBER(hpc3_device::hd_w)
 {
-	if (index && !m_wd33c93_2)
-		return;
-
-	switch (offset)
+	if (ACCESSING_BITS_0_7 && !m_hd_wr_cb[index].isnull())
 	{
-	case 0x0000:
-		if (ACCESSING_BITS_0_7)
-		{
-			LOGMASKED(LOG_SCSI, "%s: SCSI%d Write 0 = %02x\n", machine().describe_context(), index, (uint8_t)data);
-			index ? m_wd33c93_2->indir_addr_w(data & 0xff) : m_wd33c93->indir_addr_w(data & 0xff);
-		}
-		break;
-	case 0x0001:
-		if (ACCESSING_BITS_0_7)
-		{
-			LOGMASKED(LOG_SCSI, "%s: SCSI%d Write 1 = %02x\n", machine().describe_context(), index, (uint8_t)data);
-			index ? m_wd33c93_2->indir_reg_w(data & 0xff) : m_wd33c93->indir_reg_w(data & 0xff);
-		}
-		break;
-	default:
-		LOGMASKED(LOG_SCSI | LOG_UNKNOWN, "%s: %s: Unknown HPC3 HD%d Write: %08x = %08x & %08x\n", machine().describe_context(), machine().describe_context(),
+		LOGMASKED(LOG_SCSI, "%s: SCSI%d Write %02x = %02x\n", machine().describe_context(), index, offset, (uint8_t)data);
+		m_hd_wr_cb[index](offset, data & 0xff);
+	}
+	else
+	{
+		LOGMASKED(LOG_SCSI | LOG_UNKNOWN, "%s: Unknown HPC3 HD%d Write: %08x = %08x & %08x\n", machine().describe_context(),
 			index, 0x1fbc4000 + (offset << 2) + index * 0x8000, data, mem_mask);
-		break;
 	}
 }
 
-READ32_MEMBER(hpc3_base_device::volume_r)
+READ32_MEMBER(hpc3_device::volume_r)
 {
 	if (offset == 0)
 		return m_volume_r;
@@ -621,7 +577,7 @@ READ32_MEMBER(hpc3_base_device::volume_r)
 		return m_volume_l;
 }
 
-WRITE32_MEMBER(hpc3_base_device::volume_w)
+WRITE32_MEMBER(hpc3_device::volume_w)
 {
 	if (offset == 0)
 	{
@@ -635,12 +591,12 @@ WRITE32_MEMBER(hpc3_base_device::volume_w)
 	}
 }
 
-template READ32_MEMBER(hpc3_base_device::hd_r<0>);
-template READ32_MEMBER(hpc3_base_device::hd_r<1>);
-template WRITE32_MEMBER(hpc3_base_device::hd_w<0>);
-template WRITE32_MEMBER(hpc3_base_device::hd_w<1>);
+template READ32_MEMBER(hpc3_device::hd_r<0>);
+template READ32_MEMBER(hpc3_device::hd_r<1>);
+template WRITE32_MEMBER(hpc3_device::hd_w<0>);
+template WRITE32_MEMBER(hpc3_device::hd_w<1>);
 
-READ32_MEMBER(hpc3_base_device::pbus4_r)
+READ32_MEMBER(hpc3_device::pbus4_r)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -696,7 +652,7 @@ READ32_MEMBER(hpc3_base_device::pbus4_r)
 	return ret;
 }
 
-WRITE32_MEMBER(hpc3_base_device::pbus4_w)
+WRITE32_MEMBER(hpc3_device::pbus4_w)
 {
 	switch (offset)
 	{
@@ -742,7 +698,7 @@ WRITE32_MEMBER(hpc3_base_device::pbus4_w)
 	}
 }
 
-READ32_MEMBER(hpc3_base_device::pbusdma_r)
+READ32_MEMBER(hpc3_device::pbusdma_r)
 {
 	uint32_t channel = offset / (0x2000/4);
 	pbus_dma_t &dma = m_pbus_dma[channel];
@@ -769,7 +725,7 @@ READ32_MEMBER(hpc3_base_device::pbusdma_r)
 	return ret;
 }
 
-WRITE32_MEMBER(hpc3_base_device::pbusdma_w)
+WRITE32_MEMBER(hpc3_device::pbusdma_w)
 {
 	uint32_t channel = offset / (0x2000/4);
 	pbus_dma_t &dma = m_pbus_dma[channel];
@@ -829,7 +785,7 @@ WRITE32_MEMBER(hpc3_base_device::pbusdma_w)
 	}
 }
 
-READ32_MEMBER(hpc3_base_device::dma_config_r)
+READ32_MEMBER(hpc3_device::dma_config_r)
 {
 	const uint32_t channel = (offset >> 7) & 7;
 	const uint32_t data = m_pbus_dma[channel].m_config;
@@ -837,7 +793,7 @@ READ32_MEMBER(hpc3_base_device::dma_config_r)
 	return data;
 }
 
-WRITE32_MEMBER(hpc3_base_device::dma_config_w)
+WRITE32_MEMBER(hpc3_device::dma_config_w)
 {
 	const uint32_t channel = (offset >> 7) & 7;
 	COMBINE_DATA(&m_pbus_dma[channel].m_config);
@@ -856,7 +812,7 @@ WRITE32_MEMBER(hpc3_base_device::dma_config_w)
 	LOGMASKED(LOG_PBUS_DMA, "    %sUse Unsynchronized DREQ\n", BIT(data, 27) ? "" : "Do Not ");
 }
 
-READ32_MEMBER(hpc3_base_device::pio_config_r)
+READ32_MEMBER(hpc3_device::pio_config_r)
 {
 	uint32_t channel = (offset >> 6) & 15;
 	if (channel >= 10)
@@ -869,7 +825,7 @@ READ32_MEMBER(hpc3_base_device::pio_config_r)
 	return data;
 }
 
-WRITE32_MEMBER(hpc3_base_device::pio_config_w)
+WRITE32_MEMBER(hpc3_device::pio_config_w)
 {
 	uint32_t channel = (offset >> 6) & 15;
 	if (channel >= 10)
@@ -889,22 +845,32 @@ WRITE32_MEMBER(hpc3_base_device::pio_config_w)
 	LOGMASKED(LOG_PBUS_DMA, "    Even Address Bytes on %s\n", BIT(data, 19) ? "15..8" : "7..0");
 }
 
-READ32_MEMBER(hpc3_base_device::unkpbus0_r)
+uint32_t hpc3_device::bbram_r(offs_t offset)
+{
+	return m_bbram_rd_cb(offset);
+}
+
+void hpc3_device::bbram_w(offs_t offset, uint32_t data)
+{
+	m_bbram_wr_cb(offset, data);
+}
+
+READ32_MEMBER(hpc3_device::unkpbus0_r)
 {
 	LOGMASKED(LOG_UNKNOWN, "%s: Unknown PBUS Read: %08x & %08x\n", machine().describe_context(), 0x1fbc8000 + offset*4, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(hpc3_base_device::unkpbus0_w)
+WRITE32_MEMBER(hpc3_device::unkpbus0_w)
 {
 	LOGMASKED(LOG_UNKNOWN, "%s: Unknown PBUS Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbc8000 + offset*4, data, mem_mask);
 }
 
-void hpc3_base_device::dump_chain(uint32_t base)
+void hpc3_device::dump_chain(uint32_t base)
 {
-	const uint32_t addr = m_cpu_space->read_dword(base);
-	const uint32_t ctrl = m_cpu_space->read_dword(base+4);
-	const uint32_t next = m_cpu_space->read_dword(base+8);
+	const uint32_t addr = m_gio64_space->read_dword(base);
+	const uint32_t ctrl = m_gio64_space->read_dword(base+4);
+	const uint32_t next = m_gio64_space->read_dword(base+8);
 
 	LOGMASKED(LOG_CHAIN, "Chain Node:\n");
 	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", addr);
@@ -917,13 +883,13 @@ void hpc3_base_device::dump_chain(uint32_t base)
 	}
 }
 
-void hpc3_base_device::fetch_chain(int channel)
+void hpc3_device::fetch_chain(int channel)
 {
 	scsi_dma_t &dma = m_scsi_dma[channel];
 	const uint32_t desc_addr = dma.m_nbdp;
-	dma.m_cbp = m_cpu_space->read_dword(desc_addr);
-	dma.m_ctrl = m_cpu_space->read_dword(desc_addr+4);
-	dma.m_nbdp = m_cpu_space->read_dword(desc_addr+8);
+	dma.m_cbp = m_gio64_space->read_dword(desc_addr);
+	dma.m_ctrl = m_gio64_space->read_dword(desc_addr+4);
+	dma.m_nbdp = m_gio64_space->read_dword(desc_addr+8);
 	dma.m_bc = dma.m_ctrl & 0x3fff;
 
 	LOGMASKED(LOG_CHAIN, "Fetching chain from %08x:\n", desc_addr);
@@ -932,7 +898,7 @@ void hpc3_base_device::fetch_chain(int channel)
 	LOGMASKED(LOG_CHAIN, "    Next: %08x\n", dma.m_nbdp);
 }
 
-void hpc3_base_device::decrement_chain(int channel)
+void hpc3_device::decrement_chain(int channel)
 {
 	scsi_dma_t &dma = m_scsi_dma[channel];
 	dma.m_bc--;
@@ -948,7 +914,7 @@ void hpc3_base_device::decrement_chain(int channel)
 	}
 }
 
-void hpc3_base_device::scsi_drq(bool state, int channel)
+void hpc3_device::scsi_drq(bool state, int channel)
 {
 	scsi_dma_t &dma = m_scsi_dma[channel];
 	dma.m_drq = state;
@@ -959,28 +925,15 @@ void hpc3_base_device::scsi_drq(bool state, int channel)
 	}
 }
 
-void hpc3_base_device::do_scsi_dma(int channel)
+void hpc3_device::do_scsi_dma(int channel)
 {
 	scsi_dma_t &dma = m_scsi_dma[channel];
 
 	const uint32_t addr = dma.m_big_endian ? BYTE4_XOR_BE(dma.m_cbp) : BYTE4_XOR_LE(dma.m_cbp);
-	if (channel)
-	{
-		if (m_wd33c93_2)
-		{
-			if (dma.m_to_device)
-				m_wd33c93_2->dma_w(m_cpu_space->read_byte(addr));
-			else
-				m_cpu_space->write_byte(addr, m_wd33c93_2->dma_r());
-		}
-	}
+	if (dma.m_to_device)
+		m_hd_dma_wr_cb[channel](m_gio64_space->read_byte(addr));
 	else
-	{
-		if (dma.m_to_device)
-			m_wd33c93->dma_w(m_cpu_space->read_byte(addr));
-		else
-			m_cpu_space->write_byte(addr, m_wd33c93->dma_r());
-	}
+		m_gio64_space->write_byte(addr, m_hd_dma_rd_cb[channel]());
 
 	dma.m_cbp++;
 	decrement_chain(channel);
@@ -992,17 +945,17 @@ void hpc3_base_device::do_scsi_dma(int channel)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc3_base_device::scsi0_drq)
+WRITE_LINE_MEMBER(hpc3_device::scsi0_drq)
 {
 	scsi_drq(state, 0);
 }
 
-WRITE_LINE_MEMBER(hpc3_base_device::scsi1_drq)
+WRITE_LINE_MEMBER(hpc3_device::scsi1_drq)
 {
 	scsi_drq(state, 1);
 }
 
-WRITE_LINE_MEMBER(hpc3_base_device::scsi0_irq)
+WRITE_LINE_MEMBER(hpc3_device::scsi0_irq)
 {
 	if (state)
 	{
@@ -1018,7 +971,7 @@ WRITE_LINE_MEMBER(hpc3_base_device::scsi0_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc3_base_device::scsi1_irq)
+WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
 {
 	if (state)
 	{
@@ -1034,48 +987,24 @@ WRITE_LINE_MEMBER(hpc3_base_device::scsi1_irq)
 	}
 }
 
-READ32_MEMBER(hpc3_base_device::intstat_r)
+READ32_MEMBER(hpc3_device::intstat_r)
 {
 	return m_intstat;
 }
 
-READ32_MEMBER(hpc3_base_device::eeprom_r)
+uint32_t hpc3_device::eeprom_r()
 {
-	// Disabled - we don't have a dump from real hardware, and IRIX 5.x freaks out with default contents.
-	uint32_t ret = (m_cpu_aux_ctrl & ~0x10) | (m_eeprom->do_read() << 4);
-	LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+	uint32_t ret = (m_cpu_aux_ctrl & ~0x10) | (m_eeprom_dati_cb() << 4);
+	LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Read: %08x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE32_MEMBER(hpc3_base_device::eeprom_w)
+void hpc3_device::eeprom_w(uint32_t data)
 {
 	m_cpu_aux_ctrl = data;
-	LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	m_eeprom->di_write(BIT(data, 3));
-	m_eeprom->cs_write(BIT(data, 1));
-	m_eeprom->clk_write(BIT(data, 2));
-}
-
-WRITE_LINE_MEMBER(hpc3_base_device::gio_int0)
-{
-	if (state == ASSERT_LINE)
-		raise_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
-	else
-		lower_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
-}
-
-WRITE_LINE_MEMBER(hpc3_base_device::gio_int1)
-{
-	if (state == ASSERT_LINE)
-		raise_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
-	else
-		lower_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
-}
-
-WRITE_LINE_MEMBER(hpc3_base_device::gio_int2)
-{
-	if (state == ASSERT_LINE)
-		raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
-	else
-		lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
+	LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Write: %08x\n", machine().describe_context(), data);
+	m_eeprom_pre_cb(BIT(data, 0));
+	m_eeprom_dato_cb(BIT(data, 3));
+	m_eeprom_cs_cb(BIT(data, 1));
+	m_eeprom_clk_cb(BIT(data, 2));
 }
