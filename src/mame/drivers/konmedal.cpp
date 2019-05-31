@@ -22,6 +22,7 @@ Konami Custom chips:
 054157 (tilemaps)
 
  Shuriken Boy
+ Fuusen Pentai
 
 Konami Custom chips:
 K052109 (tilemaps)
@@ -666,8 +667,24 @@ ROM_START( shuriboy )
 	ROM_LOAD( "341_a10.3e", 0x000300, 0x000100, CRC(01335046) SHA1(63a2826c3883cde8e23f78e27f8d766f15799d1a) )
 ROM_END
 
+ROM_START( fuusenpn )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "241-d01-13g.bin", 0x000000, 0x010000, CRC(e9fee0f8) SHA1(2619b94284649243a84e84b166815ba1c7658814) )
+
+	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "241-a03-2h.bin", 0x000000, 0x010000, CRC(b8bd7bfa) SHA1(883f3591d87275416f917f9c302b807aac5845a4) )
+	ROM_LOAD32_BYTE( "241-a04-4h.bin", 0x000001, 0x010000, CRC(04ffa2a3) SHA1(a1b0615dc8326c296fadb5c45f94f2ea3d670556) )
+	ROM_LOAD32_BYTE( "241-a05-5h.bin", 0x000002, 0x010000, CRC(8c4ad5fa) SHA1(987f24d0566d6b815070b74dada331a4f739f601) )
+	ROM_LOAD32_BYTE( "241-a06-7h.bin", 0x000003, 0x010000, CRC(e650e4c4) SHA1(ac1f03b89f4a17b2583e3a81bd474eda01d41be0) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "241-a02-13c.bin", 0x000000, 0x020000, CRC(f2c39c7b) SHA1(ec420a1fbd6e83fe1ff5c9c8f7169b755d0cc494) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // am27s21apc
+ROM_END
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
 GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
 GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+GAME( 1995, fuusenpn, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
 
