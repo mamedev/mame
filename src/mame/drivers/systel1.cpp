@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
 #include "machine/wd_fdc.h"
@@ -96,13 +97,17 @@ void systel1_state::systel1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &systel1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &systel1_state::io_map);
 
+	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint"));
+	mainint.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	I8257(config, m_dmac, 2_MHz_XTAL); // P8257-5
 	m_dmac->out_hrq_cb().set(FUNC(systel1_state::hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(systel1_state::memory_r));
 	m_dmac->out_memw_cb().set(FUNC(systel1_state::memory_w));
 	m_dmac->out_iow_cb<2>().set("crtc", FUNC(i8276_device::dack_w));
 
-	I8251(config, "usart", 2_MHz_XTAL); // AMD P8251A
+	i8251_device &usart(I8251(config, "usart", 2_MHz_XTAL)); // AMD P8251A
+	usart.rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	clock_device &baudclock(CLOCK(config, "baudclock", 2_MHz_XTAL / 13)); // rate not verified, but also probably fixed
 	baudclock.signal_handler().set("usart", FUNC(i8251_device::write_rxc));
@@ -117,6 +122,7 @@ void systel1_state::systel1(machine_config &config)
 	crtc.set_character_width(7);
 	crtc.set_display_callback(FUNC(systel1_state::draw_character));
 	crtc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
+	crtc.irq_wr_callback().set("mainint", FUNC(input_merger_device::in_w<1>));
 
 	FD1797(config, "fdc", 2_MHz_XTAL);
 }
