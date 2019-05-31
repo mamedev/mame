@@ -1279,7 +1279,8 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
-	ready_cb(state);
+	if(!ready_cb.isnull())
+		ready_cb(state);
 
 	// why is this even possible?
 	if (!floppy)
