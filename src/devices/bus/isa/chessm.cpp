@@ -137,7 +137,6 @@ void isa8_chessm_device::device_add_mconfig(machine_config &config)
 	ARM(config, m_maincpu, 30_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &isa8_chessm_device::chessm_mem);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
-	m_maincpu->set_nested_irq_hack(false);
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	GENERIC_LATCH_8(config, m_sublatch);
