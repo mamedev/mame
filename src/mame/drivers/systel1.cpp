@@ -6,8 +6,7 @@
 
     This minimalistic luggable computer has a green-screen monitor and
     5¼-inch floppy drive (Shugart SA455) built into the unit. The detached
-    keyboard may be replaced with a standard electric typewriter. There is
-    a TYPE/WP switch on the front of the unit.
+    keyboard may be replaced with a standard electric typewriter.
 
 ***************************************************************************/
 
@@ -144,8 +143,11 @@ void systel1_state::io_map(address_map &map)
 }
 
 static INPUT_PORTS_START(systel1)
-	PORT_START("JUMPERS") // probably at J6
-	PORT_DIPNAME(0x02, 0x00, "Screen Refresh")
+	PORT_START("JUMPERS")
+	PORT_DIPNAME(0x01, 0x00, "System Mode") // TYPE/WP switch on the front of the unit
+	PORT_DIPSETTING(0x01, "Typewriter")
+	PORT_DIPSETTING(0x00, "Word Processor")
+	PORT_DIPNAME(0x02, 0x00, "Screen Refresh") // probably at J6
 	PORT_DIPSETTING(0x02, "50 Hz")
 	PORT_DIPSETTING(0x00, "60 Hz")
 INPUT_PORTS_END
