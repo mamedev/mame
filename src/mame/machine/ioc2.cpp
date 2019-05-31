@@ -91,20 +91,30 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	PC_LPT(config, m_pi1);
 
 #if IOC2_NEW_KBDC
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
 	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
-	pc_at_keyboards(kbd);
-	kbd.set_default_option(STR_KBD_MICROSOFT_NATURAL);
-	kbd.set_pc_kbdc_slot(&kbdc);
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	kbd.set_pc_kbdc_slot(&kbd_con);
+
+	// auxiliary connector
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+
+	// auxiliary port
+	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+	aux.set_pc_kbdc_slot(&aux_con);
 
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->kbd_irq().set(FUNC(ioc2_device::kbdc_int_w));
 #else
 	KBDC8042(config, m_kbdc);
@@ -692,7 +702,7 @@ void ioc2_device::set_timer_int_clear(uint32_t data)
 void ioc2_device::handle_reset_reg_write(uint8_t data)
 {
 	// guinness/fullhouse-specific implementations can handle bit 3 being used for ISDN reset on Indy only and bit 2 for EISA reset on Indigo 2 only, but for now we do nothing with it
-	if (BIT(data, 1))
+	if (!BIT(data, 1))
 	{
 #if !IOC2_NEW_KBDC
 		m_kbdc->reset();
