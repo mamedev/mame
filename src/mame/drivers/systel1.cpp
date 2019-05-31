@@ -112,6 +112,15 @@ u8 systel1_state::m1_r(offs_t offset)
 
 I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 {
+	u8 dots = lten ? 0xff : vsp ? 0 : m_chargen[(charcode << 4) | linecount];
+	if (rvv)
+		dots ^= 0xff;
+
+	for (int i = 0; i < 7; i++)
+	{
+		bitmap.pix32(y, x + i) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+		dots <<= 1;
+	}
 }
 
 void systel1_state::mem_map(address_map &map)
