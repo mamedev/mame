@@ -203,4 +203,4 @@ ROM_START(systel100)
 	ROM_LOAD("u16.bin", 0x000, 0x800, CRC(61a8d742) SHA1(69dada638a17353f91bff34a1e2319a35d8a3ebf))
 ROM_END
 
-COMP(198?, systel100, 0, 0, systel1, systel1, systel1_state, empty_init, "Systel Computer", "System 100", MACHINE_IS_SKELETON)
+COMP(198?, systel100, 0, 0, systel1, systel1, systel1_state, empty_init, "Systel Computers", "System 100", MACHINE_IS_SKELETON)
