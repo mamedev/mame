@@ -762,6 +762,7 @@ symbolics.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp
+systel1.cpp
 talkingbb.cpp
 talkingfb.cpp
 tamag1.cpp

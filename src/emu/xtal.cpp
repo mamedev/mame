@@ -160,6 +160,7 @@ const double XTAL::known_xtals[] = {
 	 10'733'000, /* 10.733_MHz_XTAL        The Fairyland Story */
 	 10'738'635, /* 10.738635_MHz_XTAL     TMS9918 family (3x NTSC subcarrier) */
 	 10'816'000, /* 10.816_MHz_XTAL        Universal 1979-1980 (Cosmic Alien, etc) */
+	 10'886'400, /* 10.8864_MHz_XTAL       Systel System 100 */
 	 10'920'000, /* 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2 */
 	 11'000'000, /* 11_MHz_XTAL            Mario I8039 sound */
 	 11'004'000, /* 11.004_MHz_XTAL        TI 911 VDT */

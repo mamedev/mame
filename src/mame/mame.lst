@@ -36847,6 +36847,9 @@ sys9002                         //
 @source:systec.cpp
 systec                          //
 
+@source:systel1.cpp
+systel100                       //
+
 @source:system1.cpp
 4dwarrio                        // 834-5918 (c) 1985 Coreland / Sega (S1)
 blockgal                        // 834-6303 (S1)
