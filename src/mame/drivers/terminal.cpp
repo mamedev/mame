@@ -120,7 +120,7 @@ ROM_START( teleguide ) // order unknown // i8051, i8031 (layout very similar to 
 	ROM_LOAD( "module_19315-051_349-01173.bin",    0x20000, 0x08000, CRC(29c4b49d) SHA1(9bf37616eb130cb6bf86954b4a4952ea99d43ce8) )
 ROM_END
 
-ROM_START( telex277d ) // D8085A, P8155. bank of 8 dips between these 2 chips. xtals on cpu board = 6.144,14.286MHz; xtal on other board = 15.414? (too blurry to read)
+ROM_START( telex277d ) // D8085A, P8155. bank of 8 dips between these 2 chips. Xtals on cpu board = 6.144,14.286MHz; Xtal on video board = 16.414
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "15834.bin",    0x0000, 0x0800, CRC(364602ed) SHA1(574b1052ab000cfb9e7f194454de65f5255c250e) )
 	ROM_LOAD( "15835.bin",    0x0800, 0x0800, CRC(b587d005) SHA1(de38b1dcbb871dc5f7dcbc177dfcbc25ecc743c4) )
