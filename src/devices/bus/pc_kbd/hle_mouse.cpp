@@ -32,7 +32,6 @@
  *   - IntelliMouse device/protocol (4-byte packet, 5 buttons, scroll wheel)
  *   - configurable clock (10kHz-16.7kHz)
  *   - receive parity error handling
- *   - resolve issue with earlier Indy/Indigo² PROM versions (IBF ignored)
  */
 
 #include "emu.h"
@@ -95,6 +94,7 @@ void hle_ps2_mouse_device::device_start()
 	save_item(NAME(m_rx_buf));
 	save_item(NAME(m_tx_len));
 	save_item(NAME(m_tx_pos));
+	save_item(NAME(m_tx_buf));
 	save_item(NAME(m_data));
 	save_item(NAME(m_parity));
 
@@ -399,7 +399,8 @@ void hle_ps2_mouse_device::command(u8 const command)
 		m_tx_buf[m_tx_len++] = 0xfa;
 
 		// force data sample after acknowledge transmitted
-		m_sample->adjust(serial_cycle * 48, 1);
+		if (!m_sample->enabled())
+			m_sample->adjust(serial_cycle * 48, 1);
 		break;
 
 	case 0xec: // reset wrap mode
