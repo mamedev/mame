@@ -145,8 +145,8 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x80004000, 0x8000400f).lrw8("rtc",
 		[this](offs_t offset) { return m_rtc->read(1); },
 		[this](offs_t offset, u8 data) { m_rtc->write(1, data); }).umask64(0xff);
-	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask64(0x00ff);
-	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask64(0xff00);
+	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w)).umask64(0x00ff);
+	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w)).umask64(0xff00);
 	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80007000, 0x80007007).rw(m_ace[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80008000, 0x80008007).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask64(0xffffffff);
@@ -270,6 +270,15 @@ void jazz_state::jazz(machine_config &config)
 	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	kbd.set_pc_kbdc_slot(&kbd_con);
 
+    // auxiliary connector
+    pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+    aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+    aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+
+    // auxiliary port
+    pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+    aux.set_pc_kbdc_slot(&aux_con);
+
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	// FIXME: reset is probably routed through the MCT-ADR
@@ -277,9 +286,8 @@ void jazz_state::jazz(machine_config &config)
 	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<6>));;
-
-	//m_kbdc->aux_clk().set();
-	//m_kbdc->aux_data().set();
+	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->aux_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<7>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
