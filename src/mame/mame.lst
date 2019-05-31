@@ -14300,6 +14300,10 @@ homo                            // bootleg
 gokidetor                       // (c) 1992 Taito
 gokidetor2                      // (c) 1992 Taito
 
+@source:goldart.cpp
+goldart
+goldartp
+
 @source:goldngam.cpp
 moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
