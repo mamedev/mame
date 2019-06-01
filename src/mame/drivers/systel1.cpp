@@ -135,12 +135,14 @@ I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 void systel1_state::floppy_control_w(u8 data)
 {
 	if (m_floppy->get_device() != nullptr)
-		m_floppy->get_device()->mon_w(!BIT(data, 0));
+		m_floppy->get_device()->ss_w(!BIT(data, 0));
 }
 
 WRITE_LINE_MEMBER(systel1_state::rts_w)
 {
-	// beep? FDC reset?
+	m_fdc->mr_w(state);
+	if (m_floppy->get_device() != nullptr)
+		m_floppy->get_device()->mon_w(!state);
 }
 
 WRITE_LINE_MEMBER(systel1_state::dtr_w)
