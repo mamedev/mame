@@ -84,11 +84,7 @@ private:
 	K052109_CB_MEMBER(shuriboy_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	DECLARE_WRITE8_MEMBER(shuri_bank_w);
-	DECLARE_READ8_MEMBER(shuri_video_r);
-	DECLARE_WRITE8_MEMBER(shuri_video_w);
 	DECLARE_WRITE8_MEMBER(shuri_control_w);
-	DECLARE_WRITE8_MEMBER(shuri_vrom_addr_w);
-	DECLARE_WRITE8_MEMBER(shuri_vrom_bank_w);
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
@@ -278,12 +274,9 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
 	map(0xdd80, 0xdd80).w(FUNC(konmedal_state::shuri_control_w));
-	map(0xde00, 0xde00).w(FUNC(konmedal_state::shuri_vrom_addr_w));
-	map(0xdf00, 0xdf00).w(FUNC(konmedal_state::shuri_vrom_bank_w));
-	map(0xe000, 0xffff).rw(FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -461,28 +454,14 @@ Dips: 2 x 8 dips bank
 
 K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | (*color & 0x40);
+	*code |= ((*color & 0xc) << 6) | (bank << 10);
+	if (*color & 0x2) *code |= 0x1000;
+	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
 }
 
 WRITE8_MEMBER(konmedal_state::shuri_bank_w)
 {
 	membank("bank1")->set_entry(data&0x3);
-}
-
-READ8_MEMBER(konmedal_state::shuri_video_r)
-{
-	if (!(m_control & 0x10))
-	{
-		return m_k052109->read(offset+0x2000);
-	}
-
-	uint8_t *ROM = memregion("k052109")->base();
-	return ROM[offset + m_vrom_base];
-}
-
-WRITE8_MEMBER(konmedal_state::shuri_video_w)
-{
-	m_k052109->write(offset+0x2000, data);
 }
 
 READ8_MEMBER(konmedal_state::shuri_irq_r)
@@ -523,19 +502,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::scanline)
 WRITE8_MEMBER(konmedal_state::shuri_control_w)
 {
 	m_control = data;
-}
-
-WRITE8_MEMBER(konmedal_state::shuri_vrom_addr_w)
-{
-	m_vrom_base &= ~0xf000;
-	m_vrom_base |= (data << 12);
-}
-
-WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
-{
-	m_vrom_base &= ~0xf0000;
-	data &= 0xc0;
-	m_vrom_base |= (data << 10);
+	m_k052109->set_rmrd_line((m_control & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->write(offset+0x1d80, data);
 }
 
 void konmedal_state::shuriboy(machine_config &config)
@@ -686,5 +654,5 @@ GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT
 GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
 GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
-GAME( 1995, fuusenpn, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
+GAME( 1993, fuusenpn, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
 
