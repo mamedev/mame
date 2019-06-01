@@ -282,21 +282,21 @@ WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
 
 READ16_MEMBER(k573dio_device::ram_r)
 {
-	uint16_t res = ram[(ram_read_adr & 0x7fffff) >> 1];
+	uint16_t res = ram[ram_read_adr >> 1];
 	ram_read_adr += 2;
 	return res;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_w)
 {
-	ram[(ram_adr & 0x1ffffff) >> 1] = data;
+	ram[ram_adr >> 1] = data;
 	ram_adr += 2;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_high_w)
 {
 	// read and write address are shared
-	ram_read_adr = (ram_read_adr & 0x001fffff) | (data << 16);
+	ram_read_adr = (ram_read_adr & 0x0000ffff) | (data << 16);
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_low_w)
