@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
@@ -183,6 +184,10 @@ static void systel1_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
+static DEVICE_INPUT_DEFAULTS_START(keyboard)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
+DEVICE_INPUT_DEFAULTS_END
+
 void systel1_state::systel1(machine_config &config)
 {
 	Z80(config, m_maincpu, 2_MHz_XTAL); // Z8400A; clock not verified
@@ -227,6 +232,10 @@ void systel1_state::systel1(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy, systel1_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	m_floppy->set_fixed(true);
 	m_floppy->enable_sound(true);
+
+	rs232_port_device &kb(RS232_PORT(config, "kb", default_rs232_devices, "keyboard"));
+	kb.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+	kb.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
 }
 
 // RAM: 8x MCM6665AP20
