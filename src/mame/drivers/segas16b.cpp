@@ -6679,7 +6679,8 @@ ROM_END
 //  Golden Axe (World), Sega System 16B
 //  CPU: FD1094 (317-0120)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-11
+//  Sega game ID: 833-7001-03 GOLDEN AXE
+//     ROM board: 834-7002-03
 //
 ROM_START( goldnaxe3 )
 	ROM_REGION( 0x80000, "maincpu", 0) // 68000 code
