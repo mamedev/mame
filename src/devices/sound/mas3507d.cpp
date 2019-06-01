@@ -43,6 +43,8 @@ void mas3507d_device::device_reset()
 	i2c_bus_curbit = -1;
 	i2c_bus_curval = 0;
 	total_sample_count = 0;
+	total_samples_decoded = 0;
+	last_samples = 0;
 	playback_enabled = false;
 }
 
@@ -352,6 +354,8 @@ void mas3507d_device::fill_buffer()
 		current_rate = mp3_info.hz;
 		stream->set_sample_rate(current_rate);
 	}
+
+	total_samples_decoded += sample_count;
 }
 
 void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int scount)
@@ -403,7 +407,8 @@ void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		return;
 	}
 
-	total_sample_count += samples;
+	total_sample_count += last_samples;
+	last_samples = samples;
 	append_buffer(outputs, pos, samples);
 	for(;;) {
 		if(pos == samples)

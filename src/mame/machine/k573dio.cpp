@@ -260,6 +260,11 @@ WRITE16_MEMBER(k573dio_device::mas_i2c_w)
 
 READ16_MEMBER(k573dio_device::mpeg_ctrl_r)
 {
+	if (k573fpga->get_mpeg_ctrl() == 0x1000 && !mas3507d->is_playing()) {
+		k573fpga->set_mpeg_ctrl(0xa000);
+		mas3507d->set_playback_enabled(false);
+	}
+
 	return k573fpga->get_mpeg_ctrl();
 }
 
