@@ -819,6 +819,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/chessmachine.h,MACHINES["CHESSMACHINE"] = true
+---------------------------------------------------
+
+if (MACHINES["CHESSMACHINE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/chessmachine.cpp",
+		MAME_DIR .. "src/devices/machine/chessmachine.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/machine/com8116.h,MACHINES["COM8116"] = true
 ---------------------------------------------------
 
