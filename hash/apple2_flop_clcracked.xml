@@ -272,7 +272,7 @@
 	</software>
 
 	<software name="carmntime">
-		<description>Where in Time is Carmen Sandiego v1.1 (cleanly cracked)</description>
+		<description>Where in Time is Carmen Sandiego (Version 1.1) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -304,7 +304,7 @@
 	</software>
 
 	<software name="carmntime35">
-		<description>Where in Time is Carmen Sandiego v1.1 800K 3.5 disc (cleanly cracked)</description>
+		<description>Where in Time is Carmen Sandiego (Version 1.1) 800K 3.5 disk (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -317,7 +317,7 @@
 	</software>
 
 	<software name="carmntime10">
-		<description>Where in Time is Carmen Sandiego v1.0 (cleanly cracked)</description>
+		<description>Where in Time is Carmen Sandiego (Version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -1316,7 +1316,7 @@
 	</software>
 
 	<software name="calskils">
-		<description>Calendar Skills (version 08.31.86) (cleanly cracked)</description>
+		<description>Calendar Skills (Version 08.31.86) (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
 		<info name="release" value="2014-12-03"/>
@@ -2015,6 +2015,7 @@
 		<description>The Electric Crayon - Fun On The Farm (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Polarware</publisher>
+		<info name="release" value="2014-08-19"/>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 		<!-- No compatibility data known at this time. -->
 
@@ -2407,7 +2408,7 @@
 	</software>
 
 	<software name="genemach">
-		<description>Gene Machine (version 2.0) (cleanly cracked)</description>
+		<description>Gene Machine (Version 2.0) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>HRM Software</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -2420,7 +2421,7 @@
 	</software>
 
 	<software name="gertrude">
-		<description>Gertrude's Secrets (version 1.2) (cleanly cracked)</description>
+		<description>Gertrude's Secrets (Version 1.2) (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -2873,7 +2874,7 @@
 	</software>
 
 	<software name="kenuston">
-		<description>Ken Uston's Professional Blackjack (v1.23) (cleanly cracked)</description>
+		<description>Ken Uston's Professional Blackjack (Version 1.23) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Intelligent Statements, Inc.</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -2912,7 +2913,7 @@
 	</software>
 
 	<software name="kittenkf">
-		<description>Kittens, Kids, and a Frog (version 01.11.85) (cleanly cracked)</description>
+		<description>Kittens, Kids, and a Frog (Version 01.11.85) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -2999,7 +3000,7 @@
 	</software>
 
 	<software name="adjct062984">
-		<description>Adjectives (version 06.29.84) (cleanly cracked)</description>
+		<description>Adjectives (Version 06.29.84) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Hartley Courseware</publisher>
 		<info name="release" value="2017-12-12"/>
@@ -3225,7 +3226,7 @@
 	</software>
 
 	<software name="ewalg113">
-		<description>Algebra Volume 1 v1.3 (Edu-Ware) (cleanly cracked)</description>
+		<description>Algebra Volume 1 (Version 1.3) (Edu-Ware) (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Edu-Ware</publisher>
 		<info name="release" value="2015-07-17"/>
@@ -3239,7 +3240,7 @@
 	</software>
 
 	<software name="ewalg211">
-		<description>Algebra Volume 2 v1.1 (Edu-Ware) (cleanly cracked)</description>
+		<description>Algebra Volume 2 (Version 1.1) (Edu-Ware) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Edu-Ware</publisher>
 		<info name="release" value="2015-08-07"/>
@@ -3253,7 +3254,7 @@
 	</software>
 
 	<software name="ewalg312">
-		<description>Algebra Volume 3 v1.2 (Edu-Ware) (cleanly cracked)</description>
+		<description>Algebra Volume 3 (Version 1.2) (Edu-Ware) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Edu-Ware</publisher>
 		<info name="release" value="2015-08-07"/>
@@ -3267,7 +3268,7 @@
 	</software>
 
 	<software name="ewalg410">
-		<description>Algebra Volume 4 v1.0 (Edu-Ware) (cleanly cracked)</description>
+		<description>Algebra Volume 4 (Version 1.0) (Edu-Ware) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Edu-Ware</publisher>
 		<info name="release" value="2015-08-07"/>
@@ -3281,7 +3282,7 @@
 	</software>
 
 	<software name="psalg512">
-		<description>Algebra Volume 5 v1.2 (Peachtree) (cleanly cracked)</description>
+		<description>Algebra Volume 5 (Version 1.2) (Peachtree) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Peachtree Software</publisher>
 		<info name="release" value="2016-04-12"/>
@@ -3295,7 +3296,7 @@
 	</software>
 
 	<software name="psalg612">
-		<description>Algebra Volume 6 v1.2 (Peachtree) (cleanly cracked)</description>
+		<description>Algebra Volume 6 (Version 1.2) (Peachtree) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Peachtree Software</publisher>
 		<info name="release" value="2016-04-12"/>
@@ -4522,7 +4523,7 @@
 	</software>
 
 	<software name="baron21">
-		<description>Baron (version 2.1) (cleanly cracked)</description>
+		<description>Baron (Version 2.1) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Blue Chip Software</publisher>
 		<info name="release" value="2015-12-27"/>
@@ -4541,7 +4542,7 @@
 	</software>
 
 	<software name="bbiov102">
-		<description>Basic Biology (version 1.02) (cleanly cracked)</description>
+		<description>Basic Biology (Version 1.02) (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Media Materials</publisher>
 		<info name="release" value="2017-07-04"/>
@@ -4597,7 +4598,7 @@
 	</software>
 
 	<software name="basdraft30">
-		<description>Basic Drafting: Review and Testmaker (version 3.0) (cleanly cracked)</description>
+		<description>Basic Drafting: Review and Testmaker (Version 3.0) (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Hearlihy &amp; Co.</publisher>
 		<info name="release" value="2017-11-01"/>
@@ -4870,7 +4871,7 @@
 	</software>
 
 	<software name="batlantm15">
-		<description>Battle of Antietam (version 1.5) (cleanly cracked)</description>
+		<description>Battle of Antietam (Version 1.5) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Strategic Simulations</publisher>
 		<info name="release" value="2018-10-21"/>
@@ -5288,7 +5289,7 @@
 	</software>
 
 	<software name="bldreadsk">
-		<description>Building Reading Skills (version 85-02) (cleanly cracked)</description>
+		<description>Building Reading Skills (Version 85-02) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Josten Learning Systems</publisher>
 		<info name="release" value="2016-03-06"/>
@@ -5393,7 +5394,7 @@
 	</software>
 
 	<software name="bumblplt12">
-		<description>Bumble Plot (version 1.2) (cleanly cracked)</description>
+		<description>Bumble Plot (Version 1.2) (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 		<info name="release" value="2015-06-01"/>
@@ -5459,7 +5460,7 @@
 	</software>
 
 	<software name="capittst">
-		<description>Capitalization Test (version 01.29.87) (cleanly cracked)</description>
+		<description>Capitalization Test (Version 01.29.87) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Hartley Courseware</publisher>
 		<info name="release" value="2016-07-14"/>
@@ -5473,7 +5474,7 @@
 	</software>
 
 	<software name="capitv15">
-		<description>Capitalization (version 1.5) (cleanly cracked)</description>
+		<description>Capitalization (Version 1.5) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Gamco Industries</publisher>
 		<info name="release" value="2017-07-03"/>
@@ -5641,7 +5642,7 @@
 	</software>
 
 	<software name="catlab">
-		<description>Catlab (version 2.0) (cleanly cracked)</description>
+		<description>Catlab (Version 2.0) (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Conduit Educational Software</publisher>
 		<info name="release" value="2015-07-15"/>
@@ -5683,7 +5684,7 @@
 	</software>
 
 	<software name="hccauseff1287">
-		<description>Cause and Effect (version 12.14.87) (cleanly cracked)</description>
+		<description>Cause and Effect (Version 12.14.87) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Hartley Courseware</publisher>
 		<info name="release" value="2017-09-17"/>
@@ -6355,7 +6356,7 @@
 	</software>
 
 	<software name="cmthv131">
-		<description>Compu-Math v1.3.1 (cleanly cracked)</description>
+		<description>Compu-Math (Version 1.3.1) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Edu-Ware</publisher>
 		<info name="release" value="2018-02-13"/>
@@ -6369,7 +6370,7 @@
 	</software>
 
 	<software name="csplv131">
-		<description>Compu-Spell (version 1.3.1) (cleanly cracked)</description>
+		<description>Compu-Spell (Version 1.3.1) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>Edu-Ware</publisher>
 		<info name="release" value="2017-10-24"/>
@@ -6402,7 +6403,7 @@
 	</software>
 
 	<software name="cmpairct">
-		<description>Computer Air Combat v1.1 (cleanly cracked)</description>
+		<description>Computer Air Combat (Version 1.1) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>Strategic Simulations</publisher>
 		<info name="release" value="2018-11-23"/>
@@ -8510,6 +8511,356 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="easygraph (4am crack).dsk" size="143360" crc="6f340a35" sha1="3dc0f9f478ad68fc58afbbb731b9fb3a0c821709" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easys60c">
+		<description>EasySearch - Sixty Countries Around The World (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2017-05-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="easysearch - sixty countries around the world (4am crack).dsk" size="143360" crc="eb4f6569" sha1="36c01d43ce42cb9cf075e1f46f04da5a535a02ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elecbill">
+		<description>Electric Bill (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>HRM Software</publisher>
+		<info name="release" value="2018-02-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="electric bill (4am crack).dsk" size="143360" crc="22a38f0c" sha1="cec3e55790b74264b2666bb342c3b63723be5c58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elecchlk">
+		<description>Electric Chalkboard (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Heartsoft</publisher>
+		<info name="release" value="2016-03-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="electric chalkboard (4am crack).dsk" size="143360" crc="094b8062" sha1="e70c59b9e79ed8a2406a74c6dd51d5d2964391d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elemath">
+		<description>Elementary Math (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2017-11-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="elementary math (4am crack).dsk" size="143360" crc="0dfa2421" sha1="3eabbe80be44de144a70b55adbdda4c91e905ca7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmusksd">
+		<description>Elements of Music - Key-Signatures Drill (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2019-01-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="elements of music - key-signatures drill (4am crack).dsk" size="143360" crc="b2601218" sha1="97df9c952211c29b5af8c237d801df49faa8986d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elite">
+		<description>Elite (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Firebird</publisher>
+		<info name="release" value="2017-01-17"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="elite (4am crack).dsk" size="143360" crc="d26f173e" sha1="5fcbd7d8de91a6dbe4d65fa2e7843f493d5ba647" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emp2is12">
+		<description>Empire II - Interstallar Sharks (Version 1.2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Edu-Ware Services</publisher>
+		<info name="release" value="2017-12-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="empire ii - interstallar sharks v1.2 (4am crack).dsk" size="143360" crc="438f83af" sha1="e74b634f337529aba2f54944a335f161f559bdff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enchnr10">
+		<description>Enchanter (Revision 10 / 830810) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2018-01-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="enchanter r10 (4am crack).dsk" size="143360" crc="7259fcc8" sha1="449062e18a07f62ca2766d1231be5e0481c02244" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enchnr16">
+		<description>Enchanter (Revision 16 / 831118) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2017-10-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="enchanter r16 (4am crack).dsk" size="143360" crc="b492b331" sha1="dc5cb42721048865d2ac2c5e1c97cad2909a598b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enctriv">
+		<description>Encyclopedia Trivia (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2017-01-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="encyclopedia trivia (4am crack).dsk" size="143360" crc="eaab54e1" sha1="6118017db3594294a27cd7e8b4a73893af286662" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="endpunct">
+		<description>End Punctuation (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2016-09-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="end punctuation (4am crack) side a.dsk" size="143360" crc="180507eb" sha1="0b76b37b1bcd9106f16170be8c9ac9494aa57f8e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="end punctuation (4am crack) side b.dsk" size="143360" crc="a74dd66e" sha1="7beb0c51cce120e9331247d0d9a75b3a72e89e68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engyconv">
+		<description>Energy Conversions (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>HRM Software</publisher>
+		<info name="release" value="2018-02-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="energy conversions (4am crack).dsk" size="143360" crc="4622a43a" sha1="3bd4da56ec60de73d1218addd41cd3d9db150309" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engachv1">
+		<description>English Achievement I (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-05-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english achievement i (4am crack).dsk" size="143360" crc="d3818808" sha1="a1085cc381fd71c5aee432dbe3218bd440615bf1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engachv2">
+		<description>English Achievement II (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-05-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english achievement ii (4am crack).dsk" size="143360" crc="30bb37ad" sha1="dcb3a2ed75c909191da9a23590002bdfe1f437af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engachv3">
+		<description>English Achievement III (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-05-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english achievement iii (4am crack).dsk" size="143360" crc="0c828a5c" sha1="5a6eb7bf49d871b2281f508e687dd13eb3f317ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engachv4">
+		<description>English Achievement IV (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-05-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english achievement iv (4am crack).dsk" size="143360" crc="477d5b33" sha1="6c6e6db183a8555544bb76fffb1cd25476d8f2d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engachv5">
+		<description>English Achievement V (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-05-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english achievement v (4am crack).dsk" size="143360" crc="78e09ab8" sha1="beffbfc431808e4607ced49e66715a8f048c7c18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engchlng">
+		<description>English Challenge (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Learning Seed Company</publisher>
+		<info name="release" value="2016-04-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english challenge (4am crack).dsk" size="143360" crc="e23b7121" sha1="ede48949b246423dc9e311f03ff40f778ec090e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epidemic">
+		<description>Epidemic (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2018-09-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="epidemic (4am and san inc crack).dsk" size="143360" crc="5851d9eb" sha1="44ecac88bf299f6cd28475bb1641f62506d6f11f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epoch">
+		<description>Epoch (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2016-10-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="epoch (4am crack).dsk" size="143360" crc="dcb272cc" sha1="ad80cf8b2fdcfcbdb12a6c099187dddd005b54f0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erniesqz">
+		<description>Ernie's Quiz (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2016-12-31"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ernie's quiz (4am crack).dsk" size="143360" crc="1233545f" sha1="ffed1a0f8a1d3dfc68d7f6f553c55641af36342f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escarctr">
+		<description>Escape from Arcturus (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2018-04-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="escape from arcturus (4am crack).dsk" size="143360" crc="f5f2cf9d" sha1="39399ee63d2e12d91edd58d0c2f609ef8defe9ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esrngstn">
+		<description>Escape from Rungistan (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2017-08-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="escape from rungistan (4am crack).dsk" size="143360" crc="283e635f" sha1="3ff75ee1bba5736a2f66a830dd28485c189e2865" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esslgrmr">
+		<description>Essential Grammar (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2016-10-08"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="essential grammar (4am crack) side a.dsk" size="143360" crc="3098e7d5" sha1="f8c0fd7bf133e841267696b6b2cd7d0a5546c8b1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="essential grammar (4am crack) side b.dsk" size="143360" crc="024d5a40" sha1="ab79e408005767a8a254dff20a2ca20320262cf8" />
 			</dataarea>
 		</part>
 	</software>
