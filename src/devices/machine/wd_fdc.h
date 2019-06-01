@@ -86,6 +86,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(enp_r);
 
+	DECLARE_WRITE_LINE_MEMBER(mr_w);
+
 	void index_callback(floppy_image_device *floppy, int state);
 
 protected:
@@ -277,7 +279,8 @@ private:
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
 
-	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready, disable_motor_control;
+	bool dden, status_type_1, intrq, drq, hld, hlt, enp, mr;
+	bool force_ready, disable_motor_control;
 	int main_state, sub_state;
 	uint8_t command, track, sector, data, status, intrq_cond;
 	int last_dir;
