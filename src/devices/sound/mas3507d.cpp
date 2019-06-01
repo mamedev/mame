@@ -285,6 +285,7 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 	case 0x0032f: logerror("MAS3507D: OutputConfig = %05x\n", val); break;
 	case 0x107f8:
 		logerror("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
+		stream->set_output_gain(0, gain_to_percentage(val));
 		break;
 	case 0x107f9:
 		logerror("MAS3507D: left->right  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
@@ -294,6 +295,7 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 		break;
 	case 0x107fb:
 		logerror("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
+		stream->set_output_gain(1, gain_to_percentage(val));
 		break;
 	default: logerror("MAS3507D: %d:%04x = %05x\n", bank, adr, val); break;
 	}
