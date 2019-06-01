@@ -26,10 +26,8 @@ public:
 	void lb186(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(sio_out_w);
-	DECLARE_WRITE8_MEMBER(drive_sel_w);
-	DECLARE_READ8_MEMBER(scsi_dack_r);
-	DECLARE_WRITE8_MEMBER(scsi_dack_w);
+	void sio_out_w(uint8_t data);
+	void drive_sel_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	static void ncr5380(device_t *device);
 	void lb186_io(address_map &map);
@@ -40,24 +38,13 @@ private:
 	required_device<ncr5380n_device> m_scsi;
 };
 
-WRITE8_MEMBER(lb186_state::scsi_dack_w)
+void lb186_state::sio_out_w(uint8_t data)
 {
-	m_scsi->dma_w(data);
-}
-
-READ8_MEMBER(lb186_state::scsi_dack_r)
-{
-	return m_scsi->dma_r();
-}
-
-WRITE8_MEMBER(lb186_state::sio_out_w)
-{
-	if(!BIT(data, 5))
-		m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 	m_maincpu->tmrin1_w(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(lb186_state::drive_sel_w)
+void lb186_state::drive_sel_w(uint8_t data)
 {
 	m_fdc->dden_w(BIT(data, 5));
 
@@ -103,7 +90,7 @@ void lb186_state::lb186_io(address_map &map)
 	map(0x1000, 0x101f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0x1100, 0x1107).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0x1180, 0x1180).rw(FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
+	map(0x1180, 0x1180).rw(m_scsi, FUNC(ncr5380n_device::dma_r), FUNC(ncr5380n_device::dma_w));
 	map(0x1200, 0x1200).w(FUNC(lb186_state::drive_sel_w));
 }
 

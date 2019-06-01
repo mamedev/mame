@@ -464,9 +464,8 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 			break;
 		case 5:
 			m_romport[2] = data;
-			if(BIT(data, 3))
-				m_fdc->soft_reset();
-			m_fdc->dden_w(!BIT(data, 2) ? true : false);
+			m_fdc->mr_w(!BIT(data, 3));
+			m_fdc->dden_w(!BIT(data, 2));
 			m_dmamplex = (data >> 4) & 3;
 			break;
 		case 7:
