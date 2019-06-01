@@ -73,7 +73,8 @@
 #include "pds.h"
 
 // other
-#include "chessm.h"
+#include "chessmdr.h"
+#include "chessmsr.h"
 #include "finalchs.h"
 
 
@@ -122,7 +123,8 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
 	device.option_add("asc88", ASC88);
-	device.option_add("chessm", ISA8_CHESSM);
+	device.option_add("chessmdr", ISA8_CHESSMDR);
+	device.option_add("chessmsr", ISA8_CHESSMSR);
 	device.option_add("finalchs", ISA8_FINALCHS);
 }
 
@@ -161,7 +163,8 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dectalk", ISA8_DECTALK);
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
-	device.option_add("chessm", ISA8_CHESSM);
+	device.option_add("chessmdr", ISA8_CHESSMDR);
+	device.option_add("chessmsr", ISA8_CHESSMSR);
 	device.option_add("finalchs", ISA8_FINALCHS);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);

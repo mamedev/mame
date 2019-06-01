@@ -8,7 +8,7 @@ The Final ChessCard by Tasc
 It is similar to the C64 version, actually not as impressive since a PC from around 1989
 should be able to run a good chess game by itself.
 
-Tasc later released The ChessMachine ISA card, see chessm.cpp.
+Tasc later released The ChessMachine ISA card, see chessm*.cpp.
 
 Multiple ROM revisions were made. Version 2.0 is compatible with the initial 1989
 software version. Version 3.6 works with the newer software package, including the
@@ -20,7 +20,7 @@ one that came with The ChessMachine.
 #include "finalchs.h"
 
 
-DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "Final ChessCard")
+DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "The Final ChessCard")
 
 //-------------------------------------------------
 //  constructor

@@ -8544,13 +8544,13 @@
 	</software>
 
 	<software name="chessm">
-		<!-- uses ChessMachine ISA card, not compatible with Final ChessCard -->
+		<!-- uses ChessMachine ISA card(or external module), not compatible with Final ChessCard -->
 		<!-- installer v3.3a, program v3.1, chess engine v2.20(The King) -->
 		<description>The ChessMachine (v3.1, The King v2.20)</description>
 		<year>1993</year>
 		<publisher>Tasc</publisher>
 		<info name="serial" value="WR.887.68.354" />
-		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine ISA card required." />
+		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine hardware required." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="theking22.img" size="737280" crc="88fd76e8" sha1="518d4e662e6d1cba624fb04870eb292a8c44a1c3"/>
@@ -8559,13 +8559,13 @@
 	</software>
 
 	<software name="chessm23">
-		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
+		<!-- uses ChessMachine SR or Final ChessCard(ROM v3.6) ISA card -->
 		<!-- installer v3.0, program v2.3, chess engine v2.1(Gideon) -->
 		<description>The ChessMachine (v2.3, Gideon v2.1)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
 		<info name="serial" value="WR.887.68.354" />
-		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine/Final ChessCard ISA card required." />
+		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine SR/Final ChessCard ISA card required." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
@@ -8587,14 +8587,14 @@
 	</software>
 
 	<software name="chessm21">
-		<!-- uses ChessMachine or Final ChessCard(ROM v3.6) ISA card -->
+		<!-- uses ChessMachine SR or Final ChessCard(ROM v3.6) ISA card -->
 		<!-- installer v2.2, program v2.1, chess engine v2.1(Gideon) -->
 		<!-- also includes optional older chess engine v0.5(The King) -->
 		<description>The ChessMachine (v2.1, Gideon v2.1)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
 		<info name="serial" value="50677" />
-		<info name="usage" value="ChessMachine/Final ChessCard ISA card required" />
+		<info name="usage" value="ChessMachine SR/Final ChessCard ISA card required" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
