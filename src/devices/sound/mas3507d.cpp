@@ -43,6 +43,7 @@ void mas3507d_device::device_reset()
 	i2c_bus_curbit = -1;
 	i2c_bus_curval = 0;
 	total_sample_count = 0;
+	playback_enabled = false;
 }
 
 void mas3507d_device::i2c_scl_w(bool line)
@@ -343,10 +344,7 @@ void mas3507d_device::fill_buffer()
 	std::copy(mp3data.begin() + mp3_info.frame_bytes, mp3data.end(), mp3data.begin());
 	mp3_count -= mp3_info.frame_bytes;
 
-	if(mp3_info.channels == 1)
-		sample_count = scount;
-	else
-		sample_count = scount;
+	sample_count = scount;
 
 	if(mp3_info.hz != current_rate) {
 		current_rate = mp3_info.hz;
@@ -394,6 +392,11 @@ void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int sco
 void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int pos = 0;
+
+	if(!playback_enabled) {
+		return;
+	}
+
 	total_sample_count += samples;
 	append_buffer(outputs, pos, samples);
 	for(;;) {

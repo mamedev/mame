@@ -218,7 +218,6 @@ WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
 	k573fpga->set_mp3_cur_adr((k573fpga->get_mp3_cur_adr() & 0xffff0000) | data); // low
 	if(is_ddrsbm_fpga)
 		k573fpga->set_crypto_key3(0);
-	mas3507d->reset_sample_count();
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_end_adr_high_w)
@@ -266,6 +265,16 @@ READ16_MEMBER(k573dio_device::mpeg_ctrl_r)
 WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
 {
 	k573fpga->set_mpeg_ctrl(data);
+
+	if (data == 0xe000) {
+		// Start playback flag
+		mas3507d->set_playback_enabled(true);
+		mas3507d->reset_sample_count();
+	} else if (data == 0xa000) {
+		// End playback flag
+		mas3507d->set_playback_enabled(false);
+		mas3507d->reset_sample_count();
+	}
 }
 
 WRITE16_MEMBER(k573dio_device::ram_write_adr_high_w)

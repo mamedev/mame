@@ -25,6 +25,8 @@ public:
 	void reset_sample_count() { total_sample_count = 0; }
 	u32 get_sample_count() const { return total_sample_count; }
 
+	void set_playback_enabled(bool enabled) { playback_enabled = enabled; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -43,6 +45,7 @@ private:
 	uint8_t i2c_bus_curval;
 	int mp3_count, sample_count, current_rate;
 	u32 total_sample_count;
+	bool playback_enabled;
 
 	mp3dec_t mp3_dec;
 	mp3dec_frame_info_t mp3_info;
