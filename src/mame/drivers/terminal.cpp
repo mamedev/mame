@@ -70,6 +70,9 @@ ROM_START( itt9216 ) // MC68008P8, (+beeper, 701188-001, xtal 38.080)// 64k ram 
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "174055-004.u40", 0x0000, 0x2000, CRC(c8611425) SHA1(31fbdd6ff72a96c59277b6edac9a6360f6e1e49e) )
+
+	ROM_REGION( 0x400, "upi", 0 ) // 8741A on keyboard simulator board
+	ROM_LOAD( "174065-003.u1", 0x000, 0x400, NO_DUMP )
 ROM_END
 
 
