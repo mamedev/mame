@@ -216,6 +216,9 @@ WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
 {
 	logerror("FPGA MPEG start address low %04x\n", data);
 	k573fpga->set_mp3_cur_adr((k573fpga->get_mp3_cur_adr() & 0xffff0000) | data); // low
+
+	if(is_ddrsbm_fpga)
+		k573fpga->set_crypto_key3(0);
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_end_adr_high_w)
