@@ -25,10 +25,6 @@ CPU speed. It should be around 14-16MHz. The ARM CPU is rated 12MHz, they
 probably went for this solution to get optimum possible speed for each module.
 
 TODO:
-- DR/EC sometimes gives "Risc communication error 21 (Put byte error)" at boot,
-  the game will retry and succeed. The problem goes away with perfect quantum.
-  But mrisc/mrisc2 is even worse, even with sync points(eg. using gen_latch), so
-  that one was given perfect quantum to fix it.
 - is interrupt handling correct?
 
 */
@@ -72,17 +68,27 @@ void chessmachine_device::device_start()
 //  external handlers
 //-------------------------------------------------
 
+void chessmachine_device::sync0_callback(void *ptr, s32 param)
+{
+	m_latch[0] = (m_latch[0] & 0x80) | param;
+}
+
 void chessmachine_device::data0_w(int state)
 {
-	m_latch[0] = (m_latch[0] & 0x80) | (state ? 1 : 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync0_callback), this), state ? 1 : 0);
+}
+
+void chessmachine_device::sync1_callback(void *ptr, s32 param)
+{
+	m_latch[0] = (m_latch[0] & 1) | param;
+
+	// cause interrupt?
+	m_maincpu->set_input_line(ARM_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void chessmachine_device::data1_w(int state)
 {
-	m_latch[0] = (m_latch[0] & 1) | (state ? 0x80 : 0);
-
-	// cause interrupt?
-	m_maincpu->set_input_line(ARM_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync1_callback), this), state ? 0x80 : 0);
 }
 
 void chessmachine_device::reset_w(int state)

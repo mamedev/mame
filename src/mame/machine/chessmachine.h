@@ -43,6 +43,8 @@ private:
 	devcb_write_line m_data_out;
 
 	u8 m_latch[2];
+	void sync0_callback(void *ptr, s32 param);
+	void sync1_callback(void *ptr, s32 param);
 
 	DECLARE_READ8_MEMBER(internal_r) { return m_latch[0]; }
 	DECLARE_WRITE8_MEMBER(internal_w) { m_latch[1] = data & 1; m_data_out(m_latch[1]); }
