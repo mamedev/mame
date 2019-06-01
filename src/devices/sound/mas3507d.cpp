@@ -396,6 +396,10 @@ void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	int pos = 0;
 
 	if(!playback_enabled) {
+		for(int i=pos; i != samples; i++) {
+			outputs[0][i] = 0;
+			outputs[1][i] = 0;
+		}
 		return;
 	}
 

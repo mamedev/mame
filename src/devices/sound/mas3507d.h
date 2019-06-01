@@ -25,7 +25,13 @@ public:
 	void reset_sample_count() { total_sample_count = 0; }
 	u32 get_sample_count() const { return total_sample_count; }
 
-	void set_playback_enabled(bool enabled) { playback_enabled = enabled; }
+	void set_playback_enabled(bool enabled) {
+		playback_enabled = enabled;
+		reset_sample_count();
+
+		memset(mp3data.data(), 0, mp3data.size());
+		mp3_count = 0;
+	}
 
 protected:
 	virtual void device_start() override;
@@ -56,7 +62,6 @@ private:
 	bool i2c_device_got_address(uint8_t address);
 	void i2c_device_got_byte(uint8_t byte);
 	void i2c_device_got_stop();
-
 
 	enum { UNDEFINED, CONTROL, DATA_READ, DATA_WRITE, BAD } i2c_subdest;
 	enum { CMD_BAD, CMD_RUN, CMD_READ_CTRL, CMD_WRITE_REG, CMD_WRITE_MEM, CMD_READ_REG, CMD_READ_MEM } i2c_command;

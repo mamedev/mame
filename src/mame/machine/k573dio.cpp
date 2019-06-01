@@ -267,11 +267,9 @@ WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
 	if (data == 0xe000) {
 		// Start playback flag
 		mas3507d->set_playback_enabled(true);
-		mas3507d->reset_sample_count();
 	} else if (data == 0xa000) {
 		// End playback flag
 		mas3507d->set_playback_enabled(false);
-		mas3507d->reset_sample_count();
 	}
 }
 
