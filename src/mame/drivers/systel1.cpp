@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
@@ -27,6 +28,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dmac(*this, "dmac")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
 		, m_rom(*this, "bootrom")
 		, m_chargen(*this, "chargen")
 	{
@@ -43,6 +46,9 @@ private:
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
 	u8 m1_r(offs_t offset);
+	void floppy_control_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(rts_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_w);
 
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
@@ -52,6 +58,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dmac;
+	required_device<fd1797_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
 	required_region_ptr<u8> m_rom;
 	required_region_ptr<u8> m_chargen;
 
@@ -64,6 +72,7 @@ private:
 void systel1_state::machine_start()
 {
 	m_ram = make_unique_clear<u8[]>(0x10000);
+	m_fdc->set_floppy(m_floppy->get_device());
 
 	save_item(NAME(m_boot_read));
 	save_item(NAME(m_boot_execute));
@@ -122,6 +131,22 @@ I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 	}
 }
 
+void systel1_state::floppy_control_w(u8 data)
+{
+	if (m_floppy->get_device() != nullptr)
+		m_floppy->get_device()->mon_w(!BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(systel1_state::rts_w)
+{
+	// beep? FDC reset?
+}
+
+WRITE_LINE_MEMBER(systel1_state::dtr_w)
+{
+	// probably floppy-related
+}
+
 void systel1_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(systel1_state::memory_r), FUNC(systel1_state::memory_w));
@@ -138,8 +163,9 @@ void systel1_state::io_map(address_map &map)
 	map(0x00, 0x00).portr("JUMPERS");
 	map(0x10, 0x11).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x29).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0x30, 0x33).rw("fdc", FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0x30, 0x33).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0x40, 0x41).rw("crtc", FUNC(i8276_device::read), FUNC(i8276_device::write));
+	map(0x70, 0x70).w(FUNC(systel1_state::floppy_control_w));
 }
 
 static INPUT_PORTS_START(systel1)
@@ -151,6 +177,11 @@ static INPUT_PORTS_START(systel1)
 	PORT_DIPSETTING(0x02, "50 Hz")
 	PORT_DIPSETTING(0x00, "60 Hz")
 INPUT_PORTS_END
+
+static void systel1_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 void systel1_state::systel1(machine_config &config)
 {
@@ -166,12 +197,14 @@ void systel1_state::systel1(machine_config &config)
 	m_dmac->out_hrq_cb().set(FUNC(systel1_state::hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(systel1_state::memory_r));
 	m_dmac->out_memw_cb().set(FUNC(systel1_state::memory_w));
-	m_dmac->in_ior_cb<1>().set("fdc", FUNC(fd1797_device::data_r));
-	m_dmac->out_iow_cb<1>().set("fdc", FUNC(fd1797_device::data_w));
+	m_dmac->in_ior_cb<1>().set(m_fdc, FUNC(fd1797_device::data_r));
+	m_dmac->out_iow_cb<1>().set(m_fdc, FUNC(fd1797_device::data_w));
 	m_dmac->out_iow_cb<2>().set("crtc", FUNC(i8276_device::dack_w));
 
 	i8251_device &usart(I8251(config, "usart", 2_MHz_XTAL)); // AMD P8251A
 	usart.rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<0>));
+	usart.rts_handler().set(FUNC(systel1_state::rts_w));
+	usart.dtr_handler().set(FUNC(systel1_state::dtr_w));
 
 	clock_device &baudclock(CLOCK(config, "baudclock", 2_MHz_XTAL / 13)); // rate not verified, but also probably fixed
 	baudclock.signal_handler().set("usart", FUNC(i8251_device::write_rxc));
@@ -188,8 +221,12 @@ void systel1_state::systel1(machine_config &config)
 	crtc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 	crtc.irq_wr_callback().set("mainint", FUNC(input_merger_device::in_w<1>));
 
-	fd1797_device &fdc(FD1797(config, "fdc", 2_MHz_XTAL));
-	fdc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq1_w));
+	FD1797(config, m_fdc, 2_MHz_XTAL / 2);
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq1_w));
+
+	FLOPPY_CONNECTOR(config, m_floppy, systel1_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	m_floppy->set_fixed(true);
+	m_floppy->enable_sound(true);
 }
 
 // RAM: 8x MCM6665AP20
