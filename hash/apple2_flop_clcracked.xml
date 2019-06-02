@@ -3,6 +3,14 @@
 
 <softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25 disks">
 
+	<!-- Several sets are missing disks. As of June 1st, 2019 we don't have
+	complete dumps for the following sets:
+
+	Set "esidioms" (Essential Idioms) is missing disk #1
+	Set "colorme" (Color Me) is missing Tink Tonk Side B
+
+	-->
+
 	<software name="101mword">
 		<description>101 Misused Words (cleanly cracked)</description>
 		<year>1983</year>
@@ -798,7 +806,7 @@
 	<software name="123seqme">
 		<description>1-2-3 Sequence Me (cleanly cracked)</description>
 		<year>1991</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -991,7 +999,7 @@
 	<software name="algernon">
 		<description>Algernon (cleanly cracked)</description>
 		<year>1987</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2015-03-17"/>
 		<!-- No compatibility data known at this time. -->
 
@@ -1243,7 +1251,7 @@
 	<software name="bounce">
 		<description>Bounce (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1414,7 +1422,7 @@
 	<software name="chalmath">
 		<description>Challenge Math (cleanly cracked)</description>
 		<year>1982</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1546,7 +1554,7 @@
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<!-- No compatibility data known at this time. -->
-		<!-- Tink Tonk side B needs to be redumped as the existing image is
+		<!-- Missing: Tink Tonk side B needs to be redumped as the existing image is
 		a duplicate of Hugga Bunch side A. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2065,6 +2073,7 @@
 		<description>European Nations and Locations (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>DesignWare, Inc.</publisher>
+		<info name="release" value="2014-08-21"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2077,7 +2086,8 @@
 	<software name="expsctmp">
 		<description>Exploring Science: Temperature (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2014-11-09"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2117,6 +2127,7 @@
 		<description>Falcons (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Piccadilly Software</publisher>
+		<info name="release" value="2015-04-28"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2143,6 +2154,7 @@
 		<description>Factoring Algebraic Expressions (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
+		<info name="release" value="2014-11-13"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2214,7 +2226,7 @@
 	<software name="fornext">
 		<description>FOR Your NEXT Adventure: FOR-NEXT Loops (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2764,7 +2776,7 @@
 	<software name="howwest">
 		<description>How The West Was One + Three x Four (cleanly cracked)</description>
 		<year>1987</year>
-		<publisher>Sunburst</publisher>
+		<publisher>Sunburst Communications</publisher>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -8600,7 +8612,7 @@
 	</software>
 
 	<software name="emp2is12">
-		<description>Empire II - Interstallar Sharks (Version 1.2) (cleanly cracked)</description>
+		<description>Empire II - Interstellar Sharks (Version 1.2) (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware Services</publisher>
 		<info name="release" value="2017-12-25"/>
@@ -8608,7 +8620,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="empire ii - interstallar sharks v1.2 (4am crack).dsk" size="143360" crc="438f83af" sha1="e74b634f337529aba2f54944a335f161f559bdff" />
+				<rom name="empire ii - interstellar sharks v1.2 (4am crack).dsk" size="143360" crc="438f83af" sha1="e74b634f337529aba2f54944a335f161f559bdff" />
 			</dataarea>
 		</part>
 	</software>
@@ -8861,6 +8873,246 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="essential grammar (4am crack) side b.dsk" size="143360" crc="024d5a40" sha1="ab79e408005767a8a254dff20a2ca20320262cf8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esidioms">
+		<description>Richard J. Dixson's Essential Idioms (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>The Regents/ALA Company</publisher>
+		<info name="release" value="2017-12-23"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- Missing: Disk 1 has not been dumped at this time
+		and is still missing. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="essential idioms (4am crack) disk 2.dsk" size="143360" crc="6beb5b85" sha1="b8af6d4fca50f25cb9908329ebe9b82b26efeb59" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="essential idioms (4am crack) disk 3.dsk" size="143360" crc="4297a46c" sha1="6cce8d619813c5c7a165ef4b4defdcb8954f6ba7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esspunct">
+		<description>Essential Punctuation (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2016-09-17"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="essential punctuation (4am crack) side a.dsk" size="143360" crc="10430478" sha1="30234fb8c877a404568169d86a69959bd643cbaa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="essential punctuation (4am crack) side b.dsk" size="143360" crc="8a302f57" sha1="074feff3f0119deb4d23b40ecd61697314ca4663" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="folwdirb">
+		<description>Eureka - Following Directions Level B (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2016-06-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="eureka - following directions level b (4am crack) side a.dsk" size="143360" crc="9e036cf5" sha1="a22ae3efcdf3488789097d8063f5a3f138a08181" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="eureka - following directions level b (4am crack) side b.dsk" size="143360" crc="813e01c0" sha1="a250f99f37cf4cde08dd1eae788b54786a7c7ae6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="examazon">
+		<description>Expedition Amazon (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2016-08-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition amazon (4am crack) side a.dsk" size="143360" crc="b7bd4d32" sha1="3effbf439395e69d197e5f919a7cf8892bb35058" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition amazon (4am crack) side b (boot).dsk" size="143360" crc="4cbb6e00" sha1="0974f4f34520234c741e67de535e664eb9b9396a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explsci">
+		<description>Explorations in Science (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Josten Learning Systems</publisher>
+		<info name="release" value="2016-03-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="explorations in science (4am crack) disk 1.dsk" size="143360" crc="0a4cc382" sha1="54c89376dffc9acbf64df6d33c80e91d56b395db" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="explorations in science (4am crack) disk 2.dsk" size="143360" crc="5f9d646a" sha1="937db63bb71d59a09c8cb9deb5abb307a24f0671" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xtraxtra">
+		<description>Extra Extra (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Media Materials</publisher>
+		<info name="release" value="2015-12-08"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- Year comes from disk label, which reports 1985. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="extra extra (4am crack).dsk" size="143360" crc="da3dc1c6" sha1="3d735a42e5f887bf1e7700e42f7e312b8a89a49b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xtra2mb">
+		<description>Extra Extra (Milton Bradley) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2015-12-18"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="extra extra (milton bradley) (4am crack).dsk" size="143360" crc="485894fc" sha1="a64120e9494098dedfb4c2da9ab899d3f4e5d280" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="facemkge">
+		<description>Facemaker Golden Edition (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Spinnaker Software</publisher>
+		<info name="release" value="2017-06-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="facemaker golden edition (4am crack).dsk" size="143360" crc="e4113cc4" sha1="850385687621f487ac67364e12104b26d74741a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="factopin">
+		<description>Fact or Opinion (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2015-08-24"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fact or opinion (4am crack).dsk" size="143360" crc="cc153b60" sha1="d7605540583b5705f754a41085f3795fb0205814" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="factors">
+		<description>Factors (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Jostens Learning Corporation</publisher>
+		<info name="release" value="2018-01-31"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="factors (4am crack).dsk" size="143360" crc="2784f813" sha1="06174fcb7f2b011689c8719ac6576036ddb22765" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f451">
+		<description>Fahrenheit 451 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Trillium</publisher>
+		<info name="release" value="2016-12-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 (4am crack) disk a.dsk" size="143360" crc="d30ec939" sha1="e829474825402e6d2230af225fc6535e35b893cc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 (4am crack) disk b.dsk" size="143360" crc="1777b983" sha1="52811cead87661371b4fa15a2dadbdf9f51397a9" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 (4am crack) disk c.dsk" size="143360" crc="8c56ec91" sha1="dfd9f53e596801b267747fbcf3d88dab83493fa0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 (4am crack) disk d.dsk" size="143360" crc="a48ecc53" sha1="b4673deab68f5ba4a41fa4ab5b025f2ffc1ceb6f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f451r2">
+		<description>Fahrenheit 451 (Revision 2) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Trillium</publisher>
+		<info name="release" value="2018-01-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 rev. 2 (4am crack) disk a.dsk" size="143360" crc="2101b05f" sha1="0f928b91f62611a25864a23f8542d65660a831ae" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 rev. 2 (4am crack) disk b.dsk" size="143360" crc="1777b983" sha1="52811cead87661371b4fa15a2dadbdf9f51397a9" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 rev. 2 (4am crack) disk c.dsk" size="143360" crc="8c56ec91" sha1="dfd9f53e596801b267747fbcf3d88dab83493fa0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="fahrenheit 451 rev. 2 (4am crack) disk d.dsk" size="143360" crc="a48ecc53" sha1="b4673deab68f5ba4a41fa4ab5b025f2ffc1ceb6f" />
 			</dataarea>
 		</part>
 	</software>
