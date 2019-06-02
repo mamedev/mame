@@ -38,6 +38,7 @@ K051649 (sound)
 #include "sound/ymz280b.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
+#include "sound/upd7759.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
@@ -55,7 +56,8 @@ public:
 		m_k052109(*this, "k052109"),
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_upd7759(*this, "upd7759")
 	{ }
 
 	void shuriboy(machine_config &config);
@@ -102,6 +104,7 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<ymz280b_device> m_ymz;
 	optional_device<okim6295_device> m_oki;
+	optional_device<upd7759_device> m_upd7759;
 
 	u8 m_control, m_control2, m_shuri_irq;
 	u32 m_vrom_base;
@@ -189,9 +192,10 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
+	m_k052109->tilemap_update();
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
 
 	return 0;
 }
@@ -204,9 +208,9 @@ void konmedal_state::konmedal_palette(palette_device &palette) const
 	{
 		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
-				PROM[i] << 4,
-				PROM[0x100 + i] << 4,
-				PROM[0x200 + i] << 4);
+				(PROM[i]) << 4,
+				(PROM[0x100 + i]) << 4,
+				(PROM[0x200 + i]) << 4);
 	}
 }
 
@@ -270,8 +274,11 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8801, 0x8801).portr("IN1");
 	map(0x8802, 0x8802).portr("DSW1");
 	map(0x8803, 0x8803).portr("DSW2");
+	map(0x8900, 0x8900).nopw();
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
 	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
+	map(0x8d00, 0x8d00).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0x9000, 0x9000).nopw();     // writes alternating 00 and 3F
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
@@ -390,8 +397,8 @@ void konmedal_state::tsukande(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
-	m_palette->enable_shadows();
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256);
+	//m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
@@ -423,8 +430,8 @@ void konmedal_state::ddboy(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
-	m_palette->enable_shadows();
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256);
+	//m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
@@ -457,6 +464,9 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 	*code |= ((*color & 0xc) << 6) | (bank << 10);
 	if (*color & 0x2) *code |= 0x1000;
 	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
+	u8 col = *color;
+	*color = (col >> 4);
+	if (layer > 0) *color |= 8;
 }
 
 WRITE8_MEMBER(konmedal_state::shuri_bank_w)
@@ -518,13 +528,13 @@ void konmedal_state::shuriboy(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_visarea(96, 416-1, 16, 240-1);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192); // not verified
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256); // not verified
+//  m_palette->enable_shadows();
+//  m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -537,7 +547,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	K051649(config, "k051649", XTAL(24'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
-	// upd7759c
+	UPD7759(config, m_upd7759);
 }
 
 ROM_START( tsukande )
