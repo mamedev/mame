@@ -14,19 +14,10 @@
 #pragma once
 
 #include "machine/eepromser.h"
-#include "machine/hpc3.h"
 
 class sgi_mc_device : public device_t
 {
 public:
-	template <typename T, typename U, typename V>
-	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag, V &&hpc3_tag)
-		: sgi_mc_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_eeprom.set_tag(std::forward<U>(eeprom_tag));
-		m_hpc3.set_tag(std::forward<V>(hpc3_tag));
-	}
 	template <typename T, typename U>
 	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag)
 		: sgi_mc_device(mconfig, tag, owner, (uint32_t)0)
@@ -36,6 +27,8 @@ public:
 	}
 	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto int_dma_done_cb() { return m_int_dma_done_cb.bind(); }
+
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
 
@@ -44,6 +37,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -52,12 +46,29 @@ protected:
 	static const device_timer_id TIMER_DMA = 1;
 
 private:
+	enum
+	{
+		MODE_TO_HOST	= (1 << 1),
+		MODE_SYNC		= (1 << 2),
+		MODE_FILL		= (1 << 3),
+		MODE_DIR		= (1 << 4),
+		MODE_SNOOP		= (1 << 5)
+	};
+
 	uint32_t dma_translate(uint32_t address);
-	void dma_tick();
+	void dma_immediate();
+
+	uint32_t get_line_count() { return m_dma_size >> 16; }
+	uint32_t get_line_width() { return (uint16_t)m_dma_size; }
+	uint32_t get_line_zoom() { return (m_dma_stride >> 16) & 0x3ff; }
+	int16_t get_stride() { return (int16_t)m_dma_stride; }
+	uint32_t get_zoom_count() { return (m_dma_count >> 16) & 0x3ff; }
+	uint32_t get_byte_count() { return (uint16_t)m_dma_count; }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<hpc3_device> m_hpc3;
+
+	devcb_write_line m_int_dma_done_cb;
 
 	address_space *m_space;
 

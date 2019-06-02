@@ -659,7 +659,7 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -729,7 +729,7 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_devic
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -811,7 +811,7 @@ uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bi
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -874,7 +874,7 @@ uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen,
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

@@ -2009,7 +2009,7 @@ void segas16a_state::system16a(machine_config &config)
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segas16a);
-	PALETTE(config, m_palette).set_entries(2048*3);
+	PALETTE(config, m_palette).set_entries(2048*2);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

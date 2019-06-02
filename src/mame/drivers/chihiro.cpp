@@ -76,7 +76,7 @@ GD build date
 |*| 2005     | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
 |*| 2006     | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
 |*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
-|*| 2006     | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.100                      | Sega                     | DVDROM | CDV-10029  |              |
 |*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
 |*| 2008     | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
 |*| 2008     | Sangokushi Taisen 3 Ver.J                          | Sega                     | DVDROM | CDV-10036J |              |
@@ -86,31 +86,78 @@ GD build date
 +-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------+
 * denotes these games are archived.
 
-   Year   Game (Unknown media)                                Manufacturer
-+-+-----------------------------------------------------------+------------+
-| | 2004 | Quest Of D                                         | Sega       |
-| | 2004 | Quest Of D (Ver.1.02)                              | Sega       |
-| | 2004 | Quest Of D (Ver.1.10)                              | Sega       |
-| | 2004 | Quest Of D (Ver.1.10a)                             | Sega       |
-| | 2005 | Quest Of D (Ver.1.20)                              | Sega       |
-| | 2005 | Quest Of D (Ver.1.20a)                             | Sega       |
-| | 2005 | Quest Of D (Ver.1.21)                              | Sega       |
-| | 2005 | Quest Of D: Gofu no Keisyousya (Ver.2.00)          | Sega       |
-| | 2005 | Quest Of D: Gofu no Keisyousya (Ver.2.01)          | Sega       |
-| | 2006 | Quest Of D: Gofu no Keisyousya (Ver.2.02b)         | Sega       |
-| | 2006 | Quest Of D: Oukoku no Syugosya (Ver.3.00)          | Sega       |
-| | 2006 | Quest Of D: Oukoku no Syugosya (Ver.3.01)          | Sega       |
-| | 2007 | Quest Of D: The Battle Kingdom (Ver.4.00)          | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.00b)         | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.00c)         | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.01)          | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.03)                       | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.10)                       | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.11)                       | Sega       |
-| | 2006 | Sangokushi Taisen (Ver.1.12)                       | Sega       |
-| | 2006 | Sangokushi Taisen 2 (Ver.2.01)                     | Sega       |
-| | 2005 | Sega Golf Club Network Pro Tour 2005               | Sega       |
-+-+------+----------------------------------------------------+------------+
+
+  Year   Game (Unknown media)                                  Manufacturer   Number
++-+-----------------------------------------------------------+------------+------------+
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005  |
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005A |
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005B |
+| | 2004 | Quest Of D 1.01D                                   | Sega       | CDV-10005D |
+| | 2004 | Quest Of D 1.02                                    | Sega       | CDV-10005E |
+| | 2004 | Quest Of D Senko Habai                             | Sega       | CDV-10005P |
+| | 2004 | Quest Of D 1.10                                    | Sega       | CDV-10006  |
+| | 2004 | Quest Of D 1.10A                                   | Sega       | CDV-10006A |
+| | 200? | Sangokushi Taisen                                  | Sega       | CDV-10009  |
+| | 200? | Sangokushi Taisen 0.94                             | Sega       | CDV-10009A |
+| | 200? | Sangokushi Taisen 1.00                             | Sega       | CDV-10009B |
+| | 200? | Sangokushi Taisen 1.001                            | Sega       | CDV-10009C |
+| | 200? | Sangokushi Taisen 1.002                            | Sega       | CDV-10009E |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009F |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009G |
+| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009H |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009J |
+| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009K |
+| | 200? | Sangokushi Taisen 1.110                            | Sega       | CDV-10009L |
+| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009M |
+| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009N |
+| | 200? | Sangokushi Taisen 1.100 (kakinhenkou)              | Sega       | CDV-10009P |
+| | 200? | Sangokushi Taisen 1.121                            | Sega       | CDV-10009Q |
+| | 200? | Sangokushi Taisen 1.122                            | Sega       | CDV-10009R |
+| | 200? | Mobile Suit Gundam 0079 Card Builder               | Banpresto  | CDV-10010A |
+| | 200? | Quest Of D 1.20                                    | Sega       | CDV-10012  |
+| | 200? | Quest Of D 1.20A                                   | Sega       | CDV-10012A |
+| | 200? | Sangokushi Taisen 1.00 (Asia)                      | Sega       | CDV-10014  |
+| | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014B |
+| | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014C |
+| | 200? | Quest Of D 1.21                                    | Sega       | CDV-10016  |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.00                | Sega       | CDV-10017  |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.01                | Sega       | CDV-10017A |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02                | Sega       | CDV-10017B |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02B               | Sega       | CDV-10017C |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02C               | Sega       | CDV-10017D |
+| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10019  |
+| | 200? | Sangokushi Taisen 2 2.010                          | Sega       | CDV-10019B |
+| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024  |
+| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024A |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.00                | Sega       | CDV-10026  |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01                | Sega       | CDV-10026A |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01A               | Sega       | CDV-10026B |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01B               | Sega       | CDV-10026C |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.02                | Sega       | CDV-10026D |
+| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10029A |
+| | 200? | Mobile Suit Gundam 0083 Card Builder               | Banpresto  | CDV-10030A |
+| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032  |
+| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032A |
+| | 200? | Sangokushi Taisen 2 (Asia) Check disc              | Sega       | CDV-10033  |
+| | 200? | Sangokushi Taisen 2 (Asia) Firmware update         | Sega       | CDV-10034  |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035  |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035A |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035C |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036A |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036B |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036D |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036G |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036H |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036K |
+| | 200? | Mobile Suit Gundam 0083 Card Builder 2.00          | Banpresto  | CDV-10037  |
+| | 200? | Mobile Suit Gundam 0083 Card Builder 2.02          | Banpresto  | CDV-10037A |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038  |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038A |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038B |
+| | 200? | Sega Golf Club Network Pro Tour 2005 (DVD NMC TJP) | Sega       | CDV-10039  |
+| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040  |
+| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040A |
++-+------+----------------------------------------------------+------------+------------+
 
 A Chihiro system consists of several boards.
 The system is in 2 separate metal boxes that fit together to form one box.

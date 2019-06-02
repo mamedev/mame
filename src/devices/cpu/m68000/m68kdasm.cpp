@@ -1897,9 +1897,9 @@ std::string m68k_disassembler::d68010_movec()
 	}
 
 	if(BIT(m_cpu_ir, 0))
-		return util::string_format("movec %c%d, %s; (%s)", BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
+		return util::string_format("movec   %c%d, %s; (%s)", BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
 	else
-		return util::string_format("movec %s, %c%d; (%s)", reg_name, BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, processor);
+		return util::string_format("movec   %s, %c%d; (%s)", reg_name, BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, processor);
 }
 
 std::string m68k_disassembler::d68000_movem_pd_16()

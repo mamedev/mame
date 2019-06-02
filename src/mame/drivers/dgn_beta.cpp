@@ -334,7 +334,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
 	screen.set_size(700,550);
 	screen.set_visarea(0, 699, 0, 549);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dgnbeta);
@@ -379,7 +379,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	FLOPPY_CONNECTOR(config, FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
 
-	HD6845(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
+	HD6845S(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(16); /*?*/

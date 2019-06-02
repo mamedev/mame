@@ -322,20 +322,10 @@ protected:
 	virtual void device_reset() override;
 };
 
-class h46505_device : public mc6845_device
+class hd6845s_device : public mc6845_device
 {
 public:
-	h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-class hd6845_device : public mc6845_device
-{
-public:
-	hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -482,8 +472,7 @@ DECLARE_DEVICE_TYPE(MC6845,   mc6845_device)
 DECLARE_DEVICE_TYPE(MC6845_1, mc6845_1_device)
 DECLARE_DEVICE_TYPE(R6545_1,  r6545_1_device)
 DECLARE_DEVICE_TYPE(C6545_1,  c6545_1_device)
-DECLARE_DEVICE_TYPE(H46505,   h46505_device)
-DECLARE_DEVICE_TYPE(HD6845,   hd6845_device)
+DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
 DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
 DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
 DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)

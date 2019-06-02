@@ -911,6 +911,23 @@ void pia6821_device::write_porta(uint8_t data)
 
 
 //-------------------------------------------------
+//  write_porta_line
+//-------------------------------------------------
+
+void pia6821_device::write_porta_line(int line, bool state)
+{
+	if (!m_in_a_pushed)
+		m_port_a_z_mask = 0xff;
+
+	uint8_t mask = 1 << line;
+	if (state)
+		set_a_input(m_in_a | mask, m_port_a_z_mask & ~mask);
+	else
+		set_a_input(m_in_a & ~mask, m_port_a_z_mask & ~mask);
+}
+
+
+//-------------------------------------------------
 //  a_output
 //-------------------------------------------------
 
@@ -1019,6 +1036,21 @@ void pia6821_device::write_portb(uint8_t data)
 
 	m_in_b = data;
 	m_in_b_pushed = true;
+}
+
+
+//-------------------------------------------------
+//  write_portb_line
+//-------------------------------------------------
+
+void pia6821_device::write_portb_line(int line, bool state)
+{
+	uint8_t mask = 1 << line;
+
+	if (state)
+		write_portb(m_in_b | mask);
+	else
+		write_portb(m_in_b & ~mask);
 }
 
 

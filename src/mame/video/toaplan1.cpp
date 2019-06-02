@@ -671,7 +671,7 @@ void toaplan1_state::log_vram()
 ***************************************************************************/
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+void toaplan1_state::draw_sprite_custom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
 		int priority)
 {
@@ -680,6 +680,7 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	const int sprite_screen_height = ((1 << 16) * gfx->height() + 0x8000) >> 16;
 	const int sprite_screen_width = ((1 << 16) * gfx->width() + 0x8000) >> 16;
+	const pen_t *pens = &m_palette->pen(pal_base);
 
 	if (sprite_screen_width && sprite_screen_height)
 	{
@@ -742,7 +743,7 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 			for (int y = sy; y < ey; y++)
 			{
 				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-				u16 *dest = &dest_bmp.pix16(y);
+				u32 *dest = &dest_bmp.pix32(y);
 				u8 *pri = &priority_bitmap.pix8(y);
 
 				int x_index = x_index_base;
@@ -752,7 +753,7 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 					if (c != 0)
 					{
 						if (pri[x] < priority)
-							dest[x] = pal_base + c;
+							dest[x] = pens[c];
 						pri[x] = 0xff; // mark it "already drawn"
 					}
 					x_index += dx;
@@ -765,7 +766,7 @@ static void draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp, co
 }
 
 
-void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void toaplan1_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u16 *source = (u16 *)m_buffered_spriteram.get();
 	u16 *size   = (u16 *)m_buffered_spritesizeram.get();
@@ -832,10 +833,10 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 /***************************************************************************
-    Draw the game screen in the given bitmap_ind16.
+    Draw the game screen in the given bitmap.
 ***************************************************************************/
 
-u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	log_vram();
 
@@ -862,7 +863,7 @@ u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-u32 toaplan1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 toaplan1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	log_vram();
 

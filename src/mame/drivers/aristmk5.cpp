@@ -34,7 +34,7 @@
        reelpwr, retrsama, retrsamb, rushrst, snowcat, swhr2a, thndh, thndha, thor, topbana,
        trpdlght, wamazona, wcougar, wildbill, wldangel
 
-    BIOS ROMs are actually nowhere to be found on a regular MK5 system, as the BIOS code is at the start of game ROMs U7 and U11.
+    BIOS ROMs are actually nowhere to be found on a regular MK5 system, as the BIOS code is at the start of game ROMs in U7 and U11.
     Therefore, no BIOS system is required as it is built into each game, with the exception of casino software (see below).
     On most US machines, set chips are required to change the system configurations on a game by swapping them with the game ROMs in U7/U11.
 
@@ -48,7 +48,7 @@
     The Brazilian casino BIOS does not use comms, therefore qnilebr is playable. By swapping u7/u11 with the other
     casino games (goldpyrb/jungjuic/penpir2), these games also become playable.
 
-    chickna5ql, bumblbugql and the 0700474V casino BIOS all use QCOM, blackpnt uses VLC (Video Lottery Consultants) comms instead.
+    Queensland games and the 0700474V casino BIOS all use QCOM, blackpnt uses VLC (Video Lottery Consultants) comms instead.
 
     Diamond Touch, Dream Weaver, Magic Touch and the New Zealand games have an autoplay option.
     The New Zealand games have this enabled by default in the options, whereas on the NSW games it is disabled by default.
@@ -129,7 +129,7 @@
     Queen of the Nile does not use this early prerecorded music in any of its variants.
 
     List of clones (identical games with different names and/or graphics):
-    Queen of the Nile = Golden Pyramids = Dolphin Treasure = Adonis = Geisha (note that Adonis has a slightly different symbol layout for reel 1, but the symbol frequency is still identical)
+    Queen of the Nile = Golden Pyramids = Dolphin Treasure = Beyond the Reef (undumped) = Adonis = Geisha (note that Adonis has a slightly different symbol layout for reel 1, but the symbol frequency is still identical)
     Sweethearts II = Heart Throb = Desert Bloom = Tropical Delight = Coral Riches II
     Phantom Pays = Enchanted Forest = Magic Garden = Lucky Clover = The Gambler = Thunder Heart (9 line) = Mountain Money (9 line)
     Diamond Touch = Magic Mask = Party Gras = Diamond Destiny
@@ -168,10 +168,10 @@
 
     Standard NSW/ACT games and similar non-US games, including Holland and Venezuela:
 
-    Step 1: Audit key in (F2), open the main door (M) and press Reserve (A) and the fourth line button (G) together to clear the memory.
+    Step 1: Audit key in (F2), press Reserve (A) and the fourth line button (G) together to clear the memory. Some games may require the main door to be open (press M) prior to clearing.
     Note: On 3-payline games, press Reserve (A) and Bet 1 Credit (E) to clear the memory.
 
-    Optionally, the main door can be closed from this point on (press M again).
+    If open, the main door can be closed from this point on (press M again).
 
     Step 2: Enter Operator Setup -> Machine Options
 
@@ -195,7 +195,7 @@
     Note: To disable both the hopper and forced hand pay on cashout, change both the Collect Limit and Hopper Refill to $0.00.
     Disabling this setting will allow hand pays but still allow the player to continue if they inadvertently hit Collect.
     To perform a hand pay or jackpot reset (e.g. after a Hyperlink feature), press (V) to allow the game to enter play mode.
-    Note that in some games such as Treasure Trove (trstrove), the collect options are been moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
+    Note that in some games such as Treasure Trove (trstrove), the collect options are moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
 
 
     New Zealand non-casino games, and most NSW/ACT touchscreen games:
@@ -213,7 +213,8 @@
     and have smaller but more frequent payouts due to gambling laws which limit the maximum possible win per bought game to $500.00. CCCE comms is not used on New Zealand machines.
 
 
-    Queensland games:
+    Queensland games, older types:
+    bumblbugql, chickna5ql
 
     Audit key in, press Reserve (A) and the fourth line button (G) together to clear the memory.
     The game will automatically enter the Machine Options menu where you can change the QCOM poll address, serial number, denomination and bill acceptor settings.
@@ -224,8 +225,19 @@
     Note 2: As the QCOM protocol is not yet emulated, the games are not playable since they automatically disable themselves after timing out.
 
 
+    Queensland games, newer types:
+    dolphntrql, indrema5ql, qnilefl, qnileql, reelrockql
+
+    Audit key in, press Collect (Q) and the fourth line button (G) together to clear the memory.
+    The game will automatically enter the Machine Options menu where you can change the serial number (it cannot be zero) and enable/disable the bill acceptor.
+    Bill acceptor options should remain disabled until implemented in MAME, otherwise the machine will give a bill acceptor stacker error.
+    Press Collect (Q) to save changes, and key out (F2) to exit the menu.
+    Note 1: Once these settings have been saved, they cannot be changed unlike games from other regions as the Machine Options menu is hidden.
+    Note 2: As the QCOM protocol is not yet emulated, the games are not playable since they automatically disable themselves after timing out.
+
+
     Casino games using the New Zealand 0700474V base EPROMs:
-    Currently, this is limited to goldpyrb, jungjuic and penpir2. The games are universal (including qnilebr below, if you swap the base EPROMs), however the base is region coded.
+    Currently, this is limited to goldpyrb, jungjuic and penpir2 (and also qnilebr if you swap the base EPROMs). The games are universal (all regions), however the base is region coded.
 
     Step 1: Audit key in, press Service (A) and the fourth line button (G) together to clear the memory.
 
@@ -234,7 +246,7 @@
 
 
     Casino games using the Brazilian 0301718V base EPROMs:
-    Currently this is limited to qnilbr (and the above three casino games if you swap the base EPROMs).
+    Currently this is limited to qnilebr (and the above three casino games if you swap the base EPROMs).
 
     This is similar to the NSW/ACT games, however upon keying in (F2), it requires a four-digit setup code before it can be initialized.
     By default, this number is 4856. After the game has accepted this code, press Service (A) and Play 7 Lines (G) at the same time to clear the memory.
@@ -323,7 +335,7 @@
     Step 3: Now that we know the correct bet/line values and the set chip version it is time to swap the U7 and U11 game chips for the set chips.
 
     To do this in MAME, press Tab to open the menu and enter Machine Configuration and select an appropriate set chip with the left/right keys.
-    I use 4.04.09 for all games as it is the latest version supported in MAME; set chips are backward compatible with previous versions so they can also be used to set up older games (for example, cashchamu requires 4.00.xx).
+    It is best to use 4.04.09 for all games as it is the latest version supported in MAME; set chips are backward compatible with previous versions so they can also be used to set up older games (for example, cashchamu requires 4.00.xx).
     You should now be in the set chip menu (if not, hit F3).
 
     Press Service and Cashout together (Q+A) to reset the SRAM and enter the Version Menu.
@@ -340,7 +352,7 @@
 
     Jurisdiction: This option sets the various US regions or Bolivia, Peru/Sask, Puerto Rico or Uruguay.
     Each region has its own gambling laws and restrictions which is why there are so many options.
-    The set chip region with the least restrictions is actually Uruguay rather than a US state, as US slot machines are not allowed to store more than $1200.00 worth of credits and/or wins and wins in excess of the limit must be hand paid.
+    The set chip region with the least restrictions is actually Uruguay rather than a US state, as US slot machines are not allowed to store more than $1200.00 worth of credits and/or wins, and wins in excess of the limit must be hand paid.
 
     Cancel Residual Credit: Soft Lockup or Hard Lockup. Residual credits are credits below the minimum value which cannot be cashed out as coins or otherwise.
     A soft lockup allows the player to either call an attendant for a hand pay or continue playing, while a hard lockup requires a hand pay of the remaining credits.
@@ -348,7 +360,7 @@
     Gamble Feature: Toggle between Disabled or Enabled.
     The gamble feature is not available in the following regions: Arizona, California, Colorado, North Dakota, South Dakota, Wisconsin and Puerto Rico.
 
-    Bill Acceptor Protocol: (To be written later once emulated)
+    Bill Acceptor Protocol: (To be written once emulated)
     EFT/Bonus Transfer: Cashless/ticket acceptance options, not required in MAME.
 
     The following items are hard coded and cannot be changed:
@@ -3757,6 +3769,31 @@ ROM_START( dolphntrceb )
 ROM_END
 
 
+// 0101250V / 602/17 / 25 Credit Multiplier / 20 Line Multiline
+// Dolphin Treasure / QCOM / A - 20/01/00
+ROM_START( dolphntrql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x0806ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xb0e71f34
+	        Calculated Checksum 0xb0e71f34  (OK)
+	    0x0806ac-0x1ad0c7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0806ac-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101250v.u7",  0x000000, 0x80000, CRC(4d38af9a) SHA1(4f0bc990b33b8421bde4473d22ad8ca55fc407c9) )
+	ROM_LOAD32_WORD( "0101250v.u11", 0x000002, 0x80000, CRC(f9750215) SHA1(8e44be5c83a1f75a95c856729cfc84c270649caf) )
+	ROM_LOAD32_WORD( "0101250v.u8",  0x100000, 0x80000, CRC(7d82a406) SHA1(c3757597fe9c484de71d81cb02046f6cca27ff44) )
+	ROM_LOAD32_WORD( "0101250v.u12", 0x100002, 0x80000, CRC(35236e6f) SHA1(f196f12a1761a235ad66f4e181ca249b1df7e245) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 // FHG4077-02 / 602/1 / 10 Credit Multiplier / 9 Line Multiline
 // Dolphin Treasure / Export / B - 06/12/96
 // All devices are 27c4002 instead of 27c4096
@@ -4612,6 +4649,32 @@ ROM_START( indrema5 )
 	ROM_LOAD32_WORD( "0100845v.u11", 0x000002, 0x80000, CRC(e371dc0f) SHA1(a01ab7fb63a19c144f2c465ecdfc042695124bdf) )
 	ROM_LOAD32_WORD( "0100845v.u8",  0x100000, 0x80000, CRC(1c6bfb47) SHA1(7f751cb499a6185a0ab64eeec511583ceeee6ee8) )
 	ROM_LOAD32_WORD( "0100845v.u12", 0x100002, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+// 0101340V / 628/3 / 10 Credit Multiplier / 20 Line MultiLine
+// INDIAN DREAMING / QLD / A - 02/05/00
+ROM_START( indrema5ql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x081823 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa70d8e67
+	        Calculated Checksum 0xa70d8e67  (OK)
+	    0x081824-0x20612b is the non-Checksummed range (unusual endpoint)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101340v.u7",  0x000000, 0x80000, CRC(60b93091) SHA1(6d4953b8312866f952b9658a680e8827bf2b5e57) )
+	ROM_LOAD32_WORD( "0101340v.u11", 0x000002, 0x80000, CRC(34125c7d) SHA1(c6e57346f2c53a04e858b01132abcb4d91403822) )
+	ROM_LOAD32_WORD( "0101340v.u8",  0x100000, 0x80000, CRC(de715129) SHA1(30c15bdfc9ee5c45e04b9f9eb614be89a911260b) )
+	ROM_LOAD32_WORD( "0101340v.u12", 0x100002, 0x80000, CRC(48d7b043) SHA1(835d148db1e2ce7747a4410e3ceea4468355a164) )
+	ROM_LOAD32_WORD( "0101340v.u9",  0x200000, 0x80000, CRC(77c94665) SHA1(48d786a323603d1315f94fef97de6f9d1311c688) )
+	ROM_LOAD32_WORD( "0101340v.u13", 0x200002, 0x80000, CRC(7ec9557e) SHA1(8f143c1ee1c82d822ff66ec5b3dac03b0c911223) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -8555,9 +8618,11 @@ GAMEL( 1998, penpir2,     aristmk5, aristmk5,           penpir2,      aristmk5_s
 // the following clone sets boot but cannot be played due to unemulated comms
 GAMEL( 1996, bumblbugql,  bumblbug, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",                   MACHINE_NOT_WORKING, layout_swhr2 )           // 593, D - 5/07/96, Rev 1.0
 GAMEL( 1998, chickna5ql,  chickna5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_NOT_WORKING, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
+GAMEL( 2000, dolphntrql,  dolphntr, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0101250V, Queensland)",              MACHINE_NOT_WORKING, layout_trstrove )        // 602/17, A - 20/01/00, Rev 1.0.1.0
 GAMEL( 1998, goldpyrb,    goldpyr,  aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",                 MACHINE_NOT_WORKING, layout_goldpyrb )        // 602/5, C - 19/06/98
-GAMEL( 2001, qnilefl,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Fast Lane (0101670V, Queensland)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, E - 17/08/01
+GAMEL( 2000, indrema5ql,  indrema5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0101340V, Queensland)",               MACHINE_NOT_WORKING, layout_aristmk5 )        // 628/3, A - 02/05/00, Rev 1.0
 GAMEL( 1999, qnileql,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0201200V, Queensland)",             MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99
+GAMEL( 2001, qnilefl,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Fast Lane (0101670V, Queensland)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, E - 17/08/01
 
 // the following parent sets are known bad dumps, and do not boot (confirmed)
 GAMEL( 1996, blackpnt,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",                   MACHINE_NOT_WORKING, layout_wildbill )        // 594/1, A - 30/07/96

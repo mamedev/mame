@@ -2,12 +2,17 @@
 // copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
-*  V-tech Socrates Driver
-*  Copyright (C) 2009-2013 Jonathan Gevaryahu AKA Lord Nightmare
+*  V-tech Socrates-series devices
+*  Copyright (C) 2009-2019 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
 *
+*  The devices in this driver all use a similar ASIC, presumably produced by
+*  Toshiba for Vtech/Yeno, in a QFP package with 100 pins (30+20+30+20)
+*  The asic variants seen in the wild are:
+*  27-0769 TC17G032AF-0248 (Socrates NTSC)
+*  27-0883 1732-8277 (Video Painter and Socrates PAL)
 *
-TODO:
+TODO (socrates):
     * The speech chip is a Toshiba tc8802AF (which is pin and speech
       compatible with the older Toshiba t6803, but adds vsm rom read mode and
       apparently does away with the melody mode); the chip is running at
@@ -117,6 +122,7 @@ public:
 
 	void init_socrates();
 	void init_iqunlimz();
+	void init_vpainter();
 
 protected:
 	enum
@@ -144,7 +150,7 @@ protected:
 	uint16_t m_scroll_offset;
 	uint16_t m_kb_spi_buffer;
 	bool m_kb_spi_request;
-	uint8_t m_kbmcu_type; // 0 for socrates, 1 for iqunlimz
+	uint8_t m_kbmcu_type; // 0 for socrates, 1 for iqunlimz, 2 for vpainter
 	uint16_t m_oldkeyvalue; // previous key pressed
 	uint16_t m_keyrepeat_holdoffcounter; // keyrepeat holdoff countdown
 	uint8_t m_io40_latch; // what was last written to speech reg (for open bus)?
@@ -176,7 +182,7 @@ protected:
 	DECLARE_READ8_MEMBER(socrates_cart_r);
 	DECLARE_READ8_MEMBER(read_f3);
 	DECLARE_WRITE8_MEMBER(kbmcu_reset);
-	DECLARE_READ8_MEMBER(status_and_speech);
+	DECLARE_READ8_MEMBER(socrates_status_r);
 	DECLARE_WRITE8_MEMBER(speech_command);
 	DECLARE_READ8_MEMBER(keyboard_buffer_read);
 	DECLARE_WRITE8_MEMBER(keyboard_buffer_update);
@@ -204,8 +210,8 @@ protected:
 
 	void socrates_rambank_map(address_map &map);
 	void socrates_rombank_map(address_map &map);
-	void z80_io(address_map &map);
-	void z80_mem(address_map &map);
+	void socrates_io(address_map &map);
+	void socrates_mem(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -419,6 +425,17 @@ void socrates_state::init_iqunlimz()
 	m_kbmcu_type = 1;
 }
 
+void socrates_state::init_vpainter()
+{
+	uint8_t *gfx = memregion("vram")->base();
+
+	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
+	for (int i = 0; i < 0x10000; i++)
+		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_kbmcu_type = 2;
+}
+
 READ8_MEMBER(socrates_state::common_rom_bank_r)
 {
 	return m_rom_bank[offset];
@@ -471,7 +488,7 @@ WRITE8_MEMBER(socrates_state::kbmcu_reset) // reset the keyboard MCU, clear its 
 	kbmcu_sim_reset();
 }
 
-READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
+READ8_MEMBER(socrates_state::socrates_status_r)// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, possibly mcu ready state?
@@ -639,7 +656,7 @@ READ8_MEMBER( socrates_state::keyboard_buffer_read )
 		if (offset == 1) return m_kb_spi_buffer&0xFF;
 		else return (m_kb_spi_buffer&0xFF00)>>8;
 	}
-	else // (m_kbmcu_type == 1) // iqunlimz hack, the system won't work without this?!?!
+	else // if ( (m_kbmcu_type == 1) || (m_kbmcu_type == 2) ) // iqunlimz hack, the system won't work without this?!?!
 	{
 		if (offset == 1) return (m_screen->vblank()?0x80:0)|(m_kbdrow[0]->read()&0xf);
 		else return (m_kb_spi_buffer&0xFF00)>>8;
@@ -980,7 +997,7 @@ INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
  Address Maps
 ******************************************************************************/
 
-void socrates_state::z80_mem(address_map &map)
+void socrates_state::socrates_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom(); /* system rom, bank 0 (fixed) */
@@ -1003,7 +1020,7 @@ void socrates_state::socrates_rambank_map(address_map &map)
 	map(0x0000, 0xffff).ram().region("vram", 0).mirror(0x30000);
 }
 
-void socrates_state::z80_io(address_map &map)
+void socrates_state::socrates_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -1023,7 +1040,7 @@ void socrates_state::z80_io(address_map &map)
 	*/
 	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
 	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
-	map(0x40, 0x40).rw(FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x40, 0x40).rw(FUNC(socrates_state::socrates_status_r), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	map(0x50, 0x51).rw(FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
 	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
 	map(0x70, 0xFF).r(FUNC(socrates_state::read_f3)); // nothing mapped here afaik
@@ -1388,7 +1405,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 	// timer rate is a massive guess; we're assuming the mcu runs at the same speed as the cpu does,
 	// and the refresh rate depends on instructions per loop of mcu, which we've randomly guessed is 60 cycles.
 	m_kbmcu_sim_timer->adjust(m_maincpu->cycles_to_attotime(3000));
-	/// TODO: dump the mcu and get rid of this...
+	/// TODO: dump the mcus and get rid of this...
 	if (m_kbmcu_type == 0)
 	{
 		// socrates keyboard MCU simulation: if a keyboard key is pressed, enqueue it into the fifo as needed
@@ -1447,7 +1464,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 			m_oldkeyvalue = keyvalue; // set this new key to be the 'previous key'
 		}
 	}
-	//else // m_kbmcu_type = 1 // this is currently hacked around by the input system so no code here
+	//else if (m_kbmcu_type == 1) // this is currently hacked around by the input system so no code here
 	//{
 	//}
 
@@ -1469,8 +1486,8 @@ void socrates_state::socrates(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(21'477'272)/6);  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::z80_mem);
-	m_maincpu->set_addrmap(AS_IO, &socrates_state::z80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::socrates_mem);
+	m_maincpu->set_addrmap(AS_IO, &socrates_state::socrates_io);
 	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
 	config.m_minimum_quantum = attotime::from_hz(60);
 
@@ -1503,7 +1520,7 @@ void socrates_state::socrates_pal(machine_config &config)
 {
 	socrates(config);
 
-	m_maincpu->set_clock(XTAL(26'601'712)/8);
+	m_maincpu->set_clock(XTAL(26'601'712)/8); // XTAL verified, divider NOT verified; this is a later ASIC so the divider may be different
 
 	config.m_minimum_quantum = attotime::from_hz(50);
 
@@ -1552,7 +1569,7 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 ******************************************************************************/
 
 ROM_START(socrates)
-	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 */
+	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 on fluke */
 	/* Socrates US NTSC */
 	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
 	/* cart port pinout:
@@ -1631,7 +1648,7 @@ ROM_START(profweis)
 	ROM_SYSTEM_BIOS(0, "89", "1989")
 	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(0)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
 	ROM_SYSTEM_BIOS(1, "88", "1988")
-	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+	ROMX_LOAD("27-00885-000-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00885-000-000 // (C)1988 VIDEO TECHNOLOGY // 8844 D"
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1650,9 +1667,25 @@ ROM_START( iqunlimz )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
 
+	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("kbmcu.bin", 0x0000, 0x1000, NO_DUMP) /* keyboard reader MCU */
+
 	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE )
 ROM_END
 
+ROM_START( vpainter )
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
+	ROM_LOAD("lh531g02.u1", 0x00000, 0x20000, CRC(898defac) SHA1(8307e00b5ce3675ce71960e7cf2d1334197a1dce)) // Label: "(Vtech)LH531G02 // (C)1991 VIDEO TECHNOLOGY // 9211 D"
+
+	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("tmp47c241nj408.u6", 0x0000, 0x1000, NO_DUMP) /* key/touchpad reader MCU */
+
+	///TODO: get rid of these regions in the status_read function or make it socrates-specific
+	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
+	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
+ROM_END
 
 /******************************************************************************
  Drivers
@@ -1666,3 +1699,6 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 // ? goes here (spanish PAL)
 
 COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+COMP( 1991, vpainter, 0,        0,      socrates_pal, socrates, socrates_state, init_vpainter, "Video Technology", "Video Painter (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// Master Video Painter goes here

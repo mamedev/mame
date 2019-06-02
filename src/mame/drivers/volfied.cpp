@@ -53,6 +53,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -274,7 +275,7 @@ void volfied_state::volfied(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

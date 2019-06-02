@@ -11,10 +11,10 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="jetsons ways with words.50" size="0x4000" crc="3fc55c1e" sha1="35b92617f6ff725e1b7f5d255c21a4e7fa8a3bc7" offset="0x0000"/>
+				<rom name="jetsons ways with words.50" size="0x4000" crc="3fc55c1e" sha1="35b92617f6ff725e1b7f5d255c21a4e7fa8a3bc7"/>
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
-				<rom name="jetsons ways with words.d0" size="0x2000" crc="e089cb46" sha1="275ac1f258aaa611163398d9b95a84bad69cd1ae" offset="0x0000"/>
+				<rom name="jetsons ways with words.d0" size="0x2000" crc="e089cb46" sha1="275ac1f258aaa611163398d9b95a84bad69cd1ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,10 +28,10 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="melody blaster.50" size="0x4000" crc="52b96271" sha1="0a1557a2d5720b7116fab60d7ab528189a23be03" offset="0x0000"/>
+				<rom name="melody blaster.50" size="0x4000" crc="52b96271" sha1="0a1557a2d5720b7116fab60d7ab528189a23be03"/>
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
-				<rom name="melody blaster.d0" size="0x2000" crc="7be551d9" sha1="ff2280d8894b996f6561e75544b62ec81b195e65" offset="0x0000"/>
+				<rom name="melody blaster.d0" size="0x2000" crc="7be551d9" sha1="ff2280d8894b996f6561e75544b62ec81b195e65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,10 +45,10 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="mind strike.50" size="0x4000" crc="604ba84a" sha1="b3e84a8decdf0cc6fe6471671c256a18dc61f34a" offset="0x0000"/>
+				<rom name="mind strike.50" size="0x4000" crc="604ba84a" sha1="b3e84a8decdf0cc6fe6471671c256a18dc61f34a"/>
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
-				<rom name="mind strike.d0" size="0x2000" crc="297717bd" sha1="e38fd12edffe278a283e08b42965fab6fd65b03d" offset="0x0000"/>
+				<rom name="mind strike.d0" size="0x2000" crc="297717bd" sha1="e38fd12edffe278a283e08b42965fab6fd65b03d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,10 +62,10 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="mr basic meets bits n bytes.50" size="0x4000" crc="b11a5c27" sha1="66dc40f0cf3d6326452620912ac6aec0f21a0484" offset="0x0000"/>
+				<rom name="mr basic meets bits n bytes.50" size="0x4000" crc="b11a5c27" sha1="66dc40f0cf3d6326452620912ac6aec0f21a0484"/>
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
-				<rom name="mr basic meets bits n bytes.d0" size="0x2000" crc="e6f08b02" sha1="b879b3ee76315b5369593cf142da6dab8eaebf71" offset="0x0000"/>
+				<rom name="mr basic meets bits n bytes.d0" size="0x2000" crc="e6f08b02" sha1="b879b3ee76315b5369593cf142da6dab8eaebf71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="scooby doo maze chase.50" size="0x4000" crc="e9e3f60d" sha1="4e8b7c7308162f58d36b4afe748a408f8e40c63b" offset="0x0000"/>
+				<rom name="scooby doo maze chase.50" size="0x4000" crc="e9e3f60d" sha1="4e8b7c7308162f58d36b4afe748a408f8e40c63b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -93,14 +93,14 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_wsmlb" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="world series major league baseball.50" size="0x4000" crc="cc7ffde7" sha1="926971342db595baab8c352b6179935774ccbcdb" offset="0x0000"/>
+				<rom name="world series major league baseball.50" size="0x4000" crc="cc7ffde7" sha1="926971342db595baab8c352b6179935774ccbcdb"/>
 			</dataarea>
 			<dataarea name="D000" size="0x4000">
-				<rom name="world series major league baseball.d0" size="0x4000" crc="839fa5c7" sha1="1ef12665079d1ce50bd2419b668344a08c9a872f" offset="0x0000"/>
+				<rom name="world series major league baseball.d0" size="0x4000" crc="839fa5c7" sha1="1ef12665079d1ce50bd2419b668344a08c9a872f"/>
 			</dataarea>
 			<!-- two ROM pages -->
 			<dataarea name="F000" size="0x4000">
-				<rom name="world series major league baseball (page 0).f0" size="0x2000" crc="a0f2fe49" sha1="fab397b49c5a7db53a501caea42fce169da5a31a" offset="0x0000"/>
+				<rom name="world series major league baseball (page 0).f0" size="0x2000" crc="a0f2fe49" sha1="fab397b49c5a7db53a501caea42fce169da5a31a"/>
 				<rom name="world series major league baseball (page 1).f0" size="0x2000" crc="94d6b056" sha1="df2a8c950dd1c398db901a624c04322d2b4f2782" offset="0x2000"/>
 			</dataarea>
 		</part>
@@ -114,16 +114,16 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_gfact" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="game factory.50" size="0x4000" crc="0838f681" sha1="f15230e32f4ee7e6371d8c4e214b8562044cfebf" offset="0x0000"/>
+				<rom name="game factory.50" size="0x4000" crc="0838f681" sha1="f15230e32f4ee7e6371d8c4e214b8562044cfebf"/>
 			</dataarea>
 			<dataarea name="9000" size="0x4000">
-				<rom name="game factory.90" size="0x4000" crc="5e491625" sha1="464798a8fefb6bf6e91f81ff6fd6caed4cfa002e" offset="0x0000"/>
+				<rom name="game factory.90" size="0x4000" crc="5e491625" sha1="464798a8fefb6bf6e91f81ff6fd6caed4cfa002e"/>
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
-				<rom name="game factory.d0" size="0x2000" crc="71f48e85" sha1="3a8327cf2aee60a5ad98bf124784b50a8aff2fab" offset="0x0000"/>
+				<rom name="game factory.d0" size="0x2000" crc="71f48e85" sha1="3a8327cf2aee60a5ad98bf124784b50a8aff2fab"/>
 			</dataarea>
 			<dataarea name="F000" size="0x2000">
-				<rom name="game factory.f0" size="0x2000" crc="7a8585e8" sha1="691ece0f6426ea5ada71f8615ca6eed24bef4578" offset="0x0000"/>
+				<rom name="game factory.f0" size="0x2000" crc="7a8585e8" sha1="691ece0f6426ea5ada71f8615ca6eed24bef4578"/>
 			</dataarea>
 			<dataarea name="ram" size="0x800">
 			</dataarea>
@@ -138,13 +138,13 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
-				<rom name="number jumble.50" size="0x4000" crc="56ac640c" sha1="4cd87295b6c473a6d48b836c11e29169a2a28d11" offset="0x0000"/>
+				<rom name="number jumble.50" size="0x4000" crc="56ac640c" sha1="4cd87295b6c473a6d48b836c11e29169a2a28d11"/>
 			</dataarea>
 			<dataarea name="D000" size="0x2000">
-				<rom name="number jumble.d0" size="0x2000" crc="2be04ed6" sha1="d86953713d178c287f502955458f9943d1dfe0a1" offset="0x0000"/>
+				<rom name="number jumble.d0" size="0x2000" crc="2be04ed6" sha1="d86953713d178c287f502955458f9943d1dfe0a1"/>
 			</dataarea>
 			<dataarea name="F000" size="0x2000">
-				<rom name="number jumble.f0" size="0x2000" crc="c5dac500" sha1="ff4a42b95f99f02cabcf8018b55f4d113404833a" offset="0x0000"/>
+				<rom name="number jumble.f0" size="0x2000" crc="c5dac500" sha1="ff4a42b95f99f02cabcf8018b55f4d113404833a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,10 +158,10 @@
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="flintstones keyboard fun.50" size="16384" crc="87996f3a" sha1="ffc8986782a461e1c99de24f92578295216e7b5f" offset="0x0000" />
+				<rom name="flintstones keyboard fun.50" size="16384" crc="87996f3a" sha1="ffc8986782a461e1c99de24f92578295216e7b5f" />
 			</dataarea>
 			<dataarea name="D000" size="8192">
-				<rom name="flintstones keyboard fun.d0" size="8192" crc="e813510b" sha1="fa6203172faf46d89fd3a9276f642cbaf6b6f2ab" offset="0x0000" />
+				<rom name="flintstones keyboard fun.d0" size="8192" crc="e813510b" sha1="fa6203172faf46d89fd3a9276f642cbaf6b6f2ab" />
 			</dataarea>
 		</part>
 	</software>

@@ -250,7 +250,7 @@ void menu_add_change_folder::handle()
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			int index = (uintptr_t)menu_event->itemref - 1;
-			const menu_item &pitem = item[index];
+			const menu_item &pitem = item(index);
 
 			// go up to the parent path
 			if (!strcmp(pitem.text.c_str(), ".."))
@@ -330,39 +330,39 @@ void menu_add_change_folder::handle()
 				int entry, bestmatch = 0;
 
 				// from current item to the end
-				for (entry = cur_selected; entry < item.size(); entry++)
-					if (item[entry].ref != nullptr && !m_search.empty())
+				for (entry = cur_selected; entry < item_count(); entry++)
+					if (item(entry).ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selected_index(entry);
 						}
 					}
 
 				// and from the first item to current one
 				for (entry = 0; entry < cur_selected; entry++)
 				{
-					if (item[entry].ref != nullptr && !m_search.empty())
+					if (item(entry).ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selected_index(entry);
 						}
 					}
 				}

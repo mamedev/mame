@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.05);
 	AY8910(config, m_ay8910[0], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 

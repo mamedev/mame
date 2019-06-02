@@ -11,14 +11,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System &amp; Utl."/>
 			<dataarea name="flop" size="142458">
-				<rom name="bw12cpm2.imd" size="142458" crc="6858234c" sha1="72981d1616402e5071a5364041694f156eafb3c5" offset="0"/>
+				<rom name="bw12cpm2.imd" size="142458" crc="6858234c" sha1="72981d1616402e5071a5364041694f156eafb3c5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Virtual Disk"/>
 			<dataarea name="flop" size="166939">
-				<rom name="bw12vdsk.imd" size="166939" crc="45cba82c" sha1="d1478242cd736c15ef9f7668266cb854b7ca4f9e" offset="0"/>
+				<rom name="bw12vdsk.imd" size="166939" crc="45cba82c" sha1="d1478242cd736c15ef9f7668266cb854b7ca4f9e"/>
 			</dataarea>
 		</part>
 	</software>

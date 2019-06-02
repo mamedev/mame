@@ -21,6 +21,7 @@
 #include "sound/tms5220.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/hc55516.h"
 
 
 //**************************************************************************

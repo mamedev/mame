@@ -1284,13 +1284,13 @@ DIP switches are not verified
 #include "dblaxle.lh"
 
 
-void taitoz_state::parse_cpu_control(  )
+void taitoz_state::parse_cpu_control()
 {
 	/* bit 0 enables cpu B */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
+void taitoz_state::cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", m_maincpu->pc(), data);
 
@@ -1301,19 +1301,19 @@ WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 	parse_cpu_control();
 }
 
-WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
+void taitoz_state::chasehq_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	cpua_ctrl_w(space, offset, data, mem_mask);
+	cpua_ctrl_w(offset, data, mem_mask);
 
 	m_lamps[0] = BIT(m_cpua_ctrl, 5);
 	m_lamps[1] = BIT(m_cpua_ctrl, 6);
 }
 
-WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
+void taitoz_state::dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	cpua_ctrl_w(space, offset, data, mem_mask);
+	cpua_ctrl_w(offset, data, mem_mask);
 
-	output().set_value("Wheel_Vibration", (data & 0x04)>>2);
+	output().set_value("Wheel_Vibration", BIT(data, 2));
 }
 
 
@@ -1355,7 +1355,7 @@ INTERRUPT_GEN_MEMBER(taitoz_state::sci_interrupt)
                               EEPROM
 ******************************************************************/
 
-static const uint16_t spacegun_default_eeprom[64]=
+static const u16 spacegun_default_eeprom[64]=
 {
 	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
 	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
@@ -1375,7 +1375,7 @@ READ16_MEMBER(taitoz_state::eep_latch_r)
 }
 #endif
 
-WRITE8_MEMBER(taitoz_state::spacegun_eeprom_w)
+void taitoz_state::spacegun_eeprom_w(u8 data)
 {
 /*          0000xxxx    (unused)
             000x0000    eeprom reset (active low)
@@ -1383,8 +1383,8 @@ WRITE8_MEMBER(taitoz_state::spacegun_eeprom_w)
             0x000000    eeprom data
             x0000000    (unused)                  */
 
-	COMBINE_DATA(&m_eep_latch);
-	ioport("EEPROMOUT")->write(data, 0xff);
+	m_eep_latch = data;
+	m_io_eepromout->write(data, 0xff);
 }
 
 
@@ -1394,18 +1394,18 @@ WRITE8_MEMBER(taitoz_state::spacegun_eeprom_w)
 
 CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
 {
-	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
+	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
 	ioport_port *port = ioport((const char *)param);
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
 
-READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
+u8 taitoz_state::contcirc_input_bypass_r()
 {
 	/* Bypass TC0040IOC controller for analog input */
 
-	uint8_t port = m_tc0040ioc->port_r(space, 0);   /* read port number */
-	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
+	u8 port = m_tc0040ioc->port_r();   /* read port number */
+	u16 steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
 	{
@@ -1416,17 +1416,17 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0040ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r();
 	}
 }
 
 
-READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
+u8 taitoz_state::chasehq_input_bypass_r()
 {
 	/* Bypass TC0040IOC controller for extra inputs */
 
-	uint8_t port = m_tc0040ioc->port_r(space, 0);   /* read port number */
-	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
+	u8 port = m_tc0040ioc->port_r();   /* read port number */
+	u16 steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
 	{
@@ -1449,14 +1449,14 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0040ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r();
 	}
 }
 
 
-READ16_MEMBER(taitoz_state::sci_steer_input_r)
+u16 taitoz_state::sci_steer_input_r(offs_t offset)
 {
-	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
+	u16 steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1473,16 +1473,16 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 }
 
 
-WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
+void taitoz_state::spacegun_gun_output_w(u16 data)
 {
-	output().set_value("Player1_Gun_Recoil",(data & 0x01));
-	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+	output().set_value("Player1_Gun_Recoil", BIT(data, 0));
+	output().set_value("Player2_Gun_Recoil", BIT(data, 1));
 }
 
 
-READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
+u16 taitoz_state::dblaxle_steer_input_r(offs_t offset)
 {
-	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
+	u16 steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1501,7 +1501,7 @@ READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 // TODO: proper motorcpu hook-up
 
 
-READ16_MEMBER(taitoz_state::chasehq_motor_r)
+u16 taitoz_state::chasehq_motor_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1517,7 +1517,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 	}
 }
 
-WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
+void taitoz_state::chasehq_motor_w(offs_t offset, u16 data)
 {
 	/* Writes $e00000-25 and $e00200-219 */
 	switch (offset)
@@ -1534,7 +1534,7 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 }
 
 
-WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
+void taitoz_state::nightstr_motor_w(offs_t offset, u16 data)
 {
 	/* Despite the informative notes at the top, the high end of the word doesn't seem to output any useful data. */
 	/* I've added this so someone else can finish it.  */
@@ -1542,24 +1542,24 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 	{
 	case 0:
 		output().set_value("Motor_1_Direction",0);
-		if (data & 1) output().set_value("Motor_1_Direction",1);
-		if (data & 2) output().set_value("Motor_1_Direction",2);
+		if (BIT(data, 0)) output().set_value("Motor_1_Direction",1);
+		if (BIT(data, 1)) output().set_value("Motor_1_Direction",2);
 		output().set_value("Motor_1_Speed",(data & 60)/4);
 
 		break;
 
 	case 4:
 		output().set_value("Motor_2_Direction",0);
-		if (data & 1) output().set_value("Motor_2_Direction",1);
-		if (data & 2) output().set_value("Motor_2_Direction",2);
+		if (BIT(data, 0)) output().set_value("Motor_2_Direction",1);
+		if (BIT(data, 1)) output().set_value("Motor_2_Direction",2);
 		output().set_value("Motor_2_Speed",(data & 60)/4);
 
 		break;
 
 	case 8:
 		output().set_value("Motor_3_Direction",0);
-		if (data & 1) output().set_value("Motor_3_Direction",1);
-		if (data & 2) output().set_value("Motor_3_Direction",2);
+		if (BIT(data, 0)) output().set_value("Motor_3_Direction",1);
+		if (BIT(data, 1)) output().set_value("Motor_3_Direction",2);
 		output().set_value("Motor_3_Speed",(data & 60)/4);
 
 		break;
@@ -1574,14 +1574,14 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 
 void taitoz_state::coin_control_w(u8 data)
 {
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT( data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT( data, 3));
 }
 
 
-READ16_MEMBER(taitoz_state::aquajack_unknown_r)
+u16 taitoz_state::aquajack_unknown_r()
 {
 	return 0xff;
 }
@@ -1593,7 +1593,7 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
 
 void taitoz_state::sound_bankswitch_w(u8 data)
 {
-	membank("z80bank")->set_entry(data & 7);
+	m_z80bank->set_entry(data & 7);
 }
 
 
@@ -1614,7 +1614,7 @@ void taitoz_state::contcirc_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
 	map(0x084000, 0x087fff).ram().share("share1");
-	map(0x090000, 0x090001).w(FUNC(taitoz_state::contcirc_out_w));    /* road palette bank, sub CPU reset, 3d glasses control */
+	map(0x090001, 0x090001).w(FUNC(taitoz_state::contcirc_out_w));    /* road palette bank, sub CPU reset, 3d glasses control */
 	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -3033,9 +3033,9 @@ static const gfx_layout tile16x8_layout =
 	16,8,   /* 16*8 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	{ STEP4(0,8) },
+	{ STEP8(8*4,1), STEP8(0,1) },
+	{ STEP8(0,8*4*2) },
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
@@ -3044,10 +3044,9 @@ static const gfx_layout tile16x16_layout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,8) },
+	{ STEP8(8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4*2) },
 	64*16   /* every sprite takes 128 consecutive bytes */
 };
 
@@ -3056,9 +3055,9 @@ static const gfx_layout charlayout =
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -3067,29 +3066,29 @@ static const gfx_layout dblaxle_charlayout =
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,        /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,1) },
+	{ STEP8(7*4,-4), STEP8(15*4,-4) },
+	{ STEP16(0,16*4) },
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_taitoz )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout, 0, 256 )    /* sprite parts */
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,      0, 256 )    /* playfield */
 GFXDECODE_END
 
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
    slot, so 2nd batch of obj must be placed third */
 
 static GFXDECODE_START( gfx_chasehq )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )   /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx4", 0x0, tile16x16_layout,  0, 256 )   /* sprite parts */
+	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout, 0, 256 )   /* sprite parts */
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,       0, 256 )   /* playfield */
+	GFXDECODE_ENTRY( "gfx4", 0x0, tile16x16_layout, 0, 256 )   /* sprite parts */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_dblaxle )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, dblaxle_charlayout,  0, 256 ) /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,    0, 256 )    /* sprite parts */
+	GFXDECODE_ENTRY( "gfx1", 0x0, dblaxle_charlayout, 0, 256 )    /* playfield */
 GFXDECODE_END
 
 
@@ -3129,22 +3128,24 @@ Contcirc road glitchiness in attract?
                    SAVE STATES
 ***********************************************************/
 
-MACHINE_START_MEMBER(taitoz_state,bshark)
+void taitoz_state::device_post_load()
 {
+	parse_cpu_control();
+}
+
+MACHINE_START_MEMBER(taitoz_state,taitoz)
+{
+	if (m_z80bank)
+	{
+		int banks = memregion("audiocpu")->bytes() / 0x4000;
+		m_z80bank->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
+	}
+
 	save_item(NAME(m_cpua_ctrl));
 
 	/* these are specific to various games: we ought to split the inits */
 	save_item(NAME(m_sci_int6));
 	save_item(NAME(m_ioc220_port));
-}
-
-MACHINE_START_MEMBER(taitoz_state,taitoz)
-{
-	int banks = memregion("audiocpu")->bytes() / 0x4000;
-
-	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
-
-	MACHINE_START_CALL_MEMBER(bshark);
 }
 
 MACHINE_START_MEMBER(taitoz_state,chasehq)
@@ -3194,21 +3195,20 @@ void taitoz_state::contcirc(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3265,21 +3265,20 @@ void taitoz_state::chasehq(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_chasehq);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3338,21 +3337,20 @@ void taitoz_state::enforce(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 31*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3388,7 +3386,7 @@ void taitoz_state::bshark_base(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::bshark_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
@@ -3572,21 +3570,20 @@ void taitoz_state::nightstr(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_chasehq);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3645,21 +3642,20 @@ void taitoz_state::aquajack(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3695,7 +3691,7 @@ void taitoz_state::spacegun(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::spacegun_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	EEPROM_93C46_16BIT(config, m_eeprom).default_data(spacegun_default_eeprom, 128);
@@ -3723,18 +3719,17 @@ void taitoz_state::spacegun(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3920,7 +3915,7 @@ ROM_START( contcirc ) /* 3D Effects controlled via dipswitch, when on can toggle
 	ROM_LOAD( "b33-30.11", 0x00000, 0x10000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b33-06", 0x000000, 0x080000, CRC(2cb40599) SHA1(48b269610f80a42608f563742e5266dcf11638d1) )   /* OBJ 16x8 */
@@ -3931,7 +3926,7 @@ ROM_START( contcirc ) /* 3D Effects controlled via dipswitch, when on can toggle
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -3961,7 +3956,7 @@ ROM_START( contcircu ) /* 3D Effects controlled via dipswitch, when on can toggl
 	ROM_LOAD( "b33-30.11", 0x00000, 0x10000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b33-06", 0x000000, 0x080000, CRC(2cb40599) SHA1(48b269610f80a42608f563742e5266dcf11638d1) )   /* OBJ 16x8 */
@@ -3972,7 +3967,7 @@ ROM_START( contcircu ) /* 3D Effects controlled via dipswitch, when on can toggl
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4002,7 +3997,7 @@ ROM_START( contcircua )
 	ROM_LOAD( "b33-30.11", 0x00000, 0x10000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b33-06", 0x000000, 0x080000, CRC(2cb40599) SHA1(48b269610f80a42608f563742e5266dcf11638d1) )   /* OBJ 16x8 */
@@ -4013,7 +4008,7 @@ ROM_START( contcircua )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4043,7 +4038,7 @@ ROM_START( contcircj )
 	ROM_LOAD( "b33-30.11", 0x00000, 0x10000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b33-02.57", 0x00000, 0x80000, CRC(f6fb3ba2) SHA1(19b7c4cf33c4737405ebe53e7342578454e6ef95) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b33-06", 0x000000, 0x080000, CRC(2cb40599) SHA1(48b269610f80a42608f563742e5266dcf11638d1) )   /* OBJ 16x8 */
@@ -4054,7 +4049,7 @@ ROM_START( contcircj )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b33-01.3", 0x00000, 0x80000, CRC(f11f2be8) SHA1(72ae08dc5bf5f6901fbb52d3b1dabcba90929b38) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4089,7 +4084,7 @@ ROM_START( chasehq )
 	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b52-34.5",  0x000000, 0x080000, CRC(7d8dce36) SHA1(ca082e647d10378144c05a70a8e4fe352d95eeaf) )
@@ -4106,7 +4101,7 @@ ROM_START( chasehq )
 	ROM_LOAD32_BYTE( "b52-32.8",  0x000002, 0x080000, CRC(8620780c) SHA1(2545fd8fb03dcddc3da86d5ea06a6dc915acd1a1) )
 	ROM_LOAD32_BYTE( "b52-33.10", 0x000003, 0x080000, CRC(e6f4b8c4) SHA1(8d15c75a16953aa56fb3dc6fd3b691e227bef622) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4171,7 +4166,7 @@ ROM_START( chasehqj )
 	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
+	ROM_LOAD16_WORD_SWAP( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b52-34.5",  0x000000, 0x080000, CRC(7d8dce36) SHA1(ca082e647d10378144c05a70a8e4fe352d95eeaf) )
@@ -4188,7 +4183,7 @@ ROM_START( chasehqj )
 	ROM_LOAD32_BYTE( "b52-32.8",  0x000002, 0x080000, CRC(8620780c) SHA1(2545fd8fb03dcddc3da86d5ea06a6dc915acd1a1) )
 	ROM_LOAD32_BYTE( "b52-33.10", 0x000003, 0x080000, CRC(e6f4b8c4) SHA1(8d15c75a16953aa56fb3dc6fd3b691e227bef622) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4252,7 +4247,7 @@ ROM_START( chasehqju )
 	ROM_LOAD( "b52-134.51",    0x00000, 0x10000, CRC(91faac7f) SHA1(05f00e0909444566877d0ef678bae49f107e1628) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
+	ROM_LOAD16_WORD_SWAP( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b52-34.5",  0x000000, 0x080000, CRC(7d8dce36) SHA1(ca082e647d10378144c05a70a8e4fe352d95eeaf) )
@@ -4269,7 +4264,7 @@ ROM_START( chasehqju )
 	ROM_LOAD32_BYTE( "b52-32.8",  0x000002, 0x080000, CRC(8620780c) SHA1(2545fd8fb03dcddc3da86d5ea06a6dc915acd1a1) )
 	ROM_LOAD32_BYTE( "b52-33.10", 0x000003, 0x080000, CRC(e6f4b8c4) SHA1(8d15c75a16953aa56fb3dc6fd3b691e227bef622) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4334,7 +4329,7 @@ ROM_START( chasehqu )
 	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
+	ROM_LOAD16_WORD_SWAP( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b52-34.5",  0x000000, 0x080000, CRC(7d8dce36) SHA1(ca082e647d10378144c05a70a8e4fe352d95eeaf) )
@@ -4351,7 +4346,7 @@ ROM_START( chasehqu )
 	ROM_LOAD32_BYTE( "b52-32.8",  0x000002, 0x080000, CRC(8620780c) SHA1(2545fd8fb03dcddc3da86d5ea06a6dc915acd1a1) )
 	ROM_LOAD32_BYTE( "b52-33.10", 0x000003, 0x080000, CRC(e6f4b8c4) SHA1(8d15c75a16953aa56fb3dc6fd3b691e227bef622) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4411,7 +4406,7 @@ ROM_START( enforce )
 	ROM_LOAD( "b58-32.41",   0x00000, 0x10000, CRC(f3fd8eca) SHA1(3b1ab64984ea43805b6494f8add26210ed1175c5) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b58-09.13", 0x00000, 0x80000, CRC(9ffd5b31) SHA1(0214fb32012a48560ca9c6ed5ee969d3c41cf95c) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b58-09.13", 0x00000, 0x80000, CRC(9ffd5b31) SHA1(0214fb32012a48560ca9c6ed5ee969d3c41cf95c) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b58-04.7",  0x000000, 0x080000, CRC(9482f08d) SHA1(3fc74b9bebca1d82b300ba72c7297c3bcd69cfa9) )
@@ -4422,7 +4417,7 @@ ROM_START( enforce )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b58-06.116", 0x00000, 0x80000, CRC(b3495d70) SHA1(ead4c2fd20b8f103a849201c7344cded013eb8bb) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b58-05.71", 0x00000, 0x80000, CRC(d1f4991b) SHA1(f1c5a9b8dce994d013290e98fda7bedf73e95900) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4454,7 +4449,7 @@ ROM_START( enforcej )
 	ROM_LOAD( "b58-32.41",   0x00000, 0x10000, CRC(f3fd8eca) SHA1(3b1ab64984ea43805b6494f8add26210ed1175c5) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b58-09.13", 0x00000, 0x80000, CRC(9ffd5b31) SHA1(0214fb32012a48560ca9c6ed5ee969d3c41cf95c) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b58-09.13", 0x00000, 0x80000, CRC(9ffd5b31) SHA1(0214fb32012a48560ca9c6ed5ee969d3c41cf95c) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b58-04.7",  0x000000, 0x080000, CRC(9482f08d) SHA1(3fc74b9bebca1d82b300ba72c7297c3bcd69cfa9) )
@@ -4465,7 +4460,7 @@ ROM_START( enforcej )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b58-06.116", 0x00000, 0x80000, CRC(b3495d70) SHA1(ead4c2fd20b8f103a849201c7344cded013eb8bb) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b58-05.71", 0x00000, 0x80000, CRC(d1f4991b) SHA1(f1c5a9b8dce994d013290e98fda7bedf73e95900) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4497,7 +4492,7 @@ ROM_START( enforceja )
 	ROM_LOAD( "b58-32.41",   0x00000, 0x10000, CRC(f3fd8eca) SHA1(3b1ab64984ea43805b6494f8add26210ed1175c5) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b58-09.13", 0x00000, 0x80000, CRC(9ffd5b31) SHA1(0214fb32012a48560ca9c6ed5ee969d3c41cf95c) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b58-09.13", 0x00000, 0x80000, CRC(9ffd5b31) SHA1(0214fb32012a48560ca9c6ed5ee969d3c41cf95c) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b58-04.7",  0x000000, 0x080000, CRC(9482f08d) SHA1(3fc74b9bebca1d82b300ba72c7297c3bcd69cfa9) )
@@ -4508,7 +4503,7 @@ ROM_START( enforceja )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b58-06.116", 0x00000, 0x80000, CRC(b3495d70) SHA1(ead4c2fd20b8f103a849201c7344cded013eb8bb) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b58-05.71", 0x00000, 0x80000, CRC(d1f4991b) SHA1(f1c5a9b8dce994d013290e98fda7bedf73e95900) )  /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4541,7 +4536,7 @@ ROM_START( bshark )
 	ROM_LOAD16_BYTE( "c34_73.113", 0x40001, 0x20000, CRC(f2fe62b5) SHA1(e31b5989b747de451ee6c2a5e15ec75235d84e0d) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c34_04.17", 0x000000, 0x080000, CRC(2446b0da) SHA1(bce5c73533e2bb7dfa7f18fad510f818cf1a542a) )    /* OBJ 16x8 */
@@ -4552,7 +4547,7 @@ ROM_START( bshark )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -4583,7 +4578,7 @@ ROM_START( bsharku )
 	ROM_LOAD16_BYTE( "c34_73.113", 0x40001, 0x20000, CRC(f2fe62b5) SHA1(e31b5989b747de451ee6c2a5e15ec75235d84e0d) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c34_04.17", 0x000000, 0x080000, CRC(2446b0da) SHA1(bce5c73533e2bb7dfa7f18fad510f818cf1a542a) )    /* OBJ 16x8 */
@@ -4594,7 +4589,7 @@ ROM_START( bsharku )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -4625,7 +4620,7 @@ ROM_START( bsharkj )
 	ROM_LOAD16_BYTE( "c34_73.113", 0x40001, 0x20000, CRC(f2fe62b5) SHA1(e31b5989b747de451ee6c2a5e15ec75235d84e0d) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c34_04.17", 0x000000, 0x080000, CRC(2446b0da) SHA1(bce5c73533e2bb7dfa7f18fad510f818cf1a542a) )    /* OBJ 16x8 */
@@ -4636,7 +4631,7 @@ ROM_START( bsharkj )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -4667,7 +4662,7 @@ ROM_START( bsharkjjs )
 	ROM_LOAD16_BYTE( "c34_81.113", 0x40001, 0x20000, CRC(23ce6bcf) SHA1(b084209f809793d8f0f11ddabee217ba1abd6038) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c34_04.17", 0x000000, 0x080000, CRC(2446b0da) SHA1(bce5c73533e2bb7dfa7f18fad510f818cf1a542a) )    /* OBJ 16x8 */
@@ -4678,7 +4673,7 @@ ROM_START( bsharkjjs )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -4710,7 +4705,7 @@ ROM_START( sci )
 	ROM_LOAD( "c09-34.31",   0x00000, 0x20000, CRC(a21b3151) SHA1(f59c7b1ba5edf97d72670ee194ce9fdc5c5b9a58) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c09-04.52", 0x000000, 0x080000, CRC(2cbb3c9b) SHA1(9e3d95f76f5f5d385b6a9516af781aefef1eb0ca) )    /* OBJ 16x8 */
@@ -4721,7 +4716,7 @@ ROM_START( sci )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4758,7 +4753,7 @@ ROM_START( scia )
 	ROM_LOAD( "c09-34.31",   0x00000, 0x20000, CRC(a21b3151) SHA1(f59c7b1ba5edf97d72670ee194ce9fdc5c5b9a58) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c09-04.52", 0x000000, 0x080000, CRC(2cbb3c9b) SHA1(9e3d95f76f5f5d385b6a9516af781aefef1eb0ca) )    /* OBJ 16x8 */
@@ -4769,7 +4764,7 @@ ROM_START( scia )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4801,7 +4796,7 @@ ROM_START( scij )
 	ROM_LOAD( "c09-27.31",   0x00000, 0x20000, CRC(cd161dca) SHA1(2e0632f290f8efae5e479c67ca8808a90e0f4afd) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c09-04.52", 0x000000, 0x080000, CRC(2cbb3c9b) SHA1(9e3d95f76f5f5d385b6a9516af781aefef1eb0ca) )    /* OBJ 16x8 */
@@ -4812,7 +4807,7 @@ ROM_START( scij )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4844,7 +4839,7 @@ ROM_START( sciu )
 	ROM_LOAD( "c09-34.31",   0x00000, 0x20000, CRC(a21b3151) SHA1(f59c7b1ba5edf97d72670ee194ce9fdc5c5b9a58) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c09-04.52", 0x000000, 0x080000, CRC(2cbb3c9b) SHA1(9e3d95f76f5f5d385b6a9516af781aefef1eb0ca) )    /* OBJ 16x8 */
@@ -4855,7 +4850,7 @@ ROM_START( sciu )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4887,7 +4882,7 @@ ROM_START( scin )
 	ROM_LOAD( "c09-34.31",   0x00000, 0x20000, CRC(a21b3151) SHA1(f59c7b1ba5edf97d72670ee194ce9fdc5c5b9a58) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) ) /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c09-04.52", 0x000000, 0x080000, CRC(2cbb3c9b) SHA1(9e3d95f76f5f5d385b6a9516af781aefef1eb0ca) )    /* OBJ 16x8 */
@@ -4898,7 +4893,7 @@ ROM_START( scin )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) ) /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4931,7 +4926,7 @@ ROM_START( nightstr )
 	ROM_LOAD( "b91-41.bin",   0x00000, 0x20000, CRC(2694bb42) SHA1(ee770472655ac0ef55eeff04037457dbf6744e4f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )    /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )    /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b91-04.bin", 0x000000, 0x080000, CRC(8ca1970d) SHA1(d8504298a38a95f1d8f3a2fba479ec75fe4d5de7) )   /* OBJ A 16x16 */
@@ -4948,7 +4943,7 @@ ROM_START( nightstr )
 	ROM_LOAD32_BYTE( "b91-06.bin", 0x000002, 0x080000, CRC(a34dc839) SHA1(e1fcb763dbc562a62e862297458bde66d691606c) )
 	ROM_LOAD32_BYTE( "b91-05.bin", 0x000003, 0x080000, CRC(5e72ac90) SHA1(c28c2718e873be5a254992ef8db256a394ca03ff) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) ) /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -4984,7 +4979,7 @@ ROM_START( nightstru )
 	ROM_LOAD( "b91-41.bin",   0x00000, 0x20000, CRC(2694bb42) SHA1(ee770472655ac0ef55eeff04037457dbf6744e4f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )    /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )    /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b91-04.bin", 0x000000, 0x080000, CRC(8ca1970d) SHA1(d8504298a38a95f1d8f3a2fba479ec75fe4d5de7) )   /* OBJ A 16x16 */
@@ -5001,7 +4996,7 @@ ROM_START( nightstru )
 	ROM_LOAD32_BYTE( "b91-06.bin", 0x000002, 0x080000, CRC(a34dc839) SHA1(e1fcb763dbc562a62e862297458bde66d691606c) )
 	ROM_LOAD32_BYTE( "b91-05.bin", 0x000003, 0x080000, CRC(5e72ac90) SHA1(c28c2718e873be5a254992ef8db256a394ca03ff) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) ) /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5037,7 +5032,7 @@ ROM_START( nightstrj )
 	ROM_LOAD( "b91-41.bin",   0x00000, 0x20000, CRC(2694bb42) SHA1(ee770472655ac0ef55eeff04037457dbf6744e4f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )    /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b91-11.bin", 0x00000, 0x80000, CRC(fff8ce31) SHA1(fc729de92937a805d79379228d7a30041594c0df) )    /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b91-04.bin", 0x000000, 0x080000, CRC(8ca1970d) SHA1(d8504298a38a95f1d8f3a2fba479ec75fe4d5de7) )   /* OBJ A 16x16 */
@@ -5054,7 +5049,7 @@ ROM_START( nightstrj )
 	ROM_LOAD32_BYTE( "b91-06.bin", 0x000002, 0x080000, CRC(a34dc839) SHA1(e1fcb763dbc562a62e862297458bde66d691606c) )
 	ROM_LOAD32_BYTE( "b91-05.bin", 0x000003, 0x080000, CRC(5e72ac90) SHA1(c28c2718e873be5a254992ef8db256a394ca03ff) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) ) /* STY spritemap */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5088,7 +5083,7 @@ ROM_START( aquajack )
 	ROM_LOAD( "b77-20.ic54",  0x00000, 0x10000, CRC(84ba54b7) SHA1(84e51c1a6a5b4eb2a65f4a6d9d54037323348f50) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b77-05.ic105", 0x00000, 0x80000, CRC(7238f0ff) SHA1(95e2d6815e99392358bbeabf1afbf237673f2e24) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b77-05.ic105", 0x00000, 0x80000, CRC(7238f0ff) SHA1(95e2d6815e99392358bbeabf1afbf237673f2e24) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b77-04.ic16", 0x000000, 0x80000, CRC(bed0be6c) SHA1(2b11824f741b7f6755bd78f594af19b63a29092f) )   /* OBJ 16x8 */
@@ -5099,7 +5094,7 @@ ROM_START( aquajack )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b77-07.ic33", 0x000000, 0x80000, CRC(7db1fc5e) SHA1(fbc88c2179b881d34d3a33d0a901d8da3445f9a8) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b77-06.ic39", 0x00000, 0x80000, CRC(ce2aed00) SHA1(9c992717914b13eb271122ecf7cca3634b013e56) )    /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -5128,7 +5123,7 @@ ROM_START( aquajacku )
 	ROM_LOAD( "b77-20.ic54",  0x00000, 0x10000, CRC(84ba54b7) SHA1(84e51c1a6a5b4eb2a65f4a6d9d54037323348f50) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b77-05.ic105", 0x00000, 0x80000, CRC(7238f0ff) SHA1(95e2d6815e99392358bbeabf1afbf237673f2e24) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b77-05.ic105", 0x00000, 0x80000, CRC(7238f0ff) SHA1(95e2d6815e99392358bbeabf1afbf237673f2e24) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b77-04.ic16", 0x000000, 0x80000, CRC(bed0be6c) SHA1(2b11824f741b7f6755bd78f594af19b63a29092f) )   /* OBJ 16x8 */
@@ -5139,7 +5134,7 @@ ROM_START( aquajacku )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b77-07.ic33", 0x000000, 0x80000, CRC(7db1fc5e) SHA1(fbc88c2179b881d34d3a33d0a901d8da3445f9a8) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b77-06.ic39", 0x00000, 0x80000, CRC(ce2aed00) SHA1(9c992717914b13eb271122ecf7cca3634b013e56) )    /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -5168,7 +5163,7 @@ ROM_START( aquajackj )
 	ROM_LOAD( "b77-20.ic54",  0x00000, 0x10000, CRC(84ba54b7) SHA1(84e51c1a6a5b4eb2a65f4a6d9d54037323348f50) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b77-05.ic105", 0x00000, 0x80000, CRC(7238f0ff) SHA1(95e2d6815e99392358bbeabf1afbf237673f2e24) )  /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "b77-05.ic105", 0x00000, 0x80000, CRC(7238f0ff) SHA1(95e2d6815e99392358bbeabf1afbf237673f2e24) )  /* SCR 8x8 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "b77-04.ic16", 0x000000, 0x80000, CRC(bed0be6c) SHA1(2b11824f741b7f6755bd78f594af19b63a29092f) )   /* OBJ 16x8 */
@@ -5179,7 +5174,7 @@ ROM_START( aquajackj )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "b77-07.ic33", 0x000000, 0x80000, CRC(7db1fc5e) SHA1(fbc88c2179b881d34d3a33d0a901d8da3445f9a8) )  /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b77-06.ic39", 0x00000, 0x80000, CRC(ce2aed00) SHA1(9c992717914b13eb271122ecf7cca3634b013e56) )    /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -5207,7 +5202,7 @@ ROM_START( spacegun )
 	ROM_LOAD16_BYTE( "c57-16+.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) ) /* Actual label is "C57 16*" */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )     /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )     /* SCR 8x8 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c57-01.25", 0x000000, 0x100000, CRC(f901b04e) SHA1(24bac1c3a0c585966a7cbeeebd9b2dd3acf45a67) )    /* OBJ 16x8 */
@@ -5215,7 +5210,7 @@ ROM_START( spacegun )
 	ROM_LOAD32_BYTE( "c57-03.12", 0x000002, 0x100000, CRC(fafca86f) SHA1(dc6ea78f0deafef632d8bd3677ec74e797dc69a2) )
 	ROM_LOAD32_BYTE( "c57-04.11", 0x000003, 0x100000, CRC(a9787090) SHA1(8c05c4c0d14a9f60defb37225da37aadf946c563) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -5245,7 +5240,7 @@ ROM_START( spacegunu )
 	ROM_LOAD16_BYTE( "c57-16+.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) ) /* Actual label is "C57 16*" */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )     /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )     /* SCR 8x8 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c57-01.25", 0x000000, 0x100000, CRC(f901b04e) SHA1(24bac1c3a0c585966a7cbeeebd9b2dd3acf45a67) )    /* OBJ 16x8 */
@@ -5253,7 +5248,7 @@ ROM_START( spacegunu )
 	ROM_LOAD32_BYTE( "c57-03.12", 0x000002, 0x100000, CRC(fafca86f) SHA1(dc6ea78f0deafef632d8bd3677ec74e797dc69a2) )
 	ROM_LOAD32_BYTE( "c57-04.11", 0x000003, 0x100000, CRC(a9787090) SHA1(8c05c4c0d14a9f60defb37225da37aadf946c563) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -5283,7 +5278,7 @@ ROM_START( spacegunj )
 	ROM_LOAD16_BYTE( "c57-16+.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) ) /* Actual label is "C57 16*" */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )     /* SCR 8x8 */
+	ROM_LOAD16_WORD_SWAP( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )     /* SCR 8x8 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c57-01.25", 0x000000, 0x100000, CRC(f901b04e) SHA1(24bac1c3a0c585966a7cbeeebd9b2dd3acf45a67) )    /* OBJ 16x8 */
@@ -5291,7 +5286,7 @@ ROM_START( spacegunj )
 	ROM_LOAD32_BYTE( "c57-03.12", 0x000002, 0x100000, CRC(fafca86f) SHA1(dc6ea78f0deafef632d8bd3677ec74e797dc69a2) )
 	ROM_LOAD32_BYTE( "c57-04.11", 0x000003, 0x100000, CRC(a9787090) SHA1(8c05c4c0d14a9f60defb37225da37aadf946c563) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )  /* STY spritemap */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -5324,8 +5319,8 @@ ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Co
 	ROM_LOAD    ( "c78-34.c42", 0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5338,7 +5333,7 @@ ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Co
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5371,8 +5366,8 @@ ROM_START( dblaxleu ) /* Manual refers to this version as the "Version Without C
 	ROM_LOAD    ( "c78-34.c42", 0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5385,7 +5380,7 @@ ROM_START( dblaxleu ) /* Manual refers to this version as the "Version Without C
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5418,8 +5413,8 @@ ROM_START( dblaxleul ) /* Side by side linkable version */
 	ROM_LOAD    ( "c78-34.c42", 0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5432,7 +5427,7 @@ ROM_START( dblaxleul ) /* Side by side linkable version */
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5465,8 +5460,8 @@ ROM_START( pwheelsj ) /* Side by side linkable version */
 	ROM_LOAD    ( "c78-32.42",    0x00000, 0x20000, CRC(1494199c) SHA1(f6b6ccaadbc5440f9342750a79ebc00c019ef355) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5477,7 +5472,7 @@ ROM_START( pwheelsj ) /* Side by side linkable version */
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5510,8 +5505,8 @@ ROM_START( racingb )
 	ROM_LOAD    ( "c84-101.42",    0x00000, 0x20000, CRC(9322106e) SHA1(6c42ee7b9c76483fec2e397ec2737c030a082267) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c84-90.12",  0x00000, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c84-89.11",  0x00001, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
+	ROM_LOAD32_WORD_SWAP( "c84-90.12",  0x00002, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c84-89.11",  0x00000, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c84-92.25", 0x000000, 0x100000, CRC(56e8fd55) SHA1(852446d4069a446dd9b88b29e461b83b8d626b2c) )    /* OBJ 16x8 */
@@ -5522,7 +5517,7 @@ ROM_START( racingb )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c84-84.12", 0x000000, 0x80000, CRC(34dc486b) SHA1(2f503be67adbc5293f2d1218c838416fd931796c) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c84-88.3", 0x00000, 0x80000, CRC(edd1f49c) SHA1(f11c419dcc7da03ef1f1665c1344c27ff35fe867) )   /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5555,8 +5550,8 @@ ROM_START( racingbj )
 	ROM_LOAD    ( "c84-101.42",    0x00000, 0x20000, CRC(9322106e) SHA1(6c42ee7b9c76483fec2e397ec2737c030a082267) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c84-90.12",  0x00000, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c84-89.11",  0x00001, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
+	ROM_LOAD32_WORD_SWAP( "c84-90.12",  0x00002, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c84-89.11",  0x00000, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c84-92.25", 0x000000, 0x100000, CRC(56e8fd55) SHA1(852446d4069a446dd9b88b29e461b83b8d626b2c) )    /* OBJ 16x8 */
@@ -5567,7 +5562,7 @@ ROM_START( racingbj )
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c84-84.12", 0x000000, 0x80000, CRC(34dc486b) SHA1(2f503be67adbc5293f2d1218c838416fd931796c) )    /* ROD, road lines */
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c84-88.3", 0x00000, 0x80000, CRC(edd1f49c) SHA1(f11c419dcc7da03ef1f1665c1344c27ff35fe867) )   /* STY spritemap */
 
 	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
@@ -5586,15 +5581,8 @@ ROM_START( racingbj )
 ROM_END
 
 
-void taitoz_state::init_taitoz()
-{
-	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_state::parse_cpu_control), this));
-}
-
 void taitoz_state::init_bshark()
 {
-	init_taitoz();
-
 	m_eep_latch = 0;
 
 	save_item(NAME(m_eep_latch));
@@ -5602,47 +5590,47 @@ void taitoz_state::init_bshark()
 
 
 
-GAMEL(1987, contcirc,   0,        contcirc,  contcirc,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircu,  contcirc, contcirc,  contcrcu,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircua, contcirc, contcirc,  contcrcj,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircj , contcirc, contcirc,  contcrcj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcirc,   0,        contcirc,  contcirc,  taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircu,  contcirc, contcirc,  contcrcu,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircua, contcirc, contcirc,  contcrcj,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircj , contcirc, contcirc,  contcrcj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc ) // same code rev as Chase H.Q. (World)
-GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc ) // same code rev as Chase H.Q. (World)
+GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAME( 1988, enforce,    0,        enforce,   enforce,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforceja,  enforce,  enforce,   enforceja, taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforce,    0,        enforce,   enforce,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforceja,  enforce,  enforce,   enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1989, sci,        0,        sci,       sci,       taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, scia,       sci,      sci,       sci,       taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, scij,       sci,      sci,       scij,      taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, sciu,       sci,      sci,       sciu,      taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1991, scin,       sci,      sci,       sci,       taitoz_state, init_taitoz,   ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, sci,        0,        sci,       sci,       taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, scia,       sci,      sci,       sci,       taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, scij,       sci,      sci,       scij,      taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, sciu,       sci,      sci,       sciu,      taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1991, scin,       sci,      sci,       sci,       taitoz_state, empty_init,  ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAME( 1989, nightstr,   0,        nightstr,  nightstr,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, nightstrj,  nightstr, nightstr,  nghtstrj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, nightstru,  nightstr, nightstr,  nghtstru,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstr,   0,        nightstr,  nightstr,  taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstrj,  nightstr, nightstr,  nghtstrj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstru,  nightstr, nightstr,  nghtstru,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Night Striker (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, aquajack,   0,        aquajack,  aquajack,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aquajacku,  aquajack, aquajack,  aquajack,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Aqua Jack (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aquajackj,  aquajack, aquajack,  aquajckj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajack,   0,        aquajack,  aquajack,  taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajacku,  aquajack, aquajack,  aquajack,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Aqua Jack (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajackj,  aquajack, aquajack,  aquajckj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, spacegun,   0,        spacegun,  spacegun,  taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  taitoz_state, init_bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegun,   0,        spacegun,  spacegun,  taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_state, init_taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
 
-GAMEL(1991, racingb,    0,        racingb,   racingb,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   taitoz_state, init_taitoz,   ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, racingb,    0,        racingb,   racingb,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )

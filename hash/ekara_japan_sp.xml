@@ -40,7 +40,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee" offset="0" />
+				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655" offset="0" />
+				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c" offset="0" />
+				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c"/>
 			</dataarea>
 		</part>
 	</software>

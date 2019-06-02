@@ -491,7 +491,7 @@ private:
 	void magicfly_palette(palette_device &palette) const;
 	void bchance_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(7mezzo);
-	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void magicfly_map(address_map &map);
 };
 
@@ -576,7 +576,7 @@ VIDEO_START_MEMBER(magicfly_state, 7mezzo)
 }
 
 
-uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -955,7 +955,6 @@ void magicfly_state::magicfly(machine_config &config)
 	screen.set_size((39+1)*8, (31+1)*8);                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(magicfly_state::screen_update_magicfly));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_magicfly);
 	PALETTE(config, "palette", FUNC(magicfly_state::magicfly_palette), 32);

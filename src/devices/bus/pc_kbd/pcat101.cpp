@@ -14,7 +14,6 @@
  * 1391401  US English 101-key
  *
  * TODO
- *   - requires mask rom 6805u3 and timer
  *   - fix issue receiving commands
  */
 
@@ -46,8 +45,7 @@ const tiny_rom_entry *ibm_pc_at_101_keyboard_device::device_rom_region() const
 
 void ibm_pc_at_101_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	// FIXME: really a 6805U3 (mask ROM, not EPROM) part
-	M68705U3(config, m_mcu, 4_MHz_XTAL);
+	M6805U3(config, m_mcu, 4_MHz_XTAL);
 
 	// ports A and C control the matrix column select
 	m_mcu->porta_w().set([this](u8 data) { m_porta = data; });
@@ -60,8 +58,8 @@ void ibm_pc_at_101_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->portb_r().set(FUNC(ibm_pc_at_101_keyboard_device::portb_r));
 	m_mcu->portb_w().set(FUNC(ibm_pc_at_101_keyboard_device::portb_w));
 
-	// TODO: timer is held high
-	//m_mcu->timer_r().set_constant(1);
+	// timer is tied high
+	m_mcu->timer_w(1);
 }
 
 INPUT_PORTS_START(ibm_pc_at_101_keyboard)
@@ -244,6 +242,9 @@ void ibm_pc_at_101_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
 
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portc));
+
 	m_leds.resolve();
 }
 
@@ -254,15 +255,12 @@ void ibm_pc_at_101_keyboard_device::device_reset()
 
 void ibm_pc_at_101_keyboard_device::data_write(int state)
 {
-	m_mcu->set_input_line(M68705_IRQ_LINE, state);
+	m_mcu->set_input_line(M6805_IRQ_LINE, state);
 }
 
 u8 ibm_pc_at_101_keyboard_device::portb_r()
 {
-	if (clock_signal())
-		return m_portb & ~0x02;
-	else
-		return m_portb | 0x02;
+	return clock_signal() ? 0x00 : 0x02;
 }
 
 void ibm_pc_at_101_keyboard_device::portb_w(u8 data)
@@ -270,8 +268,6 @@ void ibm_pc_at_101_keyboard_device::portb_w(u8 data)
 	m_leds[LED_CAPS] = BIT(data, 7) || BIT(data, 6) || BIT(data, 5);
 	m_leds[LED_NUM] = BIT(data, 4);
 	m_leds[LED_SCROLL] = BIT(data, 3);
-
-	m_portb = data;
 
 	m_pc_kbdc->data_write_from_kb(!BIT(data, 2));
 	m_pc_kbdc->clock_write_from_kb(!BIT(data, 0));

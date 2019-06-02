@@ -288,7 +288,7 @@ void talkingbb_state::main_io(address_map &map)
  RUNNER]  STEAL]             X-BASE]  ENTER]    |    REPLAY]   RELIEF]             SUB]      ENTER]
                                                 |
                   [0                            |                       [0
-				   SWING]                       |                        BALL]
+                   SWING]                       |                        BALL]
 */
 
 static INPUT_PORTS_START( talkingbb )

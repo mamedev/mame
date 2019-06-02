@@ -13,7 +13,7 @@
 		<sharedfeat name="compatibility" value="COCO" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
-				<rom name="asmdemo.dsk" size="161280" crc="6e2533f7" sha1="ebf6edfc4df71c0c450d4a72bac45f1308cf66ba" offset="0" />
+				<rom name="asmdemo.dsk" size="161280" crc="6e2533f7" sha1="ebf6edfc4df71c0c450d4a72bac45f1308cf66ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
-				<rom name="dk.dsk" size="161280" crc="87a22c49" sha1="e9c1ac85150ed14ac81c854df13f6c09fa5b4748" offset="0" />
+				<rom name="dk.dsk" size="161280" crc="87a22c49" sha1="e9c1ac85150ed14ac81c854df13f6c09fa5b4748"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
-				<rom name="dkremix.dsk" size="161280" crc="639d71af" sha1="ee1584807eb8f28744e1f1c5fc1031abd80a0548" offset="0" />
+				<rom name="dkremix.dsk" size="161280" crc="639d71af" sha1="ee1584807eb8f28744e1f1c5fc1031abd80a0548"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
-				<rom name="pacman.dsk" size="161280" crc="d2433eb7" sha1="e86d791b0211267185230774db1f6ca01582a3a3" offset="0" />
+				<rom name="pacman.dsk" size="161280" crc="d2433eb7" sha1="e86d791b0211267185230774db1f6ca01582a3a3"/>
 			</dataarea>
 		</part>
 	</software>

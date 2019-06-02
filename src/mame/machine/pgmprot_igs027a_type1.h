@@ -14,40 +14,6 @@ public:
 		m_puzzli_54_trigger = 0;
 	}
 
-	/////////////// simulations
-	uint16_t m_value0;
-	uint16_t m_value1;
-	uint16_t m_valuekey;
-	uint16_t m_ddp3lastcommand;
-	uint32_t m_valueresponse;
-	int m_curslots;
-	uint32_t m_slots[0x100];
-
-	// pstars / oldsplus / kov
-	uint16_t m_pstar_e7_value;
-	uint16_t m_pstar_b1_value;
-	uint16_t m_pstar_ce_value;
-	uint16_t m_kov_c0_value;
-	uint16_t m_kov_cb_value;
-	uint16_t m_kov_fe_value;
-	uint16_t m_extra_ram[0x100];
-	// puzzli2
-	int32_t m_puzzli_54_trigger;
-
-	typedef void (pgm_arm_type1_state::*pgm_arm_sim_command_handler)(int pc);
-
-	pgm_arm_sim_command_handler arm_sim_handler;
-
-	/////////////// emulation
-	uint16_t        m_pgm_arm_type1_highlatch_arm_w;
-	uint16_t        m_pgm_arm_type1_lowlatch_arm_w;
-	uint16_t        m_pgm_arm_type1_highlatch_68k_w;
-	uint16_t        m_pgm_arm_type1_lowlatch_68k_w;
-	uint32_t        m_pgm_arm_type1_counter;
-	optional_shared_ptr<uint32_t> m_arm7_shareram;
-
-	optional_device<cpu_device> m_prot;
-
 	void init_photoy2k();
 	void init_kovsh();
 	void init_kovshp();
@@ -64,36 +30,78 @@ public:
 	void init_kov();
 	void init_kovboot();
 	void init_oldsplus();
+
+	void pgm_arm_type1_sim(machine_config &config);
+	void pgm_arm_type1_cave(machine_config &config);
+	void pgm_arm_type1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	/////////////// simulations
+	u16 m_value0;
+	u16 m_value1;
+	u16 m_valuekey;
+	u16 m_ddp3lastcommand;
+	u32 m_valueresponse;
+	int m_curslots;
+	u32 m_slots[0x100];
+
+	// pstars / oldsplus / kov
+	u16 m_pstar_e7_value;
+	u16 m_pstar_b1_value;
+	u16 m_pstar_ce_value;
+	u16 m_kov_c0_value;
+	u16 m_kov_cb_value;
+	u16 m_kov_fe_value;
+	u16 m_extra_ram[0x100];
+	// puzzli2
+	s32 m_puzzli_54_trigger;
+
+	typedef void (pgm_arm_type1_state::*pgm_arm_sim_command_handler)(int pc);
+
+	pgm_arm_sim_command_handler arm_sim_handler;
+
+	/////////////// emulation
+	u16 m_arm_type1_highlatch_arm_w;
+	u16 m_arm_type1_lowlatch_arm_w;
+	u16 m_arm_type1_highlatch_68k_w;
+	u16 m_arm_type1_lowlatch_68k_w;
+	u32 m_arm_type1_counter;
+	optional_shared_ptr<u32> m_arm7_shareram;
+
+	optional_device<cpu_device> m_prot;
 	DECLARE_MACHINE_START(pgm_arm_type1);
 
-	DECLARE_READ32_MEMBER( pgm_arm7_type1_protlatch_r );
-	DECLARE_WRITE32_MEMBER( pgm_arm7_type1_protlatch_w );
-	DECLARE_READ16_MEMBER( pgm_arm7_type1_68k_protlatch_r );
-	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_68k_protlatch_w );
-	DECLARE_READ16_MEMBER( pgm_arm7_type1_ram_r );
-	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_ram_w );
-	DECLARE_READ32_MEMBER( pgm_arm7_type1_unk_r );
-	DECLARE_READ32_MEMBER( pgm_arm7_type1_exrom_r );
-	DECLARE_READ32_MEMBER( pgm_arm7_type1_shareram_r );
-	DECLARE_WRITE32_MEMBER( pgm_arm7_type1_shareram_w );
-	void pgm_arm7_type1_latch_init();
-	DECLARE_READ16_MEMBER( kovsh_fake_region_r );
-	DECLARE_WRITE16_MEMBER( kovshp_asic27a_write_word );
+	u16 arm7_type1_protlatch_r(offs_t offset);
+	void arm7_type1_protlatch_w(offs_t offset, u16 data);
+	u16 arm7_type1_68k_protlatch_r(offs_t offset);
+	void arm7_type1_68k_protlatch_w(offs_t offset, u16 data);
+	u16 arm7_type1_ram_r(offs_t offset, u16 mem_mask = ~0);
+	void arm7_type1_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 arm7_type1_unk_r();
+	u32 arm7_type1_exrom_r();
+	u32 arm7_type1_shareram_r(offs_t offset, u32 mem_mask = ~0);
+	void arm7_type1_shareram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void arm7_type1_latch_init();
+	u16 kovsh_fake_region_r();
+	void kovshp_asic27a_write_word(offs_t offset, u16 data);
 	void pgm_decode_kovlsqh2_tiles();
-	void pgm_decode_kovlsqh2_sprites(uint8_t *src );
+	void pgm_decode_kovlsqh2_sprites(u8 *src );
 	void pgm_decode_kovlsqh2_samples();
 	void pgm_decode_kovqhsgs_program();
 	void pgm_decode_kovqhsgs2_program();
-	DECLARE_READ16_MEMBER( pgm_arm7_type1_sim_r );
+	DECLARE_READ16_MEMBER( arm7_type1_sim_r );
 	void command_handler_ddp3(int pc);
 	void command_handler_puzzli2(int pc);
 	void command_handler_py2k2(int pc);
 	void command_handler_pstars(int pc);
 	void command_handler_kov(int pc);
 	void command_handler_oldsplus(int pc);
-	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_sim_w );
-	DECLARE_READ16_MEMBER( pgm_arm7_type1_sim_protram_r );
-	DECLARE_READ16_MEMBER( pstars_arm7_type1_sim_protram_r );
+	DECLARE_WRITE16_MEMBER( arm7_type1_sim_w );
+	u16 arm7_type1_sim_protram_r(offs_t offset);
+	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
 	int m_simregion;
 
 	/* puzzli2 protection internal state stuff */
@@ -108,7 +116,7 @@ public:
 	int prev_tablloc;
 	int numbercolumns;
 	int depth;
-	uint16_t m_row_bitmask;
+	u16 m_row_bitmask;
 	int hackcount;
 	int hackcount2;
 	int hack_47_value;
@@ -116,19 +124,16 @@ public:
 	int hack_31_table_offset2;
 	int p2_31_retcounter;
 
-	uint8_t coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
+	u8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
 	int command_31_write_type;
 
 
 	// the maximum level size returned or read by the device appears to be this size
-	uint16_t level_structure[8][10];
+	u16 level_structure[8][10];
 
 
-	int puzzli2_take_leveldata_value(uint8_t datvalue);
-	void pgm_arm_type1_sim(machine_config &config);
-	void pgm_arm_type1_cave(machine_config &config);
-	void pgm_arm_type1(machine_config &config);
+	int puzzli2_take_leveldata_value(u8 datvalue);
 	void _55857E_arm7_map(address_map &map);
 	void cavepgm_mem(address_map &map);
 	void kov_map(address_map &map);

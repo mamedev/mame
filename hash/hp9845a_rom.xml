@@ -11,7 +11,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x2800">
-				<rom name="09845-65531-01_46_mass_storage_ppu.bin" size="0x2800" crc="70fac710" sha1="233be806b5262e5261e2d2144859c45c70cb0dd9" offset="0x0000" />
+				<rom name="09845-65531-01_46_mass_storage_ppu.bin" size="0x2800" crc="70fac710" sha1="233be806b5262e5261e2d2144859c45c70cb0dd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="09845-65532-02_40-io_lpu.bin" size="0x4000" crc="f1d5bada" sha1="25aa0c482e6a5a9adcd594196262da236fc62dc1" offset="0x0000" />
+				<rom name="09845-65532-02_40-io_lpu.bin" size="0x4000" crc="f1d5bada" sha1="25aa0c482e6a5a9adcd594196262da236fc62dc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37,7 +37,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x1800">
-				<rom name="09845-65533-01_60-io_ppu.bin" size="0x1800" crc="0be7d960" sha1="f7302dd91a8aac20e6ecd430683c7aa164edc601" offset="0x0000" />
+				<rom name="09845-65533-01_60-io_ppu.bin" size="0x1800" crc="0be7d960" sha1="f7302dd91a8aac20e6ecd430683c7aa164edc601"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,7 +50,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="09845-65537-02_60-graphics.bin" size="0x4000" crc="fc5437b4" sha1="67f1e2812003de92fad713b0b1d47defc5bbb74b" offset="0x0000" />
+				<rom name="09845-65537-02_60-graphics.bin" size="0x4000" crc="fc5437b4" sha1="67f1e2812003de92fad713b0b1d47defc5bbb74b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="830107-27_20-revc-infotek_systems_pdr-45.bin" size="0x2000" crc="9f9120a0" sha1="83d2755d505228529bfe43bacb10e5a015799a47" offset="0x0000" />
+				<rom name="830107-27_20-revc-infotek_systems_pdr-45.bin" size="0x2000" crc="9f9120a0" sha1="83d2755d505228529bfe43bacb10e5a015799a47"/>
 				<rom name="830107-27_30-revc-infotek_systems_pdr-45.bin" size="0x2000" crc="d932b513" sha1="a96aadfc1a7aa48df5b5461b4e7fc6a3772290be" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -77,7 +77,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="830505-27_50-structured_software_systems_programmers_toolkit.bin" size="0x2000" crc="d5955601" sha1="d20b2b6835fc6d79028ff887be4904a4d6973b07" offset="0x0000" />
+				<rom name="830505-27_50-structured_software_systems_programmers_toolkit.bin" size="0x2000" crc="d5955601" sha1="d20b2b6835fc6d79028ff887be4904a4d6973b07"/>
 				<rom name="830505-27_60-structured_software_systems_programmers_toolkit.bin" size="0x2000" crc="0852df5f" sha1="b25e4fa1aac7735ef0932c8b60c31ddc6878fc74" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -91,7 +91,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x2000">
-				<rom name="831010-15_10-reva-structured_software_systems_mass_storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000" />
+				<rom name="831010-15_10-reva-structured_software_systems_mass_storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952"/>
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="841010-15_10-revb-structured_software_systems_mass_storage.bin" size="0x2000" crc="a29f2115" sha1="bdf2e6d8166503f66b3e6911b9d12466c0d652e1" offset="0x0000" />
+				<rom name="841010-15_10-revb-structured_software_systems_mass_storage.bin" size="0x2000" crc="a29f2115" sha1="bdf2e6d8166503f66b3e6911b9d12466c0d652e1"/>
 				<rom name="841010-15_20-revb-structured_software_systems_mass_storage.bin" size="0x2000" crc="a8b4a547" sha1="18870c40da7f1202ad3729de0b221ceb91c766ea" offset="0x2000" />
 			</dataarea>
 		</part>

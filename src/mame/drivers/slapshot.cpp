@@ -173,16 +173,16 @@ INTERRUPT_GEN_MEMBER(slapshot_state::interrupt)
                 GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(slapshot_state::service_input_r)
+u16 slapshot_state::service_input_r(offs_t offset)
 {
 	switch (offset)
 	{
 		case 0x03:
-			return ((ioport("SYSTEM")->read() & 0xef) |
-					(ioport("SERVICE")->read() & 0x10))  << 8;  /* IN3 + service switch */
+			return ((m_io_system->read() & 0xef) |
+					(m_io_service->read() & 0x10))  << 8;  /* IN3 + service switch */
 
 		default:
-			return m_tc0640fio->read(space, offset) << 8;
+			return m_tc0640fio->read(offset) << 8;
 	}
 }
 
@@ -200,7 +200,7 @@ void slapshot_state::coin_control_w(u8 data)
 
 void slapshot_state::sound_bankswitch_w(u8 data)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
 /***********************************************************
@@ -246,7 +246,7 @@ void slapshot_state::opwolf3_map(address_map &map)
 
 /***************************************************************************/
 
-void slapshot_state::opwolf3_z80_sound_map(address_map &map)
+void slapshot_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("z80bank");
@@ -380,14 +380,9 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,2),
 	6,
-	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
-	{
-	4, 0, 12, 8,
-	16+4, 16+0, 16+12, 16+8,
-	32+4, 32+0, 32+12, 32+8,
-	48+4, 48+0, 48+12, 48+8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, STEP4(0,1) },
+	{ STEP4(3*4,-4), STEP4(7*4,-4), STEP4(11*4,-4), STEP4(15*4,-4), },
+	{ STEP16(0,16*4) },
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
@@ -396,15 +391,15 @@ static const gfx_layout charlayout =
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,        /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,1) },
+	{ STEP8(7*4,-4), STEP8(15*4,-4) },
+	{ STEP16(0,16*4) },
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_slapshot )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,    0, 256 ) /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout, 4096, 256 )    /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout, 4096, 256 ) /* playfield */
 GFXDECODE_END
 
 
@@ -414,7 +409,7 @@ GFXDECODE_END
 
 void slapshot_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	m_int6_timer = timer_alloc(TIMER_SLAPSHOT_INTERRUPT6);
 }
@@ -428,7 +423,7 @@ void slapshot_state::slapshot(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
-	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_z80_sound_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
@@ -446,7 +441,7 @@ void slapshot_state::slapshot(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(slapshot_state::screen_update));
-	screen.screen_vblank().set(FUNC(slapshot_state::screen_vblank_taito_no_buffer));
+	screen.screen_vblank().set(FUNC(slapshot_state::screen_vblank_no_buffer));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
@@ -489,7 +484,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
-	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_z80_sound_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
@@ -514,7 +509,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(slapshot_state::screen_update));
-	screen.screen_vblank().set(FUNC(slapshot_state::screen_vblank_taito_no_buffer));
+	screen.screen_vblank().set(FUNC(slapshot_state::screen_vblank_no_buffer));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
@@ -563,12 +558,12 @@ ROM_START( slapshot )
 	ROM_LOAD    ( "d71-07.77",    0x00000, 0x10000, CRC(dd5f670c) SHA1(743a9563c40fe40178c9ec8eece71a08380c2239) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "d71-04.79", 0x00000, 0x80000, CRC(b727b81c) SHA1(9f56160e2b3e4d59cfa96b5c013f4e368781666e) )  /* SCR */
-	ROM_LOAD16_BYTE( "d71-05.80", 0x00001, 0x80000, CRC(7b0f5d6d) SHA1(a54e4a651dc7cdc160286afb3d38531c7b9396b1) )
+	ROM_LOAD32_WORD_SWAP( "d71-04.79", 0x00002, 0x80000, CRC(b727b81c) SHA1(9f56160e2b3e4d59cfa96b5c013f4e368781666e) )  /* SCR */
+	ROM_LOAD32_WORD_SWAP( "d71-05.80", 0x00000, 0x80000, CRC(7b0f5d6d) SHA1(a54e4a651dc7cdc160286afb3d38531c7b9396b1) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "d71-01.23", 0x000000, 0x100000, CRC(0b1e8c27) SHA1(ffa452f7414f3d61edb69bb61b29a0cc8d9176d0) )    /* OBJ 6bpp */
-	ROM_LOAD16_BYTE( "d71-02.24", 0x000001, 0x100000, CRC(ccaaea2d) SHA1(71b507f215f37e991abae5523642417a6b23a70d) )
+	ROM_LOAD16_BYTE( "d71-01.23", 0x000001, 0x100000, CRC(0b1e8c27) SHA1(ffa452f7414f3d61edb69bb61b29a0cc8d9176d0) )    /* OBJ 6bpp */
+	ROM_LOAD16_BYTE( "d71-02.24", 0x000000, 0x100000, CRC(ccaaea2d) SHA1(71b507f215f37e991abae5523642417a6b23a70d) )
 	ROM_LOAD       ( "d71-03.25", 0x300000, 0x100000, CRC(dccef9ec) SHA1(ee7a49727b822cf4c1d7acff994b77ea6191c423) )
 	ROM_FILL       (              0x200000, 0x100000, 0x00 )
 
@@ -597,12 +592,12 @@ ROM_START( opwolf3 )
 	ROM_LOAD    ( "d74_22.77",    0x00000, 0x10000, CRC(118374a6) SHA1(cc1d0d28efdf1df3e648e7d932405811854ba4ee) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
-	ROM_LOAD16_BYTE( "d74_06.81", 0x000001, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
+	ROM_LOAD32_WORD_SWAP( "d74_05.80", 0x000002, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
+	ROM_LOAD32_WORD_SWAP( "d74_06.81", 0x000000, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) )    /* OBJ 6bpp */
-	ROM_LOAD16_BYTE( "d74_03.24", 0x000001, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
+	ROM_LOAD16_BYTE( "d74_02.23", 0x000001, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) )    /* OBJ 6bpp */
+	ROM_LOAD16_BYTE( "d74_03.24", 0x000000, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
 	ROM_LOAD       ( "d74_04.25", 0x600000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
 	ROM_FILL       (              0x400000, 0x200000, 0x00 )
 
@@ -623,12 +618,12 @@ ROM_START( opwolf3u )
 	ROM_LOAD    ( "d74_19.77",    0x00000, 0x10000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
-	ROM_LOAD16_BYTE( "d74_06.81", 0x000001, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
+	ROM_LOAD32_WORD_SWAP( "d74_05.80", 0x000002, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
+	ROM_LOAD32_WORD_SWAP( "d74_06.81", 0x000000, 0x200000, CRC(2fa1e08d) SHA1(f1f34b308202fe08e73535424b5b4e3d91295224) )
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "d74_02.23", 0x000000, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) )    /* OBJ 6bpp */
-	ROM_LOAD16_BYTE( "d74_03.24", 0x000001, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
+	ROM_LOAD16_BYTE( "d74_02.23", 0x000001, 0x200000, CRC(aab86332) SHA1(b9133407504e9ef4fd5ae7d284cdb0c7f78f9a99) )    /* OBJ 6bpp */
+	ROM_LOAD16_BYTE( "d74_03.24", 0x000000, 0x200000, CRC(3f398916) SHA1(4b6a3ee0baf5f32e24e5040f233300f1ca347fe7) )
 	ROM_LOAD       ( "d74_04.25", 0x600000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
 	ROM_FILL       (              0x400000, 0x200000, 0x00 )
 
@@ -639,29 +634,29 @@ ROM_START( opwolf3u )
 ROM_END
 
 
-void slapshot_state::init_slapshot()
+void slapshot_state::driver_init()
 {
-	uint8_t *gfx = memregion("gfx2")->base();
-	int size = memregion("gfx2")->bytes();
+	u8 *gfx = memregion("gfx2")->base();
+	const u32 size = memregion("gfx2")->bytes();
 
-	uint32_t offset = size / 2;
-	for (uint32_t i = size / 2 + size / 4; i < size; i++)
+	u32 offset = size / 2;
+	for (u32 i = size / 2 + size / 4; i < size; i++)
 	{
 		/* Expand 2bits into 4bits format */
-		int data = gfx[i];
-		int d1 = (data >> 0) & 3;
-		int d2 = (data >> 2) & 3;
-		int d3 = (data >> 4) & 3;
-		int d4 = (data >> 6) & 3;
-
-		gfx[offset] = (d1 << 2) | (d2 << 6);
-		offset++;
+		const u8 data = gfx[i];
+		const u8 d1 = (data >> 0) & 3;
+		const u8 d2 = (data >> 2) & 3;
+		const u8 d3 = (data >> 4) & 3;
+		const u8 d4 = (data >> 6) & 3;
 
 		gfx[offset] = (d3 << 2) | (d4 << 6);
+		offset++;
+
+		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
 	}
 }
 
-GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, init_slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, init_slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, init_slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )

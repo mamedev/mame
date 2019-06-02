@@ -95,7 +95,7 @@ void menu_selector::populate(float &customtop, float &custombottom)
 		for (size_t index = 0; index < m_str_items.size(); ++index)
 		{
 			if ((0 <= m_initial) && (unsigned(m_initial) == index))
-				selected = index;
+				set_selected_index(index);
 
 			item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);
 		}

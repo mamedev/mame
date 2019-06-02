@@ -57,8 +57,6 @@ a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, devi
 
 void a8sio_cassette_device::device_start()
 {
-	set_a8sio_device();
-
 	save_item(NAME(m_old_cass_signal));
 	save_item(NAME(m_signal_count));
 

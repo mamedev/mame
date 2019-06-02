@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.65" green="0.65" blue="0.65" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="cb_mask"><rect><color red="0.9" green="0.87" blue="0.9" /></rect></element>
+	<element name="cb_overlay"><rect><color red="0.65" green="0.70" blue="0.65" /></rect></element>
+	<element name="red"><rect><color red="0.75" green="0.15" blue="0.2" /></rect></element>
+	<element name="blue"><rect><color red="0.15" green="0.2" blue="0.75" /></rect></element>
+	<element name="blueb"><rect><color red="0.07" green="0.01" blue="0.25" /></rect></element>
+
+	<element name="redd">
+		<rect><color red="0.5" green="0.1" blue="0.15" /></rect>
+		<text string="&#x2206;"><color red="0.4" green="0.08" blue="0.1" /></text>
+	</element>
+
+	<element name="hl" defstate="0">
+		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect state="1"><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="cb_border">
+		<rect>
+			<bounds x="0" y="0" width="1" height="1" />
+			<color red="0.8" green="0.2" blue="0.25" />
+		</rect>
+		<rect>
+			<bounds x="0.026" y="0.026" width="0.945" height="0.945" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+
+	<element name="text_switch" defstate="0">
+		<text string="POWER SWITCH: ON" align="1" state="0"><color red="0.3" green="0.3" blue="0.3" /></text>
+		<text string="POWER SWITCH: SAVE" align="1" state="1"><color red="0.3" green="0.3" blue="0.3" /></text>
+	</element>
+
+	<element name="text_l0"><text string="MOVE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l1"><text string="COLOR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l2"><text string="LEVEL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l3"><text string="P.VS.M."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l4"><text string="CLEAR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l5a"><text string="ENTER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l5b"><text string="POS."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l6"><text string="M.VS.M."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l7a"><text string="TAKE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l7b"><text string="BACK"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l8a"><text string="ENTER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l8b"><text string="MOVE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l9"><text string="P.VS.P."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+<!-- groups -->
+
+	<group name="display">
+		<backdrop element="cb_border"><bounds left="-3" right="83" top="-3" bottom="91.434" /></backdrop>
+		<screen index="0"><bounds left="0" right="80" top="0" bottom="88.434" /></screen>
+		<overlay element="cb_overlay"><bounds left="0" right="80" top="0" bottom="88.434" /></overlay>
+		<bezel element="blackb"><bounds left="79.9" right="80.1" top="-0.1" bottom="88.6" /></bezel>
+		<bezel element="blackb"><bounds left="-0.1" right="80.1" top="88.1" bottom="88.534" /></bezel>
+		<bezel element="blackb"><bounds x="-0.1" y="79.4" width="80.2" height="0.8" /></bezel>
+
+		<repeat count="4">
+			<param name="left" start="0" increment="20" />
+			<param name="right" start="10" increment="20" />
+			<repeat count="4">
+				<param name="top" start="9.96" increment="19.92" />
+				<param name="bottom" start="19.92" increment="19.92" />
+				<overlay element="cb_mask"><bounds left="~left~" right="~right~" top="~top~" bottom="~bottom~" /></overlay>
+			</repeat>
+		</repeat>
+		<repeat count="4">
+			<param name="left" start="70" increment="-20" />
+			<param name="right" start="80" increment="-20" />
+			<repeat count="4">
+				<param name="top" start="0" increment="19.92" />
+				<param name="bottom" start="9.96" increment="19.92" />
+				<overlay element="cb_mask"><bounds left="~left~" right="~right~" top="~top~" bottom="~bottom~" /></overlay>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="buttons">
+		<bounds x="6.1" y="6.1" width="87.8" height="45.8" />
+
+		<bezel element="white"><bounds x="6.1" y="6.1" width="87.8" height="45.8" /></bezel>
+		<bezel element="blackb"><bounds x="6.9" y="6.9" width="44.2" height="44.2" /></bezel>
+		<bezel element="blackb"><bounds x="51.9" y="6.9" width="27.2" height="13.8" /></bezel>
+		<bezel element="blackb"><bounds x="51.9" y="21.5" width="27.2" height="29.6" /></bezel>
+		<bezel element="blackb"><bounds x="79.9" y="6.9" width="13.2" height="44.2" /></bezel>
+
+		<bezel element="redd"><bounds x="10" y="24" width="7" height="10" /><orientation rotate="270" /></bezel>
+		<bezel element="redd"><bounds x="41" y="24" width="7" height="10" /><orientation rotate="90" /></bezel>
+		<bezel element="redd"><bounds x="24" y="10" width="10" height="7" /></bezel>
+		<bezel element="redd"><bounds x="24" y="41" width="10" height="7" /><orientation rotate="180" /></bezel>
+
+		<bezel element="text_l0"><bounds x="23.5" y="25.5" width="11" height="2.7" /></bezel>
+		<bezel element="red"><bounds x="25.5" y="29" width="7" height="5" /></bezel>
+
+		<bezel element="text_l1"><bounds x="53" y="10.3" width="11" height="2.7" /></bezel>
+		<bezel element="text_l2"><bounds x="67" y="10.3" width="11" height="2.7" /></bezel>
+		<bezel element="text_l3"><bounds x="81" y="10.3" width="11" height="2.7" /></bezel>
+		<bezel element="text_l4"><bounds x="53" y="25.5" width="11" height="2.7" /></bezel>
+		<bezel element="text_l5a"><bounds x="67" y="23.0" width="11" height="2.7" /></bezel>
+		<bezel element="text_l5b"><bounds x="67" y="25.5" width="11" height="2.7" /></bezel>
+		<bezel element="text_l6"><bounds x="81" y="25.5" width="11" height="2.7" /></bezel>
+		<bezel element="text_l7a"><bounds x="53" y="38.2" width="11" height="2.7" /></bezel>
+		<bezel element="text_l7b"><bounds x="53" y="40.7" width="11" height="2.7" /></bezel>
+		<bezel element="text_l8a"><bounds x="67" y="38.2" width="11" height="2.7" /></bezel>
+		<bezel element="text_l8b"><bounds x="67" y="40.7" width="11" height="2.7" /></bezel>
+		<bezel element="text_l9"><bounds x="81" y="40.7" width="11" height="2.7" /></bezel>
+
+		<bezel element="blue"><bounds x="55" y="13.8" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="69" y="13.8" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="83" y="13.8" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="55" y="29.0" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="69" y="29.0" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="83" y="29.0" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="55" y="44.2" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="69" y="44.2" width="7" height="5" /></bezel>
+		<bezel element="blue"><bounds x="83" y="44.2" width="7" height="5" /></bezel>
+
+		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="10" y="24" width="7" height="10" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x04"><bounds x="41" y="24" width="7" height="10" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x10"><bounds x="24" y="10" width="10" height="7" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x80"><bounds x="24" y="41" width="10" height="7" /><color alpha="0.25" /></bezel>
+
+		<bezel element="hl" inputtag="IN.1" inputmask="0x02"><bounds x="25.5" y="29" width="7" height="5" /><color alpha="0.25" /></bezel>
+
+		<bezel element="hl" inputtag="IN.2" inputmask="0x10"><bounds x="55" y="13.8" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x10"><bounds x="69" y="13.8" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="83" y="13.8" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="55" y="29.0" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="69" y="29.0" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="83" y="29.0" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x80"><bounds x="55" y="44.2" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="69" y="44.2" width="7" height="5" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="83" y="44.2" width="7" height="5" /><color alpha="0.25" /></bezel>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout (Screen)">
+		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
+	</view>
+
+	<view name="Internal Layout (Full)">
+		<bounds left="-1" right="185" top="-1" bottom="96" />
+		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
+
+		<bezel element="blueb"><bounds x="89" y="43" width="97" height="53" /></bezel>
+		<bezel element="blackb"><bounds x="92" y="46" width="97" height="53" /></bezel>
+		<group ref="buttons"><bounds x="95" y="48.634" width="87.8" height="45.8" /></group>
+
+		<bezel element="text_switch" inputtag="IN.3" inputmask="0x01"><bounds x="95" y="38" width="24" height="2.7" /></bezel>
+	</view>
+
+</mamelayout>

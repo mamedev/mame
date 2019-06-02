@@ -40,11 +40,11 @@ sm590_device::sm590_device(const machine_config &mconfig, const char *tag, devic
 { }
 
 //sm591_device::sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-//	sm510_base_device(mconfig, SM591, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm591_device::program_2x128x4), this), 6 /* data width */, address_map_constructor(FUNC(sm591_device::data_16x3.5x4), this))
+//  sm510_base_device(mconfig, SM591, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm591_device::program_2x128x4), this), 6 /* data width */, address_map_constructor(FUNC(sm591_device::data_16x3.5x4), this))
 //{ }
 
 //sm595_device::sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-//	sm510_base_device(mconfig, SM595, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm595_device::program_1x128x4_1x128x2), this), 5 /* data width */, address_map_constructor(FUNC(sm595_device::data_16x2x4), this))
+//  sm510_base_device(mconfig, SM595, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm595_device::program_1x128x4_1x128x2), this), 5 /* data width */, address_map_constructor(FUNC(sm595_device::data_16x2x4), this))
 //{ }
 
 sm590_device::sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :

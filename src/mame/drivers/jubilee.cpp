@@ -225,7 +225,7 @@ private:
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(mux_port_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
@@ -284,7 +284,7 @@ void jubilee_state::video_start()
 	m_bg_tilemap->set_scrolldx(8, 0); /* guess */
 }
 
-uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -687,7 +687,6 @@ void jubilee_state::jubileep(machine_config &config)
 	screen.set_size(32*8, 32*8);                         /* (47+1*8, 38+1*8) from CRTC settings */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);   /* (32*8, 32*8) from CRTC settings */
 	screen.set_screen_update(FUNC(jubilee_state::screen_update_jubileep));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jubileep);
 	PALETTE(config, "palette").set_entries(8);

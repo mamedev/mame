@@ -46,7 +46,7 @@ class device_interpro_keyboard_port_interface : public device_slot_card_interfac
 
 public:
 	// input lines
-	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) { }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) = 0;
 	DECLARE_WRITE_LINE_MEMBER(output_rxd) { m_port->m_rxd_handler(state); }
 
 protected:

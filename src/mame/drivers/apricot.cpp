@@ -103,7 +103,7 @@ private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
 	required_device<ram_device> m_ram;
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
@@ -347,8 +347,8 @@ void apricot_state::apricot_io(address_map &map)
 	map(0x62, 0x62).r(FUNC(apricot_state::sio_ca_r)).w(m_sio, FUNC(z80sio_device::ca_w)).umask16(0x00ff);
 	map(0x64, 0x64).r(FUNC(apricot_state::sio_db_r)).w(m_sio, FUNC(z80sio_device::db_w)).umask16(0x00ff);
 	map(0x66, 0x66).r(FUNC(apricot_state::sio_cb_r)).w(m_sio, FUNC(z80sio_device::cb_w)).umask16(0x00ff);
-	map(0x68, 0x68).mirror(0x04).w(m_crtc, FUNC(hd6845_device::address_w));
-	map(0x6a, 0x6a).mirror(0x04).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0x68, 0x68).mirror(0x04).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0x6a, 0x6a).mirror(0x04).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0x70, 0x70).mirror(0x04).w(FUNC(apricot_state::i8089_ca1_w));
 	map(0x72, 0x72).mirror(0x04).w(FUNC(apricot_state::i8089_ca2_w));
 	map(0x78, 0x7f).noprw(); // unavailable
@@ -389,7 +389,7 @@ void apricot_state::apricot(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-	HD6845(config, m_crtc, 15_MHz_XTAL / 10);
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 10);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);

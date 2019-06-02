@@ -20,7 +20,7 @@
 		<info name="alt_title" value="第４弹：暗黑势力再临"/>
 		<part name="cart" interface="c2color_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="darkones.bin" size="0x800000" crc="d2735c91" sha1="f71c1cd300893a22e52d046bc9c489e0236c6b88" offset="0" />
+				<rom name="darkones.bin" size="0x800000" crc="d2735c91" sha1="f71c1cd300893a22e52d046bc9c489e0236c6b88" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<info name="alt_title" value="第５弹：神秘的龙族之王"/>
 		<part name="cart" interface="c2color_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="kingdlnd.bin" size="0x800000" crc="1e20d906" sha1="323df1ce05ff4fc1aaefe3e0e2b929aec40cc230" offset="0" />
+				<rom name="kingdlnd.bin" size="0x800000" crc="1e20d906" sha1="323df1ce05ff4fc1aaefe3e0e2b929aec40cc230" />
 			</dataarea>
 		</part>
 	</software>

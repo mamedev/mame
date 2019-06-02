@@ -135,7 +135,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(random_read);
+	uint8_t random_read();
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(via_b_in);
@@ -144,7 +144,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void int_ack_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
 	void main_mem(address_map &map);
 	void ramdac_map(address_map &map);
@@ -160,7 +161,7 @@ private:
 };
 
 
-uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 /*
       280x230,4 bitmap layers, 8bpp,
@@ -168,7 +169,7 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 */
 
 	int x,y,z,pixdat;
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	z=0;
 	for (y=0;y<230;y++)
@@ -178,30 +179,30 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			pixdat = m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid2[z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix32(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix32(y, x) = m_palette->pen(pixdat>>8);
 
 			z++;
 		}
@@ -209,7 +210,7 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ16_MEMBER(bmcbowl_state::random_read)
+uint8_t bmcbowl_state::random_read()
 {
 	return machine().rand();
 }
@@ -302,6 +303,11 @@ void bmcbowl_state::init_stats(const uint8_t *table, int table_len, int address)
 }
 #endif
 
+void bmcbowl_state::int_ack_w(uint8_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+}
+
 void bmcbowl_state::machine_start()
 {
 	save_item(NAME(m_selected_input));
@@ -353,7 +359,7 @@ void bmcbowl_state::main_mem(address_map &map)
 	map(0x30c0c0, 0x30c0c1).nopw();
 	map(0x30c100, 0x30c101).r(FUNC(bmcbowl_state::protection_r));
 	map(0x30c140, 0x30c141).nopw();
-	map(0x30ca00, 0x30ca01).r(FUNC(bmcbowl_state::random_read)).nopw();
+	map(0x30ca01, 0x30ca01).rw(FUNC(bmcbowl_state::random_read), FUNC(bmcbowl_state::int_ack_w));
 }
 
 
@@ -473,8 +479,8 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.set_size(35*8, 30*8);
 	screen.set_visarea(0*8, 35*8-1, 0*8, 29*8-1);
 	screen.set_screen_update(FUNC(bmcbowl_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE); // probably not the source of this interrupt
+	screen.screen_vblank().append("via6522_0", FUNC(via6522_device::write_cb1));
 
 	PALETTE(config, m_palette).set_entries(256);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -500,7 +506,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	/* via */
-	via6522_device &via(VIA6522(config, "via6522_0", 1000000));
+	via6522_device &via(VIA6522(config, "via6522_0", XTAL(3'579'545) / 4)); // clock not verified (controls music tempo)
 	via.readpb_handler().set(FUNC(bmcbowl_state::via_b_in));
 	via.writepa_handler().set(FUNC(bmcbowl_state::via_a_out));
 	via.writepb_handler().set(FUNC(bmcbowl_state::via_b_out));

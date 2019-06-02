@@ -530,4 +530,11 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("vic1515", VIC1515);
 	device.option_add("vic1520", VIC1520);
 	device.option_add("c1526", C1526);
+	device.option_add("technica", TECHNICA);
+	device.option_add("bluechip", BLUE_CHIP);
+	device.option_add("cmdrc2", COMMANDER_C2);
+	device.option_add("enh2000", ENHANCER_2000);
+	device.option_add("fd148", FD148);
+	device.option_add("msdsd1", MSD_SD1);
+	device.option_add("msdsd2", MSD_SD2);
 }

@@ -66,25 +66,23 @@ public:
 	void init_sstingry();
 
 private:
-	DECLARE_WRITE16_MEMBER(tnextspc_coin_counters_w);
-	DECLARE_WRITE16_MEMBER(tnextspc_unknown_w);
-	DECLARE_WRITE16_MEMBER(alpha_microcontroller_w);
-	DECLARE_READ16_MEMBER(kyros_dip_r);
-	DECLARE_READ16_MEMBER(control_1_r);
-	DECLARE_READ16_MEMBER(control_2_r);
-	DECLARE_READ16_MEMBER(control_2_V_r);
-	DECLARE_READ16_MEMBER(control_3_r);
-	DECLARE_READ16_MEMBER(control_4_r);
-	DECLARE_READ16_MEMBER(jongbou_inputs_r);
-	DECLARE_WRITE8_MEMBER(outlatch_w);
-	DECLARE_WRITE8_MEMBER(tnextspc_soundlatch_w);
-	DECLARE_READ16_MEMBER(kyros_alpha_trigger_r);
-	DECLARE_READ16_MEMBER(alpha_II_trigger_r);
-	DECLARE_READ16_MEMBER(alpha_V_trigger_r);
-	DECLARE_READ16_MEMBER(sound_cpu_r);
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_videoram_w);
+	void tnextspc_coin_counters_w(offs_t offset, u16 data);
+	void tnextspc_unknown_w(offs_t offset, u16 data);
+	void alpha_microcontroller_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 control_1_r();
+	u16 control_2_r();
+	u16 control_3_r();
+	u16 control_4_r();
+	u16 jongbou_inputs_r();
+	void outlatch_w(offs_t offset, u8 data = 0);
+	void tnextspc_soundlatch_w(u8 data);
+	u16 kyros_alpha_trigger_r(offs_t offset);
+	u16 alpha_II_trigger_r(offs_t offset);
+	u16 alpha_V_trigger_r(offs_t offset);
+	u16 sound_cpu_r();
+	void sound_bank_w(u8 data);
+	void porta_w(u8 data);
+	void videoram_w(offs_t offset, u16 data);
 	DECLARE_WRITE_LINE_MEMBER(video_control2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_control3_w);
 
@@ -98,22 +96,22 @@ private:
 	DECLARE_VIDEO_START(alpha68k);
 	DECLARE_MACHINE_START(alpha68k_V);
 	DECLARE_MACHINE_RESET(alpha68k_V);
-	uint32_t screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(alpha68k_sound_nmi);
-	void alpha68k_flipscreen_w( int flip );
-	DECLARE_WRITE8_MEMBER(video_bank_w);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e );
-	void draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask );
-	void draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift );
-	void kyros_video_banking(int *bank, int data);
-	void jongbou_video_banking(int *bank, int data);
-	void kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
-	void sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
+	u32 screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void flipscreen_w(int flip);
+	void video_bank_w(u8 data);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e);
+	void draw_sprites_V(bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, u16 fx_mask, u16 fy_mask, u16 sprite_mask);
+	void draw_sprites_I(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift);
+	void kyros_video_banking(u8 *bank, int data);
+	void jongbou_video_banking(u8 *bank, int data);
+	void kyros_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d);
+	void sstingry_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d);
 	void alpha68k_II_map(address_map &map);
 	void alpha68k_I_map(address_map &map);
 	void alpha68k_I_s_map(address_map &map);
@@ -131,9 +129,9 @@ private:
 	void tnextspc_sound_portmap(address_map &map);
 
 	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_shared_ram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_videoram;
+	optional_shared_ptr<u16> m_shared_ram;
+	required_shared_ptr<u16> m_spriteram;
+	optional_shared_ptr<u16> m_videoram;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -144,13 +142,13 @@ private:
 	optional_device<ls259_device> m_outlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	optional_region_ptr<uint8_t> m_color_proms;
+	optional_region_ptr<u8> m_color_proms;
 
 	optional_ioport_array<7> m_in;
 	optional_memory_bank m_audiobank;
 
-	uint8_t       m_sound_nmi_mask;
-	uint8_t       m_sound_pa_latch;
+	u8       m_sound_nmi_mask;
+	u8       m_sound_pa_latch;
 
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;

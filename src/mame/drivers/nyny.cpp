@@ -618,7 +618,7 @@ void nyny_state::nyny(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	H46505(config, m_mc6845, CRTC_CLOCK);
+	MC6845(config, m_mc6845, CRTC_CLOCK); // HD46505P
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
