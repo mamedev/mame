@@ -309,6 +309,27 @@ WRITE8_MEMBER( nb1413m3_device::sndrombank1_w )
 	m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }
 
+// bikkuri, to be exposed in driver
+WRITE8_MEMBER( nb1413m3_device::sndrombank1_alt_w )
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
+	//outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
+	m_outcoin_enable = (data & 0x04) >> 2;
+
+	if (m_outcoin_enable)
+	{
+		if (m_counter++ == 2)
+		{
+			m_outcoin_flag ^= 1;
+			m_counter = 0;
+		}
+	}
+	
+	m_nmi_enable = ((data & 0x80) >> 7);
+	//m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
+}
+
 WRITE8_MEMBER( nb1413m3_device::sndrombank2_w )
 {
 	m_sndrombank2 = (data & 0x03);

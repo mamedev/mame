@@ -3424,7 +3424,7 @@ ROM_START( taiwanmb )
 	ROM_LOAD( "13.10p",      0x090000, 0x10000, CRC(6542e7da) SHA1(be6db10178f532ac273599808c52126037ac78a0) )
 
 	ROM_REGION( 0x00800, "protection", 0 ) /* protection (Intel D87??; mcu data that is extracted from the real board!) */
-	ROM_LOAD( "clut_ram.8f", 0x000000, 0x00800, CRC(bd80fa09) SHA1(896421e1e01beef0de6acebbbc255224e4e0438b) )
+	ROM_LOAD( "clut_ram.8f", 0x000000, 0x00800, BAD_DUMP CRC(bd80fa09) SHA1(896421e1e01beef0de6acebbbc255224e4e0438b) )
 ROM_END
 
 /*

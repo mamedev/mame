@@ -147,6 +147,7 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_clock_w );
 	DECLARE_READ8_MEMBER( sndrom_r );
 	DECLARE_WRITE8_MEMBER( sndrombank1_w );
+	DECLARE_WRITE8_MEMBER( sndrombank1_alt_w );
 	DECLARE_WRITE8_MEMBER( sndrombank2_w );
 	DECLARE_READ8_MEMBER( gfxrom_r );
 	DECLARE_WRITE8_MEMBER( gfxrombank_w );
