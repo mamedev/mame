@@ -383,11 +383,15 @@ ROM_END
 
 ROM_START(mrisc)
 	ROM_REGION(0x20000, "maincpu", 0)
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c74f, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L ver. HG-021 03-04-92
 	ROM_LOAD("meph-risci-v1-2.bin", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5))
 ROM_END
 
 ROM_START(mrisc2)
 	ROM_REGION(0x20000, "maincpu", 0)
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1cb7f, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L ver. 2.31 22-07-93, world champion Madrid 1992
 	ROM_LOAD("meph-riscii-v2.bin", 0x00000, 0x20000, CRC(9ecf9cd3) SHA1(7bfc628183037a172242c9589f15aca218d8fb12))
 ROM_END
 

@@ -33,7 +33,6 @@ protected:
 
 private:
 	required_device<chessmachine_device> m_chessm;
-
 };
 
 

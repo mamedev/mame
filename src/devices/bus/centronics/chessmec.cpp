@@ -15,7 +15,6 @@ see chessmachine_device for technical notes
 
 DEFINE_DEVICE_TYPE(CENTRONICS_CHESSMEC, centronics_chessmec_device, "centronics_chessmec", "The ChessMachine EC")
 
-
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
