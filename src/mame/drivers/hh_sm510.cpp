@@ -18,7 +18,6 @@ TODO:
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
-- confirm gnw_chef rom (dumped from Soviet clone but should be the same)
 - confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
@@ -1513,7 +1512,7 @@ ROM_END
 
   Nintendo Game & Watch: Chef (model FP-24)
   * PCB label FP-24
-  * Sharp SM5A label FP-24 51YB
+  * Sharp SM5A label FP-24 51YB (die label CMS646, ROM ID 74)
   * lcd screen with custom segments, 1-bit sound
 
   In 1989, Elektronika(USSR) released a clone: Merry Cook. This game most
