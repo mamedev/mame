@@ -2184,6 +2184,7 @@
 		<description>Financial Facts (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Advanced Operating Systems</publisher>
+		<info name="release" value="2014-09-25"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2433,6 +2434,7 @@
 		<description>Garfield Eat Your Words (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Random House</publisher>
+		<info name="release" value="2015-01-15"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -9342,20 +9344,6 @@
 		</part>
 	</software>
 
-	<software name="finfacts">
-		<description>Financial Facts (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Advanced Operating Systems</publisher>
-		<info name="release" value="2014-09-25"/>
-		<!-- No compatibility data known at this time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="financial facts (4am crack).dsk" size="143360" crc="45961b8d" sha1="2960be67af37b5ceb3cc21ea40bc34a16ed8a633" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bbfindrhyme">
 		<description>Bingo Bugglebee Presents: Find the Rhyme (cleanly cracked)</description>
 		<year>1985</year>
@@ -10035,7 +10023,7 @@
 				<rom name="game frame two (4am crack) satellite rescue.dsk" size="143360" crc="e599bd4e" sha1="00d9480566026a97feecccb63568d21e9fc78c37" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Content Diskette (Non-bootable)"/>
 			<dataarea name="flop" size="143360">
 				<rom name="game frame two (4am crack) content diskette.dsk" size="143360" crc="5651a570" sha1="767d8ced884e1ce1b2f098cdccbcb357c28a09e9" />
@@ -10060,6 +10048,495 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="gamma force (4am crack) side b.dsk" size="143360" crc="dc36a248" sha1="0f95fb39899ae5adcce084b729df5292745bd858" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garfdbld">
+		<description>Garfield Double Dares (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Random House</publisher>
+		<info name="release" value="2015-09-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="garfield double dares (4am crack).dsk" size="143360" crc="8e9134d1" sha1="cdb6d44445e9b7415b8dcfa0770fd9d5937a8ba9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamemakr">
+		<description>Garry Kitchen's GameMaker (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2017-01-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="garry kitchen's gamemaker (4am crack) side a.dsk" size="143360" crc="efe38ca9" sha1="fb122da41a3f99bc452e8f07dc3a43eaded3a781" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="garry kitchen's gamemaker (4am crack) side b.dsk" size="143360" crc="77b6cd7d" sha1="e5981120d268c5f36292ef6642263f7e5e124433" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbabaskt">
+		<description>GBA Championship Basketball (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2017-01-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gba championship basketball (4am crack).dsk" size="143360" crc="04a8a82f" sha1="cb3c6a916b67aa28a836bacc98d2c054bda76bc7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gelflingadventur">
+		<description>Gelfling Adventure (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2018-10-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="gelfling adventure (4am and san inc crack) side a.dsk" size="143360" crc="f6f4d6c5" sha1="910fdbe541dfa4cad4b1fe4870f22d3a18386bc1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="gelfling adventure (4am and san inc crack) side b.dsk" size="143360" crc="cf0fa125" sha1="4b131e5beb2d1a06b52f743c00eca79eb3d753b3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemswarr">
+		<description>Gemstone Warrior (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2016-12-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gemstone warrior (4am crack).dsk" size="143360" crc="ba9acfd0" sha1="4c47b66f16628bd3e4202923b8c5630f7ee4f29f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoadvus">
+		<description>Geography Adventure USA (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Marley W. Watkins</publisher>
+		<info name="release" value="2017-11-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geography adventure usa (4am crack).dsk" size="143360" crc="671ba24e" sha1="b0598111176f4313d745ac171b29de3524738f4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geofangl">
+		<description>Geometric Figures - Angles and Right Angles (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Jostens Learning Corporation</publisher>
+		<info name="release" value="2018-02-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometric figures - angles and right angles (4am crack).dsk" size="143360" crc="53bf6473" sha1="1ce1aeeda56c23f65a2fea9863f1f0d3122ee13b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geofcirc">
+		<description>Geometric Figures - Circles, Radius, Diameter (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Jostens Learning Corporation</publisher>
+		<info name="release" value="2018-02-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometric figures - circles, radius, diameter (4am crack).dsk" size="143360" crc="5e72740d" sha1="9511636b801b2d5323bd0cbe7728c9e4dc87f046" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geocurv">
+		<description>Geometry - Simple Closed Curves (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Courses by Computers</publisher>
+		<info name="release" value="2018-07-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geometry - simple closed curves (4am crack) side a.dsk" size="143360" crc="04dc4b98" sha1="a592f884e2bed5ab469c52c287ab945e4d9b64cc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geometry - simple closed curves (4am crack) side b.dsk" size="143360" crc="063cbb90" sha1="75990f05408e91bcb0f483da747ccbd51b5f2d9e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoalvtri">
+		<description>Geometry Alive - Areas of Triangles and Quadrilaterials (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2015-11-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry alive - areas of triangles and quadrilaterials (4am crack).dsk" size="143360" crc="8b92dd07" sha1="7a49f127e8ef53b3d10b8f531421d9f99e179fff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoalvcir">
+		<description>Geometry Alive - Circles (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2015-11-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry alive - circles (4am crack).dsk" size="143360" crc="111ec8eb" sha1="c8538d5d9f200b98fb1b607238c5e746883ae66a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoalvgeo">
+		<description>Geometry Alive - Fundamentals of Geometry (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2015-09-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry alive - fundamentals of geometry (4am crack).dsk" size="143360" crc="047198a8" sha1="22a53cf2b26019d1b8d2d79d16afc88ee75dd7dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomeas1">
+		<description>Geometry and Measurement volume 1 (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Charles Lund</publisher>
+		<info name="release" value="2018-06-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry and measurement volume 1 (4am and san inc crack).dsk" size="143360" crc="d1c76525" sha1="b1672495903d77aa6a40bf76d3a0073a0e98e9fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomeas2">
+		<description>Geometry and Measurement volume 2 (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Charles Lund</publisher>
+		<info name="release" value="2018-06-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geometry and measurement volume 2 (4am and san inc crack).dsk" size="143360" crc="9a1f9098" sha1="e1c24da239ce330b12cdb51e5aaa277c785496e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geopol90">
+		<description>Geopolitique 1990 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2018-09-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Geopol"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geopolitique 1990 (4am and san inc crack) side a - geopol.dsk" size="143360" crc="6e43a875" sha1="8cee72288cca5ebfc573206e0b64489f5263d392" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Geowar"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geopolitique 1990 (4am and san inc crack) side b - geowar.dsk" size="143360" crc="3c19f5c2" sha1="84331f1cfb7f54ce446e88031d85c1ccfc825dae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geowhiz">
+		<description>GeoWhiz (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Silver</publisher>
+		<info name="release" value="2018-01-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geowhiz (4am crack) disk 1.dsk" size="143360" crc="1d0a20f0" sha1="80e439e8e1eefdd82501d7f93b70d4c745ec4e41" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geowhiz (4am crack) disk 2.dsk" size="143360" crc="ca3c9e17" sha1="c20b451496cd303fd9b7707a310e8e0638692923" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geowhiz (4am crack) disk 3.dsk" size="143360" crc="b660f893" sha1="e029a6bf954fee5b5668aa3e39012fdee6af3630" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germnvoc">
+		<description>German Vocabulary Games (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2016-02-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="german vocabulary games (4am crack) disk 1 - program.dsk" size="143360" crc="97753963" sha1="113d73d99b24c417a11e35b4973faa49036b0cab" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Utilities"/>
+			<dataarea name="flop" size="143360">
+				<rom name="german vocabulary games (4am crack) disk 2 - utilities.dsk" size="143360" crc="17949c64" sha1="c3f5095a82561f58c28b22de774aa5a365b8aae5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudepuz10">
+		<description>Gertrude's Puzzles (Version 1.0) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2016-01-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1.0 (4am crack).dsk" size="143360" crc="d9511af5" sha1="6f99bb857b392f8dd58030b5464ef2ce19f96932" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudepuz">
+		<description>Gertrude's Puzzles (Version 1.2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2015-05-31"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1.2 (4am crack).dsk" size="143360" crc="5f794fa0" sha1="3b65f8e778dc7dd61ae64d6780d298474a1955a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudesec10">
+		<description>Gertrude's Secrets (Version 1.0) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2015-08-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1.0 (4am crack).dsk" size="143360" crc="969de34c" sha1="53f470ec6d1e31844c2433d7546a5d3965a0dbaa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudesec13">
+		<description>Gertrude's Secrets (Version 1.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-12-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1.3 (4am crack).dsk" size="143360" crc="98652042" sha1="881cac9cb46e7d38df878875b242fbb84e909a46" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gt2point">
+		<description>Get to the Point (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-04-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="get to the point (4am crack).dsk" size="143360" crc="8a844d12" sha1="56570db68370579bb94f46915ab415586756d41d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdyreadadd">
+		<description>Getting Ready to Read and Add (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2016-04-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="getting ready to read and add (4am crack).dsk" size="143360" crc="6150a8a8" sha1="b8a8d8e9f6eeeeb70e53c2c21b2409c269933549" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtysburg">
+		<description>Gettysburg - The Turning Point (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2018-09-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="gettysburg - the turning point (4am crack) side a.dsk" size="143360" crc="26a53290" sha1="309bd7e30750765700b2cab3fe442c48a1d1e190" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="gettysburg - the turning point (4am crack) side b.dsk" size="143360" crc="62372db7" sha1="f5e13ee7ffa10c241f55818371232bf29b05b5e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gflfootb">
+		<description>GFL Championship Football (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2017-06-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gfl championship football (4am crack).dsk" size="143360" crc="3914c9b2" sha1="a706716184a2b2e354743e79af7dc6644218352f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ginrummy">
+		<description>Gin Rummy (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2016-08-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gin rummy (4am crack).dsk" size="143360" crc="9286c88c" sha1="49140b844e7683a9f0df3eafd4a7fb8cfaa06c76" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gneenotg">
+		<description>Gnee or Not Gnee (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-04-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gnee or not gnee (4am crack).dsk" size="143360" crc="76379016" sha1="c2257c5fdacc6b4c44d52cd053aee225fd7a59fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gohayden">
+		<description>Go (Hayden) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Co.</publisher>
+		<info name="release" value="2016-07-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="go2hedcl">
+		<description>Go To The Head Of The Class (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2015-12-18"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="go to the head of the class (4am crack).dsk" size="143360" crc="f26cafd1" sha1="47a49f705f82651e85cbf24e82214740fe284e75" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="go2hedcl89">
+		<description>Go To The Head Of The Class (1989 Version) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2017-11-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="go to the head of the class 1989 (4am crack).dsk" size="143360" crc="06a8b9f0" sha1="2ea6fb3fd16e9e36bb4c3d4ac6430f19dc111c7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldfngr">
+		<description>Goldfinger (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2018-10-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="goldfinger (4am crack).dsk" size="143360" crc="7e8b51ff" sha1="a986bb4d486ef2b067f3983498f957571042cb22" />
 			</dataarea>
 		</part>
 	</software>
