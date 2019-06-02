@@ -2103,32 +2103,35 @@ READ16_MEMBER(seta_state::zingzipbl_unknown_r)
 
 void seta_state::zingzipbl_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM (up to 2MB)
-	map(0x200000, 0x20ffff).ram().share("workram");       // RAM (pointer for zombraid crosshair hack)
-//  map(0x400000, 0x400001).port_r("P1");                 // P1
-//  map(0x400002, 0x400003).port_r("P2");                 // P2
+	map(0x000000, 0x1fffff).rom();                             // ROM (up to 2MB)
+	map(0x200000, 0x20ffff).ram().share("workram");     // RAM (pointer for zombraid crosshair hack)
+	map(0x210000, 0x21ffff).ram();                             // RAM (gundhara)
+	map(0x300000, 0x30ffff).ram();                             // RAM (wrofaero only?)
+//  AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
+//  AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	map(0x400002, 0x400003).r(FUNC(seta_state::zingzipbl_unknown_r));       // P2
-//  map(0x400004, 0x400005).port_r("COINS");              // Coins
+//  AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x500004, 0x500005).nopw();
-	//map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));              // DSW
+	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)              // DSW
+	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
+	map(0x701000, 0x70ffff).ram();                             //
 	map(0x800000, 0x803fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
+	map(0x804000, 0x80ffff).ram();                             // (jjsquawk)
 	map(0x880000, 0x883fff).ram().w(FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
+	map(0x884000, 0x88ffff).ram();                             // (jjsquawk)
 	map(0x900000, 0x900005).ram().share("vctrl_0");     // VRAM 0&1 Ctrl
 
-	//map(0x902006, 0x902007).w // writes 0 here on start up
 	map(0x902010, 0x902013).r(FUNC(seta_state::zingzipbl_unknown_r));
 
 	map(0x980000, 0x980005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-	map(0xa00608, 0xa00fff).ram(); // zeroed on start up
-	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00000, 0xc000ff).ram(); // zeroed on startup
+	map(0xc00000, 0xc03fff).ram(); // soundram on original
 #if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
@@ -2161,7 +2164,7 @@ void seta_state::jjsquawb_map(address_map &map)
 	map(0x909000, 0x909005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
 	map(0xa0a000, 0xa0a5ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // RZ: Sprites Y
 	map(0xa0a600, 0xa0a607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-//  map(0xa80000, 0xa80001).ram()                              // ? 0x4000
+//  AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
 	map(0xb0c000, 0xb0ffff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // RZ: Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 #if USE_uPD71054_TIMER
@@ -2188,7 +2191,7 @@ void seta_state::orbs_map(address_map &map)
 	map(0x500000, 0x500001).portr("P1");                 // P1
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
-	//map(0x600000, 0x60000f).r(FUNC(seta_state::krzybowl_input_r);   // P1
+	//AM_RANGE(0x600000, 0x60000f) AM_READ(krzybowl_input_r     )   // P1
 	map(0x8000f0, 0x8000f1).ram();                             // NVRAM
 	map(0x800100, 0x8001ff).ram();                             // NVRAM
 	map(0xa00000, 0xa03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
@@ -2616,7 +2619,7 @@ void setaroul_state::setaroul_map(address_map &map)
 	map(0xf40000, 0xf40bff).w(FUNC(setaroul_state::spriteylow_w));
 	map(0xf40c00, 0xf40c11).w(FUNC(setaroul_state::spritectrl_w));
 
-//  map(0xf80000, 0xf80001).w(FUNC(setaroul_state::xxx)); // $40 at boot
+//  AM_RANGE(0xf80000, 0xf80001) AM_WRITE // $40 at boot
 }
 
 /***************************************************************************
@@ -2937,7 +2940,7 @@ uint16_t kiwame_state::input_r(offs_t offset)
 	switch( offset )
 	{
 		case 0x00/2:    return m_key[i]->read();
-		case 0x02/2:    return m_key[i + 5]->read();
+		case 0x02/2:    return 0xffff;
 		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
 		case 0x08/2:    return 0xffff;
@@ -3502,8 +3505,8 @@ void seta_state::tndrcade_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                             // RAM
 	map(0x0800, 0x0800).r(FUNC(seta_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             //
-	//map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
+	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD(m_soundlatch[0], generic_latch_8_device, read)             //
+	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD(m_soundlatch[1], generic_latch_8_device, read)            //
 	map(0x1000, 0x1000).portr("P1");                 // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");                 // P2
@@ -3636,7 +3639,7 @@ void seta_state::metafox_sub_map(address_map &map)
 	map(0x1000, 0x1000).portr("COINS");          // Coins
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1002, 0x1002).portr("P1");             // P1
-	//map(0x1004, 0x1004).nopr();                // ?
+	//AM_RANGE(0x1004, 0x1004) AM_READNOP                     // ?
 	map(0x1006, 0x1006).portr("P2");             // P2
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
 	map(0x7000, 0x7fff).rom();                         // ROM
@@ -5649,46 +5652,6 @@ bit 0       a   b   c   d   lc
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY7")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2  )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -6102,9 +6065,9 @@ static INPUT_PORTS_START( thunderl )
 	PORT_DIPSETTING(      0x00e0, "Seta (Visco License)" )
 	PORT_DIPSETTING(      0x00a0, "Visco" )
 	PORT_DIPSETTING(      0x0060, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
+//  PORT_DIPSETTING(      0x0040, DEF_STR( None ) )
+//  PORT_DIPSETTING(      0x0020, DEF_STR( None ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
 
 	PORT_START("DSW") //2 DSWs - $600003 & 1.b
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
@@ -6170,22 +6133,6 @@ static INPUT_PORTS_START( thunderl )
 
 	PORT_START("P4") //Player 4
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( thunderlbl )
-
-	PORT_INCLUDE( thunderl )
-
-	PORT_MODIFY("COINS")
-	PORT_DIPNAME( 0x00e0, 0x00e0, "Copyright" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x00c0, "Hyogo (Hyogo License)" )
-	PORT_DIPSETTING(      0x00e0, "(Hyogo License)" )
-	PORT_DIPSETTING(      0x00a0, "Hyogo" )
-	PORT_DIPSETTING(      0x0060, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -8457,15 +8404,15 @@ void seta_state::blockcarb_sound_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0xd000, 0xdfff).ram();
-	//map(0xf001, 0xf001) ??
+	//AM_RANGE(0xf001, 0xf001) ??
 }
 
 void seta_state::blockcarb_sound_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-//  map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+//  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD(m_soundlatch[0], generic_latch_8_device, read)
 }
 
 void seta_state::blockcarb(machine_config &config)
@@ -9512,14 +9459,14 @@ void seta_state::thunderlbl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // XTAL verified, divider unknown, but Z8400A PS, so likely
+	Z80(config, m_audiocpu, 10000000/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &seta_state::thunderlbl_sound_portmap);
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	config.device_remove("x1snd");
 
-	YM2151(config, "ymsnd", 16_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.0); // XTAL verified, divider unknown
+	YM2151(config, "ymsnd", 10000000/2).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
@@ -10385,30 +10332,6 @@ ROM_START( thunderlbl )
 	ROM_LOAD16_BYTE( "22.a3", 0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
 ROM_END
 
-ROM_START( thunderlbl2 ) // 2 PCB stack, label JK274
-	ROM_REGION( 0x010000, "maincpu", 0 )        /* 68000 Code, both 27c256, on main PCB */
-	ROM_LOAD16_BYTE( "g11", 0x000000, 0x008000, CRC(e4842fbd) SHA1(6fc4cded6a7f2e7f331c22323c5b793a7bafdd06) )
-	ROM_LOAD16_BYTE( "f11", 0x000001, 0x008000, CRC(b883ab13) SHA1(b835506b97359e3cd9e528d78c6195721be9e878) )
-
-	// they ripped the sound CPU program from Tetris!
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* sound cpu code, on main PCB */
-	ROM_LOAD( "d", 0x00000, 0x08000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) ) // 27c256
-
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* Sprites, all 27c010a, on sub PCB */
-	ROM_LOAD16_BYTE( "a10", 0x000000, 0x020000, CRC(599a632a) SHA1(29da423dfe1f971cbb205767cf902d199d968d85) )
-	ROM_LOAD16_BYTE( "a8",  0x000001, 0x020000, CRC(3aeef91c) SHA1(a5dc8c22a7bcc1199bdd09c7d0f1f8a378e757c5) )
-	ROM_LOAD16_BYTE( "a5",  0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
-	ROM_LOAD16_BYTE( "a3",  0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
-
-	ROM_REGION( 0xc00, "plds", 0 ) // all on sub PCB
-	ROM_LOAD( "pal16l8acn.e13", 0x000, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8acn.e14", 0x200, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8acn.e15", 0x400, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8acn.f13", 0x600, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8acn.h9",  0x800, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8acn.i3",  0xa00, 0x104, NO_DUMP )
-ROM_END
-
 /*
 
 Wiggie Waggie & Super Bar run on a bootleg SETA board with an OKI M6295 replacing the X1-010 sound chip.
@@ -10719,7 +10642,7 @@ ROM_START( zingzip )
 ROM_END
 
 ROM_START( zingzipbl )
-	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg9.bin",   0x000000, 0x040000, CRC(bf47a8cf) SHA1(87ef35c2dc4d25bbd90cd7528616d06362b20fc8) )
 	ROM_LOAD16_BYTE( "prg10.bin",  0x000001, 0x040000, CRC(561501ba) SHA1(f9d488b6d6b313e543738905f11ebbc5f644eb09) )
 
@@ -12261,9 +12184,8 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
-GAME( 1990, thunderl,   0,       thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1991, thunderlbl, thunderl,thunderlbl,thunderlbl,seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
-GAME( 1990, thunderlbl2,thunderl,thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning

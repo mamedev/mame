@@ -195,7 +195,7 @@ CRT-351
 |              |=============J2=============||=============J1===============||
 +----------------------------------------------------------------------------+
 
-J1 80-pin connector to J1 connector on the CRT-350 mainboard
+J1 80-pin connector to J1 connector on the CRT-350 mainboard 
 J2 80-pin connector to J2 connector on the CRT-350 mainboard
 J3 65-pin single row connector for wire harness
 J4 40-pin dual row connector for printer
@@ -353,7 +353,7 @@ CRT-351
 |              |=============J2=============||=============J1===============||
 +----------------------------------------------------------------------------+
 
-J1 80-pin connector to J1 connector on the CRT-350 mainboard
+J1 80-pin connector to J1 connector on the CRT-350 mainboard 
 J2 80-pin connector to J2 connector on the CRT-350 mainboard
 J3 65-pin single row connector for wire harness
 J4 40-pin dual row connector for printer

@@ -70,14 +70,14 @@ WRITE8_MEMBER(speedatk_state::m6845_w)
 	}
 }
 
-uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
 	uint16_t tile;
 	uint8_t color, region;
 
-	bitmap.fill(rgb_t::black(), cliprect);
+	bitmap.fill(0, cliprect);
 
 	count = (m_crtc_vreg[0x0c]<<8)|(m_crtc_vreg[0x0d] & 0xff);
 

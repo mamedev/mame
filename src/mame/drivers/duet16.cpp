@@ -160,8 +160,8 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
 	map(0xf80a0, 0xf80a3).rw("kbusart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
-	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
+	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
 	map(0xf80e0, 0xf80e3).rw("i8741", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
 	map(0xf8100, 0xf8103).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xf8120, 0xf8120).rw(FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
@@ -420,7 +420,7 @@ void duet16_state::duet16(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
+	h46505_device &crtc(H46505(config, "crtc", 2000000));
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
@@ -433,7 +433,7 @@ void duet16_state::duet16(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea_full();
-	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+	m_screen->set_screen_update("crtc", FUNC(h46505_device::screen_update));
 
 	MSM58321(config, m_rtc, 32768_Hz_XTAL);
 	m_rtc->d0_handler().set(FUNC(duet16_state::rtc_d0_w));

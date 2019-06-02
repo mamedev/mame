@@ -21,7 +21,7 @@ void segahang_state::video_start()
 	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_HANGON, 0x000, 0, 2);
 
 	// initialize the road
-	m_segaic16road->segaic16_road_init(0, m_sharrier_video ? segaic16_road_device::ROAD_SHARRIER : segaic16_road_device::ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
+	m_segaic16road->segaic16_road_init(machine(), 0, m_sharrier_video ? segaic16_road_device::ROAD_SHARRIER : segaic16_road_device::ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
 }
 
 
@@ -113,7 +113,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 						{
 							// if shadow bit is 0 and pix data is 0xa, this triggers shadow/hilight
 							if ((pix & 0x80f) == 0x00a)
-								dest[x] += m_palette_entries;
+								dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
 
 							// otherwise, just add in sprite palette base
 							else

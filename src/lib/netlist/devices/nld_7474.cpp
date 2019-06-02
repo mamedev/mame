@@ -10,8 +10,6 @@
 #include "netlist/nl_base.h"
 #include "nlid_system.h"
 
-#include <array>
-
 namespace netlist
 {
 	namespace devices
@@ -50,7 +48,7 @@ namespace netlist
 		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 		{
 			// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
-			static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+			static constexpr const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 			m_Q.push(stateQ, delay[stateQ]);
 			m_QQ.push(stateQQ, delay[stateQQ]);
 		}

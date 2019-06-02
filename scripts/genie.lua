@@ -1313,7 +1313,7 @@ configuration { "vs20*" }
 			"_CRT_SECURE_NO_DEPRECATE",
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
-
+		
 -- Windows Store/Phone projects already link against the available libraries.
 if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {

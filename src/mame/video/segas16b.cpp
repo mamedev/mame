@@ -80,7 +80,7 @@ uint32_t segas16b_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

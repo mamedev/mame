@@ -446,6 +446,33 @@ static INPUT_PORTS_START( finalapr )
 INPUT_PORTS_END
 
 
+static const gfx_layout obj_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8, /* bits per pixel */
+	{
+		/* plane offsets */
+		0,1,2,3,4,5,6,7,
+	},
+	{
+		0*16+8,1*16+8,0*16,1*16,
+		2*16+8,3*16+8,2*16,3*16,
+		4*16+8,5*16+8,4*16,5*16,
+		6*16+8,7*16+8,6*16,7*16
+	},
+	{
+		0x0*128,0x1*128,0x2*128,0x3*128,0x4*128,0x5*128,0x6*128,0x7*128,
+		0x8*128,0x9*128,0xa*128,0xb*128,0xc*128,0xd*128,0xe*128,0xf*128
+	},
+	16*128
+};
+
+static GFXDECODE_START( gfx_namcofl )
+	GFXDECODE_ENTRY( "sprite", 0, obj_layout,  0x0000, 0x10 )
+GFXDECODE_END
+
+
 TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
 {
 	m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
@@ -545,6 +572,8 @@ void namcofl_state::namcofl(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcofl_state::screen_update_namcofl));
 	m_screen->set_palette(m_c116);
 
+	GFXDECODE(config, "gfxdecode", m_c116, gfx_namcofl);
+
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(true);
@@ -554,11 +583,11 @@ void namcofl_state::namcofl(machine_config &config)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
-	m_c355spr->set_palette(m_c116);
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_scroll_offsets(0, 0);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
 	m_c355spr->set_palxor(0x0);
-	m_c355spr->set_color_base(0);
+	m_c355spr->set_gfxregion(NAMCOFL_SPRITEGFX);
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
@@ -603,11 +632,11 @@ ROM_START( speedrcr )
 	ROM_LOAD("se1_sch2.19p",   0x200000, 0x100000, CRC(e59a731e) SHA1(3fed72e9bb485d4d689ab51490360c4c6f1dc5cb) )
 	ROM_LOAD("se1_sch3.18p",   0x300000, 0x100000, CRC(f817027a) SHA1(71745476f496c60d89c8563b3e46bc85eebc79ce) )
 
-	ROM_REGION( 0x800000, "c355spr", 0 )  // OBJ
-	ROM_LOAD32_WORD("se1obj0l.ic1", 0x000000, 0x200000, CRC(17585218) SHA1(3332afa9bd194ac37b8d6f352507c523a0f2e2b3) )
-	ROM_LOAD32_WORD("se1obj0u.ic2", 0x000002, 0x200000, CRC(d14b1236) SHA1(e5447732ef3acec88fb7a00e0deca3e71a40ae65) )
-	ROM_LOAD32_WORD("se1obj1l.ic3", 0x400000, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
-	ROM_LOAD32_WORD("se1obj1u.ic4", 0x400002, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD16_BYTE("se1obj0l.ic1", 0x000001, 0x200000, CRC(17585218) SHA1(3332afa9bd194ac37b8d6f352507c523a0f2e2b3) )
+	ROM_LOAD16_BYTE("se1obj0u.ic2", 0x000000, 0x200000, CRC(d14b1236) SHA1(e5447732ef3acec88fb7a00e0deca3e71a40ae65) )
+	ROM_LOAD16_BYTE("se1obj1l.ic3", 0x400001, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
+	ROM_LOAD16_BYTE("se1obj1u.ic4", 0x400000, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
 
 	ROM_REGION( 0x100000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("se1_rsh.14k",    0x000000, 0x100000, CRC(7aa5a962) SHA1(ff936dfcfcc4ee1f5f2232df62def76ff99e671e) )
@@ -652,11 +681,11 @@ ROM_START( finalapr )
 	ROM_LOAD("flr1sch2.19p",   0x200000, 0x100000, CRC(9b6b7abd) SHA1(5cdec70db1b46bc5d0866ca155b520157fef3adf) )
 	ROM_LOAD("flr1sch3.18p",   0x300000, 0x100000, CRC(50a14f54) SHA1(ab9c2f2e11f006a9dc7e5aedd5788d7d67166d36) )
 
-	ROM_REGION( 0x800000, "c355spr", 0 )  // OBJ
-	ROM_LOAD32_WORD("flr1obj0l.ic1", 0x000000, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
-	ROM_LOAD32_WORD("flr1obj0u.ic2", 0x000002, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
-	ROM_LOAD32_WORD("flr1obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
-	ROM_LOAD32_WORD("flr1obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD16_BYTE("flr1obj0l.ic1", 0x000001, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
+	ROM_LOAD16_BYTE("flr1obj0u.ic2", 0x000000, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
+	ROM_LOAD16_BYTE("flr1obj1l.ic3", 0x400001, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
+	ROM_LOAD16_BYTE("flr1obj1u.ic4", 0x400000, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
 	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("flr1rsh.14k",    0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
@@ -691,11 +720,11 @@ ROM_START( finalapro )
 	ROM_LOAD("flr1sch2.19p",   0x200000, 0x100000, CRC(9b6b7abd) SHA1(5cdec70db1b46bc5d0866ca155b520157fef3adf) )
 	ROM_LOAD("flr1sch3.18p",   0x300000, 0x100000, CRC(50a14f54) SHA1(ab9c2f2e11f006a9dc7e5aedd5788d7d67166d36) )
 
-	ROM_REGION( 0x800000, "c355spr", 0 )  // OBJ
-	ROM_LOAD32_WORD("flr1obj0l.ic1", 0x000000, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
-	ROM_LOAD32_WORD("flr1obj0u.ic2", 0x000002, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
-	ROM_LOAD32_WORD("flr1obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
-	ROM_LOAD32_WORD("flr1obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD16_BYTE("flr1obj0l.ic1", 0x000001, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
+	ROM_LOAD16_BYTE("flr1obj0u.ic2", 0x000000, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
+	ROM_LOAD16_BYTE("flr1obj1l.ic3", 0x400001, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
+	ROM_LOAD16_BYTE("flr1obj1u.ic4", 0x400000, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
 	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("flr1rsh.14k",    0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
@@ -731,11 +760,11 @@ ROM_START( finalaprj )
 	ROM_LOAD("flr1sch2.19p",   0x200000, 0x100000, CRC(9b6b7abd) SHA1(5cdec70db1b46bc5d0866ca155b520157fef3adf) )
 	ROM_LOAD("flr1sch3.18p",   0x300000, 0x100000, CRC(50a14f54) SHA1(ab9c2f2e11f006a9dc7e5aedd5788d7d67166d36) )
 
-	ROM_REGION( 0x800000, "c355spr", 0 )  // OBJ
-	ROM_LOAD32_WORD("flr1obj0l.ic1", 0x000000, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
-	ROM_LOAD32_WORD("flr1obj0u.ic2", 0x000002, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
-	ROM_LOAD32_WORD("flr1obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
-	ROM_LOAD32_WORD("flr1obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD16_BYTE("flr1obj0l.ic1", 0x000001, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
+	ROM_LOAD16_BYTE("flr1obj0u.ic2", 0x000000, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
+	ROM_LOAD16_BYTE("flr1obj1l.ic3", 0x400001, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
+	ROM_LOAD16_BYTE("flr1obj1u.ic4", 0x400000, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
 	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("flr1rsh.14k",    0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )

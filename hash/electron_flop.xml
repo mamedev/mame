@@ -12,7 +12,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="9classiccardandboardgamesno1-adfs_e.adf" size="327680" crc="a4b8779c" sha1="316e9bc8aa4e7f9ac2f2c6794ad1e7999cd454f8"/>
+				<rom name="9classiccardandboardgamesno1-adfs_e.adf" size="327680" crc="a4b8779c" sha1="316e9bc8aa4e7f9ac2f2c6794ad1e7999cd454f8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="9classiccardandboardgamesno2-adfs_e.adf" size="327680" crc="425037ce" sha1="3ac5a733434fa79bcb5cf7bb264dc3c5fea8518d"/>
+				<rom name="9classiccardandboardgamesno2-adfs_e.adf" size="327680" crc="425037ce" sha1="3ac5a733434fa79bcb5cf7bb264dc3c5fea8518d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="137728">
-				<rom name="acheton-dfs_e.ssd" size="137728" crc="c85395a7" sha1="41893ebff3ecdbf7efbfaa5df2b5b5596ce5aa3f"/>
+				<rom name="acheton-dfs_e.ssd" size="137728" crc="c85395a7" sha1="41893ebff3ecdbf7efbfaa5df2b5b5596ce5aa3f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="alps-adfs_e.adm" size="327680" crc="d87d98ed" sha1="3fdfc69ca366bc4c2d6f1cde17ae5d3a1290b5ee"/>
+				<rom name="alps-adfs_e.adm" size="327680" crc="d87d98ed" sha1="3fdfc69ca366bc4c2d6f1cde17ae5d3a1290b5ee" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -60,7 +60,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="amxart-dfs_e.ssd" size="204800" crc="7316b694" sha1="5cd0f6799ea1c8e6ce6640453ecde6c457aef768"/>
+				<rom name="amxart-dfs_e.ssd" size="204800" crc="7316b694" sha1="5cd0f6799ea1c8e6ce6640453ecde6c457aef768" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72,7 +72,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="86784">
-				<rom name="answerbackseniorquiz-adfs_e.adf" size="86784" crc="4689b1e1" sha1="e9aa60e57410eae2750001bf6ae44458cb45b78a"/>
+				<rom name="answerbackseniorquiz-adfs_e.adf" size="86784" crc="4689b1e1" sha1="e9aa60e57410eae2750001bf6ae44458cb45b78a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -84,7 +84,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="arcadegamecreator-dfs_e.ssd" size="204800" crc="93d1e6a9" sha1="18c5b93ecf8f9a3268e8212ef583e5039c7033c5"/>
+				<rom name="arcadegamecreator-dfs_e.ssd" size="204800" crc="93d1e6a9" sha1="18c5b93ecf8f9a3268e8212ef583e5039c7033c5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="arcadegamecreator-adfs_e.adf" size="327680" crc="730ee540" sha1="36689d570099b639e7d4df2794829cf34e50a629"/>
+				<rom name="arcadegamecreator-adfs_e.adf" size="327680" crc="730ee540" sha1="36689d570099b639e7d4df2794829cf34e50a629" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="aroundtheworld-dfs_e.ssd" size="204800" crc="dfffba33" sha1="0e9bbdf127120c8f8ddb4dccaae081bb63fc1649"/>
+				<rom name="aroundtheworld-dfs_e.ssd" size="204800" crc="dfffba33" sha1="0e9bbdf127120c8f8ddb4dccaae081bb63fc1649" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="76288">
-				<rom name="avon-dfs_e.ssd" size="76288" crc="2685ee25" sha1="6192bd912ad793243429cf05142ca14147c3a237"/>
+				<rom name="avon-dfs_e.ssd" size="76288" crc="2685ee25" sha1="6192bd912ad793243429cf05142ca14147c3a237" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="38400">
-				<rom name="baron-dfs_e.ssd" size="38400" crc="d86f7a6f" sha1="09a95c36a3d06e1fcbc900452603145912e15ff5"/>
+				<rom name="baron-dfs_e.ssd" size="38400" crc="d86f7a6f" sha1="09a95c36a3d06e1fcbc900452603145912e15ff5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="bonecruncher-dfs_e.ssd" size="102400" crc="a6a7399e" sha1="d9ec7642c9fb62855fa63d2c1bc3797afe25bc75"/>
+				<rom name="bonecruncher-dfs_e.ssd" size="102400" crc="a6a7399e" sha1="d9ec7642c9fb62855fa63d2c1bc3797afe25bc75" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="classicarcadegames-adfs_e.adf" size="327680" crc="6dd95661" sha1="6e3c7b5ff078bc5b41902265686a98d606d4a5b2"/>
+				<rom name="classicarcadegames-adfs_e.adf" size="327680" crc="6dd95661" sha1="6e3c7b5ff078bc5b41902265686a98d606d4a5b2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +168,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="classroomcomputing_vol1-adfs_e.adf" size="327680" crc="f96d21e3" sha1="11474868d63206b0bf8515b30180b302d9db4b4c"/>
+				<rom name="classroomcomputing_vol1-adfs_e.adf" size="327680" crc="f96d21e3" sha1="11474868d63206b0bf8515b30180b302d9db4b4c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +180,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="163840">
-				<rom name="classroomcomputing_vol2-adfs_e.adf" size="163840" crc="042f5765" sha1="63e85184e7623b93e3b52c2e280d91bb77c5be6a"/>
+				<rom name="classroomcomputing_vol2-adfs_e.adf" size="163840" crc="042f5765" sha1="63e85184e7623b93e3b52c2e280d91bb77c5be6a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -192,7 +192,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="codenamedroid-adfs_e.adf" size="327680" crc="667f5482" sha1="e02c5d1be060c4d7bf5593469cdb71b04db3a05e"/>
+				<rom name="codenamedroid-adfs_e.adf" size="327680" crc="667f5482" sha1="e02c5d1be060c4d7bf5593469cdb71b04db3a05e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66816">
-				<rom name="countdowntodoom-dfs_e.ssd" size="66816" crc="80b89eb0" sha1="2dc872802a275759b015ddcda256d30aae61ccfe"/>
+				<rom name="countdowntodoom-dfs_e.ssd" size="66816" crc="80b89eb0" sha1="2dc872802a275759b015ddcda256d30aae61ccfe" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -216,7 +216,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="crazeerider-adfs_e.adf" size="327680" crc="11c1c183" sha1="04f7d28aeeef8504c83d8035a8f77e3ed8f9fab9"/>
+				<rom name="crazeerider-adfs_e.adf" size="327680" crc="11c1c183" sha1="04f7d28aeeef8504c83d8035a8f77e3ed8f9fab9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="database-adfs_e.adf" size="327680" crc="14e529e6" sha1="a90fb1710599fea119c233500c56c327afb7940e"/>
+				<rom name="database-adfs_e.adf" size="327680" crc="14e529e6" sha1="a90fb1710599fea119c233500c56c327afb7940e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="dreamtime-adfs_e.adf" size="327680" crc="67e5449d" sha1="4e9827611eba0cb2447b27c9ec49868991846763"/>
+				<rom name="dreamtime-adfs_e.adf" size="327680" crc="67e5449d" sha1="4e9827611eba0cb2447b27c9ec49868991846763" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -254,7 +254,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="eggheadinspace-dfs_e.ssd" size="204800" crc="2b6b2898" sha1="6032eddce98e4a0b16ea410464f0d0b2ea46e7b6"/>
+				<rom name="eggheadinspace-dfs_e.ssd" size="204800" crc="2b6b2898" sha1="6032eddce98e4a0b16ea410464f0d0b2ea46e7b6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -266,7 +266,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="elixir-adfs_e.adf" size="327680" crc="a6f407e5" sha1="57bdce7e091ccb1e415d42d463dace5662d570d3"/>
+				<rom name="elixir-adfs_e.adf" size="327680" crc="a6f407e5" sha1="57bdce7e091ccb1e415d42d463dace5662d570d3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +278,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="enthar7-dfs_e.ssd" size="204800" crc="cbbbfc7d" sha1="671c969e10f8e27b704359dd3b38576f36eb323b"/>
+				<rom name="enthar7-dfs_e.ssd" size="204800" crc="cbbbfc7d" sha1="671c969e10f8e27b704359dd3b38576f36eb323b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -291,7 +291,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="15616">
-				<rom name="hardhatharry-adfs_e.adf" size="15616" crc="c24c95ba" sha1="74d952747c4b64cb3b50599c546f0e7033af4835" />
+				<rom name="hardhatharry-adfs_e.adf" size="15616" crc="c24c95ba" sha1="74d952747c4b64cb3b50599c546f0e7033af4835" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -303,7 +303,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="hezarin-dfs_e.ssd" size="179200" crc="d8b06553" sha1="11e4cf452b47ea7a2f441090aec7534d9c306708"/>
+				<rom name="hezarin-dfs_e.ssd" size="179200" crc="d8b06553" sha1="11e4cf452b47ea7a2f441090aec7534d9c306708" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -316,7 +316,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="12032">
-				<rom name="hyperviper-adfs_e.adf" size="12032" crc="54f29687" sha1="36f7e68536e72b3776bab7c29b4e525cf62fc0bd" />
+				<rom name="hyperviper-adfs_e.adf" size="12032" crc="54f29687" sha1="36f7e68536e72b3776bab7c29b4e525cf62fc0bd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -329,7 +329,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="junglejourney-adfs_e.adf" size="327680" crc="8951a01b" sha1="6496dde226380c068aed78f2289d01c918c781e5" />
+				<rom name="junglejourney-adfs_e.adf" size="327680" crc="8951a01b" sha1="6496dde226380c068aed78f2289d01c918c781e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -341,7 +341,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="194304">
-				<rom name="keyword-dfs_e.ssd" size="194304" crc="af20ee8e" sha1="3dfc0ef39d7d005d91e4070a3730df6e88563d14"/>
+				<rom name="keyword-dfs_e.ssd" size="194304" crc="af20ee8e" sha1="3dfc0ef39d7d005d91e4070a3730df6e88563d14" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -353,7 +353,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57856">
-				<rom name="kingdomofhamil-dfs_e.ssd" size="57856" crc="d797007b" sha1="b10aa31f6d6f2adc86410dd1ea6fbdada2f38b7c"/>
+				<rom name="kingdomofhamil-dfs_e.ssd" size="57856" crc="d797007b" sha1="b10aa31f6d6f2adc86410dd1ea6fbdada2f38b7c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -365,7 +365,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="knitweardesigner-dfs_e.ssd" size="204800" crc="101c0a1b" sha1="4a89840f0a4121b65f29add4bcb90e63aa9f8985"/>
+				<rom name="knitweardesigner-dfs_e.ssd" size="204800" crc="101c0a1b" sha1="4a89840f0a4121b65f29add4bcb90e63aa9f8985" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -377,7 +377,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="129024">
-				<rom name="lastdaysofdoom-dfs_e.ssd" size="129024" crc="daa7d5aa" sha1="afc6f6ac24bad877dd80e28845114ecd9bac1dfc"/>
+				<rom name="lastdaysofdoom-dfs_e.ssd" size="129024" crc="daa7d5aa" sha1="afc6f6ac24bad877dd80e28845114ecd9bac1dfc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -389,7 +389,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="lifeofrepton-dfs_e.ssd" size="102400" crc="3fe50391" sha1="5c2d9606bfcc146cc1a5198fef7987e39344574a"/>
+				<rom name="lifeofrepton-dfs_e.ssd" size="102400" crc="3fe50391" sha1="5c2d9606bfcc146cc1a5198fef7987e39344574a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -401,7 +401,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="magicsword-dfs_e.ssd" size="204800" crc="c5c5f112" sha1="8e4eea8352df8411c772fb52d76f5df011b28681"/>
+				<rom name="magicsword-dfs_e.ssd" size="204800" crc="c5c5f112" sha1="8e4eea8352df8411c772fb52d76f5df011b28681" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -413,7 +413,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="magicsword-adfs_e.adf" size="327680" crc="0b7f1517" sha1="49fe3ff8c50f635a1b20e3f9b66e6d6574430154"/>
+				<rom name="magicsword-adfs_e.adf" size="327680" crc="0b7f1517" sha1="49fe3ff8c50f635a1b20e3f9b66e6d6574430154" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -425,7 +425,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="mathsolevelr1-dfs_e.ssd" size="204800" crc="0b09763a" sha1="b269e68ac3eb82be97371b171cc9b33500f29ce5"/>
+				<rom name="mathsolevelr1-dfs_e.ssd" size="204800" crc="0b09763a" sha1="b269e68ac3eb82be97371b171cc9b33500f29ce5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +437,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="nurseryrhymes-adfs_e.adf" size="327680" crc="4556e25b" sha1="2b7a4c307582fd3d3a308585613a1b31edc48c7f"/>
+				<rom name="nurseryrhymes-adfs_e.adf" size="327680" crc="4556e25b" sha1="2b7a4c307582fd3d3a308585613a1b31edc48c7f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -449,7 +449,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="palaceofmagic-adfs_e.adf" size="327680" crc="84e7094c" sha1="4117dec4761a39d5a1de0cd46392df7e24a55e5b"/>
+				<rom name="palaceofmagic-adfs_e.adf" size="327680" crc="84e7094c" sha1="4117dec4761a39d5a1de0cd46392df7e24a55e5b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -460,7 +460,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="76032">
-				<rom name="philosophersquest-dfs_e.ssd" size="76032" crc="7f1f5cf5" sha1="9ed436eedf8ddb98125fcb4e0147a20688e8d717"/>
+				<rom name="philosophersquest-dfs_e.ssd" size="76032" crc="7f1f5cf5" sha1="9ed436eedf8ddb98125fcb4e0147a20688e8d717" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -472,7 +472,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="piratesperil-adfs_e.adf" size="327680" crc="73812f98" sha1="8b7b6ec81181107717bc68c410b572a5ffd5872a"/>
+				<rom name="piratesperil-adfs_e.adf" size="327680" crc="73812f98" sha1="8b7b6ec81181107717bc68c410b572a5ffd5872a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="pias-dfs_e.ssd" size="204800" crc="a45acc09" sha1="3c7413811a03c087bd7f88ca5cc93807a092ffb6"/>
+				<rom name="pias-dfs_e.ssd" size="204800" crc="a45acc09" sha1="3c7413811a03c087bd7f88ca5cc93807a092ffb6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="pias-adfs_e.adf" size="327680" crc="4d42df73" sha1="b88c5661be20ea908277df4871c29a9eab8cbc60"/>
+				<rom name="pias-adfs_e.adf" size="327680" crc="4d42df73" sha1="b88c5661be20ea908277df4871c29a9eab8cbc60" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +509,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="163840">
-				<rom name="plus3gamesdisc-adfs_e.adf" size="163840" crc="a091ac3f" sha1="2b479c73d9395bd11f894d06286afc95d4d42ac2"/>
+				<rom name="plus3gamesdisc-adfs_e.adf" size="163840" crc="a091ac3f" sha1="2b479c73d9395bd11f894d06286afc95d4d42ac2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -521,7 +521,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="nzacorngames-adfs_e.adf" size="327680" crc="60844635" sha1="ed6b76d93b57bdcdadc1ab7859b5430d05ac4987"/>
+				<rom name="nzacorngames-adfs_e.adf" size="327680" crc="60844635" sha1="ed6b76d93b57bdcdadc1ab7859b5430d05ac4987" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -533,7 +533,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="presgamesdisk1-adfs_e.adf" size="327680" crc="68fd2a77" sha1="50463ee825711b32871439cad9a06bc1a1ef722e"/>
+				<rom name="presgamesdisk1-adfs_e.adf" size="327680" crc="68fd2a77" sha1="50463ee825711b32871439cad9a06bc1a1ef722e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -545,7 +545,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="presgamesdisk2-adfs_e.adf" size="327680" crc="4be7b2b7" sha1="5090e60cb37279c8c02749ebe6289d9675ece446"/>
+				<rom name="presgamesdisk2-adfs_e.adf" size="327680" crc="4be7b2b7" sha1="5090e60cb37279c8c02749ebe6289d9675ece446" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -557,7 +557,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="presgamesdisk3-adfs_e.adf" size="327680" crc="c8483e26" sha1="ac66c579e668af70e4ee80cff339851b2b191be1"/>
+				<rom name="presgamesdisk3-adfs_e.adf" size="327680" crc="c8483e26" sha1="ac66c579e668af70e4ee80cff339851b2b191be1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -569,7 +569,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="presgamesdisk4-adfs_e.adf" size="327680" crc="1258c985" sha1="29f56326c2ff6da2385b429a0c1f14ffc8d639c6"/>
+				<rom name="presgamesdisk4-adfs_e.adf" size="327680" crc="1258c985" sha1="29f56326c2ff6da2385b429a0c1f14ffc8d639c6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -581,7 +581,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="presgamesdisk5-adfs_e.adf" size="327680" crc="942d4944" sha1="174062bc4c51daccbf86685da4e5846ab582249b"/>
+				<rom name="presgamesdisk5-adfs_e.adf" size="327680" crc="942d4944" sha1="174062bc4c51daccbf86685da4e5846ab582249b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +593,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="presgamesdisk6-adfs_e.adf" size="327680" crc="6d5b538e" sha1="f4e33261a15a616368ac0968afc7ed298d86c99c"/>
+				<rom name="presgamesdisk6-adfs_e.adf" size="327680" crc="6d5b538e" sha1="f4e33261a15a616368ac0968afc7ed298d86c99c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -606,7 +606,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ravenwd-dfs_e.ssd" size="204800" crc="c84dbfe5" sha1="79ae5d2e24dc43d5713625db3c423e305756a2cb"/>
+				<rom name="ravenwd-dfs_e.ssd" size="204800" crc="c84dbfe5" sha1="79ae5d2e24dc43d5713625db3c423e305756a2cb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -618,7 +618,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="repton3-dfs_e.ssd" size="204800" crc="8c5da04d" sha1="f47cbd07bdda2ad889076e7ed5229cb77bb33be6"/>
+				<rom name="repton3-dfs_e.ssd" size="204800" crc="8c5da04d" sha1="f47cbd07bdda2ad889076e7ed5229cb77bb33be6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -630,7 +630,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="96256">
-				<rom name="reptonthrutime-dfs_e.ssd" size="96256" crc="1ce22dbf" sha1="698f3348034de64d4a53a7f41fe4f2666bf498c2"/>
+				<rom name="reptonthrutime-dfs_e.ssd" size="96256" crc="1ce22dbf" sha1="698f3348034de64d4a53a7f41fe4f2666bf498c2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -642,7 +642,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="returntodoom-dfs_e.ssd" size="204800" crc="6fae1dee" sha1="ae6852f3d0b9f135ba06221ac25c24a272eed74f"/>
+				<rom name="returntodoom-dfs_e.ssd" size="204800" crc="6fae1dee" sha1="ae6852f3d0b9f135ba06221ac25c24a272eed74f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -654,7 +654,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="spellbinder-dfs_e.ssd" size="204800" crc="dada2fca" sha1="9b3f7ba15aea5e68745242214f3bd4a7be6f79a2"/>
+				<rom name="spellbinder-dfs_e.ssd" size="204800" crc="dada2fca" sha1="9b3f7ba15aea5e68745242214f3bd4a7be6f79a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -666,7 +666,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="94976">
-				<rom name="spysnatcher-dfs_e.ssd" size="94976" crc="d9145f5f" sha1="859199a51617b454c85f94dd19ef2dcd9c3d864e"/>
+				<rom name="spysnatcher-dfs_e.ssd" size="94976" crc="d9145f5f" sha1="859199a51617b454c85f94dd19ef2dcd9c3d864e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -678,7 +678,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="superiorcollection3-adfs_e.adf" size="327680" crc="8340abfa" sha1="3e572eb5524b4312c07e326cfd2d19aac64958e6"/>
+				<rom name="superiorcollection3-adfs_e.adf" size="327680" crc="8340abfa" sha1="3e572eb5524b4312c07e326cfd2d19aac64958e6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -690,7 +690,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="Starspell-Dictionary-adfs_e.adf" size="327680" crc="93d418c6" sha1="112dacc72d7d49a8a255ca2f7185e1cf7caa0a72" />
+				<rom name="Starspell-Dictionary-adfs_e.adf" size="327680" crc="93d418c6" sha1="112dacc72d7d49a8a255ca2f7185e1cf7caa0a72" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +702,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Starspell-Dictionary-dfs_e.ssd" size="204800" crc="88c692d1" sha1="2cf05091b210d31f968a2ed90a4d1db253586415" />
+				<rom name="Starspell-Dictionary-dfs_e.ssd" size="204800" crc="88c692d1" sha1="2cf05091b210d31f968a2ed90a4d1db253586415" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -714,7 +714,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="stranded-adfs_e.adf" size="327680" crc="1d24c2c1" sha1="50efe51dccfbb10f11cb7a85ff5f28ac7c680e9a"/>
+				<rom name="stranded-adfs_e.adf" size="327680" crc="1d24c2c1" sha1="50efe51dccfbb10f11cb7a85ff5f28ac7c680e9a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -726,7 +726,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="tarodascheme-adfs_e.adf" size="327680" crc="ddaf4fdd" sha1="f554985f1f63aa31fab9ebe59e8f4aa384ac51e4"/>
+				<rom name="tarodascheme-adfs_e.adf" size="327680" crc="ddaf4fdd" sha1="f554985f1f63aa31fab9ebe59e8f4aa384ac51e4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -738,7 +738,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="10ofthebest_vol1-adfs_e.adf" size="327680" crc="1fecefe6" sha1="5742a587cd9ca2695277b0078e15edb1999dce40"/>
+				<rom name="10ofthebest_vol1-adfs_e.adf" size="327680" crc="1fecefe6" sha1="5742a587cd9ca2695277b0078e15edb1999dce40" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +750,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="10ofthebest_vol2-adfs_e.adf" size="327680" crc="6f506dec" sha1="d1a7f10a17151cbbddbb1ee2abd6993e39e51bd6"/>
+				<rom name="10ofthebest_vol2-adfs_e.adf" size="327680" crc="6f506dec" sha1="d1a7f10a17151cbbddbb1ee2abd6993e39e51bd6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -762,7 +762,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="10ofthebest_vol3-adfs_e.adf" size="327680" crc="777a2cb2" sha1="63e1a14fd63eb0b023fe7d66fba88b24a61d78a2"/>
+				<rom name="10ofthebest_vol3-adfs_e.adf" size="327680" crc="777a2cb2" sha1="63e1a14fd63eb0b023fe7d66fba88b24a61d78a2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -774,7 +774,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="10ofthebest_vol4-adfs_e.adf" size="327680" crc="0a4ea2dc" sha1="352ce6255bb9f8dabbbe787173e28bddd92b082e"/>
+				<rom name="10ofthebest_vol4-adfs_e.adf" size="327680" crc="0a4ea2dc" sha1="352ce6255bb9f8dabbbe787173e28bddd92b082e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -786,7 +786,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="ultimateprize-adfs_e.adf" size="327680" crc="ac946335" sha1="21e97c87752366e213e4fe9e9341f38b36a8d409"/>
+				<rom name="ultimateprize-adfs_e.adf" size="327680" crc="ac946335" sha1="21e97c87752366e213e4fe9e9341f38b36a8d409" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -798,7 +798,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="welcomedisc-adfs_e.adf" size="327680" crc="a6733fa6" sha1="70b5d940c9c7da85e82e29b1b4e3ad29a44c51bd"/>
+				<rom name="welcomedisc-adfs_e.adf" size="327680" crc="a6733fa6" sha1="70b5d940c9c7da85e82e29b1b4e3ad29a44c51bd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -811,7 +811,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="204800">
-				<rom name="zoar-dfs_e.ssd" size="204800" crc="3aca76fd" sha1="b022ffe0f6e3d0e3a4b17b984a4acc1fce26a93b"/>
+				<rom name="zoar-dfs_e.ssd" size="204800" crc="3aca76fd" sha1="b022ffe0f6e3d0e3a4b17b984a4acc1fce26a93b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -826,7 +826,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="pres_adfs_e00-adfs_e.adf" size="327680" crc="4fcf968c" sha1="1b625588c6e50fc91cefabfa238ed7fadccc3c70"/>
+				<rom name="pres_adfs_e00-adfs_e.adf" size="327680" crc="4fcf968c" sha1="1b625588c6e50fc91cefabfa238ed7fadccc3c70" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -839,7 +839,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="acp_dfs_e00-adfs_e.adf" size="327680" crc="4f2910a6" sha1="704196274014bd27c337403e6b16e8c7e9a4b711"/>
+				<rom name="acp_dfs_e00-adfs_e.adf" size="327680" crc="4f2910a6" sha1="704196274014bd27c337403e6b16e8c7e9a4b711" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -853,7 +853,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="pmse2p-adfs_e.adf" size="327680" crc="ba456694" sha1="7c29331f5e16ac88134e772999a2c15a642e0de1"/>
+				<rom name="pmse2p-adfs_e.adf" size="327680" crc="ba456694" sha1="7c29331f5e16ac88134e772999a2c15a642e0de1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -866,7 +866,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="pms_hi-basic-adfs_e.adf" size="327680" crc="370de8fe" sha1="bf5dcace99d386d939be9323b17cc9660a7cce2c"/>
+				<rom name="pms_hi-basic-adfs_e.adf" size="327680" crc="370de8fe" sha1="bf5dcace99d386d939be9323b17cc9660a7cce2c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -880,7 +880,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
-				<rom name="eup401-adfs_e.adf" size="163840" crc="877cb96a" sha1="ef8120efcecbd188be7f7c8d0f4ad7d37dd055bd"/>
+				<rom name="eup401-adfs_e.adf" size="163840" crc="877cb96a" sha1="ef8120efcecbd188be7f7c8d0f4ad7d37dd055bd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -892,7 +892,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
-				<rom name="eup402-adfs_e.adf" size="163840" crc="b9be7a87" sha1="e5b388acdb543b704928bf0da3a25212c36ff3b8"/>
+				<rom name="eup402-adfs_e.adf" size="163840" crc="b9be7a87" sha1="e5b388acdb543b704928bf0da3a25212c36ff3b8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -904,7 +904,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "143360">
-				<rom name="eup408-adfs_e.adf" size="143360" crc="b53e5255" sha1="0a8075adaf1a4be5d8ada3f49d855a8b6caf30d5"/>
+				<rom name="eup408-adfs_e.adf" size="143360" crc="b53e5255" sha1="0a8075adaf1a4be5d8ada3f49d855a8b6caf30d5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -916,7 +916,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eup411-adfs_e.adf" size="327680" crc="37fe65b8" sha1="d87df67bafa2f6680a53c9b74007df6ba056c52b"/>
+				<rom name="eup411-adfs_e.adf" size="327680" crc="37fe65b8" sha1="d87df67bafa2f6680a53c9b74007df6ba056c52b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -928,7 +928,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eup501-adfs_e.adf" size="327680" crc="e0236dec" sha1="b02577cadb34522267f5b57b215725cdb0cb695a"/>
+				<rom name="eup501-adfs_e.adf" size="327680" crc="e0236dec" sha1="b02577cadb34522267f5b57b215725cdb0cb695a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -940,7 +940,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
-				<rom name="eup503-adfs_e.adf" size="163840" crc="120862d9" sha1="b4181c5416fe7b8805a719214f3f755798c54888"/>
+				<rom name="eup503-adfs_e.adf" size="163840" crc="120862d9" sha1="b4181c5416fe7b8805a719214f3f755798c54888" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -952,7 +952,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eup506-adfs_e.adf" size="327680" crc="ab8e73a2" sha1="94d39072552cd39b863d4bc8262d698811e608ae"/>
+				<rom name="eup506-adfs_e.adf" size="327680" crc="ab8e73a2" sha1="94d39072552cd39b863d4bc8262d698811e608ae" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +964,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
-				<rom name="eup512-adfs_e.adf" size="163840" crc="df8498ad" sha1="0b92f865b054e19395fd66a1448c4ab1998116bb"/>
+				<rom name="eup512-adfs_e.adf" size="163840" crc="df8498ad" sha1="0b92f865b054e19395fd66a1448c4ab1998116bb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -976,7 +976,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eup609-adfs_e.adf" size="327680" crc="87677d8b" sha1="411a85d374b00d56f90bacb436477dad62354ca0"/>
+				<rom name="eup609-adfs_e.adf" size="327680" crc="87677d8b" sha1="411a85d374b00d56f90bacb436477dad62354ca0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -988,7 +988,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug00-adfs_e.adm" size="327680" crc="4740034e" sha1="f490213581c04d7dcf71ba67202060edeb3c8df5"/>
+				<rom name="eug00-adfs_e.adm" size="327680" crc="4740034e" sha1="f490213581c04d7dcf71ba67202060edeb3c8df5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1000,7 +1000,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug00-dfs_e.dsd" size="409600" crc="634eaa95" sha1="46fa0edc770e654bc00ab9dc37f9d1ef696da926"/>
+				<rom name="eug00-dfs_e.dsd" size="409600" crc="634eaa95" sha1="46fa0edc770e654bc00ab9dc37f9d1ef696da926" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1012,7 +1012,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug01-adfs_e.adm" size="327680" crc="c88aa2cc" sha1="e0241b8efb8db79aa1b2198dc8cb0da7ce1f1636"/>
+				<rom name="eug01-adfs_e.adm" size="327680" crc="c88aa2cc" sha1="e0241b8efb8db79aa1b2198dc8cb0da7ce1f1636" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1024,7 +1024,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug01-dfs_e.dsd" size="409600" crc="5dc20000" sha1="76a50e7a88a958049b0d17039fd450435a96f124"/>
+				<rom name="eug01-dfs_e.dsd" size="409600" crc="5dc20000" sha1="76a50e7a88a958049b0d17039fd450435a96f124" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1036,7 +1036,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug02-adfs_e.adm" size="327680" crc="7183e0aa" sha1="a14ef8e51dd657aa68e91239f5ac1a28630001af"/>
+				<rom name="eug02-adfs_e.adm" size="327680" crc="7183e0aa" sha1="a14ef8e51dd657aa68e91239f5ac1a28630001af" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1048,7 +1048,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug02-dfs_e.dsd" size="409600" crc="a544cafe" sha1="8eb3003d10bc2da016c285b87ac18ebd544c9d3b"/>
+				<rom name="eug02-dfs_e.dsd" size="409600" crc="a544cafe" sha1="8eb3003d10bc2da016c285b87ac18ebd544c9d3b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1060,7 +1060,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug03-adfs_e.adm" size="327680" crc="23dcd1ee" sha1="f56dd7eeea3d6cc909cf74ce4460de96474d2432"/>
+				<rom name="eug03-adfs_e.adm" size="327680" crc="23dcd1ee" sha1="f56dd7eeea3d6cc909cf74ce4460de96474d2432" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1072,7 +1072,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug03-dfs_e.dsd" size="409600" crc="f5a038b3" sha1="b7b86081955e0f6afad00231d7c06b016b0f14b7"/>
+				<rom name="eug03-dfs_e.dsd" size="409600" crc="f5a038b3" sha1="b7b86081955e0f6afad00231d7c06b016b0f14b7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1084,7 +1084,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug04-adfs_e.adm" size="327680" crc="582e6244" sha1="7bda20012b374bad4c5616cc59ecc6308a8a47e8"/>
+				<rom name="eug04-adfs_e.adm" size="327680" crc="582e6244" sha1="7bda20012b374bad4c5616cc59ecc6308a8a47e8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1096,7 +1096,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug04-dfs_e.dsd" size="409600" crc="44443e50" sha1="5595d20e332f6e2346520685e6598342c688af19"/>
+				<rom name="eug04-dfs_e.dsd" size="409600" crc="44443e50" sha1="5595d20e332f6e2346520685e6598342c688af19" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1108,7 +1108,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug05-adfs_e.adm" size="327680" crc="75b230f4" sha1="7c576854b68e6ff9dd3342fc222b26cf869b4c98"/>
+				<rom name="eug05-adfs_e.adm" size="327680" crc="75b230f4" sha1="7c576854b68e6ff9dd3342fc222b26cf869b4c98" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1120,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug05-dfs_e.dsd" size="409600" crc="9ef25d40" sha1="aaf2b7d3049d92d4b5b8c201c7a7aee8d2a9125b"/>
+				<rom name="eug05-dfs_e.dsd" size="409600" crc="9ef25d40" sha1="aaf2b7d3049d92d4b5b8c201c7a7aee8d2a9125b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1132,7 +1132,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug06-adfs_e.adm" size="327680" crc="0f93e2f4" sha1="53d97babb475dcd11ff418a998a21a49e6afb398"/>
+				<rom name="eug06-adfs_e.adm" size="327680" crc="0f93e2f4" sha1="53d97babb475dcd11ff418a998a21a49e6afb398" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1144,7 +1144,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug06-dfs_e.dsd" size="409600" crc="b9e11b3a" sha1="8d4c3c1b17921ad6e274e5c0f6f1b7b33f783bb4"/>
+				<rom name="eug06-dfs_e.dsd" size="409600" crc="b9e11b3a" sha1="8d4c3c1b17921ad6e274e5c0f6f1b7b33f783bb4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1156,7 +1156,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug07-adfs_e.adm" size="327680" crc="0893a33c" sha1="25410596e4d2c79b09e3ef0ff2b9cbec373b0c45"/>
+				<rom name="eug07-adfs_e.adm" size="327680" crc="0893a33c" sha1="25410596e4d2c79b09e3ef0ff2b9cbec373b0c45" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1168,7 +1168,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug07-dfs_e.dsd" size="409600" crc="2870b1e8" sha1="97ba97e1d328c0196e06c73cb4707bf7e1a91df0"/>
+				<rom name="eug07-dfs_e.dsd" size="409600" crc="2870b1e8" sha1="97ba97e1d328c0196e06c73cb4707bf7e1a91df0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1180,7 +1180,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug08-adfs_e.adm" size="327680" crc="975081c0" sha1="5df40bbce6ad50df548ac2c18f304c1b64b0a5b2"/>
+				<rom name="eug08-adfs_e.adm" size="327680" crc="975081c0" sha1="5df40bbce6ad50df548ac2c18f304c1b64b0a5b2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1192,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug08-dfs_e.dsd" size="409600" crc="0492b7dc" sha1="42308c74985ed546fe1219361a5b7bbbd1ecf085"/>
+				<rom name="eug08-dfs_e.dsd" size="409600" crc="0492b7dc" sha1="42308c74985ed546fe1219361a5b7bbbd1ecf085" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1204,7 +1204,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug09-adfs_e.adm" size="327680" crc="c692fd87" sha1="ec3264586f02d779b9599b966724805fc66790fb"/>
+				<rom name="eug09-adfs_e.adm" size="327680" crc="c692fd87" sha1="ec3264586f02d779b9599b966724805fc66790fb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1216,7 +1216,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug09-dfs_e.dsd" size="409600" crc="cd02060f" sha1="06bb44a7f302ae8f348730f11f0ea771d7f2a67c"/>
+				<rom name="eug09-dfs_e.dsd" size="409600" crc="cd02060f" sha1="06bb44a7f302ae8f348730f11f0ea771d7f2a67c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1228,7 +1228,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug10-adfs_e.adf" size="327680" crc="81aece86" sha1="af32dd473f9dddb1d4bbeeb14531ffe89dec7527"/>
+				<rom name="eug10-adfs_e.adf" size="327680" crc="81aece86" sha1="af32dd473f9dddb1d4bbeeb14531ffe89dec7527" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1240,7 +1240,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug10-dfs_e.dsd" size="409600" crc="fa750dc8" sha1="492ef78747d6b2914f2f9300c9c91ca65959f253"/>
+				<rom name="eug10-dfs_e.dsd" size="409600" crc="fa750dc8" sha1="492ef78747d6b2914f2f9300c9c91ca65959f253" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1252,7 +1252,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug11-adfs_e.adm" size="327680" crc="48bc3d92" sha1="07c7af3781474ee070b6de5df58b11b5328b3dba"/>
+				<rom name="eug11-adfs_e.adm" size="327680" crc="48bc3d92" sha1="07c7af3781474ee070b6de5df58b11b5328b3dba" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1264,7 +1264,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug11-dfs_e.dsd" size="409600" crc="f1218c77" sha1="cc537658a8cd4ebe121bd1f00dba91ee9d44ebd3"/>
+				<rom name="eug11-dfs_e.dsd" size="409600" crc="f1218c77" sha1="cc537658a8cd4ebe121bd1f00dba91ee9d44ebd3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1276,7 +1276,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug12-adfs_e.adm" size="327680" crc="23b0a6e2" sha1="398a4e27c5e56fdde5dcc516a8e99a84eff99afa"/>
+				<rom name="eug12-adfs_e.adm" size="327680" crc="23b0a6e2" sha1="398a4e27c5e56fdde5dcc516a8e99a84eff99afa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1288,7 +1288,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug12-dfs_e.dsd" size="409600" crc="768ae3db" sha1="21d476b7eb3eceb1302a2becbf79c61db4dd9c33"/>
+				<rom name="eug12-dfs_e.dsd" size="409600" crc="768ae3db" sha1="21d476b7eb3eceb1302a2becbf79c61db4dd9c33" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1300,7 +1300,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug13-adfs_e.adm" size="327680" crc="f563737e" sha1="a503691cd455ba0039b1bd7be5319823cf8af0f3"/>
+				<rom name="eug13-adfs_e.adm" size="327680" crc="f563737e" sha1="a503691cd455ba0039b1bd7be5319823cf8af0f3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1312,7 +1312,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug13-dfs_e.dsd" size="409600" crc="c2635188" sha1="9424dec994ba64aab6de708186b75561d0aa0df3"/>
+				<rom name="eug13-dfs_e.dsd" size="409600" crc="c2635188" sha1="9424dec994ba64aab6de708186b75561d0aa0df3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1324,7 +1324,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug14-adfs_e.adm" size="327680" crc="f779d137" sha1="c761cfc7af876c2a8d927a5167de822cf4948bda"/>
+				<rom name="eug14-adfs_e.adm" size="327680" crc="f779d137" sha1="c761cfc7af876c2a8d927a5167de822cf4948bda" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1336,7 +1336,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug14-dfs_e.dsd" size="409600" crc="ac86655d" sha1="04c5ccae88708f46e36e8cb24faa8a02c5e27b8d"/>
+				<rom name="eug14-dfs_e.dsd" size="409600" crc="ac86655d" sha1="04c5ccae88708f46e36e8cb24faa8a02c5e27b8d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1348,7 +1348,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug15-adfs_e.adm" size="327680" crc="c88bb350" sha1="9cfbd3da8717c0c420bad302da4f95e6e3b0fbbb"/>
+				<rom name="eug15-adfs_e.adm" size="327680" crc="c88bb350" sha1="9cfbd3da8717c0c420bad302da4f95e6e3b0fbbb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1360,7 +1360,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug15-dfs_e.dsd" size="409600" crc="ef2cada6" sha1="43e5c0e6b75db29827b2b3d1b7c1bf53d01ab31a"/>
+				<rom name="eug15-dfs_e.dsd" size="409600" crc="ef2cada6" sha1="43e5c0e6b75db29827b2b3d1b7c1bf53d01ab31a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1372,7 +1372,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug16-adfs_e.adm" size="327680" crc="79f77d2a" sha1="4a6733504baf7eb7220b5bc5b8ce399474a801eb"/>
+				<rom name="eug16-adfs_e.adm" size="327680" crc="79f77d2a" sha1="4a6733504baf7eb7220b5bc5b8ce399474a801eb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1384,7 +1384,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug16-dfs_e.dsd" size="409600" crc="7af78d3d" sha1="2cf4a1944a3bc1262400cc3bc934b66d535a0604"/>
+				<rom name="eug16-dfs_e.dsd" size="409600" crc="7af78d3d" sha1="2cf4a1944a3bc1262400cc3bc934b66d535a0604" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1396,7 +1396,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug17-adfs_e.adm" size="327680" crc="b3d12948" sha1="bc6fd15c12569ece9c3ee8326e3ce852c958bccf"/>
+				<rom name="eug17-adfs_e.adm" size="327680" crc="b3d12948" sha1="bc6fd15c12569ece9c3ee8326e3ce852c958bccf" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1408,7 +1408,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug17-dfs_e.dsd" size="409600" crc="b844b58d" sha1="75fc9d54000f558c8ef73ff8d02eafa1d1c35b72"/>
+				<rom name="eug17-dfs_e.dsd" size="409600" crc="b844b58d" sha1="75fc9d54000f558c8ef73ff8d02eafa1d1c35b72" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1420,7 +1420,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug18-adfs_e.adm" size="327680" crc="5836ed85" sha1="cb1724ede0b0a49c059f3090dfdb022e3534d46f"/>
+				<rom name="eug18-adfs_e.adm" size="327680" crc="5836ed85" sha1="cb1724ede0b0a49c059f3090dfdb022e3534d46f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1432,7 +1432,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug18-dfs_e.dsd" size="409600" crc="4183b2fe" sha1="2102c4964f33a0c74d79a7a0824b951c59785ed4"/>
+				<rom name="eug18-dfs_e.dsd" size="409600" crc="4183b2fe" sha1="2102c4964f33a0c74d79a7a0824b951c59785ed4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1444,7 +1444,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug19-adfs_e.adm" size="327680" crc="35e99e94" sha1="70d40fb376abf398b084aeab9e5f53707905cdbf"/>
+				<rom name="eug19-adfs_e.adm" size="327680" crc="35e99e94" sha1="70d40fb376abf398b084aeab9e5f53707905cdbf" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1456,7 +1456,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug19-dfs_e.dsd" size="409600" crc="3d21f62f" sha1="c0a6e6ad37ed9c729c6b9a62868fca2ba98aea45"/>
+				<rom name="eug19-dfs_e.dsd" size="409600" crc="3d21f62f" sha1="c0a6e6ad37ed9c729c6b9a62868fca2ba98aea45" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1468,7 +1468,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug20-adfs_e.adm" size="327680" crc="8e49a4e0" sha1="3e45590a628b7ba2dc663c900fe6d12f46d0276a"/>
+				<rom name="eug20-adfs_e.adm" size="327680" crc="8e49a4e0" sha1="3e45590a628b7ba2dc663c900fe6d12f46d0276a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1480,7 +1480,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug20-dfs_e.dsd" size="409600" crc="422a22db" sha1="3731c347b5718ce23d75ec5c68e4029d882b1392"/>
+				<rom name="eug20-dfs_e.dsd" size="409600" crc="422a22db" sha1="3731c347b5718ce23d75ec5c68e4029d882b1392" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1493,19 +1493,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc A"/>
 			<dataarea name="flop" size = "327680">
-				<rom name="eug21a-adfs_e.adm" size="327680" crc="976e8253" sha1="bfd50a79bab5b3027de2ace13a1fff847e5a5eca"/>
+				<rom name="eug21a-adfs_e.adm" size="327680" crc="976e8253" sha1="bfd50a79bab5b3027de2ace13a1fff847e5a5eca" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disc B"/>
 			<dataarea name="flop" size = "327680">
-				<rom name="eug21b-adfs_e.adm" size="327680" crc="c4c0d47a" sha1="2f382946ae07514aff952a3ca1915f56f7f3ffac"/>
+				<rom name="eug21b-adfs_e.adm" size="327680" crc="c4c0d47a" sha1="2f382946ae07514aff952a3ca1915f56f7f3ffac" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disc C"/>
 			<dataarea name="flop" size = "327680">
-				<rom name="eug21c-adfs_e.adm" size="327680" crc="5b11bb25" sha1="faaa66492b1ec2bb18e367b82e0ebaf837ac51f5"/>
+				<rom name="eug21c-adfs_e.adm" size="327680" crc="5b11bb25" sha1="faaa66492b1ec2bb18e367b82e0ebaf837ac51f5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1517,17 +1517,17 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug21a-dfs_e.dsd" size="409600" crc="2a2c9bfd" sha1="215263e9581793ac872a8ba7b6b356597ad8b960"/>
+				<rom name="eug21a-dfs_e.dsd" size="409600" crc="2a2c9bfd" sha1="215263e9581793ac872a8ba7b6b356597ad8b960" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug21b-dfs_e.dsd" size="409600" crc="057cc376" sha1="92dd2614eec5e104c0021eb74df3cd1c86a8f225"/>
+				<rom name="eug21b-dfs_e.dsd" size="409600" crc="057cc376" sha1="92dd2614eec5e104c0021eb74df3cd1c86a8f225" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug21c-dfs_e.dsd" size="409600" crc="526837c1" sha1="9bab106933fa859633dc08227eb38fe80bc02e2a"/>
+				<rom name="eug21c-dfs_e.dsd" size="409600" crc="526837c1" sha1="9bab106933fa859633dc08227eb38fe80bc02e2a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1539,7 +1539,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug22-adfs_e.adm" size="327680" crc="489bc91c" sha1="ed35a3d364d7931cc9bec21dbf33a8cf5ef9f8d5"/>
+				<rom name="eug22-adfs_e.adm" size="327680" crc="489bc91c" sha1="ed35a3d364d7931cc9bec21dbf33a8cf5ef9f8d5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1551,7 +1551,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug22-dfs_e.dsd" size="409600" crc="f65b405d" sha1="a72317277626ef01f423ee28f3c1258e95179b24"/>
+				<rom name="eug22-dfs_e.dsd" size="409600" crc="f65b405d" sha1="a72317277626ef01f423ee28f3c1258e95179b24" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1563,7 +1563,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug23-adfs_e.adm" size="327680" crc="e0891b3d" sha1="029b2f6a796101f111bb8d9b0644345f0200d73d"/>
+				<rom name="eug23-adfs_e.adm" size="327680" crc="e0891b3d" sha1="029b2f6a796101f111bb8d9b0644345f0200d73d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1575,7 +1575,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug23-dfs_e.dsd" size="409600" crc="a4435fb1" sha1="00bedd0f2d00be81e2ebd28a5c118f66eaf35aa2"/>
+				<rom name="eug23-dfs_e.dsd" size="409600" crc="a4435fb1" sha1="00bedd0f2d00be81e2ebd28a5c118f66eaf35aa2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1587,7 +1587,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug24-adfs_e.adm" size="327680" crc="8e598e9c" sha1="2dbf77c95a7013ec345eaf57ac698a45f4daa4aa"/>
+				<rom name="eug24-adfs_e.adm" size="327680" crc="8e598e9c" sha1="2dbf77c95a7013ec345eaf57ac698a45f4daa4aa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1599,7 +1599,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug24-dfs_e.dsd" size="409600" crc="ea15813b" sha1="9fad5440c43e6d65638ca54018ea96af920f7b45"/>
+				<rom name="eug24-dfs_e.dsd" size="409600" crc="ea15813b" sha1="9fad5440c43e6d65638ca54018ea96af920f7b45" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1611,7 +1611,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug25-adfs_e.adm" size="327680" crc="60eb9705" sha1="fd5c5f9a30456a12eb1518b01096ebf6ea41fc0d"/>
+				<rom name="eug25-adfs_e.adm" size="327680" crc="60eb9705" sha1="fd5c5f9a30456a12eb1518b01096ebf6ea41fc0d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1623,7 +1623,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug25-dfs_e.dsd" size="409600" crc="977a74e9" sha1="578119425a62d33f448b2b2c0bf8b835d1aed5c2"/>
+				<rom name="eug25-dfs_e.dsd" size="409600" crc="977a74e9" sha1="578119425a62d33f448b2b2c0bf8b835d1aed5c2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1635,7 +1635,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug26-adfs_e.adm" size="327680" crc="b3e71512" sha1="9f2dcfa9ab34e3bc7355225a25938384e69e9f61"/>
+				<rom name="eug26-adfs_e.adm" size="327680" crc="b3e71512" sha1="9f2dcfa9ab34e3bc7355225a25938384e69e9f61" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1647,7 +1647,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug26-dfs_e.dsd" size="409600" crc="db5df507" sha1="107096d1dfbe9a657804b598fbb78fb485a7891d"/>
+				<rom name="eug26-dfs_e.dsd" size="409600" crc="db5df507" sha1="107096d1dfbe9a657804b598fbb78fb485a7891d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1659,7 +1659,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug27-adfs_e.adm" size="327680" crc="031f778e" sha1="c6cb8c8baa3fe6fdf452d1e248e8cc6103c5d184"/>
+				<rom name="eug27-adfs_e.adm" size="327680" crc="031f778e" sha1="c6cb8c8baa3fe6fdf452d1e248e8cc6103c5d184" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1671,7 +1671,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug27-dfs_e.dsd" size="409600" crc="5fefa4e6" sha1="86115433b86808860695c053c3e1e3552f8fcf4e"/>
+				<rom name="eug27-dfs_e.dsd" size="409600" crc="5fefa4e6" sha1="86115433b86808860695c053c3e1e3552f8fcf4e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1683,7 +1683,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug28-adfs_e.adm" size="327680" crc="262049db" sha1="68c40fa3e6729bd0106b939b46ebf717c97ae945"/>
+				<rom name="eug28-adfs_e.adm" size="327680" crc="262049db" sha1="68c40fa3e6729bd0106b939b46ebf717c97ae945" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1695,7 +1695,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug28-dfs_e.dsd" size="409600" crc="18d5427c" sha1="beae565d47a8aca6a0f66e5ce2025cee65c92a24"/>
+				<rom name="eug28-dfs_e.dsd" size="409600" crc="18d5427c" sha1="beae565d47a8aca6a0f66e5ce2025cee65c92a24" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1707,7 +1707,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug29-adfs_e.adf" size="327680" crc="b79dfb85" sha1="5d78e0b086c17337fb71dc6bff965e078478d9d4"/>
+				<rom name="eug29-adfs_e.adf" size="327680" crc="b79dfb85" sha1="5d78e0b086c17337fb71dc6bff965e078478d9d4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1719,7 +1719,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug29-dfs_e.dsd" size="409600" crc="5722978c" sha1="9cb7e1b42bd6ecc756e0ccc9b3efea119ea0bfa6"/>
+				<rom name="eug29-dfs_e.dsd" size="409600" crc="5722978c" sha1="9cb7e1b42bd6ecc756e0ccc9b3efea119ea0bfa6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1731,7 +1731,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug30-adfs_e.adm" size="327680" crc="52dba14a" sha1="406c7623410a79455121d6b9bcb26e8b6bc66843"/>
+				<rom name="eug30-adfs_e.adm" size="327680" crc="52dba14a" sha1="406c7623410a79455121d6b9bcb26e8b6bc66843" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1743,7 +1743,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug30-dfs_e.dsd" size="409600" crc="a5c93259" sha1="4c54f2b80dae8e86c04a4fa7ab460793f7110afd"/>
+				<rom name="eug30-dfs_e.dsd" size="409600" crc="a5c93259" sha1="4c54f2b80dae8e86c04a4fa7ab460793f7110afd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1755,7 +1755,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug31-adfs_e.adm" size="327680" crc="2bf82f9a" sha1="df9d4ec4838932c249870b6bb4357bfc926dc740"/>
+				<rom name="eug31-adfs_e.adm" size="327680" crc="2bf82f9a" sha1="df9d4ec4838932c249870b6bb4357bfc926dc740" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1767,7 +1767,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug31-dfs_e.dsd" size="409600" crc="ccd96dfd" sha1="6ef23d4727cd80d951591a2f42d41213215706ee"/>
+				<rom name="eug31-dfs_e.dsd" size="409600" crc="ccd96dfd" sha1="6ef23d4727cd80d951591a2f42d41213215706ee" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1779,7 +1779,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug32-adfs_e.adm" size="327680" crc="a94ab4a3" sha1="081103e7db38e37060c54dfc65a1f75daf833eff"/>
+				<rom name="eug32-adfs_e.adm" size="327680" crc="a94ab4a3" sha1="081103e7db38e37060c54dfc65a1f75daf833eff" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1791,7 +1791,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug32-dfs_e.dsd" size="409600" crc="961286e3" sha1="bb482985d4fa0e7bbf3cc7326eb7c425666bf0c7"/>
+				<rom name="eug32-dfs_e.dsd" size="409600" crc="961286e3" sha1="bb482985d4fa0e7bbf3cc7326eb7c425666bf0c7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1803,7 +1803,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug33-adfs_e.adf" size="327680" crc="f59e6869" sha1="621e303427d9af758148d25f9bc07c2204ea05d4"/>
+				<rom name="eug33-adfs_e.adf" size="327680" crc="f59e6869" sha1="621e303427d9af758148d25f9bc07c2204ea05d4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1815,7 +1815,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug33-dfs_e.dsd" size="409600" crc="00047bd9" sha1="fdfa42b978bf4748a8bb041da0586577df908fe8"/>
+				<rom name="eug33-dfs_e.dsd" size="409600" crc="00047bd9" sha1="fdfa42b978bf4748a8bb041da0586577df908fe8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1827,7 +1827,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug34-adfs_e.adf" size="327680" crc="6f6e5dce" sha1="3083b46f4981baabe6226e6bfdb6316105abbed1"/>
+				<rom name="eug34-adfs_e.adf" size="327680" crc="6f6e5dce" sha1="3083b46f4981baabe6226e6bfdb6316105abbed1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1839,7 +1839,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug34-dfs_e.dsd" size="409600" crc="1b679dbe" sha1="f0a7c0cedb4d0d32734a6ab15ff0599b3be2f602"/>
+				<rom name="eug34-dfs_e.dsd" size="409600" crc="1b679dbe" sha1="f0a7c0cedb4d0d32734a6ab15ff0599b3be2f602" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1851,7 +1851,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug35-adfs_e.adm" size="327680" crc="c3128438" sha1="a429eee99e4897335c3803f403ef83668abc7014"/>
+				<rom name="eug35-adfs_e.adm" size="327680" crc="c3128438" sha1="a429eee99e4897335c3803f403ef83668abc7014" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1863,7 +1863,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug35-dfs_e.dsd" size="409600" crc="42100a1a" sha1="0e4aad4719f85aa5151a6696287ee74b6c4bb50c"/>
+				<rom name="eug35-dfs_e.dsd" size="409600" crc="42100a1a" sha1="0e4aad4719f85aa5151a6696287ee74b6c4bb50c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1875,7 +1875,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug36-adfs_e.adm" size="327680" crc="ee1d86c0" sha1="e752e9ef6941c70b60f755088fb20d287e9839ca"/>
+				<rom name="eug36-adfs_e.adm" size="327680" crc="ee1d86c0" sha1="e752e9ef6941c70b60f755088fb20d287e9839ca" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1887,7 +1887,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug36-dfs_e.dsd" size="409600" crc="459b5996" sha1="54dfc1e2de4660669412275bd88a59b7857f4d6b"/>
+				<rom name="eug36-dfs_e.dsd" size="409600" crc="459b5996" sha1="54dfc1e2de4660669412275bd88a59b7857f4d6b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1899,7 +1899,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug37-adfs_e.adf" size="327680" crc="ea443e37" sha1="fd738688da3eb774db367f9f3f1291ccea447ba6"/>
+				<rom name="eug37-adfs_e.adf" size="327680" crc="ea443e37" sha1="fd738688da3eb774db367f9f3f1291ccea447ba6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1911,7 +1911,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug37-dfs_e.dsd" size="409600" crc="3a93906b" sha1="08179e41a784141a46fef7f1cbe9f3cbb0d8b1b9"/>
+				<rom name="eug37-dfs_e.dsd" size="409600" crc="3a93906b" sha1="08179e41a784141a46fef7f1cbe9f3cbb0d8b1b9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1923,7 +1923,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug38-adfs_e.adm" size="327680" crc="2834da9b" sha1="c2e63b880af59994563fe1deb873d59edc65d0fb"/>
+				<rom name="eug38-adfs_e.adm" size="327680" crc="2834da9b" sha1="c2e63b880af59994563fe1deb873d59edc65d0fb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1935,7 +1935,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug38-dfs_e.dsd" size="409600" crc="a90ce642" sha1="394e78d74e505db29249c7d3ea4f49707cba35e8"/>
+				<rom name="eug38-dfs_e.dsd" size="409600" crc="a90ce642" sha1="394e78d74e505db29249c7d3ea4f49707cba35e8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1947,7 +1947,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug39-adfs_e.adm" size="327680" crc="5610df83" sha1="635f9ac634d8f5ec7c44efeca6b876d9f9adc9f2"/>
+				<rom name="eug39-adfs_e.adm" size="327680" crc="5610df83" sha1="635f9ac634d8f5ec7c44efeca6b876d9f9adc9f2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1959,7 +1959,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug39-dfs_e.dsd" size="409600" crc="44047d34" sha1="5c79856aa3f2c7e277befffc268b3ec5ddab4976"/>
+				<rom name="eug39-dfs_e.dsd" size="409600" crc="44047d34" sha1="5c79856aa3f2c7e277befffc268b3ec5ddab4976" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1971,7 +1971,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug40-adfs_e.adm" size="327680" crc="2d434783" sha1="6468062b255070c088faedc183da1441996a5d7d"/>
+				<rom name="eug40-adfs_e.adm" size="327680" crc="2d434783" sha1="6468062b255070c088faedc183da1441996a5d7d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1983,7 +1983,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug40-dfs_e.dsd" size="409600" crc="0846ddf4" sha1="10cc8323a1c81b2830a7dc36b9c3ef82bc0ab925"/>
+				<rom name="eug40-dfs_e.dsd" size="409600" crc="0846ddf4" sha1="10cc8323a1c81b2830a7dc36b9c3ef82bc0ab925" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1995,7 +1995,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug41-adfs_e.adf" size="327680" crc="67529ec8" sha1="390b5e990aa2a7620101fc86fcbcba4df61cacef"/>
+				<rom name="eug41-adfs_e.adf" size="327680" crc="67529ec8" sha1="390b5e990aa2a7620101fc86fcbcba4df61cacef" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2007,7 +2007,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug41-dfs_e.dsd" size="409600" crc="d591c38c" sha1="8e8e334f05f3f65a35933d70544a1ede6b18ab48"/>
+				<rom name="eug41-dfs_e.dsd" size="409600" crc="d591c38c" sha1="8e8e334f05f3f65a35933d70544a1ede6b18ab48" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2019,7 +2019,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug42-adfs_e.adm" size="327680" crc="1e62f7f9" sha1="aa7be72517733346210a6426d0273aff206da65f"/>
+				<rom name="eug42-adfs_e.adm" size="327680" crc="1e62f7f9" sha1="aa7be72517733346210a6426d0273aff206da65f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2031,7 +2031,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="eug42.ssd" size="204800" crc="2f0c398f" sha1="9b8e4375a39587024443b69aded2b468fe2044b3"/>
+				<rom name="eug42.ssd" size="204800" crc="2f0c398f" sha1="9b8e4375a39587024443b69aded2b468fe2044b3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2043,7 +2043,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug43a44-adfs_e.adm" size="327680" crc="1ba16ac2" sha1="4bc42e457c72c821fda5ef9a63d48c39b0693fcb"/>
+				<rom name="eug43a44-adfs_e.adm" size="327680" crc="1ba16ac2" sha1="4bc42e457c72c821fda5ef9a63d48c39b0693fcb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2055,7 +2055,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug43a44-dfs_e.dsd" size="409600" crc="2828094f" sha1="9162107e2f5eabb0394d6f2675e3a6646e9c79ba"/>
+				<rom name="eug43a44-dfs_e.dsd" size="409600" crc="2828094f" sha1="9162107e2f5eabb0394d6f2675e3a6646e9c79ba" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2067,7 +2067,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug45-adfs_e.adf" size="327680" crc="da5d1965" sha1="d12be02c36dc83214431570c97c91da226783433"/>
+				<rom name="eug45-adfs_e.adf" size="327680" crc="da5d1965" sha1="d12be02c36dc83214431570c97c91da226783433" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2079,7 +2079,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug45-dfs_e.dsd" size="409600" crc="ef191a48" sha1="8849be0154f05565a7aa98b65da79350ed4d3c68"/>
+				<rom name="eug45-dfs_e.dsd" size="409600" crc="ef191a48" sha1="8849be0154f05565a7aa98b65da79350ed4d3c68" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2091,7 +2091,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug46-adfs_e.adf" size="327680" crc="0b2b8091" sha1="91c478b242b6770f5e4a079200badceecdf39c66"/>
+				<rom name="eug46-adfs_e.adf" size="327680" crc="0b2b8091" sha1="91c478b242b6770f5e4a079200badceecdf39c66" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2103,7 +2103,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug46-dfs_e.dsd" size="409600" crc="2b190bfd" sha1="e8953f005b63060e3956059ff541266b1e0a6de0"/>
+				<rom name="eug46-dfs_e.dsd" size="409600" crc="2b190bfd" sha1="e8953f005b63060e3956059ff541266b1e0a6de0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2115,7 +2115,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug47-adfs_e.adf" size="327680" crc="c0d85427" sha1="6d83d56b71b5745328ba1b238f742a0107ee7849"/>
+				<rom name="eug47-adfs_e.adf" size="327680" crc="c0d85427" sha1="6d83d56b71b5745328ba1b238f742a0107ee7849" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2127,7 +2127,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug47-dfs_e.dsd" size="409600" crc="8c82041e" sha1="f827e59d013b910469f0d6ab94fab62f99e38340"/>
+				<rom name="eug47-dfs_e.dsd" size="409600" crc="8c82041e" sha1="f827e59d013b910469f0d6ab94fab62f99e38340" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2139,7 +2139,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug48-adfs_e.adf" size="327680" crc="305509f0" sha1="456397bc0a42d01d7ef32fefbb1e18a87d342253"/>
+				<rom name="eug48-adfs_e.adf" size="327680" crc="305509f0" sha1="456397bc0a42d01d7ef32fefbb1e18a87d342253" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2151,7 +2151,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug48-dfs_e.dsd" size="409600" crc="30732de9" sha1="a34170f06da0f1ef3dc37bb939cb9c64857a0121"/>
+				<rom name="eug48-dfs_e.dsd" size="409600" crc="30732de9" sha1="a34170f06da0f1ef3dc37bb939cb9c64857a0121" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2163,7 +2163,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug49-adfs_e.adf" size="327680" crc="e1ac5b94" sha1="abfe757fa476c76f23c2a5ecbfb85766ec431ab3"/>
+				<rom name="eug49-adfs_e.adf" size="327680" crc="e1ac5b94" sha1="abfe757fa476c76f23c2a5ecbfb85766ec431ab3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2175,7 +2175,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug49-dfs_e.dsd" size="409600" crc="fc48af08" sha1="9cc7f7168d25b8efda7205de336fd969643a0c30"/>
+				<rom name="eug49-dfs_e.dsd" size="409600" crc="fc48af08" sha1="9cc7f7168d25b8efda7205de336fd969643a0c30" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2187,7 +2187,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug50-adfs_e.adf" size="327680" crc="e0356521" sha1="a63a769abd8ccfc99292d53ea63a4664c780425d"/>
+				<rom name="eug50-adfs_e.adf" size="327680" crc="e0356521" sha1="a63a769abd8ccfc99292d53ea63a4664c780425d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2199,7 +2199,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug50-dfs_e.dsd" size="409600" crc="43a2281d" sha1="f8dafb77fdb70e94d8799618d50a0a72d5421a38"/>
+				<rom name="eug50-dfs_e.dsd" size="409600" crc="43a2281d" sha1="f8dafb77fdb70e94d8799618d50a0a72d5421a38" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2211,7 +2211,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug51-adfs_e.adf" size="327680" crc="fdca6ecc" sha1="a51eab375275cb8a83e839fb6ad81c9a272ed703"/>
+				<rom name="eug51-adfs_e.adf" size="327680" crc="fdca6ecc" sha1="a51eab375275cb8a83e839fb6ad81c9a272ed703" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2223,7 +2223,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug51-dfs_e.dsd" size="409600" crc="f3f33ab2" sha1="054f3c08fd01a6c29782fbff4a567becb3f06735"/>
+				<rom name="eug51-dfs_e.dsd" size="409600" crc="f3f33ab2" sha1="054f3c08fd01a6c29782fbff4a567becb3f06735" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2235,7 +2235,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug52-adfs_e.adf" size="327680" crc="0f5edcc1" sha1="d791b0c10c5a7429b49aaa78f1f3d71a56cf174a"/>
+				<rom name="eug52-adfs_e.adf" size="327680" crc="0f5edcc1" sha1="d791b0c10c5a7429b49aaa78f1f3d71a56cf174a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2247,7 +2247,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug52-dfs_e.dsd" size="409600" crc="99b705e5" sha1="c024c30e605091f1401b5badf73da256fac7e001"/>
+				<rom name="eug52-dfs_e.dsd" size="409600" crc="99b705e5" sha1="c024c30e605091f1401b5badf73da256fac7e001" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2259,7 +2259,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug53-adfs_e.adf" size="327680" crc="a475842f" sha1="40625793a26410de1e11e9a8fa7d109df555cbdd"/>
+				<rom name="eug53-adfs_e.adf" size="327680" crc="a475842f" sha1="40625793a26410de1e11e9a8fa7d109df555cbdd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2271,7 +2271,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug53-dfs_e.dsd" size="409600" crc="95edd7d6" sha1="c9dfd72506280741df7b64db51a657f66567ec8f"/>
+				<rom name="eug53-dfs_e.dsd" size="409600" crc="95edd7d6" sha1="c9dfd72506280741df7b64db51a657f66567ec8f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2283,7 +2283,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug54-adfs_e.adf" size="327680" crc="edf5e56e" sha1="404cd6816031a64469389ede117f0b8c30e515d4"/>
+				<rom name="eug54-adfs_e.adf" size="327680" crc="edf5e56e" sha1="404cd6816031a64469389ede117f0b8c30e515d4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2295,7 +2295,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug54-dfs_e.dsd" size="409600" crc="a917561b" sha1="92d4c6cc85463ea524f35067c7d8b70dd0b1379d"/>
+				<rom name="eug54-dfs_e.dsd" size="409600" crc="a917561b" sha1="92d4c6cc85463ea524f35067c7d8b70dd0b1379d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2307,7 +2307,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug55-adfs_e.adf" size="327680" crc="ce6f0c16" sha1="d1be66c7a50921a880a38dc92046fbf906b3b4d1"/>
+				<rom name="eug55-adfs_e.adf" size="327680" crc="ce6f0c16" sha1="d1be66c7a50921a880a38dc92046fbf906b3b4d1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2319,7 +2319,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug55-dfs_e.dsd" size="409600" crc="7ba2e7b2" sha1="38c78ddbf19b8cee1f5b563ffdd7b1abe6dcc0ef"/>
+				<rom name="eug55-dfs_e.dsd" size="409600" crc="7ba2e7b2" sha1="38c78ddbf19b8cee1f5b563ffdd7b1abe6dcc0ef" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2331,7 +2331,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug56-adfs_e.adf" size="327680" crc="f2c49d81" sha1="c14e47e9586d262dbf5208fcf4d51742ba7ae17b"/>
+				<rom name="eug56-adfs_e.adf" size="327680" crc="f2c49d81" sha1="c14e47e9586d262dbf5208fcf4d51742ba7ae17b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2343,7 +2343,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug56-dfs_e.dsd" size="409600" crc="fd4375e1" sha1="82734e3db0acac2b74e53339a65cc582533d811b"/>
+				<rom name="eug56-dfs_e.dsd" size="409600" crc="fd4375e1" sha1="82734e3db0acac2b74e53339a65cc582533d811b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2355,7 +2355,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug57-adfs_e.adf" size="327680" crc="d1affeb3" sha1="27a55185d7d803013d5b5f19b1707ec2bc6d8ec0"/>
+				<rom name="eug57-adfs_e.adf" size="327680" crc="d1affeb3" sha1="27a55185d7d803013d5b5f19b1707ec2bc6d8ec0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2367,7 +2367,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug57-dfs_e.dsd" size="409600" crc="22bf0a8e" sha1="d8ac6baab4aefa640579af2b1906183fab208713"/>
+				<rom name="eug57-dfs_e.dsd" size="409600" crc="22bf0a8e" sha1="d8ac6baab4aefa640579af2b1906183fab208713" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2379,7 +2379,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug58-adfs_e.adf" size="327680" crc="7d9bfb12" sha1="e9166bc7f2dd6975e46284fe8ac64e03cf8649b8"/>
+				<rom name="eug58-adfs_e.adf" size="327680" crc="7d9bfb12" sha1="e9166bc7f2dd6975e46284fe8ac64e03cf8649b8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2391,7 +2391,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug58-dfs_e.dsd" size="409600" crc="328e56cc" sha1="2a6463d4508510fce7db7309fbf1dc67e516cef3"/>
+				<rom name="eug58-dfs_e.dsd" size="409600" crc="328e56cc" sha1="2a6463d4508510fce7db7309fbf1dc67e516cef3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2403,7 +2403,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug59-adfs_e.adf" size="327680" crc="4bde890a" sha1="0a16ddd6e7fb2f449a74cc6d6e6c4d69acf4e9bc"/>
+				<rom name="eug59-adfs_e.adf" size="327680" crc="4bde890a" sha1="0a16ddd6e7fb2f449a74cc6d6e6c4d69acf4e9bc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2415,7 +2415,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug59-dfs_e.dsd" size="409600" crc="451f108a" sha1="9d5cb9aaa9479341730325bdcf72df3e4d4ed70c"/>
+				<rom name="eug59-dfs_e.dsd" size="409600" crc="451f108a" sha1="9d5cb9aaa9479341730325bdcf72df3e4d4ed70c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2427,7 +2427,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug60-adfs_e.adf" size="327680" crc="d284acb3" sha1="8436e13c9115538f8a0b76621599b8e999a55f97"/>
+				<rom name="eug60-adfs_e.adf" size="327680" crc="d284acb3" sha1="8436e13c9115538f8a0b76621599b8e999a55f97" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2439,7 +2439,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug60-dfs_e.dsd" size="409600" crc="6a8192f9" sha1="a33c1e641f76ec5e0ccc1387ef6fc78d8edfe318"/>
+				<rom name="eug60-dfs_e.dsd" size="409600" crc="6a8192f9" sha1="a33c1e641f76ec5e0ccc1387ef6fc78d8edfe318" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2451,7 +2451,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug61-adfs_e.adf" size="327680" crc="5fd813c5" sha1="283f35e0f59afc936084cfe13033f759d2df38dc"/>
+				<rom name="eug61-adfs_e.adf" size="327680" crc="5fd813c5" sha1="283f35e0f59afc936084cfe13033f759d2df38dc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2463,7 +2463,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug61-dfs_e.dsd" size="409600" crc="18055da5" sha1="1653fe39c39f31917e4f050d0f9f1b5e387cc230"/>
+				<rom name="eug61-dfs_e.dsd" size="409600" crc="18055da5" sha1="1653fe39c39f31917e4f050d0f9f1b5e387cc230" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2475,7 +2475,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug62-adfs_e.adf" size="327680" crc="7eb2d4c0" sha1="af149ecb6a1925e691310cfa45a7931076cc01b7"/>
+				<rom name="eug62-adfs_e.adf" size="327680" crc="7eb2d4c0" sha1="af149ecb6a1925e691310cfa45a7931076cc01b7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2487,7 +2487,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug62-dfs_e.dsd" size="409600" crc="4b68c7c8" sha1="4ff011ecee9a039596e20e081d5d73c7e8893a48"/>
+				<rom name="eug62-dfs_e.dsd" size="409600" crc="4b68c7c8" sha1="4ff011ecee9a039596e20e081d5d73c7e8893a48" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2499,7 +2499,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug63-adfs_e.adf" size="327680" crc="3af73966" sha1="dd705c947e5b8643626a93e458293036a6e95758"/>
+				<rom name="eug63-adfs_e.adf" size="327680" crc="3af73966" sha1="dd705c947e5b8643626a93e458293036a6e95758" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2511,7 +2511,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug63-dfs_e.dsd" size="409600" crc="80ce6698" sha1="75b9fb586e800a8523288f81ee644f89d9279a8b"/>
+				<rom name="eug63-dfs_e.dsd" size="409600" crc="80ce6698" sha1="75b9fb586e800a8523288f81ee644f89d9279a8b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2523,7 +2523,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug64-adfs_e.adf" size="327680" crc="25e82d8c" sha1="02fc1710bcb6c7a4cd8996c9a29733d460b8a2c6"/>
+				<rom name="eug64-adfs_e.adf" size="327680" crc="25e82d8c" sha1="02fc1710bcb6c7a4cd8996c9a29733d460b8a2c6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2535,7 +2535,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug64-dfs_e.dsd" size="409600" crc="2e7bb30d" sha1="a023e6d36f3382850481a5444db91e8e3869e4f6"/>
+				<rom name="eug64-dfs_e.dsd" size="409600" crc="2e7bb30d" sha1="a023e6d36f3382850481a5444db91e8e3869e4f6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2547,7 +2547,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug65-adfs_e.adf" size="327680" crc="1bfe96a4" sha1="e3142d3d37044cca97911a25e93fbc6796d7318b"/>
+				<rom name="eug65-adfs_e.adf" size="327680" crc="1bfe96a4" sha1="e3142d3d37044cca97911a25e93fbc6796d7318b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2559,7 +2559,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="eug65-dfs_e.dsd" size="409600" crc="0566d2eb" sha1="2f201c7250bc38d4a2332ec54d5da4d9c0224d2b"/>
+				<rom name="eug65-dfs_e.dsd" size="409600" crc="0566d2eb" sha1="2f201c7250bc38d4a2332ec54d5da4d9c0224d2b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2571,7 +2571,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
-				<rom name="eug66-adfs_e.adf" size="327680" crc="c7ce4f99" sha1="35bedcbb14806525a4a37bb35c24ade254183f05"/>
+				<rom name="eug66-adfs_e.adf" size="327680" crc="c7ce4f99" sha1="35bedcbb14806525a4a37bb35c24ade254183f05" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2583,7 +2583,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="eug66.ssd" size="204800" crc="1b1ac0fb" sha1="601eb49d40bc9a121395d97ec7754e6366a33aeb"/>
+				<rom name="eug66.ssd" size="204800" crc="1b1ac0fb" sha1="601eb49d40bc9a121395d97ec7754e6366a33aeb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2595,7 +2595,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="196096">
-				<rom name="eug67.ssd" size="196096" crc="f64462dd" sha1="fec1db419d9cb285db1a4dddf1c74e2e09f8feee"/>
+				<rom name="eug67.ssd" size="196096" crc="f64462dd" sha1="fec1db419d9cb285db1a4dddf1c74e2e09f8feee" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2607,7 +2607,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="391168">
-				<rom name="eug68-dfs_e.dsd" size="391168" crc="e94924cc" sha1="abdb0adfe21fad6624b5262f08626efd5d11784d"/>
+				<rom name="eug68-dfs_e.dsd" size="391168" crc="e94924cc" sha1="abdb0adfe21fad6624b5262f08626efd5d11784d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2619,7 +2619,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="150784">
-				<rom name="eug69.ssd" size="150784" crc="a668d88c" sha1="ca65e4904723cbb1c51f983c1ca34e6605eea71d"/>
+				<rom name="eug69.ssd" size="150784" crc="a668d88c" sha1="ca65e4904723cbb1c51f983c1ca34e6605eea71d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2631,7 +2631,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="381440">
-				<rom name="eug70-dfs_e.dsd" size="381440" crc="71d66fb6" sha1="2fc1b2dc931965faa3bbf56d780413416fa49d65"/>
+				<rom name="eug70-dfs_e.dsd" size="381440" crc="71d66fb6" sha1="2fc1b2dc931965faa3bbf56d780413416fa49d65" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2643,7 +2643,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="340480">
-				<rom name="eug71-dfs_e.dsd" size="340480" crc="bf695652" sha1="4cb391b48ec7e5e175884dcfc5d46c5bec02818e"/>
+				<rom name="eug71-dfs_e.dsd" size="340480" crc="bf695652" sha1="4cb391b48ec7e5e175884dcfc5d46c5bec02818e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2655,7 +2655,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="359168">
-				<rom name="eug72-dfs_e.dsd" size="359168" crc="b2c18e91" sha1="7868e7519ea40679d5f7627dd90e16a1a6dd993a"/>
+				<rom name="eug72-dfs_e.dsd" size="359168" crc="b2c18e91" sha1="7868e7519ea40679d5f7627dd90e16a1a6dd993a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2667,7 +2667,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="228608">
-				<rom name="eug73-dfs_e.dsd" size="228608" crc="29fe1b9a" sha1="809375a086f7ca687a67c90c387480e459194c14"/>
+				<rom name="eug73-dfs_e.dsd" size="228608" crc="29fe1b9a" sha1="809375a086f7ca687a67c90c387480e459194c14" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2679,7 +2679,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="406528">
-				<rom name="eug74-dfs_e.dsd" size="406528" crc="b2d40da7" sha1="8d84aacc8e512a4d75163d62218cb2ad80880286"/>
+				<rom name="eug74-dfs_e.dsd" size="406528" crc="b2d40da7" sha1="8d84aacc8e512a4d75163d62218cb2ad80880286" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2694,7 +2694,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="bbc_music_demo_world-dfs_e.dsd" size="409600" crc="32f86547" sha1="1eab8e9545d27b50a98bc083bb39cd80b68ca298"/>
+				<rom name="bbc_music_demo_world-dfs_e.dsd" size="409600" crc="32f86547" sha1="1eab8e9545d27b50a98bc083bb39cd80b68ca298" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

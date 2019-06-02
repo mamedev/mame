@@ -380,6 +380,29 @@ ROM_START( mpc1600 )
 ROM_END
 
 
+/*********************************************************** Commodore PC-1 ***
+
+Links: http://www.amiga-stuff.com/hardware/pc-i.html , http://www.zimmers.net/cbmpics/cpci.html
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 512K / 640K
+Bus: Proprietary expansion slot, carrying almost all ISA signals
+Video: On board, MDA/Hercules/CGA
+Mass storage: 1x 5.25" 360K
+On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse,
+Options: 8087 FPU
+Expansion: Expansion box: 2x ISA
+
+******************************************************************************/
+
+
+ROM_START( compc1 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("pc1_bios.bin", 0xc000, 0x4000, CRC(e37367c8) SHA1(9aac9c38b4ebdb9a740e393199c2eff75a0bde03))
+	ROM_REGION(0x8000, "gfx1", 0)
+	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
+ROM_END
+
 /********************************************************** Compaq Portable ***
 
 Links:  https://en.wikipedia.org/wiki/Compaq_Portable , http://oldcomputers.net/compaqi.html ,
@@ -1235,19 +1258,6 @@ ROM_START( kyoxt )
 	ROM_LOAD( "kyocera.rom", 0xc000, 0x4000, CRC(cd732ac6) SHA1(7258fc18565135870e31962e4bd528a06d1ee0e0))
 ROM_END
 
-/*********************Panasonic Sr. Partner / *** Nixdorf 8810/25 CPC - PC01 ***
-
-Luggable machine with a 9" monochrome enhanced CGA display and an electrostatic printer
-ROM is identical between the Nixdorf and the Panasonic
-Displays "PIT1 ERROR"
-
-******************************************************************************/
-
-ROM_START( nixpc01 )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_LOAD( "nx01.bin", 0xc000, 0x4000, CRC(b0a75d1f) SHA1(7c2890eced917969968fc2e7491cda90a9734e03))
-ROM_END
-
 
 /***************************************************************************
 
@@ -1260,13 +1270,13 @@ COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state,
 COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
+COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,       MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                 MACHINE_NOT_WORKING )
 COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",               MACHINE_NOT_WORKING )
 COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
-COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )

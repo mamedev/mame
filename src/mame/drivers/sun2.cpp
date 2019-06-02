@@ -509,7 +509,7 @@ uint8_t sun2_state::ethernet_r()
 void sun2_state::ethernet_w(uint8_t data)
 {
 	m_edlc->reset_w(!BIT(data, 7));
-	m_edlc->set_loopback(!BIT(data, 6)); // LBC on MB502
+	// Bit 6 = loopback control (active low, though inverted for MB502)
 	m_edlc->ca(BIT(data, 5));
 
 	m_ethernet_status = (data & 0xf0) | (m_ethernet_status & 0x0f);
@@ -570,7 +570,6 @@ void sun2_state::vmetype1space_map(address_map &map)
 	// 7f1000-7f17ff: AM9518 encryption processor
 	//AM_RANGE(0x7f1800, 0x7f1801) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, cb_r, cb_w, 0xff00)
 	//AM_RANGE(0x7f1802, 0x7f1803) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, db_r, db_w, 0xff00)
-	map(0x7f1804, 0x7f1805).nopr();
 	//AM_RANGE(0x7f1804, 0x7f1805) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ca_r, ca_w, 0xff00)
 	//AM_RANGE(0x7f1806, 0x7f1807) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, da_r, da_w, 0xff00)
 	map(0x7f2000, 0x7f2000).rw(SCC2_TAG, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));

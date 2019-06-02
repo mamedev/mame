@@ -788,7 +788,6 @@ chd_error chd_file::open(util::core_file &file, bool writeable, chd_file *parent
 	m_file = &file;
 	m_owns_file = false;
 	m_parent = parent;
-	m_cachehunk = ~0;
 	return open_common(writeable);
 }
 

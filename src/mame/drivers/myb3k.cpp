@@ -228,7 +228,7 @@ private:
 	required_device<i8257_device> m_dma8257;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<myb3k_keyboard_device> m_kb;
-	required_device<hd6845s_device> m_crtc;
+	required_device<h46505_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<isa8_device> m_isabus;
 	optional_device<centronics_device> m_centronics;
@@ -597,8 +597,8 @@ void myb3k_state::myb3k_io(address_map &map)
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 
 	// 1c-1d HD46505S CRTC
-	map(0x1c, 0x1c).rw(m_crtc, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
-	map(0x1d, 0x1d).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0x1c, 0x1c).rw(m_crtc, FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
+	map(0x1d, 0x1d).rw(m_crtc, FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
 
 	/* Expansion Unit 0x800 - 0xfff */
 }
@@ -980,7 +980,7 @@ void myb3k_state::myb3k(machine_config &config)
 	// m_pit8253->out_handler<2>().set(FUNC(myb3k_state::pit_out2_changed));
 
 	/* Video controller */
-	HD6845S(config, m_crtc, XTAL(14'318'181) / 16); /* Main crystal divided by 16 through a 74163 4 bit counter */
+	H46505(config, m_crtc, XTAL(14'318'181) / 16); /* Main crystal divided by 16 through a 74163 4 bit counter */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -1027,7 +1027,7 @@ void myb3k_state::myb3k(machine_config &config)
 	/* Monitor */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400);
-	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+	m_screen->set_screen_update("crtc", FUNC(h46505_device::screen_update));
 }
 
 void myb3k_state::jb3000(machine_config &config)

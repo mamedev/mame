@@ -33,7 +33,7 @@ void acorn_vdu40_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(8);
 
-	HD6845S(config, m_crtc, 12_MHz_XTAL / 6); // "MC6845S" on schematics
+	HD6845(config, m_crtc, 12_MHz_XTAL / 6);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);

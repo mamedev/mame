@@ -3024,6 +3024,7 @@ void funworld_state::fw1stpal(machine_config &config)
 	screen.set_size((124+1)*4, (30+1)*8);               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06 */
 	screen.set_screen_update(FUNC(funworld_state::screen_update_funworld));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fw1stpal);
 	PALETTE(config, m_palette, FUNC(funworld_state::funworld_palette), 0x200);

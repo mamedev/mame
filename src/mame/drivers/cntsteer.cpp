@@ -11,7 +11,7 @@
 
     todo:
     both games
-        - correct ROZ rotation (single register that controls both);
+        - correct roz rotation;
         - flip screen support;
         - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
@@ -22,12 +22,7 @@
     - Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol.
       We currently have slave CPU irq hooked up to vblank, might or might not be correct.
     - invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
-    - understand why background mirroring causes wrong gfxs on title screen_device.
-	  Probably area 0x2000-0x2fff enables tile bank bit 8 and write addresses have same mapping as reading.
-	  A preliminary decoding is in tilelayout_swap;
-	- tilemap flashing when gameplay timer is running out;
-	- tilemap scrolling, correct only for title screen.
-	  Maybe upper scroll bits also controls startdx/dy?
+    - understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging, missing video bit or it's actually a RMW thing);
     cleanup
         - split into driver/video;
 
@@ -119,7 +114,6 @@ public:
 	DECLARE_MACHINE_START(zerotrgt);
 	DECLARE_MACHINE_RESET(zerotrgt);
 	DECLARE_VIDEO_START(zerotrgt);
-	void cntsteer_palette(palette_device &palette) const;
 	void zerotrgt_palette(palette_device &palette) const;
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -137,20 +131,6 @@ public:
 	void sound_map(address_map &map);
 };
 
-
-void cntsteer_state::cntsteer_palette(palette_device &palette) const
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		// same as Chanbara
-		int const r = pal4bit((color_prom[i + 0x000] & 7) << 1);
-		int const g = pal4bit((color_prom[i + 0x100] & 7) << 1);
-		int const b = pal4bit((color_prom[i + 0x200] & 7) << 1);
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-}
 
 void cntsteer_state::zerotrgt_palette(palette_device &palette) const
 {
@@ -283,7 +263,7 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
      ---- -x-- flipy
 
 [80] -xxx ---- palette entry
-     ---- --xx upper tile bank
+     ---- --xx tile bank
 */
 
 void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -292,24 +272,21 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 	for (offs = 0; offs < 0x80; offs += 4)
 	{
-		int multi, fx, fy, sx, sy, code, color, magnify, region, tile_size;
+		int multi, fx, fy, sx, sy, code, color;
 
 		if ((m_spriteram[offs + 0] & 1) == 0)
 			continue;
 
 		code = m_spriteram[offs + 1] + ((m_spriteram[offs + 0x80] & 0x03) << 8);
 		sx = 0x100 - m_spriteram[offs + 3];
-		sy = 0xe8 - m_spriteram[offs + 2];
+		sy = 0x100 - m_spriteram[offs + 2];
 		color = 0x10 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
 
 		fx = (m_spriteram[offs + 0] & 0x04);
 		fy = (m_spriteram[offs + 0] & 0x02);
 
 		multi = m_spriteram[offs + 0] & 0x10;
-		magnify =  (m_spriteram[offs + 0] & 0x20) >> 5;
-		region = magnify ? 3 : 1;
-		tile_size = magnify ? 32 : 16; 
-		
+
 		if (m_flipscreen)
 		{
 			sy = 240 - sy;
@@ -323,17 +300,17 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
-				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - tile_size, 0);
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - tile_size, 0);
-				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -481,8 +458,11 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 	{
 		case 0: m_scrolly = data; break;
 		case 1: m_scrollx = data; break;
-		case 2: m_bg_bank = (data & 0x01) << 9;
-				m_bg_color_bank = (data & 7);
+		case 2: m_bg_bank = (data & 0x01) << 8;
+				m_bg_color_bank = (data & 6) >> 1;
+				// TODO: of course this just inibits bus request for master.
+				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
+
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
@@ -518,8 +498,6 @@ READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 {
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
-
-// TODO: on write prolly selects bit 8 of tile bank (which needs better decoding too)
 
 /*************************************
  *
@@ -685,10 +663,10 @@ void cntsteer_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 //  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
-	map(0x2000, 0x2000).w("ay1", FUNC(ym2149_device::data_w));
-	map(0x4000, 0x4000).w("ay1", FUNC(ym2149_device::address_w));
-	map(0x6000, 0x6000).w("ay2", FUNC(ym2149_device::data_w));
-	map(0x8000, 0x8000).w("ay2", FUNC(ym2149_device::address_w));
+	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xd000, 0xd000).w(FUNC(cntsteer_state::nmimask_w));
 	map(0xe000, 0xffff).rom();
@@ -861,23 +839,7 @@ static const gfx_layout sprites =
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
 		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	16*16
-};
-
-static const gfx_layout sprites_magnify =
-{
-	16,32,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 
-	  4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8, 
-	  8*8, 8*8, 9*8, 9*8, 10*8,10*8,11*8,11*8,
-	  12*8,12*8,13*8,13*8,14*8,14*8,15*8,15*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	16*16
 };
 
@@ -897,35 +859,17 @@ static const gfx_layout tilelayout =
 	8*16
 };
 
-static const gfx_layout tilelayout_swap =
-{
-	16,16,
-	0x400,
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(4,8)+4, 0, 4 },
-	{
-		RGN_FRAC(0,8)+0*8,  RGN_FRAC(1,8)+0*8, RGN_FRAC(2,8)+0*8, RGN_FRAC(3,8)+0*8,
-		RGN_FRAC(0,8)+4*8,  RGN_FRAC(1,8)+4*8, RGN_FRAC(2,8)+4*8, RGN_FRAC(3,8)+4*8,
-		RGN_FRAC(0,8)+8*8,  RGN_FRAC(1,8)+8*8, RGN_FRAC(2,8)+8*8, RGN_FRAC(3,8)+8*8,
-		RGN_FRAC(0,8)+12*8, RGN_FRAC(1,8)+12*8,RGN_FRAC(2,8)+12*8,RGN_FRAC(3,8)+12*8
-	},
-	{ 27, 26, 25, 24, 19, 18, 17, 16, 11, 10, 9, 8, 3, 2, 1, 0 },
-	8*16
-};
-
 static GFXDECODE_START( gfx_cntsteer )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,             0, 0x20 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,          0, 0x20 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites_magnify,     0, 0x20 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout_swap,     0, 0x20 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 256 ) /* Only 1 used so far :/ */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( gfx_zerotrgt )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,             0, 0x20 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,          0, 0x20 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -985,9 +929,9 @@ void cntsteer_state::cntsteer(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu2_map);
 //  m_subcpu->set_disable();
 
-	M6502(config, m_audiocpu, XTAL(12'000'000)/8);        /* ? */
+	M6502(config, m_audiocpu, 1500000);        /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(960));
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
@@ -1007,7 +951,8 @@ void cntsteer_state::cntsteer(machine_config &config)
 	config.m_perfect_cpu_quantum = subtag("subcpu");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cntsteer);
-	PALETTE(config, m_palette, FUNC(cntsteer_state::cntsteer_palette), 256);
+	PALETTE(config, m_palette).set_entries(256);
+//  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
@@ -1016,13 +961,13 @@ void cntsteer_state::cntsteer(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &ay1(YM2149(config, "ay1", XTAL(12'000'000)/8));
+	ay8910_device &ay1(AY8910(config, "ay1", 1500000));
 	ay1.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 	ay1.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	YM2149(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // labeled DAC-08CQ
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
@@ -1066,9 +1011,9 @@ void cntsteer_state::zerotrgt(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 /***************************************************************************/
@@ -1090,12 +1035,12 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by09", 0x0000, 0x2000, CRC(273eddae) SHA1(4b5450407217d9110acb85e02ea9a6584552362e) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD( "by03", 0x10000, 0x4000, CRC(d9537d33) SHA1(7d2af2eb0386ce695f2d9c7b71a72d2d8ef257e7) )
-	ROM_LOAD( "by04", 0x14000, 0x4000, CRC(4f4e9d6f) SHA1(b590aeb5efa2afa50ef202191a88bcf6894f4b8e) )
+	ROM_LOAD( "by03", 0x00000, 0x4000, CRC(d9537d33) SHA1(7d2af2eb0386ce695f2d9c7b71a72d2d8ef257e7) )
+	ROM_LOAD( "by04", 0x04000, 0x4000, CRC(4f4e9d6f) SHA1(b590aeb5efa2afa50ef202191a88bcf6894f4b8e) )
 	ROM_LOAD( "by05", 0x08000, 0x4000, CRC(592481a7) SHA1(2d412d525b04ed228a345918129b25a13286d957) )
 	ROM_LOAD( "by06", 0x0c000, 0x4000, CRC(9366e9d5) SHA1(a6a137416eaee3becae657c287fff7d974bcf68f) )
-	ROM_LOAD( "by07", 0x00000, 0x4000, CRC(8321e332) SHA1(a7aed12cb718526b0a1c5b4ae069c7973600204d) )
-	ROM_LOAD( "by08", 0x04000, 0x4000, CRC(a24bcfef) SHA1(b4f06dfb85960668ca199cfb1b6c56ccdad9e33d) )
+	ROM_LOAD( "by07", 0x10000, 0x4000, CRC(8321e332) SHA1(a7aed12cb718526b0a1c5b4ae069c7973600204d) )
+	ROM_LOAD( "by08", 0x14000, 0x4000, CRC(a24bcfef) SHA1(b4f06dfb85960668ca199cfb1b6c56ccdad9e33d) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 ) /* Tiles */
 	ROM_LOAD( "by13", 0x00000, 0x4000, CRC(d38e94fd) SHA1(bcf61b2c509f923ef2e52051a1c0e0a63bedf7a3) )
@@ -1110,11 +1055,10 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by18", 0x20000, 0x2000, CRC(1e9ce047) SHA1(7579ba6b401eb1bfc7d2d9311ebab623bd1095a2) )
 	ROM_LOAD( "by20", 0x30000, 0x2000, CRC(e2198c9e) SHA1(afea262db9154301f4b9e53e1fc91985dd934170) )
 
-	 /* All 82s129 or equivalent */
 	ROM_REGION( 0x300, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "by21.j4",  0x0200, 0x100, CRC(10e2cab4) SHA1(c266cb26b9aa3df9385605bd75a37a66ab946051) )
-	ROM_LOAD( "by22.j5",  0x0100, 0x100, CRC(8676ad80) SHA1(891c85a88fda27e7a984eec1011ef931605a443f) )
-	ROM_LOAD( "by23.j6",  0x0000, 0x100, CRC(08dfd511) SHA1(45d107533864bd21d0c4bad9f16cf75bc5e5e6a2) )
+	ROM_LOAD( "by21.j4",  0x0000, 0x100, NO_DUMP ) /* All 82s129 or equivalent */
+	ROM_LOAD( "by22.j5",  0x0100, 0x100, NO_DUMP )
+	ROM_LOAD( "by23.j6",  0x0200, 0x100, NO_DUMP )
 ROM_END
 
 ROM_START( zerotrgt )

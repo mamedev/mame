@@ -105,19 +105,18 @@ class ps2_keyboard_controller_device : public at_kbc_device_base
 {
 public:
 	// outputs to host
-	auto aux_irq() { return m_aux_irq_cb.bind(); }
+	auto mouse_irq() { return m_mouse_irq_cb.bind(); }
 
-	// outputs to aux
-	auto aux_clk() { return m_aux_clk_cb.bind(); } // open collector with 10kΩ pull-up
-	auto aux_data() { return m_aux_data_cb.bind(); } // open collector with 10kΩ pull-up
+	// outputs to mouse
+	auto mouse_clk() { return m_mouse_clk_cb.bind(); } // open collector with 10kΩ pull-up
+	auto mouse_data() { return m_mouse_data_cb.bind(); } // open collector with 10kΩ pull-up
 
 	// host interface
 	virtual uint8_t data_r() override;
-	virtual uint8_t status_r() override;
 
-	// inputs from aux
-	DECLARE_WRITE_LINE_MEMBER(aux_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(aux_data_w);
+	// inputs from mouse
+	DECLARE_WRITE_LINE_MEMBER(mouse_clk_w);
+	DECLARE_WRITE_LINE_MEMBER(mouse_data_w);
 
 	// standard constructor
 	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -131,27 +130,27 @@ protected:
 
 private:
 	// host outputs - use 1 = asserted, 0 = deasserted
-	void set_aux_irq(u8 state);
+	void set_mouse_irq(u8 state);
 
 	// mouse line drive - use 1 = pulled up, 0 = driven low
-	void set_aux_clk_out(u8 state);
-	void set_aux_data_out(u8 state);
-	u8 aux_clk_r() const;
-	u8 aux_data_r() const;
+	void set_mouse_clk_out(u8 state);
+	void set_mouse_data_out(u8 state);
+	u8 mouse_clk_r() const;
+	u8 mouse_data_r() const;
 
 	// internal sync helpers
-	TIMER_CALLBACK_MEMBER(set_aux_clk_in);
-	TIMER_CALLBACK_MEMBER(set_aux_data_in);
+	TIMER_CALLBACK_MEMBER(set_mouse_clk_in);
+	TIMER_CALLBACK_MEMBER(set_mouse_data_in);
 
 	// MCU I/O handlers
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
 
-	devcb_write_line m_aux_irq_cb;
-	devcb_write_line m_aux_clk_cb, m_aux_data_cb;
+	devcb_write_line m_mouse_irq_cb;
+	devcb_write_line m_mouse_clk_cb, m_mouse_data_cb;
 
-	u8 m_aux_irq;
-	u8 m_aux_clk_in, m_aux_clk_out, m_aux_data_in, m_aux_data_out;
+	u8 m_mouse_irq;
+	u8 m_mouse_clk_in, m_mouse_clk_out, m_mouse_data_in, m_mouse_data_out;
 	u8 m_p2_data;
 };
 

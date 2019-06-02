@@ -130,8 +130,6 @@ Unresolved Issues:
 - Elaine's end-game graphics has wrong masking effect (known non-zoomed pdrawgfx issue)
 - intro screen at wrong alpha effect; it has K054157 flag-per-tile for alpha blending?
 - Tilemap scroll is wrong at cocktail mode
-- Music fadeout isn't working
-reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 
 ***************************************************************************/
 

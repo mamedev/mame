@@ -80,8 +80,9 @@ private:
 	DECLARE_WRITE8_MEMBER(port43_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
@@ -104,7 +105,7 @@ private:
 	uint8_t m_intext;
 	uint8_t m_inv;
 	uint8_t m_cass_data[4];
-	bool m_cassbit;
+	bool m_cass_state;
 	bool m_cassold;
 	uint8_t m_key_pressed;
 	bool m_banksw_unlocked;
@@ -422,23 +423,28 @@ WRITE8_MEMBER( fc100_state::port33_w )
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::kansas_w )
+WRITE_LINE_MEMBER( fc100_state::txdata_callback )
+{
+	m_cass_state = state;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
 {
 	m_cass_data[3]++;
 
-	if (m_cassbit != m_cassold)
+	if (m_cass_state != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cassbit;
+		m_cassold = m_cass_state;
 	}
 
-	if (m_cassbit)
+	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::kansas_r)
+TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -481,7 +487,7 @@ void fc100_state::machine_start()
 void fc100_state::machine_reset()
 {
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-	m_cassbit = 0;
+	m_cass_state = 0;
 	m_cassold = 0;
 	m_key_pressed = 0;
 	membank("bankr")->set_entry(0);
@@ -544,13 +550,13 @@ void fc100_state::fc100(machine_config &config)
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	I8251(config, m_uart, 0);
-	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
+	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));
 	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL(4'915'200)/16/16)); // gives 19200
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	TIMER(config, "kansas_w").configure_periodic(FUNC(fc100_state::kansas_w), attotime::from_hz(4800)); // cass write
-	TIMER(config, "kansas_r").configure_periodic(FUNC(fc100_state::kansas_r), attotime::from_hz(40000)); // cass read
+	TIMER(config, "timer_c").configure_periodic(FUNC(fc100_state::timer_c), attotime::from_hz(4800)); // cass write
+	TIMER(config, "timer_p").configure_periodic(FUNC(fc100_state::timer_p), attotime::from_hz(40000)); // cass read
 	TIMER(config, "timer_k").configure_periodic(FUNC(fc100_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fc100_cart");

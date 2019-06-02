@@ -4210,32 +4210,6 @@ ROM_START( mspacmanbg2 )
 	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
-ROM_START( mspacmanbi ) // very similar to mspacmanbg
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2.bin",  0x0000, 0x4000,  BAD_DUMP CRC(03905a76) SHA1(1780ef598c6150ffa44bf467479670f7ca50d512) )
-	ROM_CONTINUE(       0x8000, 0x4000) // blocks 5+6 are repeated twice in here, but for 0xac0d that differs from 0x8c0d
-	ROM_FILL( 0x18b5, 0x01, 0x4e ) // bad dump, has 0x04 instead of 0x4e. Causes Ms. Pacman not responding to controls / moving autonomously
-	ROM_FILL( 0x197d, 0x01, 0xda ) // bad dump, has 0x92 instead of 0xda. Causes Ms. Pacman misplacements / teleportations inside and outside of the maze
-	ROM_FILL( 0x1a61, 0x01, 0x21 ) // bad dump, has 0x00 instead of 0x21, resulting in illegal opcode
-	ROM_FILL( 0xac0d, 0x01, 0xeb ) // bad dump, has 0xea instead of 0xeb. No ill effect observed, but better safe than sorry
-	// other differences are due to copyright and year change
-
-	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "1.bin",    0x0000, 0x0800, CRC(8ee4a3b0) SHA1(01e3453c99f7a5d78ab083c49c650e898c0dd2ee) )
-	ROM_CONTINUE(0x1000,0x800)
-	ROM_CONTINUE(0x0800,0x800)
-	ROM_CONTINUE(0x1800,0x800)
-	ROM_IGNORE(0x2000)
-
-	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, BAD_DUMP CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
-	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
-
-	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs, not dumped for this set */
-	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
-ROM_END
-
 ROM_START( mspacmanbgd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27256.01",  0x0000, 0x4000, CRC(5bcc195e) SHA1(9a82536f3a33c406b8cc9e076ccf21c61a009305) )
@@ -7611,7 +7585,6 @@ GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, pacman_state,  empty_init,  
 GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
 GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
 GAME( 1992, mspacmanbco,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Cocamatic)","Come-Cocos (Ms. Pac-Man) (Cocamatic bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // this PCB have swapped Blue and Green color lines (Ms.Pac-Man sprite should be pink), no "MADE IN GREECE" text at PCB
-GAME( 1993, mspacmanbi, mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Impeuropex)", "Ms. Pac-Man (Impeuropex bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,    ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
 

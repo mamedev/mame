@@ -123,7 +123,6 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2cffa.h"
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2scsi.h"
-#include "bus/a2bus/a2hsscsi.h"
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2videoterm.h"
@@ -3960,7 +3959,6 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  /* Focus Drive IDE card */
 	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
-	device.option_add("hsscsi", A2BUS_HSSCSI);  /* Apple II High-Speed SCSI Card */
 	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
 	device.option_add("aesms", A2BUS_AESMS);    /* Applied Engineering Super Music Synthesizer */
 	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
@@ -3981,7 +3979,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
 	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
-	device.option_add("vulcan", A2BUS_VULCANIIE); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("vulcan", A2BUS_VULCAN); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD); /* Applied Engineering Vulcan Gold IDE drive */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

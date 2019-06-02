@@ -73,7 +73,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
     bit 0 = original system (U79 and U1)
     bit 1 = MDS fast system
     bit 2 = CA3140 */
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::kansas_r )
+TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
 {
 	uint8_t cass_ws=0;
 

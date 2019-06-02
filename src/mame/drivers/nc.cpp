@@ -302,10 +302,10 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 	uint8_t *ptr;
 	int mem_type;
 	int mem_bank;
-	char bank1[20];
-	char bank5[20];
-	snprintf(bank1,ARRAY_LENGTH(bank1),"bank%d",bank+1);
-	snprintf(bank5,ARRAY_LENGTH(bank5),"bank%d",bank+5);
+	char bank1[10];
+	char bank5[10];
+	sprintf(bank1,"bank%d",bank+1);
+	sprintf(bank5,"bank%d",bank+5);
 
 	mem_type = (m_memory_config[bank]>>6) & 0x03;
 	mem_bank = m_memory_config[bank] & 0x03f;

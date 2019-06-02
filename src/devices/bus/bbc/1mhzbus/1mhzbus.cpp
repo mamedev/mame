@@ -130,10 +130,7 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 
 
 // slot devices
-#include "autoprom.h"
-//#include "beebscan.h"
 //#include "teletext.h"
-//#include "digitiser.h"
 #include "emrmidi.h"
 #include "ieee488.h"
 #include "m2000.h"
@@ -151,14 +148,11 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 
 void bbc_1mhzbus_devices(device_slot_interface &device)
 {
-	//device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
+//  device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	//device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
 	//device.option_add("awdd",       BBC_AWDD);            /* Acorn Winchester 110/130 */
-	device.option_add("autoprom",   BBC_AUTOPROM);        /* ATPL AutoPrommer */
-	//device.option_add("beebscan",   BBC_BEEBSCAN);        /* Beeb HandScan */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */
-	//device.option_add("videodig",   BBC_VIDEODIG);        /* Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */
 	//device.option_add("twdd",       BBC_TWDD);            /* Technomatic Winchester (Akhter Host Adaptor + ABD4070 */
@@ -178,7 +172,6 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
 	//device.option_add("awdd",       BBC_AWDD);            /* Acorn Winchester 110/130 */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */
-	//device.option_add("videodig",   BBC_VIDEODIG);        /*  Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */
 	//device.option_add("twdd",       BBC_TWDD);            /* Technomatic Winchester (Akhter Host Adaptor + ABD4070 */

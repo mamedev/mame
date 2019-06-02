@@ -136,7 +136,7 @@ private:
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
 
 	void _7smash_io(address_map &map);
@@ -202,14 +202,14 @@ void luckgrln_state::video_start()
 	save_item(NAME(m_palette_ram));
 }
 
-uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	const rectangle &visarea = screen.visible_area();
 
 	rectangle clip = visarea;
 
-	bitmap.fill(rgb_t::black(), cliprect);
+	bitmap.fill(0, cliprect);
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -868,7 +868,7 @@ void luckgrln_state::luckgrln(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
 	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 6000000/4)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
+	h46505_device &crtc(H46505(config, "crtc", 6000000/4)); /* unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -881,6 +881,7 @@ void luckgrln_state::luckgrln(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(luckgrln_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckgrln);
 	PALETTE(config, m_palette).set_entries(0x8000);

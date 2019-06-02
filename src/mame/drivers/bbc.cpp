@@ -132,8 +132,8 @@ void bbc_state::bbca_mem(address_map &map)
 	map(0x8000, 0xbfff).rw(FUNC(bbc_state::bbc_paged_r), FUNC(bbc_state::bbc_paged_w));                               //    8000-bfff                 Paged ROM/RAM
 	map(0xc000, 0xffff).rom().region("mos", 0);                                                                       //    c000-fbff                 OS ROM
 	map(0xfe00, 0xfeff).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fe00-feff                 SHEILA Address Page
-	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
-	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
+	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0xfe08, 0xfe0f).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                        //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
 	map(0xfe20, 0xfe2f).w(FUNC(bbc_state::video_ula_w));                                                              // W: fe20-fe2f  Video ULA      Video system chip
@@ -149,8 +149,8 @@ void bbc_state::bbc_base(address_map &map)
 	map(0xfc00, 0xfcff).rw(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::fred_r), FUNC(bbc_1mhzbus_slot_device::fred_w));  //    fc00-fcff                 FRED Address Page
 	map(0xfd00, 0xfdff).rw(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::jim_r), FUNC(bbc_1mhzbus_slot_device::jim_w));    //    fd00-fdff                 JIM Address Page
 	map(0xfe00, 0xfeff).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fe00-feff                 SHEILA Address Page
-	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
-	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
+	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0xfe08, 0xfe0f).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                        //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
 	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
@@ -239,8 +239,8 @@ void bbcm_state::bbcm_bankdev(address_map &map)
 	map(0x0000, 0x00ff).mirror(0x400).rw(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::fred_r), FUNC(bbc_1mhzbus_slot_device::fred_w));    //    fc00-fcff  Master         FRED Address Page
 	map(0x0100, 0x01ff).mirror(0x400).rw(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::jim_r), FUNC(bbc_1mhzbus_slot_device::jim_w));      //    fd00-fdff  Master         JIM Address Page
 	map(0x0200, 0x02ff).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe00-feff                 SHEILA Address Page
-	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
-	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
+	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0x0208, 0x020f).mirror(0x400).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                          //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0x0210, 0x0217).mirror(0x400).w(FUNC(bbc_state::serial_ula_w));                                                               //    fe10-fe17  Serial ULA     Serial system chip
 	map(0x0218, 0x021f).mirror(0x400).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                         //    fe18-fe1f  uPD7002        Analogue to digital converter
@@ -269,8 +269,8 @@ void bbcm_state::bbcmet_bankdev(address_map &map)
 	map(0x0000, 0x00ff).mirror(0x400).unmaprw();                                                                                      //    fc00-fcff                 FRED Address Page
 	map(0x0100, 0x01ff).mirror(0x400).unmaprw();                                                                                      //    fd00-fdff                 JIM Address Page
 	map(0x0200, 0x02ff).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe00-feff                 SHEILA Address Page
-	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
-	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
+	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0x0208, 0x020f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0x0210, 0x0217).mirror(0x400).w(FUNC(bbc_state::serial_ula_w));                                                               //    fe10-fe17  Serial ULA     Serial system chip
 	map(0x0218, 0x021f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe18-fe1f  uPD7002        Analogue to digital converter
@@ -299,8 +299,8 @@ void bbcm_state::bbcmc_bankdev(address_map &map)
 	map(0x0000, 0x00ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::fred_r), FUNC(bbc_exp_slot_device::fred_w));                //    fc00-fcff  Compact        FRED Address Page
 	map(0x0100, 0x01ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::jim_r), FUNC(bbc_exp_slot_device::jim_w));                  //    fd00-fdff  Compact        JIM Address Page
 	map(0x0200, 0x02ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::sheila_r), FUNC(bbc_exp_slot_device::sheila_w));            //    fd00-fdff  Compact        SHEILA Address Page
-	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
-	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
+	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0x0208, 0x020f).mirror(0x400).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                          //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0x0210, 0x0217).mirror(0x400).w(FUNC(bbc_state::serial_ula_w));                                                               //    fe10-fe17  Serial ULA     Serial system chip
 	map(0x0220, 0x0223).mirror(0x400).w(FUNC(bbc_state::video_ula_w));                                                                //    fe20-fe23  Video ULA      Video system chip
@@ -846,7 +846,7 @@ void bbc_state::bbca(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
-	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
+	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
 
@@ -854,7 +854,7 @@ void bbc_state::bbca(machine_config &config)
 	m_trom->set_screen_size(40, 25, 40);
 
 	/* crtc */
-	HD6845S(config, m_hd6845, 16_MHz_XTAL / 8);
+	HD6845(config, m_hd6845, 16_MHz_XTAL / 8);
 	m_hd6845->set_screen("screen");
 	m_hd6845->set_show_border_area(false);
 	m_hd6845->set_char_width(12);
@@ -1340,7 +1340,7 @@ void bbcm_state::bbcm(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
-	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
+	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
 
@@ -1348,7 +1348,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_trom->set_screen_size(40, 25, 40);
 
 	/* crtc */
-	HD6845S(config, m_hd6845, 16_MHz_XTAL / 8);
+	HD6845(config, m_hd6845, 16_MHz_XTAL / 8);
 	m_hd6845->set_screen("screen");
 	m_hd6845->set_show_border_area(false);
 	m_hd6845->set_char_width(12);

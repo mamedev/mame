@@ -207,7 +207,7 @@ void bbc_romslot_device::write(offs_t offset, uint8_t data)
 #include "rom.h"
 #include "ram.h"
 #include "dfs.h"
-#include "genie.h"
+//#include "genie.h"
 #include "pal.h"
 //#include "replay.h"
 #include "rtc.h"
@@ -226,7 +226,7 @@ void bbc_rom_devices(device_slot_interface &device)
 	device.option_add_internal("palabep", BBC_PALABEP);
 	device.option_add_internal("palabe",  BBC_PALABE);
 	device.option_add_internal("palmo2", BBC_PALMO2);
-	device.option_add_internal("genie", BBC_PMSGENIE);
+	//device.option_add_internal("genie", BBC_PMSGENIE);
 	device.option_add_internal("mrme00", BBC_MRME00);
 	//device.option_add_internal("replay", BBC_REPLAY);
 	device.option_add_internal("stlrtc",  BBC_STLRTC);

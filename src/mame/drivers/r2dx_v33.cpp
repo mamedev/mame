@@ -403,7 +403,7 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
-	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x0068e, 0x0068f).nopw(); // sprite buffering
 	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
 	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  map(0x006b4, 0x006b5).nopw();
@@ -432,7 +432,8 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 	map(0x00800, 0x00fff).ram(); // copies eeprom here?
 	map(0x01000, 0x0bfff).ram();
 
-	map(0x0c000, 0x0cfff).ram().share("spriteram");
+	map(0x0c000, 0x0c7ff).ram().share("spriteram");
+	map(0x0c800, 0x0cfff).ram();
 	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::background_w)).share("back_data");
 	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::foreground_w).share("fore_data");
 	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::midground_w).share("mid_data");
@@ -470,7 +471,7 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf)rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
-	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x0068e, 0x0068f).nopw(); // sprite buffering
 	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w));
 	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  map(0x006b4, 0x006b5).nopw();
@@ -490,7 +491,8 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 	map(0x00800, 0x00fff).ram();
 	map(0x01000, 0x0bfff).ram();
 
-	map(0x0c000, 0x0cfff).ram().share("spriteram");
+	map(0x0c000, 0x0c7ff).ram().share("spriteram");
+	map(0x0c800, 0x0cfff).ram();
 	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::background_w)).share("back_data");
 	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::foreground_w)).share("fore_data");
 	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::midground_w)).share("mid_data");
@@ -745,8 +747,6 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
 
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -782,8 +782,6 @@ void r2dx_v33_state::nzerotea(machine_config &config)
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

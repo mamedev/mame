@@ -40,8 +40,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tilegen(*this, "tilegen%u", 1),
-		m_spritegen(*this, "spritegen"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_spritegen(*this, "spritegen")
 	{ }
 
 	void madmotor(machine_config &config);
@@ -61,7 +60,6 @@ private:
 	required_device<h6280_device> m_audiocpu;
 	required_device_array<deco_bac06_device, 3> m_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -251,10 +249,10 @@ uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_tilegen[2]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[2]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
-	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, 0x800/2);
-	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen[2]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -281,22 +279,24 @@ void madmotor_state::madmotor(machine_config &config)
 	screen.set_screen_update(FUNC(madmotor_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_madmotor);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_madmotor);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
-	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
-	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_BAC06(config, m_tilegen[2], 0);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 1);
-	m_tilegen[2]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(3);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

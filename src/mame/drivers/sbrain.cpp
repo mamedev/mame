@@ -345,9 +345,11 @@ void sbrain_state::ppi_pc_w(u8 data)
 		m_keydown &= 2; // ack DR
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
-	m_fdc->mr_w(!BIT(data, 3));
 	if (BIT(data, 3))
+	{
+		m_fdc->soft_reset();
 		disk_select_w(0);
+	}
 	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
 	m_busak = BIT(data, 5);
 }

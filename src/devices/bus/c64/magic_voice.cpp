@@ -97,7 +97,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 
 	uint8_t data = 0;
 
-	data |= m_exp->game_r(get_offset(m_ca), 1, 1, 1, 0, 0) << 5;
+	data |= m_exp->game_r(get_offset(m_ca), 1, 1, 1, 0) << 5;
 	data |= m_vslsi->eos_r() << 6;
 	data |= m_fifo->dir_r() << 7;
 
@@ -144,7 +144,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 
 	uint8_t data = 0;
 
-	data |= m_exp->exrom_r(get_offset(m_ca), 1, 1, 1, 0, 0) << 7;
+	data |= m_exp->exrom_r(get_offset(m_ca), 1, 1, 1, 0) << 7;
 
 	return data;
 }

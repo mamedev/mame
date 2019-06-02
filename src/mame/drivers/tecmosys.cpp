@@ -417,7 +417,7 @@ static const gfx_layout gfxlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(0,1) },
+	{ STEP8(0,1) },
 	{ STEP8(0,4) },
 	{ STEP8(0,4*8) },
 	8*8*4
@@ -428,7 +428,7 @@ static const gfx_layout gfxlayout2 =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(0,1) },
+	{ STEP8(0,1) },
 	{ STEP8(0,4), STEP8(8*8*4,4) },
 	{ STEP8(0,4*8), STEP8(8*8*4*2,4*8) },
 	16*16*4

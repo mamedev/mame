@@ -235,15 +235,15 @@ private:
 	{
 		if (!m_prev_selected)
 		{
-			set_selected_index(0);
+			selected = 0;
 		}
 		else
 		{
-			for (int x = 0; x < item_count(); ++x)
+			for (int x = 0; x < item.size(); ++x)
 			{
-				if (item(x).ref == m_prev_selected)
+				if (item[x].ref == m_prev_selected)
 				{
-					set_selected_index(x);
+					selected = x;
 					break;
 				}
 			}

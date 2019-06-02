@@ -36,17 +36,16 @@
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type2.h"
 
-u32 pgm_arm_type2_state::arm7_latch_arm_r(offs_t offset, u32 mem_mask)
+READ32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_r )
 {
-	if (!machine().side_effects_disabled())
-		m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
+	m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
 
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: Latch read: %08x (%08x)\n", machine().describe_context(), m_kov2_latchdata_68k_w, mem_mask);
 	return m_kov2_latchdata_68k_w;
 }
 
-void pgm_arm_type2_state::arm7_latch_arm_w(offs_t offset, u32 data, u32 mem_mask)
+WRITE32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_w )
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: Latch write: %08x (%08x)\n", machine().describe_context(), data, mem_mask);
@@ -54,28 +53,28 @@ void pgm_arm_type2_state::arm7_latch_arm_w(offs_t offset, u32 data, u32 mem_mask
 	COMBINE_DATA(&m_kov2_latchdata_arm_w);
 }
 
-u32 pgm_arm_type2_state::arm7_shareram_r(offs_t offset, u32 mem_mask)
+READ32_MEMBER(pgm_arm_type2_state::arm7_shareram_r )
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, m_arm7_shareram[offset], mem_mask);
 	return m_arm7_shareram[offset];
 }
 
-void pgm_arm_type2_state::arm7_shareram_w(offs_t offset, u32 data, u32 mem_mask)
+WRITE32_MEMBER(pgm_arm_type2_state::arm7_shareram_w )
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, data, mem_mask);
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 
-u16 pgm_arm_type2_state::arm7_latch_68k_r(offs_t offset, u16 mem_mask)
+READ16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_r )
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s M68K: Latch read: %04x (%04x)\n", machine().describe_context(), m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask);
 	return m_kov2_latchdata_arm_w;
 }
 
-void pgm_arm_type2_state::arm7_latch_68k_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_w )
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s M68K: Latch write: %04x (%04x)\n", machine().describe_context(), data & 0x0000ffff, mem_mask);
@@ -84,18 +83,18 @@ void pgm_arm_type2_state::arm7_latch_68k_w(offs_t offset, u16 data, u16 mem_mask
 	m_prot->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
 }
 
-u16 pgm_arm_type2_state::arm7_ram_r(offs_t offset, u16 mem_mask)
+READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
 {
-	const u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("%s M68K: ARM7 Shared RAM Read: %04x = %04x (%08x)\n", machine().describe_context(), BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask);
 	return share16[BYTE_XOR_LE(offset)];
 }
 
-void pgm_arm_type2_state::arm7_ram_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER(pgm_arm_type2_state::arm7_ram_w )
 {
-	u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("%s M68K: ARM7 Shared RAM Write: %04x = %04x (%04x)\n", machine().describe_context(), BYTE_XOR_LE(offset), data, mem_mask);
@@ -125,11 +124,19 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 	map(0x50000000, 0x500003ff).ram();
 }
 
+MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
+{
+	MACHINE_START_CALL_MEMBER(pgm);
+	/* register type specific Save State stuff here */
+}
+
 /******* ARM 55857F *******/
 
 void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
 {
 	pgmbase(config);
+
+	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::kov2_mem);
 
@@ -137,6 +144,8 @@ void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
 	ARM7(config, m_prot, 20000000);    // 55857F
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::_55857F_arm7_map);
 }
+
+
 
 
 void pgm_arm_type2_state::kov2_latch_init()
@@ -148,20 +157,20 @@ void pgm_arm_type2_state::kov2_latch_init()
 	save_item(NAME(m_kov2_latchdata_arm_w));
 }
 
-void pgm_arm_type2_state::kov2_arm_region_w(offs_t offset, u32 data, u32 mem_mask)
+WRITE32_MEMBER(pgm_arm_type2_state::kov2_arm_region_w )
 {
-	const int pc = m_prot->pc();
-	const int regionhack = m_regionhack->read();
-	if (pc == 0x190 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
+	int pc = m_prot->pc();
+	int regionhack = ioport("RegionHack")->read();
+	if (pc==0x190 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
 	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
 }
 
-void pgm_arm_type2_state::kov2p_arm_region_w(offs_t offset, u32 data, u32 mem_mask)
+WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
 {
-	const int pc = m_prot->pc();
-	const int regionhack = m_regionhack->read();
+	int pc = m_prot->pc();
+	int regionhack = ioport("RegionHack")->read();
 //  printf("%08x\n", pc);
-	if (pc == 0x1b0 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
+	if (pc==0x1b0 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
 	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
 }
 
@@ -173,7 +182,7 @@ void pgm_arm_type2_state::init_kov2()
 	kov2_latch_init();
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::kov2_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2_arm_region_w),this));
 }
 
 
@@ -187,14 +196,14 @@ void pgm_arm_type2_state::init_kov2p()
 	kov2_latch_init();
 
 	// we only have a China internal ROM dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
 }
 
-void pgm_arm_type2_state::martmast_arm_region_w(offs_t offset, u32 data, u32 mem_mask)
+WRITE32_MEMBER(pgm_arm_type2_state::martmast_arm_region_w )
 {
-	const int pc = m_prot->pc();
-	const int regionhack = m_regionhack->read();
-	if (pc == 0x170 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
+	int pc = m_prot->pc();
+	int regionhack = ioport("RegionHack")->read();
+	if (pc==0x170 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
 	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
 }
 
@@ -206,25 +215,27 @@ void pgm_arm_type2_state::init_martmast()
 	kov2_latch_init();
 
 	// we only have a USA / CHINA internal ROMs dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::martmast_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::martmast_arm_region_w),this));
 }
+
+
 
 
 READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 {
-	const int pc = m_prot->pc();
-	const u32 data = m_arm_ram[0x300c/4];
+	int pc = m_prot->pc();
+	uint32_t data = m_arm_ram[0x300c/4];
 
-	if (pc == 0x080109b4)
+	if (pc==0x080109b4)
 	{
 		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
 		int r4 = (m_prot->state_int(ARM7_R4));
 		r4 += 0xe;
 
-		if (r4 == 0x18002f9e)
+		if (r4==0x18002f9e)
 		{
-			const u32 data2 =  m_arm_ram[0x2F9C/4] & 0xffff0000;
-			if ((data == 0x00000000) && (data2 == 0x00000000)) space.device().execute().spin_until_interrupt();
+			uint32_t data2 =  m_arm_ram[0x2F9C/4]&0xffff0000;
+			if ((data==0x00000000) && (data2==0x00000000)) space.device().execute().spin_until_interrupt();
 		}
 	}
 
@@ -233,8 +244,8 @@ READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 
 READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
 {
-	const u16 data = m_mainram[0x0ee54/2];
-	const int pc = m_maincpu->pc();
+	uint16_t data = m_mainram[0x0ee54/2];
+	int pc = m_maincpu->pc();
 
 	if (pc == 0x149dce) m_maincpu->spin_until_interrupt();
 	if (pc == 0x149cfe) m_maincpu->spin_until_interrupt();
@@ -267,6 +278,7 @@ void pgm_arm_type2_state::init_dwpc()
 	kov2_latch_init();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
+
 
 
 INPUT_PORTS_START( kov2 )

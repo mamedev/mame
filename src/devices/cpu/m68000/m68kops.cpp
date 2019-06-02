@@ -31242,8 +31242,8 @@ void m68000_base_device::xf400_cinv_l_4()
 {
 	u16 ir = m_ir;
 	u8 cache = (ir >> 6) & 3;
-	//  u8 scope = (ir >> 3) & 3;
-	//  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
+    //  u8 scope = (ir >> 3) & 3;
+    //  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
 	switch (cache) {
 	case 2:
 	case 3:

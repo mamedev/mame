@@ -15,6 +15,8 @@
 #define NAMCOFL_VTOTAL      (262)   /* needs to be checked */
 #define NAMCOFL_VBSTART (224)
 
+#define NAMCOFL_SPRITEGFX       0
+
 class namcofl_state : public driver_device
 {
 public:

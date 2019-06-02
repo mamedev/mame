@@ -39,7 +39,7 @@ private:
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
 	void dealem_palette(palette_device &palette) const;
-	uint32_t screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
 	void dealem_memmap(address_map &map);
@@ -124,7 +124,7 @@ void mpu4dealem_state::dealem_palette(palette_device &palette) const
 }
 
 
-uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	for (int y = 0; y < 32; y++)
@@ -220,12 +220,13 @@ void mpu4dealem_state::dealem(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 0*8, 31*8-1);      /* Taken from 6845 init, registers 01 & 06 */
 	screen.set_refresh_hz(56);                            /* Measured accurately from the flip-flop, but 6845 handles this */
 	screen.set_screen_update(FUNC(mpu4dealem_state::screen_update_dealem));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dealem);
 
 	PALETTE(config, m_palette, FUNC(mpu4dealem_state::dealem_palette), 32);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
+	hd6845_device &crtc(HD6845(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

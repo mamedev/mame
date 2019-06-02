@@ -483,11 +483,11 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 void tempest_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x080f).writeonly().share("avg:colorram");
+	map(0x0800, 0x080f).writeonly().share("colorram");
 	map(0x0c00, 0x0c00).portr("IN0");
 	map(0x0d00, 0x0d00).portr("DSW1");
 	map(0x0e00, 0x0e00).portr("DSW2");
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x3fff).rom();
 	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
@@ -705,7 +705,7 @@ ROM_START( tempest ) /* rev 3 */
 	ROM_LOAD( "136002-138.np3", 0x3000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -735,7 +735,7 @@ ROM_START( tempest1r ) /* rev 1 */
 	ROM_LOAD( "136002-138.np3", 0x3000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -771,7 +771,7 @@ ROM_START( tempest3 ) /* rev 3 */
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -807,7 +807,7 @@ ROM_START( tempest2 ) /* rev 2 */
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -843,7 +843,7 @@ ROM_START( tempest1 ) /* rev 1 */
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -879,7 +879,7 @@ ROM_START( temptube )
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */

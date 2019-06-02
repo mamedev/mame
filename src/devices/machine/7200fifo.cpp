@@ -143,34 +143,30 @@ uint16_t fifo7200_device::fifo_read()
 {
 	if (m_ef)
 	{
-		if (!machine().side_effects_disabled())
-			logerror("IDT7200 %s fifo_read underflow!\n", tag());
+		logerror("IDT7200 %s fifo_read underflow!\n", tag());
 		return 0x1ff;
 	}
 
 	uint16_t ret = m_buffer[m_read_ptr];
-	if (!machine().side_effects_disabled())
+	m_read_ptr = (m_read_ptr + 1) % m_ram_size;
+
+	// update flags
+	if (m_ff)
 	{
-		m_read_ptr = (m_read_ptr + 1) % m_ram_size;
+		m_ff = 0;
+		m_ff_handler(!m_ff);
+	}
 
-		// update flags
-		if (m_ff)
-		{
-			m_ff = 0;
-			m_ff_handler(!m_ff);
-		}
+	else if (m_read_ptr == m_write_ptr)
+	{
+		m_ef = 1;
+		m_ef_handler(!m_ef);
+	}
 
-		else if (m_read_ptr == m_write_ptr)
-		{
-			m_ef = 1;
-			m_ef_handler(!m_ef);
-		}
-
-		else if (((m_read_ptr + m_ram_size / 2) % m_ram_size) == m_write_ptr)
-		{
-			m_hf = 0;
-			m_hf_handler(!m_hf);
-		}
+	else if (((m_read_ptr + m_ram_size / 2) % m_ram_size) == m_write_ptr)
+	{
+		m_hf = 0;
+		m_hf_handler(!m_hf);
 	}
 
 	return ret;

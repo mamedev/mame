@@ -1,26 +1,63 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder, hap
+// copyright-holders:Curt Coder
 /**********************************************************************
 
-Tasc Final ChessCard cartridge emulation
-
-It expects a mouse in port 2, and/or joystick in port 1.
-
-The cartridge includes its own CPU (G65SC02P-4 @ 5MHz), making a relatively
-strong chess program possible on C64.
-It was also released for IBM PC, with an ISA card.
+    Tasc Final ChessCard cartridge emulation
 
 **********************************************************************/
 
+/*
+
+    TODO:
+
+    629D ldx #$00
+    629F stx $0e
+    62A1 sta $df00
+    62A4 inc $d020
+    62A7 dec $d020
+    62AA cpx $0e
+    62AC beq $62a4 <-- eternal loop here
+    62AE rts
+
+*/
+
 #include "emu.h"
 #include "fcc.h"
+
+
+
+//**************************************************************************
+//  MACROS/CONSTANTS
+//**************************************************************************
+
+#define G65SC02P4_TAG   "g65sc02p4"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "C64 Final ChessCard")
+DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "Final ChessCard")
+
+
+//-------------------------------------------------
+//  ROM( c64_fcc )
+//-------------------------------------------------
+
+ROM_START( c64_fcc )
+	ROM_REGION( 0x8000, G65SC02P4_TAG, 0 )
+	ROM_LOAD( "fcc_rom1", 0x0000, 0x8000, CRC(2949836a) SHA1(9e6283095df9e3f4802ed0c654101f8e37168bf6) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *c64_final_chesscard_device::device_rom_region() const
+{
+	return ROM_NAME( c64_fcc );
+}
 
 
 //-------------------------------------------------
@@ -29,10 +66,8 @@ DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "C64 Final Ch
 
 void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w)); // A13-A15 = low
-	//map(0x6000, 0x6000).noprw(); // N/C
-	map(0x7f00, 0x7f00).mirror(0x00ff).r(m_sublatch, FUNC(generic_latch_8_device::read)).w(m_mainlatch, FUNC(generic_latch_8_device::write)); // A8-A14 = high
-	map(0x8000, 0xffff).r(FUNC(c64_final_chesscard_device::rom_r));
+	map(0x0000, 0x1fff).mirror(0x6000).rw(FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w));
+	map(0x8000, 0xffff).rom().region(G65SC02P4_TAG, 0);
 }
 
 
@@ -42,13 +77,8 @@ void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 
 void c64_final_chesscard_device::device_add_mconfig(machine_config &config)
 {
-	M65SC02(config, m_maincpu, 5_MHz_XTAL);
+	M65SC02(config, m_maincpu, XTAL(5'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_final_chesscard_device::c64_fcc_map);
-
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-
-	GENERIC_LATCH_8(config, m_mainlatch).data_pending_callback().set(FUNC(c64_final_chesscard_device::mainlatch_int));
-	GENERIC_LATCH_8(config, m_sublatch).data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 
@@ -84,11 +114,9 @@ c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mco
 	device_t(mconfig, C64_FCC, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
-	m_maincpu(*this, "maincpu"),
-	m_mainlatch(*this, "mainlatch"),
-	m_sublatch(*this, "sublatch"),
+	m_maincpu(*this, G65SC02P4_TAG),
 	m_bank(0),
-	m_hidden(0)
+	m_ramen(0)
 {
 }
 
@@ -99,9 +127,6 @@ c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mco
 
 void c64_final_chesscard_device::device_start()
 {
-	// state saving
-	save_item(NAME(m_bank));
-	save_item(NAME(m_hidden));
 }
 
 
@@ -111,13 +136,10 @@ void c64_final_chesscard_device::device_start()
 
 void c64_final_chesscard_device::device_reset()
 {
-	m_mainlatch->read();
-	m_sublatch->read();
 	m_maincpu->reset();
 
 	m_bank = 0;
-	m_hidden = 0;
-	m_exrom = 0;
+	m_ramen = 0;
 	m_game = 0;
 }
 
@@ -128,10 +150,21 @@ void c64_final_chesscard_device::device_reset()
 
 uint8_t c64_final_chesscard_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!roml || !romh)
+	if (!roml)
+	{
+		if (m_ramen)
+		{
+			data = m_nvram[offset & 0x1fff];
+		}
+		else
+		{
+			data = m_roml[(m_bank << 14) | (offset & 0x3fff)];
+		}
+	}
+	else if (!romh)
+	{
 		data = m_roml[(m_bank << 14) | (offset & 0x3fff)];
-	else if (!io2)
-		data = m_mainlatch->read();
+	}
 
 	return data;
 }
@@ -143,16 +176,72 @@ uint8_t c64_final_chesscard_device::c64_cd_r(offs_t offset, uint8_t data, int sp
 
 void c64_final_chesscard_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!m_hidden && !io1)
+	if (!roml)
 	{
-		// d0: rom bank
-		// d1: EXROM/GAME
-		// d7: hide register
+		if (m_ramen)
+		{
+			m_nvram[offset & 0x1fff] = data;
+		}
+	}
+	else if (!io1)
+	{
+		/*
+
+		    bit     description
+
+		    0       ?
+		    1
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7
+
+		*/
+
+		printf("IO1 %04x %02x\n", offset, data);
 		m_bank = BIT(data, 0);
-		m_exrom = BIT(data, 1);
-		m_game = BIT(data, 1);
-		m_hidden = BIT(data, 7);
 	}
 	else if (!io2)
-		m_sublatch->write(data);
+	{
+		/*
+
+		    bit     description
+
+		    0       ?
+		    1
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7       ?
+
+		*/
+
+		printf("IO2 %04x %02x\n", offset, data);
+		m_ramen = BIT(data, 0);
+		m_game = BIT(data, 7);
+	}
+}
+
+
+//-------------------------------------------------
+//  nvram_r - NVRAM read
+//-------------------------------------------------
+
+READ8_MEMBER( c64_final_chesscard_device::nvram_r )
+{
+	return m_nvram[offset & m_nvram.mask()];
+}
+
+
+//-------------------------------------------------
+//  nvram_w - NVRAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( c64_final_chesscard_device::nvram_w )
+{
+	m_nvram[offset & m_nvram.mask()] = data;
 }

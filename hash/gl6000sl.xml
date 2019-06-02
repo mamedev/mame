@@ -10,7 +10,7 @@
 		<info name="serial" value="80-12072" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5776-00" size="0x20000" crc="454761e0" sha1="04741e121d8f22e86f39375a11f2e38ad382af57"/>
+				<rom name="27-5776-00" size="0x20000" crc="454761e0" sha1="04741e121d8f22e86f39375a11f2e38ad382af57" offset="0" />
 			</dataarea>
 		</part>
 	</software>

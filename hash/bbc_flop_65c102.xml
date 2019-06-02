@@ -18,7 +18,7 @@
 		<info name="usage" value="Requires 65C102 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="65C102SupportDisc.ssd" size="102400" crc="f6378bb4" sha1="03bfe9e860ecc6117f2e78771c4e301751269055"/>
+				<rom name="65C102SupportDisc.ssd" size="102400" crc="f6378bb4" sha1="03bfe9e860ecc6117f2e78771c4e301751269055" offset="0" />
 			</dataarea>
 		</part>
 	</software>

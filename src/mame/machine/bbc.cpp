@@ -1118,7 +1118,7 @@ WRITE8_MEMBER(bbc_state::bbcbp_drive_control_w)
 	// bit 4: interrupt enable (S5 wire link not fitted)
 
 	// bit 5: reset
-	m_wd1770->mr_w(BIT(data, 5));
+	if (!BIT(data, 5)) m_wd1770->soft_reset();
 }
 
 /*
@@ -1152,7 +1152,7 @@ WRITE8_MEMBER(bbc_state::bbcm_drive_control_w)
 	m_wd1770->dden_w(BIT(data, 5));
 
 	// bit 2: reset
-	m_wd1770->mr_w(BIT(data, 2));
+	if (!BIT(data, 2)) m_wd1770->soft_reset();
 }
 
 WRITE8_MEMBER(bbc_state::bbcmc_drive_control_w)
@@ -1172,7 +1172,7 @@ WRITE8_MEMBER(bbc_state::bbcmc_drive_control_w)
 	m_wd1772->dden_w(BIT(data, 5));
 
 	// bit 2: reset
-	m_wd1772->mr_w(BIT(data, 2));
+	if (!BIT(data, 2)) m_wd1772->soft_reset();
 }
 
 /**************************************

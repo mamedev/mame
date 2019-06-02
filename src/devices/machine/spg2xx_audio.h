@@ -381,25 +381,7 @@ public:
 	virtual uint32_t get_phase(const offs_t channel) const override { return m_audio_regs[(channel << 4) | 0xe]; }
 };
 
-class sunplus_gcm394_audio_device : public spg2xx_audio_device
-{
-public:
-	sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_READ16_MEMBER(control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
-
-	virtual void device_start() override;
-
-private:
-	uint16_t control_group16_r(uint8_t group, uint8_t offset);
-	void control_group16_w(uint8_t group, uint8_t offset, uint16_t data);
-
-	uint16_t m_control[2][0x20];
-};
-
 DECLARE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device)
 DECLARE_DEVICE_TYPE(SPG110_AUDIO, spg110_audio_device)
-DECLARE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device)
 
 #endif // MAME_MACHINE_SPG2XX_AUDIO_H

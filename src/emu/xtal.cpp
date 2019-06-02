@@ -160,7 +160,6 @@ const double XTAL::known_xtals[] = {
 	 10'733'000, /* 10.733_MHz_XTAL        The Fairyland Story */
 	 10'738'635, /* 10.738635_MHz_XTAL     TMS9918 family (3x NTSC subcarrier) */
 	 10'816'000, /* 10.816_MHz_XTAL        Universal 1979-1980 (Cosmic Alien, etc) */
-	 10'886'400, /* 10.8864_MHz_XTAL       Systel System 100 */
 	 10'920'000, /* 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2 */
 	 11'000'000, /* 11_MHz_XTAL            Mario I8039 sound */
 	 11'004'000, /* 11.004_MHz_XTAL        TI 911 VDT */
@@ -297,13 +296,13 @@ const double XTAL::known_xtals[] = {
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
 	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
 	 25'447'000, /* 25.447_MHz_XTAL        Namco EVA3A (Funcube2) */
+	 25'590'906, /* 25.590906_MHz_XTAL     Atari Jaguar NTSC */
+	 25'593'900, /* 25.5939_MHz_XTAL       Atari Jaguar PAL */
 	 25'771'500, /* 25.7715_MHz_XTAL       HP-2622A */
 	 25'920'000, /* 25.92_MHz_XTAL         ADDS Viewpoint 60 */
 	 26'000'000, /* 26_MHz_XTAL            Gaelco PCBs */
 	 26'366'000, /* 26.366_MHz_XTAL        DEC VT320 */
 	 26'580'000, /* 26.58_MHz_XTAL         Wyse WY-60 80-column display clock */
-	 26'590'906, /* 26.590906_MHz_XTAL     Atari Jaguar NTSC */
-	 26'593'900, /* 26.5939_MHz_XTAL       Atari Jaguar PAL */
 	 26'601'712, /* 26.601712_MHz_XTAL     Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
 	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4100/I4220/I4300 */
 	 26'666'666, /* 26.666666_MHz_XTAL     Irem M92 but most use 27MHz */
@@ -333,7 +332,6 @@ const double XTAL::known_xtals[] = {
 	 32'000'000, /* 32_MHz_XTAL            - */
 	 32'147'000, /* 32.147_MHz_XTAL        Ampex 210+ 132-column display clock */
 	 32'220'000, /* 32.22_MHz_XTAL         Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz */
-	 32'256'000, /* 32.256_MHz_XTAL        Hitachi MB-6890 */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
 	 32'530'400, /* 32.5304_MHz_XTAL       Seta 2 */
 	 33'000'000, /* 33_MHz_XTAL            Sega Model 3 video board */

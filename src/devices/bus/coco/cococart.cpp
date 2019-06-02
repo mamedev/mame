@@ -152,30 +152,6 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 
 //-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(cococart_slot_device::cts_read)
-{
-	uint8_t result = 0x00;
-	if (m_cart)
-		result = m_cart->cts_read(space, offset);
-	return result;
-}
-
-
-//-------------------------------------------------
-//  cts_write
-//-------------------------------------------------
-
-WRITE8_MEMBER(cococart_slot_device::cts_write)
-{
-	if (m_cart)
-		m_cart->cts_write(space, offset, data);
-}
-
-
-//-------------------------------------------------
 //  scs_read
 //-------------------------------------------------
 
@@ -436,7 +412,7 @@ image_init_result cococart_slot_device::call_load()
 	{
 		memory_region *cart_mem = m_cart->get_cart_memregion();
 		uint8_t *base = cart_mem->base();
-		offs_t read_length, cart_length = cart_mem->bytes();
+		offs_t read_length, cart_length = cart_mem->bytes();;
 
 		if (!loaded_through_softlist())
 		{
@@ -522,27 +498,6 @@ void device_cococart_interface::interface_pre_start()
 		throw emu_fatalerror("Expected device().owner() to be of type cococart_slot_device");
 	if (!m_host)
 		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_cococart_host_interface");
-}
-
-
-//-------------------------------------------------
-//  cts_read - Signifies a read where the CTS pin
-//  on the cartridge slot was asserted ($C000-FFEF)
-//-------------------------------------------------
-
-READ8_MEMBER(device_cococart_interface::cts_read)
-{
-	return 0x00;
-}
-
-
-//-------------------------------------------------
-//  cts_write - Signifies a write where the CTS pin
-//  on the cartridge slot was asserted ($C000-FFEF)
-//-------------------------------------------------
-
-WRITE8_MEMBER(device_cococart_interface::cts_write)
-{
 }
 
 

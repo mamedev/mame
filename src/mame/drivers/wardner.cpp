@@ -415,7 +415,7 @@ void wardner_state::wardner(machine_config &config)
 	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
-	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
@@ -432,6 +432,7 @@ void wardner_state::wardner(machine_config &config)
 	m_screen->set_screen_update(FUNC(wardner_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram8, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);

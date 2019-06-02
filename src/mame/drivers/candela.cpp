@@ -487,7 +487,6 @@ INPUT_PORTS_END
  * - Map PIA:S
  * - ROM/RAM paging by using the PIAs and the myriad of 74138s on the board
  * - Vram and screen for the 6845 CRTC
- * - Check actual clock source for CRTC. An 8MHz UKI crystal is also nearby
  * - Keyboard
  * - Serial port
  * - Floppy controller
@@ -522,7 +521,7 @@ protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
-	required_device<hd6845s_device> m_crtc;
+	required_device<h46505_device> m_crtc;
 };
 
 void can09_state::machine_reset()
@@ -641,8 +640,8 @@ void can09_state::can09_map(address_map &map)
 //  AM_RANGE(0x0000, 0x7fff) AM_RAM
 	map(0x0000, 0x7fff).ram().bankrw("bank1");
 	map(0xe000, 0xffff).rom().region("roms", 0);
-	map(0xe020, 0xe020).w(m_crtc, FUNC(hd6845s_device::address_w));
-	map(0xe021, 0xe021).w(m_crtc, FUNC(hd6845s_device::register_w));
+	map(0xe020, 0xe020).w(m_crtc, FUNC(h46505_device::address_w));
+	map(0xe021, 0xe021).w(m_crtc, FUNC(h46505_device::register_w));
 	map(0xe034, 0xe037).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 #if 0
@@ -723,8 +722,8 @@ void can09_state::can09(machine_config &config)
 	/* RAM banks */
 	RAM(config, RAM_TAG).set_default_size("768K");
 
-	// CRTC init
-	hd6845s_device &crtc(HD6845S(config, "crtc", CAN09_CPU_CLOCK)); // HD46505SP-1 (HD68A45SP)
+	// CRTC  init
+	h46505_device &crtc(H46505(config, "crtc", CAN09_CPU_CLOCK)); // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

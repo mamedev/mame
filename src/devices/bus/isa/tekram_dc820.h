@@ -34,7 +34,7 @@ protected:
 	void mask_w(u8 data);
 	void eeprom_w(u8 data);
 
-	void common_map(address_map &map);
+	void mpu_map(address_map &map);
 	void scsic_config(device_t *device);
 	void scsi_add(machine_config &config);
 
@@ -71,9 +71,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-private:
-	void mpu_map(address_map &map);
 };
 
 class tekram_dc820_device : public tekram_eisa_scsi_device
@@ -99,9 +96,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-private:
-	void mpu_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(TEKRAM_DC320B, tekram_dc320b_device)

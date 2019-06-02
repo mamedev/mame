@@ -196,7 +196,7 @@ private:
 	uint16_t  m_datA40000;
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
-	uint32_t screen_update_nevada(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nevada_palette(palette_device &palette) const;
 
 	template<int N> uint8_t duart_r(offs_t offset);
@@ -303,7 +303,7 @@ void nevada_state::video_start()
 }
 
 /***************************************************************************/
-uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -589,6 +589,7 @@ void nevada_state::nevada(machine_config &config)
 	screen.set_size((42+1)*8, (32+1)*8);                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	screen.set_visarea(0*8, 31*8-1, 0*8, 31*8-1);    /* From MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(nevada_state::screen_update_nevada));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nevada);
 	PALETTE(config, "palette", FUNC(nevada_state::nevada_palette), 256);

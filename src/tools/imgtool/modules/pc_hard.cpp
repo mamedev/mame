@@ -61,7 +61,7 @@ OPTION_GUIDE_START( pc_chd_create_optionguide )
 	OPTION_INT('S', "sectors",      "Sectors" )
 OPTION_GUIDE_END
 
-static const char pc_chd_create_optionspec[] = "H1-[16];S1-[32]-63;T10/20/30/40/50/60/70/80/90/[100]/110/120/130/140/150/160/170/180/190/200";
+static const char pc_chd_create_optionspec[] = "H1-[16]S1-[32]-63T10/20/30/40/50/60/70/80/90/[100]/110/120/130/140/150/160/170/180/190/200";
 
 static const char fat8_string[8]  = { 'F', 'A', 'T', ' ', ' ', ' ', ' ', ' ' };
 static const char fat12_string[8] = { 'F', 'A', 'T', '1', '2', ' ', ' ', ' ' };

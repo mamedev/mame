@@ -39,14 +39,12 @@ public:
 
 	void map(address_map &map);
 
-	void control_w(u8 data);
-	u8 scanline_r();
-	void scanline_w(u8 data);
-	u8 raster_irq_ack_r();
-	void vblank_irq_ack_w(u8 data);
-	u8 status_r();
-
-	void raster_irq_ack();
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_READ8_MEMBER(scanline_r);
+	DECLARE_WRITE8_MEMBER(scanline_w);
+	DECLARE_READ8_MEMBER(raster_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(vblank_irq_ack_w);
+	DECLARE_READ8_MEMBER(status_r);
 
 	DECLARE_WRITE_LINE_MEMBER(lightgun1_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(lightgun2_trigger_w);
@@ -79,9 +77,9 @@ private:
 
 	int m_raster_irq_target;
 	bool m_raster_irq_masked;
-	u8 m_raster_irq_scanline;
+	uint8_t m_raster_irq_scanline;
 
-	u8 m_lightgun_latch;
+	uint8_t m_lightgun_latch;
 };
 
 

@@ -32,7 +32,7 @@ project "netlist"
 
 	includedirs {
 		MAME_DIR .. "src/lib",
-	MAME_DIR .. "src/lib/netlist",
+    MAME_DIR .. "src/lib/netlist",
 	}
 
 	files {
@@ -48,7 +48,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/nl_parser.h",
 		MAME_DIR .. "src/lib/netlist/nl_setup.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_setup.h",
-	MAME_DIR .. "src/lib/netlist/nl_types.h",
+    MAME_DIR .. "src/lib/netlist/nl_types.h",
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
 		MAME_DIR .. "src/lib/netlist/plib/pchrono.cpp",
@@ -77,7 +77,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pstring.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.h",
-	MAME_DIR .. "src/lib/netlist/plib/ptime.h",
+    MAME_DIR .. "src/lib/netlist/plib/ptime.h",
 		MAME_DIR .. "src/lib/netlist/plib/ptypes.h",
 		MAME_DIR .. "src/lib/netlist/plib/putil.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/putil.h",
@@ -85,9 +85,9 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/tools/nl_convert.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.h",
-	MAME_DIR .. "src/lib/netlist/analog/nld_generic_models.h",
-	MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.cpp",
-	MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.h",
+    MAME_DIR .. "src/lib/netlist/analog/nld_generic_models.h",
+    MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.cpp",
+    MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.h",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.h",

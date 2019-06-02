@@ -41,10 +41,6 @@ hp_optrom_slot_device::hp_optrom_slot_device(const machine_config &mconfig, cons
 		m_base_addr(0),
 		m_end_addr(0)
 {
-	option_reset();
-	option_add_internal("rom", HP_OPTROM_CART);
-	set_default_option(nullptr);
-	set_fixed(false);
 }
 
 hp_optrom_slot_device::~hp_optrom_slot_device()
@@ -128,4 +124,9 @@ void hp_optrom_slot_device::call_unload()
 std::string hp_optrom_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 		return software_get_default_slot("rom");
+}
+
+void hp_optrom_slot_devices(device_slot_interface &device)
+{
+		device.option_add_internal("rom", HP_OPTROM_CART);
 }

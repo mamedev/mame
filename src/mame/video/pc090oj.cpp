@@ -76,7 +76,6 @@ DEFINE_DEVICE_TYPE(PC090OJ, pc090oj_device, "pc090oj", "Taito PC090OJ")
 
 pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC090OJ, tag, owner, clock),
-	device_gfx_interface(mconfig, *this),
 	m_ctrl(0),
 	m_sprite_ctrl(0),
 	m_ram(nullptr),
@@ -85,7 +84,8 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	m_x_offset(0),
 	m_y_offset(0),
 	m_use_buffer(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 

@@ -217,18 +217,6 @@ Notes:
     * Quantities of 15 or more available less case and speaker (Assembled
     keypad and circut board only). Price on request.
 
-
-Usage:
-    - If you turn it on as is, it quickly jumps into the weeds as it is expecting
-      valid code to exist at 0000. To enter the monitor, press R, hold C, press R,
-      (you will see the memory editor) then choose a command (0 for example).
-    - If you load a chip-8 cart, press R twice. If it doesn't do anything you may
-      need to do a hard reset, then hit R twice. R toggles between the CPU running
-      or stopped.
-    - There's also support for Super-Chip8 carts, but none seem to work.
-    - There's a slot option to use Tiny Basic, this starts up, but unable to type
-      anything.
-
 */
 
 #include "emu.h"

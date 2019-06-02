@@ -135,7 +135,7 @@ menu_select_software::~menu_select_software()
 void menu_select_software::handle()
 {
 	if (m_prev_selected == nullptr)
-		m_prev_selected = item(0).ref;
+		m_prev_selected = item[0].ref;
 
 	// ignore pause keys by swallowing them before we process the menu
 	machine().ui_input().pressed(IPT_UI_PAUSE);
@@ -326,8 +326,8 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 
 	if (old_software != -1)
 	{
-		set_selected_index(old_software);
-		top_line = selected_index() - (ui_globals::visible_sw_lines / 2);
+		selected = old_software;
+		top_line = selected - (ui_globals::visible_sw_lines / 2);
 	}
 
 	reselect_last::reset();

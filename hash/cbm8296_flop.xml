@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
-				<rom name="8296d-systemdisk.d82" size="1066496" crc="1dbb2376" sha1="b0201074aaa7b9e5984f02e78088a127d6b8e78d" status="baddump" />
+				<rom name="8296d-systemdisk.d82" size="1066496" crc="1dbb2376" sha1="b0201074aaa7b9e5984f02e78088a127d6b8e78d" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,13 +21,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="execudesk1.d64" size="174848" crc="1aa9a9aa" sha1="9445cc89d08215d173e84841d3b01ed327d8347c" status="baddump" />
+				<rom name="execudesk1.d64" size="174848" crc="1aa9a9aa" sha1="9445cc89d08215d173e84841d3b01ed327d8347c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="execudesk2.d64" size="174848" crc="9553ea18" sha1="01ed09de6635522ca69e7d2784c81d3a06cee1c3" status="baddump" />
+				<rom name="execudesk2.d64" size="174848" crc="9553ea18" sha1="01ed09de6635522ca69e7d2784c81d3a06cee1c3" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

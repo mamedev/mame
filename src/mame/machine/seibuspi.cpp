@@ -6,11 +6,13 @@
 
 // add two numbers generating carry from one bit to the next only if
 // the corresponding bit in carry_mask is 1
-static u32 partial_carry_sum(u32 add1,u32 add2,u32 carry_mask,int bits)
+static uint32_t partial_carry_sum(uint32_t add1,uint32_t add2,uint32_t carry_mask,int bits)
 {
-	int res = 0;
-	int carry = 0;
-	for (int i = 0; i < bits; i++)
+	int i,res,carry;
+
+	res = 0;
+	carry = 0;
+	for (i = 0;i < bits;i++)
 	{
 		int bit = BIT(add1,i) + BIT(add2,i) + carry;
 
@@ -30,17 +32,17 @@ static u32 partial_carry_sum(u32 add1,u32 add2,u32 carry_mask,int bits)
 	return res;
 }
 
-u32 partial_carry_sum32(u32 add1,u32 add2,u32 carry_mask)
+uint32_t partial_carry_sum32(uint32_t add1,uint32_t add2,uint32_t carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,32);
 }
 
-u32 partial_carry_sum24(u32 add1,u32 add2,u32 carry_mask)
+uint32_t partial_carry_sum24(uint32_t add1,uint32_t add2,uint32_t carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,24);
 }
 
-static u32 partial_carry_sum16(u32 add1,u32 add2,u32 carry_mask)
+static uint32_t partial_carry_sum16(uint32_t add1,uint32_t add2,uint32_t carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,16);
 }
@@ -68,7 +70,7 @@ Bits 0-3 select the permutation on 16 bits of the source data.
 Bits 4-14 are added to the source data, with partial carry.
 Bit 15 is still unknown.
 */
-static const u16 key_table[256]=
+static const uint16_t key_table[256]=
 {
 	0x3ad7,0x54b1,0x2d41,0x8ca0,0xa69b,0x9018,0x9db9,0x6559,
 	0xe9a7,0xb087,0x8a5e,0x821c,0xaafc,0x2ae7,0x557b,0xcd80,
@@ -119,7 +121,7 @@ static const u16 key_table[256]=
 #endif
 
 
-static const u8 spi_bitswap[16][16] =
+static const uint8_t spi_bitswap[16][16] =
 {
 	{ 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, },
 	{  7, 6, 5,14, 0,15, 4, 3, 2, 8, 9,10,11,12,13, 1, },
@@ -142,152 +144,161 @@ static const u8 spi_bitswap[16][16] =
 
 static int key(int table,int addr)
 {
-	const int xorbit = 8 + ((table & 0xc) >> 2);
+	int xorbit = 8 + ((table & 0xc) >> 2);
 	return BIT(key_table[addr & 0xff] >> 4,table) ^ BIT(addr,xorbit);
 }
 
 
-void seibuspi_sprite_decrypt(u8 *src, int rom_size)
+void seibuspi_sprite_decrypt(uint8_t *src, int rom_size)
 {
-	for (int i = 0; i < rom_size/2; i++)
-	{
-		const int addr = i >> 8;
+	int i;
 
-		const u16 y1 = src[2 * i + 0 * rom_size + 0] + (src[2 * i + 0 * rom_size + 1] << 8);
-		const u16 y2 = src[2 * i + 1 * rom_size + 0] + (src[2 * i + 1 * rom_size + 1] << 8);
-		u16 y3       = src[2 * i + 2 * rom_size + 0] + (src[2 * i + 2 * rom_size + 1] << 8);
+
+	for(i = 0; i < rom_size/2; i++)
+	{
+		int j;
+		int addr = i>>8;
+		int y1,y2,y3;
+		int s1,s2;
+		int add1,add2;
+		int plane0,plane1,plane2,plane3,plane4,plane5;
+		const uint8_t *bs;
+
+		y1 = src[2*i+0*rom_size+0] + (src[2*i+0*rom_size+1] << 8);
+		y2 = src[2*i+1*rom_size+0] + (src[2*i+1*rom_size+1] << 8);
+		y3 = src[2*i+2*rom_size+0] + (src[2*i+2*rom_size+1] << 8);
 
 
 		/* first of all, permutate 16 of the 48 bits */
-		const u8 *bs = spi_bitswap[key_table[addr & 0xff] & 0xf];
+		bs = spi_bitswap[key_table[addr & 0xff]&0xf];
 		y3 = bitswap<16>(y3, bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
 							bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 
 
 		// planes 4 & 5, interleaved
-		u32 s1 = (BIT(y1, 4) <<  0) |
-				 (BIT(y3, 7) <<  1) |
-				 (BIT(y3, 6) <<  2) |
-				 (BIT(y2,12) <<  3) |
-				 (BIT(y2, 3) <<  4) |
-				 (BIT(y1,10) <<  5) |
-				 (BIT(y1, 1) <<  6) |
-				 (BIT(y3,14) <<  7) |
-				 (BIT(y3, 2) <<  8) |
-				 (BIT(y2, 9) <<  9) |
-				 (BIT(y2, 0) << 10) |
-				 (BIT(y1, 7) << 11) |
-				 (BIT(y3,12) << 12) |
-				 (BIT(y2,15) << 13) |
-				 (BIT(y2, 6) << 14) |
-				 (BIT(y1,13) << 15);
+		s1 =    (BIT(y1, 4) <<  0) |
+				(BIT(y3, 7) <<  1) |
+				(BIT(y3, 6) <<  2) |
+				(BIT(y2,12) <<  3) |
+				(BIT(y2, 3) <<  4) |
+				(BIT(y1,10) <<  5) |
+				(BIT(y1, 1) <<  6) |
+				(BIT(y3,14) <<  7) |
+				(BIT(y3, 2) <<  8) |
+				(BIT(y2, 9) <<  9) |
+				(BIT(y2, 0) << 10) |
+				(BIT(y1, 7) << 11) |
+				(BIT(y3,12) << 12) |
+				(BIT(y2,15) << 13) |
+				(BIT(y2, 6) << 14) |
+				(BIT(y1,13) << 15);
 
-		u32 add1 = (BIT(addr,11) <<  0) |
-				   (BIT(addr,10) <<  1) |
-				   (key(10,addr) <<  2) |
-				   (key( 5,addr) <<  3) |
-				   (key( 4,addr) <<  4) |
-				   (BIT(addr,11) <<  5) |
-				   (BIT(addr,11) <<  6) |
-				   (key( 7,addr) <<  7) |
-				   (key( 6,addr) <<  8) |
-				   (key( 1,addr) <<  9) |
-				   (key( 0,addr) << 10) |
-				   (BIT(addr,11) << 11) |
-				   (key( 9,addr) << 12) |
-				   (key( 8,addr) << 13) |
-				   (key( 3,addr) << 14) |
-				   (key( 2,addr) << 15);
+		add1 =  (BIT(addr,11) <<  0) |
+				(BIT(addr,10) <<  1) |
+				(key(10,addr) <<  2) |
+				(key( 5,addr) <<  3) |
+				(key( 4,addr) <<  4) |
+				(BIT(addr,11) <<  5) |
+				(BIT(addr,11) <<  6) |
+				(key( 7,addr) <<  7) |
+				(key( 6,addr) <<  8) |
+				(key( 1,addr) <<  9) |
+				(key( 0,addr) << 10) |
+				(BIT(addr,11) << 11) |
+				(key( 9,addr) << 12) |
+				(key( 8,addr) << 13) |
+				(key( 3,addr) << 14) |
+				(key( 2,addr) << 15);
 
 		// planes 0-3, interleaved
-		u32 s2 = (BIT(y1, 5) <<  0) |
-				 (BIT(y3, 0) <<  1) |
-				 (BIT(y3, 5) <<  2) |
-				 (BIT(y2,13) <<  3) |
-				 (BIT(y2, 4) <<  4) |
-				 (BIT(y1,11) <<  5) |
-				 (BIT(y1, 2) <<  6) |
-				 (BIT(y3, 9) <<  7) |
-				 (BIT(y3, 3) <<  8) |
-				 (BIT(y2, 8) <<  9) |
-				 (BIT(y1,15) << 10) |
-				 (BIT(y1, 6) << 11) |
-				 (BIT(y3,11) << 12) |
-				 (BIT(y2,14) << 13) |
-				 (BIT(y2, 5) << 14) |
-				 (BIT(y1,12) << 15) |
-				 (BIT(y1, 3) << 16) |
-				 (BIT(y3, 8) << 17) |
-				 (BIT(y3,15) << 18) |
-				 (BIT(y2,11) << 19) |
-				 (BIT(y2, 2) << 20) |
-				 (BIT(y1, 9) << 21) |
-				 (BIT(y1, 0) << 22) |
-				 (BIT(y3,10) << 23) |
-				 (BIT(y3, 1) << 24) |
-				 (BIT(y2,10) << 25) |
-				 (BIT(y2, 1) << 26) |
-				 (BIT(y1, 8) << 27) |
-				 (BIT(y3,13) << 28) |
-				 (BIT(y3, 4) << 29) |
-				 (BIT(y2, 7) << 30) |
-				 (BIT(y1,14) << 31);
+		s2 =    (BIT(y1, 5) <<  0) |
+				(BIT(y3, 0) <<  1) |
+				(BIT(y3, 5) <<  2) |
+				(BIT(y2,13) <<  3) |
+				(BIT(y2, 4) <<  4) |
+				(BIT(y1,11) <<  5) |
+				(BIT(y1, 2) <<  6) |
+				(BIT(y3, 9) <<  7) |
+				(BIT(y3, 3) <<  8) |
+				(BIT(y2, 8) <<  9) |
+				(BIT(y1,15) << 10) |
+				(BIT(y1, 6) << 11) |
+				(BIT(y3,11) << 12) |
+				(BIT(y2,14) << 13) |
+				(BIT(y2, 5) << 14) |
+				(BIT(y1,12) << 15) |
+				(BIT(y1, 3) << 16) |
+				(BIT(y3, 8) << 17) |
+				(BIT(y3,15) << 18) |
+				(BIT(y2,11) << 19) |
+				(BIT(y2, 2) << 20) |
+				(BIT(y1, 9) << 21) |
+				(BIT(y1, 0) << 22) |
+				(BIT(y3,10) << 23) |
+				(BIT(y3, 1) << 24) |
+				(BIT(y2,10) << 25) |
+				(BIT(y2, 1) << 26) |
+				(BIT(y1, 8) << 27) |
+				(BIT(y3,13) << 28) |
+				(BIT(y3, 4) << 29) |
+				(BIT(y2, 7) << 30) |
+				(BIT(y1,14) << 31);
 
-		u32 add2 = (key( 0,addr) <<  0) |
-				   (key( 1,addr) <<  1) |
-				   (key( 2,addr) <<  2) |
-				   (key( 3,addr) <<  3) |
-				   (key( 4,addr) <<  4) |
-				   (key( 5,addr) <<  5) |
-				   (key( 6,addr) <<  6) |
-				   (key( 7,addr) <<  7) |
-				   (key( 8,addr) <<  8) |
-				   (key( 9,addr) <<  9) |
-				   (key(10,addr) << 10) |
-				   (BIT(addr,10) << 11) |
-				   (BIT(addr,11) << 12) |
-				   (BIT(addr,11) << 13) |
-				   (BIT(addr,11) << 14) |
-				   (BIT(addr,11) << 15) |
-				   (BIT(addr,11) << 16) |
-				   (key( 7,addr) << 17) |
-				   (BIT(addr,11) << 18) |
-				   (key( 6,addr) << 19) |
-				   (BIT(addr,11) << 20) |
-				   (key( 5,addr) << 21) |
-				   (BIT(addr,11) << 22) |
-				   (key( 4,addr) << 23) |
-				   (BIT(addr,10) << 24) |
-				   (key( 3,addr) << 25) |
-				   (key(10,addr) << 26) |
-				   (key( 2,addr) << 27) |
-				   (key( 9,addr) << 28) |
-				   (key( 1,addr) << 29) |
-				   (key( 8,addr) << 30) |
-				   (key( 0,addr) << 31);
+		add2 =  (key( 0,addr) <<  0) |
+				(key( 1,addr) <<  1) |
+				(key( 2,addr) <<  2) |
+				(key( 3,addr) <<  3) |
+				(key( 4,addr) <<  4) |
+				(key( 5,addr) <<  5) |
+				(key( 6,addr) <<  6) |
+				(key( 7,addr) <<  7) |
+				(key( 8,addr) <<  8) |
+				(key( 9,addr) <<  9) |
+				(key(10,addr) << 10) |
+				(BIT(addr,10) << 11) |
+				(BIT(addr,11) << 12) |
+				(BIT(addr,11) << 13) |
+				(BIT(addr,11) << 14) |
+				(BIT(addr,11) << 15) |
+				(BIT(addr,11) << 16) |
+				(key( 7,addr) << 17) |
+				(BIT(addr,11) << 18) |
+				(key( 6,addr) << 19) |
+				(BIT(addr,11) << 20) |
+				(key( 5,addr) << 21) |
+				(BIT(addr,11) << 22) |
+				(key( 4,addr) << 23) |
+				(BIT(addr,10) << 24) |
+				(key( 3,addr) << 25) |
+				(key(10,addr) << 26) |
+				(key( 2,addr) << 27) |
+				(key( 9,addr) << 28) |
+				(key( 1,addr) << 29) |
+				(key( 8,addr) << 30) |
+				(key( 0,addr) << 31);
 
 		s1 = partial_carry_sum( s1, add1, 0x3a59, 16 ) ^ 0x843a;
 		s2 = partial_carry_sum( s2, add2, 0x28d49cac, 32 ) ^ 0xc8e29f84;
 
 
 		// reorder the bits in the order MAME expects to decode the graphics
-		u8 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0, plane4 = 0, plane5 = 0;
-		for (int j = 0; j < 8; j++)
+		plane0 = plane1 = plane2 = plane3 = plane4 = plane5 = 0;
+		for (j = 0;j < 8;j++)
 		{
-			plane5 |= (BIT(s1, 2 * j + 1) << j);
-			plane4 |= (BIT(s1, 2 * j + 0) << j);
-			plane3 |= (BIT(s2, 4 * j + 3) << j);
-			plane2 |= (BIT(s2, 4 * j + 2) << j);
-			plane1 |= (BIT(s2, 4 * j + 1) << j);
-			plane0 |= (BIT(s2, 4 * j + 0) << j);
+			plane5 |= (BIT(s1, 2*j+1) << j);
+			plane4 |= (BIT(s1, 2*j+0) << j);
+			plane3 |= (BIT(s2, 4*j+3) << j);
+			plane2 |= (BIT(s2, 4*j+2) << j);
+			plane1 |= (BIT(s2, 4*j+1) << j);
+			plane0 |= (BIT(s2, 4*j+0) << j);
 		}
 
-		src[2 * i + 0 * rom_size + 0] = plane5;
-		src[2 * i + 0 * rom_size + 1] = plane4;
-		src[2 * i + 1 * rom_size + 0] = plane3;
-		src[2 * i + 1 * rom_size + 1] = plane2;
-		src[2 * i + 2 * rom_size + 0] = plane1;
-		src[2 * i + 2 * rom_size + 1] = plane0;
+		src[2*i+0*rom_size+0] = plane5;
+		src[2*i+0*rom_size+1] = plane4;
+		src[2*i+1*rom_size+0] = plane3;
+		src[2*i+1*rom_size+1] = plane2;
+		src[2*i+2*rom_size+0] = plane1;
+		src[2*i+2*rom_size+1] = plane0;
 	}
 }
 
@@ -317,26 +328,30 @@ CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000
 
 ******************************************************************************************/
 
-static void sprite_reorder(u8 *buffer)
+static void sprite_reorder(uint8_t *buffer)
 {
-	u8 temp[64];
-	for (int j = 0; j < 16; j++)
-	{
-		temp[2 * (j * 2) + 0] = buffer[2 * j + 0];
-		temp[2 * (j * 2) + 1] = buffer[2 * j + 1];
-		temp[2 * (j * 2) + 2] = buffer[2 * j + 32];
-		temp[2 * (j * 2) + 3] = buffer[2 * j + 33];
+	int j;
+	uint8_t temp[64];
+	for( j=0; j < 16; j++ ) {
+		temp[2*(j*2)+0] = buffer[2*j+0];
+		temp[2*(j*2)+1] = buffer[2*j+1];
+		temp[2*(j*2)+2] = buffer[2*j+32];
+		temp[2*(j*2)+3] = buffer[2*j+33];
 	}
 	memcpy(buffer, temp, 64);
 }
 
-void seibuspi_rise10_sprite_decrypt(u8 *rom, int size)
+void seibuspi_rise10_sprite_decrypt(uint8_t *rom, int size)
 {
-	for (int i = 0; i < size / 2; i++)
+	int i;
+
+	for (i = 0; i < size/2; i++)
 	{
-		u32 plane54 = rom[0 * size + 2 * i] + (rom[0 * size + 2 * i + 1] << 8);
-		u32 plane3210 = bitswap<32>(
-				rom[2 * size + 2 * i] + (rom[2 * size + 2 * i + 1] << 8) + (rom[1 * size + 2 * i] << 16) + (rom[1 * size + 2 * i + 1] << 24),
+		uint32_t plane54,plane3210;
+
+		plane54 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
+		plane3210 = bitswap<32>(
+				rom[2*size+2*i] + (rom[2*size+2*i+1] << 8) + (rom[1*size+2*i] << 16) + (rom[1*size+2*i+1] << 24),
 				23,13,24,4,16,12,25,30,
 				3,5,29,17,14,22,2,11,
 				27,6,15,21,1,28,10,20,
@@ -345,19 +360,19 @@ void seibuspi_rise10_sprite_decrypt(u8 *rom, int size)
 		plane54   = partial_carry_sum16( plane54, 0xabcb, 0x55aa ) ^ 0x6699;
 		plane3210 = partial_carry_sum32( plane3210, 0x654321d9 ^ 0x42, 0x1d463748 ) ^ 0x0ca352a9;
 
-		rom[0 * size + 2 * i]     = plane54   >>  8;
-		rom[0 * size + 2 * i + 1] = plane54   >>  0;
-		rom[1 * size + 2 * i]     = plane3210 >> 24;
-		rom[1 * size + 2 * i + 1] = plane3210 >> 16;
-		rom[2 * size + 2 * i]     = plane3210 >>  8;
-		rom[2 * size + 2 * i + 1] = plane3210 >>  0;
+		rom[0*size+2*i]   = plane54   >>  8;
+		rom[0*size+2*i+1] = plane54   >>  0;
+		rom[1*size+2*i]   = plane3210 >> 24;
+		rom[1*size+2*i+1] = plane3210 >> 16;
+		rom[2*size+2*i]   = plane3210 >>  8;
+		rom[2*size+2*i+1] = plane3210 >>  0;
 	}
 
-	for (int i = 0; i < size / 2; i += 32)
+	for (i = 0; i < size/2; i += 32)
 	{
-		sprite_reorder(&rom[0 * size + 2 * i]);
-		sprite_reorder(&rom[1 * size + 2 * i]);
-		sprite_reorder(&rom[2 * size + 2 * i]);
+		sprite_reorder(&rom[0*size+2*i]);
+		sprite_reorder(&rom[1*size+2*i]);
+		sprite_reorder(&rom[2*size+2*i]);
 	}
 }
 
@@ -409,94 +424,99 @@ CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 0300
 ******************************************************************************************/
 
 
-static void seibuspi_rise11_sprite_decrypt(u8 *rom, int size,
-	u32 k1, u32 k2, u32 k3, u32 k4, u32 k5, int feversoc_kludge)
+static void seibuspi_rise11_sprite_decrypt(uint8_t *rom, int size,
+	uint32_t k1, uint32_t k2, uint32_t k3, uint32_t k4, uint32_t k5, int feversoc_kludge)
 {
-	for (int i = 0; i < size/2; i++)
+	int i;
+
+	for (i = 0; i < size/2; i++)
 	{
-		const u16 b1 = rom[0 * size + 2 * i] + (rom[0 * size + 2 * i + 1] << 8);
-		const u16 b2 = rom[1 * size + 2 * i] + (rom[1 * size + 2 * i + 1] << 8);
-		const u16 b3 = rom[2 * size + 2 * i] + (rom[2 * size + 2 * i + 1] << 8);
+		uint16_t b1,b2,b3;
+		uint32_t plane543,plane210;
 
-		u32 plane543 = (BIT(b2,11)<< 0) |
-					   (BIT(b1, 6)<< 1) |
-					   (BIT(b3,12)<< 2) |
-					   (BIT(b3, 3)<< 3) |
-					   (BIT(b2,12)<< 4) |
-					   (BIT(b3,14)<< 5) |
-					   (BIT(b3, 4)<< 6) |
-					   (BIT(b1,11)<< 7) |
-					   (BIT(b1,12)<< 8) |
-					   (BIT(b1, 2)<< 9) |
-					   (BIT(b2, 5)<<10) |
-					   (BIT(b1, 9)<<11) |
-					   (BIT(b3, 1)<<12) |
-					   (BIT(b2, 2)<<13) |
-					   (BIT(b2,10)<<14) |
-					   (BIT(b3, 5)<<15) |
-					   (BIT(b1, 3)<<16) |
-					   (BIT(b2, 7)<<17) |
-					   (BIT(b1,15)<<18) |
-					   (BIT(b3, 9)<<19) |
-					   (BIT(b2,13)<<20) |
-					   (BIT(b1, 4)<<21) |
-					   (BIT(b3, 2)<<22) |
-					   (BIT(b2, 0)<<23);
+		b1 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
+		b2 = rom[1*size+2*i] + (rom[1*size+2*i+1] << 8);
+		b3 = rom[2*size+2*i] + (rom[2*size+2*i+1] << 8);
 
-		u32 plane210 = (BIT(b1,14)<< 0) |
-					   (BIT(b1, 1)<< 1) |
-					   (BIT(b1,13)<< 2) |
-					   (BIT(b3, 0)<< 3) |
-					   (BIT(b1, 7)<< 4) |
-					   (BIT(b2,14)<< 5) |
-					   (BIT(b2, 4)<< 6) |
-					   (BIT(b2, 9)<< 7) |
-					   (BIT(b3, 8)<< 8) |
-					   (BIT(b2, 1)<< 9) |
-					   (BIT(b3, 7)<<10) |
-					   (BIT(b2, 6)<<11) |
-					   (BIT(b1, 0)<<12) |
-					   (BIT(b3,11)<<13) |
-					   (BIT(b2, 8)<<14) |
-					   (BIT(b3,13)<<15) |
-					   (BIT(b1, 8)<<16) |
-					   (BIT(b3,10)<<17) |
-					   (BIT(b3, 6)<<18) |
-					   (BIT(b1,10)<<19) |
-					   (BIT(b2,15)<<20) |
-					   (BIT(b2, 3)<<21) |
-					   (BIT(b1, 5)<<22) |
-					   (BIT(b3,15)<<23);
+		plane543 =  (BIT(b2,11)<< 0) |
+					(BIT(b1, 6)<< 1) |
+					(BIT(b3,12)<< 2) |
+					(BIT(b3, 3)<< 3) |
+					(BIT(b2,12)<< 4) |
+					(BIT(b3,14)<< 5) |
+					(BIT(b3, 4)<< 6) |
+					(BIT(b1,11)<< 7) |
+					(BIT(b1,12)<< 8) |
+					(BIT(b1, 2)<< 9) |
+					(BIT(b2, 5)<<10) |
+					(BIT(b1, 9)<<11) |
+					(BIT(b3, 1)<<12) |
+					(BIT(b2, 2)<<13) |
+					(BIT(b2,10)<<14) |
+					(BIT(b3, 5)<<15) |
+					(BIT(b1, 3)<<16) |
+					(BIT(b2, 7)<<17) |
+					(BIT(b1,15)<<18) |
+					(BIT(b3, 9)<<19) |
+					(BIT(b2,13)<<20) |
+					(BIT(b1, 4)<<21) |
+					(BIT(b3, 2)<<22) |
+					(BIT(b2, 0)<<23);
+
+		plane210 =  (BIT(b1,14)<< 0) |
+					(BIT(b1, 1)<< 1) |
+					(BIT(b1,13)<< 2) |
+					(BIT(b3, 0)<< 3) |
+					(BIT(b1, 7)<< 4) |
+					(BIT(b2,14)<< 5) |
+					(BIT(b2, 4)<< 6) |
+					(BIT(b2, 9)<< 7) |
+					(BIT(b3, 8)<< 8) |
+					(BIT(b2, 1)<< 9) |
+					(BIT(b3, 7)<<10) |
+					(BIT(b2, 6)<<11) |
+					(BIT(b1, 0)<<12) |
+					(BIT(b3,11)<<13) |
+					(BIT(b2, 8)<<14) |
+					(BIT(b3,13)<<15) |
+					(BIT(b1, 8)<<16) |
+					(BIT(b3,10)<<17) |
+					(BIT(b3, 6)<<18) |
+					(BIT(b1,10)<<19) |
+					(BIT(b2,15)<<20) |
+					(BIT(b2, 3)<<21) |
+					(BIT(b1, 5)<<22) |
+					(BIT(b3,15)<<23);
 
 		plane543 = partial_carry_sum32( plane543, k1, k2 ) ^ k3;
 		plane210 = partial_carry_sum24( plane210,  i, k4 ) ^ k5;
 		if (feversoc_kludge)
 			plane210 = partial_carry_sum24( plane210,  1, 0x000001 );
 
-		rom[0 * size + 2 * i]     = plane543 >> 16;
-		rom[0 * size + 2 * i + 1] = plane543 >>  8;
-		rom[1 * size + 2 * i]     = plane543 >>  0;
-		rom[1 * size + 2 * i + 1] = plane210 >> 16;
-		rom[2 * size + 2 * i]     = plane210 >>  8;
-		rom[2 * size + 2 * i + 1] = plane210 >>  0;
+		rom[0*size+2*i]   = plane543 >> 16;
+		rom[0*size+2*i+1] = plane543 >>  8;
+		rom[1*size+2*i]   = plane543 >>  0;
+		rom[1*size+2*i+1] = plane210 >> 16;
+		rom[2*size+2*i]   = plane210 >>  8;
+		rom[2*size+2*i+1] = plane210 >>  0;
 	}
 
-	for (int i = 0; i < size / 2; i += 32)
+	for (i = 0; i < size/2; i += 32)
 	{
-		sprite_reorder(&rom[0 * size + 2 * i]);
-		sprite_reorder(&rom[1 * size + 2 * i]);
-		sprite_reorder(&rom[2 * size + 2 * i]);
+		sprite_reorder(&rom[0*size+2*i]);
+		sprite_reorder(&rom[1*size+2*i]);
+		sprite_reorder(&rom[2*size+2*i]);
 	}
 }
 
 
-void seibuspi_rise11_sprite_decrypt_rfjet(u8 *rom, int size)
+void seibuspi_rise11_sprite_decrypt_rfjet(uint8_t *rom, int size)
 {
 	seibuspi_rise11_sprite_decrypt(rom, size, 0xabcb64, 0x55aadd, 0xab6a4c, 0xd6375b, 0x8bf23b, 0);
 }
 
 
-void seibuspi_rise11_sprite_decrypt_feversoc(u8 *rom, int size)
+void seibuspi_rise11_sprite_decrypt_feversoc(uint8_t *rom, int size)
 {
 	seibuspi_rise11_sprite_decrypt(rom, size, 0x9df5b2, 0x9ae999, 0x4a32e9, 0x968bd5, 0x1d97ac, 1);
 }

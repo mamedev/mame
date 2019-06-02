@@ -53,7 +53,7 @@ WRITE8_MEMBER(usgames_state::charram_w)
 }
 
 
-uint32_t usgames_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t usgames_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;

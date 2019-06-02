@@ -289,7 +289,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::printer_status_r));
 	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::disk_select_w));
 
-	HD6845S(config, m_crtc, 14.318181_MHz_XTAL / 8); // HD46505SP-1
+	HD6845(config, m_crtc, 14.318181_MHz_XTAL / 8); // HD46505SP-1
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

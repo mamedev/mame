@@ -178,19 +178,6 @@ if not _OPTIONS["NO_USE_XINPUT"] then
 end
 
 newoption {
-	trigger = "NO_USE_XINPUT_WII_LIGHTGUN_HACK",
-	description = "Disable use of Xinput Wii Lightgun Hack",
-	allowed = {
-		{ "0",  "Enable Xinput Wii Lightgun Hack"  },
-		{ "1",  "Disable Xinput Wii Lightgun Hack" },
-	},
-}
-
-if not _OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] then
-	_OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] = "1"
-end
-
-newoption {
 	trigger = "SDL2_MULTIAPI",
 	description = "Use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)",
 	allowed = {

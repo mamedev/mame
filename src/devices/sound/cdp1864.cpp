@@ -391,7 +391,10 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 
 WRITE_LINE_MEMBER( cdp1864_device::con_w )
 {
-	m_con = state;
+	if (!state)
+	{
+		m_con = 0;
+	}
 }
 
 

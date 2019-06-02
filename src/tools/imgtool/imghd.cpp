@@ -53,14 +53,14 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 	chd_error rc;
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
 
-	/* sanity check args -- see parse_hunk_size() in src/lib/util/chd.cpp */
-	if (hunksize > (1024 * 1024))
+	/* sanity check args */
+	if (hunksize >= 2048)
 	{
 		err = IMGTOOLERR_PARAMCORRUPT;
 		return err;
 	}
 	if (hunksize <= 0)
-		hunksize = 4096;    /* default value */
+		hunksize = 1024;    /* default value */
 
 	/* bail if we are read only */
 	if (stream.is_read_only())
@@ -74,6 +74,15 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 
 	/* create the new hard drive */
 	rc = chd.create(*stream.core_file(), logicalbytes, hunksize, seclen, compression);
+	if (rc != CHDERR_NONE)
+	{
+		err = map_chd_error(rc);
+		return err;
+	}
+
+	/* open the new hard drive */
+	rc = chd.open(*stream.core_file());
+
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -227,7 +236,7 @@ OPTION_GUIDE_START( mess_hd_create_optionguide )
 	OPTION_INT(mess_hd_createopts_seclen, "seclen", "Sector Bytes" )
 OPTION_GUIDE_END
 
-#define mess_hd_create_optionspecs "B1-[4]-2048;C1-[32]-65536;D1-[8]-64;E1-[128]-4096;F128/256/[512]/1024/2048/4096/8192/16384/32768/65536"
+#define mess_hd_create_optionspecs "B[1]-2048;C1-[32]-65536;D1-[8]-64;E1-[128]-4096;F128/256/[512]/1024/2048/4096/8192/16384/32768/65536"
 
 
 void hd_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
@@ -258,5 +267,5 @@ static imgtoolerr_t mess_hd_image_create(imgtool::image &image, imgtool::stream:
 	sectors = createoptions->lookup_int(mess_hd_createopts_sectors);
 	seclen = createoptions->lookup_int(mess_hd_createopts_seclen);
 
-	return imghd_create(*stream.get(), blocksize * seclen, cylinders, heads, sectors, seclen);
+	return imghd_create(*stream.get(), blocksize, cylinders, heads, sectors, seclen);
 }

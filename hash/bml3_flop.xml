@@ -8,7 +8,7 @@
 		<publisher>Hisoft Pty. Ltd.</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
-				<rom name="hiwriter.d88" size="346800" crc="637f3b94" sha1="0bf7fdb528e03aa2409f386e63e257f5aa013c8f"  />
+				<rom name="hiwriter.d88" size="346800" crc="637f3b94" sha1="0bf7fdb528e03aa2409f386e63e257f5aa013c8f" offset="0"  />
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="185008">
-				<rom name="hidata.d88" size="185008" crc="bc610e83" sha1="162432ff9be34a87f20a02664c0aa1f8e0cb674b"  />
+				<rom name="hidata.d88" size="185008" crc="bc610e83" sha1="162432ff9be34a87f20a02664c0aa1f8e0cb674b" offset="0"  />
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<info name="programmer" value="Jonathan Edwards" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
-				<rom name="tetris.d88" size="346800" crc="f19034fc" sha1="de8385deac89f149837d76d920113c9010182def" />
+				<rom name="tetris.d88" size="346800" crc="f19034fc" sha1="de8385deac89f149837d76d920113c9010182def" offset="0" />
 			</dataarea>
 		</part>
 	</software>

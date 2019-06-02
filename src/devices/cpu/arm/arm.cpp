@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, Phil Stroffolino
-/*
+// copyright-holders:Bryan McPhail
+/* arm.c
+
     ARM 2/3/6 Emulation (26 bit address bus)
 
     Todo:
-      - Timing - Currently very approximated, nothing relies on proper timing so far.
-      - IRQ timing not yet correct (again, nothing is affected by this so far).
+      Timing - Currently very approximated, nothing relies on proper timing so far.
+      IRQ timing not yet correct (again, nothing is affected by this so far).
 
     Recent changes (2005):
       Fixed software interrupts
@@ -336,14 +337,16 @@ void arm_cpu_device::device_reset()
 
 void arm_cpu_device::execute_run()
 {
+	uint32_t pc;
+	uint32_t insn;
+
 	do
 	{
-		arm_check_irq_state();
 		debugger_instruction_hook(R15 & ADDRESS_MASK);
 
 		/* load instruction */
-		uint32_t pc = R15;
-		uint32_t insn = m_pr32( pc & ADDRESS_MASK );
+		pc = R15;
+		insn = m_pr32( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -440,6 +443,9 @@ void arm_cpu_device::execute_run()
 			m_icount -= S_CYCLE;
 			R15 += 4;
 		}
+
+		arm_check_irq_state();
+
 	} while( m_icount > 0 );
 } /* arm_execute */
 
@@ -463,7 +469,7 @@ void arm_cpu_device::arm_check_irq_state()
 		R15 = eARM_MODE_FIQ;    /* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
-		standard_irq_callback(ARM_FIRQ_LINE);
+		m_pendingFiq=0;
 		return;
 	}
 
@@ -472,7 +478,7 @@ void arm_cpu_device::arm_check_irq_state()
 		R15 = eARM_MODE_IRQ;    /* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
-		standard_irq_callback(ARM_IRQ_LINE);
+		m_pendingIrq=0;
 		return;
 	}
 }
@@ -483,13 +489,21 @@ void arm_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case ARM_IRQ_LINE: /* IRQ */
-		m_pendingIrq = state ? 1 : 0;
+		if (state && (R15&0x3)!=eARM_MODE_IRQ) /* Don't allow nested IRQs */
+			m_pendingIrq=1;
+		else
+			m_pendingIrq=0;
 		break;
 
 	case ARM_FIRQ_LINE: /* FIRQ */
-		m_pendingFiq = state ? 1 : 0;
+		if (state && (R15&0x3)!=eARM_MODE_FIQ) /* Don't allow nested FIRQs */
+			m_pendingFiq=1;
+		else
+			m_pendingFiq=0;
 		break;
 	}
+
+	arm_check_irq_state();
 }
 
 

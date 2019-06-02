@@ -41,7 +41,6 @@ namespace
 			: device_t(mconfig, COCO_DCMODEM, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_uart(*this, UART_TAG)
-			, m_eprom(*this, "eprom")
 		{
 		}
 
@@ -68,20 +67,17 @@ namespace
 		// CoCo cartridge level overrides
 		virtual uint8_t *get_cart_base() override
 		{
-			return m_eprom->base();
+			return memregion("eprom")->base();
 		}
 
 		virtual memory_region* get_cart_memregion() override
 		{
-			return m_eprom;
+			return memregion("eprom");
 		}
-
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	private:
 		// internal state
 		required_device<mos6551_device> m_uart;
-		required_memory_region m_eprom;
 	};
 };
 
@@ -122,12 +118,4 @@ const tiny_rom_entry *coco_dc_modem_device::device_rom_region() const
 	return ROM_NAME(coco_dcmodem);
 }
 
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(coco_dc_modem_device::cts_read)
-{
-	return m_eprom->base()[offset & 0x1fff];
-}
 

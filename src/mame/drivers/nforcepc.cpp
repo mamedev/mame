@@ -22,7 +22,7 @@
 
 
 #include "emu.h"
-#include "cpu/i386/athlon.h"
+#include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/intelfsh.h"

@@ -72,7 +72,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "audio/bally.h"
+#include "sound/discrete.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -101,10 +101,6 @@ public:
 
 	void by35(machine_config &config);
 	void nuovo(machine_config &config);
-	void as2888(machine_config &config);
-	void as3022(machine_config &config);
-	void sounds_plus(machine_config &config);
-	void cheap_squeak(machine_config &config);
 
 protected:
 	typedef uint8_t solenoid_feature_data[20][4];
@@ -131,12 +127,6 @@ protected:
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_digits(*this, "digit%u%u", 1U, 1U)
 		, m_solenoids(*this, "solenoid%u", 0U)
-		, m_as2888(*this, "as2888")
-		, m_as3022(*this, "as3022")
-		, m_sounds_plus(*this, "sounds_plus")
-		, m_cheap_squeak(*this, "cheap_squeak")
-		, m_sound_select_handler(*this)
-		, m_sound_int_handler(*this)
 	{ }
 
 	DECLARE_READ8_MEMBER(u10_a_r);
@@ -162,7 +152,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-	DECLARE_WRITE_LINE_MEMBER(sound_ack_w);
 
 	void by35_map(address_map &map);
 	void nuovo_map(address_map &map);
@@ -174,7 +163,7 @@ protected:
 
 	static solenoid_feature_data const s_solenoid_features_default;
 
-private:
+protected:
 	bool m_u10_ca2;
 	bool m_u10_cb1;
 	bool m_u10_cb2;
@@ -204,24 +193,58 @@ private:
 	output_finder<15 * 4> m_lamps;
 	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
-	optional_device<bally_as2888_device> m_as2888;
-	optional_device<bally_as3022_device> m_as3022;
-	optional_device<bally_sounds_plus_device> m_sounds_plus;
-	optional_device<bally_cheap_squeak_device> m_cheap_squeak;
-		devcb_write8 m_sound_select_handler;
-		devcb_write_line m_sound_int_handler;
 };
 
-class playboy_state : public by35_state
+
+class as2888_state : public by35_state
+{
+public:
+	as2888_state(machine_config const &mconfig, device_type type, char const *tag)
+		: as2888_state(mconfig, type, tag, s_solenoid_features_default)
+	{ }
+
+	void init_playboy();
+
+	void as2888(machine_config &config);
+
+protected:
+	as2888_state(machine_config const &mconfig, device_type type, char const *tag, solenoid_feature_data const &solenoid_features)
+		: by35_state(mconfig, type, tag, solenoid_features)
+		, m_snd_prom(*this, "sound1")
+		, m_discrete(*this, "discrete")
+		, m_timer_s_freq(*this, "timer_s_freq")
+		, m_snd_sustain_timer(*this, "timer_as2888")
+	{ }
+
+	DECLARE_WRITE8_MEMBER(u11_b_as2888_w);
+	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as2888_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+
+	void as2888_audio(machine_config &config);
+
+private:
+	uint8_t m_snd_sel;
+	uint8_t m_snd_tone_gen;
+	uint8_t m_snd_div;
+	required_region_ptr<uint8_t> m_snd_prom;
+	required_device<discrete_device> m_discrete;
+	required_device<timer_device> m_timer_s_freq;
+	required_device<timer_device> m_snd_sustain_timer;
+};
+
+
+class playboy_state : public as2888_state
 {
 public:
 	playboy_state(machine_config const &mconfig, device_type type, char const *tag)
-		: by35_state(mconfig, type, tag, s_solenoid_features_playboy)
+		: as2888_state(mconfig, type, tag, s_solenoid_features_playboy)
 	{ }
 
 protected:
 	static solenoid_feature_data const s_solenoid_features_playboy;
 };
+
 
 void by35_state::by35_map(address_map &map)
 {
@@ -242,11 +265,12 @@ void by35_state::nuovo_map(address_map &map)
 	map(0x1000, 0xffff).rom();
 }
 
+
+
 static INPUT_PORTS_START( by35 )
 	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_CHANGED_MEMBER(DEVICE_SELF, by35_state, self_test, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity")  PORT_CHANGED_MEMBER(DEVICE_SELF, by35_state, activity_button, 0)
-
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")            PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as 03
@@ -387,6 +411,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_DIPNAME( 0x80, 0x80, "Melody Option 2")        PORT_DIPLOCATION("SW3:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
@@ -439,378 +464,6 @@ static INPUT_PORTS_START( by35 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 INPUT_PORTS_END
 
-/*
-    Dips for os35 - Harlem Globetrotters, Dolly, Future Spa, Nitro Ground Shaker, Silverball Mania, Space Invaders, Rolling Stones, Mystic, Hotdoggin', Viking
-*/
-static INPUT_PORTS_START ( by35_os35 )
-	PORT_INCLUDE( by35 )
-
-	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")            PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as 03
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
-	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
-	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
-	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
-	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
-	PORT_DIPSETTING(    0x18, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x19, "2 Coins/12 Credits")
-	PORT_DIPSETTING(    0x1a, "1 Coin/13 Credits")
-	PORT_DIPSETTING(    0x1b, "2 Coins/13 Credits")
-	PORT_DIPSETTING(    0x1c, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x1d, "2 Coins/14 Credits")
-	PORT_DIPSETTING(    0x1e, "1 Coin/15 Credits")
-	PORT_DIPSETTING(    0x1f, "2 Coins/15 Credits")
-	PORT_DIPNAME( 0x60, 0x60, "High Score Feature")    PORT_DIPLOCATION("SW0:!6,!7")
-	PORT_DIPSETTING(    0x00, "No Award")
-	PORT_DIPSETTING(    0x40, "Extra Ball")
-	PORT_DIPSETTING(    0x60, "Replay")
-	PORT_DIPNAME( 0x80, 0x80, "S8 (game specific)")    PORT_DIPLOCATION("SW0:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 3")            PORT_DIPLOCATION("SW1:!1,!2,!3,!4,!5") // same as 01
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
-	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
-	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
-	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
-	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
-	PORT_DIPSETTING(    0x18, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x19, "2 Coins/12 Credits")
-	PORT_DIPSETTING(    0x1a, "1 Coin/13 Credits")
-	PORT_DIPSETTING(    0x1b, "2 Coins/13 Credits")
-	PORT_DIPSETTING(    0x1c, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x1d, "2 Coins/14 Credits")
-	PORT_DIPSETTING(    0x1e, "1 Coin/15 Credits")
-	PORT_DIPSETTING(    0x1f, "2 Coins/15 Credits")
-	PORT_DIPNAME( 0x20, 0x00, "S14 (game specific)")    PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S15 (game specific)")    PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, "S16 (game specific)")    PORT_DIPLOCATION("SW1:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0xf,  0x00, "Coin Slot 2")            PORT_DIPLOCATION("SW2:!1,!2,!3,!4") // s17,s18,s19,s20
-	PORT_DIPSETTING(    0x00, "Same as Slot 1")
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x09, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/10 Credits")
-	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits")
-	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
-	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits")
-	PORT_DIPNAME( 0x30, 0x60, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
-	PORT_DIPSETTING(    0x00, "Nothing")
-	PORT_DIPSETTING(    0x10, "1 Credit")
-	PORT_DIPSETTING(    0x20, "2 Credits")
-	PORT_DIPSETTING(    0x30, "3 Credits")
-	PORT_DIPNAME( 0x40, 0x00, "S23 (game specific)")    PORT_DIPLOCATION("SW2:!7") // s23
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24 (game specific)")    PORT_DIPLOCATION("SW2:!8") // s24
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-
-	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x03, 0x00, "Maximum Credits")        PORT_DIPLOCATION("SW3:!1,!2") //s25,s26
-	PORT_DIPSETTING(    0x00, "10")
-	PORT_DIPSETTING(    0x01, "15")
-	PORT_DIPSETTING(    0x02, "25")
-	PORT_DIPSETTING(    0x03, "40")
-	PORT_DIPNAME( 0x04, 0x04, "Credits Displayed")      PORT_DIPLOCATION("SW3:!3") // s27
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, "Match Feature")          PORT_DIPLOCATION("SW3:!4") // s28
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x30, 0x00, "Sound Option")           PORT_DIPLOCATION("SW3:!5,!6") // s29, s30
-	PORT_DIPSETTING(    0x00, "Option 1")
-	PORT_DIPSETTING(    0x10, "Option 2")
-	PORT_DIPSETTING(    0x20, "Option 3")
-	PORT_DIPSETTING(    0x30, "Option 4")
-	PORT_DIPNAME( 0x40, 0x00, "Balls Per Game")         PORT_DIPLOCATION("SW3:!7") // s31
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0x40, "5")
-	PORT_DIPNAME( 0x80, 0x00, "S32 (game specific)")    PORT_DIPLOCATION("SW3:!8") // s32
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-INPUT_PORTS_END
-
-/*
-    Dips for os40 - Skateball, Frontier, Xenon
-*/
-static INPUT_PORTS_START( by35_os40 )
-	PORT_INCLUDE( by35 )
-
-	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x1f, 0x00, "Coin Slot 1")            PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as #3
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "2 Coins/12 Credits")
-	PORT_DIPSETTING(    0x15, "2 Coins/14 Credits")
-	PORT_DIPSETTING(    0x16, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x17, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x19, DEF_STR( 4C_5C ))
-	PORT_DIPSETTING(    0x1a, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x1b, DEF_STR( 4C_7C ))
-	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x1d, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x1f, DEF_STR( 1C_1C ))
-	PORT_DIPNAME( 0x20, 0x00, "S6 (game specific)")     PORT_DIPLOCATION("SW0:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S7 (game specific)")     PORT_DIPLOCATION("SW0:!7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S8 (game specific)")     PORT_DIPLOCATION("SW0:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x1f, 0x00, "Coin Slot 3")            PORT_DIPLOCATION("SW1:!1,!2,!3,!4,!5") // same as #1
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "2 Coins/12 Credits")
-	PORT_DIPSETTING(    0x15, "2 Coins/14 Credits")
-	PORT_DIPSETTING(    0x16, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x17, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x19, DEF_STR( 4C_5C ))
-	PORT_DIPSETTING(    0x1a, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x1b, DEF_STR( 4C_7C ))
-	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x1d, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x1f, DEF_STR( 1C_1C ))
-	PORT_DIPNAME( 0x20, 0x00, "S14 (game specific)")    PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S15 (game specific)")    PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S16 (game specific)")    PORT_DIPLOCATION("SW1:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0xf,  0x00, "Coin Slot 2")            PORT_DIPLOCATION("SW2:!1,!2,!3,!4")
-	PORT_DIPSETTING(    0x00, "Same as Slot 1")
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x09, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/10 Credits")
-	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits")
-	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
-	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits")
-	PORT_DIPNAME( 0x10, 0x00, "S21 (game specific)")    PORT_DIPLOCATION("SW2:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S22 (game specific)")    PORT_DIPLOCATION("SW2:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "S23 (game specific)")    PORT_DIPLOCATION("SW2:!7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S24 (game specific)")    PORT_DIPLOCATION("SW2:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x80, DEF_STR( On ))
-
-	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x03, 0x00, "Maximum Credits")        PORT_DIPLOCATION("SW3:!1,!2")
-	PORT_DIPSETTING(    0x00, "10")
-	PORT_DIPSETTING(    0x01, "15")
-	PORT_DIPSETTING(    0x02, "25")
-	PORT_DIPSETTING(    0x03, "40")
-	PORT_DIPNAME( 0xc0, 0x00, "Balls Per Game")         PORT_DIPLOCATION("SW3:!7,!8")
-	PORT_DIPSETTING(    0x40, "5")
-	PORT_DIPSETTING(    0x80, "4")
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0xc0, "2")
-	PORT_DIPNAME( 0x08, 0x08, "Match Feature")          PORT_DIPLOCATION("SW3:!4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, "Credits Displayed")      PORT_DIPLOCATION("SW3:!3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x04, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x00, "S29 (game specific)")    PORT_DIPLOCATION("SW3:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S30 (game specific)")    PORT_DIPLOCATION("SW3:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-INPUT_PORTS_END
-
-/*
-    Dips for os5x - Flash Gordon to Cybernaut
-*/
-static INPUT_PORTS_START( by35_os5x )
-	PORT_INCLUDE( by35_os40 )
-
-	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x1f, 0x00, "Coin Slot 1")            PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as #3
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "2 Coins/12 Credits")
-	PORT_DIPSETTING(    0x15, "2 Coins/14 Credits")
-	PORT_DIPSETTING(    0x16, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x17, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x19, DEF_STR( 4C_5C ))
-	PORT_DIPSETTING(    0x1a, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x1b, DEF_STR( 4C_7C ))
-	PORT_DIPSETTING(    0x1c, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(    0x1d, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(    0x1e, DEF_STR( 5C_1C ))
-	PORT_DIPSETTING(    0x1f, "5 Coins/1 Credit")
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x1f, 0x00, "Coin Slot 3")            PORT_DIPLOCATION("SW1:!1,!2,!3,!4,!5") // same as #1
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
-	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_2C ))
-	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_4C ))
-	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_5C ))
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_6C ))
-	PORT_DIPSETTING(    0x11, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x12, DEF_STR( 2C_8C ))
-	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "2 Coins/12 Credits")
-	PORT_DIPSETTING(    0x15, "2 Coins/14 Credits")
-	PORT_DIPSETTING(    0x16, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x17, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_3C ))
-	PORT_DIPSETTING(    0x19, DEF_STR( 4C_5C ))
-	PORT_DIPSETTING(    0x1a, DEF_STR( 2C_7C ))
-	PORT_DIPSETTING(    0x1b, DEF_STR( 4C_7C ))
-	PORT_DIPSETTING(    0x1c, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(    0x1d, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(    0x1e, DEF_STR( 5C_1C ))
-	PORT_DIPSETTING(    0x1f, "5 Coins/1 Credit")
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( playboy )
 	PORT_INCLUDE( by35 )
 
@@ -848,101 +501,6 @@ static INPUT_PORTS_START( playboy )
 
 	PORT_START("RT2")
 	PORT_ADJUSTER( 50, "RT2 - Tone Sustain" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( frontier )
-	PORT_INCLUDE( by35_os40 )
-
-	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x20, 0x00, "A and C Rollover Lane Lite")                                 PORT_DIPLOCATION("SW0:!6")
-	PORT_DIPSETTING(    0x00, "Making A or C Lane Lites Only Puts That Lane Out")
-	PORT_DIPSETTING(    0x20, "Making A or C Lane Puts Both Lites Out")
-	PORT_DIPNAME( 0x40, 0x00, "A-B-C Extra Ball Lite")                                      PORT_DIPLOCATION("SW0:!7")
-	PORT_DIPSETTING(    0x00, "A-B-C Extra Ball Lite Comes On After Making A-B-C Lanes")
-	PORT_DIPSETTING(    0x40, "A-B-C Extra Ball Lite Is On At Start Of Game")
-	PORT_DIPNAME( 0x80, 0x00, "Special Outlane Lite")                                       PORT_DIPLOCATION("SW0:!8")
-	PORT_DIPSETTING(    0x00, "1 Lite Comes On Then Alternates")
-	PORT_DIPSETTING(    0x80, "Both Lites Come On")
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x20, 0x00, "Special Outlane Lites And Side Targets Adjustment")          PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(    0x00, "Special Lites Come On When Side Drop Target Special Is On")
-	PORT_DIPSETTING(    0x20, "Special Lites Come On When Side Drop Target 4X Is On")
-	PORT_DIPNAME( 0x40, 0x00, "A-B-C Lane Lites Recall")                                    PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPSETTING(    0x00, "Any A-B-C Lite Out Will Come Back For Next Ball")
-	PORT_DIPSETTING(    0x40, "Any A-B-C Lite Out Will Not Come Back On For Next Ball")
-	PORT_DIPNAME( 0x80, 0x00, "Frontier Bonus Score")                                       PORT_DIPLOCATION("SW1:!8")
-	PORT_DIPSETTING(    0x00, "Going In Outhole Frontier Bonus Will Not Be Collected")
-	PORT_DIPSETTING(    0x80, "Going In Outhole Frontier Bonus Will Be Collected")
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x10, 0x00, "S21 (unused)")                                               PORT_DIPLOCATION("SW2:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "S22 (unused)")                                               PORT_DIPLOCATION("SW2:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, "Frontier Bonus Lite Adjustment")                             PORT_DIPLOCATION("SW2:!7")
-	PORT_DIPSETTING(    0x00, "Frontier Bonus Will Stop At 60,000")
-	PORT_DIPSETTING(    0x40, "Frontier Bonus Will Stop At 110,000")
-	PORT_DIPNAME( 0x80, 0x00, "Gate Recall")                                                PORT_DIPLOCATION("SW2:!8")
-	PORT_DIPSETTING(    0x00, "Gate Will Stay Down For Next Ball")
-	PORT_DIPSETTING(    0x80, "Gate Will Keep Up For Next Ball")
-	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x10, 0x00, "S29 (unused)")                                               PORT_DIPLOCATION("SW3:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, "Flipper Feed Lane 15,000")                                   PORT_DIPLOCATION("SW3:!6")
-	PORT_DIPSETTING(    0x00, "1 Lite Comes On Then Alternates")
-	PORT_DIPSETTING(    0x20, "Both Lites Come On")
-
-	PORT_MODIFY("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("30 Point Rebound") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Right Out Special") PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Right Flipper Feed Lane") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Left Flipper Feed Lane") PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Left Out Special") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )  PORT_NAME("Start")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )    PORT_NAME("Tilt")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-
-	PORT_MODIFY("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Saucer") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("A Rollover Lane") PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("B Rollover Lane") PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("C Rollover Lane") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
-
-	PORT_MODIFY("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("3rd In Line Drop Target") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd In Line Drop Target") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1st In Line Drop Target") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Grizzly Target") PORT_CODE(KEYCODE_A)
-
-	PORT_MODIFY("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Saucer Rollover Button") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bit4") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Target") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Center Target") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Target") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-
-	PORT_MODIFY("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bottom Side Drop Target") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Middle Side Drop Target") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Top Side Drop Target") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Slingshot") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Slingshot") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bottom Thumper Bumper") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Thumper Bumper") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Thumper Bumper") PORT_CODE(KEYCODE_Z)
 INPUT_PORTS_END
 
 
@@ -1037,11 +595,11 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 	{
 		for (int digit=0; digit<8; digit++)
 		{
-			m_digits[0][digit] = 0;
-			m_digits[1][digit] = 0;
-			m_digits[2][digit] = 0;
-			m_digits[3][digit] = 0;
-			m_digits[4][digit] = 0;
+			m_digits[0][digit] = 0
+			m_digits[1][digit] = 0
+			m_digits[2][digit] = 0
+			m_digits[3][digit] = 0
+			m_digits[4][digit] = 0
 		}
 	}
 #endif
@@ -1077,13 +635,19 @@ READ_LINE_MEMBER( by35_state::u11_cb1_r )
 
 WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
 {
-	// Handle sound
-	if (!m_sound_int_handler.isnull())
+	m_u11_cb2 = state;
+}
+
+WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
+{
+	if (state)
 	{
-		m_sound_int_handler(state);
+		m_snd_sustain_timer->adjust(attotime::from_msec(5));
+
+		m_discrete->write(NODE_08, 11);  // 11 volt pulse
 	}
 
-	m_u11_cb2 = state;
+	u11_cb2_w(state);
 }
 
 READ8_MEMBER( by35_state::u10_a_r )
@@ -1211,13 +775,6 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 		m_digits[4][digit - 1] = patterns[m_segment[5]];
 	}
 
-	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
-		m_sound_select_handler(sound);
-	}
-
 	m_u11a = data;
 }
 
@@ -1293,14 +850,12 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][2]);
 	}
 
-	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
-		m_sound_select_handler(sound);
-	}
-
 	m_u11b = data;
+}
+
+WRITE8_MEMBER( as2888_state::u11_b_as2888_w )
+{
+	u11_b_w( space, offset, data );
 }
 
 
@@ -1355,10 +910,41 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-WRITE_LINE_MEMBER( by35_state::sound_ack_w )
+TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
 {
-	m_pia_u11->cb2_w(state);
+	m_snd_tone_gen--;
+
+	if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
+	{
+		m_snd_tone_gen = m_snd_sel;
+		m_snd_div++;
+
+		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
+
+		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
+	}
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
+{
+	offs_t offs = (m_u11b & 0x0f);
+	if ((m_u11a & 0x02) == 0) offs |= 0x10;
+	{
+		m_snd_sel = m_snd_prom[offs];
+		LOG("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
+		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
+
+		m_snd_tone_gen = m_snd_sel;
+		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
+	}
+
+	m_discrete->write(NODE_08, 0);
+	m_snd_sustain_timer->adjust(attotime::never);
+
+	LOG("Sustain off\n");
+}
+
 
 
 by35_state::solenoid_feature_data const by35_state::s_solenoid_features_default =
@@ -1418,6 +1004,7 @@ by35_state::solenoid_feature_data const playboy_state::s_solenoid_features_playb
 /*19*/  { 0xff, 0xff, 0xff,  0x00 }
 };
 
+
 void by35_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -1425,8 +1012,6 @@ void by35_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 	m_solenoids.resolve();
-	m_sound_select_handler.resolve();
-	m_sound_int_handler.resolve();
 }
 
 void by35_state::machine_reset()
@@ -1445,6 +1030,67 @@ void by35_state::machine_reset()
 	m_io_hold_x[0] = 0x80;  // Put ball in Outhole on startup
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
 }
+
+static const discrete_mixer_desc as2888_digital_mixer_info =
+{
+		DISC_MIXER_IS_RESISTOR,                       /* type */
+		{RES_K(33), RES_K(3.9)},                      /* r{} */
+		{0, 0, 0, 0},                                 /* r_node */
+		{0, 0},                                       /* c{} */
+		0,                                            /* rI  */
+//      RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(360)),   /* rF  */
+		RES_K(10),                                    /* rF  */   // not really
+		CAP_U(0.01),                                  /* cF  */
+		0,                                            /* cAmp */
+		0,                                            /* vRef */
+		0.00002                                       /* gain */
+};
+
+static const discrete_op_amp_filt_info as2888_preamp_info = {
+		RES_K(10), 0, RES_R(470), 0,      /* r1 .. r4 */
+		RES_K(10),                        /* rF */
+		CAP_U(1),                         /* C1 */
+		0,                                /* C2 */
+		0,                                /* C3 */
+		0.0,                              /* vRef */
+		12.0,                             /* vP */
+		-12.0,                            /* vN */
+};
+
+
+static DISCRETE_SOUND_START(as2888_discrete)
+
+	DISCRETE_INPUT_DATA(NODE_08)        // Start Sustain Attenuation from 555 circuit
+	DISCRETE_INPUT_LOGIC(NODE_01)       // Binary Counter B output (divide by 1) T2
+	DISCRETE_INPUT_LOGIC(NODE_04)       // Binary Counter D output (divide by 4) T3
+
+	DISCRETE_DIVIDE(NODE_11, 1, NODE_01, 1) // 2
+	DISCRETE_DIVIDE(NODE_14, 1, NODE_04, 1)
+
+
+	DISCRETE_RCFILTER(NODE_06, NODE_14, RES_K(15), CAP_U(0.1))      // T4 filter
+#if 0
+	DISCRETE_RCFILTER(NODE_05, NODE_11, RES_K(33), CAP_U(0.01))     // T1 filter
+	DISCRETE_ADDER2(NODE_07, 1, NODE_05, NODE_06)
+#else
+
+	DISCRETE_MIXER2(NODE_07, 1, NODE_11, NODE_06, &as2888_digital_mixer_info)   // Mix and filter T1 and T4 together
+#endif
+	DISCRETE_RCDISC5(NODE_87, 1, NODE_08, RES_K(150), CAP_U(1.0))
+
+	DISCRETE_RCFILTER_VREF(NODE_88,NODE_87,RES_M(1),CAP_U(0.01),2)
+	DISCRETE_MULTIPLY(NODE_09, NODE_07, NODE_88)    // Apply sustain
+
+	DISCRETE_OP_AMP_FILTER(NODE_20, 1, NODE_09, 0, DISC_OP_AMP_FILTER_IS_HIGH_PASS_1, &as2888_preamp_info)
+
+	DISCRETE_CRFILTER(NODE_25, NODE_20, RES_M(100), CAP_U(0.05))    // Resistor is fake. Capacitor in series between pre-amp and output amp.
+
+	DISCRETE_GAIN(NODE_30, NODE_25, 50) // Output amplifier LM380 fixed inbuilt gain of 50
+
+	DISCRETE_OUTPUT(NODE_30, 10000000)  //  17000000
+DISCRETE_SOUND_END
+
+
 
 void by35_state::by35(machine_config &config)
 {
@@ -1489,6 +1135,26 @@ void by35_state::by35(machine_config &config)
 	TIMER(config, m_display_refresh_timer).configure_generic(FUNC(by35_state::timer_d_pulse));   // 555 Active pulse length
 }
 
+void as2888_state::as2888_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, as2888_discrete).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	m_pia_u11->writepb_handler().set(FUNC(as2888_state::u11_b_as2888_w));
+	m_pia_u11->cb2_handler().set(FUNC(as2888_state::u11_cb2_as2888_w));
+
+	TIMER(config, "timer_s_freq").configure_periodic(FUNC(as2888_state::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
+	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(as2888_state::timer_as2888));
+}
+
+
+void as2888_state::as2888(machine_config &config)
+{
+	by35(config);
+	as2888_audio(config);
+}
+
+
 void by35_state::nuovo(machine_config &config)
 {
 	by35(config);
@@ -1497,54 +1163,7 @@ void by35_state::nuovo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
 }
 
-void by35_state::as2888(machine_config &config)
-{
-	by35(config);
 
-	BALLY_AS2888(config, m_as2888);
-	SPEAKER(config, "mono").front_center();
-	m_as2888->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_sound_select_handler.bind().set(m_as2888, FUNC(bally_as2888_device::sound_select));
-	m_sound_int_handler.bind().set(m_as2888, FUNC(bally_as2888_device::sound_int));
-}
-
-void by35_state::as3022(machine_config &config)
-{
-	by35(config);
-
-	BALLY_AS3022(config, m_as3022);
-	SPEAKER(config, "mono").front_center();
-	m_as3022->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_sound_select_handler.bind().set(m_as3022, FUNC(bally_as3022_device::sound_select));
-	m_sound_int_handler.bind().set(m_as3022, FUNC(bally_as3022_device::sound_int));
-}
-
-void by35_state::sounds_plus(machine_config &config)
-{
-	by35(config);
-
-	BALLY_SOUNDS_PLUS(config, m_sounds_plus);
-	SPEAKER(config, "mono").front_center();
-	m_sounds_plus->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_sound_select_handler.bind().set(m_sounds_plus, FUNC(bally_sounds_plus_device::sound_select));
-	m_sound_int_handler.bind().set(m_sounds_plus, FUNC(bally_sounds_plus_device::sound_int));
-}
-
-void by35_state::cheap_squeak(machine_config &config)
-{
-	by35(config);
-
-	BALLY_CHEAP_SQUEAK(config, m_cheap_squeak);
-	SPEAKER(config, "mono").front_center();
-	m_cheap_squeak->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	m_sound_select_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_select));
-	m_sound_int_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_int));
-	m_cheap_squeak->sound_ack_w_handler().set(FUNC(by35_state::sound_ack_w));
-}
 
 
 /*--------------------------------
@@ -1556,7 +1175,7 @@ ROM_START(sst)
 	ROM_LOAD( "741-08_2.716", 0x5000, 0x0800, CRC(2789cbe6) SHA1(8230657cb5ee793354a5d4a80a9348639ec9af8f))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1569,7 +1188,7 @@ ROM_START(playboy)
 	ROM_LOAD( "743-12_2.716", 0x5000, 0x0800, CRC(6fa66664) SHA1(4943220942ce74d4620eb5fbbab8f8a763f65a2e))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1582,7 +1201,7 @@ ROM_START(lostwrlp)
 	ROM_LOAD( "729-48_2.716", 0x5000, 0x0800, CRC(963bffd8) SHA1(5144092d019132946b396fd7134866a878b3ca62))
 	ROM_LOAD( "720-28_6.716", 0x5800, 0x0800, CRC(f24cce3e) SHA1(0dfeaeb5b1cf4c950ff530ee56966ac0f2257111))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1595,7 +1214,7 @@ ROM_START(smman)
 	ROM_LOAD( "742-18_2.716", 0x5000, 0x0800, CRC(5365d36c) SHA1(1db651d31e28cf3fda00bef5289bb14d3b37b3c1))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1608,7 +1227,7 @@ ROM_START(voltan)
 	ROM_LOAD( "744-04_2.716", 0x5000, 0x0800, CRC(dbf58b83) SHA1(2d5e1c42fb8987eec81d89a4fe758ff0b88a1889))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1621,7 +1240,7 @@ ROM_START(startrep)
 	ROM_LOAD( "745-12_2.716", 0x5000, 0x0800, CRC(f683210a) SHA1(6120909d97269d9abfcc34eef2c79b56a9cf53bc))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1634,7 +1253,7 @@ ROM_START(kiss)
 	ROM_LOAD( "746-14_2.716", 0x5000, 0x0800, CRC(0fc8922d) SHA1(dc6bd4d2d744df69b33ec69896cf71ac10c14a35))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-18_3.123", 0x0000, 0x0020, CRC(7b6b7d45) SHA1(22f791bac0baab71754b2f6c00c217a342c92df5))
 ROM_END
 
@@ -1647,9 +1266,11 @@ ROM_START(ngndshkr)
 	ROM_LOAD( "776-11_2.716", 0x5000, 0x0800, CRC(b0396b55) SHA1(2d10c4af7ecfa23b64ffb640111b582f44256fd5))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("776-15_4.716", 0x1000, 0x0800, CRC(63c80c52) SHA1(3350919fce237b308b8f960948f70d01d312e9c0))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("776-15_4.716", 0xf000, 0x0800, CRC(63c80c52) SHA1(3350919fce237b308b8f960948f70d01d312e9c0))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1661,9 +1282,11 @@ ROM_START(slbmania)
 	ROM_LOAD( "786-17_2.716", 0x5000, 0x0800, CRC(94af0298) SHA1(579eb0290283194d92b172f787d8a9ff54f16a07))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("786-11_4.716", 0x1000, 0x0800, CRC(2a3641e6) SHA1(64693d424277e2aaf5fd4af33b2d348a8a455448))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("786-11_4.716", 0xf000, 0x0800, CRC(2a3641e6) SHA1(64693d424277e2aaf5fd4af33b2d348a8a455448))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*-----------------------------------
@@ -1675,7 +1298,7 @@ ROM_START(hglbtrtr)
 	ROM_LOAD( "750-08_2.716", 0x5000, 0x0800, CRC(3c783931) SHA1(ee260511063aff1b72e18b3bc5a5be81aecf10c9))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1688,7 +1311,7 @@ ROM_START(dollyptn)
 	ROM_LOAD( "777-13_2.716", 0x5000, 0x0800, CRC(7fc93ea3) SHA1(534ac5ed34397fe622dcf7cc90eaf38a311fa871))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1701,7 +1324,7 @@ ROM_START(paragon)
 	ROM_LOAD( "748-15_2.716", 0x5000, 0x0800, CRC(26cc05c1) SHA1(6e11a0f2327dbf15f6c149ddd873d9af96597d9d))
 	ROM_LOAD( "720-30_6.716", 0x5800, 0x0800, CRC(4be8aab0) SHA1(b6ae0c4f27b7dd7fb13c0632617a2559f86f29ae))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x0020, "as2888:sound", 0)
+	ROM_REGION(0x0020, "sound1", 0)
 	ROM_LOAD( "729-51_3.123", 0x0000, 0x0020, CRC(6e7d3e8b) SHA1(7a93d82a05213ffa6eacfa318051414f872a701d))
 ROM_END
 
@@ -1714,9 +1337,11 @@ ROM_START(futurspa)
 	ROM_LOAD( "781-09_2.716", 0x5000, 0x0800, CRC(316617ed) SHA1(749d63cefe9541885b51db89302ad8a23e8f5b0a))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("781-02_4.716", 0x1000, 0x0800, CRC(364f7c9a) SHA1(e6a3d425317eaeba4109712c6949f11c50b82892))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("781-02_4.716", 0xf000, 0x0800, CRC(364f7c9a) SHA1(e6a3d425317eaeba4109712c6949f11c50b82892))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1728,9 +1353,11 @@ ROM_START(spaceinv)
 	ROM_LOAD( "792-13_2.716", 0x5000, 0x0800, CRC(b87b9e6b) SHA1(eab787ea81409ba88e30a342564944e1fade8124))
 	ROM_LOAD( "720-37_6.716", 0x5800, 0x0800, CRC(ceff6993) SHA1(bc91e7afdfc441ff47a37031f2d6caeb9ab64143))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("792-07_4.716", 0x1000, 0x0800, CRC(787ffd5e) SHA1(4dadad7095de27622c2120311a84555dacdc3364))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("792-07_4.716", 0xf000, 0x0800, CRC(787ffd5e) SHA1(4dadad7095de27622c2120311a84555dacdc3364))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1742,9 +1369,11 @@ ROM_START(rollston)
 	ROM_LOAD( "796-18_2.716", 0x5000, 0x0800, CRC(08c75b1a) SHA1(792a535514fe4d9476914f7f61c696a7a1bdb549))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("796-19_4.716", 0x1000, 0x0800, CRC(b740d047) SHA1(710edb6bbba0a03e4f516b501f019493a3a4033e))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("796-19_4.716", 0xf000, 0x0800, CRC(b740d047) SHA1(710edb6bbba0a03e4f516b501f019493a3a4033e))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1756,9 +1385,11 @@ ROM_START(mystic)
 	ROM_LOAD( "798-04_2.716", 0x5000, 0x0800, CRC(f54e5785) SHA1(425304512b70ef0f17ca9854af96cbb63c5ee33e))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("798-05_4.716", 0x1000, 0x0800, CRC(e759e093) SHA1(e635dac4aa925804ec658e856f7830290bfbc7b8))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("798-05_4.716", 0xf000, 0x0800, CRC(e759e093) SHA1(e635dac4aa925804ec658e856f7830290bfbc7b8))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1771,7 +1402,7 @@ ROM_START(xenon)
 	ROM_LOAD( "720-40_6.732", 0x1800, 0x0800, CRC(d7aaaa03) SHA1(4e0b901645e509bcb59bf81a6ffc1612b4fb16ee))
 	ROM_CONTINUE( 0x5800, 0x0800 )
 	ROM_RELOAD( 0x7000, 0x1000 )
-	ROM_REGION(0x10000, "sounds_plus:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("811-35_4.532", 0xf000, 0x1000, CRC(e9caccbb) SHA1(e2e09ac738c48342212bf38687299876b40cecbb))
 	ROM_LOAD("811-22_1.532", 0x8000, 0x1000, CRC(c49a968e) SHA1(86680e8cbb82e69c232313e5fdd7a0058b7eef13))
 	ROM_LOAD("811-23_2.532", 0x9000, 0x1000, CRC(41043996) SHA1(78fa3782ee9f32d14cf41a96a60f708087e97bb9))
@@ -1789,7 +1420,7 @@ ROM_START(xenonf)
 	ROM_LOAD( "720-40_6.732", 0x1800, 0x0800, CRC(d7aaaa03) SHA1(4e0b901645e509bcb59bf81a6ffc1612b4fb16ee))
 	ROM_CONTINUE( 0x5800, 0x0800 )
 	ROM_RELOAD( 0x7000, 0x1000 )
-	ROM_REGION(0x10000, "sounds_plus:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("811-36_4.532", 0xf000, 0x1000, CRC(73156c6e) SHA1(b0b3ecb44428c01849189adf6c86be3e95a99012))
 	ROM_LOAD("811-22_1.532", 0x8000, 0x1000, CRC(c49a968e) SHA1(86680e8cbb82e69c232313e5fdd7a0058b7eef13))
 	ROM_LOAD("811-23_2.532", 0x9000, 0x1000, CRC(41043996) SHA1(78fa3782ee9f32d14cf41a96a60f708087e97bb9))
@@ -1809,13 +1440,15 @@ ROM_START(viking)
 	ROM_LOAD( "802-06_2.716", 0x5000, 0x0800, CRC(40410760) SHA1(b0b87d8600a03de7090e42f6ebdeeb5feccf87f6))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("802-07-4.716", 0x1000, 0x0800, CRC(62bc5030) SHA1(5a696f784a415d5b16ee23cd72a905264a2bbeac))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("802-07-4.716", 0xf000, 0x0800, CRC(62bc5030) SHA1(5a696f784a415d5b16ee23cd72a905264a2bbeac))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
-/ Hotdoggin' #1199
+/ Hot Doggin' #1199
 /-------------------------------*/
 ROM_START(hotdoggn)
 	ROM_REGION(0x8000, "maincpu", 0)
@@ -1823,9 +1456,11 @@ ROM_START(hotdoggn)
 	ROM_LOAD( "809-06_2.716", 0x5000, 0x0800, CRC(03db3d4d) SHA1(b8eed2d22474d2b0a1667eef2fdd4ecfa5fd35f3))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
 	ROM_RELOAD( 0x7800, 0x0800)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("809-07_4.716", 0x1000, 0x0800, CRC(43f28d7f) SHA1(01fca0ee0137a0715421eaa3582ff8d324340ecf))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("809-07_4.716", 0xf000, 0x0800, CRC(43f28d7f) SHA1(01fca0ee0137a0715421eaa3582ff8d324340ecf))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 #ifdef MISSING_GAME
@@ -1833,7 +1468,7 @@ ROM_START(hotdoggb) // check to see if this is the same as above but with a diff
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "hotd2732.u2", 0x1000, 0x0800, CRC(709305ee) SHA1(37d5e681a1a2b8b2782dae3007db3e5036003e00))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-3532.u6b", 0x1800, 0x0800, CRC(b5e6a3d5) SHA1(fa1593eeed449dbac87965e613b501108a015eb2))
+	ROM_LOAD( "720-3532.u6b", 0x1800, 0x0800, CRC(b5e6a3d5) SHA1(fa1593eeed449dbac87965e613b501108a015eb2) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -1854,9 +1489,11 @@ ROM_START(skatebll)
 	ROM_LOAD( "720-40_6.732", 0x1800, 0x0800, CRC(d7aaaa03) SHA1(4e0b901645e509bcb59bf81a6ffc1612b4fb16ee))
 	ROM_CONTINUE( 0x5800, 0x0800 )
 	ROM_RELOAD( 0x7000, 0x1000 )
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("823-02_4.716", 0x1000, 0x0800, CRC(d1037b20) SHA1(8784728540573be5e8ebb940ec0046b778f9413b))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("823-02_4.716", 0xf000, 0x0800, CRC(d1037b20) SHA1(8784728540573be5e8ebb940ec0046b778f9413b))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1890,10 +1527,10 @@ ROM_START(flashgdnv)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "834-23_2.732", 0x1000, 0x0800, CRC(0c7a0d91) SHA1(1f79be15817975acbc35cb08591e2289e2eca938))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "sounds_plus:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("834-02_4.532", 0xf000, 0x1000, CRC(f1eb0a12) SHA1(a58567665547aacf9a1b2c39295d963527ef8696))
 	ROM_LOAD("834-03_1.532", 0x8000, 0x1000, CRC(88bef6f4) SHA1(561e0bde04661b700552e4fbb6141c39f2789c99))
 	ROM_LOAD("834-04_2.532", 0x9000, 0x1000, CRC(bce91475) SHA1(482b424977d73b36e2014617e3bd3deb51091c28))
@@ -1914,9 +1551,11 @@ ROM_START(frontier)
 	ROM_LOAD( "720-40_6.732", 0x1800, 0x0800, CRC(d7aaaa03) SHA1(4e0b901645e509bcb59bf81a6ffc1612b4fb16ee))
 	ROM_CONTINUE( 0x5800, 0x0800 )
 	ROM_RELOAD( 0x7000, 0x1000 )
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("819-09_4.716", 0x1000, 0x0800, CRC(a62059ca) SHA1(75e139ea2573a8c3b666c9a1024d9308da9875c7))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("819-09_4.716", 0xf000, 0x0800, CRC(a62059ca) SHA1(75e139ea2573a8c3b666c9a1024d9308da9875c7))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*--------------------------------
@@ -1926,7 +1565,7 @@ ROM_START(fball_ii)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "839-12_2.732", 0x1000, 0x0800, CRC(45e768ad) SHA1(b706cb5f3dcfa2db54d8d15de180fcbf36b3768f))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -1941,7 +1580,7 @@ ROM_START(eballdlx)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "838-15_2.732", 0x1000, 0x0800, CRC(68d92acc) SHA1(f37b16d2953677cd779073bc3eac4b586d62fad8))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -1955,7 +1594,7 @@ ROM_START(eballd14)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "838-14_2.732", 0x1000, 0x0800, CRC(27eeabde) SHA1(a8f81dbb70202bdad1c9734d629e8a5c27f2a835))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -1972,7 +1611,7 @@ ROM_START(embryon)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "841-06_2.732", 0x1000, 0x0800, CRC(80ab18e7) SHA1(52e5b1709e6f21919fc9efed67f51934d883dbb7))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -1988,7 +1627,7 @@ ROM_START(fathom)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "842-08_2.732", 0x1000, 0x0800, CRC(1180f284) SHA1(78be1fa54faba5c5b14f580e41546be685846391))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2003,7 +1642,7 @@ ROM_START(centaur)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "848-08_2.732", 0x1000, 0x0800, CRC(8bdcd32b) SHA1(39f64393d3a39a8172b3d80d196253aac1342f40))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2020,7 +1659,7 @@ ROM_START(medusa)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "845-16_2.732", 0x1000, 0x0800, CRC(b0fbd1ac) SHA1(e876eced0c02a2b4b3c308494e8c453074d0e561))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2037,7 +1676,7 @@ ROM_START(vector)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "858-11_2.732", 0x1000, 0x0800, CRC(323e286b) SHA1(998387900363fd46d392a931c1f092c886a23c69))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2054,7 +1693,7 @@ ROM_START(elektra)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "857-04_2.732", 0x1000, 0x0800, CRC(d2476720) SHA1(372c210c4f19302ffe25722bba6bcaaa85c4b90d))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2071,7 +1710,7 @@ ROM_START(spectrm)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "868-00_2.732", 0x1000, 0x0800, NO_DUMP)
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2085,7 +1724,7 @@ ROM_START(spectrm4)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "868-04_2.732", 0x1000, 0x0800, CRC(b377f5f1) SHA1(adc40204da90ef1a4470a478520b949c6ded07b5))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2102,24 +1741,28 @@ ROM_START(speakesy)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "877-03_2.732", 0x1000, 0x0800, CRC(34b28bbc) SHA1(c649a04664e694cfbd6b4d496bf76f5e802d492a))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("877-01_4.716", 0x1000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("877-01_4.716", 0xf000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 ROM_START(speakesy4p)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "877-04_2.732", 0x1000, 0x0800, CRC(8926f2bb) SHA1(617c032ce949007d6bcb52268f17bec5a02f8651))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("877-01_4.716", 0x1000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
-	ROM_RELOAD( 0x1800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("877-01_4.716", 0xf000, 0x0800, CRC(6534e826) SHA1(580653636f8d33e758e6631c9ce495f42fe3747a))
+	ROM_RELOAD(0xf800, 0x0800)
+	ROM_RELOAD(0x1000, 0x0800)
+	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
 /*---------------------------------------------------
@@ -2129,11 +1772,12 @@ ROM_START(bmx)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "888-03_2.732", 0x1000, 0x0800, CRC(038cf1be) SHA1(b000a3d84623db6a7644551e5e2f0d7b533acb13))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("888-02_4.532", 0x1000, 0x1000, CRC(5692c679) SHA1(7eef074d16cde589cde7500c4dc76c9a902c7fe3))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("888-02_4.532", 0xf000, 0x1000, CRC(5692c679) SHA1(7eef074d16cde589cde7500c4dc76c9a902c7fe3))
+	ROM_RELOAD(0x1000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2143,7 +1787,7 @@ ROM_START(rapidfip)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "869-04_2.732", 0x1000, 0x0800, CRC(26fdf048) SHA1(15787345e7162a530334bff98d877e525d4a1295))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "869-03_6.732", 0x1800, 0x0800, CRC(f6af5e8d) SHA1(3cf782d4a0ca38e3953a20d23d0eb01af87ba445))
+	ROM_LOAD( "869-03_6.732", 0x1800, 0x0800, CRC(f6af5e8d) SHA1(3cf782d4a0ca38e3953a20d23d0eb01af87ba445) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2157,7 +1801,7 @@ ROM_START(m_mpac)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "872-04_2.732", 0x1000, 0x0800, CRC(5e542882) SHA1(bec5f56cd5192e0a12ea1226a49a2b7d8eaaa5cf))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2172,22 +1816,24 @@ ROM_START(granslam)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "grndslam.u2", 0x1000, 0x0800, CRC(66aea9dc) SHA1(76c017dc83a63b7f1e6035e228370219eb9c0678))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "grndslam.u6", 0x1800, 0x0800, CRC(9e6ccea1) SHA1(5e158e021e0f3eed063577ae22cf5f1bc9655065))
+	ROM_LOAD( "grndslam.u6", 0x1800, 0x0800, CRC(9e6ccea1) SHA1(5e158e021e0f3eed063577ae22cf5f1bc9655065) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("grndslam.u4", 0x1000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("grndslam.u4", 0xf000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
+	ROM_RELOAD(0x1000, 0x1000)
 ROM_END
 
 ROM_START(granslam4)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "gr_slam.u2b", 0x1000, 0x0800, CRC(552d9423) SHA1(16b86d5b7539fd803f458f1633ecc249ef15243d))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "grndslam.u6", 0x1800, 0x0800, CRC(9e6ccea1) SHA1(5e158e021e0f3eed063577ae22cf5f1bc9655065))
+	ROM_LOAD( "grndslam.u6", 0x1800, 0x0800, CRC(9e6ccea1) SHA1(5e158e021e0f3eed063577ae22cf5f1bc9655065) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("grndslam.u4", 0x1000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("grndslam.u4", 0xf000, 0x1000, CRC(ac34bc38) SHA1(376ceb53cb51d250b5bc222001291b0c85e42e8a))
+	ROM_RELOAD(0x1000, 0x1000)
 ROM_END
 
 
@@ -2205,19 +1851,21 @@ ROM_START(goldball)
 	ROM_LOAD( "goldball.u6", 0x1800, 0x0800, CRC(9b6e79d0) SHA1(4fcda91bbe930e6131d94964a08459e395f841af))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("gb_u4.532", 0x1000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("gb_u4.532", 0xf000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
+	ROM_RELOAD(0x1000, 0x1000)
 ROM_END
 
 ROM_START(goldballn)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "u2.532", 0x1000, 0x0800, CRC(aa6eb9d6) SHA1(a73cc832450e718d9b8484e409a1f8093d91d786))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "goldball.u6", 0x1800, 0x0800, CRC(9b6e79d0) SHA1(4fcda91bbe930e6131d94964a08459e395f841af))
+	ROM_LOAD( "goldball.u6", 0x1800, 0x0800, CRC(9b6e79d0) SHA1(4fcda91bbe930e6131d94964a08459e395f841af) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "as3022:cpu", 0)
-	ROM_LOAD("gb_u4.532", 0x1000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("gb_u4.532", 0xf000, 0x1000, CRC(2dcb0315) SHA1(8cb9c9f627f0c8420d3b3d9f0d10d77a82c8be56))
+	ROM_RELOAD(0x1000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2227,14 +1875,18 @@ ROM_START(kosteel)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "kngs2732.u2", 0x1000, 0x0800, CRC(f876d8f2) SHA1(581f4b98e0a69f4ae879caeafdbf2eb979514ad1))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("kngsu4.snd", 0x8000, 0x1000, CRC(f3e4d2f6) SHA1(93f4e9e1348b1225bc02db38c994e3338afb175c))
 	ROM_RELOAD(0x9000, 0x1000)
+	ROM_RELOAD(0xa000, 0x1000)
+	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("kngsu3.snd", 0xc000, 0x1000, CRC(11b02dca) SHA1(464eee1aa1fd9b6e26d4ba635777fffad0222106))
 	ROM_RELOAD(0xd000, 0x1000)
+	ROM_RELOAD(0xe000, 0x1000)
+	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2244,11 +1896,12 @@ ROM_START(xsandos)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "x+os2732.u2", 0x1000, 0x0800, CRC(068dfe5a) SHA1(028baf79852b14cac51a7cdc8e751a8173beeccb))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("720_u3.snd", 0xc000, 0x2000, CRC(5d8e2adb) SHA1(901a26f5e598386295a1298ee3a634941bd58b3e))
+	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2258,14 +1911,18 @@ ROM_START(spyhuntr)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "spy-2732.u2", 0x1000, 0x0800, CRC(9e930f2d) SHA1(fb48ce0d8d8f8a695827c0eea57510b53daa7c39))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("spy_u4.532", 0x8000, 0x1000, CRC(a43887d0) SHA1(6bbc55943fa9f0cd97f946767f21652e19d85265))
 	ROM_RELOAD(0x9000, 0x1000)
+	ROM_RELOAD(0xa000, 0x1000)
+	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("spy_u3.532", 0xc000, 0x1000, CRC(95ffc1b8) SHA1(28f058f74abbbee120dca06f7321bcb588bef3c6))
 	ROM_RELOAD(0xd000, 0x1000)
+	ROM_RELOAD(0xe000, 0x1000)
+	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*-------------------------------------
@@ -2275,14 +1932,18 @@ ROM_START(fbclass)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "fb-class.u2", 0x1000, 0x0800, CRC(32faac6c) SHA1(589020d09f26326dab266bc7c74ca0e10de565e6))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("fbcu4.snd", 0x8000, 0x1000, CRC(697ab16f) SHA1(7beed02e6cb042f90d2048778408b1f744ffe242))
 	ROM_RELOAD(0x9000, 0x1000)
+	ROM_RELOAD(0xa000, 0x1000)
+	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("fbcu3.snd", 0xc000, 0x1000, CRC(1ad71775) SHA1(ddb885730deaf315fe7f3c1803628c06eedc8350))
 	ROM_RELOAD(0xd000, 0x1000)
+	ROM_RELOAD(0xe000, 0x1000)
+	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2292,14 +1953,18 @@ ROM_START(blakpyra)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "blkp2732.u2", 0x1000, 0x0800, CRC(600535b0) SHA1(33d080f4430ad9c33ee9de1bfbb5cfde50f0776e))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bp_u4.532", 0x8000, 0x1000, CRC(57978b4a) SHA1(4995837790d81b02325d39b548fb882a591769c5))
 	ROM_RELOAD(0x9000, 0x1000)
+	ROM_RELOAD(0xa000, 0x1000)
+	ROM_RELOAD(0xb000, 0x1000)
 	ROM_LOAD("bp_u3.532", 0xc000, 0x1000, CRC(a5005067) SHA1(bd460a20a6e8f33746880d72241d6776b85126cf))
 	ROM_RELOAD(0xd000, 0x1000)
+	ROM_RELOAD(0xe000, 0x1000)
+	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
 /*--------------------------------
@@ -2309,11 +1974,12 @@ ROM_START(cybrnaut)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "cybe2732.u2", 0x1000, 0x0800, CRC(0610b0e0) SHA1(92f5e8a83240ad03ecc16ece4824b047b77816f7))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
-	ROM_REGION(0x10000, "cheap_squeak:cpu", 0)
+	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("cybu3.snd", 0xc000, 0x2000, CRC(a3c1f6e7) SHA1(35a5e828a6f2dd9009e165328a005fa079bad6cb))
+	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2323,7 +1989,7 @@ ROM_START(cosflash)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "cf2d.532", 0x1000, 0x0800, CRC(939e941d) SHA1(889862043f351762e8c866aefb36a9ea75cbf828))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "cf6d.532", 0x1800, 0x0800, CRC(7af93d2f) SHA1(2d939b14f7fe79f836e12926f44b70037630cd3f))
+	ROM_LOAD( "cf6d.532", 0x1800, 0x0800, CRC(7af93d2f) SHA1(2d939b14f7fe79f836e12926f44b70037630cd3f) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2371,7 +2037,7 @@ ROM_START(newwave)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "blkp2732.u2", 0x1000, 0x0800, CRC(600535b0) SHA1(33d080f4430ad9c33ee9de1bfbb5cfde50f0776e))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "newwu6.532", 0x1800, 0x0800, CRC(ca72a96b) SHA1(efcd8b41bf0c19ebd7db492632e046b348619460))
+	ROM_LOAD( "newwu6.532", 0x1800, 0x0800, CRC(ca72a96b) SHA1(efcd8b41bf0c19ebd7db492632e046b348619460) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2400,7 +2066,7 @@ ROM_START(saturn2)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "spy-2732.u2", 0x1000, 0x0800, CRC(9e930f2d) SHA1(fb48ce0d8d8f8a695827c0eea57510b53daa7c39))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "saturn2.u6", 0x1800, 0x0800, CRC(ca72a96b) SHA1(efcd8b41bf0c19ebd7db492632e046b348619460))
+	ROM_LOAD( "saturn2.u6", 0x1800, 0x0800, CRC(ca72a96b) SHA1(efcd8b41bf0c19ebd7db492632e046b348619460) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2419,7 +2085,7 @@ ROM_START(spacehaw)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "cybe2732.u2g", 0x1000, 0x0800, CRC(d4a5e2f6) SHA1(841e940632993919a68c905546f533ff38a0ce31))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "spacehaw.u6", 0x1800, 0x0800, CRC(b154a3a3) SHA1(d632c5eddd0582ba2ca778ab03e11ca3f6f4e1ed))
+	ROM_LOAD( "spacehaw.u6", 0x1800, 0x0800, CRC(b154a3a3) SHA1(d632c5eddd0582ba2ca778ab03e11ca3f6f4e1ed) )
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
@@ -2746,84 +2412,84 @@ ROM_START(suprbowl)
 ROM_END
 
 // AS-2888 sound
-GAME( 1979, sst,      0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAMEL(1978, playboy,  0, as2888, playboy,   by35_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
-GAME( 1978, lostwrlp, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, smman,    0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, voltan,   0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, startrep, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, kiss,     0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, hglbtrtr, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, dollyptn, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, paragon,  0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, sst,        0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL(1978, playboy,    0,        as2888, playboy, playboy_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
+GAME( 1978, lostwrlp,   0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, smman,      0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, voltan,     0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, startrep,   0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, kiss,       0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, hglbtrtr,   0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, dollyptn,   0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, paragon,    0,        as2888, by35,    as2888_state,  init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_IS_SKELETON_MECHANICAL)
 
 // AS-3022 sound
-GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, slbmania,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, futurspa,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, spaceinv,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, mystic,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, xenon,      0,        sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, viking,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Viking",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, hotdoggn,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, skatebll,   0,        as3022,      by35_os40, by35_state, init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, frontier,   0,        as3022,      frontier,  by35_state, init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy4p, speakesy, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, bmx,        0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, granslam,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, granslam4,  granslam, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, goldball,   0,        as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, goldballn,  goldball, as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, ngndshkr,   0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, slbmania,   0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, futurspa,   0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, spaceinv,   0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, rollston,   0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, mystic,     0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, xenon,      0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, xenonf,     xenon,    by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, viking,     0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Viking",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, hotdoggn,   0,        by35, by35, by35_state, init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, skatebll,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1980, frontier,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, speakesy,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, speakesy4p, speakesy, by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, bmx,        0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, granslam,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, granslam4,  granslam, by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, goldball,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, goldballn,  goldball, by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_IS_SKELETON_MECHANICAL)
 
 // Squawk & Talk sound
-GAME( 1981, flashgdn,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnf, flashgdn, by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnv, flashgdn, sounds_plus, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fball_ii,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlx,  0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballd14,  eballdlx, by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, embryon,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, fathom,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, centaur,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, medusa,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, vector,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, elektra,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm,   0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, spectrm4,  spectrm,  by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, rapidfip,  0,        by35,        by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1982, m_mpac,    0,        by35,        by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdn,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnf,  flashgdn, by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnv,  flashgdn, by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, fball_ii,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, eballdlx,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, eballd14,   eballdlx, by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, embryon,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, fathom,     0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, centaur,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, medusa,     0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, vector,     0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, elektra,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, spectrm,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, spectrm4,   spectrm,  by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, rapidfip,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1982, m_mpac,     0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_IS_SKELETON_MECHANICAL)
 
 // Cheap Squeak sound
-GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, xsandos,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, spyhuntr, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, fbclass,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, blakpyra, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1985, cybrnaut, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, kosteel,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, xsandos,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, spyhuntr,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, fbclass,    0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, blakpyra,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, cybrnaut,   0,        by35, by35, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_IS_SKELETON_MECHANICAL)
 
 // Other manufacturers
-GAME( 1984, suprbowl, xsandos,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, tigerrag, kosteel,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, cosflash, flashgdn, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, newwave,  blakpyra, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, saturn2,  spyhuntr, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, worlddef, 0,        by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, spacehaw, cybrnaut, by35,  by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, darkshad, 0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, skflight, 0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, cobrap,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, futrquen, 0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, f1gpp,    0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, toppin,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, uboat65,  0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye, 0,        by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseyn, bullseye, by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, bbbowlin, 0,        by35,  by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, monrobwl, 0,        by35,  by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, bigbat,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, mdntmrdr, 0,        by35,  by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, blbeauty, 0,        by35,  by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, myststar, 0,        by35,  by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, suprbowl,   xsandos,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, tigerrag,   kosteel,  by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, cosflash,   flashgdn, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, newwave,    blakpyra, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, saturn2,    spyhuntr, by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, worlddef,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, spacehaw,   cybrnaut, by35,  by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, darkshad,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, skflight,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, cobrap,     0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, futrquen,   0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, f1gpp,      0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, toppin,     0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, uboat65,    0,        nuovo, by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseye,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, bullseyn,   bullseye, by35,  by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, bbbowlin,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, monrobwl,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, bigbat,     0,        by35,  by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, mdntmrdr,   0,        by35,  by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, blbeauty,   0,        by35,  by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, myststar,   0,        by35,  by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                   MACHINE_IS_SKELETON_MECHANICAL)

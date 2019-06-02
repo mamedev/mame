@@ -2228,7 +2228,7 @@ void x1_state::x1(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(x1_state::screen_update_x1));
 
-	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);

@@ -613,11 +613,11 @@ int find_lamp_strings(running_machine &machine)
 
 		for (int pos = 0; pos < 3; pos++)
 		{
-			char tempname2[64];
+			char tempname2[32];
 
-			if (pos == 0) snprintf(tempname2, ARRAY_LENGTH(tempname2), "%stop", tempname);
-			if (pos == 1) snprintf(tempname2, ARRAY_LENGTH(tempname2), "%smid", tempname);
-			if (pos == 2) snprintf(tempname2, ARRAY_LENGTH(tempname2), "%sbot", tempname);
+			if (pos == 0) sprintf(tempname2, "%stop", tempname);
+			if (pos == 1) sprintf(tempname2, "%smid", tempname);
+			if (pos == 2) sprintf(tempname2, "%sbot", tempname);
 
 
 			for (auto & lamp : lamps)

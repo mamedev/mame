@@ -2095,7 +2095,7 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 	LOG("%s(%02x) Setting up asynchronous frame format and clock\n", FUNCNAME, data);
 	if (data == m_wr4)
 	{
-		LOG("- suppressing reinit of Tx as write to wr4 is identical to previous value\n");
+		logerror("- suppressing reinit of Tx as write to wr4 is identical to previous value\n");
 	}
 	else
 	{
@@ -2119,7 +2119,7 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 	LOG("%s(%02x) Setting up the transmitter\n", FUNCNAME, data);
 	if (data == m_wr5)
 	{
-		LOG("- suppressing reinit of Tx as write to wr5 is identical to previous value\n");
+		logerror("- suppressing reinit of Tx as write to wr5 is identical to previous value\n");
 	}
 	else
 	{

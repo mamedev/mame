@@ -11,19 +11,17 @@
 #include "emu.h"
 #include "igs022.h"
 
-#include <algorithm>
 
-igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS022, tag, owner, clock)
-	, m_sharedprotram(*this, "sharedprotram")
-	, m_rom(*this, DEVICE_SELF)
 {
 }
 
 void igs022_device::device_start()
 {
 	// Reset  stuff
-	std::fill(std::begin(m_kb_regs), std::end(m_kb_regs), 0);
+	memset(m_kb_regs, 0, 0x100 * sizeof(uint32_t));
+	m_sharedprotram = nullptr;
 
 	save_item(NAME(m_kb_regs));
 }
@@ -32,21 +30,25 @@ void igs022_device::device_reset()
 {
 	//printf("igs022_device::device_reset()");
 
+
 	if (!m_sharedprotram)
 	{
 		logerror("m_sharedprotram was not set\n");
 		return;
 	}
+
 	IGS022_reset();
 
-	std::fill(std::begin(m_kb_regs), std::end(m_kb_regs), 0);
+	memset(m_kb_regs, 0, 0x100 * sizeof(uint32_t));
 }
 
 
-void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
+
+void igs022_device::IGS022_do_dma(uint16_t src, uint16_t dst, uint16_t size, uint16_t mode)
 {
 	//printf("igs022_device::IGS022_do_dma\n");
 
+	uint16_t param;
 	/*
 	P_SRC =0x300290 (offset from prot rom base)
 	P_DST =0x300292 (words from 0x300000)
@@ -59,12 +61,13 @@ void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 	1,2,3 table based ops
 	*/
 
-	const u16 param = mode >> 8;
+	param = mode >> 8;
 
 	// the initial DMA on kilbld has 0x10 set, drgw3 has 0x18 set, not sure how they affect the operation.
 	if (mode & 0x00f8) printf("IGS022_do_dma mode bits %04x set\n", mode & 0x00f8);
 
-	mode &= 0x7;  // what are the other bits?
+	mode &=0x7;  // what are the other bits?
+
 
 	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3)  || (mode == 4))
 	{
@@ -78,18 +81,19 @@ void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 		   odd offsets cause an overflow
 		*/
 
-		const u16 *PROTROM = (u16*)m_rom->base();
+		int x;
+		uint16_t *PROTROM = (uint16_t*)memregion(":igs022data")->base();
 
-		for (int x = 0; x < size; x++)
+		for (x = 0; x < size; x++)
 		{
-			u16 dat2 = PROTROM[src + x];
+			uint16_t dat2 = PROTROM[src + x];
 
-			const u8 extraoffset = param & 0xff;
-			const u8* dectable = (u8*)m_rom->base(); // the basic decryption table is at the start of the mcu data rom!
-			const u8 taboff = ((x * 2) + extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
-			u16 extraxor = ((dectable[taboff + 1]) << 8) | (dectable[taboff + 0] << 0);
+			uint8_t extraoffset = param&0xff;
+			uint8_t* dectable = (uint8_t*)memregion(":igs022data")->base(); // the basic decryption table is at the start of the mcu data rom!
+			uint8_t taboff = ((x*2)+extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
+			uint16_t extraxor = ((dectable[taboff+1]) << 8) | (dectable[taboff+0] << 0);
 
-			if (mode == 4)
+			if (mode==4)
 			{
 				extraxor = 0;
 				if ((x & 0x003) == 0x000) extraxor |= 0x0049; // 'I'
@@ -97,23 +101,25 @@ void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 				if ((x & 0x003) == 0x002) extraxor |= 0x0053; // 'S'
 				if ((x & 0x003) == 0x003) extraxor |= 0x0020; // ' '
 
+
 				if ((x & 0x300) == 0x000) extraxor |= 0x4900; // 'I'
 				if ((x & 0x300) == 0x100) extraxor |= 0x4700; // 'G'
 				if ((x & 0x300) == 0x200) extraxor |= 0x5300; // 'S'
 				if ((x & 0x300) == 0x300) extraxor |= 0x2000; // ' '
 			}
 
-			//  mode == 0 plain
-			if (mode == 3) dat2 ^= extraxor;
-			if (mode == 2) dat2 += extraxor;
-			if (mode == 1) dat2 -= extraxor;
+			//  mode==0 plain
+			if (mode==3) dat2 ^= extraxor;
+			if (mode==2) dat2 += extraxor;
+			if (mode==1) dat2 -= extraxor;
 
-			if (mode == 4)
+			if (mode==4)
 			{
-				//printf("%06x | %04x (%04x)\n", (dst+x)*2, dat2, (u16)(dat2-extraxor));
+				//printf("%06x | %04x (%04x)\n", (dst+x)*2, dat2, (uint16_t)(dat2-extraxor));
 
 				dat2 -= extraxor;
 			}
+
 
 			m_sharedprotram[dst + x] = dat2;
 		}
@@ -121,10 +127,11 @@ void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 	else if (mode == 5)
 	{
 		/* mode 5 seems to be a byteswapped copy */
-		const u16 *PROTROM = (u16*)m_rom->base();
-		for (int x = 0; x < size; x++)
+		int x;
+		uint16_t *PROTROM = (uint16_t*)memregion(":igs022data")->base();
+		for (x = 0; x < size; x++)
 		{
-			u16 dat = PROTROM[src + x];
+			uint16_t dat = PROTROM[src + x];
 			dat = ((dat &0x00ff) << 8) | ((dat &0xff00) >> 8);
 
 			m_sharedprotram[dst + x] = dat;
@@ -133,10 +140,11 @@ void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 	else if (mode == 6)
 	{
 		/* mode 6 seems to be a nibble swapped copy */
-		const u16 *PROTROM = (u16*)m_rom->base();
-		for (int x = 0; x < size; x++)
+		int x;
+		uint16_t *PROTROM = (uint16_t*)memregion(":igs022data")->base();
+		for (x = 0; x < size; x++)
 		{
-			u16 dat = PROTROM[src + x];
+			uint16_t dat = PROTROM[src + x];
 
 			dat = ((dat & 0xf0f0) >> 4)|
 					((dat & 0x0f0f) << 4);
@@ -163,17 +171,18 @@ void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 // and puts the version # of the data rom in ram
 void igs022_device::IGS022_reset()
 {
-	const u16 *PROTROM = (u16*)m_rom->base();
+	int i;
+	uint16_t *PROTROM = (uint16_t*)memregion(":igs022data")->base();
 
 	// fill ram with A5 patern
-	for (int i = 0; i < 0x4000/2; i++)
+	for (i = 0; i < 0x4000/2; i++)
 		m_sharedprotram[i] = 0xa55a;
 
 	// the auto-dma
-	u16 src        = PROTROM[0x100 / 2];
-	const u32 dst  = PROTROM[0x102 / 2];
-	const u16 size = PROTROM[0x104 / 2];
-	u16 mode       = PROTROM[0x106 / 2];
+	uint16_t src  = PROTROM[0x100 / 2];
+	uint32_t dst  = PROTROM[0x102 / 2];
+	uint16_t size = PROTROM[0x104 / 2];
+	uint16_t mode = PROTROM[0x106 / 2];
 
 	mode &= 0xff;
 
@@ -191,16 +200,17 @@ void igs022_device::IGS022_handle_command()
 {
 	//printf("igs022_device::IGS022_handle_command\n");
 
-	const u16 cmd = m_sharedprotram[0x200/2];
+
+	uint16_t cmd = m_sharedprotram[0x200/2];
 
 	if (cmd == 0x6d)    // Store values to asic ram
 	{
-		const u32 p1 = (m_sharedprotram[0x298/2] << 16) | m_sharedprotram[0x29a/2];
-		const u32 p2 = (m_sharedprotram[0x29c/2] << 16) | m_sharedprotram[0x29e/2];
+		uint32_t p1 = (m_sharedprotram[0x298/2] << 16) | m_sharedprotram[0x29a/2];
+		uint32_t p2 = (m_sharedprotram[0x29c/2] << 16) | m_sharedprotram[0x29e/2];
 
 		if ((p2 & 0xffff) == 0x9)   // Set value
 		{
-			const int reg = (p2 >> 16) & 0xffff;
+			int reg = (p2 >> 16) & 0xffff;
 
 			if (reg & 0x300) { // 300?? killbld expects 0x200, drgw3 expects 0x100?
 				m_kb_regs[reg & 0xff] = p1;
@@ -209,24 +219,24 @@ void igs022_device::IGS022_handle_command()
 
 		if ((p2 & 0xffff) == 0x6)   // Add value
 		{
-			const int src1 = (p1 >> 16) & 0xff;
-			const int src2 = (p1 >> 0) & 0xff;
-			const int dst = (p2 >> 16) & 0xff;
+			int src1 = (p1 >> 16) & 0xff;
+			int src2 = (p1 >> 0) & 0xff;
+			int dst = (p2 >> 16) & 0xff;
 
 			m_kb_regs[dst] = m_kb_regs[src2] - m_kb_regs[src1];
 		}
 
 		if ((p2 & 0xffff) == 0x1)   // Add Imm?
 		{
-			const int reg = (p2 >> 16) & 0xff;
-			const int imm = (p1 >> 0) & 0xffff;
+			int reg = (p2 >> 16) & 0xff;
+			int imm = (p1 >> 0) & 0xffff;
 
 			m_kb_regs[reg] += imm;
 		}
 
 		if ((p2 & 0xffff) == 0xa)   // Get value
 		{
-			const int reg = (p1 >> 16) & 0xFF;
+			int reg = (p1 >> 16) & 0xFF;
 
 			m_sharedprotram[0x29c/2] = (m_kb_regs[reg] >> 16) & 0xffff;
 			m_sharedprotram[0x29e/2] = m_kb_regs[reg] & 0xffff;
@@ -251,10 +261,10 @@ void igs022_device::IGS022_handle_command()
 
 	if (cmd == 0x4f) // memcpy with encryption / scrambling
 	{
-		const u16 src  = m_sharedprotram[0x290 / 2] >> 1; // External mcu data is 8 bit and addressed as such
-		const u32 dst  = m_sharedprotram[0x292 / 2];
-		const u16 size = m_sharedprotram[0x294 / 2];
-		const u16 mode = m_sharedprotram[0x296 / 2];
+		uint16_t src  = m_sharedprotram[0x290 / 2] >> 1; // External mcu data is 8 bit and addressed as such
+		uint32_t dst  = m_sharedprotram[0x292 / 2];
+		uint16_t size = m_sharedprotram[0x294 / 2];
+		uint16_t mode = m_sharedprotram[0x296 / 2];
 
 		IGS022_do_dma(src,dst,size,mode);
 

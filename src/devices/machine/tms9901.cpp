@@ -27,120 +27,108 @@
                  P5 |20          21| P4
                     +--------------+
 
-Reference: [1] TMS9901 Programmable Systems Interface Data Manual, July 1977
-           [2] A. Osborne, G. Kane: Osborne 16-bit microprocessor handbook
-
 Overview:
     TMS9901 is a support chip for TMS9900.  It handles interrupts, provides
-    several I/O pins, and a timer, which is a register which
-    decrements regularly and can generate an interrupt when it reaches 0.
+    several I/O pins, and a timer (a.k.a. clock: it is merely a register which
+    decrements regularly and can generate an interrupt when it reaches 0).
 
     It communicates with the TMS9900 with the CRU bus, and with the rest of the
     world with a number of parallel I/O pins.
 
     I/O and timer functions should work with any other 990/99xx/99xxx CPU.
-    On the other hand, interrupt handling was primarily designed for TMS9900
+    On the other hand, interrupt handling was primarily designed for tms9900
     and 99000 based systems: other CPUs can support interrupts, but not the 16
     distinct interrupt vectors.
 
-    For the 9980A, the IC1-IC3 lines are connected to the IC0-IC2 lines of the
-    9980A.
-
 Pins:
     Vcc, Vss: power supply
-    Phi* :    system clock (connected to TMS9900 Phi3* or TMS9980A CLKOUT*)
-    RST1*:    Reset input
-    CRUIN,
-    CRUOUT,
-    CRUCLK:   CRU bus
-    CE*:      Chip enable; typically driven by a decoder for the CRU address
-    S0-S4:    CRU access bits (0..31; S0 is MSB)
-    INTREQ*:  Interrupt request; active (0) when an interrupt is signaled to the CPU
-    IC0-IC3:  Interrupt level (0..15, IC0 is MSB)
-
-    Three groups of I/O pins:
-
-    Group 1: INT1*-INT6*: Interrupt inputs.
-    Group 2: INT7*_P15 - INT15*_P7: Interrupt inputs or I/O ports
-    Group 3: P0-P6: I/O ports
-
-    In group 2, the interrupt inputs and I/O ports share their pins, which
-    leads to mirroring in the CRU address space.
-
-Input/Output ports:
-    P0 to P15 are preconfigured as input ports. By writing a value to a port,
-    it is configured as an output. Caution must be taken that the pin is not
-    fed with some logic level when setting it as output, because this may
-    damage the port. To reconfigure it as an input, the chip must be reset
-    by the hard RST1* line or the soft RST2* operation (setting bit 15 to 0
-    in clock mode). Output pins can be read and return the currently set value.
-
-Interrupt inputs (group 1 and 2)
-    The interrupt inputs (INT1*-INT15*) are sampled on each falling edge of
-    the phi* clock. An interrupt mask is applied to mask away levels that
-    shall not trigger an interrupt. The mask can be set using the SBO/SBZ
-    commands (1=arm, 0=disarm) on each of the 15 bits.
-
-    After each clock cycle, the TMS9901 latches the state of INT1*-INT15*
-    (except those pins which are set as output pins).
-
-    If there are some unmasked interrupt bits, INTREQ* is asserted and the code
-    of the lowest active interrupt is placed on IC0-IC3. The interrupt line
-    and the level lines should be connected to the respective inputs of the
-    TMS9900 or TMS9980A.
-
-Group 2 pins (shared I/O and INT*)
-    Pins of group 2 are shared between the I/O ports and the interrupt inputs.
-    Internally, they are treated as different signals: There are interrupt
-    mask bits for INT7*..INT15*, and there is a CRU bit for each of the I/O
-    ports. For example, INT7* can be read by bit 7, and the same pin can be
-    read as P15 via bit 31. When setting bit 7 to 1, the INT7* input is armed
-    and triggers an interrupt at level 7 when asserted.
-
-    In contrast, when writing to bit 31, P15 (same pin) is configured as an
-    output, and the written value appears on the pin. When the port is set
-    as output, the interrupt input on the shared pin is deactivated.
-
-    According to [1], the interrupt mask should be set to 0 for those group 2
-    pins that are used as input/output pins so that no unwanted interrupts are
-    triggered.
+    Phi*: system clock (connected to TMS9900 Phi3* or TMS9980 CLKOUT*)
+    RST1*: reset input
+    CRUIN, CRUOUT, CRUCLK, CE*, S0-S4: CRU bus (CPU interface)
+    INTREQ*, IC0-IC3: interrupt bus (CPU interface)
+    INT*1-INT*6: used as interrupt/input pins.
+    P0-P6: used as input/output pins.
+    INT*7/P15-INT*15/P7: used as either interrupt/input or input/output pins.
+      Note that a pin cannot be used simultaneously as output and as interrupt.
+      (This is mostly obvious, but it implies that you cannot trigger an
+      interrupt by setting the output state of a pin, which is not SO obvious.)
 
 Clock mode:
-    The "clock mode" is entered by setting bit 0 to 1; setting to 0 enters
-    "interrupt mode". The internal clock is a 14-bit decrementer that
-    counts down by 1 every 64 clock ticks. On entering clock mode, the current
-    value of the decrementer is copied to the clock read register and can be
-    read by the CRU bits 1 to 14. Writing to these CRU bits modifies the
-    respective bit of the clock register that serves as the start value. Every
-    time a bit is written, the decrementer is loaded with the current clock
-    register value.
-                           Interrupt
-                              ^
-                              |
-    [Clock register] -> [Decrementer] -> [Clock read register]
-         ^                                         |
-         |                                         v
-         +--<---  CRU write         CRU read---<---+
+    The "clock mode" is entered by setting bit 0 to 1. This means that the
+    clock register becomes accessible to changes and inspection. The clock
+    itself runs in the interrupt mode. Accordingly, the typical setup
+    involves first setting bit 0 to 1, then loading some or all of the
+    clock register bits, and then switching to interrupt mode again. From then
+    on, INT3 is asserted whenever the clock reaches 0, and is cleared by
+    writing 0 or 1 to bit 3. The clock can only be stopped by setting the
+    register to 0 or by a reset.
 
-    The specs somewhat ambiguously say that "writing a non-zero value enables the clock"
-    and "the clock is disabled by RST1* or by writing a zero value into the clock register".
-    Tests show that when a 0 has been written, the chip still counts down from
-    0x3FFF to 0. However, no interrupt is raised when reaching 0, so "enable"
-    or "disable" most likely refer to the interrupt.
+Interrupt handling:
+    After each clock cycle, TMS9901 latches the state of INT1*-INT15* (except
+    pins which are set as output pins).  If the clock is enabled, it replaces
+    INT3* with an internal timer interrupt flag.  Then it inverts the value and
+    performs a bit-wise AND with the interrupt mask.
 
-    When enabled, the clock raises an interrupt level 3 when reaching 0,
-    overriding the input from the INT3* input. CRU bit 3 is the mask bit for
-    both clock and INT3* input. Writing any value to it changes the mask bit,
-    and as a side effect it also clears the clock interrupt.
+    If there are some unmasked interrupt bits, INTREQ* is asserted and the code
+    of the lowest active interrupt is placed on IC0-IC3.  If these pins are
+    duly connected to the tms9900 INTREQ* and IC0-IC3 pins, the result is that
+    asserting an INTn* on tms9901 will cause a level-n interrupt request on the
+    tms9900, provided that this interrupt pin is not masked in tms9901, and
+    that no unmasked higher-priority (i.e. lower-level) interrupt pin is set.
 
-    According to [2], the clock mode is temporarily left when the CRU bits of
-    the I/O ports (bits 16-31) are accessed. Thus, the 9901 can control its
-    I/O ports even when it has been set to clock mode before. (Keep in mind
-    that clock mode simply means to access the clock register; the clock is
-    counting all the time.)
+    This interrupt request lasts for as long as the interrupt pin and the
+    relevant bit in the interrupt mask are set (level-triggered interrupts).
+    (The request may be shadowed by a higher-priority interrupt request, but
+    it will resume when the higher-priority request ends.)
+
+    TIMER interrupts are kind of an exception, since they are not associated
+    with an external interrupt pin.  I think there is an internal timer
+    interrupt flag that is set when the decrementer reaches 0, and is cleared
+    by a write to the 9901 int*3 enable bit ("SBO 3" in interrupt mode).
+
+TODO:
+    * Emulate the RST1* input.  Note that RST1* active (low) makes INTREQ*
+      inactive (high) with IC0-IC3 = 0.
+    * the clock read register is updated every time the timer decrements when
+      the TMS9901 is not in clock mode.  This probably implies that if the
+      clock mode is cleared and re-asserted immediately, the tms9901 may fail
+      to update the clock read register: this is not emulated.
+    * The clock mode is entered when a 1 is written to the control bit.  It is
+      exited when a 0 is written to the control bit or the a tms9901 select bit
+      greater than 15 is accessed.  According to the data sheet, "when CE* is
+      inactive (HIGH), the PSI is not disabled from seeing the select lines.
+      As the CPU is accessing memory, A10-A14 could very easily have a value of
+      15 or greater" (this is assuming that S0-S4 are connected to A10-A14,
+      which makes sense with most tms9900 family members).  There is no way
+      this "feature" (I would call it a hardware bug) can be emulated
+      efficiently, as we would need to watch every memory access.
+
+MZ: According to the description in
+       A. Osborne, G. Kane: Osborne 16-bit microprocessor handbook
+       page 3-81
+    the 9901 only temporarily leaves the timer mode as long as S0 is set to 1.
+    In the meantime the timer function continues but cannot be queried. This
+    makes it possible to continue using the chip as a timer while working with
+    its I/O pins. Thus I believe the above TODO concering the exit of the timer
+    mode is not applicable.
+    The problem is that the original 9901 specification is not clear about this.
+
+MZ: Turned to class (January 2012)
+
+MZ: Added a synchronous clock input (Phi line) as an alternative to the
+    emu_timer.
+
+TODO: Tests on a real machine
+- Set an interrupt input (e.g. keyboard for Geneve), trigger RST2*, check whether
+  interrupt mask has been reset
+- Check whether the clock_read_register is updated whenever clock mode is exited
+  (in particular when S0=1, i.e. A10=1 -> addresses xxxx xxxx xx1x xxxx
+  requires to write a program that fits into 32 bytes; workspace elsewhere)
 
     Raphael Nabet, 2000-2004
     Michael Zapf
+
+    February 2012: Rewritten as class
 
 *****************************************************************************/
 
@@ -151,12 +139,12 @@ Clock mode:
 
 #define LOG_GENERAL  (1U << 0)
 #define LOG_PINS     (1U << 1)
-#define LOG_MASK     (1U << 2)
+#define LOG_CONFIG   (1U << 2)
 #define LOG_MODE     (1U << 3)
 #define LOG_INT      (1U << 4)
-#define LOG_CLOCK    (1U << 5)
+#define LOG_DECVALUE (1U << 5)
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE ( 0 )
 #include "logmacro.h"
 
 /*
@@ -164,133 +152,109 @@ Clock mode:
 */
 tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, TMS9901, tag, owner, clock),
-	m_int_level(0),
-	m_last_level(0),
-	m_int_mask(0),
-	m_int_pending(false),
-	m_poll_lines(false),
+	m_clock_active(false),
 	m_clockdiv(0),
-	m_timer_int_pending(false),
-	m_read_port(*this),
+	m_read_block(*this),
 	m_write_p{{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this}},
 	m_interrupt(*this)
 {
 }
 
 /*
-    Determine the most significant interrupt (lowest number)
+    should be called after any change to int_state or enabled_ints.
 */
-void tms9901_device::prioritize_interrupts()
+void tms9901_device::field_interrupts()
 {
-	// Prioritizer: Search for the interrupt with the highest level
-	bool found = false;
+	int current_ints;
 
-	// Skip the rightmost bit
-	uint16_t masked_ints = m_int_line;
-
-	// Is the clock enabled?
+	// m_int_state: inverted state of lines INT1*-INT15*. Bits are set by set_single_int only.
+	current_ints = m_int_state;
 	if (m_clock_register != 0)
 	{
-		// Disable the actual INT3* input
-		masked_ints &= ~(1<<INT3);
-
-		// Do we have a clock interrupt?
+		// if timer is enabled, INT3 pin is overridden by timer
 		if (m_timer_int_pending)
 		{
-			masked_ints |= (1<<INT3);
 			LOGMASKED(LOG_INT, "INT3 (timer) asserted\n");
+			current_ints |= INT3;
 		}
-	}
-
-	m_int_level = 1;
-	masked_ints = (masked_ints & m_int_mask)>>1;
-
-	while ((masked_ints!=0) && !found)
-	{
-		// If INTn is set, stop searching. Consider, however, that
-		// within INT7-INT15, those pins configured as outputs are not sampled
-		// (shared pins with P15-P7)
-
-		if ((masked_ints & 1) && ((m_int_level < 7) || !is_output(22-m_int_level)))
-			found = true;
 		else
 		{
-			m_int_level++;
-			masked_ints >>= 1;
+			LOGMASKED(LOG_INT, "INT3 (timer) cleared\n");
+			current_ints &= ~INT3;
 		}
 	}
 
-	if (!found) m_int_level = 15;
+	// enabled_ints: enabled interrupts
+	// Remove all settings from pins that are set as outputs (INT7*-INT15* share the same pins as P15-P7)
+	current_ints &= m_enabled_ints & (~m_pio_direction_mirror);
 
-	m_int_pending = found;
-
-	// Only for asynchronous emulation
-	if (clock()!=0) signal_int();
-}
-
-bool tms9901_device::is_output(int p)
-{
-	return BIT(m_pio_direction, p);
-}
-
-bool tms9901_device::output_value(int p)
-{
-	return BIT(m_pio_output, p);
-}
-
-void tms9901_device::set_and_latch_output(int p, bool val)
-{
-	set_bit(m_pio_direction, p, true);
-	set_bit(m_pio_output, p, val);
-	m_write_p[p](val);
-}
-
-void tms9901_device::set_bit(uint16_t& bitfield, int pos, bool val)
-{
-	if (val) bitfield |= (1<<pos);
-	else bitfield &= ~(1<<pos);
-}
-
-void tms9901_device::signal_int()
-{
-	if (m_int_level == m_last_level)
+	// Check whether we have a new state. For systems that use level-triggered
+	// interrupts it should not do any harm if the line is re-asserted
+	// but we may as well avoid this.
+	if (current_ints == m_old_int_state)
 		return;
 
-	m_last_level = m_int_level;
+	m_old_int_state = current_ints;
 
-	if (m_int_pending)
+	if (current_ints != 0)
 	{
-		LOGMASKED(LOG_INT, "Triggering interrupt, level %d\n", m_int_level);
+		// find which interrupt tripped us:
+		// the number of the first (i.e. least significant) non-zero bit among
+		// the 16 first bits
+		// we simply look for the first bit set to 1 in current_ints...
+		int level = 0;
+
+		while ((current_ints & 1)==0)
+		{
+			current_ints >>= 1; /* try next bit */
+			level++;
+		}
+		LOGMASKED(LOG_INT, "Triggering interrupt, level %d\n", level);
+		m_int_pending = true;
 		if (!m_interrupt.isnull())
-			m_interrupt(ASSERT_LINE);
+			m_interrupt(level, 1, 0xff);  // the offset carries the IC0-3 level
 	}
 	else
 	{
-		LOGMASKED(LOG_INT, "Clear all interrupts\n");
+		m_int_pending = false;
 		if (!m_interrupt.isnull())
-			m_interrupt(CLEAR_LINE);  //Spec: INTREQ*=1 <=> IC0,1,2,3 = 1111
+			m_interrupt(0xf, 0, 0xff);  //Spec: INTREQ*=1 <=> IC0,1,2,3 = 1111
 	}
 }
 
 /*
-    Signal an interrupt line change to the 9901.
-    The real circuit samples all active interrupt inputs on every falling edge
-    of the phi* clock, which is very inefficient to emulate.
-
-    Accordingly, we let the interrupt producer calls this method and
-    so push the interrupt line change.
+    function which should be called by the driver when the state of an INTn*
+    pin changes (only required if the pin is set up as an interrupt pin)
 
     state == CLEAR_LINE: INTn* is inactive (high)
     state == ASSERT_LINE: INTn* is active (low)
 
-    n=1..15
+    0<=pin_number<=15
 */
-void tms9901_device::set_int_line(int n, int state)
+void tms9901_device::set_single_int(int pin_number, int state)
 {
-	if ((n >= 1) && (n <= 15))
-	{
-		set_bit(m_int_line, n, state==ASSERT_LINE);
-		prioritize_interrupts();
+	/* remember new state of INTn* pin state */
+	if (state==ASSERT_LINE)
+		m_int_state |= 1 << pin_number;
+	else
+		m_int_state &= ~(1 << pin_number);
+
+	field_interrupts();
+}
+
+/*
+    load the content of m_clock_register into the decrementer
+*/
+void tms9901_device::timer_reload()
+{
+	if (m_clock_register != 0)
+	{   /* reset clock interval */
+		m_decrementer_value = m_clock_register;
+		m_clock_active = true;
+	}
+	else
+	{   /* clock interval == 0 -> no timer */
+		m_clock_active = false;
 	}
 }
 
@@ -299,143 +263,245 @@ void tms9901_device::set_int_line(int n, int state)
 ----------------------------------------------------------------*/
 
 /*
-    Read a bit from tms9901.
+    Read a 8 bit chunk from tms9901.
 
-     Bit     Meaning
-     ---------------
-     0       Control bit (0=Interrupt mode, 1=Clock mode)
-     1..14   /INTn  (int mode), CLKn (clock mode)
-     15      /INT15 (int mode), /INTREQ (clock mode)
-     16..31  P0...P15 input
+    signification:
+    bit 0: m_clock_mode
+    if (m_clock_mode == false)
+     bit 1-15: current status of the INT1*-INT15* pins
+    else
+     bit 1-14: current timer value
+     bit 15: value of the INTREQ* (interrupt request to TMS9900) pin.
 
-     Reading an output port delivers the latched output value.
-
-     Ports P7 to P15 share pins with the interrupt inputs /INT15 to /INT7
-     (in this order). When configured as outputs, reading returns the latched
-     values.
+    bit 16-31: current status of the P0-P15 pins (quits timer mode, too...)
 */
-READ8_MEMBER( tms9901_device::read )
+uint8_t tms9901_device::read(offs_t offset)
 {
-	int crubit = offset & 0x01f;
+	int answer = 0;
 
-	if (crubit == 0)
-		return m_clock_mode? 1 : 0;
+	offset &= 0x01f;
 
-	if (crubit > 15)
+	switch (offset >> 3)
 	{
-		// I/O lines
-		if (is_output(crubit-16))
-			return output_value(crubit-16);
+	case 0:
+		if (m_clock_mode)
+		{
+			// Clock mode. The LSB reflects the CB bit which is set to 1 for clock mode.
+			answer = ((m_clock_read_register & 0x7F) << 1) | 0x01;
+		}
 		else
 		{
-			// Positive logic; should be 0 if there is no connection.
-			if (m_read_port.isnull()) return 0;
-			return m_read_port((crubit<=P6)? crubit : P6+P0-crubit);
+			// Interrupt mode
+			// Note that we rely on the read function to deliver the same
+			// INTx levels that have been signaled via the set_single_int method.
+			// This may mean that those levels must be latched by the callee.
+			if (!m_read_block.isnull())
+				answer |= m_read_block(CB_INT7);
+
+			// Remove the bits that are set as outputs (can only be INT7*)
+			answer &= ~m_pio_direction_mirror;
+
+			// Set those bits here
+			answer |= (m_pio_output_mirror & m_pio_direction_mirror) & 0xFF;
 		}
+		LOGMASKED(LOG_PINS, "Input on lines INT7..CB = %02x\n", answer);
+		break;
+	case 1:
+		if (m_clock_mode)
+		{
+			// clock mode
+			answer = (m_clock_read_register & 0x3F80) >> 7;
+			if (!m_int_pending)
+				answer |= 0x80;
+		}
+		else
+		{
+			// See above concerning the INT levels.
+			if (!m_read_block.isnull())
+				answer |= m_read_block(INT8_INT15);
+
+			// Remove the bits that are set as outputs (can be any line)
+			answer &= ~(m_pio_direction_mirror >> 8);
+			answer |= (m_pio_output_mirror & m_pio_direction_mirror) >> 8;
+		}
+		LOGMASKED(LOG_PINS, "Input on lines INT15..INT8 = %02x\n", answer);
+		break;
+	case 2:
+		/* exit timer mode */
+		// MZ: See comments at the beginning. I'm sure that we do not quit clock mode.
+		// m_clock_mode = false;
+
+		if (!m_read_block.isnull())
+			answer = m_read_block(P0_P7);
+		else
+			answer = 0;
+
+		answer &= ~m_pio_direction;
+		answer |= (m_pio_output & m_pio_direction) & 0xFF;
+		LOGMASKED(LOG_PINS, "Input on lines P7..P0 = %02x\n", answer);
+
+		break;
+	case 3:
+		// MZ: see above
+		// m_clock_mode = false;
+		if (!m_read_block.isnull())
+			answer = m_read_block(P8_P15);
+		else
+			answer = 0;
+
+		answer &= ~(m_pio_direction >> 8);
+		answer |= (m_pio_output & m_pio_direction) >> 8;
+		LOGMASKED(LOG_PINS, "Input on lines P15..P8 = %02x\n", answer);
+
+		break;
 	}
 
-	// If we are here, crubit=1..15
-	if (m_clock_mode)
-	{
-		if (crubit == 15)    // bit 15 in clock mode = /INTREQ
-			return (m_int_pending)? 0 : 1;
+	return BIT(answer, offset & 7);
+}
 
-		return BIT(m_clock_read_register, crubit-1);
+/*
+    Write 1 bit to tms9901.
+
+    signification:
+    bit 0: write m_clock_mode
+    if (!m_clock_mode)
+     bit 1-15: write interrupt mask register
+    else
+     bit 1-14: write timer period
+     bit 15: if written value == 0, soft reset (just resets all I/O pins as input)
+
+    bit 16-31: set output state of P0-P15 (and set them as output pin) (quit timer mode, too...)
+*/
+void tms9901_device::write(offs_t offset, uint8_t data)
+{
+	data &= 1;  /* clear extra bits */
+	offset &= 0x01F;
+
+	if (offset >= 0x10)
+	{
+		int pin = offset & 0x0F;
+		LOGMASKED(LOG_PINS, "Output on P%d = %d\n", pin, data);
+
+		int bit = (1 << pin);
+
+		// MZ: see above - I think this is wrong
+		// m_clock_mode = false; // exit timer mode
+
+		// Once a value is written to a pin, the pin remains in output mode
+		// until the chip is reset
+		m_pio_direction |= bit;
+
+		// Latch the value
+		if (data)
+			m_pio_output |= bit;
+		else
+			m_pio_output &= ~bit;
+
+		if (pin >= 7)
+		{
+			// pins P7-P15 are mirrored as INT15*-INT7*,
+			// also using the same pins in the package
+			int mirror_bit = (1 << (22 - pin));
+
+			// See above
+			m_pio_direction_mirror |= mirror_bit;
+
+			if (data)
+				m_pio_output_mirror |= mirror_bit;
+			else
+				m_pio_output_mirror &= ~mirror_bit;
+		}
+
+		m_write_p[offset - 0x10](data);
+	}
+	else if (offset == 0)
+	{
+		// Write to control bit (CB)
+		if (data == 0)
+		{
+			// Switch to interrupt mode; quit clock mode
+			m_clock_mode = false;
+			LOGMASKED(LOG_MODE, "Enter interrupt mode\n");
+		}
+		else
+		{
+			m_clock_mode = true;
+			LOGMASKED(LOG_MODE, "Enter clock mode\n");
+			// we are switching to clock mode: latch the current value of
+			// the decrementer register
+			if (m_clock_register != 0)
+				m_clock_read_register = m_decrementer_value;
+			else
+				m_clock_read_register = 0;      /* timer inactive... */
+
+			LOGMASKED(LOG_CONFIG, "Clock setting = %d\n", m_clock_read_register);
+		}
+	}
+	else if (offset == 0x0f)
+	{
+		if (m_clock_mode)
+		{   /* in clock mode this is the soft reset bit */
+			if (!data)
+			{   // TMS9901 soft reset (RST2*)
+				// Spec: "Writing a 0 to bit 15 while in the clock mode executes a soft reset on the I/O pins.
+				// [...] RST2* will program all ports to the input mode"
+				m_pio_direction = 0;
+				m_pio_direction_mirror = 0;
+
+				// "RST1* (power-up reset) will reset all mask bits low."
+				// Spec is not clear on whether the mask bits are also reset by RST2*
+				// TODO: Check on a real machine. (I'd guess from the text they are not touched)
+				m_enabled_ints = 0;
+				LOGMASKED(LOG_MODE, "Soft reset (RST2*)\n");
+			}
+		}
+		else
+		{   /* modify interrupt enable mask */
+			if (data)
+				m_enabled_ints |= 0x4000;       /* set bit */
+			else
+				m_enabled_ints &= ~0x4000;      /* unset bit */
+
+			LOGMASKED(LOG_CONFIG, "Enabled interrupts = %04x\n", m_enabled_ints);
+			field_interrupts();     /* changed interrupt state */
+		}
 	}
 	else
 	{
-		// We trust the read_port method to deliver the same INTx levels that
-		// have been signaled via the set_int_line method.
-		// Thus, those levels must be latched by the component that hosts
-		// this 9901. Alternatively, use the interrupt line polling
-		// which has a bad impact on performance.
-		if (crubit>INT6 && is_output(22-crubit))
-			return output_value(22-crubit);
-		else
-			return m_read_port.isnull()? 1 : m_read_port(crubit);
-	}
-}
-
-
-/*
-    Write one bit to the tms9901.
-
-     Bit     Meaning
-     ----------------------------------------------------------
-     0       0=Interrupt mode, 1=Clock mode
-     1..14   Clock mode: Set CLKn; Interrupt mode: Set Mask n
-     15      Clock mode: /RST2; Interrupt mode: Set Mask 15
-     16..31  Set P(n-16) as output, latch value, and output it
-*/
-WRITE8_MEMBER( tms9901_device::write )
-{
-	data &= 1;  // clear extra bits
-	int crubit = offset & 0x001f;
-
-	if (crubit >= 16)
-	{
-		LOGMASKED(LOG_PINS, "Output on P%d = %d\n", crubit-16, data);
-		set_and_latch_output(crubit-P0, data);
-		return;
-	}
-
-	switch (crubit)
-	{
-	case 0:
-		// Write to control bit (CB)
-		m_clock_mode = (data!=0);
-		LOGMASKED(LOG_MODE, "Enter %s mode\n", m_clock_mode? "clock" : "interrupt");
-
+		// write one bit to 9901 (bits 1-14)
+		//
+		// m_clock_mode==false ?  Disable/Enable an interrupt
+		// :  Bit in clock interval
+		//
+		// offset is the index of the modified bit of register (-> interrupt number -1)
 		if (m_clock_mode)
-		{
-			// we are switching to clock mode: latch the current value of
-			// the decrementer register
-			m_clock_read_register = m_decrementer_value;
-			LOGMASKED(LOG_MODE, "Clock setting = %d\n", m_clock_read_register);
-		}
-		break;
+		{   /* modify clock interval */
+			int bit = 1 << ((offset & 0x0F) - 1);  /* corresponding mask */
 
-	case 15:
-		if (m_clock_mode)
-		{
-			// In clock mode, bit 15 is /RST2
-			if (data == 0) soft_reset();
+			if (data)
+				m_clock_register |= bit;       /* set bit */
+			else
+				m_clock_register &= ~bit;      /* clear bit */
+
+			/* reset clock timer (page 8) */
+			LOGMASKED(LOG_CONFIG, "Clock register = %04x\n", m_clock_register);
+			timer_reload();
 		}
 		else
-		{
-			set_bit(m_int_mask, 15, data!=0);
-			LOGMASKED(LOG_MASK, "/INT15 is %s\n", data? "enabled" : "disabled");
-			prioritize_interrupts();     // changed interrupt state
+		{   /* modify interrupt enable mask */
+			int bit = 1 << (offset & 0x0F);    /* corresponding mask */
+
+			if (data)
+				m_enabled_ints |= bit;     /* set bit */
+			else
+				m_enabled_ints &= ~bit;        /* unset bit */
+
+			if (offset == 3)
+				m_timer_int_pending = false;    /* SBO 3 clears pending timer interrupt (??) */
+
+			LOGMASKED(LOG_CONFIG, "Enabled interrupts = %04x\n", m_enabled_ints);
+			field_interrupts();     /* changed interrupt state */
 		}
-		break;
-
-	default:
-		// Bits 1..14
-		if (m_clock_mode)
-		{
-			// Modify clock interval
-			set_bit(m_clock_register, crubit-1, data!=0);
-
-			// Reset clock timer (page 8)
-			m_decrementer_value = m_clock_register;
-
-			LOGMASKED(LOG_CLOCK, "Clock register = %04x\n", m_clock_register);
-		}
-		else
-		{
-			// Modify interrupt enable mask
-			set_bit(m_int_mask, crubit, data!=0);
-
-			// [1] sect 2.5: "When the clock interrupt is active, the clock mask
-			// (mask bit 3) must be written into (with either a "0" or "1")
-			// to clear the interrupt."
-			if (crubit == 3)
-				m_timer_int_pending = false;
-
-			LOGMASKED(LOG_MASK, "/INT%d is %s\n", crubit, data? "enabled" : "disabled");
-			prioritize_interrupts();
-		}
-		break;
 	}
 }
 
@@ -443,30 +509,28 @@ WRITE8_MEMBER( tms9901_device::write )
     Timer callback
     Decrementer counts down the value set in clock mode; when it reaches 0,
     raises an interrupt and resets to the start value
+    The decrementer works as long as the clock_register contains a non-zero value.
 */
 void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id==DECREMENTER) // we have only that one
 	{
-		timer_clock_in(ASSERT_LINE);
-		timer_clock_in(CLEAR_LINE);
+		clock_in(ASSERT_LINE);
+		clock_in(CLEAR_LINE);
 	}
 }
 
-void tms9901_device::timer_clock_in(line_state clk)
+void tms9901_device::clock_in(line_state clk)
 {
-	if (clk == ASSERT_LINE)
+	if (m_clock_active && clk == ASSERT_LINE)
 	{
-		m_decrementer_value = (m_decrementer_value - 1) & 0x3FFF;
-		LOGMASKED(LOG_CLOCK, "Clock = %04x\n", m_decrementer_value);
-		if (m_decrementer_value==0)
+		m_decrementer_value--;
+		LOGMASKED(LOG_DECVALUE, "Decrementer = %d\n", m_decrementer_value);
+		if (m_decrementer_value<=0)
 		{
-			if (m_clock_register != 0)
-			{
-				LOGMASKED(LOG_INT, "Timer expired\n");
-				m_timer_int_pending = true;         // decrementer interrupt requested
-				prioritize_interrupts();
-			}
+			LOGMASKED(LOG_INT, "Timer expired\n");
+			m_timer_int_pending = true;         // decrementer interrupt requested
+			field_interrupts();
 			m_decrementer_value = m_clock_register;
 		}
 	}
@@ -479,69 +543,12 @@ void tms9901_device::timer_clock_in(line_state clk)
 */
 WRITE_LINE_MEMBER( tms9901_device::phi_line )
 {
+	// Divider by 64
 	if (state==ASSERT_LINE)
-	{
-		// Divider by 64
-		m_clockdiv = (m_clockdiv+1) & 0x3f;
-		if (m_clockdiv==0)
-		{
-			timer_clock_in(ASSERT_LINE);
+		m_clockdiv = (m_clockdiv+1) % 0x40;
 
-			// We signal the interrupt in sync with the clock line
-			signal_int();
-
-			// For the next phi assert
-			// MZ: This costs a lot of performance for a minimum of benefit.
-			if (m_poll_lines) sample_interrupt_inputs();
-		}
-		else
-		{
-			if (m_clockdiv==32)
-				timer_clock_in(CLEAR_LINE);
-		}
-	}
-}
-
-/*
-    All unmasked interrupt ports are sampled at the rising edge of phi.
-    Doing it this way (also for performance issues): For each mask bit 1,
-    fetch the pin level. Stop at the first asserted INT line.
-
-    Good idea in terms of emulation, bad in terms of performance. The Geneve
-    9640 bench dropped from 680% to 180%. Not recommended to use, except in
-    very special situations. Enable by calling set_poll_int_lines(true).
-*/
-void tms9901_device::sample_interrupt_inputs()
-{
-	int mask = m_int_mask;
-	m_int_level = 0;
-	m_int_pending = false;
-
-	while (mask != 0 && !m_int_pending)
-	{
-		m_int_level++;
-		if ((mask & 1)!=0)
-		{
-			// Negative logic
-			if (m_read_port(m_int_level)==0)
-				m_int_pending = true;
-		}
-		mask >>= 1;
-	}
-}
-
-void tms9901_device::soft_reset()
-{
-	// TMS9901 soft reset (RST2*)
-	// Spec: "Writing a 0 to bit 15 while in the clock mode executes a soft reset on the I/O pins.
-	// [...] RST2* will program all ports to the input mode"
-	m_pio_direction = 0;
-	m_pio_output = 0;
-
-	// We assume that the interrupt mask is also reset.
-	m_int_mask = 0;
-
-	LOGMASKED(LOG_MODE, "Soft reset (RST2*)\n");
+	if (m_clockdiv==0)
+		clock_in((line_state)state);
 }
 
 /*-------------------------------------------------
@@ -572,16 +579,23 @@ WRITE_LINE_MEMBER( tms9901_device::rst1_line )
 void tms9901_device::do_reset()
 {
 	m_timer_int_pending = false;
-	soft_reset();
+	m_enabled_ints = 0;
+
+	m_pio_direction = 0;
+	m_pio_direction_mirror = 0;
+	m_pio_output = m_pio_output_mirror = 0;
 
 	// This is an interrupt level latch, positive logic (bit 0 = no int)
 	// The inputs are negative logic (INTx*)
-	m_int_line = 0;
+	m_int_state = 0;
 
-	prioritize_interrupts();
+	m_old_int_state = -1;
+	field_interrupts();
 
 	m_clock_mode = false;
-	m_decrementer_value = m_clock_register = 0;
+
+	m_clock_register = 0;
+	timer_reload();
 }
 
 
@@ -598,21 +612,22 @@ void tms9901_device::device_start()
 		m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
 	}
 
-	m_read_port.resolve();
+	m_read_block.resolve();
 	for (auto &cb : m_write_p)
 		cb.resolve_safe();
 	m_interrupt.resolve();
 
 	m_clock_register = 0;
 
-	save_item(NAME(m_int_line));
-	save_item(NAME(m_pio_output));
-	save_item(NAME(m_pio_direction));
-	save_item(NAME(m_int_level));
-	save_item(NAME(m_int_mask));
-	save_item(NAME(m_last_level));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_old_int_state));
+	save_item(NAME(m_enabled_ints));
 	save_item(NAME(m_int_pending));
 	save_item(NAME(m_timer_int_pending));
+	save_item(NAME(m_pio_direction));
+	save_item(NAME(m_pio_output));
+	save_item(NAME(m_pio_direction_mirror));
+	save_item(NAME(m_pio_output_mirror));
 	save_item(NAME(m_clock_mode));
 	save_item(NAME(m_clock_register));
 	save_item(NAME(m_decrementer_value));

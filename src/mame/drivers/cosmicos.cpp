@@ -6,10 +6,6 @@
 
     http://retro.hansotten.nl/index.php?page=1802-cosmicos
 
-    Press G to start, and to enable the debugger (if -debug used).
-    The video options include 8-digit LEDs, 2-digit LEDs, and CRT,
-    of which the default is the 8-digit LEDs. Unknown how to enable
-    the others.
 
     HEX-monitor
 
@@ -58,7 +54,7 @@ enum
 
 READ8_MEMBER( cosmicos_state::read )
 {
-	if (m_boot) offset |= 0xc000;
+	if (m_boot) offset |= 0xc0c0;
 
 	uint8_t data = 0;
 
@@ -80,7 +76,7 @@ READ8_MEMBER( cosmicos_state::read )
 
 WRITE8_MEMBER( cosmicos_state::write )
 {
-	if (m_boot) offset |= 0xc000;
+	if (m_boot) offset |= 0xc0c0;
 
 	if (offset < 0xc000)
 	{
@@ -363,9 +359,11 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
-	m_digit ^= 1;
+// commented this out because (a) m_digit isn't initialised anywhere,
+// and (b) writing to a negative digit is not a good idea.
+//  m_digit = !m_digit;
 
-	m_digits[m_digit] = m_segment;
+//  m_digits[m_digit] = m_segment;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)

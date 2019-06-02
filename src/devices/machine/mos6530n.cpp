@@ -412,7 +412,7 @@ void mos6530_device_base::edge_detect()
 	uint8_t data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
 	int state = BIT(data, 7);
 
-	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0 && !m_irq_edge)
+	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0)
 	{
 		LOG("%s %s edge-detect IRQ\n", machine().time().as_string(), name());
 

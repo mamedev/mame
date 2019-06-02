@@ -27,11 +27,12 @@
 
     TODO:
     - sometimes there's no sound when started. You may need to hard reset until it beeps.
+    - don't know why, but the expected behaviour of our 6821 pia isn't what this machine
+      expects, so had to add a couple of hacks.
     - doesn't run programs for other chip-8 computers (this might be normal?)
     - we support BIN files, but have none to test with.
-    - possible CPU bugs?:
-      - in Invaders, can't shoot them
-      - in Maze, the result is rubbish (works in Emma02 emulator v1.21, but not in v1.30)
+    - in Invaders, can't shoot them
+    - in Maze, the result is rubbish (works in Emma02 emulator)
 
 **************************************************************************************************/
 
@@ -42,30 +43,30 @@
 
 
 /* Read/Write Handlers */
-// Schematic is wrong, PCB layout is correct: D0-7 swapped around on PIA.
-// There's still a bug in the PIA: if ca2 is instructed to go low, nothing happens.
+
 READ8_MEMBER( eti660_state::pia_r )
 {
 	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 
-	return bitswap<8>(m_pia->read(pia_offset), 0,1,2,3,4,5,6,7);
+	return m_pia->read(pia_offset);
 }
 
 WRITE8_MEMBER( eti660_state::pia_w )
 {
 	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
-	data = bitswap<8>(data,0,1,2,3,4,5,6,7);
+
+	// Some PIA hacks here, as mentioned in the ToDo.
+	if (pia_offset == 1)
+	{
+		// switch color on when requested (test with Wipeout game)
+		if (data == 0x2c)
+			m_color_on = 1;
+		// enable keyboard
+		if (data == 0x20)
+			data = 0x24;
+	}
+
 	m_pia->write(pia_offset, data);
-
-	// handle bug in PIA
-	if ((pia_offset == 1) && ((data & 0x30) == 0x30))
-		ca2_w(BIT(data, 3));
-}
-
-WRITE_LINE_MEMBER( eti660_state::ca2_w ) // test with Wipeout game - it should start up in colour
-{
-	m_color_on = !state;
-	m_cti->con_w(state);
 }
 
 WRITE8_MEMBER( eti660_state::colorram_w )
@@ -100,37 +101,54 @@ void eti660_state::io_map(address_map &map)
 /* Input Ports */
 static INPUT_PORTS_START( eti660 )
 	PORT_START("KEY.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("STEP") PORT_CODE(KEYCODE_S)
 INPUT_PORTS_END
+
+/* Video */
+
+READ_LINE_MEMBER( eti660_state::rdata_r )
+{
+	return BIT(m_color, 0);
+}
+
+READ_LINE_MEMBER( eti660_state::bdata_r )
+{
+	return BIT(m_color, 1);
+}
+
+READ_LINE_MEMBER( eti660_state::gdata_r )
+{
+	return BIT(m_color, 2);
+}
 
 /* CDP1802 Interface */
 
@@ -140,7 +158,7 @@ READ_LINE_MEMBER( eti660_state::clear_r )
 	// boot, like the real one does.
 	if (m_resetcnt < 0xffff)
 		m_resetcnt++;
-	if (m_resetcnt == 0xf000)
+	if (m_resetcnt == 0xff00)
 		return 0;
 	return BIT(m_special->read(), 0); // R key
 }
@@ -183,6 +201,7 @@ WRITE8_MEMBER( eti660_state::dma_w )
 	else
 		m_color = m_p_videoram[offset] ? 7 : 0;
 
+	m_cti->con_w(0); // HACK
 	m_cti->dma_w(space, offset, data);
 }
 
@@ -231,15 +250,16 @@ WRITE8_MEMBER( eti660_state::pia_pa_w )
 
 	*/
 
-	m_keylatch = bitswap<8>(data,0,1,2,3,4,5,6,7) ^ 0xff;
+	m_keylatch = data ^ 0xff;
 }
 
 void eti660_state::machine_reset()
 {
 	m_resetcnt = 0;
 	m_color_on = 0;
-	m_cti->con_w(0);
-	m_maincpu->reset();  // needed
+	// fix for F3 soft reboot
+	m_maincpu->set_state_int(cosmac_device::COSMAC_R0, 0); // set R0 to start of rom
+	m_maincpu->set_state_int(cosmac_device::COSMAC_P, 0); // set R0 as the PC register
 }
 
 void eti660_state::machine_start()
@@ -247,10 +267,6 @@ void eti660_state::machine_start()
 	m_leds.resolve();
 
 	save_item(NAME(m_color_ram));
-	save_item(NAME(m_color));
-	save_item(NAME(m_color_on));
-	save_item(NAME(m_keylatch));
-	save_item(NAME(m_resetcnt));
 }
 
 QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
@@ -313,9 +329,9 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
 	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
-	m_cti->rdata_cb().set([this] () { return BIT(m_color, 0); });
-	m_cti->bdata_cb().set([this] () { return BIT(m_color, 1); });
-	m_cti->gdata_cb().set([this] () { return BIT(m_color, 2); });
+	m_cti->rdata_cb().set(FUNC(eti660_state::rdata_r));
+	m_cti->bdata_cb().set(FUNC(eti660_state::bdata_r));
+	m_cti->gdata_cb().set(FUNC(eti660_state::gdata_r));
 	m_cti->set_chrominance(RES_K(2.2), RES_K(1), RES_K(4.7), RES_K(4.7)); // R7, R5, R6, R4
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -323,7 +339,6 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(eti660_state::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(eti660_state::pia_pa_w));
-	m_pia->ca2_handler().set(FUNC(eti660_state::ca2_w));  // not working, bug in pia
 	m_pia->irqa_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert(); // FIXME: use an input merger for these lines
 	m_pia->irqb_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert();
 

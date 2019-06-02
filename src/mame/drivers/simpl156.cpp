@@ -354,9 +354,9 @@ static GFXDECODE_START( gfx_simpl156 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(simpl156_state::vblank_interrupt)
+INTERRUPT_GEN_MEMBER(simpl156_state::interrupt)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -384,6 +384,7 @@ void simpl156_state::chainrec(machine_config &config)
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 28_MHz_XTAL /* /4 */); /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::chainrec_map);
+	m_maincpu->set_vblank_int("screen", FUNC(simpl156_state::interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
@@ -395,7 +396,6 @@ void simpl156_state::chainrec(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(simpl156_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(simpl156_state::vblank_interrupt));
 
 	PALETTE(config, m_palette);
 	m_palette->set_format(palette_device::xBGR_555, 4096);

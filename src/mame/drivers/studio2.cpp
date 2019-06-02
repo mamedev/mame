@@ -181,12 +181,6 @@ Notes:
 
     - NE555 discrete sound
 
-
-    Usage
-    - All variants: Boot up, then press F3, then press a letter (Q,W,E,A) to choose an inbuilt game.
-    - If using a cart, boot up, press F3, then follow the instructions that came with the cart (usually press Q).
-    - Currently, Visicom cannot run any carts, and has no support for st2 files.
-
 */
 
 #include "emu.h"
@@ -767,7 +761,11 @@ ROM_START( mpt02 )
 	ROM_LOAD( "87201.ic12",  0xc00, 0x400, CRC(8006a1e3) SHA1(b67612d98231485fce55d604915abd19b6d64eac) )
 ROM_END
 
-#define rom_mpt02h rom_mpt02
+ROM_START( mpt02h )
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
+	ROM_LOAD( "86676.ic13",  0x000, 0x400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
+ROM_END
+
 #define rom_mtc9016 rom_mpt02
 #define rom_shmc1200 rom_mpt02
 #define rom_cm1200 rom_mpt02

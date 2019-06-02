@@ -9,8 +9,6 @@
 #include "netlist/nl_base.h"
 #include "nlid_system.h"
 
-#include <array>
-
 namespace netlist
 {
 	namespace devices
@@ -93,7 +91,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static constexpr const std::array<netlist_time, 4> delay =
+	static constexpr const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),

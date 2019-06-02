@@ -313,7 +313,7 @@ void fp6000_state::fp6000(machine_config &config)
 	screen.set_screen_update(FUNC(fp6000_state::screen_update_fp6000));
 	screen.set_palette(m_palette);
 
-	MC6845(config, m_crtc, 16000000/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	H46505(config, m_crtc, 16000000/5);    /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

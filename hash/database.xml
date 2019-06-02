@@ -11,7 +11,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="airsea.bin" size="2048" crc="cb28b9fe" sha1="0b7eda063da93c03ab2c133c75d3d7fe5ad2b243"/>
+				<rom name="airsea.bin" size="2048" crc="cb28b9fe" sha1="0b7eda063da93c03ab2c133c75d3d7fe5ad2b243" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="blckjack.bin" size="2048" crc="ec2a91b3" sha1="ba4553d116cffa74a71ef10fbffa4c28c779c836"/>
+				<rom name="blckjack.bin" size="2048" crc="ec2a91b3" sha1="ba4553d116cffa74a71ef10fbffa4c28c779c836" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="paddleg.bin" size="2048" crc="682b876a" sha1="ecc0146c40daa79a13934b8884bc8fd0f96461c1"/>
+				<rom name="paddleg.bin" size="2048" crc="682b876a" sha1="ecc0146c40daa79a13934b8884bc8fd0f96461c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="roadrace.bin" size="2048" crc="2c770dc3" sha1="dec79fb5203a8bce9553437bb96953ca2cf64f68"/>
+				<rom name="roadrace.bin" size="2048" crc="2c770dc3" sha1="dec79fb5203a8bce9553437bb96953ca2cf64f68" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="tankplan.bin" size="2048" crc="5e8ee224" sha1="a4be10fc8ca7d8d8254988dc916cca6c65d79d35"/>
+				<rom name="tankplan.bin" size="2048" crc="5e8ee224" sha1="a4be10fc8ca7d8d8254988dc916cca6c65d79d35" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="mathema2.bin" size="2048" crc="66c5975e" sha1="efa4a5ebe540efdedec226c0af238c2652ad5b5a"/>
+				<rom name="mathema2.bin" size="2048" crc="66c5975e" sha1="efa4a5ebe540efdedec226c0af238c2652ad5b5a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +92,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="shootgal.bin" size="2048" crc="9c8e7de6" sha1="9716f93e492610516a57b7ea4cd4c0f0336a4cd7"/>
+				<rom name="shootgal.bin" size="2048" crc="9c8e7de6" sha1="9716f93e492610516a57b7ea4cd4c0f0336a4cd7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="intel3.bin" size="2048" crc="52b8c6e7" sha1="b83fd9679912b0888df38f708dbea80dfe3b8193"/>
+				<rom name="intel3.bin" size="2048" crc="52b8c6e7" sha1="b83fd9679912b0888df38f708dbea80dfe3b8193" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="maze.bin" size="2048" crc="683e02e1" sha1="bce01aa50ab23edd84ada7adbcfa0d624206d332"/>
+				<rom name="maze.bin" size="2048" crc="683e02e1" sha1="bce01aa50ab23edd84ada7adbcfa0d624206d332" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="horserac.bin" size="2048" crc="3da31bc5" sha1="f20d93a58393ba70f1404afc7f19537a84fddaca"/>
+				<rom name="horserac.bin" size="2048" crc="3da31bc5" sha1="f20d93a58393ba70f1404afc7f19537a84fddaca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -145,7 +145,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="circus.bin" size="2048" crc="0ab80f3e" sha1="cff0b7066669aad1e35803767fd98ecef4ea162d"/>
+				<rom name="circus.bin" size="2048" crc="0ab80f3e" sha1="cff0b7066669aad1e35803767fd98ecef4ea162d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +159,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348"/>
+				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="4inarow.bin" size="2048" crc="a0f5320a" sha1="ce1ab1ad5e085a3237e0de645fa3238d7702d578"/>
+				<rom name="4inarow.bin" size="2048" crc="a0f5320a" sha1="ce1ab1ad5e085a3237e0de645fa3238d7702d578" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="pinball.bin" size="2048" crc="add99c6e" sha1="85b904e5bc37e5a44c88c000307401438285910a"/>
+				<rom name="pinball.bin" size="2048" crc="add99c6e" sha1="85b904e5bc37e5a44c88c000307401438285910a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -200,7 +200,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="musicalmemory.bin" size="2048" crc="d68da80a" sha1="4cf0f74b4a0d3305c9ffa830c067a054fab25419"/>
+				<rom name="musicalmemory.bin" size="2048" crc="d68da80a" sha1="4cf0f74b4a0d3305c9ffa830c067a054fab25419" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,7 +215,7 @@
 			<!-- to verify... -->
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
-				<rom name="draughts.bin" size="4096" crc="7b868473" sha1="2557172b07c0ebaffe18a345cfa88ef24febecb0"/>
+				<rom name="draughts.bin" size="4096" crc="7b868473" sha1="2557172b07c0ebaffe18a345cfa88ef24febecb0" offset="0" />
 			</dataarea>
 			<dataarea name="ram" size="1024">
 			</dataarea>
@@ -230,7 +230,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="munchcrn.bin" size="4096" crc="704a1593" sha1="5f0b95904d6d36368727c1e0c91d94627a7471d6"/>
+				<rom name="munchcrn.bin" size="4096" crc="704a1593" sha1="5f0b95904d6d36368727c1e0c91d94627a7471d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -244,7 +244,7 @@
 			<!-- to verify... -->
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
-				<rom name="d2732c.bin" size="4096" crc="8f3f2e9c" sha1="16b8b896f0f6495b12ae6eb12f452d4817a87f98"/>
+				<rom name="d2732c.bin" size="4096" crc="8f3f2e9c" sha1="16b8b896f0f6495b12ae6eb12f452d4817a87f98" offset="0" />
 			</dataarea>
 			<dataarea name="ram" size="1024">
 			</dataarea>
@@ -258,7 +258,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="leapfrog.bin" size="4096" crc="105eb530" sha1="7211b0b1c6e8798399f4f6d2a942db4e8379c691"/>
+				<rom name="leapfrog.bin" size="4096" crc="105eb530" sha1="7211b0b1c6e8798399f4f6d2a942db4e8379c691" offset="0" />
 			</dataarea>
 		</part>
 	</software>

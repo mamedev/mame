@@ -2017,9 +2017,9 @@ void sun4_state::sun4c(machine_config &config)
 
 	// SBus
 	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
-	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, 0, sbus_cards, nullptr);
-	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, 1, sbus_cards, nullptr);
-	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, 2, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, sbus_cards, nullptr);
 }
 
 void sun4_state::sun4_20(machine_config &config)

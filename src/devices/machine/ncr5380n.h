@@ -32,8 +32,6 @@ public:
 	void dma_w(uint8_t val);
 
 protected:
-	ncr5380n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -167,8 +165,6 @@ private:
 
 	enum { DMA_NONE, DMA_IN, DMA_OUT };
 
-	uint32_t m_fake_clock;
-
 	emu_timer *tm;
 
 	uint8_t status, istatus, m_mode, m_outdata, m_busstatus, m_dmalatch;
@@ -223,13 +219,6 @@ private:
 	devcb_write_line m_drq_handler;
 };
 
-class ncr53c80_device : public ncr5380n_device
-{
-public:
-	ncr53c80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
 DECLARE_DEVICE_TYPE(NCR5380N, ncr5380n_device)
-DECLARE_DEVICE_TYPE(NCR53C80, ncr53c80_device)
 
 #endif // MAME_MACHINE_NCR5380N_H

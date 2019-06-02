@@ -27,7 +27,10 @@ void psychic5_state::change_palette(int offset, uint8_t* palram, int palbase)
 
 	int color = offset >> 1;
 
-	m_palette->set_pen_color(palbase + color, rgb_t(hi & 0x0f, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4)));
+	if (m_blend)
+		m_blend->set(palbase + color, hi & 0x0f);
+
+	m_palette->set_pen_color(palbase + color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
 void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)

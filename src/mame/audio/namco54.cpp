@@ -129,7 +129,6 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 
 void namco_54xx_device::device_start()
 {
-	save_item(NAME(m_latched_cmd));
 }
 
 //-------------------------------------------------

@@ -34,7 +34,7 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(coin_output_w);
-	uint32_t screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void buster(machine_config &config);
 	void mainmap(address_map &map);
 protected:
@@ -51,7 +51,7 @@ void buster_state::video_start()
 {
 }
 
-uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
@@ -336,6 +336,7 @@ void buster_state::buster(machine_config &config)
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 256-16-1);
 	screen.set_screen_update(FUNC(buster_state::screen_update_buster));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545)/4)); //unknown clock / type
 	crtc.set_screen("screen");

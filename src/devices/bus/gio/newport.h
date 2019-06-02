@@ -9,14 +9,14 @@
 
 #pragma once
 
-#include "gio64.h"
+#include "gio.h"
 #include "screen.h"
 
 #define ENABLE_NEWVIEW_LOG      (0)
 
 class newport_base_device : public device_t
-						  , public device_palette_interface
-						  , public device_gio64_card_interface
+                          , public device_palette_interface
+                          , public device_gio_card_interface
 {
 public:
 	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask);
@@ -32,15 +32,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual uint32_t palette_entries() const override { return 0x2000; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	void mem_map(address_map &map) override;
-
-	static constexpr device_timer_id DCB_TIMEOUT = 0;
 
 	enum
 	{
@@ -54,35 +51,6 @@ protected:
 		DCR_CURSOR_SIZE_BIT = 9,
 		DCR_CURSOR_SIZE_32 = 0,
 		DCR_CURSOR_SIZE_64 = 1
-	};
-
-	enum
-	{
-		DCB_ADDR_VC2,
-		DCB_ADDR_CMAP01,
-		DCB_ADDR_CMAP0,
-		DCB_ADDR_CMAP1,
-		DCB_ADDR_XMAP01,
-		DCB_ADDR_XMAP0,
-		DCB_ADDR_XMAP1,
-		DCB_ADDR_RAMDAC,
-		DCB_ADDR_CC1,
-		DCB_ADDR_AB1,
-		DCB_ADDR_PCD = 12
-	};
-
-	enum
-	{
-		STATUS_GFXBUSY			= (1 << 3),
-		STATUS_BACKBUSY			= (1 << 4),
-		STATUS_VRINT			= (1 << 5),
-		STATUS_VIDEOINT			= (1 << 6),
-		STATUS_GFIFOLEVEL_SHIFT	= 7,
-		STATUS_GFIFOLEVEL_MASK	= (0x3f << STATUS_GFIFOLEVEL_SHIFT),
-		STATUS_BFIFOLEVEL_SHIFT	= 13,
-		STATUS_BFIFOLEVEL_MASK	= (0x1f << STATUS_BFIFOLEVEL_SHIFT),
-		STATUS_BFIFO_INT		= 18,
-		STATUS_GFIFO_INT		= 19
 	};
 
 	struct vc2_t
@@ -125,20 +93,7 @@ protected:
 	struct rex3_t
 	{
 		uint32_t m_draw_mode0;
-		bool m_color_host;
 		uint32_t m_draw_mode1;
-		uint8_t m_plane_enable;
-		uint8_t m_plane_depth;
-		bool m_rwpacked;
-		bool m_rwdouble;
-		uint8_t m_hostdepth;
-		uint8_t m_sfactor;
-		uint8_t m_dfactor;
-		uint8_t m_logicop;
-
-		uint32_t m_store_shift;
-		uint32_t m_host_shift;
-
 		uint32_t m_write_width;
 		uint32_t m_ls_mode;
 		uint32_t m_ls_pattern;
@@ -153,10 +108,10 @@ protected:
 		int32_t m_y_start;
 		int32_t m_x_end;
 		int32_t m_y_end;
-		int16_t m_x_start_frac;
-		int16_t m_y_start_frac;
-		int16_t m_x_end_frac;
-		int16_t m_y_end_frac;
+        int16_t m_x_start_frac;
+        int16_t m_y_start_frac;
+        int16_t m_x_end_frac;
+        int16_t m_y_end_frac;
 		int16_t m_x_save;
 		uint32_t m_xy_move;
 		int16_t m_x_move;
@@ -180,14 +135,14 @@ protected:
 		int16_t m_x_end_i;
 		int16_t m_y_end_i;
 		uint32_t m_x_start_end_i;
-		uint32_t m_color_red;
-		uint32_t m_color_alpha;
-		uint32_t m_color_green;
-		uint32_t m_color_blue;
-		uint32_t m_slope_red;
-		uint32_t m_slope_alpha;
-		uint32_t m_slope_green;
-		uint32_t m_slope_blue;
+		int32_t m_color_red;
+		int32_t m_color_alpha;
+		int32_t m_color_green;
+		int32_t m_color_blue;
+		int32_t m_slope_red;
+		int32_t m_slope_alpha;
+		int32_t m_slope_green;
+		int32_t m_slope_blue;
 		uint32_t m_write_mask;
 		uint32_t m_color_i;
 		uint32_t m_zero_overflow;
@@ -207,6 +162,12 @@ protected:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint8_t m_xfer_width;
+		uint8_t m_plane_enable;
+		uint8_t m_plane_depth;
+		uint32_t m_store_shift;
+		uint8_t m_src_blend;
+		uint8_t m_dst_blend;
+		uint8_t m_logic_op;
 	};
 
 	struct cmap_t
@@ -228,7 +189,6 @@ protected:
 	void xmap1_write(uint32_t data);
 	uint32_t vc2_read();
 	void vc2_write(uint32_t data);
-	void ramdac_write(uint32_t data);
 
 	void write_x_start(int32_t val);
 	void write_y_start(int32_t val);
@@ -238,8 +198,6 @@ protected:
 	bool pixel_clip_pass(int16_t x, int16_t y);
 	void write_pixel(uint32_t color);
 	void write_pixel(int16_t x, int16_t y, uint32_t color);
-	void blend_pixel(uint32_t *dest_buf, uint32_t src);
-	void logic_pixel(uint32_t *dest_buf, uint32_t src);
 	void store_pixel(uint32_t *dest_buf, uint32_t src);
 
 	void iterate_shade();
@@ -247,55 +205,24 @@ protected:
 	virtual uint32_t get_cmap_revision() = 0;
 	virtual uint32_t get_xmap_revision() = 0;
 
-	uint32_t get_host_color();
 	uint32_t get_rgb_color(int16_t x, int16_t y);
 
-	uint32_t convert_4bpp_bgr_to_8bpp(uint8_t pix_in);
-	uint32_t convert_4bpp_bgr_to_12bpp(uint8_t pix_in);
-	uint32_t convert_4bpp_bgr_to_24bpp(uint8_t pix_in);
-	uint32_t convert_8bpp_bgr_to_4bpp(uint8_t pix_in);
-	uint32_t convert_8bpp_bgr_to_12bpp(uint8_t pix_in);
-	uint32_t convert_8bpp_bgr_to_24bpp(uint8_t pix_in);
-	uint32_t convert_12bpp_bgr_to_4bpp(uint16_t pix_in);
-	uint32_t convert_12bpp_bgr_to_8bpp(uint16_t pix_in);
-	uint32_t convert_12bpp_bgr_to_24bpp(uint16_t pix_in);
-	uint32_t convert_24bpp_bgr_to_4bpp(uint32_t pix_in);
-	uint32_t convert_24bpp_bgr_to_8bpp(uint32_t pix_in);
-	uint32_t convert_24bpp_bgr_to_12bpp(uint32_t pix_in);
-
-	uint32_t convert_4bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
-	uint32_t convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
-	uint32_t convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in);
-
-	struct bresenham_octant_info_t
-	{
-		int16_t incrx1;
-		int16_t incrx2;
-		int16_t incry1;
-		int16_t incry2;
-		uint8_t loop;
-	};
-	uint8_t get_octant(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t dx, uint16_t dy);
-	void do_fline(uint32_t color);
+    struct bresenham_octant_info_t
+    {
+        int16_t incrx1;
+        int16_t incrx2;
+        int16_t incry1;
+        int16_t incry2;
+        uint8_t loop;
+    };
+    uint8_t get_octant(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t dx, int16_t dy);
+    void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
 
 	uint32_t do_pixel_read();
 	uint64_t do_pixel_word_read();
 
 	void do_rex3_command();
-
-	void decode_vt_line(uint32_t line, uint32_t line_seq_ptr);
-	void decode_vt_table();
-	void update_screen_size();
-
-	void ramdac_remap(uint32_t *dest);
-
-	required_device<screen_device> m_screen;
-
-	uint32_t m_ramdac_lut_r[256];
-	uint32_t m_ramdac_lut_g[256];
-	uint32_t m_ramdac_lut_b[256];
-	uint8_t m_ramdac_lut_index;
 
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
@@ -305,15 +232,8 @@ protected:
 	std::unique_ptr<uint32_t[]> m_olay;
 	std::unique_ptr<uint32_t[]> m_pup;
 	std::unique_ptr<uint32_t[]> m_cid;
-	std::unique_ptr<uint32_t[]> m_vt_table;
 	cmap_t m_cmap0;
 	uint32_t m_global_mask;
-	emu_timer *m_dcb_timeout_timer;
-
-	int m_readout_x0;
-	int m_readout_y0;
-	int m_readout_x1;
-	int m_readout_y1;
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();
@@ -321,31 +241,29 @@ protected:
 
 	FILE *m_newview_log;
 #endif
-
-	static const uint32_t s_host_shifts[4];
 };
 
-class gio64_xl8_device : public newport_base_device
+class gio_xl8_device : public newport_base_device
 {
 public:
-	gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	gio_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 protected:
 	virtual uint32_t get_cmap_revision() override;
 	virtual uint32_t get_xmap_revision() override;
 };
 
-class gio64_xl24_device : public newport_base_device
+class gio_xl24_device : public newport_base_device
 {
 public:
-	gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	gio_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 protected:
 	virtual uint32_t get_cmap_revision() override;
 	virtual uint32_t get_xmap_revision() override;
 };
 
-DECLARE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device)
-DECLARE_DEVICE_TYPE(GIO64_XL24, gio64_xl24_device)
+DECLARE_DEVICE_TYPE(GIO_XL8,  gio_xl8_device)
+DECLARE_DEVICE_TYPE(GIO_XL24, gio_xl24_device)
 
 #endif // MAME_BUS_GIO_NEWPORT_H

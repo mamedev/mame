@@ -56,8 +56,8 @@ public:
 	DECLARE_VIDEO_START(cherrym);
 	void cmast91_palette(palette_device &palette) const;
 	void lucky8_palette(palette_device &palette) const;
-	uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ladylinr(machine_config &config);
 	void wcherry(machine_config &config);
@@ -166,7 +166,7 @@ public:
 	void init_tcl();
 	void init_super7();
 
-	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cm(machine_config &config);
 	void cmasterc(machine_config &config);
@@ -227,9 +227,9 @@ public:
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
 	void magodds_palette(palette_device &palette) const;
-	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(masked_irq);
 
@@ -309,7 +309,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reel3_attrram_w);
 
 	DECLARE_VIDEO_START(sangho);
-	uint32_t screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void star100(machine_config &config);
 	void star100_map(address_map &map);
@@ -355,7 +355,7 @@ public:
 	void init_unkch4();
 
 	DECLARE_VIDEO_START(unkch);
-	uint32_t screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 

@@ -27,7 +27,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="BATTLESHIPS_128K.ldf" size="204800" crc="24a45d78" sha1="2f404f1558224bde58d45b608b555f03b3c5b5b2"/>
+				<rom name="BATTLESHIPS_128K.ldf" size="204800" crc="24a45d78" sha1="2f404f1558224bde58d45b608b555f03b3c5b5b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="DW_96.ldf" size="204800" crc="e05b6fb2" sha1="251938a76385b1bcd650dd36bc8deff4f48483a2"/>
+				<rom name="DW_96.ldf" size="204800" crc="e05b6fb2" sha1="251938a76385b1bcd650dd36bc8deff4f48483a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 		<info name="usage" value="EXT LOAD &quot;GOMOKU&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="GOMOKU_96K.ldf" size="204800" crc="0f12b5a6" sha1="d9527a4993af39184fcfe030508e254f770e6105"/>
+				<rom name="GOMOKU_96K.ldf" size="204800" crc="0f12b5a6" sha1="d9527a4993af39184fcfe030508e254f770e6105" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +68,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="HANGMAN_96.ldf" size="204800" crc="5173734e" sha1="3d9933dfa2f49b7405d9277d3b2ee8ac23c3b302"/>
+				<rom name="HANGMAN_96.ldf" size="204800" crc="5173734e" sha1="3d9933dfa2f49b7405d9277d3b2ee8ac23c3b302" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="intro128.ldf" size="204800" crc="5ea7b40c" sha1="d5254105b48eccb7e1b4246abdd02ff02e8a28bf"/>
+				<rom name="intro128.ldf" size="204800" crc="5ea7b40c" sha1="d5254105b48eccb7e1b4246abdd02ff02e8a28bf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="LOGICHESS.ldf" size="204800" crc="5aa9eba3" sha1="a40b96b05184a8af1d50228cdb6982ed56cf0751"/>
+				<rom name="LOGICHESS.ldf" size="204800" crc="5aa9eba3" sha1="a40b96b05184a8af1d50228cdb6982ed56cf0751" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="MONSTERMINE_96.ldf" size="204800" crc="8087bd7e" sha1="a13569e2311e08d85f84f49ffd8024e61beec170"/>
+				<rom name="MONSTERMINE_96.ldf" size="204800" crc="8087bd7e" sha1="a13569e2311e08d85f84f49ffd8024e61beec170" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -121,7 +121,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ROADER_96.ldf" size="204800" crc="bfb99f3f" sha1="74fea2157ce6689b6385f77b78496fdf37797d76"/>
+				<rom name="ROADER_96.ldf" size="204800" crc="bfb99f3f" sha1="74fea2157ce6689b6385f77b78496fdf37797d76" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -134,7 +134,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="SLOTMACHINE_96.ldf" size="204800" crc="08e6264a" sha1="1c3bd0aa4431964544164936758211699e451205"/>
+				<rom name="SLOTMACHINE_96.ldf" size="204800" crc="08e6264a" sha1="1c3bd0aa4431964544164936758211699e451205" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 		<sharedfeat name="compatibility" value="96K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="TREASURE-ISLAND_96.ldf" size="204800" crc="a9a13b77" sha1="273aa31b244bec18104bd23c92e94d9b3a3a2f99"/>
+				<rom name="TREASURE-ISLAND_96.ldf" size="204800" crc="a9a13b77" sha1="273aa31b244bec18104bd23c92e94d9b3a3a2f99" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@
 		<info name="usage" value="EXT MLOAD &quot;FORTH&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="FORTH.ldf" size="204800" crc="82188b28" sha1="94888b4309c1c68ce8a35bfa192ac27e5cc57a7d"/>
+				<rom name="FORTH.ldf" size="204800" crc="82188b28" sha1="94888b4309c1c68ce8a35bfa192ac27e5cc57a7d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +177,7 @@
 		<info name="author" value="John Koushappas" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="Lynx Revival Group - Volume 1 (1988-08-24)(Koushappas, John)(GB).ldf" size="819200" crc="afa4e118" sha1="ca5e74ddd7a66c1812ce946b6376dfa95f424f4c"/>
+				<rom name="Lynx Revival Group - Volume 1 (1988-08-24)(Koushappas, John)(GB).ldf" size="819200" crc="afa4e118" sha1="ca5e74ddd7a66c1812ce946b6376dfa95f424f4c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -189,7 +189,7 @@
 		<info name="author" value="John Koushappas" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Lynx JM Utilities Disk v1.0 (1989-11-09)(Koushappas, John)(96K-128K)(GB).ldf" size="204800" crc="5d0e836f" sha1="4f2504228685c51970be9e41f5884e28c1c84935"/>
+				<rom name="Lynx JM Utilities Disk v1.0 (1989-11-09)(Koushappas, John)(96K-128K)(GB).ldf" size="204800" crc="5d0e836f" sha1="4f2504228685c51970be9e41f5884e28c1c84935" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="CalcStar.ldf" size="204800" crc="c377a29f" sha1="67e1fa310be14a6f2d1fab5ee222957392b8155f"/>
+				<rom name="CalcStar.ldf" size="204800" crc="c377a29f" sha1="67e1fa310be14a6f2d1fab5ee222957392b8155f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +217,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="COBOL.ldf" size="204800" crc="ae52373b" sha1="517ad01752ebbf5daff336e983c8655974c00889"/>
+				<rom name="COBOL.ldf" size="204800" crc="ae52373b" sha1="517ad01752ebbf5daff336e983c8655974c00889" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -230,7 +230,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="CPM v2.2 BIOS 1.00(Digital Research)(128K).ldf" size="204800" crc="3d51fb62" sha1="ac75b3f0dbd3ea942eb22c4b8a25a180127e2d99"/>
+				<rom name="CPM v2.2 BIOS 1.00(Digital Research)(128K).ldf" size="204800" crc="3d51fb62" sha1="ac75b3f0dbd3ea942eb22c4b8a25a180127e2d99" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +243,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="CPM v2.2 BIOS 1.02(Digital Research)(128K).ldf" size="204800" crc="2de23d92" sha1="291a54398bb3293806638d40983964795ad32be8"/>
+				<rom name="CPM v2.2 BIOS 1.02(Digital Research)(128K).ldf" size="204800" crc="2de23d92" sha1="291a54398bb3293806638d40983964795ad32be8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -256,7 +256,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="C_Compiler.ldf" size="204800" crc="713219b6" sha1="288c290556450f7b7890cf34f45ff87420263c3b"/>
+				<rom name="C_Compiler.ldf" size="204800" crc="713219b6" sha1="288c290556450f7b7890cf34f45ff87420263c3b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -269,7 +269,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="DataStar.ldf" size="204800" crc="2f441808" sha1="f0be82174b81b211c88a9e92dae39d671e74d50c"/>
+				<rom name="DataStar.ldf" size="204800" crc="2f441808" sha1="f0be82174b81b211c88a9e92dae39d671e74d50c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -282,7 +282,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="DBASE_II.ldf" size="204800" crc="2c25de17" sha1="fc994d49d18584eac3615c2d668c445714d6b613"/>
+				<rom name="DBASE_II.ldf" size="204800" crc="2c25de17" sha1="fc994d49d18584eac3615c2d668c445714d6b613" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -295,7 +295,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="E-Basic.ldf" size="204800" crc="c7967923" sha1="ca6cd9761a317f0257dcd30e883029e10d3d8038"/>
+				<rom name="E-Basic.ldf" size="204800" crc="c7967923" sha1="ca6cd9761a317f0257dcd30e883029e10d3d8038" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -308,7 +308,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="FORTRAN.ldf" size="204800" crc="d3f002da" sha1="da6e4cd1e22ad9c5066cc893d08784ed44779dfb"/>
+				<rom name="FORTRAN.ldf" size="204800" crc="d3f002da" sha1="da6e4cd1e22ad9c5066cc893d08784ed44779dfb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -321,7 +321,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="M-Basic.ldf" size="204800" crc="4f828c7e" sha1="2b14686bd1b289d1286718a1c3509d477ab81ab5"/>
+				<rom name="M-Basic.ldf" size="204800" crc="4f828c7e" sha1="2b14686bd1b289d1286718a1c3509d477ab81ab5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -334,7 +334,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="PeachCalc.ldf" size="204800" crc="518fb821" sha1="75b9301c9434dd3f126f2d4a78e6f0d0707acc02"/>
+				<rom name="PeachCalc.ldf" size="204800" crc="518fb821" sha1="75b9301c9434dd3f126f2d4a78e6f0d0707acc02" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -347,7 +347,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ReportStar.ldf" size="204800" crc="8d434038" sha1="de2f4b59e8e9086bc71fa6fdb13e2bd741b3d53a"/>
+				<rom name="ReportStar.ldf" size="204800" crc="8d434038" sha1="de2f4b59e8e9086bc71fa6fdb13e2bd741b3d53a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -360,7 +360,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="TURBO_PASCAL.ldf" size="204800" crc="ffac51fe" sha1="4312b6f2e0665a00746fc60eb53b98c828f0d8ba"/>
+				<rom name="TURBO_PASCAL.ldf" size="204800" crc="ffac51fe" sha1="4312b6f2e0665a00746fc60eb53b98c828f0d8ba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -373,7 +373,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="WordMaster.ldf" size="204800" crc="5fa87e3b" sha1="6503e9844ab751f0ba1b67b2485945caec057f43"/>
+				<rom name="WordMaster.ldf" size="204800" crc="5fa87e3b" sha1="6503e9844ab751f0ba1b67b2485945caec057f43" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -386,7 +386,7 @@
 		<sharedfeat name="compatibility" value="128K"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="WordStar.ldf" size="204800" crc="32485264" sha1="430188f77229f4faac88283a63431488dda29c10"/>
+				<rom name="WordStar.ldf" size="204800" crc="32485264" sha1="430188f77229f4faac88283a63431488dda29c10" offset="0" />
 			</dataarea>
 		</part>
 	</software>

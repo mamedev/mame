@@ -280,12 +280,13 @@ void i82355_device::global_config(u8 data)
 
 void i82355_device::identify_board()
 {
-	// Use standard format for naming .CFG and .OVL files
-	logerror("%s: EISA board identified as %c%c%c%04X\n", machine().describe_context(),
+	logerror("%s: Board identified as %c%c%c (%04X) product %02X.%02X\n", machine().describe_context(),
 		((m_id.w.h & 0x7c00) >> 10) + 'A' - 1,
 		((m_id.w.h & 0x03e0) >> 5) + 'A' - 1,
 		(m_id.w.h & 0x001f) + 'A' - 1,
-		m_id.w.l);
+		m_id.w.h,
+		m_id.b.h,
+		m_id.b.l);
 }
 
 

@@ -50,54 +50,50 @@ WRITE16_MEMBER(vaportra_state::palette_ext_w)
 
 /******************************************************************************/
 
-void vaportra_state::vaportra_colpri_cb(u32 &colour, u32 &pri_mask)
-{
-	pri_mask = 0; // above back, mid, foreground
-	if (colour >= m_priority[1])
-	{
-		pri_mask |= GFX_PMASK_4; // behind foreground
-	}
-}
 
 uint32_t vaportra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
 	int pri = m_priority[0] & 0x03;
 
-	screen.priority().fill(0, cliprect);
 	flip_screen_set(!BIT(flip, 7));
 	m_deco_tilegen[0]->pf_update(nullptr, nullptr);
 	m_deco_tilegen[1]->pf_update(nullptr, nullptr);
 
 	m_spritegen->set_flip_screen(!BIT(flip, 7));
+	m_spritegen->set_pri_type(1); // force priorities to be handled in a different way for this driver for now
 
 	/* Draw playfields */
 	if (pri == 0)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 1)
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 2)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+		m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0, m_priority[1], 0x0f);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(4), m_spriteram->buffer(), 0x800 / 2);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 1, m_priority[1], 0x0f);
 	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

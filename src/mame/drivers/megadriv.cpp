@@ -580,7 +580,7 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 }
 
 
-void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr)
+void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr)
 {
 	if (m_32x)
 		m_32x->_32x_render_videobuffer_to_screenbuffer(x, priority, lineptr);
@@ -612,6 +612,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -646,6 +647,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -680,6 +682,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 

@@ -46,7 +46,7 @@ protected:
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
-	required_device<ncr53c80_device> m_ncr5380;
+	required_device<ncr5380n_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;
 
 private:

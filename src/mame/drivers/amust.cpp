@@ -455,7 +455,7 @@ void amust_state::amust(machine_config &config)
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'318'181) / 8));
+	h46505_device &crtc(H46505(config, "crtc", XTAL(14'318'181) / 8));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

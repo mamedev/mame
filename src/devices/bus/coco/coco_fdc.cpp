@@ -11,7 +11,7 @@
     which mostly uses the same command set with some subtle differences, most
     notably the 2797 handles disk side select internally. The Dragon Alpha also
     uses the WD2797, however as this is a built in interface and not an external
-    cartridge, it is dealt with in the main coco.cpp file.
+    cartrige, it is dealt with in the main coco.cpp file.
 
     The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
     on the Dragon.  In addition, there is another register
@@ -89,7 +89,6 @@ protected:
 	};
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
 	virtual DECLARE_READ8_MEMBER(scs_read) override;
 	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -309,16 +308,6 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 		selected_floppy->ss_w(head);
 
 	m_wd17xx->dden_w(!BIT(dskreg(), 5));
-}
-
-
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(coco_fdc_device_base::cts_read)
-{
-	return memregion("eprom")->base()[offset];
 }
 
 

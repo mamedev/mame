@@ -87,8 +87,6 @@ protected:
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_WRITE16_MEMBER(priority_w);
 
-	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
-
 	void set_screen_raw_params_data_east(machine_config &config);
 
 private:
@@ -150,10 +148,6 @@ private:
 	uint32_t screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void hbarrel_colpri_cb(u32 &colour, u32 &pri_mask);
-	void bandit_colpri_cb(u32 &colour, u32 &pri_mask);
-	void midres_colpri_cb(u32 &colour, u32 &pri_mask);
 
 	void baddudes_i8751_write(int data);
 	void birdtry_i8751_write(int data);

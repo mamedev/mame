@@ -303,8 +303,6 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
-	m_lc89510_temp->set_cdrom_tag("^cdrom");
-	m_lc89510_temp->set_68k_tag(m_scdcpu);
 
 	TIMER(config, m_stopwatch_timer).configure_generic(timer_device::expired_delegate()); //stopwatch timer
 	TIMER(config, m_stamp_timer).configure_generic(FUNC(sega_segacd_device::stamp_timer_callback));

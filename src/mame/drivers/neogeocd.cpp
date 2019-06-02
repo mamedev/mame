@@ -1054,7 +1054,6 @@ void ngcd_state::neocd(machine_config &config)
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
-	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
 	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
 	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);

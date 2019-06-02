@@ -11,10 +11,9 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i8085/i8085.h"
-#include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
-#include "machine/input_merger.h"
 #include "machine/mc2661.h"
+#include "machine/terminal.h"
 
 
 class dual68_state : public driver_device
@@ -23,72 +22,52 @@ public:
 	dual68_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_usart(*this, "usart%u", 1U)
+		, m_terminal(*this, "terminal")
 		, m_p_ram(*this, "ram")
 	{ }
 
 	void dual68(machine_config &config);
 
 private:
-	uint8_t sio_direct_r(offs_t offset);
-	void sio_direct_w(offs_t offset, uint8_t data);
-	uint8_t sio_status_r();
-	uint8_t fdc_status_r();
+	void kbd_put(u8 data);
+	DECLARE_WRITE16_MEMBER(terminal_w);
 
 	void dual68_mem(address_map &map);
 	void sio4_io(address_map &map);
 	void sio4_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 4> m_usart;
+	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint16_t> m_p_ram;
+	//uint8_t m_term_data;
 };
 
 
 
-uint8_t dual68_state::sio_direct_r(offs_t offset)
+WRITE16_MEMBER( dual68_state::terminal_w )
 {
-	return m_usart[0]->read(offset);
-}
-
-void dual68_state::sio_direct_w(offs_t offset, uint8_t data)
-{
-	m_usart[0]->write(offset, data);
-}
-
-uint8_t dual68_state::sio_status_r()
-{
-	return 0x00;
-}
-
-uint8_t dual68_state::fdc_status_r()
-{
-	return 0x40;
+	m_terminal->write(data >> 8);
 }
 
 void dual68_state::dual68_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x00ffff).ram().share("ram");
-	map(0x080000, 0x081fff).rom().region("user1", 0);
-	map(0x7f0000, 0x7f0001).rw(FUNC(dual68_state::sio_direct_r), FUNC(dual68_state::sio_direct_w));
-	map(0x7f00c0, 0x7f00c0).r(FUNC(dual68_state::fdc_status_r));
-	map(0x800000, 0x801fff).rom().region("user1", 0);
+	map(0x00000000, 0x0000ffff).ram().share("ram");
+	map(0x00080000, 0x00081fff).rom().region("user1", 0);
+	map(0x007f0000, 0x007f0001).w(FUNC(dual68_state::terminal_w));
+	map(0x00800000, 0x00801fff).rom().region("user1", 0);
 }
 
 void dual68_state::sio4_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).rom().region("siocpu", 0);
-	map(0x8000, 0x87ff).mirror(0x7800).ram();
-	//map(0xffe3, 0xffe3).lr8("usart0_rx_hack", []() { return 0x02; });
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0xffff).ram();
 }
 
 void dual68_state::sio4_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x06, 0x06).r(FUNC(dual68_state::sio_status_r));
-	map(0x18, 0x18).nopw();
 	map(0x20, 0x23).rw("usart1", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0x28, 0x2b).rw("usart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0x30, 0x33).rw("usart3", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
@@ -99,16 +78,19 @@ void dual68_state::sio4_io(address_map &map)
 static INPUT_PORTS_START( dual68 )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_7200 ) // FIXME: should be 9600 with actual 2661B
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_7200 )
-DEVICE_INPUT_DEFAULTS_END
 
 void dual68_state::machine_reset()
 {
 	uint8_t* user1 = memregion("user1")->base();
 
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
+
+	m_maincpu->reset();
+}
+
+void dual68_state::kbd_put(u8 data)
+{
+	//m_term_data = data;
 }
 
 void dual68_state::dual68(machine_config &config)
@@ -121,24 +103,14 @@ void dual68_state::dual68(machine_config &config)
 	siocpu.set_addrmap(AS_PROGRAM, &dual68_state::sio4_mem);
 	siocpu.set_addrmap(AS_IO, &dual68_state::sio4_io);
 
-	for (auto &usart : m_usart)
-		MC2661(config, usart, 9.8304_MHz_XTAL / 2); // SCN2661B
-	m_usart[0]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<0>));
-	m_usart[1]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<1>));
-	m_usart[2]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<2>));
-	m_usart[3]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<3>));
-	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	/* video hardware */
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dual68_state::kbd_put));
 
-	INPUT_MERGER_ANY_HIGH(config, "usartint").output_handler().set_inputline("siocpu", I8085_RST65_LINE);
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
-	rs232.dsr_handler().set(m_usart[0], FUNC(mc2661_device::dsr_w));
-	rs232.dcd_handler().set(m_usart[0], FUNC(mc2661_device::dcd_w));
-	rs232.cts_handler().set(m_usart[0], FUNC(mc2661_device::cts_w));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	MC2661(config, "usart1", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart2", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart3", 9.8304_MHz_XTAL / 2); // SCN2661B
+	MC2661(config, "usart4", 9.8304_MHz_XTAL / 2); // SCN2661B
 }
 
 /* ROM definition */

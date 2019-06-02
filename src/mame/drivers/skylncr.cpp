@@ -198,7 +198,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	uint32_t screen_update_skylncr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	void bdream97_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
@@ -314,11 +314,11 @@ void skylncr_state::video_start()
 }
 
 
-uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
-	bitmap.fill(rgb_t::black(), cliprect);
+	bitmap.fill(0, cliprect);
 	m_reel_1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// are these hardcoded, or registers?
@@ -1675,6 +1675,7 @@ void skylncr_state::skylncr(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(skylncr_state::screen_update_skylncr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
 	PALETTE(config, m_palette).set_entries(0x200);

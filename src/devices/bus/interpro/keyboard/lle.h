@@ -30,7 +30,7 @@ protected:
 	virtual void io_map(address_map &map);
 	virtual void ext_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(input_txd) override { m_txd = state; }
+	DECLARE_WRITE_LINE_MEMBER(input_txd) override { m_txd = (state == ASSERT_LINE) ? 0 : 1; }
 
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);

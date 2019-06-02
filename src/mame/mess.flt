@@ -376,7 +376,6 @@ isbc8030.cpp
 iskr103x.cpp
 itt1700.cpp
 itt3030.cpp
-itt9216.cpp
 jade.cpp
 jazz.cpp
 jensen.cpp
@@ -397,7 +396,6 @@ kdt6.cpp
 kim1.cpp
 konin.cpp
 kramermc.cpp
-krokha.cpp
 kron.cpp
 krz2000.cpp
 kyocera.cpp
@@ -763,7 +761,6 @@ symbolics.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp
-systel1.cpp
 talkingbb.cpp
 talkingfb.cpp
 tamag1.cpp

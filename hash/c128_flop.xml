@@ -12,13 +12,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="a_mind_forever_voyaging_s1[infocom_1985](c128)(!).g64" size="333744" crc="b5fbf19d" sha1="10643b56627ce79f88b2a679b4436f473fe6bc72"/>
+				<rom name="a_mind_forever_voyaging_s1[infocom_1985](c128)(!).g64" size="333744" crc="b5fbf19d" sha1="10643b56627ce79f88b2a679b4436f473fe6bc72" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 2"/>
 			<dataarea name="flop" size="333744">
-				<rom name="a_mind_forever_voyaging_s2[infocom_1985](c128)(!).g64" size="333744" crc="86df6654" sha1="8e9ad293aed7f077ba22d885f8abc61d98d08e4a"/>
+				<rom name="a_mind_forever_voyaging_s2[infocom_1985](c128)(!).g64" size="333744" crc="86df6654" sha1="8e9ad293aed7f077ba22d885f8abc61d98d08e4a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,13 +31,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="beyond_zork_s1[infocom_1987](c128)(!).g64" size="333744" crc="1ac04818" sha1="3b3e601951f1fd8a4ba2152ce3c8b14393547b21"/>
+				<rom name="beyond_zork_s1[infocom_1987](c128)(!).g64" size="333744" crc="1ac04818" sha1="3b3e601951f1fd8a4ba2152ce3c8b14393547b21" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 2"/>
 			<dataarea name="flop" size="333744">
-				<rom name="beyond_zork_s2[infocom_1987](c128)(!).g64" size="333744" crc="15b30575" sha1="f2852c8912c9e4742ee62b698fa140158276fa6d"/>
+				<rom name="beyond_zork_s2[infocom_1987](c128)(!).g64" size="333744" crc="15b30575" sha1="f2852c8912c9e4742ee62b698fa140158276fa6d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,13 +50,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="bureaucracy_s1[infocom_1987](r116)(c128).g64" size="333744" crc="0ef108e3" sha1="097f68ada1e0a8ed14a3107d1e844f4b17e12e19"/>
+				<rom name="bureaucracy_s1[infocom_1987](r116)(c128).g64" size="333744" crc="0ef108e3" sha1="097f68ada1e0a8ed14a3107d1e844f4b17e12e19" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="333744">
-				<rom name="bureaucracy_s2[infocom_1987](r116)(c128).g64" size="333744" crc="53c3f86a" sha1="957b89aa30f38037e4931fc7968c45e7d5042c81"/>
+				<rom name="bureaucracy_s2[infocom_1987](r116)(c128).g64" size="333744" crc="53c3f86a" sha1="957b89aa30f38037e4931fc7968c45e7d5042c81" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,13 +69,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="bureaucracy_s1[infocom_1987](r86)(c128)(!).g64" size="333744" crc="203155b4" sha1="896b5aeb2573ca6da3976fd17db4c1785ce460ed"/>
+				<rom name="bureaucracy_s1[infocom_1987](r86)(c128)(!).g64" size="333744" crc="203155b4" sha1="896b5aeb2573ca6da3976fd17db4c1785ce460ed" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 2"/>
 			<dataarea name="flop" size="333744">
-				<rom name="bureaucracy_s2[infocom_1987](r86)(c128)(!).g64" size="333744" crc="aeae424a" sha1="7e7934cc2d0c040bccf27f515ea55ac7e18d1e22"/>
+				<rom name="bureaucracy_s2[infocom_1987](r86)(c128)(!).g64" size="333744" crc="aeae424a" sha1="7e7934cc2d0c040bccf27f515ea55ac7e18d1e22" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="the_last_v8[mastertronic_1985](c128).g64" size="333744" crc="34ee8b20" sha1="3d752a5f4924cf48689270f5f9464cc9529d7aa7" />
+				<rom name="the_last_v8[mastertronic_1985](c128).g64" size="333744" crc="34ee8b20" sha1="3d752a5f4924cf48689270f5f9464cc9529d7aa7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@
 		<info name="protection" value="fat" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="rocky_horror_show[crl_1987](c128).g64" size="333744" crc="cd1915f9" sha1="792756c0ae514b55ab4e06a2f4601f9cd1edf7c7" />
+				<rom name="rocky_horror_show[crl_1987](c128).g64" size="333744" crc="cd1915f9" sha1="792756c0ae514b55ab4e06a2f4601f9cd1edf7c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@
 		<info name="protection" value="fat" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="thai_boxing[anco_1986](c128)(fat).g64" size="333744" crc="6a29ef3a" sha1="ca317c6f44e940c38e1f537d88e66c52c6968885" />
+				<rom name="thai_boxing[anco_1986](c128)(fat).g64" size="333744" crc="6a29ef3a" sha1="ca317c6f44e940c38e1f537d88e66c52c6968885" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -125,7 +125,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349696">
-				<rom name="10_years_hvsc.d71" size="349696" crc="dfaf9092" sha1="253f27d5d9605b428a4968da0fddce545802e48f" />
+				<rom name="10_years_hvsc.d71" size="349696" crc="dfaf9092" sha1="253f27d5d9605b428a4968da0fddce545802e48f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +137,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="basic-128[abacus_1985](v1_03).g64" size="333744" crc="94047950" sha1="a1cd6e8302699684e0eaa8bccc0de6ad70918397" />
+				<rom name="basic-128[abacus_1985](v1_03).g64" size="333744" crc="94047950" sha1="a1cd6e8302699684e0eaa8bccc0de6ad70918397" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -149,7 +149,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="big_blue_reader_128[sogwap_1989](v3_12).g64" size="333744" crc="57d64987" sha1="8de9b32074ad13277d1e6e3f910adce234c8c9bd"/>
+				<rom name="big_blue_reader_128[sogwap_1989](v3_12).g64" size="333744" crc="57d64987" sha1="8de9b32074ad13277d1e6e3f910adce234c8c9bd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +161,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="buddy128.g64" size="333744" crc="6f4326a2" sha1="750490f1aaa445ca603282642ed3e4976029982a"/>
+				<rom name="buddy128.g64" size="333744" crc="6f4326a2" sha1="750490f1aaa445ca603282642ed3e4976029982a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="commodore_128_tutorial[cbm_1985[.g64" size="333744" crc="0a807511" sha1="270a4f0efb950184fa53bb86ad1535192c94bb5f"/>
+				<rom name="commodore_128_tutorial[cbm_1985[.g64" size="333744" crc="0a807511" sha1="270a4f0efb950184fa53bb86ad1535192c94bb5f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,13 +186,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Joystick/Keyboard Version"/>
 			<dataarea name="flop" size="333744">
-				<rom name="cadpak-128_s1[abacus_1986].g64" size="333744" crc="db4d7d19" sha1="555f0605cd9acb37186cdc72950fad74925ae576"/>
+				<rom name="cadpak-128_s1[abacus_1986].g64" size="333744" crc="db4d7d19" sha1="555f0605cd9acb37186cdc72950fad74925ae576" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Mouse Version"/>
 			<dataarea name="flop" size="333744">
-				<rom name="cadpak-128_s2[abacus_1986].g64" size="333744" crc="5c99bc8e" sha1="cf4818c00495910ed8720c72d3c416ae123af9b2"/>
+				<rom name="cadpak-128_s2[abacus_1986].g64" size="333744" crc="5c99bc8e" sha1="cf4818c00495910ed8720c72d3c416ae123af9b2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="comm_term_64_128[anchor_automation_1987].g64" size="333744" crc="c9462996" sha1="c71ee5e1c71a1770bc569b96794d555fc8c3d08b"/>
+				<rom name="comm_term_64_128[anchor_automation_1987].g64" size="333744" crc="c9462996" sha1="c71ee5e1c71a1770bc569b96794d555fc8c3d08b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -217,13 +217,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="333744">
-				<rom name="data_manager_128_s1[timeworks_1984].g64" size="333744" crc="ef5793e1" sha1="18f97719615308a0d3aacd3561ce645a65e1b84c"/>
+				<rom name="data_manager_128_s1[timeworks_1984].g64" size="333744" crc="ef5793e1" sha1="18f97719615308a0d3aacd3561ce645a65e1b84c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="333744">
-				<rom name="data_manager_128_s2[timeworks_1984].g64" size="333744" crc="fbf7cf7f" sha1="2d2aa58bd1a71cffd5d6765a9b79af867d12ecc4"/>
+				<rom name="data_manager_128_s2[timeworks_1984].g64" size="333744" crc="fbf7cf7f" sha1="2d2aa58bd1a71cffd5d6765a9b79af867d12ecc4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,7 +235,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="enhanced_sid_player_128_version[compute!_198x].g64" size="333744" crc="284e224c" sha1="8057964665c16330a3283fdd44205a17075711a0"/>
+				<rom name="enhanced_sid_player_128_version[compute!_198x].g64" size="333744" crc="284e224c" sha1="8057964665c16330a3283fdd44205a17075711a0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -247,7 +247,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="fast_hack_em_128[basement_boys_1988](v6_00).g64" size="333744" crc="4af25fa0" sha1="b6f829654116feb69155876cb7ad182be15a9474"/>
+				<rom name="fast_hack_em_128[basement_boys_1988](v6_00).g64" size="333744" crc="4af25fa0" sha1="b6f829654116feb69155876cb7ad182be15a9474" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -260,37 +260,37 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
 			<dataarea name="flop" size="333744">
-				<rom name="geos_128_2_0_s1_system[berkeley_1988].g64" size="333744" crc="17827ed0" sha1="57384ad5a3b55c56b96fbdf78f61a2da1aef862c"/>
+				<rom name="geos_128_2_0_s1_system[berkeley_1988].g64" size="333744" crc="17827ed0" sha1="57384ad5a3b55c56b96fbdf78f61a2da1aef862c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Demo"/>
 			<dataarea name="flop" size="333744">
-				<rom name="geos_128_2_0_s2_demo[berkeley_1988].g64" size="333744" crc="6170c1af" sha1="13fa33b7993ce47274c4d6ff91fd1f9837d388d3"/>
+				<rom name="geos_128_2_0_s2_demo[berkeley_1988].g64" size="333744" crc="6170c1af" sha1="13fa33b7993ce47274c4d6ff91fd1f9837d388d3" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Backup"/>
 			<dataarea name="flop" size="333744">
-				<rom name="geos_128_2_0_s3_backup[berkeley_1988].g64" size="333744" crc="b6cd4bfa" sha1="fa3d0d1b06ec16b6fcff68e6572c9260fbc5ae6b"/>
+				<rom name="geos_128_2_0_s3_backup[berkeley_1988].g64" size="333744" crc="b6cd4bfa" sha1="fa3d0d1b06ec16b6fcff68e6572c9260fbc5ae6b" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Apps"/>
 			<dataarea name="flop" size="333744">
-				<rom name="geos_128_2_0_s4_apps[berkeley_1988].g64" size="333744" crc="889bb845" sha1="2a549943851ee608c31dcad53ee0595cb0ef5ffa"/>
+				<rom name="geos_128_2_0_s4_apps[berkeley_1988].g64" size="333744" crc="889bb845" sha1="2a549943851ee608c31dcad53ee0595cb0ef5ffa" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Write Utils"/>
 			<dataarea name="flop" size="333744">
-				<rom name="geos_128_2_0_s5_write_utils[berkeley_1988].g64" size="333744" crc="6f704079" sha1="1c61723ff24ffc02f57e90f7377c3e700d1e02a6"/>
+				<rom name="geos_128_2_0_s5_write_utils[berkeley_1988].g64" size="333744" crc="6f704079" sha1="1c61723ff24ffc02f57e90f7377c3e700d1e02a6" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="GEOSpell"/>
 			<dataarea name="flop" size="333744">
-				<rom name="geos_128_2_0_s6_geospell[berkeley_1988].g64" size="333744" crc="7df9ec72" sha1="211828b78afdeab3246302951750062c256ca1b5"/>
+				<rom name="geos_128_2_0_s6_geospell[berkeley_1988].g64" size="333744" crc="7df9ec72" sha1="211828b78afdeab3246302951750062c256ca1b5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -303,13 +303,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Application Disk"/>
 			<dataarea name="flop" size="333744">
-				<rom name="jane__s1_application_disk[cbm_1985](c128).g64" size="333744" crc="21df7137" sha1="6a8536a6c64120a3ad93bd741145a7355a323143"/>
+				<rom name="jane__s1_application_disk[cbm_1985](c128).g64" size="333744" crc="21df7137" sha1="6a8536a6c64120a3ad93bd741145a7355a323143" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Help Disk"/>
 			<dataarea name="flop" size="333744">
-				<rom name="jane__s2_help_disk[cbm_1985](c128).g64" size="333744" crc="90fdc6b9" sha1="6be4610651a7c1e8b803cd4fb7212943e52d597d"/>
+				<rom name="jane__s2_help_disk[cbm_1985](c128).g64" size="333744" crc="90fdc6b9" sha1="6be4610651a7c1e8b803cd4fb7212943e52d597d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -321,7 +321,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="mach_128[access_1985].g64" size="333744" crc="9cb01daa" sha1="47c5f1dc1a242edbff1ff51a0e89f89019f5aacd"/>
+				<rom name="mach_128[access_1985].g64" size="333744" crc="9cb01daa" sha1="47c5f1dc1a242edbff1ff51a0e89f89019f5aacd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -333,7 +333,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="merlin_128_macro_assembler[roger_wagner_pub_1987](v1_10)(c128).g64" size="333744" crc="ab9a0899" sha1="55d112b3fe01b56f593d7f7dde3458279a1bf834"/>
+				<rom name="merlin_128_macro_assembler[roger_wagner_pub_1987](v1_10)(c128).g64" size="333744" crc="ab9a0899" sha1="55d112b3fe01b56f593d7f7dde3458279a1bf834" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -345,7 +345,7 @@
 		<info name="protection" value="codesheet" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="petspeed_128[systems_software_1986](v2_2).g64" size="333744" crc="64be27bc" sha1="08050d19159dbe566e16f85586cebc142dc83773"/>
+				<rom name="petspeed_128[systems_software_1986](v2_2).g64" size="333744" crc="64be27bc" sha1="08050d19159dbe566e16f85586cebc142dc83773" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="super_pascal_128[data_becker_19xx](v6_1).g64" size="333744" crc="32716bcb" sha1="6c4a0fed4f5f3fc3961d12922d563307d8de6399"/>
+				<rom name="super_pascal_128[data_becker_19xx](v6_1).g64" size="333744" crc="32716bcb" sha1="6c4a0fed4f5f3fc3961d12922d563307d8de6399" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="super_c_128_[data_becker_1985](v3_02).g64" size="333744" crc="b0208ed2" sha1="9e21cf8b2bfdbe7de62a935579cd2ea16d3e2711"/>
+				<rom name="super_c_128_[data_becker_1985](v3_02).g64" size="333744" crc="b0208ed2" sha1="9e21cf8b2bfdbe7de62a935579cd2ea16d3e2711" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,7 +383,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287512">
-				<rom name="kc002264.g64" size="287512" crc="ea540ddd" sha1="6e1b1679a4a5525c2b2cd82f7d2ea9115f62ab4c" />
+				<rom name="kc002264.g64" size="287512" crc="ea540ddd" sha1="6e1b1679a4a5525c2b2cd82f7d2ea9115f62ab4c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -397,7 +397,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287512">
-				<rom name="uc004217.g64" size="287512" crc="63c96e73" sha1="05cf4f02448d72fd57be0b335810b8f429b8d81f" />
+				<rom name="uc004217.g64" size="287512" crc="63c96e73" sha1="05cf4f02448d72fd57be0b335810b8f429b8d81f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -411,7 +411,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="572316">
-				<rom name="dd-606-04.g71" size="572316" crc="d3490406" sha1="8ece5c70dacfc7005a601534f07c9e3e05e3e266" />
+				<rom name="dd-606-04.g71" size="572316" crc="d3490406" sha1="8ece5c70dacfc7005a601534f07c9e3e05e3e266" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">
-				<rom name="greatwar.g64" size="279582" crc="177ea4f4" sha1="e6f86ba6221ef3676f8560dc13a3b5df3eff2d57" />
+				<rom name="greatwar.g64" size="279582" crc="177ea4f4" sha1="e6f86ba6221ef3676f8560dc13a3b5df3eff2d57" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -437,13 +437,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287512">
-				<rom name="ypfp128-a.g64" size="287512" crc="5d1ef4c7" sha1="07dcd3c21cd4d3d0be1425f44e701c6d68af4f40" />
+				<rom name="ypfp128-a.g64" size="287512" crc="5d1ef4c7" sha1="07dcd3c21cd4d3d0be1425f44e701c6d68af4f40" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">
-				<rom name="ypfp128-b.g64" size="279582" crc="ec4b0485" sha1="4d0820ee76f00a43cf6cae48407b11ba8652274d" />
+				<rom name="ypfp128-b.g64" size="279582" crc="ec4b0485" sha1="4d0820ee76f00a43cf6cae48407b11ba8652274d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +455,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="c1570demo.d64" size="174848" crc="6f17e125" sha1="b14bbf4a80f2605b7f230a8ee4b7080196202d29" />
+				<rom name="c1570demo.d64" size="174848" crc="6f17e125" sha1="b14bbf4a80f2605b7f230a8ee4b7080196202d29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -467,7 +467,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="1570-demo.d64" size="174848" crc="72d7d809" sha1="8e452d7bccb36c3b72210092b50b516af806f704" />
+				<rom name="1570-demo.d64" size="174848" crc="72d7d809" sha1="8e452d7bccb36c3b72210092b50b516af806f704" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -479,7 +479,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="c1571demo.d64" size="174848" crc="6143de40" sha1="97c048f22a90e837c5d6064684070bdf05192fb7" />
+				<rom name="c1571demo.d64" size="174848" crc="6143de40" sha1="97c048f22a90e837c5d6064684070bdf05192fb7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -492,7 +492,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="1581demo.d81" size="819200" crc="1c3d6a09" sha1="680ef0511586976bcd90367a41320d35728193fe" />
+				<rom name="1581demo.d81" size="819200" crc="1c3d6a09" sha1="680ef0511586976bcd90367a41320d35728193fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -504,7 +504,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="diagnostics128.d64" size="174848" crc="8e914518" sha1="f99177d7606ead1b686b7489b02dc46c68fcf050" />
+				<rom name="diagnostics128.d64" size="174848" crc="8e914518" sha1="f99177d7606ead1b686b7489b02dc46c68fcf050" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -516,7 +516,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="1700-demo.d64" size="174848" crc="673085b6" sha1="ea883cede5677027ef70afc6f164f927cb3be5e3" />
+				<rom name="1700-demo.d64" size="174848" crc="673085b6" sha1="ea883cede5677027ef70afc6f164f927cb3be5e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -530,14 +530,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.622-580745.d64" size="174848" crc="44a50dca" sha1="663427e565adb31c2e47d18010e6210b7a771375" />
+				<rom name="cpm.system.622-580745.d64" size="174848" crc="44a50dca" sha1="663427e565adb31c2e47d18010e6210b7a771375" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" />
+				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -551,14 +551,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.622-598666.d64" size="174848" crc="2c910544" sha1="ebf461bd5c72be96e40eaf4869ee9acdb3049c67" />
+				<rom name="cpm.system.622-598666.d64" size="174848" crc="2c910544" sha1="ebf461bd5c72be96e40eaf4869ee9acdb3049c67" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" />
+				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -572,14 +572,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.6228129311.d64" size="174848" crc="fe64b343" sha1="7641a16a0cbef4f716934b9d87a3dd06eba24f60" />
+				<rom name="cpm.system.6228129311.d64" size="174848" crc="fe64b343" sha1="7641a16a0cbef4f716934b9d87a3dd06eba24f60" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" />
+				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -593,14 +593,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.6228151676.d64" size="174848" crc="fa079670" sha1="458792e5a19c79b212b072d2a5a6e682c80dbce8" />
+				<rom name="cpm.system.6228151676.d64" size="174848" crc="fa079670" sha1="458792e5a19c79b212b072d2a5a6e682c80dbce8" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities2.d64" size="174848" crc="d13ce550" sha1="012a6d4456f2ea5e045dc0fa9be01227af499fe5" />
+				<rom name="cpm.utilities2.d64" size="174848" crc="d13ce550" sha1="012a6d4456f2ea5e045dc0fa9be01227af499fe5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -614,14 +614,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.german-1986.d64" size="174848" crc="8629dc87" sha1="5871a0360cf40e5320f3fce559db5c4df2e5a50e" />
+				<rom name="cpm.system.german-1986.d64" size="174848" crc="8629dc87" sha1="5871a0360cf40e5320f3fce559db5c4df2e5a50e" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities.german-1986.d64" size="174848" crc="76760e69" sha1="fa7aff4e16297cf7442f729bbfbc514385ce2aae" />
+				<rom name="cpm.utilities.german-1986.d64" size="174848" crc="76760e69" sha1="fa7aff4e16297cf7442f729bbfbc514385ce2aae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -635,14 +635,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.622-3282252.d64" size="174848" crc="ebfdf2e6" sha1="8953f4062f5af46abe01670a479c7574b3e8a63c" />
+				<rom name="cpm.system.622-3282252.d64" size="174848" crc="ebfdf2e6" sha1="8953f4062f5af46abe01670a479c7574b3e8a63c" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities3.d64" size="174848" crc="8df68a10" sha1="3158cb60111e9a4f77e96cfd02d20cbb5e7ec243" />
+				<rom name="cpm.utilities3.d64" size="174848" crc="8df68a10" sha1="3158cb60111e9a4f77e96cfd02d20cbb5e7ec243" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -656,14 +656,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.system.622-3297432.d64" size="174848" crc="7b668049" sha1="750c2b3a2662f5a3b779dab93ce6273f9b3b1fe8" />
+				<rom name="cpm.system.622-3297432.d64" size="174848" crc="7b668049" sha1="750c2b3a2662f5a3b779dab93ce6273f9b3b1fe8" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M System User Utilities Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="cpm.utilities3.d64" size="174848" crc="8df68a10" sha1="3158cb60111e9a4f77e96cfd02d20cbb5e7ec243" />
+				<rom name="cpm.utilities3.d64" size="174848" crc="8df68a10" sha1="3158cb60111e9a4f77e96cfd02d20cbb5e7ec243" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -676,7 +676,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="cpm.622-5002336.d81" size="819200" crc="091e4f48" sha1="603600b5669d8ddd8aaef8f03e84535e261eef20" />
+				<rom name="cpm.622-5002336.d81" size="819200" crc="091e4f48" sha1="603600b5669d8ddd8aaef8f03e84535e261eef20" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -688,7 +688,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349696">
-				<rom name="cpmplus3.d71" size="349696" crc="1c7be360" sha1="034d9a4ba610564c0dfa2ad9539a9a75f391863e" />
+				<rom name="cpmplus3.d71" size="349696" crc="1c7be360" sha1="034d9a4ba610564c0dfa2ad9539a9a75f391863e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -700,7 +700,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349696">
-				<rom name="cpmfast3.d71" size="349696" crc="d0e56925" sha1="b713c99122397fd96e02b73ee94e19a26d41b67e" />
+				<rom name="cpmfast3.d71" size="349696" crc="d0e56925" sha1="b713c99122397fd96e02b73ee94e19a26d41b67e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -713,7 +713,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="lunix-c128.d64" size="174848" crc="253218c3" sha1="2169f2666bdf39cbd7bfb3811f58761c9bfa6020" />
+				<rom name="lunix-c128.d64" size="174848" crc="253218c3" sha1="2169f2666bdf39cbd7bfb3811f58761c9bfa6020" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -726,7 +726,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="lunix-c128-reu.d64" size="174848" crc="234af728" sha1="741127341c1bef3dbe5f137680f6df2547f5d02e" />
+				<rom name="lunix-c128-reu.d64" size="174848" crc="234af728" sha1="741127341c1bef3dbe5f137680f6df2547f5d02e" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -21,7 +21,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4"/>
+				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="325099-01.u1" size="0x4000" crc="285e5bf8" sha1="a110dd331eefe251effdcfa272faf5680db51973"/>
+				<rom name="325099-01.u1" size="0x4000" crc="285e5bf8" sha1="a110dd331eefe251effdcfa272faf5680db51973" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="c128_785260.bin" size="0x2000" crc="d4a4e162" sha1="2c861c89be4e556982435d076b012362545f03ca"/>
+				<rom name="c128_785260.bin" size="0x2000" crc="d4a4e162" sha1="2c861c89be4e556982435d076b012362545f03ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="325109-10.u1" size="0x4000" crc="6aed47f6" sha1="30493c1e2d3345898bd105ea9f3a03d2de1f7054"/>
+				<rom name="325109-10.u1" size="0x4000" crc="6aed47f6" sha1="30493c1e2d3345898bd105ea9f3a03d2de1f7054" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +82,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="c128diag_588121.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3"/>
+				<rom name="c128diag_588121.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="c128diag_789010.bin" size="0x2000" crc="3b5fcdbd" sha1="da8851745b90dfafe4e05b2bf4e8e224b553170a"/>
+				<rom name="c128diag_789010.bin" size="0x2000" crc="3b5fcdbd" sha1="da8851745b90dfafe4e05b2bf4e8e224b553170a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -132,13 +132,13 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a"/>
+				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab"/>
+				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -154,13 +154,13 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468"/>
+				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab"/>
+				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -176,13 +176,13 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="vizastar 128" size="0x2000" status="nodump"/>
+				<rom name="vizastar 128" size="0x2000" status="nodump" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="vizastar 128.g64" size="333744" crc="f45ef840" sha1="456480c22cb9204c50d8586fe988903fefd52257"/>
+				<rom name="vizastar 128.g64" size="333744" crc="f45ef840" sha1="456480c22cb9204c50d8586fe988903fefd52257" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -198,13 +198,13 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="vizawrite 128.bin" size="0x2000" crc="b4846e5d" sha1="ab250d5bd264faacffea68fd0791d9956e7282e8"/>
+				<rom name="vizawrite 128.bin" size="0x2000" crc="b4846e5d" sha1="ab250d5bd264faacffea68fd0791d9956e7282e8" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="vizawrite 128.d81" size="819200" crc="e0ea7b98" sha1="2b1acf1f3916883df9216b593e64a98b03e7b957"/>
+				<rom name="vizawrite 128.d81" size="819200" crc="e0ea7b98" sha1="2b1acf1f3916883df9216b593e64a98b03e7b957" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,14 +221,14 @@ Missing dumps:
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="partner 128" size="0x4000" crc="686a6881" sha1="53d4bcf7aff40f1642bc143626b63beb3c8478dc"/>
+				<rom name="partner 128" size="0x4000" crc="686a6881" sha1="53d4bcf7aff40f1642bc143626b63beb3c8478dc" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Partner Diagnostic Test &amp; Program Demonstration Disk"/>
 			<dataarea name="flop" size="333744">
-				<rom name="partner 128.g64" size="287512" crc="9b2ac8d5" sha1="8143cafa623bb53b92a37d7ee2cc7d77080d80ea"/>
+				<rom name="partner 128.g64" size="287512" crc="9b2ac8d5" sha1="8143cafa623bb53b92a37d7ee2cc7d77080d80ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>

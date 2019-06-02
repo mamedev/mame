@@ -28,7 +28,7 @@
 		<part name="cart" interface="h21_cart">
 			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="comefrutas.bin" size="4096" crc="f66c8e3a" sha1="c695bd36b572dff2c8f6c49edfcfda6dda3675c1"/>
+				<rom name="comefrutas.bin" size="4096" crc="f66c8e3a" sha1="c695bd36b572dff2c8f6c49edfcfda6dda3675c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

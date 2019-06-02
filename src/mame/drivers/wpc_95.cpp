@@ -504,7 +504,7 @@ const char *const wpc_95_state::lamps_afm[64] = {
 
 const char *const wpc_95_state::outputs_afm[52] = {
 	"s:Auto plunger", "s:Trough eject", "s:Left popper", "s:Right popper", "s:Left alien lo", "s:Left alien hi", "s:Knocker", "s:Right alien hi",
-	"s:Left slingshot", "s:Right slingshot", "s:Left jet", "s:Bottom jet", "s:Right jet", "s:Right alien lo", "s:Saucer shake", "s:Drop target",
+	"s:Left slingshot", "s:Right slingshot", "s:Left jet", "s:Bottom jet", "s:Right jet", "s:Right alien lo", "s;Saucer shake", "s:Drop target",
 	"f:R ramp hi (2)", "f:R ramp lo (2)", "f:R side hi (2)", "f:R side lo", "f:Center arrow", "f:Jets", "f:Saucer dome", "m:Motor bank",
 	"f:L ramp L (2)", "f:L ramp R (2)", "f:L side hi (2)", "f:L side lo", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
 	"s:Right gate", "s:Left gate", "s:Diverter power", "s:Diverter hold", nullptr, nullptr, "f:Strobe light", nullptr,

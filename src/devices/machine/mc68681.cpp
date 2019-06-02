@@ -70,9 +70,6 @@ static const int baud_rate_ACR_0_X_1[] = { 75, 110, 134, 150, 3600, 14400, 28800
 static const int baud_rate_ACR_1[] =     { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 0, 0, 0 }; /* xr68c681 X=0 */
 static const int baud_rate_ACR_1_X_1[] = { 50, 110, 134, 200, 3600, 14400, 28800, 57600, 115200, 4800, 7200, 9600, 38400, 0, 0, 0 };
 
-static const int baud_rate_ACR_0_340[] =     { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 76800, 0, 0 }; /* xr68c681 ACR:7=0 */
-static const int baud_rate_ACR_1_340[] =     { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 38400, 0, 0 }; /* xr68c681 ACR:7=1 */
-
 #define INT_INPUT_PORT_CHANGE       0x80
 #define INT_DELTA_BREAK_B           0x40
 #define INT_RXRDY_FFULLB            0x20
@@ -999,74 +996,6 @@ int duart_base_device::calc_baud(int ch, bool rx, uint8_t data)
 	else
 	{
 		baud_rate = baud_rate_ACR_1[data & 0x0f];
-	}
-
-	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
-	{
-		LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data);
-	}
-
-	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
-	return baud_rate;
-}
-
-int mc68340_duart_device::calc_baud(int ch, bool rx, uint8_t data)
-{
-	int baud_rate;
-
-	if (BIT(ACR, 7) == 0)
-	{
-		baud_rate = baud_rate_ACR_0_340[data & 0x0f];
-
-		if (ch == 0)
-		{
-			if ((data & 0xf) == 0xe)
-			{
-				baud_rate = ip3clk/16;
-			}
-			else if ((data & 0xf) == 0xf)
-			{
-				baud_rate = ip3clk;
-			}
-		}
-		else if (ch == 1)
-		{
-			if ((data & 0xf) == 0xe)
-			{
-				baud_rate = ip5clk/16;
-			}
-			else if ((data & 0xf) == 0xf)
-			{
-				baud_rate = ip5clk;
-			}
-		}
-	}
-	else
-	{
-		baud_rate = baud_rate_ACR_1_340[data & 0x0f];
-
-		if (ch == 0)
-		{
-			if ((data & 0xf) == 0xe)
-			{
-				baud_rate = ip3clk/16;
-			}
-			else if ((data & 0xf) == 0xf)
-			{
-				baud_rate = ip3clk;
-			}
-		}
-		else if (ch == 1)
-		{
-			if ((data & 0xf) == 0xe)
-			{
-				baud_rate = ip5clk/16;
-			}
-			else if ((data & 0xf) == 0xf)
-			{
-				baud_rate = ip5clk;
-			}
-		}
 	}
 
 	if ((baud_rate == 0) && ((data & 0xf) != 0xd))

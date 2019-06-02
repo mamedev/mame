@@ -16,16 +16,16 @@
 
 class os9_format : public wd177x_format {
 public:
-	os9_format();
+    os9_format();
 
-	virtual int identify(io_generic *io, uint32_t form_factor) override;
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+    virtual int identify(io_generic *io, uint32_t form_factor) override;
+    virtual int find_size(io_generic *io, uint32_t form_factor) override;
+    virtual const char *name() const override;
+    virtual const char *description() const override;
+    virtual const char *extensions() const override;
 
 private:
-	static const format formats[];
+    static const format formats[];
 };
 
 extern const floppy_format_type FLOPPY_OS9_FORMAT;

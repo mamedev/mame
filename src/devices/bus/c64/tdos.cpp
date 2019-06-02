@@ -319,7 +319,7 @@ void c64_tdos_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2,
 
 int c64_tdos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_enabled ? 1 : m_exp->game_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
+	return m_enabled ? 1 : m_exp->game_r(offset, sphi2, ba, rw, m_slot->hiram());
 }
 
 
@@ -329,5 +329,5 @@ int c64_tdos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int 
 
 int c64_tdos_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_enabled ? 0 : m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
+	return m_enabled ? 0 : m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->hiram());
 }

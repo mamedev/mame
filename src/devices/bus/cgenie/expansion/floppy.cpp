@@ -5,6 +5,7 @@
     EACA Colour Genie Floppy Disc Controller
 
     TODO:
+    - What's the exact FD1793 model?
     - How does it turn off the motor?
     - What's the source of the timer and the exact timings?
 
@@ -32,10 +33,10 @@ DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FD
 void cgenie_fdc_device::mmio(address_map &map)
 {
 	map(0xe0, 0xe3).mirror(0x10).rw(FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
-	map(0xec, 0xec).mirror(0x10).r("wd2793", FUNC(wd2793_device::status_r)).w(FUNC(cgenie_fdc_device::command_w));
-	map(0xed, 0xed).mirror(0x10).rw("wd2793", FUNC(wd2793_device::track_r), FUNC(wd2793_device::track_w));
-	map(0xee, 0xee).mirror(0x10).rw("wd2793", FUNC(wd2793_device::sector_r), FUNC(wd2793_device::sector_w));
-	map(0xef, 0xef).mirror(0x10).rw("wd2793", FUNC(wd2793_device::data_r), FUNC(wd2793_device::data_w));
+	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(FUNC(cgenie_fdc_device::command_w));
+	map(0xed, 0xed).mirror(0x10).rw("fd1793", FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xee, 0xee).mirror(0x10).rw("fd1793", FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xef, 0xef).mirror(0x10).rw("fd1793", FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
 }
 
 FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
@@ -57,21 +58,8 @@ static void cgenie_floppies(device_slot_interface &device)
 //-------------------------------------------------
 
 ROM_START( cgenie_fdc )
-	ROM_REGION(0x2000, "software", 0)
-	ROM_DEFAULT_BIOS("unk1")
-
-	// from cgemu
-	ROM_SYSTEM_BIOS(0, "unk1", "Unknown 1")
-	ROMX_LOAD("cgdos.rom", 0x0000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893), ROM_BIOS(0))
-
-	// can't read label
-	ROM_SYSTEM_BIOS(1, "unk2", "Unknown 2")
-	ROMX_LOAD("cgdos_a.c", 0x0000, 0x1000, CRC(6164e9d1) SHA1(c42ab4e73173893918abc871d01b63a3030cf6cc), ROM_BIOS(1))
-	ROMX_LOAD("cgdos_a.d", 0x1000, 0x1000, CRC(b09eb5d1) SHA1(80db78f665a488ad8cbffea696274b53fb90e492), ROM_BIOS(1))
-
-	// typed in from source code
-	ROM_SYSTEM_BIOS(2, "v2", "Version 2")
-	ROMX_LOAD("cgdos-v2.rom", 0x0000, 0x2000, BAD_DUMP CRC(9dace9c1) SHA1(513fef9fea81bee8f5edcf831095e90941e7cd69), ROM_BIOS(2))
+	ROM_REGION(0x3000, "software", 0)
+	ROM_LOAD("cgdos.rom", 0x0000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
 ROM_END
 
 const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
@@ -86,13 +74,13 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	TIMER(config, "timer").configure_periodic(FUNC(cgenie_fdc_device::timer_callback), attotime::from_msec(25));
 
-	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
+	FD1793(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(cgenie_fdc_device::intrq_w));
 
-	FLOPPY_CONNECTOR(config, "wd2793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd2793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd2793:2", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd2793:3", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:2", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1793:3", cgenie_floppies, nullptr, cgenie_fdc_device::floppy_formats);
 
 //  SOFTWARE_LIST(config, "floppy_list").set_original("cgenie_flop");
 
@@ -115,11 +103,11 @@ MACHINE_CONFIG_END
 cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CGENIE_FDC, tag, owner, clock),
 	device_cg_exp_interface(mconfig, *this),
-	m_fdc(*this, "wd2793"),
-	m_floppy0(*this, "wd2793:0"),
-	m_floppy1(*this, "wd2793:1"),
-	m_floppy2(*this, "wd2793:2"),
-	m_floppy3(*this, "wd2793:3"),
+	m_fdc(*this, "fd1793"),
+	m_floppy0(*this, "fd1793:0"),
+	m_floppy1(*this, "fd1793:1"),
+	m_floppy2(*this, "fd1793:2"),
+	m_floppy3(*this, "fd1793:3"),
 	m_socket(*this, "socket"),
 	m_floppy(nullptr),
 	m_irq_status(0)

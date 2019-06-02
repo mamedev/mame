@@ -1785,7 +1785,7 @@ ROM_START( ws )
 	ROM_LOAD_HS( "ws1_obj3.bin",    0x60000, 0x10000, CRC(f2ed5309) SHA1(b7d9c0a617660ecceaf7db3fd53bc0377ed1b6c1) )
 ROM_END
 
-/* Beraboh Man (revision C) */
+/* Beraboh Man (revision B) */
 ROM_START( berabohm )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )

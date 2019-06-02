@@ -424,7 +424,6 @@ MACHINES["BANKDEV"] = true
 --MACHINES["BIM68153"] = true
 MACHINES["CDP1852"] = true
 MACHINES["CDP1871"] = true
-MACHINES["CHESSMACHINE"] = true
 MACHINES["CMOS40105"] = true
 MACHINES["CDU76S"] = true
 MACHINES["COM8116"] = true
@@ -439,7 +438,6 @@ MACHINES["DS1205"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
 --MACHINES["DS1386"] = true
-MACHINES["DS1994"] = true
 MACHINES["DS2401"] = true
 MACHINES["DS2404"] = true
 MACHINES["DS75160A"] = true
@@ -536,7 +534,7 @@ MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
 MACHINES["MSM6253"] = true
 --MACHINES["NCR5380"] = true
-MACHINES["NCR5380N"] = true
+--MACHINES["NCR5380N"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
 MACHINES["NETLIST"] = true
@@ -610,7 +608,6 @@ MACHINES["UPD1990A"] = true
 MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7002"] = true
-MACHINES["UPD7004"] = true
 MACHINES["UPD71071"] = true
 MACHINES["UPD765"] = true
 MACHINES["FDC_PLL"] = true
@@ -1913,7 +1910,6 @@ files {
 	MAME_DIR .. "src/mame/machine/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.h",
 	MAME_DIR .. "src/mame/drivers/gaelcopc.cpp",
-	MAME_DIR .. "src/mame/drivers/goldart.cpp",
 	MAME_DIR .. "src/mame/drivers/glass.cpp",
 	MAME_DIR .. "src/mame/includes/glass.h",
 	MAME_DIR .. "src/mame/video/glass.cpp",
@@ -2396,8 +2392,6 @@ files {
 	MAME_DIR .. "src/mame/machine/k573cass.h",
 	MAME_DIR .. "src/mame/machine/k573dio.cpp",
 	MAME_DIR .. "src/mame/machine/k573dio.h",
-	MAME_DIR .. "src/mame/machine/k573fpga.cpp",
-	MAME_DIR .. "src/mame/machine/k573fpga.h",
 	MAME_DIR .. "src/mame/machine/k573mcr.cpp",
 	MAME_DIR .. "src/mame/machine/k573mcr.h",
 	MAME_DIR .. "src/mame/machine/k573msu.cpp",
@@ -3504,7 +3498,6 @@ files {
 	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_pci.cpp",
 	MAME_DIR .. "src/mame/drivers/flashbeats.cpp",
-	MAME_DIR .. "src/mame/drivers/segaatom.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")
@@ -4510,7 +4503,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/wpc_s.cpp",
 	MAME_DIR .. "src/mame/machine/wpc.cpp",
 	MAME_DIR .. "src/mame/machine/wpc.h",
-	MAME_DIR .. "src/mame/audio/bally.cpp",
 	MAME_DIR .. "src/mame/audio/wpcsnd.cpp",
 	MAME_DIR .. "src/mame/audio/wpcsnd.h",
 	MAME_DIR .. "src/mame/video/wpc_dmd.cpp",

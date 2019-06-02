@@ -356,7 +356,7 @@ void sdl_window_info::modify_prescale(int dir)
 
 void sdl_window_info::update_cursor_state()
 {
-#if (USE_XINPUT && USE_XINPUT_WII_LIGHTGUN_HACK)
+#if (USE_XINPUT)
 	// Hack for wii-lightguns:
 	// they stop working with a grabbed mouse;
 	// even a ShowCursor(SDL_DISABLE) already does this.

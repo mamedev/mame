@@ -195,6 +195,12 @@ READ8_MEMBER(carpolo_state::interrupt_cause_r)
 	return (m_ttl74148_3s->output_r() << 1) | m_priority_0_extension;
 }
 
+void carpolo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TID_TIMER)
+		timer_tick();
+}
+
 void carpolo_state::timer_tick()
 {
 	/* cause the timer interrupt */
@@ -418,6 +424,8 @@ READ8_MEMBER(carpolo_state::pia_1_port_b_r)
 
 void carpolo_state::machine_start()
 {
+	m_timer = timer_alloc(TID_TIMER);
+
 	save_item(NAME(m_ball_screen_collision_cause));
 	save_item(NAME(m_car_ball_collision_x));
 	save_item(NAME(m_car_ball_collision_y));
@@ -472,4 +480,6 @@ void carpolo_state::machine_reset()
 
 	m_ttl7474_1a_2->clear_w (1);
 	m_ttl7474_1a_2->preset_w(1);
+
+	m_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }

@@ -110,7 +110,7 @@ private:
 	virtual void video_start() override;
 	void progolf_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_cpu(address_map &map);
 	void sound_cpu(address_map &map);
 };
@@ -136,7 +136,7 @@ void progolf_state::video_start()
 }
 
 
-uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count,color,x,y,xi,yi;
 
@@ -175,7 +175,7 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 						color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix32(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
+							bitmap.pix16(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
 					}
 				}
 
@@ -440,6 +440,7 @@ void progolf_state::progolf(machine_config &config)
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(progolf_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_progolf);
 	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);

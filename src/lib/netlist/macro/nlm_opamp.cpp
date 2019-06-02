@@ -218,8 +218,8 @@ static NETLIST_START(LM3900)
 	ALIAS(PLUS, R1.1) // Positive input
 	ALIAS(MINUS, R2.1) // Negative input
 	ALIAS(OUT, G1.OP) // Opamp output ...
-	ALIAS(GND, G1.ON)  // V- terminal
-	ALIAS(VCC, DUMMY.I)  // V+ terminal
+	ALIAS(VCC, G1.ON)  // V- terminal
+	ALIAS(GND, DUMMY.I)  // V+ terminal
 
 	DUMMY_INPUT(DUMMY)
 

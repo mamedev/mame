@@ -819,19 +819,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/chessmachine.h,MACHINES["CHESSMACHINE"] = true
----------------------------------------------------
-
-if (MACHINES["CHESSMACHINE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/chessmachine.cpp",
-		MAME_DIR .. "src/devices/machine/chessmachine.h",
-	}
-end
-
-
----------------------------------------------------
---
 --@src/devices/machine/com8116.h,MACHINES["COM8116"] = true
 ---------------------------------------------------
 
@@ -945,18 +932,6 @@ if (MACHINES["DS1386"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ds1386.cpp",
 		MAME_DIR .. "src/devices/machine/ds1386.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/ds1994.h,MACHINES["DS1994"] = true
----------------------------------------------------
-
-if (MACHINES["DS1994"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/ds1994.cpp",
-		MAME_DIR .. "src/devices/machine/ds1994.h",
 	}
 end
 
@@ -2698,8 +2673,6 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
 		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
 		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.cpp",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.h",
 	}
 end
 
@@ -2937,18 +2910,6 @@ if (MACHINES["UPD7002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/upd7002.cpp",
 		MAME_DIR .. "src/devices/machine/upd7002.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/upd7004.h,MACHINES["UPD7004"] = true
----------------------------------------------------
-
-if (MACHINES["UPD7004"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/upd7004.cpp",
-		MAME_DIR .. "src/devices/machine/upd7004.h",
 	}
 end
 

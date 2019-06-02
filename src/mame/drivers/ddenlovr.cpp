@@ -240,8 +240,8 @@ private:
 	DECLARE_MACHINE_START(funkyfig);
 	DECLARE_MACHINE_START(mjmyster);
 	DECLARE_MACHINE_START(hparadis);
-	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_irq);
 	DECLARE_WRITE_LINE_MEMBER(mmpanic_irq);
@@ -426,7 +426,7 @@ private:
 	inline void log_blit(int data );
 	void blitter_w(int blitter, offs_t offset, uint8_t data);
 	void blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data);
-	void copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
+	void copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
 	void mmpanic_update_leds();
 	void mjchuuka_get_romdata();
 	uint8_t hgokou_player_r( int player );
@@ -538,7 +538,6 @@ private:
 	uint8_t m_mjflove_irq_cause;
 	uint8_t m_daimyojn_palette_sel;
 
-	bitmap_ind16 m_htengoku_layer;
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -1608,7 +1607,7 @@ READ16_MEMBER(ddenlovr_state::ddenlovr_gfxrom_r)
 }
 
 
-void ddenlovr_state::copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer)
+void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	int x,y;
 	int scrollx = m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 0];
@@ -1623,8 +1622,6 @@ void ddenlovr_state::copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 	palbase  &= ~penmask;
 	transpen &= transmask;
 
-	const pen_t *pens = &m_palette->pen(palbase);
-
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
 		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -1635,14 +1632,15 @@ void ddenlovr_state::copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 				if ((pen & transmask) != transpen)
 				{
 					pen &= penmask;
-					bitmap.pix32(y, x) = pens[pen];
+					pen |= palbase;
+					bitmap.pix16(y, x) = pen;
 				}
 			}
 		}
 	}
 }
 
-uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int order[24][4] =
 	{
@@ -1680,7 +1678,7 @@ uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_rg
 	if (machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	bitmap.fill(m_palette->pen(m_ddenlovr_bgcolor), cliprect);
+	bitmap.fill(m_ddenlovr_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z))
@@ -4172,11 +4170,9 @@ VIDEO_START_MEMBER(ddenlovr_state,htengoku)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 	VIDEO_START_CALL_MEMBER(hnoridur);
-
-	m_screen->register_screen_bitmap(m_htengoku_layer);
 }
 
-uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer, x, y;
 
@@ -4184,12 +4180,12 @@ uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_rg
 	// format and let screen_update_ddenlovr() do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
-		m_htengoku_layer.fill(0, cliprect);
-		hanamai_copylayer(m_htengoku_layer, cliprect, layer);
+		bitmap.fill(0, cliprect);
+		hanamai_copylayer(bitmap, cliprect, layer);
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)
-				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (uint8_t)(m_htengoku_layer.pix16(y, x));
+				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (uint8_t)(bitmap.pix16(y, x));
 	}
 
 	return screen_update_ddenlovr(screen, bitmap, cliprect);
@@ -4370,6 +4366,7 @@ void ddenlovr_state::htengoku(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_htengoku));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
 
 	DYNAX_BLITTER_REV2(config, m_blitter, 0);
@@ -9717,6 +9714,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::ddenlovr_irq));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -9841,6 +9839,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::strobe_a)).invert();
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -9930,6 +9929,7 @@ void ddenlovr_state::mmpanic(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mmpanic_irq));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -10015,6 +10015,7 @@ void ddenlovr_state::hanakanz(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10060,6 +10061,7 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	m_screen->set_visarea(0, 336-1-1, 1+4, 256-15-1+4);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10177,6 +10179,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10463,6 +10466,7 @@ void ddenlovr_state::jongtei(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10515,6 +10519,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -10561,6 +10566,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -10629,6 +10635,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -10677,6 +10684,7 @@ void ddenlovr_state::daimyojn(machine_config &config)
 	m_screen->set_visarea(0, 336-1-1, 1, 256-15-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
 	PALETTE(config, m_palette).set_entries(0x200);

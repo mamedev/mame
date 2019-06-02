@@ -178,7 +178,7 @@ namespace analog
 		NETLIB_CONSTRUCTOR_DERIVED(QBJT_switch, QBJT)
 			, m_RB(*this, "m_RB", true)
 			, m_RC(*this, "m_RC", true)
-			, m_BC(*this, "m_BC", true)
+			, m_BC_dummy(*this, "m_BC", true)
 			, m_gB(1e-9)
 			, m_gC(1e-9)
 			, m_V(0.0)
@@ -187,10 +187,15 @@ namespace analog
 			register_subalias("B", m_RB.m_P);
 			register_subalias("E", m_RB.m_N);
 			register_subalias("C", m_RC.m_P);
+			//register_term("_E1", m_RC.m_N);
+
+			//register_term("_B1", m_BC_dummy.m_P);
+			//register_term("_C1", m_BC_dummy.m_N);
 
 			connect(m_RB.m_N, m_RC.m_N);
-			connect(m_RB.m_P, m_BC.m_P);
-			connect(m_RC.m_P, m_BC.m_N);
+
+			connect(m_RB.m_P, m_BC_dummy.m_P);
+			connect(m_RC.m_P, m_BC_dummy.m_N);
 		}
 
 		NETLIB_RESETI();
@@ -201,7 +206,10 @@ namespace analog
 	private:
 		nld_twoterm m_RB;
 		nld_twoterm m_RC;
-		nld_twoterm m_BC;
+
+		// FIXME: this is needed so we have all terminals belong to one net list
+
+		nld_twoterm m_BC_dummy;
 
 		nl_double m_gB; // base conductance / switch on
 		nl_double m_gC; // collector conductance / switch on
@@ -298,7 +306,7 @@ namespace analog
 		m_RB.set_G_V_I(exec().gmin(), 0.0, 0.0);
 		m_RC.set_G_V_I(exec().gmin(), 0.0, 0.0);
 
-		m_BC.set_G_V_I(exec().gmin() / 10.0, 0.0, 0.0);
+		m_BC_dummy.set_G_V_I(exec().gmin() / 10.0, 0.0, 0.0);
 
 	}
 

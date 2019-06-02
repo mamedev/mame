@@ -156,7 +156,7 @@ void menu_dats_view::draw(uint32_t flags)
 	float const visible_left = (1.0f - visible_width) * 0.5f;
 	float const extra_height = 2.0f * line_height;
 	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
-	int const visible_items = item_count() - 2;
+	int const visible_items = item.size() - 2;
 
 	// determine effective positions taking into account the hilighting arrows
 	float const effective_width = visible_width - 2.0f * gutter_width;
@@ -187,13 +187,13 @@ void menu_dats_view::draw(uint32_t flags)
 	if (top_line + m_visible_lines >= visible_items)
 		top_line = visible_items - m_visible_lines;
 
-	clear_hover();
+	hover = item.size() + 1;
 	int const n_loop = (std::min)(visible_items, m_visible_lines);
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
 		float const line_y = visible_top + (float)linenum * line_height;
 		int const itemnum = top_line + linenum;
-		menu_item const &pitem = item(itemnum);
+		menu_item const &pitem = item[itemnum];
 		char const *const itemtext = pitem.text.c_str();
 		float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float const line_y0 = line_y;
@@ -211,7 +211,7 @@ void menu_dats_view::draw(uint32_t flags)
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-				set_hover(HOVER_ARROW_UP);
+				hover = HOVER_ARROW_UP;
 			}
 			draw_arrow(
 					0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
@@ -226,7 +226,7 @@ void menu_dats_view::draw(uint32_t flags)
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-				set_hover(HOVER_ARROW_DOWN);
+				hover = HOVER_ARROW_DOWN;
 			}
 			draw_arrow(
 					0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
@@ -245,9 +245,9 @@ void menu_dats_view::draw(uint32_t flags)
 		}
 	}
 
-	for (size_t count = visible_items; count < item_count(); count++)
+	for (size_t count = visible_items; count < item.size(); count++)
 	{
-		menu_item const &pitem = item(count);
+		menu_item const &pitem = item[count];
 		char const *const itemtext = pitem.text.c_str();
 		float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float const line_y0 = line;
@@ -257,7 +257,7 @@ void menu_dats_view::draw(uint32_t flags)
 		rgb_t const bgcolor = UI_SELECTED_BG_COLOR;
 
 		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
-			set_hover(count);
+			hover = count;
 
 		if (pitem.type == menu_item_type::SEPARATOR)
 		{

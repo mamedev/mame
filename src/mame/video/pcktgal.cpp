@@ -65,7 +65,7 @@ uint32_t pcktgal_state::screen_update_pcktgal(screen_device &screen, bitmap_ind1
 {
 	bool flip = m_tilegen->get_flip_state();
 	m_tilegen->set_flip_screen(flip);
-	m_tilegen->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }
@@ -75,7 +75,7 @@ uint32_t pcktgal_state::screen_update_pcktgalb(screen_device &screen, bitmap_ind
 	bool flip = m_tilegen->get_flip_state();
 	m_tilegen->set_flip_screen(flip);
 	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
-	m_tilegen->deco_bac06_pf_draw_bootleg(screen, bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2, 0);
+	m_tilegen->deco_bac06_pf_draw_bootleg(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
 	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }

@@ -3,13 +3,14 @@
 /* BGT Fruit Machines
   BGT (British Gaming Technology) were a small Spanish company
 
-  x86 based (186/188 or equivalent)
+  x86 based, not sure exactly what CPU tho
 
 */
 
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
+#include "cpu/nec/nec.h"
+#include "cpu/i86/i86.h"
 
 
 class bgt_state : public driver_device
@@ -50,7 +51,7 @@ INPUT_PORTS_END
 
 void bgt_state::bgt(machine_config &config)
 {
-	I80186(config, m_maincpu, 12000000); // ?
+	V30(config, m_maincpu, 12000000); // ? unknown CPU.. definitely x86 based tho
 	m_maincpu->set_addrmap(AS_PROGRAM, &bgt_state::bgt_map);
 	m_maincpu->set_addrmap(AS_IO, &bgt_state::bgt_io);
 }

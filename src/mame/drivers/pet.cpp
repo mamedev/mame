@@ -167,7 +167,6 @@ ROM sockets:  UA3   2K or 4K character
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/cbm_snqk.h"
-#include "machine/input_merger.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -217,6 +216,12 @@ public:
 		m_sync(0),
 		m_graphic(0),
 		m_blanktv(0),
+		m_via_irq(CLEAR_LINE),
+		m_pia1a_irq(CLEAR_LINE),
+		m_pia1b_irq(CLEAR_LINE),
+		m_pia2a_irq(CLEAR_LINE),
+		m_pia2b_irq(CLEAR_LINE),
+		m_exp_irq(CLEAR_LINE),
 		m_user_diag(1)
 	{ }
 
@@ -244,16 +249,22 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
 	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
 
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
 	DECLARE_READ8_MEMBER( pia1_pa_r );
 	DECLARE_READ8_MEMBER( pia1_pb_r );
 	DECLARE_WRITE8_MEMBER( pia1_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
 
@@ -302,6 +313,8 @@ protected:
 	DECLARE_MACHINE_START( pet2001 );
 	DECLARE_MACHINE_RESET( pet );
 
+
+	void check_interrupts();
 	void update_speaker();
 
 	enum
@@ -339,6 +352,13 @@ protected:
 
 	uint8_t m_via_pa;
 
+	// interrupt state
+	int m_via_irq;
+	int m_pia1a_irq;
+	int m_pia1b_irq;
+	int m_pia2a_irq;
+	int m_pia2b_irq;
+	int m_exp_irq;
 	int m_user_diag;
 };
 
@@ -474,6 +494,19 @@ QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
 //**************************************************************************
 //  INTERRUPTS
 //**************************************************************************
+
+//-------------------------------------------------
+//  check_interrupts -
+//-------------------------------------------------
+
+void pet_state::check_interrupts()
+{
+	int irq = m_via_irq || m_pia1a_irq || m_pia1b_irq || m_pia2a_irq || m_pia2b_irq || m_exp_irq;
+
+	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
+	m_exp->irq_w(irq);
+}
+
 
 //-------------------------------------------------
 //  update_speaker -
@@ -1121,6 +1154,13 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
+WRITE_LINE_MEMBER( pet_state::via_irq_w )
+{
+	m_via_irq = state;
+
+	check_interrupts();
+}
+
 WRITE8_MEMBER( pet_state::via_pa_w )
 {
 	m_user->write_c((data>>0)&1);
@@ -1205,6 +1245,20 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 	m_user->write_m(state);
 }
 
+
+WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
+{
+	m_pia1a_irq = state;
+
+	check_interrupts();
+}
+
+WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
+{
+	m_pia1b_irq = state;
+
+	check_interrupts();
+}
 
 READ8_MEMBER( pet_state::pia1_pa_r )
 {
@@ -1315,6 +1369,20 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 	m_blanktv = state;
 }
 
+
+WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
+{
+	m_pia2a_irq = state;
+
+	check_interrupts();
+}
+
+WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
+{
+	m_pia2b_irq = state;
+
+	check_interrupts();
+}
 
 WRITE_LINE_MEMBER( pet_state::user_diag_w )
 {
@@ -1543,6 +1611,12 @@ MACHINE_START_MEMBER( pet_state, pet )
 	save_item(NAME(m_sync));
 	save_item(NAME(m_graphic));
 	save_item(NAME(m_blanktv));
+	save_item(NAME(m_via_irq));
+	save_item(NAME(m_pia1a_irq));
+	save_item(NAME(m_pia1b_irq));
+	save_item(NAME(m_pia2a_irq));
+	save_item(NAME(m_pia2b_irq));
+	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_user_diag));
 }
 
@@ -1657,10 +1731,6 @@ void pet_state::_32k(machine_config &config)
 
 void pet_state::base_pet_devices(machine_config &config, const char *default_drive)
 {
-	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
-	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
-	mainirq.output_handler().append(m_exp, FUNC(pet_expansion_slot_device::irq_w));
-
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	VIA6522(config, m_via, XTAL(16'000'000)/16);
@@ -1669,7 +1739,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_via->writepb_handler().set(FUNC(pet_state::via_pb_w));
 	m_via->ca2_handler().set(FUNC(pet_state::via_ca2_w));
 	m_via->cb2_handler().set(FUNC(pet_state::via_cb2_w));
-	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_via->irq_handler().set(FUNC(pet_state::via_irq_w));
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(pet_state::pia1_pa_r));
@@ -1678,16 +1748,16 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia1->writepa_handler().set(FUNC(pet_state::pia1_pa_w));
 	m_pia1->ca2_handler().set(FUNC(pet_state::pia1_ca2_w));
 	m_pia1->cb2_handler().set(PET_DATASSETTE_PORT_TAG, FUNC(pet_datassette_port_device::motor_w));
-	m_pia1->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	m_pia1->irqa_handler().set(FUNC(pet_state::pia1_irqa_w));
+	m_pia1->irqb_handler().set(FUNC(pet_state::pia1_irqb_w));
 
 	PIA6821(config, m_pia2, 0);
 	m_pia2->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_pia2->writepb_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_pia2->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
 	m_pia2->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
-	m_pia2->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
-	m_pia2->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
+	m_pia2->irqa_handler().set(FUNC(pet_state::pia2_irqa_w));
+	m_pia2->irqb_handler().set(FUNC(pet_state::pia2_irqb_w));
 
 	ieee488_slot_device::add_cbm_defaults(config, default_drive);
 	IEEE488(config, m_ieee, 0);

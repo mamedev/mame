@@ -85,9 +85,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// Clocks
@@ -114,7 +115,7 @@ private:
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;
 	uint8_t m_cass_data[4];
-	bool m_cassbit;
+	bool m_cass_state;
 	bool m_cassold;
 	uint8_t m_clockcnt;
 	virtual void machine_reset() override;
@@ -199,23 +200,23 @@ void proteus3_state::write_acia_clocks(int id, int state)
 /******************************************************************************
  Cassette
 ******************************************************************************/
-TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::kansas_w )
+TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_c )
 {
 	m_cass_data[3]++;
 
-	if (m_cassbit != m_cassold)
+	if (m_cass_state != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cassbit;
+		m_cassold = m_cass_state;
 	}
 
-	if (m_cassbit)
+	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::kansas_r )
+TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_p )
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -227,6 +228,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::kansas_r )
 		m_acia1->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
+}
+
+WRITE_LINE_MEMBER( proteus3_state::acia1_txdata_w )
+{
+	m_cass_state = state;
 }
 
 WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
@@ -355,7 +361,7 @@ void proteus3_state::machine_reset()
 {
 	m_curs_pos = 0;
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-	m_cassbit = 1;
+	m_cass_state = 1;
 	m_cassold = 1;
 	m_acia1->write_rxd(1);
 
@@ -402,14 +408,14 @@ void proteus3_state::proteus3(machine_config &config)
 
 	/* cassette */
 	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set([this] (bool state) { m_cassbit = state; });
+	m_acia1->txd_handler().set(FUNC(proteus3_state::acia1_txdata_w));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
-	TIMER(config, "kansas_w").configure_periodic(FUNC(proteus3_state::kansas_w), attotime::from_hz(4800));
-	TIMER(config, "kansas_r").configure_periodic(FUNC(proteus3_state::kansas_r), attotime::from_hz(40000));
+	TIMER(config, "timer_c").configure_periodic(FUNC(proteus3_state::timer_c), attotime::from_hz(4800));
+	TIMER(config, "timer_p").configure_periodic(FUNC(proteus3_state::timer_p), attotime::from_hz(40000));
 
 	// optional tty keyboard
 	ACIA6850(config, m_acia2, 0);

@@ -385,7 +385,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Konami</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="4game.dsk" size="225536" crc="19cc28fa" sha1="fed6c4972fc72ac51952f3b800c43f1b1240643b"/>
+				<rom name="4game.dsk" size="225536" crc="19cc28fa" sha1="fed6c4972fc72ac51952f3b800c43f1b1240643b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -396,7 +396,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="432111">
-				<rom name="256 games pack (1986)(merlin software).dsk" size="432111" crc="2146b276" sha1="f1264ae29aed7ef14a99ce3a851adf0a4888e427"/>
+				<rom name="256 games pack (1986)(merlin software).dsk" size="432111" crc="2146b276" sha1="f1264ae29aed7ef14a99ce3a851adf0a4888e427" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +407,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Syntaxsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="432111">
-				<rom name="agrovator (19xx)(syntaxsoft).dsk" size="432111" crc="c63f389c" sha1="1c83b50e3bbd91ae8a2003734a6028b88aecd42a"/>
+				<rom name="agrovator (19xx)(syntaxsoft).dsk" size="432111" crc="c63f389c" sha1="1c83b50e3bbd91ae8a2003734a6028b88aecd42a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -418,7 +418,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Orion Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="alice and the march hare (1986)(orion software).dsk" size="215296" crc="064166a6" sha1="d7138afc0068fe192ac1718ae6566b016de26571"/>
+				<rom name="alice and the march hare (1986)(orion software).dsk" size="215296" crc="064166a6" sha1="d7138afc0068fe192ac1718ae6566b016de26571" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -430,7 +430,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Glentop</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="assembly.dsk" size="215296" crc="ca014880" sha1="0c512676eb9bd2769459d5f3cf98fa173fe7ae40"/>
+				<rom name="assembly.dsk" size="215296" crc="ca014880" sha1="0c512676eb9bd2769459d5f3cf98fa173fe7ae40" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -441,7 +441,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Bubble Bus</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="boardelo.dsk" size="215296" crc="4f428e86" sha1="1aaecade1d2d7e5ca7ffdd056fe66054d0c1e36d"/>
+				<rom name="boardelo.dsk" size="215296" crc="4f428e86" sha1="1aaecade1d2d7e5ca7ffdd056fe66054d0c1e36d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -452,7 +452,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="basic.dsk" size="215296" crc="f3433463" sha1="da34ca555b1173b7683c5288209696f1780386c2"/>
+				<rom name="basic.dsk" size="215296" crc="f3433463" sha1="da34ca555b1173b7683c5288209696f1780386c2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -463,7 +463,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="castle.dsk" size="215296" crc="d21a8b66" sha1="cc12ce160e9da03c687f1d325deacf750c63622b"/>
+				<rom name="castle.dsk" size="215296" crc="d21a8b66" sha1="cc12ce160e9da03c687f1d325deacf750c63622b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -474,7 +474,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="chuckie.dsk" size="215296" crc="646a2e35" sha1="0ec273fef5172259a81a3837904450ad03842e42"/>
+				<rom name="chuckie.dsk" size="215296" crc="646a2e35" sha1="0ec273fef5172259a81a3837904450ad03842e42" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -485,7 +485,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Duncan Elvin</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="cpm3.dsk" size="215296" crc="ba285bc6" sha1="862af9d340226fb8f21ab8ae209dba209775bc6e"/>
+				<rom name="cpm3.dsk" size="215296" crc="ba285bc6" sha1="862af9d340226fb8f21ab8ae209dba209775bc6e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Leisure Genius</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="cluedo.dsk" size="215296" crc="9c512cd7" sha1="2c0c2db7d7b029b2dac634891429e3b2fc0ab896"/>
+				<rom name="cluedo.dsk" size="215296" crc="9c512cd7" sha1="2c0c2db7d7b029b2dac634891429e3b2fc0ab896" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -507,7 +507,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="colour fantasia (1984)(kuma).dsk" size="215296" crc="9ba560b0" sha1="315cf7972b5ab4101d7fa36b8473f95bfbb0b5c9"/>
+				<rom name="colour fantasia (1984)(kuma).dsk" size="215296" crc="9ba560b0" sha1="315cf7972b5ab4101d7fa36b8473f95bfbb0b5c9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -518,7 +518,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="cracker, the v2.31c (1985)(tatung).dsk" size="215296" crc="d7281b0d" sha1="92866de491cb5e8dd42d1c1cd458e17b2e0d3dcd"/>
+				<rom name="cracker, the v2.31c (1985)(tatung).dsk" size="215296" crc="d7281b0d" sha1="92866de491cb5e8dd42d1c1cd458e17b2e0d3dcd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -529,7 +529,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="cchamber.dsk" size="215296" crc="5ed3b3f6" sha1="77deff35d7d68dbf22ebdffe950e0a160a888799"/>
+				<rom name="cchamber.dsk" size="215296" crc="5ed3b3f6" sha1="77deff35d7d68dbf22ebdffe950e0a160a888799" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -540,7 +540,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="cursed chambers &amp; zrim (198x)(kuma software).dsk" size="215296" crc="e90b6d6e" sha1="42fdd02da64b5141e968a8edbeafbf244a8b67de"/>
+				<rom name="cursed chambers &amp; zrim (198x)(kuma software).dsk" size="215296" crc="e90b6d6e" sha1="42fdd02da64b5141e968a8edbeafbf244a8b67de" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -551,7 +551,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="diamond.dsk" size="215296" crc="7995e95b" sha1="af9784f5129c91de29d896cd4ef6eb013abe4b2e"/>
+				<rom name="diamond.dsk" size="215296" crc="7995e95b" sha1="af9784f5129c91de29d896cd4ef6eb013abe4b2e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -562,7 +562,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Emsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="disk.dsk" size="215296" crc="2a18d569" sha1="45950a6d63d661c4819a53e156da8027055eff42"/>
+				<rom name="disk.dsk" size="215296" crc="2a18d569" sha1="45950a6d63d661c4819a53e156da8027055eff42" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -573,7 +573,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="disco.dsk" size="215296" crc="21006fae" sha1="0c8563fb3b5d92d10f7560ed70558b74b203e2ca"/>
+				<rom name="disco.dsk" size="215296" crc="21006fae" sha1="0c8563fb3b5d92d10f7560ed70558b74b203e2ca" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -585,7 +585,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="druid.dsk" size="215296" crc="25de2d70" sha1="008fec6fdfa922172cf385166a676c3d76943a71"/>
+				<rom name="druid.dsk" size="215296" crc="25de2d70" sha1="008fec6fdfa922172cf385166a676c3d76943a71" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -596,7 +596,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Supasoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="eazidraw.dsk" size="215296" crc="8999581b" sha1="49a00d2489ae0e9bc14cf96d5363b916fe242608"/>
+				<rom name="eazidraw.dsk" size="215296" crc="8999581b" sha1="49a00d2489ae0e9bc14cf96d5363b916fe242608" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -607,7 +607,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="6in1.dsk" size="215296" crc="ab3cba74" sha1="42c12012e0053d8017cd2c9c07bd38e9b54f2e03"/>
+				<rom name="6in1.dsk" size="215296" crc="ab3cba74" sha1="42c12012e0053d8017cd2c9c07bd38e9b54f2e03" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -618,7 +618,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Emsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="einstein compendium (19xx)(emsoft).dsk" size="215296" crc="40aaf5ff" sha1="c3a4b1b128e77b97b4cfd1a8b6d5e9a718ed8136"/>
+				<rom name="einstein compendium (19xx)(emsoft).dsk" size="215296" crc="40aaf5ff" sha1="c3a4b1b128e77b97b4cfd1a8b6d5e9a718ed8136" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -629,7 +629,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Henry Philippe</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="microplx.dsk" size="215296" crc="8559318d" sha1="4c585dce341652c37d5066c63864030cd0aaa44b"/>
+				<rom name="microplx.dsk" size="215296" crc="8559318d" sha1="4c585dce341652c37d5066c63864030cd0aaa44b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -640,7 +640,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Firebird</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="elite.dsk" size="215296" crc="17dad062" sha1="e0ee4579e436ea0de01d6dc68e4034a119ee8777"/>
+				<rom name="elite.dsk" size="215296" crc="17dad062" sha1="e0ee4579e436ea0de01d6dc68e4034a119ee8777" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -651,7 +651,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="escape.dsk" size="215296" crc="354f1dc7" sha1="46fff7aaa171c13e370329eed2f8857e3349b74a"/>
+				<rom name="escape.dsk" size="215296" crc="354f1dc7" sha1="46fff7aaa171c13e370329eed2f8857e3349b74a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -662,7 +662,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="fathoms deep (19xx)(merlin software).dsk" size="215296" crc="303afc4f" sha1="4a619ebc15353c6a7cc0ec4844a430343acec68f"/>
+				<rom name="fathoms deep (19xx)(merlin software).dsk" size="215296" crc="303afc4f" sha1="4a619ebc15353c6a7cc0ec4844a430343acec68f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -673,7 +673,7 @@ Xtal Systems (Xtal Research)
 		<publisher>ScreenSoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="flightsim.dsk" size="215296" crc="9af55027" sha1="a8187166874feca2bdc8463a2c4c8ce923c4cede"/>
+				<rom name="flightsim.dsk" size="215296" crc="9af55027" sha1="a8187166874feca2bdc8463a2c4c8ce923c4cede" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -684,7 +684,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="fukung.dsk" size="215296" crc="1fa870f3" sha1="c191b77d3a688a0cc7666e82df4ab767c0985bd7"/>
+				<rom name="fukung.dsk" size="215296" crc="1fa870f3" sha1="c191b77d3a688a0cc7666e82df4ab767c0985bd7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -695,7 +695,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="games.dsk" size="215296" crc="c3b528b7" sha1="f7065b08ceced334afa94a56bbf9c6f32a9c15f5"/>
+				<rom name="games.dsk" size="215296" crc="c3b528b7" sha1="f7065b08ceced334afa94a56bbf9c6f32a9c15f5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -706,7 +706,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="get lost &amp; mr fixit (1984)(solo software).dsk" size="215296" crc="07b9417b" sha1="078e78f81c251fe3bef2caefe766f21454c06985"/>
+				<rom name="get lost &amp; mr fixit (1984)(solo software).dsk" size="215296" crc="07b9417b" sha1="078e78f81c251fe3bef2caefe766f21454c06985" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@ Xtal Systems (Xtal Research)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="gronks.dsk" size="215296" crc="706fbb82" sha1="4be0e5f6c901fddbd0d4e3867a4686e24466f9eb"/>
+				<rom name="gronks.dsk" size="215296" crc="706fbb82" sha1="4be0e5f6c901fddbd0d4e3867a4686e24466f9eb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -728,7 +728,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Screensoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="heli-maths (1985)(screensoft).dsk" size="215296" crc="05554ee4" sha1="ad180db0a1de09fa9bc33b78a616602515567032"/>
+				<rom name="heli-maths (1985)(screensoft).dsk" size="215296" crc="05554ee4" sha1="ad180db0a1de09fa9bc33b78a616602515567032" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -739,7 +739,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Orion Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="highway.dsk" size="1722368" crc="6a0b9186" sha1="dc88e7aa2cdf9d066fece5dc10092a41de077075"/>
+				<rom name="highway.dsk" size="1722368" crc="6a0b9186" sha1="dc88e7aa2cdf9d066fece5dc10092a41de077075" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +750,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="hitchiker.dsk" size="215296" crc="6d67855a" sha1="99f91956d576d815ca28f0f872bbb625d23c9ba8"/>
+				<rom name="hitchiker.dsk" size="215296" crc="6d67855a" sha1="99f91956d576d815ca28f0f872bbb625d23c9ba8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -761,7 +761,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Bubble Bus</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="hustler.dsk" size="215296" crc="86602255" sha1="964e96a6b800bf609546fc5fbb3ceb12a63c73d8"/>
+				<rom name="hustler.dsk" size="215296" crc="86602255" sha1="964e96a6b800bf609546fc5fbb3ceb12a63c73d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -773,7 +773,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="artuan.dsk" size="215296" crc="02a10c4b" sha1="e1db7bdfd057ed98416aea91641489a295e6b977"/>
+				<rom name="artuan.dsk" size="215296" crc="02a10c4b" sha1="e1db7bdfd057ed98416aea91641489a295e6b977" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -784,7 +784,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Software Projects</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="willy.dsk" size="215296" crc="0cb80035" sha1="13e0de50a739103b2e3839cf2274510e2440224c"/>
+				<rom name="willy.dsk" size="215296" crc="0cb80035" sha1="13e0de50a739103b2e3839cf2274510e2440224c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +795,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="kumautil.dsk" size="215296" crc="49149c08" sha1="ddb0aa5ac4bb63b9d9c90218db7bad794a564ab9"/>
+				<rom name="kumautil.dsk" size="215296" crc="49149c08" sha1="ddb0aa5ac4bb63b9d9c90218db7bad794a564ab9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -806,7 +806,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Terminal Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="lazyjone.dsk" size="215296" crc="fff1af5d" sha1="ed44cace57f25ddf865091f1b9753e8e0555b8c6"/>
+				<rom name="lazyjone.dsk" size="215296" crc="fff1af5d" sha1="ed44cace57f25ddf865091f1b9753e8e0555b8c6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -817,7 +817,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Electric Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="lesflics.dsk" size="215296" crc="8014e1f0" sha1="e0602ee608b7416089e05929b7bb36116a42344f"/>
+				<rom name="lesflics.dsk" size="215296" crc="8014e1f0" sha1="e0602ee608b7416089e05929b7bb36116a42344f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -828,7 +828,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Software Projects</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="manicmin.dsk" size="215296" crc="074d1c59" sha1="1cb57d05ff38517fa7aa4bcedf56a324e57d57c0"/>
+				<rom name="manicmin.dsk" size="215296" crc="074d1c59" sha1="1cb57d05ff38517fa7aa4bcedf56a324e57d57c0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -839,7 +839,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="432111">
-				<rom name="manik panik &amp; galaxoids (19xx)(solo software).dsk" size="432111" crc="3512fac4" sha1="e48e44ba48535665cd97a54185c94c559bd7813a"/>
+				<rom name="manik panik &amp; galaxoids (19xx)(solo software).dsk" size="432111" crc="3512fac4" sha1="e48e44ba48535665cd97a54185c94c559bd7813a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -850,7 +850,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="mathe.dsk" size="215296" crc="88a08a2f" sha1="bfbdd42f5fb5eeeb97c8ab04b1c8474ce59ddf40"/>
+				<rom name="mathe.dsk" size="215296" crc="88a08a2f" sha1="bfbdd42f5fb5eeeb97c8ab04b1c8474ce59ddf40" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -861,7 +861,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="mathsq.dsk" size="215296" crc="e90111b1" sha1="0949b404180115fa914d12f37edfb24de4bc83d2"/>
+				<rom name="mathsq.dsk" size="215296" crc="e90111b1" sha1="0949b404180115fa914d12f37edfb24de4bc83d2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -872,7 +872,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="maxima.dsk" size="215296" crc="9af76546" sha1="b8683812dd2f64f5f6048899863cf41ef0f60cc4"/>
+				<rom name="maxima.dsk" size="215296" crc="9af76546" sha1="b8683812dd2f64f5f6048899863cf41ef0f60cc4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -883,7 +883,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="miner dick (1984)(merlin software).dsk" size="215296" crc="85b403e9" sha1="a5902ca0d2eb6e33840c771fc204a77afc93416b"/>
+				<rom name="miner dick (1984)(merlin software).dsk" size="215296" crc="85b403e9" sha1="a5902ca0d2eb6e33840c771fc204a77afc93416b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -894,7 +894,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Leisure Genius</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="monopoly.dsk" size="215296" crc="28059487" sha1="03681989f41e434388b26e58fdc124de39864f60"/>
+				<rom name="monopoly.dsk" size="215296" crc="28059487" sha1="03681989f41e434388b26e58fdc124de39864f60" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -905,7 +905,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Emsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="mouse art (19xx)(emsoft).dsk" size="215296" crc="0645ec91" sha1="4c207b635a8acbf83361659a55953999e33cd335"/>
+				<rom name="mouse art (19xx)(emsoft).dsk" size="215296" crc="0645ec91" sha1="4c207b635a8acbf83361659a55953999e33cd335" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -916,7 +916,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="mcomposer.dsk" size="215296" crc="24a295c6" sha1="dc9682960157204ec5d2938a96a56a271bbffc11"/>
+				<rom name="mcomposer.dsk" size="215296" crc="24a295c6" sha1="dc9682960157204ec5d2938a96a56a271bbffc11" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -927,7 +927,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Screensoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="mworkshop.dsk" size="215296" crc="a4bfa2ef" sha1="edd4a4aa4ba14f72632099cfe9eaca9519fc0a4a"/>
+				<rom name="mworkshop.dsk" size="215296" crc="a4bfa2ef" sha1="edd4a4aa4ba14f72632099cfe9eaca9519fc0a4a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -938,7 +938,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Screensoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="music workshop (19xx)(screensoft)[a].dsk" size="215296" crc="bc7e66cf" sha1="438398a62e92b003672dd595d7358de662de9b70"/>
+				<rom name="music workshop (19xx)(screensoft)[a].dsk" size="215296" crc="bc7e66cf" sha1="438398a62e92b003672dd595d7358de662de9b70" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -949,7 +949,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="nightmare.dsk" size="215296" crc="13b56567" sha1="22776fe320f00fb0908ce29a8908f0dc38e0f719"/>
+				<rom name="nightmare.dsk" size="215296" crc="13b56567" sha1="22776fe320f00fb0908ce29a8908f0dc38e0f719" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -960,7 +960,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="ohmummy.dsk" size="215296" crc="86ae70c1" sha1="ceb5fb85e83a1af8540a51f70ebac366e0f588d8"/>
+				<rom name="ohmummy.dsk" size="215296" crc="86ae70c1" sha1="ceb5fb85e83a1af8540a51f70ebac366e0f588d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -971,7 +971,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="pakman &amp; millipede (198x)(kuma software).dsk" size="215296" crc="e4873d5c" sha1="9706faecc8a4df33bdcbd0dc7549d6b70257a97d"/>
+				<rom name="pakman &amp; millipede (198x)(kuma software).dsk" size="215296" crc="e4873d5c" sha1="9706faecc8a4df33bdcbd0dc7549d6b70257a97d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -982,7 +982,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Lothlorien</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="panzer attack (1985)(lothlorien).dsk" size="215296" crc="0ce722b7" sha1="78c2c21534f9299814a6757f7334d4f5b21c3995"/>
+				<rom name="panzer attack (1985)(lothlorien).dsk" size="215296" crc="0ce722b7" sha1="78c2c21534f9299814a6757f7334d4f5b21c3995" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -993,7 +993,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="peteutil.dsk" size="215296" crc="33f92503" sha1="551a8b97c5bbf1d9f2202f1fee516455d2d67c7b"/>
+				<rom name="peteutil.dsk" size="215296" crc="33f92503" sha1="551a8b97c5bbf1d9f2202f1fee516455d2d67c7b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1004,7 +1004,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="progkit.dsk" size="215296" crc="2feebf86" sha1="e488c6a92706021f94de645206dafaf1beb52b8c"/>
+				<rom name="progkit.dsk" size="215296" crc="2feebf86" sha1="e488c6a92706021f94de645206dafaf1beb52b8c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1015,7 +1015,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="punchy.dsk" size="215296" crc="644c1a0a" sha1="ff4c740976a57ec01eb9b11e09af141c20219b02"/>
+				<rom name="punchy.dsk" size="215296" crc="644c1a0a" sha1="ff4c740976a57ec01eb9b11e09af141c20219b02" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1026,7 +1026,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="432111">
-				<rom name="quantum (19xx)(orion software).dsk" size="432111" crc="2145a675" sha1="53aedb6567deafc5a5b29b1b714141ae78a78d20"/>
+				<rom name="quantum (19xx)(orion software).dsk" size="432111" crc="2145a675" sha1="53aedb6567deafc5a5b29b1b714141ae78a78d20" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1037,7 +1037,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="435183">
-				<rom name="river bandits (19xx)(merlin software).dsk" size="435183" crc="84f88b5c" sha1="728678c6f3eee525ac752c7f8b0226e6df18ec31"/>
+				<rom name="river bandits (19xx)(merlin software).dsk" size="435183" crc="84f88b5c" sha1="728678c6f3eee525ac752c7f8b0226e6df18ec31" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1048,7 +1048,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="rocket.dsk" size="215296" crc="8ffe425c" sha1="04036decd519566ab407787d9ce837416182d986"/>
+				<rom name="rocket.dsk" size="215296" crc="8ffe425c" sha1="04036decd519566ab407787d9ce837416182d986" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1059,7 +1059,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="432111">
-				<rom name="roverball (19xx)(merlin software).dsk" size="432111" crc="72ade6bd" sha1="ac2aedfa2cb5565591d444ddf50cfc013a4e23cb"/>
+				<rom name="roverball (19xx)(merlin software).dsk" size="432111" crc="72ade6bd" sha1="ac2aedfa2cb5565591d444ddf50cfc013a4e23cb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1070,7 +1070,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Orion Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="qoko2.dsk" size="215296" crc="bcbd472f" sha1="c53d9272306f119acd9e441ddacb1cd467160cc3"/>
+				<rom name="qoko2.dsk" size="215296" crc="bcbd472f" sha1="c53d9272306f119acd9e441ddacb1cd467160cc3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1081,7 +1081,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Leisure Genius</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="scrabble.dsk" size="215296" crc="d0925441" sha1="6249757df8309764c3c2577b1e682cba7bb25a0c"/>
+				<rom name="scrabble.dsk" size="215296" crc="d0925441" sha1="6249757df8309764c3c2577b1e682cba7bb25a0c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1092,7 +1092,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Syntaxsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="screenpl.dsk" size="215296" crc="a2098af2" sha1="bd8afb974470c6d25c35a4610c5c3717b3bb6971"/>
+				<rom name="screenpl.dsk" size="215296" crc="a2098af2" sha1="bd8afb974470c6d25c35a4610c5c3717b3bb6971" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1103,7 +1103,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="southern belle (19xx)(hewson consultants)[rm].dsk" size="215296" crc="fde43d49" sha1="62def9be94e32e6d608534bc9af460d657d0d14b"/>
+				<rom name="southern belle (19xx)(hewson consultants)[rm].dsk" size="215296" crc="fde43d49" sha1="62def9be94e32e6d608534bc9af460d657d0d14b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1114,7 +1114,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="spactrap.dsk" size="215296" crc="ca2fd938" sha1="a17b65b031eafe359c452c28c1ecd6260a21eb2e"/>
+				<rom name="spactrap.dsk" size="215296" crc="ca2fd938" sha1="a17b65b031eafe359c452c28c1ecd6260a21eb2e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1125,7 +1125,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Lothlorien</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="specops.dsk" size="215296" crc="608c9413" sha1="f5cec117a1a4a1c82a678a5a291c55c91617d26f"/>
+				<rom name="specops.dsk" size="215296" crc="608c9413" sha1="f5cec117a1a4a1c82a678a5a291c55c91617d26f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1136,7 +1136,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Syntaxsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="spectrum emulator disk 1 (19xx)(syntaxsoft).dsk" size="215296" crc="51cfd4ef" sha1="17fad087a94be68c659d36d16db73c82ee3fb083"/>
+				<rom name="spectrum emulator disk 1 (19xx)(syntaxsoft).dsk" size="215296" crc="51cfd4ef" sha1="17fad087a94be68c659d36d16db73c82ee3fb083" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1147,7 +1147,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="spelbuld.dsk" size="215296" crc="f59fbfd8" sha1="2fabe45acc4e830ea66778099adadca1a333239e"/>
+				<rom name="spelbuld.dsk" size="215296" crc="f59fbfd8" sha1="2fabe45acc4e830ea66778099adadca1a333239e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1158,7 +1158,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="spellbreaker (1985)(infocom).dsk" size="215296" crc="292a832d" sha1="372cfdb1cfb7be518b0f6114fad7d1c26781a227"/>
+				<rom name="spellbreaker (1985)(infocom).dsk" size="215296" crc="292a832d" sha1="372cfdb1cfb7be518b0f6114fad7d1c26781a227" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1169,7 +1169,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Computers</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="speadsht.dsk" size="215296" crc="96f8e1b8" sha1="976e16127b445ef672f4f7008a0e81e9f8dc4bba"/>
+				<rom name="speadsht.dsk" size="215296" crc="96f8e1b8" sha1="976e16127b445ef672f4f7008a0e81e9f8dc4bba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1180,7 +1180,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="star+.dsk" size="215296" crc="fdc09965" sha1="e571189c00bd2f117f84431fb01383debd1d772e"/>
+				<rom name="star+.dsk" size="215296" crc="fdc09965" sha1="e571189c00bd2f117f84431fb01383debd1d772e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1191,7 +1191,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="starq.dsk" size="215296" crc="c8e4344f" sha1="884aa4fac99205e6972f089d3c41ce757ad17099"/>
+				<rom name="starq.dsk" size="215296" crc="c8e4344f" sha1="884aa4fac99205e6972f089d3c41ce757ad17099" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1202,7 +1202,7 @@ Xtal Systems (Xtal Research)
 		<publisher>KH Scriven</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="stepper.dsk" size="215296" crc="bf206229" sha1="98bb1935d18ef060b142d6205443a89ae5a49d14"/>
+				<rom name="stepper.dsk" size="215296" crc="bf206229" sha1="98bb1935d18ef060b142d6205443a89ae5a49d14" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1213,7 +1213,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="schess.dsk" size="215296" crc="330ee711" sha1="ecb705079c67ed7310ace0fd54a17fb938b62aa9"/>
+				<rom name="schess.dsk" size="215296" crc="330ee711" sha1="ecb705079c67ed7310ace0fd54a17fb938b62aa9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1224,7 +1224,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="sforth.dsk" size="215296" crc="adba426f" sha1="1a7b90ff0f5878594c23c2f2d625df50da3987e8"/>
+				<rom name="sforth.dsk" size="215296" crc="adba426f" sha1="1a7b90ff0f5878594c23c2f2d625df50da3987e8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1235,7 +1235,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="super6.dsk" size="215296" crc="d30f1ed7" sha1="c9d36bec2116db5fa2f376e2f0c52f78ee8b8667"/>
+				<rom name="super6.dsk" size="215296" crc="d30f1ed7" sha1="c9d36bec2116db5fa2f376e2f0c52f78ee8b8667" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1246,7 +1246,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="super six game pack (198x)(tatung einsoft).dsk" size="215296" crc="a2e1621d" sha1="60854afb50f96f64069349635fd91d03ba4cda2a"/>
+				<rom name="super six game pack (198x)(tatung einsoft).dsk" size="215296" crc="a2e1621d" sha1="60854afb50f96f64069349635fd91d03ba4cda2a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1257,7 +1257,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Bell Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="432111">
-				<rom name="super 6 games disc (19xx)(bell software).dsk" size="432111" crc="f38c6b10" sha1="7d515b1a84378549e87c9aaa61af106f5201c3bd"/>
+				<rom name="super 6 games disc (19xx)(bell software).dsk" size="432111" crc="f38c6b10" sha1="7d515b1a84378549e87c9aaa61af106f5201c3bd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1268,7 +1268,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="supstor.dsk" size="215296" crc="cc3c0961" sha1="3bf8f107646e7f45ea0a20a8286eb81da73aa78a"/>
+				<rom name="supstor.dsk" size="215296" crc="cc3c0961" sha1="3bf8f107646e7f45ea0a20a8286eb81da73aa78a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1279,7 +1279,7 @@ Xtal Systems (Xtal Research)
 		<publisher>A.C.E. Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="supend.dsk" size="215296" crc="90d5482c" sha1="c7f7073ef5b643f38ac06c945bad437fe67602b9"/>
+				<rom name="supend.dsk" size="215296" crc="90d5482c" sha1="c7f7073ef5b643f38ac06c945bad437fe67602b9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1290,7 +1290,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Crystal Research</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="system5.dsk" size="215296" crc="d33a17f2" sha1="eeb2a41b244db29fff7b6ac9dde21e860fb018f2"/>
+				<rom name="system5.dsk" size="215296" crc="d33a17f2" sha1="eeb2a41b244db29fff7b6ac9dde21e860fb018f2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1301,7 +1301,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="sys80.dsk" size="215296" crc="e77e6eb0" sha1="0912b399a59003e9fa611f7393f466e27502de25"/>
+				<rom name="sys80.dsk" size="215296" crc="e77e6eb0" sha1="0912b399a59003e9fa611f7393f466e27502de25" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1312,7 +1312,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tasman Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="tasprint.dsk" size="215296" crc="c1d1ffd4" sha1="46c9629c62bbe0394d58cd17837efc0011b79b59"/>
+				<rom name="tasprint.dsk" size="215296" crc="c1d1ffd4" sha1="46c9629c62bbe0394d58cd17837efc0011b79b59" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1323,7 +1323,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tasman Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="tasword.dsk" size="215296" crc="94c27e94" sha1="5141c45b16fbbb4a6b740b2677e17635f63c8695"/>
+				<rom name="tasword.dsk" size="215296" crc="94c27e94" sha1="5141c45b16fbbb4a6b740b2677e17635f63c8695" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1334,7 +1334,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="235776">
-				<rom name="theatre.dsk" size="235776" crc="131ea117" sha1="0e0fae54ae174933801da1c488bb405809330de9"/>
+				<rom name="theatre.dsk" size="235776" crc="131ea117" sha1="0e0fae54ae174933801da1c488bb405809330de9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1345,7 +1345,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="timtrap.dsk" size="215296" crc="93d4de6f" sha1="6f947d5b36be85a8b9773c26e472c9a72c610d50"/>
+				<rom name="timtrap.dsk" size="215296" crc="93d4de6f" sha1="6f947d5b36be85a8b9773c26e472c9a72c610d50" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1356,7 +1356,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Syntaxsoft</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="toado &amp; fruckles (1986)(syntaxsoft).dsk" size="215296" crc="588f1d91" sha1="727f1ee2f5073c4ffb3980592eb34cda3ff4e255"/>
+				<rom name="toado &amp; fruckles (1986)(syntaxsoft).dsk" size="215296" crc="588f1d91" sha1="727f1ee2f5073c4ffb3980592eb34cda3ff4e255" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1367,7 +1367,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="tomb.dsk" size="215296" crc="c0efda16" sha1="9f8d07df2a09e189b17ce0ac43e16119f337ef30"/>
+				<rom name="tomb.dsk" size="215296" crc="c0efda16" sha1="9f8d07df2a09e189b17ce0ac43e16119f337ef30" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1378,7 +1378,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Hard Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="snooker.dsk" size="215296" crc="509a8c66" sha1="ded70d23bb2987c59a9221d2f8271ad249a0f7c8"/>
+				<rom name="snooker.dsk" size="215296" crc="509a8c66" sha1="ded70d23bb2987c59a9221d2f8271ad249a0f7c8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1389,7 +1389,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Solo Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="cyfax &amp; traditional 16+ maths (198x)(solo software).dsk" size="215296" crc="0c354ecd" sha1="5967d06ae1d0665d8523cb0b688ba5bf807457a5"/>
+				<rom name="cyfax &amp; traditional 16+ maths (198x)(solo software).dsk" size="215296" crc="0c354ecd" sha1="5967d06ae1d0665d8523cb0b688ba5bf807457a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1400,7 +1400,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="tycoon.dsk" size="215296" crc="b019ca6d" sha1="06f58afed1e7f8741aa648a001d79ccaa7b78bb5"/>
+				<rom name="tycoon.dsk" size="215296" crc="b019ca6d" sha1="06f58afed1e7f8741aa648a001d79ccaa7b78bb5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1411,7 +1411,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="wishbringer (19xx)(infocom).dsk" size="215296" crc="6b9c0abe" sha1="9c9de627961e89cd6944613e96144cf93dacc389"/>
+				<rom name="wishbringer (19xx)(infocom).dsk" size="215296" crc="6b9c0abe" sha1="9c9de627961e89cd6944613e96144cf93dacc389" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1422,7 +1422,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Surrey Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="wordproc.dsk" size="215296" crc="ebcde8d6" sha1="f8079b7fb1a1422236d3d1a2f5610845c4145a64"/>
+				<rom name="wordproc.dsk" size="215296" crc="ebcde8d6" sha1="f8079b7fb1a1422236d3d1a2f5610845c4145a64" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1433,7 +1433,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Electric Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="wreck.dsk" size="215296" crc="53fcd39a" sha1="76dd0102565ba64ad6fa885872c81c366a1a4c44"/>
+				<rom name="wreck.dsk" size="215296" crc="53fcd39a" sha1="76dd0102565ba64ad6fa885872c81c366a1a4c44" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1444,7 +1444,7 @@ Xtal Systems (Xtal Research)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="xmaster.dsk" size="215296" crc="15f20d52" sha1="31fca29a6de3e06c0209e95bb57b27d14a2aa832"/>
+				<rom name="xmaster.dsk" size="215296" crc="15f20d52" sha1="31fca29a6de3e06c0209e95bb57b27d14a2aa832" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1455,7 +1455,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="xanagram.dsk" size="215296" crc="1ebdfff2" sha1="9d052b0ae1ab421c7e7e1af4cee61e730235cbd9"/>
+				<rom name="xanagram.dsk" size="215296" crc="1ebdfff2" sha1="9d052b0ae1ab421c7e7e1af4cee61e730235cbd9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1466,7 +1466,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Tatung</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="xtaldos.dsk" size="215296" crc="833a5fe8" sha1="998da7d4470f52ee353abfd1f5aaf5e4d36ce35b"/>
+				<rom name="xtaldos.dsk" size="215296" crc="833a5fe8" sha1="998da7d4470f52ee353abfd1f5aaf5e4d36ce35b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1478,7 +1478,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="zen.dsk" size="215296" crc="6026bd29" sha1="214992bf15a1209eefc55a359e4f64743a2c56db"/>
+				<rom name="zen.dsk" size="215296" crc="6026bd29" sha1="214992bf15a1209eefc55a359e4f64743a2c56db" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1489,7 +1489,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="zork i - the great underground empire (198x)(infocom).dsk" size="215296" crc="f7b3609d" sha1="ba812a81498a55cb333c04f4243b82ad96d7e6bf"/>
+				<rom name="zork i - the great underground empire (198x)(infocom).dsk" size="215296" crc="f7b3609d" sha1="ba812a81498a55cb333c04f4243b82ad96d7e6bf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1500,7 +1500,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="zork2.dsk" size="215296" crc="001fc68d" sha1="35c86af9a47cf16f434d4c1a58e1203170537779"/>
+				<rom name="zork2.dsk" size="215296" crc="001fc68d" sha1="35c86af9a47cf16f434d4c1a58e1203170537779" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1511,7 +1511,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="zork iii - the dungeon master (198x)(infocom).dsk" size="215296" crc="35f19012" sha1="0e7a3665bcb52432f5831635196b94cff52490de"/>
+				<rom name="zork iii - the dungeon master (198x)(infocom).dsk" size="215296" crc="35f19012" sha1="0e7a3665bcb52432f5831635196b94cff52490de" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1526,7 +1526,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Mario Castro" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="100 metres sprint &amp; karate (19xx)(castro, mario).dsk" size="215296" crc="e19fddea" sha1="92e7f6cf7465ca99d3fea300c14a98fffe825087"/>
+				<rom name="100 metres sprint &amp; karate (19xx)(castro, mario).dsk" size="215296" crc="e19fddea" sha1="92e7f6cf7465ca99d3fea300c14a98fffe825087" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1538,7 +1538,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Mario Castro" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="conan &amp; boxing (19xx)(castro, mario).dsk" size="215296" crc="841c2f87" sha1="ef27be711470e8f1899002a7d2c135365433a7a1"/>
+				<rom name="conan &amp; boxing (19xx)(castro, mario).dsk" size="215296" crc="841c2f87" sha1="ef27be711470e8f1899002a7d2c135365433a7a1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1550,7 +1550,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Mario Castro" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="lottery (2005)(castro, mario).dsk" size="215296" crc="356cbdbb" sha1="dc832b72dda5d3997b22f48f26619eecd809b007"/>
+				<rom name="lottery (2005)(castro, mario).dsk" size="215296" crc="356cbdbb" sha1="dc832b72dda5d3997b22f48f26619eecd809b007" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1562,7 +1562,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Mario Castro" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="ski-jump &amp; nubble trubble (19xx)(castro, mario).dsk" size="215296" crc="589a78d2" sha1="e474ef511c440c8c61b8fa4cfd551cfa60e27f51"/>
+				<rom name="ski-jump &amp; nubble trubble (19xx)(castro, mario).dsk" size="215296" crc="589a78d2" sha1="e474ef511c440c8c61b8fa4cfd551cfa60e27f51" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1575,7 +1575,7 @@ Xtal Systems (Xtal Research)
 		<info name="usage" value="Start with Tatung-Xtaldos 1.31" />    <!-- Star Trek is a Basic Game -->
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="star trek (19xx)(castro, mario).dsk" size="215296" crc="525d1dd2" sha1="0f438ac14b52ff5a5071106b148c81293ba747d7"/>
+				<rom name="star trek (19xx)(castro, mario).dsk" size="215296" crc="525d1dd2" sha1="0f438ac14b52ff5a5071106b148c81293ba747d7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1587,7 +1587,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Mario Castro" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="sword feud (19xx)(a.c.e. software).dsk" size="215296" crc="b871d8f0" sha1="410710023db949bd37d6af41b844650dcfb6cefa"/>
+				<rom name="sword feud (19xx)(a.c.e. software).dsk" size="215296" crc="b871d8f0" sha1="410710023db949bd37d6af41b844650dcfb6cefa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1599,7 +1599,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="R.T. Russell" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="bbc basic v2.31 (1984)(russell, r.t.).dsk" size="215296" crc="358103e1" sha1="6d26185b34ea0ac4f6773af7f3fa2a556bd266eb"/>
+				<rom name="bbc basic v2.31 (1984)(russell, r.t.).dsk" size="215296" crc="358103e1" sha1="6d26185b34ea0ac4f6773af7f3fa2a556bd266eb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1611,7 +1611,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Andrew Dunipace" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="einstein disk international 1 (19xx)(dunipace, andrew).dsk" size="215296" crc="bc633dd3" sha1="b82eb7b2868e7243559815520143c6b59e966be7"/>
+				<rom name="einstein disk international 1 (19xx)(dunipace, andrew).dsk" size="215296" crc="bc633dd3" sha1="b82eb7b2868e7243559815520143c6b59e966be7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1623,7 +1623,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Andrew Dunipace" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="einstein disk international 2 (19xx)(dunipace, andrew).dsk" size="215296" crc="da550c81" sha1="4ca4c297c3d661ccab7e1f7bb2b3a161ae95f2b2"/>
+				<rom name="einstein disk international 2 (19xx)(dunipace, andrew).dsk" size="215296" crc="da550c81" sha1="4ca4c297c3d661ccab7e1f7bb2b3a161ae95f2b2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1635,7 +1635,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Andrew Dunipace?" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="einstein disk international 3 (19xx)(-).dsk" size="215296" crc="ff3219ea" sha1="505f3b7aafa54addeba34dab7a21009b2f9a7baa"/>
+				<rom name="einstein disk international 3 (19xx)(-).dsk" size="215296" crc="ff3219ea" sha1="505f3b7aafa54addeba34dab7a21009b2f9a7baa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1646,7 +1646,7 @@ Xtal Systems (Xtal Research)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="game compilation (19xx)(-)[cr].dsk" size="215296" crc="e9e06cad" sha1="7c584b517c0e961cc3d6ea9424876743fa0706fb"/>
+				<rom name="game compilation (19xx)(-)[cr].dsk" size="215296" crc="e9e06cad" sha1="7c584b517c0e961cc3d6ea9424876743fa0706fb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1658,7 +1658,7 @@ Xtal Systems (Xtal Research)
 		<info name="author" value="Dave Rand" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="215296">
-				<rom name="steam computer software volume 22 v1.05 (1983-07-27)(rand, dave).dsk" size="215296" crc="67aa01e8" sha1="b7e7006e7e4e7b95a3a085ccfd64872cab40184b"/>
+				<rom name="steam computer software volume 22 v1.05 (1983-07-27)(rand, dave).dsk" size="215296" crc="67aa01e8" sha1="b7e7006e7e4e7b95a3a085ccfd64872cab40184b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

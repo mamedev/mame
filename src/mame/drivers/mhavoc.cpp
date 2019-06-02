@@ -272,7 +272,7 @@ void mhavoc_state::alpha_map(address_map &map)
 	map(0x0a00, 0x0fff).bankrw("bank1").share("zram1");
 	map(0x1000, 0x1000).r(FUNC(mhavoc_state::mhavoc_gamma_r));            /* Gamma Read Port */
 	map(0x1200, 0x1200).portr("IN0").nopw();    /* Alpha Input Port 0 */
-	map(0x1400, 0x141f).ram().share("avg:colorram");    /* ColorRAM */
+	map(0x1400, 0x141f).ram().share("colorram");    /* ColorRAM */
 	map(0x1600, 0x1600).w(FUNC(mhavoc_state::mhavoc_out_0_w));           /* Control Signals */
 	map(0x1640, 0x1640).w("avg", FUNC(avg_mhavoc_device::go_w));               /* Vector Generator GO */
 	map(0x1680, 0x1680).w("watchdog", FUNC(watchdog_timer_device::reset_w));         /* Watchdog Clear */
@@ -283,7 +283,7 @@ void mhavoc_state::alpha_map(address_map &map)
 	map(0x17c0, 0x17c0).w(FUNC(mhavoc_state::mhavoc_gamma_w));           /* Gamma Communication Write Port */
 	map(0x1800, 0x1fff).ram();                             /* Shared Beta Ram */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
-	map(0x4000, 0x4fff).ram().share("avg:vectorram").region("alpha", 0x4000);    /* Vector Generator RAM */
+	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000);    /* Vector Generator RAM */
 	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
 	map(0x8000, 0xffff).rom();                 /* Program ROM (32K) */
 }
@@ -359,10 +359,10 @@ void mhavoc_state::alphaone_map(address_map &map)
 	map(0x10b0, 0x10b0).w(FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
 	map(0x10b4, 0x10b4).w(FUNC(mhavoc_state::mhavoc_rom_banksel_w));
 	map(0x10b8, 0x10b8).w(FUNC(mhavoc_state::mhavoc_ram_banksel_w));
-	map(0x10e0, 0x10ff).nopr().writeonly().share("avg:colorram");  /* ColorRAM */
+	map(0x10e0, 0x10ff).nopr().writeonly().share("colorram");  /* ColorRAM */
 	map(0x1800, 0x18ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));   /* EEROM */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
-	map(0x4000, 0x4fff).ram().share("avg:vectorram").region("alpha", 0x4000); /* Vector Generator RAM */
+	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000); /* Vector Generator RAM */
 	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
 	map(0x8000, 0xffff).rom();                             /* Program ROM (32K) */
 }
@@ -631,7 +631,7 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.318",   0x14000, 0x4000, CRC(ba935067) SHA1(05ad81e7a1982b9d8fddb48502546f48b5dc21b7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_REGION( 0x8000, "avg", 0 )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
 	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
 	ROM_LOAD( "136025.107",   0x4000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
@@ -640,7 +640,7 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -660,7 +660,7 @@ ROM_START( mhavoc2 )
 	ROM_LOAD( "136025.109",   0x14000, 0x4000, CRC(4d766827) SHA1(7697bf6f92bff0e62850ed75ff66008a08583ef7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_REGION( 0x8000, "avg", 0 )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
 	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
 	ROM_LOAD( "136025.107",   0x4000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
@@ -671,7 +671,7 @@ ROM_START( mhavoc2 )
 	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -691,7 +691,7 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.918",   0x14000, 0x4000, CRC(84735445) SHA1(21aacd862ce8911d257c6f48ead119ee5bb0b60d) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_REGION( 0x8000, "avg", 0 )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
 	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
 	ROM_LOAD( "136025.907",   0x4000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
@@ -702,7 +702,7 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.908",   0x08000, 0x4000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -722,7 +722,7 @@ ROM_START( mhavocp )
 	ROM_LOAD( "136025.018",   0x14000, 0x4000, CRC(a8c35ccd) SHA1(c243a5407557390a64c6560d857f5031f839973f) )
 
 	/* Paged Vector Generator ROM */
-	ROM_REGION( 0x8000, "avg", 0 )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
 	ROM_LOAD( "136025.006",   0x0000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
 	ROM_LOAD( "136025.007",   0x4000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
 
@@ -733,7 +733,7 @@ ROM_START( mhavocp )
 	ROM_LOAD( "136025.008",   0x8000, 0x4000, CRC(22ea7399) SHA1(eeda8cc40089506063835a62c3273e7dd3918fd5) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -754,14 +754,14 @@ ROM_START( alphaone )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_REGION( 0x8000, "avg", 0 )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
 	ROM_LOAD( "vec_pg01.tw",  0x0000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
 	ROM_LOAD( "vec_pg23.tw",  0x4000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -782,14 +782,14 @@ ROM_START( alphaonea )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_REGION( 0x8000, "avg", 0 )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
 	ROM_LOAD( "vec_pg01.tw",  0x0000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
 	ROM_LOAD( "vec_pg23.tw",  0x4000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 

@@ -6,7 +6,7 @@
 
     Known hardware:
     - Motorola 6800 CPU
-    - Hitachi HD46505SP (Motorola 6845-compatible) CRTC
+    - Hitachi HD46505 (Motorola 6845-compatible) CRTC
     - Hitachi HD46850 (Motorola 6850-compatible) ACIA
     - M58725P-15 (6116-compatible) (2k x 8bit RAM)
     - Zilog Z8430 CTC
@@ -62,7 +62,7 @@ private:
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 	required_device<z80ctc_device> m_ctc;
-	required_device<hd6845s_device> m_crtc;
+	required_device<h46505_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -150,7 +150,7 @@ void qvt102_state::qvt102(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
-	HD6845S(config, m_crtc, MASTER_CLOCK / 9);
+	H46505(config, m_crtc, MASTER_CLOCK / 9);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);

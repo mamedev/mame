@@ -37,7 +37,7 @@ start of the tc0080vco address space - not the start of chain ram.
 In practice only Dleague seems to do this, for c.10 frames as the
 pitcher bowls, and I think it's a coding error. Log it and see.]
 
-[Parentj, Ainferno and Syvalion are only games using FG0 layer.]
+[Ainferno and Syvalion are only games using FG0 layer.]
 
 Control registers
 
@@ -81,32 +81,32 @@ this seems to be the only zoom feature actually used in the games.
 DEFINE_DEVICE_TYPE(TC0080VCO, tc0080vco_device, "tc0080vco", "Taito TC0080VCO")
 
 tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TC0080VCO, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, nullptr)
-	, m_ram(nullptr)
-	, m_bg0_ram_0(nullptr)
-	, m_bg0_ram_1(nullptr)
-	, m_bg1_ram_0(nullptr)
-	, m_bg1_ram_1(nullptr)
-	, m_tx_ram_0(nullptr)
-	, m_tx_ram_1(nullptr)
-	, m_char_ram(nullptr)
-	, m_bgscroll_ram(nullptr)
-	, m_chain_ram_0(nullptr)
-	, m_chain_ram_1(nullptr)
-	, m_spriteram(nullptr)
-	, m_scroll_ram(nullptr)
-	, m_bg0_scrollx(0)
-	, m_bg0_scrolly(0)
-	, m_bg1_scrollx(0)
-	, m_bg1_scrolly(0)
-	, m_flipscreen(0)
-	, m_bg_xoffs(0)
-	, m_bg_yoffs(0)
-	, m_bg_flip_yoffs(0)
-	, m_has_fg0(1)
-	, m_colbase(0)
-	, m_gfx_region(*this, DEVICE_SELF)
+	: device_t(mconfig, TC0080VCO, tag, owner, clock),
+	m_ram(nullptr),
+	m_bg0_ram_0(nullptr),
+	m_bg0_ram_1(nullptr),
+	m_bg1_ram_0(nullptr),
+	m_bg1_ram_1(nullptr),
+	m_tx_ram_0(nullptr),
+	m_tx_ram_1(nullptr),
+	m_char_ram(nullptr),
+	m_bgscroll_ram(nullptr),
+	m_chain_ram_0(nullptr),
+	m_chain_ram_1(nullptr),
+	m_spriteram(nullptr),
+	m_scroll_ram(nullptr),
+	m_bg0_scrollx(0),
+	m_bg0_scrolly(0),
+	m_bg1_scrollx(0),
+	m_bg1_scrolly(0),
+	m_flipscreen(0),
+	m_gfxnum(0),
+	m_txnum(0),
+	m_bg_xoffs(0),
+	m_bg_yoffs(0),
+	m_bg_flip_yoffs(0),
+	m_has_fg0(1),
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -120,31 +120,22 @@ void tc0080vco_device::device_start()
 
 	#define XOR(a) WORD_XOR_BE(a)
 
-	gfx_layout tilelayout =
-	{
-		16,16,  /* 16x16 pixels */
-		0,
-		4,
-		{ STEP4(0,1) },
-		{ STEP16(15*4, -4) },
-		{ STEP16(0, 16*4) },
-		16*16*4
-	};
-	tilelayout.total = m_gfx_region->bytes() / ((16*16*4) / 8);
-
 	static const gfx_layout charlayout =
 	{
-		8, 8,   /* 8x8 pixels */
-		256,    /* 256 chars */
-		3,      /* 3 bits per pixel */
-		{ 0x10000*8 + XOR(2)*4, XOR(0)*4, XOR(2)*4 },
-		{ STEP8(0,1) },
-		{ STEP8(0,8*2) },
-		16*8
+	8, 8,   /* 8x8 pixels */
+	256,    /* 256 chars */
+	3,      /* 3 bits per pixel */
+	{ 0x10000*8 + XOR(2)*4, XOR(0)*4, XOR(2)*4 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
+	16*8
 	};
 
-	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -158,7 +149,7 @@ void tc0080vco_device::device_start()
 	m_tilemap[0]->set_scroll_rows(512);
 
 	/* Perform extra initialisations for text layer */
-	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap[2]->set_scrolldx(0, 0);
 	m_tilemap[2]->set_scrolldy(48, -448);
@@ -184,8 +175,7 @@ void tc0080vco_device::device_start()
 	m_scroll_ram    = m_ram.get() + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), tilelayout, m_gfx_region->base(), 0, 0x20, m_colbase));
-	set_gfx(1, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)m_char_ram,     0, 0x01, m_colbase + 512));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(&m_gfxdecode->palette(), charlayout, (u8 *)m_char_ram, 0, 1, 512));
 
 	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 }
@@ -195,6 +185,7 @@ void tc0080vco_device::device_start()
     DEVICE HANDLERS
 *****************************************************************************/
 
+#if 0
 static const int tc0080vco_zoomy_conv_table[] =
 {
 /*      These are hand-tuned values...      */
@@ -209,114 +200,8 @@ static const int tc0080vco_zoomy_conv_table[] =
 	0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c,0x5d, 0x5e,0x5f,0x60,0x61,0x62,0x63,0x64,0x66,
 	0x67,0x68,0x6a,0x6b,0x6c,0x6e,0x6f,0x71, 0x72,0x74,0x76,0x78,0x80,0x7b,0x7d,0x7f
 };
+#endif
 
-/* Y chain size is 16/32?/64/64? pixels. X chain size
-   is always 64 pixels. */
-
-static const u8 size[] = { 1, 2, 4, 4 };
-
-void tc0080vco_device::get_sprite_params(int offs, bool zoomy_enable)
-{
-	m_sprite.tile_offs = (m_spriteram[offs + 3] & 0x1fff) << 2;
-	if (m_sprite.tile_offs)
-	{
-		m_sprite.x0    =  m_spriteram[offs + 1] & 0x03ff;
-		m_sprite.y0    =  m_spriteram[offs + 0] & 0x03ff;
-		m_sprite.zoomx = (m_spriteram[offs + 2] & 0x7f00) >> 8;
-		/* Convert zoomy value to real value as zoomx */
-		m_sprite.zoomy = zoomy_enable ? tc0080vco_zoomy_conv_table[m_spriteram[offs + 2] & 0x007f] : m_sprite.zoomx;
-		m_sprite.ysize = size[(m_spriteram[offs + 0] & 0x0c00) >> 10];
-
-		/* The increasing ratio of expansion is different whether zoom value */
-		/* is less or more than 63.                                          */
-		if (m_sprite.zoomx < 63)
-		{
-			m_sprite.dx = 8 + (m_sprite.zoomx + 2) / 8;
-			m_sprite.ex = (m_sprite.zoomx + 2) % 8;
-			m_sprite.zx = ((m_sprite.dx << 1) + m_sprite.ex) << 11;
-		}
-		else
-		{
-			m_sprite.dx = 16 + (m_sprite.zoomx - 63) / 4;
-			m_sprite.ex = (m_sprite.zoomx - 63) % 4;
-			m_sprite.zx = (m_sprite.dx + m_sprite.ex) << 12;
-		}
-
-		if (m_sprite.zoomx == m_sprite.zoomy)
-		{
-			m_sprite.dy = m_sprite.dx;
-			m_sprite.ey = m_sprite.ex;
-			m_sprite.zy = m_sprite.zx;
-		}
-		else
-		{
-			if (m_sprite.zoomy < 63)
-			{
-				m_sprite.dy = 8 + (m_sprite.zoomy + 2) / 8;
-				m_sprite.ey = (m_sprite.zoomy + 2) % 8;
-				m_sprite.zy = ((m_sprite.dy << 1) + m_sprite.ey) << 11;
-			}
-			else
-			{
-				m_sprite.dy = 16 + (m_sprite.zoomy - 63) / 4;
-				m_sprite.ey = (m_sprite.zoomy - 63) % 4;
-				m_sprite.zy = (m_sprite.dy + m_sprite.ey) << 12;
-			}
-		}
-
-		if (m_sprite.x0 >= 0x200) m_sprite.x0 -= 0x400;
-		if (m_sprite.y0 >= 0x200) m_sprite.y0 -= 0x400;
-
-		if (m_flipscreen)
-		{
-			m_sprite.x0 = 497 - m_sprite.x0;
-			m_sprite.y0 = 498 - m_sprite.y0;
-			m_sprite.dx = -m_sprite.dx;
-			m_sprite.dy = -m_sprite.dy;
-		}
-		else
-		{
-			m_sprite.x0 += 1;
-			m_sprite.y0 += 2;
-		}
-	}
-}
-
-void tc0080vco_device::draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	u32 tile_offs = m_sprite.tile_offs;
-	int y = m_sprite.y0;
-	for (int j = 0; j < m_sprite.ysize; j++)
-	{
-		int x = m_sprite.x0;
-		for (int k = 0; k < 4; k++)
-		{
-			if (tile_offs >= 0x1000)    /* or dleague pitcher gets blanked */
-			{
-				const u32 tile  = m_chain_ram_0[tile_offs] & 0x7fff;
-				const u32 color = m_chain_ram_1[tile_offs] & 0x001f;
-				int flipx       = m_chain_ram_1[tile_offs] & 0x0040;
-				int flipy       = m_chain_ram_1[tile_offs] & 0x0080;
-
-				if (m_flipscreen)
-				{
-					flipx ^= 0x0040;
-					flipy ^= 0x0080;
-				}
-
-				gfx(0)->zoom_transpen(bitmap,cliprect,
-							tile,
-							color,
-							flipx, flipy,
-							x, y,
-							m_sprite.zx, m_sprite.zy, 0);
-			}
-			tile_offs++;
-			x += m_sprite.dx;
-		}
-		y += m_sprite.dy;
-	}
-}
 
 TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 {
@@ -327,7 +212,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxnum,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg0_ram_1[tile_index] & 0x00c0) >> 6));
@@ -342,7 +227,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxnum,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg1_ram_1[tile_index] & 0x00c0) >> 6));
@@ -369,14 +254,14 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(m_txnum,
 			tile,
 			0,
 			0);
 }
 
 
-void tc0080vco_device::scrollram_w(offs_t offset, u16 data)
+WRITE16_MEMBER( tc0080vco_device::scrollram_w )
 {
 	switch (offset)
 	{
@@ -414,12 +299,12 @@ void tc0080vco_device::scrollram_w(offs_t offset, u16 data)
 	}
 }
 
-u16 tc0080vco_device::word_r(offs_t offset)
+READ16_MEMBER( tc0080vco_device::word_r )
 {
 	return m_ram[offset];
 }
 
-void tc0080vco_device::word_w(offs_t offset, u16 data, u16 mem_mask)
+WRITE16_MEMBER( tc0080vco_device::word_w )
 {
 	COMBINE_DATA(&m_ram[offset]);
 
@@ -427,7 +312,7 @@ void tc0080vco_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (offset < 0x1000 / 2)
 	{
-		gfx(1)->mark_dirty(offset / 8);
+		m_gfxdecode->gfx(m_txnum)->mark_dirty(offset / 8);
 #if 0
 		if (!m_has_fg0)
 		{
@@ -458,7 +343,7 @@ void tc0080vco_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 
 	else if (offset < 0x11000 / 2)
 	{
-		gfx(1)->mark_dirty((offset - 0x10000 / 2) / 8);
+		m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x10000 / 2) / 8);
 #if 0
 		if (!m_has_fg0)
 		{
@@ -487,19 +372,21 @@ void tc0080vco_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 	else if (offset < 0x20800 / 2)  /* sprite ram */
 	{}
 	else if (offset < 0x20fff / 2)
-		scrollram_w(offset - (0x20800 / 2), m_ram[offset]);
+		scrollram_w(space, offset - (0x20800 / 2), m_ram[offset], mem_mask);
 }
 
 void tc0080vco_device::tilemap_update( )
 {
+	int j;
+
 	if (!m_flipscreen)
 	{
-		for (int j = 0; j < 0x400; j++)
+		for (j = 0; j < 0x400; j++)
 			m_tilemap[0]->set_scrollx((j + 0) & 0x3ff, -m_bg0_scrollx - m_bgscroll_ram[j & 0x1ff]);
 	}
 	else
 	{
-		for (int j = 0; j < 0x400; j++)
+		for (j = 0; j < 0x400; j++)
 			m_tilemap[0]->set_scrollx((j + 0) & 0x3ff, -m_bg0_scrollx + m_bgscroll_ram[j & 0x1ff]);
 	}
 
@@ -515,10 +402,11 @@ void tc0080vco_device::tilemap_update( )
 
 void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	const u16 zoom = m_scroll_ram[6];
+	u16 zoom = m_scroll_ram[6];
+	int zx, zy;
 
-	int zx = (zoom & 0xff00) >> 8;
-	int zy = zoom & 0x00ff;
+	zx = (zoom & 0xff00) >> 8;
+	zy = zoom & 0x00ff;
 
 	if (zx == 0x3f && zy == 0x7f)       /* normal size */
 	{
@@ -526,22 +414,25 @@ void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 	}
 	else        /* zoom + rowscroll = custom draw routine */
 	{
+		u16 *dst16, *src16;
+		u8 *tsrc;
 		u16 scanline[512];
 		bitmap_ind16 &srcbitmap = m_tilemap[0]->pixmap();
 		bitmap_ind8 &flagsbitmap = m_tilemap[0]->flagsmap();
 
 		int sx, zoomx, zoomy;
 		int dx, ex, dy, ey;
-		int y_index;
+		int y_index, src_y_index, row_index;
+		int x_index, x_step;
 
-		const bool flip = m_flipscreen;
+		int flip = m_flipscreen;
 
-		const int min_x = cliprect.min_x;
-		const int max_x = cliprect.max_x;
-		const int min_y = cliprect.min_y;
-		const int max_y = cliprect.max_y;
-		const int screen_width = max_x + 1;
-		const int width_mask = 0x3ff; /* underlying tilemap */
+		int min_x = cliprect.min_x;
+		int max_x = cliprect.max_x;
+		int min_y = cliprect.min_y;
+		int max_y = cliprect.max_y;
+		int screen_width = max_x + 1;
+		int width_mask = 0x3ff; /* underlying tilemap */
 
 
 #if 0
@@ -594,20 +485,20 @@ void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 
 		for (int y = min_y; y <= max_y; y++)
 		{
-			int src_y_index = (y_index >> 16) & 0x3ff;  /* tilemaps are 1024 px up/down */
+			src_y_index = (y_index >> 16) & 0x3ff;  /* tilemaps are 1024 px up/down */
 
 			/* row areas are the same in flipscreen, so we must read in reverse */
-			int row_index = (src_y_index & 0x1ff);
+			row_index = (src_y_index & 0x1ff);
 			if (flip)
 				row_index = 0x1ff - row_index;
 
-			int x_index = sx - ((m_bgscroll_ram[row_index] << 16));
+			x_index = sx - ((m_bgscroll_ram[row_index] << 16));
 
-			u16 *src16 = &srcbitmap.pix16(src_y_index);
-			u8 *tsrc  = &flagsbitmap.pix8(src_y_index);
-			u16 *dst16 = scanline;
+			src16 = &srcbitmap.pix16(src_y_index);
+			tsrc  = &flagsbitmap.pix8(src_y_index);
+			dst16 = scanline;
 
-			int x_step = zoomx;
+			x_step = zoomx;
 
 			if (flags & TILEMAP_DRAW_OPAQUE)
 			{
@@ -651,14 +542,15 @@ while (0)
 void tc0080vco_device::bg1_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
 	u8 layer = 1;
-	const u16 zoom = m_scroll_ram[6 + layer];
-	const int min_x = cliprect.min_x;
-	const int max_x = cliprect.max_x;
-	const int min_y = cliprect.min_y;
-	const int max_y = cliprect.max_y;
+	u16 zoom = m_scroll_ram[6 + layer];
+	int min_x = cliprect.min_x;
+	int max_x = cliprect.max_x;
+	int min_y = cliprect.min_y;
+	int max_y = cliprect.max_y;
+	int zoomx, zoomy;
 
-	int zoomx = (zoom & 0xff00) >> 8;
-	int zoomy =  zoom & 0x00ff;
+	zoomx = (zoom & 0xff00) >> 8;
+	zoomy =  zoom & 0x00ff;
 
 	if (zoomx == 0x3f && zoomy == 0x7f)     /* normal size */
 	{

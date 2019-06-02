@@ -16,7 +16,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="capitaine menkar.bin" size="16384" crc="4e44c913" sha1="38533b3ff84320c28c02f57819420f5bec38c137"/>
+				<rom name="capitaine menkar.bin" size="16384" crc="4e44c913" sha1="38533b3ff84320c28c02f57819420f5bec38c137" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32256">
-				<rom name="exelbasic.bin" size="32256" crc="1e92fe55" sha1="96b02b357f647be250603367091055ae7b8b5cc0"/>
+				<rom name="exelbasic.bin" size="32256" crc="1e92fe55" sha1="96b02b357f647be250603367091055ae7b8b5cc0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -38,7 +38,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32256">
-				<rom name="exelbasic+.bin" size="32256" crc="a0300b3c" sha1="4f6769ab44e79bb579bbdf6cd90a9fe4aedb464a"/>
+				<rom name="exelbasic+.bin" size="32256" crc="a0300b3c" sha1="4f6769ab44e79bb579bbdf6cd90a9fe4aedb464a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -49,7 +49,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="exeldrums.bin" size="16384" crc="8f757196" sha1="9d7c60fc7734f15f26e94ba95a77c5123538831f"/>
+				<rom name="exeldrums.bin" size="16384" crc="8f757196" sha1="9d7c60fc7734f15f26e94ba95a77c5123538831f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -60,7 +60,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32256">
-				<rom name="exelmax v1.6.bin" size="32256" crc="5e031175" sha1="4299cde83cf6bd6a85cf99788cd8a77f79489c29"/>
+				<rom name="exelmax v1.6.bin" size="32256" crc="5e031175" sha1="4299cde83cf6bd6a85cf99788cd8a77f79489c29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -71,7 +71,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32256">
-				<rom name="exelmodem.bin" size="32256" crc="884ce574" sha1="e5f06ef7e839abbdb2bd2691749791c21730fb46"/>
+				<rom name="exelmodem.bin" size="32256" crc="884ce574" sha1="e5f06ef7e839abbdb2bd2691749791c21730fb46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +82,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32256">
-				<rom name="exelogo v1.0.bin" size="32256" crc="2f7e8074" sha1="6277961f4c755ffa0c1a094a9edb3b2f77f1d9f3"/>
+				<rom name="exelogo v1.0.bin" size="32256" crc="2f7e8074" sha1="6277961f4c755ffa0c1a094a9edb3b2f77f1d9f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="exelpaint v1.0.bin" size="32768" crc="9f0e6866" sha1="929d9406a38d5c8e0d3389adecaae46ca165f053"/>
+				<rom name="exelpaint v1.0.bin" size="32768" crc="9f0e6866" sha1="929d9406a38d5c8e0d3389adecaae46ca165f053" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="exeltexte.bin" size="32768" crc="165b6003" sha1="40a20ef4fa11ab3b735e5aa7e928f875bb64d67e"/>
+				<rom name="exeltexte.bin" size="32768" crc="165b6003" sha1="40a20ef4fa11ab3b735e5aa7e928f875bb64d67e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -115,7 +115,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="guppy.bin" size="8192" crc="c3a3e6d9" sha1="29747fc1d3e0d86704ee8f7d05baaf8086f2f176"/>
+				<rom name="guppy.bin" size="8192" crc="c3a3e6d9" sha1="29747fc1d3e0d86704ee8f7d05baaf8086f2f176" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +126,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="imagix.bin" size="8192" crc="e5aa6d0b" sha1="a424f891b83aa43e768c6e95b45d13ea48bdaaf3"/>
+				<rom name="imagix.bin" size="8192" crc="e5aa6d0b" sha1="a424f891b83aa43e768c6e95b45d13ea48bdaaf3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +137,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="pindo.bin" size="16384" crc="d090c951" sha1="541ae8e261b05c3f3c67e770f04a059c2a959aea"/>
+				<rom name="pindo.bin" size="16384" crc="d090c951" sha1="541ae8e261b05c3f3c67e770f04a059c2a959aea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="quizzy.bin" size="16384" crc="162b7584" sha1="0408145d920f41e9cd0da870f9867be22f5ecba8"/>
+				<rom name="quizzy.bin" size="16384" crc="162b7584" sha1="0408145d920f41e9cd0da870f9867be22f5ecba8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +159,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="32256">
-				<rom name="tennis.bin" size="32256" crc="fd2b49e2" sha1="807f5ae71c9dbb1376d4a64e4ca1d9c24a376290"/>
+				<rom name="tennis.bin" size="32256" crc="fd2b49e2" sha1="807f5ae71c9dbb1376d4a64e4ca1d9c24a376290" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="virus.bin" size="16384" crc="cf1df2a4" sha1="21031068425fb6875c28398634d3c58facdd1fef"/>
+				<rom name="virus.bin" size="16384" crc="cf1df2a4" sha1="21031068425fb6875c28398634d3c58facdd1fef" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -181,7 +181,7 @@ Undumped:
 		<publisher>Exelvision</publisher>
 		<part name="cart" interface="exelvision_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="wizord.bin" size="8192" crc="5ed04a2c" sha1="5338e5e34613ca73ee42b4a76348e9f5fa6ecb0b"/>
+				<rom name="wizord.bin" size="8192" crc="5ed04a2c" sha1="5338e5e34613ca73ee42b4a76348e9f5fa6ecb0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>

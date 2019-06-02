@@ -147,7 +147,6 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_clock_w );
 	DECLARE_READ8_MEMBER( sndrom_r );
 	DECLARE_WRITE8_MEMBER( sndrombank1_w );
-	DECLARE_WRITE8_MEMBER( sndrombank1_alt_w );
 	DECLARE_WRITE8_MEMBER( sndrombank2_w );
 	DECLARE_READ8_MEMBER( gfxrom_r );
 	DECLARE_WRITE8_MEMBER( gfxrombank_w );
@@ -164,14 +163,13 @@ public:
 	DECLARE_READ8_MEMBER( dipsw3_h_r );
 	DECLARE_WRITE8_MEMBER( outcoin_w );
 	DECLARE_WRITE8_MEMBER( vcrctrl_w );
-	DECLARE_READ_LINE_MEMBER( busyflag_r );
-	DECLARE_WRITE_LINE_MEMBER( busyflag_w );
 
 	required_device<cpu_device> m_maincpu;
 	const char * m_sndromrgntag;
 	int m_sndrombank1;
 	int m_sndrombank2;
 	int m_busyctr;
+	int m_busyflag;
 	int m_outcoin_flag;
 	int m_inputport;
 	int m_nb1413m3_type;
@@ -184,7 +182,6 @@ protected:
 
 private:
 
-	int m_busyflag;
 	int m_74ls193_counter;
 	int m_nmi_count;          // for debug
 	int m_nmi_clock;

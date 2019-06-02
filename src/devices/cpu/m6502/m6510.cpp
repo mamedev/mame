@@ -6,9 +6,6 @@
 
     6502 with 6 i/o pins, also known as 8500
 
-    6508 is 6510 plus 256 bytes of internal RAM, mirrored across pages 0
-    and 1.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -16,7 +13,6 @@
 #include "m6510d.h"
 
 DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology M6510")
-DEFINE_DEVICE_TYPE(M6508, m6508_device, "m6508", "MOS Technology M6508")
 
 m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6510_device(mconfig, M6510, tag, owner, clock)
@@ -43,27 +39,23 @@ std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
 	return std::make_unique<m6510_disassembler>();
 }
 
-void m6510_device::init_port()
+void m6510_device::device_start()
 {
 	read_port.resolve_safe(0);
 	write_port.resolve_safe();
 
-	save_item(NAME(pullup));
-	save_item(NAME(floating));
-	save_item(NAME(dir));
-	save_item(NAME(port));
-	save_item(NAME(drive));
-}
-
-void m6510_device::device_start()
-{
 	if(cache_disabled)
 		mintf = std::make_unique<mi_6510_nd>(this);
 	else
 		mintf = std::make_unique<mi_6510_normal>(this);
 
 	init();
-	init_port();
+
+	save_item(NAME(pullup));
+	save_item(NAME(floating));
+	save_item(NAME(dir));
+	save_item(NAME(port));
+	save_item(NAME(drive));
 }
 
 void m6510_device::device_reset()
@@ -176,107 +168,5 @@ uint8_t m6510_device::mi_6510_nd::read_arg(uint16_t adr)
 		res = base->port_r();
 	return res;
 }
-
-
-m6508_device::m6508_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6510_device(mconfig, M6508, tag, owner, clock)
-{
-}
-
-void m6508_device::device_start()
-{
-	if(cache_disabled)
-		mintf = std::make_unique<mi_6508_nd>(this);
-	else
-		mintf = std::make_unique<mi_6508_normal>(this);
-
-	init();
-	init_port();
-
-	ram_page = make_unique_clear<uint8_t[]>(256);
-	save_pointer(NAME(ram_page), 256);
-}
-
-
-m6508_device::mi_6508_normal::mi_6508_normal(m6508_device *_base)
-{
-	base = _base;
-}
-
-uint8_t m6508_device::mi_6508_normal::read(uint16_t adr)
-{
-	uint8_t res = program->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
-}
-
-uint8_t m6508_device::mi_6508_normal::read_sync(uint16_t adr)
-{
-	uint8_t res = scache->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
-}
-
-uint8_t m6508_device::mi_6508_normal::read_arg(uint16_t adr)
-{
-	uint8_t res = cache->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
-}
-
-void m6508_device::mi_6508_normal::write(uint16_t adr, uint8_t val)
-{
-	program->write_byte(adr, val);
-	if(adr == 0x0000)
-		base->dir_w(val);
-	else if(adr == 0x0001)
-		base->port_w(val);
-	else if(adr < 0x0200)
-		base->ram_page[adr & 0x00ff] = val;
-}
-
-m6508_device::mi_6508_nd::mi_6508_nd(m6508_device *_base) : mi_6508_normal(_base)
-{
-}
-
-uint8_t m6508_device::mi_6508_nd::read_sync(uint16_t adr)
-{
-	uint8_t res = sprogram->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
-}
-
-uint8_t m6508_device::mi_6508_nd::read_arg(uint16_t adr)
-{
-	uint8_t res = program->read_byte(adr);
-	if(adr == 0x0000)
-		res = base->dir_r();
-	else if(adr == 0x0001)
-		res = base->port_r();
-	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
-	return res;
-}
-
 
 #include "cpu/m6502/m6510.hxx"

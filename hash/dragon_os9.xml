@@ -21,7 +21,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 1"/>
 			<dataarea name="flop" size="184344">
-				<rom name="BASIC09 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184344" crc="46ffb893" sha1="26c75b65f79190efc3a640c6399a0008a46a6cc3"/>
+				<rom name="BASIC09 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184344" crc="46ffb893" sha1="26c75b65f79190efc3a640c6399a0008a46a6cc3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -34,13 +34,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 2"/>
 			<dataarea name="flop" size="184332">
-				<rom name="C Disk 1 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="2ddbe75e" sha1="14b3a9c8b85c073b18fa8e06e2d779e63064060d"/>
+				<rom name="C Disk 1 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="2ddbe75e" sha1="14b3a9c8b85c073b18fa8e06e2d779e63064060d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 of 2"/>
 			<dataarea name="flop" size="184332">
-				<rom name="C Disk 2 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="f36d5a0a" sha1="3eeccff7d6e3eda4e0a794e7db07ab93d9f3d366"/>
+				<rom name="C Disk 2 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="f36d5a0a" sha1="3eeccff7d6e3eda4e0a794e7db07ab93d9f3d366" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Cash &amp; Vat (198x)(Dragon Data Ltd)[!][OS9].vdk" size="184332" crc="007bbda9" sha1="527a2ef2a02b8b064820ed1b30a755b9392c84e6"/>
+				<rom name="Cash &amp; Vat (198x)(Dragon Data Ltd)[!][OS9].vdk" size="184332" crc="007bbda9" sha1="527a2ef2a02b8b064820ed1b30a755b9392c84e6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="DragonPlus OS9 Drivers (1985)(Compusense Ltd)[!][OS9].vdk" size="184332" crc="9d62cb3c" sha1="bb8df0703865fa4f3be048e7ae03cd165ad07adf"/>
+				<rom name="DragonPlus OS9 Drivers (1985)(Compusense Ltd)[!][OS9].vdk" size="184332" crc="9d62cb3c" sha1="bb8df0703865fa4f3be048e7ae03cd165ad07adf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184339">
-				<rom name="DragonPlus Update (1983)(Compusense)[OS-9][!].vdk" size="184339" crc="5c57b01e" sha1="bde5e6e3c476af3ddd5f9a6082941d97173b5dc3"/>
+				<rom name="DragonPlus Update (1983)(Compusense)[OS-9][!].vdk" size="184339" crc="5c57b01e" sha1="bde5e6e3c476af3ddd5f9a6082941d97173b5dc3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 1"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Dynacalc v4.7 (1983)(Dragon Data Ltd)[OS9][!].vdk" size="184332" crc="1f2e33cd" sha1="5cb358b40de16503767d35d88b88b4ee8f419a13"/>
+				<rom name="Dynacalc v4.7 (1983)(Dragon Data Ltd)[OS9][!].vdk" size="184332" crc="1f2e33cd" sha1="5cb358b40de16503767d35d88b88b4ee8f419a13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 1"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Editor Assembler Debugger (198x)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="f2ba7d84" sha1="46518c3933393a1f93ed3c79594774bc404c3605"/>
+				<rom name="Editor Assembler Debugger (198x)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="f2ba7d84" sha1="46518c3933393a1f93ed3c79594774bc404c3605" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="OS-9 Level 1 v1.2 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184342" crc="5c33de57" sha1="d5e00fa5cf0c4d28a991866d0daee8cc14e312c2"/>
+				<rom name="OS-9 Level 1 v1.2 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184342" crc="5c33de57" sha1="d5e00fa5cf0c4d28a991866d0daee8cc14e312c2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -121,7 +121,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="OS-9 Level 1 V1.2 for DragonPlus (1983)(Compusense)[OS-9][!].vdk" size="184338" crc="0c067eab" sha1="19e4ff1eb6c7b8d49ad33d146cfaa6eb81e96e29"/>
+				<rom name="OS-9 Level 1 V1.2 for DragonPlus (1983)(Compusense)[OS-9][!].vdk" size="184338" crc="0c067eab" sha1="19e4ff1eb6c7b8d49ad33d146cfaa6eb81e96e29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@
 		<publisher>Eurohard S.A.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184339">
-				<rom name="OS-9 Level 1 V2.0 (1985)(Eurohard SA)[OS-9][!].vdk" size="184339" crc="73461aad" sha1="e1a834322eeb7ced0e9934f7c3c1c745aa6112b5"/>
+				<rom name="OS-9 Level 1 V2.0 (1985)(Eurohard SA)[OS-9][!].vdk" size="184339" crc="73461aad" sha1="e1a834322eeb7ced0e9934f7c3c1c745aa6112b5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -144,13 +144,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 2"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Pascal Disk 1 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="5847b0b5" sha1="c96214d67010ae2c6a9649e7a7df77767cdcd8d3"/>
+				<rom name="Pascal Disk 1 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="5847b0b5" sha1="c96214d67010ae2c6a9649e7a7df77767cdcd8d3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 of 2"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Pascal Disk 2 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="b50f8f27" sha1="6f4d3e98f1192f98f081de80b637ffe4cd3d0b89"/>
+				<rom name="Pascal Disk 2 (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="b50f8f27" sha1="6f4d3e98f1192f98f081de80b637ffe4cd3d0b89" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +161,7 @@
 		<publisher>Metasoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368658">
-				<rom name="Prolog (1988)(Metasoft)[OS-9][!].vdk" size="368658" crc="fa319c92" sha1="755cb11a5e836ce2a775d1692ed5042d67ab8ff5"/>
+				<rom name="Prolog (1988)(Metasoft)[OS-9][!].vdk" size="368658" crc="fa319c92" sha1="755cb11a5e836ce2a775d1692ed5042d67ab8ff5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 1"/>
 			<dataarea name="flop" size="184339">
-				<rom name="RMS (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184339" crc="ce069e1f" sha1="7df31a6c66447dbde7b00a40c4e9ab8ac2492c0a"/>
+				<rom name="RMS (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184339" crc="ce069e1f" sha1="7df31a6c66447dbde7b00a40c4e9ab8ac2492c0a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Stock Control (198x)(Dragon Data Ltd)[!][OS9].vdk" size="184332" crc="ae34cfd3" sha1="9149fc20a25435492dd3c68307020cee228b6693"/>
+				<rom name="Stock Control (198x)(Dragon Data Ltd)[!][OS9].vdk" size="184332" crc="ae34cfd3" sha1="9149fc20a25435492dd3c68307020cee228b6693" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 1"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Stylograph, Spellcheck &amp; Mailmerge (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="7e0cbb7d" sha1="33493231fee62a3baa7514d79390d6cfe65966a7"/>
+				<rom name="Stylograph, Spellcheck &amp; Mailmerge (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184332" crc="7e0cbb7d" sha1="33493231fee62a3baa7514d79390d6cfe65966a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>

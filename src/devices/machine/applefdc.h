@@ -149,8 +149,6 @@ public:
 	}
 
 	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static constexpr feature_type imperfect_features() { return feature::DISK; }
 };
 
 #endif // MAME_MACHINE_APPLEFDC_H

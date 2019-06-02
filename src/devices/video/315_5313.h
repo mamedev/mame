@@ -23,7 +23,7 @@ public:
 
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	typedef device_delegate<void (int x, uint32_t priority, uint32_t &lineptr)> md_32x_scanline_delegate;
+	typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
 	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 
@@ -33,7 +33,7 @@ public:
 
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
 	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
-	template <typename T> void set_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func = md_32x_scanline_delegate(std::forward<T>(args)...); }
@@ -75,8 +75,8 @@ public:
 			m_render_bitmap->fill(0);
 	}
 
-	std::unique_ptr<bitmap_rgb32> m_render_bitmap;
-	std::unique_ptr<uint32_t[]> m_render_line;
+	std::unique_ptr<bitmap_ind16> m_render_bitmap;
+	std::unique_ptr<uint16_t[]> m_render_line;
 	std::unique_ptr<uint16_t[]> m_render_line_raw;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
@@ -180,10 +180,12 @@ private:
 	std::unique_ptr<uint8_t[]> m_highpri_renderline;
 	std::unique_ptr<uint32_t[]> m_video_renderline;
 	std::unique_ptr<uint16_t[]> m_palette_lookup;
+	std::unique_ptr<uint16_t[]> m_palette_lookup_sprite; // for C2
+	std::unique_ptr<uint16_t[]> m_palette_lookup_shadow;
+	std::unique_ptr<uint16_t[]> m_palette_lookup_highlight;
 
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;
-	optional_device<palette_device> m_ext_palette;
 };
 
 

@@ -45,7 +45,6 @@
 #include "ultra14f.h"
 #include "ultra24f.h"
 #include "tekram_dc820.h"
-#include "asc88.h"
 
 // sound
 #include "adlib.h"
@@ -73,8 +72,6 @@
 #include "pds.h"
 
 // other
-#include "chessmdr.h"
-#include "chessmsr.h"
 #include "finalchs.h"
 
 
@@ -103,6 +100,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("fdc344", ISA8_FDC344);
 	device.option_add("fdcmag", ISA8_FDCMAG);
 	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
+	device.option_add("finalchs", ISA8_FINALCHS);
 	device.option_add("xtide", ISA8_XTIDE);
 	device.option_add("side116", ISA8_SIDE116);
 	device.option_add("hdc", ISA8_HDC);
@@ -122,10 +120,6 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("dectalk", ISA8_DECTALK);
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
-	device.option_add("asc88", ASC88);
-	device.option_add("chessmdr", ISA8_CHESSMDR);
-	device.option_add("chessmsr", ISA8_CHESSMSR);
-	device.option_add("finalchs", ISA8_FINALCHS);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -163,9 +157,6 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dectalk", ISA8_DECTALK);
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
-	device.option_add("chessmdr", ISA8_CHESSMDR);
-	device.option_add("chessmsr", ISA8_CHESSMSR);
-	device.option_add("finalchs", ISA8_FINALCHS);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);

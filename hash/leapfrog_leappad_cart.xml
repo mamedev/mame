@@ -2,21 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
-	<software name="tiggerbnca" cloneof="tiggerbnc" supported="no">
-		<description>Disney's Bounce, Tigger, Bounce (UK)</description>
-		<year>200?</year>
-		<publisher>LeapFrog</publisher>
-		<!-- No serial on cart or book -->
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7210"/>
-			<feature name="pcb_rev" value="REV.01"/>
-			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500 - Bounce, Tigger, Bounce.bin" size="0x200000" crc="f7d8c924" sha1="2fc203e0c67f8800474f73b6fd910877ccd3601e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="poohstuck" supported="no">
 		<description>Disney's Pooh Gets Stuck (UK)</description>
 		<year>200?</year>
@@ -125,36 +110,6 @@
 		</part>
 	</software>
 
-	<software name="monsters" supported="no">
-		<description>Leap 2 - Reading - Disney/Pixar Monsters, Inc. (UK)</description>
-		<year>2001</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-00366"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-2612"/>
-			<feature name="pcb_rev" value="REV.01"/>
-			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-00366 - Leap 2 - Reading - Monsters,Inc..bin" size="0x200000" crc="2ee10183" sha1="4b69c029fef9037e68dbefc14aaba6a1c2152fea" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tuttitrip" supported="no">
-		<description>Leap-Start - Pre Reading - Tutter's Tiny Trip (UK)</description>
-		<year>2001</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-00406"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7210"/>
-			<feature name="pcb_rev" value="REV.00"/>
-			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-00406 - Leap-Start - Pre Reading - Tutter's Tiny Trip.bin" size="0x200000" crc="ff64b908" sha1="c6e2c08698259eca87a91d900c24bd25e34e1567" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="compwords" supported="no">
 		<description>Phonics Program - Lesson 10 - Compound Words - A Fisherman's Tale (UK)</description>
 		<year>2003</year>
@@ -240,12 +195,7 @@
 		</part>
 	</software>
 
-	<!-- Also found as:
-		Description: Phonics - Leap's Friends From A to Z
-		Year: 2001
-		Serial: 500-00263
-		U1: MX23L8111
-	-->
+	<!-- Same ROM as 500-00263 - Phonics - Leap's Friends From A to Z -->
 	<software name="prlpfrnds" supported="no">
 		<description>Pre Reading - Leap's Friends From A to Z (UK)</description>
 		<year>2002</year>
@@ -296,51 +246,6 @@
 			<feature name="u1" value="MR27V3202E"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-01346 - 4th Grade Math.bin" size="0x400000" crc="939efe79" sha1="66baa68aa13590ca4bd18d0dc8f329398bb12414" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lionking" supported="no">
-		<description>Leap Start - Pre Reading Storybook - Disney's The Lion King (UK)</description>
-		<year>2002</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-01354"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7011"/>
-			<feature name="pcb_rev" value="REV.0:"/>
-			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-01354 - Leap Start - Pre Reading Storybook - The Lion King.bin" size="0x200000" crc="66126bc1" sha1="36f51db4669f29ee1cb8e12b1c13d9e1738e458f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="findnemoa" supported="no">
-		<description>Leap 1 - Reading - Disney/Pixar Finding Nemo (UK)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-01383"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7210"/>
-			<feature name="pcb_rev" value="REV.00"/>
-			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-01383 - Leap 1 - Reading - Finding Nemo.bin" size="0x200000" crc="89680f35" sha1="4fa4930bd7a91910607699123a7a2a2e1ff921a5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mosslake" supported="no">
-		<description>Phonics Programme - Lesson 3 - Short Vowels o and e - A Day at Moss Lake (UK)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-01389"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="pcb" value="57000-003-7210"/>
-			<feature name="pcb_rev" value="REV.00"/>
-			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-01389 - Phonics Programme - Lesson 3 - Short Vowels o and e - A Day at Moss Lake.bin" size="0x200000" crc="22c3c65d" sha1="b3c6f7de54552dd9b164b2f3a97f8565f8cc7879" />
 			</dataarea>
 		</part>
 	</software>
@@ -403,7 +308,7 @@
 	</software>
 
 	<software name="toystory2" supported="no">
-		<description>Disney/Pixar Toy Story 2 (UK)</description>
+		<description>Toy Story 2 (UK)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10497 UBL"/>
@@ -417,8 +322,8 @@
 		</part>
 	</software>
 
-	<software name="lionkings" cloneof="lionking" supported="no">
-		<description>Disney El Rey León (Spain)</description>
+	<software name="lionkings" supported="no">
+		<description>El Rey León (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10597 UBL"/>
@@ -443,19 +348,6 @@
 			<feature name="u1" value="Matronix 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10635 - Leap und die Welt der Dinosaurier (GER).bin" size="0x400000" crc="5e306c92" sha1="7496f5b994a40ea07228b5ab27ec907fbcf603b4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spiderman" supported="no">
-		<description>The Amazing Spider-Man (UK)</description>
-		<year>2004</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10638 UBL"/>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<feature name="u1" value="MR27V3202F"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x400000">
-				<rom name="500-10638 UBL - The Amazing Spider-Man.bin" size="0x400000" crc="f319ec1c" sha1="0f664f63c15ca85fc3a82b8eb4fff017d0145f8c" />
 			</dataarea>
 		</part>
 	</software>
@@ -489,19 +381,11 @@
 		</part>
 	</software>
 
-	<!-- Also found as:
-		Description: Phonics Programme - Lesson 2 - Short Vowels a and i - Tad's Good Night
-		Year: 2003
-		Serial: 500-01367
-		PCB: 57000-003-3317
-		PCB Rev: REV.03
-		U1: HY23V16202
-	-->
 	<software name="tadsgngt" supported="no">
 		<description>Tad's Good Night (UK)</description>
 		<year>1999</year>
 		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-10756 UBL"/> <!-- Also found as 500-01367 -->
+		<info name="serial" value="500-10756 UBL"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7210"/>
 			<feature name="pcb_rev" value="REV.00"/>
@@ -512,7 +396,7 @@
 		</part>
 	</software>
 
-	<software name="mosslakeg" cloneof="mosslake" supported="no">
+	<software name="mosslakeg" supported="no">
 		<description>A Day at Moss Lake (Germany)</description>
 		<year>1999</year>
 		<publisher>LeapFrog</publisher>
@@ -542,7 +426,7 @@
 		</part>
 	</software>
 
-	<software name="princesss" cloneof="princess" supported="no">
+	<software name="princesss" cloneof="princessg" supported="no">
 		<description>Disney Princesas - Cuentos de las Princesas (Spain)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
@@ -571,7 +455,7 @@
 		</part>
 	</software>
 
-	<software name="princess" supported="no">
+	<software name="princesstry" supported="no">
 		<description>Disney Princess - Princess Stories (UK)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -746,7 +630,7 @@
 		</part>
 	</software>
 
-	<software name="princessg" cloneof="princess" supported="no">
+	<software name="princessg" supported="no">
 		<description>Disney Prinzessin - Prinzessinnen-Geschichten (Germany)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>

@@ -1030,20 +1030,10 @@ void i386_device::i386_enter32()           // Opcode 0xc8
 
 	if(level > 0)
 	{
-		for(x=1;x<=level-1;x++)
+		for(x=1;x<level-1;x++)
 		{
-			uint32_t addr;
-			if(!STACK_32BIT)
-			{
-				REG16(BP) -= 4;
-				addr = REG16(BP);
-			}
-			else
-			{
-				REG32(EBP) -= 4;
-				addr = REG32(EBP);
-			}
-			PUSH32(READ32(i386_translate(SS, addr, 0)));
+			REG32(EBP) -= 4;
+			PUSH32(READ32(REG32(EBP)));
 		}
 		PUSH32(frameptr);
 	}

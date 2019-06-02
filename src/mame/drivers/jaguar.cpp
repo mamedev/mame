@@ -461,8 +461,8 @@ void jaguar_state::machine_reset()
 	dsp_resume();
 
 	/* halt the CPUs */
-	m_gpu->ctrl_w(G_CTRL, 0);
-	m_dsp->ctrl_w(D_CTRL, 0);
+	m_gpu->ctrl_w(m_gpu->space(AS_PROGRAM), G_CTRL, 0, 0xffffffff);
+	m_dsp->ctrl_w(m_dsp->space(AS_PROGRAM), D_CTRL, 0, 0xffffffff);
 
 	/* set blitter idle flag */
 	m_blitter_status = 1;
@@ -631,8 +631,8 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 		dsp_resume();
 
 		/* halt the CPUs */
-		m_gpu->ctrl_w(G_CTRL, 0);
-		m_dsp->ctrl_w(D_CTRL, 0);
+		m_gpu->ctrl_w(space, G_CTRL, 0, 0xffffffff);
+		m_dsp->ctrl_w(space, D_CTRL, 0, 0xffffffff);
 	}
 
 	/* adjust banking */
@@ -654,13 +654,13 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 
 READ32_MEMBER(jaguar_state::gpuctrl_r)
 {
-	return m_gpu->ctrl_r(offset);
+	return m_gpu->ctrl_r(space, offset);
 }
 
 
 WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 {
-	m_gpu->ctrl_w(offset, data, mem_mask);
+	m_gpu->ctrl_w(space, offset, data, mem_mask);
 }
 
 
@@ -673,13 +673,13 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 
 READ32_MEMBER(jaguar_state::dspctrl_r)
 {
-	return m_dsp->ctrl_r(offset);
+	return m_dsp->ctrl_r(space, offset);
 }
 
 
 WRITE32_MEMBER(jaguar_state::dspctrl_w)
 {
-	m_dsp->ctrl_w(offset, data, mem_mask);
+	m_dsp->ctrl_w(space, offset, data, mem_mask);
 }
 
 
@@ -1382,7 +1382,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xa30000, 0xa30003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0xa40000, 0xa40003).w(FUNC(jaguar_state::eeprom_enable_w));
 	map(0xb70000, 0xb70003).rw(FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
-//  map(0xc00000, 0xdfffff).bankr("mainsndbank");
+	map(0xc00000, 0xdfffff).bankr("mainsndbank");
 	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::config_r), FUNC(vt83c461_device::config_w));
 	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
 	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
@@ -1394,7 +1394,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
 	map(0xf17000, 0xf17003).lr16("f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
-//  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPI04
+//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
 	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
@@ -1849,8 +1849,6 @@ void jaguar_state::cojagr3k(machine_config &config)
 	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
-	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1886,7 +1884,7 @@ void jaguar_state::cojag68k(machine_config &config)
 void jaguar_state::jaguar(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, JAGUAR_CLOCK/2); // MC68000FN12F 16 MHz
+	M68000(config, m_maincpu, JAGUAR_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &jaguar_state::cpu_space_map);
 
@@ -1905,8 +1903,6 @@ void jaguar_state::jaguar(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
-
-	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2740,8 +2736,8 @@ void jaguar_state::init_vcircle()
  *************************************/
 
 /*    YEAR   NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY    FULLNAME */
-CONS( 1993,  jaguar,    0,        0,      jaguar,   jaguar,   jaguar_state, init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 1995,  jaguarcd,  jaguar,   0,      jaguarcd, jaguar,   jaguar_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1993,  jaguar,    0,        0,      jaguar,   jaguar,   jaguar_state, init_jaguar,   "Atari",   "Jaguar",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1995,  jaguarcd,  jaguar,   0,      jaguarcd, jaguar,   jaguar_state, init_jaguarcd, "Atari",   "Jaguar CD", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 /*    YEAR   NAME       PARENT    MACHINE       INPUT     CLASS         INIT            ROT   COMPANY        FULLNAME */
 GAME( 1996, area51,     0,        cojagr3k,     area51,   jaguar_state, init_area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )

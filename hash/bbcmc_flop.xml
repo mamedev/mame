@@ -16,7 +16,7 @@
 		<publisher>Alpine Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="alps24.adl" size="655360" crc="82b20916" sha1="fcf1c0290afb523cbab11069373fef28478b1ad3"/>
+				<rom name="alps24.adl" size="655360" crc="82b20916" sha1="fcf1c0290afb523cbab11069373fef28478b1ad3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 		<info name="author" value="Richard Broadhurst" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="95488">
-				<rom name="AstroBlaster.adf" size="95488" crc="372f352b" sha1="cc247c41bad2c00f99639af93e89bfb29692b00f"/>
+				<rom name="AstroBlaster.adf" size="95488" crc="372f352b" sha1="cc247c41bad2c00f99639af93e89bfb29692b00f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 		<info name="author" value="Richard Broadhurst" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="25600">
-				<rom name="carnival.adf" size="25600" crc="cbe0d763" sha1="5caf371370a1358540e8d042ccdb02db2c1470d6"/>
+				<rom name="carnival.adf" size="25600" crc="cbe0d763" sha1="5caf371370a1358540e8d042ccdb02db2c1470d6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3463936">
-				<rom name="Codename DROID (Superior) (BMC) (Disc35).fdi" size="3463936" crc="8ee0a2a3" sha1="d6f5595b6738f75b271958d0763d14fc08fafee9"/>
+				<rom name="Codename DROID (Superior) (BMC) (Disc35).fdi" size="3463936" crc="8ee0a2a3" sha1="d6f5595b6738f75b271958d0763d14fc08fafee9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<publisher>CDS</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3468288">
-				<rom name="Colossus Chess 4 (CDS) (BMC) (Disc35).fdi" size="3468288" crc="5e009178" sha1="c09038f3803d3e4441042bd8c627ff010b63657e"/>
+				<rom name="Colossus Chess 4 (CDS) (BMC) (Disc35).fdi" size="3468288" crc="5e009178" sha1="c09038f3803d3e4441042bd8c627ff010b63657e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<info name="release" value="SUG60" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381"/>
+				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3205376">
-				<rom name="Elite (Superior) (BMC) (Disc35).fdi" size="3205376" crc="a8580b91" sha1="8ec5c512d17432752c86e252f123d973098e3f5f"/>
+				<rom name="Elite (Superior) (BMC) (Disc35).fdi" size="3205376" crc="a8580b91" sha1="8ec5c512d17432752c86e252f123d973098e3f5f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3461632">
-				<rom name="Exile (Superior) (BMC) (Disc35).fdi" size="3461632" crc="92c22af9" sha1="a0bc2024d42a1f488e9012ff88451bcf0abdb592"/>
+				<rom name="Exile (Superior) (BMC) (Disc35).fdi" size="3461632" crc="92c22af9" sha1="a0bc2024d42a1f488e9012ff88451bcf0abdb592" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@
 		<publisher>4th Dimension</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3363584">
-				<rom name="Holed Out (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3363584" crc="437cccc6" sha1="ab730a66e28c6ff0028b944e2d988ab79c5c492f"/>
+				<rom name="Holed Out (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3363584" crc="437cccc6" sha1="ab730a66e28c6ff0028b944e2d988ab79c5c492f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 		<publisher>4th Dimension</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3596800">
-				<rom name="Holed Out - Extra Courses Vol 2 (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3596800" crc="bab311ef" sha1="df3747e8a3327fd63d3db91be39bcfa4572da095"/>
+				<rom name="Holed Out - Extra Courses Vol 2 (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3596800" crc="bab311ef" sha1="df3747e8a3327fd63d3db91be39bcfa4572da095" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 		<info name="author" value="Stephen Smith" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="39680">
-				<rom name="The Krystal Connection (2009)(Retro Software).adf" size="39680" crc="3f565fdf" sha1="e6ce604c23e32ad3e42b3fcd9b23ba57376bc621" />
+				<rom name="The Krystal Connection (2009)(Retro Software).adf" size="39680" crc="3f565fdf" sha1="e6ce604c23e32ad3e42b3fcd9b23ba57376bc621" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<publisher>Micro Power</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3448832">
-				<rom name="Micro Power Magic (Micro Power) (BMC) (Disc35).fdi" size="3448832" crc="fbf0e03c" sha1="ac6bcc7df5f6dc8a925d074416089d242413a409"/>
+				<rom name="Micro Power Magic (Micro Power) (BMC) (Disc35).fdi" size="3448832" crc="fbf0e03c" sha1="ac6bcc7df5f6dc8a925d074416089d242413a409" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -152,7 +152,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3719168">
-				<rom name="Play It Again Sam (Superior) (BMC) (Disc35).fdi" size="3719168" crc="480eacc7" sha1="bb6f58124f1afd20471c73893582aa1ca4e12b38"/>
+				<rom name="Play It Again Sam (Superior) (BMC) (Disc35).fdi" size="3719168" crc="480eacc7" sha1="bb6f58124f1afd20471c73893582aa1ca4e12b38" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3551232">
-				<rom name="Play It Again Sam 2 (Superior) (BMC) (Disc35).fdi" size="3551232" crc="127cca5b" sha1="b0c2c78487e1d1d514c221e50b3a6a39df1fb17b"/>
+				<rom name="Play It Again Sam 2 (Superior) (BMC) (Disc35).fdi" size="3551232" crc="127cca5b" sha1="b0c2c78487e1d1d514c221e50b3a6a39df1fb17b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -174,7 +174,7 @@
 		<publisher>4th Dimension</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3263488">
-				<rom name="Q-Master (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3263488" crc="be8358e4" sha1="4941f2ace2ca1b09f3563e28e767ee4307d98c8f"/>
+				<rom name="Q-Master (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3263488" crc="be8358e4" sha1="4941f2ace2ca1b09f3563e28e767ee4307d98c8f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3601408">
-				<rom name="Repton Thru Time (Superior) (BMC) (Disc35).fdi" size="3601408" crc="b31c34a1" sha1="fe38370a119ee9f278569bb5a088d0e4055fc92f"/>
+				<rom name="Repton Thru Time (Superior) (BMC) (Disc35).fdi" size="3601408" crc="b31c34a1" sha1="fe38370a119ee9f278569bb5a088d0e4055fc92f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,7 +196,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3400192">
-				<rom name="Around the World in 40 Screens (Superior) (BMC) (Disc35).fdi" size="3400192" crc="68ff41a2" sha1="4d4e48bfc7fdb6660e64b676dbe2b630034f0814"/>
+				<rom name="Around the World in 40 Screens (Superior) (BMC) (Disc35).fdi" size="3400192" crc="68ff41a2" sha1="4d4e48bfc7fdb6660e64b676dbe2b630034f0814" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 		<publisher>CDS</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3396096">
-				<rom name="Steve Davis Snooker (CDS) (BMC) (Disc35).fdi" size="3396096" crc="d2d2f15e" sha1="96e0adf8cb437c796b475d4785c337b7a1011612"/>
+				<rom name="Steve Davis Snooker (CDS) (BMC) (Disc35).fdi" size="3396096" crc="d2d2f15e" sha1="96e0adf8cb437c796b475d4785c337b7a1011612" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,7 +218,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3726336">
-				<rom name="Stryker's Run (Superior) (BMC) (Disc35).fdi" size="3726336" crc="2709ce38" sha1="8343477be489e7eeecf844446f05001423dc01e2"/>
+				<rom name="Stryker's Run (Superior) (BMC) (Disc35).fdi" size="3726336" crc="2709ce38" sha1="8343477be489e7eeecf844446f05001423dc01e2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@
 		<publisher>4th Dimension</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3196928">
-				<rom name="UIM (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3196928" crc="e86a2077" sha1="96102eeb1afb15fafddda4d92ad347bdbdbfcdc6"/>
+				<rom name="UIM (Fourth Dimension, The) (BMC) (Disc35).fdi" size="3196928" crc="e86a2077" sha1="96102eeb1afb15fafddda4d92ad347bdbdbfcdc6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +240,7 @@
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="welcome_compact.adl" size="655360" crc="9d747205" sha1="04cfd6d1e08e8f695befb2948e27d63fd7842b8f" />
+				<rom name="welcome_compact.adl" size="655360" crc="9d747205" sha1="04cfd6d1e08e8f695befb2948e27d63fd7842b8f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@
 		<info name="author" value="Jamie Woodhouse" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="45312">
-				<rom name="Zap! (2009)(Retro Software).adf" size="45312" crc="3554bc34" sha1="e8f206bf93c6b30295fd9926a37fb5743b8a3c93" />
+				<rom name="Zap! (2009)(Retro Software).adf" size="45312" crc="3554bc34" sha1="e8f206bf93c6b30295fd9926a37fb5743b8a3c93" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -266,12 +266,12 @@
 		<info name="release" value="SNC11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="Acom.adl" size="655360" crc="8544394e" sha1="1ece4427f2bdbcfc8232f9b40478139d090fdde6" />
+				<rom name="Acom.adl" size="655360" crc="8544394e" sha1="1ece4427f2bdbcfc8232f9b40478139d090fdde6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Acom-4.10.rom" size="16384" crc="a0fa1740" sha1="ef8f83707405b95c662c322b9e5a60456970cc9b" />
+				<rom name="Acom-4.10.rom" size="16384" crc="a0fa1740" sha1="ef8f83707405b95c662c322b9e5a60456970cc9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -283,7 +283,7 @@
 		<info name="release" value="SUB29" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
-				<rom name="viewplot.adf" size="327680" crc="2ca1eade" sha1="12eaa4ac1c6a6484a886f313bb793a2c4537eb91" />
+				<rom name="viewplot.adf" size="327680" crc="2ca1eade" sha1="12eaa4ac1c6a6484a886f313bb793a2c4537eb91" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -296,7 +296,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="animated_numbers.adl" size="655360" crc="a8b8d04d" sha1="7d633419ac6012c80f9376210e47642ca3d70d82" />
+				<rom name="animated_numbers.adl" size="655360" crc="a8b8d04d" sha1="7d633419ac6012c80f9376210e47642ca3d70d82" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -308,19 +308,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Bikes I"/>
 			<dataarea name="flop" size="655360">
-				<rom name="Bikes 1 Version 2.0-06-90.adl" size="655360" crc="3ca4ba99" sha1="397501a286ed9b1ebd5421a980e3ce3d5ca9008d" />
+				<rom name="Bikes 1 Version 2.0-06-90.adl" size="655360" crc="3ca4ba99" sha1="397501a286ed9b1ebd5421a980e3ce3d5ca9008d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Bikes II"/>
 			<dataarea name="flop" size="655360">
-				<rom name="Bikes 2 Version 2.0-06-90.adl" size="655360" crc="06fcff2e" sha1="30888334f787a5762ed3d31e9ddf387888997674" />
+				<rom name="Bikes 2 Version 2.0-06-90.adl" size="655360" crc="06fcff2e" sha1="30888334f787a5762ed3d31e9ddf387888997674" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Bikes Toolkit"/>
 			<dataarea name="flop" size="655360">
-				<rom name="Bikes Toolkit Version 2.0-06-90.adl" size="655360" crc="37eab1ee" sha1="033c50aea500c95ff334d60ec31625d95ae2fe3a" />
+				<rom name="Bikes Toolkit Version 2.0-06-90.adl" size="655360" crc="37eab1ee" sha1="033c50aea500c95ff334d60ec31625d95ae2fe3a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -332,19 +332,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disc"/>
 			<dataarea name="flop" size="20224">
-				<rom name="connections_master_disc.adl" size="20224" crc="b3149805" sha1="3065c72fa3226f8741a019bd6c0dce7db11bdf7a" />
+				<rom name="connections_master_disc.adl" size="20224" crc="b3149805" sha1="3065c72fa3226f8741a019bd6c0dce7db11bdf7a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Work Disc"/>
 			<dataarea name="flop" size="327680">
-				<rom name="connections_work_disc.adl" size="327680" crc="823766c6" sha1="e89ab5643b66218a3f42911976700942e72a066d" />
+				<rom name="connections_work_disc.adl" size="327680" crc="823766c6" sha1="e89ab5643b66218a3f42911976700942e72a066d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Print Disc"/>
 			<dataarea name="flop" size="327680">
-				<rom name="connections_print_disc.adl" size="327680" crc="22528474" sha1="46a6ea12d2acf53ccc682bc0d8b5ffb876800793" />
+				<rom name="connections_print_disc.adl" size="327680" crc="22528474" sha1="46a6ea12d2acf53ccc682bc0d8b5ffb876800793" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -355,7 +355,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="dreamtime.adl" size="655360" crc="57ff88cd" sha1="bdf7a8e3532874b74fa6658da7500fdb4d67603e" />
+				<rom name="dreamtime.adl" size="655360" crc="57ff88cd" sha1="bdf7a8e3532874b74fa6658da7500fdb4d67603e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="dreamtime.adl" size="655360" crc="033c7088" sha1="5f8b66af0b6d81f3829ac9371bbf79825536461f" />
+				<rom name="dreamtime.adl" size="655360" crc="033c7088" sha1="5f8b66af0b6d81f3829ac9371bbf79825536461f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -378,13 +378,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disc &amp; Introduction"/>
 			<dataarea name="flop" size="655360">
-				<rom name="micro_bugs_start_disc.adl" size="655360" crc="ec6f8494" sha1="47d9884a44ece0328a5adf640d88fb5edbdda12a" />
+				<rom name="micro_bugs_start_disc.adl" size="655360" crc="ec6f8494" sha1="47d9884a44ece0328a5adf640d88fb5edbdda12a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Adventure Disc"/>
 			<dataarea name="flop" size="655360">
-				<rom name="micro_bugs_adventure_disc.adl" size="655360" crc="7baa88ae" sha1="28aeb331a70ccadf45bd9800821539973b5be24f" />
+				<rom name="micro_bugs_adventure_disc.adl" size="655360" crc="7baa88ae" sha1="28aeb331a70ccadf45bd9800821539973b5be24f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -396,13 +396,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Parts 1 &amp; 2"/>
 			<dataarea name="flop" size="655360">
-				<rom name="space_mission_mada_12.adl" size="655360" crc="ed7ea48e" sha1="c9131e515732dfebb296eb1a7c8bbc2f0b7aefe4" />
+				<rom name="space_mission_mada_12.adl" size="655360" crc="ed7ea48e" sha1="c9131e515732dfebb296eb1a7c8bbc2f0b7aefe4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Parts 3 + 4"/>
 			<dataarea name="flop" size="655360">
-				<rom name="space_mission_mada_34.adl" size="655360" crc="29030385" sha1="aadaef6c3f6ca86e3cba9e250e86ab7cbb2e5403" />
+				<rom name="space_mission_mada_34.adl" size="655360" crc="29030385" sha1="aadaef6c3f6ca86e3cba9e250e86ab7cbb2e5403" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -413,7 +413,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="stig_of_the_dump.adl" size="655360" crc="d7fd696c" sha1="568ec9f8f15506564881f623d62d6faefd191d1a" />
+				<rom name="stig_of_the_dump.adl" size="655360" crc="d7fd696c" sha1="568ec9f8f15506564881f623d62d6faefd191d1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="teachers_cupboard.adl" size="655360" crc="fe49aa4c" sha1="3dd73656e1b18f74acb78fd6cd0c7ea5888b5fff" />
+				<rom name="teachers_cupboard.adl" size="655360" crc="fe49aa4c" sha1="3dd73656e1b18f74acb78fd6cd0c7ea5888b5fff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="teddy_bear_picnic.adl" size="655360" crc="4ff95e0e" sha1="494deb7727b3fe490a16b66ca471508e3d56e465" />
+				<rom name="teddy_bear_picnic.adl" size="655360" crc="4ff95e0e" sha1="494deb7727b3fe490a16b66ca471508e3d56e465" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -446,7 +446,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="teddy_bear_rainy_day.adl" size="655360" crc="5854e1eb" sha1="731b3609fbe8b6d09ee2b3ef6db155fb2012cca8" />
+				<rom name="teddy_bear_rainy_day.adl" size="655360" crc="5854e1eb" sha1="731b3609fbe8b6d09ee2b3ef6db155fb2012cca8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -457,7 +457,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
-				<rom name="three_little_pigs_at_home.adl" size="655360" crc="18e63cfd" sha1="d3b272f26f395fc987d5b0749bae88ef76ba7fe1" />
+				<rom name="three_little_pigs_at_home.adl" size="655360" crc="18e63cfd" sha1="d3b272f26f395fc987d5b0749bae88ef76ba7fe1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -471,7 +471,7 @@
 		<info name="release" value="SNL28" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="526592">
-				<rom name="acorn-c.adl" size="526592" crc="fce1d68f" sha1="a8983068eb9a699a500fa8f8ebfb369a673e7279" />
+				<rom name="acorn-c.adl" size="526592" crc="fce1d68f" sha1="a8983068eb9a699a500fa8f8ebfb369a673e7279" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -43,7 +43,6 @@ DEFINE_DEVICE_TYPE(DRAGON_JCBSND, dragon_jcbsnd_device, "dragon_jcbsnd", "Dragon
 dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DRAGON_JCBSND, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
-	, m_eprom(*this, "eprom")
 	, m_ay8910(*this, "ay8910")
 {
 }
@@ -66,7 +65,7 @@ void dragon_jcbsnd_device::device_start()
 
 uint8_t* dragon_jcbsnd_device::get_cart_base()
 {
-	return m_eprom->base();
+	return memregion("eprom")->base();
 }
 
 //-------------------------------------------------
@@ -75,7 +74,7 @@ uint8_t* dragon_jcbsnd_device::get_cart_base()
 
 memory_region* dragon_jcbsnd_device::get_cart_memregion()
 {
-	return m_eprom;
+	return memregion("eprom");
 }
 
 //-------------------------------------------------
@@ -96,13 +95,4 @@ void dragon_jcbsnd_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *dragon_jcbsnd_device::device_rom_region() const
 {
 	return ROM_NAME( dragon_jcbsnd );
-}
-
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(dragon_jcbsnd_device::cts_read)
-{
-	return m_eprom->base()[offset & 0x1fff];
 }

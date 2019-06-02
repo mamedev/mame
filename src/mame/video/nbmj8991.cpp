@@ -170,7 +170,7 @@ void nbmj8991_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_BLITTER:
-		m_nb1413m3->busyflag_w(1);
+		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
 		assert_always(false, "Unknown id in nbmj8991_state::device_timer");
@@ -278,7 +278,7 @@ void nbmj8991_state::gfxdraw()
 		}
 	}
 
-	m_nb1413m3->busyflag_w(0);
+	m_nb1413m3->m_busyflag = 0;
 	m_blitter_timer->adjust(attotime::from_nsec(1650) * m_nb1413m3->m_busyctr);
 }
 

@@ -8,7 +8,7 @@
 		<publisher>VEB Mikroelektronik Erfurt</publisher>
 		<part name="cart" interface="chessmstdm_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="PM10_bm400.bin" size="0x2000" crc="aa784d7a" sha1="fd2d6cac9805a5aaf4f51b7c974d0314a402c186"/>
+				<rom name="PM10_bm400.bin" size="0x2000" crc="aa784d7a" sha1="fd2d6cac9805a5aaf4f51b7c974d0314a402c186" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>VEB Mikroelektronik Erfurt</publisher>
 		<part name="cart" interface="chessmstdm_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="PM11_bm403_bm607.bin" size="0x4000" crc="5af4f3e2" sha1="7c9befc6182d65ca0c7d53820a0f84a3a55b9c78"/>
+				<rom name="PM11_bm403_bm607.bin" size="0x4000" crc="5af4f3e2" sha1="7c9befc6182d65ca0c7d53820a0f84a3a55b9c78" offset="0" />
 			</dataarea>
 		</part>
 	</software>

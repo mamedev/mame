@@ -42,8 +42,6 @@ public:
 			COMBINE_DATA(&m_cp0[CP0_Config]);
 	}
 
-	void bus_error() { m_bus_error = true; }
-
 protected:
 	enum cache_size_t
 	{
@@ -171,8 +169,6 @@ protected:
 		EH_VPN2_32 = 0x0000'0000'ffff'e000, // virtual page number (32-bit mode)
 		EH_VPN2_64 = 0x0000'00ff'ffff'e000, // virtual page number (64-bit mode)
 		EH_R       = 0xc000'0000'0000'0000, // region (64-bit mode)
-
-		EH_WM      = 0xc000'00ff'ffff'e0ff, // write mask
 	};
 	enum cp0_tlb_el : u64
 	{
@@ -181,8 +177,6 @@ protected:
 		EL_D   = 0x0000'0000'0000'0004, // dirty
 		EL_C   = 0x0000'0000'0000'0038, // coherency
 		EL_PFN = 0x0000'0000'3fff'ffc0, // page frame number
-
-		EL_WM  = 0x0000'0000'3fff'fffe, // write mask
 	};
 	enum cp0_tlb_el_c : u64
 	{
@@ -352,8 +346,6 @@ protected:
 	bool cp0_64() const;
 
 	// cp1 implementation
-	void cp1_unimplemented();
-	template <typename T> bool cp1_op(T op);
 	void cp1_execute(u32 const op);
 	template <typename T> void cp1_set(unsigned const reg, T const data);
 
@@ -402,8 +394,8 @@ protected:
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
-	bool m_ll_active;
-	bool m_bus_error;
+	memory_passthrough_handler *m_ll_watch;
+	u64 m_ll_addr;
 	struct tlb_entry_t
 	{
 		u64 mask;

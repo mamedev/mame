@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor ABC-80 Owoco Super Smartaid cartridge emulation
+	Luxor ABC-80 Owoco Super Smartaid cartridge emulation
 
     New BASIC commands:
 
@@ -19,40 +19,9 @@
 
 /*
 
-PCB Layout
-----------
+	TODO:
 
-Super Smartaid / Super Smartaid Magnum 4
-
-[---------------------------------------------------|
-|                       PROM    LS155   LS08        |
-|                                                   |
-||-----------CN1----------|     LS74    HC32        |
-|                                                   |
-|       ROM1        RAM                             |
-|                                                   |
-|LS245          LS126   LS393   LS00        BAT     |
-|       ROM2                                        |
-|               LS260   LS74    LS32                |
-|---------------------------------------------------|
-
-Notes:
-    All IC's shown.
-
-    RAM     - Hitachi HM6116LP-3 / Fujitsu MB8416A-15 2Kx8 SRAM
-    ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM
-    ROM2    - SGS M2716F1 2Kx8 EPROM / NEC D27128D 16Kx8 EPROM
-    PROM    - Signetics N82S131N 512x4 bipolar PROM
-    CN1     - ABC bus connector
-    BAT     - Varta 3/V150H 3.6V 140mAh Ni-MH battery
-
-*/
-
-/*
-
-    TODO:
-
-    - entering a bad command locks up the system
+	- banking
 
 */
 
@@ -177,12 +146,9 @@ uint8_t super_smartaid_t::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch (m_prom->base()[(m_prom_bank << 6) | (offset >> 10)])
+	switch (m_prom->base()[offset >> 10])
 	{
-	case 0x08:
-		m_prom_bank = 1;
-		// fallthru
-	case 0x0c: case 0x0f:
+	case 0x08: case 0x0c: case 0x0f:
 		data = m_rom_2->base()[(m_rom_bank << 12) | (offset & 0xfff)];
 		break;
 	case 0x0d:
@@ -206,12 +172,12 @@ uint8_t super_smartaid_t::abcbus_xmemfl(offs_t offset)
 
 void super_smartaid_t::abcbus_xmemw(offs_t offset, uint8_t data)
 {
-	if ((offset == 0x4040) || (offset == 0x4041))
+	if ((offset & 0x4041) == 0x4040) 
 	{
 		m_rom_bank = BIT(offset, 0);
 	}
 
-	switch (m_prom->base()[(m_prom_bank << 6) | (offset >> 10)])
+	switch (m_prom->base()[offset >> 10])
 	{
 	case 0x0e:
 		m_nvram[offset & 0x7ff] = data;

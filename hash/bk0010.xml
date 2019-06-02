@@ -9,7 +9,7 @@
 		<info name="usage" value="Load file ALJUR .COD inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1131670">
-				<rom name="aljur .cod.wav" size="1131670" crc="86882c2c" sha1="ef5a89dc30b8ea45af36d1688e167a667ad7a033" />
+				<rom name="aljur .cod.wav" size="1131670" crc="86882c2c" sha1="ef5a89dc30b8ea45af36d1688e167a667ad7a033" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<info name="usage" value="Load file Antix inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2172816">
-				<rom name="antix.wav" size="2172816" crc="a7ff6e2b" sha1="bd318ad6cb5015a660489e54fabfd6ea7ea0776a" />
+				<rom name="antix.wav" size="2172816" crc="a7ff6e2b" sha1="bd318ad6cb5015a660489e54fabfd6ea7ea0776a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<info name="usage" value="Load file Apple inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2168056">
-				<rom name="apple.wav" size="2168056" crc="478ba6a5" sha1="dd4127d690cadc39105ccb79ec4fcad744952747" />
+				<rom name="apple.wav" size="2168056" crc="478ba6a5" sha1="dd4127d690cadc39105ccb79ec4fcad744952747" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<info name="usage" value="Load file Arkano inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5129082">
-				<rom name="arkano.wav" size="5129082" crc="028a0049" sha1="e6a1addae8344d99bf3a783103338cd7a8d07200" />
+				<rom name="arkano.wav" size="5129082" crc="028a0049" sha1="e6a1addae8344d99bf3a783103338cd7a8d07200" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<info name="usage" value="Load file Arkanoid inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4600212">
-				<rom name="arkanoid.wav" size="4600212" crc="87874574" sha1="5693bc71d29eee05a516399c35c4694d7f38a1cf" />
+				<rom name="arkanoid.wav" size="4600212" crc="87874574" sha1="5693bc71d29eee05a516399c35c4694d7f38a1cf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<info name="usage" value="Load file Asp_rekl inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2428921">
-				<rom name="asp_rekl.wav" size="2428921" crc="e898872f" sha1="0515f2c24d2590b75353af8798c14b1117159346" />
+				<rom name="asp_rekl.wav" size="2428921" crc="e898872f" sha1="0515f2c24d2590b75353af8798c14b1117159346" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 		<info name="usage" value="Load file Ass inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="248263">
-				<rom name="ass.wav" size="248263" crc="77d0df82" sha1="cc3d2d1d7a8648b344279babaa4b75fab9df627d" />
+				<rom name="ass.wav" size="248263" crc="77d0df82" sha1="cc3d2d1d7a8648b344279babaa4b75fab9df627d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 		<info name="usage" value="Load file Ass2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="7624495">
-				<rom name="ass2.wav" size="7624495" crc="2c6ac739" sha1="9b8c61d7a08669db53ccfe4402300a32403fd686" />
+				<rom name="ass2.wav" size="7624495" crc="2c6ac739" sha1="9b8c61d7a08669db53ccfe4402300a32403fd686" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 		<info name="usage" value="Load file Astrdrom inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2316398">
-				<rom name="astrdrom.wav" size="2316398" crc="e3c0fd59" sha1="fc2701e6650371fd6bcf2090d1a6400f15873a8c" />
+				<rom name="astrdrom.wav" size="2316398" crc="e3c0fd59" sha1="fc2701e6650371fd6bcf2090d1a6400f15873a8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<info name="usage" value="Load file Baby inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3895885">
-				<rom name="baby.wav" size="3895885" crc="4e2b8488" sha1="fd573eaf5ecbdd60c2fb51b66b3c81d313ac3581" />
+				<rom name="baby.wav" size="3895885" crc="4e2b8488" sha1="fd573eaf5ecbdd60c2fb51b66b3c81d313ac3581" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 		<info name="usage" value="Load file Bally inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5159546">
-				<rom name="bally.wav" size="5159546" crc="2a042986" sha1="bf349b0f7e1c641aade991b5f9bf5bfce58f17a4" />
+				<rom name="bally.wav" size="5159546" crc="2a042986" sha1="bf349b0f7e1c641aade991b5f9bf5bfce58f17a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<info name="usage" value="Load file Bapple inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1614825">
-				<rom name="bapple.wav" size="1614825" crc="9c9ddb97" sha1="a551afe3c197d53ef8f2fddbee8d30aff2a343c1" />
+				<rom name="bapple.wav" size="1614825" crc="9c9ddb97" sha1="a551afe3c197d53ef8f2fddbee8d30aff2a343c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@
 		<info name="usage" value="Load file Barb inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3098024">
-				<rom name="barb.wav" size="3098024" crc="4be84230" sha1="c8d80c3359cfd8a3324d94c2e340d558ace28a46" />
+				<rom name="barb.wav" size="3098024" crc="4be84230" sha1="c8d80c3359cfd8a3324d94c2e340d558ace28a46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@
 		<info name="usage" value="Load file Barbar inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3098109">
-				<rom name="barbar.wav" size="3098109" crc="734469d2" sha1="1a60c03a651d9620cd1dcea4ac48b5f25ffe43c7" />
+				<rom name="barbar.wav" size="3098109" crc="734469d2" sha1="1a60c03a651d9620cd1dcea4ac48b5f25ffe43c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +177,7 @@
 		<info name="usage" value="Load file Barman inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1922321">
-				<rom name="barman.wav" size="1922321" crc="3c9aec1d" sha1="a23a25ebf30a727600b6ce7559da2ae3a347b4da" />
+				<rom name="barman.wav" size="1922321" crc="3c9aec1d" sha1="a23a25ebf30a727600b6ce7559da2ae3a347b4da" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -189,7 +189,7 @@
 		<info name="usage" value="Load file Batiskaf inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5016032">
-				<rom name="batiskaf.wav" size="5016032" crc="daaebb19" sha1="ddec36e73c7079562ae1d924b17fcc32fee9d659" />
+				<rom name="batiskaf.wav" size="5016032" crc="daaebb19" sha1="ddec36e73c7079562ae1d924b17fcc32fee9d659" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -201,7 +201,7 @@
 		<info name="usage" value="Load file Bigchess inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3609775">
-				<rom name="bigchess.wav" size="3609775" crc="fd0d05e9" sha1="de92ee9ff5b9d7065b8a5709e88308d4a4d137d5" />
+				<rom name="bigchess.wav" size="3609775" crc="fd0d05e9" sha1="de92ee9ff5b9d7065b8a5709e88308d4a4d137d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -213,7 +213,7 @@
 		<info name="usage" value="Load file Bil inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2543246">
-				<rom name="bil.wav" size="2543246" crc="ddbdbf96" sha1="cd9d46e8567eb830467f0d81e860a136d8cffb1a" />
+				<rom name="bil.wav" size="2543246" crc="ddbdbf96" sha1="cd9d46e8567eb830467f0d81e860a136d8cffb1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@
 		<info name="usage" value="Load file BILLIARD inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4060258">
-				<rom name="billiard.wav" size="4060258" crc="f3fc9b34" sha1="3c2a07e50146c457d6279b9e28eb8c4a97d3da5c" />
+				<rom name="billiard.wav" size="4060258" crc="f3fc9b34" sha1="3c2a07e50146c457d6279b9e28eb8c4a97d3da5c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -237,7 +237,7 @@
 		<info name="usage" value="Load file Biowar inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2956193">
-				<rom name="biowar.wav" size="2956193" crc="e9580849" sha1="49d759220fe907acca3b46f3260523aa22bc45d5" />
+				<rom name="biowar.wav" size="2956193" crc="e9580849" sha1="49d759220fe907acca3b46f3260523aa22bc45d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 		<info name="usage" value="Load file BKDEMO inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3660197">
-				<rom name="bkdemo.wav" size="3660197" crc="fbc93beb" sha1="6f2452c9ce4826910ad9bd4064c944047484638a" />
+				<rom name="bkdemo.wav" size="3660197" crc="fbc93beb" sha1="6f2452c9ce4826910ad9bd4064c944047484638a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +261,7 @@
 		<info name="usage" value="Load file Bkpack inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1279942">
-				<rom name="bkpack.wav" size="1279942" crc="679d06c2" sha1="69d19cb07b3eab733d48248aceedf0d3ef44f8a1" />
+				<rom name="bkpack.wav" size="1279942" crc="679d06c2" sha1="69d19cb07b3eab733d48248aceedf0d3ef44f8a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +273,7 @@
 		<info name="usage" value="Load file Blcout inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5158050">
-				<rom name="blcout.wav" size="5158050" crc="285eeff5" sha1="d59ccade29e0f1888f032810b759c6c0fe21dcb0" />
+				<rom name="blcout.wav" size="5158050" crc="285eeff5" sha1="d59ccade29e0f1888f032810b759c6c0fe21dcb0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -285,7 +285,7 @@
 		<info name="usage" value="Load file BLOCKOUT inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5431920">
-				<rom name="blockout.wav" size="5431920" crc="0efec65e" sha1="5150c5715b573eb7e0077507d0ce049fd900baff" />
+				<rom name="blockout.wav" size="5431920" crc="0efec65e" sha1="5150c5715b573eb7e0077507d0ce049fd900baff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -297,7 +297,7 @@
 		<info name="usage" value="Load file Bolde2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4135347">
-				<rom name="bolde2.wav" size="4135347" crc="ba1194af" sha1="bb24b131c58ff9eedcfa29a14567fa943b273687" />
+				<rom name="bolde2.wav" size="4135347" crc="ba1194af" sha1="bb24b131c58ff9eedcfa29a14567fa943b273687" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -309,7 +309,7 @@
 		<info name="usage" value="Load file Bolder2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4135398">
-				<rom name="bolder2.wav" size="4135398" crc="94686f7b" sha1="b2cd5833d0417344b42c2953bcbacc4684a739f9" />
+				<rom name="bolder2.wav" size="4135398" crc="94686f7b" sha1="b2cd5833d0417344b42c2953bcbacc4684a739f9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -321,7 +321,7 @@
 		<info name="usage" value="Load file Bolder3 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5108325">
-				<rom name="bolder3.wav" size="5108325" crc="401fc0bf" sha1="8f2bd8d5a4cbc9f1860bb87a7636e870aaf5ede4" />
+				<rom name="bolder3.wav" size="5108325" crc="401fc0bf" sha1="8f2bd8d5a4cbc9f1860bb87a7636e870aaf5ede4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -333,7 +333,7 @@
 		<info name="usage" value="Load file Bomb4 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1815102">
-				<rom name="bomb4.wav" size="1815102" crc="c28f1c6b" sha1="89ea450225bae88e582384f7ba1cce0354374367" />
+				<rom name="bomb4.wav" size="1815102" crc="c28f1c6b" sha1="89ea450225bae88e582384f7ba1cce0354374367" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -345,7 +345,7 @@
 		<info name="usage" value="Load file breach inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2172425">
-				<rom name="breach.wav" size="2172425" crc="87c45491" sha1="d206698860310bcbe5d44127453cd7c12317b43f" />
+				<rom name="breach.wav" size="2172425" crc="87c45491" sha1="d206698860310bcbe5d44127453cd7c12317b43f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@
 		<info name="usage" value="Load file Break inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5172092">
-				<rom name="break.wav" size="5172092" crc="5b8e24bf" sha1="435f6ba1841a8a8662b399176c3edaaa6f403f5f" />
+				<rom name="break.wav" size="5172092" crc="5b8e24bf" sha1="435f6ba1841a8a8662b399176c3edaaa6f403f5f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@
 		<info name="usage" value="Load file Breaking inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4154234">
-				<rom name="breaking.wav" size="4154234" crc="b468d09d" sha1="52c9de63795b7733e851205cc3c14a8274577058" />
+				<rom name="breaking.wav" size="4154234" crc="b468d09d" sha1="52c9de63795b7733e851205cc3c14a8274577058" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -381,7 +381,7 @@
 		<info name="usage" value="Load file Brhouse inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4847766">
-				<rom name="brhouse.wav" size="4847766" crc="d4526ae6" sha1="4e6a164f0254efde1626828f0b24d6cb2bc9f763" />
+				<rom name="brhouse.wav" size="4847766" crc="d4526ae6" sha1="4e6a164f0254efde1626828f0b24d6cb2bc9f763" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -393,7 +393,7 @@
 		<info name="usage" value="Load file Bubbler inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4988101">
-				<rom name="bubbler.wav" size="4988101" crc="031221fd" sha1="f3fae70005e1e6174a7a90e0f7b13f262e1d20d3" />
+				<rom name="bubbler.wav" size="4988101" crc="031221fd" sha1="f3fae70005e1e6174a7a90e0f7b13f262e1d20d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@
 		<info name="usage" value="Load file Bubler inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5113935">
-				<rom name="bubler.wav" size="5113935" crc="a479bdd9" sha1="6f6c2e06b46a3d1f86331bcc1bf35775cfc52b13" />
+				<rom name="bubler.wav" size="5113935" crc="a479bdd9" sha1="6f6c2e06b46a3d1f86331bcc1bf35775cfc52b13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@
 		<info name="usage" value="Load file Cache inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3838850">
-				<rom name="cache.wav" size="3838850" crc="8ed4880c" sha1="2c7b9b2a1ee845f89c94fd73df6ec192f3f8e892" />
+				<rom name="cache.wav" size="3838850" crc="8ed4880c" sha1="2c7b9b2a1ee845f89c94fd73df6ec192f3f8e892" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -429,7 +429,7 @@
 		<info name="usage" value="Load file Cave inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="228968">
-				<rom name="cave.wav" size="228968" crc="18d9c42c" sha1="e62fc75352fd0ad7fc064a43b34a52d0b190192d" />
+				<rom name="cave.wav" size="228968" crc="18d9c42c" sha1="e62fc75352fd0ad7fc064a43b34a52d0b190192d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -441,7 +441,7 @@
 		<info name="usage" value="Load file Cave_doc inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1077999">
-				<rom name="cave_doc.wav" size="1077999" crc="7fcdf3a0" sha1="2239b26c0b20f5d978c8b8ed2097ae93dc69a589" />
+				<rom name="cave_doc.wav" size="1077999" crc="7fcdf3a0" sha1="2239b26c0b20f5d978c8b8ed2097ae93dc69a589" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@
 		<info name="usage" value="Load file Cave_man inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5085154">
-				<rom name="cave_man.wav" size="5085154" crc="8a307bf2" sha1="17647ecef6fc13e5c9a0238c9dcc187569e5fe28" />
+				<rom name="cave_man.wav" size="5085154" crc="8a307bf2" sha1="17647ecef6fc13e5c9a0238c9dcc187569e5fe28" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +465,7 @@
 		<info name="usage" value="Load file Cave_res inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5838339">
-				<rom name="cave_res.wav" size="5838339" crc="4271e43e" sha1="c8f61269f87e42eb43f0f924d94a4d7239bdeebd" />
+				<rom name="cave_res.wav" size="5838339" crc="4271e43e" sha1="c8f61269f87e42eb43f0f924d94a4d7239bdeebd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -477,7 +477,7 @@
 		<info name="usage" value="Load file Chaser inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2471540">
-				<rom name="chaser.wav" size="2471540" crc="66c3f278" sha1="da33b09538b06623aeca5769a991ae1cfbb98cab" />
+				<rom name="chaser.wav" size="2471540" crc="66c3f278" sha1="da33b09538b06623aeca5769a991ae1cfbb98cab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -489,7 +489,7 @@
 		<info name="usage" value="Load file Checkers inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4669980">
-				<rom name="checkers.wav" size="4669980" crc="019cebe6" sha1="db477ce1acb7aad893eb3521189632c71fcdc0f8" />
+				<rom name="checkers.wav" size="4669980" crc="019cebe6" sha1="db477ce1acb7aad893eb3521189632c71fcdc0f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -501,7 +501,7 @@
 		<info name="usage" value="Load file Chess07 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4281496">
-				<rom name="chess07.wav" size="4281496" crc="1d142477" sha1="84b64a49736bb05ce00bef24d62be495d063ea6e" />
+				<rom name="chess07.wav" size="4281496" crc="1d142477" sha1="84b64a49736bb05ce00bef24d62be495d063ea6e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -513,7 +513,7 @@
 		<info name="usage" value="Load file Chess1 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3381414">
-				<rom name="chess1.wav" size="3381414" crc="b1f4a7ca" sha1="ac3e704a452dff728948a82c9a86348e490eb407" />
+				<rom name="chess1.wav" size="3381414" crc="b1f4a7ca" sha1="ac3e704a452dff728948a82c9a86348e490eb407" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -525,7 +525,7 @@
 		<info name="usage" value="Load file Chess2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2976763">
-				<rom name="chess2.wav" size="2976763" crc="def328cd" sha1="e93acdebdd82c662395612ee613d9d0339ab77f8" />
+				<rom name="chess2.wav" size="2976763" crc="def328cd" sha1="e93acdebdd82c662395612ee613d9d0339ab77f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -537,7 +537,7 @@
 		<info name="usage" value="Load file Chess3 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3765563">
-				<rom name="chess3.wav" size="3765563" crc="c0fa2955" sha1="9c48588e218f77566f0168f1b8f48246c4e97879" />
+				<rom name="chess3.wav" size="3765563" crc="c0fa2955" sha1="9c48588e218f77566f0168f1b8f48246c4e97879" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -549,7 +549,7 @@
 		<info name="usage" value="Load file Chess4 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3553420">
-				<rom name="chess4.wav" size="3553420" crc="5d7cabec" sha1="e0c1c8fbd0cf12e6d70a2ee9a4cf3d9a83de42bb" />
+				<rom name="chess4.wav" size="3553420" crc="5d7cabec" sha1="e0c1c8fbd0cf12e6d70a2ee9a4cf3d9a83de42bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -561,7 +561,7 @@
 		<info name="usage" value="Load file CIRCLER inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5296022">
-				<rom name="circler.wav" size="5296022" crc="e9b525d1" sha1="c12d7cc15205da9453b0d190e31470252c66c0a1" />
+				<rom name="circler.wav" size="5296022" crc="e9b525d1" sha1="c12d7cc15205da9453b0d190e31470252c66c0a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -573,7 +573,7 @@
 		<info name="usage" value="Load file Columns inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3723318">
-				<rom name="columns.wav" size="3723318" crc="54506302" sha1="bae35d1b4c825064526177bd738e62b480aee4c8" />
+				<rom name="columns.wav" size="3723318" crc="54506302" sha1="bae35d1b4c825064526177bd738e62b480aee4c8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -585,7 +585,7 @@
 		<info name="usage" value="Load file Columns2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5313566">
-				<rom name="columns2.wav" size="5313566" crc="1be9e659" sha1="13ec5d00dfccdc66992b8698e9391d66f47e45de" />
+				<rom name="columns2.wav" size="5313566" crc="1be9e659" sha1="13ec5d00dfccdc66992b8698e9391d66f47e45de" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -597,7 +597,7 @@
 		<info name="usage" value="Load file Comic inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3406370">
-				<rom name="comic.wav" size="3406370" crc="a759f8f9" sha1="9e2caac1b273866dcb6328e4e128ddd1af367a44" />
+				<rom name="comic.wav" size="3406370" crc="a759f8f9" sha1="9e2caac1b273866dcb6328e4e128ddd1af367a44" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -609,7 +609,7 @@
 		<info name="usage" value="Load file COSMIC inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2058457">
-				<rom name="cosmic.wav" size="2058457" crc="2440f3e1" sha1="f4ab36c6a2f8e91fbabe2934654115c9f727cf33" />
+				<rom name="cosmic.wav" size="2058457" crc="2440f3e1" sha1="f4ab36c6a2f8e91fbabe2934654115c9f727cf33" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -621,7 +621,7 @@
 		<info name="usage" value="Load file Cosmic_b inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2058661">
-				<rom name="cosmic_b.wav" size="2058661" crc="56f8b7c7" sha1="a167b5279f29fa580510801e9ab9288cc3e3243e" />
+				<rom name="cosmic_b.wav" size="2058661" crc="56f8b7c7" sha1="a167b5279f29fa580510801e9ab9288cc3e3243e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -633,7 +633,7 @@
 		<info name="usage" value="Load file Courier inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4845607">
-				<rom name="courier.wav" size="4845607" crc="b75167b9" sha1="2ce5b08143d7b511c6d57d2559c0224f734d4f5d" />
+				<rom name="courier.wav" size="4845607" crc="b75167b9" sha1="2ce5b08143d7b511c6d57d2559c0224f734d4f5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -645,7 +645,7 @@
 		<info name="usage" value="Load file covox inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="9734450">
-				<rom name="covox.wav" size="9734450" crc="b4624f15" sha1="a87edb62fe39f4a8cecc9f528b20194545baa838" />
+				<rom name="covox.wav" size="9734450" crc="b4624f15" sha1="a87edb62fe39f4a8cecc9f528b20194545baa838" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -657,7 +657,7 @@
 		<info name="usage" value="Load file Crack inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="10100732">
-				<rom name="crack.wav" size="10100732" crc="1adebbc8" sha1="37ce68cd9ce579dc720031d9ceb3bde0e6b01a1f" />
+				<rom name="crack.wav" size="10100732" crc="1adebbc8" sha1="37ce68cd9ce579dc720031d9ceb3bde0e6b01a1f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -669,7 +669,7 @@
 		<info name="usage" value="Load file Dama inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3885039">
-				<rom name="dama.wav" size="3885039" crc="2cb6c17c" sha1="048375526df2b9a347ae760ae6d8df19a5d80940" />
+				<rom name="dama.wav" size="3885039" crc="2cb6c17c" sha1="048375526df2b9a347ae760ae6d8df19a5d80940" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -681,7 +681,7 @@
 		<info name="usage" value="Load file Demsl inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3000172">
-				<rom name="demsl.wav" size="3000172" crc="9102fcaf" sha1="e598f08a4191a011e6a0baa730d990787c04403c" />
+				<rom name="demsl.wav" size="3000172" crc="9102fcaf" sha1="e598f08a4191a011e6a0baa730d990787c04403c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -693,7 +693,7 @@
 		<info name="usage" value="Load file Demsl1 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="831601">
-				<rom name="demsl1.wav" size="831601" crc="0176d49b" sha1="6cc9f1b8d09eb8913bcd245a1019048c583c9ebc" />
+				<rom name="demsl1.wav" size="831601" crc="0176d49b" sha1="6cc9f1b8d09eb8913bcd245a1019048c583c9ebc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -705,7 +705,7 @@
 		<info name="usage" value="Load file Demsl2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="847819">
-				<rom name="demsl2.wav" size="847819" crc="959d7e0a" sha1="b548696d8e797cf2334860f0ab2c31008b05fa29" />
+				<rom name="demsl2.wav" size="847819" crc="959d7e0a" sha1="b548696d8e797cf2334860f0ab2c31008b05fa29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@
 		<info name="usage" value="Load file Demsl3 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="820126">
-				<rom name="demsl3.wav" size="820126" crc="41905abc" sha1="804ba183a669b2b1539a8886212d320f54ff443b" />
+				<rom name="demsl3.wav" size="820126" crc="41905abc" sha1="804ba183a669b2b1539a8886212d320f54ff443b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -729,7 +729,7 @@
 		<info name="usage" value="Load file Desan inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4564427">
-				<rom name="desan.wav" size="4564427" crc="ed14e850" sha1="8338c821df75907b25b41dd5cf7f28a9a4262f2e" />
+				<rom name="desan.wav" size="4564427" crc="ed14e850" sha1="8338c821df75907b25b41dd5cf7f28a9a4262f2e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -741,7 +741,7 @@
 		<info name="usage" value="Load file Desandoc inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3052515">
-				<rom name="desandoc.wav" size="3052515" crc="d9d19755" sha1="4b53c167543f2fc7de6d75539dae2d8562a121e7" />
+				<rom name="desandoc.wav" size="3052515" crc="d9d19755" sha1="4b53c167543f2fc7de6d75539dae2d8562a121e7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -753,7 +753,7 @@
 		<info name="usage" value="Load file Desant inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4564478">
-				<rom name="desant.wav" size="4564478" crc="fc220dbe" sha1="b2d15141323040e902fdf52d5516d918bd76c465" />
+				<rom name="desant.wav" size="4564478" crc="fc220dbe" sha1="b2d15141323040e902fdf52d5516d918bd76c465" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -765,7 +765,7 @@
 		<info name="usage" value="Load file Diamond inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4416986">
-				<rom name="diamond.wav" size="4416986" crc="c73e3d69" sha1="7d14c4d3216e22c2b122ab4ec903fad4d486c544" />
+				<rom name="diamond.wav" size="4416986" crc="c73e3d69" sha1="7d14c4d3216e22c2b122ab4ec903fad4d486c544" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -777,7 +777,7 @@
 		<info name="usage" value="Load file Digger inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3206433">
-				<rom name="digger.wav" size="3206433" crc="f76ba166" sha1="f6737b860b3cf190ab8ec1dbab0c56dc17db401d" />
+				<rom name="digger.wav" size="3206433" crc="f76ba166" sha1="f6737b860b3cf190ab8ec1dbab0c56dc17db401d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -789,7 +789,7 @@
 		<info name="usage" value="Load file Divers3 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2170028">
-				<rom name="divers3.wav" size="2170028" crc="199c2ef6" sha1="2645cb48a80309a3b24eb7db896059ba57954c34" />
+				<rom name="divers3.wav" size="2170028" crc="199c2ef6" sha1="2645cb48a80309a3b24eb7db896059ba57954c34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -801,7 +801,7 @@
 		<info name="usage" value="Load file DRAGON.BIN inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5357318">
-				<rom name="dragon.bin.wav" size="5357318" crc="9cb49563" sha1="711b99741fb034f8b8258261111ad642efd464aa" />
+				<rom name="dragon.bin.wav" size="5357318" crc="9cb49563" sha1="711b99741fb034f8b8258261111ad642efd464aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -813,7 +813,7 @@
 		<info name="usage" value="Load file FLIER inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4172441">
-				<rom name="flier.wav" size="4172441" crc="6b47c3c2" sha1="54d9a892e832ace649a07a1ae2c3afd2bab38512" />
+				<rom name="flier.wav" size="4172441" crc="6b47c3c2" sha1="54d9a892e832ace649a07a1ae2c3afd2bab38512" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -825,7 +825,7 @@
 		<info name="usage" value="Load file FONT inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="103032">
-				<rom name="font.wav" size="103032" crc="080d6674" sha1="6164b1077977463408390c508844d0e98ecce77a" />
+				<rom name="font.wav" size="103032" crc="080d6674" sha1="6164b1077977463408390c508844d0e98ecce77a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -837,7 +837,7 @@
 		<info name="usage" value="Load file HOBBIT.OVL inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4961088">
-				<rom name="hobbit.ovl.wav" size="4961088" crc="7bea89c1" sha1="33afa8fa654fb7a20018c8ac6d6a8934004b7874" />
+				<rom name="hobbit.ovl.wav" size="4961088" crc="7bea89c1" sha1="33afa8fa654fb7a20018c8ac6d6a8934004b7874" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -849,7 +849,7 @@
 		<info name="usage" value="Load file HOBBIT inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3276541">
-				<rom name="hobbit.wav" size="3276541" crc="d7cb5071" sha1="bf6c6de306fd51c01bfe71c2fca1fb25b8fed4fc" />
+				<rom name="hobbit.wav" size="3276541" crc="d7cb5071" sha1="bf6c6de306fd51c01bfe71c2fca1fb25b8fed4fc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -861,7 +861,7 @@
 		<info name="usage" value="Load file Horror inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5203372">
-				<rom name="horror.wav" size="5203372" crc="d2ecf226" sha1="ee93b3427b40847e6b9d4929154538e68cff0c6e" />
+				<rom name="horror.wav" size="5203372" crc="d2ecf226" sha1="ee93b3427b40847e6b9d4929154538e68cff0c6e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -873,7 +873,7 @@
 		<info name="usage" value="Load file Horror_s inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4368791">
-				<rom name="horror_s.wav" size="4368791" crc="b177bc8f" sha1="c277e4cad55b8f59540fcacc92d6a855fdcb6577" />
+				<rom name="horror_s.wav" size="4368791" crc="b177bc8f" sha1="c277e4cad55b8f59540fcacc92d6a855fdcb6577" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -885,7 +885,7 @@
 		<info name="usage" value="Load file House1 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3341736">
-				<rom name="house1.wav" size="3341736" crc="2e73554a" sha1="dc14affceb6b10e7086240d8419f44e85b67a2a6" />
+				<rom name="house1.wav" size="3341736" crc="2e73554a" sha1="dc14affceb6b10e7086240d8419f44e85b67a2a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -897,7 +897,7 @@
 		<info name="usage" value="Load file House2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3802776">
-				<rom name="house2.wav" size="3802776" crc="366c4681" sha1="d65c0eb929b3f12aada5b44b501ec6e45e3a086e" />
+				<rom name="house2.wav" size="3802776" crc="366c4681" sha1="d65c0eb929b3f12aada5b44b501ec6e45e3a086e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -909,7 +909,7 @@
 		<info name="usage" value="Load file Indjon inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4156699">
-				<rom name="indjon.wav" size="4156699" crc="e9fec41a" sha1="49355e3f5f74ef864a8e0b23ed63fee483429dcb" />
+				<rom name="indjon.wav" size="4156699" crc="e9fec41a" sha1="49355e3f5f74ef864a8e0b23ed63fee483429dcb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -921,7 +921,7 @@
 		<info name="usage" value="Load file Jetman inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4532382">
-				<rom name="jetman.wav" size="4532382" crc="c9fb7d8f" sha1="4a9b4a920a66f4310f283b85439396c0c8948b98" />
+				<rom name="jetman.wav" size="4532382" crc="c9fb7d8f" sha1="4a9b4a920a66f4310f283b85439396c0c8948b98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -933,7 +933,7 @@
 		<info name="usage" value="Load file Joebla inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1665621">
-				<rom name="joebla.wav" size="1665621" crc="de6a39c4" sha1="9bedd1853f06a20163e3f603fee89e6a28b55ea9" />
+				<rom name="joebla.wav" size="1665621" crc="de6a39c4" sha1="9bedd1853f06a20163e3f603fee89e6a28b55ea9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -945,7 +945,7 @@
 		<info name="usage" value="Load file John inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1839378">
-				<rom name="john.wav" size="1839378" crc="6d9a544c" sha1="982632464fc2c5c1ab1a9b86384d7e3cd1991949" />
+				<rom name="john.wav" size="1839378" crc="6d9a544c" sha1="982632464fc2c5c1ab1a9b86384d7e3cd1991949" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -957,7 +957,7 @@
 		<info name="usage" value="Load file Johnny inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5021999">
-				<rom name="johnny.wav" size="5021999" crc="eb21daf4" sha1="087b29057185b98a16cc27a88d396f4a206d7d1f" />
+				<rom name="johnny.wav" size="5021999" crc="eb21daf4" sha1="087b29057185b98a16cc27a88d396f4a206d7d1f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -969,7 +969,7 @@
 		<info name="usage" value="Load file Jokey inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2789168">
-				<rom name="jokey.wav" size="2789168" crc="72d8fd61" sha1="4f57287c603d5a9c15a35059e1a88ed08b00ecb2" />
+				<rom name="jokey.wav" size="2789168" crc="72d8fd61" sha1="4f57287c603d5a9c15a35059e1a88ed08b00ecb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -981,7 +981,7 @@
 		<info name="usage" value="Load file Jones inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4156665">
-				<rom name="jones.wav" size="4156665" crc="606f7403" sha1="6657ae72c6d2eb89e2e34aa55eb525c043de3c45" />
+				<rom name="jones.wav" size="4156665" crc="606f7403" sha1="6657ae72c6d2eb89e2e34aa55eb525c043de3c45" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -993,7 +993,7 @@
 		<info name="usage" value="Load file Jones1 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2702485">
-				<rom name="jones1.wav" size="2702485" crc="62aa4337" sha1="8579bb989362a69df72a53378d8e5f67795da67d" />
+				<rom name="jones1.wav" size="2702485" crc="62aa4337" sha1="8579bb989362a69df72a53378d8e5f67795da67d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1005,7 +1005,7 @@
 		<info name="usage" value="Load file Jones2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3844800">
-				<rom name="jones2.wav" size="3844800" crc="f31c568a" sha1="c71e4a1b18491f359ba62174a225ea209685a99d" />
+				<rom name="jones2.wav" size="3844800" crc="f31c568a" sha1="c71e4a1b18491f359ba62174a225ea209685a99d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1017,7 +1017,7 @@
 		<info name="usage" value="Load file Jones3 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2685655">
-				<rom name="jones3.wav" size="2685655" crc="4db82dd2" sha1="390008bd487676335e28b00301d811039fac91a1" />
+				<rom name="jones3.wav" size="2685655" crc="4db82dd2" sha1="390008bd487676335e28b00301d811039fac91a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1029,7 +1029,7 @@
 		<info name="usage" value="Load file Jungle inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4943544">
-				<rom name="jungle.wav" size="4943544" crc="157885ac" sha1="35f2799ba06d04013bced26e5a273c22fb4ef6fa" />
+				<rom name="jungle.wav" size="4943544" crc="157885ac" sha1="35f2799ba06d04013bced26e5a273c22fb4ef6fa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1041,7 +1041,7 @@
 		<info name="usage" value="Load file Karado inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3612002">
-				<rom name="karado.wav" size="3612002" crc="f8715d18" sha1="abca686af114d45defc31e8bc8e1ed0797adfaf3" />
+				<rom name="karado.wav" size="3612002" crc="f8715d18" sha1="abca686af114d45defc31e8bc8e1ed0797adfaf3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1053,7 +1053,7 @@
 		<info name="usage" value="Load file Karate inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2263953">
-				<rom name="karate.wav" size="2263953" crc="f283fdce" sha1="eee2e9db9f8420453bc443afaaf43b0293685b0f" />
+				<rom name="karate.wav" size="2263953" crc="f283fdce" sha1="eee2e9db9f8420453bc443afaaf43b0293685b0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1065,7 +1065,7 @@
 		<info name="usage" value="Load file Klad inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3579651">
-				<rom name="klad.wav" size="3579651" crc="17146df9" sha1="dce5472d9845d642a9884d969fccea885a8b2f25" />
+				<rom name="klad.wav" size="3579651" crc="17146df9" sha1="dce5472d9845d642a9884d969fccea885a8b2f25" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1077,7 +1077,7 @@
 		<info name="usage" value="Load file Kurier inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3652666">
-				<rom name="kurier.wav" size="3652666" crc="cfb27952" sha1="a7bc1fd678eb449b611cfb76132bb640ada150b3" />
+				<rom name="kurier.wav" size="3652666" crc="cfb27952" sha1="a7bc1fd678eb449b611cfb76132bb640ada150b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1089,7 +1089,7 @@
 		<info name="usage" value="Load file ladder.ovl inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5124067">
-				<rom name="ladder.ovl.wav" size="5124067" crc="746a6230" sha1="93ea15199f8ce7ddcc76d101e9635973633a15c3" />
+				<rom name="ladder.ovl.wav" size="5124067" crc="746a6230" sha1="93ea15199f8ce7ddcc76d101e9635973633a15c3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1101,7 +1101,7 @@
 		<info name="usage" value="Load file ladder inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2662331">
-				<rom name="ladder.wav" size="2662331" crc="4b8305d6" sha1="b9dcaec7cc2bfaecf533d068306a0adf599e5315" />
+				<rom name="ladder.wav" size="2662331" crc="4b8305d6" sha1="b9dcaec7cc2bfaecf533d068306a0adf599e5315" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1113,7 +1113,7 @@
 		<info name="usage" value="Load file LRUNNER.GMS inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5082961">
-				<rom name="lrunner.gms.wav" size="5082961" crc="c29b8c32" sha1="e0db29c3aaa310c183daaacda1ea6052b28286d2" />
+				<rom name="lrunner.gms.wav" size="5082961" crc="c29b8c32" sha1="e0db29c3aaa310c183daaacda1ea6052b28286d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1125,7 +1125,7 @@
 		<info name="usage" value="Load file LRUNNER inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1990627">
-				<rom name="lrunner.wav" size="1990627" crc="ca69a359" sha1="a1b56888bd76cecaf07c762f6a53a82c733ff205" />
+				<rom name="lrunner.wav" size="1990627" crc="ca69a359" sha1="a1b56888bd76cecaf07c762f6a53a82c733ff205" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1137,7 +1137,7 @@
 		<info name="usage" value="Load file OTHELLO inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2493402">
-				<rom name="othello.wav" size="2493402" crc="deabaaa3" sha1="16ef3ee69dd8d442d390a2912841259134879e36" />
+				<rom name="othello.wav" size="2493402" crc="deabaaa3" sha1="16ef3ee69dd8d442d390a2912841259134879e36" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1149,7 +1149,7 @@
 		<info name="usage" value="Load file otl9 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1389575">
-				<rom name="otl9.wav" size="1389575" crc="165c31c6" sha1="b6fae5d1e4b3ada8684eadc2e716d273ae275c56" />
+				<rom name="otl9.wav" size="1389575" crc="165c31c6" sha1="b6fae5d1e4b3ada8684eadc2e716d273ae275c56" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1161,7 +1161,7 @@
 		<info name="usage" value="Load file p10k inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4167800">
-				<rom name="p10k.wav" size="4167800" crc="ec7429bf" sha1="d3dff5be3155febca489fdb205c78d6d19b19c8a" />
+				<rom name="p10k.wav" size="4167800" crc="ec7429bf" sha1="d3dff5be3155febca489fdb205c78d6d19b19c8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1173,7 +1173,7 @@
 		<info name="usage" value="Load file PACMAN inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2687627">
-				<rom name="pacman.wav" size="2687627" crc="3f379b3f" sha1="ff994f4a6c6260ec083d2e599533b2508b7ddc95" />
+				<rom name="pacman.wav" size="2687627" crc="3f379b3f" sha1="ff994f4a6c6260ec083d2e599533b2508b7ddc95" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1185,7 +1185,7 @@
 		<info name="usage" value="Load file PEREVOROT inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="88803">
-				<rom name="perevorot.wav" size="88803" crc="4c479f82" sha1="eaaedaf9e464cf26c42ac76ce5d67b07f66badf7" />
+				<rom name="perevorot.wav" size="88803" crc="4c479f82" sha1="eaaedaf9e464cf26c42ac76ce5d67b07f66badf7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1197,7 +1197,7 @@
 		<info name="usage" value="Load file POPO inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="89619">
-				<rom name="popo.wav" size="89619" crc="d5a2331a" sha1="f15c9964cd644f0df07db4fbb9159697131db9d9" />
+				<rom name="popo.wav" size="89619" crc="d5a2331a" sha1="f15c9964cd644f0df07db4fbb9159697131db9d9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1209,7 +1209,7 @@
 		<info name="usage" value="Load file RACE.OVL inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="5054282">
-				<rom name="race.ovl.wav" size="5054282" crc="9467af57" sha1="a028ffe371bf067b06e9a7d08f4c0ea1a10b80ff" />
+				<rom name="race.ovl.wav" size="5054282" crc="9467af57" sha1="a028ffe371bf067b06e9a7d08f4c0ea1a10b80ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1221,7 +1221,7 @@
 		<info name="usage" value="Load file RACE inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2472951">
-				<rom name="race.wav" size="2472951" crc="a6c83140" sha1="c0189399d5e915f4b39402b893e2b839bc2e471a" />
+				<rom name="race.wav" size="2472951" crc="a6c83140" sha1="c0189399d5e915f4b39402b893e2b839bc2e471a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1233,7 +1233,7 @@
 		<info name="usage" value="Load file Rever1 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="663250">
-				<rom name="rever1.wav" size="663250" crc="2047b95e" sha1="c00cb766a8070cf871cc162b35aaba4c1e5fd136" />
+				<rom name="rever1.wav" size="663250" crc="2047b95e" sha1="c00cb766a8070cf871cc162b35aaba4c1e5fd136" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1245,7 +1245,7 @@
 		<info name="usage" value="Load file Rever2 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2579133">
-				<rom name="rever2.wav" size="2579133" crc="e15ec7f1" sha1="3de8381a35cc2acf7f36a1bbe7eb7a6593f1d0f9" />
+				<rom name="rever2.wav" size="2579133" crc="e15ec7f1" sha1="3de8381a35cc2acf7f36a1bbe7eb7a6593f1d0f9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1257,7 +1257,7 @@
 		<info name="usage" value="Load file ROTATE inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="89177">
-				<rom name="rotate.wav" size="89177" crc="c411378f" sha1="e5de57ecc6cbdc1cf71673c09d1b2c7c08f8e26d" />
+				<rom name="rotate.wav" size="89177" crc="c411378f" sha1="e5de57ecc6cbdc1cf71673c09d1b2c7c08f8e26d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1269,7 +1269,7 @@
 		<info name="usage" value="Load file RTYPE inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="4154795">
-				<rom name="rtype.wav" size="4154795" crc="1b9d7ca8" sha1="787aa26aa195182c8c778da9987874999a0d2dab" />
+				<rom name="rtype.wav" size="4154795" crc="1b9d7ca8" sha1="787aa26aa195182c8c778da9987874999a0d2dab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1281,7 +1281,7 @@
 		<info name="usage" value="Load file RTYPE1.LAB inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="938021">
-				<rom name="rtype1.lab.wav" size="938021" crc="6c5e12b4" sha1="9fd58471c9c154f264e72984e835bb2eb0ec9f60" />
+				<rom name="rtype1.lab.wav" size="938021" crc="6c5e12b4" sha1="9fd58471c9c154f264e72984e835bb2eb0ec9f60" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1293,7 +1293,7 @@
 		<info name="usage" value="Load file RTYPE2.LAB inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="937647">
-				<rom name="rtype2.lab.wav" size="937647" crc="c96d1898" sha1="a1031b173d87cf91d5dd2058c839c4bab06b62fb" />
+				<rom name="rtype2.lab.wav" size="937647" crc="c96d1898" sha1="a1031b173d87cf91d5dd2058c839c4bab06b62fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1305,7 +1305,7 @@
 		<info name="usage" value="Load file SOKOBAN inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="2523628">
-				<rom name="sokoban.wav" size="2523628" crc="29029dc0" sha1="47cacdacb2246b5dd9c4efeaf52e64b0d1df7fa1" />
+				<rom name="sokoban.wav" size="2523628" crc="29029dc0" sha1="47cacdacb2246b5dd9c4efeaf52e64b0d1df7fa1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1317,7 +1317,7 @@
 		<info name="usage" value="Load file Stalker inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3691953">
-				<rom name="stalker.wav" size="3691953" crc="9b9eccbd" sha1="6647b2e4285ee9648c5d2fd59d9bc7a5eadcde98" />
+				<rom name="stalker.wav" size="3691953" crc="9b9eccbd" sha1="6647b2e4285ee9648c5d2fd59d9bc7a5eadcde98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1329,7 +1329,7 @@
 		<info name="usage" value="Load file TETR3 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1225066">
-				<rom name="tetr3.wav" size="1225066" crc="a139f720" sha1="56dcda5755fd9aa01ae5da7d42cb3dbc6183bc00" />
+				<rom name="tetr3.wav" size="1225066" crc="a139f720" sha1="56dcda5755fd9aa01ae5da7d42cb3dbc6183bc00" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1341,7 +1341,7 @@
 		<info name="usage" value="Load file TETRIS inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1881453">
-				<rom name="tetris.wav" size="1881453" crc="de80e5a8" sha1="af6e504bbf456a7a70813fd457e1420a6347fed0" />
+				<rom name="tetris.wav" size="1881453" crc="de80e5a8" sha1="af6e504bbf456a7a70813fd457e1420a6347fed0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1353,7 +1353,7 @@
 		<info name="usage" value="Load file Tetro inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3801518">
-				<rom name="tetro.wav" size="3801518" crc="0415d783" sha1="cb8925e2938fa12a26332de3202bb5396842cb4b" />
+				<rom name="tetro.wav" size="3801518" crc="0415d783" sha1="cb8925e2938fa12a26332de3202bb5396842cb4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1365,7 +1365,7 @@
 		<info name="usage" value="Load file XONIX1 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1758713">
-				<rom name="xonix1.wav" size="1758713" crc="24ff448a" sha1="df312c9ca50350e3e40d70ddc046eb46660a2f02" />
+				<rom name="xonix1.wav" size="1758713" crc="24ff448a" sha1="df312c9ca50350e3e40d70ddc046eb46660a2f02" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1377,7 +1377,7 @@
 		<info name="usage" value="Load file XONIX5 inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="1307176">
-				<rom name="xonix5.wav" size="1307176" crc="a7b1bac1" sha1="ec02788a531b1c704e3e5a0b4acac33dcab529a9" />
+				<rom name="xonix5.wav" size="1307176" crc="a7b1bac1" sha1="ec02788a531b1c704e3e5a0b4acac33dcab529a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1389,7 +1389,7 @@
 		<info name="usage" value="Load file ZOOM inside the Monitor" />
 		<part name="cass" interface="bk0010_cass">
 			<dataarea name="cass" size="3687346">
-				<rom name="zoom.wav" size="3687346" crc="a622e17c" sha1="fc99ce0cddf8e012dcf06073a4704b92b9f3a40f" />
+				<rom name="zoom.wav" size="3687346" crc="a622e17c" sha1="fc99ce0cddf8e012dcf06073a4704b92b9f3a40f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

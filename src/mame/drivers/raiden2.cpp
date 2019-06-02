@@ -583,7 +583,7 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	raiden2_cop_mem(map);
 
-	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
 	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
 							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
@@ -628,7 +628,7 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x00470, 0x00471).nopw();
 	map(0x006cc, 0x006cd).nopw();
 
-	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x0068e, 0x0068f).nopw(); // irq ack / sprite buffering?
 
 	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
 							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
@@ -662,7 +662,7 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x00470, 0x00471).nopw();
 	map(0x006cc, 0x006cd).nopw();
 
-	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
 	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
 							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
@@ -1060,8 +1060,6 @@ void raiden2_state::raiden2(machine_config &config)
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
 	RAIDEN2COP(config, m_raiden2cop, 0);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
@@ -1123,8 +1121,6 @@ void raiden2_state::zeroteam(machine_config &config)
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	RAIDEN2COP(config, m_raiden2cop, 0);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));

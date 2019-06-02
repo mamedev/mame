@@ -84,10 +84,10 @@ template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, Ad
 
 	for(u32 i=0; i<4; i++)
 		if(m_entries_for_key.find(m_keymap[i]) == m_entries_for_key.end())
-			generate(m_keymap[i], unitmask, umasks[i], cswidth, bits_per_access, base_shift, shift, active_count);
+			generate(m_keymap[i], umasks[i], cswidth, bits_per_access, base_shift, shift, active_count);
 }
 
-template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Width, AddrShift, Endian>::generate(u8 ukey, typename emu::detail::handler_entry_size<Width>::uX gumask, typename emu::detail::handler_entry_size<Width>::uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
+template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Width, AddrShift, Endian>::generate(u8 ukey, typename emu::detail::handler_entry_size<Width>::uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
 {
 	auto &entries = m_entries_for_key[ukey];
 
@@ -105,9 +105,8 @@ template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Widt
 		if(umask & numask) {
 			uX amask = csmask << (i & ~(cswidth - 1));
 			entries.emplace_back(entry{ amask, numask, shift, u8(i), u8(Endian == ENDIANNESS_BIG ? active_count - 1 - offset : offset) });
-		}
-		if(gumask & numask)
 			offset ++;
+		}
 	}
 }
 

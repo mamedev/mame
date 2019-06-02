@@ -121,7 +121,7 @@ protected:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_MACHINE_RESET(zerowing);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void interrupt();
@@ -132,10 +132,7 @@ protected:
 	void set_scrolls();
 	void register_common();
 	void log_vram();
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	void draw_sprite_custom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int priority);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void reset_sound();
 	DECLARE_WRITE_LINE_MEMBER(reset_callback);
 	required_device<m68000_device> m_maincpu;
@@ -180,7 +177,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
 	u16 tileram_r(offs_t offset);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	required_device<toaplan_scu_device> m_spritegen;

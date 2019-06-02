@@ -219,7 +219,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<hd6845s_device> m_hd6845;
+	required_device<hd6845_device> m_hd6845;
 	required_device<screen_device> m_screen;
 	required_device<input_merger_device> m_irqs;
 	required_device<palette_device> m_palette;

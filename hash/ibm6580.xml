@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="188446">
-				<rom name="ABC0051.IMD" size="188446" crc="d23ce97e" sha1="065aa15d6815d86689c6ebdd5d6280527991209a"/>
+				<rom name="ABC0051.IMD" size="188446" crc="d23ce97e" sha1="065aa15d6815d86689c6ebdd5d6280527991209a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="188436">
-				<rom name="ABC0051D.IMD" size="188436" crc="8e546e77" sha1="ae0431e30ca85afcf1b6a08fafa47e471f7a8327"/>
+				<rom name="ABC0051D.IMD" size="188436" crc="8e546e77" sha1="ae0431e30ca85afcf1b6a08fafa47e471f7a8327" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="270354">
-				<rom name="CED0122D.IMD" size="270354" crc="a6070e50" sha1="62e4cd029ff178a092c932f9ec36321f174bae98"/>
+				<rom name="CED0122D.IMD" size="270354" crc="a6070e50" sha1="62e4cd029ff178a092c932f9ec36321f174bae98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="262064">
-				<rom name="CED112D.IMD" size="262064" crc="afad5fc8" sha1="325817b9643739636b1be0bd1c8b79e855ef5f50"/>
+				<rom name="CED112D.IMD" size="262064" crc="afad5fc8" sha1="325817b9643739636b1be0bd1c8b79e855ef5f50" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="266999">
-				<rom name="CED12A1.IMD" size="266999" crc="f0f2cad9" sha1="69a70c9e988817eafab9caa486d8d5bcf5d80257"/>
+				<rom name="CED12A1.IMD" size="266999" crc="f0f2cad9" sha1="69a70c9e988817eafab9caa486d8d5bcf5d80257" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="269785">
-				<rom name="CED12A2D.IMD" size="269785" crc="dd1c9531" sha1="c401a9e1fe6fda958fa56d3e6f26fe77585921ff"/>
+				<rom name="CED12A2D.IMD" size="269785" crc="dd1c9531" sha1="c401a9e1fe6fda958fa56d3e6f26fe77585921ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="265686">
-				<rom name="CED13A1.IMD" size="265686" crc="e47023dc" sha1="bee94c1beec98b9a8d9487ab92e92605fd944c4b"/>
+				<rom name="CED13A1.IMD" size="265686" crc="e47023dc" sha1="bee94c1beec98b9a8d9487ab92e92605fd944c4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="269564">
-				<rom name="CED13A2D.IMD" size="269564" crc="25c29ca3" sha1="cfaec7942c28f71c80f2b28de735ffb17295b3c9"/>
+				<rom name="CED13A2D.IMD" size="269564" crc="25c29ca3" sha1="cfaec7942c28f71c80f2b28de735ffb17295b3c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="239681">
-				<rom name="PDD12A1.IMD" size="239681" crc="c97a236b" sha1="b4d150eeb6f1244158896acbefe9ee28d305b6d8"/>
+				<rom name="PDD12A1.IMD" size="239681" crc="c97a236b" sha1="b4d150eeb6f1244158896acbefe9ee28d305b6d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="262167">
-				<rom name="PDD12A2D.IMD" size="262167" crc="ed546091" sha1="2f21c19c601a53ffb7436208827e170665c16fb2"/>
+				<rom name="PDD12A2D.IMD" size="262167" crc="ed546091" sha1="2f21c19c601a53ffb7436208827e170665c16fb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="248352">
-				<rom name="PDD13A1.IMD" size="248352" crc="5ea96ddb" sha1="7d2e1b821b056dc7248b4720fb6fabb27e3eeca9"/>
+				<rom name="PDD13A1.IMD" size="248352" crc="5ea96ddb" sha1="7d2e1b821b056dc7248b4720fb6fabb27e3eeca9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="274586">
-				<rom name="TEXTAPACK1.IMD" size="274586" crc="d6e46d80" sha1="f75ab3f00341aa7df58b166b8d16d8c0b0a28cd5"/>
+				<rom name="TEXTAPACK1.IMD" size="274586" crc="d6e46d80" sha1="f75ab3f00341aa7df58b166b8d16d8c0b0a28cd5" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -10,15 +10,15 @@ Hardware notes:
 - 2*HLCD0569(also seen with 2*HLCD0601, functionally same?)
 - custom LCD screen with chess squares background
 
+TODO:
+- internal artwork
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "video/hlcd0515.h"
 #include "screen.h"
-
-// internal artwork
-#include "mchess.lh" // clickable
 
 
 namespace {
@@ -211,8 +211,6 @@ void mchess_state::mchess(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_size(977, 1080);
 	screen.set_visarea_full();
-
-	config.set_default_layout(layout_mchess);
 }
 
 
@@ -238,4 +236,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, mchess, 0,      0, mchess,  mchess, mchess_state, empty_init, "Mattel", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, mchess, 0,      0, mchess,  mchess, mchess_state, empty_init, "Mattel", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

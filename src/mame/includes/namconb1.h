@@ -19,6 +19,9 @@
 #include "video/namco_c123tmap.h"
 #include "video/namco_c169roz.h"
 
+#define NAMCONB1_SPRITEGFX      0
+
+
 
 class namconb1_state : public driver_device
 {

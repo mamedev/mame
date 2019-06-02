@@ -21,7 +21,7 @@ class sbus_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&sbus_tag, int slot, U &&opts, const char *dflt, bool fixed = false)
+	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&sbus_tag, U &&opts, const char *dflt, bool fixed = false)
 		: sbus_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -29,7 +29,6 @@ public:
 		set_default_option(dflt);
 		set_fixed(fixed);
 		m_sbus.set_tag(std::forward<T>(sbus_tag));
-		m_slot = slot;
 	}
 	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -43,7 +42,6 @@ protected:
 
 	// configuration
 	required_device<sbus_device> m_sbus;
-	int m_slot;
 
 	DECLARE_READ32_MEMBER(timeout_r);
 	DECLARE_WRITE32_MEMBER(timeout_w);
@@ -133,8 +131,8 @@ public:
 	virtual ~device_sbus_card_interface();
 
 	// inline configuration
-	void set_sbus(sbus_device *sbus, int slot);
-	template <typename T> void set_onboard(T &&sbus, int slot) { m_sbus_finder.set_tag(std::forward<T>(sbus)); m_slot = slot; }
+	void set_sbus(sbus_device *sbus, const char *slottag);
+	template <typename T> void set_onboard(T &&sbus) { m_sbus_finder.set_tag(std::forward<T>(sbus)); m_sbus_slottag = device().tag(); }
 
 	virtual void mem_map(address_map &map) = 0;
 
@@ -146,7 +144,6 @@ protected:
 
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
-	virtual void interface_post_start() override;
 	virtual void install_device() = 0;
 
 	sbus_device &sbus() { assert(m_sbus); return *m_sbus; }

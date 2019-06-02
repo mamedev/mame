@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="652950">
-				<rom name="ipcmemom.td0" size="652950" crc="41dd72a2" sha1="1bd3dde57a83a09dbd8ad2f18e52f7d96ee45f63"/>
+				<rom name="ipcmemom.td0" size="652950" crc="41dd72a2" sha1="1bd3dde57a83a09dbd8ad2f18e52f7d96ee45f63" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="172162">
-				<rom name="multipl.td0" size="172162" crc="e8e929d7" sha1="2ddbab7b6683fd2ba30238fb013ff2f25c1bcdd7"/>
+				<rom name="multipl.td0" size="172162" crc="e8e929d7" sha1="2ddbab7b6683fd2ba30238fb013ff2f25c1bcdd7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="602609">
-				<rom name="intbasic.td0" size="602609" crc="49a70601" sha1="f884a3ff678b57167451a269d1b551374614f679"/>
+				<rom name="intbasic.td0" size="602609" crc="49a70601" sha1="f884a3ff678b57167451a269d1b551374614f679" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="220544">
-				<rom name="ipcdatac.td0" size="220544" crc="97c35bcb" sha1="a4e006459b24400383c2e136645ae5ab863e7483"/>
+				<rom name="ipcdatac.td0" size="220544" crc="97c35bcb" sha1="a4e006459b24400383c2e136645ae5ab863e7483" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="456537">
-				<rom name="ipccdoc.td0" size="456537" crc="5c90332c" sha1="1f1a971e99d929a45d28654d6c32dbfeb20feb4d"/>
+				<rom name="ipccdoc.td0" size="456537" crc="5c90332c" sha1="1f1a971e99d929a45d28654d6c32dbfeb20feb4d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="554063">
-				<rom name="ipccprep.td0" size="554063" crc="f80fb865" sha1="547aa6174d4c0e08cc9005bb3c59fc88c288c8a1"/>
+				<rom name="ipccprep.td0" size="554063" crc="f80fb865" sha1="547aa6174d4c0e08cc9005bb3c59fc88c288c8a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="452140">
-				<rom name="ipcctran.td0" size="452140" crc="ef2494e0" sha1="ffd764fd701f4ffe896b919b18dc3474eff95f2a"/>
+				<rom name="ipcctran.td0" size="452140" crc="ef2494e0" sha1="ffd764fd701f4ffe896b919b18dc3474eff95f2a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="218967">
-				<rom name="basicut.td0" size="218967" crc="bd92ec7a" sha1="611eea08494ce123052453cd8cf45ce6fcc3e09f"/>
+				<rom name="basicut.td0" size="218967" crc="bd92ec7a" sha1="611eea08494ce123052453cd8cf45ce6fcc3e09f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="581442">
-				<rom name="ipcforut.td0" size="581442" crc="fb7c2093" sha1="2d8492a8c74e06c405998d848826a4fd139cf6fe"/>
+				<rom name="ipcforut.td0" size="581442" crc="fb7c2093" sha1="2d8492a8c74e06c405998d848826a4fd139cf6fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="549753">
-				<rom name="ipcforcp.td0" size="549753" crc="a4a8c914" sha1="ec76c80f81e0b55843ff4028baacb0137b94ec84"/>
+				<rom name="ipcforcp.td0" size="549753" crc="a4a8c914" sha1="ec76c80f81e0b55843ff4028baacb0137b94ec84" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="565866">
-				<rom name="lisppilt.td0" size="565866" crc="096d357b" sha1="3c4cbd4ddbb39ff02e0844ab5de36f1aaa418598"/>
+				<rom name="lisppilt.td0" size="565866" crc="096d357b" sha1="3c4cbd4ddbb39ff02e0844ab5de36f1aaa418598" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="190676">
-				<rom name="tksolve.td0" size="190676" crc="76d7752e" sha1="024ae038239c651898e9df62ce8a1256a73ea542"/>
+				<rom name="tksolve.td0" size="190676" crc="76d7752e" sha1="024ae038239c651898e9df62ce8a1256a73ea542" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="634074">
-				<rom name="diagpgrm.td0" size="634074" crc="7963e6fa" sha1="e9b65d758fbb9d5d68b21d5fb05dcd72c8d38f0e"/>
+				<rom name="diagpgrm.td0" size="634074" crc="7963e6fa" sha1="e9b65d758fbb9d5d68b21d5fb05dcd72c8d38f0e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="690608">
-				<rom name="diagsymb.td0" size="690608" crc="8f038cd1" sha1="5006444a81ac785db5e448a63c741ab3218084ea"/>
+				<rom name="diagsymb.td0" size="690608" crc="8f038cd1" sha1="5006444a81ac785db5e448a63c741ab3218084ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +177,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="111659">
-				<rom name="ipcmictk.td0" size="111659" crc="6be07a20" sha1="4d0a60c1bd2e7c83b648270154d5c6fed8b2696a"/>
+				<rom name="ipcmictk.td0" size="111659" crc="6be07a20" sha1="4d0a60c1bd2e7c83b648270154d5c6fed8b2696a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -189,7 +189,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="670738">
-				<rom name="ipcpascp.td0" size="670738" crc="3c33177e" sha1="37f9a461d15961b436fddc6890710005a7438c5c"/>
+				<rom name="ipcpascp.td0" size="670738" crc="3c33177e" sha1="37f9a461d15961b436fddc6890710005a7438c5c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -201,7 +201,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="557887">
-				<rom name="ipcpasdc.td0" size="557887" crc="873b0f30" sha1="aa1e9c73b213780862567eced9073a843900304f"/>
+				<rom name="ipcpasdc.td0" size="557887" crc="873b0f30" sha1="aa1e9c73b213780862567eced9073a843900304f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -213,7 +213,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="296521">
-				<rom name="ipcforth.td0" size="296521" crc="13b25447" sha1="bb8f08a8247ad5d6743832d949bf19fb789b0aac"/>
+				<rom name="ipcforth.td0" size="296521" crc="13b25447" sha1="bb8f08a8247ad5d6743832d949bf19fb789b0aac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="404018">
-				<rom name="tutor.td0" size="404018" crc="c5af6ff5" sha1="47eb431f609fcc6f87d3a7b5c9cafb7f9c232135"/>
+				<rom name="tutor.td0" size="404018" crc="c5af6ff5" sha1="47eb431f609fcc6f87d3a7b5c9cafb7f9c232135" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -237,7 +237,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="571098">
-				<rom name="utilitie.td0" size="571098" crc="1f9420ad" sha1="97ef267109214f2bdc183032f4d87bd1cc0e7be3"/>
+				<rom name="utilitie.td0" size="571098" crc="1f9420ad" sha1="97ef267109214f2bdc183032f4d87bd1cc0e7be3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="206296">
-				<rom name="diagnstc.td0" size="206296" crc="e3b7461e" sha1="276f82b1b4cc1bb4cf8a40311afa3ee15716004c"/>
+				<rom name="diagnstc.td0" size="206296" crc="e3b7461e" sha1="276f82b1b4cc1bb4cf8a40311afa3ee15716004c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +261,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="325235">
-				<rom name="sysmdisc.td0" size="325235" crc="5773decd" sha1="46a23f0fb2c4ea9b738ee68390bb349dd738ae6b"/>
+				<rom name="sysmdisc.td0" size="325235" crc="5773decd" sha1="46a23f0fb2c4ea9b738ee68390bb349dd738ae6b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +273,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="626512">
-				<rom name="hp-ux1.td0" size="626512" crc="cf5da5fa" sha1="4bde09a9d37f5f8f6e55925f2428c342d95db19c"/>
+				<rom name="hp-ux1.td0" size="626512" crc="cf5da5fa" sha1="4bde09a9d37f5f8f6e55925f2428c342d95db19c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -285,7 +285,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="648152">
-				<rom name="hp-ux2.td0" size="648152" crc="9f843794" sha1="de4b2276aba66d4c28e9bb44db60c62472ec6441"/>
+				<rom name="hp-ux2.td0" size="648152" crc="9f843794" sha1="de4b2276aba66d4c28e9bb44db60c62472ec6441" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -297,7 +297,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="683944">
-				<rom name="intgame1.td0" size="683944" crc="f142dece" sha1="a6436079839667456be5f7dfd05978b1c7290d71"/>
+				<rom name="intgame1.td0" size="683944" crc="f142dece" sha1="a6436079839667456be5f7dfd05978b1c7290d71" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -309,7 +309,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="389053">
-				<rom name="intgame2.td0" size="389053" crc="8e4b6266" sha1="3a5727367f580a4d8b2109ba880147f5c3025d62"/>
+				<rom name="intgame2.td0" size="389053" crc="8e4b6266" sha1="3a5727367f580a4d8b2109ba880147f5c3025d62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -321,7 +321,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="184147">
-				<rom name="intgame3.td0" size="184147" crc="a78f471d" sha1="9020b09ee1a256b2d085cc886d5998e2b2dc9d23"/>
+				<rom name="intgame3.td0" size="184147" crc="a78f471d" sha1="9020b09ee1a256b2d085cc886d5998e2b2dc9d23" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -333,7 +333,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="548830">
-				<rom name="inthack.td0" size="548830" crc="6a371529" sha1="de37526aabfc4c326a3bd89a0f5b5d9fd830b915"/>
+				<rom name="inthack.td0" size="548830" crc="6a371529" sha1="de37526aabfc4c326a3bd89a0f5b5d9fd830b915" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -345,7 +345,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="297583">
-				<rom name="plotrack.td0" size="297583" crc="b9b5975c" sha1="1a315b196cd353e1d2d79a5e8b84e935b8f99a72"/>
+				<rom name="plotrack.td0" size="297583" crc="b9b5975c" sha1="1a315b196cd353e1d2d79a5e8b84e935b8f99a72" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="400488">
-				<rom name="ipcromtl.td0" size="400488" crc="1c302801" sha1="8341446066be25649357614dd4aa937eb66f118e"/>
+				<rom name="ipcromtl.td0" size="400488" crc="1c302801" sha1="8341446066be25649357614dd4aa937eb66f118e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="486723">
-				<rom name="ipcapl.td0" size="486723" crc="1413db63" sha1="9b6e7f5f6fa66ecfad4071fd460b0faa20eb06ca"/>
+				<rom name="ipcapl.td0" size="486723" crc="1413db63" sha1="9b6e7f5f6fa66ecfad4071fd460b0faa20eb06ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -381,7 +381,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="381652">
-				<rom name="ipcaplw.td0" size="381652" crc="ede2be4d" sha1="8f85f6e4e4238fa9f21efc3beea82860157884ee"/>
+				<rom name="ipcaplw.td0" size="381652" crc="ede2be4d" sha1="8f85f6e4e4238fa9f21efc3beea82860157884ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -393,7 +393,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="641077">
-				<rom name="ipctranu.td0" size="641077" crc="6d3d5de7" sha1="b1b27f9846544dbcaa8442140bdad7b29c61fcc0"/>
+				<rom name="ipctranu.td0" size="641077" crc="6d3d5de7" sha1="b1b27f9846544dbcaa8442140bdad7b29c61fcc0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="587264">
-				<rom name="ipcsuput.td0" size="587264" crc="15a881cd" sha1="c4673a2f7188ea0b29b8a4d9bd4a60856ed8f3d2"/>
+				<rom name="ipcsuput.td0" size="587264" crc="15a881cd" sha1="c4673a2f7188ea0b29b8a4d9bd4a60856ed8f3d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="534655">
-				<rom name="ipcart.td0" size="534655" crc="fc6070bc" sha1="794216f066e1ae77c4d331b5cdb66c7735fffeaf"/>
+				<rom name="ipcart.td0" size="534655" crc="fc6070bc" sha1="794216f066e1ae77c4d331b5cdb66c7735fffeaf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -429,7 +429,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="413321">
-				<rom name="ipcbasbn.td0" size="413321" crc="b6d8f987" sha1="3bce09a5e53e64f0ad602b67016b035f1266b910"/>
+				<rom name="ipcbasbn.td0" size="413321" crc="b6d8f987" sha1="3bce09a5e53e64f0ad602b67016b035f1266b910" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -441,7 +441,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="641039">
-				<rom name="ipcdwd.td0" size="641039" crc="1e604853" sha1="ac5d69917a026a70ce8142d12a401279e627554c"/>
+				<rom name="ipcdwd.td0" size="641039" crc="1e604853" sha1="ac5d69917a026a70ce8142d12a401279e627554c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="285987">
-				<rom name="ipcmandl.td0" size="285987" crc="e31c0a41" sha1="59045fcecc336b048595d589815cfb301c594389"/>
+				<rom name="ipcmandl.td0" size="285987" crc="e31c0a41" sha1="59045fcecc336b048595d589815cfb301c594389" offset="0" />
 			</dataarea>
 		</part>
 	</software>

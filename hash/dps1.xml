@@ -13,7 +13,7 @@
 		-->
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="41261">
-				<rom name="dps1.imd" size="41261" crc="232626a4" sha1="dd25565f4394738e3c481e8123c598220c796cc1"/>
+				<rom name="dps1.imd" size="41261" crc="232626a4" sha1="dd25565f4394738e3c481e8123c598220c796cc1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

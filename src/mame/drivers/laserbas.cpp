@@ -396,7 +396,7 @@ void laserbas_state::laserbas(machine_config &config)
 	screen.set_raw(4000000, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	h46505_device &crtc(H46505(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

@@ -287,7 +287,6 @@ register. So what is controlling priority.
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"
 #include "audio/taitosnd.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -973,7 +972,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette("palette");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1047,7 +1046,7 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette("palette");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

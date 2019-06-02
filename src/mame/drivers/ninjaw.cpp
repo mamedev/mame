@@ -610,13 +610,9 @@ static const gfx_layout charlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( gfx_ninjaw_1 )
+static GFXDECODE_START( gfx_ninjaw )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles (screen 1) */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_ninjaw_23 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screens 2+) */
 GFXDECODE_END
 
@@ -747,9 +743,10 @@ void ninjaw_state::ninjaw(machine_config &config)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_ninjaw_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw_23);
-	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw_23);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjaw);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
+	PALETTE(config, "palette3").set_entries(4096);
 
 	config.set_default_layout(layout_ninjaw);
 
@@ -759,7 +756,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	lscreen.set_size(36*8, 32*8);
 	lscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
 	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
-	lscreen.set_palette(m_tc0110pcr[0]);
+	lscreen.set_palette(m_palette);
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
 	mscreen.set_refresh_hz(60);
@@ -767,7 +764,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	mscreen.set_size(36*8, 32*8);
 	mscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
 	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
-	mscreen.set_palette(m_tc0110pcr[1]);
+	mscreen.set_palette("palette2");
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
@@ -775,37 +772,37 @@ void ninjaw_state::ninjaw(machine_config &config)
 	rscreen.set_size(36*8, 32*8);
 	rscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
-	rscreen.set_palette(m_tc0110pcr[2]);
+	rscreen.set_palette("palette3");
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
-	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
+	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
+	m_tc0100scn[1]->set_gfx_region(2);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
-	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
+	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[1]->set_palette("palette2");
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
 
 	TC0100SCN(config, m_tc0100scn[2], 0);
-	m_tc0100scn[2]->set_gfx_region(1);
+	m_tc0100scn[2]->set_gfx_region(2);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
-	m_tc0100scn[2]->set_gfxdecode_tag(m_gfxdecode[2]);
-	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
+	m_tc0100scn[2]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[2]->set_palette("palette3");
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2], 0, "palette3");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -859,9 +856,10 @@ void ninjaw_state::darius2(machine_config &config)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_ninjaw_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw_23);
-	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw_23);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjaw);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
+	PALETTE(config, "palette3").set_entries(4096);
 
 	config.set_default_layout(layout_ninjaw);
 
@@ -871,7 +869,7 @@ void ninjaw_state::darius2(machine_config &config)
 	lscreen.set_size(36*8, 32*8);
 	lscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
 	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
-	lscreen.set_palette(m_tc0110pcr[0]);
+	lscreen.set_palette(m_palette);
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
 	mscreen.set_refresh_hz(60);
@@ -879,7 +877,7 @@ void ninjaw_state::darius2(machine_config &config)
 	mscreen.set_size(36*8, 32*8);
 	mscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
 	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
-	mscreen.set_palette(m_tc0110pcr[1]);
+	mscreen.set_palette("palette2");
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
@@ -887,37 +885,37 @@ void ninjaw_state::darius2(machine_config &config)
 	rscreen.set_size(36*8, 32*8);
 	rscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
-	rscreen.set_palette(m_tc0110pcr[2]);
+	rscreen.set_palette("palette3");
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
-	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
+	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
+	m_tc0100scn[1]->set_gfx_region(2);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
-	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
+	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[1]->set_palette("palette2");
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
 
 	TC0100SCN(config, m_tc0100scn[2], 0);
-	m_tc0100scn[2]->set_gfx_region(1);
+	m_tc0100scn[2]->set_gfx_region(2);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
-	m_tc0100scn[2]->set_gfxdecode_tag(m_gfxdecode[2]);
-	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
+	m_tc0100scn[2]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[2]->set_palette("palette3");
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2], 0, "palette3");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

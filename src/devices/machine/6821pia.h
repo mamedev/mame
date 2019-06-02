@@ -65,18 +65,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( porta_w ) { write_porta(data); }
 	void write_porta(uint8_t data);
-	void write_porta_line(int line, bool state);
 	void set_a_input(uint8_t data, uint8_t z_mask);
 	uint8_t a_output();
-
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { write_porta_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { write_porta_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { write_porta_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { write_porta_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { write_porta_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { write_porta_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { write_porta_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { write_porta_line(7, state); }
 
 	DECLARE_WRITE_LINE_MEMBER( ca1_w );
 
@@ -86,17 +76,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( portb_w ) { write_portb(data); }
 	void write_portb(uint8_t data);
-	void write_portb_line(int line, bool state);
 	uint8_t b_output();
-
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { write_portb_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { write_portb_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { write_portb_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { write_portb_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { write_portb_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { write_portb_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { write_portb_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { write_portb_line(7, state); }
 
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );
 

@@ -1723,7 +1723,7 @@ void galaxian_state::zigzag_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x2fff).bankr("bank1");
 	map(0x3000, 0x3fff).bankr("bank2");
-	map(0x4000, 0x47ff).ram(); // needs a full 2K of RAM
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
 	map(0x4800, 0x4fff).w(FUNC(galaxian_state::zigzag_ay8910_w));
 	map(0x5000, 0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x5800, 0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
@@ -12144,29 +12144,6 @@ ROM_START( scobrae ) // main program is identical to the scobras set once decryp
 ROM_END
 
 
-ROM_START( scobrae2 ) // same encryption as scobrae
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2c",   0x0000, 0x1000, CRC(5f38340b) SHA1(8479a294e3dd20192896fc13607a048a2a738878) )
-	ROM_LOAD( "2e",   0x1000, 0x1000, CRC(a3edcdb4) SHA1(3c11701621b868a8a08dca981d13349bea70be8d) )
-	ROM_LOAD( "2f",   0x2000, 0x1000, CRC(c6291ea6) SHA1(df1dc819ead011b0d5b64f62c1ac301794195b99) )
-	ROM_LOAD( "2h",   0x3000, 0x1000, CRC(c2197fac) SHA1(937e0652a73fae69f0a0b79c93f48facd6706af6) )
-	ROM_LOAD( "2j",   0x4000, 0x1000, CRC(80b8270f) SHA1(7f73d43e436fe2ef59058aa9e5791fd9940ea302) )
-	ROM_LOAD( "2l",   0x5000, 0x1000, CRC(f03475f6) SHA1(d2d7807fc4bb72465a4ccb78ac672f8aec9e00f1) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "5f",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
-	ROM_LOAD( "5h",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "5c",   0x0000, 0x0800, CRC(d4346959) SHA1(5eab4505beb69a5bdd88b23db60e1193371250cf) )
-	ROM_LOAD( "5d",   0x0800, 0x0800, CRC(cc025d95) SHA1(2b0784c4d05c466e0b7648f16e14f34393d792c3) )
-	ROM_LOAD( "5e",   0x1000, 0x0800, CRC(1628c53f) SHA1(ec79a73e4a2d7373454b227dd7eff255f1cc60cc) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
-ROM_END
-
-
 // two board stack MU1 and MU2A. Has different colors and level sequence. Came from an A.V.G. by Zaccaria cabinet with Konami license, but still has only Konami copyright.
 // https://www.youtube.com/watch?v=CZRRVACtC3A
 ROM_START( scobrag )
@@ -12960,7 +12937,6 @@ GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, init_
 GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, init_scobra,     ROT90,  "Konami (Sega license)",              "Super Cobra (Sega)",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, init_scobrae,    ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scobrae2,    scobra,   scobra,     scobras,    galaxian_state, init_scobrae,    ROT90,  "Konami",                             "Super Cobra (encrypted)",                                           MACHINE_SUPPORTS_SAVE ) // same encryption as scobrae, no PCB pic so not sure it has the Konatec CPU or only some logic to simulate it
 GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Karateco)",                 "Super Cobra (bootleg, set 1)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobrag,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (A.V.G. by Zaccaria)",       "Super Cobra (bootleg, set 2)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
 GAME( 1981, scobraggi,   scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Cocamatic)",                "Super Cobra (bootleg, set 3)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM

@@ -9,7 +9,7 @@
 
 		<part name="cass1" interface="ep64_cass">
 			<dataarea name="cass" size="905728">
-				<rom name="3dstarfighter.tap" size="905728" crc="0fdce7ac" sha1="326e797fad04c807779d3e6f075b1d4ab844cd34"/>
+				<rom name="3dstarfighter.tap" size="905728" crc="0fdce7ac" sha1="326e797fad04c807779d3e6f075b1d4ab844cd34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="cass1" interface="ep64_cass">
 			<dataarea name="cass" size="509952">
-				<rom name="airwolf.tap" size="509952" crc="e05e292c" sha1="5ab75a2c003aded1a7dad554ec9b10847fbf1bbd"/>
+				<rom name="airwolf.tap" size="509952" crc="e05e292c" sha1="5ab75a2c003aded1a7dad554ec9b10847fbf1bbd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="cass1" interface="ep64_cass">
 			<dataarea name="cass" size="582656">
-				<rom name="nodes.tap" size="582656" crc="ecefc1d9" sha1="f6ace3106179d75baca8380e4c902d5766b1a84e"/>
+				<rom name="nodes.tap" size="582656" crc="ecefc1d9" sha1="f6ace3106179d75baca8380e4c902d5766b1a84e" offset="0" />
 			</dataarea>
 		</part>
 	</software>

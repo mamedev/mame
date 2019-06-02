@@ -5,13 +5,16 @@
 
 #pragma once
 
-class pc090oj_device : public device_t, public device_gfx_interface
+#include "emupal.h"
+
+class pc090oj_device : public device_t
 {
 public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_usebuffer(int use_buf) { m_use_buffer = use_buf; }
 	void set_offsets(int x_offset, int y_offset)
@@ -54,6 +57,7 @@ private:
 	int        m_use_buffer;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 DECLARE_DEVICE_TYPE(PC090OJ, pc090oj_device)

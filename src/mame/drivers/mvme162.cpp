@@ -115,11 +115,11 @@
  * FFE00000-FFE1FFFF        On-board SRAM D32 128Kb
  * FFE80000-FFEFFFFF        Not decoded
  * ------------------------ Local I/O devices D8/D16/D32
- * FFF00000-FFF3FFFF        Reserved 256KB
+ * FFF00000-FFF3FFFF        Reserved 256KB      
  * FFF40000-FFF400FF        VMEchip2 (LCSR) D32 256B
  * FFF40100-FFF401FF        VMEchip2 (GCSR) D32-D8 256B
- * FFF40200-FFF40FFF        Reserved 3.5KB
- * FFF41000-FFF41FFF        Reserved 4KB
+ * FFF40200-FFF40FFF        Reserved 3.5KB             
+ * FFF41000-FFF41FFF        Reserved 4KB               
  * FFF42000-FFF41FFF        MCchip D32-D8 4KB
  * FFF43000-FFF430FF        MCECC #1 D8 256B
  * FFF43100-FFF431FF        MCECC #2 D8 256B
@@ -131,7 +131,7 @@
  * FFF47000-FFF47FFF        SCSI (53C710) D32-D8 4Kb
  * FFF48000-FFF57FFF        Reserved
  * FFF58000-FFF587FF        IPIC IP_* D32-D16
- * FFF58800-FFF58FFF        Reserved
+ * FFF58800-FFF58FFF        Reserved 
  * FFFBC000-FFFBC01F        IPIC Registers D32-D8
  * FFFBC800-FFFBFFFF        Reserved
  * FFFC0000-FFFC7FFF        MK48T08 (BBRAM, TOD Clock) D32-D8 32Kb
@@ -180,18 +180,18 @@
 #endif
 
 /*Serial Communications Interface
-The MVME162LX uses two Zilog Z85230 serial port controllers to implement the four serial communications
-interfaces. Each interface supports CTS, DCD, RTS, and DTR control signals; as well as the TXD and RXD
-transmit/receive data signals. Because the serial clocks are omitted in the MVME162LX implementation,
-serial communications are strictly asynchronous. The MVME162LX hardware supports serial baud rates of
+The MVME162LX uses two Zilog Z85230 serial port controllers to implement the four serial communications 
+interfaces. Each interface supports CTS, DCD, RTS, and DTR control signals; as well as the TXD and RXD 
+transmit/receive data signals. Because the serial clocks are omitted in the MVME162LX implementation, 
+serial communications are strictly asynchronous. The MVME162LX hardware supports serial baud rates of 
 110b/s to 38.4Kb/s. The Z85230 supplies an interrupt vector during interrupt acknowledge cycles.
-The vector is modified based upon the interrupt source within the Z85230. Interrupt request levels are
+The vector is modified based upon the interrupt source within the Z85230. Interrupt request levels are 
 programmed via the MCchip. The Z85230s are interfaced as DTE (data terminal equipment) with EIA-232-D
 signal levels. The four serial ports are routed to four RJ45 telephone connectors on the MVME162LX front panel.*/
 
 /* This gives prompt at the RS232 terminal device (9600) */
 #define BAUDGEN_CLOCK 10_MHz_XTAL // Not verified nor seen on the PCB:s
-#define SCC_CLOCK (BAUDGEN_CLOCK)
+#define SCC_CLOCK (BAUDGEN_CLOCK) 
 
 class mvme162_state : public driver_device
 {
@@ -211,7 +211,7 @@ private:
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 	void mvme162_mem(address_map &map);
-
+  
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85230_device> m_sccterm;
 	//required_device<scc85230_device> m_sccterm2;
@@ -221,10 +221,10 @@ private:
 	uint32_t m_sysram[2];
 
 	// PCC registers
-	uint8_t m_genpurp_stat;
+	uint8_t	m_genpurp_stat;
 
 	// VME chip registers
-	uint8_t m_vc_cntl_conf;
+	uint8_t	m_vc_cntl_conf;
 };
 
 void mvme162_state::mvme162_mem(address_map &map)
@@ -238,10 +238,10 @@ void mvme162_state::mvme162_mem(address_map &map)
 
 	map(0xff800000, 0xff9fffff).rom().region("roms", 0x800000); /* ROM/EEPROM bank 1 - 162bug/firmware */
 	map(0xffa00000, 0xffbfffff).rom().region("roms", 0xa00000); /* ROM/EEPROM bank 2 - unpopulated/VxWorks/etc */
-
+	
 	map(0xffe00000, 0xffe1ffff).ram(); /* 128KB on board SRAM */
 
-		/*  SGS-Thompson M48T18 RAM and clock chip, only 4088 bytes used,  and 8 bytes for the RTC, out of 8Kb though */
+        /*  SGS-Thompson M48T18 RAM and clock chip, only 4088 bytes used,  and 8 bytes for the RTC, out of 8Kb though */
 	map(0xfffc0000, 0xfffc7fff).rw("m48t18", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 
 	map(0xfff45000, 0xfff457ff).rw(m_sccterm, FUNC(scc85230_device::ba_cd_r), FUNC(scc85230_device::ba_cd_w)); /* Port 1&2 - Dual serial port Z80-SCC */
@@ -272,8 +272,8 @@ void mvme162_state::machine_reset ()
 	m_genpurp_stat &= 0xfe; /* Clear parity error bit - not used by MAME at this point so just for the record */
 }
 
-/*
-  Boot vector handler. Devices mapped at $FFF80000-$FFF9FFFF also appear at $00000000-$001FFFFF when the ROM0 bit
+/* 
+  Boot vector handler. Devices mapped at $FFF80000-$FFF9FFFF also appear at $00000000-$001FFFFF when the ROM0 bit 
   in the MCchip EPROM control register is high (ROM0=1). ROM0 is set to 1 after each reset. The ROM0 bit must be
   cleared before other resources (DRAM or SRAM) can be mapped in this range ($00000000 - $001FFFFF).
 */

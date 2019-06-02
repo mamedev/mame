@@ -143,6 +143,7 @@ Changes:
 
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -228,41 +229,20 @@ READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_address_r)
 
 	// can't really see how to get sound this way tho, maybe the unused rom is acting as lookup table to convert
 	// PSG write offsets to addresses to offsets for use here?
-	//printf("Z80 read offs %x\n", m_bootleg_sound_offset);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
 	return m_bootleg_sound_offset;
 }
 
 WRITE8_MEMBER(vsnes_state::bootleg_sound_write)
 {
-	m_bootleg_sound_offset = offset & 0xf;
+	m_bootleg_sound_offset = offset;
 	m_bootleg_sound_data = data;
-	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
 {
-	//printf("Z80 read data %02x\n", m_bootleg_sound_data);
-	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return m_bootleg_sound_data;
-}
-
-// A0 = SN #1 enable, A1 = SN #2 enable, A2 = SN write enables (both) on edge
-WRITE8_MEMBER(vsnes_state::vssmbbl_sn_w)
-{
-//  printf("sn_w: ofs %x\n", offset & 7);
-	if (!(offset & 4))
-	{
-		if (offset & 1)
-		{
-			m_sn1->write(data);
-		}
-
-		if (offset & 2)
-		{
-			m_sn2->write(data);
-		}
-	}
 }
 
 
@@ -285,26 +265,21 @@ READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 	return 0x00;
 }
 
-// from kevtris' schematics, 2 74LS139s do the Z80 address decoding.
-// A13 = 0, A14 = 0 is ROM
-// A13 = 1, A14 = 0 is RAM
-// A13 = 0, A14 = 1 is 6502 data.  Read also acks the Z80 IRQ.
-// A13 = 1, A14 = 1 is 6502 lower 4 address bits on read, SN76489 on write.  Read also acks the Z80 NMI.
-//                     A0 = SN #1 enable, A1 = SN #2 enable, A2 = SN write enables (both)
-
-// x00x xxxx xxxx xxxx = ROM (0000)
-// x01x xxxx xxxx xxxx = RAM (2000)
-// x10x xxxx xxxx xxxx = 6502 data (4000)
-// x11x xxxx xxxx xxxx = 6502 address (6000) (read)
-// x11x xxxx xxxx xW21 = SN76489s (6000) (write)
-
 void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region("sub", 0);
+	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 
-	map(0x4000, 0x5fff).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
-	map(0x6000, 0x7fff).rw(FUNC(vsnes_state::vsnes_bootleg_z80_address_r), FUNC(vsnes_state::vssmbbl_sn_w));
+	map(0x4000, 0x4000).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
+
+	map(0x6000, 0x6000).r(FUNC(vsnes_state::vsnes_bootleg_z80_latch_r)); // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
+	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
+
+
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
+
 }
 
 /******************************************************************************/
@@ -1854,7 +1829,8 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 
 	Z80(config, m_subcpu, XTAL(16'000'000)/4); /* ? MHz */ // Z8400APS-Z80CPU
 	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_bootleg_z80_map);
-	m_subcpu->set_vblank_int("screen1", FUNC(vsnes_state::irq0_line_assert));
+	m_subcpu->set_vblank_int("screen1", FUNC(vsnes_state::irq0_line_hold));
+//  m_subcpu->set_periodic_int(FUNC(vsnes_state::nmi_line_pulse));
 
 	/* video hardware */
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));

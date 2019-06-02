@@ -14,7 +14,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="TF-20 boot disk" />
 			<dataarea name="flop" size="35124">
-				<rom name="tf20boot.td0" size="35124" crc="806311eb" sha1="b67433746ed5ab84be06003f850846565e19f44c"/>
+				<rom name="tf20boot.td0" size="35124" crc="806311eb" sha1="b67433746ed5ab84be06003f850846565e19f44c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Archivers" />
 			<dataarea name="flop" size="348848">
-				<rom name="arcs.d88" size="348848" crc="ab56993a" sha1="1e7c0512bea0adf9673527c5976497531837e8a3"/>
+				<rom name="arcs.d88" size="348848" crc="ab56993a" sha1="1e7c0512bea0adf9673527c5976497531837e8a3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="VDE 2.66" />
 			<dataarea name="flop" size="348848">
-				<rom name="editor.d88" size="348848" crc="871d30ce" sha1="4f0d8342e7d92ba78fd922f0a2e13b2724a921df"/>
+				<rom name="editor.d88" size="348848" crc="871d30ce" sha1="4f0d8342e7d92ba78fd922f0a2e13b2724a921df" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Extra Utilities" />
 			<dataarea name="flop" size="348848">
-				<rom name="extrautil.d88" size="348848" crc="baaeb509" sha1="bc339742cc6d087c11b8aae010311473edfdf734"/>
+				<rom name="extrautil.d88" size="348848" crc="baaeb509" sha1="bc339742cc6d087c11b8aae010311473edfdf734" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Modem Sample &amp; M80 &amp; L80" />
 			<dataarea name="flop" size="348848">
-				<rom name="ms_m80_l80.d88" size="348848" crc="7af5815a" sha1="4e7bf6a4f7d5ac66ab432ec0e2760e265a53f72d"/>
+				<rom name="ms_m80_l80.d88" size="348848" crc="7af5815a" sha1="4e7bf6a4f7d5ac66ab432ec0e2760e265a53f72d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PROM Progs" />
 			<dataarea name="flop" size="348848">
-				<rom name="promprogs.d88" size="348848" crc="1cc048fc" sha1="6cbd0f9c1c36bca213accf9da9b0a69896c9a88a"/>
+				<rom name="promprogs.d88" size="348848" crc="1cc048fc" sha1="6cbd0f9c1c36bca213accf9da9b0a69896c9a88a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Utils" />
 			<dataarea name="flop" size="348848">
-				<rom name="px4util.d88" size="348848" crc="f39d899d" sha1="c2e8051116d87e090025c41a260a85fb46b86b10"/>
+				<rom name="px4util.d88" size="348848" crc="f39d899d" sha1="c2e8051116d87e090025c41a260a85fb46b86b10" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Utility Disk" />
 			<dataarea name="flop" size="348848">
-				<rom name="px4utilitydisk.d88" size="348848" crc="df17aae8" sha1="4be08583c079f092db95bdad2abf693639e439b9"/>
+				<rom name="px4utilitydisk.d88" size="348848" crc="df17aae8" sha1="4be08583c079f092db95bdad2abf693639e439b9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Utility Disk 2" />
 			<dataarea name="flop" size="348848">
-				<rom name="px4utils.d88" size="348848" crc="93320c5f" sha1="a256f500bafab4e6eba7031e05267dc6cb39a64e"/>
+				<rom name="px4utils.d88" size="348848" crc="93320c5f" sha1="a256f500bafab4e6eba7031e05267dc6cb39a64e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-4 Wanderer" />
 			<dataarea name="flop" size="348848">
-				<rom name="px4wand.d88" size="348848" crc="1ab716cc" sha1="4f6a83476b76f1dc42f38b3c6cd0835181b523e3"/>
+				<rom name="px4wand.d88" size="348848" crc="1ab716cc" sha1="4f6a83476b76f1dc42f38b3c6cd0835181b523e3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-8 EPS (TF-20 bootdisk)" />
 			<dataarea name="flop" size="348848">
-				<rom name="px8_eps-tf20.d88" size="348848" crc="ed627d6e" sha1="eee223a63235ef6fa311527f0c961d003ca669f0"/>
+				<rom name="px8_eps-tf20.d88" size="348848" crc="ed627d6e" sha1="eee223a63235ef6fa311527f0c961d003ca669f0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PX-8 Games" />
 			<dataarea name="flop" size="348848">
-				<rom name="px8games.d88" size="348848" crc="c724e5df" sha1="a0bfc9af1f4fcd6949f9b667ea49879284d94ba2"/>
+				<rom name="px8games.d88" size="348848" crc="c724e5df" sha1="a0bfc9af1f4fcd6949f9b667ea49879284d94ba2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Scratch" />
 			<dataarea name="flop" size="348848">
-				<rom name="scratch.d88" size="348848" crc="163fc594" sha1="ae2451d9226ff1a69db5f78f1101f60735ae2789"/>
+				<rom name="scratch.d88" size="348848" crc="163fc594" sha1="ae2451d9226ff1a69db5f78f1101f60735ae2789" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

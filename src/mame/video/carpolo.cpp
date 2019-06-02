@@ -516,12 +516,6 @@ WRITE_LINE_MEMBER(carpolo_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		/* handle the 60hz timer now (machine/carpolo.cpp) */
-		timer_tick();
-
-
-		/* sprites collision detection */
-
 		int col_x, col_y;
 		int car1_x, car2_x, car3_x, car4_x, ball_x;
 		int car1_y, car2_y, car3_y, car4_y, ball_y;
@@ -640,7 +634,9 @@ WRITE_LINE_MEMBER(carpolo_state::screen_vblank)
 
 		/* check ball collision with static screen elements */
 		{
-			int col = check_sprite_left_goal_collision(ball_x, ball_y, ball_code, ball_flipy, 0);
+			int col;
+
+			col = check_sprite_left_goal_collision(ball_x, ball_y, ball_code, ball_flipy, 0);
 
 			if (col == 1)  generate_ball_screen_interrupt(0x05);
 			if (col == 2)  generate_ball_screen_interrupt(0x03);
@@ -659,7 +655,9 @@ WRITE_LINE_MEMBER(carpolo_state::screen_vblank)
 
 		/* check car-border collision */
 		{
-			int col = check_sprite_border_collision(car1_x, car1_y, car1_code, car1_flipy);
+			int col;
+
+			col = check_sprite_border_collision(car1_x, car1_y, car1_code, car1_flipy);
 
 			if (col)
 				generate_car_border_interrupt(0, (col == 2));

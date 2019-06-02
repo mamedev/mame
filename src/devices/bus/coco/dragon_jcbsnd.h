@@ -19,25 +19,22 @@ class dragon_jcbsnd_device :
 		public device_cococart_interface
 {
 public:
-	// construction/destruction
+		// construction/destruction
 	dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+		// optional information overrides
+		virtual void device_add_mconfig(machine_config &config) override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual uint8_t* get_cart_base() override;
-	virtual memory_region* get_cart_memregion() override;
+		// device-level overrides
+		virtual void device_start() override;
+		virtual uint8_t* get_cart_base() override;
+		virtual memory_region* get_cart_memregion() override;
 
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
-
-	// internal state
-	device_image_interface *m_cart;
+		// internal state
+		device_image_interface *m_cart;
 private:
-	required_memory_region m_eprom;
-	required_device<ay8910_device> m_ay8910;
+		required_device<ay8910_device> m_ay8910;
 };
 
 

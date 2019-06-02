@@ -133,7 +133,6 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "nec_p72.h"
 #include "printer.h"
 #include "covox.h"
-#include "chessmec.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -146,5 +145,4 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("printer", CENTRONICS_PRINTER);
 	device.option_add("covox", CENTRONICS_COVOX);
 	device.option_add("covox_stereo", CENTRONICS_COVOX_STEREO);
-	device.option_add("chessmec", CENTRONICS_CHESSMEC);
 }

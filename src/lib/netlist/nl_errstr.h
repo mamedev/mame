@@ -107,8 +107,8 @@ namespace netlist
 
 	PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in sources collection")
 
-	PERRMSGV(MW_DEVICE_NOT_FOUND_FOR_HINT,          1, "Device not found for hint {1}")
-	PERRMSGV(MW_UNKNOWN_PARAMETER,                  1, "Unknown parameter {1}")
+	PERRMSGV(MW_DEVICE_NOT_FOUND_FOR_HINT,			1, "Device not found for hint {1}")
+	PERRMSGV(MW_UNKNOWN_PARAMETER,					1, "Unknown parameter {1}")
 
 	// nlid_proxy.cpp
 

@@ -21,13 +21,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_bg_scrolly(*this, "bg_scrolly"),
 		m_bg_scrollx(*this, "bg_scrollx"),
-		m_bg_gfx(*this, "bg_gfx"),
-		m_bg_map(*this, "bg_map"),
-		m_bg_col_map(*this, "bg_col_map"),
-		m_fg_map(*this, "fg_map"),
-		m_proms(*this, "proms"),
-		m_bgbank(*this, "bgbank"),
-		m_io_fake(*this, "FAKE"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -37,44 +30,37 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<u8> m_spriteram;
-	required_shared_ptr<u8> m_videoram;
-	required_shared_ptr<u8> m_bg_scrolly;
-	required_shared_ptr<u8> m_bg_scrollx;
-	required_region_ptr<u8> m_bg_gfx;
-	required_region_ptr<u8> m_bg_map;
-	required_region_ptr<u8> m_bg_col_map;
-	required_region_ptr<u8> m_fg_map;
-	required_region_ptr<u8> m_proms;
-	required_memory_bank m_bgbank;
-	required_ioport m_io_fake;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_bg_scrolly;
+	required_shared_ptr<uint8_t> m_bg_scrollx;
 
 	/* video-related */
-	u8          m_fg_scrollx;
-	u8          m_fg_scrolly;
-	u8          m_fg_select;
-	u8          m_text_scrolly;
-	u8          m_text_mode;
-	u8          m_bg_select;
-	u8          m_bg_priority;
-	u8          m_bg_mask;
-	u8          m_fg_mask;
-	u8          m_flipscreen;
-	void bg_read_bank_w(u8 data);
-	void fg_scrollx_w(u8 data);
-	void fg_scrolly_w(u8 data);
-	void fg_select_w(u8 data);
-	void text_scrolly_w(u8 data);
-	void text_mode_w(u8 data);
-	void bg_scrollx_w(offs_t offset, u8 data);
-	void bg_scrolly_w(offs_t offset, u8 data);
-	void bg_select_w(u8 data);
-	void bg_priority_w(u8 data);
-	void flipscreen_w(u8 data);
+	uint8_t          m_fg_scrollx;
+	uint8_t          m_fg_scrolly;
+	uint8_t          m_fg_select;
+	uint8_t          m_text_scrolly;
+	uint8_t          m_text_mode;
+	uint8_t          m_bg_select;
+	uint8_t          m_bg_priority;
+	uint8_t          m_bg_mask;
+	uint8_t          m_fg_mask;
+	uint8_t          m_flipscreen;
+	DECLARE_WRITE8_MEMBER(momoko_bg_read_bank_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_select_w);
+	DECLARE_WRITE8_MEMBER(momoko_text_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_text_mode_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_select_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_priority_w);
+	DECLARE_WRITE8_MEMBER(momoko_flipscreen_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri);
+	uint32_t screen_update_momoko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void momoko_draw_bg_pri( bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

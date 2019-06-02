@@ -183,7 +183,7 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 
-	void _32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr);
+	void _32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);
 	void _32x_scanline_helper_callback(int scanline);
 

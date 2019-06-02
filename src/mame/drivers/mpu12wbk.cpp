@@ -247,7 +247,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void mpu12wbk_palette(palette_device &palette) const;
-	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mpu12wbk_map(address_map &map);
 };
 
@@ -293,7 +293,7 @@ void mpu12wbk_state::video_start()
 }
 
 
-uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -509,6 +509,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	screen.set_size((32+1)*8, (32+1)*8);                  /* From MC6845, registers 00 & 04. (value-1) */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);    /* Driven by MC6845, registers 01 & 06 */
 	screen.set_screen_update(FUNC(mpu12wbk_state::screen_update_mpu12wbk));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mpu12wbk);
 	PALETTE(config, "palette", FUNC(mpu12wbk_state::mpu12wbk_palette), 512);

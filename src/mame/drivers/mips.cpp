@@ -133,7 +133,7 @@
 /*
  * Rx2030 WIP
  *
- *   - keyboard reset failure
+ *   status: boots RISC/os, requires unimplemented MIPS keyboard
  *
  * V50 internal peripherals:
  * base = 0xfe00
@@ -271,8 +271,8 @@ void rx2030_state::mmu_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offs_t const address = (m_mmu[(offset >> 11) & 0x1f] << 12) | ((offset << 1) & 0xfff);
 
-	LOGMASKED(LOG_MMU, "mmu_w offset 0x%06x reg %d page 0x%04x mapped 0x%06x data 0x%04x (%s)\n",
-		(offset << 1), (offset >> 11) & 0x1f, m_mmu[(offset >> 11) & 0x1f], address, data, machine().describe_context());
+	LOGMASKED(LOG_MMU, "mmu_w offset 0x%06x reg %d page 0x%04x mapped 0x%06x data 0x%04x\n",
+		(offset << 1), (offset >> 11) & 0x1f, m_mmu[(offset >> 11) & 0x1f], address, data);
 
 	if (ACCESSING_BITS_0_7)
 		m_ram->write(BYTE4_XOR_BE(address + 0), data);
@@ -470,9 +470,6 @@ void rx2030_state::rs2030_map(address_map &map)
 	// video hardware
 	map(0x01000000, 0x011fffff).ram().share("vram");
 	map(0x01ffff00, 0x01ffffff).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff);
-
-	//map(0x01ff1000, 0x01ff1001).w() // graphics register?
-	//map(0x01ff0080, 0x01ff0081).w() // graphics register?
 }
 
 u16 rx2030_state::lance_r(offs_t offset, u16 mem_mask)
@@ -537,7 +534,8 @@ void rx2030_state::rx2030(machine_config &config)
 	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
 	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
+	PC_KBDC_SLOT(config, m_kbd, 0);
+	pc_at_keyboards(*m_kbd);
 	m_kbd->set_pc_kbdc_slot(&kbdc);
 
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
@@ -609,6 +607,9 @@ void rx2030_state::rc2030(machine_config &config)
 	rx2030(config);
 
 	m_cpu->set_addrmap(AS_PROGRAM, &rx2030_state::rx2030_map);
+
+	// no keyboard
+	m_kbd->set_default_option(nullptr);
 
 	m_tty[1]->set_default_option("terminal");
 }
@@ -847,7 +848,8 @@ void rx3230_state::rx3230(machine_config &config)
 	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
 	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
+	PC_KBDC_SLOT(config, m_kbd, 0);
+	pc_at_keyboards(*m_kbd);
 	m_kbd->set_pc_kbdc_slot(&kbdc);
 
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm

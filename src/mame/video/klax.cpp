@@ -11,6 +11,7 @@
 #include "includes/klax.h"
 
 
+
 /*************************************
  *
  *  Tilemap callbacks
@@ -19,12 +20,13 @@
 
 TILE_GET_INFO_MEMBER(klax_state::get_playfield_tile_info)
 {
-	const u16 data1 = m_playfield_tilemap->basemem_read(tile_index);
-	const u16 data2 = m_playfield_tilemap->extmem_read(tile_index) >> 8;
-	const u32 code = data1 & 0x1fff;
-	const u32 color = data2 & 0x0f;
+	uint16_t data1 = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t data2 = m_playfield_tilemap->extmem_read(tile_index) >> 8;
+	int code = data1 & 0x1fff;
+	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 }
+
 
 
 /*************************************
@@ -68,15 +70,17 @@ const atari_motion_objects_config klax_state::s_mob_config =
 };
 
 
+
 /*************************************
  *
  *  Latch write handler
  *
  *************************************/
 
-void klax_state::klax_latch_w(u16 data)
+WRITE16_MEMBER( klax_state::klax_latch_w )
 {
 }
+
 
 
 /*************************************
@@ -85,7 +89,7 @@ void klax_state::klax_latch_w(u16 data)
  *
  *************************************/
 
-u32 klax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t klax_state::screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);
@@ -98,8 +102,8 @@ u32 klax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			const u16 *mo = &mobitmap.pix16(y);
-			u16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{

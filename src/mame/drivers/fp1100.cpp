@@ -93,9 +93,10 @@ private:
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
 	void io_map(address_map &map);
 	void main_map(address_map &map);
@@ -111,7 +112,7 @@ private:
 	uint8_t m_col_display;
 	uint8_t m_centronics_busy;
 	uint8_t m_cass_data[4];
-	bool m_cassbit;
+	bool m_cass_state;
 	bool m_cassold;
 
 	struct {
@@ -571,17 +572,22 @@ WRITE_LINE_MEMBER( fp1100_state::centronics_busy_w )
 	m_centronics_busy = state;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::kansas_w )
+WRITE_LINE_MEMBER( fp1100_state::cass_w )
+{
+	m_cass_state = state;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
 {
 	m_cass_data[3]++;
 
-	if (m_cassbit != m_cassold)
+	if (m_cass_state != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cassbit;
+		m_cassold = m_cass_state;
 	}
 
-	if (m_cassbit)
+	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
@@ -647,7 +653,7 @@ void fp1100_state::fp1100(machine_config &config)
 	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
 	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
-	sub.txd_func().set([this] (bool state) { m_cassbit = state; });
+	sub.txd_func().set(FUNC(fp1100_state::cass_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -655,7 +661,7 @@ void fp1100_state::fp1100(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea_full();
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
 	PALETTE(config, m_palette).set_entries(8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
@@ -665,7 +671,7 @@ void fp1100_state::fp1100(machine_config &config)
 			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
 	/* CRTC */
-	MC6845(config, m_crtc, MAIN_CLOCK/8);   /* unknown variant; hand tuned to get ~60 fps */
+	H46505(config, m_crtc, MAIN_CLOCK/8);   /* hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -681,7 +687,7 @@ void fp1100_state::fp1100(machine_config &config)
 	/* Cassette */
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	TIMER(config, "kansas_w").configure_periodic(FUNC(fp1100_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "timer_c").configure_periodic(FUNC(fp1100_state::timer_c), attotime::from_hz(4800)); // cass write
 }
 
 /* ROM definition */

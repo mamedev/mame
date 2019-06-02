@@ -1351,7 +1351,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 
-	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
@@ -1510,7 +1510,7 @@ VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -4386,6 +4386,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	screen.set_size((39+1)*8, (31+1)*8);          /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); /* From MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 68B45 or 6845s @ CPU clock */
 	crtc.set_screen("screen");
@@ -4748,6 +4749,7 @@ void blitz_state::megadpkr(machine_config &config)
 	screen.set_size((32)*8, (32)*8);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");

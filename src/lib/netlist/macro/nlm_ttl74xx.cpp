@@ -401,7 +401,7 @@ static NETLIST_START(TTL_7425_DIP)
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.B,  /*    B1 |2           13| D2   */ B.D,
 		X.I,  /*    X1 |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7425   11| X2   */ X.I,
+		A.C,  /*    C1 |4    7425   11| X2   */  X.I,
 		A.D,  /*    D1 |5           10| B2   */ B.B,
 		A.Q,  /*    Y1 |6            9| A2   */ B.A,
 		A.GND,/*   GND |7            8| Y2   */ B.Q
@@ -619,13 +619,13 @@ static NETLIST_START(TTL_74107_DIP)
 
 	DIPPINS(    /*          +--------------+        */
 		A.J,    /*       1J |1     ++    14| VCC    */ A.VCC,
-		A.QQ,   /*      1QQ |2           13| 1CLRQ  */ A.CLRQ,
-		A.Q,    /*       1Q |3           12| 1CLK   */ A.CLK,
-		A.K,    /*       1K |4    74107  11| 2K     */ B.K,
-		B.Q,    /*       2Q |5           10| 2CLRQ  */ B.CLRQ,
-		B.QQ,   /*      2QQ |6            9| 2CLK   */ B.CLK,
-		B.GND,  /*      GND |7            8| 2J     */ B.J
-				/*          +--------------+        */
+	    A.QQ,   /*      1QQ |2           13| 1CLRQ  */ A.CLRQ,
+	    A.Q,    /*       1Q |3           12| 1CLK   */ A.CLK,
+	    A.K,    /*       1K |4    74107  11| 2K     */ B.K,
+	    B.Q,    /*       2Q |5           10| 2CLRQ  */ B.CLRQ,
+	    B.QQ,   /*      2QQ |6            9| 2CLK   */ B.CLK,
+	    B.GND,  /*      GND |7            8| 2J     */ B.J
+	            /*          +--------------+        */
 	)
 
 NETLIST_END()

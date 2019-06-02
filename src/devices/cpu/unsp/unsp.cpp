@@ -25,11 +25,8 @@
 #include "unspdasm.h"
 
 DEFINE_DEVICE_TYPE(UNSP,    unsp_device,    "unsp",    "SunPlus u'nSP (ISA 1.0)")
-// 1.1 is just 1.0 with better CPI?
 DEFINE_DEVICE_TYPE(UNSP_11, unsp_11_device, "unsp_11", "SunPlus u'nSP (ISA 1.1)")
- // it's possible that most unSP systems we emulate are 1.2, but are not using 99% of the additional features / instructions over 1.0 (only enable_irq and enable_fiq are meant to be 1.2 specific and used, but that could be a research error)
-DEFINE_DEVICE_TYPE(UNSP_12, unsp_12_device, "unsp_12", "SunPlus u'nSP (ISA 1.2)")
-// found on GCM394 die (based on use of 2 extended push/pop opcodes in the smartfp irq), has extra instructions
+DEFINE_DEVICE_TYPE(UNSP_12, unsp_12_device, "unsp_12", "SunPlus u'nSP (ISA 1.2)") // found on GCM394 die, has extra instructions
 DEFINE_DEVICE_TYPE(UNSP_20, unsp_20_device, "unsp_20", "SunPlus u'nSP (ISA 2.0)")
 
 /* size of the execution code cache */
@@ -149,7 +146,7 @@ std::unique_ptr<util::disasm_interface> unsp_12_device::create_disassembler()
 
 std::unique_ptr<util::disasm_interface> unsp_20_device::create_disassembler()
 {
-	return std::make_unique<unsp_20_disassembler>();
+	return std::make_unique<unsp_12_disassembler>();
 }
 
 void unsp_device::unimplemented_opcode(uint16_t op)

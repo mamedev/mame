@@ -14,75 +14,78 @@
 #include "includes/momoko.h"
 
 
-void momoko_state::fg_scrollx_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_fg_scrollx_w)
 {
 	m_fg_scrollx = data;
 }
 
-void momoko_state::fg_scrolly_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_fg_scrolly_w)
 {
 	m_fg_scrolly = data;
 }
 
-void momoko_state::fg_select_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_fg_select_w)
 {
 	m_fg_select = data & 0x0f;
 	m_fg_mask = data & 0x10;
 }
 
-void momoko_state::text_scrolly_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_text_scrolly_w)
 {
 	m_text_scrolly = data;
 }
 
-void momoko_state::text_mode_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_text_mode_w)
 {
 	m_text_mode = data;
 }
 
-void momoko_state::bg_scrollx_w(offs_t offset, u8 data)
+WRITE8_MEMBER(momoko_state::momoko_bg_scrollx_w)
 {
 	m_bg_scrollx[offset] = data;
 }
 
-void momoko_state::bg_scrolly_w(offs_t offset, u8 data)
+WRITE8_MEMBER(momoko_state::momoko_bg_scrolly_w)
 {
 	m_bg_scrolly[offset] = data;
 }
 
-void momoko_state::bg_select_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_bg_select_w)
 {
 	m_bg_select = data & 0x0f;
 	m_bg_mask = data & 0x10;
 }
 
-void momoko_state::bg_priority_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_bg_priority_w)
 {
 	m_bg_priority = data & 0x01;
 }
 
-void momoko_state::flipscreen_w(u8 data)
+WRITE8_MEMBER(momoko_state::momoko_flipscreen_w)
 {
 	m_flipscreen = data & 0x01;
 }
 
 /****************************************************************************/
 
-void momoko_state::draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri)
+void momoko_state::momoko_draw_bg_pri( bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
 {
-	int px, py;
+	int xx, sx, sy, px, py, dot;
+	uint32_t gfxadr;
+	uint8_t d0, d1;
+	uint8_t *BG_GFX = memregion("gfx2")->base();
 
-	for (int sy = 0; sy < 8; sy++)
+	for (sy = 0; sy < 8; sy++)
 	{
-		const u32 gfxadr = chr * 16 + sy * 2;
-		for (int xx = 0; xx < 2; xx++)
+		gfxadr = chr * 16 + sy * 2;
+		for (xx = 0; xx < 2; xx++)
 		{
-			u8 d0 = m_bg_gfx[gfxadr + xx * 4096];
-			u8 d1 = m_bg_gfx[gfxadr + xx * 4096 + 1];
+			d0 = BG_GFX[gfxadr + xx * 4096];
+			d1 = BG_GFX[gfxadr + xx * 4096 + 1];
 
-			for (int sx = 0; sx < 4; sx++)
+			for (sx = 0; sx < 4; sx++)
 			{
-				const u8 dot = (d0 & 0x08) | ((d0 & 0x80) >> 5) | ((d1 & 0x08) >> 2) | ((d1 & 0x80) >> 7);
+				dot = (d0 & 0x08) | ((d0 & 0x80) >>5) | ((d1 & 0x08) >>2) | ((d1 & 0x80) >>7);
 				if (flipx == 0) px = sx + xx * 4 + x;
 					else      px = 7 - sx - xx * 4 + x;
 				if (flipy == 0) py = sy + y;
@@ -100,27 +103,34 @@ void momoko_state::draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx
 
 /****************************************************************************/
 
-u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int px, py, col;
+	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
+	uint8_t *spriteram = m_spriteram;
 
-	const int flip = m_flipscreen ^ (m_io_fake->read() & 0x01);
+	uint8_t *BG_MAP     = memregion("user1")->base();
+	uint8_t *BG_COL_MAP = memregion("user2")->base();
+	uint8_t *FG_MAP     = memregion("user3")->base();
+	uint8_t *TEXT_COLOR = memregion("proms")->base();
+
+
+	flip = m_flipscreen ^ (ioport("FAKE")->read() & 0x01);
 
 	/* draw BG layer */
-	int dx = (7 - m_bg_scrollx[0]) & 7;
-	int dy = (7 - m_bg_scrolly[0]) & 7;
-	int rx = (m_bg_scrollx[0] + m_bg_scrollx[1] * 256) >> 3;
-	int ry = (m_bg_scrolly[0] + m_bg_scrolly[1] * 256) >> 3;
+	dx = (7 - m_bg_scrollx[0]) & 7;
+	dy = (7 - m_bg_scrolly[0]) & 7;
+	rx = (m_bg_scrollx[0] + m_bg_scrollx[1] * 256) >> 3;
+	ry = (m_bg_scrolly[0] + m_bg_scrolly[1] * 256) >> 3;
 
 	if (m_bg_mask == 0)
 	{
-		for (int y = 0; y < 29; y++)
+		for (y = 0; y < 29; y++)
 		{
-			for (int x = 0; x < 32; x++)
+			for (x = 0; x < 32; x++)
 			{
-				const int radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f);
-				u32 chr = m_bg_map[radr];
-				col = m_bg_col_map[chr + m_bg_select * 512 + m_bg_priority * 256] & 0x0f;
+				radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f);
+				chr = BG_MAP[radr];
+				col = BG_COL_MAP[chr + m_bg_select * 512 + m_bg_priority * 256] & 0x0f;
 				chr = chr + m_bg_select * 512;
 
 				if (flip == 0)
@@ -147,15 +157,15 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 
 	/* draw sprites (momoko) */
-	for (int offs = 0; offs < 9 * 4; offs +=4)
+	for (offs = 0; offs < 9 * 4; offs +=4)
 	{
-		u32 chr = m_spriteram[offs + 1] | ((m_spriteram[offs + 2] & 0x60) << 3);
+		chr = spriteram[offs + 1] | ((spriteram[offs + 2] & 0x60) << 3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);
-		col = m_spriteram[offs + 2] & 0x07;
-		const int fx = ((m_spriteram[offs + 2] & 0x10) >> 4) ^ flip;
-		const int fy = ((m_spriteram[offs + 2] & 0x08) >> 3) ^ flip; /* ??? */
-		int x = m_spriteram[offs + 3];
-		int y = m_spriteram[offs + 0];
+		col = spriteram[offs + 2] & 0x07;
+		fx = ((spriteram[offs + 2] & 0x10) >> 4) ^ flip;
+		fy = ((spriteram[offs + 2] & 0x08) >> 3) ^ flip; /* ??? */
+		x = spriteram[offs + 3];
+		y = spriteram[offs + 0];
 
 		if (flip == 0)
 		{
@@ -177,16 +187,16 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 
 	/* draw BG layer */
-	if (m_bg_mask == 0)
+	if (m_bg_mask ==0)
 	{
-		for (int y = 0; y < 29; y++)
+		for (y = 0; y < 29; y++)
 		{
-			for (int x = 0; x < 32; x++)
+			for (x = 0; x < 32; x++)
 			{
-				const int radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f);
-				u32 chr = m_bg_map[radr];
-				col = m_bg_col_map[chr + m_bg_select * 512 + m_bg_priority * 256];
-				const u8 pri = (col & 0x10) >> 1;
+				radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f) ;
+				chr = BG_MAP[radr] ;
+				col = BG_COL_MAP[chr + m_bg_select * 512 + m_bg_priority * 256];
+				pri = (col & 0x10) >> 1;
 
 				if (flip == 0)
 				{
@@ -202,7 +212,7 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				{
 					col = col & 0x0f;
 					chr = chr + m_bg_select * 512;
-					draw_bg_pri(bitmap, chr, col, flip, flip, px, py, pri);
+					momoko_draw_bg_pri(bitmap, chr, col, flip, flip, px, py, pri);
 				}
 			}
 		}
@@ -210,15 +220,15 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 
 	/* draw sprites (others) */
-	for (int offs = 9 * 4; offs < m_spriteram.bytes(); offs += 4)
+	for (offs = 9 * 4; offs < m_spriteram.bytes(); offs += 4)
 	{
-		u32 chr = m_spriteram[offs + 1] | ((m_spriteram[offs + 2] & 0x60) << 3);
+		chr = spriteram[offs + 1] | ((spriteram[offs + 2] & 0x60) << 3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);
-		col = m_spriteram[offs + 2] & 0x07;
-		const int fx = ((m_spriteram[offs + 2] & 0x10) >> 4) ^ flip;
-		const int fy = ((m_spriteram[offs + 2] & 0x08) >> 3) ^ flip; /* ??? */
-		int x = m_spriteram[offs + 3];
-		int y = m_spriteram[offs + 0];
+		col = spriteram[offs + 2] & 0x07;
+		fx = ((spriteram[offs + 2] & 0x10) >> 4) ^ flip;
+		fy = ((spriteram[offs + 2] & 0x08) >> 3) ^ flip; /* ??? */
+		x = spriteram[offs + 3];
+		y = spriteram[offs + 0];
 
 		if (flip == 0)
 		{
@@ -239,18 +249,18 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 
 	/* draw text layer */
-	for (int y = 16; y < 240; y++)
+	for (y = 16; y < 240; y++)
 	{
-		for (int x = 0; x < 32; x++)
+		for (x = 0; x < 32; x++)
 		{
-			int sy = y;
+			sy = y;
 			if (m_text_mode == 0)
-				col = m_proms[(sy >> 3) + 0x100] & 0x0f;
+				col = TEXT_COLOR[(sy >> 3) + 0x100] & 0x0f;
 			else
 			{
-				if (m_proms[y] < 0x08)
+				if (TEXT_COLOR[y] < 0x08)
 					sy += m_text_scrolly;
-				col = (m_proms[y] & 0x07) + 0x10;
+				col = (TEXT_COLOR[y] & 0x07) + 0x10;
 			}
 			dy = sy & 7;
 			if (flip == 0)
@@ -280,12 +290,12 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 		rx = m_fg_scrollx >> 3;
 		ry = m_fg_scrolly >> 3;
 
-		for (int y = 0; y < 29; y++)
+		for (y = 0; y < 29; y++)
 		{
-			for (int x = 0; x < 32; x++)
+			for (x = 0; x < 32; x++)
 			{
-				const int radr = ((ry + y + 34) & 0x3f) * 0x20 + ((rx + x) & 0x1f) + (m_fg_select & 3) * 0x800;
-				const u32 chr = m_fg_map[radr];
+				radr = ((ry + y + 34) & 0x3f) * 0x20 + ((rx + x) & 0x1f) + (m_fg_select & 3) * 0x800;
+				chr = FG_MAP[radr] ;
 				if (flip == 0)
 				{
 					px = 8 * x + dx - 6;

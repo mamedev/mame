@@ -1043,7 +1043,7 @@ void vk100_state::vk100(machine_config &config)
 	screen.set_raw(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ); // fake screen timings for startup until 6845 sets real ones
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, 45.6192_MHz_XTAL/3/12); // unknown variant
+	H46505(config, m_crtc, 45.6192_MHz_XTAL/3/12);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);

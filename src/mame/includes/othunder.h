@@ -38,7 +38,8 @@ public:
 		m_2610_1r(*this, "2610.1r"),
 		m_2610_2l(*this, "2610.2l"),
 		m_2610_2r(*this, "2610.2r"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	void othunder(machine_config &config);
@@ -96,6 +97,7 @@ private:
 	required_device<filter_volume_device> m_2610_2l;
 	required_device<filter_volume_device> m_2610_2r;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 #endif // MAME_INCLUDES_OTHUNDER_H

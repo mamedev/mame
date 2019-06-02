@@ -15,8 +15,6 @@
 #include "bus/c64/exp.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
-#include "machine/ds75160a.h"
-#include "machine/ds75161a.h"
 #include "machine/i8255.h"
 
 
@@ -52,29 +50,9 @@ protected:
 
 private:
 	required_device<i8255_device> m_ppi;
-	required_device<ds75160a_device> m_ieee1;
-	required_device<ds75161a_device> m_ieee2;
 	required_device<ieee488_device> m_bus;
 	required_device<centronics_device> m_centronics;
 	required_device<c64_expansion_slot_device> m_exp;
-	required_ioport m_s1;
-	required_memory_region m_rom;
-
-	bool m_te;
-	int m_bank;
-	bool m_basic;
-	bool m_dipsw;
-	bool m_busy;
-
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-
-	bool pd_pgm1(offs_t offset, int sphi2);
-	bool pd_pgm234(offs_t offset, int sphi2, int bank);
 };
 
 

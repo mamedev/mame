@@ -784,7 +784,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &wicat_state::video_mem);
 	m_videocpu->set_addrmap(AS_IO, &wicat_state::video_io);
 
-	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, z8002_device::NVI_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
 
 	LS259(config, m_videoctrl);
 	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
@@ -799,7 +799,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
 	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
-	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, z8002_device::NMI_LINE);
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
 
 	IM6402(config, m_videouart, 0);
 	m_videouart->set_rrc(0);

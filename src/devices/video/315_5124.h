@@ -245,9 +245,6 @@ public:
 protected:
 	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void update_palette() override;
 	virtual void write_memory(u8 data) override;
 	virtual void load_vram_addr(u8 data) override;
 	virtual void select_sprites(int line) override;
@@ -256,9 +253,6 @@ protected:
 	virtual void select_display_mode() override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
 	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line) override;
-
-private:
-	void sega315_5313_palette(palette_device &palette) const;
 };
 
 #endif // MAME_VIDEO_315_5124_H

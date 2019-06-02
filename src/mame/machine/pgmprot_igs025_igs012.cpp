@@ -25,13 +25,14 @@
 
 void pgm_012_025_state::pgm_drgw2_decrypt()
 {
-	u16 *src = (u16 *) (memregion("maincpu")->base() + 0x100000);
+	int i;
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x80000;
 
-	for (int i = 0; i < rom_size / 2; i++)
+	for (i = 0; i < rom_size / 2; i++)
 	{
-		u16 x = src[i];
+		uint16_t x = src[i];
 
 		if (((i & 0x20890) == 0) || ((i & 0x20000) == 0x20000 && (i & 0x01500) != 0x01400))
 			x ^= 0x0002;
@@ -45,7 +46,7 @@ void pgm_012_025_state::pgm_drgw2_decrypt()
 
 // All tables all xored by 'warning' information at $1354ee (drgw2)
 // tables are the same as drgw3 and olds
-static const u8 drgw2_source_data[0x08][0xec] =
+static const uint8_t drgw2_source_data[0x08][0xec] =
 {
 	{ 0, }, // Region 0, not used
 	{   // Region 1, $13A886
@@ -105,14 +106,24 @@ static const u8 drgw2_source_data[0x08][0xec] =
 	{ 0, }  // Region 7, not used
 };
 
+MACHINE_RESET_MEMBER(pgm_012_025_state,drgw2)
+{
+	MACHINE_RESET_CALL_MEMBER(pgm);
+
+
+}
+
 void pgm_012_025_state::drgw2_common_init()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::drgw2_d80000_protection_w), (igs025_device*)m_igs025));
+
 
 	m_igs025->m_kb_source_data = drgw2_source_data;
 
 	pgm_basic_init();
 	pgm_drgw2_decrypt();
+
+
 }
 
 void pgm_012_025_state::drgw2_mem(address_map &map)
@@ -130,17 +141,19 @@ void pgm_012_025_state::pgm_012_025_drgw2(machine_config &config)
 
 	IGS025(config, m_igs025, 0);
 	//m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs012_callback), this);
+
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_012_025_state,drgw2)
 }
 
 
 void pgm_012_025_state::init_drgw2()
 {
 	/* incomplete? */
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
-	const int region = 0x06;
+	int region = 0x06;
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
@@ -151,11 +164,11 @@ void pgm_012_025_state::init_drgw2()
 
 void pgm_012_025_state::init_dw2v100x()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
-	const int region = 0x06;
+	int region = 0x06;
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
@@ -166,11 +179,11 @@ void pgm_012_025_state::init_dw2v100x()
 
 void pgm_012_025_state::init_drgw2c()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
-	const int region = 0x05;
+	int region = 0x05;
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
@@ -181,11 +194,11 @@ void pgm_012_025_state::init_drgw2c()
 
 void pgm_012_025_state::init_drgw2j()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
-	const int region = 0x01;
+	int region = 0x01;
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
@@ -199,11 +212,11 @@ void pgm_012_025_state::init_drgw2hk()
 	drgw2_common_init();
 
 	// todo, correct protection sequence for this region?
-	const int region = 0x01;
+	int region = 0x01;
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x12f520 / 2] = 0x4e93;
 	mem16[0x12f5c6 / 2] = 0x4e93;
 	mem16[0x12f656 / 2] = 0x4e93;

@@ -1330,7 +1330,7 @@ void segaybd_state::yboard(machine_config &config)
 	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
-	PALETTE(config, m_palette).set_entries(8192*2);
+	PALETTE(config, m_palette).set_entries(8192*3);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

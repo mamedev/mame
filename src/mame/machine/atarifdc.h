@@ -9,8 +9,6 @@
 #define MAME_MACHINE_ATARIFDC_H
 
 #include "imagedev/flopdrv.h"
-#include "machine/6821pia.h"
-#include "sound/pokey.h"
 
 class atari_fdc_device : public device_t
 {
@@ -50,9 +48,6 @@ private:
 		int bseclen;        /* boot sector length (sectors 1..3) */
 		int sectors;        /* total sectors, ie. tracks x heads x spt */
 	};
-
-	required_device<pokey_device> m_pokey;
-	required_device<pia6821_device> m_pia;
 
 	int  m_serout_count;
 	int  m_serout_offs;

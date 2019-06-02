@@ -88,10 +88,6 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	// reading and writing to $C000-$FFEF
-	DECLARE_READ8_MEMBER(cts_read);
-	DECLARE_WRITE8_MEMBER(cts_write);
-
 	// reading and writing to $FF40-$FF5F
 	DECLARE_READ8_MEMBER(scs_read);
 	DECLARE_WRITE8_MEMBER(scs_write);
@@ -165,8 +161,6 @@ public:
 	// construction/destruction
 	virtual ~device_cococart_interface();
 
-	virtual DECLARE_READ8_MEMBER(cts_read);
-	virtual DECLARE_WRITE8_MEMBER(cts_write);
 	virtual DECLARE_READ8_MEMBER(scs_read);
 	virtual DECLARE_WRITE8_MEMBER(scs_write);
 	virtual void set_sound_enable(bool sound_enable);

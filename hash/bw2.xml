@@ -10,7 +10,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="207783">
-				<rom name="cpm22.imd" size="207783" crc="3aade386" sha1="28e2b4edd3b81e78d874814808ce5609c84a2e68" />
+				<rom name="cpm22.imd" size="207783" crc="3aade386" sha1="28e2b4edd3b81e78d874814808ce5609c84a2e68" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="119078">
-				<rom name="cs145.imd" size="119078" crc="a74b2551" sha1="be0c27f2ffd4a24b55c9cf8e5291afdb7c80c79c" />
+				<rom name="cs145.imd" size="119078" crc="a74b2551" sha1="be0c27f2ffd4a24b55c9cf8e5291afdb7c80c79c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="97150">
-				<rom name="ds141.imd" size="97150" crc="e8c05a05" sha1="e2b095a1e695dfdb000afc17da96e602c5bf1d42" />
+				<rom name="ds141.imd" size="97150" crc="e8c05a05" sha1="e2b095a1e695dfdb000afc17da96e602c5bf1d42" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="218276">
-				<rom name="rs102.imd" size="218276" crc="92a6933f" sha1="33637d6849e335041ed723f9ff1af2bfc070940d" />
+				<rom name="rs102.imd" size="218276" crc="92a6933f" sha1="33637d6849e335041ed723f9ff1af2bfc070940d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="337561">
-				<rom name="schedule.imd" size="337561" crc="7c74cc41" sha1="c14fa0abf2fecccb9865304fad3f6aa45c709bf0" />
+				<rom name="schedule.imd" size="337561" crc="7c74cc41" sha1="c14fa0abf2fecccb9865304fad3f6aa45c709bf0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -70,13 +70,13 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="217266">
-				<rom name="ws330d1.imd" size="217266" crc="d293ae34" sha1="595f42f18d82a7cfa22736ba0fe6ce9a463a1590" />
+				<rom name="ws330d1.imd" size="217266" crc="d293ae34" sha1="595f42f18d82a7cfa22736ba0fe6ce9a463a1590" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="205296">
-				<rom name="ws330d2.imd" size="205296" crc="0a5b5463" sha1="59445f2cfb9bd684902a5d04baa84cfdc1533562" />
+				<rom name="ws330d2.imd" size="205296" crc="0a5b5463" sha1="59445f2cfb9bd684902a5d04baa84cfdc1533562" offset="0" />
 			</dataarea>
 		</part>
 	</software>

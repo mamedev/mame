@@ -10,7 +10,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="ibm_pc_convertible_startup_103_image.dsk" size="737280" crc="3504808e" sha1="36668799d41c63c950e4b3153a4bf96746a713ac"/>
+				<rom name="ibm_pc_convertible_startup_103_image.dsk" size="737280" crc="3504808e" sha1="36668799d41c63c950e4b3153a4bf96746a713ac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="5140 starter disk with app selector.ima" size="737280" crc="7ab4d598" sha1="b6ba39970db4cb1628d080a7b070e3ca4fb39ee5"/>
+				<rom name="5140 starter disk with app selector.ima" size="737280" crc="7ab4d598" sha1="b6ba39970db4cb1628d080a7b070e3ca4fb39ee5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,7 +35,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="ibm_pc_convertible_diagnostics_103_image.dsk" size="737280" crc="656a3428" sha1="de97423357fbac2ce492121cb1e02a9f3def3aad"/>
+				<rom name="ibm_pc_convertible_diagnostics_103_image.dsk" size="737280" crc="656a3428" sha1="de97423357fbac2ce492121cb1e02a9f3def3aad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="advanced diags.ima" size="737280" crc="bd4d7f93" sha1="a11216975cc3f31d10c91b9dd575206b49caa18d"/>
+				<rom name="advanced diags.ima" size="737280" crc="bd4d7f93" sha1="a11216975cc3f31d10c91b9dd575206b49caa18d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -10,22 +10,20 @@
 class igs022_device : public device_t
 {
 public:
-	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	uint16_t* m_sharedprotram;
 	void IGS022_handle_command();
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	u32        m_kb_regs[0x100];
+	uint32_t        m_kb_regs[0x100];
 
-	void IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode);
+	void IGS022_do_dma(uint16_t src, uint16_t dst, uint16_t size, uint16_t mode);
 	void IGS022_reset();
 
-private:
-	optional_shared_ptr<u16> m_sharedprotram;
-	required_memory_region m_rom;
 };
 
 

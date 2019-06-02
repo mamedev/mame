@@ -508,14 +508,6 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_VERIFY:
-		LOG("command VERIFY BytChk %d\n", !!(scsi_cmdbuf[1] & 0x02));
-		if (!(scsi_cmdbuf[1] & 0x02))
-			scsi_status_complete(SS_GOOD);
-		else
-			scsi_unknown_command();
-		break;
-
 	default:
 		LOG("command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
 		nscsi_full_device::scsi_command();

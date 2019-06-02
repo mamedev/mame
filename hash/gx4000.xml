@@ -7,7 +7,7 @@
 		<publisher>Palace Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="barb2.bin" size="131072" crc="8d5d8466" sha1="8b8c966cf70bea3ef8264d3420fbf1ae13aad096"/>
+				<rom name="barb2.bin" size="131072" crc="8d5d8466" sha1="8b8c966cf70bea3ef8264d3420fbf1ae13aad096" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18,7 +18,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="batman.bin" size="131072" crc="fed2468e" sha1="644b7671a06a37a8d0aa49a3c2e4cfca30e3c9c1"/>
+				<rom name="batman.bin" size="131072" crc="fed2468e" sha1="644b7671a06a37a8d0aa49a3c2e4cfca30e3c9c1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29,7 +29,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="brubber.bin" size="131072" crc="bb0752e7" sha1="a05975ebdba4845bb8c5097958f27a3428728f8d"/>
+				<rom name="brubber.bin" size="131072" crc="bb0752e7" sha1="a05975ebdba4845bb8c5097958f27a3428728f8d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 		<publisher>Loriciel Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="coptr271.bin" size="131072" crc="3f9d0682" sha1="4b0a80aa83eaa89f109bad55ae4b067f698faaeb"/>
+				<rom name="coptr271.bin" size="131072" crc="3f9d0682" sha1="4b0a80aa83eaa89f109bad55ae4b067f698faaeb" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@
 		<publisher>Titus Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="crzycrs2.bin" size="131072" crc="4bf81a5e" sha1="8f48816b69c00a3c07a8ddae1f5de2d36a11e966"/>
+				<rom name="crzycrs2.bin" size="131072" crc="4bf81a5e" sha1="8f48816b69c00a3c07a8ddae1f5de2d36a11e966" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>Titus Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="dicktrcy.bin" size="131072" crc="b5c29fd0" sha1="2cf3f0140990548b2b3e7f5f7eaf9d7b6ae678af"/>
+				<rom name="dicktrcy.bin" size="131072" crc="b5c29fd0" sha1="2cf3f0140990548b2b3e7f5f7eaf9d7b6ae678af" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@
 		<publisher>Titus Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="fandf2.bin" size="131072" crc="5a6329eb" sha1="3bcd8fe1f519cb8b453d2957f844e84b1e4f28d4"/>
+				<rom name="fandf2.bin" size="131072" crc="5a6329eb" sha1="3bcd8fe1f519cb8b453d2957f844e84b1e4f28d4" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="klax.bin" size="131072" crc="94356097" sha1="49b8a6cf1af1f801fb6109f65674427332005d30"/>
+				<rom name="klax.bin" size="131072" crc="94356097" sha1="49b8a6cf1af1f801fb6109f65674427332005d30" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="mystical.bin" size="131072" crc="b98b11f5" sha1="9609c1948dfa84bc51f56d94f9667e6fefdfe145"/>
+				<rom name="mystical.bin" size="131072" crc="b98b11f5" sha1="9609c1948dfa84bc51f56d94f9667e6fefdfe145" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="nvyseals.bin" size="131072" crc="92b77f03" sha1="6aab7380067ad224c804793f4e575718ff582042"/>
+				<rom name="nvyseals.bin" size="131072" crc="92b77f03" sha1="6aab7380067ad224c804793f4e575718ff582042" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 		<publisher>CVS</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="noexit.bin" size="131072" crc="28f64ce1" sha1="270844966810b91529d70f3c68f41e3986646659"/>
+				<rom name="noexit.bin" size="131072" crc="28f64ce1" sha1="270844966810b91529d70f3c68f41e3986646659" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -134,7 +134,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="othunder.bin" size="131072" crc="9d5a4f42" sha1="567a15d8a892a20ba3c0d3184a0b381b58f0c34c"/>
+				<rom name="othunder.bin" size="131072" crc="9d5a4f42" sha1="567a15d8a892a20ba3c0d3184a0b381b58f0c34c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -146,7 +146,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="pang.bin" size="131072" crc="b6a33a07" sha1="128094fa2999d61466761232b25215e594ad509a"/>
+				<rom name="pang.bin" size="131072" crc="b6a33a07" sha1="128094fa2999d61466761232b25215e594ad509a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -157,7 +157,7 @@
 		<publisher>Loriciel Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="pkckbox.bin" size="131072" crc="996c30ce" sha1="1e1c65e075c8f3e73d83d42ffe81f1311748432c"/>
+				<rom name="pkckbox.bin" size="131072" crc="996c30ce" sha1="1e1c65e075c8f3e73d83d42ffe81f1311748432c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -169,7 +169,7 @@
 		<publisher>Loriciel Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="pbmagic.bin" size="131072" crc="e7500c93" sha1="120f6b670682cedb0ca6cc8c25ad410423a3563f"/>
+				<rom name="pbmagic.bin" size="131072" crc="e7500c93" sha1="120f6b670682cedb0ca6cc8c25ad410423a3563f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +180,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="plotting.bin" size="131072" crc="f7a73aaa" sha1="7163872123d61bf575d8a766d9b55ecca0901447"/>
+				<rom name="plotting.bin" size="131072" crc="f7a73aaa" sha1="7163872123d61bf575d8a766d9b55ecca0901447" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -191,7 +191,7 @@
 		<publisher>Ubisoft</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="prtnnstr.bin" size="131072" crc="64d996f7" sha1="1f9faefca86ed8089fe28f4a1836df106dbf4d12"/>
+				<rom name="prtnnstr.bin" size="131072" crc="64d996f7" sha1="1f9faefca86ed8089fe28f4a1836df106dbf4d12" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -203,7 +203,7 @@
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="robocop2.bin" size="131072" crc="426bfabc" sha1="5eb7e056a19cb69c45c3bc575c5ed196e7fbd1f5"/>
+				<rom name="robocop2.bin" size="131072" crc="426bfabc" sha1="5eb7e056a19cb69c45c3bc575c5ed196e7fbd1f5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,7 +215,7 @@
 		<publisher>Trojan</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sktshoot.bin" size="131072" crc="24e7334d" sha1="360f2a0538bdaf15c3a69bf8eb82dcb358fbe1d5"/>
+				<rom name="sktshoot.bin" size="131072" crc="24e7334d" sha1="360f2a0538bdaf15c3a69bf8eb82dcb358fbe1d5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -226,7 +226,7 @@
 		<publisher>Gremlin Graphics</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="swtchbld.bin" size="131072" crc="32ea852d" sha1="ce7ab55a83a6003fe3e2b2a3a6f5b318da6f721d"/>
+				<rom name="swtchbld.bin" size="131072" crc="32ea852d" sha1="ce7ab55a83a6003fe3e2b2a3a6f5b318da6f721d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -237,7 +237,7 @@
 		<publisher>Loriciel Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="tnnscup2.bin" size="131072" crc="10e9d90f" sha1="9fb694a09a09f84a6519c9e074ff49504a424ccb"/>
+				<rom name="tnnscup2.bin" size="131072" crc="10e9d90f" sha1="9fb694a09a09f84a6519c9e074ff49504a424ccb" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 		<publisher>Trojan</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="enforcer.bin" size="131072" crc="69f813a7" sha1="f188716e69c54c8ffed3b56f12aec3bcdb6eabce"/>
+				<rom name="enforcer.bin" size="131072" crc="69f813a7" sha1="f188716e69c54c8ffed3b56f12aec3bcdb6eabce" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +261,7 @@
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="tintin.bin" size="131072" crc="72320df4" sha1="3b3a1f870dff22fa0952f2da93e3dc90daef90cc"/>
+				<rom name="tintin.bin" size="131072" crc="72320df4" sha1="3b3a1f870dff22fa0952f2da93e3dc90daef90cc" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -272,7 +272,7 @@
 		<publisher>Titus Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="wildstrt.bin" size="131072" crc="bcbae03b" sha1="3ff09f19471d8bcd878583f74a553048068b6dff"/>
+				<rom name="wildstrt.bin" size="131072" crc="bcbae03b" sha1="3ff09f19471d8bcd878583f74a553048068b6dff" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -284,7 +284,7 @@
 		<publisher>EPYX</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="wrldsprt.bin" size="131072" crc="5cecc439" sha1="6bc5271370eb1ee92f809874f7ef346c2117f9cd"/>
+				<rom name="wrldsprt.bin" size="131072" crc="5cecc439" sha1="6bc5271370eb1ee92f809874f7ef346c2117f9cd" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -297,7 +297,7 @@
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="plus_en.bin" size="131072" crc="91d35678" sha1="e73416091449a9e9b3bce19263a54d0bb62235f7"/>
+				<rom name="plus_en.bin" size="131072" crc="91d35678" sha1="e73416091449a9e9b3bce19263a54d0bb62235f7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -308,7 +308,7 @@
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="engpados.bin" size="131072" crc="e9c5e30e" sha1="596bf4d4dedafca71fadffb6e5fa8634c3cd843f"/>
+				<rom name="engpados.bin" size="131072" crc="e9c5e30e" sha1="596bf4d4dedafca71fadffb6e5fa8634c3cd843f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -320,7 +320,7 @@
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="plus_fr.bin" size="131072" crc="26ebc1fe" sha1="8f8031e24440d2f1174d21faabb3b0134266daf2"/>
+				<rom name="plus_fr.bin" size="131072" crc="26ebc1fe" sha1="8f8031e24440d2f1174d21faabb3b0134266daf2" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -332,7 +332,7 @@
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="basic (f) (white label).bin" size="65536" crc="37e17647" sha1="c977841fdf09151394b49035a53ee5d049b38891"/>
+				<rom name="basic (f) (white label).bin" size="65536" crc="37e17647" sha1="c977841fdf09151394b49035a53ee5d049b38891" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -343,7 +343,7 @@
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="frpados.bin" size="131072" crc="5efd7488" sha1="d618e925f326c03be4b1b018f2cc218384eb88c7"/>
+				<rom name="frpados.bin" size="131072" crc="5efd7488" sha1="d618e925f326c03be4b1b018f2cc218384eb88c7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -355,7 +355,7 @@
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="plus_es.bin" size="131072" crc="5d336a70" sha1="d9f93ed0f4790a078317f7bde8ec6bf838c965e1"/>
+				<rom name="plus_es.bin" size="131072" crc="5d336a70" sha1="d9f93ed0f4790a078317f7bde8ec6bf838c965e1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="spapados.bin" size="131072" crc="57ecd6ed" sha1="2a68079bf90dbacf9e921b54874ad3e5408a75bd"/>
+				<rom name="spapados.bin" size="131072" crc="57ecd6ed" sha1="2a68079bf90dbacf9e921b54874ad3e5408a75bd" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

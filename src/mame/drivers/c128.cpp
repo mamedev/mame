@@ -319,8 +319,8 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 	int vicfix = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_loram, m_hiram);
-	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_loram, m_hiram);
+	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_hiram);
+	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_hiram);
 
 	uint32_t input = sphi2 << 26 | m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |

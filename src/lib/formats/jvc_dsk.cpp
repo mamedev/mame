@@ -196,7 +196,7 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			uint8_t sector_data[10000];
 			int sector_offset = 0;
 			// standard RS-DOS interleave
-			static constexpr int interleave[18] = { 0, 11, 4, 15, 8, 1, 12, 5, 16, 9, 2, 13, 6, 17, 10, 3, 14, 7 };
+			int interleave[18] = { 0, 11, 4, 15, 8, 1, 12, 5, 16, 9, 2, 13, 6, 17, 10, 3, 14, 7 };
 			for (int i = 0; i < sector_count; i++)
 			{
 				sectors[interleave[i]].track = track;

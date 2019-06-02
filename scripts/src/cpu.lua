@@ -1087,8 +1087,6 @@ if (CPUS["I386"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i386/i386.cpp",
 		MAME_DIR .. "src/devices/cpu/i386/i386.h",
-		MAME_DIR .. "src/devices/cpu/i386/athlon.cpp",
-		MAME_DIR .. "src/devices/cpu/i386/athlon.h",
 		MAME_DIR .. "src/devices/cpu/i386/cache.h",
 		MAME_DIR .. "src/devices/cpu/i386/cycles.h",
 		MAME_DIR .. "src/devices/cpu/i386/i386op16.hxx",
@@ -1096,7 +1094,6 @@ if (CPUS["I386"]~=null) then
 		MAME_DIR .. "src/devices/cpu/i386/i386ops.h",
 		MAME_DIR .. "src/devices/cpu/i386/i386ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/i386priv.h",
-		MAME_DIR .. "src/devices/cpu/i386/i386segs.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/i486ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",

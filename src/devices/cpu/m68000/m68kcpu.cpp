@@ -1647,18 +1647,14 @@ void m68000_base_device::define_state(void)
 
 	state_add(STATE_GENPC,     "PC",        m_pc).mask(addrmask).callimport();
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc).mask(addrmask).callimport().noshow();
-	state_add(M68K_SR,         "SR",        m_iotemp).callimport().callexport().mask(m_sr_mask);
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_iotemp).noshow().callimport().callexport().formatstr("%16s");
 	state_add(M68K_SP,         "SP",        m_dar[15]);
 	state_add(STATE_GENSP,     "GENSP",     m_dar[15]).noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_iotemp).noshow().callimport().callexport().formatstr("%16s");
+	state_add(M68K_ISP,        "ISP",       m_iotemp).callimport().callexport();
 	state_add(M68K_USP,        "USP",       m_iotemp).callimport().callexport();
 	if (m_cpu_type & MASK_020_OR_LATER)
-	{
-		state_add(M68K_ISP,    "ISP",       m_iotemp).callimport().callexport();
 		state_add(M68K_MSP,    "MSP",       m_iotemp).callimport().callexport();
-	}
-	else
-		state_add(M68K_ISP,    "SSP",       m_iotemp).callimport().callexport();
+	state_add(M68K_SR,         "SR",        m_iotemp).noshow().callimport().callexport();
 
 	for (int regnum = 0; regnum < 8; regnum++) {
 		state_add(M68K_D0 + regnum, string_format("D%d", regnum).c_str(), m_dar[regnum]);

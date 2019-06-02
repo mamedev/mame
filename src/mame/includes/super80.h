@@ -108,7 +108,7 @@ private:
 	TIMER_CALLBACK_MEMBER(super80_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
 	void super80_io(address_map &map);
 	void super80_map(address_map &map);

@@ -2,14 +2,14 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-Lola 8A
+        Lola 8A
 
-Ivo Lola Ribar Institute
+        Ivo Lola Ribar Institute
 
-2013-08-28 Skeleton driver.
+        2013-08-28 Skeleton driver.
 
 
-BASIC commands : (must be in UPPERcase)
+    BASIC commands :
 
     LET NEXT IF GOTO GOSUB RETURN READ DATA FOR CLS INPUT DIM STOP END RESTORE
     REM CLEAR PUSH POKE PRINT OUT ERROR USR CURSOR NORMAL INVERSE PLOT UNPLOT
@@ -18,35 +18,8 @@ BASIC commands : (must be in UPPERcase)
     SPC OFF TAB THEN TO STEP AND OR XOR NOT ABS LEN SQR INT ASC CHR VAL STR MID
     ARG CALL RND LEFT RIGHT DOT SGN SIN FREE PI FN TAN COS POP PEEK INP LN EXP ATN
 
-COLOUR x (x = 0 to 3) there's no known colour ram, unable to determine
-how colours can be displayed. Therefore we only show black and white.
-
-Unknown how to produce sound - there's no commands.
-
-MON: (Guesswork by trying things)
-    - A0 : display addresses A0 to A7
-    - 0,FFF : display addresses 0 to FFE (yes it leaves one out)
-    - G,R : displays registers (R B=3 : set B register to 3)
-    - M,N,Q,T : display or set a specific "register"? (Q : display Q ; Q=6 : set Q to 6)
-    - SP : display or set SP (SP=3B00 : set SP)
-    - PC : display or set PC
-    - L : disassembler (L 0,FF : disassemble range 0 to FF)
-    - K : single-step? (address set by G) (K 99 : single-step at 99)
-
-Control Keys
-    - A : display gets a little corrupted
-    - G : back to normal
-    - C : break? (only does a newline)
-    - L : clear screen
-    - M : same as pressing Enter
-
-TO DO
-    - How to use the sound?
-    - Does it have colour?
-    - Do the AY ports do anything?
-    - What is Ctrl-A for?
-    - Need software
-    - Need manuals & schematics
+    COLOUR x (x = 0 to 3) there's no known colour ram, unable to determine
+    how colours can be displayed. Therefore we only show black and white.
 
 ****************************************************************************/
 
@@ -74,7 +47,6 @@ public:
 		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "videoram")
-		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	void lola8a(machine_config &config);
@@ -97,7 +69,6 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	required_ioport_array<10> m_io_keyboard;
 };
 
 void lola8a_state::lola8a_mem(address_map &map)
@@ -119,6 +90,7 @@ void lola8a_state::lola8a_io(address_map &map)
 	map(0x80, 0x80).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0x84, 0x84).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x88, 0x88).r(FUNC(lola8a_state::keyboard_r));
+
 	map(0x90, 0x90).rw(HD46505SP_TAG, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x92, 0x92).rw(HD46505SP_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
@@ -126,7 +98,7 @@ void lola8a_state::lola8a_io(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( lola8a )
-	PORT_START("KEY.0")
+	PORT_START("line_0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
@@ -136,7 +108,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.1")
+	PORT_START("line_1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
@@ -146,7 +118,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.2")
+	PORT_START("line_2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)
@@ -156,7 +128,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.3")
+	PORT_START("line_3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)
@@ -166,7 +138,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.4")
+	PORT_START("line_4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)
@@ -176,7 +148,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.5")
+	PORT_START("line_5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)
@@ -186,7 +158,7 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.6")
+	PORT_START("line_6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)// Z"
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)
@@ -196,32 +168,32 @@ static INPUT_PORTS_START( lola8a )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)// C"
+	PORT_START("line_7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // C"
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) // =
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)// S"
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)// C'
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)// ;
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // S"
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED) // C'
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // ;
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.8")
+	PORT_START("line_8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)// /
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) // unmarked key
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // ????
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) // :
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // :
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("KEY.9")
+	PORT_START("line_9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) // return
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) // DEL key
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) // unmarked key
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // ????
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // ????
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) // unmarked key
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED) // ????
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)// @
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
@@ -275,12 +247,17 @@ WRITE_LINE_MEMBER( lola8a_state::cass_w )
 
 READ8_MEMBER(lola8a_state::keyboard_r)
 {
-	u8 data = 0xff, kbrow = m_portb & 15;
+	static const char *const keynames[] =
+	{
+		"line_0", "line_1", "line_2", "line_3",
+		"line_4", "line_5", "line_6", "line_7",
+		"line_8", "line_9", nullptr, nullptr,
+		nullptr,nullptr,nullptr,nullptr
+	};
 
-	if (kbrow < 10)
-		data = m_io_keyboard[kbrow]->read();
-
-	return data;
+	if( keynames[m_portb & 0x0f])
+		return ioport(keynames[m_portb & 0x0f])->read();
+	return 0xff;
 }
 
 WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
@@ -307,11 +284,11 @@ void lola8a_state::lola8a(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
+	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	hd6845s_device &crtc(HD6845S(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
+	hd6845_device &crtc(HD6845(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -322,7 +299,7 @@ void lola8a_state::lola8a(machine_config &config)
 
 	/* Cassette */
 	CASSETTE(config, m_cass);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 /* ROM definition */
@@ -336,4 +313,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                    FULLNAME   FLAGS
-COMP( 1986, lola8a, 0,      0,      lola8a,  lola8a, lola8a_state, empty_init, "Institut Ivo Lola Ribar", "Lola 8A", 0 )
+COMP( 1986, lola8a, 0,      0,      lola8a,  lola8a, lola8a_state, empty_init, "Institut Ivo Lola Ribar", "Lola 8A", MACHINE_NOT_WORKING )

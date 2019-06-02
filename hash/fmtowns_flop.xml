@@ -273,31 +273,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (boot disk).hdm" size="1261568" crc="77aeeba6" sha1="c8a298e57eddda9cd9205ab1a8c62c4683ceaac2"/>
+				<rom name="[os] towns system software v1.1 l20 english (boot disk).hdm" size="1261568" crc="77aeeba6" sha1="c8a298e57eddda9cd9205ab1a8c62c4683ceaac2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 1).hdm" size="1261568" crc="e3eef6f7" sha1="bd834b0c6cdb3b7effffb5f9aa78e0f3820a2a9d"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 1).hdm" size="1261568" crc="e3eef6f7" sha1="bd834b0c6cdb3b7effffb5f9aa78e0f3820a2a9d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 2).hdm" size="1261568" crc="843fb912" sha1="d5fae04613c2b94b0fa52eb42682aefcae722a2d"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 2).hdm" size="1261568" crc="843fb912" sha1="d5fae04613c2b94b0fa52eb42682aefcae722a2d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 3).hdm" size="1261568" crc="f3759ed3" sha1="1a0e3a57164cae8d7fe1e1f42a81a2ccf2f48270"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 3).hdm" size="1261568" crc="f3759ed3" sha1="1a0e3a57164cae8d7fe1e1f42a81a2ccf2f48270" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 4).hdm" size="1261568" crc="e5a85b66" sha1="9c5b2cd9c757e20b90bdcd966b1ce231a7a351b1"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 4).hdm" size="1261568" crc="e5a85b66" sha1="9c5b2cd9c757e20b90bdcd966b1ce231a7a351b1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -309,31 +309,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (boot disk).hdm" size="1261568" crc="77aeeba6" sha1="c8a298e57eddda9cd9205ab1a8c62c4683ceaac2"/>
+				<rom name="[os] towns system software v1.1 l20 english (boot disk).hdm" size="1261568" crc="77aeeba6" sha1="c8a298e57eddda9cd9205ab1a8c62c4683ceaac2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 1).hdm" size="1261568" crc="e3eef6f7" sha1="bd834b0c6cdb3b7effffb5f9aa78e0f3820a2a9d"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 1).hdm" size="1261568" crc="e3eef6f7" sha1="bd834b0c6cdb3b7effffb5f9aa78e0f3820a2a9d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 2) [alt 1].hdm" size="1261568" crc="a420a122" sha1="5b42db0578f9ff0b8b19e34f0eea1057dfe30e92"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 2) [alt 1].hdm" size="1261568" crc="a420a122" sha1="5b42db0578f9ff0b8b19e34f0eea1057dfe30e92" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 3).hdm" size="1261568" crc="f3759ed3" sha1="1a0e3a57164cae8d7fe1e1f42a81a2ccf2f48270"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 3).hdm" size="1261568" crc="f3759ed3" sha1="1a0e3a57164cae8d7fe1e1f42a81a2ccf2f48270" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v1.1 l20 english (disk 4).hdm" size="1261568" crc="e5a85b66" sha1="9c5b2cd9c757e20b90bdcd966b1ce231a7a351b1"/>
+				<rom name="[os] towns system software v1.1 l20 english (disk 4).hdm" size="1261568" crc="e5a85b66" sha1="9c5b2cd9c757e20b90bdcd966b1ce231a7a351b1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v2.1 l51.hdm" size="1261568" crc="0fc9176c" sha1="7d96f648912102b69e1a0329aeebf386a78ece75"/>
+				<rom name="[os] towns system software v2.1 l51.hdm" size="1261568" crc="0fc9176c" sha1="7d96f648912102b69e1a0329aeebf386a78ece75" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -355,7 +355,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] towns system software v2.1 l51 [set 1].hdm" size="1261568" crc="a5bff98a" sha1="6c5d2cb94fd7d7bb31e6d55ee8700403569e5831"/>
+				<rom name="[os] towns system software v2.1 l51 [set 1].hdm" size="1261568" crc="a5bff98a" sha1="6c5d2cb94fd7d7bb31e6d55ee8700403569e5831" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -367,13 +367,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 3.1 l24 (disk 1 - system).hdm" size="1261568" crc="c9a3378f" sha1="2c423f85ceea732b41cc195b065ada9e1f09b67c"/>
+				<rom name="[os] ms-dos 3.1 l24 (disk 1 - system).hdm" size="1261568" crc="c9a3378f" sha1="2c423f85ceea732b41cc195b065ada9e1f09b67c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Utility" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 3.1 l24 (disk 2 - utility).hdm" size="1261568" crc="c6f4c86c" sha1="86e64a6744e2c7d1d5d4e3159ebd1885c691b33b"/>
+				<rom name="[os] ms-dos 3.1 l24 (disk 2 - utility).hdm" size="1261568" crc="c6f4c86c" sha1="86e64a6744e2c7d1d5d4e3159ebd1885c691b33b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -385,31 +385,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (boot disk).hdm" size="1261568" crc="16a72ad3" sha1="995b709506811697eceddcbd1812ca809d7230e8"/>
+				<rom name="[os] ms-dos 6.2 l10 (boot disk).hdm" size="1261568" crc="16a72ad3" sha1="995b709506811697eceddcbd1812ca809d7230e8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 1).hdm" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 1).hdm" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 2).hdm" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 2).hdm" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 3" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 3).hdm" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 3).hdm" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 4" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 4).hdm" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 4).hdm" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -421,31 +421,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (startup) [bad - missing data].hdm" size="1261568" crc="e7eec864" sha1="22a98bcb36566487a0253657de1a00e44e459b6a" status="baddump" />
+				<rom name="[os] ms-dos 6.2 l10 (startup) [bad - missing data].hdm" size="1261568" crc="e7eec864" sha1="22a98bcb36566487a0253657de1a00e44e459b6a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 1).hdm" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 1).hdm" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 2).hdm" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 2).hdm" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 3" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 3).hdm" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 3).hdm" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Utility 4" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 4).hdm" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38"/>
+				<rom name="[os] ms-dos 6.2 l10 (utility 4).hdm" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -463,19 +463,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="abunai tengu densetsu (disk a).hdm" size="1261568" crc="f2f5c92d" sha1="e2639b4746e228d786eceb00de98d64a5cea6cba"/>
+				<rom name="abunai tengu densetsu (disk a).hdm" size="1261568" crc="f2f5c92d" sha1="e2639b4746e228d786eceb00de98d64a5cea6cba" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="abunai tengu densetsu (disk b).hdm" size="1261568" crc="fd289b9f" sha1="5454ed981f260f41c3d8f8707a0990c23fc03dc6"/>
+				<rom name="abunai tengu densetsu (disk b).hdm" size="1261568" crc="fd289b9f" sha1="5454ed981f260f41c3d8f8707a0990c23fc03dc6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="abunai tengu densetsu (disk c).hdm" size="1261568" crc="4271f241" sha1="a6cf43f58681d06151ec8acbbd02fd98df44ed7b"/>
+				<rom name="abunai tengu densetsu (disk c).hdm" size="1261568" crc="4271f241" sha1="a6cf43f58681d06151ec8acbbd02fd98df44ed7b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -489,19 +489,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120% burning fest. (disk a).hdm" size="1261568" crc="46a5074d" sha1="8efb863ea0878f9236082f7d7935f494c4522899"/>
+				<rom name="asuka 120% burning fest. (disk a).hdm" size="1261568" crc="46a5074d" sha1="8efb863ea0878f9236082f7d7935f494c4522899" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120% burning fest. (disk b).hdm" size="1261568" crc="2a448e8f" sha1="3b57fd0a2fecec56a3362884de0770ec4538f5eb"/>
+				<rom name="asuka 120% burning fest. (disk b).hdm" size="1261568" crc="2a448e8f" sha1="3b57fd0a2fecec56a3362884de0770ec4538f5eb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120% burning fest. (disk c).hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc"/>
+				<rom name="asuka 120% burning fest. (disk c).hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -514,17 +514,17 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199112xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1283840">
-				<rom name="brandish (disk 1).d88" size="1283840" crc="1e8181ed" sha1="237d354338d44e199a2f89f15157bafb5c1b31fa" status="baddump" />
+				<rom name="brandish (disk 1).d88" size="1283840" crc="1e8181ed" sha1="237d354338d44e199a2f89f15157bafb5c1b31fa" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="brandish (disk 2).hdm" size="1261568" crc="85f4c5fc" sha1="f50824579ea4a142be1fbce6a59b8712576a2e6e"/>
+				<rom name="brandish (disk 2).hdm" size="1261568" crc="85f4c5fc" sha1="f50824579ea4a142be1fbce6a59b8712576a2e6e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="brandish (disk 3).hdm" size="1261568" crc="711d5e6d" sha1="0315531f8f7aec540163e4dda7d4cab0fe4894fe"/>
+				<rom name="brandish (disk 3).hdm" size="1261568" crc="711d5e6d" sha1="0315531f8f7aec540163e4dda7d4cab0fe4894fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -537,7 +537,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="キャメルトライ" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3599768">
-				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a"/>
+				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +550,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1282512">
-				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" status="baddump" />
+				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -564,7 +564,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="usage" value="Expansion disk for Daisenryaku III '90. Load the main game, insert this disk in any floppy drive, and press F1 in the map screen to select the load option." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="daisenryaku iii '90 map collection vol. 1.hdm" size="1261568" crc="2828cff9" sha1="d62df199fbac964580aaffd392ff51ce00279395"/>
+				<rom name="daisenryaku iii '90 map collection vol. 1.hdm" size="1261568" crc="2828cff9" sha1="d62df199fbac964580aaffd392ff51ce00279395" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -577,12 +577,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199004xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="d.p.s - dream program system (disk 1).hdm" size="1261568" crc="26a600e3" sha1="0a4d4966aa19540445d032e93d7b2ca22979720f"/>
+				<rom name="d.p.s - dream program system (disk 1).hdm" size="1261568" crc="26a600e3" sha1="0a4d4966aa19540445d032e93d7b2ca22979720f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="d.p.s - dream program system (disk 2).hdm" size="1261568" crc="1ba383fb" sha1="591d14189e9ccda81eff8fa756e2f50718ed0f85"/>
+				<rom name="d.p.s - dream program system (disk 2).hdm" size="1261568" crc="1ba383fb" sha1="591d14189e9ccda81eff8fa756e2f50718ed0f85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -596,25 +596,25 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg (disk 1 - system).hdm" size="1261568" crc="525e09d5" sha1="a3f06b510030f1a1885c24eb7c3ae3b61678d0c4"/>
+				<rom name="dream program system sg (disk 1 - system).hdm" size="1261568" crc="525e09d5" sha1="a3f06b510030f1a1885c24eb7c3ae3b61678d0c4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Kateikyoushi wa Suteki na Oshigoto" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg (disk 2 - kateikyoushi wa suteki na oshigoto).hdm" size="1261568" crc="030bbe44" sha1="7fe3bd38370c67fbd80c9b069299abcf914c45ab"/>
+				<rom name="dream program system sg (disk 2 - kateikyoushi wa suteki na oshigoto).hdm" size="1261568" crc="030bbe44" sha1="7fe3bd38370c67fbd80c9b069299abcf914c45ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Fahnen Fliegen" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg (disk 3 - fahnen fliegen).hdm" size="1261568" crc="ee47af10" sha1="3db3f994df5701ec2811c4f628ca7552845a07ab"/>
+				<rom name="dream program system sg (disk 3 - fahnen fliegen).hdm" size="1261568" crc="ee47af10" sha1="3db3f994df5701ec2811c4f628ca7552845a07ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Nobunaga no Inbou" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg (disk 4 - nobunaga no inbou).hdm" size="1261568" crc="a96f5768" sha1="3b84125f81d610ba218a2df9aab163d044ee84d4"/>
+				<rom name="dream program system sg (disk 4 - nobunaga no inbou).hdm" size="1261568" crc="a96f5768" sha1="3b84125f81d610ba218a2df9aab163d044ee84d4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -628,25 +628,25 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 2 (disk 1 - system).hdm" size="1261568" crc="9133028a" sha1="a344c08dfe37f8da333eee2f2f85a538ffa00e62"/>
+				<rom name="dream program system sg set 2 (disk 1 - system).hdm" size="1261568" crc="9133028a" sha1="a344c08dfe37f8da333eee2f2f85a538ffa00e62" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Antique House" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 2 (disk 2 - antique house).hdm" size="1261568" crc="b8d09260" sha1="d4067d8c87e3fe6f66396145edeb64fdcbe22842"/>
+				<rom name="dream program system sg set 2 (disk 2 - antique house).hdm" size="1261568" crc="b8d09260" sha1="d4067d8c87e3fe6f66396145edeb64fdcbe22842" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Akai Yoru" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 2 (disk 3 - akai yoru).hdm" size="1261568" crc="d1bdb2bf" sha1="ea58a504414d0824ddd9adc23ca504a974573f26"/>
+				<rom name="dream program system sg set 2 (disk 3 - akai yoru).hdm" size="1261568" crc="d1bdb2bf" sha1="ea58a504414d0824ddd9adc23ca504a974573f26" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Ikenai Naika Kenshin Futatabi" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 2 (disk 4 - ikenai naika kenshin futatabi).hdm" size="1261568" crc="10250dff" sha1="550696eb596e0c3ffbb670d2fd003faf664866d5"/>
+				<rom name="dream program system sg set 2 (disk 4 - ikenai naika kenshin futatabi).hdm" size="1261568" crc="10250dff" sha1="550696eb596e0c3ffbb670d2fd003faf664866d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -660,25 +660,25 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 3 (disk 1 - system).hdm" size="1261568" crc="9133028a" sha1="a344c08dfe37f8da333eee2f2f85a538ffa00e62"/>
+				<rom name="dream program system sg set 3 (disk 1 - system).hdm" size="1261568" crc="9133028a" sha1="a344c08dfe37f8da333eee2f2f85a538ffa00e62" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Sotsugyou" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 3 (disk 2 - sotsugyou).hdm" size="1261568" crc="6a9aad37" sha1="4447e8d1ef989d5927f85014b5598d9687f2f0c5"/>
+				<rom name="dream program system sg set 3 (disk 2 - sotsugyou).hdm" size="1261568" crc="6a9aad37" sha1="4447e8d1ef989d5927f85014b5598d9687f2f0c5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Rabbit P4P" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 3 (disk 3 - rabbit p4p).hdm" size="1261568" crc="eeadc748" sha1="80fd11fefde38b4abcbce95dbe2042d5016c8c06"/>
+				<rom name="dream program system sg set 3 (disk 3 - rabbit p4p).hdm" size="1261568" crc="eeadc748" sha1="80fd11fefde38b4abcbce95dbe2042d5016c8c06" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Shinkonsan Monogatari" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dream program system sg set 3 (disk 4 - shinkonsan monogatari).hdm" size="1261568" crc="868fe008" sha1="0f3a452e4614cf5f1c72ee5a31fa678b3f059a84"/>
+				<rom name="dream program system sg set 3 (disk 4 - shinkonsan monogatari).hdm" size="1261568" crc="868fe008" sha1="0f3a452e4614cf5f1c72ee5a31fa678b3f059a84" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -690,19 +690,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur (disk 1 - program).hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
+				<rom name="dinosaur (disk 1 - program).hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur (disk 2 - scenario 1).hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b"/>
+				<rom name="dinosaur (disk 2 - scenario 1).hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur (disk 3 - scenario 2).hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae"/>
+				<rom name="dinosaur (disk 3 - scenario 2).hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -723,19 +723,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Event Disk" />
 			<dataarea name="flop" size="3577270">
-				<rom name="loh_eventdisk.mfm" size="3577270" crc="3b377ff0" sha1="c1f79ecebc72ed4d477347561b6425168964c952"/>
+				<rom name="loh_eventdisk.mfm" size="3577270" crc="3b377ff0" sha1="c1f79ecebc72ed4d477347561b6425168964c952" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="3576115">
-				<rom name="loh_programdisk.mfm" size="3576115" crc="558d1a77" sha1="cc4a851c777ca72cb6ae9205a0716a76c1d4f243"/>
+				<rom name="loh_programdisk.mfm" size="3576115" crc="558d1a77" sha1="cc4a851c777ca72cb6ae9205a0716a76c1d4f243" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk" />
 			<dataarea name="flop" size="3576598">
-				<rom name="loh_scenariodisk.mfm" size="3576598" crc="f47f814f" sha1="9b350ab36a8fe7255cdebb2e03ac25fb7f62e6a4"/>
+				<rom name="loh_scenariodisk.mfm" size="3576598" crc="f47f814f" sha1="9b350ab36a8fe7255cdebb2e03ac25fb7f62e6a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -753,31 +753,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="3590084">
-				<rom name="loh2_programdisk.mfm" size="3590084" crc="bf015288" sha1="5dc1bf9bfc99c71996c38dd7b150132eb701d8e3"/>
+				<rom name="loh2_programdisk.mfm" size="3590084" crc="bf015288" sha1="5dc1bf9bfc99c71996c38dd7b150132eb701d8e3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1" />
 			<dataarea name="flop" size="3583888">
-				<rom name="loh2_scenariodisk1.mfm" size="3583888" crc="47520a2f" sha1="416b671ba5423329620a5c993548888ca7c84f0b"/>
+				<rom name="loh2_scenariodisk1.mfm" size="3583888" crc="47520a2f" sha1="416b671ba5423329620a5c993548888ca7c84f0b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 2" />
 			<dataarea name="flop" size="3583160">
-				<rom name="loh2_scenariodisk2.mfm" size="3583160" crc="aa325e10" sha1="21e99860e3ad8473f8af707e08d5a8aa34e31492"/>
+				<rom name="loh2_scenariodisk2.mfm" size="3583160" crc="aa325e10" sha1="21e99860e3ad8473f8af707e08d5a8aa34e31492" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 3" />
 			<dataarea name="flop" size="3582193">
-				<rom name="loh2_scenariodisk3.mfm" size="3582193" crc="588d3a38" sha1="59acc89c9cc4c862637be3bffb16434af101517a"/>
+				<rom name="loh2_scenariodisk3.mfm" size="3582193" crc="588d3a38" sha1="59acc89c9cc4c862637be3bffb16434af101517a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Master Program Disk" />
 			<dataarea name="flop" size="3582174">
-				<rom name="loh2_masterprogramdisk.mfm" size="3582174" crc="e7a1fd4d" sha1="9a12b8f49322f8617753efbf5118a51e95590daf"/>
+				<rom name="loh2_masterprogramdisk.mfm" size="3582174" crc="e7a1fd4d" sha1="9a12b8f49322f8617753efbf5118a51e95590daf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -790,13 +790,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dr. stop! (disk a).hdm" size="1261568" crc="622bc757" sha1="7b0e12a71c8b531ac355d733239d72a4223a5bd6"/>
+				<rom name="dr. stop! (disk a).hdm" size="1261568" crc="622bc757" sha1="7b0e12a71c8b531ac355d733239d72a4223a5bd6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dr. stop! (disk b).hdm" size="1261568" crc="faf6169c" sha1="c1cf3ecbcda6da2e581b0b00f481abef33c0c626"/>
+				<rom name="dr. stop! (disk b).hdm" size="1261568" crc="faf6169c" sha1="c1cf3ecbcda6da2e581b0b00f481abef33c0c626" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -807,7 +807,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #02.hdm" size="1261568" crc="cca4f1ae" sha1="7d73d7e2f6174f09273c7b38218294ce32380fb9"/>
+				<rom name="futoppara fd heisei #02.hdm" size="1261568" crc="cca4f1ae" sha1="7d73d7e2f6174f09273c7b38218294ce32380fb9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -818,7 +818,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #03.hdm" size="1261568" crc="1009e7c2" sha1="2f3af3115de077a0a69dc045085851d9001814a8"/>
+				<rom name="futoppara fd heisei #03.hdm" size="1261568" crc="1009e7c2" sha1="2f3af3115de077a0a69dc045085851d9001814a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -829,7 +829,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #04.hdm" size="1261568" crc="75ceb8be" sha1="0650754491576875b02e07b573c4a5a06e275ba5"/>
+				<rom name="futoppara fd heisei #04.hdm" size="1261568" crc="75ceb8be" sha1="0650754491576875b02e07b573c4a5a06e275ba5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -840,7 +840,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #05.hdm" size="1261568" crc="bb41215a" sha1="655f955ad7ee44dc1035c238f8e17b91a34b6bc6"/>
+				<rom name="futoppara fd heisei #05.hdm" size="1261568" crc="bb41215a" sha1="655f955ad7ee44dc1035c238f8e17b91a34b6bc6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -851,7 +851,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #06.hdm" size="1261568" crc="14bdb0d5" sha1="d6f32df1be6fa3aaa54ec3209af84d4a430ff5cb"/>
+				<rom name="futoppara fd heisei #06.hdm" size="1261568" crc="14bdb0d5" sha1="d6f32df1be6fa3aaa54ec3209af84d4a430ff5cb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -862,7 +862,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #07.hdm" size="1261568" crc="91d8bc3f" sha1="54eef9754dec15b4ede6a4f16fe2c15eb101255c"/>
+				<rom name="futoppara fd heisei #07.hdm" size="1261568" crc="91d8bc3f" sha1="54eef9754dec15b4ede6a4f16fe2c15eb101255c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -873,7 +873,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #08.hdm" size="1261568" crc="f8061488" sha1="fbe9fa3a916b38154ddae4576993855354120ee6"/>
+				<rom name="futoppara fd heisei #08.hdm" size="1261568" crc="f8061488" sha1="fbe9fa3a916b38154ddae4576993855354120ee6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -884,7 +884,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #09.hdm" size="1261568" crc="8d917956" sha1="10560f07227a6ce945b27deac9a86df96fef0edd"/>
+				<rom name="futoppara fd heisei #09.hdm" size="1261568" crc="8d917956" sha1="10560f07227a6ce945b27deac9a86df96fef0edd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -895,7 +895,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>SoftBank</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #10.hdm" size="1261568" crc="ae02ab66" sha1="39a2921484d1f6b141fe43af046003593b07cf0d"/>
+				<rom name="futoppara fd heisei #10.hdm" size="1261568" crc="ae02ab66" sha1="39a2921484d1f6b141fe43af046003593b07cf0d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -907,12 +907,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199305xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 01 (disk 1).hdm" size="1261568" crc="bcacfc71" sha1="ff4f4cd0846d0fdab5d60d163d8d4a91b06ca8cb"/>
+				<rom name="houma hunter lime vol. 01 (disk 1).hdm" size="1261568" crc="bcacfc71" sha1="ff4f4cd0846d0fdab5d60d163d8d4a91b06ca8cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 01 (disk 2).hdm" size="1261568" crc="d29bb913" sha1="27ed3acf34e5eecb6295386db3a111ce3acf0e53"/>
+				<rom name="houma hunter lime vol. 01 (disk 2).hdm" size="1261568" crc="d29bb913" sha1="27ed3acf34e5eecb6295386db3a111ce3acf0e53" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -924,12 +924,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199306xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 02 (disk 1).hdm" size="1261568" crc="fde9b8e5" sha1="08274b1e0912d7a03194279a814be4421ab79e75"/>
+				<rom name="houma hunter lime vol. 02 (disk 1).hdm" size="1261568" crc="fde9b8e5" sha1="08274b1e0912d7a03194279a814be4421ab79e75" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 02 (disk 2).hdm" size="1261568" crc="17c31391" sha1="d2584da1ac2e01e30256f5341f35e21513130cc1"/>
+				<rom name="houma hunter lime vol. 02 (disk 2).hdm" size="1261568" crc="17c31391" sha1="d2584da1ac2e01e30256f5341f35e21513130cc1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -941,12 +941,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199308xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 03 (disk 1).hdm" size="1261568" crc="ab3d77d0" sha1="14ca7e31131d411408e4c532ae0a9c77d28160f8"/>
+				<rom name="houma hunter lime vol. 03 (disk 1).hdm" size="1261568" crc="ab3d77d0" sha1="14ca7e31131d411408e4c532ae0a9c77d28160f8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 03 (disk 2).hdm" size="1261568" crc="10b66445" sha1="447ff2266a281c7352bf0439e7fe16e49e6fb254"/>
+				<rom name="houma hunter lime vol. 03 (disk 2).hdm" size="1261568" crc="10b66445" sha1="447ff2266a281c7352bf0439e7fe16e49e6fb254" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -958,12 +958,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199309xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 04 (disk 1).hdm" size="1261568" crc="cd83229e" sha1="3a52b0cee6a15de47c322157997cb7176abdee98"/>
+				<rom name="houma hunter lime vol. 04 (disk 1).hdm" size="1261568" crc="cd83229e" sha1="3a52b0cee6a15de47c322157997cb7176abdee98" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 04 (disk 2).hdm" size="1261568" crc="2a56cba4" sha1="3a81e2ac38d8b610f64f90b7f93c01da5ca80f46"/>
+				<rom name="houma hunter lime vol. 04 (disk 2).hdm" size="1261568" crc="2a56cba4" sha1="3a81e2ac38d8b610f64f90b7f93c01da5ca80f46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -975,12 +975,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199310xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 05 (disk 1).hdm" size="1261568" crc="87c29800" sha1="3872d0b64d9973c78cd482d6bfdd489002b483d6"/>
+				<rom name="houma hunter lime vol. 05 (disk 1).hdm" size="1261568" crc="87c29800" sha1="3872d0b64d9973c78cd482d6bfdd489002b483d6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 05 (disk 2).hdm" size="1261568" crc="2064f50f" sha1="14bee84e524ac603c94bcca791dafe3cb2c3719e"/>
+				<rom name="houma hunter lime vol. 05 (disk 2).hdm" size="1261568" crc="2064f50f" sha1="14bee84e524ac603c94bcca791dafe3cb2c3719e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -992,12 +992,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199311xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 06 (disk 1).hdm" size="1261568" crc="8bfd3e9b" sha1="aa626bb3356839cf7071ce8d8d8cc09c9951b220"/>
+				<rom name="houma hunter lime vol. 06 (disk 1).hdm" size="1261568" crc="8bfd3e9b" sha1="aa626bb3356839cf7071ce8d8d8cc09c9951b220" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 06 (disk 2).hdm" size="1261568" crc="9c669e28" sha1="a917938337a10b5ab73418ecc1bcddd55cd87d04"/>
+				<rom name="houma hunter lime vol. 06 (disk 2).hdm" size="1261568" crc="9c669e28" sha1="a917938337a10b5ab73418ecc1bcddd55cd87d04" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1009,17 +1009,17 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199312xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 07 (disk 1).hdm" size="1261568" crc="ed76de63" sha1="af2d6bcd4373245bfd7a66ac0f4c7c61a5942f9d"/>
+				<rom name="houma hunter lime vol. 07 (disk 1).hdm" size="1261568" crc="ed76de63" sha1="af2d6bcd4373245bfd7a66ac0f4c7c61a5942f9d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 07 (disk 2).hdm" size="1261568" crc="cd174cc7" sha1="a866fb6c898f2488113232c9d179aeb2545d504d"/>
+				<rom name="houma hunter lime vol. 07 (disk 2).hdm" size="1261568" crc="cd174cc7" sha1="a866fb6c898f2488113232c9d179aeb2545d504d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 07 (disk 3).hdm" size="1261568" crc="076aa899" sha1="2a4e91e20ea87657edc18ff61d6274b8aa056e54"/>
+				<rom name="houma hunter lime vol. 07 (disk 3).hdm" size="1261568" crc="076aa899" sha1="2a4e91e20ea87657edc18ff61d6274b8aa056e54" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1031,17 +1031,17 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199401xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 08 (disk 1).hdm" size="1261568" crc="f8954bcb" sha1="796336813e695c6073e334c2fc7aae7f1fa6fe6a"/>
+				<rom name="houma hunter lime vol. 08 (disk 1).hdm" size="1261568" crc="f8954bcb" sha1="796336813e695c6073e334c2fc7aae7f1fa6fe6a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 08 (disk 2).hdm" size="1261568" crc="550bbff0" sha1="636b8d763757e43f0225765ae05a3ded263f20cd"/>
+				<rom name="houma hunter lime vol. 08 (disk 2).hdm" size="1261568" crc="550bbff0" sha1="636b8d763757e43f0225765ae05a3ded263f20cd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 08 (disk 3).hdm" size="1261568" crc="d17cdd8c" sha1="e6c7542dcaa407d3e4e507702fe1a068f79e5b0b"/>
+				<rom name="houma hunter lime vol. 08 (disk 3).hdm" size="1261568" crc="d17cdd8c" sha1="e6c7542dcaa407d3e4e507702fe1a068f79e5b0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1053,17 +1053,17 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199402xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 09 (disk 1).hdm" size="1261568" crc="92e7dd6c" sha1="815405e0a58ee2105e86472281757ca4b5826f3d"/>
+				<rom name="houma hunter lime vol. 09 (disk 1).hdm" size="1261568" crc="92e7dd6c" sha1="815405e0a58ee2105e86472281757ca4b5826f3d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 09 (disk 2).hdm" size="1261568" crc="a0bf31d3" sha1="24ec5c3103080a7191c5027d16533944c33d6cce"/>
+				<rom name="houma hunter lime vol. 09 (disk 2).hdm" size="1261568" crc="a0bf31d3" sha1="24ec5c3103080a7191c5027d16533944c33d6cce" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 09 (disk 3).hdm" size="1261568" crc="65c7c667" sha1="45269774f1f6cb977262f57d03bf3c20d3b71024"/>
+				<rom name="houma hunter lime vol. 09 (disk 3).hdm" size="1261568" crc="65c7c667" sha1="45269774f1f6cb977262f57d03bf3c20d3b71024" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1075,17 +1075,17 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199403xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 10 (disk 1).hdm" size="1261568" crc="be436f73" sha1="2d9f8a0b90d59c48a25ac3c18cf753e87aae22ce"/>
+				<rom name="houma hunter lime vol. 10 (disk 1).hdm" size="1261568" crc="be436f73" sha1="2d9f8a0b90d59c48a25ac3c18cf753e87aae22ce" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 10 (disk 2).hdm" size="1261568" crc="e9cf9de2" sha1="6c1dcc4d40b9d9f55f9953eeb36d0375d00e2ccd"/>
+				<rom name="houma hunter lime vol. 10 (disk 2).hdm" size="1261568" crc="e9cf9de2" sha1="6c1dcc4d40b9d9f55f9953eeb36d0375d00e2ccd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 10 (disk 3).hdm" size="1261568" crc="d675e169" sha1="44bc603ba6293bda6fcdcf4afcd526cd21f7adc7"/>
+				<rom name="houma hunter lime vol. 10 (disk 3).hdm" size="1261568" crc="d675e169" sha1="44bc603ba6293bda6fcdcf4afcd526cd21f7adc7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1097,17 +1097,17 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199404xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 11 (disk 1).hdm" size="1261568" crc="11c06a95" sha1="97a260b2d26215518d180a2ac6959f6032049909"/>
+				<rom name="houma hunter lime vol. 11 (disk 1).hdm" size="1261568" crc="11c06a95" sha1="97a260b2d26215518d180a2ac6959f6032049909" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 11 (disk 2).hdm" size="1261568" crc="9a339a06" sha1="04ddab9becb7d337d58123f1db41f61ce370a1e8"/>
+				<rom name="houma hunter lime vol. 11 (disk 2).hdm" size="1261568" crc="9a339a06" sha1="04ddab9becb7d337d58123f1db41f61ce370a1e8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 11 (disk 3).hdm" size="1261568" crc="94f78df9" sha1="6a318d7b3766b7cc97dbcd53208a4fe17bdc2951"/>
+				<rom name="houma hunter lime vol. 11 (disk 3).hdm" size="1261568" crc="94f78df9" sha1="6a318d7b3766b7cc97dbcd53208a4fe17bdc2951" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1119,22 +1119,22 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199405xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 12 (disk 1).hdm" size="1261568" crc="1e8f5e4e" sha1="13a081f80bd8d18dd1454c5ffeffb0430382e82d"/>
+				<rom name="houma hunter lime vol. 12 (disk 1).hdm" size="1261568" crc="1e8f5e4e" sha1="13a081f80bd8d18dd1454c5ffeffb0430382e82d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 12 (disk 2).hdm" size="1261568" crc="c2c125e6" sha1="62ea776500763d4ca79c76a0ad5c7f7d39e51660"/>
+				<rom name="houma hunter lime vol. 12 (disk 2).hdm" size="1261568" crc="c2c125e6" sha1="62ea776500763d4ca79c76a0ad5c7f7d39e51660" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 12 (disk 3).hdm" size="1261568" crc="8e85a5ad" sha1="7e11e491786fef1ef71e0d29f2539003f40053c7"/>
+				<rom name="houma hunter lime vol. 12 (disk 3).hdm" size="1261568" crc="8e85a5ad" sha1="7e11e491786fef1ef71e0d29f2539003f40053c7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="houma hunter lime vol. 12 (disk 4).hdm" size="1261568" crc="21a00337" sha1="fa8b7dc24933fe52cf3bfe0e3bccdcb92d6a56e1"/>
+				<rom name="houma hunter lime vol. 12 (disk 4).hdm" size="1261568" crc="21a00337" sha1="fa8b7dc24933fe52cf3bfe0e3bccdcb92d6a56e1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1146,12 +1146,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="イマージュ" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="image (disk 1).xdf" size="1261568" crc="eff55b4f" sha1="595401dd34085b204200058f06518dbed30dab50"/>
+				<rom name="image (disk 1).xdf" size="1261568" crc="eff55b4f" sha1="595401dd34085b204200058f06518dbed30dab50" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="image (disk 2).xdf" size="1261568" crc="b331f335" sha1="276e8185cda3ae10a49548a5b4762eda1be1ee6b"/>
+				<rom name="image (disk 2).xdf" size="1261568" crc="b331f335" sha1="276e8185cda3ae10a49548a5b4762eda1be1ee6b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1164,31 +1164,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 1 - system).hdm" size="1261568" crc="7d6b858f" sha1="1670641115935a85164a58f58cdeb2b4514652a2"/>
+				<rom name="irium (disk 1 - system).hdm" size="1261568" crc="7d6b858f" sha1="1670641115935a85164a58f58cdeb2b4514652a2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 2 - a).hdm" size="1261568" crc="0d11cb39" sha1="0ef37fb4abd4cd473ba6518d3dfce40aaefeba05"/>
+				<rom name="irium (disk 2 - a).hdm" size="1261568" crc="0d11cb39" sha1="0ef37fb4abd4cd473ba6518d3dfce40aaefeba05" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 3 - b).hdm" size="1261568" crc="193a7e6d" sha1="895d7c1ff30b64612ac18aedb3b1d67f79738322"/>
+				<rom name="irium (disk 3 - b).hdm" size="1261568" crc="193a7e6d" sha1="895d7c1ff30b64612ac18aedb3b1d67f79738322" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 4 - c).hdm" size="1261568" crc="c7032ea8" sha1="35c8158074c8024dd65217727161c6f920f9ef06"/>
+				<rom name="irium (disk 4 - c).hdm" size="1261568" crc="c7032ea8" sha1="35c8158074c8024dd65217727161c6f920f9ef06" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 5 - d).hdm" size="1261568" crc="7485ce43" sha1="c16a5acf65b732676496b9fd89e337609283cb12"/>
+				<rom name="irium (disk 5 - d).hdm" size="1261568" crc="7485ce43" sha1="c16a5acf65b732676496b9fd89e337609283cb12" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1201,31 +1201,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kawarazaki-ke no ichizoku (disk a).hdm" size="1261568" crc="8e5377bb" sha1="1b977a5dbc3bae53f995cce516be29eef231267d"/>
+				<rom name="kawarazaki-ke no ichizoku (disk a).hdm" size="1261568" crc="8e5377bb" sha1="1b977a5dbc3bae53f995cce516be29eef231267d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kawarazaki-ke no ichizoku (disk b).hdm" size="1261568" crc="28cc3fe4" sha1="402e71d702b3af458110e602c3109e82bc26afb0"/>
+				<rom name="kawarazaki-ke no ichizoku (disk b).hdm" size="1261568" crc="28cc3fe4" sha1="402e71d702b3af458110e602c3109e82bc26afb0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kawarazaki-ke no ichizoku (disk c).hdm" size="1261568" crc="e7647e74" sha1="49053fc637a6d704fc766c3428741fafc6e06e5a"/>
+				<rom name="kawarazaki-ke no ichizoku (disk c).hdm" size="1261568" crc="e7647e74" sha1="49053fc637a6d704fc766c3428741fafc6e06e5a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kawarazaki-ke no ichizoku (disk d).hdm" size="1261568" crc="12a2bc4b" sha1="57eec756df31ea4e4a2aaf822a7a7200004fcd4a"/>
+				<rom name="kawarazaki-ke no ichizoku (disk d).hdm" size="1261568" crc="12a2bc4b" sha1="57eec756df31ea4e4a2aaf822a7a7200004fcd4a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kawarazaki-ke no ichizoku (disk e).hdm" size="1261568" crc="7999334a" sha1="c4e1abf0be91e679867709319fb876f6c6789aa4"/>
+				<rom name="kawarazaki-ke no ichizoku (disk e).hdm" size="1261568" crc="7999334a" sha1="c4e1abf0be91e679867709319fb876f6c6789aa4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1241,49 +1241,49 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 1).hdm" size="1261568" crc="96691e55" sha1="6e19483a53bce49613e2b8d1b248731a08759955"/>
+				<rom name="illusion city (disk 1).hdm" size="1261568" crc="96691e55" sha1="6e19483a53bce49613e2b8d1b248731a08759955" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 2).hdm" size="1261568" crc="b1c3c0a2" sha1="800831eded14baa4d8d96fd812d2fa455eabce6f"/>
+				<rom name="illusion city (disk 2).hdm" size="1261568" crc="b1c3c0a2" sha1="800831eded14baa4d8d96fd812d2fa455eabce6f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 3).hdm" size="1261568" crc="1c72b1b8" sha1="15426c64002961e9a73c6db61f26d0988ff4cdc2"/>
+				<rom name="illusion city (disk 3).hdm" size="1261568" crc="1c72b1b8" sha1="15426c64002961e9a73c6db61f26d0988ff4cdc2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 4).hdm" size="1261568" crc="b1296ae2" sha1="cad77c6db1d943de23baee76e5bfeba2e2df5092"/>
+				<rom name="illusion city (disk 4).hdm" size="1261568" crc="b1296ae2" sha1="cad77c6db1d943de23baee76e5bfeba2e2df5092" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 5).hdm" size="1261568" crc="be558e9a" sha1="c76562e36b52fd2033400d11ae36398785158a66"/>
+				<rom name="illusion city (disk 5).hdm" size="1261568" crc="be558e9a" sha1="c76562e36b52fd2033400d11ae36398785158a66" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 6).hdm" size="1261568" crc="1792c9f2" sha1="5c9d942bce8f73b9b504aeeb2d3abc634fc7e8d0"/>
+				<rom name="illusion city (disk 6).hdm" size="1261568" crc="1792c9f2" sha1="5c9d942bce8f73b9b504aeeb2d3abc634fc7e8d0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 7).hdm" size="1261568" crc="b7f3fa0c" sha1="6b1944768d6431e5e6128bbe7ce71613bfd75f56"/>
+				<rom name="illusion city (disk 7).hdm" size="1261568" crc="b7f3fa0c" sha1="6b1944768d6431e5e6128bbe7ce71613bfd75f56" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size="1261568">
-				<rom name="illusion city (disk 8).hdm" size="1261568" crc="cfc82740" sha1="f037c25c480807b15e77c3bec89185345c6e3d15"/>
+				<rom name="illusion city (disk 8).hdm" size="1261568" crc="cfc82740" sha1="f037c25c480807b15e77c3bec89185345c6e3d15" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1295,7 +1295,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="麻雀幻想曲体験版" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="mahjong gensoukyoku taikenban.bin" size="1261568" crc="bbd5391b" sha1="0d172601b6f1644b6389ffd721885f7ba5307ec2"/>
+				<rom name="mahjong gensoukyoku taikenban.bin" size="1261568" crc="bbd5391b" sha1="0d172601b6f1644b6389ffd721885f7ba5307ec2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1307,7 +1307,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>Musical Plan</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="music pro-towns (1989)(musical plan)(jp).hdm" size="1261568" crc="f5f61d98" sha1="2abb5e9042d8aae0480b551568ac2f8053126209"/>
+				<rom name="music pro-towns (1989)(musical plan)(jp).hdm" size="1261568" crc="f5f61d98" sha1="2abb5e9042d8aae0480b551568ac2f8053126209" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1319,22 +1319,22 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199301xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="premium 2 (disk 1).hdm" size="1261568" crc="1fef893a" sha1="907617847040a74ef6d92a33e9430e46d500076e"/>
+				<rom name="premium 2 (disk 1).hdm" size="1261568" crc="1fef893a" sha1="907617847040a74ef6d92a33e9430e46d500076e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="premium 2 (disk 2).hdm" size="1261568" crc="5d645e54" sha1="dd9c4c649d273b7dd0730806837bdc3c953d3272"/>
+				<rom name="premium 2 (disk 2).hdm" size="1261568" crc="5d645e54" sha1="dd9c4c649d273b7dd0730806837bdc3c953d3272" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="premium 2 (disk 3).hdm" size="1261568" crc="26d67acd" sha1="70289de0b14909480769216904707116cafbcbcb"/>
+				<rom name="premium 2 (disk 3).hdm" size="1261568" crc="26d67acd" sha1="70289de0b14909480769216904707116cafbcbcb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="premium 2 (disk 4).hdm" size="1261568" crc="5723ce84" sha1="5948e0ba82688fe321be6b49402722768996c63e"/>
+				<rom name="premium 2 (disk 4).hdm" size="1261568" crc="5723ce84" sha1="5948e0ba82688fe321be6b49402722768996c63e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1347,22 +1347,22 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199003xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 1).hdm" size="1261568" crc="fc54292a" sha1="a6dde9bfc776bdaa703be54a5fe68cee3c5a3b13"/>
+				<rom name="rance - hikari o motomete (disk 1).hdm" size="1261568" crc="fc54292a" sha1="a6dde9bfc776bdaa703be54a5fe68cee3c5a3b13" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 2).hdm" size="1261568" crc="775b7c12" sha1="f5f5487207b156459cce136a09ca4f3e92309046"/>
+				<rom name="rance - hikari o motomete (disk 2).hdm" size="1261568" crc="775b7c12" sha1="f5f5487207b156459cce136a09ca4f3e92309046" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 3).hdm" size="1261568" crc="38e84c46" sha1="2ade9200c6aed67b6e895e144226d36ca3376145"/>
+				<rom name="rance - hikari o motomete (disk 3).hdm" size="1261568" crc="38e84c46" sha1="2ade9200c6aed67b6e895e144226d36ca3376145" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 4).hdm" size="1261568" crc="ec2cb963" sha1="eb23dd3f8ba77c3922651eb7e32f09a73d7bf717"/>
+				<rom name="rance - hikari o motomete (disk 4).hdm" size="1261568" crc="ec2cb963" sha1="eb23dd3f8ba77c3922651eb7e32f09a73d7bf717" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1376,37 +1376,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk a).hdm" size="1261568" crc="8d06cd43" sha1="1c8dcee98e01e5ec34bd3b2caabf90fccf800011"/>
+				<rom name="rance 2 - hangyaku no shoujotachi (disk a).hdm" size="1261568" crc="8d06cd43" sha1="1c8dcee98e01e5ec34bd3b2caabf90fccf800011" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk b).hdm" size="1261568" crc="116f4cd2" sha1="5d1acf08309a3c33b2578d1d608d73122c2029d0"/>
+				<rom name="rance 2 - hangyaku no shoujotachi (disk b).hdm" size="1261568" crc="116f4cd2" sha1="5d1acf08309a3c33b2578d1d608d73122c2029d0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk c).hdm" size="1261568" crc="18c701c0" sha1="5379383e7acebc189712e3cb4cfc8a5dfda37f4c"/>
+				<rom name="rance 2 - hangyaku no shoujotachi (disk c).hdm" size="1261568" crc="18c701c0" sha1="5379383e7acebc189712e3cb4cfc8a5dfda37f4c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk d).hdm" size="1261568" crc="4657f014" sha1="ff5ae040d04383a8c5f19cc2d665877056f4fed0"/>
+				<rom name="rance 2 - hangyaku no shoujotachi (disk d).hdm" size="1261568" crc="4657f014" sha1="ff5ae040d04383a8c5f19cc2d665877056f4fed0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk e).hdm" size="1261568" crc="446c28e8" sha1="cdcb1c27b7a6dcaa091176e0522a28daa188b222"/>
+				<rom name="rance 2 - hangyaku no shoujotachi (disk e).hdm" size="1261568" crc="446c28e8" sha1="cdcb1c27b7a6dcaa091176e0522a28daa188b222" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk f).hdm" size="1261568" crc="c5b0b6bd" sha1="76eec3eec751007c690e36045b6bcf390acb99c7"/>
+				<rom name="rance 2 - hangyaku no shoujotachi (disk f).hdm" size="1261568" crc="c5b0b6bd" sha1="76eec3eec751007c690e36045b6bcf390acb99c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1419,37 +1419,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk a).hdm" size="1261568" crc="7ca28bcc" sha1="bcbd502d3aca183f00211dd91b34b9c6a8a53419"/>
+				<rom name="reira (disk a).hdm" size="1261568" crc="7ca28bcc" sha1="bcbd502d3aca183f00211dd91b34b9c6a8a53419" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk b).hdm" size="1261568" crc="3d66ddc6" sha1="05d1d20dd5c535dfe653e6afd23e0e256c3639ec"/>
+				<rom name="reira (disk b).hdm" size="1261568" crc="3d66ddc6" sha1="05d1d20dd5c535dfe653e6afd23e0e256c3639ec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk c).hdm" size="1261568" crc="03fa528c" sha1="635043a3490b03ee0ef06d901e774ae46f14963c"/>
+				<rom name="reira (disk c).hdm" size="1261568" crc="03fa528c" sha1="635043a3490b03ee0ef06d901e774ae46f14963c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk d).hdm" size="1261568" crc="d26f5aef" sha1="9d59989831b58ed6098b517b29f45514932c8580"/>
+				<rom name="reira (disk d).hdm" size="1261568" crc="d26f5aef" sha1="9d59989831b58ed6098b517b29f45514932c8580" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk e).hdm" size="1261568" crc="9008a977" sha1="32cf426ce9f15489c92dd1effc58da5380ea6f16"/>
+				<rom name="reira (disk e).hdm" size="1261568" crc="9008a977" sha1="32cf426ce9f15489c92dd1effc58da5380ea6f16" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk f).hdm" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2"/>
+				<rom name="reira (disk f).hdm" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1462,37 +1462,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk a) [alt 1].hdm" size="1261568" crc="d82d5732" sha1="ac51e1ee6be9afa79f984a9ddcd5109347d31c35"/>
+				<rom name="reira (disk a) [alt 1].hdm" size="1261568" crc="d82d5732" sha1="ac51e1ee6be9afa79f984a9ddcd5109347d31c35" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk b).hdm" size="1261568" crc="3d66ddc6" sha1="05d1d20dd5c535dfe653e6afd23e0e256c3639ec"/>
+				<rom name="reira (disk b).hdm" size="1261568" crc="3d66ddc6" sha1="05d1d20dd5c535dfe653e6afd23e0e256c3639ec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk c).hdm" size="1261568" crc="03fa528c" sha1="635043a3490b03ee0ef06d901e774ae46f14963c"/>
+				<rom name="reira (disk c).hdm" size="1261568" crc="03fa528c" sha1="635043a3490b03ee0ef06d901e774ae46f14963c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk d).hdm" size="1261568" crc="d26f5aef" sha1="9d59989831b58ed6098b517b29f45514932c8580"/>
+				<rom name="reira (disk d).hdm" size="1261568" crc="d26f5aef" sha1="9d59989831b58ed6098b517b29f45514932c8580" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk e).hdm" size="1261568" crc="9008a977" sha1="32cf426ce9f15489c92dd1effc58da5380ea6f16"/>
+				<rom name="reira (disk e).hdm" size="1261568" crc="9008a977" sha1="32cf426ce9f15489c92dd1effc58da5380ea6f16" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk f).hdm" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2"/>
+				<rom name="reira (disk f).hdm" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1505,19 +1505,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="shogi seiten (disk 1 - system).hdm" size="1261568" crc="3b19e6db" sha1="2a5cf638bddee29e06171f98eb3a981f3d5784b0"/>
+				<rom name="shogi seiten (disk 1 - system).hdm" size="1261568" crc="3b19e6db" sha1="2a5cf638bddee29e06171f98eb3a981f3d5784b0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="shogi seiten (disk 2 - data).hdm" size="1261568" crc="b496bcb9" sha1="4bf4a0fe3d90d62dd14ecfd442063cd511967f9a"/>
+				<rom name="shogi seiten (disk 2 - data).hdm" size="1261568" crc="b496bcb9" sha1="4bf4a0fe3d90d62dd14ecfd442063cd511967f9a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="shogi seiten (user disk).hdm" size="1261568" crc="1d010eba" sha1="7e07385ff880096ee1e6923ff2dc4c3f75b30eca" status="baddump" />
+				<rom name="shogi seiten (user disk).hdm" size="1261568" crc="1d010eba" sha1="7e07385ff880096ee1e6923ff2dc4c3f75b30eca" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1530,19 +1530,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="soreyuke nanpa-kun (disk a).hdm" size="1261568" crc="26d312fd" sha1="aaccaf41db22c44da1f637b11110d8dbf3f7c9cc"/>
+				<rom name="soreyuke nanpa-kun (disk a).hdm" size="1261568" crc="26d312fd" sha1="aaccaf41db22c44da1f637b11110d8dbf3f7c9cc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="soreyuke nanpa-kun (disk b).hdm" size="1261568" crc="36f63243" sha1="a55c8075fc0430a5288224c36b0719fe33ce329e"/>
+				<rom name="soreyuke nanpa-kun (disk b).hdm" size="1261568" crc="36f63243" sha1="a55c8075fc0430a5288224c36b0719fe33ce329e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="soreyuke nanpa-kun (disk c).hdm" size="1261568" crc="c60eb344" sha1="c88788f4156f88d80e368ee12dc486e32544ce52"/>
+				<rom name="soreyuke nanpa-kun (disk c).hdm" size="1261568" crc="c60eb344" sha1="c88788f4156f88d80e368ee12dc486e32544ce52" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1555,37 +1555,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="super d.p.s. (disk 1 - system).hdm" size="1261568" crc="af618979" sha1="bfaf62b06e25f92a731a76208ab8bf69d6ac965a"/>
+				<rom name="super d.p.s. (disk 1 - system).hdm" size="1261568" crc="af618979" sha1="bfaf62b06e25f92a731a76208ab8bf69d6ac965a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Maria to Kanpan" />
 			<dataarea name="flop" size="1261568">
-				<rom name="super d.p.s. (disk 2 - maria to kanpan a).hdm" size="1261568" crc="5c762738" sha1="f09d00215967e015258e7bde7fb22094927d0a17"/>
+				<rom name="super d.p.s. (disk 2 - maria to kanpan a).hdm" size="1261568" crc="5c762738" sha1="f09d00215967e015258e7bde7fb22094927d0a17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Kaizoku Kagyou Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="super d.p.s. (disk 3 - kaizoku kagyou a).hdm" size="1261568" crc="2728576a" sha1="406741790efc9106a7b51df07035d49d78015db2"/>
+				<rom name="super d.p.s. (disk 3 - kaizoku kagyou a).hdm" size="1261568" crc="2728576a" sha1="406741790efc9106a7b51df07035d49d78015db2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Kaizoku Kagyou Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="super d.p.s. (disk 4 - kaizoku kagyou b).hdm" size="1261568" crc="dc71038d" sha1="245001245db86d8631c74c2e4378c0e7b0de97c3"/>
+				<rom name="super d.p.s. (disk 4 - kaizoku kagyou b).hdm" size="1261568" crc="dc71038d" sha1="245001245db86d8631c74c2e4378c0e7b0de97c3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Tonoo no Mori Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="super d.p.s. (disk 5 - toono no mori a).hdm" size="1261568" crc="4fcf0a92" sha1="d5c6ef8c599c9f418e273e7493ae28aa9808f5cd"/>
+				<rom name="super d.p.s. (disk 5 - toono no mori a).hdm" size="1261568" crc="4fcf0a92" sha1="d5c6ef8c599c9f418e273e7493ae28aa9808f5cd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Tonoo no Mori Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="super d.p.s. (disk 6 - toono no mori b).hdm" size="1261568" crc="78ae11c6" sha1="8410d7c8932eb94178d821d93afd6ce3f03b0c00"/>
+				<rom name="super d.p.s. (disk 6 - toono no mori b).hdm" size="1261568" crc="78ae11c6" sha1="8410d7c8932eb94178d821d93afd6ce3f03b0c00" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1597,12 +1597,12 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199211xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sweetangel1.hdm" size="1261568" crc="2d128f6f" sha1="9003bab991a3eee955b62b333787779b850b0253"/>
+				<rom name="sweetangel1.hdm" size="1261568" crc="2d128f6f" sha1="9003bab991a3eee955b62b333787779b850b0253" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sweetangel2.hdm" size="1261568" crc="e0f4017c" sha1="447c3e91b01396d249b2aad08001339148df7bf9"/>
+				<rom name="sweetangel2.hdm" size="1261568" crc="e0f4017c" sha1="447c3e91b01396d249b2aad08001339148df7bf9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1616,7 +1616,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="198907xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="townskaraoke.hdm" size="1261568" crc="ebf71c2f" sha1="523b8f365ba056c1e38574fbc86551b60da8d1c9" status="baddump" />
+				<rom name="townskaraoke.hdm" size="1261568" crc="ebf71c2f" sha1="523b8f365ba056c1e38574fbc86551b60da8d1c9" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1628,37 +1628,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
+				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 2).hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2"/>
+				<rom name="toushin toshi (disk 2).hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 3).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f"/>
+				<rom name="toushin toshi (disk 3).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 4).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
+				<rom name="toushin toshi (disk 4).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 5).hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5"/>
+				<rom name="toushin toshi (disk 5).hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 6).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
+				<rom name="toushin toshi (disk 6).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
+				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1670,37 +1670,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
+				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 2) [alt 1].hdm" size="1261568" crc="e7881beb" sha1="438bce9cb6ffd117642269344e3ba719519c94bf"/>
+				<rom name="toushin toshi (disk 2) [alt 1].hdm" size="1261568" crc="e7881beb" sha1="438bce9cb6ffd117642269344e3ba719519c94bf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 3).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f"/>
+				<rom name="toushin toshi (disk 3).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 4).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
+				<rom name="toushin toshi (disk 4).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 5).hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5"/>
+				<rom name="toushin toshi (disk 5).hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 6).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
+				<rom name="toushin toshi (disk 6).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
+				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1713,31 +1713,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ushinawareta rakuen (disk a).hdm" size="1261568" crc="43a4ab96" sha1="49848270471a59cbeeb9aaa0fbfee7512f06b448"/>
+				<rom name="ushinawareta rakuen (disk a).hdm" size="1261568" crc="43a4ab96" sha1="49848270471a59cbeeb9aaa0fbfee7512f06b448" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ushinawareta rakuen (disk b).hdm" size="1261568" crc="2cd5aac5" sha1="f42b32087061aa4f0bfa87f712f263744233424c"/>
+				<rom name="ushinawareta rakuen (disk b).hdm" size="1261568" crc="2cd5aac5" sha1="f42b32087061aa4f0bfa87f712f263744233424c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ushinawareta rakuen (disk c).hdm" size="1261568" crc="45b0d218" sha1="787c8709d5173d4c63b8acc50b646ec06e64be26"/>
+				<rom name="ushinawareta rakuen (disk c).hdm" size="1261568" crc="45b0d218" sha1="787c8709d5173d4c63b8acc50b646ec06e64be26" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ushinawareta rakuen (disk d).hdm" size="1261568" crc="af3eb06d" sha1="a4e9a37f5ae6a61eae587f4cbe0f6c0cf62e185b"/>
+				<rom name="ushinawareta rakuen (disk d).hdm" size="1261568" crc="af3eb06d" sha1="a4e9a37f5ae6a61eae587f4cbe0f6c0cf62e185b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ushinawareta rakuen (disk e).hdm" size="1261568" crc="1481c370" sha1="95676fc68d7e402fd9e463a5ad9d82490ac544a8"/>
+				<rom name="ushinawareta rakuen (disk e).hdm" size="1261568" crc="1481c370" sha1="95676fc68d7e402fd9e463a5ad9d82490ac544a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1751,7 +1751,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>ビング (Ving)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="vp_demo.bin" size="1261568" crc="dba229be" sha1="f4c5fe2cad77183e91b676609050dfe9d324dc8a"/>
+				<rom name="vp_demo.bin" size="1261568" crc="dba229be" sha1="f4c5fe2cad77183e91b676609050dfe9d324dc8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1765,7 +1765,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>ビング (Ving)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="ving.bin" size="1261568" crc="b380deb5" sha1="3f906b81a5277fe971b2d05ba2e739130873c143"/>
+				<rom name="ving.bin" size="1261568" crc="b380deb5" sha1="3f906b81a5277fe971b2d05ba2e739130873c143" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1778,25 +1778,25 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels (disk a).hdm" size="1261568" crc="cc6b4a9b" sha1="7964cc098f71d191ad23c98e4ebc3645c7b51289"/>
+				<rom name="wrestle angels (disk a).hdm" size="1261568" crc="cc6b4a9b" sha1="7964cc098f71d191ad23c98e4ebc3645c7b51289" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels (disk b).hdm" size="1261568" crc="3dde7236" sha1="a46d733f53dd4bd23fc298e06ce6352e316447cb"/>
+				<rom name="wrestle angels (disk b).hdm" size="1261568" crc="3dde7236" sha1="a46d733f53dd4bd23fc298e06ce6352e316447cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels (disk c).hdm" size="1261568" crc="286d5d85" sha1="c6dfc2a5bd021f7e7d41ba281a4eec17e56a899c"/>
+				<rom name="wrestle angels (disk c).hdm" size="1261568" crc="286d5d85" sha1="c6dfc2a5bd021f7e7d41ba281a4eec17e56a899c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels (disk d).hdm" size="1261568" crc="44414c9e" sha1="94fc30387a7b83acaa51cf20feb2e5e28b703350"/>
+				<rom name="wrestle angels (disk d).hdm" size="1261568" crc="44414c9e" sha1="94fc30387a7b83acaa51cf20feb2e5e28b703350" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1809,31 +1809,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk a).hdm" size="1261568" crc="81f2f905" sha1="e56a00bf56422f7964ed50e43753ab9e55a7ff56"/>
+				<rom name="wrestle angels 2 (disk a).hdm" size="1261568" crc="81f2f905" sha1="e56a00bf56422f7964ed50e43753ab9e55a7ff56" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk b).hdm" size="1261568" crc="9876b409" sha1="d1cbdadfdcd26d05b15943ace576c39df721052b"/>
+				<rom name="wrestle angels 2 (disk b).hdm" size="1261568" crc="9876b409" sha1="d1cbdadfdcd26d05b15943ace576c39df721052b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk c).hdm" size="1261568" crc="4b238566" sha1="0acfd1dc58f4e9416399b3b17572ba582d6efe9b"/>
+				<rom name="wrestle angels 2 (disk c).hdm" size="1261568" crc="4b238566" sha1="0acfd1dc58f4e9416399b3b17572ba582d6efe9b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk d).hdm" size="1261568" crc="a4f395a6" sha1="b994961a2e400880bcc5924a53c9c48820eadf7a"/>
+				<rom name="wrestle angels 2 (disk d).hdm" size="1261568" crc="a4f395a6" sha1="b994961a2e400880bcc5924a53c9c48820eadf7a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk e).hdm" size="1261568" crc="ab3474d9" sha1="ea36d0bd3bbfdf057e9487be6a2ed761c3b66e9e"/>
+				<rom name="wrestle angels 2 (disk e).hdm" size="1261568" crc="ab3474d9" sha1="ea36d0bd3bbfdf057e9487be6a2ed761c3b66e9e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1846,31 +1846,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk a) [alt 1].hdm" size="1261568" crc="5cacfdb6" sha1="b44ff4b32a5181196a1375924c577f5b92f06dd5"/>
+				<rom name="wrestle angels 2 (disk a) [alt 1].hdm" size="1261568" crc="5cacfdb6" sha1="b44ff4b32a5181196a1375924c577f5b92f06dd5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk b) [alt 1].hdm" size="1261568" crc="21f596e8" sha1="2983f111dea21e5a3655db204b921e3d647d7602"/>
+				<rom name="wrestle angels 2 (disk b) [alt 1].hdm" size="1261568" crc="21f596e8" sha1="2983f111dea21e5a3655db204b921e3d647d7602" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk c) [alt 1].hdm" size="1261568" crc="36f4fbe1" sha1="4d384118a9167c51eafa0cccbc1f01f5c2cef21e"/>
+				<rom name="wrestle angels 2 (disk c) [alt 1].hdm" size="1261568" crc="36f4fbe1" sha1="4d384118a9167c51eafa0cccbc1f01f5c2cef21e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk d).hdm" size="1261568" crc="a4f395a6" sha1="b994961a2e400880bcc5924a53c9c48820eadf7a"/>
+				<rom name="wrestle angels 2 (disk d).hdm" size="1261568" crc="a4f395a6" sha1="b994961a2e400880bcc5924a53c9c48820eadf7a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 2 (disk e).hdm" size="1261568" crc="ab3474d9" sha1="ea36d0bd3bbfdf057e9487be6a2ed761c3b66e9e"/>
+				<rom name="wrestle angels 2 (disk e).hdm" size="1261568" crc="ab3474d9" sha1="ea36d0bd3bbfdf057e9487be6a2ed761c3b66e9e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1886,7 +1886,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="H2SO4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="15 puzzle.bin" size="1261568" crc="bd08eb1e" sha1="c74ab5fb58ff31219d6365156cbb2eee1d53738f"/>
+				<rom name="15 puzzle.bin" size="1261568" crc="bd08eb1e" sha1="c74ab5fb58ff31219d6365156cbb2eee1d53738f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1898,7 +1898,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Seiichi Hanai" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="abas.bin" size="1261568" crc="8ceb7dc7" sha1="c448d1eaa1a0a11334cb798754167f1ac8da9ad1"/>
+				<rom name="abas.bin" size="1261568" crc="8ceb7dc7" sha1="c448d1eaa1a0a11334cb798754167f1ac8da9ad1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1910,7 +1910,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Seiichi Hanai" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="abas new.bin" size="1261568" crc="977cabda" sha1="ad43310f17e707d27058d932d8757d9bc151ef60"/>
+				<rom name="abas new.bin" size="1261568" crc="977cabda" sha1="ad43310f17e707d27058d932d8757d9bc151ef60" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1927,7 +1927,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="usage" value="Requires AfterBurner II CD to work" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="after burner 2 again.hdm" size="1261568" crc="59135c6d" sha1="0d76f0e628ac61e56a5cb69f6252e4e8088410be"/>
+				<rom name="after burner 2 again.hdm" size="1261568" crc="59135c6d" sha1="0d76f0e628ac61e56a5cb69f6252e4e8088410be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1939,7 +1939,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="air raider.hdm" size="1261568" crc="b59eb70b" sha1="464b0be803d03dbe514514242b0fa83bfcabf2e0"/>
+				<rom name="air raider.hdm" size="1261568" crc="b59eb70b" sha1="464b0be803d03dbe514514242b0fa83bfcabf2e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1951,7 +1951,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="H2SO4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="b-braker 3.bin" size="1261568" crc="2f02a9dc" sha1="1755088ff6a8b4262459caf68914e93b8b297aaa"/>
+				<rom name="b-braker 3.bin" size="1261568" crc="2f02a9dc" sha1="1755088ff6a8b4262459caf68914e93b8b297aaa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1964,7 +1964,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="BATTLE FIGHTERS 2 -夢を賭けた戦い-" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="battle fighters 2.bin" size="1261568" crc="3e9b8b02" sha1="778f7ad583ee605af36859472f02366ca3c237e5"/>
+				<rom name="battle fighters 2.bin" size="1261568" crc="3e9b8b02" sha1="778f7ad583ee605af36859472f02366ca3c237e5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1977,7 +1977,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="BATTLE FIGHTERS 3 -古の邪神伝説-" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="battle fighters 3.bin" size="1474560" crc="a9e0ecab" sha1="ea3a3e6d8760d998d9345c17db4b6190c6187e20"/>
+				<rom name="battle fighters 3.bin" size="1474560" crc="a9e0ecab" sha1="ea3a3e6d8760d998d9345c17db4b6190c6187e20" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1990,7 +1990,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="ばう" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="bau.bin" size="1261568" crc="37707193" sha1="53e6b6e959e4f97fb5580c7bef7278088d6fc814"/>
+				<rom name="bau.bin" size="1261568" crc="37707193" sha1="53e6b6e959e4f97fb5580c7bef7278088d6fc814" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2002,7 +2002,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="M.J. Kozou" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="bliss collection #01 - whips ct. 1.hdm" size="1261568" crc="40f6e006" sha1="5792731e65d92832e58f9c92e25ee49c402cfaa8"/>
+				<rom name="bliss collection #01 - whips ct. 1.hdm" size="1261568" crc="40f6e006" sha1="5792731e65d92832e58f9c92e25ee49c402cfaa8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2014,7 +2014,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="M.J. Kozou" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="bliss collection #02 - vips.hdm" size="1261568" crc="5a046d38" sha1="5a7591b4aeff03a2b0d6a0995423647e0be8921b"/>
+				<rom name="bliss collection #02 - vips.hdm" size="1261568" crc="5a046d38" sha1="5a7591b4aeff03a2b0d6a0995423647e0be8921b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2026,7 +2026,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="M.J. Kozou" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="bliss collection #02 - vips [set 1].hdm" size="1261568" crc="addf99cb" sha1="93f46d54cc8736bb0a547f2a8851648486d2901a"/>
+				<rom name="bliss collection #02 - vips [set 1].hdm" size="1261568" crc="addf99cb" sha1="93f46d54cc8736bb0a547f2a8851648486d2901a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2038,7 +2038,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="M.J. Kozou" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="bliss collection #03 - whips ct. 2 pro.hdm" size="1261568" crc="2537528d" sha1="15463f7961f658e1f69781946545edf23719b4b5"/>
+				<rom name="bliss collection #03 - whips ct. 2 pro.hdm" size="1261568" crc="2537528d" sha1="15463f7961f658e1f69781946545edf23719b4b5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2050,7 +2050,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="M.J. Kozou" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="bliss collection #07 - whips ct. 4.hdm" size="1261568" crc="a4e41cca" sha1="cd3738b5e40c510813a1506653fbb74d9907efba"/>
+				<rom name="bliss collection #07 - whips ct. 4.hdm" size="1261568" crc="a4e41cca" sha1="cd3738b5e40c510813a1506653fbb74d9907efba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2062,7 +2062,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="クエイト (Kueito)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="break of tower.bin" size="1261568" crc="6488afc7" sha1="d21bfd8586d90884f5967c808ab6e58d11178397"/>
+				<rom name="break of tower.bin" size="1261568" crc="6488afc7" sha1="d21bfd8586d90884f5967c808ab6e58d11178397" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2075,7 +2075,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="綾波レイ官能写真集" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="doushite ii ka wakaranai - ayanami rei kannou shashin-shuu.hdm" size="1261568" crc="f5377bd7" sha1="4139aa0eab2998fe206423fdd721cd1a0a8f0484"/>
+				<rom name="doushite ii ka wakaranai - ayanami rei kannou shashin-shuu.hdm" size="1261568" crc="f5377bd7" sha1="4139aa0eab2998fe206423fdd721cd1a0a8f0484" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2087,7 +2087,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Kanju" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dream fighters.bin" size="1474560" crc="1e4d480b" sha1="8f6ecba0caa582f05e446a7b4f9c51a32757d7c8"/>
+				<rom name="dream fighters.bin" size="1474560" crc="1e4d480b" sha1="8f6ecba0caa582f05e446a7b4f9c51a32757d7c8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2099,7 +2099,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="exgmaze.hdm" size="1261568" crc="91549a87" sha1="513f70b6b45b0d90491f05c80bcd0af012017299"/>
+				<rom name="exgmaze.hdm" size="1261568" crc="91549a87" sha1="513f70b6b45b0d90491f05c80bcd0af012017299" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2111,7 +2111,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="ground attack.xdf" size="1261568" crc="22a962fe" sha1="bc62681034a93e89a5a938ddfe571a4837cdabc4"/>
+				<rom name="ground attack.xdf" size="1261568" crc="22a962fe" sha1="bc62681034a93e89a5a938ddfe571a4837cdabc4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2124,7 +2124,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="覇王争奪バトルファイターズ" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="battle fighters.bin" size="1261568" crc="911e58ab" sha1="4c379fb688e04c41e348fef8e483d925e0d55cd8"/>
+				<rom name="battle fighters.bin" size="1261568" crc="911e58ab" sha1="4c379fb688e04c41e348fef8e483d925e0d55cd8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2138,7 +2138,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="version" value="0.6" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="heboris.bin" size="1261568" crc="3bb75819" sha1="7ea2b0d71d4388f6221de81a16a9093cd206aeae"/>
+				<rom name="heboris.bin" size="1261568" crc="3bb75819" sha1="7ea2b0d71d4388f6221de81a16a9093cd206aeae" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2150,7 +2150,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="H. Taira" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="heli-command.bin" size="1261568" crc="3a293e26" sha1="100dcc10784925394e670dbb1f4cbd55d838995d"/>
+				<rom name="heli-command.bin" size="1261568" crc="3a293e26" sha1="100dcc10784925394e670dbb1f4cbd55d838995d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2162,7 +2162,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="H. Taira" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="heli-rescue.bin" size="1261568" crc="c76213e0" sha1="e484c53db79a1bc27aec40b1c175f339c1f5a59c"/>
+				<rom name="heli-rescue.bin" size="1261568" crc="c76213e0" sha1="e484c53db79a1bc27aec40b1c175f339c1f5a59c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2175,7 +2175,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="カスタリア" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="kastalia.bin" size="1261568" crc="56f09e17" sha1="e38322747dd729a38a03d133ed678fa42bcb3a9d"/>
+				<rom name="kastalia.bin" size="1261568" crc="56f09e17" sha1="e38322747dd729a38a03d133ed678fa42bcb3a9d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2188,7 +2188,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="Iron Fist 改訂版" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="iron fist kaiteiban.bin" size="1261568" crc="cd13d7b3" sha1="04075a09ed137249c33d156b7331fb1a3e437e66"/>
+				<rom name="iron fist kaiteiban.bin" size="1261568" crc="cd13d7b3" sha1="04075a09ed137249c33d156b7331fb1a3e437e66" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2200,7 +2200,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="MIO.H" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="kiss - kisekae set system.hdm" size="1261568" crc="642554e6" sha1="a462109795fa23e677cc7bdb6c5885a52cc92303"/>
+				<rom name="kiss - kisekae set system.hdm" size="1261568" crc="642554e6" sha1="a462109795fa23e677cc7bdb6c5885a52cc92303" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2213,7 +2213,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="Mister・名探偵登場" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="mister meitantei toujou.bin" size="1261568" crc="28f3c8c9" sha1="33ab0ee15e3f403ad5743119561f8649c03f3f94"/>
+				<rom name="mister meitantei toujou.bin" size="1261568" crc="28f3c8c9" sha1="33ab0ee15e3f403ad5743119561f8649c03f3f94" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2225,7 +2225,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Junior" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="panic ball ii.bin" size="1261568" crc="8de28ae6" sha1="6944feed861130d7712198950097d55b031efd61"/>
+				<rom name="panic ball ii.bin" size="1261568" crc="8de28ae6" sha1="6944feed861130d7712198950097d55b031efd61" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2237,7 +2237,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="planet attacker.hdm" size="1261568" crc="5f61b43e" sha1="0f809ea7a3f5ac74e6940260026b429f2365a417"/>
+				<rom name="planet attacker.hdm" size="1261568" crc="5f61b43e" sha1="0f809ea7a3f5ac74e6940260026b429f2365a417" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2250,7 +2250,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Team B-2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
-				<rom name="quazzle.bin" size="1261568" crc="59d635c4" sha1="66bc4ebdb7feaec191f10b74772572efc53835e2"/>
+				<rom name="quazzle.bin" size="1261568" crc="59d635c4" sha1="66bc4ebdb7feaec191f10b74772572efc53835e2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2261,7 +2261,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="realtime kaigi simulator.hdm" size="1261568" crc="489cce66" sha1="ce9c9cd28fc9f07e3a790cb31faff83243737231"/>
+				<rom name="realtime kaigi simulator.hdm" size="1261568" crc="489cce66" sha1="ce9c9cd28fc9f07e3a790cb31faff83243737231" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2273,7 +2273,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Good-Chy" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="rumstorm.bin" size="1474560" crc="ef1b27e3" sha1="ead75dfa0ff7975d2b8e97163879fbed20b31aaf"/>
+				<rom name="rumstorm.bin" size="1474560" crc="ef1b27e3" sha1="ead75dfa0ff7975d2b8e97163879fbed20b31aaf" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2285,7 +2285,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="Good-Chy" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="rumuder.bin" size="1474560" crc="6030e5cd" sha1="4f07f291b9e18e063ca7717af4905fd5b4f6686d"/>
+				<rom name="rumuder.bin" size="1474560" crc="6030e5cd" sha1="4f07f291b9e18e063ca7717af4905fd5b4f6686d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2297,7 +2297,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sword edge.hdm" size="1261568" crc="4d6c28b7" sha1="a1634b970a22ea6f1b800f7ca55ab762b83f121d"/>
+				<rom name="sword edge.hdm" size="1261568" crc="4d6c28b7" sha1="a1634b970a22ea6f1b800f7ca55ab762b83f121d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2309,7 +2309,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sword edge (map editor).hdm" size="1261568" crc="36ddef97" sha1="2cd272d7df959c4210931b2743a01e3ff9050df4"/>
+				<rom name="sword edge (map editor).hdm" size="1261568" crc="36ddef97" sha1="2cd272d7df959c4210931b2743a01e3ff9050df4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2321,7 +2321,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sword edge (sprite editor).hdm" size="1261568" crc="72947abc" sha1="c5bd8ae472dc54712f9c4094e203dcb908d777ac"/>
+				<rom name="sword edge (sprite editor).hdm" size="1261568" crc="72947abc" sha1="c5bd8ae472dc54712f9c4094e203dcb908d777ac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2333,7 +2333,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="developer" value="YS-11" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="tactical air wing.hdm" size="1261568" crc="eef1aa60" sha1="d94798c490464ebf73803900ee5eec80b55939f8"/>
+				<rom name="tactical air wing.hdm" size="1261568" crc="eef1aa60" sha1="d94798c490464ebf73803900ee5eec80b55939f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2344,7 +2344,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="vz editor 1.6 with atok 7.bin" size="1261568" crc="59c8f9db" sha1="c159eecc31b17fa596afa992d2ba96084c1e7a5d"/>
+				<rom name="vz editor 1.6 with atok 7.bin" size="1261568" crc="59c8f9db" sha1="c159eecc31b17fa596afa992d2ba96084c1e7a5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

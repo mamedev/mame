@@ -90,7 +90,7 @@ void deco_irq_device::device_reset()
 TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 {
 	const rectangle visible = m_screen->visible_area();
-	const u16 y = m_screen->vpos();
+	uint16_t y = m_screen->vpos();
 
 	// raster irq?
 	if (m_raster_irq_scanline >= visible.top() && m_raster_irq_scanline <= visible.bottom() && y == m_raster_irq_scanline)
@@ -130,13 +130,6 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 //  INTERFACE
 //**************************************************************************
 
-void deco_irq_device::raster_irq_ack()
-{
-	m_raster_irq = false;
-	m_raster1_irq_cb(CLEAR_LINE);
-	m_raster2_irq_cb(CLEAR_LINE);
-}
-
 void deco_irq_device::map(address_map &map)
 {
 	map(0x0, 0x0).w(FUNC(deco_irq_device::control_w));
@@ -145,7 +138,7 @@ void deco_irq_device::map(address_map &map)
 	map(0x3, 0x3).r(FUNC(deco_irq_device::status_r));
 }
 
-void deco_irq_device::control_w(u8 data)
+WRITE8_MEMBER( deco_irq_device::control_w )
 {
 	// 765-----  unused?
 	// ---4----  raster irq target
@@ -158,35 +151,37 @@ void deco_irq_device::control_w(u8 data)
 	m_raster_irq_masked = bool(BIT(data, 1));
 
 	if (m_raster_irq_masked)
-		raster_irq_ack();
+		raster_irq_ack_r(space, 0);
 }
 
-u8 deco_irq_device::scanline_r()
+READ8_MEMBER( deco_irq_device::scanline_r )
 {
 	return m_raster_irq_scanline;
 }
 
-void deco_irq_device::scanline_w(u8 data)
+WRITE8_MEMBER( deco_irq_device::scanline_w )
 {
 	m_raster_irq_scanline = data;
 }
 
-u8 deco_irq_device::raster_irq_ack_r()
+READ8_MEMBER( deco_irq_device::raster_irq_ack_r )
 {
-	if (!machine().side_effects_disabled())
-		raster_irq_ack();
+	m_raster_irq = false;
+	m_raster1_irq_cb(CLEAR_LINE);
+	m_raster2_irq_cb(CLEAR_LINE);
+
 	return 0xff;
 }
 
-void deco_irq_device::vblank_irq_ack_w(u8 data)
+WRITE8_MEMBER( deco_irq_device::vblank_irq_ack_w )
 {
 	m_vblank_irq = false;
 	m_vblank_irq_cb(CLEAR_LINE);
 }
 
-u8 deco_irq_device::status_r()
+READ8_MEMBER( deco_irq_device::status_r )
 {
-	u8 data = 0;
+	uint8_t data = 0;
 
 	// 7-------  unknown
 	// -6------  lightgun irq

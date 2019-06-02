@@ -88,17 +88,17 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u
 
 
 /***************************************************************************
-    Draw the game screen in the given bitmap.
+    Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
+void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	const pen_t *pens = &palette().pen(gfx(0)->colorbase());
+	const int colourbase = gfx(0)->colorbase();
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *srcline = &m_temp_spritebitmap.pix16(y);
-		u32 *dstline = &bitmap.pix32(y);
+		u16* srcline = &m_temp_spritebitmap.pix16(y);
+		u16* dstline = &bitmap.pix16(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -108,7 +108,7 @@ void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_rgb32 &bitmap, cons
 			{
 				if (pix & 0xf)
 				{
-					dstline[x] = pens[pix & 0x3ff];
+					dstline[x] = (pix & 0x3ff) + colourbase;
 				}
 			}
 		}

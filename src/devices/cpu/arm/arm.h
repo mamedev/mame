@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, Phil Stroffolino
-
+// copyright-holders:Bryan McPhail
 #ifndef MAME_CPU_ARM_ARM_H
 #define MAME_CPU_ARM_ARM_H
 

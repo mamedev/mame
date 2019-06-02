@@ -56,6 +56,12 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	enum
+	{
+		TID_TIMER,
+	};
 
 private:
 	uint8_t m_ball_screen_collision_cause;
@@ -92,6 +98,8 @@ private:
 	required_ioport_array<4> m_dial;
 	required_ioport_array<3> m_in;
 	required_ioport m_pedals;
+
+	emu_timer *m_timer;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap1;
 	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap2;

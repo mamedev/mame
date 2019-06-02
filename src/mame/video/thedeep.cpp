@@ -131,7 +131,7 @@ uint32_t thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(0), reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x400/2);
+	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x00, 0x00, 0x0f);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

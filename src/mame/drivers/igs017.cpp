@@ -1252,6 +1252,7 @@ void igs017_state::init_lhzb2()
 
 	// install and configure protection device(s)
 //  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//  m_igs022->m_sharedprotram = m_sharedprotram;
 //  m_igs025->m_kb_source_data = dw3_source_data;
 //  m_igs025->m_kb_source_data_offset = 0;
 //  m_igs025->m_kb_game_id = 0x00060000;
@@ -1425,6 +1426,7 @@ void igs017_state::init_slqz2()
 
 	// install and configure protection device(s)
 //  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//  m_igs022->m_sharedprotram = m_sharedprotram;
 //  m_igs025->m_kb_source_data = dw3_source_data;
 //  m_igs025->m_kb_source_data_offset = 0;
 //  m_igs025->m_kb_game_id = 0x00060000;
@@ -4260,7 +4262,7 @@ ROM_START( lhzb2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1100.u30", 0x00000, 0x80000, CRC(68102b25) SHA1(6c1e8d204be0efda0e9b6c2f49b5c6760712475f) )
 
-	ROM_REGION( 0x10000, "igs022", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
+	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1104.u11",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )    // address scrambling
@@ -4336,7 +4338,7 @@ ROM_START( slqz2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
 
-	ROM_REGION( 0x10000, "igs022", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
+	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )    // address scrambling

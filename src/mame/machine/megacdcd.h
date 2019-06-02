@@ -23,9 +23,6 @@ public:
 
 	template <typename... T> void set_cdc_do_dma_callback(T &&... args) { segacd_dma_callback = segacd_dma_delegate(std::forward<T>(args)...); }
 
-	template <typename T> void set_cdrom_tag(T &&tag) { m_cdrom.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_68k_tag(T &&tag) { m_68k.set_tag(std::forward<T>(tag)); }
-
 
 	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -82,11 +79,7 @@ protected:
 	void dummy_interrupt_callback(void);
 
 
-	required_device<cdrom_image_device> m_cdrom;
-	required_device<cdda_device> m_cdda;
-
 	// HACK for neoCD handling
-	optional_device<cpu_device> m_68k;
 	bool is_neoCD;
 
 
@@ -166,6 +159,7 @@ protected:
 	bool CDD_Import(running_machine& machine);
 
 	uint16_t segacd_irq_mask;
+	cdda_device* m_cdda;
 
 	/* NeoCD */
 	uint16_t nff0002;

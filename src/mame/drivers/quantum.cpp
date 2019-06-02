@@ -141,8 +141,8 @@ WRITE16_MEMBER(quantum_state::led_w)
 		m_leds[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
-		m_avg->set_flip_x(data & 0x40);
-		m_avg->set_flip_y(data & 0x80);
+		m_avg->set_flip_x (data & 0x40);
+		m_avg->set_flip_y (data & 0x80);
 	}
 }
 
@@ -164,13 +164,13 @@ void quantum_state::main_map(address_map &map)
 {
 	map(0x000000, 0x013fff).rom();
 	map(0x018000, 0x01cfff).ram();
-	map(0x800000, 0x801fff).ram().share("avg:vectorram");
+	map(0x800000, 0x801fff).ram().share("vectorram");
 	map(0x840000, 0x84001f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x840020, 0x84003f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x900000, 0x9001ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); /* trackball */
 	map(0x948000, 0x948001).portr("SYSTEM");
-	map(0x950000, 0x95001f).writeonly().share("avg:colorram");
+	map(0x950000, 0x95001f).writeonly().share("colorram");
 	map(0x958000, 0x958001).w(FUNC(quantum_state::led_w));
 	map(0x960000, 0x960001).w(FUNC(quantum_state::nvram_recall_w));
 	map(0x968000, 0x968001).w(m_avg, FUNC(avg_quantum_device::reset_word_w));
@@ -358,7 +358,7 @@ ROM_START( quantum )
 	ROM_LOAD16_BYTE( "136016.105",   0x010000, 0x002000, CRC(13ec512c) SHA1(22a0395135b83ba47eacb5129f34fc97aa1b70a1) )
 	ROM_LOAD16_BYTE( "136016.110",   0x010001, 0x002000, CRC(acb50363) SHA1(9efa9ca88efdd2d5e212bd537903892b67b4fe53) )
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	ROM_REGION( 0x200, "plds", 0 )
@@ -379,7 +379,7 @@ ROM_START( quantum1 )
 	ROM_LOAD16_BYTE( "136016.105",   0x010000, 0x002000, CRC(13ec512c) SHA1(22a0395135b83ba47eacb5129f34fc97aa1b70a1) )
 	ROM_LOAD16_BYTE( "136016.110",   0x010001, 0x002000, CRC(acb50363) SHA1(9efa9ca88efdd2d5e212bd537903892b67b4fe53) )
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	ROM_REGION( 0x200, "plds", 0 )
@@ -400,7 +400,7 @@ ROM_START( quantump )
 	ROM_LOAD16_BYTE( "quantump.2l",  0x010000, 0x002000, CRC(1285b5e7) SHA1(0e01e361da2d9cf1fac1896f8f44c4c2e75a3061) )
 	ROM_LOAD16_BYTE( "quantump.3l",  0x010001, 0x002000, CRC(e19de844) SHA1(cb4f9d80807b26d6b95405b2d830799984667f54) )
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	ROM_REGION( 0x200, "plds", 0 )

@@ -274,8 +274,9 @@ private:
 
 void omegrace_state::machine_reset()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
-	m_dvg->reset_w();
+	m_dvg->reset_w(space, 0, 0);
 }
 
 
@@ -288,8 +289,7 @@ void omegrace_state::machine_reset()
 
 READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
 {
-	if (!machine().side_effects_disabled())
-		m_dvg->go_w();
+	m_dvg->go_w(space, 0, 0);
 	return 0;
 }
 
@@ -373,7 +373,7 @@ void omegrace_state::main_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4bff).ram();
 	map(0x5c00, 0x5cff).ram().share("nvram"); /* NVRAM */
-	map(0x8000, 0x8fff).ram().share("dvg:vectorram").region("maincpu", 0x8000); /* vector ram */
+	map(0x8000, 0x8fff).ram().share("vectorram").region("maincpu", 0x8000); /* vector ram */
 	map(0x9000, 0x9fff).rom(); /* vector rom */
 }
 
@@ -581,7 +581,7 @@ ROM_START( omegrace )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-	ROM_REGION( 0x100, "dvg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -597,7 +597,7 @@ ROM_START( omegrace2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "o.r.r._audio_6-1-81.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-	ROM_REGION( 0x100, "dvg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -613,7 +613,7 @@ ROM_START( deltrace )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-	ROM_REGION( 0x100, "dvg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -626,8 +626,8 @@ ROM_END
 
 void omegrace_state::init_omegrace()
 {
-	int len = memregion("dvg:prom")->bytes();
-	uint8_t *prom = memregion("dvg:prom")->base();
+	int len = memregion("user1")->bytes();
+	uint8_t *prom = memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
 	 * lines swapped before going into the decoder.

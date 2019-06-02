@@ -294,11 +294,11 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_tc0220ioc->write(offset, data & 0xff);
+		m_tc0220ioc->write(space, offset, data & 0xff);
 	else
 	{
 		/* spacedxo also writes here - bug? */
-		m_tc0220ioc->write(offset, (data >> 8) & 0xff);
+		m_tc0220ioc->write(space, offset, (data >> 8) & 0xff);
 	}
 }
 

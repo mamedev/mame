@@ -119,6 +119,18 @@ static const char keyboard[8][9][8] = {
 	},
 };
 
+uint8_t microtan_state::read_dsw()
+{
+	switch(machine().phase())
+	{
+	case machine_phase::RESET:
+	case machine_phase::RUNNING:
+		return ioport("DSW")->read();
+
+	default:
+		return 0x00;
+	}
+}
 
 /**************************************************************
  * VIA callback functions for VIA #0
@@ -279,6 +291,7 @@ void microtan_state::store_key(int key)
 INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 {
 	int mod, row, col, chg, newvar;
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
 	if( m_repeat )
 	{
@@ -290,13 +303,14 @@ INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 		m_repeat = m_repeater;
 	}
 
+
 	row = 9;
-	newvar = m_io_keyboard[8]->read();
+	newvar = ioport("ROW8")->read();
 	chg = m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = m_io_keyboard[row - 1]->read();
+		newvar = ioport(keynames[row - 1])->read();
 		chg = m_keyrows[--row] ^ newvar;
 	}
 	if (!chg)
@@ -366,6 +380,7 @@ INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 void microtan_state::init_microtan()
 {
 	uint8_t *dst = memregion("gfx2")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -403,6 +418,19 @@ void microtan_state::init_microtan()
 		dst += 4;
 	}
 
+	switch (read_dsw() & 3)
+	{
+		case 0:  // 1K only :)
+			space.nop_readwrite(0x0400, 0xbbff);
+			break;
+		case 1:  // +7K TANEX
+			space.install_ram(0x0400, 0x1fff,nullptr);
+			space.nop_readwrite(0x2000, 0xbbff);
+			break;
+		default: // +7K TANEX + 40K TANRAM
+			space.install_ram(0x0400, 0xbbff, nullptr);
+			break;
+	}
 
 	m_read_cassette_timer = timer_alloc(TIMER_READ_CASSETTE);
 	m_pulse_nmi_timer = timer_alloc(TIMER_PULSE_NMI);
@@ -439,24 +467,12 @@ void microtan_state::machine_start()
 
 void microtan_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	switch (ioport("DSW")->read() & 3)
-	{
-		case 0:  // 1K only :)
-			space.nop_readwrite(0x0400, 0xbbff);
-			break;
-		case 1:  // +7K TANEX
-			space.install_ram(0x0400, 0x1fff,nullptr);
-			space.nop_readwrite(0x2000, 0xbbff);
-			break;
-		default: // +7K TANEX + 40K TANRAM
-			space.install_ram(0x0400, 0xbbff, nullptr);
-			break;
-	}
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
 	for (int i = 1; i < 10;  i++)
-		m_keyrows[i] = m_io_keyboard[i-1]->read();
-
+	{
+		m_keyrows[i] = ioport(keynames[i-1])->read();
+	}
 	m_led = BIT(~m_keyrows[3], 7);
 }
 

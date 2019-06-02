@@ -60,8 +60,8 @@ void itt1700_state::mem_map(address_map &map)
 void itt1700_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w("crtc", FUNC(hd6845s_device::address_w));
-	map(0x11, 0x11).w("crtc", FUNC(hd6845s_device::register_w));
+	map(0x10, 0x10).w("crtc", FUNC(hd6845_device::address_w));
+	map(0x11, 0x11).w("crtc", FUNC(hd6845_device::register_w));
 	map(0x20, 0x21).rw("upi", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
 }
 
@@ -86,7 +86,7 @@ void itt1700_state::itt1700(machine_config &config)
 	screen.set_raw(16.6698_MHz_XTAL, 882, 0, 720, 315, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 16.6698_MHz_XTAL / 9)); // on video board
+	hd6845_device &crtc(HD6845(config, "crtc", 16.6698_MHz_XTAL / 9)); // on video board
 	crtc.set_char_width(9);
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);

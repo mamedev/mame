@@ -2,14 +2,16 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-Poly-Computer 880
+    Poly-Computer 880
 
-2009-05-12 Skeleton driver.
+    12/05/2009 Skeleton driver.
 
-http://www.kc85-museum.de/books/poly880/index.html
+    http://www.kc85-museum.de/books/poly880/index.html
 
-Initially the screen is blank. The CTC causes a NMI, this autoboots the
-system, and then the PIO releases the NMI line.
+After starting this driver, the screen may be blank. Press F2 until
+something appears (most likely 'Go'). Then it can be used, or pasted to.
+
+To see it say POLY-880, start the system, press F2, F1, F2.
 
 Pasting:
         0-F : as is
@@ -22,27 +24,33 @@ Test Paste:
         -4000^11^22^33^44^55^66^77^88^99^-4000
         Now press up-arrow to confirm the data has been entered.
 
-TODO:
-    - MCYCL (activate single stepping)
-    - CYCL (single step)
-    - layout LEDs (address bus, data bus, command bus, MCYCL)
-    - RAM expansion
-
-
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/poly880.h"
 #include "poly880.lh"
 
+/*
+
+    TODO:
+
+    - SEND/SCON
+    - MCYCL (activate single stepping)
+    - CYCL (single step)
+    - layout LEDs (address bus, data bus, command bus, MCYCL)
+    - RAM expansion
+
+*/
 
 /* Read/Write Handlers */
 
 void poly880_state::update_display()
 {
 	for (int i = 0; i < 8; i++)
+	{
 		if (BIT(m_digit, i))
 			m_digits[7 - i] = m_segment;
+	}
 }
 
 WRITE8_MEMBER( poly880_state::cldig_w )
@@ -87,34 +95,34 @@ INPUT_CHANGED_MEMBER( poly880_state::trigger_nmi )
 
 static INPUT_PORTS_START( poly880 )
 	PORT_START("KI1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BACK") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("FCT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STEP") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M) PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACK") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FCT") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STEP") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M) PORT_CHAR('-')
 
 	PORT_START("KI2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 
 	PORT_START("KI3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, poly880_state, trigger_reset, 0)
@@ -128,11 +136,6 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER( poly880_state::ctc_z0_w )
 {
 	// SEND
-	if (!m_nmi && state)
-	{
-		m_nmi = true;
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
 }
 
 WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
@@ -169,27 +172,27 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 
 	    bit     signal  description
 
-	    PB0
+	    PB0     TTY
 	    PB1     MIN     tape input
-	    PB2
-	    PB3     n/c
+	    PB2     MOUT    tape output
+	    PB3
 	    PB4     KI1     key row 1 input
 	    PB5     KI2     key row 2 input
-	    PB6
+	    PB6     SCON
 	    PB7     KI3     key row 3 input
 
 	*/
 
-	uint8_t data = 0x4c | ((m_cassette->input() < +0.0) << 1);
+	uint8_t data = 0xf0 | ((m_cassette->input() < +0.0) << 1);
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
 		if (BIT(m_digit, i))
 		{
-			if (BIT(m_ki[0]->read(), i)) data |= 0x10;
-			if (BIT(m_ki[1]->read(), i)) data |= 0x20;
-			if (BIT(m_ki[2]->read(), i)) data |= 0x80;
+			if (!BIT(m_ki[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_ki[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_ki[2]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -202,29 +205,22 @@ WRITE8_MEMBER( poly880_state::pio1_pb_w )
 
 	    bit     signal  description
 
-	    PB0     TTY     speaker
-	    PB1
+	    PB0     TTY     teletype serial output
+	    PB1     MIN
 	    PB2     MOUT    tape output
 	    PB3
-	    PB4
-	    PB5
-	    PB6     SCON    release initial NMI
-	    PB7
+	    PB4     KI1     key row 1 input
+	    PB5     KI2     key row 2 input
+	    PB6     SCON
+	    PB7     KI3     key row 3 input
 
 	*/
 
-	m_speaker->level_w( BIT(data, 0));
 	/* tape output */
 	m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
-
-	if (m_nmi && BIT(data, 6))
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_nmi = false;
-	}
 }
 
-
+#if 0
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config poly880_daisy_chain[] =
@@ -234,7 +230,7 @@ static const z80_daisy_config poly880_daisy_chain[] =
 	{ Z80CTC_TAG },
 	{ nullptr }
 };
-
+#endif
 
 /* Machine Initialization */
 
@@ -255,7 +251,6 @@ void poly880_state::poly880(machine_config &config)
 	Z80(config, m_maincpu, XTAL(7'372'800)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly880_state::poly880_mem);
 	m_maincpu->set_addrmap(AS_IO, &poly880_state::poly880_io);
-	m_maincpu->set_daisy_config(poly880_daisy_chain);
 
 	/* video hardware */
 	config.set_default_layout(layout_poly880);
@@ -276,13 +271,8 @@ void poly880_state::poly880(machine_config &config)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(7'372'800)/16));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
-
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1K");
@@ -299,4 +289,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME             FLAGS
-COMP( 1983, poly880, 0,      0,      poly880, poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, poly880, 0,      0,      poly880, poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

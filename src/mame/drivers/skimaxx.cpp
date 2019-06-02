@@ -378,7 +378,7 @@ void skimaxx_state::m68030_2_map(address_map &map)
 	map(0xfffc0000, 0xfffcffff).ram().share("share1");
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
 	map(0xfffe0000, 0xfffeffff).ram().share("share1");  // HACK
-	//  map(0xfffe0010, 0xfffeffff).ram();             // HACK
+	//	map(0xfffe0010, 0xfffeffff).ram();             // HACK
 	map(0xffff0000, 0xffffffff).ram();
 }
 

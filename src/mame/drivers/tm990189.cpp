@@ -112,9 +112,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_interrupt_callback);
+	DECLARE_WRITE8_MEMBER(usr9901_interrupt_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(sys9901_interrupt_callback);
+	DECLARE_WRITE8_MEMBER(sys9901_interrupt_callback);
 	DECLARE_READ8_MEMBER(sys9901_r);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
@@ -282,13 +282,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
     tms9901 code
 */
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_interrupt_callback )
+WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
 {
 	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
 	// or by keyboard interrupt (level 6)
 	if (!m_load_state)
 	{
-		m_tms9980a->set_input_line(m_tms9901_usr->get_int_level() & 7, ASSERT_LINE);
+		m_tms9980a->set_input_line(offset & 7, ASSERT_LINE);
 	}
 }
 
@@ -320,50 +320,30 @@ WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
 	led_set(3, state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_interrupt_callback )
+WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
 {
 	// TODO: Check this
-	m_tms9901_usr->set_int_line(5, state);
+	m_tms9901_usr->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
 }
 
 READ8_MEMBER( tm990189_state::sys9901_r )
 {
-	// |-|Cass|K|K|K|K|K|C|
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
-
-	offset &= 0x0F;
-	switch (offset)
+	uint8_t data = 0;
+	if (offset == tms9901_device::CB_INT7)
 	{
-		case tms9901_device::INT1:
-		case tms9901_device::INT2:
-		case tms9901_device::INT3:
-		case tms9901_device::INT4:
-		case tms9901_device::INT5:
-			if (m_digitsel < 9)
-				return BIT(ioport(keynames[m_digitsel])->read(), offset-tms9901_device::INT1);
-			else return 0;
+		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
-		case tms9901_device::INT6:
-			return (m_cass->input() > 0);
-		default:
-			return 0;
+		/* keyboard read */
+		if (m_digitsel < 9)
+			data |= ioport(keynames[m_digitsel])->read() << 1;
+
+		/* tape input */
+		if (m_cass->input() > 0.0)
+			data |= 0x40;
 	}
-}
 
-/*
-      uint8_t data = 0;
-      if (offset == tms9901_device::CB_INT7)
-      {
-              static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
-              // keyboard read
-              if (m_digitsel < 9)
-                    data |= ioport(keynames[m_digitsel])->read() << 1;
-              // tape input
-              if (m_cass->input() > 0.0)
-                      data |= 0x40;
-      }
-      return data;
-*/
+	return data;
+}
 
 void tm990189_state::digitsel(int offset, bool state)
 {
@@ -863,7 +843,7 @@ void tm990189_state::tm990_189(machine_config &config)
 	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
 	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
 	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
-	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
+	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
 	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
@@ -883,7 +863,7 @@ void tm990189_state::tm990_189(machine_config &config)
 	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
 	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
-	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
+	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
 	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
 	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
@@ -927,7 +907,7 @@ void tm990189_state::tm990_189_v(machine_config &config)
 	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
 	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
 	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
-	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
+	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
 	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
@@ -947,7 +927,7 @@ void tm990189_state::tm990_189_v(machine_config &config)
 	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
 	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
-	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
+	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
 	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
 	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;

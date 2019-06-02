@@ -107,13 +107,13 @@ void blockout_state::main_map(address_map &map)
 	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).ram().w(FUNC(blockout_state::blockout_videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(FUNC(blockout_state::frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x280002, 0x280003).w(FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
 }
 
 void blockout_state::agress_map(address_map &map)
@@ -128,13 +128,13 @@ void blockout_state::agress_map(address_map &map)
 	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).ram().w(FUNC(blockout_state::blockout_videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(FUNC(blockout_state::frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x280002, 0x280003).w(FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
 }
 
 void blockout_state::audio_map(address_map &map)
@@ -297,10 +297,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 {
 	int scanline = param;
 
-	if (scanline == 250) // vblank-out irq
+	if(scanline == 250) // vblank-out irq
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
-	if (scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
+	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
@@ -314,14 +314,15 @@ void blockout_state::blockout(machine_config &config)
 	Z80(config, m_audiocpu, AUDIO_CLOCK);  /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* assume same as ddragon3 with adjusted visible display area */
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
-	m_screen->set_screen_update(FUNC(blockout_state::screen_update));
+	m_screen->set_screen_update(FUNC(blockout_state::screen_update_blockout));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(2, &blockout_state::blockout_xBGR_444, 513);
+	PALETTE(config, m_palette).set_entries(513);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -450,7 +451,7 @@ void blockout_state::init_agress()
 	 * For now let's use D and just patch the TRACE exception that causes the bogus mirror check
 	 */
 
-	u16 *rom = (u16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x82/2] = 0x2700;
 }

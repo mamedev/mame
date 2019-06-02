@@ -65,7 +65,7 @@
 #define LOG_CRUREAD     (1U<<6)
 #define LOG_RESETLOAD   (1U<<7)
 
-#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
+#define VERBOSE ( LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
 
 #include "logmacro.h"
 
@@ -145,15 +145,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( handset_interrupt_in );
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(psi_input_4);
-	DECLARE_READ8_MEMBER(psi_input_4a);
+	uint8_t read_by_9901(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
 	DECLARE_WRITE_LINE_MEMBER(cs1_motor);
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
-	DECLARE_WRITE_LINE_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(handset_ack);
 	DECLARE_WRITE_LINE_MEMBER(cs2_motor);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
@@ -388,13 +387,13 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('-')
 
 	PORT_START("ALPHA") /* one more port for Alpha line */
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 	/* another version of Alpha Lock which is non-toggling; this is useful when we want to attach
 	    a real TI keyboard for input. For home computers, the Alpha Lock / Shift Lock was a physically
 	    locking key. */
 	PORT_START("ALPHA1")
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alpha Lock non-toggle") PORT_CODE(KEYCODE_RWIN)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock non-toggle") PORT_CODE(KEYCODE_RWIN)
 
 INPUT_PORTS_END
 
@@ -437,208 +436,101 @@ void ti99_4x_state::external_operation(offs_t offset, uint8_t data)
 /***************************************************************************
     TI99/4x-specific tms9901 I/O handlers
 
-        Bit     Meaning
-         0      - (control)   -
-         1      /INT1         (input) EXTINT
-         2      /INT2         (input) VDP
-         3      /INT3         (input) Keyboard = line     / Joystick button
-         4      /INT4         (input) Keyboard Space line / Joystick left
-         5      /INT5         (input) Keyboard Enter line / Joystick right
-         6      /INT6         (input) Keyboard 0 line     / Joystick down
-         7  31  /INT7   P15   (input) Keyboard Fctn line  / Joystick up / AlphaLock
+    See mess/machine/tms9901.c for generic tms9901 CRU handlers.
 
-         8  30  /INT8   P14   (input) Keyboard Shift line
-         9  29  /INT9   P13   (input) Keyboard Ctrl line
-         10 28  /INT10  P12   (input) Keyboard Z line
-         11 27  /INT11  P11   (input) Cassette audio
-         12 26  /INT12  P10   (input) 99/4: Handset, 99/4A: 1
-         13 25  /INT13  P9    (output) Cassette audio   (1?)
-         14 24  /INT14  P8    (output) Audio Gate       (1?)
-         15 23  /INT15  P7    (output) Motor CS2        (1?)
+    TMS9901 interrupt handling on a TI99/4(a).
 
-         16             P0    (output) 99/4: Handset ack (1?)
-         17             P1    (input)  99/4: Handset     (1?)
-         18             P2    (output) Key col 0         (1?)
-         19             P3    (output) Key col 1         (1?)
-         20             P4    (output) Key col 2         (1?)
-         21             P5    (output) AlphaLock select  (1)
-         22             P6    (output) Motor CS1         (1?)
+    TI99/4(a) uses the following interrupts:
+    INT1: external interrupt (used by RS232 controller, for instance)
+    INT2: VDP interrupt
+    TMS9901 timer interrupt (overrides INT3)
+    INT12: handset interrupt (only on a TI-99/4 with the handset prototypes)
 
-         enum { INT1, ... INT7_P15, INT8_P14, ..., P5, P6 }
+    Three (occasionally four) interrupts are used by the system (INT1, INT2,
+    timer, and INT12 on a TI-99/4 with remote handset prototypes), out of 15/16
+    possible interrupts.  Keyboard pins can be used as interrupt pins, too, but
+    this is not emulated (it's a trick, anyway, and I don't know any program
+    which uses it).
 
-    The hardware bug of the TI-99/4A keyboard: You have to release the
-    AlphaLock key when using joysticks.
-    The AlphaLock key was obviously added to the 99/4 matrix in a quite adhoc
-    way; a separate 9901 line (P5) is used to deliver the 0 level to be routed
-    through the switch. When AlphaLock is depressed, it connects the /INT7
-    line via two 470 ohm resistors to P5. When the AlphaLock key is not
-    scanned, P5 is 1, pulling up the /INT7 line. Moving the joystick lever up
-    should pull it down, but due to the additional resistance in the long
-    cable in the joystick, the sum resistance becomes too high to safely
-    pull down the level, and the 9901 does not sense a 0 on its /INT7 input.
+    When an interrupt line is set (and the corresponding bit in the interrupt mask is set),
+    a level 1 interrupt is requested from the TMS9900.  This interrupt request lasts as long as
+    the interrupt pin and the relevant bit in the interrupt mask are set.
 
-                     Alpha
-    P5 -----[470]-----/ +
-                        |            Joy up
-    /INT7--+--[470]-----+----[xxx]-----/ ---[280]--- 0 (if column=110 or 111)
-           |
-           +---[10k]--- 1
-               pull-up
-
-    The typical fix was to insert a diode at the Alphalock key.
 ***************************************************************************/
 
-READ8_MEMBER( ti99_4x_state::psi_input_4)
+
+uint8_t ti99_4x_state::read_by_9901(offs_t offset)
 {
-	switch (offset)
+	int answer=0;
+
+	switch (offset & 0x03)
 	{
-	case tms9901_device::INT1:
-		return (m_int1==CLEAR_LINE)? 1 : 0;
-	case tms9901_device::INT2:
-		return (m_int2==CLEAR_LINE)? 1 : 0;
-	case tms9901_device::INT3:
-	case tms9901_device::INT4:
-	case tms9901_device::INT5:
-	case tms9901_device::INT6:
-	case tms9901_device::INT7_P15:
-		// Keyboard ACTIVE_LOW, Joysticks ACTIVE_LOW
-		if (m_keyboard_column >= 5)
-			return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
-		else
-			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
-	case tms9901_device::INT8_P14:
-	case tms9901_device::INT9_P13:
-	case tms9901_device::INT10_P12:
-		if (m_keyboard_column >= 5)  // no joystick lines after /INT7
-			return 1;
-		else
-			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
-	case tms9901_device::INT11_P11:
-		return (m_cassette1->input() > 0);
-	case tms9901_device::INT12_P10:
-		return (m_int12==CLEAR_LINE)? 1 : 0;
-	case tms9901_device::P1:
-		return BIT(m_joyport->read_port(), 5);  // 0x20
-	default:
-		return 1;
-	}
-}
-
-READ8_MEMBER( ti99_4x_state::psi_input_4a )
-{
-	int alphabias=0;
-
-	switch (offset)
-	{
-	case tms9901_device::INT1:
-		return (m_int1==CLEAR_LINE)? 1 : 0;
-	case tms9901_device::INT2:
-		return (m_int2==CLEAR_LINE)? 1 : 0;
-	case tms9901_device::INT3:
-	case tms9901_device::INT4:
-	case tms9901_device::INT5:
-	case tms9901_device::INT6:
-		// Keyboard ACTIVE_LOW (s.o.)
-		// Joysticks ACTIVE_LOW (handset.cpp)
-		if (m_keyboard_column >= 6)
-			return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
-		else
-			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
-
-	case tms9901_device::INT7_P15:
-		if (m_keyboard_column >= 6) // Joysticks
+	case tms9901_device::CB_INT7:
+		//
+		// Read pins INT3*-INT7* of TI99's 9901.
+		// bit 1: INT1 status
+		// bit 2: INT2 status
+		// bit 3-7: keyboard status bits 0 to 4
+		//
+		// |K|K|K|K|K|I2|I1|C|
+		//
+		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) // joy 1, 2, handset
 		{
-			// If the Alpha Lock bug is not fixed
-			if (m_alphabug->read()!=0)
-				alphabias = ~(m_alpha->read() & m_alpha1->read());
-
-			return BIT(m_joyport->read_port() | alphabias, offset-tms9901_device::INT3);
+			answer = m_joyport->read_port();
+			// The hardware bug of the TI-99/4A: you have to release the
+			// Alphalock key when using joysticks. This is a maldesign of the
+			// board: When none of the other keyboard lines are selected the
+			// depressed Alphalock key pulls up the /INT7 line which is also
+			// used for joystick up. The joystick switch then fails to lower
+			// the line enough to make the TMS9901 sense the low level.
+			// A reported, feasible fix was to cut the line and insert a diode
+			// below the Alphalock key.
+			if ((m_model!=MODEL_4) && (m_alphabug->read()!=0) ) answer |= (m_alpha->read() | m_alpha1->read());
 		}
 		else
 		{
-			if (m_check_alphalock)
-			{
-				return BIT(m_alpha->read() & m_alpha1->read(), offset-tms9901_device::INT3);
-			}
-			else
-				return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
+		if (m_check_alphalock)  // never true for TI-99/4
+		{
+			answer &= ~(m_alpha->read() | m_alpha1->read());
+		}
+		answer = (answer << 3);
+		if (m_int1 == CLEAR_LINE) answer |= 0x02;
+		if (m_int2 == CLEAR_LINE) answer |= 0x04;
 
-	case tms9901_device::INT8_P14:
-	case tms9901_device::INT9_P13:
-	case tms9901_device::INT10_P12:
-		if (m_keyboard_column >= 6)  // no joystick lines after /INT7
-			return 1;
-		else
-			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
-	case tms9901_device::INT11_P11:
-		// CS2 is write-only
-		return (m_cassette1->input()>0);
-	default:
-		return 1;
+		break;
+
+	case tms9901_device::INT8_INT15:
+		// |1|1|1|INT12|0|K|K|K|
+		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
+		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
+		answer |= 0xe0;
+		if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
+		break;
+
+	case tms9901_device::P0_P7:
+		// Required for the handset (only on TI-99/4)
+		if ((m_joyport->read_port() & 0x20)!=0) answer |= 2;
+		break;
+
+	case tms9901_device::P8_P15:
+		// Preset to 1
+		answer = 4;
+
+		// Interrupt pin of the handset (only on TI-99/4)
+		// Negative logic (interrupt pulls line down)
+		if ((m_joyport->read_port() & 0x40)==0) answer = 0;
+
+		// we don't take CS2 into account, as CS2 is a write-only unit
+		if (m_cassette1->input() > 0)
+		{
+			answer |= 8;
+		}
+		break;
 	}
+	return answer;
 }
-/*  switch (offset & 0x03)
-    {
-    case tms9901_device::CB_INT7:
-        //
-        // Read pins INT3*-INT7* of TI99's 9901.
-        // bit 1: INT1 status
-        // bit 2: INT2 status
-        // bit 3-7: keyboard status bits 0 to 4
-        //
-        // |K|K|K|K|K|I2|I1|C|
-        //
-        if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) // joy 1, 2, handset
-        {
-            answer = m_joyport->read_port();
-
-            if ((m_model!=MODEL_4) && (m_alphabug->read()!=0) ) answer |= (m_alpha->read() | m_alpha1->read());
-        }
-        else
-        {
-            answer = m_keyboard[m_keyboard_column]->read();
-        }
-        if (m_check_alphalock)  // never true for TI-99/4
-        {
-            answer &= ~(m_alpha->read() | m_alpha1->read());
-        }
-        answer = (answer << 3);
-        if (m_int1 == CLEAR_LINE) answer |= 0x02;
-        if (m_int2 == CLEAR_LINE) answer |= 0x04;
-
-        break;
-
-    case tms9901_device::INT8_INT15:
-        // |1|1|1|INT12|0|K|K|K|
-        if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
-        else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
-        answer |= 0xe0;
-        if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
-        break;
-
-    case tms9901_device::P0_P7:
-        // Required for the handset (only on TI-99/4)
-        if ((m_joyport->read_port() & 0x20)!=0) answer |= 2;
-        break;
-
-    case tms9901_device::P8_P15:
-        // Preset to 1
-        answer = 4;
-
-        // Interrupt pin of the handset (only on TI-99/4)
-        // Negative logic (interrupt pulls line down)
-        if ((m_joyport->read_port() & 0x40)==0) answer = 0;
-
-        // we don't take CS2 into account, as CS2 is a write-only unit
-        if (m_cassette1->input() > 0)
-        {
-            answer |= 8;
-        }
-        break;
-    }
-    */
-
 
 /*
     Handler for TMS9901 P0 pin (handset data acknowledge); only for 99/4
@@ -736,15 +628,17 @@ WRITE_LINE_MEMBER( ti99_4x_state::cassette_output )
 	m_cassette2->output(state==ASSERT_LINE? +1 : -1);
 }
 
-WRITE_LINE_MEMBER( ti99_4x_state::tms9901_interrupt )
+void ti99_4x_state::tms9901_interrupt(offs_t offset, uint8_t data)
 {
-	m_cpu->set_input_line(INT_9900_INTREQ, state);
+	// offset contains the interrupt level (0-15)
+	// However, the TI board just ignores that level and hardwires it to 1
+	// See below (interrupt_level)
+	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
 uint8_t ti99_4x_state::interrupt_level()
 {
-	// The interrupt level must be fetched from the 9901;
-	// on the TI-99 systems these IC lines are not used; the input lines
+	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
 	return 1;
 }
@@ -786,7 +680,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
 {
 	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 from EVPC on tms9901, level=%d\n", state);
 	m_int2 = (line_state)state;
-	m_tms9901->set_int_line(2, state);
+	m_tms9901->set_single_int(2, state);
 }
 
 /*
@@ -794,11 +688,13 @@ WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_in )
 {
-	LOGMASKED(LOG_INTERRUPTS, "VDP %s /INT2 on TMS9901\n", (state==ASSERT_LINE)? "asserts" : "clears");
-	m_int2 = (line_state)state;
-	m_tms9901->set_int_line(2, state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 on tms9901, level=%d\n", state);
+
 	// Pulse for the handset
 	if (m_model == MODEL_4) m_joyport->pulse_clock();
+
+	m_int2 = (line_state)state;
+	m_tms9901->set_single_int(2, state);
 }
 
 /*
@@ -808,7 +704,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::handset_interrupt_in)
 {
 	LOGMASKED(LOG_INTERRUPTS, "joyport INT12 on tms9901, level=%d\n", state);
 	m_int12 = (line_state)state;
-	m_tms9901->set_int_line(12, state);
+	m_tms9901->set_single_int(12, state);
 }
 
 /*
@@ -892,7 +788,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::extint )
 {
 	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
-	m_tms9901->set_int_line(1, state);
+	m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
@@ -949,6 +845,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 
 	// Programmable system interface (driven by CLKOUT)
 	TMS9901(config, m_tms9901, 0);
+	m_tms9901->read_cb().set(FUNC(ti99_4x_state::read_by_9901));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));
 	m_tms9901->p_out_cb(4).set(FUNC(ti99_4x_state::keyC2));
@@ -956,7 +853,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_tms9901->p_out_cb(7).set(FUNC(ti99_4x_state::cs2_motor));
 	m_tms9901->p_out_cb(8).set(FUNC(ti99_4x_state::audio_gate));
 	m_tms9901->p_out_cb(9).set(FUNC(ti99_4x_state::cassette_output));
-	m_tms9901->intreq_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
+	m_tms9901->intlevel_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
 
 	// Databus multiplexer
 	TI99_DATAMUX(config, m_datamux, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
@@ -999,7 +896,6 @@ void ti99_4x_state::ti99_4(machine_config& config)
 	// Main board
 	// Add handset interrupt to 9901
 	m_tms9901->p_out_cb(0).set(FUNC(ti99_4x_state::handset_ack));
-	m_tms9901->read_cb().set(FUNC(ti99_4x_state::psi_input_4)); // use a separate one for 99/4
 
 	// Input/output port: normal config
 	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
@@ -1060,7 +956,6 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 	// Main board
 	// Add Alphalock to 9901
 	m_tms9901->p_out_cb(5).set(FUNC(ti99_4x_state::alphaW));
-	m_tms9901->read_cb().set(FUNC(ti99_4x_state::psi_input_4a));
 
 	// Input/output port: Normal config
 	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
@@ -1151,7 +1046,6 @@ void ti99_4x_state::ti99_4ev_60hz(machine_config& config)
 	// Main board
 	// Add Alphalock
 	m_tms9901->p_out_cb(5).set(FUNC(ti99_4x_state::alphaW));
-	m_tms9901->read_cb().set(FUNC(ti99_4x_state::psi_input_4a));
 
 	// EVPC connector
 	// This is needed for delivering the video interrupt from the

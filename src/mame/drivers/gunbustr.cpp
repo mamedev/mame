@@ -76,7 +76,7 @@ INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-void gunbustr_state::coin_word_w(u8 data)
+WRITE8_MEMBER(gunbustr_state::coin_word_w)
 {
 	if (m_coin_lockout)
 	{
@@ -89,24 +89,24 @@ void gunbustr_state::coin_word_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 }
 
-void gunbustr_state::motor_control_w(u32 data)
+WRITE32_MEMBER(gunbustr_state::motor_control_w)
 {
 	// Standard value poked into MSW is 0x3c00
 	// (0x2000 and zero are written at startup)
-	output().set_value("Player1_Gun_Recoil", BIT(data, 24));
-	output().set_value("Player2_Gun_Recoil", BIT(data, 16));
-	output().set_value("Hit_lamp", BIT(data, 18));
+	output().set_value("Player1_Gun_Recoil", (data & 0x1000000) ? 1 : 0);
+	output().set_value("Player2_Gun_Recoil", (data & 0x10000) ? 1 : 0);
+	output().set_value("Hit_lamp", (data & 0x40000) ? 1 : 0);
 }
 
 
 
-READ32_MEMBER(gunbustr_state::gun_r)
+READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 {
-	return (m_io_light_x[0]->read() << 24) | (m_io_light_y[0]->read() << 16) |
-			(m_io_light_x[1]->read() << 8)  |  m_io_light_y[1]->read();
+	return ( ioport("LIGHT0_X")->read() << 24) | (ioport("LIGHT0_Y")->read() << 16) |
+			( ioport("LIGHT1_X")->read() << 8)  |  ioport("LIGHT1_Y")->read();
 }
 
-void gunbustr_state::gun_w(u32 data)
+WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
 {
 	/* 10000 cycle delay is arbitrary */
 	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(10000));
@@ -125,7 +125,7 @@ void gunbustr_state::gunbustr_map(address_map &map)
 	map(0x380000, 0x380003).w(FUNC(gunbustr_state::motor_control_w));                                          /* motor, lamps etc. */
 	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gun_r), FUNC(gunbustr_state::gun_w));                       /* gun coord read */
+	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gunbustr_gun_r), FUNC(gunbustr_state::gunbustr_gun_w));                       /* gun coord read */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
@@ -202,10 +202,11 @@ static const gfx_layout tile16x16_layout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ STEP4(0,8) },
-	{ STEP8(8*4,1), STEP8(0,1) },
-	{ STEP16(0,8*4*2) },
-	16*16*4   /* every sprite takes 128 consecutive bytes */
+	{ 0, 8, 16, 24 },
+	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	64*16   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout charlayout =
@@ -213,10 +214,10 @@ static const gfx_layout charlayout =
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,        /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(7*4,-4), STEP8(15*4,-4) },
-	{ STEP16(0,16*4) },
-	16*16*4     /* every sprite takes 128 consecutive bytes */
+	{ 0, 1, 2, 3 },
+	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_gunbustr )
@@ -254,7 +255,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(gunbustr_state::screen_update));
+	screen.set_screen_update(FUNC(gunbustr_state::screen_update_gunbustr));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
@@ -286,8 +287,8 @@ ROM_START( gunbustr )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "d27-01.bin", 0x00002, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "d27-02.bin", 0x00000, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+	ROM_LOAD16_BYTE( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
+	ROM_LOAD16_BYTE( "d27-02.bin", 0x00001, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
@@ -295,7 +296,7 @@ ROM_START( gunbustr )
 	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
 	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
-	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -320,8 +321,8 @@ ROM_START( gunbustru )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "d27-01.bin", 0x00002, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "d27-02.bin", 0x00000, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+	ROM_LOAD16_BYTE( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
+	ROM_LOAD16_BYTE( "d27-02.bin", 0x00001, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
@@ -329,7 +330,7 @@ ROM_START( gunbustru )
 	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
 	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
-	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -354,8 +355,8 @@ ROM_START( gunbustrj )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "d27-01.bin", 0x00002, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "d27-02.bin", 0x00000, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+	ROM_LOAD16_BYTE( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
+	ROM_LOAD16_BYTE( "d27-02.bin", 0x00001, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
@@ -363,7 +364,7 @@ ROM_START( gunbustrj )
 	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
 	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
-	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -378,7 +379,7 @@ ROM_END
 
 READ32_MEMBER(gunbustr_state::main_cycle_r)
 {
-	if (m_maincpu->pc() == 0x55a && (m_ram[0x3acc/4] & 0xff000000) == 0)
+	if (m_maincpu->pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
 		m_maincpu->spin_until_interrupt();
 
 	return m_ram[0x3acc/4];

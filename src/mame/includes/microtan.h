@@ -28,17 +28,16 @@
 class microtan_state : public driver_device
 {
 public:
-	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_irq_line(*this, "irq_line")
-		, m_cassette(*this, "cassette")
-		, m_via6522(*this, "via6522%u", 0)
-		, m_ay8910(*this, "ay8910%u", 0)
-		, m_io_keyboard(*this, "ROW%u", 0)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_led(*this, "led1")
+	microtan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_irq_line(*this, "irq_line"),
+		m_cassette(*this, "cassette"),
+		m_via6522(*this, "via6522%u", 0),
+		m_ay8910(*this, "ay8910%u", 0),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_led(*this, "led1")
 	{ }
 
 	void microtan(machine_config &config);
@@ -66,7 +65,6 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<via6522_device, 2> m_via6522;
 	required_device_array<ay8910_device, 2> m_ay8910;
-	required_ioport_array<9> m_io_keyboard;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<> m_led;
 
@@ -103,6 +101,7 @@ private:
 	DECLARE_WRITE8_MEMBER(via_1_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
+	uint8_t read_dsw();
 	void store_key(int key);
 	image_verify_result verify_snapshot(uint8_t *data, int size);
 	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);

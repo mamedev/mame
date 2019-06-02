@@ -38,8 +38,6 @@ luafilesystem - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lzma - [The GNU Lesser General Public License](http://opensource.org/licenses/LGPL-2.1)
 
-minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
-
 nanosvg - [zlib license](http://opensource.org/licenses/Zlib)
 
 portaudio - [The MIT License (MIT)](http://opensource.org/licenses/MIT) explanation at [their site](http://www.portaudio.com/license.html)

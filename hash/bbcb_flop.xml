@@ -24,7 +24,7 @@
 		<info name="notes" value="Original" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="3dbomballey.ssd" size="102400" crc="5a8deaff" sha1="d0f4716a376e4407492b4db7f87597bc07d7651f" />
+				<rom name="3dbomballey.ssd" size="102400" crc="5a8deaff" sha1="d0f4716a376e4407492b4db7f87597bc07d7651f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,7 +35,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="145408">
-				<rom name="Acheton (Topologika).ssd" size="145408" crc="64bb8ff0" sha1="2954ba2923a33c469da7c3b8263ab9b7bcdf9bb7" />
+				<rom name="Acheton (Topologika).ssd" size="145408" crc="64bb8ff0" sha1="2954ba2923a33c469da7c3b8263ab9b7bcdf9bb7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 		<publisher>Acornsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Acornsoft Demo Disk.ssd" size="204800" crc="57015366" sha1="bb72e7cc96ca87c2ebb560f7cb9cba7feb658105" />
+				<rom name="Acornsoft Demo Disk.ssd" size="204800" crc="57015366" sha1="bb72e7cc96ca87c2ebb560f7cb9cba7feb658105" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="The Acornsoft Hits Vol1.ssd" size="102400" crc="426c5a05" sha1="b2758253391909771c43c30cc19b11b1088fd0ab" />
+				<rom name="The Acornsoft Hits Vol1.ssd" size="102400" crc="426c5a05" sha1="b2758253391909771c43c30cc19b11b1088fd0ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +68,7 @@
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="95744">
-				<rom name="The Acornsoft Hits Vol2.ssd" size="95744" crc="01be9682" sha1="1e3afc6fb9a47b87e72efb55ab612150155d4981" />
+				<rom name="The Acornsoft Hits Vol2.ssd" size="95744" crc="01be9682" sha1="1e3afc6fb9a47b87e72efb55ab612150155d4981" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -79,13 +79,13 @@
 		<publisher>Alpine Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="alps23.ssd" size="204800" crc="05cb0cd3" sha1="e554baaa6499c306fb4c7acc85901a8c1ab20aa8"/>
+				<rom name="alps23.ssd" size="204800" crc="05cb0cd3" sha1="e554baaa6499c306fb4c7acc85901a8c1ab20aa8" offset="0"/>
 			</dataarea>
 		</part>
 <!--
         <part name="rom" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="alps.rom" size="16384" crc="75e5219e" sha1="bb03788d7f58e222795f460767bcdf198c21140a"/>
+                <rom name="alps.rom" size="16384" crc="75e5219e" sha1="bb03788d7f58e222795f460767bcdf198c21140a" offset="0"/>
             </dataarea>
         </part>
 -->
@@ -98,7 +98,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ArcPinball (1990)(Shibumi Soft).ssd" size="204800" crc="e255f429" sha1="ae0308ac16ebb277668dd96d1a8e58d666b318c6" />
+				<rom name="ArcPinball (1990)(Shibumi Soft).ssd" size="204800" crc="e255f429" sha1="ae0308ac16ebb277668dd96d1a8e58d666b318c6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92928">
-				<rom name="arcade soccer.ssd" size="92928" crc="c0ff80d4" sha1="7c522c65ea565b1eba20ea2200fa80b2cc06c2db" />
+				<rom name="arcade soccer.ssd" size="92928" crc="c0ff80d4" sha1="7c522c65ea565b1eba20ea2200fa80b2cc06c2db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 		<info name="author" value="Richard Broadhurst" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="103936">
-				<rom name="AstroBlaster.ssd" size="103936" crc="45b5c13c" sha1="7dd69dcb34194136a8e88ca3383a07b201662d0c"/>
+				<rom name="AstroBlaster.ssd" size="103936" crc="45b5c13c" sha1="7dd69dcb34194136a8e88ca3383a07b201662d0c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -133,7 +133,7 @@
 		<publisher>BBC Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="astromony.ssd" size="102400" crc="1b319e90" sha1="b21b233201364f357a33ca015c40b9b7dacd1dfc" />
+				<rom name="astromony.ssd" size="102400" crc="1b319e90" sha1="b21b233201364f357a33ca015c40b9b7dacd1dfc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -145,13 +145,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Avon"/>
 			<dataarea name="flop" size="87040">
-				<rom name="Avon.ssd" size="87040" crc="494729bb" sha1="88ee4f64af9023e392d328f4e05c8854d142fe83" />
+				<rom name="Avon.ssd" size="87040" crc="494729bb" sha1="88ee4f64af9023e392d328f4e05c8854d142fe83" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Murdac"/>
 			<dataarea name="flop" size="66560">
-				<rom name="Murdac.ssd" size="66560" crc="82285423" sha1="814df1fee5650085658bb6e3d1edf089eb60db25" />
+				<rom name="Murdac.ssd" size="66560" crc="82285423" sha1="814df1fee5650085658bb6e3d1edf089eb60db25" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@
 		<publisher>Micro Power</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="BanditsAt3oclock.ssd" size="102400" crc="03ffef19" sha1="2a36c57e1f1766a0c4bc3b192a2c9cdeaca9c424" />
+				<rom name="BanditsAt3oclock.ssd" size="102400" crc="03ffef19" sha1="2a36c57e1f1766a0c4bc3b192a2c9cdeaca9c424" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@
 		<publisher>Design People</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="cass" size="102400">
-				<rom name="battle_of_britain.ssd" size="102400" crc="ab286f48" sha1="2f7ee561a62ddd3008760b349ccfaf13a63031c0" />
+				<rom name="battle_of_britain.ssd" size="102400" crc="ab286f48" sha1="2f7ee561a62ddd3008760b349ccfaf13a63031c0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@
 		<publisher>Blue Ribbon</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="90880">
-				<rom name="BlueRibbonGamesDisk1.ssd" size="90880" crc="0c8878fe" sha1="db715f1820ee0a33694d8817f3c8d377bb296e33" />
+				<rom name="BlueRibbonGamesDisk1.ssd" size="90880" crc="0c8878fe" sha1="db715f1820ee0a33694d8817f3c8d377bb296e33" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@
 		<publisher>Blue Ribbon</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="67584">
-				<rom name="BlueRibbonGamesDisk2.ssd" size="67584" crc="d2e910a6" sha1="f417b2f70b1c0f58a1777e44405d40a53947d997" />
+				<rom name="BlueRibbonGamesDisk2.ssd" size="67584" crc="d2e910a6" sha1="f417b2f70b1c0f58a1777e44405d40a53947d997" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +206,7 @@
 		<publisher>Blue Ribbon</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="73728">
-				<rom name="BlueRibbonGamesDisk3.ssd" size="73728" crc="ae52b9b9" sha1="9e576452d96accd237aba01b4dd197f452a98111" />
+				<rom name="BlueRibbonGamesDisk3.ssd" size="73728" crc="ae52b9b9" sha1="9e576452d96accd237aba01b4dd197f452a98111" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +217,7 @@
 		<publisher>Bug Byte</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99840">
-				<rom name="bugbyte_compilation.ssd" size="99840" crc="fe18fae7" sha1="8de083f1624bffa669a802c7c3e75ef43498dd83" />
+				<rom name="bugbyte_compilation.ssd" size="99840" crc="fe18fae7" sha1="8de083f1624bffa669a802c7c3e75ef43498dd83" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -228,7 +228,7 @@
 		<publisher>Bug Byte</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="bugbyte_compilation2.ssd" size="102400" crc="0701047f" sha1="23c40a55bff3a97cbe7bf603fa922e2969730656" />
+				<rom name="bugbyte_compilation2.ssd" size="102400" crc="0701047f" sha1="23c40a55bff3a97cbe7bf603fa922e2969730656" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +240,7 @@
 		<info name="author" value="Richard Broadhurst" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="25344">
-				<rom name="carnival.ssd" size="25344" crc="4b4459cf" sha1="5d214b7fd55ba3ccb79d98cc3aeee4e091b939a3"/>
+				<rom name="carnival.ssd" size="25344" crc="4b4459cf" sha1="5d214b7fd55ba3ccb79d98cc3aeee4e091b939a3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@
 		<info name="author" value="David Boddie" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="CastleRaider-1.0.4-BBC.ssd" size="204800" crc="389e9dc2" sha1="3c1d30b14b16727bced0abb81e1b680234b66d8c"/>
+				<rom name="CastleRaider-1.0.4-BBC.ssd" size="204800" crc="389e9dc2" sha1="3c1d30b14b16727bced0abb81e1b680234b66d8c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -263,7 +263,7 @@
 		<publisher>Ganymede Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="29952">
-				<rom name="classic_arcade_games.ssd" size="29952" crc="9ac9f9f9" sha1="7ca211c0e5bd3ef0e7b2d9f998c1d9b1609bf7a9" />
+				<rom name="classic_arcade_games.ssd" size="29952" crc="9ac9f9f9" sha1="7ca211c0e5bd3ef0e7b2d9f998c1d9b1609bf7a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -274,7 +274,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="76800">
-				<rom name="Countdown to Doom (Topologika).ssd" size="76800" crc="d6301d2f" sha1="9ae1f29d4d28419c66f92e7c0252fe45b73b7dd1" />
+				<rom name="Countdown to Doom (Topologika).ssd" size="76800" crc="d6301d2f" sha1="9ae1f29d4d28419c66f92e7c0252fe45b73b7dd1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -285,7 +285,7 @@
 		<publisher>Mandarin</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="48640">
-				<rom name="beyondinfinity-cutetokill.ssd" size="48640" crc="350daf5c" sha1="afe6bc6448e86e6bc6bee34cae09c8cf46828b1b" />
+				<rom name="beyondinfinity-cutetokill.ssd" size="48640" crc="350daf5c" sha1="afe6bc6448e86e6bc6bee34cae09c8cf46828b1b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -296,7 +296,7 @@
 		<publisher>Cronosoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="75008">
-				<rom name="dominion.ssd" size="75008" crc="f529088a" sha1="af22b16449b82154c5f7340c4aa6ca6c3818687d" />
+				<rom name="dominion.ssd" size="75008" crc="f529088a" sha1="af22b16449b82154c5f7340c4aa6ca6c3818687d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -308,13 +308,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A: Master Version"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Dunjunz-SideA.ssd" size="102400" crc="9c45c1c4" sha1="bf6120ed9c5756fb59af6731112fe71233aca0cf" />
+				<rom name="Dunjunz-SideA.ssd" size="102400" crc="9c45c1c4" sha1="bf6120ed9c5756fb59af6731112fe71233aca0cf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B: BBC B Version"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Dunjunz-SideB.ssd" size="102400" crc="720106d5" sha1="f999969ece13bc9054772290e8b57f64d7ad2b9b" />
+				<rom name="Dunjunz-SideB.ssd" size="102400" crc="720106d5" sha1="f999969ece13bc9054772290e8b57f64d7ad2b9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@
 		<publisher>Cronosoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Egghead_In_Space.ssd" size="204800" crc="8bdecdf7" sha1="f6a4cd38977876ead16e38e5368574e272202da6" />
+				<rom name="Egghead_In_Space.ssd" size="204800" crc="8bdecdf7" sha1="f6a4cd38977876ead16e38e5368574e272202da6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@
 		<info name="release" value="SNG38" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="elitebbc.ssd" size="204800" crc="1f15458d" sha1="ac47c0d6d0006ceef2102dda521df3364aff32aa" />
+				<rom name="elitebbc.ssd" size="204800" crc="1f15458d" sha1="ac47c0d6d0006ceef2102dda521df3364aff32aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -350,7 +350,7 @@
 		<info name="author" value="Angus Duggan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="elitea.ssd" size="204800" crc="8f13afce" sha1="31e3cba984e5edc3bbd7f287f563b6d9aa6dd67e" />
+				<rom name="elitea.ssd" size="204800" crc="8f13afce" sha1="31e3cba984e5edc3bbd7f287f563b6d9aa6dd67e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -361,7 +361,7 @@
 		<publisher>Unreleased</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" />
+				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -372,7 +372,7 @@
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="45312">
-				<rom name="EmpireStrikesBack.ssd" size="45312" crc="ad35ac13" sha1="5cd62482cf749b2e5f2742fe833513870657d920" />
+				<rom name="EmpireStrikesBack.ssd" size="45312" crc="ad35ac13" sha1="5cd62482cf749b2e5f2742fe833513870657d920" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -384,7 +384,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="72704">
-				<rom name="e-type.ssd" size="72704" crc="cd685f63" sha1="9d64109db22299adbae8da053eb9d2e68a1cb08c" />
+				<rom name="e-type.ssd" size="72704" crc="cd685f63" sha1="9d64109db22299adbae8da053eb9d2e68a1cb08c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -396,20 +396,20 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Play Disk"/>
 			<dataarea name="flop" size="204800">
-				<rom name="Explorer_PlayDisk.ssd" size="204800" crc="ca3e7075" sha1="09fc0deb5fcda48e9b958db9aa03a1096471c7d1" />
+				<rom name="Explorer_PlayDisk.ssd" size="204800" crc="ca3e7075" sha1="09fc0deb5fcda48e9b958db9aa03a1096471c7d1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Save Disk"/>
 			<dataarea name="flop" size="204800">
-				<rom name="Explorer_SaveDisk.ssd" size="204800" crc="8a38a5c6" sha1="c60de8b27aee0734ff795cfd4b38afe545f2d00c" />
+				<rom name="Explorer_SaveDisk.ssd" size="204800" crc="8a38a5c6" sha1="c60de8b27aee0734ff795cfd4b38afe545f2d00c" offset="0" />
 			</dataarea>
 		</part>
 <!--
         <part name="rom1" interface="bbc_rom">
             <feature name="part_id" value="Dragon ROM"/>
             <dataarea name="rom" size="16384">
-                <rom name="dragon_rom.bin" size="16384" crc="6d92ca4f" sha1="1f5df3ffb0b982881e52bbf00b29f52e5e32d868" />
+                <rom name="dragon_rom.bin" size="16384" crc="6d92ca4f" sha1="1f5df3ffb0b982881e52bbf00b29f52e5e32d868" offset="0" />
             </dataarea>
         </part>
 -->
@@ -421,7 +421,7 @@
 		<publisher>Ocean (Unreleased)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="12544">
-				<rom name="eyes-unreleased.ssd" size="12544" crc="19f1dd27" sha1="182b05ef661872b4e63a7e627675f1f6297da8df" />
+				<rom name="eyes-unreleased.ssd" size="12544" crc="19f1dd27" sha1="182b05ef661872b4e63a7e627675f1f6297da8df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -432,7 +432,7 @@
 		<publisher>I.J.K.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="family_games.ssd" size="102400" crc="ef66ae5e" sha1="99311a6d2c7d58064d599d5b0c59639ed3f4d8e3" />
+				<rom name="family_games.ssd" size="102400" crc="ef66ae5e" sha1="99311a6d2c7d58064d599d5b0c59639ed3f4d8e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -444,7 +444,7 @@
 		<info name="author" value="Richard Broadhurst" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="25600">
-				<rom name="frogger-rs.ssd" size="25600" crc="4f0b0152" sha1="3ffe76241e34e5f6dff6ae53d070d3be40ab0002" />
+				<rom name="frogger-rs.ssd" size="25600" crc="4f0b0152" sha1="3ffe76241e34e5f6dff6ae53d070d3be40ab0002" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +455,7 @@
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65280">
-				<rom name="frogman-demo.ssd" size="65280" crc="c4fc4bc9" sha1="c81ab2374b31fb3cd761e5a6aca7ed1fc321667f" />
+				<rom name="frogman-demo.ssd" size="65280" crc="c4fc4bc9" sha1="c81ab2374b31fb3cd761e5a6aca7ed1fc321667f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -466,7 +466,7 @@
 		<publisher>Magic Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="galaxys_edge.ssd" size="204800" crc="c16a43af" sha1="16b14c7a742b842cae75303e586c1947df84c772" />
+				<rom name="galaxys_edge.ssd" size="204800" crc="c16a43af" sha1="16b14c7a742b842cae75303e586c1947df84c772" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -478,7 +478,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="giant killer.ssd" size="102400" crc="082df282" sha1="dfd5e3f33cd850246cce1a7f8de977ee21fa0385" />
+				<rom name="giant killer.ssd" size="102400" crc="082df282" sha1="dfd5e3f33cd850246cce1a7f8de977ee21fa0385" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -490,7 +490,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89856">
-				<rom name="holed out.ssd" size="89856" crc="4f767fc8" sha1="496f5f20d093651d056528fbee4bcfbc2e9a6c37" />
+				<rom name="holed out.ssd" size="89856" crc="4f767fc8" sha1="496f5f20d093651d056528fbee4bcfbc2e9a6c37" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -502,7 +502,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99584">
-				<rom name="holed out extra courses vol1.ssd" size="99584" crc="186a21e9" sha1="b4475e56fae9786c4b964e43b0b1a14dec9e8368" />
+				<rom name="holed out extra courses vol1.ssd" size="99584" crc="186a21e9" sha1="b4475e56fae9786c4b964e43b0b1a14dec9e8368" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -514,7 +514,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99584">
-				<rom name="holed out extra courses vol2.ssd" size="99584" crc="78324f99" sha1="eab859a632e8251aa7c3ece6aae4b7d759ec5b99" />
+				<rom name="holed out extra courses vol2.ssd" size="99584" crc="78324f99" sha1="eab859a632e8251aa7c3ece6aae4b7d759ec5b99" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -526,7 +526,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="the hunt search for shauna.ssd" size="102400" crc="9967e594" sha1="fc9512ecefc422ae6b2152aa308284b500072bd0" />
+				<rom name="the hunt search for shauna.ssd" size="102400" crc="9967e594" sha1="fc9512ecefc422ae6b2152aa308284b500072bd0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -538,7 +538,7 @@
 		<info name="usage" value="disable Speech" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="91392">
-				<rom name="HyperSports.ssd" size="91392" crc="8a99db6a" sha1="92ae7c8bbcef78f8ad4d89c3c2a61514d73291cb" />
+				<rom name="HyperSports.ssd" size="91392" crc="8a99db6a" sha1="92ae7c8bbcef78f8ad4d89c3c2a61514d73291cb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +550,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="56064">
-				<rom name="inertia.ssd" size="56064" crc="e7a50f85" sha1="ce2fa997a2e47abbae819a19b64858db816690d1" />
+				<rom name="inertia.ssd" size="56064" crc="e7a50f85" sha1="ce2fa997a2e47abbae819a19b64858db816690d1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -561,7 +561,7 @@
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="36864">
-				<rom name="ReturnOfTheJedi.ssd" size="36864" crc="89039566" sha1="aaef4206ab345b56fa6e0f0224fcb1585767bfe5" />
+				<rom name="ReturnOfTheJedi.ssd" size="36864" crc="89039566" sha1="aaef4206ab345b56fa6e0f0224fcb1585767bfe5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -572,7 +572,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66560">
-				<rom name="Kingdom of Hamil (Topologika).ssd" size="66560" crc="7ac4a91b" sha1="a9b6e29fe660429e915cc2fd06fcbd48f638b02b" />
+				<rom name="Kingdom of Hamil (Topologika).ssd" size="66560" crc="7ac4a91b" sha1="a9b6e29fe660429e915cc2fd06fcbd48f638b02b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -583,7 +583,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="138240">
-				<rom name="Last Days of Doom.ssd" size="138240" crc="fb49260f" sha1="06621ee58a81ce61c92f1013c02970baf9bc6b7c" />
+				<rom name="Last Days of Doom.ssd" size="138240" crc="fb49260f" sha1="06621ee58a81ce61c92f1013c02970baf9bc6b7c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -594,7 +594,7 @@
 		<publisher>Martech</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="40192">
-				<rom name="megaapocalypse.ssd" size="40192" crc="4a6e1489" sha1="399e09d9782d7f0068a9acd9113595657dbb4673" />
+				<rom name="megaapocalypse.ssd" size="40192" crc="4a6e1489" sha1="399e09d9782d7f0068a9acd9113595657dbb4673" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -605,7 +605,7 @@
 		<publisher>Design People</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Midway.ssd" size="102400" crc="808c16ed" sha1="c0c8f7f7b6f45446ddd9604a4aa9245176663f19" />
+				<rom name="Midway.ssd" size="102400" crc="808c16ed" sha1="c0c8f7f7b6f45446ddd9604a4aa9245176663f19" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -617,7 +617,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101632">
-				<rom name="nevryon.ssd" size="101632" crc="a6c83ad4" sha1="e5f8336ffd3b27be04d70974a45d3972b796afdc" />
+				<rom name="nevryon.ssd" size="101632" crc="a6c83ad4" sha1="e5f8336ffd3b27be04d70974a45d3972b796afdc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -628,7 +628,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="84480">
-				<rom name="Philosopher's Quest.ssd" size="84480" crc="20fa815c" sha1="80f06f7daf55acd3cd5803cf2393503441a59185" />
+				<rom name="Philosopher's Quest.ssd" size="84480" crc="20fa815c" sha1="80f06f7daf55acd3cd5803cf2393503441a59185" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -640,31 +640,31 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Master Disc"/>
 			<dataarea name="flop" size="82432">
-				<rom name="popquiz_master.ssd" size="82432" crc="28aed61a" sha1="1e2d25b7b35470205389603b299a13320d79a893" />
+				<rom name="popquiz_master.ssd" size="82432" crc="28aed61a" sha1="1e2d25b7b35470205389603b299a13320d79a893" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Database Disc 1"/>
 			<dataarea name="flop" size="188416">
-				<rom name="popquiz_db1.ssd" size="188416" crc="71cf1522" sha1="71f310a01afee915767fe49ff38628e143cb248c" />
+				<rom name="popquiz_db1.ssd" size="188416" crc="71cf1522" sha1="71f310a01afee915767fe49ff38628e143cb248c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Database Disc 2"/>
 			<dataarea name="flop" size="188416">
-				<rom name="popquiz_db2.ssd" size="188416" crc="d82638f4" sha1="195a3c52c4ee5f44d9acd8d45e9719669f1a0d96" />
+				<rom name="popquiz_db2.ssd" size="188416" crc="d82638f4" sha1="195a3c52c4ee5f44d9acd8d45e9719669f1a0d96" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Database Disc 3"/>
 			<dataarea name="flop" size="188416">
-				<rom name="popquiz_db3.ssd" size="188416" crc="ec14e78b" sha1="a6a6d1965008e9586bd56cd7f060b8ebca38c683" />
+				<rom name="popquiz_db3.ssd" size="188416" crc="ec14e78b" sha1="a6a6d1965008e9586bd56cd7f060b8ebca38c683" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Database Disc 4"/>
 			<dataarea name="flop" size="188416">
-				<rom name="popquiz_db4.ssd" size="188416" crc="8a2c865d" sha1="8b39e8f0c3c5c242efcd387ca9e973f4c32b4b43" />
+				<rom name="popquiz_db4.ssd" size="188416" crc="8a2c865d" sha1="8b39e8f0c3c5c242efcd387ca9e973f4c32b4b43" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -675,7 +675,7 @@
 		<publisher>Gilsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="The Quill A00 (1985)(Gilsoft).ssd" size="204800" crc="8578f744" sha1="6beafe69e3b9aba39908f4bcc98c00dedc4f9c2c" />
+				<rom name="The Quill A00 (1985)(Gilsoft).ssd" size="204800" crc="8578f744" sha1="6beafe69e3b9aba39908f4bcc98c00dedc4f9c2c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -686,7 +686,7 @@
 		<publisher>Gilsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="The Quill A03 (1985)(Gilsoft).ssd" size="204800" crc="2d4ae9d7" sha1="596fd6983324146c12eca04aa02c047e9ade97e0" />
+				<rom name="The Quill A03 (1985)(Gilsoft).ssd" size="204800" crc="2d4ae9d7" sha1="596fd6983324146c12eca04aa02c047e9ade97e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -697,7 +697,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="112640">
-				<rom name="Return to Doom.ssd" size="112640" crc="f993826d" sha1="fe88ef0e92d06f33272613575a2a2502b28d7c41" />
+				<rom name="Return to Doom.ssd" size="112640" crc="f993826d" sha1="fe88ef0e92d06f33272613575a2a2502b28d7c41" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -708,7 +708,7 @@
 		<publisher>Acornsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="30720">
-				<rom name="Revs Demo.ssd" size="30720" crc="41097c26" sha1="a5151f5286bdfd60d37eb0e1877525dee34d696a" />
+				<rom name="Revs Demo.ssd" size="30720" crc="41097c26" sha1="a5151f5286bdfd60d37eb0e1877525dee34d696a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -719,7 +719,7 @@
 		<publisher>Jacaranda Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="scavenger_hunt.ssd" size="102400" crc="1aebeea2" sha1="b964f4c81e0f629c2bfc63e68be4ba016a65ba57" />
+				<rom name="scavenger_hunt.ssd" size="102400" crc="1aebeea2" sha1="b964f4c81e0f629c2bfc63e68be4ba016a65ba57" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -730,7 +730,7 @@
 		<publisher>Leisure Genius</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="27904">
-				<rom name="Scrabble.ssd" size="27904" crc="5a4acaef" sha1="f708cb357ba9de9bac255d758b5da024bb35c754" />
+				<rom name="Scrabble.ssd" size="27904" crc="5a4acaef" sha1="f708cb357ba9de9bac255d758b5da024bb35c754" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -741,7 +741,7 @@
 		<publisher>Macmillian</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Snapple Hopper.ssd" size="102400" crc="ba35ce9e" sha1="7731af036d80e3ae66d2f4062f8d93c0b9de0963" />
+				<rom name="Snapple Hopper.ssd" size="102400" crc="ba35ce9e" sha1="7731af036d80e3ae66d2f4062f8d93c0b9de0963" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -752,7 +752,7 @@
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="40448">
-				<rom name="StarWars.ssd" size="40448" crc="0553f5ee" sha1="402bac49448f0ac6fe947ca8a75bc0e68cf0126b" />
+				<rom name="StarWars.ssd" size="40448" crc="0553f5ee" sha1="402bac49448f0ac6fe947ca8a75bc0e68cf0126b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -764,13 +764,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="82688">
-				<rom name="SuperiorCollectionVol1-Disk1.ssd" size="82688" crc="ab2cea40" sha1="f091c7f8b3a1e8e9d3b72bdd16dab266031f8e0f"/>
+				<rom name="SuperiorCollectionVol1-Disk1.ssd" size="82688" crc="ab2cea40" sha1="f091c7f8b3a1e8e9d3b72bdd16dab266031f8e0f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="99840">
-				<rom name="SuperiorCollectionVol1-Disk2.ssd" size="99840" crc="3702bcca" sha1="5774a78efb66c4c74765ebd02cf40cb324eb1c23"/>
+				<rom name="SuperiorCollectionVol1-Disk2.ssd" size="99840" crc="3702bcca" sha1="5774a78efb66c4c74765ebd02cf40cb324eb1c23" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -782,13 +782,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="79104">
-				<rom name="SuperiorCollectionVol2-Disk1.ssd" size="79104" crc="203d27b6" sha1="9d8e21a0b921f86dce0b6eafe1933791456c4a32"/>
+				<rom name="SuperiorCollectionVol2-Disk1.ssd" size="79104" crc="203d27b6" sha1="9d8e21a0b921f86dce0b6eafe1933791456c4a32" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="90880">
-				<rom name="SuperiorCollectionVol2-Disk2.ssd" size="90880" crc="5c784da3" sha1="1d7fa62287eb403c2a48ce2c2d2f7f4bbdaf860f"/>
+				<rom name="SuperiorCollectionVol2-Disk2.ssd" size="90880" crc="5c784da3" sha1="1d7fa62287eb403c2a48ce2c2d2f7f4bbdaf860f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -799,7 +799,7 @@
 		<publisher>Superior Software (Demo)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="156672">
-				<rom name="superiorsoftware-demo.ssd" size="156672" crc="f1142517" sha1="32faa9add514534bd94e0e6a8c01ae2a165e9922" />
+				<rom name="superiorsoftware-demo.ssd" size="156672" crc="f1142517" sha1="32faa9add514534bd94e0e6a8c01ae2a165e9922" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -810,7 +810,7 @@
 		<publisher>Superior Software (Demo)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="78336">
-				<rom name="superiorsoftware-games.ssd" size="78336" crc="01309c6b" sha1="731c3410fff438b0afe3c0a9f89e2c15898752b4" />
+				<rom name="superiorsoftware-games.ssd" size="78336" crc="01309c6b" sha1="731c3410fff438b0afe3c0a9f89e2c15898752b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -822,13 +822,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="102400">
-				<rom name="The Times Crosswords Volume 1-Side1.ssd" size="102400" crc="9b84fe62" sha1="d1ccb5057557cc380a9839cbf365bd0bb4dfe1a3" />
+				<rom name="The Times Crosswords Volume 1-Side1.ssd" size="102400" crc="9b84fe62" sha1="d1ccb5057557cc380a9839cbf365bd0bb4dfe1a3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="102400">
-				<rom name="The Times Crosswords Volume 1-Side2.ssd" size="102400" crc="6328fef8" sha1="02ee8578ad37ac07a52ba4114dd448fba1d80c62" />
+				<rom name="The Times Crosswords Volume 1-Side2.ssd" size="102400" crc="6328fef8" sha1="02ee8578ad37ac07a52ba4114dd448fba1d80c62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -840,13 +840,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1: System"/>
 			<dataarea name="flop" size="91904">
-				<rom name="TheMusicSystem.ssd" size="91904" crc="1b37dd8a" sha1="14f58e8adfe8b4c0bd9ee7b2796e0da092c59eb6" />
+				<rom name="TheMusicSystem.ssd" size="91904" crc="1b37dd8a" sha1="14f58e8adfe8b4c0bd9ee7b2796e0da092c59eb6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2: Song &amp; Sound Library"/>
 			<dataarea name="flop" size="102400">
-				<rom name="TMS_SongLibrary.ssd" size="102400" crc="b9cf1020" sha1="86390f123c4f97e1fe8bca611ad12325bf5857c7" />
+				<rom name="TMS_SongLibrary.ssd" size="102400" crc="b9cf1020" sha1="86390f123c4f97e1fe8bca611ad12325bf5857c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -858,7 +858,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1: System"/>
 			<dataarea name="flop" size="204800">
-				<rom name="MusicSystemUtils.ssd" size="204800" crc="e6954abc" sha1="b4aea7977c12bdc33ec639a4ff8e9267deb163a5" />
+				<rom name="MusicSystemUtils.ssd" size="204800" crc="e6954abc" sha1="b4aea7977c12bdc33ec639a4ff8e9267deb163a5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -869,7 +869,7 @@
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="TheMusicSystem(1986).ssd" size="102400" crc="fc61c400" sha1="359e360a5cd37870a68d515ac2264217192a7fee" />
+				<rom name="TheMusicSystem(1986).ssd" size="102400" crc="fc61c400" sha1="359e360a5cd37870a68d515ac2264217192a7fee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -880,7 +880,7 @@
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="TMS_SongLibrary3.ssd" size="102400" crc="55693fda" sha1="e1da0ed94747e763e17bde4386dbb95cb7a47d80" />
+				<rom name="TMS_SongLibrary3.ssd" size="102400" crc="55693fda" sha1="e1da0ed94747e763e17bde4386dbb95cb7a47d80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -891,7 +891,7 @@
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="TMS_SongLibrary4.ssd" size="102400" crc="22110db5" sha1="1c5ae87fc0b0b51d41ea12d7ccff5949486e2209" />
+				<rom name="TMS_SongLibrary4.ssd" size="102400" crc="22110db5" sha1="1c5ae87fc0b0b51d41ea12d7ccff5949486e2209" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -902,7 +902,7 @@
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="TMS_SongLibrary5.ssd" size="102400" crc="11f01076" sha1="70ff66dbc8d06c1b4014fbb7f678bc7c5e0f3587" />
+				<rom name="TMS_SongLibrary5.ssd" size="102400" crc="11f01076" sha1="70ff66dbc8d06c1b4014fbb7f678bc7c5e0f3587" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -913,7 +913,7 @@
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="TMS_SongLibrary6.ssd" size="102400" crc="2b6056fc" sha1="4f987738d9e9bbebc8679580f740015d7aea6063" />
+				<rom name="TMS_SongLibrary6.ssd" size="102400" crc="2b6056fc" sha1="4f987738d9e9bbebc8679580f740015d7aea6063" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -924,7 +924,7 @@
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="Trivial Pursuit Baby Boomer Edition (Domark).ssd" size="179200" crc="b65fdcbe" sha1="a10ea2cb66e95df53e2c5ab2d01d617a539c8c1b" />
+				<rom name="Trivial Pursuit Baby Boomer Edition (Domark).ssd" size="179200" crc="b65fdcbe" sha1="a10ea2cb66e95df53e2c5ab2d01d617a539c8c1b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -935,7 +935,7 @@
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="Trivial Pursuit Genus Edition (Domark).ssd" size="163840" crc="b56d7876" sha1="26af5eae4de2ebd46abb91223670997a02f76e44" />
+				<rom name="Trivial Pursuit Genus Edition (Domark).ssd" size="163840" crc="b56d7876" sha1="26af5eae4de2ebd46abb91223670997a02f76e44" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -946,7 +946,7 @@
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="Trivial Pursuit Young Players Edition (Domark).ssd" size="184320" crc="16cbb180" sha1="9d5582818b302a3ff9cf419a11f53117d500e517" />
+				<rom name="Trivial Pursuit Young Players Edition (Domark).ssd" size="184320" crc="16cbb180" sha1="9d5582818b302a3ff9cf419a11f53117d500e517" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -958,7 +958,7 @@
 		<info name="notes" value="Original" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="78336">
-				<rom name="welcome.ssd" size="78336" crc="03728f14" sha1="d212aa33a14b30dc2ff64920f834fe8c4e6715cc" />
+				<rom name="welcome.ssd" size="78336" crc="03728f14" sha1="d212aa33a14b30dc2ff64920f834fe8c4e6715cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -970,7 +970,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="124928">
-				<rom name="uim.ssd" size="124928" crc="08871fd4" sha1="c08e86fde0c8faa154eca45fab70c915d9b9c526" />
+				<rom name="uim.ssd" size="124928" crc="08871fd4" sha1="c08e86fde0c8faa154eca45fab70c915d9b9c526" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -981,7 +981,7 @@
 		<publisher>Cronosoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Weenies.ssd" size="204800" crc="7a12cc4f" sha1="2fa3c8bcd95459a00014e54391ee1898f52a8a2c" />
+				<rom name="Weenies.ssd" size="204800" crc="7a12cc4f" sha1="2fa3c8bcd95459a00014e54391ee1898f52a8a2c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -992,7 +992,7 @@
 		<publisher>Topologika</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Whale Games.ssd" size="102400" crc="bee1ab4c" sha1="c57b05d4ce561d1cc4efe0c3cad41c993861c150" />
+				<rom name="Whale Games.ssd" size="102400" crc="bee1ab4c" sha1="c57b05d4ce561d1cc4efe0c3cad41c993861c150" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1004,7 +1004,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88832">
-				<rom name="white magic.ssd" size="88832" crc="81988eaf" sha1="04aed4908320aa5befb11aa9d8d707bcdc493b79" />
+				<rom name="white magic.ssd" size="88832" crc="81988eaf" sha1="04aed4908320aa5befb11aa9d8d707bcdc493b79" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1016,7 +1016,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="white magic 2.ssd" size="102400" crc="8d3ed4da" sha1="fe11e69648bae6e1c6fdfc54cdde91b816ca7e85" />
+				<rom name="white magic 2.ssd" size="102400" crc="8d3ed4da" sha1="fe11e69648bae6e1c6fdfc54cdde91b816ca7e85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1028,7 +1028,7 @@
 		<info name="author" value="Andrew Cook" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Zen.2012.REL.ssd" size="143360" crc="707564ee" sha1="48e7eceb5e1c7265e2f1b1d03ccc875e5c9179a2" />
+				<rom name="Zen.2012.REL.ssd" size="143360" crc="707564ee" sha1="48e7eceb5e1c7265e2f1b1d03ccc875e5c9179a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1039,7 +1039,7 @@
 		<publisher>Audiogenic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Ziggy.ssd" size="102400" crc="6f8b22c2" sha1="e2ed1211fb22d5a7db53050c1043e24fa1abcc77" />
+				<rom name="Ziggy.ssd" size="102400" crc="6f8b22c2" sha1="e2ed1211fb22d5a7db53050c1043e24fa1abcc77" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1053,7 +1053,7 @@
 		<info name="release" value="SNB06" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="35584">
-				<rom name="database_v2.ssd" size="35584" crc="bc093645" sha1="7683a6999d4753858931f5887fd9237a22a25e8a" />
+				<rom name="database_v2.ssd" size="35584" crc="bc093645" sha1="7683a6999d4753858931f5887fd9237a22a25e8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1065,31 +1065,31 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk Side A"/>
 			<dataarea name="flop" size="102400">
-				<rom name="FleetStreetEditor_System_A.ssd" size="102400" crc="a07e2d4b" sha1="8365556cd3db0a2cba4f21f10e440e3fc1fae5c4" />
+				<rom name="FleetStreetEditor_System_A.ssd" size="102400" crc="a07e2d4b" sha1="8365556cd3db0a2cba4f21f10e440e3fc1fae5c4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Graphics Library Disk Side A"/>
 			<dataarea name="flop" size="102144">
-				<rom name="FleetStreetEditor_GraphicsLib_A.ssd" size="102144" crc="b7a3e274" sha1="c6fcf9a7e1e1ab82e29836812f354c1419ff9ea6" />
+				<rom name="FleetStreetEditor_GraphicsLib_A.ssd" size="102144" crc="b7a3e274" sha1="c6fcf9a7e1e1ab82e29836812f354c1419ff9ea6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk Side B"/>
 			<dataarea name="flop" size="96000">
-				<rom name="FleetStreetEditor_System_B.ssd" size="96000" crc="de4c79ee" sha1="8d5680d42cea761bc0c9fe5de2e98dee251e6349" />
+				<rom name="FleetStreetEditor_System_B.ssd" size="96000" crc="de4c79ee" sha1="8d5680d42cea761bc0c9fe5de2e98dee251e6349" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Graphics Library Disk Side B"/>
 			<dataarea name="flop" size="99584">
-				<rom name="FleetStreetEditor_GraphicsLib_B.ssd" size="99584" crc="f5580bc0" sha1="52b05d6f24b31fc7087fc36a93aa808eb8fd6c1c" />
+				<rom name="FleetStreetEditor_GraphicsLib_B.ssd" size="99584" crc="f5580bc0" sha1="52b05d6f24b31fc7087fc36a93aa808eb8fd6c1c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Guided Tour Files"/>
 			<dataarea name="flop" size="102400">
-				<rom name="FleetStreetEditor_GuidedTour.ssd" size="102400" crc="1f20949b" sha1="dec0aa25ce4b77badd79d47c53fa86b69dfaa86c" />
+				<rom name="FleetStreetEditor_GuidedTour.ssd" size="102400" crc="1f20949b" sha1="dec0aa25ce4b77badd79d47c53fa86b69dfaa86c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1100,7 +1100,7 @@
 		<publisher>Mirrorsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="192000">
-				<rom name="FleetStreetEditor_AdminXtra.dsd" size="192000" crc="3699dee1" sha1="cadcfd4251736cb75c1cbb6081efbab1df17d451" />
+				<rom name="FleetStreetEditor_AdminXtra.dsd" size="192000" crc="3699dee1" sha1="cadcfd4251736cb75c1cbb6081efbab1df17d451" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1112,13 +1112,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="87040">
-				<rom name="FleetStreetEditor_FontsGraphics_A.ssd" size="87040" crc="6a9c58d0" sha1="1d1efd094b3696402cda37427ad5ca0d4d465336" />
+				<rom name="FleetStreetEditor_FontsGraphics_A.ssd" size="87040" crc="6a9c58d0" sha1="1d1efd094b3696402cda37427ad5ca0d4d465336" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="100352">
-				<rom name="FleetStreetEditor_FontsGraphics_B.ssd" size="100352" crc="ab05d42e" sha1="377ca5fe4c5fc634e46066fb4b77dcd1ea275702" />
+				<rom name="FleetStreetEditor_FontsGraphics_B.ssd" size="100352" crc="ab05d42e" sha1="377ca5fe4c5fc634e46066fb4b77dcd1ea275702" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1130,13 +1130,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="102400">
-				<rom name="FleetStreetEditor_WaltDisney_A.ssd" size="102400" crc="d607a50d" sha1="a1f4cfbd086e49a775a5d18cfd4d7147905e32ae" />
+				<rom name="FleetStreetEditor_WaltDisney_A.ssd" size="102400" crc="d607a50d" sha1="a1f4cfbd086e49a775a5d18cfd4d7147905e32ae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="102400">
-				<rom name="FleetStreetEditor_WaltDisney_B.ssd" size="102400" crc="bb363052" sha1="9682f5b19a27888b0c1fc6a1f46e135ef9cb9907" />
+				<rom name="FleetStreetEditor_WaltDisney_B.ssd" size="102400" crc="bb363052" sha1="9682f5b19a27888b0c1fc6a1f46e135ef9cb9907" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1147,7 +1147,7 @@
 		<publisher>Beebugsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="MasterfileII.ssd" size="204800" crc="da1453f1" sha1="e1c830e07c04577860e42861daf1fbd6e88edd76" />
+				<rom name="MasterfileII.ssd" size="204800" crc="da1453f1" sha1="e1c830e07c04577860e42861daf1fbd6e88edd76" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1159,7 +1159,7 @@
 		<info name="author" value="Peter Gaunt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Modem Master (1987)(BBCSoft).ssd" size="102400" crc="5a5ee41f" sha1="4bc8b4d9f570d56ab718334155593ecbac61c391" />
+				<rom name="Modem Master (1987)(BBCSoft).ssd" size="102400" crc="5a5ee41f" sha1="4bc8b4d9f570d56ab718334155593ecbac61c391" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1170,7 +1170,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="OfficeMate-Watford.ssd" size="102400" crc="cae9fdca" sha1="1ffe95c2da981ec8e9e10da3b403f067e17a3b20" />
+				<rom name="OfficeMate-Watford.ssd" size="102400" crc="cae9fdca" sha1="1ffe95c2da981ec8e9e10da3b403f067e17a3b20" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1181,7 +1181,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="OfficeMaster-Watford.ssd" size="102400" crc="b1326630" sha1="9ac036789f80ed44df0400e46d9cbe999d1f379a" />
+				<rom name="OfficeMaster-Watford.ssd" size="102400" crc="b1326630" sha1="9ac036789f80ed44df0400e46d9cbe999d1f379a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1192,7 @@
 		<publisher>Dabs Press</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="42752">
-				<rom name="MiniOfficeIIADabHandGuide-DabsPress.ssd" size="42752" crc="b12a5eec" sha1="130b65576d36da544c0079f4ea327a992d19e4eb" />
+				<rom name="MiniOfficeIIADabHandGuide-DabsPress.ssd" size="42752" crc="b12a5eec" sha1="130b65576d36da544c0079f4ea327a992d19e4eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1204,7 +1204,7 @@
 		<info name="release" value="SNB17" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ViewIndex.ssd" size="204800" crc="1dde7223" sha1="217cce43355ada9287fced9cdebe31d126ca324e" />
+				<rom name="ViewIndex.ssd" size="204800" crc="1dde7223" sha1="217cce43355ada9287fced9cdebe31d126ca324e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1216,13 +1216,13 @@
 		<info name="release" value="SBB28" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ViewSpell.ssd" size="204800" crc="19c51788" sha1="e617b22f44957963247db986a01f1ab8b98c4437" />
+				<rom name="ViewSpell.ssd" size="204800" crc="19c51788" sha1="e617b22f44957963247db986a01f1ab8b98c4437" offset="0" />
 			</dataarea>
 		</part>
 <!--
         <part name="rom" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="viewspell v1.0 (1985)(acornsoft).bin" size="16384" crc="224a0fbc" sha1="251ffce5b169d8e09d89f38b7eee4176533f8e8d"/>
+                <rom name="viewspell v1.0 (1985)(acornsoft).bin" size="16384" crc="224a0fbc" sha1="251ffce5b169d8e09d89f38b7eee4176533f8e8d" offset="0"/>
             </dataarea>
         </part>
 -->
@@ -1235,7 +1235,7 @@
 		<info name="release" value="SBB27" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="ViewStore.ssd" size="102400" crc="6001906e" sha1="37008941dc584eff55c58844bd77143c4f3fe84a" />
+				<rom name="ViewStore.ssd" size="102400" crc="6001906e" sha1="37008941dc584eff55c58844bd77143c4f3fe84a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1249,7 +1249,7 @@
 		<info name="release" value="SNE24" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="ABC.ssd" size="102400" crc="bdd721b1" sha1="9129f48b9fc439de9cc92924d7e905d0f4156228" />
+				<rom name="ABC.ssd" size="102400" crc="bdd721b1" sha1="9129f48b9fc439de9cc92924d7e905d0f4156228" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1261,7 +1261,7 @@
 		<info name="release" value="SNE01" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="14336">
-				<rom name="algebraic_manipulation.ssd" size="14336" crc="73d51ba3" sha1="8e085cf021b23484273be73c10a0cba2e6445ce2" />
+				<rom name="algebraic_manipulation.ssd" size="14336" crc="73d51ba3" sha1="8e085cf021b23484273be73c10a0cba2e6445ce2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1272,7 +1272,7 @@
 		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Centre Ville (Chalksoft).ssd" size="102400" crc="66ae85f4" sha1="0f4793fec5100de5b0a8a505c323e719606201c9" />
+				<rom name="Centre Ville (Chalksoft).ssd" size="102400" crc="66ae85f4" sha1="0f4793fec5100de5b0a8a505c323e719606201c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1284,7 +1284,7 @@
 		<info name="release" value="SNE14" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Chemical Structures (1983)(Acornsoft).ssd" size="102400" crc="0ebd4344" sha1="7738b8a3657bc8ba19617f1b9eab8a5055ea4996" />
+				<rom name="Chemical Structures (1983)(Acornsoft).ssd" size="102400" crc="0ebd4344" sha1="7738b8a3657bc8ba19617f1b9eab8a5055ea4996" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1295,7 +1295,7 @@
 		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Chick Chase (Chalksoft).ssd" size="102400" crc="0aefde4a" sha1="305210091a95f796b7e1f0d6eec1e0d3c4a49252" />
+				<rom name="Chick Chase (Chalksoft).ssd" size="102400" crc="0aefde4a" sha1="305210091a95f796b7e1f0d6eec1e0d3c4a49252" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1306,7 +1306,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Consonant Blends (Sherston).ssd" size="102400" crc="b6b21cac" sha1="26915934c77baaf1862cba3cc03e1b7a07d2265f" />
+				<rom name="Consonant Blends (Sherston).ssd" size="102400" crc="b6b21cac" sha1="26915934c77baaf1862cba3cc03e1b7a07d2265f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1318,7 +1318,7 @@
 		<info name="notes" value="Identify:William; Regenerate:Conqueror" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Domesday_Project-Data_Collection.ssd" size="102400" crc="6f69afb7" sha1="fd19808b6c25556197ee6288463220e18df4557b" />
+				<rom name="Domesday_Project-Data_Collection.ssd" size="102400" crc="6f69afb7" sha1="fd19808b6c25556197ee6288463220e18df4557b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1331,13 +1331,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Welcome"/>
 			<dataarea name="flop" size="204800">
-				<rom name="microtext_welcome_disc.ssd" size="204800" crc="51474827" sha1="4256fac1f622e1a63128254a29d50f27099ea542" />
+				<rom name="microtext_welcome_disc.ssd" size="204800" crc="51474827" sha1="4256fac1f622e1a63128254a29d50f27099ea542" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Librarian"/>
 			<dataarea name="flop" size="204800">
-				<rom name="microtext_librarian_disc.ssd" size="204800" crc="6c98c541" sha1="8b7be398c2fb5bbcb4de1a03a960e1d12d4484f4" />
+				<rom name="microtext_librarian_disc.ssd" size="204800" crc="6c98c541" sha1="8b7be398c2fb5bbcb4de1a03a960e1d12d4484f4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1349,13 +1349,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="102400">
-				<rom name="through_the_dragons_eye_part1.ssd" size="102400" crc="22c4ad6a" sha1="16d21b27ff97eefd9ee1cfafcfaa3f4bd364a4cf" />
+				<rom name="through_the_dragons_eye_part1.ssd" size="102400" crc="22c4ad6a" sha1="16d21b27ff97eefd9ee1cfafcfaa3f4bd364a4cf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="102400">
-				<rom name="through_the_dragons_eye_part2.ssd" size="102400" crc="917121f8" sha1="03514d948d748a68301b8aa43396fc3f661d4ba6" />
+				<rom name="through_the_dragons_eye_part2.ssd" size="102400" crc="917121f8" sha1="03514d948d748a68301b8aa43396fc3f661d4ba6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1366,7 +1366,7 @@
 		<publisher>BBC Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Electronics In Action.ssd" size="102400" crc="5c94da0b" sha1="16d9b81efbf21b8d861576f49ea6335460056e66" />
+				<rom name="Electronics In Action.ssd" size="102400" crc="5c94da0b" sha1="16d9b81efbf21b8d861576f49ea6335460056e66" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1378,13 +1378,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="First Filer - Program (Chalksoft).ssd" size="102400" crc="4d3ca4ee" sha1="990716b324373ad823411f9c0b835ea3da231a34" />
+				<rom name="First Filer - Program (Chalksoft).ssd" size="102400" crc="4d3ca4ee" sha1="990716b324373ad823411f9c0b835ea3da231a34" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="First Filer - Data (Chalksoft).ssd" size="102400" crc="af1b275f" sha1="49a46a7a69818745cd5687e371bd19f126773f2a" />
+				<rom name="First Filer - Data (Chalksoft).ssd" size="102400" crc="af1b275f" sha1="49a46a7a69818745cd5687e371bd19f126773f2a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1395,7 +1395,7 @@
 		<publisher>Database Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Knitwear Designer (Database).ssd" size="204800" crc="a3b8b5d4" sha1="87c2b85ca57346646a34e82705616f6ac35db61e" />
+				<rom name="Knitwear Designer (Database).ssd" size="204800" crc="a3b8b5d4" sha1="87c2b85ca57346646a34e82705616f6ac35db61e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1406,7 +1406,7 @@
 		<publisher>Cambridge ELT</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="38400">
-				<rom name="London Adventure.ssd" size="38400" crc="ed449787" sha1="2dddb1010268163a40707c10115f9bd42a29b573" />
+				<rom name="London Adventure.ssd" size="38400" crc="ed449787" sha1="2dddb1010268163a40707c10115f9bd42a29b573" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1417,7 +1417,7 @@
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="43520">
-				<rom name="Mr Yog and the Nippet (Sherston).ssd" size="43520" crc="9dd6d401" sha1="aba82455fbefb8a6621d39af219d5238a8bb426a" />
+				<rom name="Mr Yog and the Nippet (Sherston).ssd" size="43520" crc="9dd6d401" sha1="aba82455fbefb8a6621d39af219d5238a8bb426a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1428,7 +1428,7 @@
 		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Note Invaders (Chalksoft).ssd" size="102400" crc="d21d458e" sha1="98a5c7405cceb9d1e076f8322459abc2688cdb6d" />
+				<rom name="Note Invaders (Chalksoft).ssd" size="102400" crc="d21d458e" sha1="98a5c7405cceb9d1e076f8322459abc2688cdb6d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1439,7 +1439,7 @@
 		<publisher>Fisher-Marriott</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="NumbersCope (Fisher-Marriott).ssd" size="102400" crc="36ca945b" sha1="e2378aebfb27fad374a5a9649a5a27a3b2744448" />
+				<rom name="NumbersCope (Fisher-Marriott).ssd" size="102400" crc="36ca945b" sha1="e2378aebfb27fad374a5a9649a5a27a3b2744448" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1450,7 +1450,7 @@
 		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Numbers and Pictures (Chalksoft).ssd" size="102400" crc="41f5f07e" sha1="3c40260499fcf80589eecd2478d55386bff18697" />
+				<rom name="Numbers and Pictures (Chalksoft).ssd" size="102400" crc="41f5f07e" sha1="3c40260499fcf80589eecd2478d55386bff18697" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1461,7 +1461,7 @@
 		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Pirate (Chalksoft).ssd" size="102400" crc="25bba368" sha1="1c100059d8f5ce28e18784d086e22f9de9654ddc" />
+				<rom name="Pirate (Chalksoft).ssd" size="102400" crc="25bba368" sha1="1c100059d8f5ce28e18784d086e22f9de9654ddc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1473,19 +1473,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Master Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Pixel Perfect MASTER DISC.ssd" size="102400" crc="c08f1a10" sha1="9f4f5cc8b810ec116ed0e33d6c4419b1632bb7c4" />
+				<rom name="Pixel Perfect MASTER DISC.ssd" size="102400" crc="c08f1a10" sha1="9f4f5cc8b810ec116ed0e33d6c4419b1632bb7c4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Page Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Pixel Perfect PAGE DISC.ssd" size="102400" crc="5eaeb803" sha1="a53b7b55e56b7fee947ff0da353a4c40ae84a01f" />
+				<rom name="Pixel Perfect PAGE DISC.ssd" size="102400" crc="5eaeb803" sha1="a53b7b55e56b7fee947ff0da353a4c40ae84a01f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Font Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Pixel Perfect FONT DISC.ssd" size="102400" crc="08e9f5b1" sha1="0bf185e829efe6a4502813a8fdcce311d6e8849d" />
+				<rom name="Pixel Perfect FONT DISC.ssd" size="102400" crc="08e9f5b1" sha1="0bf185e829efe6a4502813a8fdcce311d6e8849d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1496,7 +1496,7 @@
 		<publisher>E.S.P.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Rhythm Maker (ESP).ssd" size="102400" crc="07e41dd0" sha1="f337e45544a69b8cc1f03ece0c82c388ebaa6fde" />
+				<rom name="Rhythm Maker (ESP).ssd" size="102400" crc="07e41dd0" sha1="f337e45544a69b8cc1f03ece0c82c388ebaa6fde" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1508,19 +1508,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Pack 1 - Weather"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Science Start Here - Weather.ssd" size="102400" crc="92a082fe" sha1="96593ba84836b34b2bf785d4874bd5ffbc80144d" />
+				<rom name="Science Start Here - Weather.ssd" size="102400" crc="92a082fe" sha1="96593ba84836b34b2bf785d4874bd5ffbc80144d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Pack 1 - Birds"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Science Start Here - Birds.ssd" size="102400" crc="d1953425" sha1="04ad7abfc7794339596143d30da1061b28c0f252" />
+				<rom name="Science Start Here - Birds.ssd" size="102400" crc="d1953425" sha1="04ad7abfc7794339596143d30da1061b28c0f252" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Pack 1 - Myself"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Science Start Here - Myself.ssd" size="102400" crc="85d59681" sha1="70b6503a233de49a846ab6d37fafc429f766dc04" />
+				<rom name="Science Start Here - Myself.ssd" size="102400" crc="85d59681" sha1="70b6503a233de49a846ab6d37fafc429f766dc04" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1532,13 +1532,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Selladore Tales Startup Disk.ssd" size="102400" crc="db7d8bb2" sha1="3eeafedd9dcb8ae2e0c7b7d31c5a54a143c14f17" />
+				<rom name="Selladore Tales Startup Disk.ssd" size="102400" crc="db7d8bb2" sha1="3eeafedd9dcb8ae2e0c7b7d31c5a54a143c14f17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Selladore Tales User Disk.ssd" size="102400" crc="7dc94c38" sha1="761361d511f37f7020aff9199d8bdcded19f43d9" />
+				<rom name="Selladore Tales User Disk.ssd" size="102400" crc="7dc94c38" sha1="761361d511f37f7020aff9199d8bdcded19f43d9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1549,7 +1549,7 @@
 		<publisher>GSN Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Shape Up (GSN).ssd" size="102400" crc="d702a090" sha1="091c3476b72614ff5ce4ac645be843d93fd024a8" />
+				<rom name="Shape Up (GSN).ssd" size="102400" crc="d702a090" sha1="091c3476b72614ff5ce4ac645be843d93fd024a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1560,7 +1560,7 @@
 		<publisher>Database Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Spell (Database).ssd" size="204800" crc="1a00c48c" sha1="164923b68d9d7637b9d567639d676528628978ba" />
+				<rom name="Spell (Database).ssd" size="204800" crc="1a00c48c" sha1="164923b68d9d7637b9d567639d676528628978ba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1571,7 +1571,7 @@
 		<publisher>Fisher-Marriott</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Starspell Plus (Early) (Fisher-Marriott).ssd" size="204800" crc="7bd0b00e" sha1="9878b168191b475881cd6ec162730bb6d65d7854" />
+				<rom name="Starspell Plus (Early) (Fisher-Marriott).ssd" size="204800" crc="7bd0b00e" sha1="9878b168191b475881cd6ec162730bb6d65d7854" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1582,7 +1582,7 @@
 		<publisher>Fisher-Marriott</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Starspell Plus (Fisher-Marriott).ssd" size="102400" crc="43f94ccc" sha1="67fe665f659aca1e4de93b54d1176bbc01252d9d" />
+				<rom name="Starspell Plus (Fisher-Marriott).ssd" size="102400" crc="43f94ccc" sha1="67fe665f659aca1e4de93b54d1176bbc01252d9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1593,7 +1593,7 @@
 		<publisher>Fisher-Marriott</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="TimeShare (Fisher-Marriott).ssd" size="102400" crc="60aa3359" sha1="d5d9dd3d8fb03882380e4c2b78dcd35304bc3150" />
+				<rom name="TimeShare (Fisher-Marriott).ssd" size="102400" crc="60aa3359" sha1="d5d9dd3d8fb03882380e4c2b78dcd35304bc3150" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1605,7 +1605,7 @@
 		<info name="release" value="SNE04" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Tree of Knowledge(1983)(Acornsoft).ssd" size="102400" crc="71762857" sha1="90cf78f488804dc0bfc2a8005f20232378de3601" />
+				<rom name="Tree of Knowledge(1983)(Acornsoft).ssd" size="102400" crc="71762857" sha1="90cf78f488804dc0bfc2a8005f20232378de3601" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1617,13 +1617,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="flop" size="102400">
-				<rom name="TheWizardsReturnPart1.ssd" size="102400" crc="cfc6793a" sha1="4c5dcc40c8d5da87c3195420551c15d23ef39f59" />
+				<rom name="TheWizardsReturnPart1.ssd" size="102400" crc="cfc6793a" sha1="4c5dcc40c8d5da87c3195420551c15d23ef39f59" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Part 2"/>
 			<dataarea name="flop" size="102400">
-				<rom name="TheWizardsReturnPart2.ssd" size="102400" crc="b119a085" sha1="613e1de1a297adab19e3d63aece6c1c85b2bfc42" />
+				<rom name="TheWizardsReturnPart2.ssd" size="102400" crc="b119a085" sha1="613e1de1a297adab19e3d63aece6c1c85b2bfc42" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1634,7 +1634,7 @@
 		<publisher>Chalksoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Word Skill (Chalksoft).ssd" size="102400" crc="2f110c6e" sha1="8baa49853bcb420f089d2872b8336f465e349664" />
+				<rom name="Word Skill (Chalksoft).ssd" size="102400" crc="2f110c6e" sha1="8baa49853bcb420f089d2872b8336f465e349664" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1646,7 +1646,7 @@
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="world without words.ssd" size="102400" crc="576db44b" sha1="c2cb171af63296eb00bdb56a3b47ed0073ddc764" />
+				<rom name="world without words.ssd" size="102400" crc="576db44b" sha1="c2cb171af63296eb00bdb56a3b47ed0073ddc764" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1658,19 +1658,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Zillion Startup (Sherston).ssd" size="102400" crc="47ad8b0c" sha1="2e5af30a7cf35660ca3388be8b87e9e81740708d" />
+				<rom name="Zillion Startup (Sherston).ssd" size="102400" crc="47ad8b0c" sha1="2e5af30a7cf35660ca3388be8b87e9e81740708d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Planet"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Zillion Planet (Sherston).ssd" size="102400" crc="b360c9ef" sha1="4a3f7374313958976071a217ffa419889f1eb8b6" />
+				<rom name="Zillion Planet (Sherston).ssd" size="102400" crc="b360c9ef" sha1="4a3f7374313958976071a217ffa419889f1eb8b6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Solar"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Zillion Solar (Sherston).ssd" size="102400" crc="6980e5d3" sha1="19c2409ee1baadc2acf33ed7f48ca4632658e959" />
+				<rom name="Zillion Solar (Sherston).ssd" size="102400" crc="6980e5d3" sha1="19c2409ee1baadc2acf33ed7f48ca4632658e959" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1683,7 +1683,7 @@
 		<publisher>Computer Concepts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="75776">
-				<rom name="Accelerator.ssd" size="75776" crc="193bd9a5" sha1="224c7c5e6e2030b9fd9e5f73f8debb1c796dd4c5" />
+				<rom name="Accelerator.ssd" size="75776" crc="193bd9a5" sha1="224c7c5e6e2030b9fd9e5f73f8debb1c796dd4c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1695,13 +1695,13 @@
 		<info name="release" value="SNL03" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="BCPL_Utilities.ssd" size="102400" crc="f0e9024a" sha1="d415452758850b7f1149b7c9d2929bd4197aaaca" />
+				<rom name="BCPL_Utilities.ssd" size="102400" crc="f0e9024a" sha1="d415452758850b7f1149b7c9d2929bd4197aaaca" offset="0" />
 			</dataarea>
 		</part>
 <!--
         <part name="rom" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="bcpl v7.0 (1982)(richards computer products).bin" size="16384" crc="81c373b2" sha1="09ff6358ff4c58046f4531abe739a888898cb8d3"/>
+                <rom name="bcpl v7.0 (1982)(richards computer products).bin" size="16384" crc="81c373b2" sha1="09ff6358ff4c58046f4531abe739a888898cb8d3" offset="0"/>
             </dataarea>
         </part>
 -->
@@ -1714,7 +1714,7 @@
 		<info name="release" value="SNL12" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99840">
-				<rom name="bcpl_standalone_generator.ssd" size="99840" crc="91ac5dd5" sha1="18370351cb6813fca02f96e355ec4ae97c09b6cd" />
+				<rom name="bcpl_standalone_generator.ssd" size="99840" crc="91ac5dd5" sha1="18370351cb6813fca02f96e355ec4ae97c09b6cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1726,7 +1726,7 @@
 		<info name="release" value="SNL10" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="bcpl_calculations_package.ssd" size="102400" crc="dd67fadb" sha1="211e53f00b430ae2a61b494835644dda1de7e8e5" />
+				<rom name="bcpl_calculations_package.ssd" size="102400" crc="dd67fadb" sha1="211e53f00b430ae2a61b494835644dda1de7e8e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1738,18 +1738,18 @@
 		<info name="release" value="SNL18" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="86528">
-				<rom name="ISO_Pascal.ssd" size="86528" crc="e43f0695" sha1="5438f404993e3f65781403f7e66a34bd9ca6bac1" />
+				<rom name="ISO_Pascal.ssd" size="86528" crc="e43f0695" sha1="5438f404993e3f65781403f7e66a34bd9ca6bac1" offset="0" />
 			</dataarea>
 		</part>
 <!--
         <part name="rom1" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="pascal v1.1-1 (19xx)(-).bin" size="16384" crc="ed1a7497" sha1="44cfe2d7fb0895a6c8858f09aaf5a96bcdcc3767"/>
+                <rom name="pascal v1.1-1 (19xx)(-).bin" size="16384" crc="ed1a7497" sha1="44cfe2d7fb0895a6c8858f09aaf5a96bcdcc3767" offset="0"/>
             </dataarea>
         </part>
         <part name="rom2" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="pascal v1.1-2 (19xx)(-).bin" size="16384" crc="73455b67" sha1="0e2354e8d93d9858dbd9d24dfa0aa96a206b0b25"/>
+                <rom name="pascal v1.1-2 (19xx)(-).bin" size="16384" crc="73455b67" sha1="0e2354e8d93d9858dbd9d24dfa0aa96a206b0b25" offset="0"/>
             </dataarea>
         </part>
 -->
@@ -1763,18 +1763,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Extensions and Examples"/>
 			<dataarea name="flop" size="102400">
-				<rom name="Logo (Extensions and Examples).ssd" size="102400" crc="f917a86f" sha1="b74f8b42af4292f8c2a43266d8f221890a3aeee9" />
+				<rom name="Logo (Extensions and Examples).ssd" size="102400" crc="f917a86f" sha1="b74f8b42af4292f8c2a43266d8f221890a3aeee9" offset="0" />
 			</dataarea>
 		</part>
 <!--
         <part name="rom1" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="logo 1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae"/>
+                <rom name="logo 1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae" offset="0"/>
             </dataarea>
         </part>
         <part name="rom2" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="logo 2.rom" size="16384" crc="753ab82e" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3"/>
+                <rom name="logo 2.rom" size="16384" crc="753ab82e" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3" offset="0"/>
             </dataarea>
         </part>
 -->
@@ -1786,13 +1786,13 @@
 		<publisher>Oxford Computer Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92672">
-				<rom name="Oxford_Pascal.ssd" size="92672" crc="fb618111" sha1="2f031ed76eb56676de61e5f379c2fad048c67ed3" />
+				<rom name="Oxford_Pascal.ssd" size="92672" crc="fb618111" sha1="2f031ed76eb56676de61e5f379c2fad048c67ed3" offset="0" />
 			</dataarea>
 		</part>
 <!--
         <part name="rom" interface="bbc_rom">
             <dataarea name="rom" size="16384">
-                <rom name="oxford pascal v2.1 (19xx)(oxford computers).bin" size="16384" crc="771cd1da" sha1="898229668f03f0c5cdb73a0e59687175553c1692"/>
+                <rom name="oxford pascal v2.1 (19xx)(oxford computers).bin" size="16384" crc="771cd1da" sha1="898229668f03f0c5cdb73a0e59687175553c1692" offset="0"/>
             </dataarea>
         </part>
 -->
@@ -1808,7 +1808,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="ADFS_Utilities.ads" size="163840" crc="c3d4c582" sha1="f5dc3ffabac313782cdbd9de0734403e8120171d" />
+				<rom name="ADFS_Utilities.ads" size="163840" crc="c3d4c582" sha1="f5dc3ffabac313782cdbd9de0734403e8120171d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1819,7 +1819,7 @@
 		<publisher>Cumana</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="Cumana-BBC disk formatter issue B.ssd" size="204800" crc="34b86813" sha1="ff5972006c44f226a584a1a3993e9fd322b1104c" />
+				<rom name="Cumana-BBC disk formatter issue B.ssd" size="204800" crc="34b86813" sha1="ff5972006c44f226a584a1a3993e9fd322b1104c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1830,7 +1830,7 @@
 		<publisher>BAKsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="DOSCopy-Baksoft.ssd" size="102400" crc="d79132ee" sha1="8d1afe5e65196adc7cba79e2cc9c18b770cf30a7" />
+				<rom name="DOSCopy-Baksoft.ssd" size="102400" crc="d79132ee" sha1="8d1afe5e65196adc7cba79e2cc9c18b770cf30a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1842,7 +1842,7 @@
 		<info name="release" value="AES23" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="econet_level_1_utils.ssd" size="204800" crc="ad0fb810" sha1="5df83812d0d8492943ad8d6582c049e1fc1fa583" />
+				<rom name="econet_level_1_utils.ssd" size="204800" crc="ad0fb810" sha1="5df83812d0d8492943ad8d6582c049e1fc1fa583" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1853,7 +1853,7 @@
 		<publisher>Computech</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Integra Windows 1.00 (Computech).ssd" size="102400" crc="c28d1caa" sha1="d1fe037f04b9b8b7c60d71fa671b64a8d4452103" />
+				<rom name="Integra Windows 1.00 (Computech).ssd" size="102400" crc="c28d1caa" sha1="d1fe037f04b9b8b7c60d71fa671b64a8d4452103" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1864,7 +1864,7 @@
 		<publisher>Opus</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="27136">
-				<rom name="OpusUtilitiesDisc.ssd" size="27136" crc="e6296326" sha1="c5a1e4ef2cf62c34b50e1c107454e950d92d3d3a" />
+				<rom name="OpusUtilitiesDisc.ssd" size="27136" crc="e6296326" sha1="c5a1e4ef2cf62c34b50e1c107454e950d92d3d3a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1875,7 +1875,7 @@
 		<publisher>Microwriter</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="46336">
-				<rom name="quinkey.ssd" size="46336" crc="05630cbb" sha1="453c8a36687c1de9edd276b786e8af23cc01f7bd" />
+				<rom name="quinkey.ssd" size="46336" crc="05630cbb" sha1="453c8a36687c1de9edd276b786e8af23cc01f7bd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1887,31 +1887,31 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 1"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol1.ssd" size="204800" crc="dd095730" sha1="b8eb49a247b844c429b074d144dfa5de43bce2ef" />
+				<rom name="stl_vol1.ssd" size="204800" crc="dd095730" sha1="b8eb49a247b844c429b074d144dfa5de43bce2ef" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 2"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol2.ssd" size="204800" crc="2ecbd35e" sha1="97c684b883f0a4f05eb2e67562173d26d7db8aa3" />
+				<rom name="stl_vol2.ssd" size="204800" crc="2ecbd35e" sha1="97c684b883f0a4f05eb2e67562173d26d7db8aa3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 3"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol3.ssd" size="204800" crc="bf08e074" sha1="b8e78d782857cf513d9f69a4be0094865a41a4c9"/>
+				<rom name="stl_vol3.ssd" size="204800" crc="bf08e074" sha1="b8e78d782857cf513d9f69a4be0094865a41a4c9" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 4"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol4.ssd" size="204800" crc="fdbc91c5" sha1="85888fb83acc04b64f45a189cbdbdbb87b561e17" />
+				<rom name="stl_vol4.ssd" size="204800" crc="fdbc91c5" sha1="85888fb83acc04b64f45a189cbdbdbb87b561e17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 5"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol5.ssd" size="204800" crc="945cb82a" sha1="c5a38bf57c527593bb3222f89af555828b09420d"/>
+				<rom name="stl_vol5.ssd" size="204800" crc="945cb82a" sha1="c5a38bf57c527593bb3222f89af555828b09420d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1923,31 +1923,31 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 6"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol6.ssd" size="204800" crc="fdbfb36e" sha1="8eee5796936bb71acfd3ef1c8df08a97f61329cb" />
+				<rom name="stl_vol6.ssd" size="204800" crc="fdbfb36e" sha1="8eee5796936bb71acfd3ef1c8df08a97f61329cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 7"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol7.ssd" size="204800" crc="a1904110" sha1="b0f3aface21c890aeedaf206144a51664762227c" />
+				<rom name="stl_vol7.ssd" size="204800" crc="a1904110" sha1="b0f3aface21c890aeedaf206144a51664762227c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 8"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol8.ssd" size="204800" crc="954de889" sha1="4f7a136580afe214fab309dbc02a7b0b4dfb24c0"/>
+				<rom name="stl_vol8.ssd" size="204800" crc="954de889" sha1="4f7a136580afe214fab309dbc02a7b0b4dfb24c0" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 9"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol9.ssd" size="204800" crc="f5b62848" sha1="e8c3e76c89c6ab3be44918d3c3bfc388fec05957" />
+				<rom name="stl_vol9.ssd" size="204800" crc="f5b62848" sha1="e8c3e76c89c6ab3be44918d3c3bfc388fec05957" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Volume 10"/>
 			<dataarea name="flop" size="204800">
-				<rom name="stl_vol10.ssd" size="204800" crc="92ff5df5" sha1="8ded11ee54d9b7b0bbe1a4cae4cd28c281810ccc"/>
+				<rom name="stl_vol10.ssd" size="204800" crc="92ff5df5" sha1="8ded11ee54d9b7b0bbe1a4cae4cd28c281810ccc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1958,7 +1958,7 @@
 		<publisher>Computer Concepts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="53760">
-				<rom name="wordwise_plus_typing_tutor.ssd" size="53760" crc="5575f916" sha1="79dbcf679672b068d31ba14aaa98ec4bbb0bafa5" />
+				<rom name="wordwise_plus_typing_tutor.ssd" size="53760" crc="5575f916" sha1="79dbcf679672b068d31ba14aaa98ec4bbb0bafa5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1969,7 +1969,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="we_romram_utilities.ssd" size="102400" crc="7ec0ed6d" sha1="575e385bb61b310619647d0b0645c714bebe3543" />
+				<rom name="we_romram_utilities.ssd" size="102400" crc="7ec0ed6d" sha1="575e385bb61b310619647d0b0645c714bebe3543" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1982,7 +1982,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="56832">
-				<rom name="amx_art.ssd" size="56832" crc="a7d54d1b" sha1="634299f5b43a9a81fd12a22d6e51cbaf33954612"/>
+				<rom name="amx_art.ssd" size="56832" crc="a7d54d1b" sha1="634299f5b43a9a81fd12a22d6e51cbaf33954612" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1993,7 +1993,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55552">
-				<rom name="amx_database.ssd" size="55552" crc="66d78c22" sha1="047a4101ae48580dedc2edf3ac57e32f9717e532"/>
+				<rom name="amx_database.ssd" size="55552" crc="66d78c22" sha1="047a4101ae48580dedc2edf3ac57e32f9717e532" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2004,7 +2004,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="91136">
-				<rom name="amx_desk.ssd" size="91136" crc="2f4df9d4" sha1="81ee0463f43cfd0f3e545829fc8b946879f75a95"/>
+				<rom name="amx_desk.ssd" size="91136" crc="2f4df9d4" sha1="81ee0463f43cfd0f3e545829fc8b946879f75a95" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2016,25 +2016,25 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="A: Utilities"/>
 			<dataarea name="flop" size="102400">
-				<rom name="ExtraExtra_A_Utilities.ssd" size="102400" crc="1a36e116" sha1="d8fa12cbccc07dd8a0fea886ccbf91c03c85b906"/>
+				<rom name="ExtraExtra_A_Utilities.ssd" size="102400" crc="1a36e116" sha1="d8fa12cbccc07dd8a0fea886ccbf91c03c85b906" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="B: Fonts"/>
 			<dataarea name="flop" size="102400">
-				<rom name="ExtraExtra_B_Fonts.ssd" size="102400" crc="edd2abf2" sha1="7f22d21c5b830a8fb5438edf793089b690b62ec7"/>
+				<rom name="ExtraExtra_B_Fonts.ssd" size="102400" crc="edd2abf2" sha1="7f22d21c5b830a8fb5438edf793089b690b62ec7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="ClipArt A: Uncompacter"/>
 			<dataarea name="flop" size="204800">
-				<rom name="ExtraExtra_ClipArt_A_Uncompacter.ssd" size="204800" crc="75463b2e" sha1="1218f8a177936176ad5e0c5bef01a28059e49764"/>
+				<rom name="ExtraExtra_ClipArt_A_Uncompacter.ssd" size="204800" crc="75463b2e" sha1="1218f8a177936176ad5e0c5bef01a28059e49764" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="ClipArt B: Cutouts"/>
 			<dataarea name="flop" size="102400">
-				<rom name="ExtraExtra_ClipArt_B_Cutouts.ssd" size="102400" crc="71378ab6" sha1="863eff0acacfae5cd8b756b965b89c5894efa7bc"/>
+				<rom name="ExtraExtra_ClipArt_B_Cutouts.ssd" size="102400" crc="71378ab6" sha1="863eff0acacfae5cd8b756b965b89c5894efa7bc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2046,13 +2046,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="amx_pagemaker.ssd" size="102400" crc="7a8210ef" sha1="c4bede1c7aeb646a86065f1ec7fc108476d5e0c6"/>
+				<rom name="amx_pagemaker.ssd" size="102400" crc="7a8210ef" sha1="c4bede1c7aeb646a86065f1ec7fc108476d5e0c6" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Font Disc"/>
 			<dataarea name="flop" size="102400">
-				<rom name="amx_pagemaker_fonts.ssd" size="102400" crc="e963941d" sha1="e320df4c96ce35375dd6f8ff46b958a68b2c59a5"/>
+				<rom name="amx_pagemaker_fonts.ssd" size="102400" crc="e963941d" sha1="e320df4c96ce35375dd6f8ff46b958a68b2c59a5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2063,7 +2063,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="91648">
-				<rom name="amx_paintpot.ssd" size="91648" crc="4c32a0ea" sha1="8281403eeb5f3a3b471bbccd78bf6256e064ecfa"/>
+				<rom name="amx_paintpot.ssd" size="91648" crc="4c32a0ea" sha1="8281403eeb5f3a3b471bbccd78bf6256e064ecfa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2074,7 +2074,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="100352">
-				<rom name="amx_superart.ssd" size="100352" crc="fa07f8e3" sha1="f1d789d212779a9f1a58aa824e23136241fc1b07"/>
+				<rom name="amx_superart.ssd" size="100352" crc="fa07f8e3" sha1="f1d789d212779a9f1a58aa824e23136241fc1b07" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2085,7 +2085,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="amx_utilities.ssd" size="102400" crc="424c8708" sha1="e997e9512cbc3ad278584378d0d2420933db4ec0"/>
+				<rom name="amx_utilities.ssd" size="102400" crc="424c8708" sha1="e997e9512cbc3ad278584378d0d2420933db4ec0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2096,7 +2096,7 @@
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="amx_3dzicon.ssd" size="204800" crc="e953aaee" sha1="b62c62f166aa0d0cf4ae0cd7ecaf0a2f56b95204"/>
+				<rom name="amx_3dzicon.ssd" size="204800" crc="e953aaee" sha1="b62c62f166aa0d0cf4ae0cd7ecaf0a2f56b95204" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2107,7 +2107,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="ColourArt.ssd" size="204800" crc="5b3d93d0" sha1="7e162085a17de85ce9d6e698df40b9d65714a134"/>
+				<rom name="ColourArt.ssd" size="204800" crc="5b3d93d0" sha1="7e162085a17de85ce9d6e698df40b9d65714a134" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2118,7 +2118,7 @@
 		<publisher>System Mnemonics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="PMCutoutPreviewer.ssd" size="204800" crc="a3afc91f" sha1="1a04f247d441c3a6782cb2b15e605903ebe976d8"/>
+				<rom name="PMCutoutPreviewer.ssd" size="204800" crc="a3afc91f" sha1="1a04f247d441c3a6782cb2b15e605903ebe976d8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2129,7 +2129,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="80384">
-				<rom name="QuestPageFonts.ssd" size="80384" crc="025f5026" sha1="253075d3efcfc478cbac3eacaf55c32c0ea5bdb8"/>
+				<rom name="QuestPageFonts.ssd" size="80384" crc="025f5026" sha1="253075d3efcfc478cbac3eacaf55c32c0ea5bdb8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2140,7 +2140,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="95744">
-				<rom name="QuestPagemakerFonts.ssd" size="95744" crc="1c540b1a" sha1="5ca420717d04bebbd05f4f54e117e3e8d4790496"/>
+				<rom name="QuestPagemakerFonts.ssd" size="95744" crc="1c540b1a" sha1="5ca420717d04bebbd05f4f54e117e3e8d4790496" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2151,7 +2151,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="67840">
-				<rom name="QuestPaint_UtilityDisc.ssd" size="67840" crc="4dc47d83" sha1="129b146d2fcf5d75e9c5769437006eb735f52479"/>
+				<rom name="QuestPaint_UtilityDisc.ssd" size="67840" crc="4dc47d83" sha1="129b146d2fcf5d75e9c5769437006eb735f52479" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2165,7 +2165,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="AcornUser_1987Compilation.dsd" size="409600" crc="357b63b0" sha1="3449b212b2244cc1323d4ac66de67a9375d42413" />
+				<rom name="AcornUser_1987Compilation.dsd" size="409600" crc="357b63b0" sha1="3449b212b2244cc1323d4ac66de67a9375d42413" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2176,7 +2176,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_1988Compilation.ssd" size="204800" crc="7f3806ff" sha1="da4491fa7a09aa9c5f841e7ce2c3b9e0d9805f25" />
+				<rom name="AcornUser_1988Compilation.ssd" size="204800" crc="7f3806ff" sha1="da4491fa7a09aa9c5f841e7ce2c3b9e0d9805f25" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2187,7 +2187,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="AcornUser_Calligraphy.ssd" size="102400" crc="7c1822d1" sha1="76d92ef0b17fecb98e4e71eb5ac281dc18778144" />
+				<rom name="AcornUser_Calligraphy.ssd" size="102400" crc="7c1822d1" sha1="76d92ef0b17fecb98e4e71eb5ac281dc18778144" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2198,7 +2198,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="200704">
-				<rom name="AcornUser_DiscHelp.ssd" size="200704" crc="22fe9f55" sha1="1bafcd4459bacb803ddbfd1040241a04540a420e" />
+				<rom name="AcornUser_DiscHelp.ssd" size="200704" crc="22fe9f55" sha1="1bafcd4459bacb803ddbfd1040241a04540a420e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2209,7 +2209,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_Education.ssd" size="204800" crc="8e3b61aa" sha1="d1d2868f03b4ccb9e44b0d1e8b289ba2e4f1f61d" />
+				<rom name="AcornUser_Education.ssd" size="204800" crc="8e3b61aa" sha1="d1d2868f03b4ccb9e44b0d1e8b289ba2e4f1f61d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2221,7 +2221,7 @@
 		<info name="usage" value="Load with *GALLERY" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_Gallery-80T.ssd" size="204800" crc="cd69b8ad" sha1="62612f23c921381131b2844c4e7d341f359e3ebf" />
+				<rom name="AcornUser_Gallery-80T.ssd" size="204800" crc="cd69b8ad" sha1="62612f23c921381131b2844c4e7d341f359e3ebf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2234,13 +2234,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="99072">
-				<rom name="AcornUser_Gallery-40T-Disc1.ssd" size="99072" crc="bcc50d65" sha1="060f4217242711a1f9d66a5389447502bacd4b6f" />
+				<rom name="AcornUser_Gallery-40T-Disc1.ssd" size="99072" crc="bcc50d65" sha1="060f4217242711a1f9d66a5389447502bacd4b6f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 2"/>
 			<dataarea name="flop" size="100352">
-				<rom name="AcornUser_Gallery-40T-Disc2.ssd" size="100352" crc="805e23e9" sha1="2f706b3eb4f1b6025da7c7ed4206034c0dd7f58c" />
+				<rom name="AcornUser_Gallery-40T-Disc2.ssd" size="100352" crc="805e23e9" sha1="2f706b3eb4f1b6025da7c7ed4206034c0dd7f58c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2251,7 +2251,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="200704">
-				<rom name="AcornUser_GalleryCollection.ssd" size="200704" crc="9a609a7d" sha1="f13d5ace6815c1255a9d0bb4866a682943f1da6b" />
+				<rom name="AcornUser_GalleryCollection.ssd" size="200704" crc="9a609a7d" sha1="f13d5ace6815c1255a9d0bb4866a682943f1da6b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2262,7 +2262,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="AcornUser_Games.dsd" size="409600" crc="a5baba67" sha1="83a047610e7a63dcd9291146c33929b5e4b5aa31" />
+				<rom name="AcornUser_Games.dsd" size="409600" crc="a5baba67" sha1="83a047610e7a63dcd9291146c33929b5e4b5aa31" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2273,7 +2273,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_GraphicsUtils.ssd" size="204800" crc="ac4f8b36" sha1="5c979d6a94cfcf8d4eb4c219ccb5c3a02a41445b" />
+				<rom name="AcornUser_GraphicsUtils.ssd" size="204800" crc="ac4f8b36" sha1="5c979d6a94cfcf8d4eb4c219ccb5c3a02a41445b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2284,7 +2284,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_NetworkUtils.ssd" size="204800" crc="0d075447" sha1="551a2bf240e17293e230807f52eecc6bcf96a6ca" />
+				<rom name="AcornUser_NetworkUtils.ssd" size="204800" crc="0d075447" sha1="551a2bf240e17293e230807f52eecc6bcf96a6ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2295,7 +2295,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_Portfolio.ssd" size="204800" crc="6e1e2430" sha1="f94439aa5b692a354ffb191d0c57e6cda268402f" />
+				<rom name="AcornUser_Portfolio.ssd" size="204800" crc="6e1e2430" sha1="f94439aa5b692a354ffb191d0c57e6cda268402f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2306,7 +2306,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="AcornUser_PrinterHelp.dsd" size="409600" crc="5815cf70" sha1="f3daf16f0721db217ffddda760940d058e912779" />
+				<rom name="AcornUser_PrinterHelp.dsd" size="409600" crc="5815cf70" sha1="f3daf16f0721db217ffddda760940d058e912779" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2317,7 +2317,7 @@
 		<publisher>Redwood Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="AcornUser_SWRUtilities.ssd" size="204800" crc="8aadd43c" sha1="e123a79bfbd45ca47430cbfe290c2643d732b775" />
+				<rom name="AcornUser_SWRUtilities.ssd" size="204800" crc="8aadd43c" sha1="e123a79bfbd45ca47430cbfe290c2643d732b775" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2328,7 +2328,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="96256">
-				<rom name="Disk User 01.ssd" size="96256" crc="9366da84" sha1="6143701290b37c0fcddaa2c5be47450b5fd38249" />
+				<rom name="Disk User 01.ssd" size="96256" crc="9366da84" sha1="6143701290b37c0fcddaa2c5be47450b5fd38249" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2339,7 +2339,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="96512">
-				<rom name="Disk User 02.ssd" size="96512" crc="34b5310b" sha1="f0bbdbea28a36b3b9704318f0d1a4677297de594" />
+				<rom name="Disk User 02.ssd" size="96512" crc="34b5310b" sha1="f0bbdbea28a36b3b9704318f0d1a4677297de594" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2350,7 +2350,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101120">
-				<rom name="Disk User 03.ssd" size="101120" crc="4cd13ead" sha1="43953fb11f58d90eb697c48ebd48739165b72ae6" />
+				<rom name="Disk User 03.ssd" size="101120" crc="4cd13ead" sha1="43953fb11f58d90eb697c48ebd48739165b72ae6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2361,7 +2361,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99584">
-				<rom name="Disk User 04.ssd" size="99584" crc="2a3fc3fc" sha1="ddfbbfe14566bcb917197df6327943f914f3d715" />
+				<rom name="Disk User 04.ssd" size="99584" crc="2a3fc3fc" sha1="ddfbbfe14566bcb917197df6327943f914f3d715" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2372,7 +2372,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="94208">
-				<rom name="Disk User 05.ssd" size="94208" crc="3ec2c85b" sha1="8d1841890292684a5d519db710cdb2c51877157e" />
+				<rom name="Disk User 05.ssd" size="94208" crc="3ec2c85b" sha1="8d1841890292684a5d519db710cdb2c51877157e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2383,7 +2383,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101376">
-				<rom name="Disk User 06.ssd" size="101376" crc="fc9f4b7d" sha1="92cb8b58657c810c21a378947a2ad79aeb30e1f9" />
+				<rom name="Disk User 06.ssd" size="101376" crc="fc9f4b7d" sha1="92cb8b58657c810c21a378947a2ad79aeb30e1f9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2394,7 +2394,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102144">
-				<rom name="Disk User 07.ssd" size="102144" crc="943400a0" sha1="afac7da3ed66e151a1b8c723906359ec76601435" />
+				<rom name="Disk User 07.ssd" size="102144" crc="943400a0" sha1="afac7da3ed66e151a1b8c723906359ec76601435" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2405,7 +2405,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101376">
-				<rom name="Disk User 08.ssd" size="101376" crc="7ac0f1af" sha1="016fc2c3ef4ce38c14702b039b8ce060d3519a7f" />
+				<rom name="Disk User 08.ssd" size="101376" crc="7ac0f1af" sha1="016fc2c3ef4ce38c14702b039b8ce060d3519a7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2416,7 +2416,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102656">
-				<rom name="Disk User 09.ssd" size="102656" crc="ef6c057b" sha1="58560f4158ef712b81e0330e1498688ee8a3b7cb" />
+				<rom name="Disk User 09.ssd" size="102656" crc="ef6c057b" sha1="58560f4158ef712b81e0330e1498688ee8a3b7cb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2427,7 +2427,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="118528">
-				<rom name="Disk User 10.ssd" size="118528" crc="f0f415cf" sha1="3ebc5ced967aed1955c82eb5dc2b1d16f29eb801" />
+				<rom name="Disk User 10.ssd" size="118528" crc="f0f415cf" sha1="3ebc5ced967aed1955c82eb5dc2b1d16f29eb801" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2438,7 +2438,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="97280">
-				<rom name="Disk User 11.ssd" size="97280" crc="0b60d5c7" sha1="6c155e1a430c0c4aa729d2c5e64b6545b4d1f01f" />
+				<rom name="Disk User 11.ssd" size="97280" crc="0b60d5c7" sha1="6c155e1a430c0c4aa729d2c5e64b6545b4d1f01f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2449,7 +2449,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101120">
-				<rom name="Disk User 12.ssd" size="101120" crc="103846f1" sha1="251e956f9c328c7e4164b99ef65d8c91d0806253" />
+				<rom name="Disk User 12.ssd" size="101120" crc="103846f1" sha1="251e956f9c328c7e4164b99ef65d8c91d0806253" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2460,7 +2460,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="100608">
-				<rom name="Disk User 13.ssd" size="100608" crc="9a329e01" sha1="4b6f3505ebf79b6ac09da7301d1e86602fc5b123" />
+				<rom name="Disk User 13.ssd" size="100608" crc="9a329e01" sha1="4b6f3505ebf79b6ac09da7301d1e86602fc5b123" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2471,7 +2471,7 @@
 		<publisher>Argus Specialist Publications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="100096">
-				<rom name="Disk User 14.ssd" size="100096" crc="5ce93d1e" sha1="dd54f4b22e8536ff68c2c242595cde246bff18c1" />
+				<rom name="Disk User 14.ssd" size="100096" crc="5ce93d1e" sha1="dd54f4b22e8536ff68c2c242595cde246bff18c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2482,7 +2482,7 @@
 		<publisher>Acorn User</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="27136">
-				<rom name="SwordMaster.ssd" size="27136" crc="26d61035" sha1="11517768c7c40afab63e8f61542959ed37a1bae8" />
+				<rom name="SwordMaster.ssd" size="27136" crc="26d61035" sha1="11517768c7c40afab63e8f61542959ed37a1bae8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2493,7 +2493,7 @@
 		<publisher>Impact</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="74496">
-				<rom name="TheMicroUser-FreeXmasGift.ssd" size="74496" crc="16db1f61" sha1="0682ad1c76f2b8004ec3f67dd61300bc254d165a" />
+				<rom name="TheMicroUser-FreeXmasGift.ssd" size="74496" crc="16db1f61" sha1="0682ad1c76f2b8004ec3f67dd61300bc254d165a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2506,7 +2506,7 @@
 		<publisher>Bitshifters</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="187648">
-				<rom name="bs-beebtrk.ssd" size="187648" crc="d7fb81cc" sha1="668769f8c09daba7068bbf2eca84e6164c922c75"/>
+				<rom name="bs-beebtrk.ssd" size="187648" crc="d7fb81cc" sha1="668769f8c09daba7068bbf2eca84e6164c922c75" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2517,7 +2517,7 @@
 		<publisher>Bitshifters</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="142592">
-				<rom name="bs-beebtrk2.ssd" size="142592" crc="0174737c" sha1="75d298ab55cedd5e8492096956b7971fd1db158b"/>
+				<rom name="bs-beebtrk2.ssd" size="142592" crc="0174737c" sha1="75d298ab55cedd5e8492096956b7971fd1db158b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2528,7 +2528,7 @@
 		<publisher>Bitshifters</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="110592">
-				<rom name="bs-beebtrk3.ssd" size="110592" crc="4d349403" sha1="c82e305827cbebebf6f2d2f3fbd362ba6b5ac6f6"/>
+				<rom name="bs-beebtrk3.ssd" size="110592" crc="4d349403" sha1="c82e305827cbebebf6f2d2f3fbd362ba6b5ac6f6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2539,7 +2539,7 @@
 		<publisher>Bitshifters</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="bs-badappl.dsd" size="409600" crc="6c06dafd" sha1="92c4cd382c7073b47fa359d3352892d2d20c9b65"/>
+				<rom name="bs-badappl.dsd" size="409600" crc="6c06dafd" sha1="92c4cd382c7073b47fa359d3352892d2d20c9b65" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2552,37 +2552,37 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="94464">
-				<rom name="ByteTheAppleMusicDisc1.ssd" size="94464" crc="93153714" sha1="8de077e98fadfc4e1f82cad4b51832746d250c73"/>
+				<rom name="ByteTheAppleMusicDisc1.ssd" size="94464" crc="93153714" sha1="8de077e98fadfc4e1f82cad4b51832746d250c73" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 2"/>
 			<dataarea name="flop" size="107264">
-				<rom name="ByteTheAppleMusicDisc2.ssd" size="107264" crc="67208b29" sha1="d19ce86a805a8c39ac9c2fb701a2655f1e1a182f"/>
+				<rom name="ByteTheAppleMusicDisc2.ssd" size="107264" crc="67208b29" sha1="d19ce86a805a8c39ac9c2fb701a2655f1e1a182f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 3"/>
 			<dataarea name="flop" size="89344">
-				<rom name="ByteTheAppleMusicDisc3.ssd" size="89344" crc="7d7de2c2" sha1="138fbc85727258fed4121bbd0df64e1de46cf05a"/>
+				<rom name="ByteTheAppleMusicDisc3.ssd" size="89344" crc="7d7de2c2" sha1="138fbc85727258fed4121bbd0df64e1de46cf05a" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 4"/>
 			<dataarea name="flop" size="165632">
-				<rom name="ByteTheAppleMusicDisc4.ssd" size="165632" crc="c02c0adb" sha1="b8601c1d5e0f1acaa4613f6b78f493c9f87a62d0"/>
+				<rom name="ByteTheAppleMusicDisc4.ssd" size="165632" crc="c02c0adb" sha1="b8601c1d5e0f1acaa4613f6b78f493c9f87a62d0" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 5"/>
 			<dataarea name="flop" size="113920">
-				<rom name="ByteTheAppleMusicDisc5.ssd" size="113920" crc="91148f96" sha1="879a0975786ab3bb2467335d377e8d32dd2fc335"/>
+				<rom name="ByteTheAppleMusicDisc5.ssd" size="113920" crc="91148f96" sha1="879a0975786ab3bb2467335d377e8d32dd2fc335" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 6"/>
 			<dataarea name="flop" size="184064">
-				<rom name="ByteTheAppleMusicDisc6.ssd" size="184064" crc="f4cd73a0" sha1="302404cc54b9e68b1aa3b04b6510cce495596090"/>
+				<rom name="ByteTheAppleMusicDisc6.ssd" size="184064" crc="f4cd73a0" sha1="302404cc54b9e68b1aa3b04b6510cce495596090" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2593,7 +2593,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="396288">
-				<rom name="d-tyb01.dsd" size="396288" crc="a33a24fb" sha1="d7305e13715c1509a607dc556e4a0f8904552886"/>
+				<rom name="d-tyb01.dsd" size="396288" crc="a33a24fb" sha1="d7305e13715c1509a607dc556e4a0f8904552886" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2604,7 +2604,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="d-tyb02.dsd" size="409600" crc="41c61852" sha1="268882bec4325f52d754d56f4776fd935213a44b"/>
+				<rom name="d-tyb02.dsd" size="409600" crc="41c61852" sha1="268882bec4325f52d754d56f4776fd935213a44b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2615,7 +2615,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="408064">
-				<rom name="d-tyb03.dsd" size="408064" crc="f48fa2ff" sha1="5ce1c1b9e168f4365a6638f30110290056ed102f"/>
+				<rom name="d-tyb03.dsd" size="408064" crc="f48fa2ff" sha1="5ce1c1b9e168f4365a6638f30110290056ed102f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2626,7 +2626,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="d-tyb04.dsd" size="409600" crc="0d198ab9" sha1="319741a941881eecd569f75f4cf979d23586e7f9"/>
+				<rom name="d-tyb04.dsd" size="409600" crc="0d198ab9" sha1="319741a941881eecd569f75f4cf979d23586e7f9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2637,7 +2637,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409088">
-				<rom name="d-tyb05.dsd" size="409088" crc="ee25ffa3" sha1="580fd2d5ef8fd9741da6f9372474cb33446dbd57"/>
+				<rom name="d-tyb05.dsd" size="409088" crc="ee25ffa3" sha1="580fd2d5ef8fd9741da6f9372474cb33446dbd57" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2648,7 +2648,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="407296">
-				<rom name="d-tyb06.dsd" size="407296" crc="86b05fed" sha1="58b0e06d85a32ef9d2b16790469498fac0820f49"/>
+				<rom name="d-tyb06.dsd" size="407296" crc="86b05fed" sha1="58b0e06d85a32ef9d2b16790469498fac0820f49" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2659,7 +2659,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348416">
-				<rom name="d-tyb07.dsd" size="348416" crc="bcdf24be" sha1="59916e1cc04400bb0fbac463882beeeaa25da31b"/>
+				<rom name="d-tyb07.dsd" size="348416" crc="bcdf24be" sha1="59916e1cc04400bb0fbac463882beeeaa25da31b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2670,7 +2670,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="156160">
-				<rom name="d-tyb08.ssd" size="156160" crc="0ff117d8" sha1="8349782894b33eb49b03eea18c1d1109fdf65a24"/>
+				<rom name="d-tyb08.ssd" size="156160" crc="0ff117d8" sha1="8349782894b33eb49b03eea18c1d1109fdf65a24" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2681,7 +2681,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="d-tyb09.ssd" size="204800" crc="94340d71" sha1="485909c44b5ac0e9f601b3bc1e67e5ee03d05cbc"/>
+				<rom name="d-tyb09.ssd" size="204800" crc="94340d71" sha1="485909c44b5ac0e9f601b3bc1e67e5ee03d05cbc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2692,7 +2692,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="199680">
-				<rom name="d-tyb10.ssd" size="199680" crc="7e0102d2" sha1="96ca4a397eb2ff96264bca3f12b4e446b48d905e"/>
+				<rom name="d-tyb10.ssd" size="199680" crc="7e0102d2" sha1="96ca4a397eb2ff96264bca3f12b4e446b48d905e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2703,7 +2703,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="122880">
-				<rom name="d-tyb11.ssd" size="122880" crc="7c8e9b4d" sha1="75b846134c66d7b8451fabe4b89a4aa62896ee6d"/>
+				<rom name="d-tyb11.ssd" size="122880" crc="7c8e9b4d" sha1="75b846134c66d7b8451fabe4b89a4aa62896ee6d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2714,7 +2714,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88320">
-				<rom name="d-tyb12.ssd" size="88320" crc="c9207914" sha1="610b6c40b3bc0c7f3b341414bf2896375afb6ef2"/>
+				<rom name="d-tyb12.ssd" size="88320" crc="c9207914" sha1="610b6c40b3bc0c7f3b341414bf2896375afb6ef2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2725,7 +2725,7 @@
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="81920">
-				<rom name="tyb-expansions.ssd" size="81920" crc="d0bc04b3" sha1="5f09b1f385e02df99c004d068f234fe249c54c33"/>
+				<rom name="tyb-expansions.ssd" size="81920" crc="d0bc04b3" sha1="5f09b1f385e02df99c004d068f234fe249c54c33" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2738,7 +2738,7 @@
 		<publisher>Meritel</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="4T_Story1.ssd" size="102400" crc="ec0febbe" sha1="c556d938e75e94279364c7c0752827ce7bc6fed2"/>
+				<rom name="4T_Story1.ssd" size="102400" crc="ec0febbe" sha1="c556d938e75e94279364c7c0752827ce7bc6fed2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2749,7 +2749,7 @@
 		<publisher>Meritel</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="4T_Xmas.ssd" size="102400" crc="4bea988b" sha1="da755a6fec66bddfc859ca40fa5451a65a97ae01"/>
+				<rom name="4T_Xmas.ssd" size="102400" crc="4bea988b" sha1="da755a6fec66bddfc859ca40fa5451a65a97ae01" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2760,7 +2760,7 @@
 		<publisher>Health Education Coucil</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="funrun.ssd" size="102400" crc="c88a9bf6" sha1="4c8ead3b8a1e442e1531b71be18eca40ad1ced10"/>
+				<rom name="funrun.ssd" size="102400" crc="c88a9bf6" sha1="4c8ead3b8a1e442e1531b71be18eca40ad1ced10" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2771,7 +2771,7 @@
 		<publisher>Health Education Council</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="health.ssd" size="102400" crc="4f26c92c" sha1="7fbfb474aaa23c42cbb63b8ec04a34c1f355677c"/>
+				<rom name="health.ssd" size="102400" crc="4f26c92c" sha1="7fbfb474aaa23c42cbb63b8ec04a34c1f355677c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2785,7 +2785,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="69120">
-				<rom name="pj_sid_01.ssd" size="69120" crc="dfe6f2a5" sha1="cdfe2d49ac6ce3580f93d28d896fd0cac044102f"/>
+				<rom name="pj_sid_01.ssd" size="69120" crc="dfe6f2a5" sha1="cdfe2d49ac6ce3580f93d28d896fd0cac044102f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2797,7 +2797,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="43520">
-				<rom name="pj_sid2.ssd" size="43520" crc="9339f2cf" sha1="efc7f3032cba441f5f8110fc63371549e545b3c7"/>
+				<rom name="pj_sid2.ssd" size="43520" crc="9339f2cf" sha1="efc7f3032cba441f5f8110fc63371549e545b3c7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2809,7 +2809,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="107520">
-				<rom name="beebsid3.ssd" size="107520" crc="489c8c0b" sha1="ca8bbc734a9444007c6306f07e896cb12c8b04ca"/>
+				<rom name="beebsid3.ssd" size="107520" crc="489c8c0b" sha1="ca8bbc734a9444007c6306f07e896cb12c8b04ca" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2821,7 +2821,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="94720">
-				<rom name="beebsid4.ssd" size="94720" crc="7c987505" sha1="3ce0787e7fcd932fec34cb3dcccf05c1d7c8ede9"/>
+				<rom name="beebsid4.ssd" size="94720" crc="7c987505" sha1="3ce0787e7fcd932fec34cb3dcccf05c1d7c8ede9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2833,7 +2833,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="110080">
-				<rom name="beebsid5.ssd" size="110080" crc="d5da528d" sha1="9cb71cb0ffb48d3344b9937a0f0d16f3852cc476"/>
+				<rom name="beebsid5.ssd" size="110080" crc="d5da528d" sha1="9cb71cb0ffb48d3344b9937a0f0d16f3852cc476" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2845,7 +2845,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="58880">
-				<rom name="beebsid6.ssd" size="58880" crc="77f4e91d" sha1="0fe012e7bdf35d05184c6e8c349ebbdb5981c1e0"/>
+				<rom name="beebsid6.ssd" size="58880" crc="77f4e91d" sha1="0fe012e7bdf35d05184c6e8c349ebbdb5981c1e0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2857,7 +2857,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="76800">
-				<rom name="xmassid.ssd" size="76800" crc="fa1a0f10" sha1="d145872660c3d0ffa86903f1d6c603f2d67406fb"/>
+				<rom name="xmassid.ssd" size="76800" crc="fa1a0f10" sha1="d145872660c3d0ffa86903f1d6c603f2d67406fb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2869,7 +2869,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="140800">
-				<rom name="beebsid8.ssd" size="140800" crc="c14ad72b" sha1="acda17c6e244cd002295d880b804b503dac369de"/>
+				<rom name="beebsid8.ssd" size="140800" crc="c14ad72b" sha1="acda17c6e244cd002295d880b804b503dac369de" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2881,7 +2881,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="125440">
-				<rom name="beebsid9.ssd" size="125440" crc="1fff70c8" sha1="95547a9ec5f1c5e9e073da2744e661848500d8a5"/>
+				<rom name="beebsid9.ssd" size="125440" crc="1fff70c8" sha1="95547a9ec5f1c5e9e073da2744e661848500d8a5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2893,7 +2893,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="81920">
-				<rom name="beebsid10.ssd" size="81920" crc="1bac6da7" sha1="ceea68da1c446a270e120242f18960023981a5be"/>
+				<rom name="beebsid10.ssd" size="81920" crc="1bac6da7" sha1="ceea68da1c446a270e120242f18960023981a5be" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2905,7 +2905,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="beebsid11.ssd" size="89600" crc="6e5493fc" sha1="88a381da146f1cb671c476a20bdbe84fffecf4c7"/>
+				<rom name="beebsid11.ssd" size="89600" crc="6e5493fc" sha1="88a381da146f1cb671c476a20bdbe84fffecf4c7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2917,7 +2917,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="43520">
-				<rom name="beebsid12.ssd" size="43520" crc="24958ba0" sha1="83cf1e9ba640899aef5f90bfb68d6a2cf34d96e6"/>
+				<rom name="beebsid12.ssd" size="43520" crc="24958ba0" sha1="83cf1e9ba640899aef5f90bfb68d6a2cf34d96e6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2929,7 +2929,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="94720">
-				<rom name="beebsid13.ssd" size="94720" crc="ec6bed41" sha1="d5ebf345594c45289431875cf4a30e75da18afbd"/>
+				<rom name="beebsid13.ssd" size="94720" crc="ec6bed41" sha1="d5ebf345594c45289431875cf4a30e75da18afbd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2941,7 +2941,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="53760">
-				<rom name="beebsid14.ssd" size="53760" crc="51378281" sha1="b75f6a1b119b003c251918efb9ccd65c9617a75f"/>
+				<rom name="beebsid14.ssd" size="53760" crc="51378281" sha1="b75f6a1b119b003c251918efb9ccd65c9617a75f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2953,7 +2953,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="74240">
-				<rom name="beebsid15.ssd" size="74240" crc="dcf94822" sha1="fbb9b5bc34630545e42f2e8fa4e17e7b7ca5deac"/>
+				<rom name="beebsid15.ssd" size="74240" crc="dcf94822" sha1="fbb9b5bc34630545e42f2e8fa4e17e7b7ca5deac" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2965,7 +2965,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104960">
-				<rom name="beebsid16.ssd" size="104960" crc="7cc1c77e" sha1="2158fa955c56e0bf51daf8546614891e6fdda91e"/>
+				<rom name="beebsid16.ssd" size="104960" crc="7cc1c77e" sha1="2158fa955c56e0bf51daf8546614891e6fdda91e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2977,7 +2977,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="58880">
-				<rom name="beebsid17.ssd" size="58880" crc="b3a15530" sha1="24f43d128d28d4e4072826fc5437ea4ba3e37978"/>
+				<rom name="beebsid17.ssd" size="58880" crc="b3a15530" sha1="24f43d128d28d4e4072826fc5437ea4ba3e37978" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2989,7 +2989,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="107520">
-				<rom name="beebsid18.ssd" size="107520" crc="f332ef9f" sha1="6a9946ad960b07758490d7b23b7a6453b27d8baa"/>
+				<rom name="beebsid18.ssd" size="107520" crc="f332ef9f" sha1="6a9946ad960b07758490d7b23b7a6453b27d8baa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3001,7 +3001,7 @@
 		<info name="author" value="PitfallJones" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="240640">
-				<rom name="sidquiz.dsd" size="240640" crc="0a47bf55" sha1="26b9413b47f1e5d6b0fd501efcc73ab302fa3cff"/>
+				<rom name="sidquiz.dsd" size="240640" crc="0a47bf55" sha1="26b9413b47f1e5d6b0fd501efcc73ab302fa3cff" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

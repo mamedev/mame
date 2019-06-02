@@ -245,8 +245,8 @@ void carpolo_state::carpolo(machine_config &config)
 	pia0.cb2_handler().set(FUNC(carpolo_state::coin2_interrupt_clear_w));
 
 	pia6821_device &pia1(PIA6821(config, "pia1", 0));
-	pia1.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
-	pia1.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
+	pia0.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
+	pia0.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
 	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));
 	pia1.cb2_handler().set(FUNC(carpolo_state::coin4_interrupt_clear_w));
 

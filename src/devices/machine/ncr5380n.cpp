@@ -4,13 +4,11 @@
 
     ncr5380n.c
 
-    Implementation of the NCR 5380, aka the Zilog Z5380 & AMD Am5380
+    Implementation of the NCR 5380, aka the Zilog Z5380
 
     TODO:
     - IRQs
     - Target mode
-    - NMOS/CMOS functional differences
-    - Timings should not be clock-based (5380 has no clock input)
 
     40801766 - IIx ROM waiting point for "next read fails"
 
@@ -20,7 +18,6 @@
 #include "ncr5380n.h"
 
 DEFINE_DEVICE_TYPE(NCR5380N, ncr5380n_device, "ncr5380_new", "NCR 5380 SCSI (new)")
-DEFINE_DEVICE_TYPE(NCR53C80, ncr53c80_device, "ncr53c80", "NCR 53C80 SCSI")
 
 void ncr5380n_device::map(address_map &map)
 {
@@ -34,24 +31,13 @@ void ncr5380n_device::map(address_map &map)
 	map(0x7, 0x7).rw(FUNC(ncr5380n_device::resetparityirq_r), FUNC(ncr5380n_device::startdmainitrx_w));
 }
 
-ncr5380n_device::ncr5380n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nscsi_device(mconfig, type, tag, owner, clock)
-	, m_fake_clock(10000000)
+ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nscsi_device(mconfig, NCR5380N, tag, owner, clock)
 	, tm(nullptr), status(0), istatus(0), m_mode(0)
 	, m_outdata(0), m_busstatus(0), m_dmalatch(0), m_icommand(0), m_tcommand(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0), select_timeout(0)
 	, seq(0), tcount(0), mode(0), state(0), irq(false), drq(false)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
-{
-}
-
-ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr5380n_device(mconfig, NCR5380N, tag, owner, clock)
-{
-}
-
-ncr53c80_device::ncr53c80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr5380n_device(mconfig, NCR53C80, tag, owner, clock)
 {
 }
 
@@ -294,12 +280,12 @@ void ncr5380n_device::delay(int cycles)
 	if(!clock_conv)
 		return;
 	cycles *= clock_conv;
-	tm->adjust(attotime::from_ticks(cycles, m_fake_clock));
+	tm->adjust(clocks_to_attotime(cycles));
 }
 
 void ncr5380n_device::delay_cycles(int cycles)
 {
-	tm->adjust(attotime::from_ticks(cycles, m_fake_clock));
+	tm->adjust(clocks_to_attotime(cycles));
 }
 
 uint8_t ncr5380n_device::scsidata_r()
@@ -500,17 +486,14 @@ void ncr5380n_device::dma_w(uint8_t val)
 
 uint8_t ncr5380n_device::dma_r()
 {
-	if (!machine().side_effects_disabled())
-	{
-		// drop DRQ
-		drq_clear();
+	// drop DRQ
+	drq_clear();
 
-		// set up to receive our next byte if still in DMA mode
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-		if (m_mode & MODE_DMA)
-		{
-			recv_byte();
-		}
+	// set up to receive our next byte if still in DMA mode
+	scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+	if (m_mode & MODE_DMA)
+	{
+		recv_byte();
 	}
 	return m_dmalatch;
 }

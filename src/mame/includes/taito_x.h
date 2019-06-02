@@ -30,12 +30,12 @@ public:
 	void daisenpu(machine_config &config);
 
 private:
-	u16 superman_dsw_input_r(offs_t offset);
-	void superman_counters_w(u8 data);
-	u16 daisenpu_input_r(offs_t offset);
-	void daisenpu_input_w(offs_t offset, u16 data);
-	void kyustrkr_input_w(offs_t offset, u16 data);
-	void sound_bankswitch_w(u8 data);
+	DECLARE_READ16_MEMBER(superman_dsw_input_r);
+	DECLARE_WRITE8_MEMBER(superman_counters_w);
+	DECLARE_READ16_MEMBER(daisenpu_input_r);
+	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
+	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_MACHINE_START(taitox);
 
 	INTERRUPT_GEN_MEMBER(interrupt);

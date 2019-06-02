@@ -56,10 +56,10 @@ protected:
 
 	inline uint8_t read_reg(uint16_t reg);
 	inline uint16_t read_port(uint16_t port){ return 0;}
-	inline uint8_t read_table(uint16_t offset);// { return 0;}
+	inline uint16_t read_table(uint16_t offset){ return 0;}
 	inline void write_reg(uint16_t reg, uint8_t data);
-	inline void write_port(uint16_t port, uint16_t data);
-	inline uint16_t read_ibus(); // { return 0; }
+	inline void write_port(uint16_t port, uint16_t data){}
+	inline uint16_t read_ibus(){ return 0; }
 
 	// CPU registers
 	uint16_t m_pc;
@@ -75,18 +75,6 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
-
-	// rom regions
-	memory_region *m_table;
-
-#if 0
-	// Callbacks and set methods
-	write_line_delegate m_xxx_cb; // Called when xxx happens in CPU
-	void call_xxx_cb(int state){ if (!m_xxx.cb.isnull()) (m_xxx_cb)(state);
-public:
-	void set_xxx_callback( write_line_delegate callback ){ m_xxx_cb = callback; }
-	void set_line_yyy(int state){ m_yyy = state; }
-#endif
 };
 
 // device type definition
@@ -100,8 +88,7 @@ enum
 {
 	DIABLO_PC = 1,
 	DIABLO_A,
-	DIABLO_B,
-	DIABLO_CARRY
+	DIABLO_B
 };
 
 #endif // MAME_CPU_DIABLO_DIABLO1300_H

@@ -803,15 +803,15 @@ if (_OPTIONS["osd"] == "sdl") then
 	project("testkeys")
 	uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
 	kind "ConsoleApp"
-
+  
 	flags {
 		"Symbols", -- always include minimum symbols for executables
 	}
-
+  
 	if _OPTIONS["SEPARATE_BIN"]~="1" then
 		targetdir(MAME_DIR)
 	end
-
+  
 	links {
 		"ocore_" .. _OPTIONS["osd"],
 		ext_lib("utf8proc"),
@@ -871,17 +871,17 @@ if (_OPTIONS["osd"] == "sdl") then
 			}
 		end
 	end
-
+  
 	dofile("osd/sdl_cfg.lua")
 
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
-
+ 
 	files {
 		MAME_DIR .. "src/tools/testkeys.cpp",
 	}
-
+  
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 

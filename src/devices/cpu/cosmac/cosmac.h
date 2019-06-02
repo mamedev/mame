@@ -124,6 +124,7 @@ class cosmac_device : public cpu_device
 public:
 	// registers
 	// public because machine/pecom.cpp accesses registers through the state interface - there should be a proper way to get address on bus for this
+	// drivers/microkit.cpp and drivers/eti660.cpp are even worse setting R0 through the state interface to hack around running boot code or something
 	enum
 	{
 		COSMAC_P,

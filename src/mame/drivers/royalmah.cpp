@@ -115,8 +115,7 @@ class royalmah_state : public driver_device
 public:
 	royalmah_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
+		m_maincpu(*this,"maincpu"),
 		m_ay(*this, "aysnd"),
 		m_videoram(*this, "videoram"),
 		m_audiocpu(*this, "audiocpu"),
@@ -251,7 +250,7 @@ private:
 	void royalmah_palette(palette_device &palette) const;
 	void mjderngr_palette(palette_device &palette) const;
 
-	uint32_t screen_update_royalmah(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 
@@ -294,7 +293,6 @@ private:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_ay;
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_device<cpu_device> m_audiocpu;
@@ -419,7 +417,7 @@ WRITE8_MEMBER(royalmah_state::mjderngr_palbank_w)
 }
 
 
-uint32_t royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (offs_t offs = 0; offs < 0x4000; offs++)
 	{
@@ -433,7 +431,7 @@ uint32_t royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_rg
 		{
 			uint8_t pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
 
-			bitmap.pix32(y, x) = m_palette->pen((m_palette_base << 4) | pen);
+			bitmap.pix16(y, x) = (m_palette_base << 4) | pen;
 
 			x = (m_flip_screen) ? x - 1 : x + 1;
 			data1 = data1 >> 1;
@@ -2290,7 +2288,7 @@ static INPUT_PORTS_START( mjdiplob )
 	PORT_INCLUDE( mjctrl2 )
 
 	PORT_START("DSW1")  /* DSW1 (inport $10 -> 0x76fa) */
-	PORT_DIPNAME( 0x0f, 0x0f, "Pay Out Rate" ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, "Pay Out Rate" )
 	PORT_DIPSETTING(    0x0f, "96%" )
 	PORT_DIPSETTING(    0x0e, "93%" )
 	PORT_DIPSETTING(    0x0d, "90%" )
@@ -2307,65 +2305,65 @@ static INPUT_PORTS_START( mjdiplob )
 	PORT_DIPSETTING(    0x02, "56%" )
 	PORT_DIPSETTING(    0x01, "53%" )
 	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x20, "10" )
 	PORT_DIPSETTING(    0x30, "20" )
-	PORT_DIPNAME( 0x40, 0x00, "Table Color" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, "Green" )
-	PORT_DIPSETTING(    0x40, "Black" )
-	PORT_DIPNAME( 0x80, 0x80, "Debug Mode ?" ) PORT_DIPLOCATION("SW1:8")     // check code at 0x0b94 and 0x0de2
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      // affects videoram - flip screen ?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Debug Mode ?" )      // check code at 0x0b94 and 0x0de2
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* DSW2 (inport $62 -> 0x76fb) */
-	PORT_DIPNAME( 0x03, 0x03, "Winnings" ) PORT_DIPLOCATION("SW2:1,2")         // check code at 0x09cd
+	PORT_DIPNAME( 0x03, 0x03, "Winnings" )          // check code at 0x09cd
 	PORT_DIPSETTING(    0x00, "32 24 16 12 8 4 2 1" )   // table at 0x4b82
 	PORT_DIPSETTING(    0x03, "50 30 15 8 5 3 2 1" )    // table at 0x4b52
 	PORT_DIPSETTING(    0x02, "100 50 25 10 5 3 2 1" )  // table at 0x4b62
 	PORT_DIPSETTING(    0x01, "200 100 50 10 5 3 2 1" ) // table at 0x4b72
-	PORT_DIPNAME( 0x04, 0x00, "Yakuman Bonus" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Yakuman Bonus Period Control" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x08, "First time only" )
-	PORT_DIPNAME( 0x30, 0x30, "Yakuman Bonus Timing Control" ) PORT_DIPLOCATION("SW2:5,6")      // check code at 0x166c, Yakuman Bonus every x coins in
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Payout ?" )      // check code at 0x166c
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x10, "200" )
 	PORT_DIPSETTING(    0x20, "300" )
 	PORT_DIPSETTING(    0x30, "500" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")      // check code at 0x2c64, unused according to manual
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      // check code at 0x2c64
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")     // check code at 0x2c64, unused according to manual
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )      // check code at 0x2c64
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW3")  /* DSW3 (inport $63 -> 0x76fc), switches 5-7 could do with verifying by someone who understands Japanese and mahjong (see MT05553 for manual) */
-	PORT_DIPNAME( 0x01, 0x00, "Baibai Bonus" ) PORT_DIPLOCATION("SW3:1")  // see notes about 'Special Combinations'
+	PORT_START("DSW3")  /* DSW3 (inport $63 -> 0x76fc) */
+	PORT_DIPNAME( 0x01, 0x00, "Special Combinations" )  // see notes
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Don Den" ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "W-Bet" ) PORT_DIPLOCATION("SW3:3")      // check code at 0x531f and 0x5375
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Last Chance" ) PORT_DIPLOCATION("SW3:4")     // check code at 0x5240
-	PORT_DIPSETTING(    0x08, "Free" )
-	PORT_DIPSETTING(    0x00, "Charge" )
-	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" ) PORT_DIPLOCATION("SW3:5")      // check code at 0x2411
-	PORT_DIPSETTING(    0x00, "Good" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x20, 0x00, "Renchan" ) PORT_DIPLOCATION("SW3:6")      // check code at 0x2411 and 0x4beb
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Auto Tsumo?" ) PORT_DIPLOCATION("SW3:7")      // check code at 0x24ff, 0x25f2, 0x3fcf and 0x45d7
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Full Tests" ) PORT_DIPLOCATION("SW3:8")           // seems to hang after the last animation, unused according to manual
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )      // check code at 0x531f and 0x5375
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )      // check code at 0x5240
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )      // check code at 0x2411
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )      // check code at 0x2411 and 0x4beb
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      // check code at 0x24ff, 0x25f2, 0x3fcf and 0x45d7
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Full Tests" )            // seems to hang after the last animation
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3553,6 +3551,7 @@ void royalmah_state::royalmah(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(royalmah_state::screen_update_royalmah));
+	screen.set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -3650,7 +3649,7 @@ void royalmah_state::janyoup2(machine_config &config)
 	m_maincpu->set_clock(XTAL(18'432'000)/4); // unknown divider
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::janyoup2_iomap);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(18'432'000)/12)); // unknown divider
+	h46505_device &crtc(H46505(config, "crtc", XTAL(18'432'000)/12)); // unknown divider
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);

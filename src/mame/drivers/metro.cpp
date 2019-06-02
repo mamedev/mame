@@ -4497,7 +4497,7 @@ HSync: 15.16kHz
 
 ***************************************************************************/
 
-ROM_START( lastfort ) /* Japanese version on PCB VG420 */
+ROM_START( lastfort )
 	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "tr_jc09", 0x000000, 0x020000, CRC(8b98a49a) SHA1(15adca78d54973820d04f8b308dc58d0784eb900) )
 	ROM_LOAD16_BYTE( "tr_jc10", 0x000001, 0x020000, CRC(8d04da04) SHA1(5c7e65a39929e94d1fa99aeb5fed7030b110451f) )
@@ -4539,24 +4539,6 @@ ROM_START( lastfortk )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
-ROM_END
-
-ROM_START( lastfortj ) /* Japanese version on PCB VG460-(A) */
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "tr_mja2.8g",  0x000000, 0x020000, CRC(4059a8c8) SHA1(05f271fb86a01359b1737bbfdf3c0a83364dd7d3) )
-	ROM_LOAD16_BYTE( "tr_mja3.10g", 0x000001, 0x020000, CRC(8fc6ddcd) SHA1(626070094fbbd982e1c8d699f171a1c500db1620) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )       /* NEC78C10 Code */
-	ROM_LOAD( "tr_ma01.1i",  0x000000, 0x020000,  CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) /* Same as parent set, but different label */
-
-	ROM_REGION( 0x200000, "vdp", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "tr_ma04.15f", 0x000000, 0x080000, CRC(5feafc6f) SHA1(eb50905eb0d25eb342e08d591907f79b5eadff43) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "tr_ma07.17d", 0x000002, 0x080000, CRC(7519d569) SHA1(c88932a19a48d45a19b777113a4719b18f42a297) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "tr_ma05.17f", 0x000004, 0x080000, CRC(5d917ba5) SHA1(34fc72924fa2877c1038d7f61b22f7667af01e9f) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "tr_ma06.15d", 0x000006, 0x080000, CRC(d366c04e) SHA1(e0a67688043cb45916860d32ff1076d9257e6ad9) , ROM_GROUPWORD | ROM_SKIP(6))
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "tr_ma08.1d", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) ) /* Same as parent set, but different label */
 ROM_END
 
 ROM_START( lastfortg ) /* German version on PCB VG460-(A) */
@@ -5622,12 +5604,11 @@ GAME( 1992, pangpomsn, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,
 GAME( 1992, skyalert,  0,        skyalert,  skyalert,   metro_state, init_metro,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_state, init_karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_state, init_karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan, VG420 PCB)", MACHINE_SUPPORTS_SAVE ) // VG420 PCB
+GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastforte, lastfort, lastfort,  lastfero,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortea,lastfort, lastfort,  lastfero,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortj, lastfort, lastforg,  ladykill,   metro_state, init_lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Japan, VG460 PCB)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
-GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_state, init_lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
+GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_state, init_lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE )
 
 // MTR5260 / MTR527
 GAME( 1993, poitto,    0,        poitto,    poitto,     metro_state, init_metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!", MACHINE_SUPPORTS_SAVE )

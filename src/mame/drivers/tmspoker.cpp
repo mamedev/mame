@@ -251,7 +251,7 @@ private:
 	uint8_t inputs_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void tmspoker_palette(palette_device &palette) const;
-	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 
 	void tmspoker_cru_map(address_map &map);
@@ -288,7 +288,7 @@ void tmspoker_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -592,6 +592,7 @@ void tmspoker_state::tmspoker(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(tmspoker_state::screen_update_tmspoker));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tmspoker);
 	PALETTE(config, "palette", FUNC(tmspoker_state::tmspoker_palette), 256);

@@ -138,13 +138,8 @@ SW8 Control if the PORT displays echo the 7-segment displays (high), or just act
 
 
 ToDo
-- MMD1 cassette uart ports 0x12/13 (possibly 8251), and circuits to convert to tones
-- MMD1 tty uart ports 0x10/11 (possibly 8251), and rs232 interface
-- MMD2 Hook up WE0-3
-- MMD2 cassette is hooked up but not tested
-- MMD2 tty rs232 interface
+- Hook up reset key and dipswitch
 - Add interrupt module (INTE LED is always on atm)
-- Need software
 - Lots of other things
 
 ****************************************************************************/
@@ -152,9 +147,6 @@ ToDo
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8279.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "speaker.h"
 #include "mmd1.lh"
 #include "mmd2.lh"
 
@@ -165,10 +157,7 @@ public:
 	mmd1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "X%u", 0)
 		, m_digits(*this, "digit%u", 0U)
-		, m_mmd2(false)
 		{ }
 
 	void mmd1(machine_config &config);
@@ -176,14 +165,11 @@ public:
 
 	void init_mmd2();
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
 private:
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
 	DECLARE_READ8_MEMBER(mmd1_keyboard_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(mmd2_01_r);
 	DECLARE_READ8_MEMBER(mmd2_bank_r);
 	DECLARE_READ8_MEMBER(mmd2_kbd_r);
@@ -197,16 +183,12 @@ private:
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
-	void reset_banks();
 
 	uint8_t m_return_code;
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<i8080_cpu_device> m_maincpu;
-	optional_device<cassette_image_device> m_cass;
-	optional_ioport_array<4> m_io_keyboard;
 	output_finder<9> m_digits;
-	bool m_mmd2;
 };
 
 
@@ -291,8 +273,6 @@ void mmd1_state::mmd1_io(address_map &map)
 	map(0x00, 0x00).rw(FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
 	map(0x01, 0x01).w(FUNC(mmd1_state::mmd1_port1_w));
 	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
-	//map(0x10, 0x11).rw  TTY UART
-	//map(0x12, 0x13).rw  CASS UART
 }
 
 void mmd1_state::mmd2_mem(address_map &map)
@@ -314,9 +294,6 @@ void mmd1_state::mmd2_io(address_map &map)
 	map(0x03, 0x03).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x04, 0x04).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0x05, 0x07).r(FUNC(mmd1_state::mmd2_bank_r));
-	map(0x05, 0x05).w(FUNC(mmd1_state::cass_w));
-	//map(0x09, 0x09).w  PUP signal
-	//map(0x0a, 0x0a).w  Eprom programmer
 }
 
 
@@ -341,15 +318,16 @@ static INPUT_PORTS_START( mmd1 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 	PORT_START("LINE3")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, mmd1_state, reset_button, nullptr)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmd2 )
 	PORT_START("DSW")
+	PORT_BIT( 0x87, 0x00, IPT_UNUSED )
 	PORT_DIPNAME( 0x20, 0x00, "Sw6") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, "Hex")
 	PORT_DIPSETTING(    0x00, "Octal")
-	PORT_DIPNAME( 0x10, 0x10, "Sw7") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x10, 0x00, "Sw7") PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, "PUP")
 	PORT_DIPSETTING(    0x00, "Reset")
 	PORT_DIPNAME( 0x08, 0x08, "Sw8") PORT_DIPLOCATION("SW1:3")
@@ -393,15 +371,8 @@ static INPUT_PORTS_START( mmd2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STORE") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PREV") PORT_CODE(KEYCODE_DOWN)
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, mmd1_state, reset_button, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(mmd1_state::reset_button)
-{
-	if (newval && m_mmd2)
-		reset_banks();
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /*
 Keyboard
@@ -427,17 +398,10 @@ READ8_MEMBER( mmd1_state::mmd2_bank_r )
 
 READ8_MEMBER( mmd1_state::mmd2_01_r )
 {
-	// need to add ttyin bit 0
-	uint8_t data = 0x84;
+	// need to add cassin, ttyin bits
+	uint8_t data = 0x87;
 	data |= ioport("DSW")->read();
-	data |= (m_cass->input() < 0.02) ? 0 : 2;
 	return data;
-}
-
-WRITE8_MEMBER( mmd1_state::cass_w )
-{
-	// need to add ttyout bit 0
-	m_cass->output(BIT(data, 2) ? -1.0 : +1.0);
 }
 
 WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
@@ -456,8 +420,11 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 	uint8_t data = 0xff;
 
 	if (m_digit < 4)
-		data = m_io_keyboard[m_digit]->read();
-
+	{
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",m_digit);
+		data = ioport(kbdrow)->read();
+	}
 	return data;
 }
 
@@ -482,11 +449,6 @@ MACHINE_RESET_MEMBER(mmd1_state,mmd1)
 }
 
 MACHINE_RESET_MEMBER(mmd1_state,mmd2)
-{
-	reset_banks();
-}
-
-void mmd1_state::reset_banks()
 {
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
@@ -529,7 +491,6 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank8")->configure_entry(0, &p_ram[0xe400]);
 	membank("bank8")->configure_entry(1, &p_ram[0x8000]);
 	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
-	m_mmd2 = true;
 }
 
 void mmd1_state::mmd1(machine_config &config)
@@ -566,11 +527,6 @@ void mmd1_state::mmd2(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));        // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                       // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
-
-	/* Cassette */
-	CASSETTE(config, m_cass);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

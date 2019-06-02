@@ -617,9 +617,10 @@ WRITE_LINE_MEMBER(ngen_state::fdc_drq_w)
 WRITE8_MEMBER(ngen_state::fdc_control_w)
 {
 	m_fdc->set_floppy(m_fd0->get_device());
-	m_fd0->get_device()->mon_w(!BIT(data, 2));
-	m_fd0->get_device()->ss_w(BIT(data, 5));
-	m_fdc->mr_w(BIT(data, 7));
+	m_fd0->get_device()->mon_w(~data & 0x04);
+	m_fd0->get_device()->ss_w(data & 0x20);
+	if(~data & 0x80)
+		m_fdc->soft_reset();
 }
 
 // Hard disk control register

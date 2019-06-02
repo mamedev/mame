@@ -7,12 +7,9 @@
     These EISA host adapters have, in addition to internal and external
     SCSI and floppy disk connectors, LED and "SPKER" jumper headers. The
     DC-820 and DC-820B also have four SIMM slots in addition to 64K of
-    static RAM on board. The DC-320 and DC-320B only have 16K of SRAM;
-    the DC-820B firmware switches into DC-320E mode if it fails to read
-    dummy values back from select RAM locations beyond the 16K limit.
+    static RAM on board. The DC-320 and DC-320B only have 16K of SRAM.
 
     The DC-820B has an ASIC in place of the 11 PLDs used by the DC-820.
-    DC-320E likely uses the same ASIC, though probably on a smaller PCB.
 
     It seems likely that these controllers, like the AHA-174X, support a
     legacy ISA port interface as well as the standard EISA doorbell and
@@ -106,8 +103,9 @@ void tekram_eisa_scsi_device::eeprom_w(u8 data)
 	m_eeprom->clk_write(BIT(data, 5));
 }
 
-void tekram_eisa_scsi_device::common_map(address_map &map)
+void tekram_eisa_scsi_device::mpu_map(address_map &map)
 {
+	map(0x00000, 0x0ffff).ram();
 	map(0x10040, 0x1005f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0xff00);
 	map(0x10068, 0x10068).rw(FUNC(tekram_eisa_scsi_device::latch_status_r), FUNC(tekram_eisa_scsi_device::int0_ack_w));
 	map(0x10069, 0x10069).r(FUNC(tekram_eisa_scsi_device::status_r));
@@ -119,19 +117,6 @@ void tekram_eisa_scsi_device::common_map(address_map &map)
 	map(0x1006f, 0x1006f).w(m_hostlatch, FUNC(generic_latch_8_device::write));
 	map(0x10080, 0x10085).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w)).umask16(0x00ff);
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
-}
-
-void tekram_dc320e_device::mpu_map(address_map &map)
-{
-	common_map(map);
-	map(0x00000, 0x03fff).ram();
-	map(0x04000, 0x0ffff).noprw();
-}
-
-void tekram_dc820b_device::mpu_map(address_map &map)
-{
-	common_map(map);
-	map(0x00000, 0x0ffff).ram();
 }
 
 void tekram_dc320b_device::eeprom_w(u8 data)

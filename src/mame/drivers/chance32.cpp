@@ -67,7 +67,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
 
@@ -117,7 +117,7 @@ void chance32_state::video_start()
 }
 
 
-uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -474,8 +474,9 @@ void chance32_state::chance32(machine_config &config)
 	screen.set_size(40*16, 32*8);
 	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
 	screen.set_screen_update(FUNC(chance32_state::screen_update_chance32));
+	screen.set_palette("palette");
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
+	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);

@@ -1128,7 +1128,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	HD6845S(config, m_crtc, MASTER_CLOCK/2);    /* HD68A45SP; unknown clock, hand tuned to get ~60 fps */
+	H46505(config, m_crtc, MASTER_CLOCK/2);    /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -1165,8 +1165,8 @@ ROM_START( smc777 )
 	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
 	ROMX_LOAD( "smcrom.v2",  0x0000, 0x4000, CRC(c1494b8f) SHA1(a7396f5c292f11639ffbf0b909e8473c5aa63518), ROM_BIOS(1))
 
-	ROM_REGION( 0x400, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "m5l8041a-077p.bin", 0x000, 0x400, NO_DUMP ) // 8041 keyboard mcu, needs decapping
+	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i80xx", 0x000, 0x800, NO_DUMP ) // keyboard mcu, needs decapping
 ROM_END
 
 /* Driver */

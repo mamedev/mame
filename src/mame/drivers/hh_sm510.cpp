@@ -18,7 +18,6 @@ TODO:
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
-- confirm gnw_chef rom (dumped from Soviet clone but should be the same)
 - confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
@@ -42,18 +41,18 @@ Game list (* denotes not emulated yet)
 
 Serial  Series MCU     Title
 ---------------------------------------------
-AC-01*    s    SM5A?   Ball (aka Toss-Up)
-FL-02*    s    SM5A?   Flagman
-MT-03*    s    SM5A?   Vermin (aka The Exterminator)
-RC-04*    s    SM5A?   Fire (aka Fireman Fireman)
-IP-05*    g    SM5A?   Judge
-MN-06*    g    SM5A?   Manhole
-CN-07*    g    SM5A?   Helmet (aka Headache)
-LN-08*    g    SM5A?   Lion
+AC-01*    s    ?       Ball (aka Toss-Up)
+FL-02*    s    ?       Flagman
+MT-03*    s    ?       Vermin (aka The Exterminator)
+RC-04*    s    ?       Fire (aka Fireman Fireman)
+IP-05*    g    ?       Judge
+MN-06*    g    ?       Manhole
+CN-07*    g    ?       Helmet (aka Headache)
+LN-08*    g    ?       Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
-FP-24     ws   SM5A    Chef
+FP-24*    ws   SM5A    Chef
 MC-25     ws   SM5A    Mickey Mouse
 EG-26     ws   SM5A    Egg (near-certainly same ROM as MC-25, but LCD differs)
 FR-27     ws   SM5A    Fire
@@ -1503,122 +1502,6 @@ ROM_START( gnw_popeye )
 
 	ROM_REGION( 218428, "svg", 0)
 	ROM_LOAD( "gnw_popeye.svg", 0, 218428, CRC(b2c3fdf2) SHA1(5e782f25f9ff432a292e67efc7f5653cf2a81b60) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Nintendo Game & Watch: Chef (model FP-24)
-  * PCB label FP-24
-  * Sharp SM5A label FP-24 51YB
-  * lcd screen with custom segments, 1-bit sound
-
-  In 1989, Elektronika(USSR) released a clone: Merry Cook. This game most
-  likely shares the same ROM (to be verified) and the graphics is slightly
-  different.
-
-***************************************************************************/
-
-class gnw_chef_state : public hh_sm510_state
-{
-public:
-	gnw_chef_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void merrycook(machine_config &config);
-	void gnw_chef(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( gnw_chef )
-	PORT_START("IN.0") // R2
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-
-	PORT_START("IN.2") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND, only works after power-on
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-void gnw_chef_state::gnw_chef(machine_config &config)
-{
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // assuming same as merry cook
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(1666, 1080);
-	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-void gnw_chef_state::merrycook(machine_config & config)
-{
-	gnw_chef(config);
-
-	/* basic machine hardware */
-	KB1013VK12(config.replace(), m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1679, 1080);
-	screen->set_visarea_full();
-}
-
-// roms
-
-ROM_START( gnw_chef )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "fp-24", 0x0000, 0x0740, BAD_DUMP CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) ) // dumped from Soviet clone
-
-	ROM_REGION( 199453, "svg", 0)
-	ROM_LOAD( "gnw_chef.svg", 0, 199453, CRC(97aacb9a) SHA1(1d4b2cc70a541ad09bc13c09ce26a8c14c03c526) )
-ROM_END
-
-ROM_START( merrycook )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "merrycook.bin", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
-
-	ROM_REGION( 143959, "svg", 0)
-	ROM_LOAD( "merrycook.svg", 0, 143959, CRC(36f41ff0) SHA1(47a7886f7825b781e1cf54215c86f5105d6c3b0e) )
 ROM_END
 
 
@@ -8975,139 +8858,6 @@ ROM_END
 
 /***************************************************************************
 
-  Tronica Shuttle Voyage (MG-8)
-  * Sharp SM510 label 0019 238E TRONICA (no decap)
-  * lcd screen with custom segments, 1-bit sound
-
-  Even though the serial is MG-8, the back of the game says 1983, newer than MG-9?
-  Thief in Garden (model TG-18) is the exact same MCU, but different graphics.
-
-***************************************************************************/
-
-class trshutvoy_state : public hh_sm510_state
-{
-public:
-	trshutvoy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void trshutvoy(machine_config &config);
-	void tigarden(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( trshutvoy )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(".")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("=")
-
-	PORT_START("IN.3") // S4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_DIVIDE)
-
-	PORT_START("IN.4") // S5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_CHANGED_CB(input_changed) PORT_NAME("%")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_CB(input_changed) PORT_NAME("C")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.5") // S6
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.6") // S7
-	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Up/Sound
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // F
-
-	PORT_START("IN.7") // S8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
-
-	PORT_START("FAKE") // Up/Sound are electronically the same button
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-INPUT_PORTS_END
-
-void trshutvoy_state::trshutvoy(machine_config &config)
-{
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(1496, 1080);
-	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-void trshutvoy_state::tigarden(machine_config &config)
-{
-	trshutvoy(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1515, 1080);
-	screen->set_visarea_full();
-}
-
-// roms
-
-ROM_START( trshutvoy )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
-
-	ROM_REGION( 221654, "svg", 0)
-	ROM_LOAD( "trshutvoy.svg", 0, 221654, CRC(470a7ff5) SHA1(b297601d8a5a9c4aef414605632849e0b1925caa) )
-ROM_END
-
-ROM_START( tigarden )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
-
-	ROM_REGION( 409084, "svg", 0)
-	ROM_LOAD( "tigarden.svg", 0, 409084, CRC(cfda5138) SHA1(1bc4ed65ae0cdca3e1e9458d68ca4d6e0fc0e901) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
   Tronica Space Rescue (model MG-9)
   * PCB label MG-9 080492
   * Sharp SM510 label 0015 224B TRONICA (no decap)
@@ -9177,6 +8927,117 @@ ROM_START( trsrescue )
 
 	ROM_REGION( 178600, "svg", 0)
 	ROM_LOAD( "trsrescue.svg", 0, 178600, CRC(2fa7b2d9) SHA1(5d1fc88db3129c9126f0c05ea55fb5f117e02871) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tronica Thief in Garden (model TG-18)
+  * Sharp SM510 label 0019 238E TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tigarden_state : public hh_sm510_state
+{
+public:
+	tigarden_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void tigarden(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tigarden )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("=")
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_CHANGED_CB(input_changed) PORT_NAME("%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_CB(input_changed) PORT_NAME("C")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Up/Sound
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // F
+
+	PORT_START("IN.7") // S8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("FAKE") // Up/Sound are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+INPUT_PORTS_END
+
+void tigarden_state::tigarden(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1515, 1080);
+	screen.set_visarea_full();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tigarden )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
+
+	ROM_REGION( 409084, "svg", 0)
+	ROM_LOAD( "tigarden.svg", 0, 409084, CRC(cfda5138) SHA1(1bc4ed65ae0cdca3e1e9458d68ca4d6e0fc0e901) )
 ROM_END
 
 
@@ -9318,8 +9179,6 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
@@ -9410,10 +9269,7 @@ CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state, 
 // Tiger 72-xxx models
 CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE )
 
-// Tronica
-CONS( 1983, trshutvoy,   0,          0, trshutvoy,   trshutvoy,   trshutvoy_state,   empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, tigarden,    trshutvoy,  0, tigarden,    trshutvoy,   trshutvoy_state,   empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, trsrescue,   0,          0, trsrescue,   trsrescue,   trsrescue_state,   empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE )
-
 // misc
+CONS( 1982, trsrescue,   0,          0, trsrescue,   trsrescue,   trsrescue_state,   empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )

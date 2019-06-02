@@ -251,6 +251,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	{
 		m_core->m_icount -= 1; // unknown count
 		uint32_t addr = m_core->m_r[REG_R3] | ((m_core->m_r[REG_R4] & 0x3f) << 16);
+		add_lpc(1);
 		push(m_core->m_r[REG_PC], &m_core->m_r[REG_SP]);
 		push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
 		m_core->m_r[REG_PC] = addr & 0x0000ffff;
@@ -279,27 +280,12 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16c: case 0xf36c: case 0xf56c: case 0xf76c: case 0xf96c: case 0xfb6c: case 0xfd6c: case 0xff6c:
 	case 0xf174: case 0xf374: case 0xf574: case 0xf774: case 0xf974: case 0xfb74: case 0xfd74: case 0xff74:
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
-	{
 		//unimplemented_opcode(op);
 		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
-		// palette uploads in smartfp depend on this, however this logic only works for the first few, so isn't correct
-		uint16_t result = m_core->m_r[REG_R4];// rand();
-		uint16_t temp = m_core->m_r[REG_R4];
-
-		for (int i = 0; i < 16; i++)
-		{
-			int bit = (temp << i) & 0x8000;
-
-			if (bit)
-				break;
-
-			result |= 1 << (15 - i);
-		}
-
-		logerror("pc:%06x: r2 = exp r4 (with r2 = %04x r4 = %04x) (returning %04x)\n", UNSP_LPC, m_core->m_r[REG_R2], m_core->m_r[REG_R4], result);
-		m_core->m_r[REG_R2] = result;
+		logerror("r2 = exp r4 (with r2 = %04x r4 = %04x)\n", m_core->m_r[REG_R2], m_core->m_r[REG_R4]);
+		m_core->m_r[REG_R2] = 0x0001; // WRONG!!
 		return;
-	}
+
 
 	default:
 		return unsp_device::execute_fxxx_101_group(op);
@@ -345,7 +331,6 @@ void unsp_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf168: case 0xf368: case 0xf568: case 0xf768: case 0xf968: case 0xfb68: case 0xfd68: case 0xff68:
 	case 0xf170: case 0xf370: case 0xf570: case 0xf770: case 0xf970: case 0xfb70: case 0xfd70: case 0xff70:
 	case 0xf178: case 0xf378: case 0xf578: case 0xf778: case 0xf978: case 0xfb78: case 0xfd78: case 0xff78:
-		// break (call vector fff5?)
 		unimplemented_opcode(op);
 		return;
 
@@ -385,14 +370,6 @@ void unsp_device::execute_fxxx_101_group(uint16_t op)
 inline void unsp_device::execute_fxxx_110_group(uint16_t op)
 {
 	//uint32_t len = 1;
-
-	// some sources say this is FFc0, but smartfp clearly uses ff80
-	// EXTOP   1 1 1 1   1 1 1 1   1 0 0 0   0 0 0 0    (+16 bit imm)
-	if ((op == 0xff80) && m_iso >= 20)
-	{
-		return execute_extended_group(op);
-	}
-
 	//                         |   | |
 	// signed * signed  (size 16,1,2,3,4,5,6,7)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
@@ -406,7 +383,11 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 {
 	//uint32_t len = 1;
 	//                         |   | |
-
+	// EXTOP   1 1 1 1   1 1 1 1   1 1 0 0   0 0 0 0    (+16 bit imm)
+	if ((op == 0xffc0) && m_iso >= 20)
+	{
+		return execute_extended_group(op);
+	}
 
 	// signed * signed  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)

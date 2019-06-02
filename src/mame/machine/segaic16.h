@@ -29,11 +29,10 @@ class sega_16bit_common_base : public driver_device
 {
 public:
 	// open bus read helpers
-	u16 open_bus_r(address_space &space);
+	DECLARE_READ16_MEMBER( open_bus_r );
 
 	// palette helpers
 	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_WRITE16_MEMBER( hangon_paletteram_w );
 	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
 
 protected:
@@ -45,15 +44,15 @@ protected:
 
 public: // -- stupid system16.cpp
 	// memory pointers
-	required_shared_ptr<u16> m_paletteram;
+	required_shared_ptr<uint16_t> m_paletteram;
 protected:
 
 	// internal state
-	bool     m_open_bus_recurse;         // flag to track recursion through open_bus_r
-	u32      m_palette_entries;          // number of palette entries
-	u8       m_palette_normal[32];       // RGB translations for normal pixels
-	u8       m_palette_shadow[32];       // RGB translations for shadowed pixels
-	u8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	bool        m_open_bus_recurse;         // flag to track recursion through open_bus_r
+	uint32_t      m_palette_entries;          // number of palette entries
+	uint8_t       m_palette_normal[32];       // RGB translations for normal pixels
+	uint8_t       m_palette_shadow[32];       // RGB translations for shadowed pixels
+	uint8_t       m_palette_hilight[32];      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
@@ -64,18 +63,18 @@ protected:
 class sega_315_5195_mapper_device : public device_t
 {
 public:
-	typedef device_delegate<void (sega_315_5195_mapper_device &, u8)> mapper_delegate;
+	typedef device_delegate<void (sega_315_5195_mapper_device &, uint8_t)> mapper_delegate;
 
 	// construction/destruction
 	template <typename T>
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
 		: sega_315_5195_mapper_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_cpuregion.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	template <typename... T> void set_mapper(T &&... args) { m_mapper = mapper_delegate(std::forward<T>(args)...); }
@@ -90,12 +89,12 @@ public:
 	DECLARE_WRITE8_MEMBER( pwrite );
 
 	// mapping helpers
-	void map_as_rom(u32 offset, u32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
-	void map_as_ram(u32 offset, u32 length, offs_t mirror, const char *bank_share_name, write16_delegate whandler);
-	void map_as_handler(u32 offset, u32 length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
+	void map_as_rom(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
+	void map_as_ram(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_share_name, write16_delegate whandler);
+	void map_as_handler(uint32_t offset, uint32_t length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	// perform an explicit configuration (for bootlegs with hard-coded mappings)
-	void configure_explicit(const u8 *map_data);
+	void configure_explicit(const uint8_t *map_data);
 
 protected:
 	// device-level overrides
@@ -128,7 +127,7 @@ private:
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
 		void clear() { set(nullptr, nullptr, 0, 0, ~0, nullptr); }
-		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, u8 *src);
+		void set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, uint8_t *src);
 
 		// updating
 		void update();
@@ -136,21 +135,21 @@ private:
 
 	private:
 		// internal state
-		memory_bank *      m_bank;
-		memory_bank *      m_decrypted_bank;
-		offs_t             m_start;
-		offs_t             m_end;
-		offs_t             m_rgnoffs;
-		u8 *               m_srcptr;
-		fd1089_base_device *m_fd1089;
-		std::vector<u16>   m_fd1089_decrypted;
+		memory_bank *           m_bank;
+		memory_bank *           m_decrypted_bank;
+		offs_t                  m_start;
+		offs_t                  m_end;
+		offs_t                  m_rgnoffs;
+		uint8_t *                 m_srcptr;
+		fd1089_base_device *    m_fd1089;
+		std::vector<uint16_t>   m_fd1089_decrypted;
 		std::unique_ptr<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers
-	void compute_region(region_info &info, u8 index, u32 length, u32 mirror, u32 offset = 0);
+	void compute_region(region_info &info, uint8_t index, uint32_t length, uint32_t mirror, uint32_t offset = 0);
 	void update_mapping();
-	void fd1094_state_change(u8 state);
+	void fd1094_state_change(uint8_t state);
 
 	// configuration
 	required_device<m68000_device> m_cpu;
@@ -160,15 +159,15 @@ private:
 	devcb_write_line            m_mcu_int_callback;
 
 	// internal state
-	address_space *        m_space;
-	address_space *        m_decrypted_space;
-	u8                     m_regs[0x20];
-	u8                     m_curregion;
-	decrypt_bank           m_banks[8];
+	address_space *             m_space;
+	address_space *             m_decrypted_space;
+	uint8_t                     m_regs[0x20];
+	uint8_t                     m_curregion;
+	decrypt_bank                m_banks[8];
 
 	// communication registers
-	u8                     m_to_sound;
-	u8                     m_from_sound;
+	uint8_t                     m_to_sound;
+	uint8_t                     m_from_sound;
 };
 
 
@@ -178,11 +177,11 @@ class sega_315_5248_multiplier_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
-	u16 read(offs_t offset);
-	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 
 protected:
 	// device-level overrides
@@ -191,7 +190,7 @@ protected:
 
 private:
 	// internal state
-	u16                      m_regs[4];
+	uint16_t                      m_regs[4];
 };
 
 
@@ -201,11 +200,11 @@ class sega_315_5249_divider_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
-	u16 read(offs_t offset);
-	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 
 protected:
 	// device-level overrides
@@ -217,7 +216,7 @@ private:
 	void execute(int mode);
 
 	// internal state
-	u16                      m_regs[8];
+	uint16_t                      m_regs[8];
 };
 
 
@@ -227,7 +226,7 @@ class sega_315_5250_compare_timer_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	auto m68kint_callback() { return m_68kint_callback.bind(); }
@@ -235,9 +234,9 @@ public:
 
 	// public interface
 	DECLARE_WRITE_LINE_MEMBER(exck_w);
-	u16 read(offs_t offset);
-	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u8 zread();
+	DECLARE_READ16_MEMBER(read);
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_READ8_MEMBER(zread);
 
 protected:
 	// device-level overrides
@@ -251,14 +250,14 @@ private:
 	TIMER_CALLBACK_MEMBER(write_to_sound);
 
 	// configuration
-	devcb_write_line         m_68kint_callback;
-	devcb_write_line         m_zint_callback;
+	devcb_write_line            m_68kint_callback;
+	devcb_write_line            m_zint_callback;
 
 	// internal state
-	u16                      m_regs[16];
-	u16                      m_counter;
-	u8                       m_bit;
-	bool                     m_exck;
+	uint16_t                      m_regs[16];
+	uint16_t                      m_counter;
+	uint8_t                       m_bit;
+	bool                          m_exck;
 };
 
 

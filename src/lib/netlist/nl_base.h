@@ -43,10 +43,10 @@ class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
  *  Used to start defining a netlist device class.
  *  The simplest device without inputs or outputs would look like this:
  *
- *      NETLIB_OBJECT(some_object)
+ *      NETLIB_OBJECT(base_dummy)
  *      {
  *      public:
- *          NETLIB_CONSTRUCTOR(some_object) { }
+ *          NETLIB_CONSTRUCTOR(base_dummy) { }
  *      };
  *
  *  Also refer to #NETLIB_CONSTRUCTOR.
@@ -551,9 +551,9 @@ namespace netlist
 
 			using list_t = std::vector<core_terminal_t *>;
 
-			static constexpr const unsigned int INP_HL_SHIFT = 0;
-			static constexpr const unsigned int INP_LH_SHIFT = 1;
-			static constexpr const unsigned int INP_ACTIVE_SHIFT = 2;
+			static constexpr const auto INP_HL_SHIFT = 0;
+			static constexpr const auto INP_LH_SHIFT = 1;
+			static constexpr const auto INP_ACTIVE_SHIFT = 2;
 
 			enum state_e {
 				STATE_INP_PASSIVE = 0,
@@ -1280,6 +1280,17 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
+	// nld_base_dummy : basis for dummy devices
+	// FIXME: this is not the right place to define this
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(base_dummy)
+	{
+	public:
+		NETLIB_CONSTRUCTOR(base_dummy) { }
+	};
+
+	// -----------------------------------------------------------------------------
 	// queue_t
 	// -----------------------------------------------------------------------------
 
@@ -1556,11 +1567,11 @@ namespace netlist
 
 		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
-		bool                                m_stats;
+		bool								m_stats;
 
 		// performance
-		nperftime_t<true>                   m_stat_mainloop;
-		nperfcount_t<true>                  m_perf_out_processed;
+		nperftime_t<true>     				m_stat_mainloop;
+		nperfcount_t<true>    				m_perf_out_processed;
 };
 
 	// -----------------------------------------------------------------------------

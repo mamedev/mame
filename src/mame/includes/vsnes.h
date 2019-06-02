@@ -1,7 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-
-#include "sound/sn76496.h"
 #include "video/ppu2c0x.h"
 
 class vsnes_state : public driver_device
@@ -13,8 +11,6 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_ppu1(*this, "ppu1")
 		, m_ppu2(*this, "ppu2")
-		, m_sn1(*this, "sn1")
-		, m_sn2(*this, "sn2")
 		, m_work_ram(*this, "work_ram")
 		, m_work_ram_1(*this, "work_ram_1")
 		, m_gfx1_rom(*this, "gfx1")
@@ -50,8 +46,6 @@ private:
 	optional_device<cpu_device> m_subcpu;
 	required_device<ppu2c0x_device> m_ppu1;
 	optional_device<ppu2c0x_device> m_ppu2;
-	optional_device<sn76489_device> m_sn1;
-	optional_device<sn76489_device> m_sn2;
 
 	required_shared_ptr<uint8_t> m_work_ram;
 	optional_shared_ptr<uint8_t> m_work_ram_1;
@@ -92,7 +86,6 @@ private:
 	DECLARE_READ8_MEMBER(set_bnglngby_irq_r);
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_main);
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_sub);
-	DECLARE_WRITE8_MEMBER(vssmbbl_sn_w);
 	void v_set_mirroring(int ppu, int mirroring);
 
 	DECLARE_MACHINE_START(vsnes);

@@ -27,14 +27,13 @@ Tetris with naughty bits
 there are a variety of test modes which can be obtained
 by resetting while holding down player 2 buttons
 
+eeprom / backup data not hooked up ( 24c04a on port4 )
+
 most sources say this is a game by Nics but I believe Nics
 to be a company from Korea, this game is quite clearly a
 Spanish game, we know for a fact that NIX are from Spain
 so it could be by them instead
 
-For some reason the game isn't saving scores to the EEPROM. Settings and
-statistics are saved however. The option "AUTO SAVE SCORES" doesn't seem
-to be honored - the game writes the value to RAM but never reads it.
 
 
 */
@@ -42,7 +41,7 @@ to be honored - the game writes the value to RAM but never reads it.
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/bankdev.h"
-#include "machine/i2cmem.h"
+//#include "machine/i2cmem.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
@@ -56,8 +55,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_video_bank(*this, "video_bank"),
-		m_i2cmem(*this, "i2cmem"),
+		m_video_bank(*this, "video_bank")/*,
+		m_i2cmem(*this, "i2cmem")*/,
 		m_vram(*this, "vram")
 	{ }
 
@@ -68,16 +67,17 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_video_bank;
-	required_device<i2cmem_device> m_i2cmem;
+//  required_device<i2cmem_device> m_i2cmem;
 
 	/* misc */
 	int      m_port0;
+	int      m_port4;
 
 	/* memory */
 	required_shared_ptr<uint8_t> m_vram;
 
-	u8 eeprom_r();
-	void eeprom_w(u8 data);
+	u8 port4_r();
+	void port4_w(u8 data);
 	void port0_w(u8 data);
 
 	virtual void video_start() override;
@@ -88,16 +88,23 @@ private:
 	void hotblock_map(address_map &map);
 };
 
-u8 hotblock_state::eeprom_r()
+
+/* port 4 is some kind of eeprom / storage .. used to store the scores */
+u8 hotblock_state::port4_r()
 {
-	return m_i2cmem->read_sda();
+//  osd_printf_debug("port4_r\n");
+	//logerror("trying to read port 4 at maincpu pc %08x\n", m_maincpu->pc());
+	//return (m_i2cmem->read_sda() & 1);
+	return 0x00;
 }
 
-void hotblock_state::eeprom_w(u8 data)
+
+void hotblock_state::port4_w(u8 data)
 {
-	m_i2cmem->write_scl(BIT(data, 1));
-	m_i2cmem->write_sda(BIT(data, 0));
+	//logerror("trying to write port 4 in %02x at maincpu pc %08x\n", data, m_maincpu->pc());
+	m_port4 = data;
 }
+
 
 void hotblock_state::port0_w(u8 data)
 {
@@ -115,7 +122,7 @@ void hotblock_state::hotblock_map(address_map &map)
 void hotblock_state::hotblock_io(address_map &map)
 {
 	map(0x0000, 0x0000).w(FUNC(hotblock_state::port0_w));
-	map(0x0004, 0x0004).rw(FUNC(hotblock_state::eeprom_r), FUNC(hotblock_state::eeprom_w));
+	map(0x0004, 0x0004).rw(FUNC(hotblock_state::port4_r), FUNC(hotblock_state::port4_w));
 	map(0x8000, 0x8001).w("aysnd", FUNC(ym2149_device::address_data_w));
 	map(0x8001, 0x8001).r("aysnd", FUNC(ym2149_device::data_r));
 }
@@ -131,6 +138,7 @@ void hotblock_state::banked_video_map(address_map &map)
 void hotblock_state::video_start()
 {
 	save_item(NAME(m_port0));
+	save_item(NAME(m_port4)); //stored but not read for now
 }
 
 uint32_t hotblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -184,8 +192,7 @@ void hotblock_state::hotblock(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
 	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04A
-
+//  I2CMEM(config, m_i2cmem, 0).set_page_size(16).set_data_size(0x200); // 24C04
 	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 
 	/* video hardware */

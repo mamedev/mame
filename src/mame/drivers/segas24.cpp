@@ -2065,11 +2065,6 @@ void segas24_state::system24_floppy_dcclub(machine_config &config)
  *
  *************************************/
 
-//*************************************************************************************************************************
-//  Hot Rod, Sega System 24
-//   Sega game ID: 833-6570-01 HOT ROD
-//     Main board: 837-6571
-// I/O Controller: 834-6510
 ROM_START( hotrod )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
@@ -2203,7 +2198,7 @@ ROM_START( quizmeku ) // Quiz Mekuromeku Story
 	ROM_LOAD16_BYTE( "epr15343.ic2", 0x000000, 0x20000, CRC(c72399a7) SHA1(bfbf0079ea63f89bca4ce9081aed5d5c1d9d169a) )
 	ROM_LOAD16_BYTE( "epr15342.ic1", 0x000001, 0x20000, CRC(0968ac84) SHA1(4e1170ac123adaec32819754b5075531ff1925fe) )
 
-	ROM_REGION16_BE( 0x400000, "romboard", 0) // ROM board: 834-7492-12E
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "epr15345.ic5", 0x000000, 0x80000, CRC(88030b5d) SHA1(d2feeedb9a64c3dc8dd25716209f945d12fa9b53) )
 	ROM_LOAD16_BYTE( "epr15344.ic4", 0x000001, 0x80000, CRC(dd11b382) SHA1(2b0f49fb307a9aba0f295de64782ee095c557170) )
 	ROM_LOAD16_BYTE( "mpr15347.ic7", 0x100000, 0x80000, CRC(0472677b) SHA1(93ae57a2817b6b54c99814fca28ef51f7ff5e559) )
@@ -2363,10 +2358,6 @@ ROM_START( dcclub )
 	ROM_LOAD16_BYTE( "mpr-14096-t.3",0x100001, 0x80000, CRC(38d96502) SHA1(c68b3c5c83fd0839c3f6f81189c310ec19bdf1c4) )
 ROM_END
 
-//  Dynamic Country Club (Japan), Sega System 24
-//      ROM board: 834-7492-09E
-//     Main board: 837-6442-02
-// I/O Controller: 834-6510-01
 ROM_START( dcclubj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr13948.bin", 0x000000, 0x20000, CRC(d6a031c8) SHA1(45b7e3cd2c7412e24f547cd4185166199d3938d5) )

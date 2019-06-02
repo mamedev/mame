@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	 */
 	if(m_apb)
 		m_apb->nvi_w(state);
-	m_maincpu->set_input_line(z8001_device::NVI_LINE, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
 
@@ -744,7 +744,7 @@ WRITE_LINE_MEMBER(m20_state::int_w)
 {
 	if(m_apb && !m_apb->halted())
 		m_apb->vi_w(state);
-	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void m20_state::machine_start()

@@ -442,7 +442,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 	{
 		case 5:
 			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::sega_road_control_0_r), this), write16_delegate(FUNC(segaorun_state::sega_road_control_0_w), this));
-			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate());
+			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "roadram", write16_delegate());
 			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate());
 			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(FUNC(segaorun_state::nop_w), this));
 			break;
@@ -487,7 +487,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 		return m_custom_io_r(space, offset, mem_mask);
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return open_bus_r(space, 0, mem_mask);
 }
 
 
@@ -662,7 +662,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return open_bus_r(space, 0, mem_mask);
 }
 
 
@@ -745,7 +745,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 	}
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return open_bus_r(space,0,mem_mask);
 }
 
 
@@ -868,7 +868,7 @@ void segaorun_state::sub_map(address_map &map)
 	map.global_mask(0xfffff);
 	map(0x000000, 0x05ffff).rom().share("cpu1rom");
 	map(0x060000, 0x067fff).mirror(0x018000).ram().share("cpu1ram");
-	map(0x080000, 0x080fff).mirror(0x00f000).ram().share("segaic16road:roadram");
+	map(0x080000, 0x080fff).mirror(0x00f000).ram().share("roadram");
 	map(0x090000, 0x09ffff).rw(m_segaic16road, FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
 }
 
@@ -1175,7 +1175,7 @@ void segaorun_state::outrun_base(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaorun);
-	PALETTE(config, m_palette).set_entries(4096*2);
+	PALETTE(config, m_palette).set_entries(4096*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
@@ -1321,7 +1321,7 @@ ROM_START( outrun )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1375,7 +1375,7 @@ ROM_START( outruneh )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1442,7 +1442,7 @@ ROM_START( outrunra )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1531,7 +1531,7 @@ ROM_START( outrundx )
 	ROM_LOAD32_BYTE( "epr-10219.59", 0xe0002, 0x08000, CRC(e73b9224) SHA1(1904a71a0c18ab2a3a5929e72b1c215dbb0fa213) )
 	ROM_LOAD32_BYTE( "epr-10228.73", 0xe0003, 0x08000, CRC(25803978) SHA1(1a18922aeb516e8deb026d52e3cdcc4e69385af5) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1609,7 +1609,7 @@ ROM_START( outrundxeh )
 	ROM_LOAD32_BYTE( "epr-10219.59", 0xe0002, 0x08000, CRC(e73b9224) SHA1(1904a71a0c18ab2a3a5929e72b1c215dbb0fa213) )
 	ROM_LOAD32_BYTE( "epr-10228.73", 0xe0003, 0x08000, CRC(25803978) SHA1(1a18922aeb516e8deb026d52e3cdcc4e69385af5) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1672,7 +1672,7 @@ ROM_START( outrundxj )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1771,7 +1771,7 @@ ROM_START( outrundxa )
 	ROM_LOAD32_BYTE( "epr-10219.59", 0xe0002, 0x08000, CRC(e73b9224) SHA1(1904a71a0c18ab2a3a5929e72b1c215dbb0fa213) )
 	ROM_LOAD32_BYTE( "epr-10228.73", 0xe0003, 0x08000, CRC(25803978) SHA1(1a18922aeb516e8deb026d52e3cdcc4e69385af5) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1861,7 +1861,7 @@ ROM_START( outrunb )
 	ROM_LOAD32_BYTE( "a-31.bin",    0xc0002, 0x10000, CRC(ef7d06fe) SHA1(541b5ba45f4140e2cc29a9da2592b476d414af5d) )
 	ROM_LOAD32_BYTE( "a-33.bin",    0xc0003, 0x10000, CRC(1222af9f) SHA1(2364bd54cbe21dd688efff32e93bf154546c93d6) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx - correct order unknown (identical after bitswapping)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx - correct order unknown (identical after bitswapping)
 	ROM_LOAD( "a-2.bin", 0x0000, 0x8000, CRC(ed5bda9c) SHA1(f09a34caf1f9f6b119700a00635ab8fa8244362d) )
 	ROM_LOAD( "a-3.bin", 0x8000, 0x8000, CRC(666fe754) SHA1(606090db53d658d7b04dca4748014a411e12f259) )
 
@@ -1916,7 +1916,7 @@ ROM_START( shangon )
 	ROM_LOAD16_BYTE( "mpr-10797.2",  0x0c0001, 0x020000, CRC(27f2870d) SHA1(40a34e4555885bf3c6a42e472b80d11c3bd4dcba) )
 	ROM_LOAD16_BYTE( "mpr-10801.10", 0x0c0000, 0x020000, CRC(12781795) SHA1(44bf6f657f32b9fab119557eb73c2fbf78700204) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -1980,7 +1980,7 @@ ROM_START( shangon3 )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2035,7 +2035,7 @@ ROM_START( shangon3d )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2093,7 +2093,7 @@ ROM_START( shangon2 )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2154,7 +2154,7 @@ ROM_START( shangon1 )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2215,7 +2215,7 @@ ROM_START( shangonle )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // Road Graphics
+	ROM_REGION( 0x10000, "gfx3", 0 ) // Road Graphics
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2277,7 +2277,7 @@ ROM_START( toutrun )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2324,7 +2324,7 @@ ROM_START( toutrund )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2382,7 +2382,7 @@ ROM_START( toutrunj )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2430,7 +2430,7 @@ ROM_START( toutrunjd )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2497,7 +2497,7 @@ ROM_START( toutrun3 )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2551,7 +2551,7 @@ ROM_START( toutrun3d )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2618,7 +2618,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2673,7 +2673,7 @@ ROM_START( toutrun2d )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2737,7 +2737,7 @@ ROM_START( toutrun1 )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2806,7 +2806,7 @@ ROM_START( toutrunj1 )
 	ROM_LOAD32_BYTE( "epr-12321.ic23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "epr-12322.ic24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12298.ic47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Both are EPR-12298
 	ROM_LOAD( "epr-12298.ic28", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2861,7 +2861,7 @@ ROM_START( toutrunj1d )
 	ROM_LOAD32_BYTE( "epr-12321.ic23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "epr-12322.ic24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12298.ic47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Both are EPR-12298
 	ROM_LOAD( "epr-12298.ic28", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2895,6 +2895,9 @@ void segaorun_state::init_generic()
 	// configure the NVRAM to point to our workram
 	if (m_nvram != nullptr)
 		m_nvram->set_base(m_workram, m_workram.bytes());
+
+	// point globals to allocated memory regions
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_adc_select));
@@ -2937,8 +2940,8 @@ void segaorun_state::init_outrunb()
 	// road gfx
 	// ROM a-2.bin: swap bits 6,7
 	// ROM a-3.bin: swap bits 5,6
-	uint8_t *byte = memregion("segaic16road")->base();
-	length = memregion("segaic16road")->bytes() / 2;
+	uint8_t *byte = memregion("gfx3")->base();
+	length = memregion("gfx3")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
 	{
 		byte[i]        = bitswap<8>(byte[i],        6,7,5,4,3,2,1,0);

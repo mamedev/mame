@@ -61,7 +61,7 @@ static void hsscsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR53C80);
+	device.option_add_internal("ncr5380", NCR5380N);
 }
 
 ROM_START( hsscsi )
@@ -88,7 +88,8 @@ void a2bus_hsscsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:5", hsscsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", hsscsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:7", hsscsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
-		downcast<ncr53c80_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
+		device->set_clock(10000000);
+		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
 	});
 }
 

@@ -941,7 +941,7 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* Start 1 is already mapped in mahjong inputs */
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* ms32.cpp mahjongs don't have P2 inputs -> no Start 2*/
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* ms32.c mahjongs don't have P2 inputs -> no Start 2*/
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1559,41 +1559,7 @@ INPUT_PORTS_END
 /********** GFX DECODE **********/
 
 /* sprites are contained in 256x256 "tiles" */
-static const uint32_t sprite_xoffset[256] =
-{
-	STEP8(8*8*8*0,    8), STEP8(8*8*8*1,    8), STEP8(8*8*8*2,    8), STEP8(8*8*8*3,    8),
-	STEP8(8*8*8*4,    8), STEP8(8*8*8*5,    8), STEP8(8*8*8*6,    8), STEP8(8*8*8*7,    8),
-	STEP8(8*8*8*8,    8), STEP8(8*8*8*9,    8), STEP8(8*8*8*10,   8), STEP8(8*8*8*11,   8),
-	STEP8(8*8*8*12,   8), STEP8(8*8*8*13,   8), STEP8(8*8*8*14,   8), STEP8(8*8*8*15,   8),
-	STEP8(8*8*8*16,   8), STEP8(8*8*8*17,   8), STEP8(8*8*8*18,   8), STEP8(8*8*8*19,   8),
-	STEP8(8*8*8*20,   8), STEP8(8*8*8*21,   8), STEP8(8*8*8*22,   8), STEP8(8*8*8*23,   8),
-	STEP8(8*8*8*24,   8), STEP8(8*8*8*25,   8), STEP8(8*8*8*26,   8), STEP8(8*8*8*27,   8),
-	STEP8(8*8*8*28,   8), STEP8(8*8*8*29,   8), STEP8(8*8*8*30,   8), STEP8(8*8*8*31,   8)
-};
-static const uint32_t sprite_yoffset[256] =
-{
-	STEP8(8*8*8*0,  8*8), STEP8(8*8*8*32, 8*8), STEP8(8*8*8*64, 8*8), STEP8(8*8*8*96, 8*8),
-	STEP8(8*8*8*128,8*8), STEP8(8*8*8*160,8*8), STEP8(8*8*8*192,8*8), STEP8(8*8*8*224,8*8),
-	STEP8(8*8*8*256,8*8), STEP8(8*8*8*288,8*8), STEP8(8*8*8*320,8*8), STEP8(8*8*8*352,8*8),
-	STEP8(8*8*8*384,8*8), STEP8(8*8*8*416,8*8), STEP8(8*8*8*448,8*8), STEP8(8*8*8*480,8*8),
-	STEP8(8*8*8*512,8*8), STEP8(8*8*8*544,8*8), STEP8(8*8*8*576,8*8), STEP8(8*8*8*608,8*8),
-	STEP8(8*8*8*640,8*8), STEP8(8*8*8*672,8*8), STEP8(8*8*8*704,8*8), STEP8(8*8*8*736,8*8),
-	STEP8(8*8*8*768,8*8), STEP8(8*8*8*800,8*8), STEP8(8*8*8*832,8*8), STEP8(8*8*8*864,8*8),
-	STEP8(8*8*8*896,8*8), STEP8(8*8*8*928,8*8), STEP8(8*8*8*960,8*8), STEP8(8*8*8*992,8*8)
-};
-static const gfx_layout spritelayout =
-{
-	256, 256,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	256*256*8,
-	sprite_xoffset,
-	sprite_yoffset
-};
-
+static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
@@ -2588,6 +2554,7 @@ void ms32_state::init_ms32_common()
 void ms32_state::init_ss91022_10()
 {
 	init_ms32_common();
+	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00000,0x35, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00000,0xa3, "gfx3");
 }
@@ -2596,6 +2563,7 @@ void ms32_state::init_ss91022_10()
 void ms32_state::init_ss92046_01()
 {
 	init_ms32_common();
+	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx3");
 }
@@ -2604,6 +2572,7 @@ void ms32_state::init_ss92046_01()
 void ms32_state::init_ss92047_01()
 {
 	init_ms32_common();
+	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x24000,0x18, "gfx4");
 	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
@@ -2612,6 +2581,7 @@ void ms32_state::init_ss92047_01()
 void ms32_state::init_ss92048_01()
 {
 	init_ms32_common();
+	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x20400,0xd6, "gfx4");
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "gfx3");
 }

@@ -36,7 +36,6 @@
 # USE_QTDEBUG = 1
 # NO_X11 = 1
 # NO_USE_XINPUT = 1
-# NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
 # FORCE_DRC_C_BACKEND = 1
 
 # DEBUG = 1
@@ -744,10 +743,6 @@ endif
 
 ifdef NO_USE_XINPUT
 PARAMS += --NO_USE_XINPUT='$(NO_USE_XINPUT)'
-endif
-
-ifdef NO_USE_XINPUT_WII_LIGHTGUN_HACK
-PARAMS += --NO_USE_XINPUT_WII_LIGHTGUN_HACK='$(NO_USE_XINPUT_WII_LIGHTGUN_HACK)'
 endif
 
 ifdef SDL_LIBVER
@@ -1628,14 +1623,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.210"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.209"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.210" > $@
+	@echo #define BARE_BUILD_VERSION "0.209" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

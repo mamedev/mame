@@ -415,6 +415,19 @@ static INPUT_PORTS_START( sandscrp )
 INPUT_PORTS_END
 
 
+/* 16x16x4 tiles (made of four 8x8 tiles) */
+static const gfx_layout layout_16x16x4_2 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP4(8*8*4*0 + 3*4, -4), STEP4(8*8*4*0 + 7*4, -4),
+		STEP4(8*8*4*1 + 3*4, -4), STEP4(8*8*4*1 + 7*4, -4) },
+	{ STEP8(8*8*4*0, 8*4),     STEP8(8*8*4*2, 8*4) },
+	16*16*4
+};
+
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -429,6 +442,7 @@ static const gfx_layout layout_16x16x4 =
 
 static GFXDECODE_START( gfx_sandscrp )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0x000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4_2, 0x400, 0x40 ) // [1] Layers
 GFXDECODE_END
 
 
@@ -464,9 +478,9 @@ void sandscrp_state::sandscrp(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2);
-	m_view2->set_colbase(0x400);
+	m_view2->set_gfx_region(1);
 	m_view2->set_offset(0x5b, 0, 256, 224);
-	m_view2->set_palette("palette");
+	m_view2->set_gfxdecode_tag("gfxdecode");
 
 	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
@@ -510,9 +524,9 @@ ROM_START( sandscrp ) /* Z03VA-003 PCB */
 	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
 	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
-	ROM_REGION( 0x100000, "view2", 0 )   /* Layers */
-	ROM_LOAD16_BYTE( "3.ic33", 0x000000, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
-	ROM_LOAD16_BYTE( "4.ic32", 0x000001, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layers */
+	ROM_LOAD16_BYTE( "4.ic32", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
+	ROM_LOAD16_BYTE( "3.ic33", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
@@ -530,9 +544,9 @@ ROM_START( sandscrpa ) /* Z03VA-003 PCB, earlier program version */
 	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
 	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
-	ROM_REGION( 0x100000, "view2", 0 )   /* Layers */
-	ROM_LOAD16_BYTE( "3.ic33", 0x000000, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
-	ROM_LOAD16_BYTE( "4.ic32", 0x000001, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layers */
+	ROM_LOAD16_BYTE( "4.ic32", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
+	ROM_LOAD16_BYTE( "3.ic33", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
@@ -551,8 +565,8 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "ss502.ic16", 0x000000, 0x100000, CRC(d8012ebb) SHA1(975bbb3b57a09e41d2257d4fa3a64097144de554) )
 
-	ROM_REGION( 0x100000, "view2", 0 )   /* Layers */
-	ROM_LOAD( "ss501.ic30", 0x000000, 0x100000, CRC(0cf9f99d) SHA1(47f7f120d2bc075bedaff0a44306a8f46a1d848c) )
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layers */
+	ROM_LOAD16_WORD_SWAP( "ss501.ic30", 0x000000, 0x100000, CRC(0cf9f99d) SHA1(47f7f120d2bc075bedaff0a44306a8f46a1d848c) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )

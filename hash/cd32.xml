@@ -2,31 +2,16 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cd32" description="Amiga CD-32 CD-ROMs">
 
-	<!-- http://redump.org/disc/24202/ -->
-	<software name="akira">
-		<description>Akira (Collector's Edition)</description>
-		<year>1994</year>
-		<publisher>ICE</publisher>
-		<info name="barcode" value="5 024598 013278" />
-		<info name="disc_matrix" value="AKIRACD32 :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="akira (europe)" sha1="1abe30f210f4ee779a75796727f5fe3ef1781692"/>
-			</diskarea>
-		</part>
-	</software>
+	<!--- Sourced from Redump -->
 
-	<!-- http://redump.org/disc/3344/ -->
-	<software name="alfred" supported="partial">
-		<description>Alfred Chicken</description>
+	<!-- Doesn't boot -->
+	<software name="arabian" supported="no">
+		<description>Arabian Nights</description>
 		<year>1993</year>
-		<publisher>Mindscape</publisher>
-		<info name="serial" value="/DP130003 [Box], /CS090011 [Disc]" />
-		<info name="barcode" value="5 018247 408454 >" />
-		<info name="disc_matrix" value="CDD2971 /CS090011 ·   MASTERED BY NIMBUS" />
+		<publisher>Krisalis Software</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alfred chicken (europe)" sha1="6b6f249c830e15f7c5a5dffbe75596982a07c2c1"/>
+				<disk name="arabian nights (europe) (en,fr,de,it)" sha1="1199d1e5303f6e9cac6df78d0c032ad5a97387bd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37,8 +22,6 @@
 		<description>Alien Breed - Special Edition + Qwak</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
-		<info name="barcode" value="5 022358 170216 >" />
-		<info name="disc_matrix" value="CDD3186 ABSE/QWAK ::   MASTERED BY NIMBUS" />
 		<info name="alt_title" value="Team 17 CD32 Double Pack" /> <!-- In-game title -->
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
@@ -47,29 +30,11 @@
 		</part>
 	</software>
 
-	<!-- Crashes after menu -->
-	<!-- http://redump.org/disc/3093/ -->
-	<software name="abreedta" supported="no">
-		<description>Alien Breed: Tower Assault</description>
-		<year>1994</year>
-		<publisher>Team 17</publisher>
-		<info name="barcode" value="5 022358 170476" />
-		<info name="disc_matrix" value="CDR00345 ALIEN BREED/TOWER ASSAULT CD 32" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="alien breed - tower assault (europe)" sha1="0a34fc651775b813a910057f0235a0c26157c39e"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Freezes at into screen -->
-	<!-- http://redump.org/disc/3384/ -->
+	<!-- Wrong colors, freezes at into screen-->
 	<software name="abreed3d" supported="no">
 		<description>Alien Breed 3D</description>
 		<year>1995</year>
 		<publisher>Team 17</publisher>
-		<info name="barcode" value="5 022358 170599" />
-		<info name="disc_matrix" value="CDR00861   ALIEN BREED 3D   PC WISE" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="alien breed 3d (europe)" sha1="b6a9037ba0cd5fee65f5445b28e968074c335bbe"/>
@@ -77,370 +42,36 @@
 		</part>
 	</software>
 
-	<!-- Bundled with Issue 1 (Mar 1994) of Amiga CD32 Magazine -->
-	<software name="cd32mag1" supported="partial">
-		<description>Amiga CD32 - Volume 1</description>
+	<!-- Doesn't run-->
+	<software name="abreedta" supported="no">
+		<description>Alien Breed - Tower Assault</description>
 		<year>1994</year>
-		<publisher>Future Publishing</publisher>
-		<info name="release" value="199403xx" />
+		<publisher>Team 17</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 - volume 1 (europe)" sha1="f4d2e37ce5bb66ee58ae1bc191f71f48ad75042b" status="baddump"/>
+				<disk name="alien breed - tower assault (europe)" sha1="0a34fc651775b813a910057f0235a0c26157c39e"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Bundled with Issue 2 (Oct 1994) of Amiga CD32 Magazine -->
-	<software name="cd32mag2" supported="partial">
-		<description>Amiga CD32 - Volume 2</description>
+	<software name="akira" supported="partial">
+		<description>Akira</description>
 		<year>1994</year>
-		<publisher>Future Publishing</publisher>
-		<info name="release" value="199410xx" />
+		<publisher>ICE</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 - volume 2 (europe)" sha1="effd825a8615f12b9d939ebb27a658180ffbaf60" status="baddump"/>
+				<disk name="akira (europe)" sha1="1abe30f210f4ee779a75796727f5fe3ef1781692"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Bundled with Issue One (May 1994) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer1" supported="partial">
-		<description>Amiga CD32 Gamer - Volume 1</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="199405xx" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 1 (europe)" sha1="ceb082a7eaf0fb98008d4398edf4883de7a61496" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue Two (Jun 1994) of Amiga CD32 Gamer Magazine -->
-	<!-- http://redump.org/disc/6791/ -->
-	<software name="gamer2" supported="partial">
-		<description>Amiga CD32 Gamer - Volume 2</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="199406xx" />
-		<info name="disc_matrix" value="CDR00128 PCWISE LTD/CD32 GAMER 2" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - game demos volume 2 (europe)" sha1="21de657435961a67d9bb5db0ff657894e4bab2de"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 3 (Jul 1994) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer3" supported="partial">
-		<description>Amiga CD32 Gamer - Volume 3</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19940714" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 3 (europe)" sha1="ef8be0a94897bc1a3c8504e931fdf7470084f1c7" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 4 (Aug 1994) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer4" supported="partial">
-		<description>Amiga CD32 Gamer - Volume 4</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19940808" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 4 (europe)" sha1="2f1ed16a7a604a64c2ffe1beafb08d08588bd9b2" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 5 (Oct 1994) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer5" supported="no">
-		<description>Amiga CD32 Gamer - Volume 5</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19941013" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 5 (europe)" sha1="e249c7096e87a942e7c166bda8bd4bd5972cdb97" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 6 (Nov 1994) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer6" supported="no">
-		<description>Amiga CD32 Gamer - Volume 6</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19941110" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 6 (europe)" sha1="be226accca732c8243223c84e9c7786ca08cb85c" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 7 (Dec 1994) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer7" supported="no">
-		<description>Amiga CD32 Gamer - Volume 7</description>
-		<year>1994</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19941208" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 7 (europe)" sha1="59b82a04d92adfb8f5eded0351bc54bb4846b620" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 8 (Jan 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer8" supported="no">
-		<description>Amiga CD32 Gamer - Volume 8</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950112" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 8 (europe)" sha1="a183f6cb51fd38e9fbafb8153444303fd454f34f" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 9 (Feb 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer9" supported="no">
-		<description>Amiga CD32 Gamer - Volume 9</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950209" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 9 (europe)" sha1="29df212d20f7b035514ee3b275cd3a50347e9387" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 10 (Mar 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer10" supported="no">
-		<description>Amiga CD32 Gamer - Volume 10</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950309" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 10 (europe)" sha1="14f61389485768d9de93c061372eae34d3bf55c1" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 11 (Apr 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer11" supported="no">
-		<description>Amiga CD32 Gamer - Volume 11</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950413" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 11 (europe)" sha1="6391a4ee14dc13cfe2bf6c9d4f0318783af5e3be" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 12 (May 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer12" supported="no">
-		<description>Amiga CD32 Gamer - Volume 12</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950511" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 12 (europe)" sha1="6117859767922a931d418f1abe32bb39f3c0acfa" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 13 (Jun 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer13" supported="no">
-		<description>Amiga CD32 Gamer - Volume 13</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950608" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 13 (europe)" sha1="996b4ede3fa5378e377e34d9d886747d2cd570b6" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 14 (Jul 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer14" supported="no">
-		<description>Amiga CD32 Gamer - Volume 14</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950713" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 14 (europe)" sha1="d5e6787cbb7e588c74ee88002c076c9bfea4629b" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 15 (Aug 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer15" supported="no">
-		<description>Amiga CD32 Gamer - Volume 15</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950810" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 15 (europe)" sha1="4cd5d8f0fb5118503518182ec8c7530114ebde03" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 16 (Sep 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer16" supported="no">
-		<description>Amiga CD32 Gamer - Volume 16</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19950914" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 16 (europe)" sha1="21aa69e223625e96ced9d641e9370d5cf7ed9879" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 17 (Oct 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer17" supported="no">
-		<description>Amiga CD32 Gamer - Volume 17</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19951012" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 17 (europe)" sha1="c6251deef7386e74e148121dc73b5fba53408548" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 18 (Nov 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer18" supported="no">
-		<description>Amiga CD32 Gamer - Volume 18</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19951109" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 18 (europe)" sha1="01a2c58e29ea6ebabedd3964b12207d451a1a222" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 19 (Dec 1995) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer19" supported="no">
-		<description>Amiga CD32 Gamer - Volume 19</description>
-		<year>1995</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19951214" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 19 (europe)" sha1="298c48dd32596170623dc5160829ab32040313f3" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 20 (Jan 1996) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer20" supported="no">
-		<description>Amiga CD32 Gamer - Volume 20</description>
-		<year>1996</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19960111" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 20 (europe)" sha1="656d334358c915114f447fc44cdcbbf89a75c45d" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 21 (Feb 1996) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer21" supported="no">
-		<description>Amiga CD32 Gamer - Volume 21</description>
-		<year>1996</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19960208" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 21 (europe)" sha1="b56cad65f70f5ab901a487e4d3d5bfce60ef8835" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Bundled with Issue 22 (Mar 1996) of Amiga CD32 Gamer Magazine -->
-	<software name="gamer22" supported="no">
-		<description>Amiga CD32 Gamer - Volume 22</description>
-		<year>1996</year>
-		<publisher>Paragon Publishing</publisher>
-		<info name="release" value="19960314" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer - volume 22 (europe)" sha1="621775bf4089f3c7c968d5cde12e34e79ef4e65e" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- http://redump.org/disc/3220/ -->
-	<software name="arabian" supported="partial">
-		<description>Arabian Nights</description>
+	<software name="alfred" supported="no">
+		<description>Alfred Chicken</description>
 		<year>1993</year>
-		<publisher>Krisalis Software</publisher>
-		<info name="barcode" value="5 017898 901529 >" />
-		<info name="disc_matrix" value="CDD2857 BUZZ-AN ·   MASTERED BY NIMBUS" />
+		<publisher>Mindscape</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arabian nights (europe) (en,fr,de,it)" sha1="1199d1e5303f6e9cac6df78d0c032ad5a97387bd"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- http://redump.org/disc/3435/ -->
-	<software name="arcdpool">
-		<description>Arcade Pool</description>
-		<year>1994</year>
-		<publisher>Team 17</publisher>
-		<info name="barcode" value="5 022235 170353" />
-		<info name="disc_matrix" value="CDR00281   PC WISE LTD   TEAM 17 - ARCADE POOL CD 32" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="arcade pool (europe) (en,fr,de,it) (alt)" sha1="f497eb75d8a8ab1ec15630ad652700a0b0463a25"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Has an earlier build date, so might actually be an earlier version -->
-	<!-- http://redump.org/disc/3220/ -->
-	<software name="arcdpool1" cloneof="arcdpool">
-		<description>Arcade Pool (Alt)</description>
-		<year>1994</year>
-		<publisher>Team 17</publisher>
-		<info name="barcode" value="5 022235 170353" />
-		<info name="disc_matrix" value="CDD4978 ARCADE POOL ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="arcade pool (europe) (en,fr,de,it)" sha1="c74becbe39a592c1e9cc441dd67282951c750e9c"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="atr">
-		<description>ATR: All Terrain Racing</description>
-		<year>1995</year>
-		<publisher>Team 17</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="atr - all terrain racing (europe)" sha1="79a835dda3cc84bf82e4f65e5a99a072c22bcc5c" status="baddump"/>
+				<disk name="alfred chicken (europe)" sha1="6b6f249c830e15f7c5a5dffbe75596982a07c2c1"/>
 			</diskarea>
 		</part>
 	</software>

@@ -118,6 +118,28 @@ void rodland_rom_decode(running_machine &machine, const char *region)
 
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
 
+void ms32_rearrange_sprites(running_machine &machine, const char *region)
+{
+	/* sprites are not encrypted, but we need to move the data around to handle them as 256x256 tiles */
+	int i;
+	uint8_t *source_data;
+	int source_size;
+
+	source_data = machine.root_device().memregion       ( region )->base();
+	source_size = machine.root_device().memregion( region )->bytes();
+
+	std::vector<uint8_t> result_data(source_size);
+
+	for(i=0; i<source_size; i++)
+	{
+		int j = (i & ~0x07f8) | ((i & 0x00f8) << 3) | ((i & 0x0700) >> 5);
+
+		result_data[i] = source_data[j];
+	}
+
+	memcpy (source_data, &result_data[0], source_size);
+}
+
 
 void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const char *region)
 {

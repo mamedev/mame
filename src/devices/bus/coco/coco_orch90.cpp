@@ -21,7 +21,7 @@
     addressing CPU registers to run the 6809 at 2x speed.
 
     "P" + "ENTER" will play at regular CPU speed.  The difference should be
-    very noticeable.
+    very noticable.
 
 ***************************************************************************/
 
@@ -61,7 +61,6 @@ namespace
 		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: device_t(mconfig, COCO_ORCH90, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
-			, m_eprom(*this, "eprom")
 			, m_ldac(*this, "ldac")
 			, m_rdac(*this, "rdac")
 		{
@@ -90,22 +89,19 @@ namespace
 		// CoCo cartridge level overrides
 		virtual uint8_t *get_cart_base() override
 		{
-			return m_eprom->base();
+			return memregion("eprom")->base();
 		}
 
 		virtual memory_region* get_cart_memregion() override
 		{
-			return m_eprom;
+			return memregion("eprom");
 		}
-
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	private:
 		WRITE8_MEMBER(write_left)   { m_ldac->write(data); }
 		WRITE8_MEMBER(write_right)  { m_rdac->write(data); }
 
 		// internal state
-		required_memory_region m_eprom;
 		required_device<dac_byte_interface> m_ldac;
 		required_device<dac_byte_interface> m_rdac;
 	};
@@ -125,15 +121,6 @@ void coco_orch90_device::device_add_mconfig(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-}
-
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(coco_orch90_device::cts_read)
-{
-	return m_eprom->base()[offset & 0x1fff];
 }
 
 

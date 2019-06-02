@@ -742,8 +742,8 @@ ROM_END
 *************************/
 
 //     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
-GAMEL( 1993, spset005, 0,      splus,   splus, splus_state, empty_init, ROT0,  "IGT - International Game Technology", "S-Plus SET005 Set chip",  MACHINE_NOT_WORKING, layout_splus )
-GAMEL( 1993, spset015, 0,      splus,   splus, splus_state, empty_init, ROT0,  "IGT - International Game Technology", "S-Plus SET015 Set chip",  MACHINE_NOT_WORKING, layout_splus )
-GAMEL( 1996, spset026, 0,      splus,   splus, splus_state, empty_init, ROT0,  "IGT - International Game Technology", "S-Plus SET026 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1993, spset005, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET005 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1993, spset015, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET015 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1996, spset026, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET026 Set chip",  MACHINE_NOT_WORKING, layout_splus )
 
 GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

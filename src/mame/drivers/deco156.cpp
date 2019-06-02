@@ -58,7 +58,7 @@ private:
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -306,9 +306,9 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(deco156_state::vblank_interrupt)
+INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 DECO16IC_BANK_CB_MEMBER(deco156_state::bank_callback)
@@ -334,6 +334,7 @@ void deco156_state::hvysmsh(machine_config &config)
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::hvysmsh_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco156_state::deco32_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -343,7 +344,6 @@ void deco156_state::hvysmsh(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(deco156_state::screen_update));
-	screen.screen_vblank().set(FUNC(deco156_state::vblank_interrupt));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
@@ -386,6 +386,7 @@ void deco156_state::wcvol95(machine_config &config)
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::wcvol95_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco156_state::deco32_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -395,7 +396,6 @@ void deco156_state::wcvol95(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(deco156_state::screen_update));
-	screen.screen_vblank().set(FUNC(deco156_state::vblank_interrupt));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);

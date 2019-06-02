@@ -68,15 +68,12 @@ void jazz_state::machine_start()
 
 void jazz_state::machine_reset()
 {
-	// HACK: make sure the RTC is running
-	m_rtc->write_direct(0x0a, 0x20);
 }
 
 void jazz_state::init_common()
 {
 	// map the configured ram and vram
 	m_cpu->space(0).install_ram(0x00000000, 0x00000000 | m_ram->mask(), m_ram->pointer());
-	// FIXME: video ram must be written in emulated cpu order
 	m_cpu->space(0).install_ram(0x40000000, 0x40000000 | m_vram->mask(), m_vram->pointer());
 }
 
@@ -84,7 +81,7 @@ void jazz_state::jazz_common_map(address_map &map)
 {
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
 
-	// NOTE: defaults to console on serial1 if no video rom found
+	map(0x40000000, 0x407fffff).ram().share("vram"); // local video memory
 	map(0x60000000, 0x6000013f).lr8("video_rom",
 		[](offs_t offset)
 		{
@@ -116,9 +113,6 @@ void jazz_state::jazz_common_map(address_map &map)
 			};
 			*/
 
-			// FIXME: this is the MIPS G364 with the PROM fields zeroed to
-			// avoid a startup error, and should be replaced with the real
-			// signature above when an actual PROM dump is located.
 			static u8 const bogus_g364[] =
 			{
 				0x10, 0x00, 0x00, 0x00,  'J',  'a',  'z',  'z',
@@ -131,34 +125,30 @@ void jazz_state::jazz_common_map(address_map &map)
 			return bogus_g364[offset];
 		}).umask64(0xff);
 
-	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
-	map(0x60180000, 0x60180007).lw32("g364_reset", [this](u32 data) { m_cvc->reset(); });
+	map(0x60080000, 0x60081fff).m(m_ramdac, FUNC(g364_device::map)); // local video control
+	map(0x60180000, 0x60180007).lw32("g364_reset", [this](u32 data) { m_ramdac->reset(); });
 
 	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(jazz_mct_adr_device::map));
 
-	map(0x80001000, 0x800010ff).m(m_net, FUNC(dp83932c_device::map)).umask32(0x0000ffff);
+	map(0x80001000, 0x800010ff).m(m_network, FUNC(dp83932c_device::map)).umask32(0x0000ffff);
 	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53c94_device::map));
 	map(0x80003000, 0x8000300f).m(m_fdc, FUNC(n82077aa_device::map));
-
-	// LE: only reads 4000
-	// BE: read 400d, write 400d, write 400c
-	map(0x80004000, 0x8000400f).lrw8("rtc",
+	map(0x80004000, 0x80004007).lrw8("rtc",
 		[this](offs_t offset) { return m_rtc->read(1); },
 		[this](offs_t offset, u8 data) { m_rtc->write(1, data); }).umask64(0xff);
-	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w)).umask64(0x00ff);
-	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w)).umask64(0xff00);
+	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask64(0x00ff);
+	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask64(0xff00);
 	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80007000, 0x80007007).rw(m_ace[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80008000, 0x80008007).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask64(0xffffffff);
 	map(0x80009000, 0x8000afff).ram().share("nvram"); // 9000-9fff unprotected/a000-afff protected?
-	map(0x8000b000, 0x8000b007).lr8("mac",
-		[](offs_t offset)
-		{
-			// mac address and checksum
-			static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56, 0x00, 0xf7 };
+	map(0x8000b000, 0x8000b007).lr8("mac", [](offs_t offset)
+	{
+		// mac address and checksum
+		static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56, 0x00, 0xf7 };
 
-			return mac[offset];
-		});
+		return mac[offset];
+	});
 	// 3 4k pages of nvram: read/write, protected, read-only
 	// last page holds ethernet mac and checksum in bytes 0-7
 
@@ -202,8 +192,7 @@ FLOPPY_FORMATS_END
 
 void jazz_state::jazz(machine_config &config)
 {
-	// FIXME: slow the cpu clock to get past session manager bugcheck
-	R4000(config, m_cpu, 50_MHz_XTAL / 5);
+	R4000(config, m_cpu, 50_MHz_XTAL);
 	m_cpu->set_addrmap(0, &jazz_state::jazz_common_map);
 
 	RAM(config, m_ram);
@@ -255,49 +244,42 @@ void jazz_state::jazz(machine_config &config)
 	m_mct_adr->dma_w_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->set_epoch(1980);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	AMD_28F020(config, m_flash);
 
 	// pc keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	kbdc.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	kbdc.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
 	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(&kbd_con);
-
-    // auxiliary connector
-    pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
-    aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
-    aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
-    // auxiliary port
-    pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-    aux.set_pc_kbdc_slot(&aux_con);
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
+	pc_at_keyboards(kbd);
+	kbd.set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	kbd.set_pc_kbdc_slot(&kbdc);
 
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	// FIXME: reset is probably routed through the MCT-ADR
-	m_kbdc->hot_res().set([this](int state) { logerror("reset %d\n", state); });
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	//m_kbdc->hot_res().set_inputline(m_cpu, INPUT_LINE_RESET);
+	m_kbdc->hot_res().set([this](int state) { if (!state) m_cpu->reset(); });
+	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<6>));;
-	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->aux_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<7>));
+
+	//m_kbdc->mouse_clk().set();
+	//m_kbdc->mouse_data().set();
+	m_kbdc->mouse_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<7>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
 	m_screen->set_screen_update("g364", FUNC(g364_device::screen_update));
 	m_screen->screen_vblank().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<3>)); // maybe?
 
-	G364(config, m_cvc, 5_MHz_XTAL); // FIXME: guessed clock
-	m_cvc->set_screen(m_screen);
-	m_cvc->set_vram(m_vram);
+	G364(config, m_ramdac, 5_MHz_XTAL); // FIXME: guessed clock
+	m_ramdac->set_screen(m_screen);
+	m_ramdac->set_vram(m_vram);
 
 	// WD16C552 (two 16550 + pc_lpt)
 	NS16550(config, m_ace[0], 4233600);
@@ -338,9 +320,9 @@ void jazz_state::jazz(machine_config &config)
 	SPEAKER_SOUND(config, m_buzzer);
 	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	DP83932C(config, m_net, 20_MHz_XTAL);
-	m_net->out_int_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<4>));
-	m_net->set_ram(RAM_TAG);
+	DP83932C(config, m_network, 20_MHz_XTAL);
+	m_network->out_int_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<4>));
+	m_network->set_ram(RAM_TAG);
 
 	I82357(config, m_isp, 14.318181_MHz_XTAL);
 	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));

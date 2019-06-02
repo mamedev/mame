@@ -11,15 +11,7 @@
 
 #pragma once
 
-#define IOC2_NEW_KBDC   (0)
-
-#if IOC2_NEW_KBDC
-#include "machine/at_keybc.h"
-#else
 #include "machine/8042kbdc.h"
-#endif
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pit8253.h"
@@ -37,16 +29,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
 
-	DECLARE_WRITE_LINE_MEMBER(gio_int0_w);
-	DECLARE_WRITE_LINE_MEMBER(gio_int1_w);
-	DECLARE_WRITE_LINE_MEMBER(gio_int2_w);
-	DECLARE_WRITE_LINE_MEMBER(hpc_dma_done_w);
-	DECLARE_WRITE_LINE_MEMBER(mc_dma_done_w);
-
 	void raise_local_irq(int channel, uint8_t mask);
 	void lower_local_irq(int channel, uint8_t mask);
 
-	enum : uint8_t
+	enum
 	{
 		INT3_LOCAL0_FIFO      = 0x01,
 		INT3_LOCAL0_SCSI0     = 0x02,
@@ -58,7 +44,7 @@ public:
 		INT3_LOCAL0_MAPPABLE0 = 0x80,
 	};
 
-	enum : uint8_t
+	enum
 	{
 		INT3_LOCAL1_GP0       = 0x01,
 		INT3_LOCAL1_PANEL     = 0x02,
@@ -78,7 +64,6 @@ public:
 	void set_local_int_mask(int channel, const uint32_t mask);
 	void set_map_int_mask(int channel, const uint32_t mask);
 	void set_timer_int_clear(const uint32_t data);
-	void set_mappable_int(uint8_t mask, bool state);
 
 	uint8_t get_pit_reg(uint32_t offset) { return m_pit->read(offset); }
 	void set_pit_reg(uint32_t offset, uint8_t data) { return m_pit->write(offset, data); }
@@ -97,7 +82,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
 
-	void check_mappable_interrupt(int channel);
+	void set_mappable_int(uint8_t mask, bool state);
 
 	enum
 	{
@@ -172,12 +157,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85230_device> m_scc;
 	required_device<pc_lpt_device> m_pi1;   // we assume standard parallel port (SPP) mode
-											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner mode
-#if IOC2_NEW_KBDC
-	required_device<ps2_keyboard_controller_device> m_kbdc;
-#else
+											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes
 	required_device<kbdc8042_device> m_kbdc;
-#endif
 	required_device<pit8254_device> m_pit;
 
 	virtual void handle_reset_reg_write(uint8_t data);
@@ -230,7 +211,7 @@ public:
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	uint8_t get_system_id() override { return 0x26; }
+	uint8_t get_system_id() override { return 0x01; }
 };
 
 class ioc2_full_house_device : public ioc2_device
@@ -246,7 +227,7 @@ public:
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	uint8_t get_system_id() override { return 0x11; }
+	uint8_t get_system_id() override { return 0x20; }
 };
 
 DECLARE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device)

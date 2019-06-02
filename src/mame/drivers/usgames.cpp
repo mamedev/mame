@@ -234,6 +234,7 @@ void usgames_state::usg32(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(7*8, 57*8-1, 0*8, 31*8-1);
 	screen.set_screen_update(FUNC(usgames_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_usgames);
 	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 2*256);

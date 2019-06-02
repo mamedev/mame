@@ -76,6 +76,8 @@ public:
 	void init_mjcamera();
 	void init_kanatuen();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;

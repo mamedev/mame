@@ -39,7 +39,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アディアンの杖"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="adian no tsue (japan).fds" size="131000" crc="dcc7a8d6" sha1="1db213b613d6706b5e97ea0f5aad9bd804793a96"/>
+				<rom name="adian no tsue (japan).fds" size="131000" crc="dcc7a8d6" sha1="1db213b613d6706b5e97ea0f5aad9bd804793a96" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="愛戦士ニコル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ai senshi nicol (japan) [b].fds" size="131000" crc="1b303d37" sha1="a1b535b9e72974d97e2c01d2951d2cde5177e217" status="baddump"/>
+				<rom name="ai senshi nicol (japan) [b].fds" size="131000" crc="1b303d37" sha1="a1b535b9e72974d97e2c01d2951d2cde5177e217" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="aki to tsukasa no fushigi no kabe (japan) (unl).fds" size="131000" crc="672b7f6c" sha1="35e204ad24d21818d3f014b728bfc7cc288f39c5"/>
+				<rom name="aki to tsukasa no fushigi no kabe (japan) (unl).fds" size="131000" crc="672b7f6c" sha1="35e204ad24d21818d3f014b728bfc7cc288f39c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="悪魔城ドラキュラ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="akumajou dracula (japan) (v1.0) [b].fds" size="131000" crc="509e4346" sha1="5bef3fd3e72230f25c3ce7161f29d4c550eb8651" status="baddump"/>
+				<rom name="akumajou dracula (japan) (v1.0) [b].fds" size="131000" crc="509e4346" sha1="5bef3fd3e72230f25c3ce7161f29d4c550eb8651" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +92,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="悪魔城ドラキュラ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="akumajou dracula (japan) (v1.1) [b].fds" size="131000" crc="90e9e614" sha1="6e236fceaeafbc5485782927f96bc4426d719bcf" status="baddump"/>
+				<rom name="akumajou dracula (japan) (v1.1) [b].fds" size="131000" crc="90e9e614" sha1="6e236fceaeafbc5485782927f96bc4426d719bcf" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="悪魔城ドラキュラ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="akumajou dracula (japan) (v1.2) [b].fds" size="131000" crc="41a471b3" sha1="2f6096e264f632720ad584d8f73b978fbdac4055" status="baddump"/>
+				<rom name="akumajou dracula (japan) (v1.2) [b].fds" size="131000" crc="41a471b3" sha1="2f6096e264f632720ad584d8f73b978fbdac4055" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Square</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="aliens - alien 2 (japan) (proto) [b].fds" size="131000" crc="2b779ee3" sha1="e80992b0e3e2ec05dbd34b3d97ae39ee59244ca4" status="baddump"/>
+				<rom name="aliens - alien 2 (japan) (proto) [b].fds" size="131000" crc="2b779ee3" sha1="e80992b0e3e2ec05dbd34b3d97ae39ee59244ca4" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="オールナイトニッポン スーパーマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="all night nippon super mario brothers (japan) (promotion card).fds" size="65500" crc="43e7fe95" sha1="f30bdd3c556604d7eaa6d0f4864d5566e519b5d4"/>
+				<rom name="all night nippon super mario brothers (japan) (promotion card).fds" size="65500" crc="43e7fe95" sha1="f30bdd3c556604d7eaa6d0f4864d5566e519b5d4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アルマナの奇跡"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="armana no kiseki (japan).fds" size="131000" crc="0eb045bd" sha1="ae0e1a54c175346716c3641d844801e381507b18"/>
+				<rom name="armana no kiseki (japan).fds" size="131000" crc="0eb045bd" sha1="ae0e1a54c175346716c3641d844801e381507b18" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -158,7 +158,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アップルタウン物語"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="apple town monogatari - little computer people (japan).fds" size="131000" crc="1967673e" sha1="c6b15e0fe1887f60d31e95d72d9c8e19a3c6fef1"/>
+				<rom name="apple town monogatari - little computer people (japan).fds" size="131000" crc="1967673e" sha1="c6b15e0fe1887f60d31e95d72d9c8e19a3c6fef1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アスピック 魔蛇王の呪い"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="aspic - majaou no noroi (japan).fds" size="131000" crc="1999addb" sha1="befb31b3ffbbe26993de0dd8f15443dbd69f5d15"/>
+				<rom name="aspic - majaou no noroi (japan).fds" size="131000" crc="1999addb" sha1="befb31b3ffbbe26993de0dd8f15443dbd69f5d15" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ビッグチャレンジ!ゴー!ゴー!ボーリング"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="big challenge! go! go! bowling (japan).fds" size="131000" crc="a1ce4038" sha1="c0c93462e460423ba85a7eda9638bacaaf7a62fb"/>
+				<rom name="big challenge! go! go! bowling (japan).fds" size="131000" crc="a1ce4038" sha1="c0c93462e460423ba85a7eda9638bacaaf7a62fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -200,7 +200,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ビッグチャレンジ!ガンファイター"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="big challenge! gun fighter (japan).fds" size="131000" crc="d9836fb3" sha1="63b51007f60be5e789127a9e4a4505c1de3e64b3"/>
+				<rom name="big challenge! gun fighter (japan).fds" size="131000" crc="d9836fb3" sha1="63b51007f60be5e789127a9e4a4505c1de3e64b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,7 +215,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ビッグチャレンジ! 柔道選手権"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="big challenge! juudou senshuken (japan).fds" size="131000" crc="16c8cdd5" sha1="9293c072d53f1c52175627a1848afc8613713fbf"/>
+				<rom name="big challenge! juudou senshuken (japan).fds" size="131000" crc="16c8cdd5" sha1="9293c072d53f1c52175627a1848afc8613713fbf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バイオミラクルぼくってウパ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bio miracle bokutte upa (japan).fds" size="131000" crc="c57b947f" sha1="58db028d52c3a538c92881eafbc1c154e02f9241"/>
+				<rom name="bio miracle bokutte upa (japan).fds" size="131000" crc="c57b947f" sha1="58db028d52c3a538c92881eafbc1c154e02f9241" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +240,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Wild?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo control (japan) (unl).fds" size="131000" crc="058330fe" sha1="0a40eb7d5f516a2298826e933f8a4d581b09223c"/>
+				<rom name="bishoujo control (japan) (unl).fds" size="131000" crc="058330fe" sha1="0a40eb7d5f516a2298826e933f8a4d581b09223c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -251,7 +251,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo hanafuda club vol.1 - oichokabu hen (japan) (unl).fds" size="131000" crc="ae8ea7e4" sha1="f55b8bf24cd752fe655b06991337837437256bc0"/>
+				<rom name="bishoujo hanafuda club vol.1 - oichokabu hen (japan) (unl).fds" size="131000" crc="ae8ea7e4" sha1="f55b8bf24cd752fe655b06991337837437256bc0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo hanafuda club vol.2 - koikoi bakappana hen (japan) (unl).fds" size="131000" crc="6a619b4e" sha1="d5d6796c8709341cc0a0673bc75d93ff08dc7dc8"/>
+				<rom name="bishoujo hanafuda club vol.2 - koikoi bakappana hen (japan) (unl).fds" size="131000" crc="6a619b4e" sha1="d5d6796c8709341cc0a0673bc75d93ff08dc7dc8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -274,7 +274,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo kachinuki renju - gomoku narabe (japan) (unl).fds" size="131000" crc="ff06eb11" sha1="f6a58d5e5b01f4e7541933b38c1d8431bee45fc7"/>
+				<rom name="bishoujo kachinuki renju - gomoku narabe (japan) (unl).fds" size="131000" crc="ff06eb11" sha1="f6a58d5e5b01f4e7541933b38c1d8431bee45fc7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -285,7 +285,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo mahjong club (japan) (unl).fds" size="131000" crc="adc1e1b6" sha1="77d1128e6427472f6f4f14dcbf811caecec9c3b4"/>
+				<rom name="bishoujo mahjong club (japan) (unl).fds" size="131000" crc="adc1e1b6" sha1="77d1128e6427472f6f4f14dcbf811caecec9c3b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -296,7 +296,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo sexy derby (japan) (unl).fds" size="131000" crc="69b3908c" sha1="daba36a597101052392a37c0c570051242ab8fe1"/>
+				<rom name="bishoujo sexy derby (japan) (unl).fds" size="131000" crc="69b3908c" sha1="daba36a597101052392a37c0c570051242ab8fe1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -307,7 +307,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo sexy puzzle (japan) (unl).fds" size="131000" crc="ff74da58" sha1="72162f05e2a810867144584013da971fd6c1da23"/>
+				<rom name="bishoujo sexy puzzle (japan) (unl).fds" size="131000" crc="ff74da58" sha1="72162f05e2a810867144584013da971fd6c1da23" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +318,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo sexy slot (japan) (unl).fds" size="131000" crc="6b10fa57" sha1="f2d5cf16c00b553d8f526392102a2e955718bb97"/>
+				<rom name="bishoujo sexy slot (japan) (unl).fds" size="131000" crc="6b10fa57" sha1="f2d5cf16c00b553d8f526392102a2e955718bb97" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -329,7 +329,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo sf alien battle (japan) (unl).fds" size="131000" crc="e89fed10" sha1="659adff45a5b19930a74fed0d9b366b62de982b0"/>
+				<rom name="bishoujo sf alien battle (japan) (unl).fds" size="131000" crc="e89fed10" sha1="659adff45a5b19930a74fed0d9b366b62de982b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -340,7 +340,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Phoenix?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo shashinkan - moving school (japan) (unl).fds" size="131000" crc="8e0bba37" sha1="15333df7c64152af4296418c64be103ef2f5b859"/>
+				<rom name="bishoujo shashinkan - moving school (japan) (unl).fds" size="131000" crc="8e0bba37" sha1="15333df7c64152af4296418c64be103ef2f5b859" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Phoenix?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bishoujo shashinkan - studio cut (japan) (unl).fds" size="131000" crc="d761a49c" sha1="8596f2e33d820855d0c2010d7042a56bf5128e24"/>
+				<rom name="bishoujo shashinkan - studio cut (japan) (unl).fds" size="131000" crc="d761a49c" sha1="8596f2e33d820855d0c2010d7042a56bf5128e24" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +363,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="bodycon quest i - abakareshi musume tachi (japan) (unl).fds" size="262000" crc="c2be838f" sha1="7ba1fb00429ae76a312b20ac44ca36e2170dea38"/>
+				<rom name="bodycon quest i - abakareshi musume tachi (japan) (unl).fds" size="262000" crc="c2be838f" sha1="7ba1fb00429ae76a312b20ac44ca36e2170dea38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -377,7 +377,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="地底大陸オルドーラ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="chitei tairiku orudoora (japan).fds" size="131000" crc="9671ce0c" sha1="aa922b8dcd56a43d9e14ce07e6c37f54a482db08"/>
+				<rom name="chitei tairiku orudoora (japan).fds" size="131000" crc="9671ce0c" sha1="aa922b8dcd56a43d9e14ce07e6c37f54a482db08" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -391,7 +391,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ココナワールド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="cocona world (japan).fds" size="131000" crc="8bdce2e8" sha1="fa81a201d1f1bbeab5063c3b9bef76191c637c00"/>
+				<rom name="cocona world (japan).fds" size="131000" crc="8bdce2e8" sha1="fa81a201d1f1bbeab5063c3b9bef76191c637c00" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -402,7 +402,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="comic sakka series touma senki #1 - mashoujo gakuen evil (japan) (unl).fds" size="131000" crc="6f298c83" sha1="ca5c531e47cc419a2e4f95402e49478ec2118cae"/>
+				<rom name="comic sakka series touma senki #1 - mashoujo gakuen evil (japan) (unl).fds" size="131000" crc="6f298c83" sha1="ca5c531e47cc419a2e4f95402e49478ec2118cae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -413,7 +413,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="comic sakka series touma senki #2 - mermaid no gyakushuu (japan) (unl).fds" size="131000" crc="6532906e" sha1="85519b50d21773b3c8431247816230d9ed3c26e8"/>
+				<rom name="comic sakka series touma senki #2 - mermaid no gyakushuu (japan) (unl).fds" size="131000" crc="6532906e" sha1="85519b50d21773b3c8431247816230d9ed3c26e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="comic sakka series touma senki #3 - ryuujin sensei kikiippatsu (japan) (unl).fds" size="131000" crc="6880b1f3" sha1="a58be9b5fb84b78a3e0506335b176f0a0e01d17e"/>
+				<rom name="comic sakka series touma senki #3 - ryuujin sensei kikiippatsu (japan) (unl).fds" size="131000" crc="6880b1f3" sha1="a58be9b5fb84b78a3e0506335b176f0a0e01d17e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="comic sakka series touma senki #4 - tenkuu ryuumaou fukkatsu (japan) (unl).fds" size="131000" crc="eddb3816" sha1="2939203e6514635c5250f1d52db9b5c9d1e038e8"/>
+				<rom name="comic sakka series touma senki #4 - tenkuu ryuumaou fukkatsu (japan) (unl).fds" size="131000" crc="eddb3816" sha1="2939203e6514635c5250f1d52db9b5c9d1e038e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -446,7 +446,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="comic sakka series touma senki #5 - youjuu rudo no chousen (japan) (unl).fds" size="131000" crc="a3bd4e0b" sha1="ba9d070cbb7835b272933e6ae4c89ac6d7223745"/>
+				<rom name="comic sakka series touma senki #5 - youjuu rudo no chousen (japan) (unl).fds" size="131000" crc="a3bd4e0b" sha1="ba9d070cbb7835b272933e6ae4c89ac6d7223745" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -457,7 +457,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="date de blackjack (japan) (unl).fds" size="131000" crc="8d56f6ca" sha1="f6e7e7192517ee99ddbcae8a31da2a0a253e8e8b"/>
+				<rom name="date de blackjack (japan) (unl).fds" size="131000" crc="8d56f6ca" sha1="f6e7e7192517ee99ddbcae8a31da2a0a253e8e8b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -472,7 +472,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ディープダンジョン 魔洞戦紀"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="deep dungeon - madou senki (japan) [b].fds" size="131000" crc="ed9011d0" sha1="7d4228248e749f5aa9ae6f695a8175d80d3d5250" status="baddump"/>
+				<rom name="deep dungeon - madou senki (japan) [b].fds" size="131000" crc="ed9011d0" sha1="7d4228248e749f5aa9ae6f695a8175d80d3d5250" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -487,7 +487,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ディープダンジョンII 勇士の紋章"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="deep dungeon ii - yuushi no monshou (japan) (v1.0).fds" size="131000" crc="3e7d2102" sha1="36475bcf88d866621b26b93ddb7b181c9d60d9ab"/>
+				<rom name="deep dungeon ii - yuushi no monshou (japan) (v1.0).fds" size="131000" crc="3e7d2102" sha1="36475bcf88d866621b26b93ddb7b181c9d60d9ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -502,7 +502,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ディープダンジョンII 勇士の紋章"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="deep dungeon ii - yuushi no monshou (japan) (v1.1) [b].fds" size="131000" crc="4e5298e4" sha1="92fa66f47ef6a3e247be76101e75a01f8f5efc39" status="baddump"/>
+				<rom name="deep dungeon ii - yuushi no monshou (japan) (v1.1) [b].fds" size="131000" crc="4e5298e4" sha1="92fa66f47ef6a3e247be76101e75a01f8f5efc39" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -517,7 +517,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ダーティペア プロジェクトエデン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="dirty pair - project eden (japan) [b].fds" size="131000" crc="3c63db59" sha1="d6a4a1b28edf01dbbf445ec0fbcf9a0901435d8c" status="baddump"/>
+				<rom name="dirty pair - project eden (japan) [b].fds" size="131000" crc="3c63db59" sha1="d6a4a1b28edf01dbbf445ec0fbcf9a0901435d8c" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -531,7 +531,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ドンキーコング"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="donkey kong (japan) (disk writer).fds" size="65500" crc="9b308cb6" sha1="f6b75fbf0d274811dd9ac046cd8332a882f12dff"/>
+				<rom name="donkey kong (japan) (disk writer).fds" size="65500" crc="9b308cb6" sha1="f6b75fbf0d274811dd9ac046cd8332a882f12dff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -545,7 +545,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ドンキーコングJr."/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="donkey kong jr. (japan) (disk writer).fds" size="65500" crc="c7715a35" sha1="9da60a332d544e46716bbef784ae4c8eaf0e30d5"/>
+				<rom name="donkey kong jr. (japan) (disk writer).fds" size="65500" crc="c7715a35" sha1="9da60a332d544e46716bbef784ae4c8eaf0e30d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -559,7 +559,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ドクター・カオス 地獄の扉"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="dr. chaos - jigoku no tobira (japan) [b].fds" size="131000" crc="10840378" sha1="93600cb15c99b501f38bb9d68de405d8fb0c1956" status="baddump"/>
+				<rom name="dr. chaos - jigoku no tobira (japan) [b].fds" size="131000" crc="10840378" sha1="93600cb15c99b501f38bb9d68de405d8fb0c1956" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -573,7 +573,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ドラキュラII 呪いの封印"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="dracula ii - noroi no fuuin (japan).fds" size="131000" crc="9d81180e" sha1="da48c842bc44def1c0eb2549941c6adc65d6c379"/>
+				<rom name="dracula ii - noroi no fuuin (japan).fds" size="131000" crc="9d81180e" sha1="da48c842bc44def1c0eb2549941c6adc65d6c379" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -587,7 +587,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ドルイド 恐怖の扉"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="druid - kyoufu no tobira (japan).fds" size="131000" crc="59e777dc" sha1="297078843e2f2302d90a5a15d446ef2f8608b0c4"/>
+				<rom name="druid - kyoufu no tobira (japan).fds" size="131000" crc="59e777dc" sha1="297078843e2f2302d90a5a15d446ef2f8608b0c4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -601,7 +601,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エッガーランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="egger land (japan) [b].fds" size="131000" crc="b149ef10" sha1="997a385a62f8e6e3569dec1405da5a724e4cea4d" status="baddump"/>
+				<rom name="egger land (japan) [b].fds" size="131000" crc="b149ef10" sha1="997a385a62f8e6e3569dec1405da5a724e4cea4d" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -616,7 +616,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エレクトリシャン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="electrician (japan).fds" size="131000" crc="2ca83dfb" sha1="da2027ea081a5abed68a92f5af5f9ad9d474c7aa"/>
+				<rom name="electrician (japan).fds" size="131000" crc="2ca83dfb" sha1="da2027ea081a5abed68a92f5af5f9ad9d474c7aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -628,7 +628,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="emi-chan no moero yakyuuken! (japan) (unl).fds" size="131000" crc="13b688b4" sha1="c317500c50955daba14ec8cb71246d1fb9b1cb8f"/>
+				<rom name="emi-chan no moero yakyuuken! (japan) (unl).fds" size="131000" crc="13b688b4" sha1="c317500c50955daba14ec8cb71246d1fb9b1cb8f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -643,7 +643,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エスパードリーム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="esper dream (japan) (v1.0) [b].fds" size="131000" crc="9ddd66ae" sha1="d7e5966c55f04a6707665d0e70957e6e86574d3a" status="baddump"/>
+				<rom name="esper dream (japan) (v1.0) [b].fds" size="131000" crc="9ddd66ae" sha1="d7e5966c55f04a6707665d0e70957e6e86574d3a" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -658,7 +658,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エスパードリーム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="esper dream (japan) (v1.1) [b].fds" size="131000" crc="1fc1f1be" sha1="739286151384cb41833cb07c6ce08b73d697bb53" status="baddump"/>
+				<rom name="esper dream (japan) (v1.1) [b].fds" size="131000" crc="1fc1f1be" sha1="739286151384cb41833cb07c6ce08b73d697bb53" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -672,7 +672,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エキサイティング ベースボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="exciting baseball (japan).fds" size="131000" crc="f63c93bd" sha1="8da3756936ca7b63e18028f0a82edc6f4096af18"/>
+				<rom name="exciting baseball (japan).fds" size="131000" crc="f63c93bd" sha1="8da3756936ca7b63e18028f0a82edc6f4096af18" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -686,7 +686,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エキサイティング バスケット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="exciting basket (japan).fds" size="131000" crc="c601bd65" sha1="53facaa411a70a027eb3a843e5b725c04b039e07"/>
+				<rom name="exciting basket (japan).fds" size="131000" crc="c601bd65" sha1="53facaa411a70a027eb3a843e5b725c04b039e07" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -700,7 +700,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エキサイティング ビリヤード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="exciting billiard (japan).fds" size="131000" crc="f7e359c3" sha1="3c58b4b4da139fb2ab8a4d74792fa17e6c6ec534"/>
+				<rom name="exciting billiard (japan).fds" size="131000" crc="f7e359c3" sha1="3c58b4b4da139fb2ab8a4d74792fa17e6c6ec534" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -714,7 +714,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エキサイティング サッカー コナミカップ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="exciting soccer - konami cup (japan) [b].fds" size="131000" crc="b9f092ae" sha1="b4e0d30af30dcffdc584c17d33d1a6dee413d9e4" status="baddump"/>
+				<rom name="exciting soccer - konami cup (japan) [b].fds" size="131000" crc="b9f092ae" sha1="b4e0d30af30dcffdc584c17d33d1a6dee413d9e4" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -725,7 +725,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="fairy pinball - yousei tachi no pinball (japan) (unl).fds" size="131000" crc="ac7ed005" sha1="58e84c1bc6cfebf6e548e65f055c6b70e1fe9579"/>
+				<rom name="fairy pinball - yousei tachi no pinball (japan) (unl).fds" size="131000" crc="ac7ed005" sha1="58e84c1bc6cfebf6e548e65f055c6b70e1fe9579" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -739,7 +739,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファルシオン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="falsion (japan).fds" size="131000" crc="5442c889" sha1="b81fe9f10fb19aff6e5303e7b0445e4399811791"/>
+				<rom name="falsion (japan).fds" size="131000" crc="5442c889" sha1="b81fe9f10fb19aff6e5303e7b0445e4399811791" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -753,7 +753,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン グランプリII スリーディー ホット ラリー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="famicom grand prix ii - 3d hot rally (japan).fds" size="131000" crc="0857c4e8" sha1="b35e98154f2b6ad6690e42fe40d9b039b12ef667"/>
+				<rom name="famicom grand prix ii - 3d hot rally (japan).fds" size="131000" crc="0857c4e8" sha1="b35e98154f2b6ad6690e42fe40d9b039b12ef667" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -767,7 +767,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゴルフ ジャパン コース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="family computer golf japan course (japan).fds" size="131000" crc="fd5b83a1" sha1="532214dacbac874deb1c944f894c450feeffd2eb"/>
+				<rom name="family computer golf japan course (japan).fds" size="131000" crc="fd5b83a1" sha1="532214dacbac874deb1c944f894c450feeffd2eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -778,7 +778,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Nintendo</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="family computer golf special course (japan) (prize card).fds" size="131000" crc="528da81f" sha1="f9df95725822161784598064f50bef3ea639967d"/>
+				<rom name="family computer golf special course (japan) (prize card).fds" size="131000" crc="528da81f" sha1="f9df95725822161784598064f50bef3ea639967d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -792,7 +792,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゴルフ ユーエス コース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="family computer golf u.s. course (japan).fds" size="131000" crc="9944329a" sha1="b7726762eac903fa1450f7828ea8063e562e4689"/>
+				<rom name="family computer golf u.s. course (japan).fds" size="131000" crc="9944329a" sha1="b7726762eac903fa1450f7828ea8063e562e4689" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -803,7 +803,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Nintendo</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="family computer golf tournament - japan course (japan) (prize card).fds" size="131000" crc="c1bd72f2" sha1="31eb8b7e7c867e8dd3996633ab703ca318220519"/>
+				<rom name="family computer golf tournament - japan course (japan) (prize card).fds" size="131000" crc="c1bd72f2" sha1="31eb8b7e7c867e8dd3996633ab703ca318220519" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -817,7 +817,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="オセロ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="family computer othello (japan).fds" size="65500" crc="ac0e1e61" sha1="53a4cd01d3dd780acd538d21feffa8d5b567baf6"/>
+				<rom name="family computer othello (japan).fds" size="65500" crc="ac0e1e61" sha1="53a4cd01d3dd780acd538d21feffa8d5b567baf6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -831,7 +831,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファイナルコマンド 赤い要塞"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="final commando - akai yousai (japan).fds" size="131000" crc="08028e43" sha1="c8a2ee105571d0dcc3099f9a96db93f41b31bf5a"/>
+				<rom name="final commando - akai yousai (japan).fds" size="131000" crc="08028e43" sha1="c8a2ee105571d0dcc3099f9a96db93f41b31bf5a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -845,7 +845,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファイヤーロック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="fire rock (japan).fds" size="131000" crc="33b5b551" sha1="8fbc2ea7dd9fe79ef25511815dc0a154c4591c4b"/>
+				<rom name="fire rock (japan).fds" size="131000" crc="33b5b551" sha1="8fbc2ea7dd9fe79ef25511815dc0a154c4591c4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -857,7 +857,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 1 disk #1 - dai h taikai (japan) (unl).fds" size="262000" crc="da705136" sha1="1520405ab5b8f413f8bf763b186f61fda451945d"/>
+				<rom name="fruits mahjong 1 disk #1 - dai h taikai (japan) (unl).fds" size="262000" crc="da705136" sha1="1520405ab5b8f413f8bf763b186f61fda451945d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -869,7 +869,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 2 disk #2 - tokimeki gals (japan) (unl).fds" size="262000" crc="fe258a9b" sha1="a2d458897fa9f1c0fab2983dadb754b3d347f5da"/>
+				<rom name="fruits mahjong 2 disk #2 - tokimeki gals (japan) (unl).fds" size="262000" crc="fe258a9b" sha1="a2d458897fa9f1c0fab2983dadb754b3d347f5da" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -881,7 +881,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 2 disk #3 - yonin to dai h taikai (japan) (unl).fds" size="262000" crc="c1b1e573" sha1="b2ed81e1233810ba36391c8ea51f522fba4be94e"/>
+				<rom name="fruits mahjong 2 disk #3 - yonin to dai h taikai (japan) (unl).fds" size="262000" crc="c1b1e573" sha1="b2ed81e1233810ba36391c8ea51f522fba4be94e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -893,7 +893,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 3 disk #4 - yonin no tenshi tachi (japan) (unl).fds" size="262000" crc="314e69e8" sha1="f8d9cad20a85c57282e7cdc349f54a2369702c13"/>
+				<rom name="fruits mahjong 3 disk #4 - yonin no tenshi tachi (japan) (unl).fds" size="262000" crc="314e69e8" sha1="f8d9cad20a85c57282e7cdc349f54a2369702c13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -905,7 +905,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 3 disk #5 - tottemo h na gogo (japan) (unl).fds" size="262000" crc="53c56bb8" sha1="8184aa6d1e3dfd3db8478263838a00f0b85feed7"/>
+				<rom name="fruits mahjong 3 disk #5 - tottemo h na gogo (japan) (unl).fds" size="262000" crc="53c56bb8" sha1="8184aa6d1e3dfd3db8478263838a00f0b85feed7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -917,7 +917,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 4 disk #6 - bishoujo connection (japan) (unl).fds" size="262000" crc="db9edde5" sha1="b6df912bab17c6f44d1417a8ce91763bea16cb96"/>
+				<rom name="fruits mahjong 4 disk #6 - bishoujo connection (japan) (unl).fds" size="262000" crc="db9edde5" sha1="b6df912bab17c6f44d1417a8ce91763bea16cb96" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -929,7 +929,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="fruits mahjong 4 disk #7 - daitan h na hirusagari (japan) (unl).fds" size="262000" crc="64021329" sha1="6c37f5a03252e04f297aa811414bb7139f872779"/>
+				<rom name="fruits mahjong 4 disk #7 - daitan h na hirusagari (japan) (unl).fds" size="262000" crc="64021329" sha1="6c37f5a03252e04f297aa811414bb7139f872779" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -940,7 +940,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="game no tatsujin - money wars (japan) (unl).fds" size="131000" crc="da1e66c9" sha1="4248b8fb6c2039bbe3b10945b637e23051f27d75"/>
+				<rom name="game no tatsujin - money wars (japan) (unl).fds" size="131000" crc="da1e66c9" sha1="4248b8fb6c2039bbe3b10945b637e23051f27d75" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -955,7 +955,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="銀河伝承"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ginga denshou - galaxy odyssey (japan).fds" size="131000" crc="631d9fa8" sha1="a69c12b4ea58eea91088ccc88517e651d4bdc4b9"/>
+				<rom name="ginga denshou - galaxy odyssey (japan).fds" size="131000" crc="631d9fa8" sha1="a69c12b4ea58eea91088ccc88517e651d4bdc4b9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -969,7 +969,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゴルフ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="golf (japan) (v1.0).fds" size="65500" crc="b15026a5" sha1="cf0b69cc5f825cc867838fb8342b043cd7dc1a35"/>
+				<rom name="golf (japan) (v1.0).fds" size="65500" crc="b15026a5" sha1="cf0b69cc5f825cc867838fb8342b043cd7dc1a35" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -983,7 +983,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゴルフ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="golf (japan) (v1.1).fds" size="65500" crc="a9451981" sha1="8e84f5cc553d9bb07480bc5f92cb42e2a031eaed"/>
+				<rom name="golf (japan) (v1.1).fds" size="65500" crc="a9451981" sha1="8e84f5cc553d9bb07480bc5f92cb42e2a031eaed" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -994,7 +994,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="golf, the - bishoujo classic (japan) (unl).fds" size="131000" crc="e60874b0" sha1="247a8f6c8c8d091bee87b00fcbb1d61265e21465"/>
+				<rom name="golf, the - bishoujo classic (japan) (unl).fds" size="131000" crc="e60874b0" sha1="247a8f6c8c8d091bee87b00fcbb1d61265e21465" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1009,7 +1009,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ハオ君の不思議な旅"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="hao-kun no fushigi na tabi (japan) [b].fds" size="131000" crc="cb7a8570" sha1="1a447e0f4f07b4438130489ca337c6d87c1ab9ad" status="baddump"/>
+				<rom name="hao-kun no fushigi na tabi (japan) [b].fds" size="131000" crc="cb7a8570" sha1="1a447e0f4f07b4438130489ca337c6d87c1ab9ad" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1020,7 +1020,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="hayama reiko no date de blackjack (japan) (unl).fds" size="131000" crc="e918a01a" sha1="24267a7ba5a8698b74318acd0308d5820eda8b6d"/>
+				<rom name="hayama reiko no date de blackjack (japan) (unl).fds" size="131000" crc="e918a01a" sha1="24267a7ba5a8698b74318acd0308d5820eda8b6d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1035,7 +1035,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="光神話 パルテナの鏡"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="hikari shinwa - palthena no kagami (japan) (v1.1) [b].fds" size="131000" crc="1a9a281b" sha1="06639c568d7813381a4a2e27c54296749007fe7c" status="baddump"/>
+				<rom name="hikari shinwa - palthena no kagami (japan) (v1.1) [b].fds" size="131000" crc="1a9a281b" sha1="06639c568d7813381a4a2e27c54296749007fe7c" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1049,7 +1049,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アイスホッケー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="ice hockey (japan).fds" size="65500" crc="189fa707" sha1="55b801c3bf3dd86697f5ff858151ea1c5d3eee8b"/>
+				<rom name="ice hockey (japan).fds" size="65500" crc="189fa707" sha1="55b801c3bf3dd86697f5ff858151ea1c5d3eee8b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1064,7 +1064,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アイドルホットライン 中山美穂のトキメキハイスクール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="idol hotline - nakayama miho no tokimeki high school (japan).fds" size="131000" crc="c04ab2ea" sha1="93b2a3c56c4e64e54b6111879431909aad8422e8"/>
+				<rom name="idol hotline - nakayama miho no tokimeki high school (japan).fds" size="131000" crc="c04ab2ea" sha1="93b2a3c56c4e64e54b6111879431909aad8422e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1075,7 +1075,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="jingorou (japan) (unl).fds" size="65500" crc="72a0bd81" sha1="6230486bb3653b5b3936671695d955b9a5c78bf4"/>
+				<rom name="jingorou (japan) (unl).fds" size="65500" crc="72a0bd81" sha1="6230486bb3653b5b3936671695d955b9a5c78bf4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1090,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="カリーンの剣"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kalin no tsurugi (japan) [b].fds" size="131000" crc="d7025151" sha1="563a5d4620c1966b404c99c2fa5ee09313d75d42" status="baddump"/>
+				<rom name="kalin no tsurugi (japan) [b].fds" size="131000" crc="d7025151" sha1="563a5d4620c1966b404c99c2fa5ee09313d75d42" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1104,7 +1104,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="仮面ライダーブラック 対決シャドームーン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kamen rider black - taiketsu shadow moon (japan).fds" size="131000" crc="566c6ddf" sha1="bfe8b644fab411216614381649f0bc84f8cccb46"/>
+				<rom name="kamen rider black - taiketsu shadow moon (japan).fds" size="131000" crc="566c6ddf" sha1="bfe8b644fab411216614381649f0bc84f8cccb46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1118,7 +1118,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="カラテ・チャンプ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="karate champ (japan).fds" size="131000" crc="48f777b9" sha1="c268f5a99a6cd6761f994fc38396fad53529e5a1"/>
+				<rom name="karate champ (japan).fds" size="131000" crc="48f777b9" sha1="c268f5a99a6cd6761f994fc38396fad53529e5a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1132,7 +1132,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エアフット 野菜の国の足戦士 キック・チャレンジャー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kick challenger air foot - yasai no kuni no ashi senshi (japan).fds" size="131000" crc="78a12d0a" sha1="73d42c954cb1b87c03d9d3ad47f983e00fcf5379"/>
+				<rom name="kick challenger air foot - yasai no kuni no ashi senshi (japan).fds" size="131000" crc="78a12d0a" sha1="73d42c954cb1b87c03d9d3ad47f983e00fcf5379" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1147,7 +1147,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="消えたプリンセス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kieta princess (japan).fds" size="131000" crc="60d55cea" sha1="38148d65001c9784b7ce6b59348e1bf9ddc3fff1"/>
+				<rom name="kieta princess (japan).fds" size="131000" crc="60d55cea" sha1="38148d65001c9784b7ce6b59348e1bf9ddc3fff1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1159,7 +1159,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Wild</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="kind gal's (japan) (unl).fds" size="262000" crc="f6088296" sha1="028c901f7c7101b4ac11eb42feb7bc100239ef0f"/>
+				<rom name="kind gal's (japan) (unl).fds" size="262000" crc="f6088296" sha1="028c901f7c7101b4ac11eb42feb7bc100239ef0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1173,7 +1173,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ナイトムーブ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="knight move (japan).fds" size="65500" crc="fd6ef8d7" sha1="ca24c31db670cdff703677fce28f0a810b2d3350"/>
+				<rom name="knight move (japan).fds" size="65500" crc="fd6ef8d7" sha1="ca24c31db670cdff703677fce28f0a810b2d3350" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1184,7 +1184,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kobayashi hitomi no hold up (japan) (unl).fds" size="131000" crc="0ba1dbd0" sha1="16f2b2291eabb5c4c92964562722573f6d80c6df"/>
+				<rom name="kobayashi hitomi no hold up (japan) (unl).fds" size="131000" crc="0ba1dbd0" sha1="16f2b2291eabb5c4c92964562722573f6d80c6df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1195,7 +1195,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kobayashi hitomi shocking tennis (japan) (unl).fds" size="131000" crc="187ec24c" sha1="7389da745b2b2261c6708bbcb5f8a5700012f969"/>
+				<rom name="kobayashi hitomi shocking tennis (japan) (unl).fds" size="131000" crc="187ec24c" sha1="7389da745b2b2261c6708bbcb5f8a5700012f969" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1209,7 +1209,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="コナミック アイスホッケー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="konamic ice hockey (japan).fds" size="131000" crc="fef5125f" sha1="7128d8bb30d6dcbbee41fd5c8d97e080836bbd9d"/>
+				<rom name="konamic ice hockey (japan).fds" size="131000" crc="fef5125f" sha1="7128d8bb30d6dcbbee41fd5c8d97e080836bbd9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1220,7 +1220,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Pony Canyon</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="koneko monogatari - the adventures of chatran (japan) (sample).fds" size="131000" crc="3438794b" sha1="f94f3385dacf10bde040494742657bf44e764eb3"/>
+				<rom name="koneko monogatari - the adventures of chatran (japan) (sample).fds" size="131000" crc="3438794b" sha1="f94f3385dacf10bde040494742657bf44e764eb3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1234,7 +1234,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="子猫物語"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="koneko monogatari - the adventures of chatran (japan).fds" size="131000" crc="53a7a482" sha1="572279ce975e9bf6114bc6e919e1820316022090"/>
+				<rom name="koneko monogatari - the adventures of chatran (japan).fds" size="131000" crc="53a7a482" sha1="572279ce975e9bf6114bc6e919e1820316022090" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1246,7 +1246,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="kosodate gokko (japan) (unl).fds" size="65500" crc="2aef8cc2" sha1="93e34356a6fa262f1117402926e9a82a78cee1d6"/>
+				<rom name="kosodate gokko (japan) (unl).fds" size="65500" crc="2aef8cc2" sha1="93e34356a6fa262f1117402926e9a82a78cee1d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1261,7 +1261,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="リンクの冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.0).fds" size="131000" crc="2d9d88c0" sha1="0fde8404f6cec68a29d339993edc8a82abade409"/>
+				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.0).fds" size="131000" crc="2d9d88c0" sha1="0fde8404f6cec68a29d339993edc8a82abade409" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1276,7 +1276,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="リンクの冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.1).fds" size="131000" crc="1187fe3d" sha1="8877321f1fda7d54bf2468dd6f5e36d321cbcce1"/>
+				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.1).fds" size="131000" crc="1187fe3d" sha1="8877321f1fda7d54bf2468dd6f5e36d321cbcce1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1287,7 +1287,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="lipstick #.1 - lolita hen (japan) (unl).fds" size="131000" crc="30d9946c" sha1="7d362b988fd5357368f676b38c3ea932f2cf6d4b"/>
+				<rom name="lipstick #.1 - lolita hen (japan) (unl).fds" size="131000" crc="30d9946c" sha1="7d362b988fd5357368f676b38c3ea932f2cf6d4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1298,7 +1298,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="lipstick #.2 - joshi gakusei hen (japan) (unl).fds" size="131000" crc="784ee9c5" sha1="ba2f17dfaa36b69ac0a8a6610c59b07b5686424a"/>
+				<rom name="lipstick #.2 - joshi gakusei hen (japan) (unl).fds" size="131000" crc="784ee9c5" sha1="ba2f17dfaa36b69ac0a8a6610c59b07b5686424a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1309,7 +1309,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="lipstick #.3 - ol hen (japan) (unl).fds" size="131000" crc="bf27d663" sha1="a461d612a6e4ec21447670a31337738d4e21405b"/>
+				<rom name="lipstick #.3 - ol hen (japan) (unl).fds" size="131000" crc="bf27d663" sha1="a461d612a6e4ec21447670a31337738d4e21405b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1320,7 +1320,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="lipstick #.4 - hakui no tenshi hen (japan) (unl).fds" size="131000" crc="729e3cce" sha1="44b5bb765c7a90e8a624fcea694e09bdca7ca446"/>
+				<rom name="lipstick #.4 - hakui no tenshi hen (japan) (unl).fds" size="131000" crc="729e3cce" sha1="44b5bb765c7a90e8a624fcea694e09bdca7ca446" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1331,7 +1331,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="lipstick #.5 - stewardess hen (japan) (unl).fds" size="131000" crc="7eba7b30" sha1="9e3f51f72e6d7b32824edca4bc739de7c249f80a"/>
+				<rom name="lipstick #.5 - stewardess hen (japan) (unl).fds" size="131000" crc="7eba7b30" sha1="9e3f51f72e6d7b32824edca4bc739de7c249f80a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1345,7 +1345,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="mahjong (japan).fds" size="65500" crc="9a8a4dbf" sha1="615659bfea21919e11608031e8fe818a9e02d1e0"/>
+				<rom name="mahjong (japan).fds" size="65500" crc="9a8a4dbf" sha1="615659bfea21919e11608031e8fe818a9e02d1e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1356,7 +1356,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="mahjong goraku - bishoujo meijinsen (japan) (unl).fds" size="131000" crc="19ae50dd" sha1="069aa363c6cde5adea3ede5c56f487c83ed88d64"/>
+				<rom name="mahjong goraku - bishoujo meijinsen (japan) (unl).fds" size="131000" crc="19ae50dd" sha1="069aa363c6cde5adea3ede5c56f487c83ed88d64" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1370,7 +1370,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="迷宮寺院ダババ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="meikyuu jiin dababa (japan).fds" size="131000" crc="b488b769" sha1="8bd7c7a6e83f69617e1cb3cb0352be945905f71e"/>
+				<rom name="meikyuu jiin dababa (japan).fds" size="131000" crc="b488b769" sha1="8bd7c7a6e83f69617e1cb3cb0352be945905f71e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1385,7 +1385,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="メトロイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="metroid (japan) (v1.1) [b].fds" size="131000" crc="08a13a9e" sha1="fded31cafdee11b3ef2ec0aca7bbb738a16f91a9" status="baddump"/>
+				<rom name="metroid (japan) (v1.1) [b].fds" size="131000" crc="08a13a9e" sha1="fded31cafdee11b3ef2ec0aca7bbb738a16f91a9" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1400,7 +1400,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="メトロイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="metroid (japan) (v1.2) [b].fds" size="131000" crc="83d4edf8" sha1="af6b14f8f6a21deace116a6007a2a88855c1360d" status="baddump"/>
+				<rom name="metroid (japan) (v1.2) [b].fds" size="131000" crc="83d4edf8" sha1="af6b14f8f6a21deace116a6007a2a88855c1360d" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1415,7 +1415,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="マイケルのイングリッシュ大冒険 (初級編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="michael english daibouken (japan) (sample).fds" size="131000" crc="e407f85a" sha1="9cb57b442565bc5bce663c9cfc1e9af6602a41f7"/>
+				<rom name="michael english daibouken (japan) (sample).fds" size="131000" crc="e407f85a" sha1="9cb57b442565bc5bce663c9cfc1e9af6602a41f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1429,7 +1429,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="もえろツインビー シナモン博士を救え!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="moero twinbee - cinnamon hakase wo sukue! (japan).fds" size="131000" crc="13205221" sha1="75e31801df1f10d6e4e14c43e90b99367ed18ebf"/>
+				<rom name="moero twinbee - cinnamon hakase wo sukue! (japan).fds" size="131000" crc="13205221" sha1="75e31801df1f10d6e4e14c43e90b99367ed18ebf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1443,7 +1443,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="きね子"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="monitor puzzle kineko, the - kinetic connection (japan).fds" size="131000" crc="36094115" sha1="3a2cd622c32ed2c9ecdf01ab3908f362443f03b7"/>
+				<rom name="monitor puzzle kineko, the - kinetic connection (japan).fds" size="131000" crc="36094115" sha1="3a2cd622c32ed2c9ecdf01ab3908f362443f03b7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1457,7 +1457,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="モンティのドキドキ大脱走"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="monty on the run - monty no doki doki dai dassou (japan) [b].fds" size="131000" crc="f37893b9" sha1="97a1b69a5ada499c1067af1db0e6a13736a75083" status="baddump"/>
+				<rom name="monty on the run - monty no doki doki dai dassou (japan) [b].fds" size="131000" crc="f37893b9" sha1="97a1b69a5ada499c1067af1db0e6a13736a75083" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1471,7 +1471,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="涙の倉庫番スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="namida no soukoban special (japan).fds" size="131000" crc="0c5b12d6" sha1="57ee44b79875980363942288d552a63b22d34412"/>
+				<rom name="namida no soukoban special (japan).fds" size="131000" crc="0c5b12d6" sha1="57ee44b79875980363942288d552a63b22d34412" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1485,7 +1485,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="謎の壁 ブロックくずし"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nazo no kabe - block kuzushi (japan) [b].fds" size="131000" crc="c8511d33" sha1="ec41e34ee9447e08cc2481420195eb76788036e4" status="baddump"/>
+				<rom name="nazo no kabe - block kuzushi (japan) [b].fds" size="131000" crc="c8511d33" sha1="ec41e34ee9447e08cc2481420195eb76788036e4" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1499,7 +1499,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="謎の村雨城"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nazo no murasamejou (japan).fds" size="131000" crc="9a523757" sha1="3102abcab2bec46f63e88461f73539b94aa73cbd"/>
+				<rom name="nazo no murasamejou (japan).fds" size="131000" crc="9a523757" sha1="3102abcab2bec46f63e88461f73539b94aa73cbd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1513,7 +1513,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="謎のマガジンディスク ナゾラーランド 第2号"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nazoraa land dai 2 gou (japan) (nazo magazine disk).fds" size="131000" crc="19deace2" sha1="fbd15be09527dd6857902c92a2b1163d9a12b599"/>
+				<rom name="nazoraa land dai 2 gou (japan) (nazo magazine disk).fds" size="131000" crc="19deace2" sha1="fbd15be09527dd6857902c92a2b1163d9a12b599" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1527,7 +1527,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="謎のマガジンディスク ナゾラーランド 第3号"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nazoraa land dai 3 gou (japan) (nazo magazine disk) [b].fds" size="131000" crc="fbe7c11f" sha1="2f483ddabb2c1ad7469f7481da857fa09e6b1d9d" status="baddump"/>
+				<rom name="nazoraa land dai 3 gou (japan) (nazo magazine disk) [b].fds" size="131000" crc="fbe7c11f" sha1="2f483ddabb2c1ad7469f7481da857fa09e6b1d9d" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1541,7 +1541,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="謎のマガジンディスク ナゾラーランド 創刊号"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nazoraa land soukan gou (japan) (nazo magazine disk) [b].fds" size="131000" crc="d5b7826e" sha1="104081dd2a5dfde6510d29f75f0429fcf382f5a1" status="baddump"/>
+				<rom name="nazoraa land soukan gou (japan) (nazo magazine disk) [b].fds" size="131000" crc="d5b7826e" sha1="104081dd2a5dfde6510d29f75f0429fcf382f5a1" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1555,7 +1555,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="謎のマガジンディスク ナゾラーランド ナゾラーランド スペシャル!! 「クイズ王を探せ!」"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nazoraa land zoukan gou - quiz ou wo sagase! (japan) (nazo magazine disk) [b].fds" size="131000" crc="f449fc6c" sha1="03156138d89492f269f1f9cacd8f52f01d93c2b3" status="baddump"/>
+				<rom name="nazoraa land zoukan gou - quiz ou wo sagase! (japan) (nazo magazine disk) [b].fds" size="131000" crc="f449fc6c" sha1="03156138d89492f269f1f9cacd8f52f01d93c2b3" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1569,7 +1569,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ヌイーゼン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="neunzehn (japan) [b].fds" size="131000" crc="567fb962" sha1="3fdd89d61700e3737f1af6384e944c64a9318f8a" status="baddump"/>
+				<rom name="neunzehn (japan) [b].fds" size="131000" crc="567fb962" sha1="3fdd89d61700e3737f1af6384e944c64a9318f8a" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1583,7 +1583,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="おもいっきり探偵団 覇悪怒組 魔天郎の挑戦状"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="omoikkiri tanteidan haado gumi - matenrou no chousenjou (japan).fds" size="131000" crc="cbca97f5" sha1="b3cbcfd3ce6fa546e927be45f4fe1900fe38b9aa"/>
+				<rom name="omoikkiri tanteidan haado gumi - matenrou no chousenjou (japan).fds" size="131000" crc="cbca97f5" sha1="b3cbcfd3ce6fa546e927be45f4fe1900fe38b9aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1597,7 +1597,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="機動警察パトレイバー 第2小隊出動せよ!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="patlabor the mobile police - dai 2 shoutai shutsudou seyo! (japan) [b].fds" size="131000" crc="1eb0ce56" sha1="5db5e943132d74515fe1dbc51f7df10c91b7808c" status="baddump"/>
+				<rom name="patlabor the mobile police - dai 2 shoutai shutsudou seyo! (japan) [b].fds" size="131000" crc="1eb0ce56" sha1="5db5e943132d74515fe1dbc51f7df10c91b7808c" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1612,7 +1612,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="プロフェッショナル 麻雀悟空"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="professional mahjong gokuu (japan).fds" size="131000" crc="d820e945" sha1="90cbb3bec97f30b056b720b7237ed49a5f584f1d"/>
+				<rom name="professional mahjong gokuu (japan).fds" size="131000" crc="d820e945" sha1="90cbb3bec97f30b056b720b7237ed49a5f584f1d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1626,7 +1626,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="プロレス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="prowres - famicom wrestling association (japan) [b].fds" size="65500" crc="2f472793" sha1="ed978031a39874f812d39ef0b48d954307f20d67" status="baddump"/>
+				<rom name="prowres - famicom wrestling association (japan) [b].fds" size="65500" crc="2f472793" sha1="ed978031a39874f812d39ef0b48d954307f20d67" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1640,7 +1640,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="パルサーの光"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="pulsar no hikari - space wars simulation (japan).fds" size="131000" crc="08344d4b" sha1="029cca5d0dfc5dbf7969e4b7810147fbc8b19929"/>
+				<rom name="pulsar no hikari - space wars simulation (japan).fds" size="131000" crc="08344d4b" sha1="029cca5d0dfc5dbf7969e4b7810147fbc8b19929" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1652,7 +1652,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="quick hunter (japan) (unl).fds" size="65500" crc="c6baa8e6" sha1="d7fb89995e8ba11b77ad5f5f60a014eef5c91c1c"/>
+				<rom name="quick hunter (japan) (unl).fds" size="65500" crc="c6baa8e6" sha1="d7fb89995e8ba11b77ad5f5f60a014eef5c91c1c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1663,7 +1663,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="quick hunter - parameter disk vol.1 (japan) (unl).fds" size="65500" crc="20cc5678" sha1="b080ef79bb7930de1de3016860f5656b24e61b8f"/>
+				<rom name="quick hunter - parameter disk vol.1 (japan) (unl).fds" size="65500" crc="20cc5678" sha1="b080ef79bb7930de1de3016860f5656b24e61b8f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1677,7 +1677,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="リサの妖精伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="risa no yousei densetsu (japan).fds" size="131000" crc="d7943621" sha1="0560cdeefae79ded6ec8cc8b334becabdda47768"/>
+				<rom name="risa no yousei densetsu (japan).fds" size="131000" crc="d7943621" sha1="0560cdeefae79ded6ec8cc8b334becabdda47768" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1688,7 +1688,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sailor fuku bishoujo zukan vol. 1 (japan) (unl).fds" size="131000" crc="a6b85a58" sha1="187d16eec3150f6a0062690b39138c5a5204fb71"/>
+				<rom name="sailor fuku bishoujo zukan vol. 1 (japan) (unl).fds" size="131000" crc="a6b85a58" sha1="187d16eec3150f6a0062690b39138c5a5204fb71" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1699,7 +1699,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sailor fuku bishoujo zukan vol. 2 (japan) (unl).fds" size="131000" crc="5ff683af" sha1="bee90e52a3b4a50bbc4b2a423dff86a581b54cba"/>
+				<rom name="sailor fuku bishoujo zukan vol. 2 (japan) (unl).fds" size="131000" crc="5ff683af" sha1="bee90e52a3b4a50bbc4b2a423dff86a581b54cba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1710,7 +1710,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sailor fuku bishoujo zukan vol. 3 (japan) (unl).fds" size="131000" crc="da347669" sha1="ebaa942596296722e663b897405b3d39630fe357"/>
+				<rom name="sailor fuku bishoujo zukan vol. 3 (japan) (unl).fds" size="131000" crc="da347669" sha1="ebaa942596296722e663b897405b3d39630fe357" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1721,7 +1721,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sailor fuku bishoujo zukan vol. 4 (japan) (unl).fds" size="131000" crc="a887bc15" sha1="708c62d029fbadd55650b7c0b0e8d408b1fbbe3d"/>
+				<rom name="sailor fuku bishoujo zukan vol. 4 (japan) (unl).fds" size="131000" crc="a887bc15" sha1="708c62d029fbadd55650b7c0b0e8d408b1fbbe3d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1732,7 +1732,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sailor fuku bishoujo zukan vol. 5 (japan) (unl).fds" size="131000" crc="c09721a9" sha1="397524fce303c741abc8e8b1cbe16049c2354322"/>
+				<rom name="sailor fuku bishoujo zukan vol. 5 (japan) (unl).fds" size="131000" crc="c09721a9" sha1="397524fce303c741abc8e8b1cbe16049c2354322" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1743,7 +1743,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sailor fuku bishoujo zukan vol. 6 (japan) (unl).fds" size="131000" crc="69b6afed" sha1="1444a412b85a748da47df7fb00fef83eef159cf0"/>
+				<rom name="sailor fuku bishoujo zukan vol. 6 (japan) (unl).fds" size="131000" crc="69b6afed" sha1="1444a412b85a748da47df7fb00fef83eef159cf0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1757,7 +1757,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="サムライソード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="samurai sword (japan) [b].fds" size="131000" crc="ec3ffe8d" sha1="a6671ece642c03fbf6c707a0777011dcac17765b" status="baddump"/>
+				<rom name="samurai sword (japan) [b].fds" size="131000" crc="ec3ffe8d" sha1="a6671ece642c03fbf6c707a0777011dcac17765b" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1771,7 +1771,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="サンタクロースの宝箱"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="santa claus no takarabako (japan).fds" size="131000" crc="645b2ec7" sha1="163b500a0d4d616926270277d79138a3ecd646a7"/>
+				<rom name="santa claus no takarabako (japan).fds" size="131000" crc="645b2ec7" sha1="163b500a0d4d616926270277d79138a3ecd646a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1786,7 +1786,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="聖剣サイコカリバー 魔獣の森伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="seiken psychocalibur - majuu no mori densetsu (japan).fds" size="131000" crc="c41be40d" sha1="359a02325660092c5c2b6d13aa43b20f178901ca"/>
+				<rom name="seiken psychocalibur - majuu no mori densetsu (japan).fds" size="131000" crc="c41be40d" sha1="359a02325660092c5c2b6d13aa43b20f178901ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1797,7 +1797,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sexy invaders (japan) (unl).fds" size="131000" crc="963b047c" sha1="e4b1fb93d4cb16f1b44e2987cc734e1a5e52c0a7"/>
+				<rom name="sexy invaders (japan) (unl).fds" size="131000" crc="963b047c" sha1="e4b1fb93d4cb16f1b44e2987cc734e1a5e52c0a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1808,7 +1808,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sexy yakyuuken adventure ii - gal's dungeon part ii (japan) (unl).fds" size="131000" crc="faa53b67" sha1="075a18d541632e36a0980d8bf6e436a5bd0fe1f8"/>
+				<rom name="sexy yakyuuken adventure ii - gal's dungeon part ii (japan) (unl).fds" size="131000" crc="faa53b67" sha1="075a18d541632e36a0980d8bf6e436a5bd0fe1f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1823,7 +1823,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="シルヴィアーナ 愛いっぱいの冒険者"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="silviana - ai ippai no boukensya (japan) [b].fds" size="131000" crc="cc7738cd" sha1="3fb093609aa37052f991dfb905609b0f51932209" status="baddump"/>
+				<rom name="silviana - ai ippai no boukensya (japan) [b].fds" size="131000" crc="cc7738cd" sha1="3fb093609aa37052f991dfb905609b0f51932209" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1837,7 +1837,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="スマッシュピンポン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="smash ping pong (japan) [b].fds" size="65500" crc="23ed63a3" sha1="b92c42880e6a129cbbd910fe6d1a9ddde6afbf4f" status="baddump"/>
+				<rom name="smash ping pong (japan) [b].fds" size="65500" crc="23ed63a3" sha1="b92c42880e6a129cbbd910fe6d1a9ddde6afbf4f" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1851,7 +1851,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="サッカー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="soccer (japan).fds" size="65500" crc="252451b3" sha1="88446c2601641bb0a1201f59252af90267ed3bfe"/>
+				<rom name="soccer (japan).fds" size="65500" crc="252451b3" sha1="88446c2601641bb0a1201f59252af90267ed3bfe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1865,7 +1865,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="スーパーボーイ・アラン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="super boy allan (japan).fds" size="131000" crc="72f6194b" sha1="1c02088a34444cb45093527e840806e9f15de9c2"/>
+				<rom name="super boy allan (japan).fds" size="131000" crc="72f6194b" sha1="1c02088a34444cb45093527e840806e9f15de9c2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1880,7 +1880,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="スーパーロードランナー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="super lode runner (japan) [b].fds" size="131000" crc="9f8bb21b" sha1="98cafed5e8573558c330e80c268d94c5c01a327a" status="baddump"/>
+				<rom name="super lode runner (japan) [b].fds" size="131000" crc="9f8bb21b" sha1="98cafed5e8573558c330e80c268d94c5c01a327a" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1894,7 +1894,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="スーパーロードランナーII"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="super lode runner ii (japan) (disk writer) [b].fds" size="131000" crc="758888f4" sha1="e05ce1054000bfc74f72ff52962918f97c8240fd" status="baddump"/>
+				<rom name="super lode runner ii (japan) (disk writer) [b].fds" size="131000" crc="758888f4" sha1="e05ce1054000bfc74f72ff52962918f97c8240fd" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1908,7 +1908,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="スーパーマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="super mario brothers (japan).fds" size="65500" crc="e0890cf2" sha1="383ad8e3890a95de9595f0a6087648f51177da13"/>
+				<rom name="super mario brothers (japan).fds" size="65500" crc="e0890cf2" sha1="383ad8e3890a95de9595f0a6087648f51177da13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1922,7 +1922,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="スーパーマリオブラザーズ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="super mario brothers 2 (japan).fds" size="65500" crc="f04cd4cd" sha1="20e50128742162ee47561db9e82b2836399c880c"/>
+				<rom name="super mario brothers 2 (japan).fds" size="65500" crc="f04cd4cd" sha1="20e50128742162ee47561db9e82b2836399c880c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1936,7 +1936,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="谷川浩司の将棋指南II ～名人への道～"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tanigawa kouji no shougi shinan ii - meijin e no michi (japan).fds" size="131000" crc="6cad684c" sha1="3cfff39aaa5e4192ca40c747c8004abc80a7204a"/>
+				<rom name="tanigawa kouji no shougi shinan ii - meijin e no michi (japan).fds" size="131000" crc="6cad684c" sha1="3cfff39aaa5e4192ca40c747c8004abc80a7204a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1950,7 +1950,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="テニス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="tennis (japan).fds" size="65500" crc="04b416be" sha1="2219b77a50e3322c2bd9fee3f4cf344971a4d862"/>
+				<rom name="tennis (japan).fds" size="65500" crc="04b416be" sha1="2219b77a50e3322c2bd9fee3f4cf344971a4d862" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1961,7 +1961,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="tenshi tachi no houkago (japan) (unl).fds" size="262000" crc="45e541fe" sha1="2be8da261ac181ad19ec1283d804eca37c29c5e6"/>
+				<rom name="tenshi tachi no houkago (japan) (unl).fds" size="262000" crc="45e541fe" sha1="2be8da261ac181ad19ec1283d804eca37c29c5e6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1976,7 +1976,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="タイムツイスト 歴史のかたすみで... (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="time twist - rekishi no katasumi de (japan).fds" size="262000" crc="e88e2399" sha1="ff01d150d86ba00b2e96197d682f0d715a374ee5"/>
+				<rom name="time twist - rekishi no katasumi de (japan).fds" size="262000" crc="e88e2399" sha1="ff01d150d86ba00b2e96197d682f0d715a374ee5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1990,7 +1990,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ミスター・ゴールド 遠山の金さん すぺえす帖"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tooyama no kinsan space chou - mr. gold (japan).fds" size="131000" crc="0805a179" sha1="1b57cddb73e8616ea09b0df2a6f46789b0bef34e"/>
+				<rom name="tooyama no kinsan space chou - mr. gold (japan).fds" size="131000" crc="0805a179" sha1="1b57cddb73e8616ea09b0df2a6f46789b0bef34e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2004,7 +2004,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ツインビー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="twinbee (japan) (disk writer).fds" size="65500" crc="909bdca2" sha1="856c4fae4409729adee91849af4741cc607255b8"/>
+				<rom name="twinbee (japan) (disk writer).fds" size="65500" crc="909bdca2" sha1="856c4fae4409729adee91849af4741cc607255b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2018,7 +2018,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ウルトラマン2 出撃科特隊!!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ultraman 2 - shutsugeki katoku tai (japan).fds" size="131000" crc="8f7f0352" sha1="6d1b890d3ae55541c7cef6bf1df31a39fbb398b0"/>
+				<rom name="ultraman 2 - shutsugeki katoku tai (japan).fds" size="131000" crc="8f7f0352" sha1="6d1b890d3ae55541c7cef6bf1df31a39fbb398b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2032,7 +2032,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ウルトラマン倶楽部 地球奪還作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ultraman club - chikyuu dakkan sakusen (japan) (v1.0).fds" size="131000" crc="ad5183db" sha1="6156a65aad9406dad4feef916225dea5d3aa1a46"/>
+				<rom name="ultraman club - chikyuu dakkan sakusen (japan) (v1.0).fds" size="131000" crc="ad5183db" sha1="6156a65aad9406dad4feef916225dea5d3aa1a46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2046,7 +2046,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ウルトラマン倶楽部 地球奪還作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ultraman club - chikyuu dakkan sakusen (japan) (v1.1).fds" size="131000" crc="fd150e81" sha1="ea57b4411d5daf23333fe0c8fbb1d2b37e4360ce"/>
+				<rom name="ultraman club - chikyuu dakkan sakusen (japan) (v1.1).fds" size="131000" crc="fd150e81" sha1="ea57b4411d5daf23333fe0c8fbb1d2b37e4360ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2060,7 +2060,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バレーボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="volleyball (japan).fds" size="65500" crc="f2040d16" sha1="fb2d7fe3866765ec34249a2853a592bd0dc2217d"/>
+				<rom name="volleyball (japan).fds" size="65500" crc="f2040d16" sha1="fb2d7fe3866765ec34249a2853a592bd0dc2217d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2074,7 +2074,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="VSエキサイトバイク"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="vs. excitebike (japan).fds" size="131000" crc="febe1841" sha1="010f6dc860b0bae80e55c199b3206e95ec14e31f"/>
+				<rom name="vs. excitebike (japan).fds" size="131000" crc="febe1841" sha1="010f6dc860b0bae80e55c199b3206e95ec14e31f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2085,7 +2085,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="wakusei aton gaiden (japan) (national tax agency demo).fds" size="131000" crc="2437fa88" sha1="bb1260e1457ed8d72af05dc574570496ff8490fa"/>
+				<rom name="wakusei aton gaiden (japan) (national tax agency demo).fds" size="131000" crc="2437fa88" sha1="bb1260e1457ed8d72af05dc574570496ff8490fa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2096,7 +2096,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="yakyuuken part ii - gal's dungeon (japan) (unl).fds" size="131000" crc="b66ede23" sha1="15aed9abc6ec7dad5293f01c0fc4646bf817ae9f"/>
+				<rom name="yakyuuken part ii - gal's dungeon (japan) (unl).fds" size="131000" crc="b66ede23" sha1="15aed9abc6ec7dad5293f01c0fc4646bf817ae9f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2110,7 +2110,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="夢工場ドキドキパニック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="yume koujou doki doki panic (japan) [b].fds" size="131000" crc="c87ce753" sha1="d33e6651751a46aeba31542961380f7376545b1c" status="baddump"/>
+				<rom name="yume koujou doki doki panic (japan) [b].fds" size="131000" crc="c87ce753" sha1="d33e6651751a46aeba31542961380f7376545b1c" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2124,7 +2124,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="遊メイズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="yuu maze (japan).fds" size="131000" crc="7db80e2b" sha1="9ee5ce6176ea859ee56ca80518f0cfc40da791e0"/>
+				<rom name="yuu maze (japan).fds" size="131000" crc="7db80e2b" sha1="9ee5ce6176ea859ee56ca80518f0cfc40da791e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2135,7 +2135,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Phoenix?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="zatsugaku olympic quiz - watanabe wataru hen (japan) (unl).fds" size="131000" crc="a646f79e" sha1="ce7dcb159ec014cbbcfdbf8a76a8288c7aff04b0"/>
+				<rom name="zatsugaku olympic quiz - watanabe wataru hen (japan) (unl).fds" size="131000" crc="a646f79e" sha1="ce7dcb159ec014cbbcfdbf8a76a8288c7aff04b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2146,7 +2146,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Phoenix?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="zatsugaku olympic quiz part ii (japan) (unl).fds" size="131000" crc="42e1a3e1" sha1="fca007432aff37d4ae3092766b19ade0deaab056"/>
+				<rom name="zatsugaku olympic quiz part ii (japan) (unl).fds" size="131000" crc="42e1a3e1" sha1="fca007432aff37d4ae3092766b19ade0deaab056" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2157,7 +2157,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Nintendo</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="zelda no densetsu - the hyrule fantasy (japan) (beta) [b].fds" size="131000" crc="2f222391" sha1="2c3ff158c3716abb66677d149b3e1d23993c1bfe" status="baddump"/>
+				<rom name="zelda no densetsu - the hyrule fantasy (japan) (beta) [b].fds" size="131000" crc="2f222391" sha1="2c3ff158c3716abb66677d149b3e1d23993c1bfe" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2172,7 +2172,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゼルダの伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="zelda no densetsu - the hyrule fantasy (japan) (v1.0).fds" size="131000" crc="1f22ccb1" sha1="135ac9cbdf3983aa77d7581b26d685d02615d36a"/>
+				<rom name="zelda no densetsu - the hyrule fantasy (japan) (v1.0).fds" size="131000" crc="1f22ccb1" sha1="135ac9cbdf3983aa77d7581b26d685d02615d36a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2187,7 +2187,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゼルダの伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="zelda no densetsu - the hyrule fantasy (japan) (v1.1).fds" size="131000" crc="8f2202bf" sha1="1429fbe3e62059994b6ff7c5e5e2a330831faf63"/>
+				<rom name="zelda no densetsu - the hyrule fantasy (japan) (v1.1).fds" size="131000" crc="8f2202bf" sha1="1429fbe3e62059994b6ff7c5e5e2a330831faf63" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2201,7 +2201,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk hacker - version 1.0 (japan) (unl).fds" size="65500" crc="853a611f" sha1="3003fdd68f0980d9c0013614a9c0a1a7c72818e4"/>
+				<rom name="disk hacker - version 1.0 (japan) (unl).fds" size="65500" crc="853a611f" sha1="3003fdd68f0980d9c0013614a9c0a1a7c72818e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2212,7 +2212,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk hacker - version 1.2 (japan) (unl).fds" size="65500" crc="35039547" sha1="836985f616ab11bb36c5f836cd99d8cecd986d01"/>
+				<rom name="disk hacker - version 1.2 (japan) (unl).fds" size="65500" crc="35039547" sha1="836985f616ab11bb36c5f836cd99d8cecd986d01" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2223,7 +2223,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk hacker - version 1.3 (japan) (unl).fds" size="65500" crc="9c3790d3" sha1="c7119140c4c34b8d99dd701115fa885125e206e1"/>
+				<rom name="disk hacker - version 1.3 (japan) (unl).fds" size="65500" crc="9c3790d3" sha1="c7119140c4c34b8d99dd701115fa885125e206e1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2234,7 +2234,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk hacker ii - copy plus 3 (japan) (unl).fds" size="65500" crc="0dd82733" sha1="adf1141e2ee673ed96bd8dc2834437d406760405"/>
+				<rom name="disk hacker ii - copy plus 3 (japan) (unl).fds" size="65500" crc="0dd82733" sha1="adf1141e2ee673ed96bd8dc2834437d406760405" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2245,7 +2245,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk keeper (japan) (unl).fds" size="65500" crc="9f87b85b" sha1="a5b0425bc543a690032ac8dea9ff794bde9b75ab"/>
+				<rom name="disk keeper (japan) (unl).fds" size="65500" crc="9f87b85b" sha1="a5b0425bc543a690032ac8dea9ff794bde9b75ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2256,7 +2256,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="fmc disk card checker ver 1.3 (japan) (v1.2) (developer card).fds" size="65500" crc="aa8efcdd" sha1="10c72ab58433a654a420dd13b1412459e75be76a"/>
+				<rom name="fmc disk card checker ver 1.3 (japan) (v1.2) (developer card).fds" size="65500" crc="aa8efcdd" sha1="10c72ab58433a654a420dd13b1412459e75be76a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2267,7 +2267,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="souseiki fammy - rom-qd for 256k+64k (japan) (unl).fds" size="131000" crc="837a5d11" sha1="072f8a25e5d5309fbcb005a5e79efe43fb033e80"/>
+				<rom name="souseiki fammy - rom-qd for 256k+64k (japan) (unl).fds" size="131000" crc="837a5d11" sha1="072f8a25e5d5309fbcb005a5e79efe43fb033e80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2278,7 +2278,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="tonkachi editor (japan) (unl).fds" size="65500" crc="bea8b9a2" sha1="3f8594bdc787944835ce73692d5529ba1230ef7f"/>
+				<rom name="tonkachi editor (japan) (unl).fds" size="65500" crc="bea8b9a2" sha1="3f8594bdc787944835ce73692d5529ba1230ef7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2293,7 +2293,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="adian no tsue (prototype).fds" size="131000" crc="e342932f" sha1="c6ab5061e01b9ba3a20ad72310049c75a7dd11c3"/>
+				<rom name="adian no tsue (prototype).fds" size="131000" crc="e342932f" sha1="c6ab5061e01b9ba3a20ad72310049c75a7dd11c3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2304,7 +2304,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk control program.fds" size="65500" crc="b25e2a40" sha1="08d90bf560e50adb337b2b1198af9494d0727316"/>
+				<rom name="disk control program.fds" size="65500" crc="b25e2a40" sha1="08d90bf560e50adb337b2b1198af9494d0727316" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2316,7 +2316,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="disk hacker (sunsoft).fds" size="65500" crc="759b21f7" sha1="4c81c7d084f4007b7459c12886ee326dd2c5a3a7"/>
+				<rom name="disk hacker (sunsoft).fds" size="65500" crc="759b21f7" sha1="4c81c7d084f4007b7459c12886ee326dd2c5a3a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2327,7 +2327,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="shanghai (prototype).fds" size="65500" crc="b1ed9311" sha1="e8c62d21b815818156d734abd852d1e69a6e0530"/>
+				<rom name="shanghai (prototype).fds" size="65500" crc="b1ed9311" sha1="e8c62d21b815818156d734abd852d1e69a6e0530" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2338,7 +2338,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="shanghai 2 (dragon) (prototype).fds" size="65500" crc="4eaaea69" sha1="ac34f61676e151ef2e1879cbab254a8222c23601"/>
+				<rom name="shanghai 2 (dragon) (prototype).fds" size="65500" crc="4eaaea69" sha1="ac34f61676e151ef2e1879cbab254a8222c23601" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2349,7 +2349,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="shanghai 2 (scorpion) (prototype).fds" size="65500" crc="4e10423e" sha1="ff1ae30461496ab4ac448f9100b228e8d68ac929"/>
+				<rom name="shanghai 2 (scorpion) (prototype).fds" size="65500" crc="4e10423e" sha1="ff1ae30461496ab4ac448f9100b228e8d68ac929" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2360,7 +2360,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="tile editor (newer) (sunsoft).fds" size="65500" crc="421079df" sha1="4b8be728c8036d06d2ade6eb6ff6b0eb10f63d20"/>
+				<rom name="tile editor (newer) (sunsoft).fds" size="65500" crc="421079df" sha1="4b8be728c8036d06d2ade6eb6ff6b0eb10f63d20" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2371,7 +2371,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="tile editor (older) (sunsoft).fds" size="65500" crc="41bd542a" sha1="43c7f9fcf83604c47a1ac5a7aa070a5fb4f85c0a"/>
+				<rom name="tile editor (older) (sunsoft).fds" size="65500" crc="41bd542a" sha1="43c7f9fcf83604c47a1ac5a7aa070a5fb4f85c0a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2382,7 +2382,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="map editor (sunsoft).fds" size="65500" crc="25f8f2f3" sha1="f0922ebf0da84bb69f78609c6816da6aaa059cda"/>
+				<rom name="map editor (sunsoft).fds" size="65500" crc="25f8f2f3" sha1="f0922ebf0da84bb69f78609c6816da6aaa059cda" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2401,7 +2401,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="亜空戦記ライジン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="akara senki raijin (1988)(microcabin square)[sqf-rjn].fds" size="131000" crc="115208be" sha1="139585df8669eb1daa0620a212bddaa5313df02d"/>
+				<rom name="akara senki raijin (1988)(microcabin square)[sqf-rjn].fds" size="131000" crc="115208be" sha1="139585df8669eb1daa0620a212bddaa5313df02d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2415,7 +2415,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バックギャモン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="backgammon (1990)(nintendo)[fmc-bag].fds" size="65500" crc="97ff65a0" sha1="6bc9cb6e91c527c648a2c401ef27db5560e5c342"/>
+				<rom name="backgammon (1990)(nintendo)[fmc-bag].fds" size="65500" crc="97ff65a0" sha1="6bc9cb6e91c527c648a2c401ef27db5560e5c342" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2429,7 +2429,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="爆闘士パットンくん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bakutoushi patton-kun (1988)(soft pro)[sfc-pat].fds" size="131000" crc="c39b3bb2" sha1="da8f79f7448589bf52daeb80fdfe60abeba12e14"/>
+				<rom name="bakutoushi patton-kun (1988)(soft pro)[sfc-pat].fds" size="131000" crc="c39b3bb2" sha1="da8f79f7448589bf52daeb80fdfe60abeba12e14" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2443,7 +2443,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ベースボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="baseball (1984)(nintendo)[fmc-bas] [ok].fds" size="65500" crc="304c093b" sha1="498150ddc8fdf5a9c4a88e1dc985bfc571e73c9d"/>
+				<rom name="baseball (1984)(nintendo)[fmc-bas] [ok].fds" size="65500" crc="304c093b" sha1="498150ddc8fdf5a9c4a88e1dc985bfc571e73c9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2457,7 +2457,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ビッグチャレンジ!ドッグファイト スピリット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="big challenge! dogfight spirit (1988)(jaleco)[jfd-dfs].fds" size="131000" crc="4c4440bb" sha1="ea3bbfb7007b47ba89ac2f57ed96806bba874c8f"/>
+				<rom name="big challenge! dogfight spirit (1988)(jaleco)[jfd-dfs].fds" size="131000" crc="4c4440bb" sha1="ea3bbfb7007b47ba89ac2f57ed96806bba874c8f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2471,7 +2471,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ボンバーマン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="bomberman (1985)(hudson soft)[hfc-bmd].fds" size="65500" crc="8e440ad2" sha1="2160c4ae46d500654ed12a1340b31493f5f0b88d"/>
+				<rom name="bomberman (1985)(hudson soft)[hfc-bmd].fds" size="65500" crc="8e440ad2" sha1="2160c4ae46d500654ed12a1340b31493f5f0b88d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2485,7 +2485,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ブリーダー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="breeder (1986)(soft pro)[sfc-bre].fds" size="131000" crc="6e103744" sha1="82a6a9ca123add14839ca71e1b74d9f7708d3ab2"/>
+				<rom name="breeder (1986)(soft pro)[sfc-bre].fds" size="131000" crc="6e103744" sha1="82a6a9ca123add14839ca71e1b74d9f7708d3ab2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2499,7 +2499,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バブルボブル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bubble bobble (1987)(taito)[tfd-bub].fds" size="131000" crc="8c8d153e" sha1="a28d16fdf8472ce311a0b5f0454b5da874ad86af"/>
+				<rom name="bubble bobble (1987)(taito)[tfd-bub].fds" size="131000" crc="8c8d153e" sha1="a28d16fdf8472ce311a0b5f0454b5da874ad86af" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2513,7 +2513,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バブルボブル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="bubble bobble (1987)(taito)[tfd-bub][a].fds" size="131000" crc="134f7891" sha1="941cc960e5c7cc3fa6411eda27d3e8bba509e7c5"/>
+				<rom name="bubble bobble (1987)(taito)[tfd-bub][a].fds" size="131000" crc="134f7891" sha1="941cc960e5c7cc3fa6411eda27d3e8bba509e7c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2527,7 +2527,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バーガータイム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="burger time (1985)(data east)[dfc-bgt].fds" size="65500" crc="b3d3d6e5" sha1="9610cd5b20d0cb0d0611c49c76d89a8d8ce27927"/>
+				<rom name="burger time (1985)(data east)[dfc-bgt].fds" size="65500" crc="b3d3d6e5" sha1="9610cd5b20d0cb0d0611c49c76d89a8d8ce27927" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2541,7 +2541,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="バーガータイム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="burger time (1985)(data east)[dfc-bgt][a].fds" size="65500" crc="a4b983d1" sha1="6a6934c1ece2e7312ac46d33906489f7b4cdb118"/>
+				<rom name="burger time (1985)(data east)[dfc-bgt][a].fds" size="65500" crc="a4b983d1" sha1="6a6934c1ece2e7312ac46d33906489f7b4cdb118" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2555,7 +2555,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="クレオパトラの魔宝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="cleopatra no mahou (1987)(square)[sqf-clo].fds" size="131000" crc="b65e1335" sha1="57fc4ecfad0e1662cf5938bddbe1e6dccc6d5e7e"/>
+				<rom name="cleopatra no mahou (1987)(square)[sqf-clo].fds" size="131000" crc="b65e1335" sha1="57fc4ecfad0e1662cf5938bddbe1e6dccc6d5e7e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2569,7 +2569,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="クルクルランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="clu clu land - welcome to new clu clu land (1988)(nintendo)[fmc-cld] [ok].fds" size="65500" crc="ae73fe8e" sha1="4c5895fb61b848fd0fb8dbf75c56cf39ac7b1e6b"/>
+				<rom name="clu clu land - welcome to new clu clu land (1988)(nintendo)[fmc-cld] [ok].fds" size="65500" crc="ae73fe8e" sha1="4c5895fb61b848fd0fb8dbf75c56cf39ac7b1e6b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2584,7 +2584,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ダンディー 《ゼウオンの復活》"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="dandy - zeuon no fukkatsu (1988)(pony canyon)[pnf-dan].fds" size="131000" crc="45bc7d70" sha1="8d65d8bd6463926b6ba8600707cd6b26b0670ca8"/>
+				<rom name="dandy - zeuon no fukkatsu (1988)(pony canyon)[pnf-dan].fds" size="131000" crc="45bc7d70" sha1="8d65d8bd6463926b6ba8600707cd6b26b0670ca8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2599,7 +2599,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="デッドゾーン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="dead zone (1986)(sunsoft)[ssd-dzn] [ok].fds" size="131000" crc="329aa7fe" sha1="1b230bf7557bc19a89c7aa3174089e6b7bf00bda"/>
+				<rom name="dead zone (1986)(sunsoft)[ssd-dzn] [ok].fds" size="131000" crc="329aa7fe" sha1="1b230bf7557bc19a89c7aa3174089e6b7bf00bda" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2613,7 +2613,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="dig dug (1990)(namco)[nds-dig] [ok].fds" size="65500" crc="82b4a619" sha1="808cdf98c36b717de347983a0d32945e7b4db805"/>
+				<rom name="dig dug (1990)(namco)[nds-dig] [ok].fds" size="65500" crc="82b4a619" sha1="808cdf98c36b717de347983a0d32945e7b4db805" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2627,7 +2627,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ディグダグII"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="dig dug ii (1990)(namco)[nds-dd2] [ok].fds" size="65500" crc="819b7566" sha1="412b8b571872cc0a8259f72d92112856e971640c"/>
+				<rom name="dig dug ii (1990)(namco)[nds-dd2] [ok].fds" size="65500" crc="819b7566" sha1="412b8b571872cc0a8259f72d92112856e971640c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2641,7 +2641,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ドレミッコ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="doremikko (1987)(konami)[kds-dre].fds" size="131000" crc="bb4a1161" sha1="4a444cf829f9480e11e50e5508ed8ca54ff325b9"/>
+				<rom name="doremikko (1987)(konami)[kds-dre].fds" size="131000" crc="bb4a1161" sha1="4a444cf829f9480e11e50e5508ed8ca54ff325b9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2655,7 +2655,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エッガーランド 創造への旅立ち"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="eggerland - souzou e no tabidachi (1988)(hal laboratory)[hal-egs].fds" size="131000" crc="acd50fe2" sha1="1f0d7d06aca8aebea10ebcaadc21bbea5f323650"/>
+				<rom name="eggerland - souzou e no tabidachi (1988)(hal laboratory)[hal-egs].fds" size="131000" crc="acd50fe2" sha1="1f0d7d06aca8aebea10ebcaadc21bbea5f323650" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2669,7 +2669,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="フェアリーテイル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="fairytale (1989)(soft pro)[sfc-fyt].fds" size="131000" crc="d1e29b2f" sha1="28d8e707fb9074e2be05ae62dc14b8187f3c083a"/>
+				<rom name="fairytale (1989)(soft pro)[sfc-fyt].fds" size="131000" crc="d1e29b2f" sha1="28d8e707fb9074e2be05ae62dc14b8187f3c083a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2683,7 +2683,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン グランプリ F1レース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="famicom grand prix - f1 race (1987)(nintendo)[fsc-frge].fds" size="131000" crc="1fab4954" sha1="473a3ff43d394cef1d998731a7f2f938350146e5"/>
+				<rom name="famicom grand prix - f1 race (1987)(nintendo)[fsc-frge].fds" size="131000" crc="1fab4954" sha1="473a3ff43d394cef1d998731a7f2f938350146e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2697,7 +2697,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン グランプリ F1レース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="famicom grand prix - f1 race (1987)(nintendo)[fsc-frge][a].fds" size="131000" crc="0be26241" sha1="9670d4884c78171585b3e66759c57f29f16801b2"/>
+				<rom name="famicom grand prix - f1 race (1987)(nintendo)[fsc-frge][a].fds" size="131000" crc="0be26241" sha1="9670d4884c78171585b3e66759c57f29f16801b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2712,7 +2712,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ふぁみこんむかし話 新鬼ヶ島 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom mukashi banashi - shin onigashima - kou hen (1987)(nintendo)[fmc-on2].fds" size="262000" crc="d58509d0" sha1="5534ce545e0d4bb9ca27e8699e0c38d96a10c57e"/>
+				<rom name="famicom mukashi banashi - shin onigashima - kou hen (1987)(nintendo)[fmc-on2].fds" size="262000" crc="d58509d0" sha1="5534ce545e0d4bb9ca27e8699e0c38d96a10c57e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2727,7 +2727,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ふぁみこんむかし話 新鬼ヶ島 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom mukashi banashi - shin onigashima - kou hen (1987)(nintendo)[fmc-on2][a].fds" size="262000" crc="c4fc5037" sha1="746b8a453ed3018006f646f21942206143e55ed1"/>
+				<rom name="famicom mukashi banashi - shin onigashima - kou hen (1987)(nintendo)[fmc-on2][a].fds" size="262000" crc="c4fc5037" sha1="746b8a453ed3018006f646f21942206143e55ed1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2743,7 +2743,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ふぁみこんむかし話 新鬼ヶ島 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom mukashi banashi - shin onigashima - kou hen (1987)(nintendo)[fmc-on2][a2].fds" size="262000" crc="f6689121" sha1="3a34f0fc3a9b62915849273777ec0fb8e8d08633"/>
+				<rom name="famicom mukashi banashi - shin onigashima - kou hen (1987)(nintendo)[fmc-on2][a2].fds" size="262000" crc="f6689121" sha1="3a34f0fc3a9b62915849273777ec0fb8e8d08633" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2758,7 +2758,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ふぁみこんむかし話 遊遊記 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom mukashi banashi - yuu yuu ki - kou hen (1989)(nintendo)[fmc-uu2].fds" size="262000" crc="1e7e5983" sha1="62df28460875baa5f4832759796ab9de48ac508a"/>
+				<rom name="famicom mukashi banashi - yuu yuu ki - kou hen (1989)(nintendo)[fmc-uu2].fds" size="262000" crc="1e7e5983" sha1="62df28460875baa5f4832759796ab9de48ac508a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2773,7 +2773,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン探偵倶楽部 消えた後継者 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom tantei kurabu - kieta koukeisha (1988)(nintendo)[fmc-tc2].fds" size="262000" crc="8f3c174c" sha1="0dcf6c9bdf53b25072771860fb8bc09cdc71ef6f"/>
+				<rom name="famicom tantei kurabu - kieta koukeisha (1988)(nintendo)[fmc-tc2].fds" size="262000" crc="8f3c174c" sha1="0dcf6c9bdf53b25072771860fb8bc09cdc71ef6f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2788,7 +2788,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン探偵倶楽部 消えた後継者 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom tantei kurabu - kieta koukeisha (1988)(nintendo)[fmc-tc2][a].fds" size="262000" crc="f169b78a" sha1="21ad8bcaca93ef91c2e27b43185ee45c767abce1"/>
+				<rom name="famicom tantei kurabu - kieta koukeisha (1988)(nintendo)[fmc-tc2][a].fds" size="262000" crc="f169b78a" sha1="21ad8bcaca93ef91c2e27b43185ee45c767abce1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2803,7 +2803,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン探偵倶楽部PART II うしろに立つ少女 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom tantei kurabu part ii - ushiro ni tatsu shoujo (1989)(nintendo)[fmc-tc4].fds" size="262000" crc="a5496f4e" sha1="a8a4a5693c8d0133dcf46031906c2fb2428d96a2"/>
+				<rom name="famicom tantei kurabu part ii - ushiro ni tatsu shoujo (1989)(nintendo)[fmc-tc4].fds" size="262000" crc="a5496f4e" sha1="a8a4a5693c8d0133dcf46031906c2fb2428d96a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2818,7 +2818,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミコン探偵倶楽部PART II うしろに立つ少女 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="famicom tantei kurabu part ii - ushiro ni tatsu shoujo (1989)(nintendo)[fmc-tc4][a].fds" size="262000" crc="1cd4a774" sha1="51738b4fabcd8937a5822bec10c254ea8feb6290"/>
+				<rom name="famicom tantei kurabu part ii - ushiro ni tatsu shoujo (1989)(nintendo)[fmc-tc4][a].fds" size="262000" crc="1cd4a774" sha1="51738b4fabcd8937a5822bec10c254ea8feb6290" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2832,7 +2832,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミリーコンポーザー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="family composer (1987)(tokyo shoseki)[tks-fco].fds" size="131000" crc="206b0c9f" sha1="9f820dd1d68b147865fb73bb5e6f3809c233c92f"/>
+				<rom name="family composer (1987)(tokyo shoseki)[tks-fco].fds" size="131000" crc="206b0c9f" sha1="9f820dd1d68b147865fb73bb5e6f3809c233c92f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2846,7 +2846,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.1 香港"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="hong kong - famimaga disk vol. 1 (1990)(tokuma shoten)[gts-hkd].fds" size="65500" crc="bc8e34e9" sha1="4e7d7d6a869d8051fa8e28dfca48a69bd1214522"/>
+				<rom name="hong kong - famimaga disk vol. 1 (1990)(tokuma shoten)[gts-hkd].fds" size="65500" crc="bc8e34e9" sha1="4e7d7d6a869d8051fa8e28dfca48a69bd1214522" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2860,7 +2860,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.2 パニックスペース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="panic space - famimaga disk vol. 2 (1990)(tokuma shoten)[gts-psd].fds" size="131000" crc="7b70e65a" sha1="5bf8349fa76695c06145d0bb89b71860845399ff"/>
+				<rom name="panic space - famimaga disk vol. 2 (1990)(tokuma shoten)[gts-psd].fds" size="131000" crc="7b70e65a" sha1="5bf8349fa76695c06145d0bb89b71860845399ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2874,7 +2874,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.3 オール1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="all 1 - famimaga disk vol. 3 (1991)(tokuma shoten)[gts-ald].fds" size="65500" crc="53fbbc74" sha1="5215293b5716ec787bbab170a244b6874f442084"/>
+				<rom name="all 1 - famimaga disk vol. 3 (1991)(tokuma shoten)[gts-ald].fds" size="65500" crc="53fbbc74" sha1="5215293b5716ec787bbab170a244b6874f442084" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2888,7 +2888,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.3 オール1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="all 1 - famimaga disk vol. 3 (1991)(tokuma shoten)[gts-ald][a].fds" size="65500" crc="6ffe266a" sha1="6304314cd9976e24977fcebda4de4428f1be4119"/>
+				<rom name="all 1 - famimaga disk vol. 3 (1991)(tokuma shoten)[gts-ald][a].fds" size="65500" crc="6ffe266a" sha1="6304314cd9976e24977fcebda4de4428f1be4119" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2902,7 +2902,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.4 クロックス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="clocks - famimaga disk vol. 4 (1991)(tokuma shoten)[gts-ckd].fds" size="65500" crc="5c497943" sha1="30006eea8ecd8ce74ae98386fd86e1d2e162118f"/>
+				<rom name="clocks - famimaga disk vol. 4 (1991)(tokuma shoten)[gts-ckd].fds" size="65500" crc="5c497943" sha1="30006eea8ecd8ce74ae98386fd86e1d2e162118f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2916,7 +2916,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.5 ぷよぷよ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="puyo puyo - famimaga disk vol. 5 (1991)(tokuma shoten)[gts-pyo].fds" size="131000" crc="a23a3590" sha1="e9a41d6e3c0e7f085d25f29ccd93d585cbc62406"/>
+				<rom name="puyo puyo - famimaga disk vol. 5 (1991)(tokuma shoten)[gts-pyo].fds" size="131000" crc="a23a3590" sha1="e9a41d6e3c0e7f085d25f29ccd93d585cbc62406" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2930,7 +2930,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファミマガ ディスク Vol.6 じゃんけんディスク城"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="janken disk shiro - famimaga disk vol. 6 (1992)(tokuma shoten)[gts-jkd].fds" size="131000" crc="bb76c89f" sha1="84ba1a50fbfc26f868e8b949021ebcd3004a0711"/>
+				<rom name="janken disk shiro - famimaga disk vol. 6 (1992)(tokuma shoten)[gts-jkd].fds" size="131000" crc="bb76c89f" sha1="84ba1a50fbfc26f868e8b949021ebcd3004a0711" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2944,7 +2944,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ファイヤー・バム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="fire bam (1988)(hal laboratory)[hal-fbm].fds" size="131000" crc="94989e29" sha1="731c9aa2f024648e7c819d39f3ed49c9741cb1d8"/>
+				<rom name="fire bam (1988)(hal laboratory)[hal-fbm].fds" size="131000" crc="94989e29" sha1="731c9aa2f024648e7c819d39f3ed49c9741cb1d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2958,7 +2958,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="風雲少林拳"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="fuuun shaolin kyo (1987)(jaleco)[jfd-fsh].fds" size="131000" crc="d89b03a7" sha1="1ea7934ef4b7b7f8abee29f811f7deb70a6a1882"/>
+				<rom name="fuuun shaolin kyo (1987)(jaleco)[jfd-fsh].fds" size="131000" crc="d89b03a7" sha1="1ea7934ef4b7b7f8abee29f811f7deb70a6a1882" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2973,7 +2973,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="風雲少林拳 暗黒の魔王"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="fuuun shaolin kyo - ankoku no maou (1988)(jaleco)[jfd-sam].fds" size="131000" crc="01be4c91" sha1="14926aebdd8ade30737c92b37de764a4a6580383"/>
+				<rom name="fuuun shaolin kyo - ankoku no maou (1988)(jaleco)[jfd-sam].fds" size="131000" crc="01be4c91" sha1="14926aebdd8ade30737c92b37de764a4a6580383" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2987,7 +2987,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ギャラガ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="galaga (1990)(namco)[nds-gag].fds" size="65500" crc="ddee6ba2" sha1="67b9c617fff69670d1dc600568e2fe4c23c355ab"/>
+				<rom name="galaga (1990)(namco)[nds-gag].fds" size="65500" crc="ddee6ba2" sha1="67b9c617fff69670d1dc600568e2fe4c23c355ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3001,7 +3001,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="galaxian (1990)(namco)[nds-gxn].fds" size="65500" crc="c7c8866b" sha1="d1f87c32567bf748e5a7379b872538b4859c6d87"/>
+				<rom name="galaxian (1990)(namco)[nds-gxn].fds" size="65500" crc="c7c8866b" sha1="d1f87c32567bf748e5a7379b872538b4859c6d87" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3015,7 +3015,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ガルフォース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="gall force - eternal story (1986)(hal laboratory)[hal-gal].fds" size="131000" crc="78fb6d8d" sha1="0dda16bb6dc3fc69d65fd10f3f51b2ebe5a901fe"/>
+				<rom name="gall force - eternal story (1986)(hal laboratory)[hal-gal].fds" size="131000" crc="78fb6d8d" sha1="0dda16bb6dc3fc69d65fd10f3f51b2ebe5a901fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3029,7 +3029,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="極楽遊戯"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="gokuraku yuugi - game tengoku (1987)(sofel)[sfl-gtg].fds" size="131000" crc="2a7ec6ac" sha1="854fa83062bf53efee7181d16602407019cb8ae3"/>
+				<rom name="gokuraku yuugi - game tengoku (1987)(sofel)[sfl-gtg].fds" size="131000" crc="2a7ec6ac" sha1="854fa83062bf53efee7181d16602407019cb8ae3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3043,7 +3043,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="グーニーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="goonies, the (1988)(konami)[kds-gns].fds" size="65500" crc="7680acfd" sha1="10a17fac52a525f32853e88c0c63e69130f777d9"/>
+				<rom name="goonies, the (1988)(konami)[kds-gns].fds" size="65500" crc="7680acfd" sha1="10a17fac52a525f32853e88c0c63e69130f777d9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3057,7 +3057,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="グーニーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="goonies, the (1988)(konami)[kds-gns][a].fds" size="65500" crc="fa0f5861" sha1="500dfe3cdbb4f58a59bc008fae3246993951e152"/>
+				<rom name="goonies, the (1988)(konami)[kds-gns][a].fds" size="65500" crc="fa0f5861" sha1="500dfe3cdbb4f58a59bc008fae3246993951e152" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3071,7 +3071,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="グリーンベレー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="green beret (1987)(konami)[kds-grn].fds" size="131000" crc="576f8809" sha1="45c596f097abc975c114cedd0fd27615f0cee1e5"/>
+				<rom name="green beret (1987)(konami)[kds-grn].fds" size="131000" crc="576f8809" sha1="45c596f097abc975c114cedd0fd27615f0cee1e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3085,7 +3085,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ガンスモーク"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="gun.smoke (1988)(capcom)[cap-gun].fds" size="131000" crc="a3d09153" sha1="7b0f266c208d5b837bf8868a56019b6299f2cccd"/>
+				<rom name="gun.smoke (1988)(capcom)[cap-gun].fds" size="131000" crc="a3d09153" sha1="7b0f266c208d5b837bf8868a56019b6299f2cccd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3099,7 +3099,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ガンスモーク"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="gun.smoke (1988)(capcom)[cap-gun][a].fds" size="131000" crc="fb640ec2" sha1="8af6a89c8c0cf0cb49ea23bee6cdd60bbdb12063"/>
+				<rom name="gun.smoke (1988)(capcom)[cap-gun][a].fds" size="131000" crc="fb640ec2" sha1="8af6a89c8c0cf0cb49ea23bee6cdd60bbdb12063" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3113,7 +3113,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ジャイラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="gyruss (1988)(konami)[kds-grs].fds" size="131000" crc="623954ad" sha1="8aef9b07dcb2bbbbd70a1c0f5599e61d1db63d6a"/>
+				<rom name="gyruss (1988)(konami)[kds-grs].fds" size="131000" crc="623954ad" sha1="8aef9b07dcb2bbbbd70a1c0f5599e61d1db63d6a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3127,7 +3127,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ハレーウォーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="halley wars (1989)(taito)[tfd-hal].fds" size="131000" crc="b866378e" sha1="829b17b65bd7384da910cd8a50c729c64bf71dab"/>
+				<rom name="halley wars (1989)(taito)[tfd-hal].fds" size="131000" crc="b866378e" sha1="829b17b65bd7384da910cd8a50c729c64bf71dab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3141,7 +3141,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="光神話 パルテナの鏡"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="hikari shinwa - palutena no kagami (1986)(nintendo)[fmc-ptm].fds" size="131000" crc="63290e2c" sha1="0929e1d861e1d001dbd8797830271582638e6af0"/>
+				<rom name="hikari shinwa - palutena no kagami (1986)(nintendo)[fmc-ptm].fds" size="131000" crc="63290e2c" sha1="0929e1d861e1d001dbd8797830271582638e6af0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3155,7 +3155,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="光神話 パルテナの鏡"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="hikari shinwa - palutena no kagami v1.1 (1986)(nintendo)[fmc-ptm].fds" size="131000" crc="4e6319bb" sha1="e89b6cf9b2c331d1b9fe3b30395b61150376f9b1"/>
+				<rom name="hikari shinwa - palutena no kagami v1.1 (1986)(nintendo)[fmc-ptm].fds" size="131000" crc="4e6319bb" sha1="e89b6cf9b2c331d1b9fe3b30395b61150376f9b1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3170,7 +3170,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="光GENJI ローラーパニック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="hikaru genji - roller panic (1989)(pony canyon)[pnf-gen].fds" size="131000" crc="d9ec0c0a" sha1="a605d59a4fecae246b51b1f400be7ae51bb2a197"/>
+				<rom name="hikaru genji - roller panic (1989)(pony canyon)[pnf-gen].fds" size="131000" crc="d9ec0c0a" sha1="a605d59a4fecae246b51b1f400be7ae51bb2a197" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3185,7 +3185,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アイアムアティーチャー スーパーマリオのセーター"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="i am a teacher - super mario no sweater (1986)(royal kougyou)[roy-ism] [ok].fds" size="131000" crc="ce7e8631" sha1="0f792b8a6d86d93298ef4964b4b8aee3d8fa5a4d"/>
+				<rom name="i am a teacher - super mario no sweater (1986)(royal kougyou)[roy-ism] [ok].fds" size="131000" crc="ce7e8631" sha1="0f792b8a6d86d93298ef4964b4b8aee3d8fa5a4d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3199,7 +3199,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アイアムアティーチャー 手あみのきそ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="i am a teacher - teami no kiso (1986)(royal kougyou)[roy-itk] [ok].fds" size="131000" crc="6a14ffaf" sha1="49ea5ba871497f48bf4ca03f55ce0df39b27b333"/>
+				<rom name="i am a teacher - teami no kiso (1986)(royal kougyou)[roy-itk] [ok].fds" size="131000" crc="6a14ffaf" sha1="49ea5ba871497f48bf4ca03f55ce0df39b27b333" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3213,7 +3213,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アイスクライマー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="ice climber (1984)(nintendo)[fmc-icd].fds" size="65500" crc="575789b6" sha1="3b6e967df4ee396f50c42e7b243288517c6e7eec"/>
+				<rom name="ice climber (1984)(nintendo)[fmc-icd].fds" size="65500" crc="575789b6" sha1="3b6e967df4ee396f50c42e7b243288517c6e7eec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3227,7 +3227,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="アイスクライマー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="ice climber (1984)(nintendo)[fmc-icd][a].fds" size="65500" crc="3696a05d" sha1="7af7d466e2cca30c1ee1461af0f296ebaf089bdf"/>
+				<rom name="ice climber (1984)(nintendo)[fmc-icd][a].fds" size="65500" crc="3696a05d" sha1="7af7d466e2cca30c1ee1461af0f296ebaf089bdf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3241,7 +3241,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="囲碁 九路盤対局"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="igo - kyuu roban taikyoku (1987)(bps)[bps-igo].fds" size="131000" crc="4e57189f" sha1="8b5f207cf4c947da11e6109fd95662cca85c8eca"/>
+				<rom name="igo - kyuu roban taikyoku (1987)(bps)[bps-igo].fds" size="131000" crc="4e57189f" sha1="8b5f207cf4c947da11e6109fd95662cca85c8eca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3255,7 +3255,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="石道"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ishido (1990)(hiro)[hir-iso].fds" size="131000" crc="2f5f7502" sha1="dae4ccdaee835e8bca0883bd60800bd17b38c953"/>
+				<rom name="ishido (1990)(hiro)[hir-iso].fds" size="131000" crc="2f5f7502" sha1="dae4ccdaee835e8bca0883bd60800bd17b38c953" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3269,7 +3269,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="じゃあまん探偵団 魔隣組 ○秘ジゴマ捜査ファイル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="jaaman tanteidan marine kumi - maruhi jigoma sousa file (1988)(bandai)[ban-mar].fds" size="131000" crc="30529227" sha1="5f18994e6834793b430a00d50b9fce3fda6db7b2"/>
+				<rom name="jaaman tanteidan marine kumi - maruhi jigoma sousa file (1988)(bandai)[ban-mar].fds" size="131000" crc="30529227" sha1="5f18994e6834793b430a00d50b9fce3fda6db7b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3284,7 +3284,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="磁界少年 メット・マグ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="jikai shounen metto mag (1987)(thinking rabbit)[sqf-mtm].fds" size="131000" crc="df1ef0eb" sha1="48380a4700c9d86d8ed0a8d82e51bd80bc0c9fb7"/>
+				<rom name="jikai shounen metto mag (1987)(thinking rabbit)[sqf-mtm].fds" size="131000" crc="df1ef0eb" sha1="48380a4700c9d86d8ed0a8d82e51bd80bc0c9fb7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3299,7 +3299,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="磁界少年 メット・マグ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="jikai shounen metto mag (1987)(thinking rabbit)[sqf-mtm][a].fds" size="131000" crc="58da4230" sha1="84dd9ffe5c3e096fe5d939cf877f93d2c98eddc3"/>
+				<rom name="jikai shounen metto mag (1987)(thinking rabbit)[sqf-mtm][a].fds" size="131000" crc="58da4230" sha1="84dd9ffe5c3e096fe5d939cf877f93d2c98eddc3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3313,7 +3313,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="帰ってきたマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar].fds" size="131000" crc="ffd5744f" sha1="51713116586a47e3b9a672c0e04366a000ef0962"/>
+				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar].fds" size="131000" crc="ffd5744f" sha1="51713116586a47e3b9a672c0e04366a000ef0962" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3327,7 +3327,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="帰ってきたマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a].fds" size="131000" crc="6bf3bf4f" sha1="fd06e0f888cac61c811c3a4f42f16f3b65d8cf3c"/>
+				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a].fds" size="131000" crc="6bf3bf4f" sha1="fd06e0f888cac61c811c3a4f42f16f3b65d8cf3c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3341,7 +3341,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="帰ってきたマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a2].fds" size="131000" crc="d926207f" sha1="8ee2827a599ecfad4ff80a76e24a7f3a8f52b26a"/>
+				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a2].fds" size="131000" crc="d926207f" sha1="8ee2827a599ecfad4ff80a76e24a7f3a8f52b26a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3355,7 +3355,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="帰ってきたマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a3].fds" size="131000" crc="eb9c5f5a" sha1="cee03bc6b95bd709b58b3d31dfd4f957c9778567"/>
+				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a3].fds" size="131000" crc="eb9c5f5a" sha1="cee03bc6b95bd709b58b3d31dfd4f957c9778567" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3369,7 +3369,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="帰ってきたマリオブラザーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a4].fds" size="131000" crc="2927e797" sha1="d9954f3a6eb3e667559b6b13dba720b49078a5d2"/>
+				<rom name="kaettekita mario bros. (1988)(nintendo)[fmc-kmar][a4].fds" size="131000" crc="2927e797" sha1="d9954f3a6eb3e667559b6b13dba720b49078a5d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3383,7 +3383,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="かっとび!童児"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kattobi! warabe ko (1989)(pack-in-video)[pac-ktd].fds" size="131000" crc="477c9410" sha1="e93fff62ce47eb9e5c36de5bbcb0d8671ffd4be4"/>
+				<rom name="kattobi! warabe ko (1989)(pack-in-video)[pac-ktd].fds" size="131000" crc="477c9410" sha1="e93fff62ce47eb9e5c36de5bbcb0d8671ffd4be4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3397,7 +3397,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="キックアンドラン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kick and run (1988)(taito)[tfd-kic] [ok].fds" size="131000" crc="93212594" sha1="693ba545ede23e421a50b1d089009345b9ecbc09"/>
+				<rom name="kick and run (1988)(taito)[tfd-kic] [ok].fds" size="131000" crc="93212594" sha1="693ba545ede23e421a50b1d089009345b9ecbc09" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3411,7 +3411,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="奇々怪界 怒濤編"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kiki kaikai - dotou hen (1987)(taito)[tfd-kik].fds" size="131000" crc="fce6c80b" sha1="94679e9ea5fd6507bf67cc9a46cd8e00daa496ff"/>
+				<rom name="kiki kaikai - dotou hen (1987)(taito)[tfd-kik].fds" size="131000" crc="fce6c80b" sha1="94679e9ea5fd6507bf67cc9a46cd8e00daa496ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3425,7 +3425,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="キン肉マン キン肉星王位争奪戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="kinnikuman - kinniku ookurai soudatsusen (1987)(bandai)[ban-knm].fds" size="131000" crc="e1d66911" sha1="6a09a35454a1c64e2de1e8982af95122ce80e26a"/>
+				<rom name="kinnikuman - kinniku ookurai soudatsusen (1987)(bandai)[ban-knm].fds" size="131000" crc="e1d66911" sha1="6a09a35454a1c64e2de1e8982af95122ce80e26a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3439,7 +3439,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ナイト・ロアー ―魔城の狼男―"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="knight lore - majou no ookami otoko (1986)(jaleco)[jfd-klm][h].fds" size="131000" crc="07464563" sha1="1314d62343b1012555f3250ddc2c377e4a892847"/>
+				<rom name="knight lore - majou no ookami otoko (1986)(jaleco)[jfd-klm][h].fds" size="131000" crc="07464563" sha1="1314d62343b1012555f3250ddc2c377e4a892847" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3453,7 +3453,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="コナミック テニス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="konami tennis (1988)(konami)[kds-tni] [ok].fds" size="131000" crc="1cd10d73" sha1="8ec056286c1b5afee883e1b03950a68f14e0a266"/>
+				<rom name="konami tennis (1988)(konami)[kds-tni] [ok].fds" size="131000" crc="1cd10d73" sha1="8ec056286c1b5afee883e1b03950a68f14e0a266" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3468,7 +3468,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="リュッター"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="lutter (1989)(athena)[ath-ltd].fds" size="131000" crc="e39a4eea" sha1="3c7e7f2d9b0f9083a9e65943c6621e8bd292714a"/>
+				<rom name="lutter (1989)(athena)[ath-ltd].fds" size="131000" crc="e39a4eea" sha1="3c7e7f2d9b0f9083a9e65943c6621e8bd292714a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3482,7 +3482,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="マグマ プロジェクト ハッカー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="magma project - hacker (1989)(tokuma shoten)[gts-mph][b].fds" size="131000" crc="e94ace67" sha1="8dd4e7b72e065f9524cb3088f65511363fadc833"/>
+				<rom name="magma project - hacker (1989)(tokuma shoten)[gts-mph][b].fds" size="131000" crc="e94ace67" sha1="8dd4e7b72e065f9524cb3088f65511363fadc833" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3496,7 +3496,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="麻雀家族"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="mahjong kazoku (1987)(irem)[ifd-mjk].fds" size="131000" crc="3d43b203" sha1="249a7442fdd286400e0c0c661a7ddc5a93fdef32"/>
+				<rom name="mahjong kazoku (1987)(irem)[ifd-mjk].fds" size="131000" crc="3d43b203" sha1="249a7442fdd286400e0c0c661a7ddc5a93fdef32" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3510,7 +3510,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="メルヘンヴェール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="marchen veil (1987)(sunsoft)[ssd-mvl][h].fds" size="131000" crc="1d08ccce" sha1="c06447d87eeaa33f85f4e8d9ec252b31aae77320"/>
+				<rom name="marchen veil (1987)(sunsoft)[ssd-mvl][h].fds" size="131000" crc="1d08ccce" sha1="c06447d87eeaa33f85f4e8d9ec252b31aae77320" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3524,7 +3524,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="魔塔の崩壊 THE HERO OF BABEL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="matou no houkai - the hero of babel (1988)(pony canyon)[pnf-mat].fds" size="131000" crc="faa1a02b" sha1="abc12795e4c3a8bb83204559c8c147ef1ab50a8d"/>
+				<rom name="matou no houkai - the hero of babel (1988)(pony canyon)[pnf-mat].fds" size="131000" crc="faa1a02b" sha1="abc12795e4c3a8bb83204559c8c147ef1ab50a8d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3538,7 +3538,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="魔塔の崩壊 THE HERO OF BABEL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="matou no houkai - the hero of babel (1988)(pony canyon)[pnf-mat][a].fds" size="131000" crc="0f2050c7" sha1="732bccacfa31cab05ee3af8d7c454c43a0c0870d"/>
+				<rom name="matou no houkai - the hero of babel (1988)(pony canyon)[pnf-mat][a].fds" size="131000" crc="0f2050c7" sha1="732bccacfa31cab05ee3af8d7c454c43a0c0870d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3552,7 +3552,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="きね子II"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="monitor puzzle kineko vol. ii, the - kinetic connection (1987)(irem)[ifd-ki2].fds" size="131000" crc="c4f0a9c2" sha1="60bcfa4ca1b05befa068cb0adf5deb28e77f190c"/>
+				<rom name="monitor puzzle kineko vol. ii, the - kinetic connection (1987)(irem)[ifd-ki2].fds" size="131000" crc="c4f0a9c2" sha1="60bcfa4ca1b05befa068cb0adf5deb28e77f190c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3566,7 +3566,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ムーンボールマジック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="moon ball magic (1988)(dog)[sqf-mbm].fds" size="131000" crc="ccfe663f" sha1="86cd67b516ba134e07399f74d6cf3ebec16bae76"/>
+				<rom name="moon ball magic (1988)(dog)[sqf-mbm].fds" size="131000" crc="ccfe663f" sha1="86cd67b516ba134e07399f74d6cf3ebec16bae76" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3580,7 +3580,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="なんきんのアドベンチア"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="nankin no adventure (1988)(sunsoft)[ssd-nad].fds" size="131000" crc="af68b7c1" sha1="f8972592152d61c51452394a7f123a4c16859804"/>
+				<rom name="nankin no adventure (1988)(sunsoft)[ssd-nad].fds" size="131000" crc="af68b7c1" sha1="f8972592152d61c51452394a7f123a4c16859804" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3594,7 +3594,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="オトッキー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="otocky (1987)(ascii)[asc-oto].fds" size="131000" crc="8143c338" sha1="5798cd0cc84ebb34dc3ce1f57b2d72ca13964127"/>
+				<rom name="otocky (1987)(ascii)[asc-oto].fds" size="131000" crc="8143c338" sha1="5798cd0cc84ebb34dc3ce1f57b2d72ca13964127" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3608,7 +3608,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="パックマン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="pac-man (1990)(namco)[nds-pac].fds" size="65500" crc="e1c1c60d" sha1="5c2c673853aee583246a7d651b6336ef67167eb1"/>
+				<rom name="pac-man (1990)(namco)[nds-pac].fds" size="65500" crc="e1c1c60d" sha1="5c2c673853aee583246a7d651b6336ef67167eb1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3622,7 +3622,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="パチコン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="pachi com (1985)(toshiba emi)[tfs-pcd].fds" size="65500" crc="92d3bb0c" sha1="b632661d5c765a902fb5b2a3c2833e73d0dc0324"/>
+				<rom name="pachi com (1985)(toshiba emi)[tfs-pcd].fds" size="65500" crc="92d3bb0c" sha1="b632661d5c765a902fb5b2a3c2833e73d0dc0324" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3636,7 +3636,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="パチンコグランプリ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="pachinko grand prix (1988)(data east)[dfc-pgp].fds" size="131000" crc="299d751d" sha1="1beda2ddea73d1b018b81fbead9318d3e2d4e4fd"/>
+				<rom name="pachinko grand prix (1988)(data east)[dfc-pgp].fds" size="131000" crc="299d751d" sha1="1beda2ddea73d1b018b81fbead9318d3e2d4e4fd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3650,7 +3650,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ピンボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="pinball (1989)(nintendo)[fmc-pnd].fds" size="65500" crc="a52f1cf7" sha1="c6f0927d79e057472ca34e7052975f3606900f78"/>
+				<rom name="pinball (1989)(nintendo)[fmc-pnd].fds" size="65500" crc="a52f1cf7" sha1="c6f0927d79e057472ca34e7052975f3606900f78" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3664,7 +3664,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="プロゴルファー猿 影のトーナメント"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="pro golfer saru - kage no tournament (1987)(bandai)[ban-pgs].fds" size="131000" crc="9a8ce9b2" sha1="efe0116ad3156bfb32ef060b4f3f2cd42860f054"/>
+				<rom name="pro golfer saru - kage no tournament (1987)(bandai)[ban-pgs].fds" size="131000" crc="9a8ce9b2" sha1="efe0116ad3156bfb32ef060b4f3f2cd42860f054" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3679,7 +3679,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="パットパットゴルフ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="putt putt golf (1989)(pack-in-video)[pac-ppg].fds" size="131000" crc="805f5166" sha1="1a104236265ca57c3b434f7027d4d772e5dd2558"/>
+				<rom name="putt putt golf (1989)(pack-in-video)[pac-ppg].fds" size="131000" crc="805f5166" sha1="1a104236265ca57c3b434f7027d4d772e5dd2558" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3693,7 +3693,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="パズルボーイズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="puzzle boys (1990)(atlus)[atl-puz].fds" size="131000" crc="b9f22094" sha1="017715580b14cd5a02081fe6b28011389e95e195"/>
+				<rom name="puzzle boys (1990)(atlus)[atl-puz].fds" size="131000" crc="b9f22094" sha1="017715580b14cd5a02081fe6b28011389e95e195" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3707,7 +3707,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="らじかるぼんばー!! 地雷くん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="radical bomber!! jirai kun (1988)(jaleco)[jfd-grk].fds" size="131000" crc="e9b2edc9" sha1="9979ac4dc613ed5f67973542b1d5ea996e1c47c1"/>
+				<rom name="radical bomber!! jirai kun (1988)(jaleco)[jfd-grk].fds" size="131000" crc="e9b2edc9" sha1="9979ac4dc613ed5f67973542b1d5ea996e1c47c1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3721,7 +3721,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="リフレクトワールド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="reflect world (1987)(east cube)[ecf-rwd].fds" size="131000" crc="52f623d1" sha1="84906e333904966c87568c1d6a65259264b22bd7"/>
+				<rom name="reflect world (1987)(east cube)[ecf-rwd].fds" size="131000" crc="52f623d1" sha1="84906e333904966c87568c1d6a65259264b22bd7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3735,7 +3735,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="レリクス暗黒要塞"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="relics - ankoku yousai (1987)(bothtec)[btc-rlc].fds" size="131000" crc="cb05a540" sha1="6850d27ad778c20de319f6a3505bc57baef377a6"/>
+				<rom name="relics - ankoku yousai (1987)(bothtec)[btc-rlc].fds" size="131000" crc="cb05a540" sha1="6850d27ad778c20de319f6a3505bc57baef377a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3749,7 +3749,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="レプリカート"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="replicart (1988)(taito)[tdf-rep].fds" size="131000" crc="50459c8a" sha1="e260efc833343205d02ddfb7e5d69846f5d6fb79"/>
+				<rom name="replicart (1988)(taito)[tdf-rep].fds" size="131000" crc="50459c8a" sha1="e260efc833343205d02ddfb7e5d69846f5d6fb79" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3763,7 +3763,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ロジャー・ラビット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="roger rabbit (1989)(kemco)[ksc-rrr].fds" size="131000" crc="8350559a" sha1="0d34576bc5c14fb0edb6f8fa8e2daca0438912ea"/>
+				<rom name="roger rabbit (1989)(kemco)[ksc-rrr].fds" size="131000" crc="8350559a" sha1="0d34576bc5c14fb0edb6f8fa8e2daca0438912ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3777,7 +3777,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="SDガンダムワールド ガチャポン戦士 スクランブルウォーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sd gundam world - gachapon senshi - scramble wars (1987)(bandai)[ban-sgw].fds" size="131000" crc="9d287c3f" sha1="e4c5e6d2fab30c4c472f81ad396c23885b978deb"/>
+				<rom name="sd gundam world - gachapon senshi - scramble wars (1987)(bandai)[ban-sgw].fds" size="131000" crc="9d287c3f" sha1="e4c5e6d2fab30c4c472f81ad396c23885b978deb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3791,7 +3791,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="SDガンダムワールド ガチャポン戦士 スクランブルウォーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sd gundam world - gachapon senshi - scramble wars (1987)(bandai)[ban-sgw][a].fds" size="131000" crc="c1dcb7e4" sha1="1ea908cdbf2a0ecf04f8f9be0f2997a4c0b0bc15"/>
+				<rom name="sd gundam world - gachapon senshi - scramble wars (1987)(bandai)[ban-sgw][a].fds" size="131000" crc="c1dcb7e4" sha1="1ea908cdbf2a0ecf04f8f9be0f2997a4c0b0bc15" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3805,7 +3805,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="SDガンダムワールド ガチャポン戦士 スクランブルウォーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sd gundam world - gachapon senshi - scramble wars (1987)(bandai)[ban-sgw][a2].fds" size="131000" crc="bb15c4f6" sha1="ba06717f77a05e04bbd17df9c9d4694f3573cea0"/>
+				<rom name="sd gundam world - gachapon senshi - scramble wars (1987)(bandai)[ban-sgw][a2].fds" size="131000" crc="bb15c4f6" sha1="ba06717f77a05e04bbd17df9c9d4694f3573cea0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3819,7 +3819,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="SDガンダムワールド ガチャポン戦士 スクランブルウォーズ マップコレクション"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sd gundam world - gachapon senshi - scramble wars - map collection (1989)(bandai)[ban-sg2].fds" size="131000" crc="1017ad62" sha1="a59644eef6510d31e85a704881bdfcf7bf399a0d"/>
+				<rom name="sd gundam world - gachapon senshi - scramble wars - map collection (1989)(bandai)[ban-sg2].fds" size="131000" crc="1017ad62" sha1="a59644eef6510d31e85a704881bdfcf7bf399a0d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3833,7 +3833,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="SDガンダムワールド ガチャポン戦士 スクランブルウォーズ マップコレクション"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="sd gundam world - gachapon senshi - scramble wars - map collection (1989)(bandai)[ban-sg2][a].fds" size="131000" crc="748601ad" sha1="fff48467af166bfeb949755097854d010061b781"/>
+				<rom name="sd gundam world - gachapon senshi - scramble wars - map collection (1989)(bandai)[ban-sg2][a].fds" size="131000" crc="748601ad" sha1="fff48467af166bfeb949755097854d010061b781" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3847,7 +3847,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="セクション ゼット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="section-z (1987)(capcom)[cap-scz].fds" size="131000" crc="89bb5790" sha1="cdb702843d419e6433c04d29e78ac0a863c730a2"/>
+				<rom name="section-z (1987)(capcom)[cap-scz].fds" size="131000" crc="89bb5790" sha1="cdb702843d419e6433c04d29e78ac0a863c730a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3861,7 +3861,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ソロモンの鍵"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="solomon no kagi (1987)(tecmo)[tcf-skd].fds" size="65500" crc="091fd6d1" sha1="5cafd9bc9b2dd3f4c95f5c3a391098f82aa0fd3b"/>
+				<rom name="solomon no kagi (1987)(tecmo)[tcf-skd].fds" size="65500" crc="091fd6d1" sha1="5cafd9bc9b2dd3f4c95f5c3a391098f82aa0fd3b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3875,7 +3875,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="水晶の龍"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="suishou no ryuu (1986)(dog)[sqf-ssd].fds" size="131000" crc="5c467251" sha1="50a6d3b2c89efd598d83e48f7f1f8b41c518dc8b"/>
+				<rom name="suishou no ryuu (1986)(dog)[sqf-ssd].fds" size="131000" crc="5c467251" sha1="50a6d3b2c89efd598d83e48f7f1f8b41c518dc8b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3889,7 +3889,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="タマ&amp;フレンズ 3丁目大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tama &amp; friends - 3 choume dai bouken (1989)(bandai).fds" size="131000" crc="fcf52fb7" sha1="93b83f58a1202df85b4ad9255b5d529a24cf5875"/>
+				<rom name="tama &amp; friends - 3 choume dai bouken (1989)(bandai).fds" size="131000" crc="fcf52fb7" sha1="93b83f58a1202df85b4ad9255b5d529a24cf5875" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3903,7 +3903,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="タマ&amp;フレンズ 3丁目大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tama &amp; friends - 3 choume dai bouken (1989)(bandai)[a].fds" size="131000" crc="e8bc04a2" sha1="63ed0e4bb01aa97dbc8a18e9263760f617f7f0a1"/>
+				<rom name="tama &amp; friends - 3 choume dai bouken (1989)(bandai)[a].fds" size="131000" crc="e8bc04a2" sha1="63ed0e4bb01aa97dbc8a18e9263760f617f7f0a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3918,7 +3918,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="探偵 神宮寺三郎 危険な二人 (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
-				<rom name="tantei jinguuji saburou - kikenna futari - zn pen (1988)(data east)[dfc-kf1].fds" size="262000" crc="28aab9c5" sha1="a394e5ea1a6b4e1d434e7ae3c9d96cd05850c60b"/>
+				<rom name="tantei jinguuji saburou - kikenna futari - zn pen (1988)(data east)[dfc-kf1].fds" size="262000" crc="28aab9c5" sha1="a394e5ea1a6b4e1d434e7ae3c9d96cd05850c60b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3932,7 +3932,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="探偵 神宮寺三郎 「新宿中央公園殺人事件」"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tantei jinguuji saburou - shinjuku chuuou kouen satsujin jiken (1987)(data east)[dfc-juk].fds" size="131000" crc="ef2b462a" sha1="6809bc869998cde506e7603e0dd9355e3ec6af86"/>
+				<rom name="tantei jinguuji saburou - shinjuku chuuou kouen satsujin jiken (1987)(data east)[dfc-juk].fds" size="131000" crc="ef2b462a" sha1="6809bc869998cde506e7603e0dd9355e3ec6af86" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3946,7 +3946,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="タロット占い"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tarot (198x)(scorpion soft).fds" size="131000" crc="e67a149a" sha1="eea31a2a4af73b41367c2e40b84bbbcedc32f2a1"/>
+				<rom name="tarot (198x)(scorpion soft).fds" size="131000" crc="e67a149a" sha1="eea31a2a4af73b41367c2e40b84bbbcedc32f2a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3960,7 +3960,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="イタニックミステリー ―蒼の戦慄―"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="titanic mystery - ao no senritsu (1987)(gakken)[gat-tit].fds" size="131000" crc="58e8eaf6" sha1="f1abbe1c2937e11ac0bce0b188c92c6f4ec1c90f"/>
+				<rom name="titanic mystery - ao no senritsu (1987)(gakken)[gat-tit].fds" size="131000" crc="58e8eaf6" sha1="f1abbe1c2937e11ac0bce0b188c92c6f4ec1c90f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3974,7 +3974,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="とびだせ大作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tobidase daisakusen (1987)(square)[sqf-tds].fds" size="131000" crc="0140588c" sha1="3b7dbdf06b54ee325aa161a2acf878c59a3e48a5"/>
+				<rom name="tobidase daisakusen (1987)(square)[sqf-tds].fds" size="131000" crc="0140588c" sha1="3b7dbdf06b54ee325aa161a2acf878c59a3e48a5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3988,7 +3988,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="とびだせ大作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tobidase daisakusen (1987)(square)[sqf-tds][a].fds" size="131000" crc="e1f2d279" sha1="4726dfbdd9cdb995a012c7abab031471b79cc4cd"/>
+				<rom name="tobidase daisakusen (1987)(square)[sqf-tds][a].fds" size="131000" crc="e1f2d279" sha1="4726dfbdd9cdb995a012c7abab031471b79cc4cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4003,7 +4003,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="とびだせ大作戦"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tobidase daisakusen (1987)(square)[sqf-tds][a2].fds" size="131000" crc="226f166c" sha1="94b73ac6224723d5bd39f65b1b0d309d6b7d688d"/>
+				<rom name="tobidase daisakusen (1987)(square)[sqf-tds][a2].fds" size="131000" crc="226f166c" sha1="94b73ac6224723d5bd39f65b1b0d309d6b7d688d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4017,7 +4017,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="トップルジップ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="topple zip (1987)(bothtec).fds" size="131000" crc="cb68e307" sha1="3ecca6ac539aba640d91b55829b0c5b09c7c91b2"/>
+				<rom name="topple zip (1987)(bothtec).fds" size="131000" crc="cb68e307" sha1="3ecca6ac539aba640d91b55829b0c5b09c7c91b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4032,7 +4032,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="トランスフォーマーII ザ・ヘッドマスターズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="transformer - the head master (1987)(takara).fds" size="131000" crc="3b46dbbf" sha1="e802d6c5b455dca623a6d7f0e27cb742d7d8aff9"/>
+				<rom name="transformer - the head master (1987)(takara).fds" size="131000" crc="3b46dbbf" sha1="e802d6c5b455dca623a6d7f0e27cb742d7d8aff9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4046,7 +4046,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ウルトラマン 怪獣帝国の逆襲"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ultraman - kaijuu teikoku no gyakushuu (1986)(bandai)[ban-ulm].fds" size="131000" crc="2f69cc12" sha1="74a7755e2477a42e27b6fb96aa36c6c336facae2"/>
+				<rom name="ultraman - kaijuu teikoku no gyakushuu (1986)(bandai)[ban-ulm].fds" size="131000" crc="2f69cc12" sha1="74a7755e2477a42e27b6fb96aa36c6c336facae2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4060,7 +4060,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ウルトラマン 怪獣帝国の逆襲"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="ultraman - kaijuu teikoku no gyakushuu (1986)(bandai)[ban-ulm][a].fds" size="131000" crc="abcc81bf" sha1="0f711efbf57c6c2aa2d33de4b42f36a04a086fbb"/>
+				<rom name="ultraman - kaijuu teikoku no gyakushuu (1986)(bandai)[ban-ulm][a].fds" size="131000" crc="abcc81bf" sha1="0f711efbf57c6c2aa2d33de4b42f36a04a086fbb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4074,7 +4074,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ワードナの森"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="wardner no mori (1988)(taito)[tfd-wad].fds" size="131000" crc="2d04e09f" sha1="80aea3f5b5b1a9f22158be260ea1db19a1210dcc"/>
+				<rom name="wardner no mori (1988)(taito)[tfd-wad].fds" size="131000" crc="2d04e09f" sha1="80aea3f5b5b1a9f22158be260ea1db19a1210dcc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4088,7 +4088,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ウインター・ゲームズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="winter games (1987)(pony canyon)[pnf-win].fds" size="131000" crc="324d5b7b" sha1="aefc8b0002f6e3ea780462e5464353ba559f13a0"/>
+				<rom name="winter games (1987)(pony canyon)[pnf-win].fds" size="131000" crc="324d5b7b" sha1="aefc8b0002f6e3ea780462e5464353ba559f13a0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4102,7 +4102,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="レッキングクルー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="wrecking crew (1988)(nintendo).fds" size="65500" crc="04763d6a" sha1="fb0931dfe0c22bcf3e843f57e1426bf82dca08f5"/>
+				<rom name="wrecking crew (1988)(nintendo).fds" size="65500" crc="04763d6a" sha1="fb0931dfe0c22bcf3e843f57e1426bf82dca08f5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4116,7 +4116,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ゼビウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="xevious (1990)(namco).fds" size="65500" crc="3da99b11" sha1="2d264c9963197c69df96c3fd9d8dbeefbbe2c8be"/>
+				<rom name="xevious (1990)(namco).fds" size="65500" crc="3da99b11" sha1="2d264c9963197c69df96c3fd9d8dbeefbbe2c8be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4130,7 +4130,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="妖怪屋敷"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="youkai yashiki (1987)(irem)[ifd-yok].fds" size="131000" crc="181719ad" sha1="2debce974eee45e6045ddaa97874023bf215949d"/>
+				<rom name="youkai yashiki (1987)(irem)[ifd-yok].fds" size="131000" crc="181719ad" sha1="2debce974eee45e6045ddaa97874023bf215949d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4144,7 +4144,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="ザナック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="zanac (1988)(pony canyon)[pnf-zan].fds" size="65500" crc="c3ace814" sha1="c6ac053cfb48ef367480042c59a00d6a26057643"/>
+				<rom name="zanac (1988)(pony canyon)[pnf-zan].fds" size="65500" crc="c3ace814" sha1="c6ac053cfb48ef367480042c59a00d6a26057643" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4155,7 +4155,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Wild?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="casino de pink (198x)(wild)[xxx-xxx].fds" size="131000" crc="d3e3fd42" sha1="0708f9987d4c0d33da6ddca58e61e77f6e6aa7af"/>
+				<rom name="casino de pink (198x)(wild)[xxx-xxx].fds" size="131000" crc="d3e3fd42" sha1="0708f9987d4c0d33da6ddca58e61e77f6e6aa7af" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4166,7 +4166,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Hangsing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65500">
-				<rom name="city connection (1989)(hangsing)[xxx-xxx].fds" size="65500" crc="4495a7c4" sha1="5ce2c13a9a292449273d007d27eff3388e579563"/>
+				<rom name="city connection (1989)(hangsing)[xxx-xxx].fds" size="65500" crc="4495a7c4" sha1="5ce2c13a9a292449273d007d27eff3388e579563" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4178,7 +4178,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sun?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="mario bobble (1989)(sun)[xxx-xxx] [ok].fds" size="131000" crc="1497f20d" sha1="8af7ff449e4b3f17f8bce7f8337702215a4e8abd"/>
+				<rom name="mario bobble (1989)(sun)[xxx-xxx] [ok].fds" size="131000" crc="1497f20d" sha1="8af7ff449e4b3f17f8bce7f8337702215a4e8abd" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -348,7 +348,7 @@ void bzone_state::bzone_map(address_map &map)
 	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1840, 0x1840).w(FUNC(bzone_state::bzone_sounds_w));
 	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -373,7 +373,7 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
 	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -666,7 +666,7 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -696,7 +696,7 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -727,7 +727,7 @@ ROM_START( bzonec ) /* cocktail version */
 	ROM_LOAD( "bz3b3800",   0x3800, 0x0800, CRC(76cf57f6) SHA1(1b8f3fcd664ed04ce60d94fdf27e56b20d52bdbd) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -759,7 +759,7 @@ ROM_START( bradley )
 	ROM_LOAD( "bta3.bin",   0x3800, 0x0800, CRC(d669d796) SHA1(ad606882320cd13612c7962d4718680fe5a35dd3) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -813,7 +813,7 @@ ROM_START( redbaron ) /* Analog Vec Gen A035742-02 Rev. C+ */
 	ROM_LOAD( "037007-01.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
 
 	/* Mathbox PROMs */
@@ -847,7 +847,7 @@ ROM_START( redbarona ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "037007-01e.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
 
 	/* Mathbox PROMs */

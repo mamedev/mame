@@ -301,12 +301,12 @@ void pasopia_state::pasopia(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia);
 	PALETTE(config, m_palette).set_entries(8);
 
 	/* Devices */
-	MC6845(config, m_crtc, XTAL(4'000'000)/4);   /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	H46505(config, m_crtc, XTAL(4'000'000)/4);   /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

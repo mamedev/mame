@@ -99,24 +99,24 @@
 
 const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 {
-	rgb_t(0x30, 0xd2, 0x00), /* GREEN */
-	rgb_t(0xc1, 0xe5, 0x00), /* YELLOW */
-	rgb_t(0x4c, 0x3a, 0xb4), /* BLUE */
-	rgb_t(0x9a, 0x32, 0x36), /* RED */
-	rgb_t(0xbf, 0xc8, 0xad), /* BUFF */
-	rgb_t(0x41, 0xaf, 0x71), /* CYAN */
-	rgb_t(0xc8, 0x4e, 0xf0), /* MAGENTA */
-	rgb_t(0xd4, 0x7f, 0x00), /* ORANGE */
+	rgb_t(0x07, 0xff, 0x00), /* GREEN */
+	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
+	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
+	rgb_t(0xcc, 0x00, 0x3b), /* RED */
+	rgb_t(0xff, 0xff, 0xff), /* BUFF */
+	rgb_t(0x07, 0xe3, 0x99), /* CYAN */
+	rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
+	rgb_t(0xff, 0x81, 0x00), /* ORANGE */
 
-	rgb_t(0x26, 0x30, 0x16), /* BLACK */
-	rgb_t(0x30, 0xd2, 0x00), /* GREEN */
-	rgb_t(0x26, 0x30, 0x16), /* BLACK */
-	rgb_t(0xbf, 0xc8, 0xad), /* BUFF */
+	rgb_t(0x00, 0x00, 0x00), /* BLACK */
+	rgb_t(0x07, 0xff, 0x00), /* GREEN */
+	rgb_t(0x00, 0x00, 0x00), /* BLACK */
+	rgb_t(0xff, 0xff, 0xff), /* BUFF */
 
 	rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
-	rgb_t(0x30, 0xd2, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
-	rgb_t(0x6b, 0x27, 0x00), /* ALPHANUMERIC DARK ORANGE */
-	rgb_t(0xff, 0xb7, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
+	rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
+	rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
+	rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
 };
 
 
@@ -558,8 +558,6 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 	{
 		m_bw_palette[i] = black_and_white(s_palette[i]);
 	}
-
-	m_artifacter.create_color_blend_table( s_palette );
 }
 
 
@@ -905,14 +903,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
 
 		/* artifacting */
-		if( m_artifacter.get_pal_artifacting() )
-		{
-			if( y % 2)
-				m_artifacter.process_artifacts_pal<1>(bitmap, y - 1, base_x, base_y, m_data[y].m_mode[0], palette);
-		}
-		else
-			m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
-
+		m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
 	}
 
 	width = m_data[191].m_sample_count;
@@ -1684,7 +1675,6 @@ ioport_constructor mc6847_base_device::device_input_ports() const
 
 mc6847_base_device::artifacter::artifacter()
 {
-	m_palartifacting = false;
 	m_config = nullptr;
 	m_artifacting = 0;
 	m_saved_artifacting = 0;
@@ -1801,31 +1791,6 @@ mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double fac
 
 
 
-//-------------------------------------------------
-//  artifacter::create_color_blend_table
-//-------------------------------------------------
-
-void mc6847_base_device::artifacter::create_color_blend_table( const pixel_t *palette )
-{
-	// PAL color blend map
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[3],palette[2]),rgb_t(0x7c, 0x2e, 0x81))); /* RED-BLUE */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[2],palette[3]),rgb_t(0x6b, 0x3e, 0x6b))); /* BLUE-RED */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[7],palette[6]),rgb_t(0xbe, 0x73, 0x65))); /* ORANGE-MAGENTA */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[6],palette[7]),rgb_t(0xde, 0x5f, 0x6a))); /* MAGENTA-ORANGE */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[7],palette[5]),rgb_t(0x7e, 0xa2, 0x00))); /* ORANGE-CYAN */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[5],palette[7]),rgb_t(0x99, 0x8d, 0x3c))); /* CYAN-ORANGE */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[5],palette[6]),rgb_t(0x82, 0x80, 0xc5))); /* CYAN-MAGENTA */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[6],palette[5]),rgb_t(0x89, 0x80, 0x9f))); /* MAGENTA-CYAN */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[0],palette[5]),rgb_t(0x44, 0xb7, 0x1b))); /* GREEN-CYAN */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[5],palette[0]),rgb_t(0x4a, 0xf2, 0x70))); /* CYAN-GREEN */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[1],palette[4]),rgb_t(0xdc, 0xd2, 0x57))); /* YELLOW-BUFF */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[4],palette[1]),rgb_t(0xd1, 0xf6, 0x95))); /* BUFF-YELLOW */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[0],palette[6]),rgb_t(0xa6, 0x86, 0x10))); /* GREEN-MAGENTA */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[6],palette[0]),rgb_t(0x6b, 0xbe, 0xb3))); /* MAGENTA-GREEN */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[0],palette[7]),rgb_t(0x91, 0xc5, 0x3b))); /* GREEN-ORANGE */
-	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[7],palette[0]),rgb_t(0xad, 0xbc, 0x22))); /* ORANGE-GREEN */
-}
-
 //**************************************************************************
 //  VARIATIONS
 //**************************************************************************
@@ -1859,7 +1824,6 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
 {
-	m_artifacter.set_pal_artifacting(true);
 }
 
 
@@ -1882,7 +1846,6 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, pal_square_fontdata8x12, 313.0)
 {
-	m_artifacter.set_pal_artifacting(true);
 }
 
 
@@ -1905,7 +1868,6 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, pal_round_fontdata8x12, 313.0)
 {
-	m_artifacter.set_pal_artifacting(true);
 }
 
 

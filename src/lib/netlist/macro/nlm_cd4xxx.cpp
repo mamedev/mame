@@ -28,16 +28,17 @@ static NETLIST_START(CD4001_DIP)
 	CD4001_NOR(s3)
 	CD4001_NOR(s4)
 
-	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
-	NET_C(s1.VDD, s2.VDD, s3.VDD, s4.VDD)
+	DUMMY_INPUT(VSS)
+	DUMMY_INPUT(VDD)
+
 	DIPPINS(    /*       +--------------+      */
-		s1.A,   /*    A1 |1     ++    14| VCC  */ s1.VCC,
+		s1.A,   /*    A1 |1     ++    14| VCC  */ VDD.I,
 		s1.B,   /*    B1 |2           13| A6   */ s4.B,
 		s1.Q,   /*    A2 |3           12| Y6   */ s4.A,
 		s2.Q,   /*    Y2 |4    4001   11| A5   */ s4.Q,
 		s2.A,   /*    A3 |5           10| Y5   */ s3.Q,
 		s2.B,   /*    Y3 |6            9| A4   */ s3.B,
-		s1.VDD, /*   GND |7            8| Y4   */ s3.A
+		VSS.I,  /*   GND |7            8| Y4   */ s3.A
 				/*       +--------------+      */
 	)
 

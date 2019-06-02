@@ -30,7 +30,6 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "cpu/m6805/m68705.h"
 #include "bus/isa/aga.h"
 #include "bus/isa/fdc.h"
 #include "machine/genpc.h"
@@ -562,8 +561,6 @@ void europc_pc_state::europc(machine_config &config)
 
 	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
-	M6805U2(config, "kbdctrl", 16_MHz_XTAL / 4);
-
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "aga", false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
@@ -593,8 +590,6 @@ void europc_pc_state::europc2(machine_config &config)
 void europc_pc_state::euroxt(machine_config &config)
 {
 	europc(config);
-
-	config.device_remove("kbdctrl");
 
 	m_ram->set_default_size("768K");
 

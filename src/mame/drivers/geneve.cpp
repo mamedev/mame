@@ -203,7 +203,7 @@
 #define LOG_CRU     (1U<<4)
 
 // Minimum log should be settings and warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -234,7 +234,7 @@ private:
 	void cruwrite(offs_t offset, uint8_t data);
 
 	// Connections with the system interface TMS9901
-	uint8_t psi_input(offs_t offset);
+	uint8_t read_by_9901(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
 	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
 	DECLARE_WRITE_LINE_MEMBER(joystick_select);
@@ -453,103 +453,64 @@ uint8_t geneve_state::cruread(offs_t offset)
     CRU callbacks
 ***********************************************************************/
 
-uint8_t geneve_state::psi_input(offs_t offset)
+uint8_t geneve_state::read_by_9901(offs_t offset)
 {
-	switch (offset)
+	int answer = 0;
+
+	switch (offset & 0x03)
 	{
-	// External interrupt (INTA)
-	case tms9901_device::INT1:
-		return (m_inta==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::CB_INT7:
+		//
+		// Read pins INT3*-INT7* of Geneve's 9901.
+		// bit 1: INTA status
+		// bit 2: INT2 status
+		// bit 3-7: joystick status
+		//
+		// |K|K|K|K|K|I2|I1|C|
+		// negative logic
+		if (m_inta==CLEAR_LINE) answer |= 0x02;
+		if (m_int2==CLEAR_LINE) answer |= 0x04;
+		answer |= m_joyport->read_port()<<3;
+		break;
 
-	// Video interrupt
-	case tms9901_device::INT2:
-		return (m_int2==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::INT8_INT15:
+		// Read pins int8_t*-INT15* of Geneve 9901.
+		//
+		// bit 0: keyboard interrupt
+		// bit 1: unused
+		// bit 2: mouse left button
+		// (bit 3: clock interrupt)
+		// bit 4: INTB from PE-bus
+		// bit 5 & 7: used as output
+		// bit 6: unused
+		if (m_keyint==CLEAR_LINE) answer |= 0x01;
+		if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x04;
+		// TODO: add clock interrupt
+		if (m_intb==CLEAR_LINE) answer |= 0x10;
+		if (m_video_wait==ASSERT_LINE) answer |= 0x20;
+		// TODO: PAL pin 5
+		LOGMASKED(LOG_LINES, "INT15-8 = %02x\n", answer);
+		break;
 
-	// Joystick port
-	case tms9901_device::INT3:
-	case tms9901_device::INT4:
-	case tms9901_device::INT5:
-	case tms9901_device::INT6:
-	case tms9901_device::INT7_P15:
-		return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
+	case tms9901_device::P0_P7:
+		// Read pins P0-P7 of TMS9901. All pins are configured as outputs, so nothing here.
+		break;
 
-	// Keyboard interrupt
-	case tms9901_device::INT8_P14:
-		return (m_keyint==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::P8_P15:
+		// Read pins P8-P15 of TMS 9901.
+		// bit 4: mouse left button
+		// video wait is an output; no input possible here
+		if (m_intb==CLEAR_LINE) answer |= 0x04;     // mirror from above
+		// TODO: 0x08 = real-time clock int
+		if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x10; // mirror from above
+		if (m_keyint==CLEAR_LINE) answer |= 0x40;
 
-	// Left mouse button
-	case tms9901_device::INT10_P12:
-		LOG("Mouse button = %d\n", m_colorbus->left_button());
-		return (m_colorbus->left_button()==CLEAR_LINE)? 1 : 0;
-
-	// TODO: Real time clock interrupt
-	case tms9901_device::INT11_P11:
-		return 1;
-
-	// INTB interrupt
-	case tms9901_device::INT12_P10:
-		return (m_intb==CLEAR_LINE)? 1 : 0;
-
-	default:
-		LOG("Unknown pin %d\n", offset);
-		return 1;
+		// Joystick up (mirror of bit 7)
+		if ((m_joyport->read_port() & 0x10)==0) answer |= 0x80;
+		break;
 	}
+	return answer;
 }
-
-/*
-    switch (offset & 0x03)
-    {
-    case tms9901_device::CB_INT7:
-        //
-        // Read pins INT3*-INT7* of Geneve's 9901.
-        // bit 1: INTA status
-        // bit 2: INT2 status
-        // bit 3-7: joystick status
-        //
-        // |K|K|K|K|K|I2|I1|C|
-        // negative logic
-        if (m_inta==CLEAR_LINE) answer |= 0x02;
-        if (m_int2==CLEAR_LINE) answer |= 0x04;
-        answer |= m_joyport->read_port()<<3;
-        break;
-
-    case tms9901_device::INT8_INT15:
-        // Read pins int8_t*-INT15* of Geneve 9901.
-        //
-        // bit 0: keyboard interrupt
-        // bit 1: unused
-        // bit 2: mouse left button
-        // (bit 3: clock interrupt)
-        // bit 4: INTB from PE-bus
-        // bit 5 & 7: used as output
-        // bit 6: unused
-        if (m_keyint==CLEAR_LINE) answer |= 0x01;
-        if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x04;
-        // TODO: add clock interrupt
-        if (m_intb==CLEAR_LINE) answer |= 0x10;
-        if (m_video_wait==ASSERT_LINE) answer |= 0x20;
-        // TODO: PAL pin 5
-        LOGMASKED(LOG_LINES, "INT15-8 = %02x\n", answer);
-        break;
-
-    case tms9901_device::P0_P7:
-        // Read pins P0-P7 of TMS9901. All pins are configured as outputs, so nothing here.
-        break;
-
-    case tms9901_device::P8_P15:
-        // Read pins P8-P15 of TMS 9901.
-        // bit 4: mouse left button
-        // video wait is an output; no input possible here
-        if (m_intb==CLEAR_LINE) answer |= 0x04;     // mirror from above
-        // TODO: 0x08 = real-time clock int
-        if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x10; // mirror from above
-        if (m_keyint==CLEAR_LINE) answer |= 0x40;
-
-        // Joystick up (mirror of bit 7)
-        if ((m_joyport->read_port() & 0x10)==0) answer |= 0x80;
-        break;
-    }
-    */
 
 /*
     Write PE bus reset line
@@ -616,7 +577,7 @@ void geneve_state::tms9901_interrupt(offs_t offset, uint8_t data)
 WRITE_LINE_MEMBER( geneve_state::inta )
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
-	m_tms9901->set_int_line(1, state);
+	m_tms9901->set_single_int(1, state);
 	m_cpu->set_input_line(INT_9995_INT4, state);
 }
 
@@ -626,7 +587,7 @@ WRITE_LINE_MEMBER( geneve_state::inta )
 WRITE_LINE_MEMBER( geneve_state::intb )
 {
 	m_intb = (state!=0)? ASSERT_LINE : CLEAR_LINE;
-	m_tms9901->set_int_line(12, state);
+	m_tms9901->set_single_int(12, state);
 }
 
 WRITE_LINE_MEMBER( geneve_state::ext_ready )
@@ -653,7 +614,7 @@ WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
 	if (state != m_int2)
 	{
 		m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
-		m_tms9901->set_int_line(2, state);
+		m_tms9901->set_single_int(2, state);
 		if (state!=0)
 		{
 			m_colorbus->poll();
@@ -667,7 +628,7 @@ WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
 WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 {
 	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
-	m_tms9901->set_int_line(8, state);
+	m_tms9901->set_single_int(8, state);
 }
 
 void geneve_state::external_operation(offs_t offset, uint8_t data)
@@ -780,7 +741,7 @@ void geneve_state::geneve_common(machine_config &config)
 
 	// Main board components
 	TMS9901(config, m_tms9901, 0);
-	m_tms9901->read_cb().set(FUNC(geneve_state::psi_input));
+	m_tms9901->read_cb().set(FUNC(geneve_state::read_by_9901));
 	m_tms9901->p_out_cb(0).set(FUNC(geneve_state::peripheral_bus_reset));
 	m_tms9901->p_out_cb(1).set(FUNC(geneve_state::VDP_reset));
 	m_tms9901->p_out_cb(2).set(FUNC(geneve_state::joystick_select));
@@ -790,7 +751,7 @@ void geneve_state::geneve_common(machine_config &config)
 	m_tms9901->p_out_cb(7).set(FUNC(geneve_state::extbus_wait_states));
 	m_tms9901->p_out_cb(9).set(FUNC(geneve_state::video_wait_states));
 	m_tms9901->p_out_cb(13).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_select_msb));
-	m_tms9901->intreq_cb().set(FUNC(geneve_state::tms9901_interrupt));
+	m_tms9901->intlevel_cb().set(FUNC(geneve_state::tms9901_interrupt));
 
 	// Clock
 	MM58274C(config, GENEVE_CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday

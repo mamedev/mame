@@ -471,6 +471,7 @@ void _4roses_state::_4roses(machine_config &config)
 	screen.set_size((124+1)*4, (30+1)*8);               /* guess. taken from funworld games */
 	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* guess. taken from funworld games */
 	screen.set_screen_update(FUNC(_4roses_state::screen_update_funworld));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_4roses);
 

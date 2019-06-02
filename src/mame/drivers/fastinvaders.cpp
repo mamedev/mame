@@ -79,7 +79,7 @@ private:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(dark_1_clr);
 	DECLARE_WRITE8_MEMBER(dark_2_clr);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void fastinvaders_map(address_map &map);
 	void fastinvaders_io_base(address_map &map);
@@ -220,11 +220,11 @@ void fastinvaders_state::video_start()
 {
 }
 
-uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	bitmap.fill(rgb_t::black(), cliprect);
+	bitmap.fill(0, cliprect);
 
 	int count = 0;
 	for (int y = 0; y < 19; y++)
@@ -656,6 +656,7 @@ void fastinvaders_state::fastinvaders(machine_config &config)
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0*16, 40*16-1, 0*14, 19*14-1);
 	screen.set_screen_update(FUNC(fastinvaders_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_fastinvaders);
 	PALETTE(config, "palette", palette_device::MONOCHROME);

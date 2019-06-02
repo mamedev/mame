@@ -682,7 +682,7 @@ void twincobr_state::twincobr(machine_config &config)
 	m_coinlatch->q_out_cb<7>().set(FUNC(twincobr_state::coin_lockout_2_w));
 
 	/* video hardware */
-	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(28'000'000)/8)); /* 3.5MHz measured on CLKin */
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(28'000'000)/8)); /* 3.5MHz measured on CLKin */
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
@@ -699,6 +699,7 @@ void twincobr_state::twincobr(machine_config &config)
 	m_screen->set_screen_update(FUNC(twincobr_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram16, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twincobr);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1792);

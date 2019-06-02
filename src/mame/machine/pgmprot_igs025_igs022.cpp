@@ -36,18 +36,18 @@
 
 void pgm_022_025_state::pgm_dw3_decrypt()
 {
-	u16 *src = (u16 *) (memregion("maincpu")->base() + 0x100000);
+	int i;
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x100000;
 
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		u16 x = src[i];
+	for(i=0; i<rom_size/2; i++) {
+		uint16_t x = src[i];
 
-		if ((i & 0x005460) == 0x001400 || (i & 0x005450) == 0x001040)
+		if((i & 0x005460) == 0x001400 || (i & 0x005450) == 0x001040)
 			x ^= 0x0100;
 
-		if ((i & 0x005e00) == 0x001c00 || (i & 0x005580) == 0x001100)
+		if((i & 0x005e00) == 0x001c00 || (i & 0x005580) == 0x001100)
 			x ^= 0x0040;
 
 		src[i] = x;
@@ -56,18 +56,18 @@ void pgm_022_025_state::pgm_dw3_decrypt()
 
 void pgm_022_025_state::pgm_killbld_decrypt()
 {
-	u16 *src = (u16 *) (memregion("maincpu")->base() + 0x100000);
+	int i;
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x200000;
 
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		u16 x = src[i];
+	for(i=0; i<rom_size/2; i++) {
+		uint16_t x = src[i];
 
-		if ((i & 0x006d00) == 0x000400 || (i & 0x006c80) == 0x000880)
+		if((i & 0x006d00) == 0x000400 || (i & 0x006c80) == 0x000880)
 			x ^= 0x0008;
 
-		if ((i & 0x007500) == 0x002400 || (i & 0x007600) == 0x003200)
+		if((i & 0x007500) == 0x002400 || (i & 0x007600) == 0x003200)
 			x ^= 0x1000;
 
 		src[i] = x;
@@ -75,7 +75,7 @@ void pgm_022_025_state::pgm_killbld_decrypt()
 }
 
 // these were all xored by a table at $178B2A
-static const u8 killbld_source_data[0x0c][0xec] =  // offsets to these tables stored at $155ed0
+static const uint8_t killbld_source_data[0x0c][0xec] =  // offsets to these tables stored at $155ed0
 {
 	{ // region 16, $178772
 		0x5e, 0x09, 0xb3, 0x39, 0x60, 0x71, 0x71, 0x53, 0x11, 0xe5, 0x26, 0x34, 0x4c, 0x8c, 0x90, 0xee,
@@ -189,7 +189,7 @@ static const u8 killbld_source_data[0x0c][0xec] =  // offsets to these tables st
 
 // all tables xored with data from $149c4c
 // tables are the same as olds and drgw2
-static const u8 dw3_source_data[0x08][0xec] =
+static const uint8_t dw3_source_data[0x08][0xec] =
 {
 	{ 0, },
 	{ // region 1, $14c21a
@@ -315,23 +315,25 @@ static const u8 dw3_source_data[0x08][0xec] =
 
 MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 {
-	const int region = (ioport(":Region")->read()) & 0xff;
+	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region - 0x16;
 	m_igs025->m_kb_game_id = 0x89911400 | region;
 
-	pgm_state::machine_reset();
+	MACHINE_RESET_CALL_MEMBER(pgm);
 }
 
 MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
 {
-	const int region = (ioport(":Region")->read()) & 0xff;
+	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00060000 | region;
 
-	pgm_state::machine_reset();
+	MACHINE_RESET_CALL_MEMBER(pgm);
 }
+
+
 
 
 void pgm_022_025_state::igs025_to_igs022_callback( void )
@@ -341,6 +343,7 @@ void pgm_022_025_state::igs025_to_igs022_callback( void )
 }
 
 
+
 void pgm_022_025_state::init_killbld()
 {
 	pgm_basic_init();
@@ -348,6 +351,7 @@ void pgm_022_025_state::init_killbld()
 
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+	m_igs022->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = killbld_source_data;
 }
 
@@ -358,6 +362,7 @@ void pgm_022_025_state::init_drgw3()
 
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+	m_igs022->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = dw3_source_data;
 }
 
@@ -366,7 +371,7 @@ void pgm_022_025_state::killbld_mem(address_map &map)
 {
 	pgm_mem(map);
 	map(0x100000, 0x2fffff).bankr("bank1"); /* Game ROM */
-	map(0x300000, 0x303fff).ram().share("igs022:sharedprotram"); // Shared with protection device
+	map(0x300000, 0x303fff).ram().share("sharedprotram"); // Shared with protection device
 }
 
 

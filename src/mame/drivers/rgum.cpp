@@ -44,7 +44,7 @@ private:
 	required_shared_ptr<uint8_t> m_cram;
 	uint8_t m_hbeat;
 	virtual void video_start() override;
-	uint32_t screen_update_royalgum(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -56,7 +56,7 @@ void rgum_state::video_start()
 {
 }
 
-uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
@@ -258,6 +258,7 @@ void rgum_state::rgum(machine_config &config)
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1);
 	screen.set_screen_update(FUNC(rgum_state::screen_update_royalgum));
+	screen.set_palette(m_palette);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 24000000/16));   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 	crtc.set_screen("screen");

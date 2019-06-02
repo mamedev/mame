@@ -25,9 +25,9 @@ uint32_t actfancr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_tilegen[1]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_spriteram16.get(), 0x800/2);
-	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram16.get(), 0x00, 0x00, 0x0f);
+	m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 	return 0;
 }

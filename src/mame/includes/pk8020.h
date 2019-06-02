@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, AJR
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  * includes/pk8020.h
@@ -10,13 +10,12 @@
 
 #pragma once
 
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
-#include "machine/bankdev.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
 #include "machine/pic8259.h"
-#include "machine/pla.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
@@ -30,18 +29,22 @@ public:
 	pk8020_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_decplm(*this, "decplm"),
-		m_devbank(*this, "devbank"),
+		m_ppi8255_1(*this, "ppi8255_1"),
+		m_ppi8255_2(*this, "ppi8255_2"),
+		m_ppi8255_3(*this, "ppi8255_3"),
+		m_rs232(*this, "i8251line"),
+		m_lan(*this, "i8251lan"),
 		m_ram(*this, RAM_TAG),
-		m_ios(*this, "ios%u", 1U),
-		m_fdc(*this, "fdc"),
-		m_floppy(*this, "fdc:%u", 0U),
-		m_inr(*this, "inr"),
+		m_wd1793(*this, "wd1793"),
+		m_floppy0(*this, "wd1793:0"),
+		m_floppy1(*this, "wd1793:1"),
+		m_floppy2(*this, "wd1793:2"),
+		m_floppy3(*this, "wd1793:3"),
+		m_pit8253(*this, "pit8253"),
+		m_pic8259(*this, "pic8259"),
 		m_speaker(*this, "speaker"),
-		m_printer(*this, "printer"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
-		m_io_port(*this, "LINE%u", 0U),
 		m_palette(*this, "palette")
 	{ }
 
@@ -50,40 +53,34 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	uint8_t keyboard_r(offs_t offset);
-	void sysreg_w(offs_t offset, uint8_t data);
-	void color_w(uint8_t data);
-	void palette_w(uint8_t data);
-	void video_page_w(uint8_t data);
-	uint8_t text_r(offs_t offset);
-	void text_w(offs_t offset, uint8_t data);
-	uint8_t gzu_r(offs_t offset);
-	void gzu_w(offs_t offset, uint8_t data);
-	uint8_t devices_r(offs_t offset);
-	void devices_w(offs_t offset, uint8_t data);
-	uint8_t memory_r(offs_t offset);
-	void memory_w(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_READ8_MEMBER(sysreg_r);
+	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_READ8_MEMBER(text_r);
+	DECLARE_WRITE8_MEMBER(text_w);
+	DECLARE_READ8_MEMBER(gzu_r);
+	DECLARE_WRITE8_MEMBER(gzu_w);
+	DECLARE_READ8_MEMBER(devices_r);
+	DECLARE_WRITE8_MEMBER(devices_w);
 	void pk8020_palette(palette_device &palette) const;
 	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
-	uint8_t ppi_porta_r();
-	void floppy_control_w(uint8_t data);
-	void ppi_2_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-
-	static const char *plm_select_name(uint8_t data);
-	void log_bank_select(uint8_t bank, offs_t start, offs_t end, uint8_t rdecplm, uint8_t wdecplm);
+	DECLARE_READ8_MEMBER(pk8020_porta_r);
+	DECLARE_WRITE8_MEMBER(pk8020_portc_w);
+	DECLARE_WRITE8_MEMBER(pk8020_portb_w);
+	DECLARE_READ8_MEMBER(pk8020_portc_r);
+	DECLARE_WRITE8_MEMBER(pk8020_2_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
+	void pk8020_set_bank(uint8_t data);
 
 	void pk8020_io(address_map &map);
 	void pk8020_mem(address_map &map);
-	void devices_map(address_map &map);
 
-	uint8_t m_bank_select;
 	uint8_t m_color;
 	uint8_t m_video_page;
 	uint8_t m_wide;
@@ -92,22 +89,28 @@ private:
 	uint8_t m_text_attr;
 	uint8_t m_takt;
 	uint8_t m_video_page_access;
+	uint8_t m_portc_data;
 	uint8_t m_sound_gate;
 	uint8_t m_sound_level;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<pls100_device> m_decplm;
-	required_device<address_map_bank_device> m_devbank;
+	required_device<i8255_device> m_ppi8255_1;
+	required_device<i8255_device> m_ppi8255_2;
+	required_device<i8255_device> m_ppi8255_3;
+	required_device<i8251_device> m_rs232;
+	required_device<i8251_device> m_lan;
 	required_device<ram_device> m_ram;
-	required_device_array<i8251_device, 2> m_ios;
-	required_device<kr1818vg93_device> m_fdc;
-	required_device_array<floppy_connector, 4> m_floppy;
-	required_device<pic8259_device> m_inr;
+	required_device<fd1793_device> m_wd1793;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<pit8253_device> m_pit8253;
+	required_device<pic8259_device> m_pic8259;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<centronics_device> m_printer;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<uint8_t> m_region_gfx1;
-	required_ioport_array<16> m_io_port;
+	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
 };
 

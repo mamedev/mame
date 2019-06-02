@@ -62,16 +62,6 @@ protected:
 protected:
 };
 
-class a2bus_vulcaniie_device : public a2bus_vulcanbase_device
-{
-public:
-	a2bus_vulcaniie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-protected:
-	virtual void device_start() override;
-};
-
 class a2bus_vulcangold_device : public a2bus_vulcanbase_device
 {
 public:
@@ -81,7 +71,6 @@ public:
 
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device)
-DECLARE_DEVICE_TYPE(A2BUS_VULCANIIE,  a2bus_vulcaniie_device)
 DECLARE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device)
 
 #endif // MAME_BUS_A2BUS_VULCAN_H

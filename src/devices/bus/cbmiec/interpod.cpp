@@ -70,14 +70,13 @@ Notes:
 #define R6532_TAG       "u3"
 #define R6522_TAG       "u4"
 #define MC6850_TAG      "u5"
-#define RS232_TAG       "rs232"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(INTERPOD, interpod_t, "interpod", "Interpod")
+DEFINE_DEVICE_TYPE(INTERPOD, interpod_device, "interpod", "Interpod")
 
 
 
@@ -91,11 +90,8 @@ DEFINE_DEVICE_TYPE(INTERPOD, interpod_t, "interpod", "Interpod")
 
 ROM_START( interpod )
 	ROM_REGION( 0x800, R6502_TAG, 0 )
-	ROM_DEFAULT_BIOS("v16")
-	ROM_SYSTEM_BIOS( 0, "v14", "Version 1.4" )
-	ROMX_LOAD( "1.4.u2", 0x000, 0x800, CRC(c5b71982) SHA1(614d677b7c6273f6b84fa61affaf91cfdaeed6a6), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v16", "Version 1.6" )
-	ROMX_LOAD( "1.6.u2", 0x000, 0x800, CRC(67bb0436) SHA1(7659c45b73f577233f7657c4da9141dcfe8b6d97), ROM_BIOS(1) )
+	ROM_LOAD( "1.4.u2", 0x000, 0x800, CRC(c5b71982) SHA1(614d677b7c6273f6b84fa61affaf91cfdaeed6a6) )
+	ROM_LOAD( "1.6.u2", 0x000, 0x800, CRC(67bb0436) SHA1(7659c45b73f577233f7657c4da9141dcfe8b6d97) )
 ROM_END
 
 
@@ -103,7 +99,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *interpod_t::device_rom_region() const
+const tiny_rom_entry *interpod_device::device_rom_region() const
 {
 	return ROM_NAME( interpod );
 }
@@ -113,7 +109,7 @@ const tiny_rom_entry *interpod_t::device_rom_region() const
 //  ADDRESS_MAP( interpod_mem )
 //-------------------------------------------------
 
-void interpod_t::interpod_mem(address_map &map)
+void interpod_device::interpod_mem(address_map &map)
 {
 	map(0x0000, 0x007f).mirror(0x3b80).m(R6532_TAG, FUNC(mos6532_new_device::ram_map));
 	map(0x0400, 0x041f).mirror(0x3be0).m(R6532_TAG, FUNC(mos6532_new_device::io_map));
@@ -127,22 +123,17 @@ void interpod_t::interpod_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void interpod_t::device_add_mconfig(machine_config &config)
+void interpod_device::device_add_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &interpod_t::interpod_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &interpod_device::interpod_mem);
 
 	VIA6522(config, m_via, 1000000);
-
 	MOS6532_NEW(config, m_riot, 1000000);
-
 	ACIA6850(config, m_acia, 0);
 
 	ieee488_device::add_cbm_devices(config, nullptr);
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
-
 
 
 //**************************************************************************
@@ -150,27 +141,25 @@ void interpod_t::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  interpod_t - constructor
+//  interpod_device - constructor
 //-------------------------------------------------
 
-interpod_t::interpod_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, INTERPOD, tag, owner, clock),
-	device_cbm_iec_interface(mconfig, *this),
-	m_maincpu(*this, R6502_TAG),
-	m_via(*this, R6522_TAG),
-	m_riot(*this, R6532_TAG),
-	m_acia(*this, MC6850_TAG),
-	m_ieee(*this, IEEE488_TAG),
-	m_rs232(*this, RS232_TAG)
+interpod_device::interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, INTERPOD, tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, R6502_TAG),
+		m_via(*this, R6522_TAG),
+		m_riot(*this, R6532_TAG),
+		m_acia(*this, MC6850_TAG),
+		m_ieee(*this, IEEE488_TAG)
 {
 }
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void interpod_t::device_start()
+void interpod_device::device_start()
 {
 }
 
@@ -179,6 +168,6 @@ void interpod_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void interpod_t::device_reset()
+void interpod_device::device_reset()
 {
 }

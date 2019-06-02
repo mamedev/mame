@@ -196,6 +196,7 @@ void polepos_state::video_start()
 	save_item(NAME(m_road16_vscroll));
 	save_item(NAME(m_chacl));
 	save_item(NAME(m_scroll));
+	save_item(NAME(m_sub_irq_mask));
 }
 
 

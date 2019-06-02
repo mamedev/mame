@@ -204,9 +204,11 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_highpri_renderline(nullptr)
 	, m_video_renderline(nullptr)
 	, m_palette_lookup(nullptr)
+	, m_palette_lookup_sprite(nullptr)
+	, m_palette_lookup_shadow(nullptr)
+	, m_palette_lookup_highlight(nullptr)
 	, m_space68k(nullptr)
 	, m_cpu68k(*this, finder_base::DUMMY_TAG)
-	, m_ext_palette(*this, finder_base::DUMMY_TAG)
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
@@ -220,6 +222,8 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 void sega315_5313_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5313_mode4_device::device_add_mconfig(config);
+
+	m_palette->set_entries(0x200); // more entries for 32X - not really the cleanest way to do this
 
 	SEGAPSG(config.replace(), m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
 }
@@ -290,13 +294,22 @@ void sega315_5313_device::device_start()
 	m_video_renderline = std::make_unique<uint32_t[]>(320);
 
 	m_palette_lookup = std::make_unique<uint16_t[]>(0x40);
+	m_palette_lookup_sprite = std::make_unique<uint16_t[]>(0x40);
+
+	m_palette_lookup_shadow = std::make_unique<uint16_t[]>(0x40);
+	m_palette_lookup_highlight = std::make_unique<uint16_t[]>(0x40);
 
 	memset(m_palette_lookup.get(),0x00,0x40*2);
+	memset(m_palette_lookup_sprite.get(),0x00,0x40*2);
+
+	memset(m_palette_lookup_shadow.get(),0x00,0x40*2);
+	memset(m_palette_lookup_highlight.get(),0x00,0x40*2);
+
 
 	if (!m_use_alt_timing)
-		m_render_bitmap = std::make_unique<bitmap_rgb32>(320, 512); // allocate maximum sizes we're going to use, it's safer.
+		m_render_bitmap = std::make_unique<bitmap_ind16>(320, 512); // allocate maximum sizes we're going to use, it's safer.
 	else
-		m_render_line = std::make_unique<uint32_t[]>(320);
+		m_render_line = std::make_unique<uint16_t[]>(320);
 
 	m_render_line_raw = std::make_unique<uint16_t[]>(320);
 
@@ -304,11 +317,14 @@ void sega315_5313_device::device_start()
 	// but better safe than sorry...
 	save_pointer(NAME(m_sprite_renderline), 1024);
 	save_pointer(NAME(m_highpri_renderline), 320);
-	save_pointer(NAME(m_video_renderline), 320);
+	save_pointer(NAME(m_video_renderline), 320/4);
 	save_pointer(NAME(m_palette_lookup), 0x40);
-	save_pointer(NAME(m_render_line_raw), 320);
+	save_pointer(NAME(m_palette_lookup_sprite), 0x40);
+	save_pointer(NAME(m_palette_lookup_shadow), 0x40);
+	save_pointer(NAME(m_palette_lookup_highlight), 0x40);
+	save_pointer(NAME(m_render_line_raw), 320/2);
 	if (m_use_alt_timing)
-		save_pointer(NAME(m_render_line), 320);
+		save_pointer(NAME(m_render_line), 320/2);
 
 	m_irq6_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq6_on_timer_callback), this));
 	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));
@@ -398,17 +414,20 @@ void sega315_5313_device::write_cram_value(int offset, int data)
 	//logerror("Wrote to CRAM addr %04x data %04x\n",m_vdp_address&0xfffe,m_cram[m_vdp_address>>1]);
 	if (m_use_cram)
 	{
-		data = ((m_cram[offset] & 0xe) >> 1) | ((m_cram[offset] & 0xe0) >> 2) | ((m_cram[offset] & 0xe00) >> 3);
-		m_palette_lookup[offset] = data;
-		if (m_ext_palette != nullptr)
+		int r,g,b;
+		r = ((data >> 1)&0x07);
+		g = ((data >> 5)&0x07);
+		b = ((data >> 9)&0x07);
+		if (m_palwrite_base != -1)
 		{
-			if (m_palwrite_base != -1)
-			{
-				m_ext_palette->set_pen_color(offset + m_palwrite_base, m_palette->pen(data));
-				m_ext_palette->set_pen_color(offset + m_palwrite_base + 0x40, m_palette->pen(0x200 | data));
-				m_ext_palette->set_pen_color(offset + m_palwrite_base + 0x80, m_palette->pen(0x400 | data));
-			}
+			m_palette->set_pen_color(offset + m_palwrite_base ,pal3bit(r),pal3bit(g),pal3bit(b));
+			m_palette->set_pen_color(offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
+			m_palette->set_pen_color(offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
 		}
+		m_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
+		m_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);
+		m_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
+		m_palette_lookup_highlight[offset] = ((b|0x08)<<1) | ((g|0x08)<<6) | ((r|0x08)<<11);
 	}
 }
 
@@ -2622,14 +2641,16 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 /* This converts our render buffer to real screen colours */
 void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 {
-	uint32_t *lineptr;
+	uint16_t *lineptr;
+
+
 
 	if (!m_use_alt_timing)
 	{
 		if (scanline >= m_render_bitmap->height()) // safety, shouldn't happen now we allocate a fixed amount tho
 			return;
 
-		lineptr = &m_render_bitmap->pix32(scanline);
+		lineptr = &m_render_bitmap->pix16(scanline);
 
 	}
 	else
@@ -2638,9 +2659,6 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 	for (int x = 0; x < 320; x++)
 	{
 		uint32_t dat = m_video_renderline[x];
-		uint16_t clut = m_palette_lookup[(dat & 0x3f)];
-		if (!MEGADRIVE_REG0_SPECIAL_PAL) // 3 bit color mode, correct?
-			clut &= 0x111;
 
 		if (!(dat & 0x20000))
 			m_render_line_raw[x] = 0x100;
@@ -2652,12 +2670,12 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 		{
 			if (dat & 0x10000)
 			{
-				lineptr[x] = m_palette->pen(clut);
+				lineptr[x] = m_palette_lookup_sprite[(dat & 0x3f)];
 				m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 			}
 			else
 			{
-				lineptr[x] = m_palette->pen(clut);
+				lineptr[x] = m_palette_lookup[(dat & 0x3f)];
 				m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 			}
 
@@ -2673,25 +2691,26 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
 				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
 				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-					lineptr[x] = m_palette->pen(0x200 | clut);
+					lineptr[x] = m_palette_lookup_shadow[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
 					break;
 
 				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 				case 0x8000: // low pri, highlight sprite = normal;
-					lineptr[x] = m_palette->pen(clut);
+					lineptr[x] = m_palette_lookup[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 					break;
 
 				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 				case 0x18000: // (sprite) low pri, highlight sprite = normal;
-					lineptr[x] = m_palette->pen(clut);
+					lineptr[x] = m_palette_lookup_sprite[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 					break;
 
+
 				case 0x0c000: // normal pri, highlight set = highlight?
 				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-					lineptr[x] = m_palette->pen(0x400 | clut);
+					lineptr[x] = m_palette_lookup_highlight[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
 					break;
 

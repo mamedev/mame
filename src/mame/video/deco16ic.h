@@ -69,20 +69,20 @@ public:
 
 	void print_debug_info(bitmap_ind16 &bitmap);
 
-	void pf_update(const u16 *rowscroll_1_ptr, const u16 *rowscroll_2_ptr);
+	void pf_update(const uint16_t *rowscroll_1_ptr, const uint16_t *rowscroll_2_ptr);
 
 	template<class _BitmapClass>
-	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
 	template<class _BitmapClass>
-	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
-	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
-	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
-	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
-	void tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
 
 	/* used by boogwing, nitrobal */
-	void tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, int is_tattoo = false, u8 pmask = 0xff);
-	void tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, int is_tattoo = false, u8 pmask = 0xff);
+	void tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo = false);
+	void tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo = false);
 
 	/* used by robocop2 */
 	void set_tilemap_colour_mask(int tmap, int mask);
@@ -109,18 +109,17 @@ public:
 	tilemap_t *tilemap0_16x16,
 	tilemap_t *tilemap1_8x8,
 	tilemap_t *tilemap1_16x16,
-	const u16 *rowscroll_ptr,
-	const u16 scrollx,
-	const u16 scrolly,
-	const u16 control0,
-	const u16 control1,
+	const uint16_t *rowscroll_ptr,
+	const uint16_t scrollx,
+	const uint16_t scrolly,
+	const uint16_t control0,
+	const uint16_t control1,
 	int combine_mask,
 	int combine_shift,
 	int trans_mask,
 	int flags,
-	u8 priority,
-	int is_tattoo,
-	u8 pmask = 0xff
+	uint32_t priority,
+	int is_tattoo
 	);
 
 protected:
@@ -130,11 +129,11 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<u16[]> m_pf1_data;
-	std::unique_ptr<u16[]> m_pf2_data;
-	std::unique_ptr<u16[]> m_pf12_control;
+	std::unique_ptr<uint16_t[]> m_pf1_data;
+	std::unique_ptr<uint16_t[]> m_pf2_data;
+	std::unique_ptr<uint16_t[]> m_pf12_control;
 
-	const u16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
+	const uint16_t *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 
 	tilemap_t *m_pf1_tilemap_16x16, *m_pf2_tilemap_16x16;
 	tilemap_t *m_pf1_tilemap_8x8, *m_pf2_tilemap_8x8;

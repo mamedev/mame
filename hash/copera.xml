@@ -21,7 +21,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-16163 J05" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16163 j05.ic1" size="1048576" crc="9b05acc9" sha1="cd4f3260309a1236f6f0d491f385d4dececa349e" loadflag="load16_word_swap" />
+				<rom name="mpr-16163 j05.ic1" size="1048576" crc="9b05acc9" sha1="cd4f3260309a1236f6f0d491f385d4dececa349e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-16164 J06" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16164 j06.ic1" size="1048576" crc="24aa1251" sha1="1a7d5156aa3f2ffba168bce1bbd9436cb0c11510" loadflag="load16_word_swap" />
+				<rom name="mpr-16164 j06.ic1" size="1048576" crc="24aa1251" sha1="1a7d5156aa3f2ffba168bce1bbd9436cb0c11510" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-16162 J04" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16162 j04.ic1" size="1048576" crc="a7d33072" sha1="081c61e35478ffdda6eda58f40be056732f35595" loadflag="load16_word_swap" />
+				<rom name="mpr-16162 j04.ic1" size="1048576" crc="a7d33072" sha1="081c61e35478ffdda6eda58f40be056732f35595" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-16600 J07" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16600.ic1" size="1048576" crc="d1aee834" sha1="93c825160286b483904428eece2b14e521c20d15" loadflag="load16_word_swap" />
+				<rom name="mpr-16600.ic1" size="1048576" crc="d1aee834" sha1="93c825160286b483904428eece2b14e521c20d15" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6434C" />
 			<feature name="ic1" value="MPR-17017-H" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17017-h.ic1" size="1048576" crc="b25e7134" sha1="0578314e66b2385e0520a421af695ccfef44f076" loadflag="load16_word_swap" />
+				<rom name="mpr-17017-h.ic1" size="1048576" crc="b25e7134" sha1="0578314e66b2385e0520a421af695ccfef44f076" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-17438 J11" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17438 j11.ic1" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" loadflag="load16_word_swap" />
+				<rom name="mpr-17438 j11.ic1" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-17509 J12" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17509 j12.ic1" size="1048576" crc="0cb5727d" sha1="5f271c69f574a761f2c83f8005978dcb0635e81b" loadflag="load16_word_swap" />
+				<rom name="mpr-17509 j12.ic1" size="1048576" crc="0cb5727d" sha1="5f271c69f574a761f2c83f8005978dcb0635e81b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +126,7 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-xxxxx" />    <!-- unreadable marking -->
 			<dataarea name="rom" size="1048576">
-				<rom name="copera no chikyuu daisuki.ic1" size="1048576" crc="9a5dd562" sha1="730195fc41efb923a4f8e8acd5228d1ae8b16c16" loadflag="load16_word_swap" />
+				<rom name="copera no chikyuu daisuki.ic1" size="1048576" crc="9a5dd562" sha1="730195fc41efb923a4f8e8acd5228d1ae8b16c16" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

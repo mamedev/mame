@@ -282,7 +282,7 @@ void b16_state::b16(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette(m_palette);
 
-	MC6845(config, m_mc6845, XTAL(14'318'181)/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	H46505(config, m_mc6845, XTAL(14'318'181)/5);    /* unknown clock, hand tuned to get ~60 fps */
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);

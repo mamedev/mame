@@ -24,7 +24,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="gk1.bin" size="0x200000" crc="775608cd" sha1="8b53fd4e8ced709df2716c839abfd7e41cc719d2"/>
+				<rom name="gk1.bin" size="0x200000" crc="775608cd" sha1="8b53fd4e8ced709df2716c839abfd7e41cc719d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>

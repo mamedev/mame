@@ -25,7 +25,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	//  required_device<meg_embedded_device> m_meg;
+	//	required_device<meg_embedded_device> m_meg;
 
 	sound_stream *m_stream;
 

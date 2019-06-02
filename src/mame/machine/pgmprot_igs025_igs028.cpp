@@ -26,7 +26,7 @@
 
 // tables are xored by table at $1998dc
 // tables are the same as drgw3 and drgw2
-static const u8 m_olds_source_data[8][0xec] = // table addresses $2951CA
+static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
 {
 	{ // region 0, unused...
 		0,
@@ -152,14 +152,14 @@ static const u8 m_olds_source_data[8][0xec] = // table addresses $2951CA
 	}
 };
 
-void pgm_028_025_state::machine_reset()
+MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
-	const int region = (ioport(":Region")->read()) & 0xff;
+	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00900000 | region;
 
-	pgm_state::machine_reset();
+	MACHINE_RESET_CALL_MEMBER(pgm);
 }
 
 void pgm_028_025_state::init_olds()
@@ -169,6 +169,7 @@ void pgm_028_025_state::init_olds()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
 	m_igs028->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = m_olds_source_data;
+
 }
 
 void pgm_028_025_state::olds_mem(address_map &map)
@@ -195,6 +196,8 @@ void pgm_028_025_state::pgm_028_025_ol(machine_config &config)
 	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
 
 	IGS028(config, m_igs028, 0);
+
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
 }
 
 

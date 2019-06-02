@@ -23,65 +23,32 @@
 
     Custom Chip 084 (Starfield generation)
 
-
-                  ----------------------
-   NE555 1Hz      | 10              24 | VCC
-                  |                    |
-                  |                    |
-   18Mhz      401 | 1               19 | 419 Reset Enable
-    6MHz      109 | 2                  |
- 256H*        403 | 3   Custom 084     |
- Vblank*      404 | 4                  |
- /SYNC*       405 | 5               18 | Blue
- Aux. Enable  406 | 6               17 | Blue
- Stars Enable 407 | 7                  |
- Horz.Flip    HFF | 8               16 | Green
-       GND        | 11              15 | Green
-                  |                    |
- H8Q          423 | 23              14 | Red
- V1           422 | 22              13 | Red
- V2           421 | 21                 |
- 0x8120       420 | 20                 |
-                  ----------------------
-
- line 420 seems to be related to 419 which is connect to reset circuit -> watchdog
-
- There are two star fields implemented here. The active one can be selected in
- Machine Configuration.
-
- a) Scramble Starfield
-
- 1/3 star width like scramble/galaxian, starfield code same as scramble.
- This one is similar to the Konami starfield video below.
-
- b) Bootleg Starfield
-
- Guru provided schematics of a daughter-board which on a Konami bootleg replaced
- custom chip 084. This starfield matches the starfield (picture) of this bootleg.
-
- None of the two alterntives reproduces the star field which can be observed in
- the Stern videos below.
-
- FIXME: For an exact emulation we need a 084 at some time.
- FIXME: The Konami video below is different from tutankhm. Looks like we
-        are missing an early board dump
+    * Inputs:
+    *
+    *      NE555 ==> 10 (approx 1 HZ)
+    *       401  ==>  1  (crystal clock, most likely around 6 MHz)
+    *       109  ==>  2  (Video related)
+    *       403  ==>  3  (Video related)
+    *       403  ==>  4  (Video related)
+    *       405  ==>  5  (Video related)
+    *       406  ==>  6  (Video related)
+    *       420  ==> 20  (Video related)
+    *       421  ==> 21  (Video related)
+    *       422  ==> 22  (Video related)
+    *       423  ==> 23  (Video horizontal signal H1)
+    *0x8206 HFF  ==>  7 (Horizontal flip)
+    *0x8204 407  ==>  8  (Enable ???)
+    *
+    *Outputs:
+    *   13      Red
+    *   14      Red
+    *   15      Green
+    *   16      Green
+    *   17      Blue
+    *   18      Blue
 
 
- Starfield videos ....
-
- Konami
- https://www.youtube.com/watch?v=YwVjJtQK2n4
-
- Stern
- https://www.youtube.com/watch?v=g6nv6jHFP80
- https://www.youtube.com/watch?v=D_hmvFi2ehw
- https://www.youtube.com/watch?v=EZNqH-JPzPM
- https://www.youtube.com/watch?v=1MPvSIEIpFU
-
- */
-
-
-/***************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "includes/tutankhm.h"
@@ -92,7 +59,6 @@
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
-#include "schedule.h"
 
 
 /*************************************
@@ -168,16 +134,8 @@ void tutankhm_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0x800f).mirror(0x00f0).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	//0x8100 -> Custom 089 D9 Pin 15
 	map(0x8100, 0x8100).mirror(0x000f).ram().share("scroll");
-
-	/* a read here produces a 1-0-1 write to line 420 (084).
-	 * This most likely resets some sort of timer implemented by the 084 custom chip
-	 * which would on line 419 trigger a reset.
-	 */
-	//0x8720 -> Custom 084 F3 Pin 20
 	map(0x8120, 0x8120).mirror(0x000f).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	//0x8740 -> Custom 089 D9 Pin 11 - Unknown, not used
 	map(0x8160, 0x8160).mirror(0x000f).portr("DSW2"); /* DSW2 (inverted bits) */
 	map(0x8180, 0x8180).mirror(0x000f).portr("IN0");  /* IN0 I/O: Coin slots, service, 1P/2P buttons */
 	map(0x81a0, 0x81a0).mirror(0x000f).portr("IN1");  /* IN1: Player 1 I/O */
@@ -187,7 +145,6 @@ void tutankhm_state::main_map(address_map &map)
 	map(0x8300, 0x8300).mirror(0x00ff).w(FUNC(tutankhm_state::tutankhm_bankselect_w));
 	map(0x8600, 0x8600).mirror(0x00ff).w(FUNC(tutankhm_state::sound_on_w));
 	map(0x8700, 0x8700).mirror(0x00ff).w(m_timeplt_audio, FUNC(timeplt_audio_device::sound_data_w));
-
 	map(0x8800, 0x8fff).ram();
 	map(0x9000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xffff).rom();
@@ -245,11 +202,6 @@ static INPUT_PORTS_START( tutankhm )
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
-
-	PORT_START("STARS")
-	PORT_CONFNAME( 0x01, 0x01, "Starfield selection" )
-	PORT_CONFSETTING(    0x00, "Konami HW bootleg (6MHz stars)" )
-	PORT_CONFSETTING(    0x01, "Scramble implementation" )
 INPUT_PORTS_END
 
 
@@ -263,17 +215,10 @@ void tutankhm_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 
-	m_star_mode = 0;
-
 	save_item(NAME(m_irq_toggle));
 	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_flipscreen_x));
-	save_item(NAME(m_flipscreen_y));
-	//rgb_t m_star_color[64];
-	//std::unique_ptr<uint8_t[]> m_stars;
-	save_item(NAME(m_stars_enabled));
-	save_item(NAME(m_stars_blink_state));
-	save_item(NAME(m_star_mode));
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
 }
 
 void tutankhm_state::machine_reset()
@@ -292,7 +237,7 @@ void tutankhm_state::tutankhm(machine_config &config)
 	mainlatch.q_out_cb<1>().set_nop(); // PAY OUT - not used
 	mainlatch.q_out_cb<2>().set(FUNC(tutankhm_state::coin_counter_2_w));
 	mainlatch.q_out_cb<3>().set(FUNC(tutankhm_state::coin_counter_1_w));
-	mainlatch.q_out_cb<4>().set(FUNC(tutankhm_state::galaxian_stars_enable_w));
+	mainlatch.q_out_cb<4>().set_nop(); // starfield?
 	mainlatch.q_out_cb<5>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
 	mainlatch.q_out_cb<6>().set(FUNC(tutankhm_state::flip_screen_x_w));
 	mainlatch.q_out_cb<7>().set(FUNC(tutankhm_state::flip_screen_y_w));
@@ -300,18 +245,18 @@ void tutankhm_state::tutankhm(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
-	PALETTE(config, m_palette).set_format(1, tutankhm_state::raw_to_rgb_func, 16);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);  /* not sure about the visible area */
+	screen.set_screen_update(FUNC(tutankhm_state::screen_update_tutankhm));
+	screen.screen_vblank().set(FUNC(tutankhm_state::vblank_irq));
 
-	m_screen->set_screen_update(FUNC(tutankhm_state::screen_update_tutankhm));
-	m_screen->screen_vblank().set(FUNC(tutankhm_state::vblank_irq));
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 16);
 
 	/* sound hardware */
 	TIMEPLT_AUDIO(config, "timeplt_audio");
-
-	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	TIMER(config, "stars").configure_periodic(FUNC(tutankhm_state::scramble_stars_blink_timer), PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001));
 }
 
 

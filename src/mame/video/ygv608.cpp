@@ -317,9 +317,8 @@ void ygv608_device::port_map(address_map &map)
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, tag, owner, clock),
-	  device_gfx_interface(mconfig, *this, gfx_ygv608, DEVICE_SELF),
+	  device_gfx_interface(mconfig, *this, gfx_ygv608),
 	  device_memory_interface(mconfig, *this),
-	  device_palette_interface(mconfig, *this),
 	  device_video_interface(mconfig, *this),
 	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),
 	  m_vblank_handler(*this),
@@ -1602,7 +1601,7 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 		m_color_state_w = 0;
 //      if(m_colour_palette[m_palette_address][0] & 0x80) // Transparency designation, none of the Namco games enables it?
 
-		set_pen_color(m_palette_address,
+		palette().set_pen_color(m_palette_address,
 			pal6bit( m_colour_palette[m_palette_address][0] ),
 			pal6bit( m_colour_palette[m_palette_address][1] ),
 			pal6bit( m_colour_palette[m_palette_address][2] ));

@@ -69,7 +69,7 @@ void m68340_cpu_device::update_ipl()
 
 void m68340_cpu_device::internal_vectors_r(address_map &map)
 {
-	map(0xfffffff0, 0xffffffff).r(FUNC(m68340_cpu_device::int_ack)).umask16(0x00ff);
+	map(0xfffff0, 0xffffff).r(FUNC(m68340_cpu_device::int_ack)).umask16(0x00ff);
 }
 
 

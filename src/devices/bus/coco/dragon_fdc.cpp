@@ -99,7 +99,6 @@ namespace
 		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
 		virtual DECLARE_READ8_MEMBER(scs_read) override;
 		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 		virtual void device_add_mconfig(machine_config &config) override;
@@ -121,7 +120,6 @@ namespace
 		premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
 		virtual DECLARE_READ8_MEMBER(scs_read) override;
 		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 		virtual void device_add_mconfig(machine_config &config) override;
@@ -286,22 +284,6 @@ void premier_fdc_device_base::dskreg_w(uint8_t data)
 	m_wd2791->dden_w(!BIT(data, 4));
 
 	set_dskreg(data);
-}
-
-
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(dragon_fdc_device_base::cts_read)
-{
-	return memregion("eprom")->base()[offset];
-}
-
-
-READ8_MEMBER(premier_fdc_device_base::cts_read)
-{
-	return memregion("eprom")->base()[offset];
 }
 
 

@@ -8,7 +8,7 @@
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-void warriorb_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip)
+void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
 {
 	int offs, data, data2, tilenum, color, flipx, flipy;
 	int x, y, priority, pri_mask;
@@ -54,7 +54,7 @@ void warriorb_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		if (x > 0x3c0) x -= 0x400;
 		if (y > 0x180) y -= 0x200;
 
-		m_gfxdecode[chip]->gfx(0)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 					tilenum,
 					color,
 					flipx,flipy,
@@ -93,13 +93,13 @@ uint32_t warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitm
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap.fill(m_tc0110pcr[chip]->black_pen(), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw middle layer
 	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen, bitmap, cliprect, xoffs * chip, 8, chip); // draw sprites
+	draw_sprites(screen, bitmap, cliprect, xoffs * chip, 8); // draw sprites
 
 	// draw top(text) layer
 	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);

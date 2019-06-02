@@ -41,7 +41,7 @@ KinderComp (Spinnaker)
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="basic.bin" size="32768" crc="8fc2a724" sha1="216915e954d393e42a30d1eb8666371439dcbd38"/>
+				<rom name="basic.bin" size="32768" crc="8fc2a724" sha1="216915e954d393e42a30d1eb8666371439dcbd38" offset="0" />
 				<rom size="32768" offset="0x8000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -55,7 +55,7 @@ KinderComp (Spinnaker)
 		<sharedfeat name="requirement" value="ibmpcjr_flop:pcdos21"/>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="colorpnt.bin" size="65536" crc="0dcdef20" sha1="5aeee32a4ec4dd1aeea9a02b3d174a2f294d13b9"/>
+				<rom name="colorpnt.bin" size="65536" crc="0dcdef20" sha1="5aeee32a4ec4dd1aeea9a02b3d174a2f294d13b9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@ KinderComp (Spinnaker)
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="crosfire.bin" size="8192" crc="8c52b5ca" sha1="6a012cddb8188f157790f9ff633862f514ecdf8f"/>
+				<rom name="crosfire.bin" size="8192" crc="8c52b5ca" sha1="6a012cddb8188f157790f9ff633862f514ecdf8f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@ KinderComp (Spinnaker)
 		<publisher>Spinnaker</publisher>
 		<part name="cart1" interface="ibmpcjr_cart">
 			<dataarea name="rom" size = "8192">
-				<rom name="fraction.bin" size="8192" crc="28bb80e0" sha1="2ab31a435fa2f0c07226f3f7cf073f2b2a6c1c2c"/>
+				<rom name="fraction.bin" size="8192" crc="28bb80e0" sha1="2ab31a435fa2f0c07226f3f7cf073f2b2a6c1c2c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,12 +108,12 @@ KinderComp (Spinnaker)
 		<sharedfeat name="requirement" value="ibmpcjr_flop:pcdos21"/>
 		<part name="cart1" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223"/>
+				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe"/>
+				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@ KinderComp (Spinnaker)
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="mineshft.bin" size="8192" crc="ed70ef88" sha1="73ee013a3ae3d5648e712718b2414e87edbadb1c"/>
+				<rom name="mineshft.bin" size="8192" crc="ed70ef88" sha1="73ee013a3ae3d5648e712718b2414e87edbadb1c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@ KinderComp (Spinnaker)
 		<publisher>Gebelli</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="mouser.bin" size="8192" crc="cf392a67" sha1="cbcdcf8c7d5d4e143145ab1dd7fdc04948ebc194"/>
+				<rom name="mouser.bin" size="8192" crc="cf392a67" sha1="cbcdcf8c7d5d4e143145ab1dd7fdc04948ebc194" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@ KinderComp (Spinnaker)
 		<publisher>Racore</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="pc_id.bin" size="65536" crc="08898215" sha1="399a30a6ef60d5dc21a4bf869e56a1730696d173"/>
+				<rom name="pc_id.bin" size="65536" crc="08898215" sha1="399a30a6ef60d5dc21a4bf869e56a1730696d173" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -176,7 +176,7 @@ KinderComp (Spinnaker)
 		<publisher>Activision</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="pitfall2.bin" size="16384" crc="5359b9f8" sha1="a4a5e8bee86a6824869996cfe3bba24dd7b31a14"/>
+				<rom name="pitfall2.bin" size="16384" crc="5359b9f8" sha1="a4a5e8bee86a6824869996cfe3bba24dd7b31a14" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -187,7 +187,7 @@ KinderComp (Spinnaker)
 		<publisher>Activision</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="rivrraid.bin" size="16384" crc="7c122e43" sha1="b1e425ebe03b50688a3f78b4dc11d89b26e1441d"/>
+				<rom name="rivrraid.bin" size="16384" crc="7c122e43" sha1="b1e425ebe03b50688a3f78b4dc11d89b26e1441d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -198,7 +198,7 @@ KinderComp (Spinnaker)
 		<publisher>Gebelli</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scubavnt.bin" size="8192" crc="5d400806" sha1="af8ce72fe1348114dddd89a32540c19e85a9144c"/>
+				<rom name="scubavnt.bin" size="8192" crc="5d400806" sha1="af8ce72fe1348114dddd89a32540c19e85a9144c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

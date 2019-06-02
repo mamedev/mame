@@ -372,358 +372,720 @@ extern MODRM_TABLE i386_MODRM_table[256];
 
 /***********************************************************************************/
 
-enum X86_CYCLES
+void i386_device::CHANGE_PC(uint32_t pc)
 {
-	CYCLES_MOV_REG_REG,
-	CYCLES_MOV_REG_MEM,
-	CYCLES_MOV_MEM_REG,
-	CYCLES_MOV_IMM_REG,
-	CYCLES_MOV_IMM_MEM,
-	CYCLES_MOV_ACC_MEM,
-	CYCLES_MOV_MEM_ACC,
-	CYCLES_MOV_REG_SREG,
-	CYCLES_MOV_MEM_SREG,
-	CYCLES_MOV_SREG_REG,
-	CYCLES_MOV_SREG_MEM,
-	CYCLES_MOVSX_REG_REG,
-	CYCLES_MOVSX_MEM_REG,
-	CYCLES_MOVZX_REG_REG,
-	CYCLES_MOVZX_MEM_REG,
-	CYCLES_PUSH_RM,
-	CYCLES_PUSH_REG_SHORT,
-	CYCLES_PUSH_SREG,
-	CYCLES_PUSH_IMM,
-	CYCLES_PUSHA,
-	CYCLES_POP_RM,
-	CYCLES_POP_REG_SHORT,
-	CYCLES_POP_SREG,
-	CYCLES_POPA,
-	CYCLES_XCHG_REG_REG,
-	CYCLES_XCHG_REG_MEM,
-	CYCLES_IN,
-	CYCLES_IN_VAR,
-	CYCLES_OUT,
-	CYCLES_OUT_VAR,
-	CYCLES_LEA,
-	CYCLES_LDS,
-	CYCLES_LES,
-	CYCLES_LFS,
-	CYCLES_LGS,
-	CYCLES_LSS,
-	CYCLES_CLC,
-	CYCLES_CLD,
-	CYCLES_CLI,
-	CYCLES_CLTS,
-	CYCLES_CMC,
-	CYCLES_LAHF,
-	CYCLES_POPF,
-	CYCLES_PUSHF,
-	CYCLES_SAHF,
-	CYCLES_STC,
-	CYCLES_STD,
-	CYCLES_STI,
-	CYCLES_ALU_REG_REG,
-	CYCLES_ALU_REG_MEM,
-	CYCLES_ALU_MEM_REG,
-	CYCLES_ALU_IMM_REG,
-	CYCLES_ALU_IMM_MEM,
-	CYCLES_ALU_IMM_ACC,
-	CYCLES_INC_REG,
-	CYCLES_INC_MEM,
-	CYCLES_DEC_REG,
-	CYCLES_DEC_MEM,
-	CYCLES_CMP_REG_REG,
-	CYCLES_CMP_REG_MEM,
-	CYCLES_CMP_MEM_REG,
-	CYCLES_CMP_IMM_REG,
-	CYCLES_CMP_IMM_MEM,
-	CYCLES_CMP_IMM_ACC,
-	CYCLES_TEST_REG_REG,
-	CYCLES_TEST_REG_MEM,
-	CYCLES_TEST_IMM_REG,
-	CYCLES_TEST_IMM_MEM,
-	CYCLES_TEST_IMM_ACC,
-	CYCLES_NEG_REG,
-	CYCLES_NEG_MEM,
-	CYCLES_AAA,
-	CYCLES_AAS,
-	CYCLES_DAA,
-	CYCLES_DAS,
-	CYCLES_MUL8_ACC_REG,
-	CYCLES_MUL8_ACC_MEM,
-	CYCLES_MUL16_ACC_REG,
-	CYCLES_MUL16_ACC_MEM,
-	CYCLES_MUL32_ACC_REG,
-	CYCLES_MUL32_ACC_MEM,
-	CYCLES_IMUL8_ACC_REG,
-	CYCLES_IMUL8_ACC_MEM,
-	CYCLES_IMUL16_ACC_REG,
-	CYCLES_IMUL16_ACC_MEM,
-	CYCLES_IMUL32_ACC_REG,
-	CYCLES_IMUL32_ACC_MEM,
-	CYCLES_IMUL8_REG_REG,
-	CYCLES_IMUL8_REG_MEM,
-	CYCLES_IMUL16_REG_REG,
-	CYCLES_IMUL16_REG_MEM,
-	CYCLES_IMUL32_REG_REG,
-	CYCLES_IMUL32_REG_MEM,
-	CYCLES_IMUL16_REG_IMM_REG,
-	CYCLES_IMUL16_MEM_IMM_REG,
-	CYCLES_IMUL32_REG_IMM_REG,
-	CYCLES_IMUL32_MEM_IMM_REG,
-	CYCLES_DIV8_ACC_REG,
-	CYCLES_DIV8_ACC_MEM,
-	CYCLES_DIV16_ACC_REG,
-	CYCLES_DIV16_ACC_MEM,
-	CYCLES_DIV32_ACC_REG,
-	CYCLES_DIV32_ACC_MEM,
-	CYCLES_IDIV8_ACC_REG,
-	CYCLES_IDIV8_ACC_MEM,
-	CYCLES_IDIV16_ACC_REG,
-	CYCLES_IDIV16_ACC_MEM,
-	CYCLES_IDIV32_ACC_REG,
-	CYCLES_IDIV32_ACC_MEM,
-	CYCLES_AAD,
-	CYCLES_AAM,
-	CYCLES_CBW,
-	CYCLES_CWD,
-	CYCLES_ROTATE_REG,
-	CYCLES_ROTATE_MEM,
-	CYCLES_ROTATE_CARRY_REG,
-	CYCLES_ROTATE_CARRY_MEM,
-	CYCLES_SHLD_REG,
-	CYCLES_SHLD_MEM,
-	CYCLES_SHRD_REG,
-	CYCLES_SHRD_MEM,
-	CYCLES_NOT_REG,
-	CYCLES_NOT_MEM,
-	CYCLES_CMPS,
-	CYCLES_INS,
-	CYCLES_LODS,
-	CYCLES_MOVS,
-	CYCLES_OUTS,
-	CYCLES_SCAS,
-	CYCLES_STOS,
-	CYCLES_XLAT,
-	CYCLES_REP_CMPS_BASE,
-	CYCLES_REP_INS_BASE,
-	CYCLES_REP_LODS_BASE,
-	CYCLES_REP_MOVS_BASE,
-	CYCLES_REP_OUTS_BASE,
-	CYCLES_REP_SCAS_BASE,
-	CYCLES_REP_STOS_BASE,
-	CYCLES_REP_CMPS,
-	CYCLES_REP_INS,
-	CYCLES_REP_LODS,
-	CYCLES_REP_MOVS,
-	CYCLES_REP_OUTS,
-	CYCLES_REP_SCAS,
-	CYCLES_REP_STOS,
-	CYCLES_BSF_BASE,
-	CYCLES_BSF,
-	CYCLES_BSR_BASE,
-	CYCLES_BSR,
-	CYCLES_BT_IMM_REG,
-	CYCLES_BT_IMM_MEM,
-	CYCLES_BT_REG_REG,
-	CYCLES_BT_REG_MEM,
-	CYCLES_BTC_IMM_REG,
-	CYCLES_BTC_IMM_MEM,
-	CYCLES_BTC_REG_REG,
-	CYCLES_BTC_REG_MEM,
-	CYCLES_BTR_IMM_REG,
-	CYCLES_BTR_IMM_MEM,
-	CYCLES_BTR_REG_REG,
-	CYCLES_BTR_REG_MEM,
-	CYCLES_BTS_IMM_REG,
-	CYCLES_BTS_IMM_MEM,
-	CYCLES_BTS_REG_REG,
-	CYCLES_BTS_REG_MEM,
-	CYCLES_CALL,                // E8
-	CYCLES_CALL_REG,            // FF /2
-	CYCLES_CALL_MEM,            // FF /2
-	CYCLES_CALL_INTERSEG,       // 9A
-	CYCLES_CALL_REG_INTERSEG,   // FF /3
-	CYCLES_CALL_MEM_INTERSEG,   // FF /3
-	CYCLES_JMP_SHORT,           // EB
-	CYCLES_JMP,                 // E9
-	CYCLES_JMP_REG,             // FF /4
-	CYCLES_JMP_MEM,             // FF /4
-	CYCLES_JMP_INTERSEG,        // EA
-	CYCLES_JMP_REG_INTERSEG,    // FF /5
-	CYCLES_JMP_MEM_INTERSEG,    // FF /5
-	CYCLES_RET,                 // C3
-	CYCLES_RET_IMM,             // C2
-	CYCLES_RET_INTERSEG,        // CB
-	CYCLES_RET_IMM_INTERSEG,    // CA
-	CYCLES_JCC_DISP8,
-	CYCLES_JCC_FULL_DISP,
-	CYCLES_JCC_DISP8_NOBRANCH,
-	CYCLES_JCC_FULL_DISP_NOBRANCH,
-	CYCLES_JCXZ,
-	CYCLES_JCXZ_NOBRANCH,
-	CYCLES_LOOP,
-	CYCLES_LOOPZ,
-	CYCLES_LOOPNZ,
-	CYCLES_SETCC_REG,
-	CYCLES_SETCC_MEM,
-	CYCLES_ENTER,
-	CYCLES_LEAVE,
-	CYCLES_INT,
-	CYCLES_INT3,
-	CYCLES_INTO_OF1,
-	CYCLES_INTO_OF0,
-	CYCLES_BOUND_IN_RANGE,
-	CYCLES_BOUND_OUT_RANGE,
-	CYCLES_IRET,
-	CYCLES_HLT,
-	CYCLES_MOV_REG_CR0,
-	CYCLES_MOV_REG_CR2,
-	CYCLES_MOV_REG_CR3,
-	CYCLES_MOV_CR_REG,
-	CYCLES_MOV_REG_DR0_3,
-	CYCLES_MOV_REG_DR6_7,
-	CYCLES_MOV_DR6_7_REG,
-	CYCLES_MOV_DR0_3_REG,
-	CYCLES_MOV_REG_TR6_7,
-	CYCLES_MOV_TR6_7_REG,
-	CYCLES_NOP,
-	CYCLES_WAIT,
-	CYCLES_ARPL_REG,
-	CYCLES_ARPL_MEM,
-	CYCLES_LAR_REG,
-	CYCLES_LAR_MEM,
-	CYCLES_LGDT,
-	CYCLES_LIDT,
-	CYCLES_LLDT_REG,
-	CYCLES_LLDT_MEM,
-	CYCLES_LMSW_REG,
-	CYCLES_LMSW_MEM,
-	CYCLES_LSL_REG,
-	CYCLES_LSL_MEM,
-	CYCLES_LTR_REG,
-	CYCLES_LTR_MEM,
-	CYCLES_SGDT,
-	CYCLES_SIDT,
-	CYCLES_SLDT_REG,
-	CYCLES_SLDT_MEM,
-	CYCLES_SMSW_REG,
-	CYCLES_SMSW_MEM,
-	CYCLES_STR_REG,
-	CYCLES_STR_MEM,
-	CYCLES_VERR_REG,
-	CYCLES_VERR_MEM,
-	CYCLES_VERW_REG,
-	CYCLES_VERW_MEM,
-	CYCLES_LOCK,
+	m_pc = i386_translate(CS, pc, -1 );
+}
 
-	CYCLES_BSWAP,
-	CYCLES_CMPXCHG8B,
-	CYCLES_CMPXCHG,
-	CYCLES_CPUID,
-	CYCLES_CPUID_EAX1,
-	CYCLES_INVD,
-	CYCLES_XADD,
-	CYCLES_RDTSC,
-	CYCLES_RSM,
-	CYCLES_RDMSR,
+void i386_device::NEAR_BRANCH(int32_t offs)
+{
+	/* TODO: limit */
+	m_eip += offs;
+	m_pc += offs;
+}
 
-	CYCLES_FABS,
-	CYCLES_FADD,
-	CYCLES_FBLD,
-	CYCLES_FBSTP,
-	CYCLES_FCHS,
-	CYCLES_FCLEX,
-	CYCLES_FCOM,
-	CYCLES_FCOS,
-	CYCLES_FDECSTP,
-	CYCLES_FDISI,
-	CYCLES_FDIV,
-	CYCLES_FDIVR,
-	CYCLES_FENI,
-	CYCLES_FFREE,
-	CYCLES_FIADD,
-	CYCLES_FICOM,
-	CYCLES_FIDIV,
-	CYCLES_FILD,
-	CYCLES_FIMUL,
-	CYCLES_FINCSTP,
-	CYCLES_FINIT,
-	CYCLES_FIST,
-	CYCLES_FISUB,
-	CYCLES_FLD,
-	CYCLES_FLDZ,
-	CYCLES_FLD1,
-	CYCLES_FLDL2E,
-	CYCLES_FLDL2T,
-	CYCLES_FLDLG2,
-	CYCLES_FLDLN2,
-	CYCLES_FLDPI,
-	CYCLES_FLDCW,
-	CYCLES_FLDENV,
-	CYCLES_FMUL,
-	CYCLES_FNOP,
-	CYCLES_FPATAN,
-	CYCLES_FPREM,
-	CYCLES_FPREM1,
-	CYCLES_FPTAN,
-	CYCLES_FRNDINT,
-	CYCLES_FRSTOR,
-	CYCLES_FSAVE,
-	CYCLES_FSCALE,
-	CYCLES_FSETPM,
-	CYCLES_FSIN,
-	CYCLES_FSINCOS,
-	CYCLES_FSQRT,
-	CYCLES_FST,
-	CYCLES_FSTCW,
-	CYCLES_FSTENV,
-	CYCLES_FSTSW,
-	CYCLES_FSUB,
-	CYCLES_FSUBR,
-	CYCLES_FTST,
-	CYCLES_FUCOM,
-	CYCLES_FXAM,
-	CYCLES_FXCH,
-	CYCLES_FXTRACT,
-	CYCLES_FYL2X,
-	CYCLES_FYL2XPI,
-	CYCLES_CMPXCHG_REG_REG_T,
-	CYCLES_CMPXCHG_REG_REG_F,
-	CYCLES_CMPXCHG_REG_MEM_T,
-	CYCLES_CMPXCHG_REG_MEM_F,
-	CYCLES_XADD_REG_REG,
-	CYCLES_XADD_REG_MEM,
+uint8_t i386_device::FETCH()
+{
+	uint8_t value;
+	uint32_t address = m_pc, error;
 
-	CYCLES_NUM_OPCODES
-};
+	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+		PF_THROW(error);
+
+	value = mem_pr8(address & m_a20_mask);
+#ifdef DEBUG_MISSING_OPCODE
+	m_opcode_bytes[m_opcode_bytes_length] = value;
+	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
+#endif
+	m_eip++;
+	m_pc++;
+	return value;
+}
+uint16_t i386_device::FETCH16()
+{
+	uint16_t value;
+	uint32_t address = m_pc, error;
+
+	if( !WORD_ALIGNED(address) ) {       /* Unaligned read */
+		value = (FETCH() << 0);
+		value |= (FETCH() << 8);
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+			PF_THROW(error);
+		address &= m_a20_mask;
+		value = mem_pr16(address);
+		m_eip += 2;
+		m_pc += 2;
+	}
+	return value;
+}
+uint32_t i386_device::FETCH32()
+{
+	uint32_t value;
+	uint32_t address = m_pc, error;
+
+	if( !DWORD_ALIGNED(m_pc) ) {      /* Unaligned read */
+		value = (FETCH() << 0);
+		value |= (FETCH() << 8);
+		value |= (FETCH() << 16);
+		value |= (FETCH() << 24);
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		value = mem_pr32(address);
+		m_eip += 4;
+		m_pc += 4;
+	}
+	return value;
+}
+
+uint8_t i386_device::READ8(uint32_t ea)
+{
+	uint32_t address = ea, error;
+
+	if(!translate_address(m_CPL,TRANSLATE_READ,&address, &error))
+		PF_THROW(error);
+
+	address &= m_a20_mask;
+	return mem_prd8(address);
+}
+uint16_t i386_device::READ16(uint32_t ea)
+{
+	uint16_t value;
+	uint32_t address = ea, error;
+
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned read */
+		value = (READ8( address+0 ) << 0);
+		value |= (READ8( address+1 ) << 8);
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		value = mem_prd16( address );
+	}
+	return value;
+}
+uint32_t i386_device::READ32(uint32_t ea)
+{
+	uint32_t value;
+	uint32_t address = ea, error;
+
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned read */
+		value = (READ8( address+0 ) << 0);
+		value |= (READ8( address+1 ) << 8);
+		value |= (READ8( address+2 ) << 16),
+		value |= (READ8( address+3 ) << 24);
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		value = mem_prd32( address );
+	}
+	return value;
+}
+
+uint64_t i386_device::READ64(uint32_t ea)
+{
+	uint64_t value;
+	uint32_t address = ea, error;
+
+	if( !QWORD_ALIGNED(ea) ) {        /* Unaligned read */
+		value = (((uint64_t) READ8( address+0 )) << 0);
+		value |= (((uint64_t) READ8( address+1 )) << 8);
+		value |= (((uint64_t) READ8( address+2 )) << 16);
+		value |= (((uint64_t) READ8( address+3 )) << 24);
+		value |= (((uint64_t) READ8( address+4 )) << 32);
+		value |= (((uint64_t) READ8( address+5 )) << 40);
+		value |= (((uint64_t) READ8( address+6 )) << 48);
+		value |= (((uint64_t) READ8( address+7 )) << 56);
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		value = (((uint64_t) mem_prd32( address+0 )) << 0);
+		value |= (((uint64_t) mem_prd32( address+4 )) << 32);
+	}
+	return value;
+}
+uint8_t i386_device::READ8PL0(uint32_t ea)
+{
+	uint32_t address = ea, error;
+
+	if(!translate_address(0,TRANSLATE_READ,&address,&error))
+		PF_THROW(error);
+
+	address &= m_a20_mask;
+	return mem_prd8(address);
+}
+uint16_t i386_device::READ16PL0(uint32_t ea)
+{
+	uint16_t value;
+	uint32_t address = ea, error;
+
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned read */
+		value = (READ8PL0( address+0 ) << 0);
+		value |= (READ8PL0( address+1 ) << 8);
+	} else {
+		if(!translate_address(0,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		value = mem_prd16( address );
+	}
+	return value;
+}
+
+uint32_t i386_device::READ32PL0(uint32_t ea)
+{
+	uint32_t value;
+	uint32_t address = ea, error;
+
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned read */
+		value = (READ8PL0( address+0 ) << 0);
+		value |= (READ8PL0( address+1 ) << 8);
+		value |= (READ8PL0( address+2 ) << 16);
+		value |= (READ8PL0( address+3 ) << 24);
+	} else {
+		if(!translate_address(0,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		value = mem_prd32( address );
+	}
+	return value;
+}
+
+void i386_device::WRITE_TEST(uint32_t ea)
+{
+	uint32_t address = ea, error;
+	if(!translate_address(m_CPL,TRANSLATE_WRITE,&address,&error))
+		PF_THROW(error);
+}
+
+void i386_device::WRITE8(uint32_t ea, uint8_t value)
+{
+	uint32_t address = ea, error;
+
+	if(!translate_address(m_CPL,TRANSLATE_WRITE,&address,&error))
+		PF_THROW(error);
+
+	address &= m_a20_mask;
+	mem_pwd8(address, value);
+}
+void i386_device::WRITE16(uint32_t ea, uint16_t value)
+{
+	uint32_t address = ea, error;
+
+	if( !WORD_ALIGNED(ea) ) {        /* Unaligned write */
+		WRITE8( address+0, value & 0xff );
+		WRITE8( address+1, (value >> 8) & 0xff );
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_WRITE,&address,&error))
+			PF_THROW(error);
+
+		address &= m_a20_mask;
+		mem_pwd16(address, value);
+	}
+}
+void i386_device::WRITE32(uint32_t ea, uint32_t value)
+{
+	uint32_t address = ea, error;
+
+	if( !DWORD_ALIGNED(ea) ) {        /* Unaligned write */
+		WRITE8( address+0, value & 0xff );
+		WRITE8( address+1, (value >> 8) & 0xff );
+		WRITE8( address+2, (value >> 16) & 0xff );
+		WRITE8( address+3, (value >> 24) & 0xff );
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_WRITE,&address,&error))
+			PF_THROW(error);
+
+		ea &= m_a20_mask;
+		mem_pwd32(address, value);
+	}
+}
+
+void i386_device::WRITE64(uint32_t ea, uint64_t value)
+{
+	uint32_t address = ea, error;
+
+	if( !QWORD_ALIGNED(ea) ) {        /* Unaligned write */
+		WRITE8( address+0, value & 0xff );
+		WRITE8( address+1, (value >> 8) & 0xff );
+		WRITE8( address+2, (value >> 16) & 0xff );
+		WRITE8( address+3, (value >> 24) & 0xff );
+		WRITE8( address+4, (value >> 32) & 0xff );
+		WRITE8( address+5, (value >> 40) & 0xff );
+		WRITE8( address+6, (value >> 48) & 0xff );
+		WRITE8( address+7, (value >> 56) & 0xff );
+	} else {
+		if(!translate_address(m_CPL,TRANSLATE_WRITE,&address,&error))
+			PF_THROW(error);
+
+		ea &= m_a20_mask;
+		mem_pwd32(address+0, value & 0xffffffff);
+		mem_pwd32(address+4, (value >> 32) & 0xffffffff);
+	}
+}
+
+/***********************************************************************************/
+
+uint8_t i386_device::OR8(uint8_t dst, uint8_t src)
+{
+	uint8_t res = dst | src;
+	m_CF = m_OF = 0;
+	SetSZPF8(res);
+	return res;
+}
+uint16_t i386_device::OR16(uint16_t dst, uint16_t src)
+{
+	uint16_t res = dst | src;
+	m_CF = m_OF = 0;
+	SetSZPF16(res);
+	return res;
+}
+uint32_t i386_device::OR32(uint32_t dst, uint32_t src)
+{
+	uint32_t res = dst | src;
+	m_CF = m_OF = 0;
+	SetSZPF32(res);
+	return res;
+}
+
+uint8_t i386_device::AND8(uint8_t dst, uint8_t src)
+{
+	uint8_t res = dst & src;
+	m_CF = m_OF = 0;
+	SetSZPF8(res);
+	return res;
+}
+uint16_t i386_device::AND16(uint16_t dst, uint16_t src)
+{
+	uint16_t res = dst & src;
+	m_CF = m_OF = 0;
+	SetSZPF16(res);
+	return res;
+}
+uint32_t i386_device::AND32(uint32_t dst, uint32_t src)
+{
+	uint32_t res = dst & src;
+	m_CF = m_OF = 0;
+	SetSZPF32(res);
+	return res;
+}
+
+uint8_t i386_device::XOR8(uint8_t dst, uint8_t src)
+{
+	uint8_t res = dst ^ src;
+	m_CF = m_OF = 0;
+	SetSZPF8(res);
+	return res;
+}
+uint16_t i386_device::XOR16(uint16_t dst, uint16_t src)
+{
+	uint16_t res = dst ^ src;
+	m_CF = m_OF = 0;
+	SetSZPF16(res);
+	return res;
+}
+uint32_t i386_device::XOR32(uint32_t dst, uint32_t src)
+{
+	uint32_t res = dst ^ src;
+	m_CF = m_OF = 0;
+	SetSZPF32(res);
+	return res;
+}
+
+#define SUB8(dst, src) SBB8(dst, src, 0)
+uint8_t i386_device::SBB8(uint8_t dst, uint8_t src, uint8_t b)
+{
+	uint16_t res = (uint16_t)dst - (uint16_t)src - (uint8_t)b;
+	SetCF8(res);
+	SetOF_Sub8(res,src,dst);
+	SetAF(res,src,dst);
+	SetSZPF8(res);
+	return (uint8_t)res;
+}
+
+#define SUB16(dst, src) SBB16(dst, src, 0)
+uint16_t i386_device::SBB16(uint16_t dst, uint16_t src, uint16_t b)
+{
+	uint32_t res = (uint32_t)dst - (uint32_t)src - (uint32_t)b;
+	SetCF16(res);
+	SetOF_Sub16(res,src,dst);
+	SetAF(res,src,dst);
+	SetSZPF16(res);
+	return (uint16_t)res;
+}
+
+#define SUB32(dst, src) SBB32(dst, src, 0)
+uint32_t i386_device::SBB32(uint32_t dst, uint32_t src, uint32_t b)
+{
+	uint64_t res = (uint64_t)dst - (uint64_t)src - (uint64_t) b;
+	SetCF32(res);
+	SetOF_Sub32(res,src,dst);
+	SetAF(res,src,dst);
+	SetSZPF32(res);
+	return (uint32_t)res;
+}
+
+#define ADD8(dst, src) ADC8(dst, src, 0)
+uint8_t i386_device::ADC8(uint8_t dst, uint8_t src, uint8_t c)
+{
+	uint16_t res = (uint16_t)dst + (uint16_t)src + (uint16_t)c;
+	SetCF8(res);
+	SetOF_Add8(res,src,dst);
+	SetAF(res,src,dst);
+	SetSZPF8(res);
+	return (uint8_t)res;
+}
+
+#define ADD16(dst, src) ADC16(dst, src, 0)
+uint16_t i386_device::ADC16(uint16_t dst, uint16_t src, uint8_t c)
+{
+	uint32_t res = (uint32_t)dst + (uint32_t)src + (uint32_t)c;
+	SetCF16(res);
+	SetOF_Add16(res,src,dst);
+	SetAF(res,src,dst);
+	SetSZPF16(res);
+	return (uint16_t)res;
+}
+
+#define ADD32(dst, src) ADC32(dst, src, 0)
+uint32_t i386_device::ADC32(uint32_t dst, uint32_t src, uint32_t c)
+{
+	uint64_t res = (uint64_t)dst + (uint64_t)src + (uint64_t) c;
+	SetCF32(res);
+	SetOF_Add32(res,src,dst);
+	SetAF(res,src,dst);
+	SetSZPF32(res);
+	return (uint32_t)res;
+}
+
+uint8_t i386_device::INC8(uint8_t dst)
+{
+	uint16_t res = (uint16_t)dst + 1;
+	SetOF_Add8(res,1,dst);
+	SetAF(res,1,dst);
+	SetSZPF8(res);
+	return (uint8_t)res;
+}
+uint16_t i386_device::INC16(uint16_t dst)
+{
+	uint32_t res = (uint32_t)dst + 1;
+	SetOF_Add16(res,1,dst);
+	SetAF(res,1,dst);
+	SetSZPF16(res);
+	return (uint16_t)res;
+}
+uint32_t i386_device::INC32(uint32_t dst)
+{
+	uint64_t res = (uint64_t)dst + 1;
+	SetOF_Add32(res,1,dst);
+	SetAF(res,1,dst);
+	SetSZPF32(res);
+	return (uint32_t)res;
+}
+
+uint8_t i386_device::DEC8(uint8_t dst)
+{
+	uint16_t res = (uint16_t)dst - 1;
+	SetOF_Sub8(res,1,dst);
+	SetAF(res,1,dst);
+	SetSZPF8(res);
+	return (uint8_t)res;
+}
+uint16_t i386_device::DEC16(uint16_t dst)
+{
+	uint32_t res = (uint32_t)dst - 1;
+	SetOF_Sub16(res,1,dst);
+	SetAF(res,1,dst);
+	SetSZPF16(res);
+	return (uint16_t)res;
+}
+uint32_t i386_device::DEC32(uint32_t dst)
+{
+	uint64_t res = (uint64_t)dst - 1;
+	SetOF_Sub32(res,1,dst);
+	SetAF(res,1,dst);
+	SetSZPF32(res);
+	return (uint32_t)res;
+}
 
 
-#define CPU_CYCLES_I386         0
-#define CPU_CYCLES_I486         1
-#define CPU_CYCLES_PENTIUM      2
-#define CPU_CYCLES_MEDIAGX      3
 
-#define OP_I386         0x1
-#define OP_FPU          0x2
-#define OP_I486         0x4
-#define OP_PENTIUM      0x8
-#define OP_MMX          0x10
-#define OP_PPRO         0x20
-#define OP_SSE          0x40
-#define OP_SSE2         0x80
-#define OP_SSE3         0x100
-#define OP_CYRIX        0x8000
-#define OP_2BYTE        0x80000000
-#define OP_3BYTE66      0x40000000
-#define OP_3BYTEF2      0x20000000
-#define OP_3BYTEF3      0x10000000
-#define OP_3BYTE38      0x08000000
-#define OP_3BYTE3A      0x04000000
-#define OP_4BYTE3866    0x02000000
-#define OP_4BYTE3A66    0x01000000
-#define OP_4BYTE38F2    0x00800000
-#define OP_4BYTE3AF2    0x00400000
-#define OP_4BYTE38F3    0x00200000
+void i386_device::PUSH16(uint16_t value)
+{
+	uint32_t ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) - 2;
+		ea = i386_translate(SS, new_esp, 1);
+		WRITE16(ea, value );
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = (REG16(SP) - 2) & 0xffff;
+		ea = i386_translate(SS, new_esp, 1);
+		WRITE16(ea, value );
+		REG16(SP) = new_esp;
+	}
+}
+void i386_device::PUSH32(uint32_t value)
+{
+	uint32_t ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) - 4;
+		ea = i386_translate(SS, new_esp, 1);
+		WRITE32(ea, value );
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = (REG16(SP) - 4) & 0xffff;
+		ea = i386_translate(SS, new_esp, 1);
+		WRITE32(ea, value );
+		REG16(SP) = new_esp;
+	}
+}
+
+void i386_device::PUSH32SEG(uint32_t value)
+{
+	uint32_t ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) - 4;
+		ea = i386_translate(SS, new_esp, 1);
+		((m_cpu_version & 0xf00) == 0x300) ? WRITE16(ea, value) : WRITE32(ea, value ); // 486 also?
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = (REG16(SP) - 4) & 0xffff;
+		ea = i386_translate(SS, new_esp, 1);
+		((m_cpu_version & 0xf00) == 0x300) ? WRITE16(ea, value) : WRITE32(ea, value );
+		REG16(SP) = new_esp;
+	}
+}
+
+void i386_device::PUSH8(uint8_t value)
+{
+	if( m_operand_size ) {
+		PUSH32((int32_t)(int8_t)value);
+	} else {
+		PUSH16((int16_t)(int8_t)value);
+	}
+}
+
+uint8_t i386_device::POP8()
+{
+	uint8_t value;
+	uint32_t ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) + 1;
+		ea = i386_translate(SS, new_esp - 1, 0);
+		value = READ8(ea );
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = REG16(SP) + 1;
+		ea = i386_translate(SS, (new_esp - 1) & 0xffff, 0);
+		value = READ8(ea );
+		REG16(SP) = new_esp;
+	}
+	return value;
+}
+uint16_t i386_device::POP16()
+{
+	uint16_t value;
+	uint32_t ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) + 2;
+		ea = i386_translate(SS, new_esp - 2, 0);
+		value = READ16(ea );
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = REG16(SP) + 2;
+		ea = i386_translate(SS, (new_esp - 2) & 0xffff, 0);
+		value = READ16(ea );
+		REG16(SP) = new_esp;
+	}
+	return value;
+}
+uint32_t i386_device::POP32()
+{
+	uint32_t value;
+	uint32_t ea, new_esp;
+	if( STACK_32BIT ) {
+		new_esp = REG32(ESP) + 4;
+		ea = i386_translate(SS, new_esp - 4, 0);
+		value = READ32(ea );
+		REG32(ESP) = new_esp;
+	} else {
+		new_esp = REG16(SP) + 4;
+		ea = i386_translate(SS, (new_esp - 4) & 0xffff, 0);
+		value = READ32(ea );
+		REG16(SP) = new_esp;
+	}
+	return value;
+}
+
+void i386_device::BUMP_SI(int adjustment)
+{
+	if ( m_address_size )
+		REG32(ESI) += ((m_DF) ? -adjustment : +adjustment);
+	else
+		REG16(SI) += ((m_DF) ? -adjustment : +adjustment);
+}
+
+void i386_device::BUMP_DI(int adjustment)
+{
+	if ( m_address_size )
+		REG32(EDI) += ((m_DF) ? -adjustment : +adjustment);
+	else
+		REG16(DI) += ((m_DF) ? -adjustment : +adjustment);
+}
+
+void i386_device::CYCLES(int x)
+{
+	if (PROTECTED_MODE)
+	{
+		m_cycles -= m_cycle_table_pm[x];
+	}
+	else
+	{
+		m_cycles -= m_cycle_table_rm[x];
+	}
+}
+
+void i386_device::CYCLES_RM(int modrm, int r, int m)
+{
+	if (modrm >= 0xc0)
+	{
+		if (PROTECTED_MODE)
+		{
+			m_cycles -= m_cycle_table_pm[r];
+		}
+		else
+		{
+			m_cycles -= m_cycle_table_rm[r];
+		}
+	}
+	else
+	{
+		if (PROTECTED_MODE)
+		{
+			m_cycles -= m_cycle_table_pm[m];
+		}
+		else
+		{
+			m_cycles -= m_cycle_table_rm[m];
+		}
+	}
+}
+
+
+
+/***********************************************************************************
+    I/O ACCESS
+***********************************************************************************/
+
+void i386_device::check_ioperm(offs_t port, uint8_t mask)
+{
+	uint8_t IOPL, map;
+	uint16_t IOPB;
+	uint32_t address;
+
+	if(!PROTECTED_MODE)
+		return;
+
+	IOPL = m_IOP1 | (m_IOP2 << 1);
+	if(!V8086_MODE && (m_CPL <= IOPL))
+		return;
+
+	if((m_task.limit < 0x67) || ((m_task.flags & 0xd) != 9))
+		FAULT_THROW(FAULT_GP,0);
+
+	address = m_task.base;
+	IOPB = READ16PL0(address+0x66);
+	if((IOPB+(port/8)) > m_task.limit)
+		FAULT_THROW(FAULT_GP,0);
+
+	map = READ8PL0(address+IOPB+(port/8));
+	map >>= (port%8);
+	if(map & mask)
+		FAULT_THROW(FAULT_GP,0);
+}
+
+uint8_t i386_device::READPORT8(offs_t port)
+{
+	check_ioperm(port, 1);
+	return m_io->read_byte(port);
+}
+
+void i386_device::WRITEPORT8(offs_t port, uint8_t value)
+{
+	check_ioperm(port, 1);
+	m_io->write_byte(port, value);
+}
+
+uint16_t i386_device::READPORT16(offs_t port)
+{
+	if (port & 1)
+	{
+		uint16_t value = READPORT8(port);
+		value |= (READPORT8(port + 1) << 8);
+		return value;
+	}
+	else
+	{
+		check_ioperm(port, 3);
+		return m_io->read_word(port);
+	}
+}
+
+void i386_device::WRITEPORT16(offs_t port, uint16_t value)
+{
+	if (port & 1)
+	{
+		WRITEPORT8(port, value & 0xff);
+		WRITEPORT8(port + 1, (value >> 8) & 0xff);
+	}
+	else
+	{
+		check_ioperm(port, 3);
+		m_io->write_word(port, value);
+	}
+}
+
+uint32_t i386_device::READPORT32(offs_t port)
+{
+	if (port & 3)
+	{
+		uint32_t value = READPORT8(port);
+		value |= (READPORT8(port + 1) << 8);
+		value |= (READPORT8(port + 2) << 16);
+		value |= (READPORT8(port + 3) << 24);
+		return value;
+	}
+	else
+	{
+		check_ioperm(port, 0xf);
+		return m_io->read_dword(port);
+	}
+}
+
+void i386_device::WRITEPORT32(offs_t port, uint32_t value)
+{
+	if (port & 3)
+	{
+		WRITEPORT8(port, value & 0xff);
+		WRITEPORT8(port + 1, (value >> 8) & 0xff);
+		WRITEPORT8(port + 2, (value >> 16) & 0xff);
+		WRITEPORT8(port + 3, (value >> 24) & 0xff);
+	}
+	else
+	{
+		check_ioperm(port, 0xf);
+		m_io->write_dword(port, value);
+	}
+}
 
 #endif /* __I386_H__ */

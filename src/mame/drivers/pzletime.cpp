@@ -41,7 +41,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette%u", 0U)
+		m_palette(*this, "palette")
 	{ }
 
 	void pzletime(machine_config &config);
@@ -75,13 +75,13 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void pzletime_palette(palette_device &palette) const;
-	uint32_t screen_update_pzletime(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device_array<palette_device, 2> m_palette;
+	required_device<palette_device> m_palette;
 	void pzletime_map(address_map &map);
 };
 
@@ -114,12 +114,12 @@ void pzletime_state::video_start()
 	m_txt_tilemap->set_transparent_pen(0);
 }
 
-uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count;
 	int y, x;
 
-	bitmap.fill(m_palette[0]->pen(0), cliprect); //bg pen
+	bitmap.fill(m_palette->pen(0), cliprect); //bg pen
 
 	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
 	m_txt_tilemap->set_scrollx(0, m_tilemap_regs[1]);
@@ -136,7 +136,7 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 			for (x = 0; x < 512; x++)
 			{
 				if (m_bg_videoram[count] & 0x8000)
-					bitmap.pix32((y - 18) & 0xff, (x - 32) & 0x1ff) = m_palette[1]->pen(m_bg_videoram[count] & 0x7fff);
+					bitmap.pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (m_bg_videoram[count] & 0x7fff);
 
 				count++;
 			}
@@ -202,14 +202,29 @@ WRITE16_MEMBER(pzletime_state::ticket_w)
 
 WRITE16_MEMBER(pzletime_state::video_regs_w)
 {
+	int i;
+
 	COMBINE_DATA(&m_video_regs[offset]);
 
-	if (offset < 2 && m_video_regs[offset] > 0)
+	if (offset == 0)
 	{
-		double contrast = 32768.0 / static_cast<double>(m_video_regs[offset]);
-
-		for (unsigned i = 0; i < m_palette[offset]->entries(); i++)
-			m_palette[offset]->set_pen_contrast(i, contrast);
+		if (m_video_regs[0] > 0)
+		{
+			for (i = 0; i < 0x300; i++)
+			{
+				m_palette->set_pen_contrast(i, (double)0x8000/(double)m_video_regs[0]);
+			}
+		}
+	}
+	else if (offset == 1)
+	{
+		if (m_video_regs[1] > 0)
+		{
+			for (i = 0x300; i < 32768 + 0x300; i++)
+			{
+				m_palette->set_pen_contrast(i, (double)0x8000/(double)m_video_regs[1]);
+			}
+		}
 	}
 }
 
@@ -228,7 +243,7 @@ void pzletime_state::pzletime_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x700000, 0x700005).ram().w(FUNC(pzletime_state::video_regs_w)).share("video_regs");
 	map(0x800001, 0x800001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x900000, 0x9005ff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette0");
+	map(0x900000, 0x9005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00007).ram().share("tilemap_regs");
 	map(0xb00000, 0xb3ffff).ram().share("bg_videoram");
 	map(0xc00000, 0xc00fff).ram().w(FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
@@ -300,6 +315,15 @@ static GFXDECODE_START( gfx_pzletime )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
 GFXDECODE_END
 
+void pzletime_state::pzletime_palette(palette_device &palette) const
+{
+	// first 0x300 colors are dynamic
+
+	// initialize 555 RGB lookup
+	for (int i = 0; i < 32768; i++)
+		palette.set_pen_color(i + 0x300, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+}
+
 void pzletime_state::machine_start()
 {
 	save_item(NAME(m_ticket));
@@ -324,12 +348,11 @@ void pzletime_state::pzletime(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 48*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(pzletime_state::screen_update_pzletime));
+	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette[0], gfx_pzletime);
-
-	PALETTE(config, m_palette[0]).set_format(palette_device::xRGB_555, 768);
-
-	PALETTE(config, m_palette[1], palette_device::RGB_555);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pzletime);
+	PALETTE(config, m_palette, FUNC(pzletime_state::pzletime_palette));
+	m_palette->set_format(palette_device::xRGB_555, 0x300 + 32768);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

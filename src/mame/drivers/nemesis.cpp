@@ -20,7 +20,7 @@
     Hyper Crash (Version C) GX790
     Kitten Kaboodle         GX712
     Nyan Nyan Panic (Japan) GX712
-    Bubble System
+	Bubble System
 
 driver by Bryan McPhail
 
@@ -37,7 +37,7 @@ modified by hap
  Special thx 2 Neusneus, Audrey Tautou, my water bottle, chair, sleepiness
 
 Bubble System added 2019 ArcadeHacker/Bryan McPhail
-
+ 
 Notes:
 - blkpnthr:
 There are sprite priority problems in upper part of the screen ,
@@ -173,14 +173,14 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 			//int unknownBit = m_bubsys_control_ram[0] & 0x800;
 
 			logerror("\tCopy page %02x to shared ram\n", page);
-
+			
 			const uint8_t *src = memregion("bubblememory")->base();
 			memcpy(m_bubsys_shared_ram + 0xf00/2, src + page * 0x90, 0x80);
 
 			// The last 2 bytes of the block are loaded into the control register
 			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
-
-			m_maincpu->set_input_line(5, HOLD_LINE);
+				
+			m_maincpu->set_input_line(5, HOLD_LINE);		
 		}
 		// Write?
 		else if (m_bubsys_control_ram[1]==2)
@@ -191,7 +191,7 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 	else
 	{
 		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here
+		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here	
 	}
 }
 
@@ -396,8 +396,8 @@ void nemesis_state::bubsys_map(address_map &map)
 	map(0x05cc04, 0x05cc05).portr("IN2");
 	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x070000, 0x073fff).ram();  /* WORK RAM */
-	map(0x078000, 0x07ffff).rom();  /* Empty diagnostic ROM slot */
+	map(0x070000, 0x073fff).ram();	/* WORK RAM */
+	map(0x078000, 0x07ffff).rom();	/* Empty diagnostic ROM slot */
 }
 
 void nemesis_state::konamigt_map(address_map &map)
@@ -2906,7 +2906,7 @@ ROM_START( bubsys )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
-	ROM_REGION( 0x49000, "bubblememory", ROMREGION_ERASE00 )
+	ROM_REGION( 0x49000, "bubblememory", ROMREGION_ERASE00 ) 
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
@@ -2923,7 +2923,7 @@ ROM_START( gradiusb )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
-	ROM_REGION( 0x48360, "bubblememory", 0 )
+	ROM_REGION( 0x48360, "bubblememory", 0 ) 
 	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
 	ROM_LOAD16_WORD_SWAP( "gradius.bin", 0x000, 0x48360, CRC(f83b9607) SHA1(53493c2d5b0e66dd6b75865abf0982ee50c01a6f) )
 
@@ -2941,27 +2941,27 @@ ROM_END
 void nemesis_state::bubsys_init()
 {
 	/*
-	    The MCU is the master of the system and controls the /RESET and /HALT lines of the 68000.
-	    At boot the MCU halts the 68000 and copies the 68000 boot program to shared RAM which
-	    takes 30.65 milliseconds then the 68000 starts execution.
-
-	    As the MCU is not dumped we effectively start the simulation at the point the 68000
-	    is released, and manually copy the boot program to 68000 address space.
+		The MCU is the master of the system and controls the /RESET and /HALT lines of the 68000.
+		At boot the MCU halts the 68000 and copies the 68000 boot program to shared RAM which
+		takes 30.65 milliseconds then the 68000 starts execution.
+		
+		As the MCU is not dumped we effectively start the simulation at the point the 68000
+		is released, and manually copy the boot program to 68000 address space.
 	*/
-
+	
 	const uint8_t *src = memregion("maincpu")->base();
 	memcpy(m_bubsys_shared_ram, src, 0x1e0);
 
 	/*
-	    The MCU sets this flag once the boot program is copied.  The 68000 will reset
-	    if the value is not correct.
+		The MCU sets this flag once the boot program is copied.  The 68000 will reset
+		if the value is not correct.
 	*/
-	m_bubsys_control_ram[3]=0x240;
+	m_bubsys_control_ram[3]=0x240;	
 }
 
 GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", 0 )
 // Bubble System Twinbee
-// Bubble System RF2
+// Bubble System RF2 
 // Bubble System Galactic Warriors
 // Bubble System Attack Rush

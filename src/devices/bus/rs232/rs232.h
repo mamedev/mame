@@ -22,7 +22,6 @@
 #define RS232_BAUD_38400 (0x0b)
 #define RS232_BAUD_57600 (0x0c)
 #define RS232_BAUD_115200 (0x0d)
-#define RS232_BAUD_7200 (0x0e)
 
 #define MCFG_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
@@ -34,7 +33,6 @@
 	PORT_CONFSETTING( RS232_BAUD_1200, "1200") \
 	PORT_CONFSETTING( RS232_BAUD_2400, "2400") \
 	PORT_CONFSETTING( RS232_BAUD_4800, "4800") \
-	PORT_CONFSETTING( RS232_BAUD_7200, "7200") \
 	PORT_CONFSETTING( RS232_BAUD_9600, "9600") \
 	PORT_CONFSETTING( RS232_BAUD_14400, "14400") \
 	PORT_CONFSETTING( RS232_BAUD_19200, "19200") \
@@ -210,8 +208,7 @@ protected:
 			28800,
 			38400,
 			57600,
-			115200,
-			7200
+			115200
 		};
 
 		return values[baud];

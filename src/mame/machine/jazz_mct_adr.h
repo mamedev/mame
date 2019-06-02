@@ -127,17 +127,14 @@ private:
 		DMA_CACHE_FLUSH_ERROR = 0x00000400,
 	};
 
-	u32 m_dma_invalid_address;
 	u32 m_trans_tbl_base;
 	u32 m_trans_tbl_limit;
 	u32 m_ioc_maint;
-	u32 m_dma_memory_failed_address;
 	u32 m_ioc_physical_tag;
 	u32 m_ioc_logical_tag;
 	u32 m_ioc_byte_mask;
 	u32 m_remote_speed[16];
 	u32 m_dma_reg[32];
-	u32 m_dma_interrupt_source;
 	u32 m_memory_refresh_rate;
 	u32 m_nvram_protect;
 

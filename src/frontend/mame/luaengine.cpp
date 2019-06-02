@@ -722,43 +722,33 @@ void lua_engine::attach_notifiers()
 void lua_engine::initialize()
 {
 
-/*  emu library
- *
+/*
  * emu.app_name() - return application name
  * emu.app_version() - return application version
- * emu.gamename() - return game full name
- * emu.romname() - return game ROM name
- * emu.softname() - return softlist name
+ * emu.gamename() - returns game full name
+ * emu.softname() - returns softlist name
+ * emu.keypost(keys) - post keys to natural keyboard
  * emu.time() - return emulation time
- * emu.pid() - return frontend process ID
- *
- * emu.driver_find(driver_name) - find and return game_driver for driver_name
- * emu.start(driver_name) - start given driver_name
+ * emu.start(driver) - start given driver
  * emu.pause() - pause emulation
  * emu.unpause() - unpause emulation
- * emu.step() - advance one frame
- * emu.keypost(keys) - post keys to natural keyboard
- * emu.wait(len) - wait for len within coroutine
- * emu.lang_translate(str) - get translation for str if available
- *
- * emu.register_prestart(callback) - register callback before reset
- * emu.register_start(callback) - register callback after reset
- * emu.register_stop(callback) - register callback after stopping
- * emu.register_pause(callback) - register callback at pause
- * emu.register_resume(callback) - register callback at resume
- * emu.register_frame(callback) - register callback at end of frame
- * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
- * emu.register_periodic(callback) - register periodic callback while program is running
- * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
- * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
- * emu.show_menu(menu_name) - show menu by name and pause the machine
- *
- * emu.print_verbose(str) - output to stderr at verbose level
- * emu.print_error(str) - output to stderr at error level
- * emu.print_info(str) - output to stderr at info level
- * emu.print_debug(str) - output to stderr at debug level
+ * emu.register_prestart(callback) - callback before reset
+ * emu.register_start(callback) - callback after reset
+ * emu.register_stop(callback) - callback after stopping
+ * emu.register_pause(callback) - callback at pause
+ * emu.register_resume(callback) - callback at resume
+ * emu.register_frame(callback) - callback at end of frame
+ * emu.register_frame_done(callback) - callback after frame is drawn to screen (for overlays)
+ * emu.register_periodic(callback) - periodic callback while program is running
+ * emu.register_menu(event_callback, populate_callback, name) - callbacks for plugin menu
+ * emu.print_verbose(str) -- output to stderr at verbose level
+ * emu.print_error(str) -- output to stderr at error level
+ * emu.print_info(str) -- output to stderr at info level
+ * emu.print_debug(str) -- output to stderr at debug level
+ * emu.driver_find(driver) -- find and return game_driver for driver
+ * emu.wait(len) -- wait for len within coroutine
+ * emu.lang_translate(str) -- get translation for str if available
  */
-
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
@@ -778,10 +768,6 @@ void lua_engine::initialize()
 		};
 	emu["pause"] = [this](){ return machine().pause(); };
 	emu["unpause"] = [this](){ return machine().resume(); };
-	emu["step"] = [this]() {
-			mame_machine_manager::instance()->ui().set_single_step(true);
-			machine().resume();
-		};
 	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
 	emu["register_stop"] = [this](sol::function func){ register_function(func, "LUA_ON_STOP"); };
@@ -829,21 +815,16 @@ void lua_engine::initialize()
 	emu["lang_translate"] = &lang_translate;
 	emu["pid"] = &osd_getpid;
 
-
-/*  emu_file library
- *
- * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style
- *                                     with 'rwc' with addtional c for create *and truncate*
- *                                     (be careful) support zipped files on the searchpath
- *
- * file:open(name) - open first file matching name in searchpath. supports read
- *                   and write sockets as "socket.127.0.0.1:1234"
+/*
+ * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
+ *                                     support zipped files on the searchpath
+ * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
  * file:open_next() - open next file matching name in searchpath
  * file:read(len) - only reads len bytes, doesn't do lua style formats
  * file:write(data) - write data to file
  * file:seek(offset, whence) - whence is as C "SEEK_*" int
  * file:seek([opt] whence, [opt] offset) - lua style "set"|"cur"|"end", returns cur offset
- * file:size() - file size in bytes
+ * file:size() -
  * file:filename() - name of current file, container name if file is in zip
  * file:fullpath() -
 */
@@ -937,17 +918,11 @@ void lua_engine::initialize()
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
 
-
-/*  thread library
- *
+/*
  * emu.thread()
- *
- * thread:start(scr) - run scr (lua code as string) in a seperate thread
- *                     in a new empty (other than modules) lua context.
- *                     thread runs until yield() and/or terminates on return.
- * thread:continue(val) - resume thread that has yielded and pass val to it
- *
- * thread.result - get result of a terminated thread as string
+ * thread.start(scr) - run scr (string not function) in a seperate thread in a new empty (other then modules) lua context
+ * thread.continue(val) - resume thread and pass val to it
+ * thread.result() - get thread result as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
  */
@@ -1006,14 +981,10 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
-
-/*  save_item library
- *
+/*
  * emu.item(item_index)
- *
  * item.size - size of the raw data type
  * item.count - number of entries
- *
  * item:read(offset) - read entry value by index
  * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
  * item:write(offset, value) - write entry value by index
@@ -1079,18 +1050,12 @@ void lua_engine::initialize()
 					}
 				});
 
-
-/*  core_options library
- *
- * manager:options()
- * manager:machine():options()
- * manager:ui():options()
- * manager:plugins()
- *
+/* manager:options()
+ * machine:options()
+ * machine:ui():options()
  * options:help() - get help for options
  * options:command(command) - return output for command
- *
- * options.entries[] - get table of option entries (k=name, v=core_options::entry)
+ * options.entries[] - get table of option entries
  */
 
 	sol().registry().new_usertype<core_options>("core_options", "new", sol::no_constructor,
@@ -1117,18 +1082,14 @@ void lua_engine::initialize()
 				return table;
 			}));
 
-
-/*  core_options::entry library
- *
- * options.entries[entry_name]
- *
- * entry:value() - get value of entry
- * entry:value(val) - set entry to val
- * entry:description() - get info about entry
- * entry:default_value() - get default for entry
- * entry:minimum() - get min value for entry
- * entry:maximum() - get max value for entry
- * entry:has_range() - are min and max valid for entry
+/* options.entries[entry_name]
+ * entry.value() - get value of entry
+ * entry.value(val) - set entry to val
+ * entry.description() - get info about entry
+ * entry.default_value() - get default for entry
+ * entry.minimum() - get min value for entry
+ * entry.maximum() - get max value for entry
+ * entry.has_range() - are min and max valid for entry
  */
 
 	sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor,
@@ -1177,37 +1138,27 @@ void lua_engine::initialize()
 			"maximum", &core_options::entry::maximum,
 			"has_range", &core_options::entry::has_range);
 
-
-/*  running_machine library
- *
- * manager:machine()
- *
+/* manager:machine()
  * machine:exit() - close program
  * machine:hard_reset() - hard reset emulation
  * machine:soft_reset() - soft reset emulation
  * machine:save(filename) - save state to filename
  * machine:load(filename) - load state from filename
- * machine:popmessage(str) - print str as popup
- * machine:popmessage() - clear displayed popup message
- * machine:logerror(str) - print str to log
- *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
  * machine:render() - get render_manager
  * machine:ioport() - get ioport_manager
  * machine:parameters() - get parameter_manager
- * machine:memory() - get memory_manager
  * machine:options() - get machine core_options
- * machine:outputs() - get output_manager
+ * machine:output() - get output_manager
  * machine:input() - get input_manager
  * machine:uiinput() - get ui_input_manager
- * machine:debugger() - get debugger_manager
- *
  * machine.paused - get paused state
- *
- * machine.devices[] - get device table (k=tag, v=device_t)
- * machine.screens[] - get screens table (k=tag, v=screen_device)
- * machine.images[] - get available image devices table (k=type, v=device_image_interface)
+ * machine.devices[] - get device table
+ * machine.screens[] - get screens table
+ * machine.images[] - get available image devices
+ * machine:popmessage(str) - print str as popup
+ * machine:logerror(str) - print str to log
  */
 
 	sol().registry().new_usertype<running_machine> ("machine", "new", sol::no_constructor,
@@ -1270,31 +1221,7 @@ void lua_engine::initialize()
 					[](running_machine &m) { m.popmessage(); }),
 			"logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); } );
 
-
-/*  game_driver library
- *
- * emu.driver_find(driver_name)
- *
- * driver.source_file - relative path to the source file
- * driver.parent
- * driver.name
- * driver.description
- * driver.year
- * driver.manufacturer
- * driver.compatible_with
- * driver.default_layout
- * driver.orientation - screen rotation degree (rot0/90/180/270)
- * driver.type - machine type (arcade/console/computer/other)
- * driver.not_working - not considered working
- * driver.supports_save - supports save states
- * driver.no_cocktail - screen flip support is missing
- * driver.is_bios_root - this driver entry is a BIOS root
- * driver.requires_artwork - requires external artwork for key game elements
- * driver.clickable_artwork - artwork is clickable and requires mouse cursor
- * driver.unofficial - unofficial hardware modification
- * driver.no_sound_hw - system has no sound output
- * driver.mechanical - contains mechanical parts (pinball, redemption games, ...)
- * driver.is_incomplete - official system with blatantly incomplete hardware/software
+/* game_driver - this should be self explanatory
  */
 
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
@@ -1305,72 +1232,14 @@ void lua_engine::initialize()
 			"year", sol::readonly(&game_driver::year),
 			"manufacturer", sol::readonly(&game_driver::manufacturer),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),
-			"default_layout", sol::readonly(&game_driver::default_layout),
-			"orientation", sol::property([](game_driver const &driver) {
-					std::string rot;
-					switch (driver.flags & machine_flags::MASK_ORIENTATION)
-					{
-					case machine_flags::ROT0:
-						rot = "rot0";
-						break;
-					case machine_flags::ROT90:
-						rot = "rot90";
-						break;
-					case machine_flags::ROT180:
-						rot = "rot180";
-						break;
-					case machine_flags::ROT270:
-						rot = "rot270";
-						break;
-					default:
-						rot = "undefined";
-						break;
-					}
-					return rot;
-				}),
-			"type", sol::property([](game_driver const &driver) {
-					std::string type;
-					switch (driver.flags & machine_flags::MASK_TYPE)
-					{
-					case machine_flags::TYPE_ARCADE:
-						type = "arcade";
-						break;
-					case machine_flags::TYPE_CONSOLE:
-						type = "console";
-						break;
-					case machine_flags::TYPE_COMPUTER:
-						type = "computer";
-						break;
-					default:
-						type = "other";
-						break;
-					}
-					return type;
-				}),
-			"not_working", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) > 0; }),
-			"supports_save", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) > 0; }),
-			"no_cocktail", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) > 0; }),
-			"is_bios_root", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) > 0; }),
-			"requires_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) > 0; }),
-			"clickable_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) > 0; }),
-			"unofficial", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) > 0; }),
-			"no_sound_hw", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) > 0; }),
-			"mechanical", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) > 0; }),
-			"is_incomplete", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) > 0; }
-		));
+			"default_layout", sol::readonly(&game_driver::default_layout));
 
-
-/*  debugger_manager library (requires debugger to be active)
- *
- * manager:machine():debugger()
- *
- * debugger:command(command_string) - run command_string in debugger console
- *
- * debugger.consolelog[] - get consolelog text buffer (wrap_textbuf)
- * debugger.errorlog[] - get errorlog text buffer (wrap_textbuf)
- *
- * debugger.visible_cpu - accessor for debugger active cpu for commands, affects debug views
- * debugger.execution_state - accessor for active cpu run state
+/* machine:debugger()
+ * debug:command(cmd) - run cmd in debugger console
+ * debug.consolelog[] - get consolelog
+ * debug.errorlog[] - get errorlog
+ * debug.visible_cpu - accessor for debugger active cpu for commands, affects debug views
+ * debug.execution_state - accessor for active cpu run state
  */
 
 	struct wrap_textbuf { wrap_textbuf(text_buffer *buf) { textbuf = buf; }; text_buffer *textbuf; };
@@ -1391,40 +1260,22 @@ void lua_engine::initialize()
 						debug.cpu().set_execution_running();
 				}));
 
-
-/*  wrap_textbuf library (requires debugger to be active)
- *
- * manager:machine():debugger().consolelog
- * manager:machine():debugger().errorlog
- *
- * log[index] - get log entry
- * #log - entry count
- */
-
 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
 			"__metatable", [](){},
 			"__newindex", [](){},
 			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },
 			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
 
-
-/*  device_debug library (requires debugger to be active)
- *
- * manager:machine().devices[device_tag]:debug()
- *
+/* device:debug()
  * debug:step([opt] steps) - run cpu steps, default 1
  * debug:go() - run cpu
- * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
- *                                            expressions. returns breakpoint index
+ * debug:bpset(addr, cond, act) - set break, cond and act are debugger expressions
  * debug:bpclr(idx) - clear break
- * debug:bplist()[] - table of breakpoints (k=index, v=device_debug::breakpoint)
- * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
- *                                                              are debugger expressions.
- *                                                              returns watchpoint index
+ * debug:bplist()[] - table of breakpoints
+ * debug:wpset(space, type, addr, len, cond, act) - set watch, cond and act are debugger expressions
  * debug:wpclr(idx) - clear watch
- * debug:wplist(space)[] - table of watchpoints (k=index, v=watchpoint)
+ * debug:wplist(space)[] - table of watchpoints
  */
-
 	sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor,
 			"step", [](device_debug &dev, sol::object num) {
 					int steps = 1;
@@ -1490,19 +1341,15 @@ void lua_engine::initialize()
 				});
 
 
-/*  device_t library
- *
- * manager:machine().devices[device_tag]
- *
+/* machine.devices[device_tag]
  * device:name() - device long name
  * device:shortname() - device short name
  * device:tag() - device tree tag
  * device:owner() - device parent tag
  * device:debug() - debug interface, cpus only
- *
- * device.spaces[] - device address spaces table (k=name, v=addr_space)
- * device.state[] - device state entries table (k=name, v=device_state_entry)
- * device.items[] - device save state items table (k=name, v=index)
+ * device.spaces[] - device address spaces table
+ * device.state[] - device state entries table
+ * device.items[] - device save state items table (item name is key, item index is value)
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
@@ -1559,28 +1406,6 @@ void lua_engine::initialize()
 					return table;
 				}));
 
-
-/*  addr_space library
- *
- * manager:machine().devices[device_tag].spaces[space]
- *
- * read/write by signedness u/i and bit-width 8/16/32/64:
- * space:read_*(addr)
- * space:write_*(addr, val)
- * space:read_log_*(addr)
- * space:write_log_*(addr, val)
- * space:read_direct_*(addr)
- * space:write_direct_*(addr, val)
- *
- * space.name - address space name
- * space.shift - address bus shift, bitshift required for a bytewise address
- *               to map onto this space's addess resolution (addressing granularity).
- *               positive value means leftshift, negative means rightshift.
- * space.index
- *
- * space.map[] - table of address map entries (k=index, v=address_map_entry)
- */
-
 	sol().registry().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>(),
 			"read_i8", &addr_space::mem_read<int8_t>,
 			"read_u8", &addr_space::mem_read<uint8_t>,
@@ -1633,16 +1458,6 @@ void lua_engine::initialize()
 			"name", sol::property([](addr_space &sp) { return sp.space.name(); }),
 			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
 			"index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }),
-
-/* address_map_entry library
- *
- * manager:machine().devices[device_tag].spaces[space].map[entry_index]
- *
- * mapentry.offset - address start
- * mapentry.endoff - address end
- * mapentry.readtype
- * mapentry.writetype
- */
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
@@ -1658,14 +1473,9 @@ void lua_engine::initialize()
 					return map;
 				}));
 
-
-/*  ioport_manager library
- *
- * manager:machine():ioport()
- *
+/* machine:ioport()
  * ioport:count_players() - get count of player controllers
- *
- * ioport.ports[] - ioports table (k=tag, v=ioport_port)
+ * ioport.ports[] - ioports table
  */
 
 	sol().registry().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
@@ -1677,19 +1487,14 @@ void lua_engine::initialize()
 					return port_table;
 				}));
 
-
-/*  ioport_port library
- *
- * manager:machine():ioport().ports[port_tag]
- *
+/* ioport.ports[port_tag]
  * port:tag() - get port tag
  * port:active() - get port status
  * port:live() - get port ioport_port_live (TODO: not usable from lua as of now)
  * port:read() - get port value
  * port:write(val, mask) - set port to value & mask (output fields only, for other fields use field:set_value(val))
  * port:field(mask) - get ioport_field for port and mask
- *
- * port.fields[] - get ioport_field table (k=name, v=ioport_field)
+ * port.field[] - get ioport_field table
  */
 
 	sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor,
@@ -1720,38 +1525,7 @@ void lua_engine::initialize()
 					return f_table;
 				}));
 
-
-/*  ioport_field library
- *
- * manager:machine():ioport().ports[port_tag].fields[field_name]
- *
- * field:set_value(value)
- *
- * field.device - get associated device_t
- * field.live - get ioport_field_live
-
- * field.name
- * field.default_name
- * field.player
- * field.mask
- * field.defvalue
- * field.sensitivity
- * field.way - amount of available directions
- * field.is_analog
- * field.is_digital_joystick
- * field.enabled
- * field.optional
- * field.cocktail
- * field.toggle - whether field is a toggle
- * field.rotated
- * field.analog_reverse
- * field.analog_reset
- * field.analog_wraps
- * field.analog_invert
- * field.impulse
- * field.type
- * field.crosshair_scale
- * field.crosshair_offset
+/* port.field[field_tag] - this should be self explanatory
  */
 
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
@@ -1783,44 +1557,29 @@ void lua_engine::initialize()
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
 			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
 
-
-/*  ioport_field_live library
- *
- * manager:machine():ioport().ports[port_tag].fields[field_name].live
- *
- * live.name
+/* field.live
  */
 
 	sol().registry().new_usertype<ioport_field_live>("ioport_field_live", "new", sol::no_constructor,
 			"name", &ioport_field_live::name);
 
-
-/*  parameters_manager library
- *
- * manager:machine():parameters()
- *
- * parameters:add(tag, val) - add tag = val parameter
- * parameters:lookup(tag) - get val for tag
+/* machine:parameters()
+ * parameter:add(tag, val) - add tag = val parameter
+ * parameter:lookup(tag) - get val for tag
  */
 
 	sol().registry().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor,
 			"add", &parameters_manager::add,
 			"lookup", &parameters_manager::lookup);
 
-
-/*  video_manager library
- *
- * manager:machine():video()
- *
- * video:begin_recording([opt] filename) - start AVI recording to filename if given or default
- * video:end_recording() - stop AVI recording
- * video:is_recording() - get recording status
+/* machine:video()
+ * video:begin_recording([opt] filename) - start recording to filename if given or default
+ * video:end_recording() - stop recording
  * video:snapshot() - save shot of all screens
+ * video:is_recording() - get recording status
  * video:skip_this_frame() - is current frame going to be skipped
  * video:speed_factor() - get speed factor
  * video:speed_percent() - get percent from realtime
- * video:frame_update()
- *
  * video.frameskip - current frameskip
  * video.throttled - throttle state
  * video.throttle_rate - throttle rate
@@ -1852,11 +1611,7 @@ void lua_engine::initialize()
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
-
-/*  input_manager library
- *
- * manager:machine():input()
- *
+/* machine:input()
  * input:code_from_token(token) - get input_code for KEYCODE_* string token
  * input:code_pressed(code) - get pressed state for input_code
  * input:code_to_token(code) - get KEYCODE_* string token for code
@@ -1865,10 +1620,6 @@ void lua_engine::initialize()
  * input:seq_pressed(seq) - get pressed state for input_seq
  * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
  * input:seq_name(seq) - get seq friendly name
- * input:seq_poll_start(class, [opt] start_seq) - start polling for input_item_class passed as string
- *                                                (switch/abs[olute]/rel[ative]/max[imum])
- * input:seq_poll() - poll once, returns true if input was fetched
- * input:seq_poll_final() - get final input_seq
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
@@ -1889,12 +1640,8 @@ void lua_engine::initialize()
 			"seq_poll", &input_manager::seq_poll,
 			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
 
-
-/*  ui_input_manager library
- *
- * manager:machine():uiinput()
- *
- * uiinput:find_mouse() - return x, y, button state, ui render target
+/* machine:uiinput()
+ * uiinput:find_mouse() - returns x, y, button state, ui render target
  * uiinput:pressed(key) - get pressed state for ui key
  */
 
@@ -1907,12 +1654,8 @@ void lua_engine::initialize()
 				},
 			"pressed", &ui_input_manager::pressed);
 
-
-/*  render_target library
- *
- * manager:machine():render().targets[target_index]
- * manager:machine():render():ui_target()
- *
+/* render.targets[target_index]
+ * render:ui_target()
  * target:view_bounds() - get x0, x1, y0, y1 bounds for target
  * target:width() - get target width
  * target:height() - get target height
@@ -1921,7 +1664,6 @@ void lua_engine::initialize()
  * target:is_ui_target() - is ui render target
  * target:index() - target index
  * target:view_name(index) - current target layout view name
- *
  * target.max_update_rate -
  * target.view - current target layout view
  * target.orientation - current target orientation
@@ -1954,17 +1696,7 @@ void lua_engine::initialize()
 			"screen_overlay", sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled),
 			"zoom", sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen));
 
-
-/*  render_container library
- *
- * manager:machine():render():ui_container()
- *
- * container:orientation()
- * container:xscale()
- * container:yscale()
- * container:xoffset()
- * container:yoffset()
- * container:is_empty()
+/* render:ui_container() - this should be self explanatory
  */
 
 	sol().registry().new_usertype<render_container>("render_container", "new", sol::no_constructor,
@@ -1975,15 +1707,10 @@ void lua_engine::initialize()
 			"yoffset", &render_container::yoffset,
 			"is_empty", &render_container::is_empty);
 
-
-/*  render_manager library
- *
- * manager:machine():render()
- *
+/* machine:render()
  * render:max_update_rate() -
- * render:ui_target() - render_target for ui drawing
- * render:ui_container() - render_container for ui drawing
- *
+ * render:ui_target() - target for ui drawing
+ * render:ui_container() - container for ui drawing
  * render.targets[] - render_target table
  */
 
@@ -1999,16 +1726,10 @@ void lua_engine::initialize()
 					return target_table;
 				}));
 
-
-/*  screen_device library
- *
- * manager:machine().screens[screen_tag]
- *
- * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol
- *                                                     filled with fillcol, color is 32bit argb
+/* machine.screens[screen_tag]
+ * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol, color is 32bit argb
  * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
- * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y
- *                                                                            with left/right/center justification
+ * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y with left, right, center justification
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
@@ -2022,8 +1743,8 @@ void lua_engine::initialize()
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
  * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
- * screen:pixels() - get whole screen binary bitmap as string
- */
+ * screen:pixels() - get whole screen bitmap as string
+*/
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
 			"draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
@@ -2151,20 +1872,14 @@ void lua_engine::initialize()
 				}
 			);
 
-
-/*  mame_ui_manager library
- *
- * manager:ui()
- *
+/* mame_manager:ui()
  * ui:is_menu_active() - ui menu state
  * ui:options() - ui core_options
+ * ui.show_fps - fps display enabled
+ * ui.show_profiler - profiler display enabled
  * ui:get_line_height() - current ui font height
  * ui:get_string_width(str, scale) - get str width with ui font at scale factor of current font size
  * ui:get_char_width(char) - get width of utf8 glyph char with ui font
- *
- * ui.single_step
- * ui.show_fps - fps display enabled
- * ui.show_profiler - profiler display enabled
  */
 
 	sol().registry().new_usertype<mame_ui_manager>("ui", "new", sol::no_constructor,
@@ -2178,16 +1893,11 @@ void lua_engine::initialize()
 			// sol converts char32_t to a string
 			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
 
-
-/*  device_state_entry library
- *
- * manager:machine().devices[device_tag].state[state_name]
- *
+/* device.state[]
  * state:name() - get device state name
+ * state:value() - get device state value
  * state:is_visible() - is state visible in debugger
  * state:is_divider() - is state a divider
- *
- * state.value - get device state value
  */
 
 	sol().registry().new_usertype<device_state_entry>("dev_space", "new", sol::no_constructor,
@@ -2212,11 +1922,7 @@ void lua_engine::initialize()
 			"is_visible", &device_state_entry::visible,
 			"is_divider", &device_state_entry::divider);
 
-
-/*  memory_manager library
- *
- * manager:machine():memory()
- *
+/* machine:memory()
  * memory.banks[] - table of memory banks
  * memory.regions[] - table of memory regions
  * memory.shares[] - table of memory shares
@@ -2242,16 +1948,6 @@ void lua_engine::initialize()
 					return table;
 				}));
 
-/*  memory_region library
- *
- * manager:machine():memory().regions[region_tag]
- *
- * read/write by signedness u/i and bit-width 8/16/32/64:
- * region:read_*(addr)
- * region:write_*(addr, val)
- *
- * region.size
- */
 	sol().registry().new_usertype<memory_region>("region", "new", sol::no_constructor,
 			"read_i8", &region_read<int8_t>,
 			"read_u8", &region_read<uint8_t>,
@@ -2270,17 +1966,6 @@ void lua_engine::initialize()
 			"write_i64", &region_write<int64_t>,
 			"write_u64", &region_write<uint64_t>,
 			"size", sol::property(&memory_region::bytes));
-
-/*  memory_share library
- *
- * manager:machine():memory().shares[share_tag]
- *
- * read/write by signedness u/i and bit-width 8/16/32/64:
- * share:read_*(addr)
- * share:write_*(addr, val)
- *
- * region.size
-*/
 
 	sol().registry().new_usertype<memory_share>("share", "new", sol::no_constructor,
 			"read_i8", &share_read<int8_t>,
@@ -2301,17 +1986,13 @@ void lua_engine::initialize()
 			"write_u64", &share_write<uint64_t>,
 			"size", sol::property(&memory_share::bytes));
 
-
-/*  output_manager library
- *
- * manager:machine():outputs()
- *
- * outputs:set_value(name, val) - set output name to val
- * outputs:set_indexed_value(index, val) - set output index to val
- * outputs:get_value(name) - get output name value
- * outputs:get_indexed_value(index) - get output index value
- * outputs:name_to_id(name) - get index for name
- * outputs:id_to_name(index) - get name for index
+/* machine:output()
+ * output:set_value(name, val) - set output name to val
+ * output:set_indexed_value(index, val) - set output index to val
+ * output:get_value(name) - get output name value
+ * output:get_indexed_value(index) - get output index value
+ * output:name_to_id(name) - get index for name
+ * output:id_to_name(index) - get name for index
  */
 
 	sol().registry().new_usertype<output_manager>("output", "new", sol::no_constructor,
@@ -2322,28 +2003,7 @@ void lua_engine::initialize()
 			"name_to_id", &output_manager::name_to_id,
 			"id_to_name", &output_manager::id_to_name);
 
-
-/*  device_image_interface library
- *
- * manager:machine().images[image_type]
- *
- * image:exists()
- * image:filename() - full path to the image file
- * image:longname()
- * image:manufacturer()
- * image:year()
- * image:software_list_name()
- * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
- * image:load()
- * image:unload()
- * image:crc()
- *
- * image.device - get associated device_t
- * image.software_parent
- * image.is_readable
- * image.is_writeable
- * image.is_creatable
- * image.is_reset_on_load
+/* machine.images[] - images are floppy/cart/cdrom/tape/hdd etc, otherwise this should be self explanatory
  */
 
 	sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
@@ -2363,18 +2023,6 @@ void lua_engine::initialize()
 			"is_writeable", sol::property(&device_image_interface::is_writeable),
 			"is_creatable", sol::property(&device_image_interface::is_creatable),
 			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
-
-
-/*  mame_machine_manager library
- *
- * manager
- * mame_manager - alias of manager
- *
- * manager:machine() - running machine
- * manager:options() - core options
- * manager:plugins() - plugin options
- * manager:ui() - mame ui manager
- */
 
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,

@@ -286,10 +286,10 @@ namespace devices
 	// nld_dummy_input
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(dummy_input)
+	NETLIB_OBJECT_DERIVED(dummy_input, base_dummy)
 	{
 	public:
-		NETLIB_CONSTRUCTOR(dummy_input)
+		NETLIB_CONSTRUCTOR_DERIVED(dummy_input, base_dummy)
 		, m_I(*this, "I")
 		{
 		}
@@ -308,10 +308,10 @@ namespace devices
 	// nld_frontier
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(frontier)
+	NETLIB_OBJECT_DERIVED(frontier, base_dummy)
 	{
 	public:
-		NETLIB_CONSTRUCTOR(frontier)
+		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
 		, m_RIN(*this, "m_RIN", true)
 		, m_ROUT(*this, "m_ROUT", true)
 		, m_I(*this, "_I")

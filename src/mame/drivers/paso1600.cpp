@@ -325,7 +325,7 @@ void paso1600_state::paso1600(machine_config &config)
 	PALETTE(config, m_palette).set_entries(8);
 
 	/* Devices */
-	mc6845_device &crtc(MC6845(config, "crtc", 16000000/4));    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	h46505_device &crtc(H46505(config, "crtc", 16000000/4));    /* unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

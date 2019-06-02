@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "screen.h"
 #include <memory>
 
 class deco_bac06_device : public device_t
@@ -25,9 +24,9 @@ public:
 	void disable_16x16() { m_supports_16x16 = false; }
 	void disable_rc_scroll() { m_supports_rc_scroll = false; }
 
-	std::unique_ptr<u16[]> m_pf_data;
-	std::unique_ptr<u16[]> m_pf_rowscroll;
-	std::unique_ptr<u16[]> m_pf_colscroll;
+	std::unique_ptr<uint16_t[]> m_pf_data;
+	std::unique_ptr<uint16_t[]> m_pf_rowscroll;
+	std::unique_ptr<uint16_t[]> m_pf_colscroll;
 
 	tilemap_t* m_pf8x8_tilemap[3];
 	tilemap_t* m_pf16x16_tilemap[3];
@@ -40,11 +39,11 @@ public:
 	bool    m_supports_rc_scroll;
 
 	void create_tilemaps(int region8x8,int region16x16);
-	u16 m_pf_control_0[8];
-	u16 m_pf_control_1[8];
+	uint16_t m_pf_control_0[8];
+	uint16_t m_pf_control_1[8];
 
-	void deco_bac06_pf_draw(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition, u8 pri = 0, u8 primask = 0xff);
-	void deco_bac06_pf_draw_bootleg(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type, u8 pri = 0, u8 primask = 0xff);
+	void deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition);
+	void deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type);
 
 
 	/* I wonder if pf_control_0 is really registers, or a selection of pins.
@@ -59,12 +58,12 @@ public:
 	  For now we have this get_flip_state function so that drivers can query the bit and set other
 	  flip flags accordingly
 	*/
-	u8 get_flip_state(void) { return m_pf_control_0[0] & 0x80; };
+	uint8_t get_flip_state(void) { return m_pf_control_0[0]&0x80; };
 
 	void set_colmask(int data) { m_gfxcolmask = data; }
 	void set_flip_screen(bool flip);
 
-	u8 m_gfxcolmask;
+	uint8_t m_gfxcolmask;
 	int m_rambank; // external connection?
 	bool m_flip_screen;
 
@@ -106,28 +105,26 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	u8 m_gfxregion8x8;
-	u8 m_gfxregion16x16;
+	uint8_t m_gfxregion8x8;
+	uint8_t m_gfxregion16x16;
 	int m_wide;
 
-	u8 m_bppmult_8x8;
-	u8 m_bppmask_8x8;
+	uint8_t m_bppmult_8x8;
+	uint8_t m_bppmask_8x8;
 
-	u8 m_bppmult_16x16;
-	u8 m_bppmask_16x16;
+	uint8_t m_bppmult_16x16;
+	uint8_t m_bppmask_16x16;
 
 	void custom_tilemap_draw(bitmap_ind16 &bitmap,
-							bitmap_ind8 &primap,
 							const rectangle &cliprect,
 							tilemap_t *tilemap_ptr,
-							const u16 *rowscroll_ptr,
-							const u16 *colscroll_ptr,
-							const u16 *control0,
-							const u16 *control1,
+							const uint16_t *rowscroll_ptr,
+							const uint16_t *colscroll_ptr,
+							const uint16_t *control0,
+							const uint16_t *control1,
 							int flags,
-							u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition,
-							u8 bppmult, u8 bppmask,
-							u8 pri = 0, u8 pmask = 0xff);
+							uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition,
+							uint8_t bppmult, uint8_t bppmask);
 
 private:
 	TILEMAP_MAPPER_MEMBER(tile_shape0_scan);

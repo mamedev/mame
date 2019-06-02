@@ -1964,6 +1964,7 @@ void toaplan1_rallybik_state::rallybik(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(toaplan1_rallybik_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_rallybik_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	TOAPLAN_SCU(config, m_spritegen, 0);
 	m_spritegen->set_palette(m_palette);
@@ -1998,6 +1999,7 @@ void toaplan1_state::truxton(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2028,6 +2030,7 @@ void toaplan1_state::hellfire(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16);
 	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2060,6 +2063,7 @@ void toaplan1_state::zerowing(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16);
 	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2095,6 +2099,7 @@ void toaplan1_demonwld_state::demonwld(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16);
 	m_screen->set_screen_update(FUNC(toaplan1_demonwld_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_demonwld_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2127,6 +2132,7 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(toaplan1_samesame_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_samesame_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2159,6 +2165,7 @@ void toaplan1_state::outzone(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2191,6 +2198,7 @@ void toaplan1_state::outzonecv(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
@@ -2223,6 +2231,7 @@ void toaplan1_state::vimana(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));

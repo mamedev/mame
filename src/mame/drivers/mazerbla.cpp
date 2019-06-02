@@ -1053,7 +1053,7 @@ void mazerbla_state::greatgun(machine_config &config)
 	m_screen->set_screen_update(FUNC(mazerbla_state::screen_update_mazerbla));
 	m_screen->screen_vblank().set(FUNC(mazerbla_state::screen_vblank));
 
-	PALETTE(config, "palette", FUNC(mazerbla_state::mazerbla_palette), 256+1);
+	PALETTE(config, "palette", FUNC(mazerbla_state::mazerbla_palette), 246+1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

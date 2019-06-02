@@ -376,5 +376,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY              FULLNAME                                        FLAGS
 COMP( 1981, k28,  0,      0, k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )

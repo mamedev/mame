@@ -2595,6 +2595,7 @@ void calomega_state::sys903(machine_config &config)
 	screen.set_size((39+1)*8, (31+1)*8);                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    /* Taken from MC6845 init, registers 01 & 06 */
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
 	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?

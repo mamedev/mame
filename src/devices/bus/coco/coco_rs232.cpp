@@ -39,7 +39,6 @@ namespace
 		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: device_t(mconfig, COCO_RS232, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
-			, m_eprom(*this, "eprom")
 			, m_uart(*this, UART_TAG)
 		{
 		}
@@ -66,19 +65,16 @@ namespace
 		// CoCo cartridge level overrides
 		virtual uint8_t *get_cart_base() override
 		{
-			return m_eprom->base();
+			return memregion("eprom")->base();
 		}
 
 		virtual memory_region* get_cart_memregion() override
 		{
-			return m_eprom;
+			return memregion("eprom");
 		}
-
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	private:
 		// internal state
-		required_memory_region m_eprom;
 		required_device<mos6551_device> m_uart;
 	};
 };
@@ -114,15 +110,6 @@ ROM_END
 const tiny_rom_entry *coco_rs232_device::device_rom_region() const
 {
 	return ROM_NAME(coco_rs232_device);
-}
-
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(coco_rs232_device::cts_read)
-{
-	return m_eprom->base()[offset & 0x0fff];
 }
 
 //**************************************************************************

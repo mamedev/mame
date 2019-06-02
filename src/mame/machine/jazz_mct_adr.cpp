@@ -50,13 +50,13 @@ void jazz_mct_adr_device::map(address_map &map)
 {
 	map(0x000, 0x007).lrw32("configuration", [this](){ return m_config; }, [this](u32 data) { m_config = data; });
 	map(0x008, 0x00f).lr32("revision_level", [](){ return 1; });
-	map(0x010, 0x017).lr32("dma_invalid_address", [this]() { m_dma_interrupt_source &= ~DMA_ADDRESS_ERROR; return m_dma_invalid_address; });
+	map(0x010, 0x017).lr32("invalid_address", []() { return 0; });
 	map(0x018, 0x01f).lrw32("translation_base", [this]() { return m_trans_tbl_base; }, [this](u32 data) { LOG("tbl base 0x%08x\n", data); m_trans_tbl_base = data; });
 	map(0x020, 0x027).lrw32("translation_limit", [this]() { return m_trans_tbl_limit; }, [this](u32 data) { LOG("tbl limit 0x%08x\n", data); m_trans_tbl_limit = data; });
 	map(0x028, 0x02f).lrw32("translation_invalidate", []() { return 0; }, [](u32 data) { });
 	map(0x030, 0x037).lw32("cache_maintenance", [this](u32 data) { m_ioc_maint = data; });
 	map(0x038, 0x03f).lr32("remote_failed_address", []() { return 0; });
-	map(0x040, 0x047).lr32("dma_memory_failed_address", [this]() { m_dma_interrupt_source &= ~DMA_PARITY_ERROR; return m_dma_memory_failed_address; });
+	map(0x040, 0x047).lr32("memory_failed_address", []() { return 0; });
 	map(0x048, 0x04f).lw32("io_cache_physical_tag", [this](u32 data) { m_ioc_physical_tag = data; });
 	map(0x050, 0x057).lw32("io_cache_logical_tag", [this](u32 data) { m_ioc_logical_tag = data; });
 	map(0x058, 0x05f).lrw32("io_cache_byte_mask",
@@ -99,7 +99,7 @@ void jazz_mct_adr_device::map(address_map &map)
 			if ((reg == REG_ENABLE) && (data & DMA_ENABLE))
 				LOG("dma started address 0x%08x count %d\n", translate_address(m_dma_reg[(0 << 2) + REG_ADDRESS]), m_dma_reg[(0 << 2) + REG_COUNT]);
 		});
-	map(0x200, 0x207).lr32("interrupt_source", [this]() { return m_dma_interrupt_source; });
+	map(0x200, 0x207).lr32("interrupt_source", []() { return 0; });
 	map(0x208, 0x20f).lr32("error_type", []() { return 0; });
 	map(0x210, 0x217).lrw32("refresh_rate", [this]() { return m_memory_refresh_rate; }, [this](u32 data) { m_memory_refresh_rate = data; });
 	// refresh_counter
@@ -112,7 +112,7 @@ void jazz_mct_adr_device::map(address_map &map)
 
 		m_interval_timer->adjust(interval, 0, interval);
 	});
-	map(0x230, 0x237).lr32("interval_timer", [this]() { if (m_out_int_timer_asserted) { m_out_int_timer_asserted = false; m_out_int_timer(0); } return m_interval_timer->remaining().as_ticks(1000); });
+	map(0x230, 0x237).lr32("interval_timer", [this]() { if (m_out_int_timer_asserted) { m_out_int_timer_asserted = false; m_out_int_timer(0); } return 0; });
 	map(0x238, 0x23b).lr32("interrupt_acknowledge", [this]() { return m_eisa_iack(); });
 }
 

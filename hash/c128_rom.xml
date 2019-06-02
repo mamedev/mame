@@ -8,7 +8,7 @@
 		<publisher>Walrusoft</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="basic8.bin" size="0x8000" crc="d0bdd4aa" sha1="ef64b7336966167dfd624fc7acafa1179e2c52b4"/>
+				<rom name="basic8.bin" size="0x8000" crc="d0bdd4aa" sha1="ef64b7336966167dfd624fc7acafa1179e2c52b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19,13 +19,13 @@
 		<publisher>Randy Winchester</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="keydos.bin" size="0x8000" crc="79d84d04" sha1="ccda467d8f6c23928127e5a2fdaae964fcc946d4"/>
+				<rom name="keydos.bin" size="0x8000" crc="79d84d04" sha1="ccda467d8f6c23928127e5a2fdaae964fcc946d4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="KeyDOS ROM Support Utilities and Demonstrations"/>
 			<dataarea name="flop" size="174848">
-				<rom name="keydos.d64" size="174848" crc="adc716d5" sha1="48c2820669b7cb5dfff7a006db18dfb39b3ef9a0"/>
+				<rom name="keydos.d64" size="174848" crc="adc716d5" sha1="48c2820669b7cb5dfff7a006db18dfb39b3ef9a0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="ramdos128-4.5.bin" size="0x8000" crc="c73296ce" sha1="551bb1c78d044cd67210f79c6e732fe1ce3e91ce"/>
+				<rom name="ramdos128-4.5.bin" size="0x8000" crc="c73296ce" sha1="551bb1c78d044cd67210f79c6e732fe1ce3e91ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 		<publisher>Utilities Unlimited</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="super_chip.bin" size="0x8000" crc="a66f73c5" sha1="a766997b86db5bd9b77de551f0a6da6ad159b8d3"/>
+				<rom name="super_chip.bin" size="0x8000" crc="a66f73c5" sha1="a766997b86db5bd9b77de551f0a6da6ad159b8d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 		<publisher>Utilities Unlimited</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="super_chip_b.bin" size="0x8000" crc="defb9efd" sha1="86ef9268e4d01b8d4515677d1875cd11767984ee"/>
+				<rom name="super_chip_b.bin" size="0x8000" crc="defb9efd" sha1="86ef9268e4d01b8d4515677d1875cd11767984ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<publisher>Alf H. Jonassen</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="servant.bin" size="0x8000" crc="f6588fb9" sha1="f13710b0ca23ac079d119f2f5703cdd763db5211"/>
+				<rom name="servant.bin" size="0x8000" crc="f6588fb9" sha1="f13710b0ca23ac079d119f2f5703cdd763db5211" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="geos128am1581.bin" size="0x8000" crc="0790c2ea" sha1="3ba3902d47ac46f610dd58a1fec38fc1c0746fac"/>
+				<rom name="geos128am1581.bin" size="0x8000" crc="0790c2ea" sha1="3ba3902d47ac46f610dd58a1fec38fc1c0746fac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="geos128ge1581.bin" size="0x8000" crc="1a60e07c" sha1="588bab588ad793b758cff26e68758065a42f15ea"/>
+				<rom name="geos128ge1581.bin" size="0x8000" crc="1a60e07c" sha1="588bab588ad793b758cff26e68758065a42f15ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -102,7 +102,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
-				<rom name="geos128am1571.bin" size="0x8000" crc="e438e085" sha1="23e0d7aa7f5c73d91c8759e21008044808f61496"/>
+				<rom name="geos128am1571.bin" size="0x8000" crc="e438e085" sha1="23e0d7aa7f5c73d91c8759e21008044808f61496" offset="0" />
 			</dataarea>
 		</part>
 	</software>

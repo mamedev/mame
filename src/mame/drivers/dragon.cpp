@@ -22,7 +22,6 @@
 
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
-#include "bus/coco/dragon_sprites.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_orch90.h"
@@ -171,7 +170,6 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("premier_fdc", PREMIER_FDC);
 	device.option_add("sdtandy_fdc", SDTANDY_FDC);
 	device.option_add("jcbsnd", DRAGON_JCBSND);
-	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
@@ -306,11 +304,11 @@ void d64plus_state::d64plus(machine_config &config)
 	plus_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	plus_screen.set_size(640, 264);
 	plus_screen.set_visarea_full();
-	plus_screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+	plus_screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc
-	HD6845S(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
+	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
 	m_crtc->set_screen("plus_screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

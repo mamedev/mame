@@ -9,13 +9,13 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="base, the (1985)(the adventure workshop)(part 1 of 2)[req isdos].img" size="737280" crc="ce0f0d3e" sha1="6978202b1de2415795df7fac9f395d12321b3a27"/>
+				<rom name="base, the (1985)(the adventure workshop)(part 1 of 2)[req isdos].img" size="737280" crc="ce0f0d3e" sha1="6978202b1de2415795df7fac9f395d12321b3a27" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="base, the (1985)(the adventure workshop)(part 2 of 2)[req isdos].img" size="737280" crc="3ce872f3" sha1="a467299ed78b40686795ddf13820c98ebbe9d81a"/>
+				<rom name="base, the (1985)(the adventure workshop)(part 2 of 2)[req isdos].img" size="737280" crc="3ce872f3" sha1="a467299ed78b40686795ddf13820c98ebbe9d81a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="deadline (1986)(infocom)[req isdos].img" size="737280" crc="e194e5c8" sha1="8d810e43fa07808883e3aa85cee702e41629856d"/>
+				<rom name="deadline (1986)(infocom)[req isdos].img" size="737280" crc="e194e5c8" sha1="8d810e43fa07808883e3aa85cee702e41629856d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk - basic (19xx)(ep-forever-forum).img" size="737280" crc="25fce9c1" sha1="5fc0f1d571b30a9ea7067f091e87c1e8f0883843"/>
+				<rom name="games compilation disk - basic (19xx)(ep-forever-forum).img" size="737280" crc="25fce9c1" sha1="5fc0f1d571b30a9ea7067f091e87c1e8f0883843" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk - basic (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="c02ea2b2" sha1="28b6cfee6e83e9e57231a2ead80e6ff2b63223b5"/>
+				<rom name="games compilation disk - basic (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="c02ea2b2" sha1="28b6cfee6e83e9e57231a2ead80e6ff2b63223b5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_01 (19xx)(ep-forever-forum).img" size="737280" crc="8e45c4dd" sha1="c5175028d8fac75915619701d2566b5a9931d559"/>
+				<rom name="games compilation disk_01 (19xx)(ep-forever-forum).img" size="737280" crc="8e45c4dd" sha1="c5175028d8fac75915619701d2566b5a9931d559" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_01 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="6f8bc78a" sha1="33ae7a98efd5b4b8995b3bf77a38c2c0974be899"/>
+				<rom name="games compilation disk_01 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="6f8bc78a" sha1="33ae7a98efd5b4b8995b3bf77a38c2c0974be899" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_02 (19xx)(ep-forever-forum).img" size="737280" crc="0709d27f" sha1="82b1dc5bc49fb7a9fe52fb9ccc073181bed1737b"/>
+				<rom name="games compilation disk_02 (19xx)(ep-forever-forum).img" size="737280" crc="0709d27f" sha1="82b1dc5bc49fb7a9fe52fb9ccc073181bed1737b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_02 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3b3bc780" sha1="7be16c9e552178999873955b3458ca6779ad6062"/>
+				<rom name="games compilation disk_02 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3b3bc780" sha1="7be16c9e552178999873955b3458ca6779ad6062" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_03 (19xx)(ep-forever-forum).img" size="737280" crc="d4d14fd6" sha1="f759c52395a5df4c7aef16e03a72829e5ce5d05c"/>
+				<rom name="games compilation disk_03 (19xx)(ep-forever-forum).img" size="737280" crc="d4d14fd6" sha1="f759c52395a5df4c7aef16e03a72829e5ce5d05c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_03 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="bf3ef812" sha1="af3f45a1bb3d5583b4e3f3b78b940cc492199bfa"/>
+				<rom name="games compilation disk_03 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="bf3ef812" sha1="af3f45a1bb3d5583b4e3f3b78b940cc492199bfa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_04 (19xx)(ep-forever-forum).img" size="737280" crc="4633a544" sha1="3986e749061a5d9dbbd30ae87a9116e7be2b81ab"/>
+				<rom name="games compilation disk_04 (19xx)(ep-forever-forum).img" size="737280" crc="4633a544" sha1="3986e749061a5d9dbbd30ae87a9116e7be2b81ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -147,7 +147,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_04 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="de362980" sha1="a5f542727cd5de75e866f452470c6c5048c0b143"/>
+				<rom name="games compilation disk_04 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="de362980" sha1="a5f542727cd5de75e866f452470c6c5048c0b143" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +159,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_05 (19xx)(ep-forever-forum).img" size="737280" crc="a3e4f02e" sha1="9804e87c33a67d987eef2261b4fc2b6e6cc0070d"/>
+				<rom name="games compilation disk_05 (19xx)(ep-forever-forum).img" size="737280" crc="a3e4f02e" sha1="9804e87c33a67d987eef2261b4fc2b6e6cc0070d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -171,7 +171,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_05 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9530516b" sha1="af31fe6bad325e88a083ebad0833a44fb7f3b734"/>
+				<rom name="games compilation disk_05 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9530516b" sha1="af31fe6bad325e88a083ebad0833a44fb7f3b734" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_06 (19xx)(ep-forever-forum).img" size="737280" crc="7e9f4612" sha1="9b5c02510db27decc31c3d430317f216e383e246"/>
+				<rom name="games compilation disk_06 (19xx)(ep-forever-forum).img" size="737280" crc="7e9f4612" sha1="9b5c02510db27decc31c3d430317f216e383e246" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_06 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a33c0c3d" sha1="562f2e57b009afad3b1fc996aa29b2bfca765749"/>
+				<rom name="games compilation disk_06 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a33c0c3d" sha1="562f2e57b009afad3b1fc996aa29b2bfca765749" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_07 (19xx)(ep-forever-forum).img" size="737280" crc="d805e9ca" sha1="15d3d79e0f7e3f28974296a3033bf96871ef9a14"/>
+				<rom name="games compilation disk_07 (19xx)(ep-forever-forum).img" size="737280" crc="d805e9ca" sha1="15d3d79e0f7e3f28974296a3033bf96871ef9a14" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +219,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_07 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a9a1bef2" sha1="94af8b3e6ee9c919c015d190f0ea485cf5653912"/>
+				<rom name="games compilation disk_07 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a9a1bef2" sha1="94af8b3e6ee9c919c015d190f0ea485cf5653912" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +231,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_08 (19xx)(ep-forever-forum).img" size="737280" crc="181f62fa" sha1="7570e771212f370ecc4c2bd29e5ebe3a1d227549"/>
+				<rom name="games compilation disk_08 (19xx)(ep-forever-forum).img" size="737280" crc="181f62fa" sha1="7570e771212f370ecc4c2bd29e5ebe3a1d227549" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +243,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_08 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="126dc57f" sha1="a205d912e4a62fbfe62109f39fd3c3150a8bdb46"/>
+				<rom name="games compilation disk_08 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="126dc57f" sha1="a205d912e4a62fbfe62109f39fd3c3150a8bdb46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_09 (19xx)(ep-forever-forum).img" size="737280" crc="6b2b77ab" sha1="2c06c5ce1d503de4827590af549849e07f01237e"/>
+				<rom name="games compilation disk_09 (19xx)(ep-forever-forum).img" size="737280" crc="6b2b77ab" sha1="2c06c5ce1d503de4827590af549849e07f01237e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +267,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_09 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="1e5e97c4" sha1="f7f946d6fd1ab23f447ef636bb63a64d202937d0"/>
+				<rom name="games compilation disk_09 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="1e5e97c4" sha1="f7f946d6fd1ab23f447ef636bb63a64d202937d0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +279,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_10 (19xx)(ep-forever-forum).img" size="737280" crc="bbc68eef" sha1="dc22a92f3cb6d838da5503d70570482758f58ed7"/>
+				<rom name="games compilation disk_10 (19xx)(ep-forever-forum).img" size="737280" crc="bbc68eef" sha1="dc22a92f3cb6d838da5503d70570482758f58ed7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -291,7 +291,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_10 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="f52b002d" sha1="405cc57233a0db1c581d4f8437dd116ec5c871b8"/>
+				<rom name="games compilation disk_10 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="f52b002d" sha1="405cc57233a0db1c581d4f8437dd116ec5c871b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -303,7 +303,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_11 (19xx)(ep-forever-forum).img" size="737280" crc="bd240b19" sha1="c0ace0aab56d025199ba15ed63b5e8af4b3d3193"/>
+				<rom name="games compilation disk_11 (19xx)(ep-forever-forum).img" size="737280" crc="bd240b19" sha1="c0ace0aab56d025199ba15ed63b5e8af4b3d3193" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -315,7 +315,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_11 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ffde4fc3" sha1="4436be7059a58e168c8bda21660eaf2c963d0ac6"/>
+				<rom name="games compilation disk_11 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ffde4fc3" sha1="4436be7059a58e168c8bda21660eaf2c963d0ac6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -327,7 +327,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_12 (19xx)(ep-forever-forum).img" size="737280" crc="a6d8c2aa" sha1="02e2415967d0fc70506015bd34392783f2ea9737"/>
+				<rom name="games compilation disk_12 (19xx)(ep-forever-forum).img" size="737280" crc="a6d8c2aa" sha1="02e2415967d0fc70506015bd34392783f2ea9737" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +339,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_12 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="0991ac23" sha1="b6daa903826aa5ef3b9293212c6bfbec97abb684"/>
+				<rom name="games compilation disk_12 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="0991ac23" sha1="b6daa903826aa5ef3b9293212c6bfbec97abb684" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -351,7 +351,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_13 (19xx)(ep-forever-forum).img" size="737280" crc="17a19be5" sha1="3898b10dc27b6caca7afc8441be627f30584d5e6"/>
+				<rom name="games compilation disk_13 (19xx)(ep-forever-forum).img" size="737280" crc="17a19be5" sha1="3898b10dc27b6caca7afc8441be627f30584d5e6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +363,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_13 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3646e2c3" sha1="69cdd23a6b3468c4926738e5d3ac59d05ce6a9f6"/>
+				<rom name="games compilation disk_13 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3646e2c3" sha1="69cdd23a6b3468c4926738e5d3ac59d05ce6a9f6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -375,7 +375,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_14 (19xx)(ep-forever-forum).img" size="737280" crc="81288a32" sha1="00ed110691ebc1aa1dbfc10c68ecce12bb728290"/>
+				<rom name="games compilation disk_14 (19xx)(ep-forever-forum).img" size="737280" crc="81288a32" sha1="00ed110691ebc1aa1dbfc10c68ecce12bb728290" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -387,7 +387,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_14 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="1be0138b" sha1="5e0a62844d8a19b8ff9046ff9072f5f3dcc18412"/>
+				<rom name="games compilation disk_14 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="1be0138b" sha1="5e0a62844d8a19b8ff9046ff9072f5f3dcc18412" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,7 +399,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_15 (19xx)(ep-forever-forum).img" size="737280" crc="e008c143" sha1="d74477d0169dc75b25ac961d2a249cb3b28bf183"/>
+				<rom name="games compilation disk_15 (19xx)(ep-forever-forum).img" size="737280" crc="e008c143" sha1="d74477d0169dc75b25ac961d2a249cb3b28bf183" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -411,7 +411,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_15 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="7ba09cdc" sha1="0dc27886e21ba1f70093bd212504c3457cd0698e"/>
+				<rom name="games compilation disk_15 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="7ba09cdc" sha1="0dc27886e21ba1f70093bd212504c3457cd0698e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -423,7 +423,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_16 (19xx)(ep-forever-forum).img" size="737280" crc="3d1c51f8" sha1="2108b05f68ab993f9e849be6c3ad752813548691"/>
+				<rom name="games compilation disk_16 (19xx)(ep-forever-forum).img" size="737280" crc="3d1c51f8" sha1="2108b05f68ab993f9e849be6c3ad752813548691" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_16 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="dce8b749" sha1="27e01c189b75cd86947c57c80da71bea3df2335b"/>
+				<rom name="games compilation disk_16 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="dce8b749" sha1="27e01c189b75cd86947c57c80da71bea3df2335b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -447,7 +447,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_17 (19xx)(ep-forever-forum).img" size="737280" crc="11f3decc" sha1="d642ecc264b6d6085d10976089ae1c3790b05131"/>
+				<rom name="games compilation disk_17 (19xx)(ep-forever-forum).img" size="737280" crc="11f3decc" sha1="d642ecc264b6d6085d10976089ae1c3790b05131" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -459,7 +459,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_17 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="d248b94c" sha1="a915a3fd952d96d7a45d90b1ecffe4635b2f16b3"/>
+				<rom name="games compilation disk_17 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="d248b94c" sha1="a915a3fd952d96d7a45d90b1ecffe4635b2f16b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -471,7 +471,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_18 (19xx)(ep-forever-forum).img" size="737280" crc="675b304b" sha1="3ed1cfac91bf72a18044a06d4152e36d3a72abc9"/>
+				<rom name="games compilation disk_18 (19xx)(ep-forever-forum).img" size="737280" crc="675b304b" sha1="3ed1cfac91bf72a18044a06d4152e36d3a72abc9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -483,7 +483,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_18 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="16ff6773" sha1="3bb79757ca1bf6066a60810015cb45969c9cf774"/>
+				<rom name="games compilation disk_18 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="16ff6773" sha1="3bb79757ca1bf6066a60810015cb45969c9cf774" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -495,7 +495,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_19 (19xx)(ep-forever-forum).img" size="737280" crc="e330e63c" sha1="afa9609d03ce871ae872cab5542640f752072068"/>
+				<rom name="games compilation disk_19 (19xx)(ep-forever-forum).img" size="737280" crc="e330e63c" sha1="afa9609d03ce871ae872cab5542640f752072068" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -507,7 +507,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_19 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="513df64a" sha1="fdcf6035dbcdae619a184427ec1cec468d766c38"/>
+				<rom name="games compilation disk_19 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="513df64a" sha1="fdcf6035dbcdae619a184427ec1cec468d766c38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -519,7 +519,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_20 (19xx)(ep-forever-forum).img" size="737280" crc="59d8e1e6" sha1="0da4fad0ee9db31e46c482b956f549c9ebb65ef5"/>
+				<rom name="games compilation disk_20 (19xx)(ep-forever-forum).img" size="737280" crc="59d8e1e6" sha1="0da4fad0ee9db31e46c482b956f549c9ebb65ef5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -531,7 +531,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_20 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="8f75906f" sha1="4072e69840ed2d8b7d33e9786afd2b30f9e7dbe3"/>
+				<rom name="games compilation disk_20 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="8f75906f" sha1="4072e69840ed2d8b7d33e9786afd2b30f9e7dbe3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -543,7 +543,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_21 (19xx)(ep-forever-forum).img" size="737280" crc="1dea2aee" sha1="a70c45c07e94440a204b0605e86a3c3c5e31efb5"/>
+				<rom name="games compilation disk_21 (19xx)(ep-forever-forum).img" size="737280" crc="1dea2aee" sha1="a70c45c07e94440a204b0605e86a3c3c5e31efb5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -555,7 +555,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_21 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="6c4e7dd6" sha1="5dc8fe92eef5de44e78c4b03357dab426e950b0f"/>
+				<rom name="games compilation disk_21 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="6c4e7dd6" sha1="5dc8fe92eef5de44e78c4b03357dab426e950b0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -567,7 +567,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_22 (19xx)(ep-forever-forum).img" size="737280" crc="0d4e2fdf" sha1="c5c00a54ee0f3fd05d34d5ac16e935f8f2eb1d85"/>
+				<rom name="games compilation disk_22 (19xx)(ep-forever-forum).img" size="737280" crc="0d4e2fdf" sha1="c5c00a54ee0f3fd05d34d5ac16e935f8f2eb1d85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -579,7 +579,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_22 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="672ff390" sha1="61643116a7c423a38611a50716b85ea0296444ee"/>
+				<rom name="games compilation disk_22 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="672ff390" sha1="61643116a7c423a38611a50716b85ea0296444ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -591,7 +591,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_23 (19xx)(ep-forever-forum).img" size="737280" crc="657d25cd" sha1="930dea450bf243afc93d5ba8ebf5774b1d19d087"/>
+				<rom name="games compilation disk_23 (19xx)(ep-forever-forum).img" size="737280" crc="657d25cd" sha1="930dea450bf243afc93d5ba8ebf5774b1d19d087" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -603,7 +603,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_23 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ec01841b" sha1="914f728a26a4f349b17276b1f61084a7932b53cd"/>
+				<rom name="games compilation disk_23 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ec01841b" sha1="914f728a26a4f349b17276b1f61084a7932b53cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -615,7 +615,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_24 (19xx)(ep-forever-forum).img" size="737280" crc="e337b5d0" sha1="f9482f3f3662f1082604a3655b963f23dc2fe5b3"/>
+				<rom name="games compilation disk_24 (19xx)(ep-forever-forum).img" size="737280" crc="e337b5d0" sha1="f9482f3f3662f1082604a3655b963f23dc2fe5b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -627,7 +627,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_24 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9293e2e8" sha1="fc0c3e09f0648abc6bebd4b6973609ed52e33b2b"/>
+				<rom name="games compilation disk_24 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9293e2e8" sha1="fc0c3e09f0648abc6bebd4b6973609ed52e33b2b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -639,7 +639,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_25 (19xx)(ep-forever-forum).img" size="737280" crc="62c0f3d5" sha1="a9bef2de3d2a71f93a77904a05fd73fa40e9b4e4"/>
+				<rom name="games compilation disk_25 (19xx)(ep-forever-forum).img" size="737280" crc="62c0f3d5" sha1="a9bef2de3d2a71f93a77904a05fd73fa40e9b4e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -651,7 +651,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_25 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b1a31dd8" sha1="c364e037992b039832719d2091b524307fea114c"/>
+				<rom name="games compilation disk_25 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b1a31dd8" sha1="c364e037992b039832719d2091b524307fea114c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +663,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_26 (19xx)(ep-forever-forum).img" size="737280" crc="56079b8e" sha1="a11dca5a307425a68c8bc0575074ea473efc7cd1"/>
+				<rom name="games compilation disk_26 (19xx)(ep-forever-forum).img" size="737280" crc="56079b8e" sha1="a11dca5a307425a68c8bc0575074ea473efc7cd1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -675,7 +675,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_26 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="27a3ccb6" sha1="91283eacd3841feeb17efe98f9d25b7db8966d61"/>
+				<rom name="games compilation disk_26 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="27a3ccb6" sha1="91283eacd3841feeb17efe98f9d25b7db8966d61" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -687,7 +687,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_27 (19xx)(ep-forever-forum).img" size="737280" crc="1c57d906" sha1="282f511fa0fd5db2fcc1b2ae98e665b57f2a4c57"/>
+				<rom name="games compilation disk_27 (19xx)(ep-forever-forum).img" size="737280" crc="1c57d906" sha1="282f511fa0fd5db2fcc1b2ae98e665b57f2a4c57" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -699,7 +699,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_27 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="6df38e3e" sha1="f692a892328a4b4f2f61763bef5087a7b36917aa"/>
+				<rom name="games compilation disk_27 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="6df38e3e" sha1="f692a892328a4b4f2f61763bef5087a7b36917aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -711,7 +711,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_28 (19xx)(ep-forever-forum).img" size="737280" crc="73963880" sha1="843aee12f1f7b2fbad2a9b81c664aec9eea1a636"/>
+				<rom name="games compilation disk_28 (19xx)(ep-forever-forum).img" size="737280" crc="73963880" sha1="843aee12f1f7b2fbad2a9b81c664aec9eea1a636" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -723,7 +723,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_28 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="02326fb8" sha1="ce42e7232a87493903c3d93f5f2b5ae721cbb55b"/>
+				<rom name="games compilation disk_28 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="02326fb8" sha1="ce42e7232a87493903c3d93f5f2b5ae721cbb55b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -735,7 +735,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_29 (19xx)(ep-forever-forum).img" size="737280" crc="c143b75e" sha1="2b6e3377d021bb2fd15f9cce670896c54478ca6e"/>
+				<rom name="games compilation disk_29 (19xx)(ep-forever-forum).img" size="737280" crc="c143b75e" sha1="2b6e3377d021bb2fd15f9cce670896c54478ca6e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -747,7 +747,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_29 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b6f744de" sha1="dcf5f33043500e7a515f1f9e2cc49aa7e2aa02e5"/>
+				<rom name="games compilation disk_29 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b6f744de" sha1="dcf5f33043500e7a515f1f9e2cc49aa7e2aa02e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -759,7 +759,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_30 (19xx)(ep-forever-forum).img" size="737280" crc="b86adcc8" sha1="b8cf3ee4f625a547b7d611c92a8b358abeddca17"/>
+				<rom name="games compilation disk_30 (19xx)(ep-forever-forum).img" size="737280" crc="b86adcc8" sha1="b8cf3ee4f625a547b7d611c92a8b358abeddca17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -771,7 +771,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_30 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9dddab88" sha1="30c610125d603743bfca0bf63b34b666d67e64cc"/>
+				<rom name="games compilation disk_30 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9dddab88" sha1="30c610125d603743bfca0bf63b34b666d67e64cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -783,7 +783,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_31 (19xx)(ep-forever-forum).img" size="737280" crc="e82468ec" sha1="b3dce54a183a1a3a0dd2e187015a688fc5d2ab0c"/>
+				<rom name="games compilation disk_31 (19xx)(ep-forever-forum).img" size="737280" crc="e82468ec" sha1="b3dce54a183a1a3a0dd2e187015a688fc5d2ab0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +795,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_31 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="157d674d" sha1="e166c1b606c0e8fa92cafea07ae87da4f559b654"/>
+				<rom name="games compilation disk_31 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="157d674d" sha1="e166c1b606c0e8fa92cafea07ae87da4f559b654" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -807,7 +807,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_32 (19xx)(ep-forever-forum).img" size="737280" crc="bd4270fe" sha1="2e87328e2e3e9a283b9c9a4648c3cf37849d64c5"/>
+				<rom name="games compilation disk_32 (19xx)(ep-forever-forum).img" size="737280" crc="bd4270fe" sha1="2e87328e2e3e9a283b9c9a4648c3cf37849d64c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -819,7 +819,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_32 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="70304b59" sha1="547b44ee13ef6fe3d3fba5f5dbe5c8e296c903b2"/>
+				<rom name="games compilation disk_32 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="70304b59" sha1="547b44ee13ef6fe3d3fba5f5dbe5c8e296c903b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -831,7 +831,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_33 (19xx)(ep-forever-forum).img" size="737280" crc="e649c717" sha1="cdc492b142f9dec805ce2ee077c20d3b26953414"/>
+				<rom name="games compilation disk_33 (19xx)(ep-forever-forum).img" size="737280" crc="e649c717" sha1="cdc492b142f9dec805ce2ee077c20d3b26953414" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -843,7 +843,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_33 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3f3f2cb4" sha1="cf0307851760387a6a6d149c61eae9c44248e1a4"/>
+				<rom name="games compilation disk_33 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3f3f2cb4" sha1="cf0307851760387a6a6d149c61eae9c44248e1a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -855,7 +855,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_34 (19xx)(ep-forever-forum).img" size="737280" crc="5ef9ceac" sha1="e074536cf034bf82b0f3caf3d2225cd73bd58b3d"/>
+				<rom name="games compilation disk_34 (19xx)(ep-forever-forum).img" size="737280" crc="5ef9ceac" sha1="e074536cf034bf82b0f3caf3d2225cd73bd58b3d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -867,7 +867,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_34 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="190d9e43" sha1="6daa15ad3233c44508ee42baa53a340c47142770"/>
+				<rom name="games compilation disk_34 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="190d9e43" sha1="6daa15ad3233c44508ee42baa53a340c47142770" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -879,7 +879,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_35 (19xx)(ep-forever-forum).img" size="737280" crc="06a9d914" sha1="ece83e79b4732f964d35e4906e5f34872e80c1d6"/>
+				<rom name="games compilation disk_35 (19xx)(ep-forever-forum).img" size="737280" crc="06a9d914" sha1="ece83e79b4732f964d35e4906e5f34872e80c1d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -891,7 +891,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_35 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="94b616c4" sha1="801b60195b906aee50827a7b099b6870d42d0beb"/>
+				<rom name="games compilation disk_35 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="94b616c4" sha1="801b60195b906aee50827a7b099b6870d42d0beb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -903,7 +903,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_36 (19xx)(ep-forever-forum).img" size="737280" crc="929b9a8b" sha1="e801f4ae821e000cc81889d159c56b85795d42bb"/>
+				<rom name="games compilation disk_36 (19xx)(ep-forever-forum).img" size="737280" crc="929b9a8b" sha1="e801f4ae821e000cc81889d159c56b85795d42bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -915,7 +915,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_36 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="4cb710d3" sha1="5486cd0983211deb290075f4851b6d7fa4f2805a"/>
+				<rom name="games compilation disk_36 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="4cb710d3" sha1="5486cd0983211deb290075f4851b6d7fa4f2805a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -927,7 +927,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_37 (19xx)(ep-forever-forum).img" size="737280" crc="7cc40a00" sha1="b9af6364bdab5b1ea3e07eae8d29a0a58f883274"/>
+				<rom name="games compilation disk_37 (19xx)(ep-forever-forum).img" size="737280" crc="7cc40a00" sha1="b9af6364bdab5b1ea3e07eae8d29a0a58f883274" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -939,7 +939,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_37 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="16a5d64f" sha1="0d50979654c54e15c0df793bad444cf8915d0df8"/>
+				<rom name="games compilation disk_37 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="16a5d64f" sha1="0d50979654c54e15c0df793bad444cf8915d0df8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -951,7 +951,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_38 (19xx)(ep-forever-forum).img" size="737280" crc="b4a52e6c" sha1="4c9c6016533f1b17943946cf06236048b3464fb2"/>
+				<rom name="games compilation disk_38 (19xx)(ep-forever-forum).img" size="737280" crc="b4a52e6c" sha1="4c9c6016533f1b17943946cf06236048b3464fb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -963,7 +963,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_38 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="655b7bd8" sha1="fef70a797dfe1f30578cc4521aecec60c9974410"/>
+				<rom name="games compilation disk_38 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="655b7bd8" sha1="fef70a797dfe1f30578cc4521aecec60c9974410" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -975,7 +975,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_39 (19xx)(ep-forever-forum).img" size="737280" crc="cc7bfbbd" sha1="5f0bf5e1531fde4f53efe682ae8891f74517a902"/>
+				<rom name="games compilation disk_39 (19xx)(ep-forever-forum).img" size="737280" crc="cc7bfbbd" sha1="5f0bf5e1531fde4f53efe682ae8891f74517a902" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -987,7 +987,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_39 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="48dd71ed" sha1="c0c90f0cf18a418032cdc7005c8fde3e31a29868"/>
+				<rom name="games compilation disk_39 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="48dd71ed" sha1="c0c90f0cf18a418032cdc7005c8fde3e31a29868" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -999,7 +999,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_40 (19xx)(ep-forever-forum).img" size="737280" crc="29e43d83" sha1="2fd085991b8eae4812f522fb254cde5f9bb92277"/>
+				<rom name="games compilation disk_40 (19xx)(ep-forever-forum).img" size="737280" crc="29e43d83" sha1="2fd085991b8eae4812f522fb254cde5f9bb92277" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1011,7 +1011,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_40 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ab827b54" sha1="981a976f3cb8ca83dd5363f6351c92fe212d2014"/>
+				<rom name="games compilation disk_40 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ab827b54" sha1="981a976f3cb8ca83dd5363f6351c92fe212d2014" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1023,7 +1023,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_41 (19xx)(ep-forever-forum).img" size="737280" crc="a28230e3" sha1="b19f16d39a155a7032d4a95df0e4c54993f8eaf9"/>
+				<rom name="games compilation disk_41 (19xx)(ep-forever-forum).img" size="737280" crc="a28230e3" sha1="b19f16d39a155a7032d4a95df0e4c54993f8eaf9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1035,7 +1035,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_41 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="f72a4d5f" sha1="4b3b72cc4d0f84f4b9fb938f9c4682d83af2aff8"/>
+				<rom name="games compilation disk_41 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="f72a4d5f" sha1="4b3b72cc4d0f84f4b9fb938f9c4682d83af2aff8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1047,7 +1047,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_42 (19xx)(ep-forever-forum).img" size="737280" crc="ff9890fb" sha1="48e542c2c255ed768fb49448bd302480f0a9baf3"/>
+				<rom name="games compilation disk_42 (19xx)(ep-forever-forum).img" size="737280" crc="ff9890fb" sha1="48e542c2c255ed768fb49448bd302480f0a9baf3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1059,7 +1059,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_42 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="382ec263" sha1="ed43a02841cb76a94d39d058b74a6da97ff7c51e"/>
+				<rom name="games compilation disk_42 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="382ec263" sha1="ed43a02841cb76a94d39d058b74a6da97ff7c51e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1071,7 +1071,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_43 (19xx)(ep-forever-forum).img" size="737280" crc="d39f9590" sha1="201776dd3546611e61811bf3015ed4c0cb8831af"/>
+				<rom name="games compilation disk_43 (19xx)(ep-forever-forum).img" size="737280" crc="d39f9590" sha1="201776dd3546611e61811bf3015ed4c0cb8831af" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1083,7 +1083,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_43 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a23bc2a8" sha1="af4cbdd56e3b82932c5ab7b84a4a2b2ed1d6c8dd"/>
+				<rom name="games compilation disk_43 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a23bc2a8" sha1="af4cbdd56e3b82932c5ab7b84a4a2b2ed1d6c8dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1095,7 +1095,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_44 (19xx)(ep-forever-forum).img" size="737280" crc="db9b75e7" sha1="5a9809d1d5806084791771a146e063711854307b"/>
+				<rom name="games compilation disk_44 (19xx)(ep-forever-forum).img" size="737280" crc="db9b75e7" sha1="5a9809d1d5806084791771a146e063711854307b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1107,7 +1107,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_44 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="10881913" sha1="9bec322270e9d6218511f878de61ada0d688835e"/>
+				<rom name="games compilation disk_44 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="10881913" sha1="9bec322270e9d6218511f878de61ada0d688835e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1119,7 +1119,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_45 (19xx)(ep-forever-forum).img" size="737280" crc="1e025011" sha1="184ec5b89fc3786b531fd79f98a9bb90c9828d85"/>
+				<rom name="games compilation disk_45 (19xx)(ep-forever-forum).img" size="737280" crc="1e025011" sha1="184ec5b89fc3786b531fd79f98a9bb90c9828d85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1131,7 +1131,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_45 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="d3d824aa" sha1="3bd4fbf3886224e4e5cdeba830eb00dc051a8509"/>
+				<rom name="games compilation disk_45 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="d3d824aa" sha1="3bd4fbf3886224e4e5cdeba830eb00dc051a8509" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1143,7 +1143,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_46 (19xx)(ep-forever-forum).img" size="737280" crc="30bf6e0c" sha1="ec0278ff7562a210002617df1e708372da748409"/>
+				<rom name="games compilation disk_46 (19xx)(ep-forever-forum).img" size="737280" crc="30bf6e0c" sha1="ec0278ff7562a210002617df1e708372da748409" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1155,7 +1155,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_46 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="96314e2a" sha1="8849bc271c6e9b41c74b1edd190ae36b9d795364"/>
+				<rom name="games compilation disk_46 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="96314e2a" sha1="8849bc271c6e9b41c74b1edd190ae36b9d795364" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1167,7 +1167,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_47 (19xx)(ep-forever-forum).img" size="737280" crc="2b23b607" sha1="30f5e6f1623513595746e6ee9c35ed7440e824b8"/>
+				<rom name="games compilation disk_47 (19xx)(ep-forever-forum).img" size="737280" crc="2b23b607" sha1="30f5e6f1623513595746e6ee9c35ed7440e824b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1179,7 +1179,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_47 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="5ea857e2" sha1="576baede9bfe34296411545fc372fece7c4ff1a6"/>
+				<rom name="games compilation disk_47 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="5ea857e2" sha1="576baede9bfe34296411545fc372fece7c4ff1a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1191,7 +1191,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_48 (19xx)(ep-forever-forum).img" size="737280" crc="d1adddfa" sha1="0e8646db29477ea3a40a613d0050bf99be906074"/>
+				<rom name="games compilation disk_48 (19xx)(ep-forever-forum).img" size="737280" crc="d1adddfa" sha1="0e8646db29477ea3a40a613d0050bf99be906074" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1203,7 +1203,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_48 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3ed7d257" sha1="0c9e783b1b20ef7cc9c11c7b1313e29fe107ae35"/>
+				<rom name="games compilation disk_48 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="3ed7d257" sha1="0c9e783b1b20ef7cc9c11c7b1313e29fe107ae35" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1215,7 +1215,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_49 (19xx)(ep-forever-forum).img" size="737280" crc="1239f524" sha1="73e95240a2bba80f9716f6d1da7743c9f3faf0d2"/>
+				<rom name="games compilation disk_49 (19xx)(ep-forever-forum).img" size="737280" crc="1239f524" sha1="73e95240a2bba80f9716f6d1da7743c9f3faf0d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1227,7 +1227,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_49 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="639da21c" sha1="4e51c5a7b1264e1bb2845995bce7e32cebd83e7b"/>
+				<rom name="games compilation disk_49 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="639da21c" sha1="4e51c5a7b1264e1bb2845995bce7e32cebd83e7b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1239,7 +1239,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_50 (19xx)(ep-forever-forum).img" size="737280" crc="a6d0ab85" sha1="d3b2686f4213d09e8fe2718b3e235c07b5f00b54"/>
+				<rom name="games compilation disk_50 (19xx)(ep-forever-forum).img" size="737280" crc="a6d0ab85" sha1="d3b2686f4213d09e8fe2718b3e235c07b5f00b54" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1251,7 +1251,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_50 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="5703efbc" sha1="dc85ee55e0bcc4cae2655b3112aeb6b8060a8566"/>
+				<rom name="games compilation disk_50 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="5703efbc" sha1="dc85ee55e0bcc4cae2655b3112aeb6b8060a8566" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1263,7 +1263,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_51 (19xx)(ep-forever-forum).img" size="737280" crc="12f41cb6" sha1="8ae3bc4ac6e0fe000cd9d92c910bd43dd8ee0c60"/>
+				<rom name="games compilation disk_51 (19xx)(ep-forever-forum).img" size="737280" crc="12f41cb6" sha1="8ae3bc4ac6e0fe000cd9d92c910bd43dd8ee0c60" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1275,7 +1275,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_51 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="04975c06" sha1="090af2c0d901b70a8c0707bf1c94600529b1d475"/>
+				<rom name="games compilation disk_51 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="04975c06" sha1="090af2c0d901b70a8c0707bf1c94600529b1d475" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1287,7 +1287,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_52 (19xx)(ep-forever-forum).img" size="737280" crc="1dd6e08f" sha1="b5fb0dd7dd8114a81f2cdad839248cb9c85fa72c"/>
+				<rom name="games compilation disk_52 (19xx)(ep-forever-forum).img" size="737280" crc="1dd6e08f" sha1="b5fb0dd7dd8114a81f2cdad839248cb9c85fa72c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1299,7 +1299,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_52 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ac746f7d" sha1="8755c55fc6263ab01f4435511941524f35ec20f7"/>
+				<rom name="games compilation disk_52 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ac746f7d" sha1="8755c55fc6263ab01f4435511941524f35ec20f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1311,7 +1311,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_53 (19xx)(ep-forever-forum).img" size="737280" crc="9c42271b" sha1="0fed0ef0cf46b59dc44f7dbd1ef2c2a57f7a447a"/>
+				<rom name="games compilation disk_53 (19xx)(ep-forever-forum).img" size="737280" crc="9c42271b" sha1="0fed0ef0cf46b59dc44f7dbd1ef2c2a57f7a447a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1323,7 +1323,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_53 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="156f1e1d" sha1="33c54e172734264f68f03d3f15137216cdc153e4"/>
+				<rom name="games compilation disk_53 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="156f1e1d" sha1="33c54e172734264f68f03d3f15137216cdc153e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1335,7 +1335,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_54 (19xx)(ep-forever-forum).img" size="737280" crc="4203f85d" sha1="e6c2ff3b66ed40d1367015b7fd0eb145315dc380"/>
+				<rom name="games compilation disk_54 (19xx)(ep-forever-forum).img" size="737280" crc="4203f85d" sha1="e6c2ff3b66ed40d1367015b7fd0eb145315dc380" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1347,7 +1347,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_54 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="19bc8440" sha1="aaa1dca8ecb6e85b174f28ffac590479f3178174"/>
+				<rom name="games compilation disk_54 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="19bc8440" sha1="aaa1dca8ecb6e85b174f28ffac590479f3178174" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1359,7 +1359,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_55 (19xx)(ep-forever-forum).img" size="737280" crc="0666d292" sha1="989c7acbbaed92037f9025fc9e7f74e6656c4024"/>
+				<rom name="games compilation disk_55 (19xx)(ep-forever-forum).img" size="737280" crc="0666d292" sha1="989c7acbbaed92037f9025fc9e7f74e6656c4024" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1371,7 +1371,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_55 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ca9d1240" sha1="40206bdfbf570d07d4ad961d65048228f59d9020"/>
+				<rom name="games compilation disk_55 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="ca9d1240" sha1="40206bdfbf570d07d4ad961d65048228f59d9020" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1383,7 +1383,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_56 (19xx)(ep-forever-forum).img" size="737280" crc="db171fc6" sha1="7364904f83975f1ff7809ebde2aa4ad63b632d90"/>
+				<rom name="games compilation disk_56 (19xx)(ep-forever-forum).img" size="737280" crc="db171fc6" sha1="7364904f83975f1ff7809ebde2aa4ad63b632d90" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1395,7 +1395,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_56 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="eca2e039" sha1="6e12747498e9c56bdd2830aa6a7b69e607c859bb"/>
+				<rom name="games compilation disk_56 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="eca2e039" sha1="6e12747498e9c56bdd2830aa6a7b69e607c859bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1407,7 +1407,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_57 (19xx)(ep-forever-forum).img" size="737280" crc="be56573b" sha1="ae36491f75f203da20b930bb3d3b7e41b407046c"/>
+				<rom name="games compilation disk_57 (19xx)(ep-forever-forum).img" size="737280" crc="be56573b" sha1="ae36491f75f203da20b930bb3d3b7e41b407046c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1419,7 +1419,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_57 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a475b912" sha1="3927c8d99a3af05f1a9ba50645df5279bd392427"/>
+				<rom name="games compilation disk_57 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a475b912" sha1="3927c8d99a3af05f1a9ba50645df5279bd392427" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1431,7 +1431,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_58 (19xx)(ep-forever-forum).img" size="737280" crc="f7ead5e3" sha1="c15bbe0448ad7a1cedeb1bc04f3ac7497aa12d2a"/>
+				<rom name="games compilation disk_58 (19xx)(ep-forever-forum).img" size="737280" crc="f7ead5e3" sha1="c15bbe0448ad7a1cedeb1bc04f3ac7497aa12d2a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1443,7 +1443,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_58 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="100f16f4" sha1="a26e1060db43fc6c18feb7f8b677e7fca041bcde"/>
+				<rom name="games compilation disk_58 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="100f16f4" sha1="a26e1060db43fc6c18feb7f8b677e7fca041bcde" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1455,7 +1455,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_59 (19xx)(ep-forever-forum).img" size="737280" crc="0aeb25f5" sha1="7f55dc9ea27da1bdfec16c001f4dfa40778638ec"/>
+				<rom name="games compilation disk_59 (19xx)(ep-forever-forum).img" size="737280" crc="0aeb25f5" sha1="7f55dc9ea27da1bdfec16c001f4dfa40778638ec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1467,7 +1467,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_59 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="7b4f72cd" sha1="4dfff9437d69714fbd66d7e5f6fce0d91b45a538"/>
+				<rom name="games compilation disk_59 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="7b4f72cd" sha1="4dfff9437d69714fbd66d7e5f6fce0d91b45a538" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1479,7 +1479,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_60 (19xx)(ep-forever-forum).img" size="737280" crc="724249e4" sha1="38f81020a16348323598fe25dc4b9b20d8d5b175"/>
+				<rom name="games compilation disk_60 (19xx)(ep-forever-forum).img" size="737280" crc="724249e4" sha1="38f81020a16348323598fe25dc4b9b20d8d5b175" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1491,7 +1491,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_60 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="03e61edc" sha1="1713df37c1fde3aa453b9365ee3ad77efafcf4a7"/>
+				<rom name="games compilation disk_60 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="03e61edc" sha1="1713df37c1fde3aa453b9365ee3ad77efafcf4a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1503,7 +1503,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_61 (19xx)(ep-forever-forum).img" size="737280" crc="92176d7e" sha1="157788330a9752939763418de793df706eec92c4"/>
+				<rom name="games compilation disk_61 (19xx)(ep-forever-forum).img" size="737280" crc="92176d7e" sha1="157788330a9752939763418de793df706eec92c4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1515,7 +1515,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_61 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="f876b131" sha1="58c68796e7a0a7cb353e5bceb3c491d0f195affb"/>
+				<rom name="games compilation disk_61 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="f876b131" sha1="58c68796e7a0a7cb353e5bceb3c491d0f195affb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1527,7 +1527,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_62 (19xx)(ep-forever-forum).img" size="737280" crc="c56d1368" sha1="668daf6ffa7e7f3adfe5bc87ff1020f4de9d8a89"/>
+				<rom name="games compilation disk_62 (19xx)(ep-forever-forum).img" size="737280" crc="c56d1368" sha1="668daf6ffa7e7f3adfe5bc87ff1020f4de9d8a89" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1539,7 +1539,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_62 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="d45b8d49" sha1="1f109b9dbf796ce9f93b2b528be2e8897a1558bd"/>
+				<rom name="games compilation disk_62 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="d45b8d49" sha1="1f109b9dbf796ce9f93b2b528be2e8897a1558bd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1551,7 +1551,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_63 (19xx)(ep-forever-forum).img" size="737280" crc="9d6cd24f" sha1="d4410ad67fda8ff893a93ab53f502af7c0320384"/>
+				<rom name="games compilation disk_63 (19xx)(ep-forever-forum).img" size="737280" crc="9d6cd24f" sha1="d4410ad67fda8ff893a93ab53f502af7c0320384" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1563,7 +1563,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_63 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="04c9fe7e" sha1="50c8884fe8ab4d6ebce384b25553a5ec6e880525"/>
+				<rom name="games compilation disk_63 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="04c9fe7e" sha1="50c8884fe8ab4d6ebce384b25553a5ec6e880525" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1575,7 +1575,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_64 (19xx)(ep-forever-forum).img" size="737280" crc="679e3cbc" sha1="4273b7479e86c41e64c9e741717476ea15e5294a"/>
+				<rom name="games compilation disk_64 (19xx)(ep-forever-forum).img" size="737280" crc="679e3cbc" sha1="4273b7479e86c41e64c9e741717476ea15e5294a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1587,7 +1587,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_64 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="7f11153b" sha1="d9ae73cc61d382b3381a67d953cd486f6640b80a"/>
+				<rom name="games compilation disk_64 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="7f11153b" sha1="d9ae73cc61d382b3381a67d953cd486f6640b80a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1599,7 +1599,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_65 (19xx)(ep-forever-forum).img" size="737280" crc="d90199da" sha1="eddcbb951d800c8e73f2378f1d265463b81ddb76"/>
+				<rom name="games compilation disk_65 (19xx)(ep-forever-forum).img" size="737280" crc="d90199da" sha1="eddcbb951d800c8e73f2378f1d265463b81ddb76" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1611,7 +1611,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_65 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="4b64ce13" sha1="f6812d88343509a400044ef92868e68906de9c12"/>
+				<rom name="games compilation disk_65 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="4b64ce13" sha1="f6812d88343509a400044ef92868e68906de9c12" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1623,7 +1623,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_66 (19xx)(ep-forever-forum).img" size="737280" crc="d27c5892" sha1="b91de08e643a5cf48da5227aa2492830bc0a7749"/>
+				<rom name="games compilation disk_66 (19xx)(ep-forever-forum).img" size="737280" crc="d27c5892" sha1="b91de08e643a5cf48da5227aa2492830bc0a7749" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1635,7 +1635,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_66 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="c7efbfab" sha1="e567ccab0b6cbe6db29bb3b823a6b3843d99282e"/>
+				<rom name="games compilation disk_66 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="c7efbfab" sha1="e567ccab0b6cbe6db29bb3b823a6b3843d99282e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1647,7 +1647,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_67 (19xx)(ep-forever-forum).img" size="737280" crc="225438ea" sha1="ceb76d18422c03dc669004e590e99101036f3d9a"/>
+				<rom name="games compilation disk_67 (19xx)(ep-forever-forum).img" size="737280" crc="225438ea" sha1="ceb76d18422c03dc669004e590e99101036f3d9a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1659,7 +1659,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_67 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="53231763" sha1="1fb8aee263fec44f09e9c757bdb542fc148f3edb"/>
+				<rom name="games compilation disk_67 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="53231763" sha1="1fb8aee263fec44f09e9c757bdb542fc148f3edb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1671,7 +1671,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_68 (19xx)(ep-forever-forum).img" size="737280" crc="f69d8297" sha1="10af6f78ca215a9862198f7837fb718a18a07535"/>
+				<rom name="games compilation disk_68 (19xx)(ep-forever-forum).img" size="737280" crc="f69d8297" sha1="10af6f78ca215a9862198f7837fb718a18a07535" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1683,7 +1683,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_68 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="55742b4f" sha1="42c7d34a2ba93b92462080354973c39804a4d471"/>
+				<rom name="games compilation disk_68 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="55742b4f" sha1="42c7d34a2ba93b92462080354973c39804a4d471" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1695,7 +1695,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_69 (19xx)(ep-forever-forum).img" size="737280" crc="90e42dd7" sha1="d25cf523ce9ca295c18fd950a4e7f899a0f3da2f"/>
+				<rom name="games compilation disk_69 (19xx)(ep-forever-forum).img" size="737280" crc="90e42dd7" sha1="d25cf523ce9ca295c18fd950a4e7f899a0f3da2f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1707,7 +1707,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_69 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b1b9ecff" sha1="4194e339a1e8025178ea16068af09a8023444810"/>
+				<rom name="games compilation disk_69 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b1b9ecff" sha1="4194e339a1e8025178ea16068af09a8023444810" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1719,7 +1719,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_70 (19xx)(ep-forever-forum).img" size="737280" crc="d03f45a5" sha1="7af7bb322295ea33c603a803cdce0656246c4385"/>
+				<rom name="games compilation disk_70 (19xx)(ep-forever-forum).img" size="737280" crc="d03f45a5" sha1="7af7bb322295ea33c603a803cdce0656246c4385" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1731,7 +1731,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_70 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b2167779" sha1="5cfe57d4f184bc204f0e5c391b31c279055fe321"/>
+				<rom name="games compilation disk_70 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b2167779" sha1="5cfe57d4f184bc204f0e5c391b31c279055fe321" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1743,7 +1743,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_71 (19xx)(ep-forever-forum).img" size="737280" crc="c72afe23" sha1="b602ed4896a0107824df493629c61c08d9ae1e0c"/>
+				<rom name="games compilation disk_71 (19xx)(ep-forever-forum).img" size="737280" crc="c72afe23" sha1="b602ed4896a0107824df493629c61c08d9ae1e0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1755,7 +1755,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_71 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a3b24e72" sha1="0b7ac1448d31ac41fdc2f37b112b63e3839a3d2d"/>
+				<rom name="games compilation disk_71 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="a3b24e72" sha1="0b7ac1448d31ac41fdc2f37b112b63e3839a3d2d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1767,7 +1767,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_72 (19xx)(ep-forever-forum).img" size="737280" crc="6ba04646" sha1="cfbd4dd16e27292ab866565b18508cc0c2e4d37c"/>
+				<rom name="games compilation disk_72 (19xx)(ep-forever-forum).img" size="737280" crc="6ba04646" sha1="cfbd4dd16e27292ab866565b18508cc0c2e4d37c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1779,7 +1779,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_72 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="76a5ed18" sha1="a845ff9af22f142e964accb529ee0a577b65b533"/>
+				<rom name="games compilation disk_72 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="76a5ed18" sha1="a845ff9af22f142e964accb529ee0a577b65b533" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1791,7 +1791,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_73 (19xx)(ep-forever-forum).img" size="737280" crc="4d088817" sha1="dc7d3e3c0eebd4e5dc1a41396f01b8d7c430db95"/>
+				<rom name="games compilation disk_73 (19xx)(ep-forever-forum).img" size="737280" crc="4d088817" sha1="dc7d3e3c0eebd4e5dc1a41396f01b8d7c430db95" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1803,7 +1803,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_73 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9a6876c9" sha1="44f9e2a9aeef5f9778fd237bd221f2740a791719"/>
+				<rom name="games compilation disk_73 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="9a6876c9" sha1="44f9e2a9aeef5f9778fd237bd221f2740a791719" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1815,7 +1815,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_74 (19xx)(ep-forever-forum).img" size="737280" crc="6c72a738" sha1="f2331a489a620b439a9cc446e93f35f71dd343be"/>
+				<rom name="games compilation disk_74 (19xx)(ep-forever-forum).img" size="737280" crc="6c72a738" sha1="f2331a489a620b439a9cc446e93f35f71dd343be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1827,7 +1827,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="games compilation disk_74 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b944e9d8" sha1="e946ab381d22bbdba17d4f8f91ded7eef65098dc"/>
+				<rom name="games compilation disk_74 (19xx)(ep-forever-forum)[m vicman without loader-menue].img" size="737280" crc="b944e9d8" sha1="e946ab381d22bbdba17d4f8f91ded7eef65098dc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1839,7 +1839,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="isdos3_5.img" size="737280" crc="19db0f63" sha1="3842ff90a0930013e23b6e24a770ca1e8694855d"/>
+				<rom name="isdos3_5.img" size="737280" crc="19db0f63" sha1="3842ff90a0930013e23b6e24a770ca1e8694855d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1851,7 +1851,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="island, the (1985)(the adventure workshop)[req isdos].img" size="737280" crc="691ab47c" sha1="aaa84c8d8484dee798eff4c0e3a445b165073d3f"/>
+				<rom name="island, the (1985)(the adventure workshop)[req isdos].img" size="737280" crc="691ab47c" sha1="aaa84c8d8484dee798eff4c0e3a445b165073d3f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1863,7 +1863,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="seastalker (1984)(infocom)[req isdos].img" size="737280" crc="105f8a24" sha1="56f2c90e07664c73345630b98c7ae3de61649196"/>
+				<rom name="seastalker (1984)(infocom)[req isdos].img" size="737280" crc="105f8a24" sha1="56f2c90e07664c73345630b98c7ae3de61649196" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1875,7 +1875,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="sokoban 4k (2004)(povysoft)(pd)[req isdos].img" size="737280" crc="451c8b1d" sha1="54b4df0ae9652125651bf497ac20bedba5e35e52"/>
+				<rom name="sokoban 4k (2004)(povysoft)(pd)[req isdos].img" size="737280" crc="451c8b1d" sha1="54b4df0ae9652125651bf497ac20bedba5e35e52" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1887,7 +1887,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="zork 1 - the great underground empire (1984)(infocom)[req isdos].img" size="737280" crc="d41c0936" sha1="63fd32ef6b907bba1d7e0b36bb662e415f3fdc1c"/>
+				<rom name="zork 1 - the great underground empire (1984)(infocom)[req isdos].img" size="737280" crc="d41c0936" sha1="63fd32ef6b907bba1d7e0b36bb662e415f3fdc1c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1899,7 +1899,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="zork 2 - the wizard of frobozz (1984)(infocom)[req isdos].img" size="737280" crc="0a1d32ac" sha1="61ed70c927ea584ee57aef62fb1af011dff11927"/>
+				<rom name="zork 2 - the wizard of frobozz (1984)(infocom)[req isdos].img" size="737280" crc="0a1d32ac" sha1="61ed70c927ea584ee57aef62fb1af011dff11927" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1911,7 +1911,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="zork 3 - the dungeon master (1984)(infocom)[req isdos].img" size="737280" crc="696cb95d" sha1="e94ca5e044e82a44af45d40aa382cfab8055cfda"/>
+				<rom name="zork 3 - the dungeon master (1984)(infocom)[req isdos].img" size="737280" crc="696cb95d" sha1="e94ca5e044e82a44af45d40aa382cfab8055cfda" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1923,7 +1923,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dbase23beng.img" size="737280" crc="23efa558" sha1="99bd27b6621b8c30ad0e37deedbbe3aff87f6e30"/>
+				<rom name="dbase23beng.img" size="737280" crc="23efa558" sha1="99bd27b6621b8c30ad0e37deedbbe3aff87f6e30" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1935,7 +1935,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="dbase242hu.img" size="737280" crc="130473a8" sha1="7394b6c73ba8912d6d12ea3ee5f22e0107dab0bf"/>
+				<rom name="dbase242hu.img" size="737280" crc="130473a8" sha1="7394b6c73ba8912d6d12ea3ee5f22e0107dab0bf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1947,7 +1947,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="is-dos.img" size="737280" crc="546afadf" sha1="d827a8cb74ebf243f061b653bb82b3ca722d4a65"/>
+				<rom name="is-dos.img" size="737280" crc="546afadf" sha1="d827a8cb74ebf243f061b653bb82b3ca722d4a65" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1959,7 +1959,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="turbopascal3.img" size="737280" crc="00304f67" sha1="5e00d28aaff56d4b9d385f54ff7220f0adbbb717"/>
+				<rom name="turbopascal3.img" size="737280" crc="00304f67" sha1="5e00d28aaff56d4b9d385f54ff7220f0adbbb717" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1971,7 +1971,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="wordstar.img" size="737280" crc="99f84027" sha1="6acc070e7d24bb46985b6b8b651dff34e33f987f"/>
+				<rom name="wordstar.img" size="737280" crc="99f84027" sha1="6acc070e7d24bb46985b6b8b651dff34e33f987f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

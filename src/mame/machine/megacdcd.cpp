@@ -98,17 +98,17 @@
 #define CHECK_SCD_LV5_INTERRUPT \
 	if (segacd_irq_mask & 0x20) \
 	{ \
-		m_68k->set_input_line(5, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
 	}
 #define CHECK_SCD_LV4_INTERRUPT \
 	if (segacd_irq_mask & 0x10) \
 	{ \
-		m_68k->set_input_line(4, HOLD_LINE); \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
 	}
 #define CHECK_SCD_LV4_INTERRUPT_A \
 	if (segacd_irq_mask & 0x10) \
 	{ \
-		m_68k->set_input_line(4, HOLD_LINE); \
+		machine().device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
 	}
 
 
@@ -135,9 +135,6 @@ DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "lc89510_t
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LC89510_TEMP, tag, owner, clock)
-	, m_cdrom(*this, finder_base::DUMMY_TAG)
-	, m_cdda(*this, "cdda")
-	, m_68k(*this, finder_base::DUMMY_TAG)
 {
 	segacd_dma_callback =  segacd_dma_delegate(FUNC(lc89510_temp_device::Fake_CDC_Do_DMA), this);
 	type1_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
@@ -176,6 +173,8 @@ void lc89510_temp_device::device_start()
 	type1_interrupt_callback.bind_relative_to(*owner());
 	type2_interrupt_callback.bind_relative_to(*owner());
 	type3_interrupt_callback.bind_relative_to(*owner());
+
+	m_cdda = (cdda_device*)subdevice("cdda");
 }
 
 void lc89510_temp_device::device_reset()
@@ -1106,12 +1105,16 @@ void lc89510_temp_device::reset_cd(void)
 	lc89510_Reset();
 
 	{
-		segacd.cd = m_cdrom->get_cdrom_file();
-		if ( segacd.cd )
+		cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
+		if ( cddevice )
 		{
-			segacd.toc = cdrom_get_toc( segacd.cd );
-			m_cdda->set_cdrom(segacd.cd);
-			m_cdda->stop_audio(); //stop any pending CD-DA
+			segacd.cd = cddevice->get_cdrom_file();
+			if ( segacd.cd )
+			{
+				segacd.toc = cdrom_get_toc( segacd.cd );
+				m_cdda->set_cdrom(segacd.cd);
+				m_cdda->stop_audio(); //stop any pending CD-DA
+			}
 		}
 	}
 

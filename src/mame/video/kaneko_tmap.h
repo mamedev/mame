@@ -5,7 +5,7 @@
 
 #pragma once
 
-class kaneko_view2_tilemap_device : public device_t, public device_gfx_interface
+class kaneko_view2_tilemap_device : public device_t
 {
 public:
 	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner)
@@ -16,7 +16,8 @@ public:
 	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_colbase(u16 base) { m_colbase = base; }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfx_region(int region) { m_tilebase = region; }
 	void set_offset(int dx, int dy, int xdim, int ydim)
 	{
 		m_dx = dx;
@@ -75,10 +76,10 @@ private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	required_shared_ptr_array<u16, 2> m_vram;
 	required_shared_ptr_array<u16, 2> m_vscroll;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	// set when creating device
-	required_memory_region m_gfxrom;
-	u16 m_colbase;
+	int m_tilebase;
 	int m_dx, m_dy, m_xdim, m_ydim;
 	int m_invert_flip;
 

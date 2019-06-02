@@ -728,9 +728,9 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
-	const unsigned int new_Q(m_new_Q);
+	const auto new_Q(m_new_Q);
 
-	const unsigned int mask((new_Q << core_terminal_t::INP_LH_SHIFT)
+	const auto mask((new_Q << core_terminal_t::INP_LH_SHIFT)
 			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT));
 
 	m_in_queue = queue_status::DELIVERED; /* mark as taken ... */

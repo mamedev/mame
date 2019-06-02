@@ -18,8 +18,8 @@
 
   Game Notes:
 
-  * Mini-Boy 7.
-
+  * Mini-Boy 7. 
+  
   Seven games in one, plus Ad message support.
   http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4275
 
@@ -173,7 +173,7 @@
   [2011... 2019]
 
   - Wired PIA and AY8910 properly.
-  - Implemented and documented the PIA port B multiplexion.
+  - Implemented and documented the PIA port B multiplexion. 
   - Lot of fixes, getting Mini-Boy 7 working.
   - Added support for Super Mini-Boy.
   - Added technical and games notes.
@@ -547,10 +547,10 @@ static INPUT_PORTS_START( sminiboy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hold 1 / Play")        PORT_CODE(KEYCODE_Z)  // hold 1 / play
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service / Books")      PORT_CODE(KEYCODE_0)  // service / books
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("08 - changes screen")  PORT_CODE(KEYCODE_E)  // (changes in screen)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10")   PORT_CODE(KEYCODE_R)  //
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("20")   PORT_CODE(KEYCODE_T)  //
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("40")   PORT_CODE(KEYCODE_Y)  //
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("80")   PORT_CODE(KEYCODE_U)  //
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10")   PORT_CODE(KEYCODE_R)  // 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("20")   PORT_CODE(KEYCODE_T)  // 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("40")   PORT_CODE(KEYCODE_Y)  // 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("80")   PORT_CODE(KEYCODE_U)  // 
 
 
 	PORT_START("DSW2")

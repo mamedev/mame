@@ -70,16 +70,6 @@ void sega_315_5649_device::device_start()
 	save_item(NAME(m_analog_channel));
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void sega_315_5649_device::device_reset()
-{
-	// set all ports to input on reset
-	m_port_config = 0xff;
-}
-
 
 //**************************************************************************
 //  INTERFACE

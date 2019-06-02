@@ -242,9 +242,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-private:
-	virtual int calc_baud(int ch, bool rx, uint8_t data) override;
 };
 
 class xr68c681_device : public mc68681_device

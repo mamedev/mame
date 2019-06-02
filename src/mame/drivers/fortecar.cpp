@@ -368,7 +368,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ayportb_w);
 
 	void fortecar_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void fortecar_map(address_map &map);
 	void fortecar_ports(address_map &map);
@@ -384,7 +384,7 @@ void fortecar_state::machine_start()
 	m_lamps.resolve();
 }
 
-uint32_t fortecar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t fortecar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 
@@ -700,6 +700,7 @@ void fortecar_state::fortecar(machine_config &config)
 	screen.set_size(640, 256);
 	screen.set_visarea(0, 600-1, 0, 240-1);    /* driven by CRTC */
 	screen.set_screen_update(FUNC(fortecar_state::screen_update));
+	screen.set_palette(m_palette);
 
 	EEPROM_93C56_16BIT(config, "eeprom").default_value(0);
 

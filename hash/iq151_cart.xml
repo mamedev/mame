@@ -9,7 +9,7 @@
 		<part name="cart" interface="iq151_cart">
 			<feature name="slot" value="basic6"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="basic6.rom" size="0x2000" crc="8d9fd36f" sha1="2fa3b142938ed5e8ec7c62a0a14a55cbde231a2e"/>
+				<rom name="basic6.rom" size="0x2000" crc="8d9fd36f" sha1="2fa3b142938ed5e8ec7c62a0a14a55cbde231a2e" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<part name="cart" interface="iq151_cart">
 			<feature name="slot" value="basicg" />
 			<dataarea name="rom" size="0x3000">
-				<rom name="basicg_a.rom" size="0x1000" crc="1890de5e" sha1="0b04458518b3bc23d6af52a373f9f88aa5eb28a6"/>
+				<rom name="basicg_a.rom" size="0x1000" crc="1890de5e" sha1="0b04458518b3bc23d6af52a373f9f88aa5eb28a6" offset="0x00000" />
 				<rom name="basicg_b.rom" size="0x2000" crc="ac632b85" sha1="062a6812b167a8a94ee391a3e73a024b3fab3506" offset="0x01000" />
 			</dataarea>
 		</part>
@@ -36,21 +36,21 @@
 			<!-- AMOS, editor and Pascal run-time -->
 			<feature name="slot" value="amos1" />
 			<dataarea name="rom" size="0x4000">
-				<rom name="amos_pascal.rom" size="0x4000" crc="e6409320" sha1="1da85d3382e3313a79b3e1384d60db48ea350d52"/>
+				<rom name="amos_pascal.rom" size="0x4000" crc="e6409320" sha1="1da85d3382e3313a79b3e1384d60db48ea350d52" offset="0x00000" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="iq151_cart">
 			<!-- Pascal compiler -->
 			<feature name="slot" value="amos2" />
 			<dataarea name="rom" size="0x4000">
-				<rom name="amos_pascal1.rom" size="0x4000" crc="f6709004" sha1="333340f3e5c20eecd9eb5dcea03b02372e61eeec"/>
+				<rom name="amos_pascal1.rom" size="0x4000" crc="f6709004" sha1="333340f3e5c20eecd9eb5dcea03b02372e61eeec" offset="0x00000" />
 			</dataarea>
 		</part>
 		<part name="cart3" interface="iq151_cart">
 			<!-- Debugger and assembler -->
 			<feature name="slot" value="amos3" />
 			<dataarea name="rom" size="0x4000">
-				<rom name="amos_assembler.rom" size="0x4000" crc="fea64786" sha1="c531d3d857eea7384ef69c24ce91f576feafa8b0"/>
+				<rom name="amos_assembler.rom" size="0x4000" crc="fea64786" sha1="c531d3d857eea7384ef69c24ce91f576feafa8b0" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>

@@ -378,7 +378,7 @@ private:
 	void kiwame_map(address_map &map);
 
 	required_device<tmp68301_device> m_maincpu;
-	required_ioport_array<10> m_key;
+	required_ioport_array<5> m_key;
 
 	uint16_t m_kiwame_row_select;
 };

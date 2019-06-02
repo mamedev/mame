@@ -10,6 +10,10 @@ public:
 	{
 	}
 
+
+	required_device<igs025_device> m_igs025;
+
+	void pgm_drgw2_decrypt();
 	void drgw2_common_init();
 
 	void init_drgw2();
@@ -18,10 +22,7 @@ public:
 	void init_drgw2j();
 	void init_drgw2hk();
 
+	DECLARE_MACHINE_RESET(drgw2);
 	void pgm_012_025_drgw2(machine_config &config);
-private:
-	required_device<igs025_device> m_igs025;
-
-	void pgm_drgw2_decrypt();
 	void drgw2_mem(address_map &map);
 };

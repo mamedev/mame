@@ -75,7 +75,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
 	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
-	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
 	void port_map(address_map &map);
@@ -114,7 +114,7 @@ void albazg_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t albazg_state::screen_update_yumefuda(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t albazg_state::screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -383,8 +383,9 @@ void albazg_state::yumefuda(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(albazg_state::screen_update_yumefuda));
+	screen.set_palette("palette");
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
+	h46505_device &crtc(H46505(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

@@ -10,7 +10,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="masc_03a.bin" size="32768" crc="cbec2471" sha1="770ab06b1fcc35da08ce8453b754b8f62520cdd0" />
+				<rom name="masc_03a.bin" size="32768" crc="cbec2471" sha1="770ab06b1fcc35da08ce8453b754b8f62520cdd0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="advco4a.bin" size="32768" crc="e5ff9113" sha1="262f6f72bd0b63531102e8d4da0345b39ca3ea2f" />
+				<rom name="advco4a.bin" size="32768" crc="e5ff9113" sha1="262f6f72bd0b63531102e8d4da0345b39ca3ea2f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bbc2_1.bin" size="8192" crc="ee348134" sha1="0528f7c935549f5fe7c033f1f5e58cba8a03736b" />
+				<rom name="bbc2_1.bin" size="8192" crc="ee348134" sha1="0528f7c935549f5fe7c033f1f5e58cba8a03736b" offset="0" />
 				<rom name="bbc2_2.bin" size="8192" crc="358f6dea" sha1="b0f6afbef17727fbf5664b010cd7b70dd906ea80" offset="0x2000" />
 				<rom name="bbc2_3.bin" size="8192" crc="c94691ac" sha1="16f52712db0d7122b850bada6200408b22d95a43" offset="0x4000" />
 				<rom name="bbc2_4.bin" size="8192" crc="ec6405e2" sha1="eb59238b446e94428081fc5d3594eac60b873192" offset="0x6000" />
@@ -46,7 +46,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bbc4a.0" size="16384" crc="d1f20bc0" sha1="368fa3ff5affea6ca355b09b4f00917299fa6a8e" />
+				<rom name="bbc4a.0" size="16384" crc="d1f20bc0" sha1="368fa3ff5affea6ca355b09b4f00917299fa6a8e" offset="0" />
 				<rom name="bbc4a.1" size="16384" crc="2ee770f9" sha1="15e62090c2329954a41140041e73e953006be699" offset="0x4000" />
 			</dataarea>
 		</part>
@@ -58,7 +58,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="cpc_2_1.bin" size="8192" crc="1efd1481" sha1="d0483da7ae3abff4a1141a89d066e2b5879a52c1" />
+				<rom name="cpc_2_1.bin" size="8192" crc="1efd1481" sha1="d0483da7ae3abff4a1141a89d066e2b5879a52c1" offset="0" />
 				<rom name="cpc_2_2.bin" size="8192" crc="93b263ec" sha1="8d63244d91156a9d86da8460eb80d0b7d287675a" offset="0x2000" />
 				<rom name="cpc_2_3.bin" size="8192" crc="9ceb5493" sha1="ebed605d297e34f85c831c023e5925ce800d57a3" offset="0x4000" />
 			</dataarea>
@@ -71,7 +71,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="2cp1_1.bin" size="16384" crc="5e18577d" sha1="b22858fb42231453e80fa994a7431e9853b4a2eb" />
+				<rom name="2cp1_1.bin" size="16384" crc="5e18577d" sha1="b22858fb42231453e80fa994a7431e9853b4a2eb" offset="0" />
 				<rom name="2cp1_2.bin" size="16384" crc="6a99a161" sha1="9d8e215dd7ef2cf50c28c43d0e73236ee17ab8a6" offset="0x4000" />
 			</dataarea>
 		</part>
@@ -83,7 +83,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="club_play_2.bin" size="32768" crc="2867fc62" sha1="ef519def0ad37882da81a9c16371cf2b1d8919ee" />
+				<rom name="club_play_2.bin" size="32768" crc="2867fc62" sha1="ef519def0ad37882da81a9c16371cf2b1d8919ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="cp3.bin" size="32768" crc="a17569d8" sha1="151256d1d0957e3c6c07e2b0150c679384ce195d" />
+				<rom name="cp3.bin" size="32768" crc="a17569d8" sha1="151256d1d0957e3c6c07e2b0150c679384ce195d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="conc019.bin" size="32768" crc="968179b3" sha1="eb23cd6506a2afea3ff72535be18102036723f94" />
+				<rom name="conc019.bin" size="32768" crc="968179b3" sha1="eb23cd6506a2afea3ff72535be18102036723f94" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -116,7 +116,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="dupc04a.bin" size="32768" crc="83d55b90" sha1="61a01c0ccb19f01b3e875db467886969b8284259" />
+				<rom name="dupc04a.bin" size="32768" crc="83d55b90" sha1="61a01c0ccb19f01b3e875db467886969b8284259" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -127,7 +127,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="mp_1_1.bin" size="16384" crc="d28d9995" sha1="4288eae32eaabbe489b549a30e4eb35a4e671ae7" />
+				<rom name="mp_1_1.bin" size="16384" crc="d28d9995" sha1="4288eae32eaabbe489b549a30e4eb35a4e671ae7" offset="0" />
 				<rom name="mp_1_2.bin" size="16384" crc="b221ff05" sha1="95b13a2ce554a394a4139e868e5be9455b091b26" offset="0x4000" />
 			</dataarea>
 		</part>

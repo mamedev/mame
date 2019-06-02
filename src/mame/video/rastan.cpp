@@ -13,7 +13,7 @@
 
 /***************************************************************************/
 
-void rastan_state::spritectrl_w(u16 data)
+WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
 {
 	/* bits 5-7 are the sprite palette bank */
 	m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);
@@ -31,7 +31,7 @@ void rastan_state::spritectrl_w(u16 data)
 
 /***************************************************************************/
 
-u32 rastan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[2];
 

@@ -11,7 +11,7 @@
 #include "screen.h"
 
 
-void rohga_state::rohga_buffer_spriteram16_w(u16 data)
+WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 {
 	// Spriteram seems to be triple buffered (no sprite lag on real pcb, but there
 	// is on driver with only double buffering)
@@ -20,10 +20,10 @@ void rohga_state::rohga_buffer_spriteram16_w(u16 data)
 
 /******************************************************************************/
 
-u32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	const u16 priority = m_decocomn->priority_r();
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
+	uint16_t priority = m_decocomn->priority_r();
 
 	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
@@ -80,47 +80,55 @@ VIDEO_START_MEMBER(rohga_state,wizdfire)
 }
 
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities
-void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri, u16 primask)
+void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask)
 {
+	int y, x;
 	const pen_t *paldata = m_palette->pens();
-	bitmap_ind16* sprite_bitmap = &m_sprgen[1]->get_sprite_temp_bitmap();
-	const u16 penbase = 0x600;
+	bitmap_ind16* sprite_bitmap;
+	int penbase;
 
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	sprite_bitmap = &m_sprgen[1]->get_sprite_temp_bitmap();
+	penbase = 0x600;
+
+	uint16_t* srcline;
+	uint32_t* dstline;
+
+
+	for (y=cliprect.top();y<=cliprect.bottom();y++)
 	{
-		const u16* srcline = &sprite_bitmap->pix16(y,0);
-		u32* dstline = &bitmap.pix32(y,0);
+		srcline=&sprite_bitmap->pix16(y,0);
+		dstline=&bitmap.pix32(y,0);
 
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		for (x=cliprect.left();x<=cliprect.right();x++)
 		{
-			const u16 pix = srcline[x];
+			uint16_t pix = srcline[x];
 
 			if ((pix & primask) != pri)
 				continue;
 
-			if (pix & 0xf)
+			if (pix&0xf)
 			{
-				u16 pen = pix & 0x1ff;
+				uint16_t pen = pix&0x1ff;
 
-				if (pen & 0x100)
+				if (pen&0x100)
 				{
-					const u32 base = dstline[x];
-					pen &= 0xff;
-					dstline[x] = alpha_blend_r32(base, paldata[pen + penbase], 0x80);
+					uint32_t base = dstline[x];
+					pen &=0xff;
+					dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], 0x80);
 				}
 				else
 				{
-					dstline[x] = paldata[pen + penbase];
+					dstline[x] = paldata[pen+penbase];
 				}
 			}
 		}
 	}
 }
 
-u32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	const u16 priority = m_decocomn->priority_r();
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
+	uint16_t priority = m_decocomn->priority_r();
 
 	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
@@ -158,25 +166,33 @@ u32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bit
 
 void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	int y, x;
 	const pen_t *paldata = &m_palette->pen(0);
-	const u16 priority = m_decocomn->priority_r();
+	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2;
+	bitmap_ind8* priority_bitmap;
 
-	bitmap_ind16 *sprite_bitmap1 = &m_sprgen[0]->get_sprite_temp_bitmap();
-	bitmap_ind16 *sprite_bitmap2 = &m_sprgen[1]->get_sprite_temp_bitmap();
-	bitmap_ind8* priority_bitmap = &screen.priority();
+	uint16_t priority = m_decocomn->priority_r();
 
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	sprite_bitmap1 = &m_sprgen[0]->get_sprite_temp_bitmap();
+	sprite_bitmap2 = &m_sprgen[1]->get_sprite_temp_bitmap();
+	priority_bitmap = &screen.priority();
+
+	uint32_t* dstline;
+	uint16_t *srcline1, *srcline2;
+	uint8_t *srcpriline;
+
+	for (y=cliprect.top();y<=cliprect.bottom();y++)
 	{
-		const u16 *srcline1 = &sprite_bitmap1->pix16(y,0);
-		const u16 *srcline2 = &sprite_bitmap2->pix16(y,0);
-		const u8 *srcpriline = &priority_bitmap->pix8(y,0);
+		srcline1=&sprite_bitmap1->pix16(y,0);
+		srcline2=&sprite_bitmap2->pix16(y,0);
+		srcpriline=&priority_bitmap->pix8(y,0);
 
-		u32* dstline = &bitmap.pix32(y,0);
+		dstline=&bitmap.pix32(y,0);
 
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		for (x=cliprect.left();x<=cliprect.right();x++)
 		{
-			const u16 pix1 = srcline1[x];
-			const u16 pix2 = srcline2[x];
+			uint16_t pix1 = srcline1[x];
+			uint16_t pix2 = srcline2[x];
 
 			/* Here we have
 			 pix1 - raw pixel / colour / priority data from first 1st chip
@@ -268,7 +284,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 					break;
 			}
 
-			const u8 bgpri = srcpriline[x];
+			uint8_t bgpri = srcpriline[x];
 			/* once we get here we have
 
 			pri1 - 0x001/0x002/0x004/0x008/0x010/0x020/0x040/0x080/0x100/0x200 (sprite chip 1 pixel priority relative to bg)
@@ -279,13 +295,13 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			pix2 - same as before  ^^
 			*/
 
-			bool drawnpixe1 = false;
+			int drawnpixe1 = 0;
 			if (pix1 & 0xf)
 			{
 				if (pri1 > bgpri)
 				{
-					dstline[x] = paldata[(pix1 & 0x1ff) + 0x400];
-					drawnpixe1 = true;
+					dstline[x] = paldata[(pix1&0x1ff)+0x400];
+					drawnpixe1 = 1;
 				}
 			}
 
@@ -297,12 +313,12 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 					{
 						if (pix2 & 0x100)
 						{
-							const u32 base = dstline[x];
-							dstline[x] = alpha_blend_r32(base, paldata[(pix2 & 0xff) + 0x600], 0x80);
+							uint32_t base = dstline[x];
+							dstline[x] = alpha_blend_r32(base, paldata[(pix2&0xff)+0x600], 0x80);
 						}
 						else
 						{
-							dstline[x] = paldata[(pix2 & 0xff) + 0x600];
+							dstline[x] = paldata[(pix2&0xff)+0x600];
 						}
 					}
 				}
@@ -311,10 +327,10 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 }
 
-u32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	const u16 priority = m_decocomn->priority_r();
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
+	uint16_t priority = m_decocomn->priority_r();
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen[0]->set_flip_screen(BIT(flip, 7));

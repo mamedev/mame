@@ -83,12 +83,13 @@ private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t m_term_data;
-	bool m_cassbit;
+	bool m_flag;
 	bool m_cassold;
 	uint8_t m_cass_data[4];
 	virtual void machine_reset() override;
@@ -103,13 +104,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_w)
 {
 	m_cass_data[3]++;
 
-	if (m_cassbit != m_cassold)
+	if (m_flag != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cassbit;
+		m_cassold = m_flag;
 	}
 
-	if (m_cassbit)
+	if (m_flag)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
@@ -132,6 +133,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_r)
 WRITE_LINE_MEMBER(cd2650_state::tape_deck_on_w)
 {
 	m_cass->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+}
+
+WRITE_LINE_MEMBER(cd2650_state::cass_w)
+{
+	m_flag = state;
 }
 
 READ_LINE_MEMBER(cd2650_state::cass_r)
@@ -322,7 +328,7 @@ void cd2650_state::cd2650(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cd2650_state::cd2650_io);
 	m_maincpu->set_addrmap(AS_DATA, &cd2650_state::cd2650_data);
 	m_maincpu->sense_handler().set(FUNC(cd2650_state::cass_r));
-	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
+	m_maincpu->flag_handler().set(FUNC(cd2650_state::cass_w));
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // IC26
 	outlatch.q_out_cb<0>().set(FUNC(cd2650_state::tape_deck_on_w)); // TD ON

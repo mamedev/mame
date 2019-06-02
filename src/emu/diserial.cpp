@@ -315,12 +315,12 @@ void device_serial_interface::receive_register_extract()
 	switch (m_df_parity)
 	{
 	case PARITY_ODD:
-		if (parity_received == serial_helper_get_parity(data))
+		if (parity_received != serial_helper_get_parity(data))
 			m_rcv_parity_error = true;
 		break;
 
 	case PARITY_EVEN:
-		if (parity_received != serial_helper_get_parity(data))
+		if (parity_received == serial_helper_get_parity(data))
 			m_rcv_parity_error = true;
 		break;
 
@@ -399,10 +399,10 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 			/* get parity */
 			/* if parity = 0, data has even parity - i.e. there is an even number of one bits in the data */
 			/* if parity = 1, data has odd parity - i.e. there is an odd number of one bits in the data */
-			parity = serial_helper_get_parity(data_byte) ^ 1;
+			parity = serial_helper_get_parity(data_byte);
 			break;
 		case PARITY_EVEN:
-			parity = serial_helper_get_parity(data_byte);
+			parity = serial_helper_get_parity(data_byte) ^ 1;
 			break;
 		case PARITY_MARK:
 			parity = 1;

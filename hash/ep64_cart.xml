@@ -9,7 +9,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="9128ds-0237_enter08-46-a.u1" size="0x4000" crc="683cf455" sha1="50a548d1df3ea86f9b5fa669afd8ff124050e776"/>
+				<rom name="9128ds-0237_enter08-46-a.u1" size="0x4000" crc="683cf455" sha1="50a548d1df3ea86f9b5fa669afd8ff124050e776" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="basic 1.0 - eprom 1-2 (198x)(enterprise).bin" size="0x2000" crc="681961cd" sha1="052ac869da3764b44031328cd584985f705a6516"/>
+				<rom name="basic 1.0 - eprom 1-2 (198x)(enterprise).bin" size="0x2000" crc="681961cd" sha1="052ac869da3764b44031328cd584985f705a6516" offset="0x0000" />
 				<rom name="basic 1.0 - eprom 2-2 (198x)(enterprise).bin" size="0x2000" crc="9cddb79e" sha1="7551f74cc332f20923c36b24ae0ad3274f74ec37" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -34,7 +34,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="basic 1.1 - eprom 1.1 (198x)(enterprise).bin" size="0x4000" crc="683cf455" sha1="50a548d1df3ea86f9b5fa669afd8ff124050e776"/>
+				<rom name="basic 1.1 - eprom 1.1 (198x)(enterprise).bin" size="0x4000" crc="683cf455" sha1="50a548d1df3ea86f9b5fa669afd8ff124050e776" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="basic interpreter v2.1 (1985)(intelligent software).bin" size="0x4000" crc="55f96251" sha1="03bbb386cf530e804363acdfc1d13e64cf28af2e"/>
+				<rom name="basic interpreter v2.1 (1985)(intelligent software).bin" size="0x4000" crc="55f96251" sha1="03bbb386cf530e804363acdfc1d13e64cf28af2e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="epdos v1.7 (19xx)(haluska, laszlo).bin" size="0x8000" crc="201319eb" sha1="08da5017cb95c9f5edf07a66903eef414621cd7d"/>
+				<rom name="epdos v1.7 (19xx)(haluska, laszlo).bin" size="0x8000" crc="201319eb" sha1="08da5017cb95c9f5edf07a66903eef414621cd7d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="ex-dos eprom (198x)(enterprise).bin" size="0x4000" crc="e6daa0e9" sha1="05ba161aa8796c04f227eb2d52496943ada814f2"/>
+				<rom name="ex-dos eprom (198x)(enterprise).bin" size="0x4000" crc="e6daa0e9" sha1="05ba161aa8796c04f227eb2d52496943ada814f2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +82,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="exdos basic+forth (198x)(enterprise).bin" size="0x8000" crc="0cc38deb" sha1="e381f0efd7d3235336c23c32e9d9dc3f96059b7f"/>
+				<rom name="exdos basic+forth (198x)(enterprise).bin" size="0x8000" crc="0cc38deb" sha1="e381f0efd7d3235336c23c32e9d9dc3f96059b7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="forth (198x)(enterprise).bin" size="0x4000" crc="5077dc39" sha1="9ca625742444f87fdf82e1586fc1799bd3302209"/>
+				<rom name="forth (198x)(enterprise).bin" size="0x4000" crc="5077dc39" sha1="9ca625742444f87fdf82e1586fc1799bd3302209" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="hisoft pascal enterprise v1.01 (1985)(hisoft).bin" size="0x8000" crc="d62f2a46" sha1="05c0a9859e484d6ec051da7415b2a9070cf26f11"/>
+				<rom name="hisoft pascal enterprise v1.01 (1985)(hisoft).bin" size="0x8000" crc="d62f2a46" sha1="05c0a9859e484d6ec051da7415b2a9070cf26f11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="hp enterprise v1.01 (1985)(hisoft).bin" size="0x4000" crc="944c0baa" sha1="ad344075398a4cfa928201d2a97d51e6cdc37dd3"/>
+				<rom name="hp enterprise v1.01 (1985)(hisoft).bin" size="0x4000" crc="944c0baa" sha1="ad344075398a4cfa928201d2a97d51e6cdc37dd3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="turbo asmon 1.5 (19xx)(sandor gyangy).bin" size="0x8000" crc="9bebc655" sha1="0d1ef90a36e1014f29b2eeffbc585307da01ee56"/>
+				<rom name="turbo asmon 1.5 (19xx)(sandor gyangy).bin" size="0x8000" crc="9bebc655" sha1="0d1ef90a36e1014f29b2eeffbc585307da01ee56" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="turbo exdos+isdos (19xx)(zoltan nemeth).bin" size="0x8000" crc="bc02efa9" sha1="ebfac10f92173942bb4fed6da8336ae8d257a1bd"/>
+				<rom name="turbo exdos+isdos (19xx)(zoltan nemeth).bin" size="0x8000" crc="bc02efa9" sha1="ebfac10f92173942bb4fed6da8336ae8d257a1bd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -154,7 +154,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="uelisp v0.6 (198x)(enterprise).bin" size="0x3fff" crc="bf516194" sha1="0ca8588123e3573eed84c2b5fd030959e396aa88" status="baddump" />
+				<rom name="uelisp v0.6 (198x)(enterprise).bin" size="0x3fff" crc="bf516194" sha1="0ca8588123e3573eed84c2b5fd030959e396aa88" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="zozotools v1.8 (19xx)(zoltan nemeth).bin" size="0x8000" crc="5e8d0aa9" sha1="8b7db07b0ade24b9420cf5d4531e729b637fa5c9"/>
+				<rom name="zozotools v1.8 (19xx)(zoltan nemeth).bin" size="0x8000" crc="5e8d0aa9" sha1="8b7db07b0ade24b9420cf5d4531e729b637fa5c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -178,7 +178,7 @@
 
 		<part name="cart" interface="ep64_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="brd.rom" size="0x4000" crc="f45a7454" sha1="096c91fad6a4d10323cd67e133b3ebc5c50e2bb2"/>
+				<rom name="brd.rom" size="0x4000" crc="f45a7454" sha1="096c91fad6a4d10323cd67e133b3ebc5c50e2bb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>

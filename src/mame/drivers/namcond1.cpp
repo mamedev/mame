@@ -196,6 +196,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 #include "cpu/m68000/m68000.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -382,6 +383,7 @@ void namcond1_state::namcond1(machine_config &config)
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	YGV608(config, m_ygv608, 0);
+	m_ygv608->set_palette("palette");
 	m_ygv608->vblank_callback().set(FUNC(namcond1_state::vblank_irq_w));
 	m_ygv608->raster_callback().set(FUNC(namcond1_state::raster_irq_w));
 	m_ygv608->set_screen("screen");
@@ -394,7 +396,9 @@ void namcond1_state::namcond1(machine_config &config)
 	*/
 	screen.set_raw( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224);
 	screen.set_screen_update("ygv608", FUNC(ygv608_device::update_screen));
-	screen.set_palette("ygv608");
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette").set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

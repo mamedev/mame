@@ -18,6 +18,8 @@
         * in Cruis'n World attract mode, right side of sky looks like it has wrapped
         * Off Road Challenge has polygon sorting issues, among other problems
         * Issues for the Wargods sets:
+           Sound D/RAM      ERROR EE (during boot diag)
+           Listen for Tone  ERROR E1 (during boot diag)
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
 
 Known to exist but not dumped:

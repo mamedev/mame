@@ -107,8 +107,8 @@
 /*
     Constructor.
 */
-tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TMC0430, tag, owner, clock),
+tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TMC0430, tag, owner, clock),
 	m_gromready(*this),
 	m_current_clock_level(CLEAR_LINE),
 	m_current_ident(0),
