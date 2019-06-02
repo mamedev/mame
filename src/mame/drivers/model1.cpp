@@ -188,9 +188,9 @@ Notes:
           315-5711      - Wing War, Star Wars Arcade, Netmerc
           315-5724      - Virtua Fighter
       315-5463      - Sega Custom (QFP160)
-      315-5464      - Sega Custom (QFP160)
-      315-5465      - Sega Custom (QFP100)
-      315-5338A     - Sega Custom (QFP100)
+      315-5464      - Sega Custom (QFP160) - Copro TGP glue chip
+      315-5465      - Sega Custom (QFP100) - Address decode, interrupts, etc
+      315-5338A     - Sega Custom (QFP100) - Inputs
       *2            - Unpopulated position for 315-5338A
       J4, J5, J6    - Jumpers, all set to 2-3
 
@@ -269,15 +269,15 @@ Notes:
       CN1, CN2 - Connectors to join Video board to CPU board
       CN3      - Connector for R/G/B/Sync output (@ 24kHz)
       CN4      - 20 pin IDC flat-cable connector (purpose unknown)
-      315-5483 - PAL CK2605 (DIP20)
-      315-5484 - Lattice GAL16V8A (DIP20)
-      315-5485 - Lattice GAL16V8A (DIP20)
-      315-5486 - Lattice GAL16V8A (x3, DIP20)
-      315-5422 - Sega Custom (QFP160)
-      315-5423 - Sega Custom (QFP160)
-      315-5424 - Sega Custom (QFP160)
-      315-5425 - Sega Custom (QFP160)
-      315-5292 - Sega Custom (QFP160)
+      315-5483 - PAL CK2605 (DIP20)           -- Priorities
+      315-5484 - Lattice GAL16V8A (DIP20)     -- Palette bank selection
+      315-5485 - Lattice GAL16V8A (DIP20)     -- Palette access address decode
+      315-5486 - Lattice GAL16V8A (x3, DIP20) -- Color clear on blank
+      315-5422 - Sega Custom (QFP160) -- Z sorting (8K*16bits + 128K*16bits storage)
+      315-5423 - Sega Custom (QFP160) -- Renderer 1
+      315-5424 - Sega Custom (QFP160) -- Renderer 2, provides opr-14748 addresses
+      315-5425 - Sega Custom (QFP160) -- Renderer 3, framebuffer management (32K*8bits + 2x256K*16bits storage)
+      315-5292 - Sega Custom (QFP160) -- Tilemaps (128k*32bits + 32K*16bits storage)
 
       OPR-14748.15  \
       OPR-14748.16  - 1M SOP40 mask ROMs, tied to 315-5423 & 315-5424. Note both ROMs are identical.
@@ -868,108 +868,56 @@ void model1_state::machine_reset()
 	}
 }
 
-WRITE16_MEMBER(model1_state::md1_w)
-{
-	COMBINE_DATA(m_display_list1+offset);
-	// never executed
-	//if(0 && offset)
-	//  return;
-	if(false)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
-}
-
-WRITE16_MEMBER(model1_state::md0_w)
-{
-	COMBINE_DATA(m_display_list0+offset);
-	// never executed
-	//if(0 && offset)
-	//  return;
-	if(false)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
-}
-
-WRITE16_MEMBER(model1_state::p_w)
-{
-	uint16_t old = m_paletteram16[offset];
-	m_palette->write16(offset, data, mem_mask);
-	if(0 && m_paletteram16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, m_maincpu->pc());
-}
-
-WRITE16_MEMBER(model1_state::mr_w)
-{
-	COMBINE_DATA(m_mr+offset);
-	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, m_maincpu->pc());
-}
-
-WRITE16_MEMBER(model1_state::mr2_w)
-{
-	COMBINE_DATA(m_mr2+offset);
-#if 0
-	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, m_maincpu->pc());
-	}
-	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", m_mr2[0x3680/2+1], m_mr2[0x3680/2], m_maincpu->pc());
-	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", m_mr2[0x06ca/2+1], m_mr2[0x06ca/2], m_maincpu->pc());
-	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", m_mr2[0x1eca/2+1], m_mr2[0x1eca/2], m_maincpu->pc());
-#endif
-
-	// wingwar scene position, pc=e1ce -> d735
-	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(m_mr2+0x1f08/2), m_maincpu->pc());
-	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(m_mr2+0x1f0c/2), m_maincpu->pc());
-	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), m_maincpu->pc());
-}
 
 void model1_state::model1_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x1fffff).bankr("bank1");
-	map(0x200000, 0x2fffff).rom();
+	/* ROMA */ map(0x000000, 0x0fffff).rom();
+	/* ROMO */ map(0x100000, 0x1fffff).bankr("bank1");
+	/* ROMX */ map(0x200000, 0x2fffff).rom();
+	/* ROMY */
+	/* RAMA */ map(0x400000, 0x40ffff).ram();
+	/* RAMB */ map(0x500000, 0x53ffff).ram();
 
-	map(0x400000, 0x40ffff).ram().w(FUNC(model1_state::mr2_w)).share("mr2");
-	map(0x500000, 0x53ffff).ram().w(FUNC(model1_state::mr_w)).share("mr");
+	/* TGP  */ map(0x600000, 0x60ffff).ram().share("display_list0");
+	/*      */ map(0x610000, 0x61ffff).ram().share("display_list1");
+	/*      */ map(0x680000, 0x680003).rw(FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
-	map(0x600000, 0x60ffff).ram().w(FUNC(model1_state::md0_w)).share("display_list0");
-	map(0x610000, 0x61ffff).ram().w(FUNC(model1_state::md1_w)).share("display_list1");
-	map(0x680000, 0x680003).rw(FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
+	/* SCR  */ map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
+	/*      */ map(0x720000, 0x720001).nopw();        // Unknown, always 0
+	/*      */ map(0x740000, 0x740001).nopw();        // Horizontal synchronization register
+	/*      */ map(0x760000, 0x760001).nopw();        // Vertical synchronization register
+	/*      */ map(0x770000, 0x770001).nopw();        // Video synchronization switch
+	/*      */ map(0x780000, 0x7fffff).rw(m_tiles, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
 
-	map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
-	map(0x720000, 0x720001).nopw();        // Unknown, always 0
-	map(0x740000, 0x740001).nopw();        // Horizontal synchronization register
-	map(0x760000, 0x760001).nopw();        // Vertical synchronization register
-	map(0x770000, 0x770001).nopw();        // Video synchronization switch
-	map(0x780000, 0x7fffff).rw(m_tiles, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
+	/* OBJ  */
 
-	map(0x900000, 0x903fff).ram().w(FUNC(model1_state::p_w)).share("palette");
-	map(0x910000, 0x91bfff).ram().share("color_xlat");
+	/* COL  */ map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	/*      */ map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc00fff).r(FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
+	/* EX0  */
+	/* EX1  */
 
-	map(0xc40000, 0xc40003).rw(m_m1uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	/* I/O  */ map(0xc00000, 0xc00fff).r(FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
+	/*      */ map(0xc40000, 0xc40003).rw(m_m1uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 
-	map(0xd00000, 0xd00001).rw(FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w));
-	map(0xd20000, 0xd20003).w(FUNC(model1_state::v60_copro_ram_w));
-	map(0xd80000, 0xd80003).w(FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
-	map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r));
+	/* CPR  */ map(0xd00000, 0xd00001).rw(FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w)).mirror(0x1fffe);
+	/*      */ map(0xd20000, 0xd20003).rw(FUNC(model1_state::v60_copro_ram_r), FUNC(model1_state::v60_copro_ram_w)).mirror(0x1fffc);
+	/*      */ map(0xd80000, 0xd80003).rw(FUNC(model1_state::v60_copro_fifo_r), FUNC(model1_state::v60_copro_fifo_w)).mirror(0x1fffc);
+	/*      */ map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r)).mirror(0x1fffc);
 
-	map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
-	map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
-	map(0xe0000c, 0xe0000f).nopw();
+	/* GLUE */ map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
+	/*      */ map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
+	/*      */ map(0xe0000c, 0xe0000f).nopw();
 
-	map(0xf80000, 0xffffff).rom();
+	/* ROM0 */ map(0xf80000, 0xffffff).rom();
 }
 
 void model1_state::model1_io(address_map &map)
 {
-	map(0xd20000, 0xd20003).r(FUNC(model1_state::v60_copro_ram_r));
-	map(0xd80000, 0xd80003).r(FUNC(model1_state::v60_copro_fifo_r));
+	map(0xd00000, 0xd00001).rw(FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w)).mirror(0x1fffe);
+	map(0xd20000, 0xd20003).rw(FUNC(model1_state::v60_copro_ram_r), FUNC(model1_state::v60_copro_ram_w)).mirror(0x1fffc);
+	map(0xd80000, 0xd80003).rw(FUNC(model1_state::v60_copro_fifo_r), FUNC(model1_state::v60_copro_fifo_w)).mirror(0x1fffc);
+	map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r)).mirror(0x1fffc);
 }
 
 void model1_state::model1_comm_mem(address_map &map)
@@ -1240,7 +1188,7 @@ ROM_START( vf )
 	ROM_LOAD16_BYTE( "mpr-16091.13", 0x1300001, 0x80000, CRC(53115448) SHA1(af798d5b1fcb720d7288a5ac48839d9ace16a2f2) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5724.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5724.bin", 0, 0x2000, CRC(09b4fb99) SHA1(7f3a3fb0b8d2e98d2238944c7526113d31af9d88) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16120.7", 0x00000, 0x20000, CRC(2bff8378) SHA1(854b08ab983e4e98cb666f2f44de9a6829b1eb52) )
@@ -1381,10 +1329,10 @@ ROM_START( swa )
 	ROM_RELOAD(          0x080000, 0x80000 )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
-		ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
+	ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
 	ROM_RELOAD(0x80000, 0x20000)
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
@@ -1429,10 +1377,10 @@ ROM_START( swaj )
 	ROM_RELOAD(          0x080000, 0x80000 )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
-		ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
+	ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
 	ROM_RELOAD(0x80000, 0x20000)
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
@@ -1486,7 +1434,7 @@ ROM_START( wingwar )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
@@ -1547,7 +1495,7 @@ ROM_START( wingwaru )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
@@ -1599,7 +1547,7 @@ ROM_START( wingwarj )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
@@ -1653,7 +1601,7 @@ ROM_START( wingwar360 )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
@@ -1705,7 +1653,7 @@ ROM_START( netmerc )
 	ROM_LOAD16_BYTE( "epr-18127.ic11", 0x1200001, 0x80000, CRC(d307a4ca) SHA1(5555235f740c1b09f6e1587d0fceb35b23d4a8a8) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+	ROM_LOAD("315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-18121.ic7", 0x00000, 0x80000, CRC(113285b5) SHA1(5d060cee41e8d6a4a918f890c2d169d87dbcad79) )
@@ -1745,13 +1693,11 @@ void model1_state::model1(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model1_state::model1_interrupt), "screen", 0, 1);
 
-#if 1
 	MB86233(config, m_tgp_copro, 16000000);
 	m_tgp_copro->set_addrmap(AS_PROGRAM, &model1_state::copro_prog_map);
 	m_tgp_copro->set_addrmap(AS_DATA, &model1_state::copro_data_map);
 	m_tgp_copro->set_addrmap(AS_IO, &model1_state::copro_io_map);
 	m_tgp_copro->set_addrmap(mb86233_device::AS_RF, &model1_state::copro_rf_map);
-#endif
 
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
 	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
@@ -1782,16 +1728,9 @@ void model1_state::model1(machine_config &config)
 	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 }
 
-void model1_state::model1_hle(machine_config &config)
-{
-	model1(config);
-
-	config.device_remove("tgp_copro");
-}
-
 void model1_state::vf(machine_config &config)
 {
-	model1_hle(config);
+	model1(config);
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
 	ioboard.set_default_bios_tag("epr14869b");
@@ -1836,7 +1775,7 @@ void model1_state::vformula(machine_config &config)
 
 void model1_state::swa(machine_config &config)
 {
-	model1_hle(config);
+	model1(config);
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
 	ioboard.set_default_bios_tag("epr14869b");
@@ -1860,7 +1799,7 @@ void model1_state::swa(machine_config &config)
 
 void model1_state::wingwar(machine_config &config)
 {
-	model1_hle(config);
+	model1(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_comm_mem);
 
@@ -1904,7 +1843,7 @@ void model1_state::polhemus_map(address_map &map)
 
 void model1_state::netmerc(machine_config &config)
 {
-	model1_hle(config);
+	model1(config);
 	i386sx_device &polhemus(I386SX(config, "polhemus", 16000000));
 	polhemus.set_addrmap(AS_PROGRAM, &model1_state::polhemus_map);
 
@@ -1928,13 +1867,13 @@ void model1_state::netmerc(machine_config &config)
 //**************************************************************************
 
 //    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
-GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           0 )
 GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
 GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       MACHINE_NOT_WORKING )
+GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    0 )
+GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", 0 )
+GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
+GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
+GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
+GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
 GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )
