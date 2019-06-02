@@ -16158,6 +16158,9 @@ itt1700                         //
 @source:itt3030.cpp
 itt3030                         //
 
+@source:itt9216.cpp
+itt9216                         //
+
 @source:jack.cpp
 brix                            // (c) 1982 Cinematronics + Advanced Microcomputer Systems
 freeze                          // Cinematronics
@@ -37618,7 +37621,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 feap90                          //
-itt9216                         //
 loewe715                        //
 loewed                          //
 t3210                           //
