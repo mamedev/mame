@@ -1043,6 +1043,9 @@ void z80sio_channel::device_reset()
 	m_all_sent_delay = 0;
 	m_tx_in_pkt = false;
 	m_tx_forced_sync = true;
+	m_txd = 1;
+	out_txd_cb(1);
+	m_tx_sr = ~0;
 
 	// TODO: what happens to WAIT/READY?
 
