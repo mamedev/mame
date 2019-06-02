@@ -2,9 +2,15 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    jaguar.c
+    jaguar.cpp
     Core implementation for the portable Jaguar DSP emulator.
     Written by Aaron Giles
+
+	TODO:
+	- Implement pipeline, actually instruction cycles;
+	  Currently implementation is similar to single stepping
+	  with single cycle
+	- Implement and acknowlodge remain registers
 
 ***************************************************************************/
 
@@ -13,6 +19,7 @@
 #include "jaguar.h"
 #include "jagdasm.h"
 
+#include <algorithm>
 
 #define LOG_GPU_IO      0
 #define LOG_DSP_IO      0
@@ -22,38 +29,37 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ZFLAG                   0x00001
-#define CFLAG                   0x00002
-#define NFLAG                   0x00004
-#define IFLAG                   0x00008
-#define EINT0FLAG               0x00010
-#define EINT1FLAG               0x00020
-#define EINT2FLAG               0x00040
-#define EINT3FLAG               0x00080
-#define EINT4FLAG               0x00100
-#define EINT04FLAGS             (EINT0FLAG | EINT1FLAG | EINT2FLAG | EINT3FLAG | EINT4FLAG)
-#define CINT0FLAG               0x00200
-#define CINT1FLAG               0x00400
-#define CINT2FLAG               0x00800
-#define CINT3FLAG               0x01000
-#define CINT4FLAG               0x02000
-#define CINT04FLAGS             (CINT0FLAG | CINT1FLAG | CINT2FLAG | CINT3FLAG | CINT4FLAG)
-#define RPAGEFLAG               0x04000
-#define DMAFLAG                 0x08000
-#define EINT5FLAG               0x10000     /* DSP only */
-#define CINT5FLAG               0x20000     /* DSP only */
+static constexpr u32 ZFLAG       = 0x00001;
+static constexpr u32 CFLAG       = 0x00002;
+static constexpr u32 NFLAG       = 0x00004;
+static constexpr u32 IFLAG       = 0x00008;
+static constexpr u32 EINT0FLAG   = 0x00010;
+static constexpr u32 EINT1FLAG   = 0x00020;
+static constexpr u32 EINT2FLAG   = 0x00040;
+static constexpr u32 EINT3FLAG   = 0x00080;
+static constexpr u32 EINT4FLAG   = 0x00100;
+static constexpr u32 EINT04FLAGS = EINT0FLAG | EINT1FLAG | EINT2FLAG | EINT3FLAG | EINT4FLAG;
+static constexpr u32 CINT0FLAG   = 0x00200;
+static constexpr u32 CINT1FLAG   = 0x00400;
+static constexpr u32 CINT2FLAG   = 0x00800;
+static constexpr u32 CINT3FLAG   = 0x01000;
+static constexpr u32 CINT4FLAG   = 0x02000;
+static constexpr u32 CINT04FLAGS = CINT0FLAG | CINT1FLAG | CINT2FLAG | CINT3FLAG | CINT4FLAG;
+static constexpr u32 RPAGEFLAG   = 0x04000;
+static constexpr u32 DMAFLAG     = 0x08000;
+static constexpr u32 EINT5FLAG   = 0x10000;     /* DSP only */
+static constexpr u32 CINT5FLAG   = 0x20000;     /* DSP only */
 
-#define CLR_Z()                 (FLAGS &= ~ZFLAG)
-#define CLR_ZN()                (FLAGS &= ~(ZFLAG | NFLAG))
-#define CLR_ZNC()               (FLAGS &= ~(CFLAG | ZFLAG | NFLAG))
-#define SET_Z(r)                (FLAGS |= ((r) == 0))
-#define SET_C_ADD(a,b)          (FLAGS |= ((uint32_t)(b) > (uint32_t)(~(a))) << 1)
-#define SET_C_SUB(a,b)          (FLAGS |= ((uint32_t)(b) > (uint32_t)(a)) << 1)
-#define SET_N(r)                (FLAGS |= (((uint32_t)(r) >> 29) & 4))
-#define SET_ZN(r)               SET_N(r); SET_Z(r)
-#define SET_ZNC_ADD(a,b,r)      SET_N(r); SET_Z(r); SET_C_ADD(a,b)
-#define SET_ZNC_SUB(a,b,r)      SET_N(r); SET_Z(r); SET_C_SUB(a,b)
-
+inline void jaguar_cpu_device::CLR_Z()                          { m_ctrl[G_FLAGS] &= ~ZFLAG; }
+inline void jaguar_cpu_device::CLR_ZN()                         { m_ctrl[G_FLAGS] &= ~(ZFLAG | NFLAG); }
+inline void jaguar_cpu_device::CLR_ZNC()                        { m_ctrl[G_FLAGS] &= ~(CFLAG | ZFLAG | NFLAG); }
+inline void jaguar_cpu_device::SET_Z(u32 r)                     { m_ctrl[G_FLAGS] |= (r == 0); }
+inline void jaguar_cpu_device::SET_C_ADD(u32 a, u32 b)          { m_ctrl[G_FLAGS] |= (b > (~a)) << 1; }
+inline void jaguar_cpu_device::SET_C_SUB(u32 a, u32 b)          { m_ctrl[G_FLAGS] |= (b > a) << 1; }
+inline void jaguar_cpu_device::SET_N(u32 r)                     { m_ctrl[G_FLAGS] |= ((r >> 29) & 4); }
+inline void jaguar_cpu_device::SET_ZN(u32 r)                    { SET_N(r); SET_Z(r); }
+inline void jaguar_cpu_device::SET_ZNC_ADD(u32 a, u32 b, u32 r) { SET_N(r); SET_Z(r); SET_C_ADD(a, b); }
+inline void jaguar_cpu_device::SET_ZNC_SUB(u32 a, u32 b, u32 r) { SET_N(r); SET_Z(r); SET_C_SUB(a, b); }
 
 
 /***************************************************************************
@@ -63,25 +69,26 @@
 #define PC                  m_ctrl[G_PC]
 #define FLAGS               m_ctrl[G_FLAGS]
 
-#define CONDITION(x)        condition_table[(x) + ((FLAGS & 7) << 5)]
+inline u8 jaguar_cpu_device::CONDITION(u8 x)
+{
+	return condition_table[x + ((m_ctrl[G_FLAGS] & 7) << 5)];
+}
 
-#define READBYTE(a)         m_program->read_byte(a)
-#define READWORD(a)         m_program->read_word(a)
-#define READLONG(a)         m_program->read_dword(a)
+inline u8 jaguar_cpu_device::READBYTE(offs_t a)  { return m_program->read_byte(a); }
+inline u16 jaguar_cpu_device::READWORD(offs_t a) { return m_program->read_word(a); }
+inline u32 jaguar_cpu_device::READLONG(offs_t a) { return m_program->read_dword(a); }
 
-#define WRITEBYTE(a,v)      m_program->write_byte(a, v)
-#define WRITEWORD(a,v)      m_program->write_word(a, v)
-#define WRITELONG(a,v)      m_program->write_dword(a, v)
-
+inline void jaguar_cpu_device::WRITEBYTE(offs_t a, u8 v)  { m_program->write_byte(a, v); }
+inline void jaguar_cpu_device::WRITEWORD(offs_t a, u16 v) { m_program->write_word(a, v); }
+inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v) { m_program->write_dword(a, v); }
 
 
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
 
-const uint32_t jaguar_cpu_device::convert_zero[32] =
+const u32 jaguar_cpu_device::convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
-
 
 
 /***************************************************************************
@@ -129,12 +136,11 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
 };
 
 
-
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)           (m_cache->read_word(pc))
+inline u16 jaguar_cpu_device::ROPCODE(offs_t pc) { return m_cache->read_word(pc); }
 
 // SC414200AT
 DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari Jaguar GPU \"Tom\"")
@@ -142,9 +148,10 @@ DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari
 DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Motorola Atari Jaguar DSP \"Jerry\"")
 
 
-jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool isdsp)
+jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
+	, m_version(version) // 1 : Jaguar prototype, 2 : Jaguar first release, 3 : Midsummer prototype, Other : unknown/reserved
 	, m_isdsp(isdsp)
 	, m_cpu_interrupt(*this)
 	, m_tables_referenced(false)
@@ -164,14 +171,14 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 }
 
 
-jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jaguar_cpu_device(mconfig, JAGUARGPU, tag, owner, clock, false)
+jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: jaguar_cpu_device(mconfig, JAGUARGPU, tag, owner, clock, 2, false)
 {
 }
 
 
-jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jaguar_cpu_device(mconfig, JAGUARDSP, tag, owner, clock, true)
+jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: jaguar_cpu_device(mconfig, JAGUARDSP, tag, owner, clock, 2, true)
 {
 }
 
@@ -185,11 +192,8 @@ device_memory_interface::space_config_vector jaguar_cpu_device::memory_space_con
 
 void jaguar_cpu_device::update_register_banks()
 {
-	uint32_t temp;
-	int i, bank;
-
 	/* pick the bank */
-	bank = FLAGS & RPAGEFLAG;
+	u32 bank = FLAGS & RPAGEFLAG;
 	if (FLAGS & IFLAG) bank = 0;
 
 	/* do we need to swap? */
@@ -199,8 +203,12 @@ void jaguar_cpu_device::update_register_banks()
 		m_bankswitch_icount = m_icount - 1;
 
 		/* exchange the contents */
-		for (i = 0; i < 32; i++)
-			temp = m_r[i], m_r[i] = m_a[i], m_a[i] = temp;
+		for (int i = 0; i < 32; i++)
+		{
+			const u32 temp = m_r[i];
+			m_r[i] = m_a[i];
+			m_a[i] = temp;
+		}
 
 		/* swap the bank pointers */
 		if (bank == 0)
@@ -217,25 +225,24 @@ void jaguar_cpu_device::update_register_banks()
 }
 
 
-
 /***************************************************************************
     IRQ HANDLING
 ***************************************************************************/
 
 void jaguar_cpu_device::check_irqs()
 {
-	int bits, mask, which = 0;
+	int which = 0;
 
 	/* if the IMASK is set, bail */
 	if (FLAGS & IFLAG)
 		return;
 
 	/* get the active interrupt bits */
-	bits = (m_ctrl[G_CTRL] >> 6) & 0x1f;
+	u8 bits = (m_ctrl[G_CTRL] >> 6) & 0x1f;
 	bits |= (m_ctrl[G_CTRL] >> 10) & 0x20;
 
 	/* get the interrupt mask */
-	mask = (FLAGS >> 4) & 0x1f;
+	u8 mask = (FLAGS >> 4) & 0x1f;
 	mask |= (FLAGS >> 11) & 0x20;
 
 	/* bail if nothing is available */
@@ -267,7 +274,7 @@ void jaguar_cpu_device::check_irqs()
 
 void jaguar_cpu_device::execute_set_input(int irqline, int state)
 {
-	int mask = (irqline < 5) ? (0x40 << irqline) : 0x10000;
+	const u32 mask = (irqline < 5) ? (0x40 << irqline) : 0x10000;
 	m_ctrl[G_CTRL] &= ~mask;
 	if (state != CLEAR_LINE)
 	{
@@ -277,15 +284,12 @@ void jaguar_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-
 /***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
 void jaguar_cpu_device::init_tables()
 {
-	int i, j;
-
 	m_tables_referenced = true;
 
 	/* if we're not the first, skip */
@@ -297,8 +301,8 @@ void jaguar_cpu_device::init_tables()
 	}
 
 	/* fill in the mirror table */
-	mirror_table = std::make_unique<uint16_t[]>(65536);
-	for (i = 0; i < 65536; i++)
+	mirror_table = std::make_unique<u16[]>(65536);
+	for (int i = 0; i < 65536; i++)
 		mirror_table[i] = ((i >> 15) & 0x0001) | ((i >> 13) & 0x0002) |
 							((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
 							((i >> 7)  & 0x0010) | ((i >> 5)  & 0x0020) |
@@ -309,9 +313,9 @@ void jaguar_cpu_device::init_tables()
 							((i << 13) & 0x4000) | ((i << 15) & 0x8000);
 
 	/* fill in the condition table */
-	condition_table = std::make_unique<uint8_t[]>(32 * 8);
-	for (i = 0; i < 8; i++)
-		for (j = 0; j < 32; j++)
+	condition_table = std::make_unique<u8[]>(32 * 8);
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 32; j++)
 		{
 			int result = 1;
 			if (j & 1)
@@ -327,7 +331,7 @@ void jaguar_cpu_device::init_tables()
 }
 
 
-void jaguar_cpu_device::jaguar_postload()
+void jaguar_cpu_device::device_post_load()
 {
 	update_register_banks();
 	check_irqs();
@@ -346,7 +350,6 @@ void jaguar_cpu_device::device_start()
 	save_item(NAME(m_a));
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_ppc));
-	machine().save().register_postload(save_prepost_delegate(FUNC(jaguar_cpu_device::jaguar_postload), this));
 
 	if (m_isdsp)
 	{
@@ -359,9 +362,9 @@ void jaguar_cpu_device::device_start()
 		m_internal_ram_end = 0xf03fff;
 	}
 
-	memset(m_r, 0, sizeof(m_r));
-	memset(m_a, 0, sizeof(m_a));
-	memset(m_ctrl, 0, sizeof(m_ctrl));
+	std::fill(std::begin(m_r), std::end(m_r), 0);
+	std::fill(std::begin(m_a), std::end(m_a), 0);
+	std::fill(std::begin(m_ctrl), std::end(m_ctrl), 0);
 	m_ppc = 0;
 	m_accum = 0;
 	m_bankswitch_icount = 0;
@@ -451,7 +454,6 @@ jaguar_cpu_device::~jaguar_cpu_device()
 }
 
 
-
 /***************************************************************************
     CORE EXECUTION LOOP
 ***************************************************************************/
@@ -475,15 +477,13 @@ void jaguargpu_cpu_device::execute_run()
 	/* core execution loop */
 	do
 	{
-		uint32_t op;
-
 		/* debugging */
 		//if (PC < 0xf03000 || PC > 0xf04000) { fatalerror("GPU: PC = %06X (ppc = %06X)\n", PC, m_ppc); }
 		m_ppc = PC;
 		debugger_instruction_hook(PC);
 
 		/* instruction fetch */
-		op = ROPCODE(PC);
+		const u16 op = ROPCODE(PC);
 		PC += 2;
 
 		/* parse the instruction */
@@ -512,15 +512,13 @@ void jaguardsp_cpu_device::execute_run()
 	/* core execution loop */
 	do
 	{
-		uint32_t op;
-
 		/* debugging */
 		//if (PC < 0xf1b000 || PC > 0xf1d000) { fatalerror(stderr, "DSP: PC = %06X\n", PC); }
 		m_ppc = PC;
 		debugger_instruction_hook(PC);
 
 		/* instruction fetch */
-		op = ROPCODE(PC);
+		const u16 op = ROPCODE(PC);
 		PC += 2;
 
 		/* parse the instruction */
@@ -531,15 +529,14 @@ void jaguardsp_cpu_device::execute_run()
 }
 
 
-
 /***************************************************************************
     OPCODES
 ***************************************************************************/
 
-void jaguar_cpu_device::abs_rn(uint16_t op)
+void jaguar_cpu_device::abs_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t res = m_r[dreg];
+	const u8 dreg = op & 31;
+	u32 res = m_r[dreg];
 	CLR_ZNC();
 	if (res & 0x80000000)
 	{
@@ -549,121 +546,121 @@ void jaguar_cpu_device::abs_rn(uint16_t op)
 	SET_Z(res);
 }
 
-void jaguar_cpu_device::add_rn_rn(uint16_t op)
+void jaguar_cpu_device::add_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 + r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 + r1;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_ADD(r2, r1, res);
 }
 
-void jaguar_cpu_device::addc_rn_rn(uint16_t op)
+void jaguar_cpu_device::addc_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t c = ((FLAGS >> 1) & 1);
-	uint32_t res = r2 + r1 + c;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	u32 c = ((FLAGS >> 1) & 1);
+	const u32 res = r2 + r1 + c;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_ADD(r2, r1 + c, res);
 }
 
-void jaguar_cpu_device::addq_n_rn(uint16_t op)
+void jaguar_cpu_device::addq_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 + r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 + r1;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_ADD(r2, r1, res);
 }
 
-void jaguar_cpu_device::addqmod_n_rn(uint16_t op)  /* DSP only */
+void jaguar_cpu_device::addqmod_n_rn(u16 op)  /* DSP only */
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 + r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	u32 res = r2 + r1;
 	res = (res & ~m_ctrl[D_MOD]) | (r2 & ~m_ctrl[D_MOD]);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_ADD(r2, r1, res);
 }
 
-void jaguar_cpu_device::addqt_n_rn(uint16_t op)
+void jaguar_cpu_device::addqt_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 + r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 + r1;
 	m_r[dreg] = res;
 }
 
-void jaguar_cpu_device::and_rn_rn(uint16_t op)
+void jaguar_cpu_device::and_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 & r1;
-	m_r[dreg] = res;
-	CLR_ZN(); SET_ZN(res);
-}
-
-void jaguar_cpu_device::bclr_n_rn(uint16_t op)
-{
-	int dreg = op & 31;
-	uint32_t r1 = (op >> 5) & 31;
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 & ~(1 << r1);
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 & r1;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::bset_n_rn(uint16_t op)
+void jaguar_cpu_device::bclr_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = (op >> 5) & 31;
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 | (1 << r1);
+	const u8 dreg = op & 31;
+	const u32 r1 = (op >> 5) & 31;
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 & ~(1 << r1);
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::btst_n_rn(uint16_t op)
+void jaguar_cpu_device::bset_n_rn(u16 op)
 {
-	uint32_t r1 = (op >> 5) & 31;
-	uint32_t r2 = m_r[op & 31];
+	const u8 dreg = op & 31;
+	const u32 r1 = (op >> 5) & 31;
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 | (1 << r1);
+	m_r[dreg] = res;
+	CLR_ZN(); SET_ZN(res);
+}
+
+void jaguar_cpu_device::btst_n_rn(u16 op)
+{
+	const u32 r1 = (op >> 5) & 31;
+	const u32 r2 = m_r[op & 31];
 	CLR_Z(); FLAGS |= (~r2 >> r1) & 1;
 }
 
-void jaguar_cpu_device::cmp_rn_rn(uint16_t op)
+void jaguar_cpu_device::cmp_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[op & 31];
-	uint32_t res = r2 - r1;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[op & 31];
+	const u32 res = r2 - r1;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1, res);
 }
 
-void jaguar_cpu_device::cmpq_n_rn(uint16_t op)
+void jaguar_cpu_device::cmpq_n_rn(u16 op)
 {
-	uint32_t r1 = (int8_t)(op >> 2) >> 3;
-	uint32_t r2 = m_r[op & 31];
-	uint32_t res = r2 - r1;
+	const u32 r1 = (s8)(op >> 2) >> 3;
+	const u32 r2 = m_r[op & 31];
+	const u32 res = r2 - r1;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1, res);
 }
 
-void jaguar_cpu_device::div_rn_rn(uint16_t op)
+void jaguar_cpu_device::div_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
 	if (r1)
 	{
 		if (m_ctrl[D_DIVCTRL] & 1)
 		{
-			m_r[dreg] = ((uint64_t)r2 << 16) / r1;
-			m_ctrl[D_REMAINDER] = ((uint64_t)r2 << 16) % r1;
+			m_r[dreg] = ((u64)r2 << 16) / r1;
+			m_ctrl[D_REMAINDER] = ((u64)r2 << 16) % r1;
 		}
 		else
 		{
@@ -675,35 +672,35 @@ void jaguar_cpu_device::div_rn_rn(uint16_t op)
 		m_r[dreg] = 0xffffffff;
 }
 
-void jaguar_cpu_device::illegal(uint16_t op)
+void jaguar_cpu_device::illegal(u16 op)
 {
 }
 
-void jaguar_cpu_device::imacn_rn_rn(uint16_t op)
+void jaguar_cpu_device::imacn_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[op & 31];
-	m_accum += (int64_t)((int16_t)r1 * (int16_t)r2);
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[op & 31];
+	m_accum += (s64)((int16_t)r1 * (int16_t)r2);
 	logerror("Unexpected IMACN instruction!\n");
 }
 
-void jaguar_cpu_device::imult_rn_rn(uint16_t op)
+void jaguar_cpu_device::imult_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = (int16_t)r1 * (int16_t)r2;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = (int16_t)r1 * (int16_t)r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::imultn_rn_rn(uint16_t op)
+void jaguar_cpu_device::imultn_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = (int16_t)r1 * (int16_t)r2;
-	m_accum = (int32_t)res;
+	const u8 dreg = op & 31;
+	u32 r1 = m_r[(op >> 5) & 31];
+	u32 r2 = m_r[dreg];
+	const u32 res = (int16_t)r1 * (int16_t)r2;
+	m_accum = (s32)res;
 	CLR_ZN(); SET_ZN(res);
 
 	op = ROPCODE(PC);
@@ -711,23 +708,23 @@ void jaguar_cpu_device::imultn_rn_rn(uint16_t op)
 	{
 		r1 = m_r[(op >> 5) & 31];
 		r2 = m_r[op & 31];
-		m_accum += (int64_t)((int16_t)r1 * (int16_t)r2);
+		m_accum += (s64)((int16_t)r1 * (int16_t)r2);
 		PC += 2;
 		op = ROPCODE(PC);
 	}
 	if ((op >> 10) == 19)
 	{
 		PC += 2;
-		m_r[op & 31] = (uint32_t)m_accum;
+		m_r[op & 31] = (u32)m_accum;
 	}
 }
 
-void jaguar_cpu_device::jr_cc_n(uint16_t op)
+void jaguar_cpu_device::jr_cc_n(u16 op)
 {
 	if (CONDITION(op & 31))
 	{
-		int32_t r1 = (int8_t)((op >> 2) & 0xf8) >> 2;
-		uint32_t newpc = PC + r1;
+		const s32 r1 = (s8)((op >> 2) & 0xf8) >> 2;
+		const u32 newpc = PC + r1;
 		debugger_instruction_hook(PC);
 		op = ROPCODE(PC);
 		PC = newpc;
@@ -737,14 +734,14 @@ void jaguar_cpu_device::jr_cc_n(uint16_t op)
 	}
 }
 
-void jaguar_cpu_device::jump_cc_rn(uint16_t op)
+void jaguar_cpu_device::jump_cc_rn(u16 op)
 {
 	if (CONDITION(op & 31))
 	{
-		uint8_t reg = (op >> 5) & 31;
+		const u8 reg = (op >> 5) & 31;
 
 		/* special kludge for risky code in the cojag DSP interrupt handlers */
-		uint32_t newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
+		const u32 newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
 		debugger_instruction_hook(PC);
 		op = ROPCODE(PC);
 		PC = newpc;
@@ -754,39 +751,39 @@ void jaguar_cpu_device::jump_cc_rn(uint16_t op)
 	}
 }
 
-void jaguar_cpu_device::load_rn_rn(uint16_t op)
+void jaguar_cpu_device::load_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	m_r[op & 31] = READLONG(r1);
 }
 
-void jaguar_cpu_device::load_r14n_rn(uint16_t op)
+void jaguar_cpu_device::load_r14n_rn(u16 op)
 {
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
+	const u32 r1 = convert_zero[(op >> 5) & 31];
 	m_r[op & 31] = READLONG(m_r[14] + 4 * r1);
 }
 
-void jaguar_cpu_device::load_r15n_rn(uint16_t op)
+void jaguar_cpu_device::load_r15n_rn(u16 op)
 {
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
+	const u32 r1 = convert_zero[(op >> 5) & 31];
 	m_r[op & 31] = READLONG(m_r[15] + 4 * r1);
 }
 
-void jaguar_cpu_device::load_r14rn_rn(uint16_t op)
+void jaguar_cpu_device::load_r14rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	m_r[op & 31] = READLONG(m_r[14] + r1);
 }
 
-void jaguar_cpu_device::load_r15rn_rn(uint16_t op)
+void jaguar_cpu_device::load_r15rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	m_r[op & 31] = READLONG(m_r[15] + r1);
 }
 
-void jaguar_cpu_device::loadb_rn_rn(uint16_t op)
+void jaguar_cpu_device::loadb_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	if (r1 >= m_internal_ram_start && r1 <= m_internal_ram_end)
 	{
 		m_r[op & 31] = READLONG(r1 & ~3);
@@ -797,9 +794,9 @@ void jaguar_cpu_device::loadb_rn_rn(uint16_t op)
 	}
 }
 
-void jaguar_cpu_device::loadw_rn_rn(uint16_t op)
+void jaguar_cpu_device::loadw_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	if (r1 >= m_internal_ram_start && r1 <= m_internal_ram_end)
 	{
 		m_r[op & 31] = READLONG(r1 & ~3);
@@ -810,9 +807,9 @@ void jaguar_cpu_device::loadw_rn_rn(uint16_t op)
 	}
 }
 
-void jaguar_cpu_device::loadp_rn_rn(uint16_t op)   /* GPU only */
+void jaguar_cpu_device::loadp_rn_rn(u16 op)   /* GPU only */
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	if (r1 >= m_internal_ram_start && r1 <= m_internal_ram_end)
 	{
 		m_r[op & 31] = READLONG(r1 & ~3);
@@ -824,27 +821,26 @@ void jaguar_cpu_device::loadp_rn_rn(uint16_t op)   /* GPU only */
 	}
 }
 
-void jaguar_cpu_device::mirror_rn(uint16_t op) /* DSP only */
+void jaguar_cpu_device::mirror_rn(u16 op) /* DSP only */
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[dreg];
-	uint32_t res = (mirror_table[r1 & 0xffff] << 16) | mirror_table[r1 >> 16];
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[dreg];
+	const u32 res = (mirror_table[r1 & 0xffff] << 16) | mirror_table[r1 >> 16];
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::mmult_rn_rn(uint16_t op)
+void jaguar_cpu_device::mmult_rn_rn(u16 op)
 {
-	int count = m_ctrl[G_MTXC] & 15, i;
-	int sreg = (op >> 5) & 31;
-	int dreg = op & 31;
-	uint32_t addr = m_ctrl[G_MTXA];
-	int64_t accum = 0;
-	uint32_t res;
+	const u8 count = m_ctrl[G_MTXC] & 15;
+	const u8 sreg = (op >> 5) & 31;
+	const u8 dreg = op & 31;
+	u32 addr = m_ctrl[G_MTXA];
+	s64 accum = 0;
 
 	if (!(m_ctrl[G_MTXC] & 0x10))
 	{
-		for (i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			accum += (int16_t)(m_b1[sreg + i/2] >> (16 * ((i & 1) ^ 1))) * (int16_t)READWORD(addr);
 			addr += 2;
@@ -852,81 +848,82 @@ void jaguar_cpu_device::mmult_rn_rn(uint16_t op)
 	}
 	else
 	{
-		for (i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			accum += (int16_t)(m_b1[sreg + i/2] >> (16 * ((i & 1) ^ 1))) * (int16_t)READWORD(addr);
 			addr += 2 * count;
 		}
 	}
-	m_r[dreg] = res = (uint32_t)accum;
+	const u32 res = (u32)accum;
+	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::move_rn_rn(uint16_t op)
+void jaguar_cpu_device::move_rn_rn(u16 op)
 {
 	m_r[op & 31] = m_r[(op >> 5) & 31];
 }
 
-void jaguar_cpu_device::move_pc_rn(uint16_t op)
+void jaguar_cpu_device::move_pc_rn(u16 op)
 {
 	m_r[op & 31] = m_ppc;
 }
 
-void jaguar_cpu_device::movefa_rn_rn(uint16_t op)
+void jaguar_cpu_device::movefa_rn_rn(u16 op)
 {
 	m_r[op & 31] = m_a[(op >> 5) & 31];
 }
 
-void jaguar_cpu_device::movei_n_rn(uint16_t op)
+void jaguar_cpu_device::movei_n_rn(u16 op)
 {
-	uint32_t res = ROPCODE(PC) | (ROPCODE(PC + 2) << 16);
+	const u32 res = ROPCODE(PC) | (ROPCODE(PC + 2) << 16);
 	PC += 4;
 	m_r[op & 31] = res;
 }
 
-void jaguar_cpu_device::moveq_n_rn(uint16_t op)
+void jaguar_cpu_device::moveq_n_rn(u16 op)
 {
 	m_r[op & 31] = (op >> 5) & 31;
 }
 
-void jaguar_cpu_device::moveta_rn_rn(uint16_t op)
+void jaguar_cpu_device::moveta_rn_rn(u16 op)
 {
 	m_a[op & 31] = m_r[(op >> 5) & 31];
 }
 
-void jaguar_cpu_device::mtoi_rn_rn(uint16_t op)
+void jaguar_cpu_device::mtoi_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	m_r[op & 31] = (((int32_t)r1 >> 8) & 0xff800000) | (r1 & 0x007fffff);
+	const u32 r1 = m_r[(op >> 5) & 31];
+	m_r[op & 31] = (((s32)r1 >> 8) & 0xff800000) | (r1 & 0x007fffff);
 }
 
-void jaguar_cpu_device::mult_rn_rn(uint16_t op)
+void jaguar_cpu_device::mult_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = (uint16_t)r1 * (uint16_t)r2;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = (u16)r1 * (u16)r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::neg_rn(uint16_t op)
+void jaguar_cpu_device::neg_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = -r2;
+	const u8 dreg = op & 31;
+	const u32 r2 = m_r[dreg];
+	const u32 res = -r2;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_SUB(0, r2, res);
 }
 
-void jaguar_cpu_device::nop(uint16_t op)
+void jaguar_cpu_device::nop(u16 op)
 {
 }
 
-void jaguar_cpu_device::normi_rn_rn(uint16_t op)
+void jaguar_cpu_device::normi_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t res = 0;
+	u32 r1 = m_r[(op >> 5) & 31];
+	u32 res = 0;
 	if (r1 != 0)
 	{
 		while ((r1 & 0xffc00000) == 0)
@@ -944,30 +941,30 @@ void jaguar_cpu_device::normi_rn_rn(uint16_t op)
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::not_rn(uint16_t op)
+void jaguar_cpu_device::not_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t res = ~m_r[dreg];
+	const u8 dreg = op & 31;
+	const u32 res = ~m_r[dreg];
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::or_rn_rn(uint16_t op)
+void jaguar_cpu_device::or_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r1 | r2;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r1 | r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::pack_rn(uint16_t op)       /* GPU only */
+void jaguar_cpu_device::pack_rn(u16 op)       /* GPU only */
 {
-	int dreg = op & 31;
+	const u8 dreg = op & 31;
 	int pack = (op >> 5) & 31;
-	uint32_t r2 = m_r[dreg];
-	uint32_t res;
+	const u32 r2 = m_r[dreg];
+	u32 res;
 	if (pack == 0)    /* PACK */
 		res = ((r2 >> 10) & 0xf000) | ((r2 >> 5) & 0x0f00) | (r2 & 0xff);
 	else            /* UNPACK */
@@ -975,83 +972,83 @@ void jaguar_cpu_device::pack_rn(uint16_t op)       /* GPU only */
 	m_r[dreg] = res;
 }
 
-void jaguar_cpu_device::resmac_rn(uint16_t op)
+void jaguar_cpu_device::resmac_rn(u16 op)
 {
-	m_r[op & 31] = (uint32_t)m_accum;
+	m_r[op & 31] = (u32)m_accum;
 }
 
-void jaguar_cpu_device::ror_rn_rn(uint16_t op)
+void jaguar_cpu_device::ror_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31] & 31;
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = (r2 >> r1) | (r2 << (32 - r1));
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31] & 31;
+	const u32 r2 = m_r[dreg];
+	const u32 res = (r2 >> r1) | (r2 << (32 - r1));
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); FLAGS |= (r2 >> 30) & 2;
 }
 
-void jaguar_cpu_device::rorq_n_rn(uint16_t op)
+void jaguar_cpu_device::rorq_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = (r2 >> r1) | (r2 << (32 - r1));
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = (r2 >> r1) | (r2 << (32 - r1));
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); FLAGS |= (r2 >> 30) & 2;
 }
 
-void jaguar_cpu_device::sat8_rn(uint16_t op)       /* GPU only */
+void jaguar_cpu_device::sat8_rn(u16 op)       /* GPU only */
 {
-	int dreg = op & 31;
-	int32_t r2 = m_r[dreg];
-	uint32_t res = (r2 < 0) ? 0 : (r2 > 255) ? 255 : r2;
+	const u8 dreg = op & 31;
+	s32 r2 = m_r[dreg];
+	const u32 res = (r2 < 0) ? 0 : (r2 > 255) ? 255 : r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::sat16_rn(uint16_t op)      /* GPU only */
+void jaguar_cpu_device::sat16_rn(u16 op)      /* GPU only */
 {
-	int dreg = op & 31;
-	int32_t r2 = m_r[dreg];
-	uint32_t res = (r2 < 0) ? 0 : (r2 > 65535) ? 65535 : r2;
+	const u8 dreg = op & 31;
+	s32 r2 = m_r[dreg];
+	const u32 res = (r2 < 0) ? 0 : (r2 > 65535) ? 65535 : r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::sat16s_rn(uint16_t op)     /* DSP only */
+void jaguar_cpu_device::sat16s_rn(u16 op)     /* DSP only */
 {
-	int dreg = op & 31;
-	int32_t r2 = m_r[dreg];
-	uint32_t res = (r2 < -32768) ? -32768 : (r2 > 32767) ? 32767 : r2;
+	const u8 dreg = op & 31;
+	s32 r2 = m_r[dreg];
+	const u32 res = (r2 < -32768) ? -32768 : (r2 > 32767) ? 32767 : r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::sat24_rn(uint16_t op)          /* GPU only */
+void jaguar_cpu_device::sat24_rn(u16 op)          /* GPU only */
 {
-	int dreg = op & 31;
-	int32_t r2 = m_r[dreg];
-	uint32_t res = (r2 < 0) ? 0 : (r2 > 16777215) ? 16777215 : r2;
+	const u8 dreg = op & 31;
+	s32 r2 = m_r[dreg];
+	const u32 res = (r2 < 0) ? 0 : (r2 > 16777215) ? 16777215 : r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::sat32s_rn(uint16_t op)     /* DSP only */
+void jaguar_cpu_device::sat32s_rn(u16 op)     /* DSP only */
 {
-	int dreg = op & 31;
-	int32_t r2 = (uint32_t)m_r[dreg];
-	int32_t temp = m_accum >> 32;
-	uint32_t res = (temp < -1) ? (int32_t)0x80000000 : (temp > 0) ? (int32_t)0x7fffffff : r2;
+	const u8 dreg = op & 31;
+	s32 r2 = (u32)m_r[dreg];
+	s32 temp = m_accum >> 32;
+	const u32 res = (temp < -1) ? (s32)0x80000000 : (temp > 0) ? (s32)0x7fffffff : r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
 
-void jaguar_cpu_device::sh_rn_rn(uint16_t op)
+void jaguar_cpu_device::sh_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	int32_t r1 = (int32_t)m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res;
+	const u8 dreg = op & 31;
+	const s32 r1 = (s32)m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	u32 res;
 
 	CLR_ZNC();
 	if (r1 < 0)
@@ -1068,12 +1065,12 @@ void jaguar_cpu_device::sh_rn_rn(uint16_t op)
 	SET_ZN(res);
 }
 
-void jaguar_cpu_device::sha_rn_rn(uint16_t op)
+void jaguar_cpu_device::sha_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	int32_t r1 = (int32_t)m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res;
+	const u8 dreg = op & 31;
+	const s32 r1 = (s32)m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	u32 res;
 
 	CLR_ZNC();
 	if (r1 < 0)
@@ -1083,76 +1080,76 @@ void jaguar_cpu_device::sha_rn_rn(uint16_t op)
 	}
 	else
 	{
-		res = (r1 >= 32) ? ((int32_t)r2 >> 31) : ((int32_t)r2 >> r1);
+		res = (r1 >= 32) ? ((s32)r2 >> 31) : ((s32)r2 >> r1);
 		FLAGS |= (r2 << 1) & 2;
 	}
 	m_r[dreg] = res;
 	SET_ZN(res);
 }
 
-void jaguar_cpu_device::sharq_n_rn(uint16_t op)
+void jaguar_cpu_device::sharq_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	int32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = (int32_t)r2 >> r1;
+	const u8 dreg = op & 31;
+	const s32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = (s32)r2 >> r1;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); FLAGS |= (r2 << 1) & 2;
 }
 
-void jaguar_cpu_device::shlq_n_rn(uint16_t op)
+void jaguar_cpu_device::shlq_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	int32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 << (32 - r1);
+	const u8 dreg = op & 31;
+	const s32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 << (32 - r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); FLAGS |= (r2 >> 30) & 2;
 }
 
-void jaguar_cpu_device::shrq_n_rn(uint16_t op)
+void jaguar_cpu_device::shrq_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	int32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 >> r1;
+	const u8 dreg = op & 31;
+	const s32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 >> r1;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); FLAGS |= (r2 << 1) & 2;
 }
 
-void jaguar_cpu_device::store_rn_rn(uint16_t op)
+void jaguar_cpu_device::store_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	WRITELONG(r1, m_r[op & 31]);
 }
 
-void jaguar_cpu_device::store_rn_r14n(uint16_t op)
+void jaguar_cpu_device::store_rn_r14n(u16 op)
 {
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
+	const u32 r1 = convert_zero[(op >> 5) & 31];
 	WRITELONG(m_r[14] + r1 * 4, m_r[op & 31]);
 }
 
-void jaguar_cpu_device::store_rn_r15n(uint16_t op)
+void jaguar_cpu_device::store_rn_r15n(u16 op)
 {
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
+	const u32 r1 = convert_zero[(op >> 5) & 31];
 	WRITELONG(m_r[15] + r1 * 4, m_r[op & 31]);
 }
 
-void jaguar_cpu_device::store_rn_r14rn(uint16_t op)
+void jaguar_cpu_device::store_rn_r14rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	WRITELONG(m_r[14] + r1, m_r[op & 31]);
 }
 
-void jaguar_cpu_device::store_rn_r15rn(uint16_t op)
+void jaguar_cpu_device::store_rn_r15rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	WRITELONG(m_r[15] + r1, m_r[op & 31]);
 }
 
-void jaguar_cpu_device::storeb_rn_rn(uint16_t op)
+void jaguar_cpu_device::storeb_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	if (r1 >= m_internal_ram_start && r1 <= m_internal_ram_end)
 	{
 		WRITELONG(r1 & ~3, m_r[op & 31]);
@@ -1163,9 +1160,9 @@ void jaguar_cpu_device::storeb_rn_rn(uint16_t op)
 	}
 }
 
-void jaguar_cpu_device::storew_rn_rn(uint16_t op)
+void jaguar_cpu_device::storew_rn_rn(u16 op)
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	if (r1 >= m_internal_ram_start && r1 <= m_internal_ram_end)
 	{
 		WRITELONG(r1 & ~3, m_r[op & 31]);
@@ -1176,9 +1173,9 @@ void jaguar_cpu_device::storew_rn_rn(uint16_t op)
 	}
 }
 
-void jaguar_cpu_device::storep_rn_rn(uint16_t op)  /* GPU only */
+void jaguar_cpu_device::storep_rn_rn(u16 op)  /* GPU only */
 {
-	uint32_t r1 = m_r[(op >> 5) & 31];
+	const u32 r1 = m_r[(op >> 5) & 31];
 	if (r1 >= m_internal_ram_start && r1 <= m_internal_ram_end)
 	{
 		WRITELONG(r1 & ~3, m_r[op & 31]);
@@ -1190,63 +1187,63 @@ void jaguar_cpu_device::storep_rn_rn(uint16_t op)  /* GPU only */
 	}
 }
 
-void jaguar_cpu_device::sub_rn_rn(uint16_t op)
+void jaguar_cpu_device::sub_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 - r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 - r1;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1, res);
 }
 
-void jaguar_cpu_device::subc_rn_rn(uint16_t op)
+void jaguar_cpu_device::subc_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t c = ((FLAGS >> 1) & 1);
-	uint32_t res = r2 - r1 - c;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	u32 c = ((FLAGS >> 1) & 1);
+	const u32 res = r2 - r1 - c;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1 + c, res);
 }
 
-void jaguar_cpu_device::subq_n_rn(uint16_t op)
+void jaguar_cpu_device::subq_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 - r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 - r1;
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1, res);
 }
 
-void jaguar_cpu_device::subqmod_n_rn(uint16_t op)  /* DSP only */
+void jaguar_cpu_device::subqmod_n_rn(u16 op)  /* DSP only */
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 - r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	u32 res = r2 - r1;
 	res = (res & ~m_ctrl[D_MOD]) | (r2 & ~m_ctrl[D_MOD]);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1, res);
 }
 
-void jaguar_cpu_device::subqt_n_rn(uint16_t op)
+void jaguar_cpu_device::subqt_n_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = convert_zero[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r2 - r1;
+	const u8 dreg = op & 31;
+	const u32 r1 = convert_zero[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r2 - r1;
 	m_r[dreg] = res;
 }
 
-void jaguar_cpu_device::xor_rn_rn(uint16_t op)
+void jaguar_cpu_device::xor_rn_rn(u16 op)
 {
-	int dreg = op & 31;
-	uint32_t r1 = m_r[(op >> 5) & 31];
-	uint32_t r2 = m_r[dreg];
-	uint32_t res = r1 ^ r2;
+	const u8 dreg = op & 31;
+	const u32 r1 = m_r[(op >> 5) & 31];
+	const u32 r2 = m_r[dreg];
+	const u32 res = r1 ^ r2;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
 }
@@ -1257,24 +1254,26 @@ void jaguar_cpu_device::xor_rn_rn(uint16_t op)
     I/O HANDLING
 ***************************************************************************/
 
-READ32_MEMBER( jaguargpu_cpu_device::ctrl_r  )
+u32 jaguargpu_cpu_device::ctrl_r(offs_t offset)
 {
 	if (LOG_GPU_IO) logerror("GPU read register @ F021%02X\n", offset * 4);
 
-	return m_ctrl[offset];
+	u32 res = m_ctrl[offset];
+	if (offset == G_CTRL)
+		res |= (m_version & 0xf) << 12;
+
+	return res;
 }
 
 
-WRITE32_MEMBER( jaguargpu_cpu_device::ctrl_w )
+void jaguargpu_cpu_device::ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	uint32_t oldval, newval;
-
 	if (LOG_GPU_IO && offset != G_HIDATA)
 		logerror("GPU write register @ F021%02X = %08X\n", offset * 4, data);
 
 	/* remember the old and set the new */
-	oldval = m_ctrl[offset];
-	newval = oldval;
+	const u32 oldval = m_ctrl[offset];
+	u32 newval = oldval;
 	COMBINE_DATA(&newval);
 
 	/* handle the various registers */
@@ -1349,26 +1348,28 @@ WRITE32_MEMBER( jaguargpu_cpu_device::ctrl_w )
     I/O HANDLING
 ***************************************************************************/
 
-READ32_MEMBER( jaguardsp_cpu_device::ctrl_r )
+u32 jaguardsp_cpu_device::ctrl_r(offs_t offset)
 {
 	if (LOG_DSP_IO && offset != D_FLAGS)
 		logerror("DSP read register @ F1A1%02X\n", offset * 4);
 
 	/* switch to the target context */
-	return m_ctrl[offset];
+	u32 res = m_ctrl[offset];
+	if (offset == D_CTRL)
+		res |= (m_version & 0xf) << 12;
+
+	return res;
 }
 
 
-WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
+void jaguardsp_cpu_device::ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	uint32_t oldval, newval;
-
 	if (LOG_DSP_IO && offset != D_FLAGS)
 		logerror("DSP write register @ F1A1%02X = %08X\n", offset * 4, data);
 
 	/* remember the old and set the new */
-	oldval = m_ctrl[offset];
-	newval = oldval;
+	const u32 oldval = m_ctrl[offset];
+	u32 newval = oldval;
 	COMBINE_DATA(&newval);
 
 	/* handle the various registers */

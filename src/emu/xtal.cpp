@@ -297,13 +297,13 @@ const double XTAL::known_xtals[] = {
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
 	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
 	 25'447'000, /* 25.447_MHz_XTAL        Namco EVA3A (Funcube2) */
-	 25'590'906, /* 25.590906_MHz_XTAL     Atari Jaguar NTSC */
-	 25'593'900, /* 25.5939_MHz_XTAL       Atari Jaguar PAL */
 	 25'771'500, /* 25.7715_MHz_XTAL       HP-2622A */
 	 25'920'000, /* 25.92_MHz_XTAL         ADDS Viewpoint 60 */
 	 26'000'000, /* 26_MHz_XTAL            Gaelco PCBs */
 	 26'366'000, /* 26.366_MHz_XTAL        DEC VT320 */
 	 26'580'000, /* 26.58_MHz_XTAL         Wyse WY-60 80-column display clock */
+	 26'590'906, /* 26.590906_MHz_XTAL     Atari Jaguar NTSC */
+	 26'593'900, /* 26.5939_MHz_XTAL       Atari Jaguar PAL */
 	 26'601'712, /* 26.601712_MHz_XTAL     Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
 	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4100/I4220/I4300 */
 	 26'666'666, /* 26.666666_MHz_XTAL     Irem M92 but most use 27MHz */

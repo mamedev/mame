@@ -29,7 +29,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const uint8_t convert_zero[32];
+	static const u8 convert_zero[32];
 	static const char *const condition[32];
 
 	const variant m_variant;

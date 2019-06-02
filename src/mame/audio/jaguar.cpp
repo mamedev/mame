@@ -261,7 +261,7 @@ WRITE16_MEMBER( jaguar_state::jerry_regs_w )
 WRITE32_MEMBER( jaguar_state::dsp_flags_w )
 {
 	/* write the data through */
-	m_dsp->ctrl_w(space, offset, data, mem_mask);
+	m_dsp->ctrl_w(offset, data, mem_mask);
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
