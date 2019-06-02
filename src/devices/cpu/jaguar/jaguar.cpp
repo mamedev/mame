@@ -151,7 +151,7 @@ DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Motorola Atari
 jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
-	, m_version(version) // 1 : Prototype, 2 : First release, 3 : Midsummer prototype, Other : unknown/reserved
+	, m_version(version) // 1 : Jaguar prototype, 2 : Jaguar first release, 3 : Midsummer prototype, Other : unknown/reserved
 	, m_isdsp(isdsp)
 	, m_cpu_interrupt(*this)
 	, m_tables_referenced(false)
