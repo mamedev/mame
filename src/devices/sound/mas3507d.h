@@ -34,6 +34,8 @@ public:
 		memset(mp3data.data(), 0, mp3data.size());
 		memset(samples.data(), 0, samples.size());
 		mp3_count = 0;
+
+		mp3dec_init(&mp3_dec);
 	}
 
 protected:
@@ -47,7 +49,7 @@ private:
 	enum { IDLE, STARTED, NAK, ACK, ACK2 } i2c_bus_state;
 	enum { UNKNOWN, VALIDATED, WRONG } i2c_bus_address;
 
-	std::array<u8, 8000> mp3data;
+	std::array<u8, 0xe00> mp3data;
 	std::array<mp3d_sample_t, MINIMP3_MAX_SAMPLES_PER_FRAME> samples;
 	bool i2c_scli, i2c_sclo, i2c_sdai, i2c_sdao;
 	int i2c_bus_curbit;

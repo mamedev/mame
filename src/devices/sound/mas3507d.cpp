@@ -30,7 +30,6 @@ void mas3507d_device::device_start()
 {
 	current_rate = 44100;
 	stream = stream_alloc(0, 2, current_rate);
-	mp3dec_init(&mp3_dec);
 	cb_sample.resolve();
 }
 
@@ -326,7 +325,7 @@ void mas3507d_device::run_program(uint32_t adr)
 
 void mas3507d_device::fill_buffer()
 {
-	while(mp3_count < mp3data.size()) {
+	while(mp3_count + 2 < mp3data.size()) {
 		u16 v = cb_sample();
 		mp3data[mp3_count++] = v >> 8;
 		mp3data[mp3_count++] = v;
