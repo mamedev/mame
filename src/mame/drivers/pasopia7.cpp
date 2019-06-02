@@ -984,7 +984,7 @@ void pasopia7_state::p7_raster(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
-	H46505(config, m_crtc, VDP_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, VDP_CLOCK); /* unknown variant, unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -1007,7 +1007,7 @@ void pasopia7_state::p7_lcd(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pasopia7_state::p7_lcd_palette), 8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
-	H46505(config, m_crtc, LCD_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, LCD_CLOCK); /* unknown variant, unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

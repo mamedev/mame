@@ -275,7 +275,7 @@ WRITE8_MEMBER(vsc_state::pio_portb_w)
 	m_speech->start_w(data >> 6 & 1);
 
 	// d2: lower TSI volume
-	m_speech->set_output_gain(0, (data & 4) ? 0.5 : 1.0);
+	m_speech->set_output_gain(0, (data & 4) ? 0.25 : 1.0);
 }
 
 

@@ -2,38 +2,42 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Poly-88 driver by Miodrag Milanovic
+Poly-88 driver by Miodrag Milanovic
 
-        18/05/2009 Initial implementation
+2009-05-18 Initial implementation
+2019-05-25 Poly8813 new roms
 
-        Poly-88 ToDo:
-        MT 06231: Cassette saving hangs. Also, the system has different
-        formats depending on a switch. Only one format is currently
-        emulated.
+ToDo:
+- POLY88 - MT 06231: Cassette saving hangs. Also, the system has different
+  formats depending on a switch. Only one format is currently emulated.
+- POLY8813 - Schematic shows a 8251 on the main board.
+- POLY8813 - Schematic of FDC shows a mc6852 and i8255, no dedicated fdc chip.
 
 
-        Poly-8813 is a disk-based computer with 3 mini-floppy drives.
-        Booting is done by pressing the "Load" button, mounted on the
-        front panel near the power switch. Although user manuals are easy
-        to obtain, technical information and drive controller schematics
-        are not. The disk format is known to be 256 bytes per sector, 10
-        sectors per track, 35 tracks, single sided, for a total of 89600
-        bytes.
+Poly-8813 is a disk-based computer with 3 mini-floppy drives.
+Booting is done by pressing the "Load" button, mounted on the
+front panel near the power switch. Although user manuals are easy
+to obtain, technical information and drive controller schematics
+are not. The disk format is known to be 256 bytes per sector, 10
+sectors per track, 35 tracks, single sided, for a total of 89600
+bytes.
 
-        The Poly-8813 BIOS makes use of undocumented instructions which we
-        do not currently emulate. These are at 006A (print a character
-        routine - ED ED 05); another is at 0100 (move memory routine -
-        ED ED 03); the last is at 087B (disk I/O routine - ED ED 01). The
-        code at 0100 can be replaced by 7E 12 13 23 03 79 B0 C2 00 01 C9,
-        which exactly fits into the available space. The routine at 006A is
-        likewise could be exactly replaced with F5 C5 D5 E5, which enters
-        a display routine that appears in other assembly listings but seems
-        to have no entry point here. Since the ED ED opcode is defined as
-        for CALLN in the NEC V20/V30's 8080 mode, it might be the case that
-        these are actually hooks patched into the original code for
-        emulation purposes. (There is also a slim possibility that this
-        opcode invokes an undocumented feature of the NEC uPD8080AF, which
-        at least some models of the Poly-88 are known to have used.)
+Notes for old poly8813 roms:
+
+The Poly-8813 BIOS makes use of undocumented instructions which we
+do not currently emulate. These are at 006A (print a character
+routine - ED ED 05); another is at 0100 (move memory routine -
+ED ED 03); the last is at 087B (disk I/O routine - ED ED 01). The
+code at 0100 can be replaced by 7E 12 13 23 03 79 B0 C2 00 01 C9,
+which exactly fits into the available space. The routine at 006A is
+likewise could be exactly replaced with F5 C5 D5 E5, which enters
+a display routine that appears in other assembly listings but seems
+to have no entry point here. Since the ED ED opcode is defined as
+for CALLN in the NEC V20/V30's 8080 mode, it might be the case that
+these are actually hooks patched into the original code for
+emulation purposes. (There is also a slim possibility that this
+opcode invokes an undocumented feature of the NEC uPD8080AF, which
+at least some models of the Poly-88 are known to have used.)
 
 ****************************************************************************/
 
@@ -254,9 +258,12 @@ ROM_END
 
 ROM_START( poly8813 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "poly8813-1.bin", 0x0000, 0x0400, CRC(7fd980a0) SHA1(a71d5999deb4323a11db1c0ea0dcb1dacfaf47ef))
-	ROM_LOAD( "poly8813-2.rom", 0x0400, 0x0400, CRC(1ad7c06c) SHA1(c96b8f03c184de58dbdcee18d297dbccf2d77176))
-	ROM_LOAD( "poly8813-3.rom", 0x0800, 0x0400, CRC(3df57e5b) SHA1(5b0c4febfc7515fc07e63dcb21d0ab32bc6a2e46))
+	ROM_LOAD( "poly8813.27",  0x0000, 0x0400, CRC(0baa1a4c) SHA1(c6cf4b89bdde200813d34aab08150d5f3025ce33) )
+	ROM_LOAD( "poly8813.26",  0x0400, 0x0400, CRC(7011f3a3) SHA1(228eb54b9f62649b3b674e9f1bf21f2981e12c03) )
+	ROM_LOAD( "poly8813.25",  0x0800, 0x0400, CRC(9f7570e2) SHA1(767f2111b4eb856a077b1b4afe9209aca3866e52) )
+	//ROM_LOAD( "poly8813-1.bin", 0x0000, 0x0400, CRC(7fd980a0) SHA1(a71d5999deb4323a11db1c0ea0dcb1dacfaf47ef))
+	//ROM_LOAD( "poly8813-2.rom", 0x0400, 0x0400, CRC(1ad7c06c) SHA1(c96b8f03c184de58dbdcee18d297dbccf2d77176))
+	//ROM_LOAD( "poly8813-3.rom", 0x0800, 0x0400, CRC(3df57e5b) SHA1(5b0c4febfc7515fc07e63dcb21d0ab32bc6a2e46))
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "6571.bin", 0x0000, 0x0800, CRC(5a25144b) SHA1(7b9fee0c8ef2605b85d12b6d9fe8feb82418c63a) )

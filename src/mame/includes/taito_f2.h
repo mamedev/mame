@@ -30,9 +30,7 @@ public:
 		, m_cchip(*this, "cchip")
 		, m_cchip_irq_clear(*this, "cchip_irq_clear")
 		, m_oki(*this, "oki")
-		, m_tc0100scn(*this, "tc0100scn")
-		, m_tc0100scn_1(*this, "tc0100scn_1")
-		, m_tc0100scn_2(*this, "tc0100scn_2")
+		, m_tc0100scn(*this, "tc0100scn_%u", 1U)
 		, m_tc0110pcr(*this, "tc0110pcr")
 		, m_tc0360pri(*this, "tc0360pri")
 		, m_tc0280grd(*this, "tc0280grd")
@@ -43,12 +41,19 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_io_paddle(*this, "PADDLE%u", 1U)
+		, m_io_in(*this, "IN%u", 0U)
+		, m_io_dswa(*this, "DSWA")
+		, m_io_dswb(*this, "DSWB")
+		, m_audiobank(*this, "audiobank")
+		, m_okibank(*this, "okibank")
 	{ }
 
 
 	void taito_f2_tc0220ioc(machine_config &config);
 	void taito_f2_tc0510nio(machine_config &config);
 	void taito_f2_te7750(machine_config &config);
+	void taito_f2_tc0110pcr(machine_config &config);
 	void taito_f2(machine_config &config);
 	void thundfox(machine_config &config);
 	void dinorex(machine_config &config);
@@ -90,67 +95,69 @@ public:
 	void init_finalb();
 
 protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 	enum
 	{
-		TIMER_TAITOF2_INTERRUPT6
+		TIMER_INTERRUPT6
 	};
 
 	struct f2_tempsprite
 	{
-		int code, color;
-		int flipx, flipy;
+		u32 code, color;
+		bool flipx, flipy;
 		int x, y;
 		int zoomx, zoomy;
-		int primask;
+		u32 primask;
 	};
 	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_sprite_extension;
-	required_shared_ptr<uint16_t> m_spriteram;
-	std::unique_ptr<uint16_t[]>        m_spriteram_buffered;
-	std::unique_ptr<uint16_t[]>        m_spriteram_delayed;
+	optional_shared_ptr<u16> m_sprite_extension;
+	required_shared_ptr<u16> m_spriteram;
+	std::unique_ptr<u16[]>   m_spriteram_buffered;
+	std::unique_ptr<u16[]>   m_spriteram_delayed;
 
 	/* video-related */
 	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
-	int             m_sprite_type;
+	int           m_sprite_type;
 
-	uint16_t          m_spritebank[8];
-//  uint16_t          m_spritebank_eof[8];
-	uint16_t          m_spritebank_buffered[8];
+	u16           m_spritebank[8];
+//  u16           m_spritebank_eof[8];
+	u16           m_spritebank_buffered[8];
 
-	int32_t           m_sprites_disabled;
-	int32_t           m_sprites_active_area;
-	int32_t           m_sprites_master_scrollx;
-	int32_t           m_sprites_master_scrolly;
+	bool          m_sprites_disabled;
+	s32           m_sprites_active_area;
+	s32           m_sprites_master_scrollx;
+	s32           m_sprites_master_scrolly;
 	/* remember flip status over frames because driftout can fail to set it */
-	int32_t           m_sprites_flipscreen;
+	bool          m_sprites_flipscreen;
 
 	/* On the left hand screen edge (assuming horiz screen, no
 	   screenflip: in screenflip it is the right hand edge etc.)
 	   there may be 0-3 unwanted pixels in both tilemaps *and*
 	   sprites. To erase this we use f2_hide_pixels (0 to +3). */
 
-	int32_t           m_hide_pixels;
-	int32_t           m_flip_hide_pixels; /* Different in some games */
+	s32           m_hide_pixels;
+	s32           m_flip_hide_pixels; /* Different in some games */
 
-	int32_t           m_pivot_xdisp;  /* Needed in games with a pivot layer */
-	int32_t           m_pivot_ydisp;
+	s32           m_pivot_xdisp;  /* Needed in games with a pivot layer */
+	s32           m_pivot_ydisp;
 
-	int32_t           m_game;
+	s32           m_game;
 
-	uint8_t           m_tilepri[6]; // todo - move into taitoic.c
-	uint8_t           m_spritepri[6]; // todo - move into taitoic.c
-	uint8_t           m_spriteblendmode; // todo - move into taitoic.c
+	u8            m_tilepri[6]; // todo - move into taitoic.c
+	u8            m_spritepri[6]; // todo - move into taitoic.c
+	u8            m_spriteblendmode; // todo - move into taitoic.c
 
-	int             m_prepare_sprites;
-	uint8_t         m_gfxbank;
+	int           m_prepare_sprites;
+	u8            m_gfxbank;
 
 	/* misc */
-	int32_t           m_mjnquest_input;
-	int             m_last[2];
-	int             m_nibble;
-	int32_t           m_driveout_sound_latch;
-	int32_t           m_oki_bank;
-	emu_timer       *m_int6_timer;
+	s32           m_mjnquest_input;
+	int           m_last[2];
+	int           m_nibble;
+	s32           m_driveout_sound_latch;
+	emu_timer     *m_int6_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -158,9 +165,7 @@ protected:
 	optional_device<taito_cchip_device> m_cchip;
 	optional_device<timer_device> m_cchip_irq_clear;
 	optional_device<okim6295_device> m_oki;
-	optional_device<tc0100scn_device> m_tc0100scn;
-	optional_device<tc0100scn_device> m_tc0100scn_1;
-	optional_device<tc0100scn_device> m_tc0100scn_2;
+	optional_device_array<tc0100scn_device, 2> m_tc0100scn;
 	optional_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0360pri_device> m_tc0360pri;
 	optional_device<tc0280grd_device> m_tc0280grd;
@@ -170,77 +175,81 @@ protected:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(coin_nibble_w);
-	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
-	DECLARE_WRITE8_MEMBER(taitof2_4p_coin_word_w);
-	DECLARE_READ16_MEMBER(cameltry_paddle_r);
-	DECLARE_READ16_MEMBER(mjnquest_dsw_r);
-	DECLARE_READ16_MEMBER(mjnquest_input_r);
-	DECLARE_WRITE16_MEMBER(mjnquest_inputselect_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_READ8_MEMBER(driveout_sound_command_r);
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	DECLARE_WRITE16_MEMBER(driveout_sound_command_w);
-	DECLARE_WRITE16_MEMBER(taitof2_sprite_extension_w);
-	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
-	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
+	optional_ioport_array<2> m_io_paddle;
+	optional_ioport_array<7> m_io_in;
+	optional_ioport m_io_dswa;
+	optional_ioport m_io_dswb;
+
+	optional_memory_bank m_audiobank;
+	optional_memory_bank m_okibank;
+
+	void coin_nibble_w(u8 data);
+	void growl_coin_word_w(u8 data);
+	void _4p_coin_word_w(u8 data);
+	u16 cameltry_paddle_r(offs_t offset);
+	u16 mjnquest_dsw_r(offs_t offset);
+	u16 mjnquest_input_r();
+	void mjnquest_inputselect_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+	u8 driveout_sound_command_r();
+	void oki_bank_w(u8 data);
+	void driveout_sound_command_w(offs_t offset, u8 data);
+	void sprite_extension_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void spritebank_w(offs_t offset, u16 data);
+	void koshien_spritebank_w(u16 data);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
 	void mjnquest_gfxbank_w(u8 data);
 	TC0100SCN_CB_MEMBER(mjnquest_tmap_cb);
 
-	DECLARE_MACHINE_START(f2);
-	DECLARE_VIDEO_START(taitof2_default);
-	DECLARE_MACHINE_START(common);
-	DECLARE_VIDEO_START(taitof2_dondokod);
-	DECLARE_VIDEO_START(taitof2_driftout);
-	DECLARE_VIDEO_START(taitof2_finalb);
-	DECLARE_VIDEO_START(taitof2_megab);
-	DECLARE_VIDEO_START(taitof2_thundfox);
-	DECLARE_VIDEO_START(taitof2_ssi);
-	DECLARE_VIDEO_START(taitof2_gunfront);
-	DECLARE_VIDEO_START(taitof2_growl);
-	DECLARE_VIDEO_START(taitof2_mjnquest);
-	DECLARE_VIDEO_START(taitof2_footchmp);
-	DECLARE_VIDEO_START(taitof2_hthero);
-	DECLARE_VIDEO_START(taitof2_koshien);
-	DECLARE_VIDEO_START(taitof2_yuyugogo);
-	DECLARE_VIDEO_START(taitof2_ninjak);
-	DECLARE_VIDEO_START(taitof2_solfigtr);
-	DECLARE_VIDEO_START(taitof2_pulirula);
-	DECLARE_VIDEO_START(taitof2_metalb);
-	DECLARE_VIDEO_START(taitof2_qzchikyu);
-	DECLARE_VIDEO_START(taitof2_yesnoj);
-	DECLARE_VIDEO_START(taitof2_deadconx);
-	DECLARE_VIDEO_START(taitof2_deadconxj);
-	DECLARE_VIDEO_START(taitof2_dinorex);
-	DECLARE_VIDEO_START(taitof2_quiz);
-	uint32_t screen_update_taitof2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_pri(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_thundfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_ssi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_VIDEO_START(dondokod);
+	DECLARE_VIDEO_START(driftout);
+	DECLARE_VIDEO_START(finalb);
+	DECLARE_VIDEO_START(megab);
+	DECLARE_VIDEO_START(thundfox);
+	DECLARE_VIDEO_START(ssi);
+	DECLARE_VIDEO_START(gunfront);
+	DECLARE_VIDEO_START(growl);
+	DECLARE_VIDEO_START(mjnquest);
+	DECLARE_VIDEO_START(footchmp);
+	DECLARE_VIDEO_START(hthero);
+	DECLARE_VIDEO_START(koshien);
+	DECLARE_VIDEO_START(yuyugogo);
+	DECLARE_VIDEO_START(ninjak);
+	DECLARE_VIDEO_START(solfigtr);
+	DECLARE_VIDEO_START(pulirula);
+	DECLARE_VIDEO_START(metalb);
+	DECLARE_VIDEO_START(qzchikyu);
+	DECLARE_VIDEO_START(yesnoj);
+	DECLARE_VIDEO_START(deadconx);
+	DECLARE_VIDEO_START(deadconxj);
+	DECLARE_VIDEO_START(dinorex);
+	DECLARE_VIDEO_START(quiz);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_pri(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_thundfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ssi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_thundfox);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_full_buffer_delayed);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_qzchikyu);
-	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(megab_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
-	void reset_driveout_sound_region();
-	void taitof2_core_vh_start (int sprite_type, int hide, int flip_hide );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer );
-	void update_spritebanks(  );
-	void taitof2_handle_sprite_buffering(  );
-	void taitof2_update_sprites_active_area(  );
-	void draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t priority);
+	void core_vh_start(int sprite_type, int hide, int flip_hide);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int uses_tc360_mixer);
+	void update_spritebanks();
+	void handle_sprite_buffering();
+	void update_sprites_active_area();
+	void draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 priority);
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
+	u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley);
 
 	void cameltry_map(address_map &map);
 	void cameltrya_map(address_map &map);
@@ -250,6 +259,7 @@ protected:
 	void dondokod_map(address_map &map);
 	void driftout_map(address_map &map);
 	void driveout_map(address_map &map);
+	void driveout_oki_map(address_map &map);
 	void driveout_sound_map(address_map &map);
 	void finalb_map(address_map &map);
 	void footchmp_map(address_map &map);

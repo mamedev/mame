@@ -14,6 +14,7 @@ DEFINE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device, "nxm5301sun
 DEFINE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device, "nxm5401sun", "XM-5401B Sun 4x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device, "nxm5701", "XM-5701B 12x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun", "XM-5701B Sun 12x CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device, "scsi_cdrom_apple", "Apple SCSI CD-ROM")
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
@@ -52,6 +53,11 @@ nscsi_toshiba_xm5701_device::nscsi_toshiba_xm5701_device(const machine_config &m
 
 nscsi_toshiba_xm5701_sun_device::nscsi_toshiba_xm5701_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_XM5701SUN, tag, owner, "TOSHIBA ", "XM5701TASUN12XCD", "0997", 0x98, 0x02)
+{
+}
+
+nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
 {
 }
 
@@ -622,5 +628,32 @@ bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
 
 	default:
 		return nscsi_full_device::scsi_command_done(command, length);
+	}
+}
+/*
+   The Apple II SCSI Card firmware demands that ASC on a failing TEST_UNIT_READY be either 0x28 or 0xb0.
+   0x28 is MEDIA_CHANGED, 0xb0 is vendor-specific.  If the drive returns the normal 0x3A for disc-not-present,
+   the firmware assumes the drive is broken and retries the TEST_UNIT_READY for 60 seconds before giving up
+   and booting the machine.
+*/
+void nscsi_cdrom_apple_device::scsi_command()
+{
+	switch (scsi_cmdbuf[0]) {
+	case SC_TEST_UNIT_READY:
+		LOG("command TEST UNIT READY (AppleCD)\n");
+		if(cdrom)
+		{
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			sense(false, SK_NOT_READY, 0xb0);
+			scsi_status_complete(SS_CHECK_CONDITION);
+		}
+		break;
+
+	default:
+		nscsi_cdrom_device::scsi_command();
+		break;
 	}
 }

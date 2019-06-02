@@ -69,7 +69,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icpppianofavorites.bin" size="0x800000" crc="cca31d78" sha1="4724df29c008e9518345ec4fc77288b7ec138c29" offset="0" />
+				<rom name="icpppianofavorites.bin" size="0x800000" crc="cca31d78" sha1="4724df29c008e9518345ec4fc77288b7ec138c29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppdoratheexplorermusicaladventure.bin" size="0x800000" crc="9136a225" sha1="489c7f0df999fa13e92d3c661cdad5d19d5ef513" offset="0" />
+				<rom name="icppdoratheexplorermusicaladventure.bin" size="0x800000" crc="9136a225" sha1="489c7f0df999fa13e92d3c661cdad5d19d5ef513"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppjungleboogie.bin" size="0x800000" crc="632ab0a3" sha1="ec8b56cc0eaec0ac31f7c224167449e691c07bc6" offset="0" />
+				<rom name="icppjungleboogie.bin" size="0x800000" crc="632ab0a3" sha1="ec8b56cc0eaec0ac31f7c224167449e691c07bc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -102,7 +102,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppscoobydoomonstermayhem.bin" size="0x800000" crc="e16c715e" sha1="3f6322ea9404b87620d924f0c0b0ad405f50f674" offset="0" />
+				<rom name="icppscoobydoomonstermayhem.bin" size="0x800000" crc="e16c715e" sha1="3f6322ea9404b87620d924f0c0b0ad405f50f674"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppbarbieprincessenchantedsounds.bin" size="0x800000" crc="393beea8" sha1="a0a74e6cbceaff5c0f2b0b5f08ac65774d784051" offset="0" />
+				<rom name="icppbarbieprincessenchantedsounds.bin" size="0x800000" crc="393beea8" sha1="a0a74e6cbceaff5c0f2b0b5f08ac65774d784051"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppshowtunes.bin" size="0x800000" crc="c95836fd" sha1="c07b500f241fc6b3a3302b580794bb2eb86977c7" offset="0" />
+				<rom name="icppshowtunes.bin" size="0x800000" crc="c95836fd" sha1="c07b500f241fc6b3a3302b580794bb2eb86977c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppholidaywonderland.bin" size="0x800000" crc="12efca09" sha1="99a6d5591ba6ebe52127d8838e8ee71952ebf59e" offset="0" />
+				<rom name="icppholidaywonderland.bin" size="0x800000" crc="12efca09" sha1="99a6d5591ba6ebe52127d8838e8ee71952ebf59e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -146,7 +146,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icpprockindanceparty.bin" size="0x800000" crc="00d597d3" sha1="603c8d9d11f5e1d075a1b524e99b581d859b43ba" offset="0" />
+				<rom name="icpprockindanceparty.bin" size="0x800000" crc="00d597d3" sha1="603c8d9d11f5e1d075a1b524e99b581d859b43ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -157,7 +157,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icpppophits.bin" size="0x800000" crc="c15ccdad" sha1="f4a058c83b1a90a1c8c5cfa766429330ce34409d" offset="0" />
+				<rom name="icpppophits.bin" size="0x800000" crc="c15ccdad" sha1="f4a058c83b1a90a1c8c5cfa766429330ce34409d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +168,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppjamminjunglesafari.bin" size="0x800000" crc="6408abb6" sha1="9c9c050e919222a80369d2a116a85db6cc4d7acb" offset="0" />
+				<rom name="icppjamminjunglesafari.bin" size="0x800000" crc="6408abb6" sha1="9c9c050e919222a80369d2a116a85db6cc4d7acb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppwizardofoz.bin" size="0x800000" crc="4c004177" sha1="415463532e760542cacdc833ed1d201df70e18d3" offset="0" />
+				<rom name="icppwizardofoz.bin" size="0x800000" crc="4c004177" sha1="415463532e760542cacdc833ed1d201df70e18d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -190,7 +190,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppamericanidoltakethestage.bin" size="0x800000" crc="908a965d" sha1="9faca7bb85ca395e2f8cd444884f0a74ce22d151" offset="0" />
+				<rom name="icppamericanidoltakethestage.bin" size="0x800000" crc="908a965d" sha1="9faca7bb85ca395e2f8cd444884f0a74ce22d151"/>
 			</dataarea>
 		</part>
 	</software>
@@ -201,7 +201,7 @@
 		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="icanpian_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="icppmagicalmelodies.bin" size="0x800000" crc="c5f4c7eb" sha1="d47feebba010c498cd11cd6019df6c7680840ee5" offset="0" />
+				<rom name="icppmagicalmelodies.bin" size="0x800000" crc="c5f4c7eb" sha1="d47feebba010c498cd11cd6019df6c7680840ee5"/>
 			</dataarea>
 		</part>
 	</software>

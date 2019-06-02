@@ -69,7 +69,7 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_READ16_MEMBER(line_printer_r);
-	DECLARE_WRITE16_MEMBER(disk_control_w);
+	void disk_control_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(gcr_w);
 	DECLARE_WRITE_LINE_MEMBER(romlmap_w);
 	DECLARE_WRITE_LINE_MEMBER(error_enable_w);
@@ -159,8 +159,7 @@ void unixpc_state::machine_start()
 
 void unixpc_state::machine_reset()
 {
-	// force ROM into lower mem on reset
-	m_ramrombank->set_bank(0);
+	disk_control_w(0);
 }
 
 WRITE_LINE_MEMBER(unixpc_state::error_enable_w)
@@ -257,9 +256,9 @@ WRITE16_MEMBER(unixpc_state::diskdma_ptr_w)
     FLOPPY
 ***************************************************************************/
 
-WRITE16_MEMBER(unixpc_state::disk_control_w)
+void unixpc_state::disk_control_w(uint8_t data)
 {
-	logerror("disk_control_w: %04x\n", data);
+	logerror("disk_control_w: %02x\n", data);
 
 	// TODO: bits 0-2 = head select
 
@@ -275,6 +274,8 @@ WRITE16_MEMBER(unixpc_state::disk_control_w)
 		m_wd2797->set_floppy(m_floppy);
 	else
 		m_wd2797->set_floppy(nullptr);
+
+	m_wd2797->mr_w(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER(unixpc_state::wd2797_intrq_w)
@@ -331,7 +332,7 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0x490000, 0x490001).select(0x7000).w(FUNC(unixpc_state::tcr_w));
 	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::bus_w));
 	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
-	map(0x4e0000, 0x4e0001).w(FUNC(unixpc_state::disk_control_w));
+	map(0x4e0001, 0x4e0001).w(FUNC(unixpc_state::disk_control_w)).cswidth(16);
 	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
 	map(0xe00000, 0xe0000f).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);

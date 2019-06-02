@@ -128,7 +128,7 @@ WRITE8_MEMBER(starwars_state::esb_slapstic_w)
 
 void starwars_state::main_map(address_map &map)
 {
-	map(0x0000, 0x2fff).ram().share("vectorram").region("maincpu", 0);
+	map(0x0000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0);
 	map(0x3000, 0x3fff).rom();                             /* vector_rom */
 	map(0x4300, 0x431f).portr("IN0");
 	map(0x4320, 0x433f).portr("IN1");
@@ -402,7 +402,7 @@ ROM_START( starwars )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -430,7 +430,7 @@ ROM_START( starwars1 )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -458,7 +458,7 @@ ROM_START( starwarso )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -486,7 +486,7 @@ ROM_START( tomcatsw )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -521,7 +521,7 @@ ROM_START( esb )
 	ROM_LOAD( "136031-112.1h", 0x6000, 0x2000, CRC(ca72d341) SHA1(52de5b82bb85d7c9caad2047e540d0748aa93ba5) ) /* Sound ROM 1 */
 	ROM_CONTINUE(              0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */

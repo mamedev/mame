@@ -133,31 +133,22 @@
     November 2013: Included new dumps [Michael Zapf]
 
 ===========================================================================
-Known Issues (MZ, 2010-11-07)
+Known Issues (MZ, 2019-05-10)
 
   KEEP IN MIND THAT TEXAS INSTRUMENTS NEVER RELEASED THE TI-99/8 AND THAT
   THERE ARE ONLY A FEW PROTOTYPES OF THE TI-99/8 AVAILABLE. ALL SOFTWARE
   MUST BE ASSUMED TO HAVE REMAINED IN A PRELIMINARY STATE.
 
-- Extended Basic II does not start when a floppy controller is present. This is
-  a problem of the prototypical XB II which we cannot solve. It seems as if only
-  hexbus devices are properly supported, but we currently do not have an
-  emulation for those. Thus you can currently only use cassette to load and
-  save programs. You MUST not plug in any floppy controller when you intend to
-  start XB II. Other cartridges (like Editor/Assembler)
-  seem to be unaffected by this problem and can make use of the floppy
-  controllers.
-    Technical detail: The designers of XB II seem to have decided to put PABs
-    (Peripheral access block; contains pointers to buffers, the file name, and
-    the access modes) into CPU RAM instead of the traditional storage in VDP
-    RAM. The existing peripheral cards are hard-coded to interpret the given
-    pointer to the PAB as pointing to a VDP RAM address. That is, as soon as
-    the card is found, control is passed to the DSR (device service routine),
-    the file name will not be found, and control returns with an error. It seems
-    as if XB II does not properly handle this situation and may lock up
-    (sometimes it starts up, but file access is still not possible).
+- TI-99/4A disk controllers cannot be used with the TI-99/8 in Extended Basic II.
+  In the 99/8, the peripheral access block (PAB, set of data defining the
+  access to the device, like floppy) may be located in CPU RAM, while the
+  controllers of the 99/4A expect the PAB to be in video RAM only. Exbasic II
+  sets up the PAB in CPU RAM, which leads to a crash. Other cartridges from
+  the 99/4A certainly use video RAM, and so the disk controller works.
+  Therefore, the Hexbus floppy drive HX5102 is recommended for use with the
+  TI-99/8. You do not even need to attach the Peripheral Box.
 
-    TODO: Emulate a Hexbus floppy.
+  mame ti99_8 -hexbus hx5102 -flop1 somedisk.dsk
 
 - Multiple cartridges are not shown in the startup screen; only one
   cartridge is presented. You have to manually select the cartridges with the
@@ -266,7 +257,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt );
 
 	// Connections with the system interface TMS9901
-	uint8_t read_by_9901(offs_t offset);
+	uint8_t psi_input(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
@@ -464,75 +455,44 @@ void ti99_8_state::cruwrite(offs_t offset, uint8_t data)
     keyboard column selection.)
 ***************************************************************************/
 
-uint8_t ti99_8_state::read_by_9901(offs_t offset)
+uint8_t ti99_8_state::psi_input(offs_t offset)
 {
-	int answer=0;
-	uint8_t joyst;
-	switch (offset & 0x03)
+	switch (offset)
 	{
-	case tms9901_device::CB_INT7:
-		// Read pins INT3*-INT7* of TI99's 9901.
-		//
-		// bit 1: INT1 status
-		// bit 2: INT2 status
-		// bits 3-4: unused?
-		// bit 5: ???
-		// bit 6-7: keyboard status bits 0 through 1
+	case tms9901_device::INT1:
+		return (m_int1==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::INT2:
+		return (m_int2==CLEAR_LINE)? 1 : 0;
 
-		// |K|K|-|-|-|I2|I1|C|
+	case tms9901_device::INT6:
 		if (m_keyboard_column >= 14)
-		{
-			// TI-99/8's wiring differs from the TI-99/4A
-			joyst = m_joyport->read_port();
-			answer = (joyst & 0x01) | ((joyst & 0x10)>>3);
-		}
-		else
-		{
-			answer = m_keyboard[m_keyboard_column]->read();
-		}
-		answer = (answer << 6);
-		if (m_int1 == CLEAR_LINE) answer |= 0x02;
-		if (m_int2 == CLEAR_LINE) answer |= 0x04;
+			return BIT(m_joyport->read_port(),0);
 
-		break;
-
-	case tms9901_device::INT8_INT15:
-		// Read pins int8_t*-INT15* of TI99's 9901.
-		//
-		// bit 0-2: keyboard status bits 2 to 4
-		// bit 3: tape input mirror
-		// bit 4: unused
-		// bit 5-7: weird, not emulated
-
-		// |0|0|0|0|0|K|K|K|
-
+	case tms9901_device::INT7_P15:
 		if (m_keyboard_column >= 14)
-		{
-			joyst = m_joyport->read_port();
-			answer = joyst << 1;
-		}
-		else
-		{
-			answer = m_keyboard[m_keyboard_column]->read();
-		}
-		answer = (answer >> 2) & 0x07;
-		break;
+			return BIT(m_joyport->read_port(),4);
 
-	case tms9901_device::P0_P7:
-		// Read pins P0-P7 of TI99's 9901. None here.
-		break;
+	case tms9901_device::INT8_P14:
+		if (m_keyboard_column >= 14)
+			return BIT(m_joyport->read_port(),1);
 
-	case tms9901_device::P8_P15:
-		// Read pins P8-P15 of TI99's 9901. (TI-99/8)
-		//
-		// bit 26: high
-		// bit 27: tape input
-		answer = 4;
-		if (m_cassette->input() > 0)
-			answer |= 8;
-		break;
+	case tms9901_device::INT9_P13:
+		if (m_keyboard_column >= 14)
+			return BIT(m_joyport->read_port(),2);
+
+	case tms9901_device::INT10_P12:
+		if (m_keyboard_column >= 14)
+			return BIT(m_joyport->read_port(),3);
+
+		// return for last 5 cases if column<14
+		return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT6);
+
+	case tms9901_device::INT11_P11:
+		return (m_cassette->input() > 0);
+
+	default:
+		return 1;
 	}
-	return answer;
 }
 
 /*
@@ -613,7 +573,7 @@ WRITE_LINE_MEMBER( ti99_8_state::video_interrupt )
 {
 	LOGMASKED(LOG_INTERRUPTS, "VDP int 2 on tms9901, level=%02x\n", state);
 	m_int2 = (line_state)state;
-	m_tms9901->set_single_int(2, state);
+	m_tms9901->set_int_line(2, state);
 }
 
 /***********************************************************
@@ -665,7 +625,7 @@ WRITE_LINE_MEMBER( ti99_8_state::extint )
 {
 	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
-	m_tms9901->set_single_int(1, state);
+	m_tms9901->set_int_line(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_8_state::notconnected )
@@ -735,7 +695,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// 9901 configuration
 	TMS9901(config, m_tms9901, 0);
-	m_tms9901->read_cb().set(FUNC(ti99_8_state::read_by_9901));
+	m_tms9901->read_cb().set(FUNC(ti99_8_state::psi_input));
 	m_tms9901->p_out_cb(0).set(FUNC(ti99_8_state::keyC0));
 	m_tms9901->p_out_cb(1).set(FUNC(ti99_8_state::keyC1));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_8_state::keyC2));
@@ -745,7 +705,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_tms9901->p_out_cb(6).set(FUNC(ti99_8_state::cassette_motor));
 	m_tms9901->p_out_cb(8).set(FUNC(ti99_8_state::audio_gate));
 	m_tms9901->p_out_cb(9).set(FUNC(ti99_8_state::cassette_output));
-	m_tms9901->intlevel_cb().set(FUNC(ti99_8_state::tms9901_interrupt));
+	m_tms9901->intreq_cb().set(FUNC(ti99_8_state::tms9901_interrupt));
 
 	// Mainboard with custom chips
 	TI99_MAINBOARD8(config, m_mainboard, 0);

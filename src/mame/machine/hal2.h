@@ -11,6 +11,10 @@
 
 #pragma once
 
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
 class hal2_device : public device_t
 {
 public:
@@ -24,17 +28,30 @@ public:
 	DECLARE_WRITE32_MEMBER(write);
 	DECLARE_READ32_MEMBER(read);
 
+	attotime get_rate(const uint32_t channel);
+
+	void set_right_volume(uint8_t vol) { m_rdac->set_output_gain(ALL_OUTPUTS, vol / 255.0f); }
+	void set_left_volume(uint8_t vol) { m_ldac->set_output_gain(ALL_OUTPUTS, vol / 255.0f); }
+
+	void dma_write(uint32_t channel, int16_t data);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void update_clock_freq(int clock_gen);
 
 	enum
 	{
-		IAR_TYPE       = 0xf000,
-		IAR_NUM        = 0x0f00,
-		IAR_ACCESS_SEL = 0x0080,
-		IAR_PARAM      = 0x000c,
-		IAR_RB_INDEX   = 0x0003,
+		IAR_TYPE			= 0xf000,
+		IAR_TYPE_SHIFT		= 12,
+		IAR_NUM				= 0x0f00,
+		IAR_NUM_SHIFT		= 8,
+		IAR_ACCESS_SEL		= 0x0080,
+		IAR_PARAM			= 0x000c,
+		IAR_PARAM_SHIFT		= 2,
+		IAR_RB_INDEX		= 0x0003
 	};
 
 	enum
@@ -57,8 +74,38 @@ protected:
 		INDIRECT_DATA3_REG   = 0x0070/4,
 	};
 
+	enum
+	{
+		DAC_L,
+		DAC_R
+	};
+
+	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
+	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
+
+	uint32_t m_isr;
 	uint32_t m_iar;
 	uint32_t m_idr[4];
+
+	uint32_t m_codeca_ctrl[2];
+	uint32_t m_codeca_channel;
+	uint32_t m_codeca_clock;
+	uint32_t m_codeca_channel_count;
+
+	uint32_t m_codecb_ctrl[2];
+	uint32_t m_codecb_channel;
+	uint32_t m_codecb_clock;
+	uint32_t m_codecb_channel_count;
+
+	uint32_t m_bres_clock_sel[3];
+	uint32_t m_bres_clock_inc[3];
+	uint32_t m_bres_clock_modctrl[3];
+	uint32_t m_bres_clock_freq[3];
+	attotime m_bres_clock_rate[3];
+
+	uint32_t m_curr_dac;
+
+	static const uint32_t s_channel_pair[4];
 };
 
 DECLARE_DEVICE_TYPE(SGI_HAL2, hal2_device)

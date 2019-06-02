@@ -114,14 +114,14 @@ void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const 
 					switch (pix & 0xc0)
 					{
 						case 0x00:
-							dst[x] = pix + 0x2000; /* 0x2040 - would be shadow? */
+							dst[x] = pix + 0x1000; /* 0x1040 - would be shadow? */
 							break;
 						case 0x40:
 						case 0x80:
-							dst[x] = pix + 0x2000;
+							dst[x] = pix + 0x1000;
 							break;
 						case 0xc0:
-							dst[x] = pix + 0x2000; /* 0x2080 - would be higlight? */
+							dst[x] = pix + 0x1000; /* 0x1080 - would be higlight? */
 							break;
 					}
 					pri[x] |= priority;
@@ -240,7 +240,7 @@ uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

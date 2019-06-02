@@ -323,14 +323,11 @@ void segaxbd_state::device_start()
 		throw device_missing_dependencies();
 
 	m_lamps.resolve();
-	// point globals to allocated memory regions
-	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
 	video_start();
 
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
-
 
 	// save state
 	save_item(NAME(m_timer_irq_state));
@@ -916,10 +913,12 @@ WRITE16_MEMBER( segaxbd_state::paletteram_w )
 	int g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
 	int b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
-	// normal colors
+	// shadow / hilight toggle bit in palette RAM
+	rgb_t effects = (newval & 0x8000) ?
+				rgb_t(m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]) :
+				rgb_t(m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
 	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
-	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
-	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
 }
 
 //**************************************************************************
@@ -951,7 +950,7 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x2e0000, 0x2e0007).mirror(0x003ff8).rw("multiplier_subx", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x2e4000, 0x2e401f).mirror(0x003fe0).rw("divider_subx", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
 	map(0x2e8000, 0x2e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
-	map(0x2ec000, 0x2ecfff).mirror(0x001000).ram().share("roadram");
+	map(0x2ec000, 0x2ecfff).mirror(0x001000).ram().share("segaic16road:roadram");
 	map(0x2ee000, 0x2effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
 	map(0x3f8000, 0x3fbfff).ram().share("backup1");
@@ -977,7 +976,7 @@ void segaxbd_state::sub_map(address_map &map)
 	map(0x0e0000, 0x0e0007).mirror(0x003ff8).rw("multiplier_subx", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x0e4000, 0x0e401f).mirror(0x003fe0).rw("divider_subx", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
 	map(0x0e8000, 0x0e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
-	map(0x0ec000, 0x0ecfff).mirror(0x001000).ram().share("roadram");
+	map(0x0ec000, 0x0ecfff).mirror(0x001000).ram().share("segaic16road:roadram");
 	map(0x0ee000, 0x0effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
 }
 
@@ -1716,7 +1715,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
-	PALETTE(config, m_palette).set_entries(8192*3);
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224);
@@ -2079,7 +2078,7 @@ ROM_START( aburner )
 	ROM_LOAD32_BYTE( "epr-10948.101", 0x180002, 0x20000, CRC(64284761) SHA1(9594c671900f7f49d8fb965bc17b4380ce2c68d5) )
 	ROM_LOAD32_BYTE( "epr-10949.105", 0x180003, 0x20000, CRC(d8437d92) SHA1(480291358c3d197645d7bd149bdfe5d41071d52d) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	ROM_LOAD( "epr-10922.40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2130,7 +2129,7 @@ ROM_START( aburner2 )
 	ROM_LOAD32_BYTE( "epr-11118.101", 0x180002, 0x20000, CRC(8f38540b) SHA1(1fdfb157d1aca96cb635bd3d64f94545eb88c133) )
 	ROM_LOAD32_BYTE( "epr-11119.105", 0x180003, 0x20000, CRC(d0343a8e) SHA1(8c0c0addb6dfd0ea04c3900a9f7f7c731ca6e9ea) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	ROM_LOAD( "epr-10922.40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2179,7 +2178,7 @@ ROM_START( aburner2g )
 	ROM_LOAD32_BYTE( "epr-11118.101", 0x180002, 0x20000, CRC(8f38540b) SHA1(1fdfb157d1aca96cb635bd3d64f94545eb88c133) )
 	ROM_LOAD32_BYTE( "epr-11119.105", 0x180003, 0x20000, CRC(d0343a8e) SHA1(8c0c0addb6dfd0ea04c3900a9f7f7c731ca6e9ea) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	ROM_LOAD( "epr-10922.40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2246,7 +2245,7 @@ ROM_START( loffire )
 	ROM_LOAD32_BYTE( "epr-12777.101", 0x180002, 0x20000, CRC(29d5b953) SHA1(0c932a67e2aecffa7a1dbaa587c96214e1a2cc7f) )
 	ROM_LOAD32_BYTE( "epr-12778.105", 0x180003, 0x20000, CRC(2fb68e07) SHA1(8685e72aed115cbc9c6c7511217996a573b30d16) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2292,7 +2291,7 @@ ROM_START( loffired )
 	ROM_LOAD32_BYTE( "epr-12777.101", 0x180002, 0x20000, CRC(29d5b953) SHA1(0c932a67e2aecffa7a1dbaa587c96214e1a2cc7f) )
 	ROM_LOAD32_BYTE( "epr-12778.105", 0x180003, 0x20000, CRC(2fb68e07) SHA1(8685e72aed115cbc9c6c7511217996a573b30d16) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2346,7 +2345,7 @@ ROM_START( loffireu )
 	ROM_LOAD32_BYTE( "epr-12777.101", 0x180002, 0x20000, CRC(29d5b953) SHA1(0c932a67e2aecffa7a1dbaa587c96214e1a2cc7f) )
 	ROM_LOAD32_BYTE( "epr-12778.105", 0x180003, 0x20000, CRC(2fb68e07) SHA1(8685e72aed115cbc9c6c7511217996a573b30d16) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2392,7 +2391,7 @@ ROM_START( loffireud )
 	ROM_LOAD32_BYTE( "epr-12777.101", 0x180002, 0x20000, CRC(29d5b953) SHA1(0c932a67e2aecffa7a1dbaa587c96214e1a2cc7f) )
 	ROM_LOAD32_BYTE( "epr-12778.105", 0x180003, 0x20000, CRC(2fb68e07) SHA1(8685e72aed115cbc9c6c7511217996a573b30d16) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2449,7 +2448,7 @@ ROM_START( loffirej )
 	ROM_LOAD32_BYTE( "epr-12777.101", 0x180002, 0x20000, CRC(29d5b953) SHA1(0c932a67e2aecffa7a1dbaa587c96214e1a2cc7f) )
 	ROM_LOAD32_BYTE( "epr-12778.105", 0x180003, 0x20000, CRC(2fb68e07) SHA1(8685e72aed115cbc9c6c7511217996a573b30d16) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2495,7 +2494,7 @@ ROM_START( loffirejd )
 	ROM_LOAD32_BYTE( "epr-12777.101", 0x180002, 0x20000, CRC(29d5b953) SHA1(0c932a67e2aecffa7a1dbaa587c96214e1a2cc7f) )
 	ROM_LOAD32_BYTE( "epr-12778.105", 0x180003, 0x20000, CRC(2fb68e07) SHA1(8685e72aed115cbc9c6c7511217996a573b30d16) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2554,7 +2553,7 @@ ROM_START( thndrbld )
 	ROM_LOAD32_BYTE( "epr-11393.ic101", 0x180002, 0x20000, CRC(525e2e1d) SHA1(6fd09f775e7e6cad8078513d1af0a8ff40fb1360) ) // replaced from original rev?
 	ROM_LOAD32_BYTE( "epr-11392.ic105", 0x180003, 0x20000, CRC(b4a382f7) SHA1(c03a05ba521f654db1a9c5f5717b7a15e5a29d4e) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // Road Data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // Road Data
 	ROM_LOAD( "epr-11313.ic29", 0x00000, 0x10000, CRC(6a56c4c3) SHA1(c1b8023cb2ba4e96be052031c24b6ae424225c71) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2602,7 +2601,7 @@ ROM_START( thndrbldd )
 	ROM_LOAD32_BYTE( "epr-11393.ic101", 0x180002, 0x20000, CRC(525e2e1d) SHA1(6fd09f775e7e6cad8078513d1af0a8ff40fb1360) ) // replaced from original rev?
 	ROM_LOAD32_BYTE( "epr-11392.ic105", 0x180003, 0x20000, CRC(b4a382f7) SHA1(c03a05ba521f654db1a9c5f5717b7a15e5a29d4e) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // Road Data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // Road Data
 	ROM_LOAD( "epr-11313.ic29", 0x00000, 0x10000, CRC(6a56c4c3) SHA1(c1b8023cb2ba4e96be052031c24b6ae424225c71) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2656,7 +2655,7 @@ ROM_START( thndrbld1 )
 	ROM_LOAD32_BYTE( "epr-11333.ic101", 0x180002, 0x20000, CRC(05a2333f) SHA1(70f213945fa7fe056fe17a02558638e87f2c001e) )
 	ROM_LOAD32_BYTE( "epr-11332.ic105", 0x180003, 0x20000, CRC(dc089ec6) SHA1(d72390c45138a507e79af112addbc015560fc248) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // Road Data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // Road Data
 	ROM_LOAD( "epr-11313.ic29", 0x00000, 0x10000, CRC(6a56c4c3) SHA1(c1b8023cb2ba4e96be052031c24b6ae424225c71) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2714,7 +2713,7 @@ ROM_START( lastsurv )
 	ROM_LOAD32_BYTE( "epr-12074.ic101", 0x180002, 0x20000, CRC(ee6cbb73) SHA1(c68d825ded83dd06ba7b816622db3d57631b4fcc) )
 	ROM_LOAD32_BYTE( "epr-12073.ic105", 0x180003, 0x20000, CRC(167e6342) SHA1(2f87074d6821a974cbb137ca2bec28fafc0df46f) )
 
-	ROM_REGION( 0x20000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // Road Data
+	ROM_REGION( 0x20000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // Road Data
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2762,7 +2761,7 @@ ROM_START( lastsurvd )
 	ROM_LOAD32_BYTE( "epr-12074.ic101", 0x180002, 0x20000, CRC(ee6cbb73) SHA1(c68d825ded83dd06ba7b816622db3d57631b4fcc) )
 	ROM_LOAD32_BYTE( "epr-12073.ic105", 0x180003, 0x20000, CRC(167e6342) SHA1(2f87074d6821a974cbb137ca2bec28fafc0df46f) )
 
-	ROM_REGION( 0x20000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // Road Data
+	ROM_REGION( 0x20000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // Road Data
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2817,7 +2816,7 @@ ROM_START( rachero )
 	ROM_LOAD32_BYTE( "epr-12862.ic101", 0x180002, 0x20000, CRC(7d4c3b05) SHA1(4e25a077b403549c681c5047912d0e28f4c07720) )
 	ROM_LOAD32_BYTE( "epr-12863.ic105", 0x180003, 0x20000, CRC(85095053) SHA1(f93194ecc0300956280cc0515b3e3ba2c9f71364) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ground data
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2863,7 +2862,7 @@ ROM_START( racherod )
 	ROM_LOAD32_BYTE( "epr-12862.ic101", 0x180002, 0x20000, CRC(7d4c3b05) SHA1(4e25a077b403549c681c5047912d0e28f4c07720) )
 	ROM_LOAD32_BYTE( "epr-12863.ic105", 0x180003, 0x20000, CRC(85095053) SHA1(f93194ecc0300956280cc0515b3e3ba2c9f71364) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ground data
 	// none
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -2958,7 +2957,7 @@ ROM_START( smgp )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3016,7 +3015,7 @@ ROM_START( smgpd )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3082,7 +3081,7 @@ ROM_START( smgp6 )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3140,7 +3139,7 @@ ROM_START( smgp6d )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3256,7 +3255,7 @@ ROM_START( smgp5 )
 	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
 	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3314,7 +3313,7 @@ ROM_START( smgp5d )
 	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
 	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3379,7 +3378,7 @@ ROM_START( smgpu )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3437,7 +3436,7 @@ ROM_START( smgpud )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3503,7 +3502,7 @@ ROM_START( smgpu1 )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3561,7 +3560,7 @@ ROM_START( smgpu1d )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3669,7 +3668,7 @@ ROM_START( smgpu2 )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3727,7 +3726,7 @@ ROM_START( smgpu2d )
 	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
 	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3792,7 +3791,7 @@ ROM_START( smgpj )
 	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
 	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3851,7 +3850,7 @@ ROM_START( smgpjd )
 	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
 	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3917,7 +3916,7 @@ ROM_START( smgpja )
 	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
 	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -3987,7 +3986,7 @@ ROM_START( abcop )
 	ROM_LOAD32_BYTE( "opr-13538.ic101", 0x180002, 0x20000, CRC(bf9a4586) SHA1(6013dee83375d72d262c8c04c2e668afea2e216c) )
 	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ground data
 	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4033,7 +4032,7 @@ ROM_START( abcopd )
 	ROM_LOAD32_BYTE( "opr-13538.ic101", 0x180002, 0x20000, CRC(bf9a4586) SHA1(6013dee83375d72d262c8c04c2e668afea2e216c) )
 	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ground data
 	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4086,7 +4085,7 @@ ROM_START( abcopj )
 	ROM_LOAD32_BYTE( "opr-13538.ic101", 0x180002, 0x20000, CRC(bf9a4586) SHA1(6013dee83375d72d262c8c04c2e668afea2e216c) )
 	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ground data
 	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4132,7 +4131,7 @@ ROM_START( abcopjd )
 	ROM_LOAD32_BYTE( "opr-13538.ic101", 0x180002, 0x20000, CRC(bf9a4586) SHA1(6013dee83375d72d262c8c04c2e668afea2e216c) )
 	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // ground data
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ground data
 	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4190,7 +4189,7 @@ ROM_START( gpriders )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4240,7 +4239,7 @@ ROM_START( gprider )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4287,7 +4286,7 @@ ROM_START( gprider )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "subpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "subpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "subpcb:soundcpu", 0 ) // sound CPU
@@ -4343,7 +4342,7 @@ ROM_START( gpriderus )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4393,7 +4392,7 @@ ROM_START( gprideru )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4440,7 +4439,7 @@ ROM_START( gprideru )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "subpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "subpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "subpcb:soundcpu", 0 ) // sound CPU
@@ -4495,7 +4494,7 @@ ROM_START( gpriderjs )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4545,7 +4544,7 @@ ROM_START( gpriderj )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
@@ -4592,7 +4591,7 @@ ROM_START( gpriderj )
 	ROM_LOAD32_BYTE( "epr-13368.ic101", 0x180002, 0x20000, CRC(0f50716c) SHA1(eb4c7f47e11c58fe0d58f67e6dafabc6291eabb8) )
 	ROM_LOAD32_BYTE( "epr-13367.ic105", 0x180003, 0x20000, CRC(4b1bb51f) SHA1(17fd5ac9e18dd6097a015e9d7b6815826f9c53f1) )
 
-	ROM_REGION( 0x10000, "subpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "subpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "subpcb:soundcpu", 0 ) // sound CPU
@@ -4630,7 +4629,7 @@ ROM_START( rascot )
 	ROM_LOAD32_BYTE( "epr-13958",  0x000002, 0x20000, CRC(7803a027) SHA1(ff659da334e4440a6de9be43dde9dfa21dae5f14) )
 	ROM_LOAD32_BYTE( "epr-13957",  0x000003, 0x20000, CRC(6d50fb54) SHA1(d21462c30a5555980b964930ddef4dc1963e1d8e) )
 
-	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // link ROM?

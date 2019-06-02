@@ -30,7 +30,7 @@
     - Audio: it could be better
     - DAC output is used to compare against analog inputs; core doesn't permit
       audio outputs to be used for non-speaker purposes.
-    - Bios 5 crashes mess after scrolling about half a screen
+    - Bios 5 crashes MAME after scrolling about half a screen
 
 ****************************************************************************/
 
@@ -61,46 +61,46 @@
 class applix_state : public driver_device
 {
 public:
-	applix_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_base(*this, "base"),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_via(*this, "via6522"),
-		m_centronics(*this, "centronics"),
-		m_cent_data_out(*this, "cent_data_out"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
-		m_ldac(*this, "ldac"),
-		m_rdac(*this, "rdac"),
-		m_cass(*this, "cassette"),
-		m_io_dsw(*this, "DSW"),
-		m_io_fdc(*this, "FDC"),
-		m_io_k0f(*this, "K0f"),
-		m_io_k300(*this, "K30_0"),
-		m_io_k301(*this, "K30_1"),
-		m_io_k310(*this, "K31_0"),
-		m_io_k311(*this, "K31_1"),
-		m_io_k320(*this, "K32_0"),
-		m_io_k321(*this, "K32_1"),
-		m_io_k330(*this, "K33_0"),
-		m_io_k331(*this, "K33_1"),
-		m_io_k340(*this, "K34_0"),
-		m_io_k341(*this, "K34_1"),
-		m_io_k350(*this, "K35_0"),
-		m_io_k351(*this, "K35_1"),
-		m_io_k360(*this, "K36_0"),
-		m_io_k361(*this, "K36_1"),
-		m_io_k370(*this, "K37_0"),
-		m_io_k371(*this, "K37_1"),
-		m_io_k380(*this, "K38_0"),
-		m_io_k390(*this, "K39_0"),
-		m_io_k3a0(*this, "K3a_0"),
-		m_io_k3b0(*this, "K3b_0"),
-		m_io_k0b(*this, "K0b"),
-		m_expansion(*this, "expansion"),
-		m_palette(*this, "palette")
+	applix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_base(*this, "base")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_via(*this, "via6522")
+		, m_centronics(*this, "centronics")
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_ldac(*this, "ldac")
+		, m_rdac(*this, "rdac")
+		, m_cass(*this, "cassette")
+		, m_io_dsw(*this, "DSW")
+		, m_io_fdc(*this, "FDC")
+		, m_io_k0f(*this, "K0f")
+		, m_io_k300(*this, "K30_0")
+		, m_io_k301(*this, "K30_1")
+		, m_io_k310(*this, "K31_0")
+		, m_io_k311(*this, "K31_1")
+		, m_io_k320(*this, "K32_0")
+		, m_io_k321(*this, "K32_1")
+		, m_io_k330(*this, "K33_0")
+		, m_io_k331(*this, "K33_1")
+		, m_io_k340(*this, "K34_0")
+		, m_io_k341(*this, "K34_1")
+		, m_io_k350(*this, "K35_0")
+		, m_io_k351(*this, "K35_1")
+		, m_io_k360(*this, "K36_0")
+		, m_io_k361(*this, "K36_1")
+		, m_io_k370(*this, "K37_0")
+		, m_io_k371(*this, "K37_1")
+		, m_io_k380(*this, "K38_0")
+		, m_io_k390(*this, "K39_0")
+		, m_io_k3a0(*this, "K3a_0")
+		, m_io_k3b0(*this, "K3b_0")
+		, m_io_k0b(*this, "K0b")
+		, m_expansion(*this, "expansion")
+		, m_palette(*this, "palette")
 	{ }
 
 	void applix(machine_config &config);

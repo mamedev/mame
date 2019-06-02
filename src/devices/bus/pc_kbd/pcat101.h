@@ -47,12 +47,11 @@ private:
 	void portb_w(u8 data);
 	u8 portd_r();
 
-	required_device<m68705_device> m_mcu;
+	required_device<m6805u3_device> m_mcu;
 	required_ioport_array<16> m_matrix;
 	output_finder<3> m_leds;
 
 	u8 m_porta;
-	u8 m_portb;
 	u8 m_portc;
 };
 

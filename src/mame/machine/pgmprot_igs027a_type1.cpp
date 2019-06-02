@@ -66,69 +66,74 @@
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r )
+u16 pgm_arm_type1_state::arm7_type1_protlatch_r(offs_t offset)
 {
-	machine().scheduler().synchronize(); // force resync
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(); // force resync
 
-	return (m_pgm_arm_type1_highlatch_68k_w << 16) | (m_pgm_arm_type1_lowlatch_68k_w);
+	if (offset & 1)
+		return m_arm_type1_highlatch_68k_w;
+	else
+		return m_arm_type1_lowlatch_68k_w;
 }
 
-WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w )
+void pgm_arm_type1_state::arm7_type1_protlatch_w(offs_t offset, u16 data)
 {
 	machine().scheduler().synchronize(); // force resync
 
-	if (ACCESSING_BITS_16_31)
+	if (offset & 1)
 	{
-		m_pgm_arm_type1_highlatch_arm_w = data >> 16;
-		m_pgm_arm_type1_highlatch_68k_w = 0;
+		m_arm_type1_highlatch_arm_w = data;
+		m_arm_type1_highlatch_68k_w = 0;
 	}
-	if (ACCESSING_BITS_0_15)
+	else
 	{
-		m_pgm_arm_type1_lowlatch_arm_w = data;
-		m_pgm_arm_type1_lowlatch_68k_w = 0;
+		m_arm_type1_lowlatch_arm_w = data;
+		m_arm_type1_lowlatch_68k_w = 0;
 	}
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r )
+u16 pgm_arm_type1_state::arm7_type1_68k_protlatch_r(offs_t offset)
 {
-	machine().scheduler().synchronize(); // force resync
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
 	{
-		case 1: return m_pgm_arm_type1_highlatch_arm_w;
-		case 0: return m_pgm_arm_type1_lowlatch_arm_w;
+		case 1: return m_arm_type1_highlatch_arm_w;
+		case 0: return m_arm_type1_lowlatch_arm_w;
 	}
 	return -1;
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w )
+void pgm_arm_type1_state::arm7_type1_68k_protlatch_w(offs_t offset, u16 data)
 {
 	machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
 	{
 		case 1:
-			m_pgm_arm_type1_highlatch_68k_w = data;
+			m_arm_type1_highlatch_68k_w = data;
 			break;
 
 		case 0:
-			m_pgm_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_lowlatch_68k_w = data;
 			break;
 	}
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
+u16 pgm_arm_type1_state::arm7_type1_ram_r(offs_t offset, u16 mem_mask)
 {
-	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
+	const u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) %s\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, machine().describe_context());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
+void pgm_arm_type1_state::arm7_type1_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
+	u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) %s\n", BYTE_XOR_LE(offset), data, mem_mask, machine().describe_context());
@@ -136,26 +141,27 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
 }
 
 
-
-
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_unk_r )
+u32 pgm_arm_type1_state::arm7_type1_unk_r()
 {
-	return m_pgm_arm_type1_counter++;
+	const u32 val = m_arm_type1_counter;
+	if (!machine().side_effects_disabled())
+		m_arm_type1_counter++;
+	return val;
 }
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_exrom_r )
+u32 pgm_arm_type1_state::arm7_type1_exrom_r()
 {
 	return 0x00000000;
 }
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_r )
+u32 pgm_arm_type1_state::arm7_type1_shareram_r(offs_t offset, u32 mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) %s\n", offset << 2, m_arm7_shareram[offset], mem_mask, machine().describe_context());
 	return m_arm7_shareram[offset];
 }
 
-WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_w )
+void pgm_arm_type1_state::arm7_type1_shareram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) %s\n", offset << 2, data, mem_mask, machine().describe_context());
@@ -169,23 +175,21 @@ void pgm_arm_type1_state::kov_map(address_map &map)
 {
 	pgm_mem(map);
 	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
-	map(0x4f0000, 0x4f003f).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_w)); /* ARM7 Shared RAM */
-	map(0x500000, 0x500005).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
+	map(0x4f0000, 0x4f003f).rw(FUNC(pgm_arm_type1_state::arm7_type1_ram_r), FUNC(pgm_arm_type1_state::arm7_type1_ram_w)); /* ARM7 Shared RAM */
+	map(0x500000, 0x500005).rw(FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
 }
 
 void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom();
-	map(0x08100000, 0x083fffff).r(FUNC(pgm_arm_type1_state::pgm_arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
+	map(0x08100000, 0x083fffff).r(FUNC(pgm_arm_type1_state::arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
 	map(0x10000000, 0x100003ff).ram(); // internal ram for asic
-	map(0x40000000, 0x40000003).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w));
+	map(0x40000000, 0x40000003).rw(FUNC(pgm_arm_type1_state::arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_protlatch_w));
 	map(0x40000008, 0x4000000b).nopw(); // ?
-	map(0x4000000c, 0x4000000f).r(FUNC(pgm_arm_type1_state::pgm_arm7_type1_unk_r));
-	map(0x50800000, 0x5080003f).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_w)).share("arm7_shareram");
+	map(0x4000000c, 0x4000000f).r(FUNC(pgm_arm_type1_state::arm7_type1_unk_r));
+	map(0x50800000, 0x5080003f).rw(FUNC(pgm_arm_type1_state::arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::arm7_type1_shareram_w)).share("arm7_shareram");
 	map(0x50000000, 0x500003ff).ram(); // uploads xor table to decrypt 68k rom here
 }
-
-
 
 
 /**************************** SIMULATIONS *****************************/
@@ -204,9 +208,8 @@ void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 }
 
 
-MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
+void pgm_arm_type1_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
 	save_item(NAME(m_value0));
 	save_item(NAME(m_value1));
 	save_item(NAME(m_valuekey));
@@ -220,8 +223,6 @@ void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
 	pgmbase(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
-
-	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
 
 	subdevice<screen_device>("screen")->set_refresh_hz(59.17); // verified on pcb
 }
@@ -247,28 +248,28 @@ void pgm_arm_type1_state::pgm_arm_type1(machine_config &config)
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
 }
 
-void pgm_arm_type1_state::pgm_arm7_type1_latch_init()
+void pgm_arm_type1_state::arm7_type1_latch_init()
 {
-	m_pgm_arm_type1_highlatch_arm_w = 0;
-	m_pgm_arm_type1_lowlatch_arm_w = 0;
-	m_pgm_arm_type1_highlatch_68k_w = 0;
-	m_pgm_arm_type1_lowlatch_68k_w = 0;
-	m_pgm_arm_type1_counter = 1;
+	m_arm_type1_highlatch_arm_w = 0;
+	m_arm_type1_lowlatch_arm_w = 0;
+	m_arm_type1_highlatch_68k_w = 0;
+	m_arm_type1_lowlatch_68k_w = 0;
+	m_arm_type1_counter = 1;
 
-	save_item(NAME(m_pgm_arm_type1_highlatch_arm_w));
-	save_item(NAME(m_pgm_arm_type1_lowlatch_arm_w));
-	save_item(NAME(m_pgm_arm_type1_highlatch_68k_w));
-	save_item(NAME(m_pgm_arm_type1_lowlatch_68k_w));
-	save_item(NAME(m_pgm_arm_type1_counter));
+	save_item(NAME(m_arm_type1_highlatch_arm_w));
+	save_item(NAME(m_arm_type1_lowlatch_arm_w));
+	save_item(NAME(m_arm_type1_highlatch_68k_w));
+	save_item(NAME(m_arm_type1_lowlatch_68k_w));
+	save_item(NAME(m_arm_type1_counter));
 }
 
-READ16_MEMBER(pgm_arm_type1_state::kovsh_fake_region_r )
+u16 pgm_arm_type1_state::kovsh_fake_region_r()
 {
-	int regionhack = ioport("RegionHack")->read();
+	const int regionhack = m_regionhack->read();
 	if (regionhack != 0xff) return regionhack;
 
-	offset = 0x4;
-	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
+	offs_t offset = 0x4;
+	u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
@@ -276,33 +277,33 @@ void pgm_arm_type1_state::init_photoy2k()
 {
 	pgm_basic_init();
 	pgm_photoy2k_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	arm7_type1_latch_init();
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
 
 void pgm_arm_type1_state::init_kovsh()
 {
 	pgm_basic_init();
 	pgm_kovsh_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	arm7_type1_latch_init();
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
 
 /* Fake remapping of ASIC commands to the ones used by KOVSH due to the lack of the real ARM rom for this set */
-WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
+void pgm_arm_type1_state::kovshp_asic27a_write_word(offs_t offset, u16 data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_pgm_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_lowlatch_68k_w = data;
 		return;
 
 		case 1:
 		{
-			unsigned char asic_key = data >> 8;
-			unsigned char asic_cmd = (data & 0xff) ^ asic_key;
+			const u8 asic_key = data >> 8;
+			u8 asic_cmd = (data & 0xff) ^ asic_key;
 
 			switch (asic_cmd)
 			{
@@ -343,7 +344,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 				case 0xf8: asic_cmd = 0xf3; break;
 			}
 
-			m_pgm_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
+			m_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
 		}
 		return;
 	}
@@ -354,11 +355,10 @@ void pgm_arm_type1_state::init_kovshp()
 {
 	pgm_basic_init();
 	pgm_kovshp_decrypt(machine());
-	pgm_arm7_type1_latch_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
+	arm7_type1_latch_init();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
-
 
 
 /* bootleg inits */
@@ -367,20 +367,19 @@ void pgm_arm_type1_state::init_kovshxas()
 {
 	pgm_basic_init();
 //  pgm_kovshp_decrypt(machine());
-	pgm_arm7_type1_latch_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
+	arm7_type1_latch_init();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 {
-	int i, j;
-	uint16_t *src = (uint16_t *)(memregion("tiles")->base() + 0x180000);
-	std::vector<uint16_t> dst(0x800000);
+	u16 *src = (u16 *)(memregion("tiles")->base() + 0x180000);
+	std::vector<u16> dst(0x800000);
 
-	for (i = 0; i < 0x800000 / 2; i++)
+	for (int i = 0; i < 0x800000 / 2; i++)
 	{
-		j = bitswap<24>(i, 23, 22, 9, 8, 21, 18, 0, 1, 2, 3, 16, 15, 14, 13, 12, 11, 10, 19, 20, 17, 7, 6, 5, 4);
+		const int j = bitswap<24>(i, 23, 22, 9, 8, 21, 18, 0, 1, 2, 3, 16, 15, 14, 13, 12, 11, 10, 19, 20, 17, 7, 6, 5, 4);
 
 		dst[j] = bitswap<16>(src[i], 1, 14, 8, 7, 0, 15, 6, 9, 13, 2, 5, 10, 12, 3, 4, 11);
 	}
@@ -388,14 +387,13 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 	memcpy( src, &dst[0], 0x800000 );
 }
 
-void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( uint8_t *src )
+void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( u8 *src )
 {
-	int i, j;
-	std::vector<uint8_t> dst(0x800000);
+	std::vector<u8> dst(0x800000);
 
-	for (i = 0; i < 0x800000; i++)
+	for (int i = 0; i < 0x800000; i++)
 	{
-		j = bitswap<24>(i, 23, 10, 9, 22, 19, 18, 20, 21, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+		const int j = bitswap<24>(i, 23, 10, 9, 22, 19, 18, 20, 21, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
 		dst[j] = src[i];
 	}
@@ -405,10 +403,9 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( uint8_t *src )
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
 {
-	int i;
-	uint8_t *src = (uint8_t *)(memregion("ics")->base() + 0x400000);
+	u8 *src = (u8 *)(memregion("ics")->base() + 0x400000);
 
-	for (i = 0; i < 0x400000; i+=2) {
+	for (int i = 0; i < 0x400000; i+=2) {
 		src[i + 0x000001] = src[i + 0x400001];
 	}
 
@@ -417,13 +414,12 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
 
 void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 {
-	int i;
-	uint16_t *src = (uint16_t *)(memregion("maincpu")->base() + 0x100000);
-	std::vector<uint16_t> dst(0x400000);
+	u16 *src = (u16 *)(memregion("maincpu")->base() + 0x100000);
+	std::vector<u16> dst(0x400000);
 
-	for (i = 0; i < 0x400000 / 2; i++)
+	for (int i = 0; i < 0x400000 / 2; i++)
 	{
-		int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0);
+		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0);
 
 		dst[j] = bitswap<16>(src[i], 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 	}
@@ -433,13 +429,12 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 
 void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 {
-	int i;
-	uint16_t *src = (uint16_t *)(memregion("maincpu")->base() + 0x100000);
-	std::vector<uint16_t> dst(0x400000);
+	u16 *src = (u16 *)(memregion("maincpu")->base() + 0x100000);
+	std::vector<u16> dst(0x400000);
 
-	for (i = 0; i < 0x400000 / 2; i++)
+	for (int i = 0; i < 0x400000 / 2; i++)
 	{
-		int j = bitswap<24>(i, 23, 22, 21, 20, 19, 16, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 18, 17, 7);
+		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 16, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 18, 17, 7);
 
 		dst[j] = src[i];
 	}
@@ -464,9 +459,9 @@ void pgm_arm_type1_state::init_kovlsqh2()
 
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();
-	pgm_arm7_type1_latch_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
+	arm7_type1_latch_init();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16sm_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
 
 void pgm_arm_type1_state::init_kovqhsgs()
@@ -485,9 +480,9 @@ void pgm_arm_type1_state::init_kovqhsgs()
 
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();
-	pgm_arm7_type1_latch_init();
+	arm7_type1_latch_init();
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
 
 /*
@@ -499,26 +494,23 @@ void pgm_arm_type1_state::init_kovqhsgs()
  bp A71A0,1,{d0=0x12;g}
 */
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_r )
+READ16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_r )
 {
 	if (offset == 0)
 	{
-		uint16_t d = m_valueresponse & 0xffff;
-		uint16_t realkey = m_valuekey >> 8;
+		u16 d = m_valueresponse & 0xffff;
+		u16 realkey = m_valuekey >> 8;
 		realkey |= m_valuekey;
 		d ^= realkey;
-
 		return d;
-
 	}
 	else if (offset == 1)
 	{
-		uint16_t d = m_valueresponse >> 16;
-		uint16_t realkey = m_valuekey >> 8;
+		u16 d = m_valueresponse >> 16;
+		u16 realkey = m_valuekey >> 8;
 		realkey |= m_valuekey;
 		d ^= realkey;
 		return d;
-
 	}
 	return 0xffff;
 }
@@ -535,15 +527,15 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 
 		case 0x40:
 			m_valueresponse = 0x880000;
-			m_slots[(m_value0>>10)&0x1F]=
-				(m_slots[(m_value0>>5)&0x1F]+
-					m_slots[(m_value0>>0)&0x1F])&0xffffff;
+			m_slots[(m_value0 >> 10) & 0x1F]=
+				(m_slots[(m_value0 >> 5) & 0x1F]+
+					m_slots[(m_value0 >> 0) & 0x1F]) & 0xffffff;
 			break;
 
 		case 0x67: // set high bits
 	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
-			m_curslots = (m_value0 & 0xff00)>>8;
+			m_curslots = (m_value0 & 0xff00) >> 8;
 			m_slots[m_curslots] = (m_value0 & 0x00ff) << 16;
 			break;
 
@@ -553,15 +545,13 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 			m_slots[m_curslots] |= (m_value0 & 0xffff);
 			break;
 
-
 		case 0x8e: // read back result of operations
 	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
-			m_valueresponse = m_slots[m_value0&0xff];
+			m_valueresponse = m_slots[m_value0 & 0xff];
 			break;
 
-
 		case 0x99: // reset?
-			m_simregion = 0;//ioport("Region")->read();
+			m_simregion = 0;//m_region->read();
 			m_valuekey = 0x100;
 			m_valueresponse = 0x00880000 | m_simregion << 8;
 			break;
@@ -572,7 +562,7 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 /* preliminary */
 
 // should be correct, note each value only appears once
-uint8_t puzzli2_level_decode[256] = {
+u8 puzzli2_level_decode[256] = {
 	// 0  ,  1  ,  2  ,  3  ,  4  ,  5   , 6  ,  7  ,  8  ,  9  ,  a  ,  b  ,  c  ,  d  ,  e  ,  f  ,
 	0x32, 0x3e, 0xb2, 0x37, 0x31, 0x22, 0xd6, 0x0d, 0x35, 0x5c, 0x8d, 0x3c, 0x7a, 0x5f, 0xd7, 0xac, // 0x0
 //   0  ,  0  ,  0  ,  0  ,  0  ,  1  ,  1  ,  0  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  x  ,  x  ,
@@ -619,12 +609,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		{
 			// how is this selected? command 54?
 
-
 			/* writes the following sequence before how to play
 			 each level has a different sequence written before it, size of sequence doesn't seem directly connected to level size (unlike the reads)
 			 so it's probably compressed somehow as well as scrambled?  68k doesnt know in advance how big each lot of data is either, it only stops
 			 writing when it gets a difference response from the MCU.
-
 
 			00138278: 31 00fd | (set xor table offset)
 		UNKNOWN - related to depth / number of columns?
@@ -691,7 +679,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 				if (hackcount2==0)
 				{
-					puzzli2_take_leveldata_value(m_value0&0xff);
+					puzzli2_take_leveldata_value(m_value0 & 0xff);
 
 					hack_31_table_offset = m_value0 & 0xff;
 					hack_31_table_offset2 = 0;
@@ -702,7 +690,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 				}
 				else  // how do we decide end?
 				{
-					int end = puzzli2_take_leveldata_value(m_value0&0xff);
+					int end = puzzli2_take_leveldata_value(m_value0 & 0xff);
 
 					if (!end)
 					{
@@ -710,8 +698,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 						// but different for the writes on startup?
 						m_valueresponse = 0x00d20000;
 
-						//uint8_t tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
-						//uint8_t xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+						//u8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2 & 0xf)) & 0xff;
+						//u8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
 						//puzzli2_printf("value %02x, after xor is %02x (table address,value %02x,%02x)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr]);
 
 						hackcount2++;
@@ -719,20 +707,16 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 					}
 					else
 					{
-						hackcount2=0;
+						hackcount2 = 0;
 
 						// when the ARM detects the end of the stream has been reached it returns a 0x63 status with the number of columns in the data word
 						m_valueresponse = 0x00630000 | numbercolumns;
 
-						//uint8_t tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
-						//uint8_t xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+						//u8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2 & 0xf)) & 0xff;
+						//u8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
 						//puzzli2_printf("value %02x, after xor is %02x (table address,value %02x,%02x) (end, returning %02x as playfield width)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr], m_valueresponse);
-
-
 					}
 				}
-
-
 			}
 			else
 			{
@@ -746,7 +730,6 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		}
 		break;
 
-
 		// after writing the compressed and scrambled data stream for the level (copied from ROM) with command 0x31
 		// the game expects to read back a fully formed level structure from the ARM
 		case 0x13:
@@ -755,7 +738,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			// this is the how to play screen, correctly returned with current code
 			/*
-			uint16_t retvals[61] =
+			u16 retvals[61] =
 			{ 0x0008, // depth (-2?)
 			  0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // first column
 			  0x0103, 0x0100, 0x0101, 0x0105, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -767,7 +750,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			*/
 
 
-			uint16_t* leveldata = &level_structure[0][0];
+			u16* leveldata = &level_structure[0][0];
 			if (hackcount==0)
 			{
 				m_valueresponse = 0x002d0000 | ((depth>>4)+1); // this *seems* to come from upper bits of the first real value written to the device during the level stream (verify, seems wrong for some levels because you get a black bar on the bottom of the screen, but might be bad xors)
@@ -800,7 +783,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		case 0x38: // Reset
 			puzzli2_printf("%08x: %02x %04x (RESET)\n",pc, m_ddp3lastcommand, m_value0);
-			m_simregion = ioport("Region")->read();
+			m_simregion = m_region->read();
 			m_valueresponse = 0x780000 | m_simregion<<8; // this must also return the cart region or the game will act in odd ways when inserting a coin on continue, or during the game on later levels
 			m_valuekey = 0x100;
 			m_puzzli_54_trigger = 0;
@@ -818,8 +801,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			hack_47_value = m_value0;
 
-			//hack_47_value = ((m_value0 & 0x0700)>>8) * 0x19;
-			//hack_47_value +=((m_value0 & 0x0007)>>0) * 0x05;
+			//hack_47_value = ((m_value0 & 0x0700) >> 8) * 0x19;
+			//hack_47_value +=((m_value0 & 0x0007) >> 0) * 0x05;
 			if (m_value0 & 0xf0f0) puzzli2_printf("unhandled 0x47 bits %04x\n", m_value0);
 
 			//puzzli2_printf("0x47 value was %04x - using %04x\n", m_value0, hack_47_value);
@@ -836,15 +819,15 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			// it writes a value of 0x0000 then expects to read back like
 			// this for the lower part of the game backgrounds
-			if (m_value0==0x0000)
+			if (m_value0 == 0x0000)
 			{
-				int val = ((hack_47_value & 0x0f00)>>8) * 0x19;
+				int val = ((hack_47_value & 0x0f00) >> 8) * 0x19;
 				m_valueresponse = 0x00740000 | (val & 0xffff);
 			}
 			else
 			{
-				int val = ((hack_47_value & 0x0f00)>>8) * 0x19;
-				val +=((hack_47_value & 0x000f)>>0) * 0x05;
+				int val = ((hack_47_value & 0x0f00) >> 8) * 0x19;
+				val +=((hack_47_value & 0x000f) >> 0) * 0x05;
 				val += m_value0 & 0x000f;
 				m_valueresponse = 0x00740000 | (val & 0xffff);
 
@@ -862,7 +845,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			// this command is written before the values used to decrypt the z80 addresses (assumed) are uploaded with command 31
 			command_31_write_type = 1;
 
-			m_valueresponse = 0x36<<16;
+			m_valueresponse = 0x36 << 16;
 			p2_31_retcounter = 0xc;
 		break;
 
@@ -872,7 +855,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			// this command is written after the values used to decrypt the z80 addresses (assumed) are uploaded with command 31
 			command_31_write_type = 0;
 
-			//m_valueresponse = 0x74<<16;
+			//m_valueresponse = 0x74 << 16;
 			m_valueresponse = 0x740061;
 		break;
 
@@ -886,7 +869,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			m_puzzli_54_trigger = 1;
 			hackcount2 = 0;
 			hackcount = 0;
-			m_valueresponse = 0x36<<16;
+			m_valueresponse = 0x36 << 16;
 
 			//  clear the return structure
 			for (auto & elem : level_structure)
@@ -934,23 +917,23 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			if (!strcmp(machine().system().name,"puzzli2"))
 			{
-				if (m_value0==0x0000)
+				if (m_value0 == 0x0000)
 				{
 					m_valueresponse = 0x001694a8;
 				}
-				else if (m_value0==0x0001)
+				else if (m_value0 == 0x0001)
 				{
 					m_valueresponse = 0x0016cfae;
 				}
-				else if (m_value0==0x0002)
+				else if (m_value0 == 0x0002)
 				{
 					m_valueresponse = 0x0016ebf2; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
 				}
-				else if (m_value0==0x0003) // before 'cast' screen
+				else if (m_value0 == 0x0003) // before 'cast' screen
 				{
 					m_valueresponse = 0x0016faa8;
 				}
-				else if (m_value0==0x0004) // 2 player demo
+				else if (m_value0 == 0x0004) // 2 player demo
 				{
 					m_valueresponse = 0x00174416;
 				}
@@ -963,23 +946,23 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			}
 			else // puzzli2 super
 			{
-				if (m_value0==0x0000)
+				if (m_value0 == 0x0000)
 				{
 					m_valueresponse = 0x19027a;
 				}
-				else if (m_value0==0x0001)
+				else if (m_value0 == 0x0001)
 				{
 					m_valueresponse = 0x193D80;
 				}
-				else if (m_value0==0x0002)
+				else if (m_value0 == 0x0002)
 				{
 					m_valueresponse = 0x1959c4;
 				}
-				else if (m_value0==0x0003)
+				else if (m_value0 == 0x0003)
 				{
 					m_valueresponse = 0x19687a;
 				}
-				else if (m_value0==0x0004)
+				else if (m_value0 == 0x0004)
 				{
 					m_valueresponse = 0x19b1e8;
 				}
@@ -996,11 +979,11 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			if (!strcmp(machine().system().name,"puzzli2"))
 			{
-				if ( (m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) || (m_value0==0x0003) )
+				if ( (m_value0 == 0x0000) || (m_value0 == 0x0001) || (m_value0 == 0x0002) || (m_value0 == 0x0003) )
 				{
 					m_valueresponse = 0x00166178; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
 				}
-				else if ( m_value0==0x0004 ) // 2 player demo
+				else if ( m_value0 == 0x0004 ) // 2 player demo
 				{
 					m_valueresponse = 0x00166e72;
 				}
@@ -1012,11 +995,11 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			}
 			else // puzzli2 super
 			{
-				if ((m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) ||  (m_value0==0x0003))
+				if ((m_value0 == 0x0000) || (m_value0 == 0x0001) || (m_value0 == 0x0002) ||  (m_value0 == 0x0003))
 				{
 					m_valueresponse = 0x18cf4a;
 				}
-				else if ( m_value0==0x0004 ) // 2 player demo
+				else if ( m_value0 == 0x0004 ) // 2 player demo
 				{
 					m_valueresponse = 0x0018dc44;
 				}
@@ -1031,7 +1014,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		default:
 			puzzli2_printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
 
-			m_valueresponse = 0x74<<16;
+			m_valueresponse = 0x74 << 16;
 		break;
 	}
 }
@@ -1065,7 +1048,7 @@ void pgm_arm_type1_state::command_handler_py2k2(int pc)
 		break;
 
 		case 0x99: // reset?
-			m_simregion = ioport("Region")->read();
+			m_simregion = m_region->read();
 			m_valuekey = 0x100;
 			m_valueresponse = 0x00880000 | m_simregion<<8;
 
@@ -1176,10 +1159,9 @@ void pgm_arm_type1_state::command_handler_pstars(int pc)
 	switch (m_ddp3lastcommand)
 	{
 		case 0x99:
-			m_simregion = ioport("Region")->read();
+			m_simregion = m_region->read();
 			m_valuekey = 0x100;
 			m_valueresponse = 0x00880000 | m_simregion<<8;
-
 			break;
 
 		case 0xe0:
@@ -1274,13 +1256,13 @@ void pgm_arm_type1_state::command_handler_pstars(int pc)
 
 /* Old KOV and bootlegs sim ... really these should be read out... */
 
-static const uint8_t kov_BATABLE[0x40] = {
+static const u8 kov_BATABLE[0x40] = {
 	0x00,0x29,0x2c,0x35,0x3a,0x41,0x4a,0x4e,0x57,0x5e,0x77,0x79,0x7a,0x7b,0x7c,0x7d,
 	0x7e,0x7f,0x80,0x81,0x82,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x90,
 	0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9e,0xa3,0xd4,0xa9,0xaf,0xb5,0xbb,0xc1
 };
 
-static const uint8_t kov_B0TABLE[16] = { 2, 0, 1, 4, 3 }; // Maps char portraits to tables
+static const u8 kov_B0TABLE[16] = { 2, 0, 1, 4, 3 }; // Maps char portraits to tables
 
 
 void pgm_arm_type1_state::command_handler_kov(int pc)
@@ -1297,7 +1279,7 @@ void pgm_arm_type1_state::command_handler_kov(int pc)
 		break;
 
 		case 0x99: // Reset
-			m_simregion = ioport("Region")->read();
+			m_simregion = m_region->read();
 			m_valueresponse = 0x880000 | m_simregion<<8;
 			m_valuekey = 0x100;
 		break;
@@ -1371,7 +1353,7 @@ void pgm_arm_type1_state::command_handler_kov(int pc)
 		{
 			m_valueresponse = 0x880000;
 
-			int32_t sel = (m_curslots >> 12) & 0x0f;
+			s32 sel = (m_curslots >> 12) & 0x0f;
 			m_slots[sel] = (m_slots[sel] & 0x00ff0000) | ((m_value0 & 0xffff) <<  0);
 		}
 		break;
@@ -1381,7 +1363,7 @@ void pgm_arm_type1_state::command_handler_kov(int pc)
 			m_valueresponse = 0x880000;
 			m_curslots = m_value0;
 
-			int32_t sel = (m_curslots >> 12) & 0x0f;
+			s32 sel = (m_curslots >> 12) & 0x0f;
 			m_slots[sel] = (m_slots[sel] & 0x0000ffff) | ((m_value0 & 0x00ff) << 16);
 		}
 		break;
@@ -1572,7 +1554,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 	switch (m_ddp3lastcommand)
 	{
 		case 0x88:
-			m_simregion = ioport("Region")->read();
+			m_simregion = m_region->read();
 			m_valuekey = 0x100;
 			m_valueresponse = 0x00990000 | m_simregion<<8;
 
@@ -1740,9 +1722,9 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 	}
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
+WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_w )
 {
-	int pc = m_maincpu->pc();
+	const int pc = m_maincpu->pc();
 
 	if (offset == 0)
 	{
@@ -1751,7 +1733,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 	}
 	else if (offset == 1)
 	{
-		uint16_t realkey;
+		u16 realkey;
 		if ((data >> 8) == 0xff)
 			m_valuekey = 0xff00;
 		realkey = m_valuekey >> 8;
@@ -1770,12 +1752,12 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 
 		(this->*arm_sim_handler)(pc);
 	}
-	else if (offset==2)
+	else if (offset == 2)
 	{
 	}
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r )
+u16 pgm_arm_type1_state::arm7_type1_sim_protram_r(offs_t offset)
 {
 	if (offset == 4)
 		return m_simregion;
@@ -1783,14 +1765,19 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r )
+u16 pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r(offs_t offset)
 {
 	if (offset == 4)        //region
-		return ioport("Region")->read();
+		return m_region->read();
 	else if (offset >= 0x10)  //timer
 	{
-		logerror("PSTARS ACCESS COUNTER %6X\n", m_extra_ram[offset - 0x10]);
-		return m_extra_ram[offset - 0x10]--;
+		const u16 val = m_extra_ram[offset - 0x10];
+		if (!machine().side_effects_disabled())
+		{
+			logerror("PSTARS ACCESS COUNTER %6X\n", val);
+			m_extra_ram[offset - 0x10]--;
+		}
+		return val;
 	}
 	return 0x0000;
 }
@@ -1801,7 +1788,7 @@ void pgm_arm_type1_state::init_ddp3()
 	pgm_basic_init(false);
 	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 }
 
 void pgm_arm_type1_state::init_ket()
@@ -1809,7 +1796,7 @@ void pgm_arm_type1_state::init_ket()
 	pgm_basic_init(false);
 	pgm_ket_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 }
 
 void pgm_arm_type1_state::init_espgal()
@@ -1817,14 +1804,14 @@ void pgm_arm_type1_state::init_espgal()
 	pgm_basic_init(false);
 	pgm_espgal_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 }
 
 
-int count_bits(uint16_t value)
+int count_bits(u16 value)
 {
 	int count = 0;
-	for (int i=0;i<16;i++)
+	for (int i = 0; i < 16; i++)
 	{
 		int bit = (value >> i) & 1;
 
@@ -1834,10 +1821,10 @@ int count_bits(uint16_t value)
 	return count;
 }
 
-int get_position_of_bit(uint16_t value, int bit_wanted)
+int get_position_of_bit(u16 value, int bit_wanted)
 {
 	int count = 0;
-	for (int i=0;i<16;i++)
+	for (int i = 0; i < 16; i++)
 	{
 		int bit = (value >> i) & 1;
 
@@ -1850,9 +1837,9 @@ int get_position_of_bit(uint16_t value, int bit_wanted)
 	return -1;
 }
 
-int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
+int pgm_arm_type1_state::puzzli2_take_leveldata_value(u8 datvalue)
 {
-	if (stage==-1)
+	if (stage == -1)
 	{
 		entries_left = 0;
 		currentcolumn = 0;
@@ -1871,14 +1858,14 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 	}
 	else
 	{
-		uint8_t rawvalue = datvalue;
-		uint8_t tableloc = (tableoffs+tableoffs2)&0xff;
+		u8 rawvalue = datvalue;
+		u8 tableloc = (tableoffs+tableoffs2) & 0xff;
 		rawvalue ^= puzzli2_level_decode[tableloc];
 
 		tableoffs2++;
-		tableoffs2&=0xf;
+		tableoffs2 &= 0xf;
 
-		if (stage==0)
+		if (stage == 0)
 		{
 			stage = 1;
 
@@ -1889,11 +1876,8 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 
 			puzzli2_printf("%02x <- Sizes (level depth %01x) (number of columns %01x)", rawvalue, depth>>4, numbercolumns);
 
-
 			if ((depth != 0x80) && (depth != 0x70) && (depth != 0x50))
 				fatalerror("depth isn't 0x5, 0x7 or 0x8");
-
-
 
 			// it seems to use this to specify the number of columns, ie how many data structures follow, so that the ARM knows when to send back the 'finished' flag.
 			// it also gets returned at the end with said flag
@@ -1903,7 +1887,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 			puzzli2_printf("\n");
 
 		}
-		else if (stage==1)
+		else if (stage == 1)
 		{
 			puzzli2_printf("%02x <- Number of Entries for this Column (and upper mask) (column is %d) (xor table location is %02x) ", rawvalue, currentcolumn, tableloc);
 			stage = 2;
@@ -1920,13 +1904,9 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 				puzzli2_printf("0 entries for this column?"); // seems a valid condition based on the data
 			}
 
-
-
 			puzzli2_printf("\n");
-
-
 		}
-		else if (stage==2)
+		else if (stage == 2)
 		{
 			puzzli2_printf("%02x <- Mask value equal to number of entries (xor table location is %02x)", rawvalue, tableloc);
 			stage = 3;
@@ -1948,7 +1928,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 				m_row_bitmask = 0;
 
 				coverage[tableloc] = 1;
-				if (rawvalue!=0)
+				if (rawvalue != 0)
 				{
 					puzzli2_printf(" invalid mask after 00 length?");
 					// attempt to correct the table
@@ -1956,12 +1936,12 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 
 				}
 				coverage[prev_tablloc] = 1;
-				if (full_entry!=0)
+				if (full_entry != 0)
 				{
 					puzzli2_printf(" previous value wasn't 0x00");
 				}
 
-				if (currentcolumn==numbercolumns)
+				if (currentcolumn == numbercolumns)
 				{
 					return 1;
 				}
@@ -1981,23 +1961,22 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 
 					int desired_mask = 0;
 
-					if (num_entries==0x00) desired_mask = 0x00;
-					if (num_entries==0x01) desired_mask = 0x01;
-					if (num_entries==0x02) desired_mask = 0x03;
-					if (num_entries==0x03) desired_mask = 0x07;
-					if (num_entries==0x04) desired_mask = 0x0f;
-					if (num_entries==0x05) desired_mask = 0x1f;
-					if (num_entries==0x06) desired_mask = 0x3f;
-					if (num_entries==0x07) desired_mask = 0x7f;
-					if (num_entries==0x08) desired_mask = 0xff;
-					if (num_entries==0x09) desired_mask = 0xff;
-					if (num_entries==0x0a) desired_mask = 0xff;
+					if (num_entries == 0x00) desired_mask = 0x00;
+					if (num_entries == 0x01) desired_mask = 0x01;
+					if (num_entries == 0x02) desired_mask = 0x03;
+					if (num_entries == 0x03) desired_mask = 0x07;
+					if (num_entries == 0x04) desired_mask = 0x0f;
+					if (num_entries == 0x05) desired_mask = 0x1f;
+					if (num_entries == 0x06) desired_mask = 0x3f;
+					if (num_entries == 0x07) desired_mask = 0x7f;
+					if (num_entries == 0x08) desired_mask = 0xff;
+					if (num_entries == 0x09) desired_mask = 0xff;
+					if (num_entries == 0x0a) desired_mask = 0xff;
 
-					if (rawvalue!=desired_mask)
+					if (rawvalue != desired_mask)
 					{
 						puzzli2_printf(" possible wrong mask?");
 					}
-
 
 				}
 
@@ -2006,9 +1985,9 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 			puzzli2_printf("\n");
 
 		}
-		else if (stage==3)
+		else if (stage == 3)
 		{
-			uint16_t object_value;
+			u16 object_value;
 
 			// return values
 			// 0x0100 = normal fish
@@ -2025,21 +2004,21 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 			// 110 - renders as a flashing fish you can't catch? glitches game?
 			// 111 - repeat of other fish type you can't catch...
 
-			if (rawvalue<=0x10) // regular fish
+			if (rawvalue <= 0x10) // regular fish
 			{
 				int fishtype = rawvalue;
 				puzzli2_printf("%02x <- fish type %d", rawvalue, fishtype);
 				object_value = 0x0100 + fishtype;
 				// 0x110 is a flashy fish? might be glitchy and need a special number..
 			}
-			else if (rawvalue<=0x21) // fish in bubbles
+			else if (rawvalue <= 0x21) // fish in bubbles
 			{
 				int fishtype = rawvalue - 0x11;
 				puzzli2_printf("%02x <- fish in bubble %d", rawvalue, fishtype);
 				object_value = 0x0120 + fishtype;
 				// 0x130 is a flashy fish? might be glitchy and need a special number..
 			}
-			else if (rawvalue<=0x32) // fish in eggs
+			else if (rawvalue <= 0x32) // fish in eggs
 			{
 				int fishtype = rawvalue - 0x22;
 				puzzli2_printf("%02x <- fish in egg %d", rawvalue, fishtype);
@@ -2047,7 +2026,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 				// 0x150 is a flashy fish? might be glitchy and need a special number..
 
 			}
-			else if (rawvalue<=0x43) // fish on hook cases, seem to be base 0x180
+			else if (rawvalue <= 0x43) // fish on hook cases, seem to be base 0x180
 			{
 				int fishtype = rawvalue - 0x33;
 				puzzli2_printf("%02x <- fish on hook %d", rawvalue, fishtype);
@@ -2056,26 +2035,25 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 
 			}
 			////////////////////// special objects follow
-			else if (rawvalue==0xd0) {object_value = 0x0200; puzzli2_printf("%02x <- generic bubbles", rawvalue);}
+			else if (rawvalue == 0xd0) {object_value = 0x0200; puzzli2_printf("%02x <- generic bubbles", rawvalue);}
 
-			else if (rawvalue==0xe0) {object_value = 0x8000; puzzli2_printf("%02x <- solid middle", rawvalue);}
-			else if (rawvalue==0xe1) {object_value = 0x8020; puzzli2_printf("%02x <- solid top slant down", rawvalue);} // solid slant top down
-			else if (rawvalue==0xe2) {object_value = 0x8040; puzzli2_printf("%02x <- solid top slant up", rawvalue);} // solid slant top up
-			else if (rawvalue==0xe3) {object_value = 0x8060; puzzli2_printf("%02x <- solid bottom slant up", rawvalue);}
-			else if (rawvalue==0xe4) {object_value = 0x8080; puzzli2_printf("%02x <- solid bottom slant down", rawvalue);} // sold slant bottom up
-
+			else if (rawvalue == 0xe0) {object_value = 0x8000; puzzli2_printf("%02x <- solid middle", rawvalue);}
+			else if (rawvalue == 0xe1) {object_value = 0x8020; puzzli2_printf("%02x <- solid top slant down", rawvalue);} // solid slant top down
+			else if (rawvalue == 0xe2) {object_value = 0x8040; puzzli2_printf("%02x <- solid top slant up", rawvalue);} // solid slant top up
+			else if (rawvalue == 0xe3) {object_value = 0x8060; puzzli2_printf("%02x <- solid bottom slant up", rawvalue);}
+			else if (rawvalue == 0xe4) {object_value = 0x8080; puzzli2_printf("%02x <- solid bottom slant down", rawvalue);} // sold slant bottom up
 
 			else                     {object_value = 0xffff; puzzli2_printf("%02x <- unknown object", rawvalue);}
 
 			puzzli2_printf("  (xor table location is %02x)\n",tableloc);
 
-			if (object_value==0xffff)
+			if (object_value == 0xffff)
 			{
 				object_value = 0x110;
 				popmessage("unknown object type %02x\n", rawvalue);
 			}
 
-			int realrow = get_position_of_bit(m_row_bitmask, currentrow);
+			const int realrow = get_position_of_bit(m_row_bitmask, currentrow);
 
 			if (realrow != -1)
 				level_structure[currentcolumn][realrow] = object_value;
@@ -2090,7 +2068,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 				currentrow = 0;
 				m_row_bitmask = 0;
 
-				if (currentcolumn==numbercolumns)
+				if (currentcolumn == numbercolumns)
 				{
 					return 1;
 				}
@@ -2109,11 +2087,10 @@ void pgm_arm_type1_state::init_puzzli2()
 {
 	pgm_basic_init();
 
-
 	pgm_puzzli2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
 
 	hackcount = 0;
@@ -2123,11 +2100,11 @@ void pgm_arm_type1_state::init_puzzli2()
 
 //#define PUZZLI2_LEVEL_STRUCTURE_LOG
 #ifdef PUZZLI2_LEVEL_STRUCTURE_LOG
-	uint8_t *src2 = (uint8_t *) (machine().root_device().memregion("maincpu")->base());
+	u8 *src2 = (u8 *) (machine().root_device().memregion("maincpu")->base());
 
 	int offset;
 	int limit;
-	for (int i=0;i<256;i++)
+	for (int i = 0; i < 256; i++)
 		coverage[i] = 0;
 
 	if (!strcmp(machine().system().name,"puzzli2"))
@@ -2144,21 +2121,20 @@ void pgm_arm_type1_state::init_puzzli2()
 
 
 
-	for (int i=0;i<limit;i++)
+	for (int i = 0; i < limit; i++)
 	{
-		uint32_t val1 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
+		u32 val1 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
 		offset += 4;
-		uint32_t val2 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
+		u32 val2 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
 
 
 		printf("(%d) data range %08x %08x\n", i, val1, val2);
 
 		int x = 0;
 
-
 		stage = -1;
 
-		for (x=val1; x<val2;x++)
+		for (x = val1; x < val2; x++)
 		{
 			int end = puzzli2_take_leveldata_value(src2[x^1]);
 
@@ -2190,7 +2166,7 @@ void pgm_arm_type1_state::init_puzzli2()
 
 		printf("total number of valid columns was %02x\n", currentcolumn);
 
-		if ((currentcolumn!=0x6) && (currentcolumn!=0x7) && (currentcolumn!=0x8))  // 5 is suspicious
+		if ((currentcolumn != 0x6) && (currentcolumn != 0x7) && (currentcolumn != 0x8))  // 5 is suspicious
 			fatalerror("invalid number of columns?\n");
 
 		if (numbercolumns != currentcolumn)
@@ -2207,7 +2183,7 @@ void pgm_arm_type1_state::init_puzzli2()
 #if 0
 	if (!strcmp(machine().system().name,"puzzli2"))
 	{
-	uint8_t *src3 = (uint8_t *) (machine().root_device().memregion("maincpu")->base());
+	u8 *src3 = (u8 *) (machine().root_device().memregion("maincpu")->base());
 	printf("how to play data pointer %02x %02x %02x %02x\n", src3[0x17b28e ^1], src3[0x17b28f ^1], src3[0x17b290 ^1], src3[0x17b291 ^1]);
 	src3[0x17b28e ^1] = 0x00;
 	src3[0x17b28f ^1] = 0x11;
@@ -2219,7 +2195,7 @@ void pgm_arm_type1_state::init_puzzli2()
 	pgm_puzzli2_decrypt(machine());
 
 	{
-		uint8_t *ROM = (uint8_t*)memregion("maincpu")->base();
+		u8 *ROM = (u8*)memregion("maincpu")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -2242,8 +2218,8 @@ void pgm_arm_type1_state::init_py2k2()
 	pgm_basic_init();
 	pgm_py2k2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 }
 
 void pgm_arm_type1_state::init_pgm3in1()
@@ -2251,8 +2227,8 @@ void pgm_arm_type1_state::init_pgm3in1()
 	pgm_basic_init();
 	pgm_decrypt_pgm3in1(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 	m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
@@ -2260,7 +2236,7 @@ void pgm_arm_type1_state::init_pstar()
 {
 	pgm_basic_init();
 	pgm_pstar_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	arm7_type1_latch_init();
 
 	m_pstar_e7_value = 0;
 	m_pstar_b1_value = 0;
@@ -2268,11 +2244,11 @@ void pgm_arm_type1_state::init_pstar()
 	m_extra_ram[0] = 0;
 	m_extra_ram[1] = 0;
 	m_extra_ram[2] = 0;
-	memset(m_slots, 0, 16 * sizeof(uint32_t));
+	memset(m_slots, 0, 16 * sizeof(u32));
 
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_pstars;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r),this));
 
 	save_item(NAME(m_pstar_e7_value));
 	save_item(NAME(m_pstar_b1_value));
@@ -2284,28 +2260,28 @@ void pgm_arm_type1_state::init_kov()
 {
 	pgm_basic_init();
 	pgm_kov_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	arm7_type1_latch_init();
 	m_curslots = 0;
 	m_kov_c0_value = 0;
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 }
 
 void pgm_arm_type1_state::init_kovboot()
 {
 	pgm_basic_init();
 //  pgm_kov_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	arm7_type1_latch_init();
 	m_curslots = 0;
 	m_kov_c0_value = 0;
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 
 }
 
@@ -2313,12 +2289,12 @@ void pgm_arm_type1_state::init_oldsplus()
 {
 	pgm_basic_init();
 	pgm_oldsplus_decrypt(machine());
-	pgm_arm7_type1_latch_init();
-	memset(m_extra_ram, 0, 0x100 * sizeof(uint16_t));
-	memset(m_slots, 0, 0x100 * sizeof(uint32_t));
+	arm7_type1_latch_init();
+	memset(m_extra_ram, 0, 0x100 * sizeof(u16));
+	memset(m_slots, 0, 0x100 * sizeof(u32));
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_oldsplus;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 	save_item(NAME(m_extra_ram));
 }
 

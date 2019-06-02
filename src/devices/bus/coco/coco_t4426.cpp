@@ -129,17 +129,18 @@ namespace
 
 		optional_ioport m_autostart;
 
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 		virtual DECLARE_READ8_MEMBER(scs_read) override;
 		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 	private:
 		// internal state
+		required_memory_region m_eprom;
+		required_memory_region m_eprom_banked;
 		required_device<acia6850_device> m_uart;
 		required_device<pia6821_device> m_pia;
 		required_device<mc14411_device> m_brg;
 
 		required_ioport             m_serial_baud;
-
-		void set_bank();
 	};
 };
 
@@ -241,6 +242,8 @@ coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type 
 	, m_cart(nullptr)
 	, m_select(0)
 	, m_autostart(*this, CART_AUTOSTART_TAG)
+	, m_eprom(*this, CARTSLOT_TAG)
+	, m_eprom_banked(*this, CARTBANK_TAG)
 	, m_uart(*this, UART_TAG)
 	, m_pia(*this, PIA_TAG)
 	, m_brg(*this, BRG_TAG)
@@ -293,7 +296,7 @@ void coco_t4426_device::device_reset()
 	LOG("%s()\n", FUNCNAME );
 	auto cart_line = line_value::Q;
 	set_line_value(line::CART, cart_line);
-	set_bank();
+	m_select = 0x00;
 
 	// Set up the BRG divider statically to X1
 	m_brg->rsa_w( ASSERT_LINE );
@@ -398,26 +401,39 @@ WRITE8_MEMBER( coco_t4426_device::pia_A_w )
 {
 	LOGPIA("%s(%02x)\n", FUNCNAME, data);
 	m_select = data;
-	set_bank();
 }
 
-void coco_t4426_device::set_bank()
-{
-	uint8_t *cartbase = memregion(CARTSLOT_TAG)->base();
-	uint8_t *bankbase = memregion(CARTBANK_TAG)->base();
+/*-------------------------------------------------
+    cts_read
+-------------------------------------------------*/
 
-	switch (m_select)
+READ8_MEMBER(coco_t4426_device::cts_read)
+{
+	uint8_t result = 0x00;
+
+	switch (offset & 0x2000)
 	{
-	case 0:
-	case ROM0:memcpy(cartbase, bankbase + 0x0000, 0x2000); break;
-	case ROM1:memcpy(cartbase, bankbase + 0x2000, 0x2000); break;
-	case ROM2:memcpy(cartbase, bankbase + 0x4000, 0x2000); break;
-	case ROM3:memcpy(cartbase, bankbase + 0x6000, 0x2000); break;
-	case ROM4:memcpy(cartbase, bankbase + 0x8000, 0x2000); break;
-	case ROM5:memcpy(cartbase, bankbase + 0xa000, 0x2000); break;
-	case ROM6:memcpy(cartbase, bankbase + 0xc000, 0x2000); break;
-	case ROM7:memcpy(cartbase, bankbase + 0xe000, 0x2000); break;
+	case 0x0000:
+		switch (m_select)
+		{
+		case 0:
+		case ROM0:result = m_eprom_banked->base()[0x0000 | offset]; break;
+		case ROM1:result = m_eprom_banked->base()[0x2000 | offset]; break;
+		case ROM2:result = m_eprom_banked->base()[0x4000 | offset]; break;
+		case ROM3:result = m_eprom_banked->base()[0x6000 | offset]; break;
+		case ROM4:result = m_eprom_banked->base()[0x8000 | offset]; break;
+		case ROM5:result = m_eprom_banked->base()[0xa000 | offset]; break;
+		case ROM6:result = m_eprom_banked->base()[0xc000 | offset]; break;
+		case ROM7:result = m_eprom_banked->base()[0xe000 | offset]; break;
+		}
+		break;
+
+	case 0x2000:
+		result = m_eprom->base()[offset];
+		break;
 	}
+
+	return result;
 }
 
 /*-------------------------------------------------

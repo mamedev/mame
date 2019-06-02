@@ -10,7 +10,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1: Matsnill, rita, schema, stava"/>
 			<dataarea name="flop" size="309963">
-				<rom name="compis-program.td0" size="309963" crc="bc2e30cb" sha1="02b12b205104547869773f5bc7a0100a7a70c997" offset="0" />
+				<rom name="compis-program.td0" size="309963" crc="bc2e30cb" sha1="02b12b205104547869773f5bc7a0100a7a70c997"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="331170">
-				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e" offset="0" />
+				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="246025">
-				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee" offset="0" />
+				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="557550">
-				<rom name="compismsdos.imd" size="557550" crc="5919305f" sha1="5cacb6344c96eba5c99a134e573cb4571751b892" offset="0" />
+				<rom name="compismsdos.imd" size="557550" crc="5919305f" sha1="5cacb6344c96eba5c99a134e573cb4571751b892"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="671503">
-				<rom name="compissys2.imd" size="671503" crc="13ca7af8" sha1="c6c1e747d5e5899a31ceb2fc7f83b0ac6593bf08" offset="0" />
+				<rom name="compissys2.imd" size="671503" crc="13ca7af8" sha1="c6c1e747d5e5899a31ceb2fc7f83b0ac6593bf08"/>
 			</dataarea>
 		</part>
 	</software>

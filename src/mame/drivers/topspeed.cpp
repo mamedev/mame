@@ -191,7 +191,7 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
-	uint8_t port = m_tc0040ioc->port_r(space, 0);
+	uint8_t port = m_tc0040ioc->port_r();
 	uint16_t steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
@@ -203,7 +203,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0040ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r();
 	}
 }
 

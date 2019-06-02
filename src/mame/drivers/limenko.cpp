@@ -78,13 +78,13 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_fg_videoram;
-	required_shared_ptr<uint32_t> m_md_videoram;
-	required_shared_ptr<uint32_t> m_bg_videoram;
-	required_shared_ptr<uint32_t> m_spriteram;
-	required_shared_ptr<uint32_t> m_videoreg;
-	required_region_ptr<uint8_t> m_gfx_region;
+	required_shared_ptr<u32> m_mainram;
+	required_shared_ptr<u32> m_fg_videoram;
+	required_shared_ptr<u32> m_md_videoram;
+	required_shared_ptr<u32> m_bg_videoram;
+	required_shared_ptr<u32> m_spriteram;
+	required_shared_ptr<u32> m_videoreg;
+	required_region_ptr<u8> m_gfx_region;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
@@ -94,31 +94,32 @@ private:
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
-	uint8_t m_spotty_sound_cmd;
+	u8 m_spotty_sound_cmd;
 
-	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
-	DECLARE_WRITE32_MEMBER(bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(md_videoram_w);
-	DECLARE_WRITE32_MEMBER(fg_videoram_w);
-	DECLARE_WRITE32_MEMBER(spriteram_buffer_w);
-	DECLARE_WRITE8_MEMBER(spotty_sound_cmd_w);
-	DECLARE_READ8_MEMBER(spotty_sound_cmd_r);
-	DECLARE_READ8_MEMBER(spotty_sound_r);
+	void coincounter_w(u32 data);
+	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void md_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void fg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void spriteram_buffer_w(u32 data);
+	void spotty_sound_cmd_w(u8 data);
+	u8 spotty_sound_cmd_r();
+	u8 spotty_sound_r();
 	DECLARE_READ32_MEMBER(dynabomb_speedup_r);
 	DECLARE_READ32_MEMBER(legendoh_speedup_r);
 	DECLARE_READ32_MEMBER(sb2003_speedup_r);
 	DECLARE_READ32_MEMBER(spotty_speedup_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void qs1000_p1_w(u8 data);
+	void qs1000_p2_w(u8 data);
+	void qs1000_p3_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
-	void draw_sprites(const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,u8 width,u8 height,u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color, u8 priority);
+	void draw_sprites();
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	void limenko_io_map(address_map &map);
 	void limenko_map(address_map &map);
@@ -130,25 +131,25 @@ private:
   MISC FUNCTIONS
 *****************************************************************************************************/
 
-WRITE32_MEMBER(limenko_state::limenko_coincounter_w)
+void limenko_state::coincounter_w(u32 data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x10000);
 }
 
 
-WRITE32_MEMBER(limenko_state::bg_videoram_w)
+void limenko_state::bg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(limenko_state::md_videoram_w)
+void limenko_state::md_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(limenko_state::fg_videoram_w)
+void limenko_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -159,18 +160,13 @@ CUSTOM_INPUT_MEMBER(limenko_state::spriteram_bit_r)
 	return m_spriteram_bit;
 }
 
-WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
+void limenko_state::spriteram_buffer_w(u32 data)
 {
-	rectangle clip(0, 383, 0, 239);
-
-	m_sprites_bitmap_pri.fill(0, clip);
-	m_sprites_bitmap.fill(0, clip);
-
 	// toggle spriterams location in the memory map
 	m_spriteram_bit ^= 1;
 
 	// draw the sprites to the frame buffer
-	draw_sprites(clip);
+	draw_sprites();
 
 	// buffer the next number of sprites to draw
 	m_prev_sprites_count = (m_videoreg[0] & 0x1ff0000) >> 16;
@@ -180,16 +176,16 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
  SOUND FUNCTIONS
  *****************************************************************************************************/
 
-WRITE8_MEMBER(limenko_state::qs1000_p1_w)
+void limenko_state::qs1000_p1_w(u8 data)
 {
 }
 
-WRITE8_MEMBER(limenko_state::qs1000_p2_w)
+void limenko_state::qs1000_p2_w(u8 data)
 {
 	// Unknown. Often written with 0
 }
 
-WRITE8_MEMBER(limenko_state::qs1000_p3_w)
+void limenko_state::qs1000_p3_w(u8 data)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?
@@ -225,7 +221,7 @@ void limenko_state::limenko_io_map(address_map &map)
 	map(0x0000, 0x0003).portr("IN0");
 	map(0x0800, 0x0803).portr("IN1");
 	map(0x1000, 0x1003).portr("IN2");
-	map(0x4000, 0x4003).w(FUNC(limenko_state::limenko_coincounter_w));
+	map(0x4000, 0x4003).w(FUNC(limenko_state::coincounter_w));
 	map(0x4800, 0x4803).portw("EEPROMOUT");
 	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
 }
@@ -258,21 +254,21 @@ void limenko_state::spotty_io_map(address_map &map)
 	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
 }
 
-WRITE8_MEMBER(limenko_state::spotty_sound_cmd_w)
+void limenko_state::spotty_sound_cmd_w(u8 data)
 {
 	m_spotty_sound_cmd = data;
 }
 
-READ8_MEMBER(limenko_state::spotty_sound_cmd_r)
+u8 limenko_state::spotty_sound_cmd_r()
 {
 	return 0; //??? some status bit? if set it executes a jump in the code
 }
 
-READ8_MEMBER(limenko_state::spotty_sound_r)
+u8 limenko_state::spotty_sound_r()
 {
 	// check m_spotty_sound_cmd bits...
 
-	if(m_spotty_sound_cmd == 0xf7)
+	if (m_spotty_sound_cmd == 0xf7)
 		return m_soundlatch->read();
 	else
 		return m_oki->read();
@@ -284,148 +280,119 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 
 TILE_GET_INFO_MEMBER(limenko_state::get_bg_tile_info)
 {
-	int tile  = m_bg_videoram[tile_index] & 0x7ffff;
-	int color = (m_bg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	const u32 tile  = m_bg_videoram[tile_index] & 0x7ffff;
+	const u32 color = (m_bg_videoram[tile_index]>>28) & 0xf;
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(limenko_state::get_md_tile_info)
 {
-	int tile  = m_md_videoram[tile_index] & 0x7ffff;
-	int color = (m_md_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	const u32 tile  = m_md_videoram[tile_index] & 0x7ffff;
+	const u32 color = (m_md_videoram[tile_index]>>28) & 0xf;
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 {
-	int tile  = m_fg_videoram[tile_index] & 0x7ffff;
-	int color = (m_fg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	const u32 tile  = m_fg_videoram[tile_index] & 0x7ffff;
+	const u32 color = (m_fg_videoram[tile_index]>>28) & 0xf;
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
-		int priority)
+void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,u8 width, u8 height,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color, u8 priority)
 {
-	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
+	/* Start drawing */
+	const u16 pal = color << 8;
+	const u8 *source_base = &m_gfx_region[code];
 
-	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
-	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
 
-	if (sprite_screen_width && sprite_screen_height)
-	{
-		/* compute sprite increment per screen pixel */
-		int dx = (gfx->width()<<16)/sprite_screen_width;
-		int dy = (gfx->height()<<16)/sprite_screen_height;
+	int x_index_base = flipx ? width - 1 : 0;
+	int y_index = flipy ? height - 1 : 0;
 
-		int ex = sx+sprite_screen_width;
-		int ey = sy+sprite_screen_height;
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
 
-		int x_index_base;
-		int y_index;
+	// end coordinates
+	int ex = sx + width;
+	int ey = sy + height;
 
-		if( flipx )
+	if (sx < clip.min_x)
+	{ // clip left
+		int pixels = clip.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < clip.min_y)
+	{ // clip top
+		int pixels = clip.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > clip.max_x + 1)
+	{ // clip right
+		ex = clip.max_x + 1;
+	}
+	if (ey > clip.max_y + 1)
+	{ // clip bottom
+		ey = clip.max_y + 1;
+	}
+
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
 		{
-			x_index_base = (sprite_screen_width-1)*dx;
-			dx = -dx;
-		}
-		else
-		{
-			x_index_base = 0;
-		}
-
-		if( flipy )
-		{
-			y_index = (sprite_screen_height-1)*dy;
-			dy = -dy;
-		}
-		else
-		{
-			y_index = 0;
-		}
-
-		if( sx < clip.min_x)
-		{ /* clip left */
-			int pixels = clip.min_x-sx;
-			sx += pixels;
-			x_index_base += pixels*dx;
-		}
-		if( sy < clip.min_y )
-		{ /* clip top */
-			int pixels = clip.min_y-sy;
-			sy += pixels;
-			y_index += pixels*dy;
-		}
-		/* NS 980211 - fixed incorrect clipping */
-		if( ex > clip.max_x+1 )
-		{ /* clip right */
-			int pixels = ex-clip.max_x-1;
-			ex -= pixels;
-		}
-		if( ey > clip.max_y+1 )
-		{ /* clip bottom */
-			int pixels = ey-clip.max_y-1;
-			ey -= pixels;
-		}
-
-		if( ex>sx )
-		{ /* skip if inner loop doesn't draw anything */
-			int y;
-
-			for( y=sy; y<ey; y++ )
+			const u8 *source = source_base + y_index * width;
+			u16 *dest = &dest_bmp.pix16(y);
+			u8 *pri = &m_sprites_bitmap_pri.pix8(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
 			{
-				const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
-				uint16_t *dest = &dest_bmp.pix16(y);
-				uint8_t *pri = &m_sprites_bitmap_pri.pix8(y);
-
-				int x, x_index = x_index_base;
-				for( x=sx; x<ex; x++ )
+				const u8 c = source[x_index];
+				if (c != transparent_color)
 				{
-					int c = source[x_index>>16];
-					if( c != 0 )
-					{
-						if (pri[x]<priority)
+						if (pri[x] < priority)
 						{
-							dest[x] = pal_base+c;
+							dest[x] = pal + c;
 							pri[x] = priority;
 						}
-
-					}
-					x_index += dx;
 				}
-
-				y_index += dy;
+				x_index += xinc;
 			}
+			y_index += yinc;
 		}
 	}
 }
 
 // sprites aren't tile based (except for 8x8 ones)
-void limenko_state::draw_sprites(const rectangle &cliprect)
+void limenko_state::draw_sprites()
 {
-	int i;
-	uint32_t *sprites = m_spriteram + (0x200*2 * m_spriteram_bit);
-	uint8_t *gfx_max  = m_gfx_region + m_gfx_region.bytes();
+	const rectangle cliprect(0,511,0,511);
+	m_sprites_bitmap_pri.fill(0, cliprect);
+	m_sprites_bitmap.fill(0, cliprect);
 
-	uint8_t *gfxdata;
+	u32 *sprites = m_spriteram + (0x200 * 2 * m_spriteram_bit);
 
-	for(i = 0; i <= m_prev_sprites_count*2; i += 2)
+	for (int i = 0; i <= m_prev_sprites_count * 2; i += 2)
 	{
-		int x, width, flipx, y, height, flipy, code, color, pri;
+		if (~sprites[i] & 0x80000000) continue;
 
-		if(~sprites[i] & 0x80000000) continue;
+		const int x      =  ((sprites[i + 0] & 0x01ff0000) >> 16);
+		const int width  = (((sprites[i + 0] & 0x0e000000) >> 25) + 1) * 8;
+		const bool flipx =    sprites[i + 0] & 0x10000000;
+		const int y      =    sprites[i + 0] & 0x000001ff;
+		const int height = (((sprites[i + 0] & 0x00000e00) >> 9) + 1) * 8;
+		const bool flipy =    sprites[i + 0] & 0x00001000;
+		const u32 code   =   (sprites[i + 1] & 0x0007ffff) << 6;
+		const u32 color  =   (sprites[i + 1] & 0xf0000000) >> 28;
 
-		x = ((sprites[i] & 0x1ff0000) >> 16);
-		width = (((sprites[i] & 0xe000000) >> 25) + 1) * 8;
-		flipx = sprites[i] & 0x10000000;
-		y = sprites[i] & 0x1ff;
-		height = (((sprites[i] & 0xe00) >> 9) + 1) * 8;
-		flipy = sprites[i] & 0x1000;
-		code = sprites[i + 1] & 0x7ffff;
-		color = (sprites[i + 1] & 0xf0000000) >> 28;
-
-		if(sprites[i + 1] & 0x04000000)
+		int pri = 0;
+		if (sprites[i + 1] & 0x04000000)
 		{
 			// below fg
 			pri = 1;
@@ -436,44 +403,37 @@ void limenko_state::draw_sprites(const rectangle &cliprect)
 			pri = 2;
 		}
 
-		gfxdata = m_gfx_region + 64 * code;
-
 		/* Bounds checking */
-		if ( (gfxdata + width * height - 1) >= gfx_max )
+		if ((code + (width * height)) > m_gfx_region.length())
 			continue;
 
-		/* prepare GfxElement on the fly */
-		gfx_element gfx(m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
-
-		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
+		draw_single_sprite(m_sprites_bitmap,cliprect,width,height,code,color,flipx,flipy,x,y,0,pri);
 
 		// wrap around x
-		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y,pri);
+		draw_single_sprite(m_sprites_bitmap,cliprect,width,height,code,color,flipx,flipy,x-512,y,0,pri);
 
 		// wrap around y
-		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y-512,pri);
+		draw_single_sprite(m_sprites_bitmap,cliprect,width,height,code,color,flipx,flipy,x,y-512,0,pri);
 
 		// wrap around x and y
-		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y-512,pri);
+		draw_single_sprite(m_sprites_bitmap,cliprect,width,height,code,color,flipx,flipy,x-512,y-512,0,pri);
 	}
 }
 
 void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
-	int y;
-	for( y=cliprect.min_y; y<=cliprect.max_y; y++ )
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *source = &sprites_bitmap.pix16(y);
-		uint16_t *dest = &bitmap.pix16(y);
-		uint8_t *dest_pri = &priority_bitmap.pix8(y);
-		uint8_t *source_pri = &m_sprites_bitmap_pri.pix8(y);
+		u16 *source = &sprites_bitmap.pix16(y);
+		u16 *dest = &bitmap.pix16(y);
+		u8 *dest_pri = &priority_bitmap.pix8(y);
+		u8 *source_pri = &m_sprites_bitmap_pri.pix8(y);
 
-		int x;
-		for( x=cliprect.min_x; x<=cliprect.max_x; x++ )
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if( source[x]!= 0 )
+			if (source[x] != 0)
 			{
-				if(dest_pri[x] < source_pri[x])
+				if (dest_pri[x] < source_pri[x])
 					dest[x] = source[x];
 			}
 		}
@@ -489,14 +449,14 @@ void limenko_state::video_start()
 	m_md_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_sprites_bitmap.allocate(384,240);
-	m_sprites_bitmap_pri.allocate(384,240);
+	m_sprites_bitmap.allocate(512,512);
+	m_sprites_bitmap_pri.allocate(512,512);
 
 	save_item(NAME(m_spriteram_bit));
 	save_item(NAME(m_prev_sprites_count));
 }
 
-uint32_t limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 limenko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
@@ -518,7 +478,7 @@ uint32_t limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind1
 	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,1);
 
-	if(m_videoreg[0] & 8)
+	if (m_videoreg[0] & 8)
 		copy_sprites(bitmap, m_sprites_bitmap, screen.priority(), cliprect);
 
 	return 0;
@@ -528,159 +488,159 @@ uint32_t limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind1
   INPUT PORTS
 *****************************************************************************************************/
 
-static INPUT_PORTS_START( legendoh )
+static INPUT_PORTS_START(legendoh)
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(3)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(3)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(3)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
+	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(1)
+	PORT_BIT(0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(3)
+	PORT_BIT(0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(3)
+	PORT_BIT(0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(3)
+	PORT_BIT(0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(3)
+	PORT_BIT(0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3)
+	PORT_BIT(0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3)
+	PORT_BIT(0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(3)
+	PORT_BIT(0x80000000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(3)
+	PORT_BIT(0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(4)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(4)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(4)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(4)
+	PORT_BIT(0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(4)
+	PORT_BIT(0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(4)
+	PORT_BIT(0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4)
+	PORT_BIT(0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(4)
+	PORT_BIT(0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(4)
+	PORT_BIT(0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(4)
+	PORT_BIT(0x80000000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(4)
+	PORT_BIT(0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
-	PORT_BIT( 0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM) //security bit
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT(0x01000000, IP_ACTIVE_LOW, IPT_START3)
+	PORT_BIT(0x02000000, IP_ACTIVE_LOW, IPT_START4)
+	PORT_BIT(0x04000000, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x08000000, IP_ACTIVE_LOW, IPT_COIN4)
+	PORT_BIT(0x10000000, IP_ACTIVE_LOW, IPT_SERVICE2)
+	PORT_DIPNAME(0x20000000, 0x00000000, "Sound Enable")
+	PORT_DIPSETTING(         0x20000000, DEF_STR(Off))
+	PORT_DIPSETTING(         0x00000000, DEF_STR(On))
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT(0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
+	PORT_START("EEPROMOUT")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+//  PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sb2003 )
+static INPUT_PORTS_START(sb2003)
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
+	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(1)
+	PORT_BIT(0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // checked in dynabomb I/O test, but doesn't work in game
-	PORT_BIT( 0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM) //security bit
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_DIPNAME(0x20000000, 0x00000000, "Sound Enable")
+	PORT_DIPSETTING(         0x20000000, DEF_STR(Off))
+	PORT_DIPSETTING(         0x00000000, DEF_STR(On))
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1) // checked in dynabomb I/O test, but doesn't work in game
+	PORT_BIT(0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
+	PORT_START("EEPROMOUT")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+//  PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spotty )
+static INPUT_PORTS_START(spotty)
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Hold 1")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Hold 2")
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Hold 3")
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Change")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_NAME("Hold 1")
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_NAME("Hold 2")
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_NAME("Hold 3")
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Hold 4")
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Bet")
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Stop")
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Change")
+	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Prize Hopper 1")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Prize Hopper 2")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Prize Hopper 3")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Prize Hopper 1")
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Prize Hopper 2")
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Prize Hopper 3")
+	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
-	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM) //security bit
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_DIPNAME(0x20000000, 0x20000000, DEF_STR(Demo_Sounds))
+	PORT_DIPSETTING(         0x00000000, DEF_STR(Off))
+	PORT_DIPSETTING(         0x20000000, DEF_STR(On))
+	PORT_BIT(0x80000000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
+	PORT_START("EEPROMOUT")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+//  PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 /*****************************************************************************************************
@@ -699,8 +659,8 @@ static const gfx_layout tile_layout =
 	8*8*8,
 };
 
-static GFXDECODE_START( gfx_limenko )
-	GFXDECODE_ENTRY( "gfx", 0, tile_layout, 0, 16 ) /* tiles */
+static GFXDECODE_START(gfx_limenko)
+	GFXDECODE_ENTRY("gfx", 0, tile_layout, 0, 16) /* tiles */
 GFXDECODE_END
 
 
@@ -723,7 +683,7 @@ void limenko_state::limenko(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 240);
 	screen.set_visarea(0, 383, 0, 239);
-	screen.set_screen_update(FUNC(limenko_state::screen_update_limenko));
+	screen.set_screen_update(FUNC(limenko_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_limenko);
@@ -768,7 +728,7 @@ void limenko_state::spotty(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 240);
 	screen.set_visarea(0, 383, 0, 239);
-	screen.set_screen_update(FUNC(limenko_state::screen_update_limenko));
+	screen.set_screen_update(FUNC(limenko_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_limenko);
@@ -820,76 +780,76 @@ Notes:
 
 */
 
-ROM_START( dynabomb )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD16_WORD_SWAP( "rom.u6", 0x000000, 0x200000, CRC(457e015d) SHA1(3afb56cdf903c9084c1f283dc50ec504ce3e199f) )
+ROM_START(dynabomb)
+	ROM_REGION32_BE(0x200000, "maincpu", 0) /* Hyperstone CPU Code */
+	ROM_LOAD16_WORD_SWAP("rom.u6", 0x000000, 0x200000, CRC(457e015d) SHA1(3afb56cdf903c9084c1f283dc50ec504ce3e199f))
 
-	ROM_REGION32_BE( 0x400000, "maindata", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "rom.u5", 0x000000, 0x200000, CRC(7e837adf) SHA1(8613fa187b8d4574b3935aa439aec2515033d64c) )
+	ROM_REGION32_BE(0x400000, "maindata", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("rom.u5", 0x000000, 0x200000, CRC(7e837adf) SHA1(8613fa187b8d4574b3935aa439aec2515033d64c))
 
-	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
-	ROM_LOAD( "rom.u16", 0x00000, 0x20000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a) )
-	ROM_FILL(            0x20000, 0x60000, 0xff)
+	ROM_REGION(0x80000, "qs1000:cpu", 0) /* QS1000 CPU */
+	ROM_LOAD("rom.u16", 0x00000, 0x20000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a))
+	ROM_FILL(           0x20000, 0x60000, 0xff)
 
-	ROM_REGION( 0x800000, "gfx", 0 )
-	ROM_LOAD32_BYTE( "rom.u1", 0x000000, 0x200000, CRC(bf33eff6) SHA1(089b6d88d6d744bcfa036c6869f0444d6ceb26c9) )
-	ROM_LOAD32_BYTE( "rom.u2", 0x000001, 0x200000, CRC(790bbcd5) SHA1(fc52c15fffc77dc3b3bc89a9606223c4fbaa578c) )
-	ROM_LOAD32_BYTE( "rom.u3", 0x000002, 0x200000, CRC(ec094b12) SHA1(13c105df066ff308cc7e1842907644790946e5b5) )
-	ROM_LOAD32_BYTE( "rom.u4", 0x000003, 0x200000, CRC(88b24e3c) SHA1(5f267f08144b413b55ef5e15c52e9cda096b80e7) )
+	ROM_REGION(0x800000, "gfx", 0)
+	ROM_LOAD32_BYTE("rom.u1", 0x000000, 0x200000, CRC(bf33eff6) SHA1(089b6d88d6d744bcfa036c6869f0444d6ceb26c9))
+	ROM_LOAD32_BYTE("rom.u2", 0x000001, 0x200000, CRC(790bbcd5) SHA1(fc52c15fffc77dc3b3bc89a9606223c4fbaa578c))
+	ROM_LOAD32_BYTE("rom.u3", 0x000002, 0x200000, CRC(ec094b12) SHA1(13c105df066ff308cc7e1842907644790946e5b5))
+	ROM_LOAD32_BYTE("rom.u4", 0x000003, 0x200000, CRC(88b24e3c) SHA1(5f267f08144b413b55ef5e15c52e9cda096b80e7))
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
-	ROM_LOAD( "rom.u18",  0x000000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
-	ROM_LOAD( "rom.u17",  0x080000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
-	ROM_LOAD( "qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	ROM_REGION(0x1000000, "qs1000", 0) /* QDSP wavetable ROMs */
+	ROM_LOAD("rom.u18",  0x000000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de))
+	ROM_LOAD("rom.u17",  0x080000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907))
+	ROM_LOAD("qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02))
 	// U19 empty
 	// U20 empty
 ROM_END
 
-ROM_START( sb2003 ) /* No specific Country/Region */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD16_WORD_SWAP( "sb2003_05.u6", 0x00000000, 0x200000, CRC(8aec4554) SHA1(57a12b142eb7bf08dd1e78d3c79222001bbaa636) )
+ROM_START(sb2003) /* No specific Country/Region */
+	ROM_REGION32_BE(0x200000, "maincpu", 0) /* Hyperstone CPU Code */
+	ROM_LOAD16_WORD_SWAP("sb2003_05.u6", 0x00000000, 0x200000, CRC(8aec4554) SHA1(57a12b142eb7bf08dd1e78d3c79222001bbaa636))
 
-	ROM_REGION32_BE( 0x400000, "maindata", ROMREGION_ERASEFF )
+	ROM_REGION32_BE(0x400000, "maindata", ROMREGION_ERASEFF)
 	// u5 empty
 
-	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
-	ROM_LOAD( "07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
-	ROM_FILL(           0x20000, 0x60000, 0xff)
+	ROM_REGION(0x80000, "qs1000:cpu", 0) /* QS1000 CPU */
+	ROM_LOAD("07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7))
+	ROM_FILL(          0x20000, 0x60000, 0xff)
 
-	ROM_REGION( 0x800000, "gfx", 0 )
-	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
-	ROM_LOAD32_BYTE( "02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402) )
-	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
-	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
+	ROM_REGION(0x800000, "gfx", 0)
+	ROM_LOAD32_BYTE("01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961))
+	ROM_LOAD32_BYTE("02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402))
+	ROM_LOAD32_BYTE("03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d))
+	ROM_LOAD32_BYTE("04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230))
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
-	ROM_LOAD( "06.u18",    0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
-	ROM_LOAD( "qs1003.u4", 0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	ROM_REGION(0x1000000, "qs1000", 0) /* QDSP wavetable ROMs */
+	ROM_LOAD("06.u18",    0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed))
+	ROM_LOAD("qs1003.u4", 0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02))
 	// U17 empty
 	// U19 empty
 	// U20 (S-ROM) empty
 ROM_END
 
-ROM_START( sb2003a ) /* Asia Region */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD16_WORD_SWAP( "sb2003a_05.u6", 0x000000, 0x200000, CRC(265e45a7) SHA1(b9c8b63aa89c08f3d9d404621e301b122f85389a) )
+ROM_START(sb2003a) /* Asia Region */
+	ROM_REGION32_BE(0x200000, "maincpu", 0) /* Hyperstone CPU Code */
+	ROM_LOAD16_WORD_SWAP("sb2003a_05.u6", 0x000000, 0x200000, CRC(265e45a7) SHA1(b9c8b63aa89c08f3d9d404621e301b122f85389a))
 
-	ROM_REGION32_BE( 0x400000, "maindata", ROMREGION_ERASEFF )
+	ROM_REGION32_BE(0x400000, "maindata", ROMREGION_ERASEFF)
 	// u5 empty
 
-	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
-	ROM_LOAD( "07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
-	ROM_FILL(           0x20000, 0x60000, 0xff)
+	ROM_REGION(0x80000, "qs1000:cpu", 0) /* QS1000 CPU */
+	ROM_LOAD("07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7))
+	ROM_FILL(          0x20000, 0x60000, 0xff)
 
-	ROM_REGION( 0x800000, "gfx", 0 )
-	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
-	ROM_LOAD32_BYTE( "02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402) )
-	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
-	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
+	ROM_REGION(0x800000, "gfx", 0)
+	ROM_LOAD32_BYTE("01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961))
+	ROM_LOAD32_BYTE("02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402))
+	ROM_LOAD32_BYTE("03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d))
+	ROM_LOAD32_BYTE("04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230))
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROM */
-	ROM_LOAD( "06.u18",   0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
-	ROM_LOAD( "qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	ROM_REGION(0x1000000, "qs1000", 0) /* QDSP wavetable ROM */
+	ROM_LOAD("06.u18",   0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed))
+	ROM_LOAD("qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02))
 	// U17 empty
 	// U19 empty
 	// U20 (S-ROM) empty
@@ -967,40 +927,40 @@ Link up 2 cabinets, up to 4 players can play at a time as a team
 
 */
 
-ROM_START( legendoh )
-	ROM_REGION32_BE( 0x200000, "maincpu", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+ROM_START(legendoh)
+	ROM_REGION32_BE(0x200000, "maincpu", ROMREGION_ERASEFF) /* Hyperstone CPU Code */
 	/* sys_rom1 empty */
 	/* sys_rom2 empty */
 	/* sys_rom3 empty */
-	ROM_LOAD16_WORD_SWAP( "01.sys_rom4", 0x180000, 0x80000, CRC(49b4a91f) SHA1(21619e8cd0b2fba8c2e08158497575a1760f52c5) )
+	ROM_LOAD16_WORD_SWAP("01.sys_rom4", 0x180000, 0x80000, CRC(49b4a91f) SHA1(21619e8cd0b2fba8c2e08158497575a1760f52c5))
 
-	ROM_REGION32_BE( 0x400000, "maindata", 0 )
-	ROM_LOAD16_WORD_SWAP( "sys_rom6", 0x000000, 0x200000, CRC(5c13d467) SHA1(ed07b7e1b22293e256787ab079d00c2fb070bf4f) )
-	ROM_LOAD16_WORD_SWAP( "sys_rom5", 0x200000, 0x200000, CRC(19dc8d23) SHA1(433687c6aa24b9456436eecb1dcb57814af3009d) )
+	ROM_REGION32_BE(0x400000, "maindata", 0)
+	ROM_LOAD16_WORD_SWAP("sys_rom6", 0x000000, 0x200000, CRC(5c13d467) SHA1(ed07b7e1b22293e256787ab079d00c2fb070bf4f))
+	ROM_LOAD16_WORD_SWAP("sys_rom5", 0x200000, 0x200000, CRC(19dc8d23) SHA1(433687c6aa24b9456436eecb1dcb57814af3009d))
 	/* sys_rom8 empty */
 	/* sys_rom7 empty */
 
-	ROM_REGION( 0x1200000, "gfx", 0 )
-	ROM_LOAD32_BYTE( "cg_rom10",     0x0000000, 0x200000, CRC(93a48489) SHA1(a14157d31b4e9c8eb7ebe1b2f1b707ec8c8561a0) )
-	ROM_LOAD32_BYTE( "cg_rom20",     0x0000001, 0x200000, CRC(1a6c0258) SHA1(ac7c3b8c2fdfb542103032144a30293d44759fd1) )
-	ROM_LOAD32_BYTE( "cg_rom30",     0x0000002, 0x200000, CRC(a0559ef4) SHA1(6622f7107b374c9da816b9814fe93347e7422190) )
-	ROM_LOAD32_BYTE( "cg_rom40",     0x0000003, 0x200000, CRC(a607b2b5) SHA1(9a6b867d6a777cbc910b98d505367819e0c20077) )
-	ROM_LOAD32_BYTE( "cg_rom11",     0x0800000, 0x200000, CRC(a9fd5a50) SHA1(d15fc4d1697c1505aa98979af09bcfbbc2521145) )
-	ROM_LOAD32_BYTE( "cg_rom21",     0x0800001, 0x200000, CRC(b05cdeb2) SHA1(43115146496ee3a820278ffc0b5f0325d6af6335) )
-	ROM_LOAD32_BYTE( "cg_rom31",     0x0800002, 0x200000, CRC(a9a0d386) SHA1(501af14ea1af70be4862172701af4850750d3f36) )
-	ROM_LOAD32_BYTE( "cg_rom41",     0x0800003, 0x200000, CRC(1c014f45) SHA1(a76246e90b41cc892575f3a3dc26d8d674e3fc3a) )
-	ROM_LOAD32_BYTE( "02.cg_rom12",  0x1000000, 0x080000, CRC(8b2e8cbc) SHA1(6ed6db843e27d715e473752dd3853a28bb81a368) )
-	ROM_LOAD32_BYTE( "03.cg_rom22",  0x1000001, 0x080000, CRC(a35960c8) SHA1(86914701930512cae81d1ad892d482264f80f695) )
-	ROM_LOAD32_BYTE( "04.cg_rom32",  0x1000002, 0x080000, CRC(3f486cab) SHA1(6507d4bb9b4aa7d43f1026e932c82629d4fa44dd) )
-	ROM_LOAD32_BYTE( "05.cg_rom42",  0x1000003, 0x080000, CRC(5d807bec) SHA1(c72c77ed0478f705018519cf68a54d22524d05fd) )
+	ROM_REGION(0x1200000, "gfx", 0)
+	ROM_LOAD32_BYTE("cg_rom10",     0x0000000, 0x200000, CRC(93a48489) SHA1(a14157d31b4e9c8eb7ebe1b2f1b707ec8c8561a0))
+	ROM_LOAD32_BYTE("cg_rom20",     0x0000001, 0x200000, CRC(1a6c0258) SHA1(ac7c3b8c2fdfb542103032144a30293d44759fd1))
+	ROM_LOAD32_BYTE("cg_rom30",     0x0000002, 0x200000, CRC(a0559ef4) SHA1(6622f7107b374c9da816b9814fe93347e7422190))
+	ROM_LOAD32_BYTE("cg_rom40",     0x0000003, 0x200000, CRC(a607b2b5) SHA1(9a6b867d6a777cbc910b98d505367819e0c20077))
+	ROM_LOAD32_BYTE("cg_rom11",     0x0800000, 0x200000, CRC(a9fd5a50) SHA1(d15fc4d1697c1505aa98979af09bcfbbc2521145))
+	ROM_LOAD32_BYTE("cg_rom21",     0x0800001, 0x200000, CRC(b05cdeb2) SHA1(43115146496ee3a820278ffc0b5f0325d6af6335))
+	ROM_LOAD32_BYTE("cg_rom31",     0x0800002, 0x200000, CRC(a9a0d386) SHA1(501af14ea1af70be4862172701af4850750d3f36))
+	ROM_LOAD32_BYTE("cg_rom41",     0x0800003, 0x200000, CRC(1c014f45) SHA1(a76246e90b41cc892575f3a3dc26d8d674e3fc3a))
+	ROM_LOAD32_BYTE("02.cg_rom12",  0x1000000, 0x080000, CRC(8b2e8cbc) SHA1(6ed6db843e27d715e473752dd3853a28bb81a368))
+	ROM_LOAD32_BYTE("03.cg_rom22",  0x1000001, 0x080000, CRC(a35960c8) SHA1(86914701930512cae81d1ad892d482264f80f695))
+	ROM_LOAD32_BYTE("04.cg_rom32",  0x1000002, 0x080000, CRC(3f486cab) SHA1(6507d4bb9b4aa7d43f1026e932c82629d4fa44dd))
+	ROM_LOAD32_BYTE("05.cg_rom42",  0x1000003, 0x080000, CRC(5d807bec) SHA1(c72c77ed0478f705018519cf68a54d22524d05fd))
 
-	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
-	ROM_LOAD( "sou_prg.06", 0x000000, 0x80000, CRC(bfafe7aa) SHA1(3e65869fe0970bafb59a0225642834042fdedfa6) )
+	ROM_REGION(0x80000, "qs1000:cpu", 0) /* QS1000 CPU */
+	ROM_LOAD("sou_prg.06", 0x000000, 0x80000, CRC(bfafe7aa) SHA1(3e65869fe0970bafb59a0225642834042fdedfa6))
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
-	ROM_LOAD( "sou_rom.07", 0x000000, 0x080000, CRC(4c6eb6d2) SHA1(58bced7bd944e03b0e3dfe1107c01819a33b2b31) )
-	ROM_LOAD( "sou_rom.08", 0x080000, 0x080000, CRC(42c32dd5) SHA1(4702771288ba40119de63feb67eed85667235d81) )
-	ROM_LOAD( "qs1003.u4",  0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	ROM_REGION(0x1000000, "qs1000", 0) /* QDSP wavetable ROMs */
+	ROM_LOAD("sou_rom.07", 0x000000, 0x080000, CRC(4c6eb6d2) SHA1(58bced7bd944e03b0e3dfe1107c01819a33b2b31))
+	ROM_LOAD("sou_rom.08", 0x080000, 0x080000, CRC(42c32dd5) SHA1(4702771288ba40119de63feb67eed85667235d81))
+	ROM_LOAD("qs1003.u4",  0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02))
 ROM_END
 
 /*
@@ -1029,31 +989,31 @@ SW2 = Reset
 
 */
 
-ROM_START( spotty )
-	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+ROM_START(spotty)
+	ROM_REGION32_BE(0x100000, "maincpu", ROMREGION_ERASEFF) /* Hyperstone CPU Code */
 	/* sys_rom1 empty */
-	ROM_LOAD16_WORD_SWAP( "sys_rom2",     0x080000, 0x80000, CRC(6ded8d9b) SHA1(547c532f4014d818c4412244b60dbc439496de20) )
+	ROM_LOAD16_WORD_SWAP("sys_rom2",     0x080000, 0x80000, CRC(6ded8d9b) SHA1(547c532f4014d818c4412244b60dbc439496de20))
 
-	ROM_REGION( 0x01000, "audiocpu", 0 )
-	ROM_LOAD( "at89c4051.mcu", 0x000000, 0x01000, CRC(82ceab26) SHA1(9bbc454bdcbc70dc01f10a13c9fc01c884918fe8) )
+	ROM_REGION(0x01000, "audiocpu", 0)
+	ROM_LOAD("at89c4051.mcu", 0x000000, 0x01000, CRC(82ceab26) SHA1(9bbc454bdcbc70dc01f10a13c9fc01c884918fe8))
 
 	/* Expand the gfx roms here */
-	ROM_REGION( 0x200000, "gfx", ROMREGION_ERASE00 )
+	ROM_REGION(0x200000, "gfx", ROMREGION_ERASE00)
 
-	ROM_REGION( 0x200000, "maindata", ROMREGION_ERASE00 )
-	ROM_LOAD32_BYTE( "gc_rom1",      0x000000, 0x80000, CRC(ea03f9c5) SHA1(5038c03c519c774da253f9ae4fa205e7eeaa2780) )
-	ROM_LOAD32_BYTE( "gc_rom3",      0x000001, 0x80000, CRC(0ddac0b9) SHA1(f4ac8e6dd7f1cbdeb97139008982e6c17a3d18b9) )
+	ROM_REGION(0x200000, "maindata", ROMREGION_ERASE00)
+	ROM_LOAD32_BYTE("gc_rom1",      0x000000, 0x80000, CRC(ea03f9c5) SHA1(5038c03c519c774da253f9ae4fa205e7eeaa2780))
+	ROM_LOAD32_BYTE("gc_rom3",      0x000001, 0x80000, CRC(0ddac0b9) SHA1(f4ac8e6dd7f1cbdeb97139008982e6c17a3d18b9))
 	/* gc_rom2 empty */
 
-	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "sou_rom1",     0x000000, 0x40000, CRC(5791195b) SHA1(de0df8f89f395cbf3508b01aeea05675e110ad04) )
+	ROM_REGION(0x40000, "oki", 0)
+	ROM_LOAD("sou_rom1",     0x000000, 0x40000, CRC(5791195b) SHA1(de0df8f89f395cbf3508b01aeea05675e110ad04))
 ROM_END
 
 
 
 READ32_MEMBER(limenko_state::dynabomb_speedup_r)
 {
-	if(m_maincpu->pc() == 0xc25b8)
+	if (m_maincpu->pc() == 0xc25b8)
 	{
 		m_maincpu->eat_cycles(50);
 	}
@@ -1063,7 +1023,7 @@ READ32_MEMBER(limenko_state::dynabomb_speedup_r)
 
 READ32_MEMBER(limenko_state::legendoh_speedup_r)
 {
-	if(m_maincpu->pc() == 0x23e32)
+	if (m_maincpu->pc() == 0x23e32)
 	{
 		m_maincpu->eat_cycles(50);
 	}
@@ -1073,7 +1033,7 @@ READ32_MEMBER(limenko_state::legendoh_speedup_r)
 
 READ32_MEMBER(limenko_state::sb2003_speedup_r)
 {
-	if(m_maincpu->pc() == 0x26da4)
+	if (m_maincpu->pc() == 0x26da4)
 	{
 		m_maincpu->eat_cycles(50);
 	}
@@ -1083,7 +1043,7 @@ READ32_MEMBER(limenko_state::sb2003_speedup_r)
 
 READ32_MEMBER(limenko_state::spotty_speedup_r)
 {
-	if(m_maincpu->pc() == 0x8560)
+	if (m_maincpu->pc() == 0x8560)
 	{
 		m_maincpu->eat_cycles(50);
 	}
@@ -1124,8 +1084,8 @@ void limenko_state::init_sb2003()
 
 void limenko_state::init_spotty()
 {
-	uint8_t *dst    = memregion("gfx")->base();
-	uint8_t *src    = memregion("maindata")->base();
+	u8 *dst    = memregion("gfx")->base();
+	u8 *src    = memregion("maindata")->base();
 
 	/* expand 4bpp roms to 8bpp space */
 	for (int x = 0; x < 0x200000; x += 4)
@@ -1143,10 +1103,10 @@ void limenko_state::init_spotty()
 	save_item(NAME(m_spotty_sound_cmd));
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_SUPPORTS_SAVE )
-GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_SUPPORTS_SAVE )
+GAME(2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_SUPPORTS_SAVE)
+GAME(2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_SUPPORTS_SAVE)
+GAME(2003, sb2003,   0,      limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_SUPPORTS_SAVE)
+GAME(2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, init_sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_SUPPORTS_SAVE)
 
 // this game only uses the same graphics chip used in Limenko's system
-GAME( 2001, spotty,   0,      spotty,  spotty,   limenko_state, init_spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(2001, spotty,   0,      spotty,  spotty,   limenko_state, init_spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)

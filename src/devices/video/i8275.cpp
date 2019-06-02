@@ -385,6 +385,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 						else
 						{
 							vsp = 1;
+							rvv = m_rvv; // cancel out reverse video for attribute character itself
 						}
 					}
 					else

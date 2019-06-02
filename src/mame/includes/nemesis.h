@@ -33,7 +33,7 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
 		m_bubsys_shared_ram(*this, "bubsys_shared"),
-		m_bubsys_control_ram(*this, "bubsys_control"),	
+		m_bubsys_control_ram(*this, "bubsys_control"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_filter1(*this, "filter1"),
@@ -148,7 +148,7 @@ private:
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(bubsys_vblank_irq);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);

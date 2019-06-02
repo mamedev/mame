@@ -1151,20 +1151,12 @@ void screen_device::update_now()
 		// if the line before us was incomplete, we must do it in two pieces
 		if (m_partial_scan_hpos > 0)
 		{
-			if (current_vpos > 1)
-			{
-				s32 save_scan = m_partial_scan_hpos;
-				update_partial(current_vpos - 2);
-				m_partial_scan_hpos = save_scan;
-			}
-
 			// now finish the previous partial scanline
-			int scanline = current_vpos - 1;
 			clip.set(
 					(std::max)(clip.left(), m_partial_scan_hpos),
-					(std::min)(clip.right(), current_hpos),
+					clip.right(),
 					(std::max)(clip.top(), m_last_partial_scan),
-					(std::min)(clip.bottom(), scanline));
+					(std::min)(clip.bottom(), m_last_partial_scan));
 
 			// if there's something to draw, do it
 			if (!clip.empty())
@@ -1182,10 +1174,10 @@ void screen_device::update_now()
 				m_partial_updates_this_frame++;
 				g_profiler.stop();
 				m_partial_scan_hpos = 0;
-				m_last_partial_scan = current_vpos + 1;
+				m_last_partial_scan++;
 			}
 		}
-		else
+		if (current_vpos > m_last_partial_scan)
 		{
 			update_partial(current_vpos - 1);
 		}
@@ -1257,7 +1249,7 @@ void screen_device::reset_partial_updates()
 
 u32 screen_device::pixel(s32 x, s32 y)
 {
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	if (!curbitmap.valid())
 		return 0;
 
@@ -1297,7 +1289,7 @@ u32 screen_device::pixel(s32 x, s32 y)
 
 void screen_device::pixels(u32 *buffer)
 {
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	if (!curbitmap.valid())
 		return;
 

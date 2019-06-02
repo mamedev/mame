@@ -877,22 +877,21 @@ void asuka_state::bonzeadv(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
 	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
-	PALETTE(config, "palette").set_entries(4096);
+	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -936,23 +935,22 @@ void asuka_state::asuka(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
-	PALETTE(config, "palette").set_entries(4096);
+	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(1);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1008,24 +1006,23 @@ void asuka_state::cadash(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
-	PALETTE(config, "palette").set_entries(4096);
+	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(1);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1069,23 +1066,22 @@ void asuka_state::mofflott(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
-	PALETTE(config, "palette").set_entries(4096);   /* only Mofflott uses full palette space */
+	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1137,23 +1133,22 @@ void asuka_state::eto(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
-	screen.set_palette("palette");
+	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
-	PALETTE(config, "palette").set_entries(4096);
+	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");
-	m_pc090oj->set_palette_tag("palette");
+	m_pc090oj->set_palette(m_tc0110pcr);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
-	m_tc0100scn->set_palette("palette");
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0, "palette");
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

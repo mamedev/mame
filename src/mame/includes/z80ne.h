@@ -92,6 +92,7 @@ public:
 	{
 	}
 
+	void lx387(machine_config &config);
 	void z80net(machine_config &config);
 	void z80ne(machine_config &config);
 	void z80netb(machine_config &config);

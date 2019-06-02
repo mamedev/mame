@@ -203,7 +203,9 @@
 #include "machine/esqvfd.h"
 
 #include "machine/68340.h"
+#include "machine/68340ser.h"
 #include "sound/es5506.h"
+#include "machine/esqpanel.h"
 
 #include "speaker.h"
 
@@ -214,7 +216,7 @@ public:
 	esqmr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sq1vfd(*this, "sq1vfd")
+		, m_panel(*this, "sq1vfd")
 	{ }
 
 	void mr(machine_config &config);
@@ -223,12 +225,15 @@ public:
 
 private:
 	required_device<m68340_cpu_device> m_maincpu;
-	required_device<esq2x40_sq1_device> m_sq1vfd;
+	required_device<esqpanel2x40_vfx_device> m_panel;
 
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+
 	void mr_map(address_map &map);
 };
 
@@ -239,9 +244,20 @@ void esqmr_state::machine_reset()
 void esqmr_state::mr_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
-//  AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
-//  AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
-//    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
+	map(0x00300000, 0x0037ffff).rom().region("maincpu", 0x80000);   // MR-61 needs this
+	map(0x00c00000, 0x00c7ffff).ram();
+	map(0x00dc0000, 0x00dc003f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x00de0000, 0x00de003f).rw("ensoniq2", FUNC(es5506_device::read), FUNC(es5506_device::write));
+}
+
+WRITE_LINE_MEMBER(esqmr_state::duart_tx_a)
+{
+	//m_mdout->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(esqmr_state::duart_tx_b)
+{
+	m_panel->rx_w(state);
 }
 
 WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
@@ -258,7 +274,13 @@ void esqmr_state::mr(machine_config &config)
 	M68340(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &esqmr_state::mr_map);
 
-	ESQ2X40_SQ1(config, m_sq1vfd, 60);
+	mc68340_serial_module_device &duart(*m_maincpu->subdevice<mc68340_serial_module_device>("serial"));
+	duart.set_clocks(500000, 500000, 1000000, 1000000);
+	duart.a_tx_cb().set(FUNC(esqmr_state::duart_tx_a));
+	duart.b_tx_cb().set(FUNC(esqmr_state::duart_tx_b));
+
+	ESQPANEL2X40_VFX(config, m_panel);
+	m_panel->write_tx().set(duart, FUNC(mc68340_serial_module_device::rx_b_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -10,6 +10,7 @@ device_network_interface::device_network_interface(const machine_config &mconfig
 	m_bandwidth = bandwidth;
 	set_mac("\0\0\0\0\0\0");
 	m_intf = 0;
+	m_loopback_control = false;
 }
 
 device_network_interface::~device_network_interface()
@@ -22,14 +23,30 @@ void device_network_interface::interface_pre_start()
 	m_recv_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_network_interface::recv_complete), this));
 }
 
-int device_network_interface::send(u8 *buf, int len) const
+void device_network_interface::interface_post_start()
+{
+	device().save_item(NAME(m_loopback_control));
+}
+
+int device_network_interface::send(u8 *buf, int len)
 {
 	// TODO: enable this check when other devices implement delayed transmit
 	//assert_always(!m_send_timer->enabled(), "attempted to transmit while transmit already in progress");
 
 	int result = 0;
 
-	if (m_dev)
+	if (m_loopback_control)
+	{
+		// loop data back to receiver
+		result = recv_start_cb(buf, len);
+
+		if (result)
+		{
+			// schedule receive complete callback
+			m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+		}
+	}
+	else if (m_dev)
 	{
 		// send the data
 		result = m_dev->send(buf, len);
@@ -50,8 +67,11 @@ void device_network_interface::recv_cb(u8 *buf, int len)
 {
 	assert_always(!m_recv_timer->enabled(), "attempted to receive while receive already in progress");
 
+	int result = 0;
+
 	// process the received data
-	int result = recv_start_cb(buf, len);
+	if (!m_loopback_control)
+		result = recv_start_cb(buf, len);
 
 	if (result)
 	{
@@ -69,7 +89,7 @@ TIMER_CALLBACK_MEMBER(device_network_interface::recv_complete)
 	recv_complete_cb(param);
 
 	// start receiving data from the network again
-	if (m_dev)
+	if (m_dev && !m_loopback_control)
 		m_dev->start();
 }
 
@@ -95,4 +115,20 @@ void device_network_interface::set_interface(int id)
 		id = -1;
 	}
 	m_intf = id;
+}
+
+void device_network_interface::set_loopback(bool loopback)
+{
+	if (m_loopback_control == loopback)
+		return;
+
+	m_loopback_control = loopback;
+
+	if (m_dev)
+	{
+		if (loopback)
+			m_dev->stop();
+		else if (!m_recv_timer->enabled())
+			m_dev->start();
+	}
 }

@@ -283,20 +283,18 @@ void actfancr_state::actfancr(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); /* VBL */
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_actfan);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_actfan);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
-	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
-	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(1);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -343,20 +341,18 @@ void actfancr_state::triothep(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); /* VBL */
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_triothep);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_triothep);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
-	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
-	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(1);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

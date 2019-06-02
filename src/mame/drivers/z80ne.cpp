@@ -447,16 +447,8 @@ void z80ne_state::z80ne(machine_config &config)
 	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 }
 
-void z80ne_state::z80net(machine_config &config)
+void z80ne_state::lx387(machine_config &config)
 {
-	z80ne(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80net_mem);
-	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80net_io);
-
-	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
-	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
-
 	KR2376_ST(config, m_lx387_kr2376, 50000);
 	m_lx387_kr2376->x<0>().set_ioport("X0");
 	m_lx387_kr2376->x<1>().set_ioport("X1");
@@ -468,6 +460,19 @@ void z80ne_state::z80net(machine_config &config)
 	m_lx387_kr2376->x<7>().set_ioport("X7");
 	m_lx387_kr2376->shift().set(FUNC(z80ne_state::lx387_shift_r));
 	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
+}
+
+void z80ne_state::z80net(machine_config &config)
+{
+	z80ne(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::z80net_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::z80net_io);
+
+	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
+	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
+
+	lx387(config);
 
 	/* video hardware */
 	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
@@ -510,17 +515,7 @@ void z80ne_state::z80netb(machine_config &config)
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("z80ne_cass");
 
-	KR2376_ST(config, m_lx387_kr2376, 50000);
-	m_lx387_kr2376->x<0>().set_ioport("X0");
-	m_lx387_kr2376->x<1>().set_ioport("X1");
-	m_lx387_kr2376->x<2>().set_ioport("X2");
-	m_lx387_kr2376->x<3>().set_ioport("X3");
-	m_lx387_kr2376->x<4>().set_ioport("X4");
-	m_lx387_kr2376->x<5>().set_ioport("X5");
-	m_lx387_kr2376->x<6>().set_ioport("X6");
-	m_lx387_kr2376->x<7>().set_ioport("X7");
-	m_lx387_kr2376->shift().set(FUNC(z80ne_state::lx387_shift_r));
-	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
+	lx387(config);
 
 	/* video hardware */
 	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
@@ -563,7 +558,7 @@ void z80netf_state::z80netf(machine_config &config)
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("z80ne_cass");
 
-	KR2376_ST(config, m_lx387_kr2376, 50000);
+	lx387(config);
 
 	/* video hardware */
 	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);

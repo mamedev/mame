@@ -11,7 +11,7 @@
 #define LOG_DATA_SENT   (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
-#define VERBOSE (LOG_UNSUPPORTED | LOG_DATA_SENT)
+#define VERBOSE (LOG_UNSUPPORTED)
 
 #include "logmacro.h"
 

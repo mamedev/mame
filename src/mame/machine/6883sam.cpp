@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 //**************************************************************************
 
 //-------------------------------------------------
-//  ctor
+//  constructor
 //-------------------------------------------------
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -85,6 +85,7 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	, m_space_FF40(*this)
 	, m_space_FF60(*this)
 	, m_space_FFE0(*this)
+	, m_space_FFF2(*this)
 {
 }
 
@@ -157,7 +158,7 @@ void sam6883_device::configure_bank(int bank, uint8_t *memory, uint32_t memory_s
 	switch(bank)
 	{
 		case 3:
-			m_space_C000.point(m_banks[3], m_banks[3].m_memory_offset);
+			m_space_C000.point(m_banks[3], 0x0000);
 			break;
 		case 4:
 			m_space_FF00.point(m_banks[4], 0x0000);
@@ -173,6 +174,7 @@ void sam6883_device::configure_bank(int bank, uint8_t *memory, uint32_t memory_s
 			break;
 		case 2:
 			m_space_FFE0.point(m_banks[2], 0x1FE0);
+			m_space_FFF2.point(m_banks[2], 0x1FF2);
 			break;
 	}
 }
@@ -264,8 +266,9 @@ void sam6883_device::update_memory(void)
 			break;
 
 		case SAM_STATE_M1:
+			// 64k mode (dynamic)
 		case SAM_STATE_M1|SAM_STATE_M0:
-			// 64k mode
+			// 64k mode (static)
 			if (m_sam_state & SAM_STATE_TY)
 			{
 				// full 64k RAM
@@ -293,8 +296,8 @@ void sam6883_device::update_memory(void)
 		m_space_C000.point(m_banks[3], m_banks[3].m_memory_offset);
 	}
 
-	// update $FFE0-$FFFF
-	m_space_FFE0.point(m_banks[2], m_banks[2].m_memory_offset + 0x1FE0);
+	// update $FFF2-$FFFF
+	m_space_FFF2.point(m_banks[2], m_banks[2].m_memory_offset + 0x1FF2);
 }
 
 
@@ -442,7 +445,7 @@ WRITE_LINE_MEMBER( sam6883_device::hs_w )
 
 
 //-------------------------------------------------
-//  sam_space::ctor
+//  sam_space::constructor
 //-------------------------------------------------
 
 template<uint16_t _addrstart, uint16_t _addrend>
@@ -506,38 +509,34 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		if (length != ~0)
 			length -= std::min(offset, length);
 
-		// do we even have a bank?  and if so, have legit changes occured?
-		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (length != m_length))
+		// name the bank
+		auto tag = string_format("bank%04X_%c", addrstart, is_write ? 'w' : 'r');
+
+		// determine "nop_addrstart" - where the bank ends, and above which is AM_NOP
+		uint32_t nop_addrstart = (length != ~0)
+			? std::min(addrend + 1, addrstart + length)
+			: addrend + 1;
+
+		// install the bank
+		if (is_write)
 		{
-			// name the bank
-			auto tag = string_format("bank%04X_%c", addrstart, is_write ? 'w' : 'r');
-
-			// determine "nop_addrstart" - where the bank ends, and above which is AM_NOP
-			uint32_t nop_addrstart = (length != ~0)
-				? std::min(addrend + 1, addrstart + length)
-				: addrend + 1;
-
-			// install the bank
-			if (is_write)
-			{
-				if (addrstart < nop_addrstart)
-					cpu_space().install_write_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
-				if (nop_addrstart <= addrend)
-					cpu_space().nop_write(nop_addrstart, addrend);
-			}
-			else
-			{
-				if (addrstart < nop_addrstart)
-					cpu_space().install_read_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
-				if (nop_addrstart <= addrend)
-					cpu_space().nop_read(nop_addrstart, addrend);
-			}
-
-			m_length = length;
-
-			// and get it
-			memory_bank = cpu_space().device().owner()->membank(tag.c_str());
+			if (addrstart < nop_addrstart)
+				cpu_space().install_write_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
+			if (nop_addrstart <= addrend)
+				cpu_space().nop_write(nop_addrstart, addrend);
 		}
+		else
+		{
+			if (addrstart < nop_addrstart)
+				cpu_space().install_read_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
+			if (nop_addrstart <= addrend)
+				cpu_space().nop_read(nop_addrstart, addrend);
+		}
+
+		m_length = length;
+
+		// and get it
+		memory_bank = cpu_space().device().owner()->membank(tag.c_str());
 
 		// point the bank
 		if (memory_bank != nullptr)
@@ -551,7 +550,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 	else
 	{
 		// this bank uses handlers - first thing's first, assert that we are not doing
-		// any weird stuff with offfsets and lengths - that isn't supported in this path
+		// any weird stuff with offsets and lengths - that isn't supported in this path
 		assert((offset == 0) && (length == (uint32_t)~0));
 
 		if (is_write)

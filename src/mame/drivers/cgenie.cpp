@@ -82,7 +82,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<rs232_port_device> m_rs232;
 	required_device<cg_exp_slot_device> m_exp;
 	required_memory_region m_char_rom;
@@ -125,8 +125,8 @@ void cgenie_state::cgenie_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf8, 0xf8).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xf9, 0xf9).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xfa, 0xfa).w(m_crtc, FUNC(hd6845_device::address_w));
-	map(0xfb, 0xfb).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0xfa, 0xfa).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0xfb, 0xfb).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xff, 0xff).rw(FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
 }
 
@@ -444,9 +444,9 @@ void cgenie_state::cgenie(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
-	HD6845(config, m_crtc, XTAL(17'734'470) / 16);
+	HD6845S(config, m_crtc, XTAL(17'734'470) / 16);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
