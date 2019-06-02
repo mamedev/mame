@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    jagdasm.c
+    jagdasm.cpp
     Disassembler for the portable Jaguar DSP emulator.
     Written by Aaron Giles
 
@@ -15,7 +15,7 @@
     STATIC VARIABLES
 ***************************************************************************/
 
-const uint8_t jaguar_disassembler::convert_zero[32] =
+const u8 jaguar_disassembler::convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
 const char *const jaguar_disassembler::condition[32] =
@@ -71,10 +71,10 @@ std::string jaguar_disassembler::signed_16bit(int16_t val)
 
 offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t flags = 0;
-	int op = opcodes.r16(pc);
-	int reg1 = (op >> 5) & 31;
-	int reg2 = op & 31;
+	u32 flags = 0;
+	const u16 op = opcodes.r16(pc);
+	const u8 reg1 = (op >> 5) & 31;
+	const u8 reg2 = op & 31;
 	int size = 2;
 
 	pc += 2;
@@ -150,7 +150,7 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 50:    util::stream_format(stream, "store   r%d,(r15+$%x)", reg2, convert_zero[reg1]*4);break;
 		case 51:    util::stream_format(stream, "move    pc,r%d", reg2);                            break;
 		case 52:    util::stream_format(stream, "jump    %s(r%d)", condition[reg2], reg1);          break;
-		case 53:    util::stream_format(stream, "jr      %s%08X", condition[reg2], pc + ((int8_t)(reg1 << 3) >> 2)); break;
+		case 53:    util::stream_format(stream, "jr      %s%08X", condition[reg2], pc + ((s8)(reg1 << 3) >> 2)); break;
 		case 54:    util::stream_format(stream, "mmult   r%d,r%d", reg1, reg2);                 break;
 		case 55:    util::stream_format(stream, "mtoi    r%d,r%d", reg1, reg2);                 break;
 		case 56:    util::stream_format(stream, "normi   r%d,r%d", reg1, reg2);                 break;
@@ -180,7 +180,7 @@ jaguar_disassembler::jaguar_disassembler(variant var) : m_variant(var)
 {
 }
 
-uint32_t jaguar_disassembler::opcode_alignment() const
+u32 jaguar_disassembler::opcode_alignment() const
 {
 	return 2;
 }
