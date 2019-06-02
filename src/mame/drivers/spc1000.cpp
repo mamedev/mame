@@ -4,25 +4,18 @@
 
 Samsung SPC-1000 driver by Miodrag Milanovic
 
-    2009-05-10 Preliminary driver.
-    2014-02-16 Added cassette, many games are playable
+2009-05-10 Preliminary driver.
+2014-02-16 Added cassette, many games are playable
 
 ToDo:
 - Find out if any of the unconnected parts of 6000,4000,4001 are used
 
 
-NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
-                  disk. Since it is not to our coding standards, it is
-                  commented out with #if 0/#endif and 3 slashes (///).
-                  It is planned to be converted when time permits. The
-                  author is Miso Kim.
+Hardware details of the fdc: Intelligent device, Z80 CPU,
+XTAL(8'000'000), PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
+small ics.
 
-                  Hardware details of the fdc: Intelligent device, Z80 CPU,
-                  XTAL(8'000'000), PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
-                  small ics. And of course, no schematic.
-
-
-2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
+2014-10-11: Added code for the floppy disk [Meeso Kim]
 
 2015-06-19: Added code for the centronics printer port
 
@@ -229,7 +222,8 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) && (time - m_time).as_attoseconds()/ATTOSECONDS_PER_MICROSECOND > 100) {
+	if (BIT(data, 1) && (time - m_time).as_attoseconds()/ATTOSECONDS_PER_MICROSECOND > 100)
+	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
 	}
@@ -410,7 +404,7 @@ void spc1000_state::machine_start()
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
 
-		m_time = machine().scheduler().time();
+	m_time = machine().scheduler().time();
 }
 
 void spc1000_state::machine_reset()
