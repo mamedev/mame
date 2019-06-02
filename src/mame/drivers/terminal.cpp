@@ -89,13 +89,19 @@ ROM_START( loewe715 ) // i8051, ITT LOTTI // 64k ram // colour
 ROM_END
 
 
-ROM_START( t3210 ) // order unknown // i8031, 8742 // 4+2k ram onboard; 24kb in battery-backed expansion // b&w
-	ROM_REGION( 0x12000, "maincpu", 0 )
+ROM_START( t3210 ) // order unknown // i8031, 8742, D80C39C // 4+2k ram onboard; 24kb in battery-backed expansion // b&w
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s22723_r115-c1-6_ct.d6",   0x00000, 0x8000, CRC(d09fea94) SHA1(52168060093dfe964c0316d9ff335cd59da01d48) )
 	ROM_LOAD( "s22723_r115-c2-6_ct.d7",   0x08000, 0x8000, CRC(6e1eaacd) SHA1(cfda25dbbeddc7c75379c4b0dc97addb602d79ef) )
-	ROM_LOAD( "s22723_r121-c2-2.d11",     0x10000, 0x0800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
-	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x10800, 0x0800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) )
-	ROM_LOAD( "prom_s22723_r120-c1.bin",  0x11000, 0x0100, CRC(4460cd50) SHA1(fe36d758d64493cb5f8217fe51bbbe8203424fbe) )
+
+	ROM_REGION( 0x800, "upi", 0 )
+	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x000, 0x800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) BAD_DUMP ) // BADADDR xx-xxxxxxxx
+
+	ROM_REGION( 0x800, "mcu", 0 ) // lock card
+	ROM_LOAD( "s22723_r121-c2-2.d11",     0x000, 0x800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "prom_s22723_r120-c1.bin",  0x000, 0x100, CRC(4460cd50) SHA1(fe36d758d64493cb5f8217fe51bbbe8203424fbe) )
 ROM_END
 
 
@@ -103,6 +109,9 @@ ROM_START( feap90 ) // order unknown // i8031, i8742 (+SAA5351, 80C42C121) // 4+
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "s22723-r116-c25-6 ex.d6", 0x00000, 0x10000, CRC(8362778d) SHA1(30fbe45eaedc1ed2e7b189f12e2ba7c23ab75de7) )
 	ROM_LOAD( "s22723-r116-c26-6 ex.d2", 0x10000, 0x08000, CRC(121622ba) SHA1(c447da13f88772ec7d26e55ca8822e2c2dc3ecef) )
+
+	ROM_REGION( 0x800, "upi", 0 )
+	ROM_LOAD( "8838p8-80c42c121-a85.d16", 0x000, 0x800, NO_DUMP )
 ROM_END
 
 
