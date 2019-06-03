@@ -8933,6 +8933,10 @@ sbishik                         // GX675 (c) 1998 (Korea)
 sbishika                        // GX675 (c) 1998 (Korea)
 dobouchn                        //
 
+@source:bitel.cpp
+feap90                          //
+t3210                           //
+
 @source:bitgraph.cpp
 bitgrpha                        //
 bitgrphb                        //
@@ -37620,10 +37624,8 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminal.cpp
 7951om                          //
 alcat258                        //
-feap90                          //
 loewe715                        //
 loewed                          //
-t3210                           //
 teleguide                       //
 telex277d                       // Telex 1979
 
