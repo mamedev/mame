@@ -1606,7 +1606,7 @@ void gnw_chef_state::merrycook(machine_config & config)
 
 ROM_START( gnw_chef )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "fp-24", 0x0000, 0x0740, BAD_DUMP CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) ) // dumped from Soviet clone
+	ROM_LOAD( "fp-24", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
 
 	ROM_REGION( 199453, "svg", 0)
 	ROM_LOAD( "gnw_chef.svg", 0, 199453, CRC(97aacb9a) SHA1(1d4b2cc70a541ad09bc13c09ce26a8c14c03c526) )
