@@ -22,7 +22,7 @@ public:
 	void i2c_scl_w(bool line);
 	void i2c_sda_w(bool line);
 
-	void reset_sample_count() { total_sample_count = total_samples_decoded = last_samples = 0; }
+	void reset_sample_count() { total_sample_count = total_samples_decoded = last_samples = sample_count = 0; }
 	u32 get_sample_count() const { return total_sample_count; }
 	u32 get_samples_decoded() const { return total_samples_decoded; }
 	bool is_playing() { return playback_enabled && total_sample_count <= total_samples_decoded; }
