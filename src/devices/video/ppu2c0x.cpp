@@ -1335,7 +1335,7 @@ void ppu2c0x_device::render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, 
 {
 	if (cliprect.bottom() <= BOTTOM_VISIBLE_SCANLINE && cliprect.right() < screen().visible_area().right())
 	{
-		// Partial line update, need to render first.
+		// Partial line update, need to render first (especially for light gun emulation).
 		update_scanline();
 	}
 	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, cliprect);
