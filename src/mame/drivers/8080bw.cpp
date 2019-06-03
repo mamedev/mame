@@ -3588,6 +3588,18 @@ ROM_START( searthina )
 	ROM_LOAD( "unka.a1",   0x1c00, 0x0400, CRC(4b65bd7c) SHA1(3931f9f5b0e3339ab484eee14473d3a474935fd9) )
 ROM_END
 
+ROM_START( supinvsion )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h-am4708.bin", 0x0000, 0x0400, CRC(281570f0) SHA1(9499d9abbe50df67865fe7a258abe58b4dc1f185) )
+	ROM_LOAD( "g-am4708.bin", 0x0400, 0x0400, CRC(c0b6cd79) SHA1(c2383b5d40a47ea518ce7f76ea035dbe4bfe0161) )
+	ROM_LOAD( "f-am4708.bin", 0x0800, 0x0400, CRC(2a8d9cd5) SHA1(7948d79b326e729bcb629607c8797156ff9fb0e8) )
+	ROM_LOAD( "e-am4708.bin", 0x0c00, 0x0400, CRC(03e9ef33) SHA1(8141c089fb300ebbd857bab8dee0875014fe8409) )
+	ROM_LOAD( "d-am4708.bin", 0x1000, 0x0400, CRC(b2527c77) SHA1(3a855118d4296ea3afbf553191630f32dfbe8220) )
+	ROM_LOAD( "c-am4708.bin", 0x1400, 0x0400, CRC(a883ff01) SHA1(fdc3d1fb4e4d732810ab6746f0df640dc1642e3c) )
+	ROM_LOAD( "b-am4708.bin", 0x1800, 0x0400, CRC(46e02fcf) SHA1(5509f1a04bf44fbfebffb5dd5c78f503960b100d) )
+	ROM_LOAD( "a-am4708.bin", 0x1c00, 0x0400, CRC(bf4d3267) SHA1(45d789e57543e8efad16cb82bf898ba6b6e1ec3e) )
+ROM_END
+
 ROM_START( searthie )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "searthie.h",   0x0000, 0x0800, CRC(92b08b91) SHA1(4cebb70735e5231717619c7b8e5d3080694338b7) )
@@ -5210,6 +5222,7 @@ GAMEL(1978, superinv,    invaders, invaders,  superinv,  mw8080bw_state, empty_i
 GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  mw8080bw_state, empty_init,    ROT270, "bootleg (Emag)", "Super Invaders (bootleg set 2)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // not related to Zenitone-Microsec version
 GAMEL(1980, searthin,    invaders, invaders,  searthin,  mw8080bw_state, empty_init,    ROT270, "bootleg (Competitive Video)", "Super Earth Invasion (set 1)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, searthina,   invaders, invaders,  searthin,  mw8080bw_state, empty_init,    ROT270, "bootleg (Competitive Video)", "Super Earth Invasion (set 2)", MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, supinvsion,  invaders, invaders,  searthin,  mw8080bw_state, empty_init,    ROT270, "bootleg (Electromar / Irecsa)", "Super Invasion (Electromar, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS, layout_invaders )
 GAMEL(1980, searthie,    invaders, invaders,  searthin,  mw8080bw_state, empty_init,    ROT270, "bootleg (Electrocoin)", "Super Earth Invasion (set 3)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv,    invaders, invaders,  alieninv,  mw8080bw_state, empty_init,    ROT270, "bootleg (Margamatics)", "Alien Invasion", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,  invaders, invaders,  searthin,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Alien Invasion Part II", MACHINE_SUPPORTS_SAVE, layout_invaders )
