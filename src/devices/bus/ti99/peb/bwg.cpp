@@ -622,7 +622,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	m_wd1773->intrq_wr_callback().set(FUNC(snug_bwg_device::fdc_irq_w));
 	m_wd1773->drq_wr_callback().set(FUNC(snug_bwg_device::fdc_drq_w));
 
-	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
+	MM58274C(config, CLOCK_TAG, 32.768_kHz_XTAL).set_mode_and_day(1, 0); // 24h, sunday
 
 	FLOPPY_CONNECTOR(config, "0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
@@ -631,7 +631,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
 
-	LS259(config, m_crulatch0_7); // U13
+	HC259(config, m_crulatch0_7); // U13
 	m_crulatch0_7->q_out_cb<0>().set(FUNC(snug_bwg_device::den_w));
 	m_crulatch0_7->q_out_cb<1>().set(FUNC(snug_bwg_device::mop_w));
 	m_crulatch0_7->q_out_cb<2>().set(FUNC(snug_bwg_device::waiten_w));
@@ -641,7 +641,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	m_crulatch0_7->q_out_cb<6>().set(FUNC(snug_bwg_device::dsel3_w));
 	m_crulatch0_7->q_out_cb<7>().set(FUNC(snug_bwg_device::sidsel_w));
 
-	LS259(config, m_crulatch8_15); // U12
+	HC259(config, m_crulatch8_15); // U12
 	m_crulatch8_15->q_out_cb<0>().set(FUNC(snug_bwg_device::dsel4_w));
 	m_crulatch8_15->q_out_cb<2>().set(FUNC(snug_bwg_device::dden_w));
 
