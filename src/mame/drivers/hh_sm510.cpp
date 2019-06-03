@@ -1515,9 +1515,8 @@ ROM_END
   * Sharp SM5A label FP-24 51YB (die label CMS646, ROM ID 74)
   * lcd screen with custom segments, 1-bit sound
 
-  In 1989, Elektronika(USSR) released a clone: Merry Cook. This game most
-  likely shares the same ROM (to be verified) and the graphics is slightly
-  different.
+  In 1989, Elektronika(USSR) released a clone: Merry Cook. This game shares
+  the same ROM, though the graphics are slightly different.
 
 ***************************************************************************/
 
