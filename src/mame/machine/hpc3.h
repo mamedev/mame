@@ -14,9 +14,23 @@
 #include "machine/hal2.h"
 #include "machine/ioc2.h"
 
-class hpc3_device : public device_t
+class hpc3_device : public device_t, public device_memory_interface
 {
 public:
+	enum pbus_space
+	{
+		AS_PIO0 = 0,
+		AS_PIO1,
+		AS_PIO2,
+		AS_PIO3,
+		AS_PIO4,
+		AS_PIO5,
+		AS_PIO6,
+		AS_PIO7,
+		AS_PIO8,
+		AS_PIO9
+	};
+
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T, typename U>
@@ -58,6 +72,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual space_config_vector memory_space_config() const override;
+
 	enum fifo_type_t : uint32_t
 	{
 		FIFO_PBUS,
@@ -76,16 +92,14 @@ protected:
 	template <fifo_type_t Type> DECLARE_READ32_MEMBER(fifo_r);
 	template <fifo_type_t Type> DECLARE_WRITE32_MEMBER(fifo_w);
 	DECLARE_READ32_MEMBER(intstat_r);
+	uint32_t misc_r();
+	void misc_w(uint32_t data);
 	uint32_t eeprom_r();
 	void eeprom_w(uint32_t data);
-	DECLARE_READ32_MEMBER(volume_r);
-	DECLARE_WRITE32_MEMBER(volume_w);
-	DECLARE_READ32_MEMBER(pbus4_r);
-	DECLARE_WRITE32_MEMBER(pbus4_w);
+	uint32_t pio_data_r(offs_t offset);
+	void pio_data_w(offs_t offset, uint32_t data);
 	DECLARE_READ32_MEMBER(pbusdma_r);
 	DECLARE_WRITE32_MEMBER(pbusdma_w);
-	DECLARE_READ32_MEMBER(unkpbus0_r);
-	DECLARE_WRITE32_MEMBER(unkpbus0_w);
 
 	DECLARE_READ32_MEMBER(dma_config_r);
 	DECLARE_WRITE32_MEMBER(dma_config_w);
@@ -155,7 +169,10 @@ protected:
 		ENET_XMIT = 1
 	};
 
+	const address_space_config m_pio_space_config[10];
+
 	required_address_space m_gio64_space;
+	address_space *m_pio_space[10];
 	required_device<ioc2_device> m_ioc2;
 	required_device<hal2_device> m_hal2;
 
@@ -174,9 +191,8 @@ protected:
 	devcb_write_line m_dma_complete_int_cb;
 
 	uint32_t m_intstat;
+	uint32_t m_misc;
 	uint32_t m_cpu_aux_ctrl;
-	uint8_t m_volume_l;
-	uint8_t m_volume_r;
 
 	struct scsi_dma_t
 	{

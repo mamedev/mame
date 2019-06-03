@@ -30,8 +30,8 @@ class ioc2_device : public device_t
 public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	DECLARE_INPUT_CHANGED_MEMBER( power_button );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
@@ -70,18 +70,10 @@ public:
 		INT3_LOCAL1_RETRACE   = 0x80,
 	};
 
-	uint32_t get_local_int_status(int channel) const { return m_int3_local_status_reg[channel]; }
-	uint32_t get_local_int_mask(int channel) const { return m_int3_local_mask_reg[channel]; }
-	uint32_t get_map_int_status() const { return m_int3_map_status_reg; }
-	uint32_t get_map_int_mask(int channel) const { return m_int3_map_mask_reg[channel]; }
-
-	void set_local_int_mask(int channel, const uint32_t mask);
-	void set_map_int_mask(int channel, const uint32_t mask);
-	void set_timer_int_clear(const uint32_t data);
+	void set_local_int_mask(int channel, const uint8_t mask);
+	void set_map_int_mask(int channel, const uint8_t mask);
+	void set_timer_int_clear(const uint8_t data);
 	void set_mappable_int(uint8_t mask, bool state);
-
-	uint8_t get_pit_reg(uint32_t offset) { return m_pit->read(offset); }
-	void set_pit_reg(uint32_t offset, uint8_t data) { return m_pit->write(offset, data); }
 
 protected:
 	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -244,6 +236,9 @@ public:
 	}
 
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t int2_r(offs_t offset);
+	void int2_w(offs_t offset, uint8_t data);
 
 protected:
 	uint8_t get_system_id() override { return 0x11; }

@@ -301,8 +301,10 @@ void ioc2_device::check_mappable_interrupt(int channel)
 	}
 }
 
-READ32_MEMBER(ioc2_device::read)
+uint8_t ioc2_device::read(offs_t offset)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case PI1_DATA_REG:
@@ -504,64 +506,66 @@ READ32_MEMBER(ioc2_device::read)
 	return 0;
 }
 
-WRITE32_MEMBER( ioc2_device::write )
+void ioc2_device::write(offs_t offset, uint8_t data)
 {
+	address_space &space = machine().dummy_space();
+
 	switch (offset)
 	{
 		case PI1_DATA_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Data Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pi1->write(space, offset, (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Data Register: %02x\n", machine().describe_context(), data);
+			m_pi1->write(space, offset, data);
 			return;
 		case PI1_CTRL_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Control Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pi1->write(space, offset, (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Control Register: %02x\n", machine().describe_context(), data);
+			m_pi1->write(space, offset, data);
 			return;
 		case PI1_STATUS_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Status Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pi1->write(space, offset, (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Status Register: %02x\n", machine().describe_context(), data);
+			m_pi1->write(space, offset, data);
 			return;
 
 		case PI1_DMA_CTRL_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 DMA Control Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 DMA Control Register: %02x\n", machine().describe_context(), data);
 			return;
 		case PI1_INT_STATUS_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Interrupt Status Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Interrupt Status Register: %02x\n", machine().describe_context(), data);
 			return;
 		case PI1_INT_MASK_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Interrupt Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Interrupt Mask Register: %02x\n", machine().describe_context(), data);
 			return;
 		case PI1_TIMER1_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer1 Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer1 Register: %02x\n", machine().describe_context(), data);
 			return;
 		case PI1_TIMER2_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer2 Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer2 Register: %02x\n", machine().describe_context(), data);
 			return;
 		case PI1_TIMER3_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer3 Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer3 Register: %02x\n", machine().describe_context(), data);
 			return;
 		case PI1_TIMER4_REG:
-			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer4 Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PI1, "%s: Write PI1 Timer4 Register: %02x\n", machine().describe_context(), data);
 			return;
 
 		case SERIAL1_CMD_REG:
-			LOGMASKED(LOG_SERIAL, "%s: Write Serial 1 Command Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_SERIAL, "%s: Write Serial 1 Command Register: %02x\n", machine().describe_context(), data);
 			m_scc->ba_cd_w(space, 3, data & 0xff);
 			return;
 		case SERIAL1_DATA_REG:
-			LOGMASKED(LOG_SERIAL, "%s: Write Serial 1 Data Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_SERIAL, "%s: Write Serial 1 Data Register: %02x\n", machine().describe_context(), data);
 			m_scc->ba_cd_w(space, 2, data & 0xff);
 			return;
 		case SERIAL2_CMD_REG:
-			LOGMASKED(LOG_SERIAL, "%s: Write Serial 2 Command Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_SERIAL, "%s: Write Serial 2 Command Register: %02x\n", machine().describe_context(), data);
 			m_scc->ba_cd_w(space, 1, data & 0xff);
 			return;
 		case SERIAL2_DATA_REG:
-			LOGMASKED(LOG_SERIAL, "%s: Write Serial 2 Data Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_SERIAL, "%s: Write Serial 2 Data Register: %02x\n", machine().describe_context(), data);
 			m_scc->ba_cd_w(space, 0, data & 0xff);
 			return;
 
 		case KBD_MOUSE_REGS1:
-			LOGMASKED(LOG_MOUSEKBD, "%s: Write Keyboard/Mouse Register 1: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_MOUSEKBD, "%s: Write Keyboard/Mouse Register 1: %02x\n", machine().describe_context(), data);
 #if IOC2_NEW_KBDC
 			m_kbdc->data_w(data & 0xff);
 #else
@@ -569,7 +573,7 @@ WRITE32_MEMBER( ioc2_device::write )
 #endif
 			return;
 		case KBD_MOUSE_REGS2:
-			LOGMASKED(LOG_MOUSEKBD, "%s: Write Keyboard/Mouse Register 2: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_MOUSEKBD, "%s: Write Keyboard/Mouse Register 2: %02x\n", machine().describe_context(), data);
 #if IOC2_NEW_KBDC
 			m_kbdc->command_w(data & 0xff);
 #else
@@ -578,7 +582,7 @@ WRITE32_MEMBER( ioc2_device::write )
 			return;
 
 		case PANEL_REG:
-			LOGMASKED(LOG_PANEL, "%s: Write Front Panel Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_PANEL, "%s: Write Front Panel Register: %02x\n", machine().describe_context(), data);
 			m_front_panel_reg &= ~(data & (FRONT_PANEL_VOL_UP_INT | FRONT_PANEL_VOL_DOWN_INT | FRONT_PANEL_POWER_BUTTON_INT));
 			if (!(m_front_panel_reg & FRONT_PANEL_INT_MASK))
 				lower_local_irq(1, INT3_LOCAL1_PANEL);
@@ -592,7 +596,7 @@ WRITE32_MEMBER( ioc2_device::write )
 			// 2    RW      Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
 			// 1    RW      ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
 			// 0    RW      [same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
-			LOGMASKED(LOG_DMA_SEL, "%s: Write DMA Select Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_DMA_SEL, "%s: Write DMA Select Register: %02x\n", machine().describe_context(), data);
 			uint8_t old = m_dma_sel;
 			m_dma_sel = data;
 			uint8_t changed = old ^ m_dma_sel;
@@ -609,12 +613,12 @@ WRITE32_MEMBER( ioc2_device::write )
 		}
 
 		case RESET_REG:
-			LOGMASKED(LOG_RESET, "%s: Write Reset Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_RESET, "%s: Write Reset Register: %02x\n", machine().describe_context(), data);
 			handle_reset_reg_write(data);
 			return;
 
 		case WRITE_REG:
-			LOGMASKED(LOG_WRITE, "%s: Write Write Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_WRITE, "%s: Write Write Register: %02x\n", machine().describe_context(), data);
 			m_write_reg = data;
 			return;
 
@@ -626,71 +630,173 @@ WRITE32_MEMBER( ioc2_device::write )
 			return;
 
 		case INT3_LOCAL0_MASK_REG:
-			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local0 Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local0 Mask Register: %02x\n", machine().describe_context(), data);
 			set_local_int_mask(0, data);
 			return;
 		case INT3_LOCAL1_MASK_REG:
-			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local1 Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local1 Mask Register: %02x\n", machine().describe_context(), data);
 			set_local_int_mask(1, data);
 			return;
 
 		case INT3_MAP_MASK0_REG:
-			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask0 Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask0 Register: %02x\n", machine().describe_context(), data);
 			set_map_int_mask(0, data);
 			return;
 		case INT3_MAP_MASK1_REG:
-			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask1 Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask1 Register: %02x\n", machine().describe_context(), data);
 			set_map_int_mask(1, data);
 			return;
 		case INT3_MAP_POLARITY_REG:
 			// TODO: Mappable interrupt polarity select
-			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Polarity Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Polarity Register: %02x\n", machine().describe_context(), data);
 			m_int3_map_pol_reg = data;
 			return;
 		case INT3_TIMER_CLEAR_REG:
-			LOGMASKED(LOG_INT3, "%s: Write Interrupt Timer Clear Register: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_INT3, "%s: Write Interrupt Timer Clear Register: %02x\n", machine().describe_context(), data);
 			set_timer_int_clear(data);
 			return;
 
 		case TIMER_COUNT0_REG:
-			LOGMASKED(LOG_PIT, "%s: Write Timer Count0 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(0, (uint8_t)data);
+			LOGMASKED(LOG_PIT, "%s: Write Timer Count0 Register: %02x\n", machine().describe_context(), data);
+			m_pit->write(0, data);
 			return;
 		case TIMER_COUNT1_REG:
-			LOGMASKED(LOG_PIT, "%s: Write Timer Count1 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(1, (uint8_t)data);
+			LOGMASKED(LOG_PIT, "%s: Write Timer Count1 Register: %02x\n", machine().describe_context(), data);
+			m_pit->write(1, data);
 			return;
 		case TIMER_COUNT2_REG:
-			LOGMASKED(LOG_PIT, "%s: Write Timer Count2 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(2, (uint8_t)data);
+			LOGMASKED(LOG_PIT, "%s: Write Timer Count2 Register: %02x\n", machine().describe_context(), data);
+			m_pit->write(2, data);
 			return;
 		case TIMER_CONTROL_REG:
-			LOGMASKED(LOG_PIT, "%s: Write Timer Control Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(3, (uint8_t)data);
+			LOGMASKED(LOG_PIT, "%s: Write Timer Control Register: %02x\n", machine().describe_context(), data);
+			m_pit->write(3, data);
 			return;
 	}
 }
 
-void ioc2_device::set_local_int_mask(int channel, uint32_t mask)
+uint8_t ioc2_full_house_device::int2_r(offs_t offset)
+{
+	uint8_t ret = 0;
+	switch (offset)
+	{
+	case 0x0000/4:
+		ret = m_int3_local_status_reg[0];
+		LOGMASKED(LOG_INT3, "%s: INT2 Local0 Interrupt Status Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0004/4:
+		ret = m_int3_local_mask_reg[0];
+		LOGMASKED(LOG_INT3, "%s: INT2 Local0 Interrupt Mask Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0008/4:
+		ret = m_int3_local_status_reg[1];
+		LOGMASKED(LOG_INT3, "%s: INT2 Local1 Interrupt Status Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x000c/4:
+		ret = m_int3_local_mask_reg[1];
+		LOGMASKED(LOG_INT3, "%s: INT2 Local1 Interrupt Mask Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0010/4:
+		ret = m_int3_map_status_reg;
+		LOGMASKED(LOG_INT3, "%s: INT2 Mappable Interrupt Status: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0014/4:
+		ret = m_int3_map_mask_reg[0];
+		LOGMASKED(LOG_INT3, "%s: INT2 Mapped Interrupt 0 Mask Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0018/4:
+		ret = m_int3_map_mask_reg[1];
+		LOGMASKED(LOG_INT3, "%s: INT2 Mapped Interrupt 1 Mask Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0030/4:
+		ret = m_pit->read(0);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Counter 0 Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0034/4:
+		ret = m_pit->read(1);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Counter 1 Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x0038/4:
+		ret = m_pit->read(2);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Counter 2 Read: %02x\n", machine().describe_context(), ret);
+		break;
+	case 0x003c/4:
+		ret = m_pit->read(3);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Control Read: %02x\n", machine().describe_context(), ret);
+		break;
+	default:
+		LOGMASKED(LOG_READ, "%s: Unknown INT2 Read: %08x\n", machine().describe_context(), 0x1fbd9000 + (offset << 2));
+		break;
+	}
+	return ret;
+}
+
+void ioc2_full_house_device::int2_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0x0004/4:
+		set_local_int_mask(0, data);
+		LOGMASKED(LOG_INT3, "%s: INT2 Local0 Interrupt Mask Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x000c/4:
+		set_local_int_mask(1, data);
+		LOGMASKED(LOG_INT3, "%s: INT2 Local1 Interrupt Mask Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x0014/4:
+		set_map_int_mask(0, data);
+		LOGMASKED(LOG_INT3, "%s: INT2 Mapped Interrupt 0 Mask Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x0018/4:
+		set_map_int_mask(1, data);
+		LOGMASKED(LOG_INT3, "%s: INT2 Mapped Interrupt 1 Mask Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x0020/4:
+		set_timer_int_clear(data);
+		LOGMASKED(LOG_INT3, "%s: INT2 Timer Interrupt Clear Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x0030/4:
+		m_pit->write(0, data);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Counter 0 Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x0034/4:
+		m_pit->write(1, data);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Counter 1 Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x0038/4:
+		m_pit->write(2, data);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Counter 2 Write: %02x\n", machine().describe_context(), data);
+		break;
+	case 0x003c/4:
+		m_pit->write(3, data);
+		LOGMASKED(LOG_PIT, "%s: INT2 PIT Control Write: %02x\n", machine().describe_context(), data);
+		break;
+	default:
+		LOGMASKED(LOG_WRITE, "%s: Unknown INT2 Write: %08x = %02x\n", machine().describe_context(), 0x1fbd9000 + (offset << 2), data);
+		break;
+	}
+}
+
+void ioc2_device::set_local_int_mask(int channel, uint8_t mask)
 {
 	uint8_t old = m_int3_local_mask_reg[channel];
-	m_int3_local_mask_reg[channel] = (uint8_t)mask;
+	m_int3_local_mask_reg[channel] = mask;
 	bool old_line = (old & m_int3_local_status_reg[channel]) != 0;
 	bool new_line = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) != 0;
 	if (old_line != new_line)
 	{
-		const uint32_t int_bits = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]);
+		const uint8_t int_bits = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]);
 		m_maincpu->set_input_line(channel, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-void ioc2_device::set_map_int_mask(int channel, uint32_t mask)
+void ioc2_device::set_map_int_mask(int channel, uint8_t mask)
 {
-	m_int3_map_mask_reg[channel] = (uint8_t)mask;
+	m_int3_map_mask_reg[channel] = mask;
 	check_mappable_interrupt(channel);
 }
 
-void ioc2_device::set_timer_int_clear(uint32_t data)
+void ioc2_device::set_timer_int_clear(uint8_t data)
 {
 	if (BIT(data, 0))
 	{

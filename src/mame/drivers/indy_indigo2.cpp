@@ -21,8 +21,8 @@
 *  1f400000 - 1f5fffff      GIO64 - EXP0
 *  1f600000 - 1f9fffff      GIO64 - EXP1 - Unused
 *  1fa00000 - 1fa1ffff      Memory Controller
-*  1fb00000 - 1fb1a7ff      HPC3 CHIP1
-*  1fb80000 - 1fb9a7ff      HPC3 CHIP0
+*  1fb00000 - 1fb7ffff      HPC3 CHIP1
+*  1fb80000 - 1fbfffff      HPC3 CHIP0
 *  1fc00000 - 1fffffff      BIOS
 *  20000000 - 2fffffff      High System Memory
 *  30000000 - 7fffffff      Reserved
@@ -102,13 +102,23 @@ public:
 	void indy_4610(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE64_MEMBER(write_ram);
 	DECLARE_READ32_MEMBER(bus_error);
 
+	uint8_t volume_r(offs_t offset);
+	void volume_w(offs_t offset, uint8_t data);
+
 	void ip24_map(address_map &map);
 	void ip24_base_map(address_map &map);
+	void pio0_map(address_map &map);
+	void pio1_map(address_map &map);
+	void pio2_map(address_map &map);
+	void pio3_map(address_map &map);
+	void pio5_map(address_map &map);
+	void pio6_map(address_map &map);
 
 	void wd33c93(device_t *device);
 
@@ -128,6 +138,9 @@ protected:
 	optional_device<gio64_slot_device> m_gio64_gfx;
 	optional_device<gio64_slot_device> m_gio64_exp0;
 	optional_device<gio64_slot_device> m_gio64_exp1;
+
+	uint8_t m_volume_l;
+	uint8_t m_volume_r;
 };
 
 class ip22_state : public ip24_state
@@ -147,6 +160,7 @@ private:
 	void wd33c93_2(device_t *device);
 
 	void ip22_map(address_map &map);
+	void pio4_map(address_map &map);
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
@@ -181,6 +195,28 @@ WRITE64_MEMBER(ip24_state::write_ram)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
+uint8_t ip24_state::volume_r(offs_t offset)
+{
+	if (offset == 0)
+		return m_volume_r;
+	else
+		return m_volume_l;
+}
+
+void ip24_state::volume_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		m_volume_r = data;
+		m_hal2->set_right_volume(data);
+	}
+	else
+	{
+		m_volume_l = data;
+		m_hal2->set_left_volume(data);
+	}
+}
+
 void ip24_state::ip24_base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
@@ -199,10 +235,41 @@ void ip24_state::ip24_map(address_map &map)
 	map(0x00080000, 0x0009ffff).rw(m_vino, FUNC(vino_device::read), FUNC(vino_device::write));
 }
 
+void ip24_state::pio0_map(address_map &map)
+{
+	map(0x00, 0xff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
+}
+
+void ip24_state::pio1_map(address_map &map)
+{
+	map(0x00, 0xff).ram(); // hack
+}
+
+void ip24_state::pio2_map(address_map &map)
+{
+	map(0x00, 0x01).rw(FUNC(ip24_state::volume_r), FUNC(ip24_state::volume_w)).umask16(0x00ff);
+}
+
+void ip24_state::pio6_map(address_map &map)
+{
+	map(0x00, 0xff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write)).umask16(0x00ff);
+}
+
 void ip22_state::ip22_map(address_map &map)
 {
 	ip22_state::ip24_base_map(map);
 	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
+}
+
+void ip22_state::pio4_map(address_map &map)
+{
+	map(0x00, 0xff).rw("ioc2", FUNC(ioc2_full_house_device::int2_r), FUNC(ioc2_full_house_device::int2_w)).umask16(0x00ff);
+}
+
+void ip24_state::machine_start()
+{
+	save_item(NAME(m_volume_l));
+	save_item(NAME(m_volume_r));
 }
 
 void ip24_state::machine_reset()
@@ -258,6 +325,10 @@ void ip24_state::ip24_base(machine_config &config)
 
 	SGI_HPC3(config, m_hpc3, m_ioc2, m_hal2);
 	m_hpc3->set_gio64_space(m_maincpu, AS_PROGRAM);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO0, &ip24_state::pio0_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO1, &ip24_state::pio1_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO2, &ip24_state::pio2_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::dma_r));
@@ -342,6 +413,7 @@ void ip22_state::indigo2_4415(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus2:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO4, &ip22_state::pio4_map);
 	m_hpc3->hd_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::dma_r));

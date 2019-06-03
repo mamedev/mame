@@ -15,10 +15,9 @@
 #define LOG_SCSI_DMA    (1 << 3)
 #define LOG_SCSI_IRQ    (1 << 4)
 #define LOG_ETHERNET    (1 << 5)
-#define LOG_PBUS4       (1 << 6)
-#define LOG_CHAIN       (1 << 7)
-#define LOG_EEPROM      (1 << 8)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_SCSI_IRQ | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN | LOG_EEPROM)
+#define LOG_CHAIN       (1 << 6)
+#define LOG_EEPROM      (1 << 7)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_SCSI_IRQ | LOG_ETHERNET | LOG_CHAIN | LOG_EEPROM)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
@@ -27,6 +26,18 @@ DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")
 
 hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SGI_HPC3, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_pio_space_config{
+		{"PIO channel 0", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 1", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 2", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 3", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 4", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 5", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 6", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 7", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 8", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"PIO channel 9", ENDIANNESS_LITTLE, 16, 8, -1}}
 	, m_gio64_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_ioc2(*this, finder_base::DUMMY_TAG)
 	, m_hal2(*this, finder_base::DUMMY_TAG)
@@ -44,6 +55,22 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 	, m_eeprom_pre_cb(*this)
 	, m_dma_complete_int_cb(*this)
 {
+}
+
+device_memory_interface::space_config_vector hpc3_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PIO0, &m_pio_space_config[0]),
+		std::make_pair(AS_PIO1, &m_pio_space_config[1]),
+		std::make_pair(AS_PIO2, &m_pio_space_config[2]),
+		std::make_pair(AS_PIO3, &m_pio_space_config[3]),
+		std::make_pair(AS_PIO4, &m_pio_space_config[4]),
+		std::make_pair(AS_PIO5, &m_pio_space_config[5]),
+		std::make_pair(AS_PIO6, &m_pio_space_config[6]),
+		std::make_pair(AS_PIO7, &m_pio_space_config[7]),
+		std::make_pair(AS_PIO8, &m_pio_space_config[8]),
+		std::make_pair(AS_PIO9, &m_pio_space_config[9])
+	};
 }
 
 void hpc3_device::device_resolve_objects()
@@ -68,11 +95,13 @@ void hpc3_device::device_resolve_objects()
 
 void hpc3_device::device_start()
 {
+	for (uint32_t i = 0; i < 10; i++)
+		m_pio_space[i] = &space(AS_PIO0 + i);
+
 	save_item(NAME(m_intstat));
+	save_item(NAME(m_misc));
 	save_item(NAME(m_cpu_aux_ctrl));
 	save_item(NAME(m_pio_config));
-	save_item(NAME(m_volume_l));
-	save_item(NAME(m_volume_r));
 
 	for (uint32_t i = 0; i < 2; i++)
 	{
@@ -170,16 +199,13 @@ void hpc3_device::map(address_map &map)
 	map(0x0002c000, 0x0002c0ff).rw(FUNC(hpc3_device::fifo_r<FIFO_ENET_RECV>), FUNC(hpc3_device::fifo_w<FIFO_ENET_RECV>)); // ENET Recv FIFO
 	map(0x0002e000, 0x0002e13f).rw(FUNC(hpc3_device::fifo_r<FIFO_ENET_XMIT>), FUNC(hpc3_device::fifo_w<FIFO_ENET_XMIT>)); // ENET Xmit FIFO
 	map(0x00030000, 0x00030003).r(FUNC(hpc3_device::intstat_r));
+	map(0x00030004, 0x00030007).rw(FUNC(hpc3_device::misc_r), FUNC(hpc3_device::misc_w));
 	map(0x00030008, 0x0003000b).rw(FUNC(hpc3_device::eeprom_r), FUNC(hpc3_device::eeprom_w));
 	map(0x0003000c, 0x0003000f).r(FUNC(hpc3_device::intstat_r));
 	map(0x00040000, 0x00047fff).rw(FUNC(hpc3_device::hd_r<0>), FUNC(hpc3_device::hd_w<0>));
 	map(0x00048000, 0x0004ffff).rw(FUNC(hpc3_device::hd_r<1>), FUNC(hpc3_device::hd_w<1>));
 	map(0x00054000, 0x000544ff).rw(FUNC(hpc3_device::enet_r), FUNC(hpc3_device::enet_w));
-	map(0x00058000, 0x000583ff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
-	map(0x00058400, 0x000587ff).ram(); // hack
-	map(0x00058800, 0x00058807).rw(FUNC(hpc3_device::volume_r), FUNC(hpc3_device::volume_w));
-	map(0x00059000, 0x000593ff).rw(FUNC(hpc3_device::pbus4_r), FUNC(hpc3_device::pbus4_w));
-	map(0x00059800, 0x00059bff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write));
+	map(0x00058000, 0x0005bfff).rw(FUNC(hpc3_device::pio_data_r), FUNC(hpc3_device::pio_data_w));
 	map(0x0005c000, 0x0005cfff).rw(FUNC(hpc3_device::dma_config_r), FUNC(hpc3_device::dma_config_w));
 	map(0x0005d000, 0x0005dfff).rw(FUNC(hpc3_device::pio_config_r), FUNC(hpc3_device::pio_config_w));
 	map(0x00060000, 0x0007ffff).rw(FUNC(hpc3_device::bbram_r), FUNC(hpc3_device::bbram_w));
@@ -213,7 +239,7 @@ void hpc3_device::do_pbus_dma(uint32_t channel)
 	if (dma.m_active && channel < 4)
 	{
 		uint16_t temp16 = m_gio64_space->read_dword(dma.m_cur_ptr) >> 16;
-		int16_t stemp16 = (int16_t)((temp16 >> 8) | (temp16 << 8));
+		int16_t stemp16 = (int16_t)(BIT(m_pbus_dma[channel].m_config, 19) ? temp16 : swapendian_int16(temp16));
 
 		m_hal2->dma_write(channel, stemp16);
 
@@ -569,131 +595,55 @@ WRITE32_MEMBER(hpc3_device::hd_w)
 	}
 }
 
-READ32_MEMBER(hpc3_device::volume_r)
-{
-	if (offset == 0)
-		return m_volume_r;
-	else
-		return m_volume_l;
-}
-
-WRITE32_MEMBER(hpc3_device::volume_w)
-{
-	if (offset == 0)
-	{
-		m_volume_r = (uint8_t)data;
-		m_hal2->set_right_volume((uint8_t)data);
-	}
-	else
-	{
-		m_volume_l = (uint8_t)data;
-		m_hal2->set_left_volume((uint8_t)data);
-	}
-}
-
 template READ32_MEMBER(hpc3_device::hd_r<0>);
 template READ32_MEMBER(hpc3_device::hd_r<1>);
 template WRITE32_MEMBER(hpc3_device::hd_w<0>);
 template WRITE32_MEMBER(hpc3_device::hd_w<1>);
 
-READ32_MEMBER(hpc3_device::pbus4_r)
+uint32_t hpc3_device::pio_data_r(offs_t offset)
 {
-	uint32_t ret = 0;
-	switch (offset)
+	uint32_t channel = (offset >> 8) & 15;
+	if (channel >= 10)
 	{
-	case 0x0000/4:
-		ret = m_ioc2->get_local_int_status(0);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Status Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0004/4:
-		ret = m_ioc2->get_local_int_mask(0);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0008/4:
-		ret = m_ioc2->get_local_int_status(1);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Status Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x000c/4:
-		ret = m_ioc2->get_local_int_mask(1);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0010/4:
-		ret = m_ioc2->get_map_int_status();
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mappable Interrupt Status: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0014/4:
-		ret = m_ioc2->get_map_int_mask(0);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0018/4:
-		ret = m_ioc2->get_map_int_mask(1);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0030/4:
-		ret = m_ioc2->get_pit_reg(0);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0034/4:
-		ret = m_ioc2->get_pit_reg(1);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x0038/4:
-		ret = m_ioc2->get_pit_reg(2);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 2 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	case 0x003c/4:
-		ret = m_ioc2->get_pit_reg(3);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Control Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		break;
-	default:
-		LOGMASKED(LOG_PBUS4 | LOG_UNKNOWN, "%s: Unknown HPC3 PBUS4 Read: %08x (%08x)\n", machine().describe_context(), 0x1fbd9000 + (offset << 2), mem_mask);
-		break;
+		channel = (channel & 1) ? 9 : 8;
 	}
-	return ret;
+
+	switch ((m_pio_config[channel] >> 18) & 3)
+	{
+	default:
+	case 0: // 8-bit, data on PBUS 7:0
+		return m_pio_space[channel]->read_word(offset & 0xff, 0x00ff) & 0xff;
+
+	case 2: // 8-bit, data on PBUS 15:8
+		return m_pio_space[channel]->read_word(offset & 0xff, 0xff00) >> 8;
+
+	case 1: // 16-bit, odd high
+	case 3: // 16-bit, even high
+		return m_pio_space[channel]->read_word(offset & 0xff, 0xffff);
+	}
 }
 
-WRITE32_MEMBER(hpc3_device::pbus4_w)
+void hpc3_device::pio_data_w(offs_t offset, uint32_t data)
 {
-	switch (offset)
+	uint32_t channel = (offset >> 8) & 15;
+	if (channel >= 10)
 	{
-	case 0x0004/4:
-		m_ioc2->set_local_int_mask(0, data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		channel = (channel & 1) ? 9 : 8;
+	}
+
+	switch ((m_pio_config[channel] >> 18) & 3)
+	{
+	case 0: // 8-bit, data on PBUS 7:0
+		m_pio_space[channel]->write_word(offset & 0xff, data & 0xffff, 0x00ff);
 		break;
-	case 0x000c/4:
-		m_ioc2->set_local_int_mask(1, data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+
+	case 2: // 8-bit, data on PBUS 15:8
+		m_pio_space[channel]->write_word(offset & 0xff, swapendian_int16(data & 0xffff), 0xff00);
 		break;
-	case 0x0014/4:
-		m_ioc2->set_map_int_mask(0, data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x0018/4:
-		m_ioc2->set_map_int_mask(1, data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x0020/4:
-		m_ioc2->set_timer_int_clear(data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Timer Interrupt Clear Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x0030/4:
-		m_ioc2->set_pit_reg(0, (uint8_t)data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x0034/4:
-		m_ioc2->set_pit_reg(1, (uint8_t)data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x0038/4:
-		m_ioc2->set_pit_reg(2, (uint8_t)data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 2 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x003c/4:
-		m_ioc2->set_pit_reg(3, (uint8_t)data);
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	default:
-		LOGMASKED(LOG_PBUS4 | LOG_UNKNOWN, "%s: Unknown HPC3 PBUS4 Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd9000 + (offset << 2), data, mem_mask);
+
+	case 1: // 16-bit, odd high
+	case 3: // 16-bit, even high
+		m_pio_space[channel]->write_word(offset & 0xff, data & 0xffff, 0xffff);
 		break;
 	}
 }
@@ -805,7 +755,7 @@ WRITE32_MEMBER(hpc3_device::dma_config_w)
 	LOGMASKED(LOG_PBUS_DMA, "    DMA Write State D3 gio_clk cycles: %d\n", BIT(data, 9) ? 2 : 3);
 	LOGMASKED(LOG_PBUS_DMA, "    DMA Write State D4 gio_clk cycles: %d\n", (data >> 10) & 0xf);
 	LOGMASKED(LOG_PBUS_DMA, "    DMA Write State D5 gio_clk cycles: %d\n", (data >> 14) & 0xf);
-	LOGMASKED(LOG_PBUS_DMA, "    Device Bit Width: %d\n", BIT(data, 18) ? 16 : 32);
+	LOGMASKED(LOG_PBUS_DMA, "    Device Bit Width: %d\n", BIT(data, 18) ? 16 : 8);
 	LOGMASKED(LOG_PBUS_DMA, "    Even Address Bytes on %s\n", BIT(data, 19) ? "15..8" : "7..0");
 	LOGMASKED(LOG_PBUS_DMA, "    Device %s Real-Time\n", BIT(data, 21) ? "is" : "is not");
 	LOGMASKED(LOG_PBUS_DMA, "    Burst Count: %d\n", (data >> 22) & 0x1f);
@@ -841,7 +791,7 @@ WRITE32_MEMBER(hpc3_device::pio_config_w)
 	LOGMASKED(LOG_PBUS_DMA, "    PIO Write State P2 gio_clk cycles: %d\n", BIT(data, 9) ? 1 : 2);
 	LOGMASKED(LOG_PBUS_DMA, "    PIO Write State P3 gio_clk cycles: %d\n", (data >> 10) & 0xf);
 	LOGMASKED(LOG_PBUS_DMA, "    PIO Write State P4 gio_clk cycles: %d\n", (data >> 14) & 0xf);
-	LOGMASKED(LOG_PBUS_DMA, "    Device Bit Width: %d\n", BIT(data, 18) ? 16 : 32);
+	LOGMASKED(LOG_PBUS_DMA, "    Device Bit Width: %d\n", BIT(data, 18) ? 16 : 8);
 	LOGMASKED(LOG_PBUS_DMA, "    Even Address Bytes on %s\n", BIT(data, 19) ? "15..8" : "7..0");
 }
 
@@ -853,17 +803,6 @@ uint32_t hpc3_device::bbram_r(offs_t offset)
 void hpc3_device::bbram_w(offs_t offset, uint32_t data)
 {
 	m_bbram_wr_cb(offset, data);
-}
-
-READ32_MEMBER(hpc3_device::unkpbus0_r)
-{
-	LOGMASKED(LOG_UNKNOWN, "%s: Unknown PBUS Read: %08x & %08x\n", machine().describe_context(), 0x1fbc8000 + offset*4, mem_mask);
-	return 0;
-}
-
-WRITE32_MEMBER(hpc3_device::unkpbus0_w)
-{
-	LOGMASKED(LOG_UNKNOWN, "%s: Unknown PBUS Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbc8000 + offset*4, data, mem_mask);
 }
 
 void hpc3_device::dump_chain(uint32_t base)
@@ -990,6 +929,19 @@ WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
 READ32_MEMBER(hpc3_device::intstat_r)
 {
 	return m_intstat;
+}
+
+uint32_t hpc3_device::misc_r()
+{
+	return m_misc;
+}
+
+void hpc3_device::misc_w(uint32_t data)
+{
+	LOGMASKED(LOG_PBUS_DMA, "%s: Write miscellaneous register: %08x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PBUS_DMA, "    Real time devices %sabled\n", BIT(data, 0) ? "en" : "dis");
+	LOGMASKED(LOG_PBUS_DMA, "    DMA descriptors are %s endian\n", BIT(data, 1) ? "little" : "big");
+	m_misc = data & 3;
 }
 
 uint32_t hpc3_device::eeprom_r()

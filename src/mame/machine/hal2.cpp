@@ -50,19 +50,19 @@ void hal2_device::device_reset()
 {
 	m_isr = 0;
 	m_iar = 0;
-	memset(m_idr, 0, sizeof(uint32_t) * 4);
-	memset(m_codeca_ctrl, 0, sizeof(uint32_t) * 2);
+	memset(m_idr, 0, sizeof(uint16_t) * 4);
+	memset(m_codeca_ctrl, 0, sizeof(uint16_t) * 2);
 	m_codeca_channel = 0;
 	m_codeca_clock = 0;
 	m_codeca_channel_count = 0;
-	memset(m_codecb_ctrl, 0, sizeof(uint32_t) * 2);
+	memset(m_codecb_ctrl, 0, sizeof(uint16_t) * 2);
 	m_codecb_channel = 0;
 	m_codecb_clock = 0;
 	m_codecb_channel_count = 0;
-	memset(m_bres_clock_sel, 0, sizeof(uint32_t) * 3);
-	memset(m_bres_clock_inc, 0, sizeof(uint32_t) * 3);
-	memset(m_bres_clock_modctrl, 0, sizeof(uint32_t) * 3);
-	memset(m_bres_clock_freq, 0, sizeof(uint32_t) * 3);
+	memset(m_bres_clock_sel, 0, sizeof(uint16_t) * 3);
+	memset(m_bres_clock_inc, 0, sizeof(uint16_t) * 3);
+	memset(m_bres_clock_modctrl, 0, sizeof(uint16_t) * 3);
+	memset(m_bres_clock_freq, 0, sizeof(uint16_t) * 3);
 	for (int i = 0; i < 3; i++)
 	{
 		m_bres_clock_rate[i] = attotime::zero;
@@ -70,7 +70,7 @@ void hal2_device::device_reset()
 	m_curr_dac = 0;
 }
 
-READ32_MEMBER(hal2_device::read)
+uint16_t hal2_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -82,38 +82,38 @@ READ32_MEMBER(hal2_device::read)
 		return 0x4011;
 
 	case INDIRECT_DATA0_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 0 Read: %08x & %08x\n", machine().describe_context(), m_idr[3], mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 0 Read: %04x\n", machine().describe_context(), m_idr[0]);
 		return m_idr[0];
 
 	case INDIRECT_DATA1_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 1 Read: %08x & %08x\n", machine().describe_context(), m_idr[3], mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 1 Read: %04x\n", machine().describe_context(), m_idr[1]);
 		return m_idr[1];
 
 	case INDIRECT_DATA2_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 2 Read: %08x & %08x\n", machine().describe_context(), m_idr[3], mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 2 Read: %04x\n", machine().describe_context(), m_idr[2]);
 		return m_idr[2];
 
 	case INDIRECT_DATA3_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 3 Read: %08x & %08x\n", machine().describe_context(), m_idr[3], mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 3 Read: %04x\n", machine().describe_context(), m_idr[3]);
 		return m_idr[3];
 	}
-	LOGMASKED(LOG_READS | LOG_UNKNOWN, "%s: Unknown HAL2 read: %08x & %08x\n", machine().describe_context(), 0x1fbd8000 + offset*4, mem_mask);
+	LOGMASKED(LOG_READS | LOG_UNKNOWN, "%s: Unknown HAL2 read: %08x\n", machine().describe_context(), 0x1fbd8000 + offset*4);
 	return 0;
 }
 
-WRITE32_MEMBER(hal2_device::write)
+void hal2_device::write(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
 	case STATUS_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Status Write: 0x%08x (%08x)\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Status Write: 0x%04x\n", machine().describe_context(), data);
 		LOGMASKED(LOG_WRITES, "    HAL2 Global Reset %s\n", (data & ISR_GLOBAL_RESET) ? "Inactive" : "Active");
 		LOGMASKED(LOG_WRITES, "    HAL2 Codec Reset %s\n", (data & ISR_CODEC_RESET) ? "Inactive" : "Active");
 		m_isr &= ~0x1c;
 		m_isr |= data & 0x1c;
 		break;
 	case INDIRECT_ADDRESS_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Address Register Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Address Register Write: %04x\n", machine().describe_context(), data);
 		m_iar = data;
 		switch (data & IAR_TYPE)
 		{
@@ -253,7 +253,7 @@ WRITE32_MEMBER(hal2_device::write)
 					{
 						m_bres_clock_inc[clock_gen] = m_idr[0];
 						m_bres_clock_modctrl[clock_gen] = m_idr[1];
-						LOGMASKED(LOG_WRITES, "                Inc:%04x, ModCtrl:%04x\n", (uint16_t)m_idr[0], (uint16_t)m_idr[1]);
+						LOGMASKED(LOG_WRITES, "                Inc:%04x, ModCtrl:%04x\n", m_idr[0], m_idr[1]);
 						update_clock_freq(clock_gen);
 					}
 				}
@@ -305,27 +305,27 @@ WRITE32_MEMBER(hal2_device::write)
 		return;
 
 	case INDIRECT_DATA0_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 0 Write: %04x\n", machine().describe_context(), data);
 		m_idr[0] = data;
 		return;
 
 	case INDIRECT_DATA1_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 1 Write: %04x\n", machine().describe_context(), data);
 		m_idr[1] = data;
 		return;
 
 	case INDIRECT_DATA2_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 2 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 2 Write: %04x\n", machine().describe_context(), data);
 		m_idr[2] = data;
 		return;
 
 	case INDIRECT_DATA3_REG:
-		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 3 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 3 Write: %04x\n", machine().describe_context(), data);
 		m_idr[3] = data;
 		return;
 
 	default:
-		LOGMASKED(LOG_WRITES, "%s: Unknown HAL2 Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd8000 + offset*4, data, mem_mask);
+		LOGMASKED(LOG_WRITES, "%s: Unknown HAL2 Write: %08x = %04x\n", machine().describe_context(), 0x1fbd8000 + offset*4, data);
 		break;
 	}
 }
@@ -346,7 +346,7 @@ void hal2_device::update_clock_freq(int clock_gen)
 			return;
 	}
 
-	const uint32_t mod = 0x10000 - (((uint16_t)m_bres_clock_modctrl[clock_gen] + 1) - m_bres_clock_inc[clock_gen]);
+	const uint32_t mod = 0x10000 - ((m_bres_clock_modctrl[clock_gen] + 1) - m_bres_clock_inc[clock_gen]);
 	if (mod == 0)
 		m_bres_clock_rate[clock_gen] = attotime::from_ticks(1, m_bres_clock_freq[clock_gen] * m_bres_clock_inc[clock_gen]);
 	else
