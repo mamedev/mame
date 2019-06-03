@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(COM8116_003, com8116_003_device, "com8116_003", "COM8116-003 
 DEFINE_DEVICE_TYPE(COM5016_5, com5016_5_device, "com5016_5", "COM5016-5 Dual BRG")
 DEFINE_DEVICE_TYPE(COM5016_013, com5016_013_device, "com5016_013", "COM5016-013 Dual BRG")
 DEFINE_DEVICE_TYPE(COM8116_020, com8116_020_device, "com8116_020", "COM8116-020 Dual BRG")
+DEFINE_DEVICE_TYPE(K1135AB, k1135ab_device, "k1135ab", "K1135A/B Dual BRG")
 
 // Parts with T after the number do not have an internal oscillator and require an external clock source
 // The SMC/COM 5xxx parts are all dual 5v/12v parts, while the 8xxx parts are 5v only
@@ -128,6 +129,11 @@ com5016_013_device::com5016_013_device(const machine_config &mconfig, const char
 
 com8116_020_device::com8116_020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	com8116_device(mconfig, COM8116_020, tag, owner, clock, divisors_16X_1_8432MHz)
+{
+}
+
+k1135ab_device::k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	com8116_device(mconfig, K1135AB, tag, owner, clock, divisors_16X_5_0688MHz)
 {
 }
 

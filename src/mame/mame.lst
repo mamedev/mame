@@ -11828,6 +11828,9 @@ dotrikun                        // cabinet test board
 dotrikun2                       // cabinet test board
 dotriman
 
+@source:dpb7000.cpp
+dpb7000                         //
+
 @source:dps1.cpp
 dps1                            //
 
