@@ -2774,7 +2774,7 @@
 	<software name="homewrtr">
 		<description>Homework Writer (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>Scholastic, Inc.</publisher>
+		<publisher>Scholastic</publisher>
 		<info name="release" value="2015-01-20"/>
 		<!-- No compatibility data known at this time. -->
 
@@ -11930,6 +11930,159 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="planetfall r26 (4am crack).dsk" size="143360" crc="4bfa9d63" sha1="8161c0a8ed770c2632d1c47d4c946b0b6ff8ae9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plasmania">
+		<description>Plasmania (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2014-08-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="plasmania (4am crack).dsk" size="143360" crc="c2d17ccc" sha1="c391783756e05acc6d725feb68f115fd59004a35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="porvpara">
+		<description>Spanish Grammar Review: Por vs. Para (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2014-11-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="por vs para (4am crack).dsk" size="143360" crc="4eb13da5" sha1="50dfba4195e10e5c41868e3e952daab778390254" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quations">
+		<description>Quations (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-11-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="quations (4am crack).dsk" size="143360" crc="db6035e3" sha1="f7d4eb95e219d66b719238e9f680769a42b04fa5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rabrobmk">
+		<description>Rabbits, Robots, and a Monkey 1 (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2014-06-03"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- It comes on five disks; the first three disks are single-sided,
+		but the last two are double-sided. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 1.dsk" size="143360" crc="264a2f9a" sha1="68403191afdd1af837443a6e037ac9c48be3d810" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 2.dsk" size="143360" crc="ea11ed4d" sha1="7b1bc9ab192ce8446c5d39844be33851cb3ae7be" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 3.dsk" size="143360" crc="ab802f81" sha1="2e3ee038325c0451f112acf1adfd8bac591582ec" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 4 side a.dsk" size="143360" crc="ab2783b6" sha1="4084d3431e329671d2151b24df328379d64bc1a2" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 4 side b.dsk" size="143360" crc="8896e26c" sha1="c9f25da4d00556fbd49d48d06fffaea04740d71e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 5 side a.dsk" size="143360" crc="f1934c1c" sha1="4a56d970d6f363a90d9b82603b3023ded28238d0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rabbits, robots, and a monkey 1 (4am crack) disk 5 side b.dsk" size="143360" crc="8896e26c" sha1="c9f25da4d00556fbd49d48d06fffaea04740d71e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racecarr">
+		<description>Race Car 'Rithmetic (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Unicorn Software Company</publisher>
+		<info name="release" value="2014-08-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="race car 'rithmetic (4am crack).dsk" size="143360" crc="136fcd47" sha1="3f3a4a5d9465366a22a1e01fc5d0b771f57be7b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Check these 4AM cracks against the trex ones. Do we need to change
+	to these instead? -->
+	<software name="4amracter">
+		<description>Racter (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2014-12-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="racter (4am crack).dsk" size="143360" crc="4a8d1fdf" sha1="338edfaf156b86b09a1e46a20b359097f23bf9ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="radwarr">
+		<description>Rad Warrior (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2014-05-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rad warrior (4am crack).dsk" size="143360" crc="7291bacf" sha1="89e3ff2f25b33b09a8410fcbcd1b38671d16c4dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4amrambop2">
+		<description>Rambo First Blood Part II (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2014-08-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rambo first blood part ii (4am crack).dsk" size="143360" crc="81d373ce" sha1="811d257c3a20f6af54eb4e0c88d65fe90c1afed1" />
 			</dataarea>
 		</part>
 	</software>
