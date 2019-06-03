@@ -568,6 +568,7 @@
 		<description>Paperboy (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Mindscape / Atari</publisher>
+		<info name="release" value="2014-05-15"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -11634,23 +11635,301 @@
 		<info name="release" value="2017-12-26"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="might and magic (4am crack) disk a.dsk" size="143360" crc="901fe2fc" sha1="8e3eced8ce1268b37ddd8da6749e1e013679b5e0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="might and magic (4am crack) disk b.dsk" size="143360" crc="07b7cb1d" sha1="cdd82455f23d758595ea6ecb4d9bfbbb49a8b4d8" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="143360">
 				<rom name="might and magic (4am crack) disk c.dsk" size="143360" crc="1febb9a0" sha1="94d4b0ec4dc2cbc805685f4ac8d078b414a2897c" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="might and magic (4am crack) disk d.dsk" size="143360" crc="d9e1a068" sha1="01a892bd0f31ecf3f54ed308b8e87d24f99f1ec1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mindmatr">
+		<description>Mind Over Matter (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2014-09-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mind over matter (4am crack) side a.dsk" size="143360" crc="33d09a62" sha1="54008c93eb36e48d0dadf7c5d0887f695ff7672e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mind over matter (4am crack) side b.dsk" size="143360" crc="590aed4d" sha1="287080bae1abf0de4b95987d073e30b98ea1795e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtwnpar12">
+		<description>Moptown Parade (Version 1.2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2017-04-18"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown parade (4am crack).dsk" size="143360" crc="ff062b97" sha1="2d7d7b01a621c0c9aab97df33a9f983cc7568bd0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnglnksclsc">
+		<description>M-ss-ng L-nks - Classics Old and New (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2016-01-08"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="m-ss-ng l-nks - classics old and new (4am crack).dsk" size="143360" crc="e77c27e8" sha1="f6daf25c36163b9531209e578666d93c54d553f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnglnks">
+		<description>M-ss-ng L-nks (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2014-05-18"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="m-ss-ng l-nks (4am crack).dsk" size="143360" crc="e06faf5c" sha1="e79bbc293d71411f6be73687128b921856d8dd67" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnglnksmicr">
+		<description>M-ss-ng L-nks MicroEncyclopedia (1987 Revised Edition) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2016-02-24"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="m-ss-ng l-nks microencyclopedia (1987 revised edition) (4am crack).dsk" size="143360" crc="a457cc3e" sha1="703e7cedabe2394af56f8674f900e710e5951f94" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnglnksyplit">
+		<description>M-ss-ng L-nks Young People's Literature (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2014-09-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="m-ss-ng l-nks young people's literature (4am crack).dsk" size="143360" crc="dffcf526" sha1="a47e2ab5494c7928b06a5f0b85b6b8a9eaca1b3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnglnksygl83">
+		<description>M-ss-ng L-nks Young People's Literature (1983 Version) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2016-02-24"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="m-ss-ng l-nks young people's literature 1983 (4am crack).dsk" size="143360" crc="07750529" sha1="fc1b8aeee05765177043571e3562b67090f73411" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbmultdv">
+		<description>Multiplication and Division (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Silver Burdett Company</publisher>
+		<info name="release" value="2014-09-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="multiplication and division (4am crack).dsk" size="143360" crc="262a25a3" sha1="8e899d84eeac12292a3e2b175a1c84d41eee6e4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrdrbt12">
+		<description>Mystery Master: Murder by the Dozen (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="release" value="2014-07-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="murder by the dozen (4am crack).dsk" size="143360" crc="852886ae" sha1="60f8158cca62be57309174ad8729303b73958894" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nmbrbwlg">
+		<description>Number Bowling: Decimals and Fractions (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2014-08-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="number bowling (4am crack).dsk" size="143360" crc="62cfab88" sha1="3700731fe0a85236bbb6733e2cf34b714c3f20ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numratn1">
+		<description>Numeration 1 - Under The Big Top (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2014-08-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="numeration 1 (4am crack).dsk" size="143360" crc="abe01a8e" sha1="602ec5934eef43c098d4373d4594cb2cfb18b531" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odd1out">
+		<description>Odd One Out (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2014-08-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="odd one out (4am crack).dsk" size="143360" crc="92caf802" sha1="30b1e88bb7a37491592bd501a0776a2ac3128f81" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odd1ot90">
+		<description>Odd One Out (26-AUG-1990 Version) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-05-23"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- This version, dated 26-AUG-1990 based on file metadata. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="odd one out 1990 (4am crack).dsk" size="143360" crc="ac9dc6d2" sha1="3553590d53726fbad5792312f463207d87bc45ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcofcake">
+		<description>Early Games: Piece of Cake (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Counterpoint Software</publisher>
+		<info name="release" value="2014-06-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="piece of cake (4am crack).dsk" size="143360" crc="497f44b7" sha1="4224d39053c3b70305f00610689dc551c3aa5291" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pccakem">
+		<description>Early Games: Piece of Cake Math (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Springboard Software</publisher>
+		<info name="release" value="2014-08-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="piece of cake math (4am crack).dsk" size="143360" crc="b73d1855" sha1="1219efb6057136d3cf22f9e27c24d1e16856192d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitstop2">
+		<description>Pitstop II (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2014-08-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pitstop ii (4am crack).dsk" size="143360" crc="6821705b" sha1="cf5d291a800c54cecfb65a69e465266d3e2319eb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall2">
+		<description>Pitfall II: Lost Caverns (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2015-11-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pitfall ii (4am crack).dsk" size="143360" crc="459f017b" sha1="bc68e69980f249e45998921781b15e031cf7b3c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plnflr20">
+		<description>Planetfall (Release 20 / 830708) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2017-10-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="planetfall r20 (4am crack).dsk" size="143360" crc="dcd44739" sha1="237d8b17a6cf85260a3d3defda2a5bc27b3ccd39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plnflr26">
+		<description>Planetfall (Release 26 / 831014) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2017-10-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="planetfall r26 (4am crack).dsk" size="143360" crc="4bfa9d63" sha1="8161c0a8ed770c2632d1c47d4c946b0b6ff8ae9a" />
 			</dataarea>
 		</part>
 	</software>
