@@ -55,9 +55,8 @@ NMI is from the IRQ line on the FDC (again, SQ-80 only).
 TODO:
     - VFD display
     - Keyboard
-    - Analog filters and VCA on the back end of the 5503
-    - SQ-80 support (additional banking, FDC)
-      SQ-80 is totally broken now, jumping into unmapped memory
+    - Analog filters and VCA on the back end of the 5503 (inaccurate)
+    - duart seems to keep interrupting even after MIDI xmit buffer becomes empty
 
 NOTES:
     Commands from KPC are all 2 bytes
@@ -433,6 +432,10 @@ private:
 	void send_through_panel(uint8_t data);
 	void esq1_map(address_map &map);
 	void sq80_map(address_map &map);
+
+	bool kpc_calibrated;  // sq80 requires keyboard calibration acknowledgement
+	int m_adc_target;     // adc poll target (index into the table below)
+	uint8_t m_adc_value[6] = { 0,0,128,0,0,0 };	// VALV,PEDV,PITV,MODV,FILV,BATV
 };
 
 
@@ -442,7 +445,7 @@ WRITE_LINE_MEMBER(esq1_state::esq1_doc_irq)
 
 READ8_MEMBER(esq1_state::esq1_adc_read)
 {
-	return 0x00;
+	return m_adc_value[m_adc_target];
 }
 
 void esq1_state::machine_reset()
@@ -450,7 +453,7 @@ void esq1_state::machine_reset()
 	// set default OSROM banking
 	membank("osbank")->set_base(memregion("osrom")->base() );
 
-	m_mapper_state = 0;
+	m_mapper_state = 1;
 	m_seq_bank = 0;
 }
 
@@ -466,7 +469,7 @@ WRITE8_MEMBER(esq1_state::wd1772_w)
 
 WRITE8_MEMBER(esq1_state::mapper_w)
 {
-	m_mapper_state = (data & 1) ^ 1;
+	m_mapper_state = (data & 1);
 
 //    printf("mapper_state = %d\n", data ^ 1);
 }
@@ -521,8 +524,7 @@ void esq1_state::esq1_map(address_map &map)
 void esq1_state::sq80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();                 // OSRAM
-	map(0x4000, 0x5fff).ram();                 // SEQRAM
-//  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
+	map(0x4000, 0x5fff).rw(FUNC(esq1_state::seqdosram_r), FUNC(esq1_state::seqdosram_w));
 	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
 	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
@@ -549,7 +551,7 @@ void esq1_state::sq80_map(address_map &map)
 
 WRITE8_MEMBER(esq1_state::duart_output)
 {
-	int bank = ((data >> 1) & 0x7);
+	int bank = m_adc_target = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
 //  printf("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
@@ -577,14 +579,23 @@ void esq1_state::send_through_panel(uint8_t data)
 
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
+	uint8_t offset = 0;
+	if (strncmp(machine().basename(), "sq80", 4) == 0) {
+		if (!kpc_calibrated) { // ack SQ80 keyboard calibration
+			send_through_panel((uint8_t)(uintptr_t)0xff);
+			kpc_calibrated = true;
+		}
+		offset = 2; // SQ80 keycodes are offset by -2
+	}
+
 	if (oldval == 0 && newval == 1)
 	{
-		send_through_panel((uint8_t)(uintptr_t)param);
+		send_through_panel((uint8_t)(uintptr_t)param - offset);
 		send_through_panel((uint8_t)(uintptr_t)0x00);
 	}
 	else if (oldval == 1 && newval == 0)
 	{
-		send_through_panel((uint8_t)(uintptr_t)param&0x7f);
+		send_through_panel(((uint8_t)(uintptr_t)param - offset)&0x7f);
 		send_through_panel((uint8_t)(uintptr_t)0x00);
 	}
 }
@@ -637,6 +648,7 @@ void esq1_state::sq80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::sq80_map);
 
 	WD1772(config, m_fdc, 4000000);
+	kpc_calibrated = false;
 }
 
 static INPUT_PORTS_START( esq1 )
@@ -685,10 +697,10 @@ ROM_START( sq80 )
 	ROM_LOAD( "sq80rom.hig",  0x8000, 0x008000, CRC(f83962b1) SHA1(e3e5cf41f15a37f8bf29b88fb1c85c0fca9ea912) )
 
 	ROM_REGION(0x40000, "es5503", 0)
-	ROM_LOAD( "2202.bin",     0x0000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) )
-	ROM_LOAD( "2203.bin",     0x0000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) )
-	ROM_LOAD( "2204.bin",     0x0000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) )
-	ROM_LOAD( "2205.bin",     0x0000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) )
+	ROM_LOAD( "2202.bin",     0x00000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) )
+	ROM_LOAD( "2203.bin",     0x20000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) )
+	ROM_LOAD( "2204.bin",     0x10000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) )
+	ROM_LOAD( "2205.bin",     0x30000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) )
 
 	ROM_REGION(0x8000, "kpc", 0)    // 68HC11 keyboard/front panel processor
 	ROM_LOAD( "sq80_kpc_150.bin", 0x000000, 0x008000, CRC(8170b728) SHA1(3ad68bb03948e51b20d2e54309baa5c02a468f7c) )
