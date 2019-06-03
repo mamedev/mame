@@ -118,6 +118,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "cpu/z80/kl5c80a12.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "machine/74259.h"
@@ -10000,7 +10001,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 void ddenlovr_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000); // KL5C80A12
+	KL5C80A12(config, m_maincpu, 8000000); // KL5C80A12
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hanakanz_portmap);
 
@@ -10045,7 +10046,7 @@ void ddenlovr_state::hkagerou(machine_config &config)
 void ddenlovr_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinyo_portmap);
 
@@ -10448,7 +10449,7 @@ void ddenlovr_state::hparadis(machine_config &config)
 void ddenlovr_state::jongtei(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(20'000'000) / 2); // KL5C80A12
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2); // KL5C80A12
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::jongtei_portmap);
 
