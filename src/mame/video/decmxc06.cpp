@@ -58,7 +58,7 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	if (priority)             { start = size - 4; end =   -4; inc = -4; }
 	else                      { start =        0; end = size; inc = +4; }
 
-	for (int offs = start; offs != end; offs += inc)
+	for (int offs = start; offs != end;)
 	{
 		u32 pri_mask = 0;
 		int flipy, incy, mult, parentFlipY;
@@ -96,7 +96,10 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		// thedeep strongly suggests that this check goes here, otherwise the radar breaks
 		if (!(spriteram[offs] & 0x8000))
+		{
+			offs += inc;
 			continue;
+		}
 
 		for (int x = 0; x < w; x++)
 		{
@@ -136,6 +139,10 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 					}
 				}
 			}
+			offs += inc;
+			if (offs == end)
+				return;
+
 		}
 	}
 }
