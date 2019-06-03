@@ -30,6 +30,7 @@
   2.0 (RB) - C++ conversion, more accurate oscillator IRQ timing
   2.1 (RB) - Corrected phase when looping; synthLAB, Arkanoid, and Arkanoid II no longer go out of tune
   2.1.1 (RB) - Fixed issue introduced in 2.0 where IRQs were delayed
+  2.1.2 (jariseon) - Increased address space to 0x40000 (for Ensoniq SQ80, see esq1.cpp)
 */
 
 #include "emu.h"
@@ -40,7 +41,7 @@ DEFINE_DEVICE_TYPE(ES5503, es5503_device, "es5503", "Ensoniq ES5503")
 
 // useful constants
 static constexpr uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
-static constexpr uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
+static constexpr uint32_t wavemasks[8] = { 0x3ff00, 0x3fe00, 0x3fc00, 0x3f800, 0x3f000, 0x3e000, 0x3c000, 0x38000 };
 static constexpr uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
 static constexpr int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
@@ -55,7 +56,7 @@ static constexpr int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ES5503, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 17),
+		device_rom_interface(mconfig, *this, 18),
 		m_irq_func(*this),
 		m_adc_func(*this)
 {
@@ -403,14 +404,12 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xc0:  // bank select / wavetable size / resolution
-				if (data & 0x40)    // bank select - not used on the Apple IIgs
-				{
-					oscillators[osc].wavetblpointer |= 0x10000;
-				}
-				else
-				{
-					oscillators[osc].wavetblpointer &= 0xffff;
-				}
+				oscillators[osc].wavetblpointer &= 0xffff;
+
+				// bank select - not used on the Apple IIgs
+				// ESQ1 uses bit 6
+				// SQ80 uses bits 7 and 6
+				oscillators[osc].wavetblpointer |= (data & 0xc0) << 10;
 
 				oscillators[osc].wavetblsize = ((data>>3) & 7);
 				oscillators[osc].wtsize = wavesizes[oscillators[osc].wavetblsize];
