@@ -41,10 +41,7 @@ void mas3507d_device::device_reset()
 	i2c_bus_address = UNKNOWN;
 	i2c_bus_curbit = -1;
 	i2c_bus_curval = 0;
-	total_sample_count = 0;
-	total_samples_decoded = 0;
-	last_samples = 0;
-	playback_enabled = false;
+	set_playback_enabled(false);
 }
 
 void mas3507d_device::i2c_scl_w(bool line)
