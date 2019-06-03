@@ -11005,6 +11005,236 @@
 		</part>
 	</software>
 
+	<software name="microz1">
+		<description>Microzine 1 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-11-20"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 1 (4am crack) side a.dsk" size="143360" crc="9e666b8a" sha1="ec96944073b36f5d7464230459dfe09a9b2eca65" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 1 (4am crack) side b.dsk" size="143360" crc="cb976c03" sha1="1f5e59cf060c878952ed3c0b75eded361d349d9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz2">
+		<description>Microzine 2 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-10-25"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 2 (4am crack) side a.dsk" size="143360" crc="72bb6ddd" sha1="9aee8893352c1d4120e9c1982376795c79d20f13" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 2 (4am crack) side b.dsk" size="143360" crc="25257804" sha1="71586b80a5615afa6d343455d83bafd2693076bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz3">
+		<description>Microzine 3 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-06-06"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 3 (4am crack) side a.dsk" size="143360" crc="7c9bbc2b" sha1="c1236457b86e0cf323971af437f628e55edd14a7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 3 (4am crack) side b.dsk" size="143360" crc="b6b7481e" sha1="2c9873412400a825dfe1dc3176a2a70fc45be600" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz4">
+		<description>Microzine 4 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-09-27"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 4 (4am crack) side a.dsk" size="143360" crc="96b1dfcc" sha1="6a491c14cf99ccb3f8e2a824a4fe01ad94d2d778" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 4 (4am crack) side b.dsk" size="143360" crc="fd39ac1c" sha1="24b5c754ab766be82b81e144c49841fad0c039af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz5">
+		<description>Microzine 5 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-18"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 5 (4am crack) side a.dsk" size="143360" crc="d7c11cf2" sha1="6c5b6d8cff999cf4830a5a417ac3afca71e7084f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 5 (4am crack) side b.dsk" size="143360" crc="518c5ae6" sha1="6c628a1cd850373c8dfdb924a41fb4e8353ac2c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz6">
+		<description>Microzine 6 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-30"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 6 (4am crack) side a.dsk" size="143360" crc="6be25dc8" sha1="c3dfc7b20c43c82a5d121eed4c7e350c4e009a87" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 6 (4am crack) side b.dsk" size="143360" crc="e6b262e2" sha1="64a1f11e61afe1fc8cb8c84b1ae69fa9d085ee53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz7">
+		<description>Microzine 7 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-23"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 7 (4am crack) side a.dsk" size="143360" crc="0912f2d9" sha1="f97ce5e1a31a860ba5555b0f1d033af87eba6c46" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 7 (4am crack) side b.dsk" size="143360" crc="963acf79" sha1="cdaa13217113d64d45cad49e87807bb7d6755a34" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz8">
+		<description>Microzine 8 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-09-29"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 8 (4am crack) side a.dsk" size="143360" crc="cfe70144" sha1="19530e59961ff79c8c24b8be85b4517bcaacbc30" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 8 (4am crack) side b.dsk" size="143360" crc="5a596733" sha1="2e2e6b3dae2e60703e91823900cdb0bafd1cf62a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz9">
+		<description>Microzine 9 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-23"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 9 (4am crack) side a.dsk" size="143360" crc="6f29d83b" sha1="bfe3a40473da56bc0e020ad8423b68a6b7fdbd29" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 9 (4am crack) side b.dsk" size="143360" crc="e67167bd" sha1="feebeb1e9dce3ed06322256f67d8da963b486be0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz11">
+		<description>Microzine 11 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-12-23"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 11 (4am crack) side a.dsk" size="143360" crc="0abc0997" sha1="3bb156c59d8cd499751485c3499333d65da329b4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 11 (4am crack) side b.dsk" size="143360" crc="69dbf006" sha1="5b30ed2febb8d290b3570d6dce3983afd6522de6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="microz12">
 		<description>Microzine 12 (cleanly cracked)</description>
 		<year>????</year>
@@ -11051,6 +11281,75 @@
 		</part>
 	</software>
 
+	<software name="microz14">
+		<description>Microzine 14 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2017-01-27"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 14 (4am crack) side a.dsk" size="143360" crc="a57b307f" sha1="5d0a1364bfd62c1451ba8a1a1c770a06a14ab4a3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 14 (4am crack) side b.dsk" size="143360" crc="6c3093e1" sha1="6771508ffbeed75a6007888df944250ced006e77" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz15">
+		<description>Microzine 15 (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-28"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 15 (4am crack) side a.dsk" size="143360" crc="4d657f14" sha1="f596ce8e2baa51165ac48a6e2817b9e35ee29384" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 15 (4am crack) side b.dsk" size="143360" crc="480860b7" sha1="a96328311c52e7485c263665b32ad217cd7b9ce4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz16">
+		<description>Microzine 16 (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-28"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 16 (4am crack) side a.dsk" size="143360" crc="bc17e015" sha1="762ffd978514ff11375def0cef2dd3d98f5daf3d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 16 (4am crack) side b.dsk" size="143360" crc="4d55c818" sha1="6ca337e6b6cdf9cd359add5af663920e7f758842" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="microz17">
 		<description>Microzine 17 (cleanly cracked)</description>
 		<year>????</year>
@@ -11070,6 +11369,288 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="microzine 17 (4am crack) side b.dsk" size="143360" crc="0b54abab" sha1="1bc21af7fbb0b487f2cefdcd8bc8aefe6d41dadb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz18">
+		<description>Microzine 18 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-09-15"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 18 (4am crack) side a.dsk" size="143360" crc="5629d036" sha1="9d4056e9cc7e15837ee7130acf6a191feb6ebff5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 18 (4am crack) side b.dsk" size="143360" crc="de57b45a" sha1="7bcec7ca4b8c850ca320633d22f1b79503252869" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz19">
+		<description>Microzine 19 (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-03"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 19 (4am crack) side a.dsk" size="143360" crc="017db69b" sha1="ffea42ceb5b2dce7e07ec1a2a00f31fb2bb1f7cb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 19 (4am crack) side b.dsk" size="143360" crc="8851de17" sha1="6a163f247a6951303c40c48db43380979b636520" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz20">
+		<description>Microzine 20 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-09-16"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 20 (4am crack) side a.dsk" size="143360" crc="06366c44" sha1="4b89af730aeb13dd468986401d24f24ae4ed27a3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 20 (4am crack) side b.dsk" size="143360" crc="a7aae272" sha1="72cf4c2039500d8f790a7c7d692c1727c25fa299" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz21">
+		<description>Microzine 21 (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-03"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 21 (4am crack) side a.dsk" size="143360" crc="f1dfb9a1" sha1="766968384da072fb8f4b8d2e7975d8cfa14b0325" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 21 (4am crack) side b.dsk" size="143360" crc="ddf708c5" sha1="a73c3e3812edfa8192ff38ae3d689b12a45cb84f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz22">
+		<description>Microzine 22 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-09-16"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 22 (4am crack) disk 1 side a.dsk" size="143360" crc="3d7ff291" sha1="5d2a09f8f00c74aa521711f8a4a65e8f988fba45" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 22 (4am crack) disk 1 side b.dsk" size="143360" crc="8bba3bf3" sha1="e218a1f1851bf15e6683519d773ec6bebd6e9549" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 22 (4am crack) disk 2.dsk" size="143360" crc="6680bd05" sha1="83b165874ab626007a5438fe3336f607266538da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz23">
+		<description>Microzine 23 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-09-30"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 23 (4am crack) side a.dsk" size="143360" crc="f889c02f" sha1="400706e9421826d0aa4db897b3ac3fcfa3c757d5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 23 (4am crack) side b.dsk" size="143360" crc="29f864ad" sha1="059d64998daa7579a2d17bf7a2205d58f9e912f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz24">
+		<description>Microzine 24 (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-03"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 24 (4am crack) disk 1 side a.dsk" size="143360" crc="e7862317" sha1="869a6a75c17e8a36453bf2b744338fa26aa156c4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 24 (4am crack) disk 1 side b.dsk" size="143360" crc="c6fb87ab" sha1="29cc0fcb3056114f16f65cb9882798eac11ba870" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 24 (4am crack) disk 2.dsk" size="143360" crc="75dd81e1" sha1="45d6d33704a13e0b71acbdac7eb8923a3f7f1172" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz25">
+		<description>Microzine 25 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-08-14"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 25 (4am crack) side a.dsk" size="143360" crc="de74fe0a" sha1="51c8e5923503377a2e89fe15dc8a97fcc33b2c60" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 25 (4am crack) side b.dsk" size="143360" crc="45e94581" sha1="13f3c3179ab4f47905f0732956c70d36ec37b54a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz26">
+		<description>Microzine 26 (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2014-08-20"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 26 (4am crack) side a.dsk" size="143360" crc="f38b0586" sha1="59c4e0bd0b942e2f35b1d4bab94f90bfb01e19a7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 26 (4am crack) side b.dsk" size="143360" crc="62ddd009" sha1="525a8a3b609bffb20e32cf555e94bdfa072057a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz27">
+		<description>Microzine 27 (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-08-03"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- "Microzine" is an educational disk-based magazine
+		published by Scholastic between 1983 and 1992. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 27 (4am crack) disk 1 side a.dsk" size="143360" crc="dd23e9a6" sha1="c8a16a146d2ee2668bd4176f84ef6447fa59a277" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 27 (4am crack) disk 1 side b.dsk" size="143360" crc="78901b86" sha1="07ffc243b5e1efc24765652847cd2b3ca431259e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 27 (4am crack) disk 2 side a.dsk" size="143360" crc="5e2e691b" sha1="9f250c761a6f7999b72da0235627347a90221d89" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microzine 27 (4am crack) disk 2 side b.dsk" size="143360" crc="0eef531f" sha1="edfedfe58247cad9da28dbfbf6f0fe07c9608a68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmg1">
+		<description>Might and Magic: Book One - Secret of the Inner Sanctum</description>
+		<year>1986</year>
+		<publisher>New World Computing</publisher>
+		<info name="release" value="2017-12-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="might and magic (4am crack) disk a.dsk" size="143360" crc="901fe2fc" sha1="8e3eced8ce1268b37ddd8da6749e1e013679b5e0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="might and magic (4am crack) disk b.dsk" size="143360" crc="07b7cb1d" sha1="cdd82455f23d758595ea6ecb4d9bfbbb49a8b4d8" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="might and magic (4am crack) disk c.dsk" size="143360" crc="1febb9a0" sha1="94d4b0ec4dc2cbc805685f4ac8d078b414a2897c" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="might and magic (4am crack) disk d.dsk" size="143360" crc="d9e1a068" sha1="01a892bd0f31ecf3f54ed308b8e87d24f99f1ec1" />
 			</dataarea>
 		</part>
 	</software>
