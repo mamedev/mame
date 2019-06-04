@@ -286,38 +286,38 @@ WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
 WRITE16_MEMBER(k573dio_device::ram_write_adr_high_w)
 {
 	// read and write address are shared
-	ram_adr = (ram_adr & 0x0000ffff) | (data << 16);
+	ram_adr = ((ram_adr & 0x0000ffff) | (data << 16)) & 0x1ffffff;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
 {
 	// read and write address are shared
-	ram_adr = (ram_adr & 0xffff0000) | data;
+	ram_adr = ((ram_adr & 0xffff0000) | data) & 0x1ffffff;
 }
 
 READ16_MEMBER(k573dio_device::ram_r)
 {
-	uint16_t res = ram[ram_read_adr >> 1];
+	uint16_t res = ram[(ram_read_adr & 0x1ffffff) >> 1];
 	ram_read_adr += 2;
 	return res;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_w)
 {
-	ram[ram_adr >> 1] = data;
+	ram[(ram_adr & 0x1ffffff) >> 1] = data;
 	ram_adr += 2;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_high_w)
 {
 	// read and write address are shared
-	ram_read_adr = (ram_read_adr & 0x0000ffff) | (data << 16);
+	ram_read_adr = ((ram_read_adr & 0x0000ffff) | (data << 16)) & 0x1ffffff;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_low_w)
 {
 	// read and write address are shared
-	ram_read_adr = (ram_read_adr & 0xffff0000) | data;
+	ram_read_adr = ((ram_read_adr & 0xffff0000) | data) & 0x1ffffff;
 }
 
 READ16_MEMBER(k573dio_device::mp3_playback_high_r)
