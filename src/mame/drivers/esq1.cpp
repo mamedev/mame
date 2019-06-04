@@ -183,6 +183,7 @@ NOTES:
 #include "emu.h"
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "machine/esqpanel.h"
@@ -420,11 +421,8 @@ private:
 	DECLARE_WRITE8_MEMBER(mapper_w);
 	DECLARE_WRITE8_MEMBER(analog_w);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
-	DECLARE_WRITE_LINE_MEMBER(esq1_doc_irq);
 	DECLARE_READ8_MEMBER(esq1_adc_read);
 
 	DECLARE_READ8_MEMBER(es5503_sample_r);
@@ -453,10 +451,6 @@ READ8_MEMBER( esq1_state::es5503_sample_r )
 void esq1_state::sq80_es5503_map(address_map &map)
 {
 	map(0x000000, 0x1ffff).r(FUNC(esq1_state::es5503_sample_r));
-}
-
-WRITE_LINE_MEMBER(esq1_state::esq1_doc_irq)
-{
 }
 
 READ8_MEMBER(esq1_state::esq1_adc_read)
@@ -578,17 +572,6 @@ WRITE8_MEMBER(esq1_state::duart_output)
 //    printf("seqram_bank = %x\n", state->m_seq_bank);
 }
 
-// MIDI send
-WRITE_LINE_MEMBER(esq1_state::duart_tx_a)
-{
-	m_mdout->write_txd(state);
-}
-
-WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
-{
-	m_panel->rx_w(state);
-}
-
 void esq1_state::send_through_panel(uint8_t data)
 {
 	m_panel->xmit_char(data);
@@ -621,14 +604,18 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 
 void esq1_state::esq1(machine_config &config)
 {
-	MC6809(config, m_maincpu, XTAL(8'000'000)); // XTAL not directly attached to CPU
+	MC6809E(config, m_maincpu, 8_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::esq1_map);
 
-	SCN2681(config, m_duart, XTAL(8'000'000) / 2);
-	m_duart->set_clocks(XTAL(8'000'000) / 16, XTAL(8'000'000) / 16, XTAL(8'000'000) / 8, XTAL(8'000'000) / 8);
-	m_duart->irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	m_duart->a_tx_cb().set(FUNC(esq1_state::duart_tx_a));
-	m_duart->b_tx_cb().set(FUNC(esq1_state::duart_tx_b));
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
+	mainirq.output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	mainirq.output_handler().append_inputline(m_maincpu, M6809_FIRQ_LINE); // IRQ and FIRQ are tied together
+
+	SCN2681(config, m_duart, 8_MHz_XTAL / 2);
+	m_duart->set_clocks(8_MHz_XTAL / 16, 8_MHz_XTAL / 16, 8_MHz_XTAL / 8, 8_MHz_XTAL / 8);
+	m_duart->irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
+	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel2x40_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq1_state::duart_output));
 
 	ESQPANEL2X40(config, m_panel);
@@ -647,9 +634,9 @@ void esq1_state::esq1(machine_config &config)
 	m_filters->add_route(0, "lspeaker", 1.0);
 	m_filters->add_route(1, "rspeaker", 1.0);
 
-	ES5503(config, m_es5503, XTAL(8'000'000));
+	ES5503(config, m_es5503, 8_MHz_XTAL);
 	m_es5503->set_channels(8);
-	m_es5503->irq_func().set(FUNC(esq1_state::esq1_doc_irq));
+	m_es5503->irq_func().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_es5503->adc_func().set(FUNC(esq1_state::esq1_adc_read));
 	m_es5503->add_route(0, "filters", 1.0, 0);
 	m_es5503->add_route(1, "filters", 1.0, 1);
@@ -667,8 +654,11 @@ void esq1_state::sq80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::sq80_map);
 
 	m_es5503->set_addrmap(0, &esq1_state::sq80_es5503_map);
+	m_es5503->irq_func().set_nop(); // not connected here
 
-	WD1772(config, m_fdc, 4000000);
+	WD1772(config, m_fdc, 8_MHz_XTAL);
+	m_fdc->drq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 static INPUT_PORTS_START( esq1 )
