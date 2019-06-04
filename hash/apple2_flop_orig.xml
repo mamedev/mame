@@ -5179,4 +5179,178 @@
 		</part>
 	</software>
 
+	<software name="ultima1t">
+		<description>Ultima I: The Beginning</description>
+		<year>1986</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-05-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+		<!-- This is the Ultima Trilogy rerelease version. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234735">
+				<rom name="ultima i - the beginning.woz" size="234735" crc="d06b8c18" sha1="9d909f6e098f23935854a9e63f7b2d7b8efc8dfc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renegade">
+		<description>Renegade</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="release" value="2019-05-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234755">
+				<rom name="renegade side a.woz" size="234755" crc="040575e3" sha1="be136b6986f712453d1ffa826cf704fd35e95c49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234755">
+				<rom name="renegade side b.woz" size="234755" crc="d245d5ae" sha1="7113632f3d6b9933402ee0e9ab612a2d8a460d92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skicrzed">
+		<description>Ski Crazed (Version 28701)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2019-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="ski crazed.woz" size="234775" crc="92531d10" sha1="9fb8ad412976644fa03814229e1b84196ca8fcaf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thief">
+		<description>Thief</description>
+		<year>1981</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2019-05-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234747">
+				<rom name="thief.woz" size="234747" crc="6e62cbe2" sha1="a5e9045ae1a516a502dd37a888a452d647c1b571" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcazar">
+		<description>Alcazar: The Forgotten Fortress</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-05-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="alcazar.woz" size="234795" crc="549a5df2" sha1="2ecf7bb3154b001932db62fdee7e0a9704449eb2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrcool">
+		<description>Mr. Cool</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2019-05-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="mr. cool.woz" size="234781" crc="e40dca20" sha1="0dc5a1222ecd1cb56913c78b6a36d5f63b44910e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmplstsk">
+		<description>Rumpelstiltskin</description>
+		<year>1987</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-05-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234745">
+				<rom name="rumpelstiltskin.woz" size="234745" crc="b28efd1c" sha1="4c0a5d5feaf441bcb95874009a73f5037bfaad20" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submissn">
+		<description>Sub Mission</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Sub Mission" is a 1987 simulation game developed by Tom Snyder Productions and published by Mindscape. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234804">
+				<rom name="Sub Mission.woz" size="234804" crc="a028902c" sha1="9805fe623de40e0d6d39a9aad4abcc2024bf4572" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thtreuro">
+		<description>Theatre Europe</description>
+		<year>1986</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="Theatre Europe.woz" size="234773" crc="fd26a9f2" sha1="bc37e6a1805ba72ce8259c06ee3e82c7770afff1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="station5">
+		<description>Station 5</description>
+		<year>1984</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234761">
+				<rom name="Station 5.woz" size="234761" crc="52124dfd" sha1="7baaa8a17d373182c28f3486423f770a35078cb9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ogre">
+		<description>OGRE</description>
+		<year>1986</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234755">
+				<rom name="OGRE.woz" size="234755" crc="76123140" sha1="540dfe0e7ff7fe7a2c7bbb8d41b2cb85fbcaa6ea" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
