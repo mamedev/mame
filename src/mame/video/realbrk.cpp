@@ -187,12 +187,18 @@ void realbrk_state::video_start()
 // DaiDaiKakumei
 // layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder
 template <bool Rotatable>
-void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
+void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority)
 {
+	constexpr uint32_t PRI_MAP[4]{
+			GFX_PMASK_4,                                // over m_tilemap[1], over m_tilemap[0], under m_tilemap[2]
+			GFX_PMASK_4 | GFX_PMASK_2,                  // over m_tilemap[1], under m_tilemap[0], under m_tilemap[2]
+			GFX_PMASK_4 | GFX_PMASK_2 | GFX_PMASK_1,    // under m_tilemap[1], under m_tilemap[0], under m_tilemap[2]
+			GFX_PMASK_4 | GFX_PMASK_2 | GFX_PMASK_1 };  // unknown
+
 	int const max_x(m_screen->width());
 	int const max_y(m_screen->height());
 
-	for (int offs = 0x3000 / 2; offs < 0x3600 / 2; offs += 2 / 2)
+	for (int offs = (0x3600 - 2) / 2; offs >= 0x3000 / 2; offs -= 2 / 2)
 	{
 		if (BIT(m_spriteram[offs], 15))
 			continue;
@@ -220,8 +226,6 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		int code    = s[7];
 
-		if (pri != layer)
-			continue;
 
 		sx      =       ((sx & 0x1ff) - (sx & 0x200)) << 16;
 		sy      =       ((sy & 0x0ff) - (sy & 0x100)) << 16;
@@ -320,16 +324,18 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						break;
 					}
 
+					// FIXME: how to apply priority here?
 					copybitmap_trans(bitmap, *m_tmpbitmap1, 0, 0, currx, curry, cliprect, 0);
 				}
 				else
 				{
-					m_gfxdecode->gfx(gfx)->zoom_transpen(bitmap, cliprect,
+					m_gfxdecode->gfx(gfx)->prio_zoom_transpen(bitmap, cliprect,
 							code++,
 							color,
 							flipx, flipy,
 							currx, curry,
 							scalex << 12, scaley << 12,
+							priority, PRI_MAP[pri],
 							0);
 				}
 			}
@@ -406,18 +412,11 @@ uint32_t realbrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 #endif
 
-	if (layers_ctrl & 8) draw_sprites<true>(bitmap, cliprect, 3); // Unknown
-	if (layers_ctrl & 8) draw_sprites<true>(bitmap, cliprect, 2); // Under m_tilemap[1], Under m_tilemap[0]
-
 	if (layers_ctrl & 2) m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
-
-	if (layers_ctrl & 8) draw_sprites<true>(bitmap,cliprect, 1); // Over m_tilemap[1], Under m_tilemap[0]
-
 	if (layers_ctrl & 1) m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 2);
-
-	if (layers_ctrl & 8) draw_sprites<true>(bitmap,cliprect, 0); // Over m_tilemap[1], Over m_tilemap[0]
-
 	if (layers_ctrl & 4) m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4);
+
+	if (layers_ctrl & 8) draw_sprites<true>(bitmap, cliprect, screen.priority());
 
 //  popmessage("%04x",m_vregs[0x8/2]);
 	return 0;
@@ -482,23 +481,17 @@ uint32_t realbrk_state::screen_update_dai2kaku(screen_device &screen, bitmap_ind
 
 	bool const bgpri(BIT(m_vregs[8 / 2], 15));
 
-	// spr 0
-	if (layers_ctrl & 8) draw_sprites<false>(bitmap, cliprect, 2);
-
 	// bglow
 	if (layers_ctrl & (bgpri ? 1 : 2)) m_tilemap[bgpri ? 0 : 1]->draw(screen, bitmap, cliprect, 0, 1);
-
-	// spr 1
-	if (layers_ctrl & 8) draw_sprites<false>(bitmap, cliprect, 1);
 
 	// bghigh
 	if (layers_ctrl & (bgpri ? 2 : 1)) m_tilemap[bgpri ? 1 : 0]->draw(screen, bitmap, cliprect, 0, 2);
 
-	// spr 2
-	if (layers_ctrl & 8) draw_sprites<false>(bitmap, cliprect, 0);
-
 	// fix
 	if (layers_ctrl & 4) m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4);
+
+	// spr 0/1/2
+	if (layers_ctrl & 8) draw_sprites<false>(bitmap, cliprect, screen.priority());
 
 //  usrintf_showmessage("%04x",m_vregs[0x8/2]);
 	return 0;
