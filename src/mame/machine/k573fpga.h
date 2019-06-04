@@ -20,10 +20,9 @@ public:
 	void set_ram(u16 *v) { ram = v; }
 	u16 get_decrypted();
 
-	void set_crypto_key1(u16 v) { orig_crypto_key1 = crypto_key1 = v; }
+	void set_crypto_key1(u16 v) { crypto_key1 = v; }
 	void set_crypto_key2(u16 v) { crypto_key2 = v; }
 	void set_crypto_key3(u8 v) { crypto_key3 = v; }
-	u16 get_crypto_key1() const { return orig_crypto_key1; }
 
 	uint32_t get_mp3_cur_adr() { return mp3_cur_adr; }
 	void set_mp3_cur_adr(u32 v) { mp3_cur_adr = v; }
@@ -44,7 +43,7 @@ protected:
 private:
 	u16 *ram;
 
-	u16 orig_crypto_key1, crypto_key1, crypto_key2;
+	u16 crypto_key1, crypto_key2;
 	u8 crypto_key3;
 
 	u32 mp3_cur_adr, mp3_end_adr, mpeg_ctrl_flag;

@@ -82,6 +82,7 @@ private:
 	void output(int offset, uint16_t data);
 
 	bool is_ddrsbm_fpga;
+	u16 crypto_key1;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)

@@ -235,12 +235,14 @@ WRITE16_MEMBER(k573dio_device::mpeg_end_adr_low_w)
 
 READ16_MEMBER(k573dio_device::mpeg_key_1_r)
 {
-	return k573fpga->get_crypto_key1();
+	// Dance Dance Revolution Solo Bass Mix reads this key before starting songs
+	return crypto_key1;
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_key_1_w)
 {
 	logerror("FPGA MPEG key 1/3 %04x\n", data);
+	crypto_key1 = data;
 	k573fpga->set_crypto_key1(data);
 }
 
