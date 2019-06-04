@@ -285,7 +285,7 @@ void jazz_state::jazz(machine_config &config)
 	m_kbdc->hot_res().set([this](int state) { logerror("reset %d\n", state); });
 	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<6>));;
+	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<6>));
 	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->aux_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<7>));
