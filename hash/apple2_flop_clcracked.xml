@@ -13331,7 +13331,7 @@
 	</software>
 
 	<software name="kkafbcm1">
-		<description>Kittens, Kids and a Frog - Building Comprehension I (1989 Version) (cleanly cracked)</description>
+		<description>Kittens, Kids, and a Frog - Building Comprehension I (1989 Version) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Hartley Courseware</publisher>
 		<info name="release" value="2016-02-16"/>
@@ -14208,6 +14208,454 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="lode runner (4am crack).dsk" size="143360" crc="148a8095" sha1="2293b9b3f73e207d5d9e8d62a7c29774e8ac2913" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logclvls">
+		<description>Logic Levels (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Fisher Price Learning</publisher>
+		<info name="release" value="2016-01-14"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="logic levels (4am crack).dsk" size="143360" crc="a29ce7eb" sha1="dba5f89f86cefc2cd02c67be9d5f135b6c0b648b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logictls">
+		<description>Logic Tools (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2015-01-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="logic tools (4am crack).dsk" size="143360" crc="ee462ed7" sha1="5831cb4ed9a1e0aca58c88c2a4ee796b5a9bd3fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwlngdiv">
+		<description>Long Division (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2017-04-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="long division (4am crack).dsk" size="143360" crc="f6ede713" sha1="ba70aec5a6820c7d6f24da695a647ddd5cb48f9e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordyore">
+		<description>Lordlings of Yore (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Softlore Corporation</publisher>
+		<info name="release" value="2018-10-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="lordlings of yore (4am crack).dsk" size="143360" crc="3e546d40" sha1="ae6f02c1c76e265e5a0e2efdf31c4a730a0eb2c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordconq">
+		<description>Lords of Conquest (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2017-03-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="lords of conquest (4am and san inc crack) side a.dsk" size="143360" crc="19d1dd77" sha1="e342bf48d1730e8bb0b1f5400cb61857af50ec98" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="lords of conquest (4am and san inc crack) side b.dsk" size="143360" crc="e746d78e" sha1="1257315c299df977acc32dad3840bee7b55144f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lucirelm">
+		<description>Lucifer's Realm (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2018-10-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="lucifer's realm (4am crack) side a.dsk" size="143360" crc="67de4b68" sha1="379b42b6ab77099d973fb9bf0dc3d3bc7dfdafdd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="lucifer's realm (4am crack) side b.dsk" size="143360" crc="22a9ffa1" sha1="6d4c3d5ba165eb9aff632432538181eb9e77c8b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l7splgme">
+		<description>Lucky 7 Spelling Games - Elementary (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2019-01-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="lucky 7 spelling games - elementary (4am crack).dsk" size="143360" crc="bdf2f55c" sha1="27594836a052a8a216b5914b605bdc33605e59c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mladjadv">
+		<description>Mad Libs Writer - Adjective-Adverb Writer (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2016-08-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mad libs writer - adjective-adverb writer (4am crack).dsk" size="143360" crc="495d6483" sha1="63db8960d71b1aa0c65ce686a6c5ddeb9dda3767" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlverbw">
+		<description>Mad Libs Writer - Verb Writer (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2016-08-14"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mad libs writer - verb writer (4am crack).dsk" size="143360" crc="da19f405" sha1="dd875452f56375dd943f94078024d5f9ca2fe8e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madvntre">
+		<description>Mad Venture (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Micro Lab</publisher>
+		<info name="release" value="2018-11-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mad venture (4am crack).dsk" size="143360" crc="b784eef9" sha1="fc5fdafa8092f3195da19c37329dc8e0f38d8a0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magcstle">
+		<description>Magic Castle (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Methods and Solutions</publisher>
+		<info name="release" value="2016-07-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic castle (4am crack).dsk" size="143360" crc="5588b3bb" sha1="03d8c67d24b5051e2f76b359ac39cd99784e97a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt20v13">
+		<description>Magic Slate 20 (Version 1.3) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20 v1.3 (4am crack).dsk" size="143360" crc="e370e505" sha1="fee4ddf7fab3417243d8cd9ca3d10862a1ab448e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt20v14">
+		<description>Magic Slate 20 (Version 1.4) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-08-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20 v1.4 (4am crack).dsk" size="143360" crc="7079eca0" sha1="9436520fcf78ce6c0353535cbca537c6cc355f72" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt2040v10">
+		<description>Magic Slate 20/40 (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20-40 v1.0 (4am crack).dsk" size="143360" crc="2f4dc4e2" sha1="3162c9d18c82513f1701787328d1de8faa488045" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt2040v102">
+		<description>Magic Slate 20/40 (Version 1.02) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20-40 v1.02 (4am crack).dsk" size="143360" crc="6bb3eaf4" sha1="2547b77691c0be14ca342ca33a7c7c694670d06f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt2040v112">
+		<description>Magic Slate 20/40 (Version 1.12) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20-40 v1.12 (4am crack).dsk" size="143360" crc="6a7a06c4" sha1="245383423d8f0f4dd53eda7bb4b37253e85ad699" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt2040v122">
+		<description>Magic Slate 20/40 (Version 1.22) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-14"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20-40 v1.22 (4am crack).dsk" size="143360" crc="32f95875" sha1="6224d1c7bf1041f9b2fc38b05207062c723b95c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt2040v123">
+		<description>Magic Slate 20/40 (Version 1.23) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-17"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 20-40 v1.23 (4am crack).dsk" size="143360" crc="ef5cb3a7" sha1="9e2ae5fb18f1ce695c2810a3dabd410f5c843994" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt40v13">
+		<description>Magic Slate 40 (Version 1.3) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 40 v1.3 (4am crack).dsk" size="143360" crc="38768169" sha1="b3e47eaf3903f70bf714a1551dc83199082c6326" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt40v14">
+		<description>Magic Slate 40 (Version 1.4) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-08-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 40 v1.4 (4am crack).dsk" size="143360" crc="3fb43587" sha1="2c9adec8de909bc76c093948e9024c6cf1b64789" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt80v112">
+		<description>Magic Slate 80 (Version 1.12) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 80 v1.12 (4am crack).dsk" size="143360" crc="14c67a02" sha1="65c46ed3db1a7c00f351704578b02d12dff3e033" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt80v122">
+		<description>Magic Slate 80 (Version 1.22) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-08-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 80 v1.22 (4am crack).dsk" size="143360" crc="646dbb70" sha1="5270e370f47a3eb7709d471ff7aae8ccee352e45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt80v123">
+		<description>Magic Slate 80 (Version 1.23) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-17"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 80 v1.23 (4am crack).dsk" size="143360" crc="47061cf3" sha1="e39645e568d9d83881a8744a2385dc0919a81192" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt80v14">
+		<description>Magic Slate 80 (Version 1.4) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-02-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate 80 v1.4 (4am crack).dsk" size="143360" crc="7058b6fb" sha1="25e4907f748d3d4dedfafd973eb52698fb3a5ad4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt220v10a">
+		<description>Magic Slate II 20 (Version 1.0a) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2018-01-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate ii 20 v1.0a (4am crack).dsk" size="143360" crc="f19bc38e" sha1="45fd1a802788ecb6e76e633d01d2a5efa84a5440" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt240v10a">
+		<description>Magic Slate II 40 (Version 1.0a) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2018-01-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate ii 40 v1.0a (4am crack).dsk" size="143360" crc="8f3b2116" sha1="ccb948a548b1aa5175cfba08c1e9a5fa346d5e38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslt280v10a">
+		<description>Magic Slate II 80 (Version 1.0a) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2018-01-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic slate ii 80 v1.0a (4am crack).dsk" size="143360" crc="d20f04fe" sha1="34417fff1fd262dc4091d7d43bf1f1cb7584721c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspells">
+		<description>Magic Spells (1981) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2016-12-31"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic spells (1981) (4am crack).dsk" size="143360" crc="19692861" sha1="58765788f0fd841a5add6f7d3693cfccceb56f3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msplls21">
+		<description>Magic Spells (Version 2.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2015-12-08"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic spells 2.1 (4am crack).dsk" size="143360" crc="6167bda5" sha1="7642bc892a333194abd0333e115e6c167cdbb6e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmyths">
+		<description>Magical Myths (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2015-01-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magical myths (4am crack).dsk" size="143360" crc="d8904963" sha1="b667c40c3a9fab1e7e52db5da8de639c760edc9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="makeface">
+		<description>Make A Face (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2015-12-18"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="make a face (4am crack).dsk" size="143360" crc="c0ce6ccc" sha1="f1e1d8eda0cc21e44db831fbf5ff02edbc721f8d" />
 			</dataarea>
 		</part>
 	</software>

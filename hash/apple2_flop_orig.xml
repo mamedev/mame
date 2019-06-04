@@ -5292,4 +5292,65 @@
 		</part>
 	</software>
 
+	<software name="submissn">
+		<description>Sub Mission</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Sub Mission" is a 1987 simulation game developed by Tom Snyder Productions and published by Mindscape. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234804">
+				<rom name="Sub Mission.woz" size="234804" crc="a028902c" sha1="9805fe623de40e0d6d39a9aad4abcc2024bf4572" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thtreuro">
+		<description>Theatre Europe</description>
+		<year>1986</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="Theatre Europe.woz" size="234773" crc="fd26a9f2" sha1="bc37e6a1805ba72ce8259c06ee3e82c7770afff1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="station5">
+		<description>Station 5</description>
+		<year>1984</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234761">
+				<rom name="Station 5.woz" size="234761" crc="52124dfd" sha1="7baaa8a17d373182c28f3486423f770a35078cb9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ogre">
+		<description>OGRE</description>
+		<year>1986</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-06-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234755">
+				<rom name="OGRE.woz" size="234755" crc="76123140" sha1="540dfe0e7ff7fe7a2c7bbb8d41b2cb85fbcaa6ea" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
