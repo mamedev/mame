@@ -43,10 +43,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ram_w);
 	DECLARE_WRITE16_MEMBER(ram_read_adr_high_w);
 	DECLARE_WRITE16_MEMBER(ram_read_adr_low_w);
-	DECLARE_READ16_MEMBER(mp3_playback_high_r);
-	DECLARE_WRITE16_MEMBER(mp3_playback_high_w);
-	DECLARE_READ16_MEMBER(mp3_playback_low_r);
-	DECLARE_WRITE16_MEMBER(mp3_playback_low_w);
+	DECLARE_READ16_MEMBER(mp3_frame_count_high_r);
+	DECLARE_READ16_MEMBER(mp3_frame_count_low_r);
 	DECLARE_WRITE16_MEMBER(output_0_w);
 	DECLARE_WRITE16_MEMBER(output_1_w);
 	DECLARE_WRITE16_MEMBER(output_7_w);

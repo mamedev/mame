@@ -41,7 +41,13 @@ void mas3507d_device::device_reset()
 	i2c_bus_address = UNKNOWN;
 	i2c_bus_curbit = -1;
 	i2c_bus_curval = 0;
-	set_playback_enabled(false);
+
+	mp3dec_init(&mp3_dec);
+	memset(mp3data.data(), 0, mp3data.size());
+	memset(samples.data(), 0, samples.size());
+	mp3_count = 0;
+	sample_count = 0;
+	total_frame_count = 0;
 }
 
 void mas3507d_device::i2c_scl_w(bool line)
@@ -351,7 +357,7 @@ void mas3507d_device::fill_buffer()
 		stream->set_sample_rate(current_rate);
 	}
 
-	total_samples_decoded += sample_count;
+	total_frame_count += scount;
 }
 
 void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int scount)
@@ -391,32 +397,30 @@ void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int sco
 	sample_count -= s1;
 }
 
-void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int csamples)
 {
 	int pos = 0;
 
-	if(!playback_enabled) {
-		for(int i=pos; i != samples; i++) {
-			outputs[0][i] = 0;
-			outputs[1][i] = 0;
-		}
-		return;
-	}
-
-	total_sample_count += last_samples;
-	last_samples = samples;
-	append_buffer(outputs, pos, samples);
+	append_buffer(outputs, pos, csamples);
 	for(;;) {
-		if(pos == samples)
+		if(pos == csamples)
 			return;
 		fill_buffer();
 		if(!sample_count) {
-			for(int i=pos; i != samples; i++) {
+			// In the case of a bad frame or no frames being around, reset the state of the decoder
+			mp3dec_init(&mp3_dec);
+			memset(mp3data.data(), 0, mp3data.size());
+			memset(samples.data(), 0, samples.size());
+			mp3_count = 0;
+			sample_count = 0;
+			total_frame_count = 0;
+
+			for(int i=pos; i != csamples; i++) {
 				outputs[0][i] = 0;
 				outputs[1][i] = 0;
 			}
 			return;
 		}
-		append_buffer(outputs, pos, samples);
+		append_buffer(outputs, pos, csamples);
 	}
 }

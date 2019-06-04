@@ -22,24 +22,7 @@ public:
 	void i2c_scl_w(bool line);
 	void i2c_sda_w(bool line);
 
-	void reset_sample_count() { total_sample_count = 0; }
-	u32 get_sample_count() const { return total_sample_count; }
-	u32 get_samples_decoded() const { return total_samples_decoded; }
-	bool is_playing() { return playback_enabled && total_sample_count <= total_samples_decoded; }
-
-	void set_playback_enabled(bool enabled) {
-		playback_enabled = enabled;
-		reset_sample_count();
-
-		memset(mp3data.data(), 0, mp3data.size());
-		memset(samples.data(), 0, samples.size());
-		mp3_count = 0;
-		total_samples_decoded = 0;
-		last_samples = 0;
-		sample_count = 0;
-
-		mp3dec_init(&mp3_dec);
-	}
+	u32 get_frame_count() const { return total_frame_count; }
 
 protected:
 	virtual void device_start() override;
@@ -58,8 +41,8 @@ private:
 	int i2c_bus_curbit;
 	uint8_t i2c_bus_curval;
 	int mp3_count, sample_count, current_rate;
-	u32 total_sample_count, total_samples_decoded, last_samples;
-	bool playback_enabled;
+	u32 total_frame_count;
+	bool playback_enabled, playback_waiting;
 
 	mp3dec_t mp3_dec;
 	mp3dec_frame_info_t mp3_info;

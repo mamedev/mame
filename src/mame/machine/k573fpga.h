@@ -36,6 +36,8 @@ public:
 	u16 get_mpeg_ctrl();
 	void set_mpeg_ctrl(u16 data);
 
+	bool is_playing() { return (mpeg_ctrl_flag & 0xe000) == 0xe000 && mp3_cur_adr < mp3_end_adr; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
