@@ -150,7 +150,7 @@ uint8_t at_kbc_device_base::status_r()
 	u8 const data = m_mcu->upi41_master_r(machine().dummy_space(), 1U);
 	LOGMASKED(LOG_STATUS, "status_r 0x%02x%s%s%s%s%s%s%s%s (%s)\n", data,
 		BIT(data, 7) ? " PER" : "", BIT(data, 6) ? " RTO" : "",
-		BIT(data, 5) ? " TTO" : "", BIT(data, 4) ? " INH" : "",
+		BIT(data, 5) ? " TTO" : "", BIT(data, 4) ? "" : " INH",
 		BIT(data, 3) ? " CMD" : "", BIT(data, 2) ? " SYS" : "",
 		BIT(data, 1) ? " IBF" : "", BIT(data, 0) ? " OBF" : "",
 		machine().describe_context());
@@ -428,7 +428,7 @@ uint8_t ps2_keyboard_controller_device::status_r()
 	u8 const data = m_mcu->upi41_master_r(machine().dummy_space(), 1U);
 	LOGMASKED(LOG_STATUS, "status_r 0x%02x%s%s%s%s%s%s%s%s (%s)\n", data,
 		BIT(data, 7) ? " PER" : "",     BIT(data, 6) ? " GTO" : "",
-		BIT(data, 5) ? " AUX_OBF" : "", BIT(data, 4) ? " INH" : "",
+		BIT(data, 5) ? " AUX_OBF" : "", BIT(data, 4) ? "" : " INH",
 		BIT(data, 3) ? " CMD" : "",     BIT(data, 2) ? " SYS" : "",
 		BIT(data, 1) ? " IBF" : "",     BIT(data, 0) ? " OBF" : "",
 		machine().describe_context());
