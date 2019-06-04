@@ -118,18 +118,16 @@ void jensen_state::jensen(machine_config &config)
 	INTEL_E28F008SA(config, m_feprom[0]);
 	INTEL_E28F008SA(config, m_feprom[1]);
 
-	// pc keyboard connector
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	//kbdc.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	//kbdc.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	//kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	//kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
 	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
-	pc_at_keyboards(kbd);
-	kbd.set_default_option(STR_KBD_MICROSOFT_NATURAL);
-	kbd.set_pc_kbdc_slot(&kbdc);
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	kbd.set_pc_kbdc_slot(&kbd_con);
 
-	// TODO: VL82C106 (rtc, 2xserial, parallel, 2xps/2)
+	// TODO: VL82C106 (rtc, dual serial, parallel, dual ps/2)
 	// TODO: 18.432 MHz crystal
 #if 0
 	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
