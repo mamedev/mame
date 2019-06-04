@@ -14660,4 +14660,198 @@
 		</part>
 	</software>
 
+	<software name="mngscspd">
+		<description>Managing for Success - Personal Development (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>CBS Software</publisher>
+		<info name="release" value="2015-07-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="managing for success - personal development (4am crack) disk 1.dsk" size="143360" crc="f55832b9" sha1="dab39b24319a8453244c176cf483e05e4a1ec606" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="managing for success - personal development (4am crack) disk 2.dsk" size="143360" crc="007c18b8" sha1="fc57ab2b37909d55eee5daa08f62a67291c8a1bf" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="managing for success - personal development (4am crack) disk 3.dsk" size="143360" crc="3b559019" sha1="c3f9db4f98bbe78b09ee1127b136dd908a18828b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmansion">
+		<description>Maniac Mansion (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="release" value="2015-09-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="maniac mansion (4am crack) side a.dsk" size="143360" crc="b353887f" sha1="59551145b051d6f071314c7e235792061566881d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="maniac mansion (4am crack) side b.dsk" size="143360" crc="de0a27e2" sha1="823be1e6dac320029806b7d1d8e521ae66ab3dac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mapskils">
+		<description>Map Skills (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2016-01-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="map skills (4am crack).dsk" size="143360" crc="9eaa2488" sha1="40e8afa7c8a5c5f13fcb31663494d0f076134445" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mglatlng">
+		<description>Maps and Globes - Latitude and Longitude (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2017-05-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="maps and globes - latitude and longitude (4am crack) disk 1.dsk" size="143360" crc="4b077524" sha1="c6a1de752ea8f0536987271ecdf74154b234f36b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="maps and globes - latitude and longitude (4am crack) disk 2.dsk" size="143360" crc="293ae15b" sha1="e58ca22835fa54b3e2f26870460e0d8d9beed63a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marauder">
+		<description>Marauder (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2017-01-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="marauder (4am crack).dsk" size="143360" crc="3e1d27ad" sha1="5f1f31a629d51dc94ac50172e74bb52bd9528d4d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmadness">
+		<description>Marble Madness (4am and san inc crack) side A</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2017-03-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marble madness (4am and san inc crack) side a.dsk" size="143360" crc="e2fd1c35" sha1="9dc2dd127209ffb81deb0e52d4681b9a9ff81338" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marble madness (4am and san inc crack) side b.dsk" size="143360" crc="3b98e16d" sha1="ce1f565c64cad221ce5d84f6413a7fdf0b507d33" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martksht">
+		<description>Marianas Turkey Shoot (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>General Quarters Software</publisher>
+		<info name="release" value="2017-08-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marianas turkey shoot (4am crack) side a.dsk" size="143360" crc="f0f3d1ff" sha1="161671f01c6b4f289ee9fb840da89bf5d5a7804d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marianas turkey shoot (4am crack) side b.dsk" size="143360" crc="f709d6c3" sha1="c254a558b6a677b960e500b45764e75e1df6ebeb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marscars">
+		<description>Mars Cars (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2017-09-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mars cars (4am crack).dsk" size="143360" crc="8e675381" sha1="509aa4a2677f125c72b0acd0f535a12d11587cdf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mfamilyr">
+		<description>Marty's Family Reader</description>
+		<year>1992</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2016-08-12"/>
+		<info name="usage" value="Disks 1, 2, and 7 remain missing." />
+		<!-- 4AM only had access to disks 3, 4, 5, 6, and 8. The rest remain
+		undumped at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 3.dsk" size="143360" crc="84ddbc56" sha1="f2c2dc2e6913e0b207634beade98a2efb23f308b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 4.dsk" size="143360" crc="c392ac2d" sha1="f552c64a1c302185f7855d2eae233f5817efcb3f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 5.dsk" size="143360" crc="ae3a906e" sha1="c41597b898fb3d562d70e1883ba6a22f0884d034" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 6.dsk" size="143360" crc="abc07f2a" sha1="eb1c14c1477828ba4192abff374abc01740d2649" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="143360">
+				<rom name="marty's family reader (4am crack) disk 8.dsk" size="143360" crc="18349e56" sha1="3fd1db410bf1858c8e18d74a11db14a30945ba46" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
