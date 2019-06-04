@@ -54,7 +54,7 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<u16> m_spriteram;
-	required_shared_ptr_array<u16,4> m_vram;
+	required_shared_ptr_array<u16, 4> m_vram;
 	required_shared_ptr<u16> m_vregs;
 	required_shared_ptr<u16> m_unknown;
 	required_shared_ptr<u16> m_priority;
