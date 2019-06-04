@@ -27,6 +27,9 @@ public:
 	void e9161(machine_config &config);
 
 private:
+	u16 berr_r();
+	void berr_w(u16 data);
+
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -34,11 +37,28 @@ private:
 };
 
 
+u16 e9161_state::berr_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	return 0xffff;
+}
+
+void e9161_state::berr_w(u16 data)
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+}
+
 void e9161_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x000007).rom().region("program", 0);
-	map(0x018000, 0x0187ff).ram();
+	map(0x000008, 0x01ffff).ram();
+	map(0x020000, 0x020001).w(FUNC(e9161_state::berr_w));
+	map(0xa00000, 0xa00001).mirror(0x1ffffe).r(FUNC(e9161_state::berr_r));
 	map(0xc00000, 0xc03fff).rom().region("program", 0);
+	map(0xe00000, 0xe03fff).ram();
+	map(0xffe000, 0xffe03f).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 }
 
 
