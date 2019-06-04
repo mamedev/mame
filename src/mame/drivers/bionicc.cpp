@@ -303,69 +303,43 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout spritelayout_bionicc=
-{
-	16,16,  /* 16*16 sprites */
-	2048,   /* 2048 sprites */
-	4,      /* 4 bits per pixel */
-	{ 0x30000*8,0x20000*8,0x10000*8,0 },
-	{
-		0,1,2,3,4,5,6,7,
-		(16*8)+0,(16*8)+1,(16*8)+2,(16*8)+3,
-		(16*8)+4,(16*8)+5,(16*8)+6,(16*8)+7
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
-	},
-	256   /* every sprite takes 256 consecutive bytes */
-};
-
-static const gfx_layout vramlayout_bionicc=
+static const gfx_layout vramlayout=
 {
 	8,8,    /* 8*8 characters */
-	1024,   /* 1024 character */
+	RGN_FRAC(1,1),   /* 1024 character */
 	2,      /* 2 bitplanes */
 	{ 4,0 },
-	{ 0,1,2,3,8,9,10,11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	128   /* every character takes 128 consecutive bytes */
 };
 
-static const gfx_layout scroll2layout_bionicc=
+static const gfx_layout scroll2layout=
 {
 	8,8,    /* 8*8 tiles */
-	2048,   /* 2048 tiles */
+	RGN_FRAC(1,2),   /* 2048 tiles */
 	4,      /* 4 bits per pixel */
-	{ (0x08000*8)+4,0x08000*8,4,0 },
-	{ 0,1,2,3, 8,9,10,11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2),4,0 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	128   /* every tile takes 128 consecutive bytes */
 };
 
-static const gfx_layout scroll1layout_bionicc=
+static const gfx_layout scroll1layout=
 {
 	16,16,  /* 16*16 tiles */
-	2048,   /* 2048 tiles */
+	RGN_FRAC(1,2),   /* 2048 tiles */
 	4,      /* 4 bits per pixel */
-	{ (0x020000*8)+4,0x020000*8,4,0 },
-	{
-		0,1,2,3, 8,9,10,11,
-		(8*4*8)+0,(8*4*8)+1,(8*4*8)+2,(8*4*8)+3,
-		(8*4*8)+8,(8*4*8)+9,(8*4*8)+10,(8*4*8)+11
-	},
-	{
-		0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16
-	},
+	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2),4,0 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+4*2,1) },
+	{ STEP16(0,4*2*2) },
 	512   /* each tile takes 512 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_bionicc )
-	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout_bionicc,   0,  4 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout_bionicc, 256,  4 )    /* colors 256- 319 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_bionicc,  512, 16 )    /* colors 512- 767 */
+	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,    768, 64 )    /* colors 768-1023 */
+	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout,   0,  4 )    /* colors   0-  63 */
+	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout, 256,  4 )    /* colors 256- 319 */
 GFXDECODE_END
 
 
@@ -421,6 +395,8 @@ void bionicc_state::bionicc(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bionicc);
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_color_base(512);    /* colors 512- 767 */
 
 	PALETTE(config, m_palette).set_format(2, &bionicc_state::RRRRGGGGBBBBIIII, 1024);
 
@@ -471,15 +447,15 @@ ROM_START( bionicc ) /* "Not for use in Japan" */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "tse_10.13f",   0x00000, 0x8000, CRC(d28eeacc) SHA1(8b4a655a48da276b07f3464c65743b13cec52bcb) )   /* Sprites */
-	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
-	ROM_LOAD( "tse_15.13g",   0x10000, 0x8000, CRC(9b5593c0) SHA1(73c0acbb01fe69c2bd29dea11b6a223c8efb54a0) )
-	ROM_LOAD( "tsu_14.11g",   0x18000, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
-	ROM_LOAD( "tse_20.13j",   0x20000, 0x8000, CRC(b03db778) SHA1(f72a93e73196c800c1893fd3b523394d702547dd) )
-	ROM_LOAD( "tsu_19.11j",   0x28000, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
-	ROM_LOAD( "tse_22.17j",   0x30000, 0x8000, CRC(d4dedeb3) SHA1(e121057bb541f3f5c755963ca22832c3fe2637c0) )
-	ROM_LOAD( "tsu_21.15j",   0x38000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tse_10.13f",   0x00003, 0x8000, CRC(d28eeacc) SHA1(8b4a655a48da276b07f3464c65743b13cec52bcb) )   /* Sprites */
+	ROM_LOAD32_BYTE( "tsu_09.11f",   0x20003, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
+	ROM_LOAD32_BYTE( "tse_15.13g",   0x00002, 0x8000, CRC(9b5593c0) SHA1(73c0acbb01fe69c2bd29dea11b6a223c8efb54a0) )
+	ROM_LOAD32_BYTE( "tsu_14.11g",   0x20002, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
+	ROM_LOAD32_BYTE( "tse_20.13j",   0x00001, 0x8000, CRC(b03db778) SHA1(f72a93e73196c800c1893fd3b523394d702547dd) )
+	ROM_LOAD32_BYTE( "tsu_19.11j",   0x20001, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
+	ROM_LOAD32_BYTE( "tse_22.17j",   0x00000, 0x8000, CRC(d4dedeb3) SHA1(e121057bb541f3f5c755963ca22832c3fe2637c0) )
+	ROM_LOAD32_BYTE( "tsu_21.15j",   0x20000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -515,15 +491,15 @@ ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "tsu_10.13f",   0x00000, 0x8000, CRC(f1180d02) SHA1(312626af48235a1f726ab596f296ef4739785ca0) )   /* Sprites */
-	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
-	ROM_LOAD( "tsu_15.13g",   0x10000, 0x8000, CRC(ea912701) SHA1(106336c63a1c8a0b13236268bc533a8263285cad) )
-	ROM_LOAD( "tsu_14.11g",   0x18000, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
-	ROM_LOAD( "tsu_20.13j",   0x20000, 0x8000, CRC(17857ad2) SHA1(9f45cea6e9ce82bfc9ee6896a30257d20fb38bca) )
-	ROM_LOAD( "tsu_19.11j",   0x28000, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
-	ROM_LOAD( "tsu_22.17j",   0x30000, 0x8000, CRC(5ee1ae6a) SHA1(76ca53d847c940c4176d79ba49b0c10efd6342e8) )
-	ROM_LOAD( "tsu_21.15j",   0x38000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tsu_10.13f",   0x00003, 0x8000, CRC(f1180d02) SHA1(312626af48235a1f726ab596f296ef4739785ca0) )   /* Sprites */
+	ROM_LOAD32_BYTE( "tsu_09.11f",   0x20003, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
+	ROM_LOAD32_BYTE( "tsu_15.13g",   0x00002, 0x8000, CRC(ea912701) SHA1(106336c63a1c8a0b13236268bc533a8263285cad) )
+	ROM_LOAD32_BYTE( "tsu_14.11g",   0x20002, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
+	ROM_LOAD32_BYTE( "tsu_20.13j",   0x00001, 0x8000, CRC(17857ad2) SHA1(9f45cea6e9ce82bfc9ee6896a30257d20fb38bca) )
+	ROM_LOAD32_BYTE( "tsu_19.11j",   0x20001, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
+	ROM_LOAD32_BYTE( "tsu_22.17j",   0x00000, 0x8000, CRC(5ee1ae6a) SHA1(76ca53d847c940c4176d79ba49b0c10efd6342e8) )
+	ROM_LOAD32_BYTE( "tsu_21.15j",   0x20000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -559,15 +535,15 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "tsu_10.13f",   0x00000, 0x8000, CRC(f1180d02) SHA1(312626af48235a1f726ab596f296ef4739785ca0) )   /* Sprites */
-	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
-	ROM_LOAD( "tsu_15.13g",   0x10000, 0x8000, CRC(ea912701) SHA1(106336c63a1c8a0b13236268bc533a8263285cad) )
-	ROM_LOAD( "tsu_14.11g",   0x18000, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
-	ROM_LOAD( "tsu_20.13j",   0x20000, 0x8000, CRC(17857ad2) SHA1(9f45cea6e9ce82bfc9ee6896a30257d20fb38bca) )
-	ROM_LOAD( "tsu_19.11j",   0x28000, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
-	ROM_LOAD( "tsu_22.17j",   0x30000, 0x8000, CRC(5ee1ae6a) SHA1(76ca53d847c940c4176d79ba49b0c10efd6342e8) )
-	ROM_LOAD( "tsu_21.15j",   0x38000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tsu_10.13f",   0x00003, 0x8000, CRC(f1180d02) SHA1(312626af48235a1f726ab596f296ef4739785ca0) )   /* Sprites */
+	ROM_LOAD32_BYTE( "tsu_09.11f",   0x20003, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
+	ROM_LOAD32_BYTE( "tsu_15.13g",   0x00002, 0x8000, CRC(ea912701) SHA1(106336c63a1c8a0b13236268bc533a8263285cad) )
+	ROM_LOAD32_BYTE( "tsu_14.11g",   0x20002, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
+	ROM_LOAD32_BYTE( "tsu_20.13j",   0x00001, 0x8000, CRC(17857ad2) SHA1(9f45cea6e9ce82bfc9ee6896a30257d20fb38bca) )
+	ROM_LOAD32_BYTE( "tsu_19.11j",   0x20001, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
+	ROM_LOAD32_BYTE( "tsu_22.17j",   0x00000, 0x8000, CRC(5ee1ae6a) SHA1(76ca53d847c940c4176d79ba49b0c10efd6342e8) )
+	ROM_LOAD32_BYTE( "tsu_21.15j",   0x20000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -603,15 +579,15 @@ ROM_START( topsecrt2 ) /* "Not for use in any other country but Japan" */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "ts_10.13f",    0x00000, 0x8000, CRC(c3587d05) SHA1(ad0898a5d4cf110783ef092bf8e65b6ef31a8ae0) )   /* Sprites */
-	ROM_LOAD( "ts_09.11f",    0x08000, 0x8000, CRC(6b63eef2) SHA1(5d1580db7f49c5994c2a08a36c2d05f3e246930d) )
-	ROM_LOAD( "ts_15.13g",    0x10000, 0x8000, CRC(db8cebb0) SHA1(1cc9eac14851cde95fb2d69d6f5ffb08bc9c0d93) )
-	ROM_LOAD( "ts_14.11g",    0x18000, 0x8000, CRC(e2e41abf) SHA1(d002d0d8fdbb9ec3e2eac218f6338f733953ca82) )
-	ROM_LOAD( "ts_20.13j",    0x20000, 0x8000, CRC(bfd1a695) SHA1(bf93486b96bfa1a1d5015189043b07e6130e6df1) )
-	ROM_LOAD( "ts_19.11j",    0x28000, 0x8000, CRC(928b669e) SHA1(98ea9d23a46b0700490fd2fa7ab4fb0988dd5ca6) )
-	ROM_LOAD( "ts_22.17j",    0x30000, 0x8000, CRC(3fe05d9a) SHA1(32e28ef03fb82785019d1ae8b3859215b5368c2b) )
-	ROM_LOAD( "ts_21.15j",    0x38000, 0x8000, CRC(27a9bb7c) SHA1(bb60332c0ecde4d7797960dec39c1079498175c3) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "ts_10.13f",    0x00003, 0x8000, CRC(c3587d05) SHA1(ad0898a5d4cf110783ef092bf8e65b6ef31a8ae0) )   /* Sprites */
+	ROM_LOAD32_BYTE( "ts_09.11f",    0x20003, 0x8000, CRC(6b63eef2) SHA1(5d1580db7f49c5994c2a08a36c2d05f3e246930d) )
+	ROM_LOAD32_BYTE( "ts_15.13g",    0x00002, 0x8000, CRC(db8cebb0) SHA1(1cc9eac14851cde95fb2d69d6f5ffb08bc9c0d93) )
+	ROM_LOAD32_BYTE( "ts_14.11g",    0x20002, 0x8000, CRC(e2e41abf) SHA1(d002d0d8fdbb9ec3e2eac218f6338f733953ca82) )
+	ROM_LOAD32_BYTE( "ts_20.13j",    0x00001, 0x8000, CRC(bfd1a695) SHA1(bf93486b96bfa1a1d5015189043b07e6130e6df1) )
+	ROM_LOAD32_BYTE( "ts_19.11j",    0x20001, 0x8000, CRC(928b669e) SHA1(98ea9d23a46b0700490fd2fa7ab4fb0988dd5ca6) )
+	ROM_LOAD32_BYTE( "ts_22.17j",    0x00000, 0x8000, CRC(3fe05d9a) SHA1(32e28ef03fb82785019d1ae8b3859215b5368c2b) )
+	ROM_LOAD32_BYTE( "ts_21.15j",    0x20000, 0x8000, CRC(27a9bb7c) SHA1(bb60332c0ecde4d7797960dec39c1079498175c3) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -647,15 +623,15 @@ ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "ts_10.13f",    0x00000, 0x8000, CRC(c3587d05) SHA1(ad0898a5d4cf110783ef092bf8e65b6ef31a8ae0) )   /* Sprites */
-	ROM_LOAD( "ts_09.11f",    0x08000, 0x8000, CRC(6b63eef2) SHA1(5d1580db7f49c5994c2a08a36c2d05f3e246930d) )
-	ROM_LOAD( "ts_15.13g",    0x10000, 0x8000, CRC(db8cebb0) SHA1(1cc9eac14851cde95fb2d69d6f5ffb08bc9c0d93) )
-	ROM_LOAD( "ts_14.11g",    0x18000, 0x8000, CRC(e2e41abf) SHA1(d002d0d8fdbb9ec3e2eac218f6338f733953ca82) )
-	ROM_LOAD( "ts_20.13j",    0x20000, 0x8000, CRC(bfd1a695) SHA1(bf93486b96bfa1a1d5015189043b07e6130e6df1) )
-	ROM_LOAD( "ts_19.11j",    0x28000, 0x8000, CRC(928b669e) SHA1(98ea9d23a46b0700490fd2fa7ab4fb0988dd5ca6) )
-	ROM_LOAD( "ts_22.17j",    0x30000, 0x8000, CRC(3fe05d9a) SHA1(32e28ef03fb82785019d1ae8b3859215b5368c2b) )
-	ROM_LOAD( "ts_21.15j",    0x38000, 0x8000, CRC(27a9bb7c) SHA1(bb60332c0ecde4d7797960dec39c1079498175c3) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "ts_10.13f",    0x00003, 0x8000, CRC(c3587d05) SHA1(ad0898a5d4cf110783ef092bf8e65b6ef31a8ae0) )   /* Sprites */
+	ROM_LOAD32_BYTE( "ts_09.11f",    0x20003, 0x8000, CRC(6b63eef2) SHA1(5d1580db7f49c5994c2a08a36c2d05f3e246930d) )
+	ROM_LOAD32_BYTE( "ts_15.13g",    0x00002, 0x8000, CRC(db8cebb0) SHA1(1cc9eac14851cde95fb2d69d6f5ffb08bc9c0d93) )
+	ROM_LOAD32_BYTE( "ts_14.11g",    0x20002, 0x8000, CRC(e2e41abf) SHA1(d002d0d8fdbb9ec3e2eac218f6338f733953ca82) )
+	ROM_LOAD32_BYTE( "ts_20.13j",    0x00001, 0x8000, CRC(bfd1a695) SHA1(bf93486b96bfa1a1d5015189043b07e6130e6df1) )
+	ROM_LOAD32_BYTE( "ts_19.11j",    0x20001, 0x8000, CRC(928b669e) SHA1(98ea9d23a46b0700490fd2fa7ab4fb0988dd5ca6) )
+	ROM_LOAD32_BYTE( "ts_22.17j",    0x00000, 0x8000, CRC(3fe05d9a) SHA1(32e28ef03fb82785019d1ae8b3859215b5368c2b) )
+	ROM_LOAD32_BYTE( "ts_21.15j",    0x20000, 0x8000, CRC(27a9bb7c) SHA1(bb60332c0ecde4d7797960dec39c1079498175c3) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -691,11 +667,11 @@ ROM_START( bioniccbl )
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) ) // 17.bin
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) ) // 18.bin
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "07.bin",       0x00000, 0x10000, CRC(a0e78996) SHA1(810a54e657c0faaff6a8494acaf803d1d2151893) )
-	ROM_LOAD( "11.bin",       0x10000, 0x10000, CRC(37cb11c2) SHA1(af8c2ae4bb6e6c13ea3e8b7c96e5b18f1eb1d5a5) )
-	ROM_LOAD( "15.bin",       0x20000, 0x10000, CRC(4e0354ce) SHA1(d3256c891b44c6593b0b44c0d0a3e754ce78c1cb) )
-	ROM_LOAD( "16.bin",       0x30000, 0x10000, CRC(ac89e5cc) SHA1(aa7e065ece6d25b7e83fadcd22c09e1f7dc0b86f) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "07.bin",       0x00003, 0x10000, CRC(a0e78996) SHA1(810a54e657c0faaff6a8494acaf803d1d2151893) )
+	ROM_LOAD32_BYTE( "11.bin",       0x00002, 0x10000, CRC(37cb11c2) SHA1(af8c2ae4bb6e6c13ea3e8b7c96e5b18f1eb1d5a5) )
+	ROM_LOAD32_BYTE( "15.bin",       0x00001, 0x10000, CRC(4e0354ce) SHA1(d3256c891b44c6593b0b44c0d0a3e754ce78c1cb) )
+	ROM_LOAD32_BYTE( "16.bin",       0x00000, 0x10000, CRC(ac89e5cc) SHA1(aa7e065ece6d25b7e83fadcd22c09e1f7dc0b86f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -731,15 +707,15 @@ ROM_START( bioniccbl2 ) // only the 4 maincpu ROMs differ, they came from an ori
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "tse_10.13f",   0x00000, 0x8000, CRC(d28eeacc) SHA1(8b4a655a48da276b07f3464c65743b13cec52bcb) )   /* Sprites */
-	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
-	ROM_LOAD( "tse_15.13g",   0x10000, 0x8000, CRC(9b5593c0) SHA1(73c0acbb01fe69c2bd29dea11b6a223c8efb54a0) )
-	ROM_LOAD( "tsu_14.11g",   0x18000, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
-	ROM_LOAD( "tse_20.13j",   0x20000, 0x8000, CRC(b03db778) SHA1(f72a93e73196c800c1893fd3b523394d702547dd) )
-	ROM_LOAD( "tsu_19.11j",   0x28000, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
-	ROM_LOAD( "tse_22.17j",   0x30000, 0x8000, CRC(d4dedeb3) SHA1(e121057bb541f3f5c755963ca22832c3fe2637c0) )
-	ROM_LOAD( "tsu_21.15j",   0x38000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tse_10.13f",   0x00003, 0x8000, CRC(d28eeacc) SHA1(8b4a655a48da276b07f3464c65743b13cec52bcb) )   /* Sprites */
+	ROM_LOAD32_BYTE( "tsu_09.11f",   0x20003, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
+	ROM_LOAD32_BYTE( "tse_15.13g",   0x00002, 0x8000, CRC(9b5593c0) SHA1(73c0acbb01fe69c2bd29dea11b6a223c8efb54a0) )
+	ROM_LOAD32_BYTE( "tsu_14.11g",   0x20002, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
+	ROM_LOAD32_BYTE( "tse_20.13j",   0x00001, 0x8000, CRC(b03db778) SHA1(f72a93e73196c800c1893fd3b523394d702547dd) )
+	ROM_LOAD32_BYTE( "tsu_19.11j",   0x20001, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
+	ROM_LOAD32_BYTE( "tse_22.17j",   0x00000, 0x8000, CRC(d4dedeb3) SHA1(e121057bb541f3f5c755963ca22832c3fe2637c0) )
+	ROM_LOAD32_BYTE( "tsu_21.15j",   0x20000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */

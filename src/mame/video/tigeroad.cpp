@@ -121,7 +121,7 @@ void tigeroad_state::video_start()
 uint32_t tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 2, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), true);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 	return 0;
