@@ -602,8 +602,8 @@ static const gfx_layout text_layout =
 	RGN_FRAC(1,1),
 	2,
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	16*8
 };
 
@@ -613,39 +613,16 @@ static const gfx_layout tile_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
-	{
-		0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-		64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+8+0, 64*8+8+1, 64*8+8+2, 64*8+8+3,
-		2*64*8+0, 2*64*8+1, 2*64*8+2, 2*64*8+3, 2*64*8+8+0, 2*64*8+8+1, 2*64*8+8+2, 2*64*8+8+3,
-		3*64*8+0, 3*64*8+1, 3*64*8+2, 3*64*8+3, 3*64*8+8+0, 3*64*8+8+1, 3*64*8+8+2, 3*64*8+8+3,
-	},
-	{
-		0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16,
-		16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16,
-		24*16, 25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16
-	},
+	{ STEP4(0,1),        STEP4(4*2,1),          STEP4(4*2*2*32,1), STEP4(4*2*2*32+4*2,1),
+	  STEP4(4*2*2*64,1), STEP4(4*2*2*64+4*2,1), STEP4(4*2*2*96,1), STEP4(4*2*2*96+4*2,1) },
+	{ STEP32(0,4*2*2) },
 	256*8
-};
-
-static const gfx_layout sprite_layout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8
 };
 
 
 static GFXDECODE_START( gfx_tigeroad )
-	GFXDECODE_ENTRY( "text", 0, text_layout,      0x300, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, tile_layout,     0x100, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( "text",  0, text_layout, 0x300, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 0x100, 16 )
 GFXDECODE_END
 
 void tigeroad_state::tigeroad(machine_config &config)
@@ -676,6 +653,8 @@ void tigeroad_state::tigeroad(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_color_base(0x200);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
@@ -752,6 +731,8 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_color_base(0x200);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
@@ -827,11 +808,11 @@ ROM_START( tigeroad ) /* ECT program roms */
 	ROM_LOAD( "tr-07a.2j", 0xc0000, 0x20000, CRC(5f907d4d) SHA1(1820c5c6e0b078db9c64655c7983ea115ad81036) )
 	ROM_LOAD( "tr_08.2l",  0xe0000, 0x20000, CRC(adee35e2) SHA1(6707cf43a697eb9465449a144ae4508afe2e6496) ) /* EPROM */
 
-	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "tr-09a.3b", 0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
-	ROM_LOAD( "tr-10a.2b", 0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
-	ROM_LOAD( "tr-11a.3d", 0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
-	ROM_LOAD( "tr-12a.2d", 0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
+	ROM_REGION( 0x080000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tr-09a.3b", 0x00003, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
+	ROM_LOAD32_BYTE( "tr-10a.2b", 0x00002, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
+	ROM_LOAD32_BYTE( "tr-11a.3d", 0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
+	ROM_LOAD32_BYTE( "tr-12a.2d", 0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
@@ -863,11 +844,11 @@ ROM_START( tigeroadu ) /* US ROMSTAR program roms */
 	ROM_LOAD( "tr-07a.2j", 0xc0000, 0x20000, CRC(5f907d4d) SHA1(1820c5c6e0b078db9c64655c7983ea115ad81036) )
 	ROM_LOAD( "tr_08.2l",  0xe0000, 0x20000, CRC(adee35e2) SHA1(6707cf43a697eb9465449a144ae4508afe2e6496) ) /* EPROM */
 
-	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "tr-09a.3b", 0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
-	ROM_LOAD( "tr-10a.2b", 0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
-	ROM_LOAD( "tr-11a.3d", 0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
-	ROM_LOAD( "tr-12a.2d", 0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
+	ROM_REGION( 0x080000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tr-09a.3b", 0x00003, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
+	ROM_LOAD32_BYTE( "tr-10a.2b", 0x00002, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
+	ROM_LOAD32_BYTE( "tr-11a.3d", 0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
+	ROM_LOAD32_BYTE( "tr-12a.2d", 0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
@@ -900,11 +881,11 @@ ROM_START( toramich )
 	ROM_LOAD( "tr-07a.2j", 0xc0000, 0x20000, CRC(5f907d4d) SHA1(1820c5c6e0b078db9c64655c7983ea115ad81036) )
 	ROM_LOAD( "tr_08.2l",  0xe0000, 0x20000, CRC(adee35e2) SHA1(6707cf43a697eb9465449a144ae4508afe2e6496) ) /* EPROM */
 
-	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "tr-09a.3b", 0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
-	ROM_LOAD( "tr-10a.2b", 0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
-	ROM_LOAD( "tr-11a.3d", 0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
-	ROM_LOAD( "tr-12a.2d", 0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
+	ROM_REGION( 0x080000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tr-09a.3b", 0x00003, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
+	ROM_LOAD32_BYTE( "tr-10a.2b", 0x00002, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
+	ROM_LOAD32_BYTE( "tr-11a.3d", 0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
+	ROM_LOAD32_BYTE( "tr-12a.2d", 0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
@@ -939,11 +920,11 @@ ROM_START( tigeroadb )
 	ROM_LOAD( "tgrroad.17",   0xe0000, 0x10000, CRC(3f7539cc) SHA1(ca3ef1fabcb0c7abd7bc211ba128d2433e3dbf26) )
 	ROM_LOAD( "tgrroad.18",   0xf0000, 0x10000, CRC(e2e053cb) SHA1(eb9432140fc167dec5d3273112933201be2be1b3) )
 
-	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "tr-09a.bin",   0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
-	ROM_LOAD( "tr-10a.bin",   0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
-	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
-	ROM_LOAD( "tr-12a.bin",   0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
+	ROM_REGION( 0x080000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "tr-09a.bin",   0x00003, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
+	ROM_LOAD32_BYTE( "tr-10a.bin",   0x00002, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
+	ROM_LOAD32_BYTE( "tr-11a.bin",   0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
+	ROM_LOAD32_BYTE( "tr-12a.bin",   0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr13.bin",     0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
@@ -974,11 +955,11 @@ ROM_START( f1dream )
 	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
 	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
 
-	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "03b_06.bin",   0x00000, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
-	ROM_LOAD( "02b_05.bin",   0x10000, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
-	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
-	ROM_LOAD( "02d_07.bin",   0x30000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
+	ROM_REGION( 0x040000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "03b_06.bin",   0x00003, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
+	ROM_LOAD32_BYTE( "02b_05.bin",   0x00002, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
+	ROM_LOAD32_BYTE( "03d_08.bin",   0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
+	ROM_LOAD32_BYTE( "02d_07.bin",   0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
@@ -1008,11 +989,11 @@ ROM_START( f1dreamb )
 	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
 	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
 
-	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "03b_06.bin",   0x00000, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
-	ROM_LOAD( "02b_05.bin",   0x10000, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
-	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
-	ROM_LOAD( "02d_07.bin",   0x30000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
+	ROM_REGION( 0x040000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "03b_06.bin",   0x00003, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
+	ROM_LOAD32_BYTE( "02b_05.bin",   0x00002, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
+	ROM_LOAD32_BYTE( "03d_08.bin",   0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
+	ROM_LOAD32_BYTE( "02d_07.bin",   0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
@@ -1042,11 +1023,11 @@ ROM_START( f1dreamba )
 	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
 	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
 
-	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "03b_06.bin",   0x00000, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
-	ROM_LOAD( "02b_05.bin",   0x10000, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
-	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
-	ROM_LOAD( "02d_07.bin",   0x30000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
+	ROM_REGION( 0x040000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "03b_06.bin",   0x00003, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
+	ROM_LOAD32_BYTE( "02b_05.bin",   0x00002, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
+	ROM_LOAD32_BYTE( "03d_08.bin",   0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
+	ROM_LOAD32_BYTE( "02d_07.bin",   0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
 	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
@@ -1070,11 +1051,11 @@ ROM_START( pushman )
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "pushman.001",  0x00000, 0x08000, CRC(626e5865) SHA1(4ab96c8512f439d18390094d71a898f5c576399c) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "pushman.004", 0x30000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) )
-	ROM_LOAD( "pushman.005", 0x20000, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) )
-	ROM_LOAD( "pushman.002", 0x10000, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) )
-	ROM_LOAD( "pushman.003", 0x00000, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "pushman.004", 0x00000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) )
+	ROM_LOAD32_BYTE( "pushman.005", 0x00001, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) )
+	ROM_LOAD32_BYTE( "pushman.002", 0x00002, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) )
+	ROM_LOAD32_BYTE( "pushman.003", 0x00003, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "pushman.006", 0x20000, 0x10000, CRC(48ef3da6) SHA1(407d50c2030584bb17a4d4a1bb45e0b04e1a95a4) )
@@ -1103,11 +1084,11 @@ ROM_START( pushmana )
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "pushmana.130",  0x00000, 0x10000, CRC(f83f92e7) SHA1(37f337d7b496f8d81eed247c80390a6aabcf4b95) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "pushman.004", 0x30000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) ) // .58
-	ROM_LOAD( "pushman.005", 0x20000, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) ) // .59
-	ROM_LOAD( "pushman.002", 0x10000, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) ) // .56
-	ROM_LOAD( "pushman.003", 0x00000, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) ) // .57
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "pushman.004", 0x00000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) ) // .58
+	ROM_LOAD32_BYTE( "pushman.005", 0x00001, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) ) // .59
+	ROM_LOAD32_BYTE( "pushman.002", 0x00002, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) ) // .56
+	ROM_LOAD32_BYTE( "pushman.003", 0x00003, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) ) // .57
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "pushman.006", 0x20000, 0x10000, CRC(48ef3da6) SHA1(407d50c2030584bb17a4d4a1bb45e0b04e1a95a4) ) // .131
@@ -1136,11 +1117,11 @@ ROM_START( pushmans )
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "pman-1.ic130",  0x00000, 0x08000, CRC(14497754) SHA1(a47d03c56add18c5d9aed221990550b18589ff43) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "pman-4.ic58", 0x30000, 0x10000, CRC(16e5ce6b) SHA1(cb9c6094a853abc550eae29c35083f26a0d1de94) )
-	ROM_LOAD( "pman-5.ic59", 0x20000, 0x10000, CRC(b82140b8) SHA1(0a16b904eb2739bfa22a87d03266d3ff2b750b67) )
-	ROM_LOAD( "pman-2.56", 0x10000, 0x10000, CRC(2cb2ac29) SHA1(165447ad7eb8593c0d4346096ec13ac386e905c9) )
-	ROM_LOAD( "pman-3.57", 0x00000, 0x10000, CRC(8ab957c8) SHA1(143501819920c521353930f83e49f1e19fbba34f) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "pman-4.ic58", 0x00000, 0x10000, CRC(16e5ce6b) SHA1(cb9c6094a853abc550eae29c35083f26a0d1de94) )
+	ROM_LOAD32_BYTE( "pman-5.ic59", 0x00001, 0x10000, CRC(b82140b8) SHA1(0a16b904eb2739bfa22a87d03266d3ff2b750b67) )
+	ROM_LOAD32_BYTE( "pman-2.56",   0x00002, 0x10000, CRC(2cb2ac29) SHA1(165447ad7eb8593c0d4346096ec13ac386e905c9) )
+	ROM_LOAD32_BYTE( "pman-3.57",   0x00003, 0x10000, CRC(8ab957c8) SHA1(143501819920c521353930f83e49f1e19fbba34f) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "pman-6.ic131", 0x20000, 0x10000, CRC(bd0f9025) SHA1(7262410d4631f1b051c605d5cea5b91e9f68327e) )
@@ -1169,11 +1150,11 @@ ROM_START( pushmant ) /* Single plane PCB */
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "1.ic130",  0x00000, 0x08000, CRC(14497754) SHA1(a47d03c56add18c5d9aed221990550b18589ff43) ) /* Same as the Sammy set */
 
-	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "4.ic58", 0x30000, 0x10000, CRC(69209214) SHA1(c5b527234aefbdfb39864806e2b1784fdf2dd49c) )
-	ROM_LOAD( "5.ic59", 0x20000, 0x10000, CRC(75fc0ac4) SHA1(aa3a19573b96d89b94bfddda5b404d19cbb47335) )
-	ROM_LOAD( "2.ic56", 0x10000, 0x10000, CRC(2bb8093f) SHA1(e86048d676b06796a1d2ed325ea8ea9cada3c4b6) )
-	ROM_LOAD( "3.ic57", 0x00000, 0x10000, CRC(5f1c4e7a) SHA1(751caf2365eccbab6d7de5434c4656ac5bd7f13b) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "4.ic58", 0x00000, 0x10000, CRC(69209214) SHA1(c5b527234aefbdfb39864806e2b1784fdf2dd49c) )
+	ROM_LOAD32_BYTE( "5.ic59", 0x00001, 0x10000, CRC(75fc0ac4) SHA1(aa3a19573b96d89b94bfddda5b404d19cbb47335) )
+	ROM_LOAD32_BYTE( "2.ic56", 0x00002, 0x10000, CRC(2bb8093f) SHA1(e86048d676b06796a1d2ed325ea8ea9cada3c4b6) )
+	ROM_LOAD32_BYTE( "3.ic57", 0x00003, 0x10000, CRC(5f1c4e7a) SHA1(751caf2365eccbab6d7de5434c4656ac5bd7f13b) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "6.ic131", 0x20000, 0x10000, CRC(bd0f9025) SHA1(7262410d4631f1b051c605d5cea5b91e9f68327e) ) /* These 4 are the same as the Sammy set */
@@ -1202,11 +1183,11 @@ ROM_START( bballs )
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "bb1.g20",  0x00000, 0x08000, CRC(b62dbcb8) SHA1(121613f6d2bcd226e71d4ae71830b9b0d15c2331) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "bb4.d1", 0x30000, 0x10000, CRC(b77de5f8) SHA1(e966f982d712109c4402ca3a8cd2c19640d52bdb) )
-	ROM_LOAD( "bb5.d2", 0x20000, 0x10000, CRC(ffffccbf) SHA1(3ac85c06c3dca1de8839fca73f5de3982a3baca0) )
-	ROM_LOAD( "bb2.b1", 0x10000, 0x10000, CRC(a5b13236) SHA1(e2d21fa3c878b328238ba8b400f3ab00b0763f6b) )
-	ROM_LOAD( "bb3.b2", 0x00000, 0x10000, CRC(e35b383d) SHA1(5312e80d786dc2ffe0f7b1038a64f8ec6e590e0c) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "bb4.d1", 0x00000, 0x10000, CRC(b77de5f8) SHA1(e966f982d712109c4402ca3a8cd2c19640d52bdb) )
+	ROM_LOAD32_BYTE( "bb5.d2", 0x00001, 0x10000, CRC(ffffccbf) SHA1(3ac85c06c3dca1de8839fca73f5de3982a3baca0) )
+	ROM_LOAD32_BYTE( "bb2.b1", 0x00002, 0x10000, CRC(a5b13236) SHA1(e2d21fa3c878b328238ba8b400f3ab00b0763f6b) )
+	ROM_LOAD32_BYTE( "bb3.b2", 0x00003, 0x10000, CRC(e35b383d) SHA1(5312e80d786dc2ffe0f7b1038a64f8ec6e590e0c) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "bb6.h1", 0x20000, 0x10000, CRC(0cada9ce) SHA1(5f2e85baf5f04e874e0857451946c8b1e1c8d209) )
@@ -1235,11 +1216,11 @@ ROM_START( bballsa )
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "1.ic130",  0x00000, 0x08000, CRC(67672444) SHA1(f1d4681999d44e8d3cbf26b8a9c05f50573e0df6) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "4.ic58", 0x30000, 0x10000, CRC(144ca816) SHA1(c166e3f42f12c14df977adad363575e786b2be51) )
-	ROM_LOAD( "5.ic59", 0x20000, 0x10000, CRC(486c8385) SHA1(4421160573a2435bb0f330a04fef486d14a1293b) )
-	ROM_LOAD( "2.ic56", 0x10000, 0x10000, CRC(1d464915) SHA1(3396e919da7e3d08a1a9c76db5d0d214ddf7adcd) )
-	ROM_LOAD( "3.ic57", 0x00000, 0x10000, CRC(595439ec) SHA1(6e1a79e5583960f700fd8a63cd48c7e222a315dc) )
+	ROM_REGION( 0x40000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "4.ic58", 0x00000, 0x10000, CRC(144ca816) SHA1(c166e3f42f12c14df977adad363575e786b2be51) )
+	ROM_LOAD32_BYTE( "5.ic59", 0x00001, 0x10000, CRC(486c8385) SHA1(4421160573a2435bb0f330a04fef486d14a1293b) )
+	ROM_LOAD32_BYTE( "2.ic56", 0x00002, 0x10000, CRC(1d464915) SHA1(3396e919da7e3d08a1a9c76db5d0d214ddf7adcd) )
+	ROM_LOAD32_BYTE( "3.ic57", 0x00003, 0x10000, CRC(595439ec) SHA1(6e1a79e5583960f700fd8a63cd48c7e222a315dc) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "6.ic131", 0x20000, 0x10000, CRC(15d4975b) SHA1(71dbb63e70a52ec12fdfc20047a48beb73fac8a0) )

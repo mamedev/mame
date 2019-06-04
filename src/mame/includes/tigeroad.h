@@ -22,18 +22,18 @@ class tigeroad_state : public driver_device
 {
 public:
 	tigeroad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_ram16(*this, "ram16"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_spritegen(*this, "spritegen"),
-		m_soundlatch(*this, "soundlatch"),
-		m_has_coinlock(true)
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_videoram(*this, "videoram")
+		, m_ram16(*this, "ram16")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_msm(*this, "msm")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_has_coinlock(true)
 	{ }
 
 	void toramich(machine_config &config);
