@@ -8,7 +8,8 @@
 
 	Set "esidioms" (Essential Idioms) is missing disk #1
 	Set "colorme" (Color Me) is missing Tink Tonk Side B
-
+	Set "mfamilyr" (Marty's Family Reader) is missing disks #1, 2, and 7
+	Set "mthtutsb" (Math Tutor: Subtraction) is missing disk #1.
 	-->
 
 	<software name="101mword">
@@ -460,6 +461,7 @@
 		<description>Master of the Lamps (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
+		<info name="release" value="2017-01-27"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -14850,6 +14852,866 @@
 			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="143360">
 				<rom name="marty's family reader (4am crack) disk 8.dsk" size="143360" crc="18349e56" sha1="3fd1db410bf1858c8e18d74a11db14a30945ba46" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mskparad">
+		<description>Mask Parade (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Springboard Software</publisher>
+		<info name="release" value="2015-05-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mask parade (4am crack) side a.dsk" size="143360" crc="7a548d9a" sha1="3f2edcac9c6ce9adf10d23266bde0c6719a7174a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mask parade (4am crack) side b.dsk" size="143360" crc="c27b3265" sha1="98907dad19cd3bc6c830b39240fba5a4c6fd0a36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrmtch">
+		<description>Master Match (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2016-09-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="master match (4am crack).dsk" size="143360" crc="55f51bd3" sha1="661a2aee76ee637be730cd700f3d8d79daa320fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrcons">
+		<description>Mastering Consonants (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Centurion Software</publisher>
+		<info name="release" value="2017-04-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mastering consonants (4am crack).dsk" size="143360" crc="f52c7c80" sha1="222a6bbd81b74d26d6977a67974eac6081ac7762" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrvowl">
+		<description>Mastering Vowels (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Centurion Software</publisher>
+		<info name="release" value="2017-04-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mastering vowels (4am crack).dsk" size="143360" crc="51c6bd56" sha1="48cbd8093af7b6d4ec74826ffd4ee5562ec3aef7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrtype">
+		<description>MasterType (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2014-06-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mastertype (4am crack).dsk" size="143360" crc="56228da0" sha1="dd47918b4b9c8f1ab3a5a92b3df3ab418393ed0e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrtg21">
+		<description>MasterType and Training Ground (Version 2.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2016-12-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastertype and training ground 2.1 (4am crack) side a.dsk" size="143360" crc="3dd7e19f" sha1="7642b88358e9631b7e287a3d3015ed457f0abb4c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastertype and training ground 2.1 (4am crack) side b.dsk" size="143360" crc="5c9768ef" sha1="51633323a5e5d3d3ed2127c2134cff88b2b736a8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrtfaf">
+		<description>MasterType's Figures + Formulas (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2019-01-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mastertype's figures + formulas (4am crack).dsk" size="143360" crc="467475ad" sha1="36b14d32b08c3c001e4ac5ac4d6d61e496a96392" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchit">
+		<description>Match It (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>The Regents / ALA Company</publisher>
+		<info name="release" value="2016-03-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="match it (4am crack).dsk" size="143360" crc="b8f3f62a" sha1="ffe3f8b3283c31d1295bc976f92cace8987d8dbd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtchlaw">
+		<description>Matching Letters and Words (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Centurion Software</publisher>
+		<info name="release" value="2017-04-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="matching letters and words (4am crack).dsk" size="143360" crc="053b19aa" sha1="058e97a0584e5f6460a0f45bc420d7d95a942599" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathnme">
+		<description>Math and Me (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="release" value="2018-06-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math and me (4am crack) side a.dsk" size="143360" crc="5ed2319e" sha1="5352c1eeef481d0ad5093ca593077f5c08f562bb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math and me (4am crack) side b.dsk" size="143360" crc="8e2f238b" sha1="022eeefae915f9d5aa39b4f619d2483e4325d625" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtperfin">
+		<description>Math and Your Personal Finances (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Media Materials</publisher>
+		<info name="release" value="2017-02-08"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math and your personal finances (4am crack).dsk" size="143360" crc="bcebc4f2" sha1="b11b7afe567484369022898b5a07fe67e5923c2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthblsmy">
+		<description>Math Blaster Mystery (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="release" value="2015-01-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster mystery (4am crack) disk 1.dsk" size="143360" crc="05089188" sha1="2259769286301c56cb32be27a4511d9ebc43a618" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster mystery (4am crack) disk 2.dsk" size="143360" crc="b6145178" sha1="fe5e09c35b34dda837e0f4de2ee8d9f29d7780a0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster mystery (4am crack) disk 3.dsk" size="143360" crc="e912ff49" sha1="1dc156e0f49d6f798c84841d19571847a39d6b6b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster mystery (4am crack) disk 4.dsk" size="143360" crc="1531679c" sha1="53be5142a4446d5ce4a01663d041503556634e53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthblm13">
+		<description>Math Blaster Mystery (Version 1.3) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="release" value="2015-09-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster mystery 1.3 (4am crack) disk 1.dsk" size="143360" crc="561fc0b7" sha1="d54f5c95cf167920e1da26f66ffde7809165c8ae" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster mystery 1.3 (4am crack) disk 2.dsk" size="143360" crc="bda9fe2e" sha1="c95e66294ed81967c4d9898a4608ff060f796e61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthblpls">
+		<description>Math Blaster Plus (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="release" value="2015-05-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster plus (4am crack) side a.dsk" size="143360" crc="e6d8210a" sha1="55f8c2c963360ef4198f392f15d25eccaea66360" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster plus (4am crack) side b.dsk" size="143360" crc="7974488f" sha1="81a2a9614e1a27ecd3ee0d343d84dc700b473bc9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthclsl5">
+		<description>Math Class Level 5 (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2015-08-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math class level 5 (4am crack).dsk" size="143360" crc="09d86525" sha1="0e52df951a0812b17591a5252f7d2149aed97180" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthconc1">
+		<description>Math Concepts I (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2017-08-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math concepts i (4am crack).dsk" size="143360" crc="0bb875c3" sha1="253deb2f69c2d93e24a1e228fed1af97eac5fbdd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthfootb">
+		<description>Math Football (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2016-09-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math football (4am crack) side a.dsk" size="143360" crc="bca51203" sha1="09d4f404aaaee721527bc65988b46b09db9eec44" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math football (4am crack) side b.dsk" size="143360" crc="76846b59" sha1="90dafb02aae9db59dacc90794be0ccdf7ec618fa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthevryd">
+		<description>Math For Everyday Living (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2015-09-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math for everyday living (4am crack) disk 1.dsk" size="143360" crc="5749c1dd" sha1="dcd1d60161b71552b917b16a8988dd7a3a08d8d9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math for everyday living (4am crack) disk 2.dsk" size="143360" crc="88b04045" sha1="e3727d8f73e89fe965f7ebccbab64575d6a25b5b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthnutsh">
+		<description>Math in a Nutshell (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="release" value="2015-11-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math in a nutshell (4am crack).dsk" size="143360" crc="fa85b751" sha1="79a94f8d16e086b08c44ec3587b5db30b514aae2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtib113">
+		<description>Math Item Banks 1-13 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Harcourt Brace Jovanovich</publisher>
+		<info name="release" value="2017-02-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math item banks 1-13 (4am crack).dsk" size="143360" crc="3546870e" sha1="37c1426e47854db07de2976831d59d90dded54e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthlvl1">
+		<description>Math Level 1 - I Can Add And Subtract (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2017-07-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math level 1 - i can add and subtract (4am crack).dsk" size="143360" crc="37700561" sha1="212a3c25571020808e955a9c434441fd8f5e2480" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthlvl3">
+		<description>Math Level 3 - I Can Multiply and Divide (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2017-07-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math level 3 - i can multiply and divide (4am crack).dsk" size="143360" crc="0009b0b1" sha1="f7f3bd20bf9bd036cf8692e34c205e5b1dcd4559" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthlvl4">
+		<description>Math Level 4 - Advanced Addition and Subtraction (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2017-07-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math level 4 - advanced addition and subtraction (4am crack).dsk" size="143360" crc="b3f18736" sha1="81356155aee90a4e6293e20cd0e9463e7443c99e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthlvl6">
+		<description>Math Level 6 - Ratio, Proportion, and Percent (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2017-07-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math level 6 - ratio, proportion, and percent (4am crack).dsk" size="143360" crc="5d17ef07" sha1="cfe7cf99d0c09cd3347e14119895e64571e45a53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthmagic">
+		<description>Math Magic (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Mindplay</publisher>
+		<info name="release" value="2015-03-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math magic (4am crack).dsk" size="143360" crc="85163eba" sha1="6b96b4d16e7973777873172c9381ee9fe5cde989" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthmrvls">
+		<description>Math Marvels (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Houghton Mifflin Company</publisher>
+		<info name="release" value="2015-10-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math marvels (4am crack).dsk" size="143360" crc="9bb48616" sha1="8f68bef75ed73a41148c075a7fdcb215b9cd4f01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthmstrs">
+		<description>Math Masters (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Houghton Mifflin Company</publisher>
+		<info name="release" value="2017-01-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math masters (4am crack).dsk" size="143360" crc="410978d0" sha1="b9d8db84b19138732e982a1713fb8e2e841bee25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqad">
+		<description>Math Sequences - Addition (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - addition (4am crack).dsk" size="143360" crc="61c134a2" sha1="54051b3f143b85f9fe4de1dee3319bedacdb987c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqad84">
+		<description>Math Sequences - Addition (1984 Version) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - addition 1984 (4am crack).dsk" size="143360" crc="f04d7515" sha1="2e7e198879b3e26f82a7c9f0bf12df689d3afa38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqdc">
+		<description>Math Sequences - Decimals (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - decimals (4am crack).dsk" size="143360" crc="779a55bc" sha1="6ff1314b2b18ba568988c69dc333c21ffd718402" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqdv">
+		<description>Math Sequences - Division (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - division (4am crack).dsk" size="143360" crc="22e2f5c9" sha1="0004f9ab857ba431c93105c94cf49bfa0ed873a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqeq">
+		<description>Math Sequences - Equations (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - equations (4am crack).dsk" size="143360" crc="2bd62c97" sha1="d17fb69e5720a31bd90f7d513e063c7f2f433bbe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqfr">
+		<description>Math Sequences - Fractions (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - fractions (4am crack).dsk" size="143360" crc="9c78035a" sha1="5624140e2781658e83011d1a7f6d4eccf9183c42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqin">
+		<description>Math Sequences - Integers (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - integers (4am crack).dsk" size="143360" crc="6e34b980" sha1="194651f4499515e7c96cc40565f500a73d885d07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqla">
+		<description>Math Sequences - Laws of Arithmetic (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - laws of arithmetic (4am crack).dsk" size="143360" crc="d4dab30a" sha1="eed4913249993059fcc1f7048e6abbf736f52392" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthsequt">
+		<description>Math Sequences - Management Utilities (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-06-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - management utilities (4am crack).dsk" size="143360" crc="631bccd3" sha1="370929174aadb4ff55a31c6a201bac1ff51d35a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqmf">
+		<description>Math Sequences - Measurement Formulas (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - measurement formulas (4am crack).dsk" size="143360" crc="9b64b157" sha1="eb98ca975c1fd5e064791aa1b7c9f3a16ea336f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqml">
+		<description>Math Sequences - Multiplication (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - multiplication (4am crack).dsk" size="143360" crc="0ec1575e" sha1="edd7e983883bbb851e0b91a6ec4c8f467176c23c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqml80">
+		<description>Math Sequences - Multiplication (1980 Version) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-10-15"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - multiplication 1980 (4am crack).dsk" size="143360" crc="7ec155e9" sha1="ee0b47cd098f2e0061ec4f8e4e1236cc4eb7d69f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqnr">
+		<description>Math Sequences - Number Readiness (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - number readiness (4am crack).dsk" size="143360" crc="3b24099c" sha1="43455de33fd3faa10bd34cf28cc7b05ad3069f1a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqnr80">
+		<description>Math Sequences - Number Readiness (1980 Version) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-10-15"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - number readiness 1980 (4am crack).dsk" size="143360" crc="464f1c9a" sha1="8a81077d3c2a809fdaaeb54f073fad87b9e1a158" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqpr">
+		<description>Math Sequences - Percents (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - percents (4am crack).dsk" size="143360" crc="f6864e40" sha1="ac25cf5c44fb45b115d03b9551cd7720ef7d8482" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqt1">
+		<description>Math Sequences - Pre- and Post Tests I (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - pre- and post tests i (4am crack).dsk" size="143360" crc="e9437f1a" sha1="4637b43316dfa45b7156a5a832e6ff0a8a367458" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqt2">
+		<description>Math Sequences - Pre- and Post-Tests II (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - pre- and post-tests ii (4am crack).dsk" size="143360" crc="c27aa0be" sha1="003ceaa025c41a1ad9e05c6b065848a7bb8f2b31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqsb">
+		<description>Math Sequences - Subtraction (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - subtraction (4am crack).dsk" size="143360" crc="6479dd22" sha1="41cb61063079327540b7466243ad99591f4f1a58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqw1">
+		<description>Math Sequences - Worksheet Generator (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - worksheet generator (4am crack).dsk" size="143360" crc="7e4673c1" sha1="e03f74de49e7730889b66be9ee714820c38b02b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthseqw2">
+		<description>Math Sequences - Worksheet Generator II (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2017-04-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - worksheet generator ii (4am crack).dsk" size="143360" crc="3612ce07" sha1="29e4414936b10e35c7a2d2dd56c2c48e0cc7f594" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtshp86">
+		<description>Math Shop (1986-10-27 Version) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-06-15"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math shop 1986-10-27 (4am crack) side a.dsk" size="143360" crc="79855249" sha1="b00423772e1279407884d11a3071295feed873aa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math shop 1986-10-27 (4am crack) side b.dsk" size="143360" crc="8f5ad4e3" sha1="b0698a8765151af7380af5c1d2f730f68b88363c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthtutad">
+		<description>Math Tutor - Addition (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-01-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - addition (4am crack) disk 1.dsk" size="143360" crc="54280396" sha1="38da29762f058f977ee1bf831944647cccdc7c80" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - addition (4am crack) disk 2.dsk" size="143360" crc="8590b515" sha1="05e0b3cda0590ec476cc98b8a727b250f18d7c04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthtutdc">
+		<description>Math Tutor - Decimals (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2015-12-27"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - decimals (4am crack) side a.dsk" size="143360" crc="482441d5" sha1="c657f7dc0cb78914ba145677f91458faf3947129" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - decimals (4am crack) side b.dsk" size="143360" crc="1778ba6f" sha1="e03a4bdff0b6d590bd21fbbc9d7d23230c1249f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthtutdv">
+		<description>Math Tutor - Division (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-01-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - division (4am crack) disk 1.dsk" size="143360" crc="2a60510d" sha1="e0327c658af10fd0114c09e3eb4b6ba2a7f3c12c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - division (4am crack) disk 2.dsk" size="143360" crc="17ddcfb2" sha1="f9291dac23d0c78c2e1f77fb6e6e579cf61d8140" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthtutf1">
+		<description>Math Tutor - Fractions Part I (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-01-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - fractions part i (4am crack) disk 1.dsk" size="143360" crc="e9fff9a7" sha1="ee663a020faa7af8407c3e77cc7894c8c028f57a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - fractions part i (4am crack) disk 2.dsk" size="143360" crc="c63787af" sha1="1c8ffe3229290b355dd2be70980d0411b491d3c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthtutml">
+		<description>Math Tutor - Multiplication (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-03-07"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - multiplication (4am crack) disk 1.dsk" size="143360" crc="cdeaaf7c" sha1="77ea1352f710b38f4880198019e8cee066d4a4e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthtutsb">
+		<description>Math Tutor: Subtraction</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2016-03-08"/>
+		<info name="usage" value="Disk 1 remains missing." />
+		<!-- 4AM only had access to disk 2. Disk 1 is still missing. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math tutor - subtraction (4am crack) disk 2.dsk" size="143360" crc="0561257a" sha1="420d9856dcc69993637c51a0685cb250313d71bd" />
 			</dataarea>
 		</part>
 	</software>
