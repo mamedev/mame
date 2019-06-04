@@ -417,6 +417,7 @@ void _4enlinea_state::audio_portmap(address_map &map)
 void _4enlinea_state::k7_mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xc000, 0xdfff).rom().region("maincpu", 0x8000);
 	map(0xe000, 0xffff).ram().share("nvram");
 }
 
@@ -639,4 +640,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME              FLAGS  */
 GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea",    MACHINE_NOT_WORKING )
-GAME( 2004, k7_olym,  0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal", "Olympic Darts (K7)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1994, k7_olym,  0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal", "Olympic Darts (K7)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
