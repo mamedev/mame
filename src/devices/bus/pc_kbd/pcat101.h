@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-/*
- * IBM Model M PC/AT and PS/2 101-key keyboard emulation.
- */
-
 #ifndef MAME_BUS_PC_KBD_PCAT101_H
 #define MAME_BUS_PC_KBD_PCAT101_H
 
@@ -12,7 +8,6 @@
 
 #include "cpu/m6805/m68705.h"
 #include "pc_kbdc.h"
-#include "machine/rescap.h"
 
 class ibm_pc_at_101_keyboard_device
 	: public device_t

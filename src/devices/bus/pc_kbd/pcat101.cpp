@@ -13,8 +13,6 @@
  * Part No  Layout
  * 1391401  US English 101-key
  *
- * TODO
- *   - fix issue receiving commands
  */
 
 #include "emu.h"
