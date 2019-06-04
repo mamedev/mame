@@ -97,6 +97,7 @@ sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz
 
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 System Compumatic
+k7_olym                         //
 
 @source:4enraya.cpp
 4enraya                         // (c) 1990 IDSA

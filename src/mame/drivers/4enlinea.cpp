@@ -190,6 +190,7 @@
 #include "bus/isa/cga.h"
 #include "bus/isa/isa.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/cgapal.h"
 #include "video/mc6845.h"
@@ -215,6 +216,7 @@ public:
 	{ }
 
 	void _4enlinea(machine_config &config);
+	void k7_olym(machine_config &config);
 
 private:
 	required_device<ay8910_device> m_ay;
@@ -239,6 +241,9 @@ private:
 	void audio_portmap(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
+
+	void k7_mem_map(address_map &map);
+	void k7_io_map(address_map &map);
 };
 
 
@@ -403,10 +408,23 @@ void _4enlinea_state::audio_map(address_map &map)
 
 }
 
-
 void _4enlinea_state::audio_portmap(address_map &map)
 {
 	map.global_mask(0xff);
+}
+
+
+void _4enlinea_state::k7_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xe000, 0xffff).ram().share("nvram");
+}
+
+void _4enlinea_state::k7_io_map(address_map &map)
+{
+	map(0x0100, 0x0100).w(m_ay, FUNC(ay8910_device::address_w));
+	map(0x0101, 0x0101).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x0102, 0x0102).w(m_ay, FUNC(ay8910_device::data_w));
 }
 
 
@@ -440,6 +458,32 @@ static INPUT_PORTS_START( 4enlinea )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                   PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
+
+	PORT_START( "pcvideo_cga_config" )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( k7_olym )
+	PORT_START("IN-P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN-P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "pcvideo_cga_config" )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -540,6 +584,28 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 }
 
 
+void _4enlinea_state::k7_olym(machine_config &config)
+{
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 2); // Z84C00BB6
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4enlinea_state::k7_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &_4enlinea_state::k7_io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D4464C-15L (6264) + battery
+
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+
+	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
+
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay, 14.318181_MHz_XTAL / 8); // Winbond WF19054
+	m_ay->port_a_read_callback().set_ioport("IN-P2");
+	m_ay->port_b_read_callback().set_ioport("IN-P1");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+
 /***********************************
 *             Rom Load             *
 ***********************************/
@@ -558,10 +624,19 @@ ROM_START( 4enlinea )
 	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x000, 0x117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
 ROM_END
 
+ROM_START( k7_olym )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "odk7_v3.11_27c512.ic18", 0x00000, 0x10000, CRC(063d24fe) SHA1(ad4509438d2028ede779f5aa9a918d1020c1db41) )
+
+	ROM_REGION( 0x300, "plds", 0 )
+	ROM_LOAD( "a1_gal16v8a.ic11", 0x000, 0x117, NO_DUMP ) // protected
+	ROM_LOAD( "b1_gal16v8a.ic4",  0x117, 0x117, NO_DUMP ) // protected
+ROM_END
 
 /***********************************
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME              FLAGS  */
+GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea",    MACHINE_NOT_WORKING )
+GAME( 2004, k7_olym,  0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal", "Olympic Darts (K7)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
