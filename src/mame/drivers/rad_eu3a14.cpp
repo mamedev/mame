@@ -178,8 +178,8 @@ private:
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int xpos, int ypos, int gfxno);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int gfxno);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
 };
 
 
@@ -430,22 +430,22 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 }
 
-void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int xpos, int ypos, int gfxno)
+void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int gfxno)
 {
 	int tileno = offset + count;
 	gfx_element *gfx = m_gfxdecode->gfx(gfxno);
-	gfx->transpen(bitmap, cliprect, tileno, pal, flipx, 0, xpos, ypos, 0);
+	gfx->transpen(bitmap, cliprect, tileno, pal, flipx, flipy, xpos, ypos, 0);
 }
 
 
-void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri)
 {
 	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
 	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
 	for (int i = m_spriterambase; i < m_spriterambase + 0x7e0; i += 8)
 	{
 		/*
-		+0  e--f hhww  flip, enable, height, width
+		+0  e-ff hhww  flip yx, enable, height, width
 		+1  yyyy yyyy  ypos
 		+2  xxxx xxxx  xpos
 		+3  pppp ----  palette
@@ -464,10 +464,16 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		int h = attr & 0x0c;
 		int w = attr & 0x03;
 		int flipx = (attr & 0x10) >> 4;
+		int flipy = (attr & 0x20) >> 5;
 
 		int height = 0;
 		int width = 0;
 		int pal = attr2 >> 4;
+
+		int pri = attr2 & 0x07;
+
+		if (pri != drawpri)
+			continue;
 
 		// no idea
 		if (attr2 & 0x08)
@@ -541,9 +547,13 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 			int count = 0;
 			for (int yy = 0; yy < height; yy++)
 			{
+				int yoff = flipy ? height-1-yy : yy;
+
 				for (int xx = 0; xx < width; xx++)
 				{
-					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, x + xx * 8, y + yy, gfxno);
+					int xoff = flipx ? (((width - 1) * 8) - (xx * 8)) : (xx * 8);
+
+					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, flipy, x + xoff, y + yoff, gfxno);
 					count++;
 				}
 			}
@@ -561,7 +571,11 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 
 	handle_palette(screen, bitmap, cliprect);
 	draw_background(screen, bitmap, cliprect);
-	draw_sprites(screen, bitmap, cliprect);
+
+	for (int i = 0; i < 8; i++)
+	{
+		draw_sprites(screen, bitmap, cliprect, i);
+	}
 
 	return 0;
 }
