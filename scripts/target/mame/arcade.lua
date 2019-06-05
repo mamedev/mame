@@ -2226,6 +2226,7 @@ files {
 	MAME_DIR .. "src/mame/video/djboy.cpp",
 	MAME_DIR .. "src/mame/drivers/expro02.cpp",
 	MAME_DIR .. "src/mame/drivers/galpanic.cpp",
+	MAME_DIR .. "src/mame/drivers/galpanic_ms.cpp",
 	MAME_DIR .. "src/mame/includes/galpnipt.h",
 	MAME_DIR .. "src/mame/includes/galpanic.h",
 	MAME_DIR .. "src/mame/video/galpanic.cpp",
