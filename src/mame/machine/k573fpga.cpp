@@ -140,10 +140,11 @@ u16 k573fpga_device::decrypt_ddrsbm(u16 data)
 
 u16 k573fpga_device::get_decrypted()
 {
-	if(mp3_cur_adr >= mp3_end_adr || (mpeg_ctrl_flag & 0xe000) != 0xe000)
+	if(mp3_cur_adr >= mp3_end_adr || (mpeg_ctrl_flag & 0xe000) != 0xe000) {
 		return 0;
+	}
 
-	u16 src = ram[(mp3_cur_adr & 0x1ffffff) >> 1];
+	u16 src = ram[mp3_cur_adr >> 1];
 	u16 result = use_ddrsbm_fpga ? decrypt_ddrsbm(src) : decrypt_default(src);
 	mp3_cur_adr += 2;
 
