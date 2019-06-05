@@ -316,51 +316,17 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,4*16) },
-	16*16*4
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ STEP16(0,4*16) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_f1gp )
-	GFXDECODE_ENTRY( "gfx1",    0, charlayout,   0x000,  1 )
-	GFXDECODE_ENTRY( "gfx2",    0, spritelayout, 0x100, 16 )
-	GFXDECODE_ENTRY( "gfx3",    0, spritelayout, 0x200, 16 )
-	GFXDECODE_RAM( "rozgfxram", 0, tilelayout,   0x300, 16 )
+	GFXDECODE_ENTRY( "gfx1",    0, gfx_8x8x8_raw,          0x000,  1 )
+	GFXDECODE_ENTRY( "gfx2",    0, gfx_16x16x4_packed_lsb, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx3",    0, gfx_16x16x4_packed_lsb, 0x200, 16 )
+	GFXDECODE_RAM( "rozgfxram", 0, gfx_16x16x4_packed_msb, 0x300, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_f1gp2 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0x100, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw,          0x000,  1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 0x200, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
 
