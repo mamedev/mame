@@ -75,7 +75,7 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		int flipx = data0 & 0x2000;
 		parentFlipY = flipy = data0 & 0x4000;
 		const int h = (1 << ((data0 & 0x1800) >> 11));   /* 1x, 2x, 4x, 8x height */
-		const int w = (1 << ((data0 & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
+		int w = (1 << ((data0 & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
 
 		int sx = data2 & 0x01ff;
 		int sy = data0 & 0x01ff;
@@ -145,10 +145,13 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 				}
 			}
 			chainoffs += 4;
+		}
+		while (w)
+		{
+			w--;
 			offs += inc;
 			if (offs == end)
 				return;
-
 		}
 	}
 }
