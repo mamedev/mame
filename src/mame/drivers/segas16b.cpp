@@ -5941,6 +5941,9 @@ ROM_END
 //  E-Swat (World), Sega System 16B
 //  CPU: FD1094 (317-0130)
 //  ROM Board type: 171-5797
+//  Sega game ID: 833-7164-02 ESWAT
+//    Main board: 837-7166-02
+//     ROM board: 834-7165-02
 //
 ROM_START( eswat )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -6007,7 +6010,9 @@ ROM_END
 //  E-Swat (US), Sega System 16B
 //  CPU: FD1094 (317-0129)
 //  ROM Board type: 171-5797
-//  Sega ID# for ROM board: 834-7165-01
+//  Sega game ID: 833-7164-01 ESWAT
+//    Main board: 837-7166-01
+//     ROM board: 834-7165-01
 //
 ROM_START( eswatu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -6074,7 +6079,7 @@ ROM_END
 //  E-Swat (Japan), Sega System 16B
 //  CPU: FD1094 (317-0128)
 //  ROM Board type: 171-5797
-//  Sega game ID: 833-7164
+//  Sega game ID: 833-7164 ESWAT
 //    Main board: 837-7166
 //     ROM board: 834-7165
 //
