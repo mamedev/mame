@@ -7606,6 +7606,92 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="chessm">
+		<!-- uses ChessMachine ISA card(or external module), not compatible with Final ChessCard -->
+		<!-- installer v3.3a, program v3.1, chess engine The King v2.20(23-04-93) -->
+		<description>The ChessMachine (v3.1, The King v2.20)</description>
+		<year>1993</year>
+		<publisher>Tasc</publisher>
+		<info name="serial" value="WR.887.68.354" />
+		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine hardware required." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="theking22.img" size="737280" crc="88fd76e8" sha1="518d4e662e6d1cba624fb04870eb292a8c44a1c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessm23" cloneof="chessm">
+		<!-- uses ChessMachine SR or Final ChessCard(ROM v3.6) ISA card -->
+		<!-- installer v3.0, program v2.3, chess engine Gideon v2.1(02-07-91) -->
+		<!-- Gideon v2.1 is the same as the one in chessm21, but encrypted -->
+		<description>The ChessMachine (v2.3, Gideon v2.1)</description>
+		<year>1991</year>
+		<publisher>Tasc</publisher>
+		<info name="serial" value="WR.887.68.354" />
+		<info name="usage" value="Installer registration number is WR.887.68.354. ChessMachine SR/Final ChessCard ISA card required." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="6659ab39" sha1="1459c9e2425fd19042d580872cf77d95debaa023"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="d7182b95" sha1="bb474de5e0f7a3a5eecbf004ec1038a4a3d0ab9e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Game 1990" />
+			<dataarea name="flop" size="737280">
+				<rom name="game1990.img" size="737280" crc="056e572d" sha1="620a44254c1f4e86c01a4d4b407b820f45993a1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessm21" cloneof="chessm">
+		<!-- uses ChessMachine SR or Final ChessCard(ROM v3.6) ISA card -->
+		<!-- installer v2.2, program v2.1, chess engine Gideon v2.1(02-07-91) + The King 0.5(02-07-91) -->
+		<description>The ChessMachine (v2.1, Gideon v2.1)</description>
+		<year>1991</year>
+		<publisher>Tasc</publisher>
+		<info name="serial" value="50677" />
+		<info name="usage" value="ChessMachine SR/Final ChessCard ISA card required" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="a93939a6" sha1="2f3927e50dd82b93ca3fa1436f5b664abc18d061"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Option 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="option1.img" size="737280" crc="cba1616e" sha1="d773fbf810957c419d63cd4abb8466651ff1a832"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessm21o" cloneof="chessm">
+		<!-- uses ChessMachine SR or Final ChessCard(ROM v3.6) ISA card -->
+		<!-- installer v2.2, program v2.1, chess engine Gideon v1.7(29-05-91) + The King 0.5(05-06-91) -->
+		<description>The ChessMachine (v2.1, Gideon v1.7)</description>
+		<year>1991</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="ChessMachine SR/Final ChessCard ISA card required" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="79005b25" sha1="2a7cc406dd1fbf0b351a117c8a092069a33dbdc3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Option 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="option1.img" size="737280" crc="cba1616e" sha1="d773fbf810957c419d63cd4abb8466651ff1a832"/>
+			</dataarea>
+		</part>
+	</software>
 	<software name="chipdale">
 		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
 		<year>1990</year>
@@ -8051,6 +8137,34 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Ferrari Formula One [5.25][2 of 2].img" size="368640" crc="9815c5b6" sha1="ddb8e3bcea701b3a325a0e2a4359c491fde47a59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finalchs">
+		<!-- uses Final ChessCard ISA card, ROM v3.6 (incompatible with older version) -->
+		<!-- installer v2.0, program v1.9 -->
+		<description>The Final ChessCard (v1.9)</description>
+		<year>1990</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="Final ChessCard ISA card required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="finalchs.img" size="737280" crc="300958e4" sha1="8ba33b8022f26462873ec5df6b3562e268b6019d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finalchs15" cloneof="finalchs">
+		<!-- uses Final ChessCard ISA card, ROM v2.0 (incompatible with newer version) -->
+		<!-- installer v(none), program v1.5, install.exe and setup.exe are in Dutch -->
+		<description>The Final ChessCard (v1.5)</description>
+		<year>1989</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="Final ChessCard ISA card required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="finalchs15.img" size="737280" crc="4988a9c7" sha1="27483b574e73ca1bbd3984f7d1318ecc313a8b3e"/>
 			</dataarea>
 		</part>
 	</software>
