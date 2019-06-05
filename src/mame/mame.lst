@@ -13799,6 +13799,9 @@ galpanic                        // (c) 1990 Kaneko
 galpanica                       // (c) 1990 Kaneko
 galpanicb                       // (c) 1990 Kaneko
 
+@source:galpanic_ms.cpp
+galpanicms
+
 @source:galspnbl.cpp
 galspnbl                        // (c) 1996 Comad
 hotpinbl                        // (c) 1995 Comad & New Japan System
