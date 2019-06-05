@@ -42,7 +42,6 @@ private:
 	uint8_t i2c_bus_curval;
 	int mp3_count, sample_count, current_rate;
 	u32 total_frame_count;
-	bool playback_enabled, playback_waiting;
 
 	mp3dec_t mp3_dec;
 	mp3dec_frame_info_t mp3_info;
