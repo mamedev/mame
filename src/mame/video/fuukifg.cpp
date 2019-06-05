@@ -25,7 +25,7 @@ void fuukivid_device::device_start()
 	gfx_layout layout_16x16x4 =
 	{
 		16,16,
-		RGN_FRAC(1,1),
+		0,
 		4,
 		{ STEP4(0,1) },
 		{ STEP16(0,4) },
