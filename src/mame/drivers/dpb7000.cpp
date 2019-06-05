@@ -12,6 +12,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6850acia.h"
+#include "machine/am2910.h"
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "video/mc6845.h"
@@ -36,6 +37,9 @@ public:
 		, m_auto_start(*this, "AUTOSTART")
 		, m_config_sw12(*this, "CONFIGSW12")
 		, m_config_sw34(*this, "CONFIGSW34")
+		, m_diskseq(*this, "diskseq")
+		, m_diskseq_ucode(*this, "diskseq_ucode")
+		, m_diskseq_prom(*this, "diskseq_prom")
 	{
 	}
 
@@ -46,6 +50,9 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	static constexpr device_timer_id TIMER_DISKSEQ = 0;
 
 	DECLARE_READ16_MEMBER(bus_error_r);
 	DECLARE_WRITE16_MEMBER(bus_error_w);
@@ -55,20 +62,27 @@ private:
 	DECLARE_READ16_MEMBER(cpu_ctrlbus_r);
 	DECLARE_WRITE16_MEMBER(cpu_ctrlbus_w);
 
+	DECLARE_WRITE_LINE_MEMBER(req_a_w);
+	DECLARE_WRITE_LINE_MEMBER(req_b_w);
+
 	enum : uint16_t
 	{
 		SYSCTRL_AUTO_START		= 0x0001,
-		SYSCTRL_REQ_B_OUT		= 0x0020,
-		SYSCTRL_REQ_A_OUT		= 0x0040,
+		SYSCTRL_REQ_B_EN		= 0x0020,
+		SYSCTRL_REQ_A_EN		= 0x0040,
 		SYSCTRL_REQ_A_IN		= 0x0080,
 		SYSCTRL_REQ_B_IN		= 0x8000
 	};
 
 	DECLARE_READ16_MEMBER(cpu_sysctrl_r);
 	DECLARE_WRITE16_MEMBER(cpu_sysctrl_w);
+	void update_req_irqs();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
+
+	DECLARE_WRITE16_MEMBER(diskseq_y_w);
+	void diskseq_tick();
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia;
@@ -83,9 +97,54 @@ private:
 	required_ioport m_auto_start;
 	required_ioport m_config_sw12;
 	required_ioport m_config_sw34;
+	required_device<am2910_device> m_diskseq;
+	required_memory_region m_diskseq_ucode;
+	required_memory_region m_diskseq_prom;
+
+	emu_timer *m_diskseq_clk;
+
+	enum : uint8_t
+	{
+		DSEQ_STATUS_READY_BIT			= 0,	// C5
+		DSEQ_STATUS_FAULT_BIT			= 1,	// C6
+		DSEQ_STATUS_ONCYL_BIT			= 2,	// C7
+		DSEQ_STATUS_SKERR_BIT			= 3,	// C8
+		DSEQ_STATUS_INDEX_BIT			= 4,	// C9
+		DSEQ_STATUS_SECTOR_BIT			= 5,	// C10
+		DSEQ_STATUS_AMFND_BIT			= 6,	// C11
+		DSEQ_STATUS_WTPROT_BIT			= 7,	// C12
+		DSEQ_STATUS_SELECTED_BIT		= 8,	// C13
+		DSEQ_STATUS_SEEKEND_BIT			= 9,	// C14
+		DSEQ_STATUS_SYNC_DET_BIT		= 10,	// C15
+		DSEQ_STATUS_RAM_ADDR_OVFLO_BIT	= 11,	// C16
+
+		DSEQ_CTRLOUT_CK_SEL_1		= (1 << 0),	// S40
+		DSEQ_CTRLOUT_CK_SEL_0		= (1 << 1),	// S41
+		DSEQ_CTRLOUT_ADDR_W_PERMIT	= (1 << 2),	// S42
+		DSEQ_CTRLOUT_ZERO_RAM		= (1 << 3),	// S43
+		DSEQ_CTRLOUT_WRITE_RAM		= (1 << 4),	// S44
+		DSEQ_CTRLOUT_WORD_READ_RAM	= (1 << 5),	// S45
+		DSEQ_CTRLOUT_WRITE_SYNC		= (1 << 6),	// S46
+		DSEQ_CTRLOUT_SYNC_DET_EN	= (1 << 7),	// S47
+
+		DSEQ_CTRLOUT_WRITE_ZERO		= (1 << 5), // S53
+		DSEQ_CTRLOUT_LINE_CK		= (1 << 6), // S54
+		DSEQ_CTRLOUT_DISC_CLEAR		= (1 << 7), // S55
+	};
 
 	uint8_t m_csr;
 	uint16_t m_sys_ctrl;
+	int m_diskseq_cp;
+	bool m_diskseq_reset;
+	uint8_t m_diskseq_line_cnt;			// EF/EE
+	uint8_t m_diskseq_ed_cnt;			// ED
+	uint8_t m_diskseq_head_cnt;			// EC
+	uint16_t m_diskseq_cyl;				// AE/BH
+	uint16_t m_diskseq_cmd;				// DD/CC
+	uint8_t m_diskseq_status_in;		// CG
+	uint8_t m_diskseq_status_out;		// BC
+	uint8_t m_diskseq_ucode_latch[7];	// GG/GF/GE/GD/GC/GB/GA
+	uint8_t m_diskseq_cc_inputs[4];		// Inputs to FE/FD/FC/FB
 };
 
 void dpb7000_state::main_map(address_map &map)
@@ -237,12 +296,47 @@ void dpb7000_state::machine_start()
 {
 	save_item(NAME(m_csr));
 	save_item(NAME(m_sys_ctrl));
+	save_item(NAME(m_diskseq_cp));
+	save_item(NAME(m_diskseq_reset));
+	save_item(NAME(m_diskseq_line_cnt));
+	save_item(NAME(m_diskseq_ed_cnt));
+	save_item(NAME(m_diskseq_head_cnt));
+	save_item(NAME(m_diskseq_cyl));
+	save_item(NAME(m_diskseq_cmd));
+	save_item(NAME(m_diskseq_status_in));
+	save_item(NAME(m_diskseq_status_out));
+	save_item(NAME(m_diskseq_ucode_latch));
+	save_item(NAME(m_diskseq_cc_inputs));
+
+	m_diskseq_clk = timer_alloc(TIMER_DISKSEQ);
 }
 
 void dpb7000_state::machine_reset()
 {
 	m_brg->stt_w(m_baud_dip->read());
 	m_csr = 0;
+	m_sys_ctrl = 0;
+	m_diskseq_cp = 0;
+	m_diskseq_reset = false;
+	m_diskseq_line_cnt = 0;
+	m_diskseq_ed_cnt = 0;
+	m_diskseq_head_cnt = 0;
+	m_diskseq_cyl = 0;
+	m_diskseq_cmd = 0;
+	m_diskseq_status_in = 0;
+	m_diskseq_status_out = 0;
+	memset(m_diskseq_ucode_latch, 0, 7);
+	memset(m_diskseq_cc_inputs, 0, 4);
+
+	m_diskseq_clk->adjust(attotime::from_hz(1000000), 0, attotime::from_hz(1000000));
+}
+
+void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_DISKSEQ)
+	{
+		diskseq_tick();
+	}
 }
 
 MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
@@ -277,6 +371,117 @@ MC6845_ON_UPDATE_ADDR_CHANGED(dpb7000_state::crtc_addr_changed)
 {
 }
 
+WRITE16_MEMBER(dpb7000_state::diskseq_y_w)
+{
+	uint8_t old_prom_latch[7];
+	memcpy(old_prom_latch, m_diskseq_ucode_latch, 7);
+
+	const uint8_t *ucode_prom = m_diskseq_ucode->base();
+	for (int i = 0; i < 7; i++)
+	{
+		m_diskseq_ucode_latch[i] = ucode_prom[data | (i << 8)];
+	}
+
+	if (m_diskseq_reset)
+	{
+		m_diskseq->i_w(0);
+	}
+	else
+	{
+		m_diskseq->i_w(m_diskseq_ucode_latch[1] & 0x0f);
+	}
+	m_diskseq->d_w(m_diskseq_ucode_latch[0]);
+
+	if (!BIT(old_prom_latch[2], 1) && BIT(m_diskseq_ucode_latch[2], 1)) // S17: Line Counter Clock
+		m_diskseq_line_cnt++;
+	if (BIT(m_diskseq_ucode_latch[2], 2)) // S18: Line Counter Reset
+		m_diskseq_line_cnt = 0;
+
+	if (!BIT(old_prom_latch[2], 3) && BIT(m_diskseq_ucode_latch[2], 3)) // S19: ED Counter Clock
+		m_diskseq_ed_cnt++;
+	if (BIT(m_diskseq_ucode_latch[2], 4)) // S20: ED Counter Reset
+		m_diskseq_ed_cnt = 0;
+
+	if (!BIT(old_prom_latch[2], 5) && BIT(m_diskseq_ucode_latch[2], 5)) // S21: Auto-Head Clock
+		m_diskseq_head_cnt++;
+	if (BIT(m_diskseq_ucode_latch[2], 6)) // S22: Auto-Head Reset
+		m_diskseq_head_cnt = 0;
+
+	memset(m_diskseq_cc_inputs, 0, 4);
+	m_diskseq_cc_inputs[0] |= m_diskseq_prom->base()[m_diskseq_line_cnt & 0x1f] & 3;
+	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_ed_cnt, 2) << 2;
+	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_head_cnt, 0) << 3;
+	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_status_in, DSEQ_STATUS_READY_BIT) << 5;
+	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_status_in, DSEQ_STATUS_FAULT_BIT) << 6;
+	m_diskseq_cc_inputs[0] |= BIT(m_diskseq_status_in, DSEQ_STATUS_ONCYL_BIT) << 7;
+
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SKERR_BIT);
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_INDEX_BIT) << 1;
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SECTOR_BIT) << 2;
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_AMFND_BIT) << 3;
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_WTPROT_BIT) << 4;
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SELECTED_BIT) << 5;
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SEEKEND_BIT) << 6;
+	m_diskseq_cc_inputs[1] |= BIT(m_diskseq_status_in, DSEQ_STATUS_SYNC_DET_BIT) << 7;
+
+	m_diskseq_cc_inputs[2] |= BIT(m_diskseq_status_in, DSEQ_STATUS_RAM_ADDR_OVFLO_BIT);
+	// C17..C19 tied low
+	m_diskseq_cc_inputs[2] |= (m_diskseq_cmd & 0xf) << 4;
+
+	m_diskseq_cc_inputs[3] = (m_diskseq_cmd >> 4) & 0xff;
+
+	// S15, S16: Select which bank of 8 lines is treated as /CC input to Am2910
+	const uint8_t fx_bank_sel = (BIT(m_diskseq_ucode_latch[2], 0) << 1) | BIT(m_diskseq_ucode_latch[1], 7);
+
+	// S12, S13, S14: Select which bit from the bank is treated as /CC input to Am2910
+	const uint8_t fx_bit_sel = (BIT(m_diskseq_ucode_latch[1], 6) << 2) | (BIT(m_diskseq_ucode_latch[1], 5) << 1) | BIT(m_diskseq_ucode_latch[1], 4);
+
+	m_diskseq->cc_w(BIT(m_diskseq_cc_inputs[fx_bank_sel], fx_bit_sel) ? 0 : 1);
+
+	// S25: End of sequencer program
+	//logerror("ucode latches %02x: %02x %02x %02x %02x %02x %02x %02x\n", data,
+		//m_diskseq_ucode_latch[0], m_diskseq_ucode_latch[1], m_diskseq_ucode_latch[2], m_diskseq_ucode_latch[3],
+		//m_diskseq_ucode_latch[4], m_diskseq_ucode_latch[5], m_diskseq_ucode_latch[6]);
+	req_b_w(BIT(m_diskseq_ucode_latch[3], 1) ? 0 : 1);
+
+	// S23: FCYL TAG
+	// S24: Push cylinder number onto the bus cable
+	// S26, S28..S34: Command word to push onto bus cable
+	// S27: Push command word from S26, S28..S34 onto bus cable
+	// S35: FHD TAG
+	// S36: FCMD TAG
+	// S37: FSEL TAG
+	// S38: N/C
+	// S39: N/C from PROM, contains D INDEX status bit
+	// S40..S47: Outgoing control signals
+	// S48: CPU Status Byte D0
+	// S49: CPU Status Byte D1
+	// S50: CPU Status Byte D2
+	// C5 (D READY): CPU Status Byte D3
+	// C12 (D WTPROT): CPU Status Byte D4
+	// ED Bit 0: CPU Status Byte D5
+	// ED Bit 1: CPU Status Byte D6
+	// C6 (D FAULT): CPU Status Byte D7
+
+	m_diskseq_status_out = m_diskseq_ucode_latch[6] & 7;
+	m_diskseq_status_out |= BIT(m_diskseq_status_in, DSEQ_STATUS_READY_BIT) << 3;
+	m_diskseq_status_out |= BIT(m_diskseq_status_in, DSEQ_STATUS_WTPROT_BIT) << 4;
+	m_diskseq_status_out |= (m_diskseq_ed_cnt & 3) << 5;
+	m_diskseq_status_out |= BIT(m_diskseq_status_in, DSEQ_STATUS_FAULT_BIT) << 7;
+}
+
+void dpb7000_state::diskseq_tick()
+{
+	m_diskseq_cp = (m_diskseq_cp ? 0 : 1);
+	m_diskseq->cp_w(m_diskseq_cp);
+
+	if (m_diskseq_cp && m_diskseq_reset)
+	{
+		req_b_w(0);
+		m_diskseq_reset = false;
+	}
+}
+
 READ16_MEMBER(dpb7000_state::bus_error_r)
 {
 	if(!machine().side_effects_disabled())
@@ -309,24 +514,77 @@ READ16_MEMBER(dpb7000_state::cpu_ctrlbus_r)
 	uint16_t ret = 0;
 	switch (m_csr)
 	{
-		case 12:
-			ret = m_config_sw34->read();
-			logerror("%s: CPU read from Control Bus, Config Switches 1/2: %04x\n", machine().describe_context(), ret);
-			break;
-		case 14:
-			ret = m_config_sw12->read();
-			logerror("%s: CPU read from Control Bus, Config Switches 3/4: %04x\n", machine().describe_context(), ret);
-			break;
-		default:
-			logerror("%s: CPU read from Control Bus, unknown CSR %d\n", machine().describe_context(), m_csr);
-			break;
+	case 12:
+		ret = m_config_sw34->read();
+		logerror("%s: CPU read from Control Bus, Config Switches 1/2: %04x\n", machine().describe_context(), ret);
+		break;
+	case 14:
+		ret = m_config_sw12->read();
+		logerror("%s: CPU read from Control Bus, Config Switches 3/4: %04x\n", machine().describe_context(), ret);
+		break;
+	case 15:
+		logerror("%s: CPU read from Control Bus, Disk Sequencer Card status: %02x\n", machine().describe_context(), m_diskseq_status_out);
+		ret = m_diskseq_status_out;
+		break;
+	default:
+		logerror("%s: CPU read from Control Bus, unknown CSR %d\n", machine().describe_context(), m_csr);
+		break;
 	}
 	return ret;
 }
 
 WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 {
-	logerror("%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
+	switch (m_csr)
+	{
+	case 1: // Disk Sequencer Card, disc access
+	{
+		const uint8_t hi_nybble = data >> 12;
+		if (hi_nybble == 0)
+		{
+			m_diskseq_cyl = data & 0x3ff;
+			logerror("%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x\n", machine().describe_context(), m_diskseq_cyl);
+		}
+		else if (hi_nybble == 2)
+		{
+			m_diskseq_cmd = data & 0xfff;
+			req_b_w(1);
+			logerror("%s: CPU write to Control Bus, Disk Sequencer Card, Command: %04x\n", machine().describe_context(), m_diskseq_cmd);
+		}
+		else
+		{
+			logerror("%s: CPU write to Control Bus, Disk Sequencer Card, Unrecognized hi nybble: %04x\n", machine().describe_context(), data);
+		}
+		break;
+	}
+	case 15: // Disk Sequencer Card, panic reset
+		logerror("%s: CPU write to Control Bus, Disk Sequencer Card, panic reset\n", machine().describe_context());
+		m_diskseq_reset = true;
+		break;
+	default:
+		logerror("%s: CPU write to Control Bus, unknown CSR %d: %04x\n", machine().describe_context(), m_csr, data);
+		break;
+	}
+}
+
+WRITE_LINE_MEMBER(dpb7000_state::req_a_w)
+{
+	if (state)
+		m_sys_ctrl |= SYSCTRL_REQ_A_IN;
+	else
+		m_sys_ctrl &= ~SYSCTRL_REQ_A_IN;
+
+	update_req_irqs();
+}
+
+WRITE_LINE_MEMBER(dpb7000_state::req_b_w)
+{
+	if (state)
+		m_sys_ctrl |= SYSCTRL_REQ_B_IN;
+	else
+		m_sys_ctrl &= ~SYSCTRL_REQ_B_IN;
+
+	update_req_irqs();
 }
 
 READ16_MEMBER(dpb7000_state::cpu_sysctrl_r)
@@ -340,10 +598,18 @@ READ16_MEMBER(dpb7000_state::cpu_sysctrl_r)
 
 WRITE16_MEMBER(dpb7000_state::cpu_sysctrl_w)
 {
-	const uint16_t mask = (SYSCTRL_REQ_A_OUT | SYSCTRL_REQ_B_OUT);
+	const uint16_t mask = (SYSCTRL_REQ_A_EN | SYSCTRL_REQ_B_EN);
 	logerror("%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
 	m_sys_ctrl &= ~mask;
 	m_sys_ctrl |= (data & mask);
+
+	update_req_irqs();
+}
+
+void dpb7000_state::update_req_irqs()
+{
+	m_maincpu->set_input_line(5, (m_sys_ctrl & SYSCTRL_REQ_A_IN) && (m_sys_ctrl & SYSCTRL_REQ_A_EN) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, (m_sys_ctrl & SYSCTRL_REQ_B_IN) && (m_sys_ctrl & SYSCTRL_REQ_B_EN) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dpb7000_state::dpb7000(machine_config &config)
@@ -393,6 +659,12 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_update_row_callback(FUNC(dpb7000_state::crtc_update_row), this);
 	m_crtc->set_on_update_addr_change_callback(FUNC(dpb7000_state::crtc_addr_changed), this);
+
+	AM2910(config, m_diskseq, 0); // We drive the clock manually from the driver
+	m_diskseq->ci_w(1);
+	m_diskseq->rld_w(1);
+	m_diskseq->ccen_w(0);
+	m_diskseq->y().set(FUNC(dpb7000_state::diskseq_y_w));
 }
 
 
@@ -416,7 +688,19 @@ ROM_START( dpb7000 )
 	ROM_LOAD16_BYTE("01616a-gad-397d.bin", 0x70000, 0x8000, CRC(0b95f9ed) SHA1(77126ee6c1f3dcdb8aa669ab74ff112e3f01918a))
 
 	ROM_REGION(0x1000, "vduchar", 0)
-	ROM_LOAD( "bw14char.ic1",  0x0000, 0x1000, BAD_DUMP CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411) )
+	ROM_LOAD("bw14char.ic1",  0x0000, 0x1000, BAD_DUMP CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411))
+
+	ROM_REGION(0x700, "diskseq_ucode", 0)
+	ROM_LOAD("17704a-hga-256.bin", 0x000, 0x100, CRC(ab59d8fd) SHA1(6dcbbb48838a5e370e22a708cea44e3db80d6505))
+	ROM_LOAD("17704a-hfa-256.bin", 0x100, 0x100, CRC(f2475396) SHA1(b525ba58d37128cadf1e7285fb421c14e2495587))
+	ROM_LOAD("17704a-hea-256.bin", 0x200, 0x100, CRC(0a19cc11) SHA1(13b72368d7cb5b7f685adfa07f07029026426b80))
+	ROM_LOAD("17704a-hda-256.bin", 0x300, 0x100, CRC(a431cdf6) SHA1(027eea87ccafde727208277b40e3a3f88433343a))
+	ROM_LOAD("17704a-hca-256.bin", 0x400, 0x100, CRC(610ef462) SHA1(f495647cc8420b7470ad68bccc069370f8f2af93))
+	ROM_LOAD("17704a-hba-256.bin", 0x500, 0x100, CRC(94c16baf) SHA1(13baef1359bf92a8ebb9a0c39f4223e810c3cdc1))
+	ROM_LOAD("17704a-haa-256.bin", 0x600, 0x100, CRC(0080f2a9) SHA1(63c7b31e5f65cc6e2c5fc67883c84284652cb4a7))
+
+	ROM_REGION(0x700, "diskseq_prom", 0)
+	ROM_LOAD("17704a-dfa-32.bin", 0x00, 0x20, CRC(ce5b8b46) SHA1(49a1e619f52101b6078e2f51d82ce5947fe2c011))
 ROM_END
 
 COMP( 1981, dpb7000, 0, 0, dpb7000, dpb7000, dpb7000_state, empty_init, "Quantel", "DPB-7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
