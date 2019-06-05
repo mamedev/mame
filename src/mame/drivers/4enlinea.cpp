@@ -472,6 +472,7 @@ void _4enlinea_state::k7_io_map(address_map &map)
 	map(0x0100, 0x0100).w(m_ay, FUNC(ay8910_device::address_w));
 	map(0x0101, 0x0101).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x0102, 0x0102).w(m_ay, FUNC(ay8910_device::data_w));
+//	0x03bf W (0x40)
 }
 
 
@@ -668,19 +669,24 @@ ROM_START( 4enlinea )
 	ROM_LOAD( "cuatro_en_linea_27c256__cicplay-1.ic19", 0x0000, 0x8000, CRC(307a57a3) SHA1(241329d919ec43d0eeb1dad0a4db6cf6de06e7e1) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 )   /* default serial EEPROM */
-	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x000, 0x800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )
+	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x0000, 0x0800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )
 
-	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x000, 0x117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x0000, 0x0117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
 ROM_END
 
 ROM_START( k7_olym )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "odk7_v3.11_27c512.ic18", 0x00000, 0x10000, CRC(063d24fe) SHA1(ad4509438d2028ede779f5aa9a918d1020c1db41) )
 
-	ROM_REGION( 0x300, "plds", 0 )
-	ROM_LOAD( "a1_gal16v8a.ic11", 0x000, 0x117, NO_DUMP ) // protected
-	ROM_LOAD( "b1_gal16v8a.ic4",  0x117, 0x117, NO_DUMP ) // protected
+    // The EEPROM contains a custom message (operators can set on-screen messages).
+    // A clean one for default need to be created... 
+	ROM_REGION( 0x0800, "eeprom", 0 )
+	ROM_LOAD( "x24c16p.bin", 0x0000, 0x0800, CRC(4c6685b2) SHA1(38c4f64f038d7ce185d6fd0b6eec4c9818f64e8e) )
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	ROM_LOAD( "a1_gal16v8a.ic11", 0x0000, 0x0117, NO_DUMP ) // protected
+	ROM_LOAD( "b1_gal16v8a.ic4",  0x0117, 0x0117, NO_DUMP ) // protected
 ROM_END
 
 /***********************************
