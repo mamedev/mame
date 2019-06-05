@@ -15716,4 +15716,1512 @@
 		</part>
 	</software>
 
+	<software name="matactl4">
+		<description>Mathematics Activities Courseware Level 4 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Houghton-Mifflin Company</publisher>
+		<info name="release" value="2015-09-18"/>
+		<info name="usage" value="Disk 1 remains missing. Disk 2 does boot." />
+		<!-- No compatibility data known at this time. -->
+		<!-- Main menu presents choices from 6-10, implying disk 1 is missing.
+		The disk does autoboot, though, so it's usable.
+		Is there a disk 3? -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics activities courseware level 4 (4am crack).dsk" size="143360" crc="e1da2ca3" sha1="5c511315cce317eb557863fba426e8ca5e111dec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matactl6">
+		<description>Mathematics Activities Courseware Level 6 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Houghton-Mifflin Company</publisher>
+		<info name="release" value="2015-09-18"/>
+		<!-- No compatibility data known at this time. -->
+		<!-- Main menu shows choices from 11-15, implying disk 1 and 2 are missing.
+		The disk does autoboot, though, so it's usable. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics activities courseware level 6 (4am crack) disk c.dsk" size="143360" crc="1a934b32" sha1="312cba0c7b7cad7ce54f38dfc649e45b0ef69928" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matprbl1">
+		<description>Mathematics Problem Solving Software Level 1 (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2015-08-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics problem solving software level 1 (4am crack).dsk" size="143360" crc="35568515" sha1="a2f0e35fa72c001a6de73aa5a73bc7e5a8c83e7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matprbl2">
+		<description>Mathematics Problem Solving Software Level 2 (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2015-09-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics problem solving software level 2 (4am crack).dsk" size="143360" crc="63f0b526" sha1="6731ea5899a976cee585424a4d13ee0eef7f49e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matprbl3">
+		<description>Mathematics Problem Solving Software Level 3 (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2015-08-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics problem solving software level 3 (4am crack).dsk" size="143360" crc="ed1af7e2" sha1="cec30713c134114e552b4655c100555ca92abc47" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matskll2">
+		<description>Mathematics Skills Software Level 2 (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2017-04-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics skills software level 2 (4am crack).dsk" size="143360" crc="34546027" sha1="c68de97341cf217eedaec51edcdbfe7a7502c1cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathtdy">
+		<description>Mathematics Today (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Harcourt Brace Jovanovich</publisher>
+		<info name="release" value="2015-06-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics today (4am crack) disk 1.dsk" size="143360" crc="72593c32" sha1="f5b63a9de6867db4eeef4fd0f433fcb3f4dd70a6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics today (4am crack) disk 2.dsk" size="143360" crc="14336eb3" sha1="f2b92d21a6268aaf95d90b081be8694a5a9dd526" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics today (4am crack) disk 3.dsk" size="143360" crc="f72e4796" sha1="c26f46df588652699f44c13d629753ce2ae32ff8" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics today (4am crack) disk 4.dsk" size="143360" crc="4f991bf2" sha1="2166fd9d631967b1b66f20c2256043136cb4d123" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics today (4am crack) disk 5.dsk" size="143360" crc="a723cb74" sha1="73ae7707637d23531cebb7b3ef47a1ae14e02008" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matwrdg3">
+		<description>Mathematics Word Problems Grade 3 (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2019-01-15"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics word problems grade 3 (4am crack).dsk" size="143360" crc="71c69657" sha1="a12e698502f5c123a23a8946998dc01ad332c303" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matinvalg">
+		<description>Maths Invaders - Special Products and Algebraic Factors (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2015-08-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="maths invaders - special products and algebraic factors (4am crack).dsk" size="143360" crc="e758f3c1" sha1="1f0849b1d326031817e52d69985a749cf4ace3cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maxcomnd">
+		<description>Max Command (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Rock Roy</publisher>
+		<info name="release" value="2018-05-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="max command (4am crack).dsk" size="143360" crc="13916672" sha1="6562fd83798cea8ef5d343066406a7147efb9a33" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maxdubtr">
+		<description>Max Dublin's Treasure (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Grolier Publishing</publisher>
+		<info name="release" value="2017-01-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="max dublin's treasure (4am crack).dsk" size="143360" crc="ffcead45" sha1="46ce81cab173e0748768544a2babd43ea27c821f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maxwmanr">
+		<description>Maxwell Manor (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2018-09-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="maxwell manor (4am crack).dsk" size="143360" crc="48743f08" sha1="2f8c8e6470a1c08ee4c5194896ab546047570411" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcopnp11">
+		<description>MECC-A114 Writing an Opinion Paper (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a114 writing an opinion paper v1.1 (4am crack).dsk" size="143360" crc="2c4a3959" sha1="6836ede014567f28f9aecd817cfba9a6603cd127" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps12">
+		<description>MECC-A116 Puzzles and Posters (Version 1.2) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-09-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.2 (4am crack).dsk" size="143360" crc="e8065d81" sha1="949eac6aeb407155bc3a2b25bf905fdd722afe39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcstgd14">
+		<description>MECC-A126 Study Guide (Version 1.4) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-05-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a126 study guide v1.4 (4am crack).dsk" size="143360" crc="ce5dcb2c" sha1="a032305a26620bfc1b6037e31444c442bd4f2ec1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrt11a">
+		<description>MECC-A132 MECC Writer (Version 1.1a) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-06-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a132 mecc writer v1.1a (4am crack).dsk" size="143360" crc="4bc56e61" sha1="97312d304c59e63df37ef3c1384ec080aaea428d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrph11">
+		<description>MECC-A136 MECC Graphing Primer (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a136 mecc graphing primer v1.1 (4am crack).dsk" size="143360" crc="e84acabc" sha1="8447901e9b4adab28e6e5676446436649a1e19cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqpr12">
+		<description>MECC-A140 MECC Dataquest - The Presidents (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a140 mecc dataquest - the presidents v1.2 (4am crack) side a.dsk" size="143360" crc="f6ca8cc6" sha1="b6922153cf050e185674ae132f5dccdac259fc2c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a140 mecc dataquest - the presidents v1.2 (4am crack) side b.dsk" size="143360" crc="4ee86200" sha1="46db8c27e9605440a156e3d9597220864cae7dc9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcinfm10">
+		<description>MECC-A141 MECC Information Manager (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-09-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a141 mecc information manager v1.0 (4am crack) disk 1.dsk" size="143360" crc="bac7b4c0" sha1="800de9ffafc6d62ee7fd71fb97b3972f484cde13" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a141 mecc information manager v1.0 (4am crack) disk 2.dsk" size="143360" crc="3d8b5afe" sha1="472f73d12e14a7980299d53b72c59a55cc51da36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcinfm11">
+		<description>MECC-A141 MECC Information Manager (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-09-08"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a141 mecc information manager v1.1 (4am crack) side a.dsk" size="143360" crc="777df2d1" sha1="7bfbab5f7f8a5d0b7f31a36e4c1f7c8cff2aedce" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a141 mecc information manager v1.1 (4am crack) side b.dsk" size="143360" crc="92bd5dc4" sha1="feedc9785a4706d8b066b5af2dec3c52ffaceef1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmtdg12">
+		<description>MECC-A149 Mastering Math Diagnostic System (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a149 mastering math diagnostic system v1.2 (4am crack).dsk" size="143360" crc="256ef797" sha1="126c3c384dd7f03e3a2afea300723287e72d8844" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdmn11">
+		<description>MECC-A153 Word Munchers (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-02-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a153 word munchers v1.1 (4am crack).dsk" size="143360" crc="4619237f" sha1="18b5f4bb6147f4aa02c6c4b947de4efb1e438de3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqcm11">
+		<description>MECC-A172 MECC Dataquest Composer (Version 1.1) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a172 mecc dataquest composer v1.1 (4am crack).dsk" size="143360" crc="2ab4729b" sha1="7f618da046c0bc9c3ae49bd407c1181913211203" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqsm10">
+		<description>MECC-A173 Dataquest Sampler (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-05-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a173 dataquest sampler v1.0 (4am crack).dsk" size="143360" crc="2dc20258" sha1="5e16478c96680d7f27c45c30d622ed9e01623024" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqwc10">
+		<description>MECC-A197 MECC Dataquest - The World Community (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-06-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a197 mecc dataquest - the world community v1.0 (4am crack).dsk" size="143360" crc="2f642b64" sha1="3bd5252bd32b53e73d4727938e3483c4bf79ba36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrcm11">
+		<description>MECC-A197 MECC Dataquest - The World Community (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a197 mecc dataquest - the world community v1.1 (4am crack).dsk" size="143360" crc="92429ea2" sha1="4166c6368a86bf89912e1a46dd7bdfe0fe5bfea0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrcn11">
+		<description>MECC-A202 Fraction Concepts, Inc. (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a202 fraction concepts, inc. v1.1 (4am crack).dsk" size="143360" crc="32324fec" sha1="61f3a6c8d55a56aaf4ba8186cad8ac56b749c4e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrpu12">
+		<description>MECC-A203 Fraction Practice Unlimited (Version 1.2) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a203 fraction practice unlimited v1.2 (4am crack).dsk" size="143360" crc="0f08c4e0" sha1="c1cbd7a2acfc045c5d9965a5c3ca4288ba53fa39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmyso11">
+		<description>MECC-A211 Mystery Objects (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-09-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a211 mystery objects v1.1 (4am crack).dsk" size="143360" crc="16fd7f16" sha1="873b85f0b60ad566f6c27f6d73095a2af560e601" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcptrn11">
+		<description>MECC-A227 Patterns (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-03-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a227 patterns v1.1 (4am crack).dsk" size="143360" crc="0838f11a" sha1="8f28c3be8026571166087944f18234bde6946a04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsppr11">
+		<description>MECC-A232 Spelling Press (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-05-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a232 spelling press v1.1 (4am crack).dsk" size="143360" crc="0814259c" sha1="749091bef3e40c55fda933ef431189db25c96857" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspat10">
+		<description>MECC-A234 Spelling Puzzles and Tests (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-09-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a234 spelling puzzles and tests v1.0 (4am crack).dsk" size="143360" crc="8ccf9c1e" sha1="2c248766e5833d4ae55a016cc5f8a4df96f80a78" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctcho11">
+		<description>MECC-A242 Teacher Option Organizer (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a242 teacher option organizer v1.1 (4am crack).dsk" size="143360" crc="210ceb4e" sha1="43ac6f0d1e8c680bb2b5aecddf2d0e8aa00c1b45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctcho13">
+		<description>MECC-A242 Teacher Option Organizer (Version 1.3) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a242 teacher option organizer v1.3 (4am crack).dsk" size="143360" crc="befcbe79" sha1="dfb4052dfeadc2fb511aa88bdcfd9036521cca27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqla10">
+		<description>MECC-A243 MECC Dataquest - Latin America (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-12-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a243 mecc dataquest - latin america v1.0 (4am crack).dsk" size="143360" crc="147c0206" sha1="b0c2f14f65ec0c6e29cb5eb25086b4dd48e0382b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmk10">
+		<description>MECC-A248 CommuniKeys (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-03-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a248 communikeys v1.0 (4am crack).dsk" size="143360" crc="7b2b32ae" sha1="2b76a1d969ea26b1d0498c51c3f713f561d5d273" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqes10">
+		<description>MECC-A253 MECC Dataquest - Europe and Soviet Union (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-03-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a253 mecc dataquest - europe and soviet union v1.0 (4am crack).dsk" size="143360" crc="1c43f036" sha1="fa5968516e6d1399adb5b41b95210d28d35065f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctnv10">
+		<description>MECC-A277 Time Navigator Around The World (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-12-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a277 time navigator around the world v1.0 (4am crack) side a.dsk" size="143360" crc="c6509fbb" sha1="bd1f61736c54ad5456e94628518673e7a800ff9e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a277 time navigator around the world v1.0 (4am crack) side b.dsk" size="143360" crc="ecdb18b6" sha1="6e3838031f0d0523a9600679fb01c5002074e13b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchsmk10">
+		<description>MECC-A313 History Makers (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-09-04"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a313 history makers v1.0 (4am crack).dsk" size="143360" crc="ffde0a65" sha1="5f3cd5deafc8437818938c806f77bc25e1f790f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdrlv10">
+		<description>MECC-A314 Dr. Livingstone, I Presume (Version 1.0) (cleanly cracked)</description>
+		<year>????</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-10-24"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a314 dr. livingstone, i presume v1.0 (4am crack) side a.dsk" size="143360" crc="770f033a" sha1="59621c2487093cc8ad85a4b00549ee9f70e1df26" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a314 dr. livingstone, i presume v1.0 (4am crack) side b.dsk" size="143360" crc="af17407e" sha1="9faeab958d67a992fe745e7e2b2f699eefb3458b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcexch10">
+		<description>MECC-A316 Exploring Chaos (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-02-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a316 exploring chaos v1.0 (4am crack).dsk" size="143360" crc="4ce4b300" sha1="3c643fea34d40347ab545026ca58155cd9e8df48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelm135">
+		<description>MECC-A702 Elementary Vol. 1 (Version 3.5) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-02-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a702 elementary vol. 1 v3.5 (4am crack).dsk" size="143360" crc="6970dbf5" sha1="55dd9caa3316d3c72255b2bb8f45efc3c3bdc58c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelm232">
+		<description>MECC-A703 Elementary Vol. 2 (Version 3.2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-03-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a703 elementary vol. 2 v3.2 (4am crack).dsk" size="143360" crc="f0a317f2" sha1="567196ae736b8b2658297eac44da7fd24b281fee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelm345">
+		<description>MECC-A704 Elementary Vol. 3 Science (Version 4.5) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a704 elementary vol. 3 science v4.5 (4am crack).dsk" size="143360" crc="45c61eef" sha1="b244f1e5040b6266e285ecefdaba0bcbb2349b14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelm347">
+		<description>MECC-A704 Elementary vol. 3 (Version 4.7) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-07-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a704 elementary vol. 3 v4.7 (4am crack).dsk" size="143360" crc="9620d530" sha1="e7a40bee7965a62e0b10be5866a31667714b7a7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelm348">
+		<description>MECC-A704 Elementary Vol. 3 (Version 4.8) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-10-24"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a704 elementary vol. 3 v4.8 (4am crack).dsk" size="143360" crc="46b21887" sha1="f2d09a96a8374024d547a5aa2c63fd699e466d03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsci122">
+		<description>MECC-A708 Science Vol. 1 (Version 2.2) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-09-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a708 science vol. 1 v2.2 (4am crack).dsk" size="143360" crc="4da4c14e" sha1="427a70a55c9beed6409bfeec5d2bb53d951f49f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmst122">
+		<description>MECC-A712 Music Theory Vol. 1 (Version 2.2) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a712 music theory vol. 1 v2.2 (4am crack).dsk" size="143360" crc="3dfaaf92" sha1="b80ced1e7d3dfb258fc93b46737b0b298430a6af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcbs1u45">
+		<description>MECC-A714 Business vol. 1 - Utilities (Version 4.5) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-10-17"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a714 business vol. 1 - utilities v4.5 (4am crack).dsk" size="143360" crc="d86dd84d" sha1="2a65d7946f4fba09a41fca613062e1c20782627f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcbus315">
+		<description>MECC-A721 Business vol. 3 (Version 1.5) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a721 business vol. 3 v1.5 (4am crack).dsk" size="143360" crc="20462bd4" sha1="da6f2caddeebee10c1f2d9c2c86e045d14fc94db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelm613">
+		<description>MECC-A725 Elementary Vol. 6 (Version 1.3) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-02-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a725 elementary vol. 6 v1.3 (4am crack).dsk" size="143360" crc="48f81fe8" sha1="1d9b89a3bb70543d1e9fa092c1f00c6edec7fe60" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl130">
+		<description>MECC-A726 Spelling Vol. 1 (Version 3.0) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-02-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a726 spelling vol. 1 v3.0 (4am crack).dsk" size="143360" crc="c349f5fb" sha1="410b8807f44ff6ead25316d6ff2ad94d9930cc06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmth312">
+		<description>MECC-A738 Mathematics Vol. 3 (Version 1.2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-02-13"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a738 mathematics vol. 3 v1.2 (4am crack).dsk" size="143360" crc="05cc380f" sha1="f79741ad323b6ac8774ffa78a12ad2bad12e97cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmth413">
+		<description>MECC-A744 Mathematics vol. 4 (Version 1.3) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-07-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a744 mathematics vol. 4 v1.3 (4am crack).dsk" size="143360" crc="29201f0d" sha1="4cb3d7bd57b79bb7af1b0d165d38f1d311a6c909" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mceng112">
+		<description>MECC-A746 English Vol. 1 (Version 1.2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-01-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a746 english vol. 1 v1.2 (4am crack).dsk" size="143360" crc="50799468" sha1="ae8391897bfff1d82e46c649fee81d52f194cadc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnut212">
+		<description>MECC-A753 Nutrition vol. 2 (Version 1.2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a753 nutrition vol. 2 v1.2 (4am crack).dsk" size="143360" crc="d7f7abe5" sha1="e37e720be519f2ee65ce07985bac3544273bc181" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfdft10">
+		<description>MECC-A756 Food Facts (Version 1.0) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-09-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a756 food facts v1.0 (4am crack).dsk" size="143360" crc="0b27e7ea" sha1="33f3cc36f64e5d71a1196f0680ac42462fc23c4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfdft12">
+		<description>MECC-A756 Food Facts (Version 1.2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-04-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a756 food facts v1.2 (4am crack).dsk" size="143360" crc="f01a8013" sha1="3e0aafbe0300760f714bfa8b44e65517691b096a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccgm210">
+		<description>MECC-A758 Computer Generated Mathematics Materials Problem Solving Vol. 2 (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-03-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a758 computer generated mathematics materials problem solving vol. 2 v1.0 (4am crack).dsk" size="143360" crc="b06e7c6d" sha1="628687e69cac2a03a4f9813f3a4c0352015f94c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchim11">
+		<description>MECC-A761 Health Immunization (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a761 health immunization v1.1 (4am crack).dsk" size="143360" crc="44707bce" sha1="3d8db5ff22779a6bdb424de9c3ad5a4f7178ccd1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcadfr10">
+		<description>MECC-A774 Adventures with Fractions (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a774 adventures with fractions v1.0 (4am crack).dsk" size="143360" crc="19082fe3" sha1="69fa9f09131a664de126ca44297a338eeb9ac2b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrcm10">
+		<description>MECC-A779 The Friendly Computer (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-03-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a779 the friendly computer v1.0 (4am crack).dsk" size="143360" crc="b9766c14" sha1="7c46c4d8001bf649bdb7a482669c3112a0e70730" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwacs10">
+		<description>MECC-A785 Writing A Character Sketch (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-08-02"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="7085b661" sha1="2f0afa37c569d6f6e2ece14e73794c618c2c77b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgdle14">
+		<description>MECC-A787 Guide de l'Enseignant (Version 1.4) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2016-11-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a787 guide de l'enseignant v1.4 (4am crack).dsk" size="143360" crc="bee8947d" sha1="59ad6c2eb678b4e5d2b957ae60e58f5152ec0099" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mceadd10">
+		<description>MECC-A788 Early Addition (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-07-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a788 early addition v1.0 (4am crack).dsk" size="143360" crc="83307ddb" sha1="4a04542c192bde3372b966fb0a65d4ba9d43a342" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc3rmc11">
+		<description>MECC-A811 The Three R's of Microcomputing (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-06-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a811 the three r's of microcomputing v1.1 (4am crack).dsk" size="143360" crc="34a20bd6" sha1="5a6716f6b182f5cf956afaa44a76893bdca5dd66" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrph12">
+		<description>MECC-A817 Graphing (Version 1.2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-06-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a817 graphing v1.2 (4am crack).dsk" size="143360" crc="65dd0974" sha1="538f5affa1d2effd6820940b7806187b0e81eae0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnmsy11">
+		<description>MECC-A819 Number Systems (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-06-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a819 number systems v1.1 (4am crack).dsk" size="143360" crc="7d2e8139" sha1="a3411af801385f869b6680b2586c30a353fb910f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprob10">
+		<description>MECC-A821 Probability (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-02-11"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a821 probability v1.0 (4am crack).dsk" size="143360" crc="de1ff340" sha1="d1f08ed1e6c6c1274f4fad580ca95fae09638432" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnutf12">
+		<description>MECC-A822 Nutrition and Food Groups (Version 1.2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2018-01-03"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a822 nutrition and food groups v1.2 (4am crack).dsk" size="143360" crc="c7dfa14c" sha1="c2cb7e2e7ae75a521572152329f3b473f79509f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcclsf11">
+		<description>MECC-A824 Classification (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-06-01"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a824 classification v1.1 (4am crack).dsk" size="143360" crc="c1057864" sha1="73f8b7434ea969340e8f075a57da3f65fa8fe98b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsoli">
+		<description>MECC-H111A Spare Moments Solitaire (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-11-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-h111a spare moments solitaire (4am crack).dsk" size="143360" crc="7a3bda7b" sha1="e0ab3ca75fb1721aa4178e77ac3f6bf75443a0c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwafrnd">
+		<description>MECC-H111B Spare Moments with a Friend (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2017-11-20"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-h111b spare moments with a friend (4am crack).dsk" size="143360" crc="a10f239e" sha1="d91ec199ecc1dbc37c34636de67b238c7712b269" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mechbr12">
+		<description>Mech Brigade (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2018-10-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Game and boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mech brigade v1.2 (4am and san inc crack) disk 1 - game (boot).dsk" size="143360" crc="d980a62d" sha1="d3045577dc03d823c4c20e8195f3ec68cbcd9451" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Scenario"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mech brigade v1.2 (4am and san inc crack) disk 2 - scenario.dsk" size="143360" crc="f115d3cf" sha1="9f4f9b759e236ba6ed6d8092ed6fb78d95301eea" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="medastat">
+		<description>Medalist Series - States (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2017-05-31"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="medalist series - states (4am crack).dsk" size="143360" crc="83fd764c" sha1="2a00b865a4773712cdb399567b095d94ae54861a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meetpres">
+		<description>Meet The Presidents (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2015-05-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="meet the presidents (4am crack) disk 1.dsk" size="143360" crc="3b8c1637" sha1="34f163cc86f650e55057e3038473937e29dfbf28" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="meet the presidents (4am crack) disk 2.dsk" size="143360" crc="8d38a788" sha1="cb996e3dbec4d5c1ad7f139606e8d47557a26859" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="meet the presidents (4am crack) disk 3.dsk" size="143360" crc="34b07a92" sha1="ebc9288035856ef0b51aad93afac8df6b49f18c2" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="meet the presidents (4am crack) disk 4.dsk" size="143360" crc="3961fd70" sha1="cfce4d1391268eba05cb2adb56726b2035920cd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memblbl">
+		<description>Memory Building Blocks (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2015-09-05"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="memory building blocks (4am crack).dsk" size="143360" crc="920d72aa" sha1="134b757c80271f2bdef3c15b3f62ff1bfbe65618" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="membl89">
+		<description>Memory Building Blocks (1989 Version) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2017-05-23"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="memory building blocks 1989 (4am crack).dsk" size="143360" crc="0d26696e" sha1="7ed271f29776dd32e1b9374520fdce3697aa33c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memcst83">
+		<description>Memory Castle (1983 Version) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2016-01-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="memory castle 1983 (4am crack).dsk" size="143360" crc="9478ed1e" sha1="170aa3d36733aa9343a4590df1c23a63f44396f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmatch86">
+		<description>Memory Match (Version 01.24.86) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2017-12-12"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="memory match 01.24.86 (4am crack).dsk" size="143360" crc="13ba215a" sha1="c4b99793ee9793763f7d6755331018385344d36f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meminder">
+		<description>Memory Minder (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Computer Headware</publisher>
+		<info name="release" value="2015-11-22"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="memory minder (4am crack) side a.dsk" size="143360" crc="c347ca23" sha1="3d6b5b4023738c672f1b95772d03a9487f0d2055" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="memory minder (4am crack) side b.dsk" size="143360" crc="7c0402b8" sha1="0385f888b871d8c05f45b100f95231e14adce2b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metrmsn">
+		<description>Meteor Mission (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2016-03-09"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="meteor mission (4am crack).dsk" size="143360" crc="8b809537" sha1="902b418c41aff8e9f89c6b13a9851be6414192db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metrmlt">
+		<description>Meteor Multiplication (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2015-07-06"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="meteor multiplication (4am crack).dsk" size="143360" crc="62281009" sha1="c9493d7151f77d6feacdfd93da97feec83c3e403" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtrmlt2">
+		<description>Meteor Multiplication (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Developmental Learning</publisher>
+		<info name="release" value="2017-06-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="meteor multiplication rev. 2 (4am crack).dsk" size="143360" crc="0f314196" sha1="452ecbab360ba6fbd0b02edf4f3a61cad0408471" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microadd">
+		<description>Micro Addition (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2016-08-14"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro addition (4am crack).dsk" size="143360" crc="10e7aefc" sha1="c9f05bff90fac6c7abcf31a6acc0ee8965248468" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microdiv">
+		<description>Micro Division (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2016-07-14"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro division (4am crack).dsk" size="143360" crc="e6d86580" sha1="dfdaabce438fb5b075ef6c3970ea995b61653f55" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microhab">
+		<description>Micro Habitats (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Reader's Digest Software</publisher>
+		<info name="release" value="2017-01-16"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro habitats (4am crack).dsk" size="143360" crc="2964da2c" sha1="e3173b735cb5c695cab142c01bacc7851ed7ecf5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miclbasb">
+		<description>Micro League Baseball (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Stoneware</publisher>
+		<info name="release" value="2017-11-26"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro league baseball (4am crack).dsk" size="143360" crc="ee6237b4" sha1="e77be478ca53962269d875b9742dda50475272e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromul">
+		<description>Micro Multiplication (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2016-08-21"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro multiplication (4am crack).dsk" size="143360" crc="8f87468f" sha1="4728a423315f032f3562702d75a0a9718b1b9796" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microbe">
+		<description>Microbe (supports Mockingboard) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2017-04-30"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microbe (supports mockingboard)(4am crack).dsk" size="143360" crc="ab19e7b6" sha1="aa7842f68f60f3ac55c502ea423f6fc8958b37cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microbe3">
+		<description>Microbe (Revision 3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2017-05-10"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microbe rev. 3 (4am crack).dsk" size="143360" crc="287270b1" sha1="3f9a1950131310c3cbaf5b45c7992ec4748e662f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds1pls">
+		<description>Micro-LADS 1 Plurals and Noun-Verb Agreement (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 1 plurals and noun-verb agreement (4am crack).dsk" size="143360" crc="6dad9d98" sha1="9b5b16ea2e00a1e21edaffbeeaee5d6ebd169bb9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds2vf">
+		<description>Micro-LADS 2 Verb Forms (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-28"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 2 verb forms (4am crack).dsk" size="143360" crc="3709e7bc" sha1="18b2b5e5cc9a93cb2fe3c88cfec1fdcd44e274b4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds3prp">
+		<description>Micro-LADS 3 Prepositions (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 3 prepositions (4am crack).dsk" size="143360" crc="9b6a204f" sha1="1f2f134486f43e598b563cf759fe6ed9b5d3c985" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds4prn">
+		<description>Micro-LADS 4 Pronouns (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 4 pronouns (4am crack).dsk" size="143360" crc="fa9c708b" sha1="1a8cc921112a24404d39d188dce7abbbd527afbf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds5ng">
+		<description>Micro-LADS 5 Negatives (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 5 negatives (4am crack).dsk" size="143360" crc="244e65c5" sha1="ce6752867230430e35dbea0dfe91bc4420f9dc2c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds6de">
+		<description>Micro-LADS 6 Deictic Expressions, Passive, and WH-questions (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 6 deictic expressions, passive, and wh-questions (4am crack).dsk" size="143360" crc="1fa593ca" sha1="190dde1093f0f759dc2f5d848a6358d351cbe43c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlds7pr2">
+		<description>Micro-LADS 7 Prepositions II (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2016-09-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro-lads 7 prepositions ii (4am crack).dsk" size="143360" crc="35a599f2" sha1="056372e56805dabad02d3e193d1f1b54d558d93a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micrjrny">
+		<description>Microscopic Journey (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2017-10-25"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microscopic journey (4am crack).dsk" size="143360" crc="78479c3f" sha1="02ab3f200a412f472ad8a63d90583b08072039f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcorgtrl">
+		<description>MECC-A157 Oregon Trail (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2019-05-29"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side a.dsk" size="143360" crc="c4cfd4aa" sha1="ec0a9ad7cec071f3fccef8a7a4207e2930025f88" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side b.dsk" size="143360" crc="edd6f8a7" sha1="e58fbb135b17b36df7437f6ee2988b0de8cc5ea3" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
