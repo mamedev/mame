@@ -7692,6 +7692,26 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="chessmen">
+		<!-- collection of chess engines for The ChessMachine, including The King 2.54 and Gideon 3.1 -->
+		<!-- not an official Tasc disk, some of the files were taken from (undumped) copy-protected disks -->
+		<description>The ChessMachine (RISC engines)</description>
+		<year>1991</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="ChessMachine installation required, see README.TXT" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="989b0640" sha1="bf012e74a67590a94b3320727f76c834fabe4251"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="4cf95170" sha1="320710397eaf659a631bc2fdd194805a3454665d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chipdale">
 		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
 		<year>1990</year>
