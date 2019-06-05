@@ -197,6 +197,7 @@ dms5000.cpp
 dms86.cpp
 dmv.cpp
 dolphunk.cpp
+dpb7000.cpp
 dps1.cpp
 dragon.cpp
 dsb46.cpp
