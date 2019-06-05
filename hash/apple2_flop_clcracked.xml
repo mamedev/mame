@@ -487,9 +487,11 @@
 
 	<software name="mrdo">
 		<description>Mr. Do (cleanly cracked)</description>
-		<year>1983</year>
+		<year>1985</year>
 		<publisher>Datasoft</publisher>
+		<info name="release" value="2015-07-05"/>
 		<!-- No compatibility data known at this time. -->
+		<!-- Crack was updated on 2015-07-05 to fix corrupted blocks. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -502,6 +504,7 @@
 		<description>Ms. Pac Man (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<info name="release" value="2015-03-18"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3087,7 +3090,6 @@
 		<description>Agenda Files (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
-		<!-- Dump release date not known at this time. -->
 		<info name="release" value="2018-06-09"/>
 
 		<part name="flop1" interface="floppy_5_25">
