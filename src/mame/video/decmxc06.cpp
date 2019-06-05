@@ -4,9 +4,15 @@
  Deco MXC06 sprite generator:
 
  used by:
- madmotor.c
+ madmotor.cpp
+ dec0.cpp
+ stadhero.cpp
+ thedeep.cpp
+ actfancr.cpp
+ vaportra.cpp
+ dec8.cpp
 
-Notes (dec0.c)
+Notes (dec0.cpp)
 
    Sprite data:  The unknown bits seem to be unused.
 
@@ -28,11 +34,6 @@ Notes (dec0.c)
         Bit 3: Sprite flash (sprite is displayed every other frame)
         Bit 4,5,6,7:  - Colour
     Byte 5: X-coords
-
-
-todo:
-    Implement sprite/tilemap orthogonality (not strictly needed as no
-    games make deliberate use of it). (pdrawgfx, or rendering to bitmap for manual mixing)
 
 */
 
@@ -73,8 +74,8 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		int flipx = data0 & 0x2000;
 		parentFlipY = flipy = data0 & 0x4000;
-		const u16 h = (1 << ((data0 & 0x1800) >> 11));   /* 1x, 2x, 4x, 8x height */
-		const u16 w = (1 << ((data0 & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
+		const int h = (1 << ((data0 & 0x1800) >> 11));   /* 1x, 2x, 4x, 8x height */
+		int w = (1 << ((data0 & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
 
 		int sx = data2 & 0x01ff;
 		int sy = data0 & 0x01ff;
@@ -101,48 +102,56 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			continue;
 		}
 
+		int chainoffs = priority ? offs - ((w - 1) * 4) : offs; // or bandit breaks
 		for (int x = 0; x < w; x++)
 		{
-			// maybe, birdie try appears to specify the base code for each part..
-			u16 code = spriteram[offs + 1] & 0x1fff;
-
-			code &= ~(h - 1);
-
-			// not affected by flipscreen
-			if (parentFlipY) // in the case of multi-width sprites the y flip bit is set by the parent
-				incy = -1;
-			else
+			if (chainoffs < size)
 			{
-				code += h - 1;
-				incy = 1;
-			}
+				// maybe, birdie try appears to specify the base code for each part..
+				u16 code = spriteram[chainoffs + 1] & 0x1fff;
 
-			for (int y = 0; y < h; y++)
-			{
-				if (!flash || (screen.frame_number() & 1))
+				code &= ~(h - 1);
+
+				// not affected by flipscreen
+				if (parentFlipY) // in the case of multi-width sprites the y flip bit is set by the parent
+					incy = -1;
+				else
 				{
-					if (priority)
+					code += h - 1;
+					incy = 1;
+				}
+
+				for (int y = 0; y < h; y++)
+				{
+					if (!flash || (screen.frame_number() & 1))
 					{
-						gfx->prio_transpen(bitmap, cliprect,
-							code - y * incy,
-							colour,
-							flipx, flipy,
-							sx + (mult * x), sy + (mult * y), screen.priority(), pri_mask, 0);
-					}
-					else
-					{
-						gfx->transpen(bitmap, cliprect,
-							code - y * incy,
-							colour,
-							flipx, flipy,
-							sx + (mult * x), sy + (mult * y), 0);
+						if (priority)
+						{
+							gfx->prio_transpen(bitmap, cliprect,
+								code - y * incy,
+								colour,
+								flipx, flipy,
+								sx + (mult * x), sy + (mult * y), screen.priority(), pri_mask, 0);
+						}
+						else
+						{
+							gfx->transpen(bitmap, cliprect,
+								code - y * incy,
+								colour,
+								flipx, flipy,
+								sx + (mult * x), sy + (mult * y), 0);
+						}
 					}
 				}
 			}
+			chainoffs += 4;
+		}
+		while (w)
+		{
+			w--;
 			offs += inc;
 			if (offs == end)
 				return;
-
 		}
 	}
 }
