@@ -182,6 +182,10 @@ void newport_base_device::device_start()
 	save_item(NAME(m_rex3.m_color_alpha));
 	save_item(NAME(m_rex3.m_color_green));
 	save_item(NAME(m_rex3.m_color_blue));
+	save_item(NAME(m_rex3.m_curr_color_red));
+	save_item(NAME(m_rex3.m_curr_color_alpha));
+	save_item(NAME(m_rex3.m_curr_color_green));
+	save_item(NAME(m_rex3.m_curr_color_blue));
 	save_item(NAME(m_rex3.m_slope_red));
 	save_item(NAME(m_rex3.m_slope_alpha));
 	save_item(NAME(m_rex3.m_slope_green));
@@ -588,6 +592,23 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 			start_logging();
 		else
 			stop_logging();
+	}
+#endif
+
+#if ENABLE_NEWVIEW_LOG
+	if (m_newview_log != nullptr)
+	{
+		uint32_t offset_lo = 0x80000000;
+		uint32_t data_hi = 0;
+		uint32_t data_lo = 0;
+		uint32_t mem_mask_hi = 0;
+		uint32_t mem_mask_lo = 0;
+
+		fwrite(&offset_lo, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&data_hi, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&data_lo, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&mem_mask_hi, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&mem_mask_lo, sizeof(uint32_t), 1, m_newview_log);
 	}
 #endif
 
@@ -2187,20 +2208,51 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 {
 	static const uint8_t s_bayer[4][4] = { { 0, 12, 3, 15 },{ 8, 4, 11, 7 },{ 2, 14, 1, 13 },{ 10, 6, 9, 5 } };
 
-	const uint32_t red = (uint8_t)(m_rex3.m_color_red >> 11);
-	const uint32_t green = (uint8_t)(m_rex3.m_color_green >> 11);
-	const uint32_t blue = (uint8_t)(m_rex3.m_color_blue >> 11);
+    //uint32_t red = (uint8_t)(m_rex3.m_color_red >> 11);
+    //uint32_t green = (uint8_t)(m_rex3.m_color_green >> 11);
+    //uint32_t blue = (uint8_t)(m_rex3.m_color_blue >> 11);
+
+    uint32_t red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
+    uint32_t green = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
+    uint32_t blue = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+
+    if (red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
+    {
+        red = 0;
+	}
+    else if (red > 0xff)
+    {
+        red = 0x7ffff;
+	}
+
+    if (green >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
+    {
+        green = 0;
+	}
+    else if (green > 0xff)
+    {
+        green = 0x7ffff;
+	}
+
+    if (blue >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
+    {
+        blue = 0;
+	}
+    else if (blue > 0xff)
+    {
+        blue = 0x7ffff;
+	}
 
 	if (!BIT(m_rex3.m_draw_mode1, 15)) // RGB
 	{
 		switch (m_rex3.m_plane_depth)
 		{
 		case 0: // 4bpp
-            return (m_rex3.m_color_red >> 11) & 0x0000000f;
+            return (m_rex3.m_curr_color_red >> 11) & 0x0000000f;
 		case 1: // 8bpp
-            return (m_rex3.m_color_red >> 11) & 0x000000ff;
+            return (m_rex3.m_curr_color_red >> 11) & 0x000000ff;
 		case 2: // 12bpp
-            return (m_rex3.m_color_red >> 9) & 0x00000fff;
+            return (m_rex3.m_curr_color_red >> 9) & 0x00000fff;
 		case 3: // 24bpp
 			// Not supported
 			return 0;
@@ -2301,7 +2353,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 	}
 }
 
-uint8_t newport_base_device::get_octant(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t dx, uint16_t dy)
+uint8_t newport_base_device::get_octant(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dx, int32_t dy)
 {
 	if (x1 < x2)
 	{
@@ -2321,15 +2373,15 @@ uint8_t newport_base_device::get_octant(uint16_t x1, uint16_t y1, uint16_t x2, u
 
 void newport_base_device::do_fline(uint32_t color)
 {
-	const uint32_t x1 = m_rex3.m_x_start >> 7;
-	const uint32_t y1 = m_rex3.m_y_start >> 7;
-	const uint32_t x2 = m_rex3.m_x_end >> 7;
-	const uint32_t y2 = m_rex3.m_y_end >> 7;
+	const int32_t x1 = (int32_t)((m_rex3.m_x_start >> 7) << 12) >> 12;
+	const int32_t y1 = (int32_t)((m_rex3.m_y_start >> 7) << 12) >> 12;
+	const int32_t x2 = (int32_t)((m_rex3.m_x_end >> 7) << 12) >> 12;
+	const int32_t y2 = (int32_t)((m_rex3.m_y_end >> 7) << 12) >> 12;
 
-	const uint16_t x10 = x1 & ~0xf;
-	const uint16_t y10 = y1 & ~0xf;
-	const uint16_t x20 = x2 & ~0xf;
-	const uint16_t y20 = y2 & ~0xf;
+	const int32_t x10 = x1 & ~0xf;
+	const int32_t y10 = y1 & ~0xf;
+	const int32_t x20 = x2 & ~0xf;
+	const int32_t y20 = y2 & ~0xf;
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
 	const bool skip_first = BIT(m_rex3.m_draw_mode0, 10);
@@ -2337,17 +2389,17 @@ void newport_base_device::do_fline(uint32_t color)
 	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
 	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
-	uint16_t x = x10;
-	uint16_t y = y10;
+	int32_t x = x10;
+	int32_t y = y10;
 
-	uint16_t x1_fract = m_rex3.m_x_start_frac;
-	uint16_t y1_fract = m_rex3.m_y_start_frac;
+	int16_t x1_fract = m_rex3.m_x_start_frac;
+	int16_t y1_fract = m_rex3.m_y_start_frac;
 
-	int32_t dx = abs((int32_t)x1 - (int32_t)x2);
-	int32_t dy = abs((int32_t)y1 - (int32_t)y2);
+	int32_t dx = abs(x1 - x2);
+	int32_t dy = abs(y1 - y2);
 
-	const int16_t dx_i = abs(x10 - x20) - 1;
-	const int16_t dy_i = abs(y10 - y20) - 1;
+	const int32_t dx_i = abs(x10 - x20) - 1;
+	const int32_t dy_i = abs(y10 - y20) - 1;
 
 	static const bresenham_octant_info_t s_bresenham_infos[8] =
 	{
@@ -2362,14 +2414,14 @@ void newport_base_device::do_fline(uint32_t color)
 	};
 
 	const uint8_t octant = get_octant(x1, y1, x2, y2, dx, dy);
-	const int16_t incrx1 = s_bresenham_infos[octant].incrx1;
-	const int16_t incrx2 = s_bresenham_infos[octant].incrx2;
-	const int16_t incry1 = s_bresenham_infos[octant].incry1;
-	const int16_t incry2 = s_bresenham_infos[octant].incry2;
-	int16_t loop = s_bresenham_infos[octant].loop ? dy_i : dx_i;
+	const int32_t incrx1 = s_bresenham_infos[octant].incrx1;
+	const int32_t incrx2 = s_bresenham_infos[octant].incrx2;
+	const int32_t incry1 = s_bresenham_infos[octant].incry1;
+	const int32_t incry2 = s_bresenham_infos[octant].incry2;
+	int32_t loop = s_bresenham_infos[octant].loop ? dy_i : dx_i;
 	if (BIT(m_rex3.m_draw_mode0, 15) && loop > 32)
 		loop = 32;
-	const int16_t x_major = 1 - s_bresenham_infos[octant].loop;
+	const int32_t x_major = 1 - s_bresenham_infos[octant].loop;
 
 	const int32_t incr1 = s_bresenham_infos[octant].loop ? (2 * dx) : (2 * dy);
 	const int32_t incr2 = s_bresenham_infos[octant].loop ? (2 * (dx - dy)) : (2 * (dy - dx));
@@ -2443,10 +2495,12 @@ void newport_base_device::do_fline(uint32_t color)
 
 	if (!skip_first || iterate_one)
 	{
+		const int16_t x16 = (int16_t)(x >> 4);
+		const int16_t y16 = (int16_t)(y >> 4);
 		if (shade || rgbmode)
-			write_pixel(x >> 4, y >> 4, get_rgb_color(x >> 4, y >> 4));
+			write_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x >> 4, y >> 4, color);
+			write_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2472,12 +2526,14 @@ void newport_base_device::do_fline(uint32_t color)
 		}
 	}
 
-	for (int16_t i = 1; i < loop; i++)
+	for (int32_t i = 1; i < loop; i++)
 	{
+		const int16_t x16 = (int16_t)(x >> 4);
+		const int16_t y16 = (int16_t)(y >> 4);
 		if (shade || rgbmode)
-			write_pixel(x >> 4, y >> 4, get_rgb_color(x >> 4, y >> 4));
+			write_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x >> 4, y >> 4, color);
+			write_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2498,10 +2554,12 @@ void newport_base_device::do_fline(uint32_t color)
 
 	if (!skip_last)
 	{
+		const int16_t x16 = (int16_t)(x2 >> 4);
+		const int16_t y16 = (int16_t)(y2 >> 4);
 		if (shade || rgbmode)
-			write_pixel(x2 >> 4, y2 >> 4, get_rgb_color(x2 >> 4, y2 >> 4));
+			write_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x2 >> 4, y2 >> 4, color);
+			write_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2518,10 +2576,10 @@ void newport_base_device::do_fline(uint32_t color)
 
 void newport_base_device::do_iline(uint32_t color)
 {
-	uint16_t x1 = m_rex3.m_x_start_i;
-	uint16_t y1 = m_rex3.m_y_start_i;
-	uint16_t x2 = m_rex3.m_x_end_i;
-	uint16_t y2 = m_rex3.m_y_end_i;
+	int32_t x1 = m_rex3.m_x_start_i;
+	int32_t y1 = m_rex3.m_y_start_i;
+	int32_t x2 = m_rex3.m_x_end_i;
+	int32_t y2 = m_rex3.m_y_end_i;
 
 	const bool iterate_one = (m_rex3.m_draw_mode0 & 0x300) == 0;
 	const bool skip_first = BIT(m_rex3.m_draw_mode0, 10);
@@ -2529,10 +2587,10 @@ void newport_base_device::do_iline(uint32_t color)
 	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
 	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 
-	uint16_t x = x1;
-	uint16_t y = y1;
-	uint16_t dx = abs(x1 - x2);
-	uint16_t dy = abs(y1 - y2);
+	int32_t x = x1;
+	int32_t y = y1;
+	int32_t dx = abs(x2 - x1);
+	int32_t dy = abs(y2 - y1);
 
 	static const bresenham_octant_info_t s_bresenham_infos[8] =
 	{
@@ -2547,24 +2605,27 @@ void newport_base_device::do_iline(uint32_t color)
 	};
 
 	const uint8_t octant = get_octant(x1, y1, x2, y2, dx, dy);
-	const int16_t incrx1 = s_bresenham_infos[octant].incrx1;
-	const int16_t incrx2 = s_bresenham_infos[octant].incrx2;
-	const int16_t incry1 = s_bresenham_infos[octant].incry1;
-	const int16_t incry2 = s_bresenham_infos[octant].incry2;
-	uint16_t loop = s_bresenham_infos[octant].loop ? dy : dx;
+	const int32_t incrx1 = s_bresenham_infos[octant].incrx1;
+	const int32_t incrx2 = s_bresenham_infos[octant].incrx2;
+	const int32_t incry1 = s_bresenham_infos[octant].incry1;
+	const int32_t incry2 = s_bresenham_infos[octant].incry2;
+	int32_t loop = s_bresenham_infos[octant].loop ? dy : dx;
 	if (BIT(m_rex3.m_draw_mode0, 15) && loop > 32)
 		loop = 32;
 
-	const int16_t incr1 = 2 * (s_bresenham_infos[octant].loop ? dx : dy);
-	const int16_t incr2 = 2 * (s_bresenham_infos[octant].loop ? (dx - dy) : (dy - dx));
-	int16_t d = incr1 - (s_bresenham_infos[octant].loop ? dy : dx);
+	const int32_t incr1 = 2 * (s_bresenham_infos[octant].loop ? dx : dy);
+	const int32_t incr2 = 2 * (s_bresenham_infos[octant].loop ? (dx - dy) : (dy - dx));
+	int32_t d = incr1 - (s_bresenham_infos[octant].loop ? dy : dx);
 
 	if (!skip_first || iterate_one)
 	{
+		const int16_t x16 = (int16_t)x;
+		const int16_t y16 = (int16_t)y;
+
 		if (shade || rgbmode)
-			write_pixel(x, y, get_rgb_color(x, y));
+			write_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x, y, color);
+			write_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2590,12 +2651,15 @@ void newport_base_device::do_iline(uint32_t color)
 		}
 	}
 
-	for (int16_t i = 1; i < loop; i++)
+	for (int32_t i = 1; i < loop; i++)
 	{
+		const int16_t x16 = (int16_t)x;
+		const int16_t y16 = (int16_t)y;
+
 		if (shade || rgbmode)
-			write_pixel(x, y, get_rgb_color(x, y));
+			write_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x, y, color);
+			write_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2616,10 +2680,13 @@ void newport_base_device::do_iline(uint32_t color)
 
 	if (!skip_last)
 	{
+		const int16_t x16 = (int16_t)x2;
+		const int16_t y16 = (int16_t)y2;
+
 		if (shade || rgbmode)
-			write_pixel(x2, y2, get_rgb_color(x2, y2));
+			write_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x2, y2, color);
+			write_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2791,9 +2858,58 @@ uint64_t newport_base_device::do_pixel_word_read()
 
 void newport_base_device::iterate_shade()
 {
-	m_rex3.m_color_red += m_rex3.m_slope_red;
-	m_rex3.m_color_green += m_rex3.m_slope_green;
-	m_rex3.m_color_blue += m_rex3.m_slope_blue;
+    if (m_rex3.m_slope_red & 0x7fffff)
+        m_rex3.m_curr_color_red += (m_rex3.m_slope_red << 8) >> 8;
+    if (m_rex3.m_slope_green & 0x7ffff)
+        m_rex3.m_curr_color_green += (m_rex3.m_slope_green << 12) >> 12;
+    if (m_rex3.m_slope_blue & 0x7ffff)
+        m_rex3.m_curr_color_blue += (m_rex3.m_slope_blue << 12) >> 12;
+
+    if (BIT(m_rex3.m_draw_mode0, 21)) // CIClamp
+    {
+        if (BIT(m_rex3.m_draw_mode1, 15)) // RGBMode
+        {
+            uint32_t val_red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
+            uint32_t val_grn = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
+            uint32_t val_blu = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+
+            if (val_red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
+                m_rex3.m_curr_color_red = 0;
+            else if (val_red > 0xff)
+                m_rex3.m_curr_color_red = 0x7ffff;
+
+            if (val_grn >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
+                m_rex3.m_curr_color_green = 0;
+            else if (val_grn > 0xff)
+                m_rex3.m_curr_color_green = 0x7ffff;
+
+            if (val_blu >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
+                m_rex3.m_curr_color_blue = 0;
+            else if (val_blu > 0xff)
+                m_rex3.m_curr_color_blue = 0x7ffff;
+        }
+        else
+        {
+            switch ((m_rex3.m_draw_mode1 >> 3) & 3)
+            {
+            case 0: // 4bpp
+                if (BIT(m_rex3.m_color_red, 15))
+                    m_rex3.m_color_red = 0x00007fff;
+                break;
+            case 1: // 8bpp
+                if (BIT(m_rex3.m_color_red, 19))
+                    m_rex3.m_color_red = 0x0007ffff;
+                break;
+            case 2: // 12bpp
+                if (BIT(m_rex3.m_color_red, 21))
+                    m_rex3.m_color_red = 0x001fffff;
+                break;
+            case 3: // 24bpp
+                    // No clamping on CI
+                break;
+            }
+        }
+    }
 }
 
 void newport_base_device::do_rex3_command()
@@ -2830,9 +2946,6 @@ void newport_base_device::do_rex3_command()
 			{
 				case 0: // Span
 				{
-					if (BIT(mode0, 19) && dx < 0) // LROnly
-						break;
-
 					end_x += dx;
 
 					int16_t prim_end_x = end_x;
@@ -2888,9 +3001,17 @@ void newport_base_device::do_rex3_command()
 						}
 					}
 
+					const bool lr_abort = BIT(mode0, 19) && dx < 0;
+
 					uint32_t bit = 31;
 					do
 					{
+						if (lr_abort)
+							break;
+
+						if (shade)
+							iterate_shade();
+
 						if (BIT(pattern, bit))
 						{
 							if (m_rex3.m_color_host)
@@ -2905,12 +3026,17 @@ void newport_base_device::do_rex3_command()
 							write_pixel(start_x, start_y, m_rex3.m_color_back);
 						}
 
-						if (shade)
-							iterate_shade();
-
 						bit = (bit - 1) & 0x1f;
 						start_x += dx;
 					} while (start_x != prim_end_x && start_x != end_x && stop_on_x);
+
+					if ((dx > 0 && start_x >= end_x) || (dx < 0 && start_x <= end_x) || lr_abort)
+					{
+						m_rex3.m_curr_color_red = m_rex3.m_color_red;
+						m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
+						m_rex3.m_curr_color_green = m_rex3.m_color_green;
+						m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
+					}
 
 					write_x_start(start_x << 11);
 					break;
@@ -2918,9 +3044,6 @@ void newport_base_device::do_rex3_command()
 
 				case 1: // Block
 				{
-					if (BIT(mode0, 19) && dx < 0) // LROnly
-						break;
-
 					end_x += dx;
 					end_y += dy;
 
@@ -2976,11 +3099,19 @@ void newport_base_device::do_rex3_command()
 						}
 					}
 
+					const bool lr_abort = BIT(mode0, 19) && dx < 0;
+
 					do
 					{
 						uint32_t bit = 31;
 						do
 						{
+							if (lr_abort)
+								break;
+
+							if (shade)
+								iterate_shade();
+
 							if (BIT(pattern, bit))
 							{
 								if (m_rex3.m_color_host)
@@ -2995,15 +3126,16 @@ void newport_base_device::do_rex3_command()
 								write_pixel(start_x, start_y, m_rex3.m_color_back);
 							}
 
-							if (shade)
-								iterate_shade();
-
 							bit = (bit - 1) & 0x1f;
 							start_x += dx;
 						} while (start_x != prim_end_x && start_x != end_x && stop_on_x);
 
-						if (start_x == end_x)
+						if ((dx > 0 && start_x >= end_x) || (dx < 0 && start_x <= end_x) || lr_abort)
 						{
+                            m_rex3.m_curr_color_red = m_rex3.m_color_red;
+                            m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
+                            m_rex3.m_curr_color_green = m_rex3.m_color_green;
+                            m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
 							start_x = m_rex3.m_x_save;
 							start_y += dy;
 						}
@@ -3644,11 +3776,13 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
             {
                 m_rex3.m_color_i = m_rex3.m_color_red >> 9;
             }
+            m_rex3.m_curr_color_red = m_rex3.m_color_red;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Alpha Full State Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_alpha = (int32_t)(data & 0xfffff);
+            m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
 		}
 		break;
 	case 0x0208/8:
@@ -3656,11 +3790,13 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Green Full State Write: %08x\n", (uint32_t)(data >> 32));
 			m_rex3.m_color_green = (int32_t)((data >> 32) & 0xfffff);
+            m_rex3.m_curr_color_green = m_rex3.m_color_green;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Blue Full State Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_blue = (int32_t)(data & 0xfffff);
+            m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
 		}
 		break;
 	case 0x0210/8:

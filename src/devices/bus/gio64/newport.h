@@ -184,10 +184,14 @@ protected:
 		uint32_t m_color_alpha;
 		uint32_t m_color_green;
 		uint32_t m_color_blue;
-		uint32_t m_slope_red;
-		uint32_t m_slope_alpha;
-		uint32_t m_slope_green;
-		uint32_t m_slope_blue;
+		uint32_t m_curr_color_red;
+		uint32_t m_curr_color_alpha;
+		uint32_t m_curr_color_green;
+		uint32_t m_curr_color_blue;
+		int32_t m_slope_red;
+		int32_t m_slope_alpha;
+		int32_t m_slope_green;
+		int32_t m_slope_blue;
 		uint32_t m_write_mask;
 		uint32_t m_color_i;
 		uint32_t m_zero_overflow;
@@ -275,7 +279,7 @@ protected:
 		int16_t incry2;
 		uint8_t loop;
 	};
-	uint8_t get_octant(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t dx, uint16_t dy);
+	uint8_t get_octant(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dx, int32_t dy);
 	void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
 
