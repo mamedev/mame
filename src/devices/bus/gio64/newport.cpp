@@ -1971,7 +1971,7 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 {
 	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
 
-	float sa = 0.0f;
+	float sa = ((src >> 24) & 0xff) / 255.0f;
 	float sb = 0.0f;
 	float sg = 0.0f;
 	float sr = 0.0f;
@@ -1991,13 +1991,11 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 	switch (m_rex3.m_plane_depth)
 	{
 	case 0: // 4bpp (not supported)
-	case 1: // 8bpp (not supported)
-		break;
-	case 2: // 12bpp
-		sa = (((src >> 12) & 15) * 0x11) / 255.0f;
-		sr = (((src >> 8) & 15) * 0x11) / 255.0f;
-		sg = (((src >> 4) & 15) * 0x11) / 255.0f;
-		sb = (((src >> 0) & 15) * 0x11) / 255.0f;
+        break;
+	case 1: // 8bpp
+	    sb = (0xaa * BIT(src, 7)) | (0x55 * BIT(src, 6));
+	    sg = (0x92 * BIT(src, 5)) | (0x49 * BIT(src, 4)) | (0x24 * BIT(src, 3));
+	    sr = (0x92 * BIT(src, 2)) | (0x49 * BIT(src, 1)) | (0x24 * BIT(src, 0));
 
 		if (BIT(m_rex3.m_draw_mode1, 25))
 		{
@@ -2008,16 +2006,35 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 		else
 		{
 			const uint32_t dstc = dst & 0xfff;
-			dr = (((dstc >> 8) & 15) * 0x11) / 255.0f;
+			db = (((dstc >> 8) & 15) * 0x11) / 255.0f;
 			dg = (((dstc >> 4) & 15) * 0x11) / 255.0f;
-			db = (((dstc >> 0) & 15) * 0x11) / 255.0f;
+			dr = (((dstc >> 0) & 15) * 0x11) / 255.0f;
+		}
+		break;
+	case 2: // 12bpp
+		sb = (((src >> 8) & 15) * 0x11) / 255.0f;
+		sg = (((src >> 4) & 15) * 0x11) / 255.0f;
+		sr = (((src >> 0) & 15) * 0x11) / 255.0f;
+
+		if (BIT(m_rex3.m_draw_mode1, 25))
+		{
+			db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
+			dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
+			dr = (uint8_t)(m_rex3.m_color_back >>  0) / 255.0f;
+		}
+		else
+		{
+			const uint32_t dstc = dst & 0xfff;
+			db = (((dstc >> 8) & 15) * 0x11) / 255.0f;
+			dg = (((dstc >> 4) & 15) * 0x11) / 255.0f;
+			dr = (((dstc >> 0) & 15) * 0x11) / 255.0f;
 		}
 		break;
 	case 3: // 24bpp
 		sa = (uint8_t)(src >> 24) / 255.0f;
-		sr = (uint8_t)(src >> 16) / 255.0f;
+		sb = (uint8_t)(src >> 16) / 255.0f;
 		sg = (uint8_t)(src >>  8) / 255.0f;
-		sb = (uint8_t)(src >>  0) / 255.0f;
+		sr = (uint8_t)(src >>  0) / 255.0f;
 
 		if (BIT(m_rex3.m_draw_mode1, 25))
 		{
@@ -2028,9 +2045,9 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 		else
 		{
 			const uint32_t dstc = dst;
-			dr = (uint8_t)(dstc >> 16) / 255.0f;
+			db = (uint8_t)(dstc >> 16) / 255.0f;
 			dg = (uint8_t)(dstc >>  8) / 255.0f;
-			db = (uint8_t)(dstc >>  0) / 255.0f;
+			dr = (uint8_t)(dstc >>  0) / 255.0f;
 		}
 		break;
 	}
@@ -2125,10 +2142,10 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 	case 1: // 8bpp (not supported)
 		break;
 	case 2: // 12bpp
-		store_pixel(dest_buf, ((r_blend_i & 0xf0) << 4) | (g_blend_i & 0xf0) | ((b_blend_i & 0xf0) >> 4));
+		store_pixel(dest_buf, ((b_blend_i & 0xf0) << 4) | (g_blend_i & 0xf0) | ((r_blend_i & 0xf0) >> 4));
 		break;
 	case 3: // 24bpp
-		store_pixel(dest_buf, (r_blend_i << 16) | (g_blend_i << 8) | b_blend_i);
+		store_pixel(dest_buf, (b_blend_i << 16) | (g_blend_i << 8) | r_blend_i);
 		break;
 	}
 }
@@ -2208,13 +2225,10 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 {
 	static const uint8_t s_bayer[4][4] = { { 0, 12, 3, 15 },{ 8, 4, 11, 7 },{ 2, 14, 1, 13 },{ 10, 6, 9, 5 } };
 
-    //uint32_t red = (uint8_t)(m_rex3.m_color_red >> 11);
-    //uint32_t green = (uint8_t)(m_rex3.m_color_green >> 11);
-    //uint32_t blue = (uint8_t)(m_rex3.m_color_blue >> 11);
-
     uint32_t red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
     uint32_t green = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
     uint32_t blue = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+    uint32_t alpha = ((m_rex3.m_curr_color_alpha >> 11) & 0x1ff);
 
     if (red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
     {
@@ -2222,7 +2236,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 	}
     else if (red > 0xff)
     {
-        red = 0x7ffff;
+        red = 0xff;
 	}
 
     if (green >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
@@ -2231,7 +2245,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 	}
     else if (green > 0xff)
     {
-        green = 0x7ffff;
+        green = 0xff;
 	}
 
     if (blue >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
@@ -2240,8 +2254,18 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 	}
     else if (blue > 0xff)
     {
-        blue = 0x7ffff;
+        blue = 0xff;
 	}
+
+    if (alpha >= 0x180 || BIT(m_rex3.m_curr_color_alpha, 31))
+    {
+        alpha = 0;
+	}
+    else if (alpha > 0xff)
+    {
+        alpha = 0xff;
+	}
+    alpha <<= 24;
 
 	if (!BIT(m_rex3.m_draw_mode1, 15)) // RGB
 	{
@@ -2282,7 +2306,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 			if (db > 1) db = 1;
 
 			uint32_t color = (db << 3) | (dg << 1) | dr;
-			return (color << 4) | color;
+			return alpha | (color << 4) | color;
 		}
 
 		case 1: // 8bpp
@@ -2303,7 +2327,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 			if (dg > 7) dg = 7;
 			if (db > 3) db = 3;
 
-			return (db << 6) | (dg << 3) | dr;
+			return alpha | (db << 6) | (dg << 3) | dr;
 		}
 
 		case 2: // 12bpp
@@ -2325,11 +2349,11 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 			if (db > 15) db = 15;
 
 			uint32_t color = (db << 8) | (dg << 4) | dr;
-			return (color << 12) | color;
+			return alpha | (color << 12) | color;
 		}
 
 		case 3: // 24bpp
-			return (blue << 16) | (green << 8) | red;
+			return alpha | (blue << 16) | (green << 8) | red;
 
 		default:
 			return 0;
@@ -2340,13 +2364,13 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 		switch (m_rex3.m_plane_depth)
 		{
 		case 0: // 4bpp
-			return (BIT(blue, 7) << 3) | ((green & 0xc0) >> 5) | BIT(red, 7);
+			return alpha | (BIT(blue, 7) << 3) | ((green & 0xc0) >> 5) | BIT(red, 7);
 		case 1: // 8bpp
-			return (blue & 0xc0) | ((green & 0xe0) >> 2) | ((red & 0xe0) >> 5);
+			return alpha | (blue & 0xc0) | ((green & 0xe0) >> 2) | ((red & 0xe0) >> 5);
 		case 2: // 12bpp
-			return ((blue & 0xf0) << 4) | (green & 0xf0) | ((red & 0xf0) >> 4);
+			return alpha | ((blue & 0xf0) << 4) | (green & 0xf0) | ((red & 0xf0) >> 4);
 		case 3: // 24bpp
-			return (blue << 16) | (green << 8) | red;
+			return alpha | (blue << 16) | (green << 8) | red;
 		default:
 			return 0;
 		}
@@ -2864,14 +2888,17 @@ void newport_base_device::iterate_shade()
         m_rex3.m_curr_color_green += (m_rex3.m_slope_green << 12) >> 12;
     if (m_rex3.m_slope_blue & 0x7ffff)
         m_rex3.m_curr_color_blue += (m_rex3.m_slope_blue << 12) >> 12;
+    if (m_rex3.m_slope_alpha & 0x7ffff)
+        m_rex3.m_curr_color_alpha += (m_rex3.m_slope_alpha << 12) >> 12;
 
     if (BIT(m_rex3.m_draw_mode0, 21)) // CIClamp
     {
         if (BIT(m_rex3.m_draw_mode1, 15)) // RGBMode
         {
-            uint32_t val_red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
-            uint32_t val_grn = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
-            uint32_t val_blu = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+            const uint32_t val_red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
+            const uint32_t val_grn = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
+            const uint32_t val_blu = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+            const uint32_t val_alpha = ((m_rex3.m_curr_color_alpha >> 11) & 0x1ff);
 
             if (val_red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
                 m_rex3.m_curr_color_red = 0;
@@ -2887,6 +2914,11 @@ void newport_base_device::iterate_shade()
                 m_rex3.m_curr_color_blue = 0;
             else if (val_blu > 0xff)
                 m_rex3.m_curr_color_blue = 0x7ffff;
+
+            if (val_alpha >= 0x180 || BIT(m_rex3.m_curr_color_alpha, 31))
+                m_rex3.m_curr_color_alpha = 0;
+            else if (val_alpha > 0xff)
+                m_rex3.m_curr_color_alpha = 0x7ffff;
         }
         else
         {
