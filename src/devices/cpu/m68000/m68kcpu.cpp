@@ -1342,6 +1342,10 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
  * 32-bit data memory interface
  ****************************************************************************/
 
+static inline u32 dword_from_byte(u8 data) { return u32(data) << 24 | u32(data) << 16 | u32(data) << 8 | data; }
+static inline u32 dword_from_word(u16 data) { return u32(data) << 16 | data; }
+static inline u32 dword_from_unaligned_word(u16 data) { return u32(data & 0xff00) << 16 | u32(data) << 8 | (data & 0xff00) >> 8; }
+
 /* interface for 32-bit data bus (68EC020, 68020) */
 void m68000_base_device::init32(address_space &space, address_space &ospace)
 {
@@ -1353,10 +1357,51 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
 	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word_unaligned(address); };
 	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword_unaligned(address); };
-	m_write8  = [this](offs_t address, u8 data)  { m_space->write_byte(address, data); };
-	m_write16 = [this](offs_t address, u16 data)  { m_space->write_word_unaligned(address, data); };
-	m_write32 = [this](offs_t address, u32 data)  { m_space->write_dword_unaligned(address, data); };
+	m_write8  = [this](offs_t address, u8 data)  {
+		m_space->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+	};
+	m_write16 = [this](offs_t address, u16 data)  {
+		switch (address & 3) {
+		case 0:
+			m_space->write_dword(address, dword_from_word(data), 0xffff0000U);
+			break;
 
+		case 1:
+			m_space->write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
+			break;
+
+		case 2:
+			m_space->write_dword(address - 2, dword_from_word(data), 0x0000ffff);
+			break;
+
+		case 3:
+			m_space->write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
+			m_space->write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000);
+			break;
+		}
+	};
+	m_write32 = [this](offs_t address, u32 data)  {
+		switch (address & 3) {
+		case 0:
+			m_space->write_dword(address, data, 0xffffffffU);
+			break;
+
+		case 1:
+			m_space->write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			m_space->write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			break;
+
+		case 2:
+			m_space->write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			m_space->write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			break;
+
+		case 3:
+			m_space->write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			m_space->write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			break;
+		}
+	};
 }
 
 /* interface for 32-bit data bus with PMMU */
