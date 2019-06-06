@@ -41,7 +41,7 @@ Game list (* denotes not emulated yet)
 
 Serial  Series MCU     Title
 ---------------------------------------------
-AC-01*    s    SM5A?   Ball (aka Toss-Up)
+AC-01*    s    SM5A    Ball (aka Toss-Up)
 FL-02*    s    SM5A?   Flagman
 MT-03*    s    SM5A?   Vermin (aka The Exterminator)
 RC-04*    s    SM5A?   Fire (aka Fireman Fireman)
