@@ -117,7 +117,7 @@ inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, c
 		{
 			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *shadow_pens = m_shadow_pen_array.get() + (gfx->granularity() * (color % gfx->colors()));
-			const uint8_t *code_base = gfx->get_data(code % gfx->elements());
+			const uint16_t *code_base = gfx->get_data(code % gfx->elements());
 
 			int block_size = 8 * scalex;
 			int sprite_screen_height = ((ssy&0xffff)+block_size)>>16;
@@ -237,7 +237,7 @@ inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, c
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
-									const uint8_t *source = code_base + (cy>>16) * gfx->rowbytes();
+									const uint16_t *source = code_base + (cy>>16) * gfx->rowbytes();
 									int c = source[(cx >> 16)];
 									if( c != transparent_color )
 									{
@@ -260,7 +260,7 @@ inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, c
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const uint8_t *source = code_base + (y_index>>16) * gfx->rowbytes();
+								const uint16_t *source = code_base + (y_index>>16) * gfx->rowbytes();
 								typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 
 								int x, x_index = x_index_base;
@@ -1158,12 +1158,12 @@ void cyclwarr_state::tile_expand()
 	dest = srcdata;
 	for (int c = 0; c < gx0->elements(); c++)
 	{
-		const uint8_t *c0base = gx0->get_data(c);
+		const uint16_t *c0base = gx0->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gx0->height(); y++)
 		{
-			const uint8_t *c0 = c0base;
+			const uint16_t *c0 = c0base;
 
 			for (int x = 0; x < gx0->width(); x++)
 			{

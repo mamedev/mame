@@ -1147,7 +1147,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 
 			uint8_t code_transparent, code_opaque;
 			const pen_t *pal_ptr;
-			const uint8_t  *src_ptr;
+			const uint16_t  *src_ptr;
 			uint8_t  *xpr_ptr;
 			uint16_t *dst_ptr;
 			uint16_t pen, basepen;
@@ -2078,7 +2078,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 			uint8_t code_transparent, code_opaque;
 			const pen_t *pal_ptr;
-			const uint8_t  *src_ptr;
+			const uint16_t  *src_ptr;
 			uint8_t  *xpr_ptr;
 			uint16_t *dst_ptr;
 			uint16_t pen, basepen;

@@ -1085,7 +1085,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 		gfx_element *gfx1 = gfx(big ? 3 : 1);
 		uint32_t tile2 = big ? ((tile & 0xfffff) + ((code & 0xf) << 3)) :
 								((tile & 0xfffff) + ((code & 0xf) << 1));
-		const uint8_t* data;
+		const uint16_t* data;
 		uint8_t flipxy = (code & 0x6000) >> 13;
 
 		if (tile2 < gfx1->elements())
@@ -1117,7 +1117,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 		gfx_element *gfx1 = gfx(big ? 2 : 0);
 		uint32_t tile2 = big ? ((tile & 0xfffff) + ((code & 0xf) << 2)) :
 								((tile & 0xfffff) + (code & 0xf));
-		const uint8_t* data;
+		const uint16_t* data;
 		uint8_t flipxy = (code & 0x6000) >> 13;
 
 		if (tile2 < gfx1->elements())

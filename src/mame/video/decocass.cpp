@@ -125,6 +125,7 @@
 
 #include "emu.h"
 #include "includes/decocass.h"
+#include <algorithm>
 
 
 static const uint32_t tile_offset[32*32] = {
@@ -248,8 +249,8 @@ void decocass_state::draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &pr
 		sy += 256;
 	int sx = m_part_h_shift - 128;
 
-	const uint8_t *objdata0 = m_gfxdecode->gfx(3)->get_data(0);
-	const uint8_t *objdata1 = m_gfxdecode->gfx(3)->get_data(1);
+	const uint16_t *objdata0 = m_gfxdecode->gfx(3)->get_data(0);
+	const uint16_t *objdata1 = m_gfxdecode->gfx(3)->get_data(1);
 	assert(m_gfxdecode->gfx(3)->rowbytes() == 64);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -719,7 +720,7 @@ void decocass_state::video_start()
 	m_gfxdecode->gfx(3)->set_source(m_objectram);
 
 	/* create an empty tile */
-	memset(m_empty_tile, 0, sizeof(m_empty_tile));
+	std::fill(std::begin(m_empty_tile), std::end(m_empty_tile), 0);
 }
 
 uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

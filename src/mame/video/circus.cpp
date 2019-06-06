@@ -63,7 +63,7 @@ void circus_state::draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 void circus_state::draw_sprite_collision( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *sprite_gfx = m_gfxdecode->gfx(1);
-	const uint8_t *sprite_data = sprite_gfx->get_data(m_clown_z);
+	const uint16_t *sprite_data = sprite_gfx->get_data(m_clown_z);
 	int sx, sy, dx, dy;
 	int pixel, collision = 0;
 

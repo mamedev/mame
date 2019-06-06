@@ -438,7 +438,7 @@ void k053247_device::zdrawgfxzoom32GP(
 #define FPENT  0
 
 	// inner loop
-	const u8  *src_ptr;
+	const u16 *src_ptr;
 	int src_x;
 	int eax, ecx;
 	int src_fx, src_fdx;
@@ -452,7 +452,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 	// outter loop
 	int src_fby, src_fdy, src_fbx;
-	const u8 *src_base;
+	const u16 *src_base;
 	int dst_w, dst_h;
 
 	// one-time

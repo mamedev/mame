@@ -681,7 +681,7 @@ void taito_f3_state::video_start()
 		{
 			int x,y;
 			int chk_trans_or_opa=0;
-			const uint8_t *dp = sprite_gfx->get_data(c);
+			const uint16_t *dp = sprite_gfx->get_data(c);
 			for (y = 0;y < sprite_gfx->height();y++)
 			{
 				for (x = 0;x < sprite_gfx->width();x++)
@@ -710,7 +710,7 @@ void taito_f3_state::video_start()
 			{
 				int chk_trans_or_opa=0;
 				uint8_t extra_mask = ((extra_planes << 4) | 0x0f);
-				const uint8_t *dp = pf_gfx->get_data(c);
+				const uint16_t *dp = pf_gfx->get_data(c);
 
 				for (y = 0;y < pf_gfx->height();y++)
 				{
@@ -2591,7 +2591,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &c
 	if( gfx )
 	{
 		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const uint8_t *code_base = gfx->get_data(code % gfx->elements());
+		const uint16_t *code_base = gfx->get_data(code % gfx->elements());
 
 		{
 			/* compute sprite increment per screen pixel */
@@ -2654,7 +2654,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &c
 				{
 					int y=ey-sy;
 					int x=(ex-sx-1)|(m_tile_opaque_sp[code % gfx->elements()]<<4);
-					const uint8_t *source0 = code_base + y_index * 16 + x_index_base;
+					const uint16_t *source0 = code_base + y_index * 16 + x_index_base;
 					uint32_t *dest0 = &dest_bmp.pix32(sy, sx);
 					uint8_t *pri0 = &m_pri_alp_bitmap.pix8(sy, sx);
 					int yadv = dest_bmp.rowpixels();
@@ -2662,7 +2662,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &c
 					dy=dy*16;
 					while(1)
 					{
-						const uint8_t *source = source0;
+						const uint16_t *source = source0;
 						uint32_t *dest = dest0;
 						uint8_t *pri = pri0;
 
@@ -2741,7 +2741,7 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangl
 	if( gfx )
 	{
 		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const uint8_t *code_base = gfx->get_data(code % gfx->elements());
+		const uint16_t *code_base = gfx->get_data(code % gfx->elements());
 
 		{
 			/* compute sprite increment per screen pixel */
@@ -2805,7 +2805,7 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangl
 					int y;
 					for( y=sy; y<ey; y++ )
 					{
-						const uint8_t *source = code_base + (y_index>>16) * 16;
+						const uint16_t *source = code_base + (y_index>>16) * 16;
 						uint32_t *dest = &dest_bmp.pix32(y);
 						uint8_t *pri = &m_pri_alp_bitmap.pix8(y);
 

@@ -387,7 +387,7 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
 	sy = sy + 16;
 
-	const u8* gfx = decodegfx->get_data(code);
+	const u16* gfx = decodegfx->get_data(code);
 
 	flipy = (flipy) ? 0x0f : 0;
 	flipx = (flipx) ? 0x0f : 0;

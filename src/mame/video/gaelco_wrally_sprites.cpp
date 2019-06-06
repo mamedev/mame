@@ -93,7 +93,7 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 		}
 
 		// wrally adjusts sx by 0x0f, blmbycar implementation was 0x10
-		const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
+		const uint16_t *gfx_src = gfx->get_data(number % gfx->elements());
 
 		for (int py = 0; py < gfx->height(); py++)
 		{

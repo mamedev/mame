@@ -129,7 +129,7 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 {
 	/* Start drawing */
 	const u16 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u8 *source_base = gfx->get_data(code % gfx->elements());
+	const u16 *source_base = gfx->get_data(code % gfx->elements());
 
 	int xinc = flipx ? -1 : 1;
 	int yinc = flipy ? -1 : 1;
@@ -171,12 +171,12 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * gfx->rowbytes();
+			const u16 *source = source_base + y_index * gfx->rowbytes();
 			u16 *dest = &dest_bmp.pix16(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
-				u8 c = source[x_index];
+				const u16 c = source[x_index];
 				if (c != transparent_color)
 				{
 					if (flicker) // verified from PCB (reference : https://www.youtube.com/watch?v=ooXyyvpW1O0)

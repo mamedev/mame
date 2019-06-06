@@ -41,12 +41,12 @@ void jedi_state::video_start()
 	u8 *dest = srcdata;
 	for (int c = 0; c < gx0->elements(); c++)
 	{
-		const u8 *c0base = gx0->get_data(c);
+		const u16 *c0base = gx0->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gx0->height(); y++)
 		{
-			const u8 *c0 = c0base;
+			const u16 *c0 = c0base;
 
 			for (int x = 0; x < gx0->width(); x++)
 			{
@@ -59,6 +59,35 @@ void jedi_state::video_start()
 
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(1);
+
+	/* the text layer pixel determines pen address bits A8 and A9 */
+	gfx_element *gx1 = m_gfxdecode->gfx(0);
+
+	// allocate memory for the assembled data
+	u16 *srcdata16 = auto_alloc_array(machine(), u16, gx1->elements() * gx1->width() * gx1->height());
+
+	// loop over elements
+	u16 *dest16 = srcdata16;
+	for (int c = 0; c < gx1->elements(); c++)
+	{
+		const u16 *c1base = gx1->get_data(c);
+
+		// loop over height
+		for (int y = 0; y < gx1->height(); y++)
+		{
+			const u16 *c1 = c1base;
+
+			for (int x = 0; x < gx1->width(); x++)
+			{
+				const u16 pix = (*c1++ & 0x3);
+				*dest16++ = pix << 8;
+			}
+			c1base += gx1->rowbytes();
+		}
+	}
+
+	gx1->set_raw_layout(srcdata16, gx1->width(), gx1->height(), gx1->elements(), 16 * gx1->width(), 16 * gx1->width() * gx1->height());
+	gx1->set_granularity(1);
 #endif
 
 	/* register for saving */

@@ -401,7 +401,7 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 	// set up the default tile data
 	memset(&m_tileinfo, 0, sizeof(m_tileinfo));
 	m_tileinfo.decoder = &decoder;
-	m_tileinfo.pen_mask = 0xff;
+	m_tileinfo.pen_mask = 0xffff;
 	m_tileinfo.gfxnum = 0xff;
 
 	// allocate transparency mapping data
@@ -780,7 +780,7 @@ g_profiler.stop();
 //  the palette_base
 //-------------------------------------------------
 
-u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask)
+u8 tilemap_t::tile_draw(const u16 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u16 pen_mask)
 {
 	// OR in the force layer flags
 	category |= flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2);
@@ -816,7 +816,7 @@ u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 
 		int xoffs = 0;
 		for (u16 tx = 0; tx < m_tilewidth; tx++)
 		{
-			u8 pen = (*pendata++) & pen_mask;
+			u16 pen = (*pendata++) & pen_mask;
 			u8 map = penmap[pen];
 			pixptr[xoffs] = palette_base + pen;
 			flagsptr[xoffs] = map | category;

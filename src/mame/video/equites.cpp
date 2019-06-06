@@ -310,7 +310,7 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 //      const uint8_t * const xromline = xrom + (scalex << 4);
 		const uint8_t * const yromline = yrom + (scaley << 4) + (15 - scaley);
-		const uint8_t* const srcgfx = gfx->get_data(tile);
+		const uint16_t* const srcgfx = gfx->get_data(tile);
 		const pen_t *paldata = &m_palette->pen(gfx->colorbase() + gfx->granularity() * color);
 		int x,yy;
 
