@@ -54,9 +54,6 @@ class abstract_ata_interface_device : public device_t
 {
 public:
 	// static configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dmarq_handler(Object &&cb) { return m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dasp_handler(Object &&cb) { return m_dasp_handler.set_callback(std::forward<Object>(cb)); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto dmarq_handler() { return m_dmarq_handler.bind(); }
 	auto dasp_handler() { return m_dasp_handler.bind(); }

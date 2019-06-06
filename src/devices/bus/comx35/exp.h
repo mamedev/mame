@@ -59,7 +59,6 @@ public:
 
 	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 	auto irq_callback() { return m_write_irq.bind(); }
 
 	uint8_t mrd_r(offs_t offset, int *extrom);

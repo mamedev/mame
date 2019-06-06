@@ -46,8 +46,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rx_w);
 	DECLARE_WRITE_LINE_MEMBER(clk_w);
 
-	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_clk_cb(Object &&cb) { return clk_cb.set_callback(std::forward<Object>(cb)); }
 	auto tx_handler() { return tx_cb.bind(); }
 	auto clk_handler() { return clk_cb.bind(); }
 

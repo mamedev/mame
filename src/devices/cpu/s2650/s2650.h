@@ -32,9 +32,6 @@ public:
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_sense_handler(Object &&cb) { return m_sense_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_flag_handler(Object &&cb) { return m_flag_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_intack_handler(Object &&cb) { return m_intack_handler.set_callback(std::forward<Object>(cb)); }
 	auto sense_handler() { return m_sense_handler.bind(); }
 	auto flag_handler() { return m_flag_handler.bind(); }
 	auto intack_handler() { return m_intack_handler.bind(); }

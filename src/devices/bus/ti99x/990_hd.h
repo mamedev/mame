@@ -15,8 +15,6 @@ class ti990_hdc_device : public device_t
 public:
 	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_interrupt_callback.set_callback(std::forward<Object>(cb)); }
-
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 

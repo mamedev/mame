@@ -269,7 +269,6 @@ public:
 		m_screen_update_rgb32 = callback;
 	}
 
-	template<class Object> devcb_base &set_screen_vblank(Object &&object) { return m_screen_vblank.set_callback(std::forward<Object>(object)); }
 	auto screen_vblank() { return m_screen_vblank.bind(); }
 	auto scanline() { m_video_attributes |= VIDEO_UPDATE_SCANLINE; return m_scanline_cb.bind(); }
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
@@ -557,8 +556,6 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
 	downcast<screen_device &>(*device).set_screen_update(_device, &_class::_method, #_class "::" #_method);
-#define MCFG_SCREEN_VBLANK_CALLBACK(_devcb) \
-	downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	downcast<screen_device &>(*device).set_palette(_palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \

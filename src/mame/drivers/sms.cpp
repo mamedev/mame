@@ -521,7 +521,7 @@ void sms_state::sms_ntsc_base(machine_config &config)
 
 /*
     For SMS drivers, the ratio between CPU and pixel clocks, set through dividers, is 2/3. The
-    division that sets the pixel clock, in MCFG_SCREEN_RAW_PARAMS(), results in a remainder
+    division that sets the pixel clock, in screen.set_raw(), results in a remainder
     that is discarded internally. Due to this rounding, the cycle time and the screen pixel
     time, derived from their clocks, do not longer match (inversely) the exact original ratio
     of these clocks. The SMS VDP emulation controls some properties (counters/flags) through
@@ -532,47 +532,57 @@ void sms_state::sms_ntsc_base(machine_config &config)
     elapsed time by the pixel time, the obtained pixel count may be less than expected. Flubba's
     VDPTest ROM relies on exact results. A workaround is to use an additional macro, for each
     driver, that resets the refresh rate, and by consequence the pixel time, without discarding
-    the remainder of the division. If the core is fixed in the future, the MCFG_SCREEN_REFRESH_RATE
-    lines after each MCFG_SCREEN_RAW_PARAMS call below can be removed.
+    the remainder of the division. If the core is fixed in the future, the screen.set_refresh_hz
+    lines after each screen.set_raw call below can be removed.
 */
 
-#define MCFG_SCREEN_SMS_PAL_RAW_PARAMS(_pixelclock) \
-	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		sega315_5124_device::WIDTH, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
-		sega315_5124_device::HEIGHT_PAL, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240) \
-	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
+template <typename X>
+void sms_state::screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock)
+{
+	screen.set_raw(std::forward<X>(pixelclock),
+		sega315_5124_device::WIDTH,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
+		sega315_5124_device::HEIGHT_PAL,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240);
+	screen.set_refresh_hz(pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL));
+}
 
-#define MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(_pixelclock) \
-	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		sega315_5124_device::WIDTH, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
-		sega315_5124_device::HEIGHT_NTSC, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224) \
-	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+template <typename X>
+void sms_state::screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock)
+{
+	screen.set_raw(std::forward<X>(pixelclock),
+		sega315_5124_device::WIDTH,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
+		sega315_5124_device::HEIGHT_NTSC,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	screen.set_refresh_hz(pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+}
 
-#define MCFG_SCREEN_GG_RAW_PARAMS(_pixelclock) \
-	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		sega315_5124_device::WIDTH, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8, \
-		sega315_5124_device::HEIGHT_NTSC, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 ) \
-	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+template <typename X>
+void sms_state::screen_gg_raw_params(screen_device &screen, X &&pixelclock)
+{
+	screen.set_raw(std::forward<X>(pixelclock),
+		sega315_5124_device::WIDTH,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8,
+		sega315_5124_device::HEIGHT_NTSC,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 );
+	screen.set_refresh_hz(pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms2_ntsc)
+void sms_state::sms2_ntsc(machine_config &config)
+{
 	sms_ntsc_base(config);
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
 	SEGA315_5246(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
@@ -582,28 +592,29 @@ MACHINE_CONFIG_START(sms_state::sms2_ntsc)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms1_ntsc)
+void sms_state::sms1_ntsc(machine_config &config)
+{
 	sms_ntsc_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_left)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_ntsc_raw_params(*m_left_lcd, XTAL(10'738'635)/2);
+	m_left_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1_left));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_right)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_ntsc_raw_params(*m_right_lcd, XTAL(10'738'635)/2);
+	m_right_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1_right));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms_state::screen_vblank_sms1));
 
 	config.set_default_layout(layout_sms1);
 
@@ -623,7 +634,7 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 void smssdisp_state::sms_sdisp(machine_config &config)
 {
@@ -659,13 +670,14 @@ void sms_state::sms_pal_base(machine_config &config)
 	config.m_minimum_quantum = attotime::from_hz(50);
 }
 
-MACHINE_CONFIG_START(sms_state::sms2_pal)
+void sms_state::sms2_pal(machine_config &config)
+{
 	sms_pal_base(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
 	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PAL/5);
 	m_vdp->set_screen(m_main_scr);
@@ -675,27 +687,28 @@ MACHINE_CONFIG_START(sms_state::sms2_pal)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_pal)
+void sms_state::sms1_pal(machine_config &config)
+{
 	sms_pal_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PAL/10);
+	m_left_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PAL/10);
+	m_right_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms_state::screen_vblank_sms1));
 
 	config.set_default_layout(layout_sms1);
 
@@ -715,7 +728,7 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 
 void sms_state::sms_paln_base(machine_config &config)
@@ -729,13 +742,14 @@ void sms_state::sms_paln_base(machine_config &config)
 	config.m_minimum_quantum = attotime::from_hz(50);
 }
 
-MACHINE_CONFIG_START(sms_state::sms3_paln)
+void sms_state::sms3_paln(machine_config &config)
+{
 	sms_paln_base(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
 	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PALN);
 	m_vdp->set_screen(m_main_scr);
@@ -745,27 +759,28 @@ MACHINE_CONFIG_START(sms_state::sms3_paln)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_paln)
+void sms_state::sms1_paln(machine_config &config)
+{
 	sms_paln_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PALN/2);
+	m_left_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PALN/2);
+	m_right_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms_state::screen_vblank_sms1));
 
 	config.set_default_layout(layout_sms1);
 
@@ -785,7 +800,7 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 
 void sms_state::sms_br_base(machine_config &config)
@@ -800,13 +815,14 @@ void sms_state::sms_br_base(machine_config &config)
 	config.m_minimum_quantum = attotime::from_hz(60);
 }
 
-MACHINE_CONFIG_START(sms_state::sms3_br)
+void sms_state::sms3_br(machine_config &config)
+{
 	sms_br_base(config);
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
 	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PALM);
 	m_vdp->set_screen(m_main_scr);
@@ -816,28 +832,29 @@ MACHINE_CONFIG_START(sms_state::sms3_br)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_br)
+void sms_state::sms1_br(machine_config &config)
+{
 	sms_br_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_ntsc_raw_params(*m_left_lcd, MASTER_CLOCK_PALM/2);
+	m_left_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_ntsc_raw_params(*m_right_lcd, MASTER_CLOCK_PALM/2);
+	m_right_lcd->set_screen_update(FUNC(sms_state::screen_update_sms1));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms_state::screen_vblank_sms1));
 
 	config.set_default_layout(layout_sms1);
 
@@ -857,7 +874,7 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 
 void sms_state::sms2_kr(machine_config &config)
@@ -939,7 +956,8 @@ void sms_state::sg1000m3(machine_config &config)
 	m_has_jpn_sms_cart_slot = true;
 }
 
-MACHINE_CONFIG_START(sms_state::gamegear)
+void sms_state::gamegear(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_GG/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
@@ -948,9 +966,9 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_GG_RAW_PARAMS(MASTER_CLOCK_GG/6)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_gamegear)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_LCD);
+	screen_gg_raw_params(*m_main_scr, MASTER_CLOCK_GG/6);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_gamegear));
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
@@ -979,7 +997,7 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	m_is_gamegear = true;
 	m_has_bios_0400 = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 void sms_state::gamegeaj(machine_config &config)
 {

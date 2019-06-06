@@ -27,18 +27,11 @@ public:
 	// configuration helpers
 	void set_decryption_table(const uint8_t *decryption_table) { m_v25v35_decryptiontable = decryption_table; }
 
-	template <class Object> devcb_base &set_pt_in_cb(Object &&cb) { return m_pt_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p0_in_cb(Object &&cb) { return m_p0_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p1_in_cb(Object &&cb) { return m_p1_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p2_in_cb(Object &&cb) { return m_p2_in.set_callback(std::forward<Object>(cb)); }
 	auto pt_in_cb() { return m_pt_in.bind(); }
 	auto p0_in_cb() { return m_p0_in.bind(); }
 	auto p1_in_cb() { return m_p1_in.bind(); }
 	auto p2_in_cb() { return m_p2_in.bind(); }
 
-	template <class Object> devcb_base &set_p0_out_cb(Object &&cb) { return m_p0_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p1_out_cb(Object &&cb) { return m_p1_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p2_out_cb(Object &&cb) { return m_p2_out.set_callback(std::forward<Object>(cb)); }
 	auto p0_out_cb() { return m_p0_out.bind(); }
 	auto p1_out_cb() { return m_p1_out.bind(); }
 	auto p2_out_cb() { return m_p2_out.bind(); }

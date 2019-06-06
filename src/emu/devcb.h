@@ -24,75 +24,6 @@
 
 
 //**************************************************************************
-//  LEGACY SYNAX SUPPORT - WILL BE REMOVED
-//**************************************************************************
-
-#include <tuple>
-
-#define DEVCB_READ8(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_READ16(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_READ32(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_READLINE(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-
-#define DEVCB_WRITE8(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_WRITE16(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_WRITE32(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_WRITELINE(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-
-template <typename T> struct devcb_constant_t { T m_value; };
-template <typename T> auto DEVCB_CONSTANT(T &&value) { return devcb_constant_t<std::decay_t<T> >{ std::forward<T>(value) }; }
-
-struct DEVCB_IOPORT
-{
-	constexpr DEVCB_IOPORT(char const *tag) : m_tag(tag) { }
-	char const *m_tag;
-};
-
-struct DEVCB_INPUTLINE
-{
-	constexpr DEVCB_INPUTLINE(char const *tag, int linenum) : m_tag(tag), m_linenum(linenum) { }
-	char const *m_tag;
-	int m_linenum;
-};
-
-struct DEVCB_ASSERTLINE
-{
-	constexpr DEVCB_ASSERTLINE(char const *tag, int linenum) : m_tag(tag), m_linenum(linenum) { }
-	char const *m_tag;
-	int m_linenum;
-};
-
-struct DEVCB_CLEARLINE
-{
-	constexpr DEVCB_CLEARLINE(char const *tag, int linenum) : m_tag(tag), m_linenum(linenum) { }
-	char const *m_tag;
-	int m_linenum;
-};
-
-struct DEVCB_HOLDLINE
-{
-	constexpr DEVCB_HOLDLINE(char const *tag, int linenum) : m_tag(tag), m_linenum(linenum) { }
-	char const *m_tag;
-	int m_linenum;
-};
-
-struct DEVCB_MEMBANK
-{
-	constexpr DEVCB_MEMBANK(char const *tag) : m_tag(tag) { }
-	char const *m_tag;
-};
-
-struct DEVCB_OUTPUT
-{
-	constexpr DEVCB_OUTPUT(char const *tag) : m_tag(tag) { }
-	char const *m_tag;
-};
-
-enum devcb_noop_t { DEVCB_NOOP };
-
-
-
-//**************************************************************************
 //  DETECT PROBLEMATIC COMPILERS
 //**************************************************************************
 
@@ -964,21 +895,6 @@ public:
 
 	binder bind();
 	void reset();
-
-	// legacy syntax support - will be removed
-	template <typename T, typename U, typename V>
-	devcb_base &set_callback(std::tuple<T, U, V> const &desc)
-	{
-		bind().set(std::forward<T>(std::get<0>(desc)), std::forward<U>(std::get<1>(desc)), std::forward<V>(std::get<2>(desc)));
-		return *this;
-	}
-	devcb_base &set_callback(DEVCB_IOPORT &&desc) { bind().set_ioport(desc.m_tag); return *this; }
-	template <typename T>
-	devcb_base &set_callback(devcb_constant_t<T> &&desc)
-	{
-		bind().set_constant(std::move(desc.m_value));
-		return *this;
-	}
 
 	virtual void validity_check(validity_checker &valid) const override;
 
@@ -2449,21 +2365,6 @@ public:
 
 	binder bind();
 	void reset();
-
-	// legacy syntax support - will be removed
-	template <typename T, typename U, typename V>
-	devcb_base &set_callback(std::tuple<T, U, V> const &desc)
-	{
-		bind().set(std::forward<T>(std::get<0>(desc)), std::forward<U>(std::get<1>(desc)), std::forward<V>(std::get<2>(desc)));
-		return *this;
-	}
-	devcb_base &set_callback(DEVCB_INPUTLINE &&desc) { bind().set_inputline(desc.m_tag, desc.m_linenum); return *this; }
-	devcb_base &set_callback(DEVCB_ASSERTLINE &&desc) { bind().set_inputline(desc.m_tag, desc.m_linenum, ASSERT_LINE); return *this; }
-	devcb_base &set_callback(DEVCB_CLEARLINE &&desc) { bind().set_inputline(desc.m_tag, desc.m_linenum, CLEAR_LINE); return *this; }
-	devcb_base &set_callback(DEVCB_HOLDLINE &&desc) { bind().set_inputline(desc.m_tag, desc.m_linenum, HOLD_LINE); return *this; }
-	devcb_base &set_callback(DEVCB_MEMBANK &&desc) { bind().set_membank(desc.m_tag); return *this; }
-	devcb_base &set_callback(DEVCB_OUTPUT &&desc) { bind().set_output(desc.m_tag); return *this; }
-	devcb_base &set_callback(devcb_noop_t desc) { bind().set_nop(); return *this; }
 
 	virtual void validity_check(validity_checker &valid) const override;
 

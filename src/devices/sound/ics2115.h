@@ -18,7 +18,6 @@ public:
 	// construction/destruction
 	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	auto irq() { return m_irq_cb.bind(); }
 
 	u8 read(offs_t offset);
