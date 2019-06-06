@@ -211,8 +211,11 @@ protected:
 			b = clr0.b;
 		}
 
-
+#ifdef LSB_FIRST
 		u8 b, g, r, t;
+#else
+		u8 t, r, g, b;
+#endif
 	};
 
 	typedef clr_t colour_t;
