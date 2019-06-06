@@ -53,6 +53,7 @@
 				#if _SMODE == 0
 				//g_profiler.start(PROFILER_USER7);
 
+
 					#if _DMODE == 0
 					//g_profiler.start(PROFILER_USER1);
 					// this is used extensively in the games (ingame, futari title screens etc.)
@@ -179,11 +180,12 @@
 #endif
 #endif
 
+
 			#endif
 
 			// write result
-			*bmp = s_clr.trgb.to_pen() | (pen & 0x20000000);
-			//*bmp = (s_clr.u32 << 3)|(pen & 0x20000000); // using the union is actually significantly slower than our to_pen function!
+			*bmp = s_clr.trgb.to_pen()|(pen&0x20000000);
+			//*bmp = (s_clr.u32<<3)|(pen&0x20000000); // using the union is actually significantly slower than our to_pen function!
 
 #endif // END NOT REALLY SIMPLE
 
