@@ -112,6 +112,7 @@ public:
 	void expcard(machine_config &config);
 	void xplan(machine_config &config);
 	void xtrain(machine_config &config);
+	void ptrain(machine_config &config);
 
 	void init_bishjan();
 	void init_new2001();
@@ -178,6 +179,7 @@ private:
 	DECLARE_WRITE8_MEMBER(saklove_outputs_w);
 	DECLARE_WRITE8_MEMBER(xplan_outputs_w);
 	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
+	DECLARE_READ8_MEMBER(xtrain_subsino_r);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
 
@@ -201,6 +203,7 @@ private:
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
 	void xtrain_io(address_map &map);
+	void ptrain_io(address_map &map);
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -1528,6 +1531,14 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
+READ8_MEMBER(subsino2_state::xtrain_subsino_r)
+{
+	// xtrain immediately ends the payout when this matches
+	// but mtrain refuses to payout if this doesn't match
+	static const char data[] = { "SUBSINO" };
+	return data[offset];
+}
+
 void subsino2_state::expcard_io(address_map &map)
 {
 	xplan_common_io(map);
@@ -1542,6 +1553,12 @@ void subsino2_state::xtrain_io(address_map &map)
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
+}
+
+void subsino2_state::ptrain_io(address_map &map)
+{
+	xtrain_io(map);
+	map(0x0313, 0x0319).r(FUNC(subsino2_state::xtrain_subsino_r));
 }
 
 
@@ -2555,6 +2572,12 @@ void subsino2_state::xtrain(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xtrain_io);
 }
 
+void subsino2_state::ptrain(machine_config &config)
+{
+	xtrain(config);
+	m_maincpu->set_addrmap(AS_IO, &subsino2_state::ptrain_io);
+}
+
 void subsino2_state::expcard(machine_config &config)
 {
 	xplan(config);
@@ -3329,7 +3352,7 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove
 
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
-GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptrain,   0,        ptrain,   xtrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 
