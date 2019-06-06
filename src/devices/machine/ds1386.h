@@ -74,8 +74,11 @@
 
 #pragma once
 
+#include "dirtc.h"
+
 class ds1386_device : public device_t,
-					  public device_nvram_interface
+					  public device_nvram_interface,
+					  public device_rtc_interface
 {
 public:
 	auto inta() { return m_inta_cb.bind(); }
@@ -122,13 +125,17 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return false; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	static constexpr device_timer_id CLOCK_TIMER = 0;
 	static constexpr device_timer_id SQUAREWAVE_TIMER = 1;

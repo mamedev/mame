@@ -97,6 +97,10 @@ public:
 	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	template <typename X> static void screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock);
+	template <typename X> static void screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock);
+	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
+
 	DECLARE_READ8_MEMBER(read_0000);
 	DECLARE_READ8_MEMBER(read_4000);
 	DECLARE_READ8_MEMBER(read_8000);

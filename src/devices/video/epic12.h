@@ -211,14 +211,17 @@ protected:
 			b = clr0.b;
 		}
 
-
+#ifdef LSB_FIRST
 		u8 b, g, r, t;
+#else
+		u8 t, r, g, b;
+#endif
 	};
 
 	union colour_t
 	{
 		clr_t trgb;
-		u32 u32;
+		u32 data;
 	};
 
 	typedef void (*blitfunction)(

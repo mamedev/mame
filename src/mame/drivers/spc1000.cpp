@@ -222,11 +222,14 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) && (time - m_time).as_attoseconds()/ATTOSECONDS_PER_MICROSECOND > 100)
+	if (BIT(data, 1) || (((time - m_time).as_attoseconds()/ATTOSECONDS_PER_MILLISECOND) < 1000))
 	{
-		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
 	}
+	else
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 

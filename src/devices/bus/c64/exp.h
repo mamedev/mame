@@ -67,12 +67,6 @@ public:
 
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_write_reset.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_rd_callback(Object &&cb) { return m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto nmi_callback() { return m_write_nmi.bind(); }
 	auto reset_callback() { return m_write_reset.bind(); }

@@ -98,8 +98,8 @@ class ttl74174_device : public ttl741745_device
 public:
 	ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_q5_cb(Object &&cb) { return m_q5_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_q6_cb(Object &&cb) { return m_q6_func.set_callback(std::forward<Object>(cb)); }
+	auto q5_cb() { return m_q5_func.bind(); }
+	auto q6_cb() { return m_q6_func.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( d5_w );
 	DECLARE_WRITE_LINE_MEMBER( d6_w );
@@ -126,10 +126,10 @@ class ttl74175_device : public ttl741745_device
 public:
 	ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_not_q1_cb(Object &&cb) { return m_not_q1_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_not_q2_cb(Object &&cb) { return m_not_q2_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_not_q3_cb(Object &&cb) { return m_not_q3_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_not_q4_cb(Object &&cb) { return m_not_q4_func.set_callback(std::forward<Object>(cb)); }
+	auto not_q1_cb() { return m_not_q1_func.bind(); }
+	auto not_q2_cb() { return m_not_q2_func.bind(); }
+	auto not_q3_cb() { return m_not_q3_func.bind(); }
+	auto not_q4_cb() { return m_not_q4_func.bind(); }
 
 protected:
 	virtual void device_start() override;

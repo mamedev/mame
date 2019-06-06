@@ -4010,6 +4010,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/systel1.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
+	MAME_DIR .. "src/mame/drivers/tasc.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/telex274.cpp",

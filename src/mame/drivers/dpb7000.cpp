@@ -53,6 +53,8 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static constexpr device_timer_id TIMER_DISKSEQ = 0;
+	static constexpr device_timer_id TIMER_FIELD_IN = 1;
+	static constexpr device_timer_id TIMER_FIELD_OUT = 1;
 
 	DECLARE_READ16_MEMBER(bus_error_r);
 	DECLARE_WRITE16_MEMBER(bus_error_w);
@@ -102,6 +104,8 @@ private:
 	required_memory_region m_diskseq_prom;
 
 	emu_timer *m_diskseq_clk;
+	emu_timer *m_field_in_clk;
+	emu_timer *m_field_out_clk;
 
 	enum : uint8_t
 	{
@@ -309,6 +313,13 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_cc_inputs));
 
 	m_diskseq_clk = timer_alloc(TIMER_DISKSEQ);
+	m_diskseq_clk->adjust(attotime::never);
+
+	m_field_in_clk = timer_alloc(TIMER_FIELD_IN);
+	m_field_in_clk->adjust(attotime::never);
+
+	m_field_out_clk = timer_alloc(TIMER_FIELD_IN);
+	m_field_out_clk->adjust(attotime::never);
 }
 
 void dpb7000_state::machine_reset()
@@ -329,14 +340,18 @@ void dpb7000_state::machine_reset()
 	memset(m_diskseq_cc_inputs, 0, 4);
 
 	m_diskseq_clk->adjust(attotime::from_hz(1000000), 0, attotime::from_hz(1000000));
+	m_field_in_clk->adjust(attotime::from_hz(59.94), 0, attotime::from_hz(59.94));
+	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 9.0), 0, attotime::from_hz(59.94));
 }
 
 void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_DISKSEQ)
-	{
 		diskseq_tick();
-	}
+	else if (id == TIMER_FIELD_IN)
+		req_a_w(1);
+	else if (id == TIMER_FIELD_OUT)
+		req_a_w(0);
 }
 
 MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
