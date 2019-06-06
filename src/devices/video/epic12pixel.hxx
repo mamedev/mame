@@ -183,7 +183,7 @@
 
 			// write result
 			*bmp = s_clr.trgb.to_pen() | (pen & 0x20000000);
-			//*bmp = (s_clr.data << 3)|(pen & 0x20000000); // using the union is actually significantly slower than our to_pen function!
+			//*bmp = (s_clr.data << 3) | (pen & 0x20000000); // using the union is actually significantly slower than our to_pen function!
 
 #endif // END NOT REALLY SIMPLE
 
