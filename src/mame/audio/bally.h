@@ -161,10 +161,10 @@ private:
 	DECLARE_READ8_MEMBER(pia_porta_r);
 	DECLARE_WRITE8_MEMBER(pia_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
 	DECLARE_READ8_MEMBER(ay_io_r);
 
-	void update_sound_selects();
+	void update_ay_bus();
 };
 
 

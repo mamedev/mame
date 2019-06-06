@@ -215,9 +215,9 @@ TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_int_sync)
 
 
 //-------------------------------------------------
-//  irq_w - IRQ line state changes
+//  pia_irq_w - IRQ line state changes
 //-------------------------------------------------
-WRITE_LINE_MEMBER(bally_as3022_device::irq_w)
+WRITE_LINE_MEMBER(bally_as3022_device::pia_irq_w)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -250,8 +250,8 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(bally_as3022_device::pia_porta_w));
 	m_pia->writepb_handler().set(FUNC(bally_as3022_device::pia_portb_w));
 	m_pia->cb2_handler().set(FUNC(bally_as3022_device::pia_cb2_w));
-	m_pia->irqa_handler().set(FUNC(bally_as3022_device::irq_w));
-	m_pia->irqb_handler().set(FUNC(bally_as3022_device::irq_w));
+	m_pia->irqa_handler().set(FUNC(bally_as3022_device::pia_irq_w));
+	m_pia->irqb_handler().set(FUNC(bally_as3022_device::pia_irq_w));
 
         for (required_device<filter_rc_device> &filter : m_ay_filters)
 		// TODO: Calculate exact filter values. An AC filter is good enough for now
@@ -310,7 +310,7 @@ WRITE8_MEMBER(bally_as3022_device::pia_porta_w)
 		logerror("PIA port A bus contention!\n");
 	}
 	m_ay_data = data;
-	update_sound_selects();
+	update_ay_bus();
 }
 
 //-------------------------------------------------
@@ -324,7 +324,7 @@ WRITE8_MEMBER(bally_as3022_device::pia_portb_w)
 	{
 		m_ay_data = m_ay->data_r();
 	}
-	update_sound_selects();
+	update_ay_bus();
 }
 
 //-------------------------------------------------
@@ -356,7 +356,7 @@ READ8_MEMBER(bally_as3022_device::ay_io_r)
 	return ~m_sound_select & 0x3f;
 }
 
-void bally_as3022_device::update_sound_selects()
+void bally_as3022_device::update_ay_bus()
 {
 	if (m_bc1 && m_bdir)
 	{
