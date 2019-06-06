@@ -52,6 +52,19 @@
 		</part>
 	</software>
 
+	<software name="wbxlboot" supported="no">
+		<description>WinBook XL Boot Disk</description>
+		<year>1997</year>
+		<publisher>WinBook Computer</publisher>
+		<info name="serial" value="XL21A" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Disk - Windows 95"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="WinBook XL - Boot Disk Windows 95 - XL21A.img" size="1474560" crc="008734c0" sha1="feda8737a60d7a7a9ecc3d279cd03ff8dec3a5d1"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- OS Disks -->
 	<software name="alflinux" supported="no">
 		<description>Alfalinux 0.3.1 -Laetitia-</description>
@@ -5453,22 +5466,15 @@
 		</part>
 	</software>
 
-	<software name="winbkxl" supported="no">
+	<software name="wbxlaud" supported="no">
 		<description>WinBook XL Audio</description>
 		<year>1997</year>
 		<publisher>WinBook Computer</publisher>
+		<info name="serial" value="XL1A" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Audio - Windows 95 - DOS"/>
-			<feature name="disk_serial" value="XL1A" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="WinBook XL Audio Windows 95 DOS XL1A.img" size="1474560" crc="57f622ed" sha1="0b4a1dac6e665ace47da65e46e28dfbfe392e4d8"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Boot Disk - Windows 95"/>
-			<feature name="disk_serial" value="XL21A" />
-			<dataarea name="flop" size = "1474560">
-				<rom name="WinBook XL - Boot Disk Windows 95 - XL21A.img" size="1474560" crc="008734c0" sha1="feda8737a60d7a7a9ecc3d279cd03ff8dec3a5d1"/>
 			</dataarea>
 		</part>
 	</software>
