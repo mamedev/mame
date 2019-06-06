@@ -6,6 +6,24 @@
 
 ***********************************************************************
                _____________
+    /INTA   1 |             | 28  Vcc
+       NC   2 |             | 27  /WE
+       NC   3 |             | 26  /INTB
+       NC   4 |             | 25  NC
+       A5   5 |             | 24  NC
+       A4   6 |             | 23  SQW
+       A3   7 |             | 22  /OE
+       A2   8 |             | 21  NC
+       A1   9 |             | 20  /CE
+       A0  10 |             | 19  DQ7
+      DQ0  11 |             | 18  DQ6
+      DQ1  12 |             | 17  DQ5
+      DQ2  13 |             | 16  DQ4
+      GND  14 |_____________| 15  DQ3
+
+               DS1286 (64 x 8)
+
+               _____________
     /INTA   1 |             | 32  Vcc
     /INTB   2 |             | 31  SQW
    NC/A14   3 |             | 30  Vcc
@@ -168,6 +186,12 @@ protected:
 	const size_t m_ram_size;
 };
 
+class ds1286_device : public ds1386_device
+{
+public:
+	ds1286_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class ds1386_8k_device : public ds1386_device
 {
 public:
@@ -180,6 +204,7 @@ public:
 	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+DECLARE_DEVICE_TYPE(DS1286,     ds1286_device)
 DECLARE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device)
 DECLARE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device)
 

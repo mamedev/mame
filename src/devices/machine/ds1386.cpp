@@ -27,8 +27,9 @@
 #define HOURS_12_24     (0x40)
 #define HOURS_AM_PM     (0x20)
 
-DEFINE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device,  "ds1386_8k",  "DS1386 RAMified Watchdog Timekeeper (8K)")
-DEFINE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device, "ds1386_32k", "DS1386 RAMified Watchdog Timekeeper (32K)")
+DEFINE_DEVICE_TYPE(DS1286,     ds1286_device,     "ds1286",     "DS1286 Watchdog Timekeeper")
+DEFINE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device,  "ds1386_8k",  "DS1386-8K RAMified Watchdog Timekeeper")
+DEFINE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device, "ds1386_32k", "DS1386-32K RAMified Watchdog Timekeeper")
 
 ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -57,6 +58,11 @@ ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, co
 	, m_months_enables(0)
 	, m_years(0)
 	, m_ram_size(size)
+{
+}
+
+ds1286_device::ds1286_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ds1386_device(mconfig, DS1286, tag, owner, clock, 64)
 {
 }
 
