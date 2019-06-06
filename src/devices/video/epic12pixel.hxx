@@ -37,18 +37,18 @@
 #endif
 
 			// convert source to clr
-			pen_to_clr(pen, &s_clr);
+			pen_to_clr(pen, &s_clr.trgb);
 			//s_clr.data = (pen >> 3); // using the union is actually significantly slower than our pen_to_clr to function!
 			// source * intesity and clamp
 
 #if TINT == 1
-			s_clr.mul(*tint_clr);
+			s_clr.trgb.mul(*tint_clr);
 #endif
 
 			#if BLENDED == 1
 
 				// convert destination to clr
-				pen_to_clr(*bmp, &d_clr);
+				pen_to_clr(*bmp, &d_clr.trgb);
 				//d_clr.data = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
 				#if _SMODE == 0
 				//g_profiler.start(PROFILER_USER7);
@@ -57,98 +57,98 @@
 					//g_profiler.start(PROFILER_USER1);
 					// this is used extensively in the games (ingame, futari title screens etc.)
 
-					s_clr.r = colrtable_add[salpha_table[(s_clr.r)]][dalpha_table[(d_clr.r)]];
-					s_clr.g = colrtable_add[salpha_table[(s_clr.g)]][dalpha_table[(d_clr.g)]];
-					s_clr.b = colrtable_add[salpha_table[(s_clr.b)]][dalpha_table[(d_clr.b)]];
+					s_clr.trgb.r = colrtable_add[salpha_table[(s_clr.trgb.r)]][dalpha_table[(d_clr.trgb.r)]];
+					s_clr.trgb.g = colrtable_add[salpha_table[(s_clr.trgb.g)]][dalpha_table[(d_clr.trgb.g)]];
+					s_clr.trgb.b = colrtable_add[salpha_table[(s_clr.trgb.b)]][dalpha_table[(d_clr.trgb.b)]];
 					#elif _DMODE == 1
 					//g_profiler.start(PROFILER_USER2);
 					// futari ~7%
-					s_clr.r = colrtable_add[salpha_table[(s_clr.r)]][colrtable[(s_clr.r)][(d_clr.r)]];
-					s_clr.g = colrtable_add[salpha_table[(s_clr.g)]][colrtable[(s_clr.g)][(d_clr.g)]];
-					s_clr.b = colrtable_add[salpha_table[(s_clr.b)]][colrtable[(s_clr.b)][(d_clr.b)]];
+					s_clr.trgb.r = colrtable_add[salpha_table[(s_clr.trgb.r)]][colrtable[(s_clr.trgb.r)][(d_clr.trgb.r)]];
+					s_clr.trgb.g = colrtable_add[salpha_table[(s_clr.trgb.g)]][colrtable[(s_clr.trgb.g)][(d_clr.trgb.g)]];
+					s_clr.trgb.b = colrtable_add[salpha_table[(s_clr.trgb.b)]][colrtable[(s_clr.trgb.b)][(d_clr.trgb.b)]];
 					#elif _DMODE == 2
 					//g_profiler.start(PROFILER_USER3);
-					clr0.mul_fixed(s_alpha, s_clr);
-					s_clr.add_with_clr_square(clr0, d_clr);
+					clr0.trgb.mul_fixed(s_alpha, s_clr.trgb);
+					s_clr.trgb.add_with_clr_square(clr0.trgb, d_clr.trgb);
 					#elif _DMODE == 3
 					//g_profiler.start(PROFILER_USER4);
-					clr0.mul_fixed(s_alpha, s_clr);
-					s_clr.add(clr0, d_clr);
+					clr0.trgb.mul_fixed(s_alpha, s_clr.trgb);
+					s_clr.trgb.add(clr0.trgb, d_clr.trgb);
 
 					#elif _DMODE == 4
 					//g_profiler.start(PROFILER_USER5);
-					clr0.mul_fixed(s_alpha, s_clr);
-					s_clr.add_with_clr_mul_fixed_rev(clr0, d_alpha, d_clr);
+					clr0.trgb.mul_fixed(s_alpha, s_clr.trgb);
+					s_clr.trgb.add_with_clr_mul_fixed_rev(clr0.trgb, d_alpha, d_clr.trgb);
 					#elif _DMODE == 5
 					// futari black character select ~13%
 					//g_profiler.start(PROFILER_USER6);
-					s_clr.r =  colrtable_add[salpha_table[(s_clr.r)]][colrtable_rev[(s_clr.r)][(d_clr.r)]];
-					s_clr.g =  colrtable_add[salpha_table[(s_clr.g)]][colrtable_rev[(s_clr.g)][(d_clr.g)]];
-					s_clr.b =  colrtable_add[salpha_table[(s_clr.b)]][colrtable_rev[(s_clr.b)][(d_clr.b)]];
+					s_clr.trgb.r =  colrtable_add[salpha_table[(s_clr.trgb.r)]][colrtable_rev[(s_clr.trgb.r)][(d_clr.trgb.r)]];
+					s_clr.trgb.g =  colrtable_add[salpha_table[(s_clr.trgb.g)]][colrtable_rev[(s_clr.trgb.g)][(d_clr.trgb.g)]];
+					s_clr.trgb.b =  colrtable_add[salpha_table[(s_clr.trgb.b)]][colrtable_rev[(s_clr.trgb.b)][(d_clr.trgb.b)]];
 
 					#elif _DMODE == 6
 					//g_profiler.start(PROFILER_USER7);
-					clr0.mul_fixed(s_alpha, s_clr);
-					s_clr.add_with_clr_mul_rev_square(clr0, d_clr);
+					clr0.trgb.mul_fixed(s_alpha, s_clr.trgb);
+					s_clr.trgb.add_with_clr_mul_rev_square(clr0.trgb, d_clr.trgb);
 					#elif _DMODE == 7
 					//g_profiler.start(PROFILER_USER8);
-					clr0.mul_fixed(s_alpha, s_clr);
-					s_clr.add(clr0, d_clr);
+					clr0.trgb.mul_fixed(s_alpha, s_clr.trgb);
+					s_clr.trgb.add(clr0.trgb, d_clr.trgb);
 					#endif
 
 				//g_profiler.stop();
 				#elif _SMODE == 1
 				//g_profiler.start(PROFILER_USER6);
-				clr0.square(s_clr);
+				clr0.trgb.square(s_clr.trgb);
 
 				#elif _SMODE == 2
 			//  g_profiler.start(PROFILER_USER4);
 					#if _DMODE == 0
 					// this is used heavily on espgal2 highscore screen (~28%) optimized to avoid use of temp clr0 variable
-					s_clr.r = colrtable_add[colrtable[(d_clr.r)][(s_clr.r)]][dalpha_table[(d_clr.r)]];
-					s_clr.g = colrtable_add[colrtable[(d_clr.g)][(s_clr.g)]][dalpha_table[(d_clr.g)]];
-					s_clr.b = colrtable_add[colrtable[(d_clr.b)][(s_clr.b)]][dalpha_table[(d_clr.b)]];
+					s_clr.trgb.r = colrtable_add[colrtable[(d_clr.trgb.r)][(s_clr.trgb.r)]][dalpha_table[(d_clr.trgb.r)]];
+					s_clr.trgb.g = colrtable_add[colrtable[(d_clr.trgb.g)][(s_clr.trgb.g)]][dalpha_table[(d_clr.trgb.g)]];
+					s_clr.trgb.b = colrtable_add[colrtable[(d_clr.trgb.b)][(s_clr.trgb.b)]][dalpha_table[(d_clr.trgb.b)]];
 					#elif _DMODE == 1
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add_with_clr_mul_3param(clr0, d_clr, s_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add_with_clr_mul_3param(clr0.trgb, d_clr.trgb, s_clr.trgb);
 					#elif _DMODE == 2
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add_with_clr_square(clr0, d_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add_with_clr_square(clr0.trgb, d_clr.trgb);
 					#elif _DMODE == 3
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add(clr0, d_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add(clr0.trgb, d_clr.trgb);
 
 					#elif _DMODE == 4
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add_with_clr_mul_fixed_rev(clr0, d_alpha, d_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add_with_clr_mul_fixed_rev(clr0.trgb, d_alpha, d_clr.trgb);
 					#elif _DMODE == 5
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add_with_clr_mul_rev_3param(clr0, d_clr, s_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add_with_clr_mul_rev_3param(clr0.trgb, d_clr.trgb, s_clr.trgb);
 					#elif _DMODE == 6
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add_with_clr_mul_rev_square(clr0, d_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add_with_clr_mul_rev_square(clr0.trgb, d_clr.trgb);
 					#elif _DMODE == 7
-					clr0.mul_3param(s_clr, d_clr);
-					s_clr.add(clr0, d_clr);
+					clr0.trgb.mul_3param(s_clr.trgb, d_clr.trgb);
+					s_clr.trgb.add(clr0.trgb, d_clr.trgb);
 					#endif
 				//g_profiler.stop();
 
 				#elif _SMODE == 3
 				//g_profiler.start(PROFILER_USER1);
-				clr0.copy(s_clr);
+				clr0.trgb.copy(s_clr.trgb);
 
 				#elif _SMODE == 4
 				//g_profiler.start(PROFILER_USER2);
-				clr0.mul_fixed_rev(s_alpha, s_clr);
+				clr0.trgb.mul_fixed_rev(s_alpha, s_clr.trgb);
 				#elif _SMODE == 5
 				//g_profiler.start(PROFILER_USER3);
-				clr0.mul_rev_square(s_clr);
+				clr0.trgb.mul_rev_square(s_clr.trgb);
 				#elif _SMODE == 6
 				//g_profiler.start(PROFILER_USER4);
-				clr0.mul_rev_3param(s_clr, d_clr);
+				clr0.trgb.mul_rev_3param(s_clr.trgb, d_clr.trgb);
 				#elif _SMODE == 7
 				//g_profiler.start(PROFILER_USER5);
-				clr0.copy(s_clr);
+				clr0.trgb.copy(s_clr.trgb);
 				#endif
 
 
@@ -157,22 +157,22 @@
 #if _SMODE != 0
 
 				#if _DMODE == 0
-				s_clr.add_with_clr_mul_fixed(clr0, d_alpha, d_clr);
+				s_clr.trgb.add_with_clr_mul_fixed(clr0.trgb, d_alpha, d_clr.trgb);
 				#elif _DMODE == 1
-				s_clr.add_with_clr_mul_3param(clr0, d_clr, s_clr);
+				s_clr.trgb.add_with_clr_mul_3param(clr0.trgb, d_clr.trgb, s_clr.trgb);
 				#elif _DMODE == 2
-				s_clr.add_with_clr_square(clr0, d_clr);
+				s_clr.trgb.add_with_clr_square(clr0.trgb, d_clr.trgb);
 				#elif _DMODE == 3
-				s_clr.add(clr0, d_clr);
+				s_clr.trgb.add(clr0.trgb, d_clr.trgb);
 
 				#elif _DMODE == 4
-				s_clr.add_with_clr_mul_fixed_rev(clr0, d_alpha, d_clr);
+				s_clr.trgb.add_with_clr_mul_fixed_rev(clr0.trgb, d_alpha, d_clr.trgb);
 				#elif _DMODE == 5
-				s_clr.add_with_clr_mul_rev_3param(clr0, d_clr, s_clr);
+				s_clr.trgb.add_with_clr_mul_rev_3param(clr0.trgb, d_clr.trgb, s_clr.trgb);
 				#elif _DMODE == 6
-				s_clr.add_with_clr_mul_rev_square(clr0, d_clr);
+				s_clr.trgb.add_with_clr_mul_rev_square(clr0.trgb, d_clr.trgb);
 				#elif _DMODE == 7
-				s_clr.add(clr0, d_clr);
+				s_clr.trgb.add(clr0.trgb, d_clr.trgb);
 				#endif
 
 				//g_profiler.stop();
@@ -182,7 +182,7 @@
 			#endif
 
 			// write result
-			*bmp = s_clr.to_pen() | (pen & 0x20000000);
+			*bmp = s_clr.trgb.to_pen() | (pen & 0x20000000);
 			//*bmp = (s_clr.data << 3)|(pen & 0x20000000); // using the union is actually significantly slower than our to_pen function!
 
 #endif // END NOT REALLY SIMPLE

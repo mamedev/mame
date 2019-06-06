@@ -218,14 +218,11 @@ protected:
 #endif
 	};
 
-	typedef clr_t colour_t;
-	/*
-	union colour_t // not endian-safe, currently de-union'd
+	union colour_t
 	{
 		clr_t trgb;
 		u32 data;
 	};
-	*/
 
 	typedef void (*blitfunction)(
 			bitmap_rgb32 *,
