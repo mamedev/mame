@@ -105,7 +105,7 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		int chainoffs = priority ? offs - ((w - 1) * 4) : offs; // or bandit breaks
 		for (int x = 0; x < w; x++)
 		{
-			if (chainoffs < size)
+			if ((chainoffs < size) && (chainoffs >= 0))
 			{
 				// maybe, birdie try appears to specify the base code for each part..
 				u16 code = spriteram[chainoffs + 1] & 0x1fff;
