@@ -68,6 +68,8 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	enum
@@ -89,7 +91,7 @@ private:
 	u16      m_cpua_ctrl;
 	s32      m_sci_int6;
 	s32      m_ioc220_port;
-	u8      m_eep_latch;
+	u8       m_eep_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -129,8 +131,6 @@ private:
 	u16 sci_spriteframe_r();
 	void sci_spriteframe_w(u16 data);
 	void contcirc_out_w(u8 data);
-	DECLARE_MACHINE_START(taitoz);
-	DECLARE_MACHINE_RESET(taitoz);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(chasehq);
 	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
