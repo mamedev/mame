@@ -442,7 +442,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #include "emu.h"
 #include "includes/cps1.h"
 
-#include "algorithm"
+#include <algorithm>
 
 #define VERBOSE 0
 
