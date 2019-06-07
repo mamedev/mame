@@ -51,6 +51,8 @@
 	6871: eor #$f7
 	6873: bne $68c8
 
+	It is not clear how to access Huntin'3 Test Mode (if possible) there do appear to be tiles for it tho
+
 	Huntin'3 appears to use the hardware much more extensively than other games and shows we need the following features
 	 - Raster Interrupt (Rowscroll in most game modes)
 	 - RAM based tiles (status bar in Shooting Range, text descriptions on menus etc.)
@@ -377,12 +379,18 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 		if (m_bytespertile == 2)
 		{
 			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
+
+			if (m_tilecfg[2] & 0x04) // palette in 4bpp mode at least
+			{
+				realpalette = palette | ((m_tilecfg[1] & 0xf0) >> 4);
+			}
 		}
 		else if (m_bytespertile == 4) // rad_foot hidden test mode, rad_hnt3 shooting range (not yet correct)
 		{
 			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);// | (m_mainram[i + 2] << 16) |  | (m_mainram[i + 3] << 24);
 
 			// m_mainram[i + 3] & 0x04 is set in both seen cases, maybe per-tile bpp?
+			// this would match up with this mode being inline replacements for m_tilecfg[1] and m_tilecfg[2];
 
 			if (m_tilecfg[2] & 0x04) // palette in 4bpp mode at least
 			{
@@ -411,7 +419,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int size;
 
 	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
-	// m_tilecfg[1]   ---t x--?    ? = used foot x = used, huntin3 summary (palette bank?) t = basketball test mode
+	// m_tilecfg[1]   pppp x--?    ? = used foot x = used, huntin3 summary (palette bank?) p = palette (used for different stages in huntin3 and the hidden test modes in others)
 	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
 
 	if (m_tilecfg[0] & 0x10)
