@@ -37,7 +37,7 @@
 
 	To access hidden test mode in Golden Tee Home hold back/backspin and left during power on.
 
-	To access hidden test mode in Basketball hold Right and Button 1 during power on.
+	To access hidden test mode in Basketball hold left and Button 1 during power on.
 
 	Huntin'3 appears to use the hardware much more extensively than other games and shows we need the following features
 	 - Raster Interrupt (Rowscroll in most game modes)
@@ -260,20 +260,7 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 	case 0x03: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
 	case 0x04: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
 	case 0x05: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
-	case 0x06: // 8x8 4bpp
-	{
-		bppdiv = 2;
-		if (m_bytespertile == 4) // maybe 4 bytes per tile mode always has finer addressing due to having more bits?
-		{
-			baseaddr += tileno * 32;
-			break;
-		}
-		else
-		{
-			baseaddr += tileno * 64;
-			break;
-		}
-	}
+	case 0x06: bppdiv = 2; baseaddr += tileno * 32;  break; // 8x8 4bpp
 	default: break;
 	}
 	const uint8_t *gfxdata = &m_mainregion[baseaddr & 0x3fffff];
@@ -412,7 +399,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int size;
 
 	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
-	// m_tilecfg[1]   ---- x--?    ? = used foot x = used, huntin3 summary (palette bank?)
+	// m_tilecfg[1]   ---t x--?    ? = used foot x = used, huntin3 summary (palette bank?) t = basketball test mode
 	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
 
 	if (m_tilecfg[0] & 0x10)
@@ -1136,8 +1123,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( radica_bask )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x08, 0x08, "IN0" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
