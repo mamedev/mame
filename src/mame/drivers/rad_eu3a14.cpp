@@ -271,7 +271,7 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix)
-							dst[realx] = pix;
+							dst[realx] = pix | (palette<<8);
 					}
 				}
 				else if (bppdiv == 2) // 4bpp
@@ -280,7 +280,7 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0xf0)
-							dst[realx] = (pix & 0xf0) >> 4;
+							dst[realx] = ((pix & 0xf0) >> 4) | (palette<<4);
 					}
 
 					realx++;
@@ -288,7 +288,7 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0x0f)
-							dst[realx] = pix & 0x0f;
+							dst[realx] = (pix & 0x0f) | (palette<<4);
 					}
 				}
 			}
@@ -303,6 +303,8 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 
 	int pagesize = m_pagewidth * m_pageheight * 2;
 
+	int palette = 0;
+
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 	if (m_tilecfg[2] & 0x04) // 4bpp selection
 	{
@@ -312,6 +314,11 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			gfxno = 6; // 8x8 4bpp
 		}
+
+		if (m_tilecfg[1] & 0x08)
+		{
+			palette += 16;
+		}
 	}
 	else // 8bpp selection
 	{
@@ -320,6 +327,11 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 		if (size == 8)
 		{
 			gfxno = 5; // 8x8 8bpp
+		}
+
+		if (m_tilecfg[1] & 0x08)
+		{
+			palette += 1;
 		}
 	}
 
@@ -339,7 +351,7 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);// | (m_mainram[i + 2] << 16) |  | (m_mainram[i + 3] << 24);
 		}
 
-		draw_tile(bitmap, cliprect, gfxno, tile, base, 0, 0, 0, xdraw, ydraw, 0, size);
+		draw_tile(bitmap, cliprect, gfxno, tile, base, palette, 0, 0, xdraw, ydraw, 0, size);
 
 		xdraw += size;
 
@@ -360,7 +372,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int size;
 
 	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
-	// m_tilecfg[1]   ---- ---?    ? = used foot
+	// m_tilecfg[1]   ---- x--?    ? = used foot x = used, huntin3 summary
 	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
 
 	if (m_tilecfg[0] & 0x10)
@@ -384,7 +396,6 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	{
 		m_bytespertile = 2;
 	}
-
 
 	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
 	{
@@ -414,6 +425,9 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	}
 	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
 	{
+	//	int base = (m_tilebase[1] << 8) | m_tilebase[0];
+	//	popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
+
 		// normal
 		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
 		// wrap x
@@ -741,13 +755,19 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5102, 0x5102).ram();
 	map(0x5103, 0x5106).ram();
 	map(0x5107, 0x5107).ram(); // on transitions, maybe layer disables?
+	map(0x5108, 0x5109).ram(); // hnt3, frequently rewrites same values, maybe something to do with raster irq?
 	map(0x5110, 0x5112).ram().share("tilecfg");
 	map(0x5113, 0x5113).ram(); // written with tilebase?
 	map(0x5114, 0x5115).ram().share("tilebase");
 	map(0x5116, 0x5117).ram();
+	map(0x511a, 0x511e).ram(); // hnt3
 	map(0x5121, 0x5124).ram().share("scrollregs");
+	map(0x5125, 0x512c).ram(); // hnt3
 
 	map(0x5140, 0x5140).ram();
+	map(0x5141, 0x5142).ram(); // hnt3 changes values
+	map(0x5143, 0x5145).ram(); // hnt3
+	map(0x5148, 0x514b).ram(); // hnt3
 	map(0x5150, 0x5150).ram().share("spriteaddr"); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
 	map(0x5151, 0x5152).ram().share("spritebase");
 	map(0x5153, 0x5153).ram(); // startup
