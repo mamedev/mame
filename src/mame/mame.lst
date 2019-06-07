@@ -37619,6 +37619,9 @@ tekxp330                        //
 @source:telex274.cpp
 telex274                        //
 
+@source:telex277d.cpp
+telex277d                       // Telex 1979
+
 @source:tempest.cpp
 tempest                         // 136002           (c) 1980
 tempest1                        // 136002           (c) 1980
@@ -37639,7 +37642,6 @@ alcat258                        //
 loewe715                        //
 loewed                          //
 teleguide                       //
-telex277d                       // Telex 1979
 
 @source:terracre.cpp
 amatelas                        // (c) 1986

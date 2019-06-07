@@ -4014,6 +4014,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/telex274.cpp",
+	MAME_DIR .. "src/mame/drivers/telex277d.cpp",
 	MAME_DIR .. "src/mame/drivers/terak.cpp",
 	MAME_DIR .. "src/mame/drivers/terco.cpp",
 	MAME_DIR .. "src/mame/drivers/terminal.cpp",
