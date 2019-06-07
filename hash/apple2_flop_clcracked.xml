@@ -534,6 +534,7 @@
 		<description>Pac-Man (Atari) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<info name="release" value="2015-03-18"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -546,7 +547,8 @@
 	<software name="pacmand">
 		<description>Pac-Man (Datasoft) (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Datasoft / Namco America</publisher>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2015-03-10"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -557,9 +559,10 @@
 	</software>
 
 	<software name="pacmant">
-		<description>Pac-Man (Thunder Mountain copyight) (cleanly cracked)</description>
+		<description>Pac-Man (Thunder Mountain) (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Thunder Mountain / Namco</publisher>
+		<publisher>Thunder Mountain</publisher>
+		<info name="release" value="2015-05-12"/>
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -5849,11 +5852,13 @@
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship baseball (4am crack) side a.dsk" size="143360" crc="dc772a9f" sha1="0dccab61467b5d08c3de4a05e9410ce56d2bbf4d" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship baseball (4am crack) side b.dsk" size="143360" crc="b4767c81" sha1="4ad26e03f0227ec4eada7ad0709222baf79427bb" />
 			</dataarea>
@@ -5910,11 +5915,13 @@
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="chariots, cougars, and kings (4am crack) disk 1.dsk" size="143360" crc="8fc9df9f" sha1="d966d3a65ff4eb861d9faa58fb491a33c4b94fe8" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="chariots, cougars, and kings (4am crack) disk 2.dsk" size="143360" crc="57dcc568" sha1="fccb739ccc8dcddd00b60dcabad2745909f0f517" />
 			</dataarea>
