@@ -52,8 +52,8 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 3'579'545) :
-		bally_as2888_device(mconfig, BALLY_AS2888, tag, owner, clock)
+			uint32_t clock = 0) :
+		bally_as2888_device(mconfig, BALLY_AS2888, tag, owner)
 	{ }
 
 	// read/write
@@ -67,10 +67,9 @@ protected:
 			const machine_config &mconfig,
 			device_type type,
 			const char *tag,
-			device_t *owner,
-			uint32_t clock) :
-			device_t(mconfig, type, tag, owner, clock),
-				device_mixer_interface(mconfig, *this),
+			device_t *owner) :
+		device_t(mconfig, type, tag, owner, 0),
+		device_mixer_interface(mconfig, *this),
 		m_snd_prom(*this, "sound"),
 		m_discrete(*this, "discrete"),
 		m_timer_s_freq(*this, "timer_s_freq"),
