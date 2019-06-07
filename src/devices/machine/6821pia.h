@@ -5,9 +5,9 @@
     Motorola 6821 PIA interface and emulation
 
     Notes:
-        * get_port_b_z_mask() gives the caller the bitmask that shows
+        * port_b_z_mask() gives the caller the bitmask that shows
           which bits are high-impedance when reading port B, and thus
-          neither 0 or 1. get_output_cb2_z() returns the same info
+          neither 0 or 1. cb2_output_z() returns the same info
           for the CB2 pin.
         * set_port_a_z_mask allows the input callback to indicate
           which port A bits are disconnected. For these bits, the
