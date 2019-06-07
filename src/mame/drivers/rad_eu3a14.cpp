@@ -108,6 +108,7 @@ public:
 		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_tilecfg(*this, "tilecfg"),
+		m_ramtilecfg(*this, "ramtilecfg"),
 		m_tilebase(*this, "tilebase"),
 		m_spriteaddr(*this, "spriteaddr"),
 		m_spritebase(*this, "spritebase"),
@@ -182,6 +183,7 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
 	required_shared_ptr<uint8_t> m_tilecfg;
+	required_shared_ptr<uint8_t> m_ramtilecfg;
 	required_shared_ptr<uint8_t> m_tilebase;
 	required_shared_ptr<uint8_t> m_spriteaddr;
 	required_shared_ptr<uint8_t> m_spritebase;
@@ -204,8 +206,8 @@ private:
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int backtiletype, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size);
-	void draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
+	void draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int backtiletype, int tileno, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram);
+	void draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int which, int xbase, int ybase, int size, int bpp, int base, int drawfromram);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int spritetiletype);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
@@ -265,11 +267,11 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int backtiletype, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size)
+void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int backtiletype, int tileno, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
 	int bppdiv = 1;
 	int baseaddr = base * 256;
-
+	
 	switch (backtiletype)
 	{
 	case 0x00: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
@@ -278,7 +280,17 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 	case 0x03: bppdiv = 2; baseaddr += tileno * 32;  break; // 8x8 4bpp
 	default: break;
 	}
-	const uint8_t *gfxdata = &m_mainregion[baseaddr & 0x3fffff];
+	
+	uint8_t* gfxdata;
+
+	if (drawfromram)
+	{
+		gfxdata = &m_mainram[baseaddr & 0x3fff];
+	}
+	else
+	{
+		gfxdata = &m_mainregion[baseaddr & 0x3fffff];
+	}
 
 	int xstride = size / bppdiv;
 
@@ -326,21 +338,13 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 	}
 }
 
-void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
+void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int which, int xbase, int ybase, int size, int bpp, int base, int drawfromram)
 {
 	int backtiletype = 0;
 
-	int pagesize = m_pagewidth * m_pageheight * 2;
-
-	if (m_bytespertile == 4)
-	{
-		pagesize <<= 1; // shift because we need twice as much ram for this mode
-	}
-
 	int palette = 0;
 
-	int base = (m_tilebase[1] << 8) | m_tilebase[0];
-	if (m_tilecfg[2] & 0x04) // 4bpp selection
+	if (bpp) // 4bpp selection
 	{
 		backtiletype = 1; // 16x16 4bpp
 
@@ -373,7 +377,7 @@ void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind
 	int ydraw = ybase;
 	int count = 0;
 
-	for (int i = m_tilerambase + pagesize * which; i < m_tilerambase + pagesize * (which + 1); i += m_bytespertile)
+	for (int i = ramstart; i < ramend; i += m_bytespertile)
 	{
 		int tile = 0;
 		int realpalette = palette;
@@ -399,7 +403,7 @@ void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind
 			}
 		}
 
-		draw_background_tile(bitmap, cliprect, backtiletype, tile, base, realpalette, 0, 0, xdraw, ydraw, 0, size);
+		draw_background_tile(bitmap, cliprect, backtiletype, tile, realpalette, 0, 0, xdraw, ydraw, 0, size, base, drawfromram);
 
 		xdraw += size;
 
@@ -416,6 +420,8 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 {
 	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
+
+	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 
 	int size;
 
@@ -445,45 +451,109 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 		m_bytespertile = 2;
 	}
 
+	int bpp = m_tilecfg[2] & 0x04;
+	int ramstart = 0;
+	int ramend = 0;
+
+	int pagesize = m_pagewidth * m_pageheight * 2;
+
+	if (m_bytespertile == 4)
+	{
+		pagesize <<= 1; // shift because we need twice as much ram for this mode
+	}
+
 	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
 	{
-		// normal
-		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight) - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight) - yscroll, size);
+		ramstart = m_tilerambase + pagesize * 0;
+		ramend = m_tilerambase + pagesize * 1;
 
-		// wrap x
-		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, 0 - xscroll, 0 - yscroll, size, bpp, base, 0); // normal
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll, size, bpp, base, 0); // wrap x
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size, bpp, base, 0); // wrap y
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size, bpp, base, 0); // wrap x+y
 
-		// wrap y
-		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		ramstart = m_tilerambase + pagesize * 1;
+		ramend = m_tilerambase + pagesize * 2;
 
-		// wrap x+y
-		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
-		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 1, (size * m_pagewidth) - xscroll, 0 - yscroll, size, bpp, base, 0); // normal
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 1, (size * m_pagewidth * 3) - xscroll, 0 - yscroll, size, bpp, base, 0); // wrap x
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 1, (size * m_pagewidth) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size, bpp, base, 0); // wrap y
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 1, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size, bpp, base, 0); // wrap x+y
+
+		ramstart = m_tilerambase + pagesize * 2;
+		ramend = m_tilerambase + pagesize * 3;
+	
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 2, 0 - xscroll, (size * m_pageheight) - yscroll, size, bpp, base, 0); // normal
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll, size, bpp, base, 0); // wrap x
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 2, 0 - xscroll, (size * m_pageheight * 3) - yscroll, size, bpp, base, 0); // wrap y
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll, size, bpp, base, 0); // wrap x+y
+
+		ramstart = m_tilerambase + pagesize * 3;
+		ramend = m_tilerambase + pagesize * 4;
+	
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight) - yscroll, size, bpp, base, 0); // normal
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight) - yscroll, size, bpp, base, 0); // wrap x
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight * 3) - yscroll, size, bpp, base, 0);// wrap y
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 3) - yscroll, size, bpp, base, 0); // wrap x+y
 	}
 	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
 	{
-	//	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 	//	popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
+		ramstart = m_tilerambase + pagesize * 0;
+		ramend = m_tilerambase + pagesize * 1;
 
 		// normal
-		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, 0 - xscroll, 0 - yscroll, size, bpp, base, 0);
 		// wrap x
-		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size, bpp, base, 0);
 		// wrap y
-		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size, bpp, base, 0);
 		// wrap x+y
-		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size, bpp, base, 0);
+
+		// RAM based tile layer
+
+		// this register use is questionable
+		if (m_ramtilecfg[0] & 0x80)
+		{
+			// this is the gfxbase in ram for all cases seen
+			base = (0x2000-0x200)/256;
+			if (m_ramtilecfg[0] & 0x10)
+			{
+				size = 8;
+				m_pagewidth = 32;
+				m_pageheight = 28;
+				xscroll = 0;
+				yscroll = 0;
+				bpp = 4;
+			}
+			else
+			{
+				size = 16;
+				m_pagewidth = 32/2;
+				m_pageheight = 28/2;
+				xscroll = 0;
+				yscroll = 0;
+				bpp = 4;
+			}
+
+			// this is in the same place even when the first tilemap is in 16x16 mode, probably a base register somewhere
+			ramstart = m_tilerambase + 0x700;
+			ramend = m_tilerambase + 0x700 + 0x700;
+					
+			// don't draw the hnt3 menu stuff for now, something is still wrong
+			if (m_ramtilecfg[0] & 0x10)
+			{
+				// normal
+				draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 1, 0 - xscroll, 0 - yscroll, size, bpp, base, 1);
+				// wrap x
+				draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 1, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size, bpp, base, 1);
+				// wrap y
+				draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 1, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size, bpp, base, 1);
+				// wrap x+y
+				draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 1, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size, bpp, base, 1);
+			}
+		}
 	}
 	else
 	{
@@ -831,10 +901,10 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5121, 0x5124).ram().share("scrollregs");
 	map(0x5125, 0x512c).ram(); // hnt3
 
-	map(0x5140, 0x5140).ram();
-	map(0x5141, 0x5142).ram(); // hnt3 changes values
+	map(0x5140, 0x5142).ram().share("ramtilecfg");; // hnt3
 	map(0x5143, 0x5145).ram(); // hnt3
 	map(0x5148, 0x514b).ram(); // hnt3
+
 	map(0x5150, 0x5150).ram().share("spriteaddr"); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
 	map(0x5151, 0x5152).ram().share("spritebase");
 	map(0x5153, 0x5153).ram(); // startup
