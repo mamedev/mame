@@ -504,7 +504,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 {
 	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
 	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
-	for (int i = m_spriterambase; i < m_spriterambase + 0x7e0; i += 8)
+	for (int i = m_spriterambase; i < m_spriterambase + 0x800; i += 8)
 	{
 		/*
 		+0  e-ff hhww  flip yx, enable, height, width
