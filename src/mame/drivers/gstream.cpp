@@ -646,7 +646,7 @@ void gstream_state::drawgfx_rgb(bitmap_rgb32 &bitmap,const rectangle &clip,gfx_e
 			for (int x = sx; x < ex; x++)
 			{
 				const u16 c = source[x_index];
-				if ((c != 0) || (pal[c] != 0)) // draw this pixel when RGB color OR rom data is not 0
+				if (c != 0) // draw this pixel when rom data is not 0
 					dest[x] = pal[c];
 
 				x_index += xinc;
@@ -709,11 +709,9 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2] );
 	bitmap.fill(0,cliprect);
 
-
 	draw_bg(bitmap, cliprect, 2, m_vram + 0x800/4);
 	draw_bg(bitmap, cliprect, 1, m_vram + 0x400/4);
 	draw_bg(bitmap, cliprect, 0, m_vram + 0x000/4); // move on top for x2222 , check
-
 
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{
