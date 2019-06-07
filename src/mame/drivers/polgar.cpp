@@ -4,6 +4,8 @@
 
 Mephisto Polgar and RISC
 
+The chess engine in Mephisto Risc is also compatible with Tasc's The ChessMachine.
+
 TODO:
 - Mephisto Risc maincpu is more likely 5MHz, but LCD doesn't like it
 

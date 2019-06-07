@@ -2,7 +2,9 @@
 // copyright-holders:Sandro Ronco
 /******************************************************************************
 
-    Saitek RISC 2500
+    Saitek RISC 2500, Mephisto Montreux
+
+    The chess engine is also compatible with Tasc's The ChessMachine software.
 
     TODO:
      - Sound is too short and high pitch, better when you underclock the cpu.

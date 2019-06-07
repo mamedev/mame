@@ -4,6 +4,9 @@
 
 Tasc ChessSystem
 
+Commonly known as Tasc R30, it's basically a dedicated ChessMachine.
+The chess engine is also compatible with Tasc's The ChessMachine software.
+
 R30 hardware notes:
 - ARM6 CPU(P60ARM/CG) @ 30MHz
 - 256KB ROM, 512KB program RAM, 128KB permanent RAM
