@@ -30,6 +30,18 @@
     The Basketball camera also uses an ETOMS CU5502.  It’s different from the others (XaviXport + Real Swing Golf) in that the sensor is on a small PCB with
     a 3.58MHz resonator with 16 wires going to another small PCB that has a glob and a 4MHz resonator.  6 wires go from that PCB to the main game PCB.
 
+	To access hidden test mode in Football hold enter and left during power on.
+
+	Football test mode tests X pos, Y pos, Z pos, direction and speed.  This data must all be coming from the camera in the unit as the shinpads are simply
+	reflective objects, they don't contain any electronics.  It could be a useful test case for better understanding these things.
+
+	To access hidden test mode in Golden Tee Home hold back/backspin and left during power on for test mode
+
+	Huntin'3 appears to use the hardware much more extensively than other games and shows we need the following features
+	 - Raster Interrupt (Rowscroll in most game modes)
+	 - RAM based tiles (status bar in Shooting Range, text descriptions on menus etc.)
+	these aren't yet emulated.
+
 */
 
 #include "emu.h"
@@ -246,7 +258,18 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 	case 0x03: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
 	case 0x04: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
 	case 0x05: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
-	case 0x06: bppdiv = 2; baseaddr += tileno * 64;  break; // 8x8 4bpp
+	case 0x06: // 8x8 4bpp
+	{
+		bppdiv = 2;
+		if (m_bytespertile == 4) // maybe 4 bytes per tile mode always has finer addressing due to having more bits?
+		{
+			baseaddr += tileno * 32; 
+		}
+		else
+		{
+			baseaddr += tileno * 64;  break;
+		}
+	}
 	default: break;
 	}
 	const uint8_t *gfxdata = &m_mainregion[baseaddr & 0x3fffff];
@@ -303,6 +326,11 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 
 	int pagesize = m_pagewidth * m_pageheight * 2;
 
+	if (m_bytespertile == 4)
+	{
+		pagesize <<= 1;
+	}
+
 	int palette = 0;
 
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
@@ -317,7 +345,7 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (m_tilecfg[1] & 0x08)
 		{
-			palette += 16;
+			palette |= 0x10;
 		}
 	}
 	else // 8bpp selection
@@ -342,6 +370,7 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 	for (int i = m_tilerambase + pagesize * which; i < m_tilerambase + pagesize * (which + 1); i += m_bytespertile)
 	{
 		int tile = 0;
+		int realpalette = palette;
 		if (m_bytespertile == 2)
 		{
 			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
@@ -349,9 +378,16 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 		else if (m_bytespertile == 4) // rad_foot hidden test mode, rad_hnt3 shooting range (not yet correct)
 		{
 			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);// | (m_mainram[i + 2] << 16) |  | (m_mainram[i + 3] << 24);
+
+			// m_mainram[i + 3] & 0x04 is set in both seen cases, maybe per-tile bpp?
+
+			if (m_tilecfg[2] & 0x04) // palette in 4bpp mode at least
+			{
+				realpalette |= (m_mainram[i + 2] & 0xf0) >> 4;  // hnt3 shooting gallery sets this, lower bits also used, maybe per-tile priority?
+			}
 		}
 
-		draw_tile(bitmap, cliprect, gfxno, tile, base, palette, 0, 0, xdraw, ydraw, 0, size);
+		draw_tile(bitmap, cliprect, gfxno, tile, base, realpalette, 0, 0, xdraw, ydraw, 0, size);
 
 		xdraw += size;
 
@@ -372,7 +408,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int size;
 
 	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
-	// m_tilecfg[1]   ---- x--?    ? = used foot x = used, huntin3 summary
+	// m_tilecfg[1]   ---- x--?    ? = used foot x = used, huntin3 summary (palette bank?)
 	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
 
 	if (m_tilecfg[0] & 0x10)
@@ -811,7 +847,6 @@ WRITE8_MEMBER(radica_eu3a14_state::dma_trigger_w)
 }
 
 
-// hold back/backspin and left during power on for test mode
 static INPUT_PORTS_START( rad_gtg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -948,7 +983,7 @@ static INPUT_PORTS_START( rad_rsgp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// hold enter and left during power on for test mode
+
 static INPUT_PORTS_START( radica_foot )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
