@@ -39,6 +39,18 @@
 
 	To access hidden test mode in Basketball hold left and Button 1 during power on.
 
+	To access hidden test mode in Real Swing Gold hold left and down during power on.
+	 - test mode check
+	 77B6: lda $5041
+	 77B9: eor #$ed
+	 77BB: beq $77be
+
+	To access hidden test mode in Baseball 3 hold down during power on.
+	- test mode check
+	686E: lda $5041
+	6871: eor #$f7
+	6873: bne $68c8
+
 	Huntin'3 appears to use the hardware much more extensively than other games and shows we need the following features
 	 - Raster Interrupt (Rowscroll in most game modes)
 	 - RAM based tiles (status bar in Shooting Range, text descriptions on menus etc.)
@@ -893,6 +905,7 @@ static INPUT_PORTS_START( rad_gtg )
 	PORT_START("TV")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( rad_rsg ) // base unit just has 4 directions + enter and a sensor to swing the club over
 	PORT_START("IN0")
