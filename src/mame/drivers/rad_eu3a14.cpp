@@ -202,11 +202,12 @@ private:
 
 	uint8_t m_portdir[3];
 
-	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxno, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size);
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
+
+	void draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int backtiletype, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size);
+	void draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int gfxno);
+	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int spritetiletype);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
 };
 
@@ -264,17 +265,17 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxno, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size)
+void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int backtiletype, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size)
 {
 	int bppdiv = 1;
 	int baseaddr = base * 256;
 
-	switch (gfxno)
+	switch (backtiletype)
 	{
-	case 0x03: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
-	case 0x04: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
-	case 0x05: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
-	case 0x06: bppdiv = 2; baseaddr += tileno * 32;  break; // 8x8 4bpp
+	case 0x00: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
+	case 0x01: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
+	case 0x02: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
+	case 0x03: bppdiv = 2; baseaddr += tileno * 32;  break; // 8x8 4bpp
 	default: break;
 	}
 	const uint8_t *gfxdata = &m_mainregion[baseaddr & 0x3fffff];
@@ -325,9 +326,9 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 }
 
-void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
+void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
 {
-	int gfxno = 0;
+	int backtiletype = 0;
 
 	int pagesize = m_pagewidth * m_pageheight * 2;
 
@@ -341,11 +342,11 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 	if (m_tilecfg[2] & 0x04) // 4bpp selection
 	{
-		gfxno = 4; // 16x16 4bpp
+		backtiletype = 1; // 16x16 4bpp
 
 		if (size == 8)
 		{
-			gfxno = 6; // 8x8 4bpp
+			backtiletype = 3; // 8x8 4bpp
 		}
 
 		if (m_tilecfg[1] & 0x08)
@@ -355,11 +356,11 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	else // 8bpp selection
 	{
-		gfxno = 3; // 16x16 8bpp
+		backtiletype = 0; // 16x16 8bpp
 
 		if (size == 8)
 		{
-			gfxno = 5; // 8x8 8bpp
+			backtiletype = 2; // 8x8 8bpp
 		}
 
 		if (m_tilecfg[1] & 0x08)
@@ -398,7 +399,7 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 		}
 
-		draw_tile(bitmap, cliprect, gfxno, tile, base, realpalette, 0, 0, xdraw, ydraw, 0, size);
+		draw_background_tile(bitmap, cliprect, backtiletype, tile, base, realpalette, 0, 0, xdraw, ydraw, 0, size);
 
 		xdraw += size;
 
@@ -447,28 +448,28 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
 	{
 		// normal
-		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight) - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight) - yscroll, size);
 
 		// wrap x
-		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight) - yscroll, size);
 
 		// wrap y
-		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight * 3) - yscroll, size);
 
 		// wrap x+y
-		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
-		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 3) - yscroll, size);
 	}
 	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
 	{
@@ -476,13 +477,13 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	//	popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
 
 		// normal
-		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
 		// wrap x
-		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size);
 		// wrap y
-		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
 		// wrap x+y
-		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+		draw_background_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
 	}
 	else
 	{
@@ -491,10 +492,10 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 }
 
-void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int gfxno)
+void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int spritetiletype)
 {
 	int tileno = offset + count;
-	gfx_element *gfx = m_gfxdecode->gfx(gfxno);
+	gfx_element *gfx = m_gfxdecode->gfx(spritetiletype);
 	gfx->transpen(bitmap, cliprect, tileno, pal, flipx, flipy, xpos, ypos, 0);
 }
 
@@ -509,7 +510,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		+0  e-ff hhww  flip yx, enable, height, width
 		+1  yyyy yyyy  ypos
 		+2  xxxx xxxx  xpos
-		+3  pppp ----  palette
+		+3  pppp Pzzz  p = palette, P = upper palette bank, z = priority
 		+4  tttt tttt  tile bits
 		+5  tttt tttt
 		+6  --TT TPPP  TTT = tile bank PPP = bpp select (+more?)
@@ -529,16 +530,16 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		int height = 0;
 		int width = 0;
-		int pal = attr2 >> 4;
+		int pal = 0;
+
+
 
 		int pri = attr2 & 0x07;
+
 
 		if (pri != drawpri)
 			continue;
 
-		// no idea
-		if (attr2 & 0x08)
-			pal += 0x10;
 
 		switch (h)
 		{
@@ -567,7 +568,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
 		int extra = m_mainram[i + 6];
-		int gfxno = 1;
+		int spritetiletype = 1;
 
 		int spritebase = (m_spritebase[1] << 8) | m_spritebase[0];
 
@@ -578,19 +579,38 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		switch (extra & 0x07)
 		{
 		case 0x00: // 8bpp
-		case 0x07: // 8bpp
 			offset >>= 1;
-			gfxno = 2;
+			spritetiletype = 2;
+
+			if (attr2 & 0x08)
+				pal += 0x1;
+
 			break;
 
+		case 0x07: // 7bpp (rad_foot ingame)
+			offset >>= 1;
+			spritetiletype = 3;
+
+			//pal = (attr2 & 0x80) >> 7; // TODO: check which bits actually get used to select palette on 7bpp tiles
+
+			if (attr2 & 0x08) // this bit is confirmed as still being palette bank
+				pal += 0x2;
+
+			break;
+			
 		case 0x02: // 2bpp
 			offset <<= 1;
-			gfxno = 0;
+			spritetiletype = 0;
 			pal = 0;
 			break;
 
 		case 0x04: // 4bpp
-			gfxno = 1;
+			spritetiletype = 1;
+
+			pal = (attr2 & 0xf0) >> 4;
+
+			if (attr2 & 0x08)
+				pal += 0x10;
 			break;
 
 		case 0x01: // unknowns
@@ -614,7 +634,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 				{
 					int xoff = flipx ? (((width - 1) * 8) - (xx * 8)) : (xx * 8);
 
-					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, flipy, x + xoff, y + yoff, gfxno);
+					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, flipy, x + xoff, y + yoff, spritetiletype);
 					count++;
 				}
 			}
@@ -1388,6 +1408,18 @@ static const gfx_layout helper8x1x8_layout =
 	8 * 8
 };
 
+// 7bpp layer here just drops a bit, doesn't change how things are packed so it's just a wasteful encoding that allows more palette selections (4 vs 2 of 8bpp)
+static const gfx_layout helper8x1x7_layout =
+{
+	8,1,
+	RGN_FRAC(1,1),
+	7,
+	{ 1,2,3,4,5,6,7 },
+	{ STEP8(0,8) },
+	{ 0 },
+	8 * 8
+};
+
 // background
 static const gfx_layout helper16x16x8_layout =
 {
@@ -1396,7 +1428,7 @@ static const gfx_layout helper16x16x8_layout =
 	8,
 	{ STEP8(0,1) },
 	{ STEP16(0,8) },
-	{ STEP16(0,16*8)  },
+	{ STEP16(0,16*8) },
 	16 * 16 * 8
 };
 
@@ -1407,7 +1439,7 @@ static const gfx_layout helper16x16x4_layout =
 	4,
 	{ STEP4(0,1) },
 	{ STEP16(0,4) },
-	{ STEP16(0,16*4)  },
+	{ STEP16(0,16*4) },
 	16 * 16 * 4
 };
 
@@ -1418,7 +1450,7 @@ static const gfx_layout helper8x8x8_layout =
 	8,
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
-	{ STEP8(0,8*8)  },
+	{ STEP8(0,8*8) },
 	8 * 8 * 8
 };
 
@@ -1438,7 +1470,9 @@ static GFXDECODE_START( gfx_helper )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
-	// standard decodes
+	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x7_layout,    0x0, 4  )
+
+	// dummy standard decodes to see background tiles, not used for drawing
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x4_layout,  0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x8_layout,    0x0, 2  )
