@@ -183,6 +183,7 @@ private:
 	int       m_oki_bank[2];
 	int       m_toggle;
 	int       m_xoffset;
+	bool      m_is_rgb;
 
 	DECLARE_WRITE32_MEMBER(vram_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(scrollx_w);
@@ -198,6 +199,8 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
+	void drawgfx_rgb(bitmap_rgb32 &bitmap,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -590,6 +593,69 @@ void gstream_state::video_start()
 }
 
 
+void gstream_state::drawgfx_rgb(bitmap_rgb32 &bitmap,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy)
+{
+	/* Start drawing */
+	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+	const u16 *source_base = gfx->get_data(code % gfx->elements());
+
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
+
+	int x_index_base = flipx ? gfx->width() - 1 : 0;
+	int y_index = flipy ? gfx->height() - 1 : 0;
+
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
+
+	// end coordinates
+	int ex = sx + gfx->width();
+	int ey = sy + gfx->height();
+
+	if (sx < clip.min_x)
+	{ // clip left
+		int pixels = clip.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < clip.min_y)
+	{ // clip top
+		int pixels = clip.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > clip.max_x + 1)
+	{ // clip right
+		ex = clip.max_x + 1;
+	}
+	if (ey > clip.max_y + 1)
+	{ // clip bottom
+		ey = clip.max_y + 1;
+	}
+
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
+		{
+			const u16 *source = source_base + y_index * gfx->rowbytes();
+			u32 *dest = &bitmap.pix32(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
+			{
+				const u16 c = source[x_index];
+				if ((c != 0) || (pal[c] != 0)) // draw this pixel when RGB color OR rom data is not 0
+					dest[x] = pal[c];
+
+				x_index += xinc;
+			}
+			y_index += yinc;
+		}
+	}
+}
+
 void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram )
 {
 	int scrollx;
@@ -608,7 +674,10 @@ void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 			int pal = (vram_data & 0xc000) >> 14;
 			int code = (vram_data & 0x0fff);
 
-			m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+			if (m_is_rgb)
+				drawgfx_rgb(bitmap,cliprect,m_gfxdecode->gfx(map),code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f));
+			else
+				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
 			basex++;
 		}
@@ -654,10 +723,20 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		int y = m_vram[i + 2] & 0xff;
 		int col = m_vram[i + 3] & 0x1f;
 
-		m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
-		m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
-		m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
-		m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
+		if (m_is_rgb)
+		{
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset, y);
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset, y-0x100);
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset - 0x200, y);
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset - 0x200, y-0x100);
+		}
+		else
+		{
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
+		}
 	}
 	return 0;
 }
@@ -894,6 +973,7 @@ void gstream_state::init_gstream()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 
 	m_xoffset = 2;
+	m_is_rgb = false;
 }
 
 
@@ -903,6 +983,7 @@ void gstream_state::init_x2222()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer
 
 	m_xoffset = 0;
+	m_is_rgb = true;
 }
 
 

@@ -450,7 +450,7 @@ void gfx_element::transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
@@ -478,7 +478,7 @@ void gfx_element::transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
@@ -716,7 +716,7 @@ void gfx_element::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		return transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
@@ -748,7 +748,7 @@ void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		return transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
@@ -1008,7 +1008,7 @@ void gfx_element::prio_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
@@ -1038,7 +1038,7 @@ void gfx_element::prio_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
@@ -1301,7 +1301,7 @@ void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &clipre
 		return prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
@@ -1336,7 +1336,7 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
 		return prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xff)
+	if (trans_pen > 0xffff)
 		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
