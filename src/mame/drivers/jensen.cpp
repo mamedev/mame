@@ -225,17 +225,21 @@ ROM_START(dpcaxp150)
 	 */
 	ROM_REGION32_LE(0x100000, "feprom1", 0)
 
-	// source: dumped from physical board
-	ROM_SYSTEM_BIOS(0, "v19", "Version 1.9, 22-JUN-1995")
-	ROMX_LOAD("001z5__bl07.v19", 0x00000, 0x100000, CRC(26da3478) SHA1(baa7c92b01244aad84420268a06d04c6e2a30754), ROM_BIOS(0))
+	// source: extracted from ftp://ftp.hp.com/pub/alphaserver/firmware/retired_platforms/alphapc/dec2000_axp150/dec2000_v2_2.exe
+	ROM_SYSTEM_BIOS(0, "v22", "Version 2.2, 12-FEB-1996")
+	ROMX_LOAD("001z5__bl07.v22", 0x00000, 0x100000, CRC(1edb9c98) SHA1(a45f0dde236e189a57afc1ed354201180ab2f234), ROM_BIOS(0))
 
-	// source: extracted from ftp://ftp.hp.com/pub/alphaserver/firmware/retired_platforms/alphapc/dec2000_axp150/
-	ROM_SYSTEM_BIOS(1, "v22", "Version 2.2, 12-FEB-1996")
-	ROMX_LOAD("001z5__bl07.v22", 0x00000, 0x100000, CRC(1edb9c98) SHA1(a45f0dde236e189a57afc1ed354201180ab2f234), ROM_BIOS(1))
+	// source: extracted from https://archive.org/download/ntrisc/alpha/ftp.alphant.com/Drivers/fw150v431.zip
+	ROM_SYSTEM_BIOS(1, "v19", "Version 1.9, 22-JUN-1995")
+	ROMX_LOAD("001z5__bl07.v19", 0x00000, 0x100000, CRC(53e981ee) SHA1(c726981441af88d8a224b1f81efee3a6ec95f227), ROM_BIOS(1))
 
-	// source: extracted from https://archive.org/details/decpcaxp
+	// source: extracted from https://archive.org/download/decpcaxp/DEC%20PC%20AXP%20Firmware%20Upgrade%20No9%20GXE.img
 	ROM_SYSTEM_BIOS(2, "v13", "Version 1.3, 10-JUN-1994")
 	ROMX_LOAD("001z5__bl07.v13", 0x00000, 0x100000, CRC(8035f370) SHA1(2ebd75267ab7373d344efe44e700645ed31b44cd), ROM_BIOS(2))
+
+	// source: extracted from https://archive.org/download/ntrisc/alpha/ftp.alphant.com/Drivers/fw35-1.zip
+	ROM_SYSTEM_BIOS(3, "vff", "Version f.f, 19-MAY-1994")
+	ROMX_LOAD("001z5__bl07.vff", 0x00000, 0x100000, CRC(99238153) SHA1(ce543bd11937bdf24c4d9e898e917438c2163a20), ROM_BIOS(3))
 ROM_END
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME                  FLAGS */
