@@ -35,7 +35,9 @@
 	Football test mode tests X pos, Y pos, Z pos, direction and speed.  This data must all be coming from the camera in the unit as the shinpads are simply
 	reflective objects, they don't contain any electronics.  It could be a useful test case for better understanding these things.
 
-	To access hidden test mode in Golden Tee Home hold back/backspin and left during power on for test mode
+	To access hidden test mode in Golden Tee Home hold back/backspin and left during power on.
+
+	To access hidden test mode in Basketball hold Right and Button 1 during power on.
 
 	Huntin'3 appears to use the hardware much more extensively than other games and shows we need the following features
 	 - Raster Interrupt (Rowscroll in most game modes)
