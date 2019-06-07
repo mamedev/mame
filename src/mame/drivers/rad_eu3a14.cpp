@@ -263,11 +263,13 @@ void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &clipr
 		bppdiv = 2;
 		if (m_bytespertile == 4) // maybe 4 bytes per tile mode always has finer addressing due to having more bits?
 		{
-			baseaddr += tileno * 32; 
+			baseaddr += tileno * 32;
+			break;
 		}
 		else
 		{
-			baseaddr += tileno * 64;  break;
+			baseaddr += tileno * 64;
+			break;
 		}
 	}
 	default: break;
@@ -328,7 +330,7 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 
 	if (m_bytespertile == 4)
 	{
-		pagesize <<= 1;
+		pagesize <<= 1; // shift because we need twice as much ram for this mode
 	}
 
 	int palette = 0;
