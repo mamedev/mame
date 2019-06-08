@@ -4852,10 +4852,14 @@ void nv2a_renderer::savestate_items()
 {
 }
 
+void nv2a_renderer::set_ram_base(void *base)
+{
+	basemempointer = (uint8_t*)base;
+	topmempointer = basemempointer + 512 * 1024 * 1024 - 1;
+}
+
 void nv2a_renderer::start(address_space *cpu_space)
 {
-	basemempointer = (uint8_t *)cpu_space->get_read_ptr(0);
-	topmempointer = basemempointer + 512 * 1024 * 1024 - 1;
 	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
 	puller_timer->enable(false);
 }

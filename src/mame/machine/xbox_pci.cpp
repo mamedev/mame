@@ -69,6 +69,12 @@ nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag,
 	set_ids(0x10de02a6, 0, 0, 0);
 }
 
+void nv2a_ram_device::device_start()
+{
+	pci_device::device_start();
+	ram.resize(ram_size * 1024 * 1024 / 4);
+}
+
 READ32_MEMBER(nv2a_ram_device::config_register_r)
 {
 	return 0x08800044;
@@ -76,6 +82,12 @@ READ32_MEMBER(nv2a_ram_device::config_register_r)
 
 WRITE32_MEMBER(nv2a_ram_device::config_register_w)
 {
+}
+
+void nv2a_ram_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	memory_space->install_ram(0x00000000, ram_size * 1024 * 1024 - 1, &ram[0]);
 }
 
 /*
@@ -121,6 +133,12 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 	pic8259_1(*this, "pic8259_1"),
 	pic8259_2(*this, "pic8259_2"),
 	pit8254(*this, "pit8254"),
+	m_pm1_status(0),
+	m_pm1_enable(0),
+	m_pm1_control(0),
+	m_pm1_timer(0),
+	m_gpe0_status(0),
+	m_gpe0_enable(0),
 	m_global_smi_control(0),
 	m_smi_command_port(0)
 {
@@ -129,11 +147,15 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
+	set_multifunction_device(true);
 	m_smi_callback.resolve_safe();
 	m_interrupt_output.resolve_safe();
 	m_boot_state_hook.resolve_safe();
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
+	status = 0x00b0;
+	command = 0x0081;
+	command_mask = 0x01be;
 	for (int a = 0; a < 16; a++)
 		lpcdevices[a] = nullptr;
 	for (device_t &d : subdevices())
@@ -203,7 +225,7 @@ void mcpx_isalpc_device::update_smi_line()
 
 READ32_MEMBER(mcpx_isalpc_device::acpi_r)
 {
-	logerror("Acpi read from %04X mask %08X\n", bank_infos[0].adr + offset * 4, mem_mask);
+	logerror("Acpi read from %04X mask %08X\n", (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	if ((offset == 0xa) && ACCESSING_BITS_0_15)
 		return m_global_smi_control;
 	if ((offset == 0xb) && ACCESSING_BITS_16_23)
@@ -213,15 +235,35 @@ READ32_MEMBER(mcpx_isalpc_device::acpi_r)
 
 WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 {
-	// Seen using word registers at the following offsets
+	logerror("Acpi write %08X to %04X mask %08X\n", data, (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
+	// Seen using word registers at offsets
 	// 0x00 0x02 0x04 0x08 0x20 0x22 0x28 0xa0 0xa2 0xc0-0xd8
-	if ((offset == 0xa) && ACCESSING_BITS_0_15)
+	// Byte access at 0x2e
+	if ((offset == 0) && ACCESSING_BITS_0_15)
+		// pm1 status register
+		m_pm1_status = data & 0xffff;
+	else if ((offset == 0) && ACCESSING_BITS_16_31)
+		// pm1 enable register
+		m_pm1_enable = data >> 16;
+	else if ((offset == 1) && ACCESSING_BITS_0_15)
+		// pm1 control register
+		m_pm1_control = data & 0xffff;
+	else if ((offset == 2) && ACCESSING_BITS_0_15)
+		// pm1 timer register
+		m_pm1_timer = data & 0xffff;
+	else if ((offset == 8) && ACCESSING_BITS_0_15)
+		// gpe0 status register
+		m_gpe0_status = data & 0xffff;
+	else if ((offset == 8) && ACCESSING_BITS_16_31)
+		// gpe0 enable register
+		m_gpe0_enable = data >> 16;
+	else if ((offset == 0xa) && ACCESSING_BITS_0_15)
 	{
 		// Global SMI Control
 		m_global_smi_control = m_global_smi_control & (~data & 0xffff);
 		update_smi_line();
 	}
-	if ((offset == 0xb) && ACCESSING_BITS_16_23)
+	else if ((offset == 0xb) && ACCESSING_BITS_16_23)
 	{
 		// SMI Command Port
 		// write to byte 0x2e must generate a SMI interrupt
@@ -230,7 +272,8 @@ WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 		update_smi_line();
 		logerror("Generate software SMI with value %02X\n", m_smi_command_port);
 	}
-	logerror("Acpi write %08X to %04X mask %08X\n", data, bank_infos[0].adr + offset * 4, mem_mask);
+	else
+		logerror("Acpi write not recognized\n");
 }
 
 WRITE8_MEMBER(mcpx_isalpc_device::boot_state_w)
@@ -384,6 +427,7 @@ mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *
 void mcpx_smbus_device::device_start()
 {
 	pci_device::device_start();
+	set_multifunction_device(true);
 	m_interrupt_handler.resolve_safe();
 	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io0));
 	bank_infos[0].adr = 0x1000;
@@ -391,6 +435,7 @@ void mcpx_smbus_device::device_start()
 	bank_infos[1].adr = 0xc000;
 	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
 	bank_infos[2].adr = 0xc200;
+	status = 0x00b0;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
 		for (int a = 0; a < 128; a++)
@@ -547,6 +592,7 @@ void mcpx_ohci_device::device_start()
 	m_interrupt_handler.resolve_safe();
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
+	status = 0x00b0;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
 	ohci_usb->set_irq_callbaclk(
@@ -689,6 +735,7 @@ void mcpx_apu_device::device_start()
 	pci_device::device_start();
 	add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
 	bank_infos[0].adr = 0xfe800000;
+	status = 0x00b0;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
 	memset(apust.voices_active, 0, sizeof(apust.voices_active));
@@ -884,12 +931,14 @@ mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, co
 void mcpx_ac97_audio_device::device_start()
 {
 	pci_device::device_start();
+	set_multifunction_device(true);
 	add_map(0x00000100, M_IO, FUNC(mcpx_ac97_audio_device::ac97_io0));
 	bank_infos[0].adr = 0xd000;
 	add_map(0x00000080, M_IO, FUNC(mcpx_ac97_audio_device::ac97_io1));
 	bank_infos[1].adr = 0xd200;
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
 	bank_infos[2].adr = 0xfec00000;
+	status = 0x00b0;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
 
@@ -981,24 +1030,56 @@ mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, co
 
 DEFINE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device, "mcpx_ide", "MCPX IDE Controller")
 
-void mcpx_ide_device::mcpx_ide_io(address_map &map)
+void mcpx_ide_device::config_map(address_map &map)
 {
-	map(0x0000, 0x000f).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
+	pci_device::config_map(map);
+	map(0x08, 0x0b).rw(FUNC(pci_device::class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
+}
+
+void mcpx_ide_device::ide_pri_command(address_map &map)
+{
+	map(0, 7).rw("ide1", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
+}
+
+void mcpx_ide_device::ide_pri_control(address_map &map)
+{
+}
+
+void mcpx_ide_device::ide_sec_command(address_map &map)
+{
+	map(0, 7).rw("ide2", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
+}
+
+void mcpx_ide_device::ide_sec_control(address_map &map)
+{
+}
+
+void mcpx_ide_device::ide_io(address_map &map)
+{
+	map(0x0000, 0x0007).rw("ide1", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
+	map(0x0008, 0x000f).rw("ide2", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
-	m_interrupt_handler(*this)
+	m_pri_interrupt_handler(*this),
+	m_sec_interrupt_handler(*this)
 {
-	set_ids(0x10de01bc, 0, 0, 0);
+	set_ids(0x10de01bc, 0, 0x01018a, 0);
 }
 
 void mcpx_ide_device::device_start()
 {
 	pci_device::device_start();
-	add_map(0x00000010, M_IO, FUNC(mcpx_ide_device::mcpx_ide_io));
-	bank_infos[0].adr = 0xff60;
-	m_interrupt_handler.resolve_safe();
+	add_map(0x00000008, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_pri_command)); // primary command block
+	add_map(0x00000004, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_pri_control)); // primary control block
+	add_map(0x00000008, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_sec_command)); // secondary command block
+	add_map(0x00000004, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_sec_control)); // secondary control block
+	add_map(0x00000010, M_IO, FUNC(mcpx_ide_device::ide_io));
+	bank_infos[4].adr = 0xff60;
+	status = 0x00b0;
+	m_pri_interrupt_handler.resolve_safe();
+	m_sec_interrupt_handler.resolve_safe();
 }
 
 void mcpx_ide_device::device_reset()
@@ -1008,14 +1089,42 @@ void mcpx_ide_device::device_reset()
 
 void mcpx_ide_device::device_add_mconfig(machine_config &config)
 {
-	bus_master_ide_controller_device &ide(BUS_MASTER_IDE_CONTROLLER(config, "ide", 0));
-	ide.irq_handler().set(FUNC(mcpx_ide_device::ide_interrupt));
-	ide.set_bus_master_space(":maincpu", AS_PROGRAM);
+	bus_master_ide_controller_device &ide1(BUS_MASTER_IDE_CONTROLLER(config, "ide1", 0));
+	ide1.irq_handler().set(FUNC(mcpx_ide_device::ide_pri_interrupt));
+	ide1.set_bus_master_space(":maincpu", AS_PROGRAM);
+
+	bus_master_ide_controller_device &ide2(BUS_MASTER_IDE_CONTROLLER(config, "ide2", 0));
+	ide2.irq_handler().set(FUNC(mcpx_ide_device::ide_sec_interrupt));
+	ide2.set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_interrupt)
+void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	m_interrupt_handler(state);
+	if (~pclass & 1)
+		io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
+	/*if (~pclass & 4)
+		io_space->install_device(0x3f0, 0x3f7, *this, &mcpx_ide_device::ide_sec_command);*/
+}
+
+WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		// bit 0 specifies if the primary channel is in compatibility or native-pci mode
+		// bit 2 specifies if the secondary channel is in compatibility or native-pci mode
+		pclass = (pclass & 0xfffffffa) | ((data >> 8) & 5);
+	}
+}
+
+WRITE_LINE_MEMBER(mcpx_ide_device::ide_pri_interrupt)
+{
+	m_pri_interrupt_handler(state);
+}
+
+WRITE_LINE_MEMBER(mcpx_ide_device::ide_sec_interrupt)
+{
+	m_sec_interrupt_handler(state);
 }
 
 /*
@@ -1088,6 +1197,7 @@ void nv2a_gpu_device::device_start()
 void nv2a_gpu_device::device_reset()
 {
 	pci_device::device_reset();
+	nvidia_nv2a->set_ram_base(m_program->get_read_ptr(0));
 }
 
 READ32_MEMBER(nv2a_gpu_device::geforce_r)
