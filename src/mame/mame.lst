@@ -12482,6 +12482,22 @@ egghunt                         // (c) 1995 Invi Image
 einst256                        //
 einstein                        //
 
+@source:elan_eu3a14.cpp
+rad_gtg
+rad_rsg
+rad_rsgp
+rad_foot
+rad_bb3
+rad_bb3p
+rad_hnt3
+rad_hnt3p
+rad_bask
+rad_baskp
+
+@source:elan_eu3a05.cpp
+rad_sinv
+rad_tetr
+
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
 
@@ -33375,22 +33391,6 @@ r9751                           // ROLM 9751 phone system
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
 rabbitjt                        // (c) 1996 Electronic Arts
-
-@source:rad_eu3a14.cpp
-rad_gtg
-rad_rsg
-rad_rsgp
-rad_foot
-rad_bb3
-rad_bb3p
-rad_hnt3
-rad_hnt3p
-rad_bask
-rad_baskp
-
-@source:rad_eu3a05.cpp
-rad_sinv
-rad_tetr
 
 @source:radio86.cpp
 impuls03                        //
