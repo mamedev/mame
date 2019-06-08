@@ -883,7 +883,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		height *= 4;
 
-		x -= 8;
+		x -= 6;
 		y -= 4;
 
 		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
