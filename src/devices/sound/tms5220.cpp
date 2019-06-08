@@ -368,41 +368,40 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 
 
 /* *****debugging defines***** */
+// general, somewhat obsolete, catch all for debugs which don't fit elsewhere
 #define LOG_GENERAL (1 << 0)
-// above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
-#define LOG_DUMP_INPUT_DATA (1 << 1)
 /* 5220 only; above dumps the data written to the tms52xx to stdout, useful
    for making logged data dumps for real hardware tests */
-#define LOG_FIFO (1 << 2)
+#define LOG_DUMP_INPUT_DATA (1 << 1)
 // 5220 only; above debugs FIFO stuff: writes, reads and flag updates
-#define LOG_PARSE_FRAME_DUMP_BIN (1 << 3)
+#define LOG_FIFO (1 << 2)
 // dumps each speech frame as binary
-#define LOG_PARSE_FRAME_DUMP_HEX (1 << 4)
+#define LOG_PARSE_FRAME_DUMP_BIN (1 << 3)
 // dumps each speech frame as hex
+#define LOG_PARSE_FRAME_DUMP_HEX (1 << 4)
+// dumps info if a frame ran out of data
 #define LOG_FRAME_ERRORS (1 << 6)
-// above dumps info if a frame ran out of data
+// dumps all non-speech-data command writes
 #define LOG_COMMAND_DUMP (1 << 7)
-// above dumps all non-speech-data command writes
+// dumps decoded info about command writes
 #define LOG_COMMAND_VERBOSE (1 << 8)
-// above dumps decoded info about command writes
+// spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #define LOG_PIN_READS (1 << 9)
-// above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
+// dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
 #define LOG_GENERATION (1 << 10)
-// above dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
+// dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
 #define LOG_GENERATION_VERBOSE (1 << 11)
-// above dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
+// dumps the lattice filter state data each sample.
 #define LOG_LATTICE (1 << 12)
-// above dumps the lattice filter state data each sample.
+// dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
 #define LOG_CLIP (1 << 13)
-// above dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
+// debugs the io ready callback timer
 #define LOG_IO_READY (1 << 14)
-// above debugs the io ready callback timer
+// debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 #define LOG_RS_WS (1 << 15)
-// above debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 
 //#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS)
 #include "logmacro.h"
-// TODO: switch the comments to be above the defines instead of below them
 
 #define MAX_SAMPLE_CHUNK    512
 
