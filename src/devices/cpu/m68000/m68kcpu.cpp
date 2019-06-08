@@ -1342,9 +1342,9 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
  * 32-bit data memory interface
  ****************************************************************************/
 
-static inline u32 dword_from_byte(u8 data) { return u32(data) << 24 | u32(data) << 16 | u32(data) << 8 | data; }
-static inline u32 dword_from_word(u16 data) { return u32(data) << 16 | data; }
-static inline u32 dword_from_unaligned_word(u16 data) { return u32(data & 0xff00) << 16 | u32(data) << 8 | (data & 0xff00) >> 8; }
+static inline u32 dword_from_byte(u8 data) { return data * 0x01010101U; }
+static inline u32 dword_from_word(u16 data) { return data * 0x00010001U; }
+static inline u32 dword_from_unaligned_word(u16 data) { return u32(data) << 8 | ((data >> 8) * 0x01000001U); }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
 void m68000_base_device::init32(address_space &space, address_space &ospace)
@@ -1376,7 +1376,7 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 
 		case 3:
 			m_space->write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
-			m_space->write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000);
+			m_space->write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
 			break;
 		}
 	};

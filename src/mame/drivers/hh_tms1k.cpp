@@ -143,6 +143,7 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
+  - tithermos temperature sensor comparator (right now just the digital clock works)
   - is alphie(patent) the same as the final version?
 
 ***************************************************************************/
@@ -151,6 +152,7 @@
 #include "includes/hh_tms1k.h"
 
 #include "machine/tms1024.h"
+#include "machine/clock.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
@@ -228,6 +230,7 @@
 #include "tcfball.lh"
 #include "tcfballa.lh"
 #include "timaze.lh"
+#include "tithermos.lh"
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
@@ -9394,6 +9397,161 @@ ROM_END
 
 /***************************************************************************
 
+  Texas Instruments Electronic Digital Thermostat
+  * TMS0970 MCU, TMC0910B (die label 0970F-10E)
+  * 4-digit 7seg LED display
+  * temperature sensor, heat/cool outputs, fan
+
+  This is a thermostat and digital clock. It's the 2nd one described in
+  patents US4388692 and US4298946.
+
+***************************************************************************/
+
+class tithermos_state : public hh_tms1k_state
+{
+public:
+	tithermos_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_60hz(*this, "ac_line")
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void tithermos(machine_config &config);
+
+private:
+	required_device<clock_device> m_60hz;
+};
+
+// handlers
+
+WRITE16_MEMBER(tithermos_state::write_r)
+{
+	// D1-D4: select digit
+	set_display_segmask(0xf, 0x7f);
+	display_matrix(7, 4, m_o, data);
+
+	// D6: heat/cool
+	// D8: A/D reset
+	m_r = data;
+}
+
+WRITE16_MEMBER(tithermos_state::write_o)
+{
+	// SA-SP: input mux
+	// SA-SG: digit segments
+	m_o = m_inp_mux = data;
+}
+
+READ8_MEMBER(tithermos_state::read_k)
+{
+	// K: multiplexed inputs
+	u8 data = read_inputs(8);
+
+	// when SB/SD/SP is high:
+	if (m_inp_mux & 0x8a)
+	{
+		// K1: 60hz from AC line
+		// K2: battery low?
+		// K8: A/D output (TODO)
+		data |= (m_60hz->signal_r()) ? 1 : 0;
+	}
+
+	return data;
+}
+
+// config
+
+static INPUT_PORTS_START( tithermos )
+	PORT_START("IN.0") // SA
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Two Set PM 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Four Set PM 2")
+
+	PORT_START("IN.1") // SB
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // SC
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Two Set PM 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Four Set PM 1")
+
+	PORT_START("IN.3") // SD
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_CONFNAME( 0x06, 0x04, "System")
+	PORT_CONFSETTING(    0x04, "Heat" )
+	PORT_CONFSETTING(    0x00, "Off" )
+	PORT_CONFSETTING(    0x02, "Cool" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // A/D output
+
+	PORT_START("IN.4") // SE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Two Set AM 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Four Set AM 2")
+
+	PORT_START("IN.5") // SF
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Two Set AM 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Four Set AM 1")
+
+	PORT_START("IN.6") // SG
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Temp / Actual")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Time / Clock")
+
+	PORT_START("IN.7") // SP
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_CONFNAME( 0x06, 0x04, "Mode")
+	PORT_CONFSETTING(    0x04, "Constant" )
+	PORT_CONFSETTING(    0x00, "Four Set" )
+	PORT_CONFSETTING(    0x02, "Two Set" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // A/D output
+INPUT_PORTS_END
+
+void tithermos_state::tithermos(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS0970(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(tithermos_state::read_k));
+	m_maincpu->r().set(FUNC(tithermos_state::write_r));
+	m_maincpu->o().set(FUNC(tithermos_state::write_o));
+
+	CLOCK(config, "ac_line", 60).signal_handler().set_nop();
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_tithermos);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( tithermos )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0910b", 0x0000, 0x0400, CRC(232011cf) SHA1(598ae8cecd98226fb5056c99ce9f47fd23785fd7) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common2_instr.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_tithermos_micro.pla", 0, 860, CRC(a3bb8ca5) SHA1(006ea733440001c37a77d4ffbc4bd2a8fee212ac) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_tithermos_output.pla", 0, 352, CRC(eb3598fd) SHA1(2372ae17fb982cae2710bf8c348bf02b767daabd) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
@@ -10564,6 +10722,7 @@ CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, emp
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -7701,13 +7701,8 @@ has been replaced with an all-zero block. -->
 		<publisher>Tasc</publisher>
 		<info name="usage" value="ChessMachine installation required, see README.TXT" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="989b0640" sha1="bf012e74a67590a94b3320727f76c834fabe4251"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="4cf95170" sha1="320710397eaf659a631bc2fdd194805a3454665d"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="chessmen.img" size="1474560" crc="737be161" sha1="edc6e6506778115b5238c6e8ad907ece42d99634"/>
 			</dataarea>
 		</part>
 	</software>

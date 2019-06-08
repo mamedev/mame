@@ -109,7 +109,7 @@ private:
 
 	DECLARE_READ32_MEMBER(sngkace_input_r);
 	DECLARE_READ32_MEMBER(gunbird_input_r);
-	DECLARE_WRITE32_MEMBER(s1945_mcu_w);
+	void s1945_mcu_w(offs_t offset, uint8_t data);
 	DECLARE_READ32_MEMBER(s1945_mcu_r);
 	DECLARE_READ32_MEMBER(s1945_input_r);
 	DECLARE_WRITE8_MEMBER(s1945bl_okibank_w);

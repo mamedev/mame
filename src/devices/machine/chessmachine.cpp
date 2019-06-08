@@ -25,6 +25,7 @@ CPU speed. It should be around 14-16MHz. The ARM CPU is rated 12MHz, they
 probably went for this solution to get optimum possible speed for each module.
 
 TODO:
+- PC version still gives a sync error on boot sometimes, probably related to quantum
 - is interrupt handling correct?
 - timer shouldn't be needed for disabling bootstrap, real ARM has already read the next opcode
 
