@@ -66,7 +66,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
-#include "audio/rad_eu3a05.h"
+#include "audio/elan_eu3a05.h"
 #include "machine/timer.h"
 
 /*

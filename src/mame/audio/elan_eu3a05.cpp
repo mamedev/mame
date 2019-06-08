@@ -4,9 +4,9 @@
 // Format not understood, it is not OKI ADPCM or IMA ADPCM, maybe something more basic?
 
 #include "emu.h"
-#include "rad_eu3a05.h"
+#include "elan_eu3a05.h"
 
-DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound", "Radica 6502 Sound")
+DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound", "Elan EU3A05 / EU3A14 Sound")
 
 #define LOG_AUDIO       (1U << 0)
 
