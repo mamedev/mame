@@ -1025,7 +1025,20 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r));
 	map(0x50a9, 0x50a9).nopw(); // startup, read foot
 
-	// video regs are here this time
+	// video regs are in the 51xx range
+
+	// huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and gallery mode timer??
+	// 5100 - 0x0f when effect is enabled, 0x00 otherwise?   
+	// 5101 - 0x0e in both modes
+	// 5102 - 0x86 in both modes
+	// 5103 - 0x0e in tropy room (left?)                                  / 0x2a in gallery mode (left position?)
+	// 5104 - trophy room window / highlight top, move with cursor        / 0xbf in gallery mode (top?)
+	// 5105 - 0x52 in trophy room (right?)                                / counts from 0xa1 to 0x2a (right position?)
+	// 5106 - trophy room window / highlight bottom, move with cursor     / 0xcb in gallery mode (bottom?)
+	// 5107 - 0x00
+	// 5108 - 0x04 in both modes
+	// 5109 - 0xc2 in both modes
+
 	map(0x5100, 0x5100).ram();
 	map(0x5101, 0x5101).ram();
 	map(0x5102, 0x5102).ram();
