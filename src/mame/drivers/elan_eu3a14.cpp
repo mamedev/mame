@@ -518,8 +518,8 @@ void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap
 		rtm_yscroll = 0;
 
 		// disable layer in shooting gallery for now until we understand it
-		if (m_ramtilecfg[5] == 0x06)
-			return;
+		//if (m_ramtilecfg[5] == 0x06)
+		//	return;
 
 		// force same mode as other tilemap?
 #if 0
@@ -557,6 +557,14 @@ void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap
 		// this is in the same place even when the first tilemap is in 16x16 mode, probably a base register somewhere
 		int ramstart = m_tilerambase + 0x700;
 		int ramend = m_tilerambase + 0x700 + 0x700;
+
+		// hack for shooting gallery mode
+		if (m_ramtilecfg[5] == 0x06)
+		{
+			ramstart = 0x3980-0x200;
+			ramend = 0x3980-0x200 + 0x700;
+		}
+
 
 		{
 			// normal
