@@ -259,7 +259,7 @@ static const z80_daisy_config rs128_daisy_chain[] =
 
 TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 {
-	bool cass_ws = (m_cassette->input() > +0.03) ? 1 : 0;
+	bool cass_ws = (m_cassette->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cassold)
 	{
