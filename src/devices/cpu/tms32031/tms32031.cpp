@@ -2,9 +2,15 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    tms32031.c
+    tms32031.cpp
 
-    TMS32031/2 emulator
+    TMS32030/1/2 emulator
+	
+	Todo: Serial communications for device linking
+	-Known to be compatible with RS-232 (Midway V Unit and Gaelco 3d), and FireWire (Midway Zeus II).
+	-320C30 can support two serial ports naturally while 32031/2 only supports one.
+		+However, All Midway V Unit, Zeus II, and some Gaelco 3d (specfically Speed Up) pcbs have two serial ports for linking between more than two pcbs.
+	-Is FireWire only compatible with 320C32?
 
 ***************************************************************************/
 
