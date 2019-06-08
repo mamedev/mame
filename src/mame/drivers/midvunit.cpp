@@ -15,8 +15,8 @@
     Todo:
         * Cruis'n World's neutral gear texture corruption
         * Both games will eventually freeze in attract mode
-        * in Cruis'n World attract mode, right side of sky looks like it has wrapped
-        * Cruis'n USA's ending plays at double speed
+        * Some skybox textures in Cruis'n world do not load correctly and leak.
+        * Cruis'n USA's rom test, car select, high score screen and ending sequence plays at double speed
         * RS232 support for communications (requires serial support from tms32031.cpp)
 
 Known to exist but not dumped:
@@ -1220,13 +1220,13 @@ Notes:
                     - labelled 'A-19673' for Cruis'n USA
                     - labelled 'A-21167 U111' for Cruis'n World
                     - labelled 'A-21173 U111' for Off Road Challenge
-      P3		- 7-pin connector for speakers
-      P4		- 5-pin power connector
-      P5-P7		- Not used
-      P8		- 20-pin ribbon connector to wheel board
-      P9		- 12-pin connector for volume control and gears
-      P10		- Ribbon connector for DB25 serial ports/cabinet linking
-      P11		- 13-pin connector for analog inputs; gas, brake and steering
+      P3	- 7-pin connector for speakers
+      P4	- 5-pin power connector
+      P5-P7	- Not used
+      P8	- 20-pin ribbon connector to wheel board
+      P9	- 12-pin connector for volume control and gears
+      P10	- Ribbon connector for DB25 serial ports/cabinet linking
+      P11	- 13-pin connector for analog inputs; gas, brake and steering
       VSync     - 57.7090Hz  \
       HSync     - 24.807kHz  / measured via EL4583
       ROMs      - All ROMs 27C040 or 27C801
