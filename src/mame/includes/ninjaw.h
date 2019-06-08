@@ -38,6 +38,11 @@ public:
 	void darius2(machine_config &config);
 	void ninjaw(machine_config &config);
 
+protected:
+	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -50,31 +55,27 @@ private:
 	required_device_array<gfxdecode_device, 3> m_gfxdecode;
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_spriteram;
 
 	/* memory regions */
 	required_memory_bank m_z80bank;
 
 	/* misc */
-	uint16_t     m_cpua_ctrl;
+	u16     m_cpua_ctrl;
 	int        m_pandata[4];
 
 	void coin_control_w(u8 data);
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	void cpua_ctrl_w(u16 data);
 	void sound_bankswitch_w(u8 data);
 	void pancontrol_w(offs_t offset, u8 data);
-	DECLARE_WRITE16_MEMBER(tc0100scn_triple_screen_w);
+	void tc0100scn_triple_screen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void postload();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs, int chip);
+	u32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip);
 	void parse_control();
-	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
+	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
 	void darius2_master_map(address_map &map);
 	void darius2_slave_map(address_map &map);
 	void ninjaw_master_map(address_map &map);
