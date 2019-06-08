@@ -30,7 +30,7 @@
     The Basketball camera also uses an ETOMS CU5502.  It’s different from the others (XaviXport + Real Swing Golf) in that the sensor is on a small PCB with
     a 3.58MHz resonator with 16 wires going to another small PCB that has a glob and a 4MHz resonator.  6 wires go from that PCB to the main game PCB.
 
-	To access hidden test mode in Football hold enter and left during power on.
+	To access hidden test mode in Football hold enter and right during power on.
 
 	Football test mode tests X pos, Y pos, Z pos, direction and speed.  This data must all be coming from the camera in the unit as the shinpads are simply
 	reflective objects, they don't contain any electronics.  It could be a useful test case for better understanding these things.
@@ -39,7 +39,7 @@
 
 	To access hidden test mode in Basketball hold left and Button 1 during power on.
 
-	To access hidden test mode in Real Swing Gold hold left and down during power on.
+	To access hidden test mode in Real Swing Golf hold left and down during power on.
 	 - test mode check
 	 77B6: lda $5041
 	 77B9: eor #$ed
