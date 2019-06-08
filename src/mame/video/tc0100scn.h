@@ -36,6 +36,11 @@ public:
 		m_flip_text_xoffs = x_offset;
 		m_flip_text_yoffs = y_offset;
 	}
+	void update_granularity()
+	{
+		if (gfx(0)) gfx(0)->set_granularity(m_gfxdecode->gfx(m_gfxnum)->granularity());
+		if (gfx(1)) gfx(1)->set_granularity(m_gfxdecode->gfx(m_gfxnum)->granularity());
+	}
 
 	static constexpr unsigned SINGLE_VDU = 1024; // for set_multiscr_xoffs
 
