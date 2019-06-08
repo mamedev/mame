@@ -8,6 +8,7 @@ DEFINE_DEVICE_TYPE(I82439HX, i82439hx_host_device, "i82439hx", "Intel 82439HX no
 void i82439hx_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	map(0x10, 0x4f).noprw();
 	map(0x50, 0x50).rw(FUNC(i82439hx_host_device::pcon_r), FUNC(i82439hx_host_device::pcon_w));
 	map(0x52, 0x52).rw(FUNC(i82439hx_host_device::cc_r), FUNC(i82439hx_host_device::cc_w));
 	map(0x56, 0x56).rw(FUNC(i82439hx_host_device::dramec_r), FUNC(i82439hx_host_device::dramec_w));
@@ -46,7 +47,9 @@ void i82439hx_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	command = 0x0006;
+	command_mask = 0x0106;
+	status = 0x0200;
 
 	ram.resize(ram_size/4);
 }
@@ -159,6 +162,11 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 	memory_space->install_ram          (0x01000000, ram_size-1, &ram[0x01000000/4]);
 }
 
+
+READ8_MEMBER (i82439hx_host_device::header_type_r)
+{
+	return 0x00; // from datasheet
+}
 
 READ8_MEMBER (i82439hx_host_device::pcon_r)
 {
