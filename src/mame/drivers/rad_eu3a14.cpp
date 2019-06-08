@@ -312,7 +312,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix)
-							dst[realx] = pix | (palette<<8);
+							dst[realx] = pix | palette;
 					}
 				}
 				else if (bppdiv == 2) // 4bpp
@@ -321,7 +321,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0xf0)
-							dst[realx] = ((pix & 0xf0) >> 4) | (palette<<4);
+							dst[realx] = ((pix & 0xf0) >> 4) | palette;
 					}
 
 					realx++;
@@ -329,7 +329,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0x0f)
-							dst[realx] = (pix & 0x0f) | (palette<<4);
+							dst[realx] = (pix & 0x0f) | palette;
 					}
 				}
 				else if (bppdiv == 4) // 2bpp (hnt3 ram text)
@@ -338,7 +338,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0xc0)
-							dst[realx] = ((pix & 0xc0) >> 6);
+							dst[realx] = ((pix & 0xc0) >> 6) | palette;
 					}
 
 					realx++;
@@ -346,7 +346,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0x30)
-							dst[realx] = ((pix & 0x30) >> 4);
+							dst[realx] = ((pix & 0x30) >> 4) | palette;
 					}
 		
 					realx++;
@@ -354,7 +354,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0x0c)
-							dst[realx] = ((pix & 0x0c) >> 2);
+							dst[realx] = ((pix & 0x0c) >> 2) | palette;
 					}
 
 					realx++;
@@ -362,7 +362,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0x03)
-							dst[realx] = ((pix & 0x03) >> 0);
+							dst[realx] = ((pix & 0x03) >> 0) | palette;
 					}
 				}
 			}
@@ -371,13 +371,14 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 	}
 }
 
-void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int which, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
+void radica_eu3a14_state::draw_background_page(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int ramstart, int ramend, int which, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
 {
 	int backtiletype = 0;
 
-	int palette = 0;
+	int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
+	palette = palette << 4;
 
-	if (bpp==4) // 4bpp selection
+	if (bpp == 4) // 4bpp selection
 	{
 		backtiletype = 1; // 16x16 4bpp
 
@@ -385,13 +386,8 @@ void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind
 		{
 			backtiletype = 3; // 8x8 4bpp
 		}
-
-		if (palettepri & 0x08)
-		{
-			palette |= 0x10;
-		}
 	}
-	else if (bpp==8) // 8bpp selection
+	else if (bpp == 8) // 8bpp selection
 	{
 		backtiletype = 0; // 16x16 8bpp
 
@@ -400,10 +396,7 @@ void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind
 			backtiletype = 2; // 8x8 8bpp
 		}
 
-		if (palettepri & 0x08)
-		{
-			palette += 1;
-		}
+		palette &= 0x100; // only top bit valid, as there are only 2 palettes?
 	}
 	else // 2bpp?
 	{
@@ -422,9 +415,12 @@ void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind
 		{
 			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
 
-			if (m_tilecfg[2] & 0x04) // palette in 4bpp mode at least
+			if (bpp == 4) // palette in 4bpp mode at least
 			{
-				realpalette = palette | ((palettepri & 0xf0) >> 4);
+				realpalette = palette;
+			}
+			else if (bpp == 2)
+			{
 			}
 		}
 		else if (bytespertile == 4) // rad_foot hidden test mode, rad_hnt3 shooting range (not yet correct)
@@ -434,9 +430,14 @@ void radica_eu3a14_state::draw_background_page(screen_device &screen, bitmap_ind
 			// m_mainram[i + 3] & 0x04 is set in both seen cases, maybe per-tile bpp?
 			// this would match up with this mode being inline replacements for m_tilecfg[1] (palettepri) and m_tilecfg[2] (bpp);
 
-			if (m_tilecfg[2] & 0x04) // palette in 4bpp mode at least
+			if (bpp == 4) // palette in 4bpp mode at least
 			{
-				realpalette |= (m_mainram[i + 2] & 0xf0) >> 4;  // hnt3 shooting gallery sets this, lower bits also used, maybe per-tile priority?
+				int newpalette = ((m_mainram[i + 2] & 0xf0) >> 4) | ((m_mainram[i + 2] & 0x08) << 1);
+				newpalette = newpalette << 4;
+				realpalette = newpalette;
+			}
+			else if (bpp == 2)
+			{
 			}
 		}
 
