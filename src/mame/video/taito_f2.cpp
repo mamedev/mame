@@ -696,7 +696,7 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		if (m_sprite_type == 0)
 		{
 			code = m_spriteram_buffered[(offs) / 2] & 0x1fff;
-			u32 i = (code & 0x1c00) >> 10;
+			const u32 i = (code & 0x1c00) >> 10;
 			code = m_spritebank[i] + (code & 0x3ff);
 		}
 
@@ -1033,13 +1033,13 @@ u32 taitof2_state::screen_update_pri(screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-void taitof2_state::draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 priority)
+void taitof2_state::draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority, u8 priority_mask)
 {
 	if (m_tc0280grd != nullptr)
-		m_tc0280grd->tc0280grd_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
+		m_tc0280grd->tc0280grd_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority, priority_mask);
 
 	if (m_tc0430grw != nullptr)
-		m_tc0430grw->tc0430grw_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
+		m_tc0430grw->tc0430grw_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority, priority_mask);
 }
 
 u32 taitof2_state::screen_update_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1103,7 +1103,6 @@ u32 taitof2_state::screen_update_pri_roz(screen_device &screen, bitmap_ind16 &bi
 	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
-
 
 
 /* Thunderfox */
@@ -1205,7 +1204,6 @@ u32 taitof2_state::screen_update_thundfox(screen_device &screen, bitmap_ind16 &b
 	}
 	return 0;
 }
-
 
 
 /*********************************************************************
