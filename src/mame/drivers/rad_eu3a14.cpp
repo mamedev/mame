@@ -109,7 +109,6 @@ public:
 		m_scrollregs(*this, "scrollregs"),
 		m_tilecfg(*this, "tilecfg"),
 		m_ramtilecfg(*this, "ramtilecfg"),
-		m_tilebase(*this, "tilebase"),
 		m_spriteaddr(*this, "spriteaddr"),
 		m_spritebase(*this, "spritebase"),
 		m_mainram(*this, "mainram"),
@@ -184,7 +183,6 @@ private:
 	required_shared_ptr<uint8_t> m_scrollregs;
 	required_shared_ptr<uint8_t> m_tilecfg;
 	required_shared_ptr<uint8_t> m_ramtilecfg;
-	required_shared_ptr<uint8_t> m_tilebase;
 	required_shared_ptr<uint8_t> m_spriteaddr;
 	required_shared_ptr<uint8_t> m_spritebase;
 	required_shared_ptr<uint8_t> m_mainram;
@@ -512,7 +510,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
-	int base = (m_tilebase[1] << 8) | m_tilebase[0];
+	int base = (m_tilecfg[5] << 8) | m_tilecfg[4];
 
 	int pagewidth = 1, pageheight = 1;
 	int bytespertile = 2;
@@ -520,7 +518,16 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
 	// m_tilecfg[1]   pppp x--?    ? = used foot x = used, huntin3 summary (palette bank?) p = palette (used for different stages in huntin3 and the hidden test modes in others)
-	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
+	// m_tilecfg[2]   ---- bbbb    b = bpp mode (0 = 8bpp)
+	// m_tilecfg[3]   ---- ----     (unused or more gfxbase?)
+	// m_tilecfg[4]   gggg gggg     gfxbase (lower bits)
+	// m_tilecfg[5]   gggg gggg     gfxbase (upper bits)
+
+	// ramtilecfg appears to be a similar format, except for the other layer with ram base tiles
+	// however 'a' in m_tilecfg[0] is NOT set
+	// also m_tilecfg[0] has 0x80 set, which would be 4 bytes per tile, but it isn't?
+	// the layer seems to be disabled by setting m_tilecfg[0] to 0?
+
 
 	if (m_tilecfg[0] & 0x10)
 	{
@@ -967,18 +974,20 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5103, 0x5106).ram();
 	map(0x5107, 0x5107).ram(); // on transitions, maybe layer disables?
 	map(0x5108, 0x5109).ram(); // hnt3, frequently rewrites same values, maybe something to do with raster irq?
-	map(0x5110, 0x5112).ram().share("tilecfg");
-	map(0x5113, 0x5113).ram(); // written with tilebase?
-	map(0x5114, 0x5115).ram().share("tilebase");
+
+	// layer specific regs?
+	map(0x5110, 0x5115).ram().share("tilecfg");
 	map(0x5116, 0x5117).ram();
 	map(0x511a, 0x511e).ram(); // hnt3
+
 	map(0x5121, 0x5124).ram().share("scrollregs");
 	map(0x5125, 0x512c).ram(); // hnt3
 
-	map(0x5140, 0x5142).ram().share("ramtilecfg");; // hnt3
-	map(0x5143, 0x5145).ram(); // hnt3
+	// layer specific regs?
+	map(0x5140, 0x5145).ram().share("ramtilecfg"); // hnt3
 	map(0x5148, 0x514b).ram(); // hnt3
 
+	// sprite specific regs?
 	map(0x5150, 0x5150).ram().share("spriteaddr"); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
 	map(0x5151, 0x5152).ram().share("spritebase");
 	map(0x5153, 0x5153).ram(); // startup
