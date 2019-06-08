@@ -725,6 +725,7 @@
 	<element name="Text_Solenoids"><text string="Momentary Solenoids"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="Text_Coils"><text string="Coils"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="Text_MPU_LED"><text string="MPU LED"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="Text_Sound_LED"><text string="Sound LED"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="Text_Activity"><text string="Activity Switch"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="Text_Service"><text string="Service Switch"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="Text_Slam"><text string="Slam Switch"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -1012,18 +1013,6 @@
 		<bezel element="Text_Multiball"><bounds x="013" y="350" width="314" height="12" /></bezel>
 
 
-		<!-- Backbox -->
-
-		<!-- MPU Board Power On Self Test LED -->
-		<bezel element="Text_MPU_LED">         <bounds x="609" y="342" width="30" height="10" /></bezel>
-		<bezel name="led0" element="LED_Green"><bounds x="618" y="328" width="10" height="10" /></bezel>
-
-		<!-- MPU Board Activity Switch -->
-		<bezel element="Text_Activity">                                      <bounds x="540" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="TEST" inputmask="0x02"><bounds x="550" y="331" width="20" height="10" /></bezel>
-		<bezel element="Key_0">                                              <bounds x="571" y="330" width="10" height="10" /></bezel>
-
-
 		<!-- Player 1 Score -->
 		<bezel name="lamp14" element="Lamp_P1"><bounds x="330" y="55" width="15" height="15" /></bezel>         <!-- Backbox ~ 1st Player Up -->
 		<bezel name="digit17" element="Digit"><bounds x="360" y="55" width="10" height="15" /></bezel>
@@ -1184,20 +1173,32 @@
 		<bezel name="solenoid19" element="Coil_PullDown"><bounds x="615" y="459" width="09" height="12" /></bezel>
 
 
-
+		<!-- Backbox -->
 		<!-- Cabinet Switches -->
-		<bezel element="Text_Service">                                       <bounds x="485" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="TEST" inputmask="0x01"><bounds x="495" y="331" width="20" height="10" /></bezel>
-		<bezel element="Key_9">                                              <bounds x="516" y="330" width="10" height="10" /></bezel>
+		<bezel element="Text_Service">                                       <bounds x="425" y="342" width="50" height="10" /></bezel>
+		<bezel element="Switch_Push-Button" inputtag="TEST" inputmask="0x01"><bounds x="435" y="331" width="20" height="10" /></bezel>
+		<bezel element="Key_9">                                              <bounds x="456" y="330" width="10" height="10" /></bezel>
 
-		<bezel element="Text_Slam">                                     <bounds x="430" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_SlamTilt" inputtag="X1" inputmask="0x80"><bounds x="434" y="331" width="25" height="08" /></bezel>
-		<bezel element="Key_Equals">                                    <bounds x="461" y="330" width="10" height="10" /></bezel>
+		<bezel element="Text_Slam">                                     <bounds x="370" y="342" width="50" height="10" /></bezel>
+		<bezel element="Switch_SlamTilt" inputtag="X1" inputmask="0x80"><bounds x="374" y="331" width="25" height="08" /></bezel>
+		<bezel element="Key_Equals">                                    <bounds x="401" y="330" width="10" height="10" /></bezel>
 
-		<bezel element="Text_Tilt">                                 <bounds x="380" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_Tilt" inputtag="X0" inputmask="0x40"><bounds x="390" y="324" width="17" height="17" /></bezel>
-		<bezel element="Key_T">                                     <bounds x="411" y="330" width="10" height="10" /></bezel>
+		<bezel element="Text_Tilt">                                 <bounds x="320" y="342" width="50" height="10" /></bezel>
+		<bezel element="Switch_Tilt" inputtag="X0" inputmask="0x40"><bounds x="330" y="324" width="17" height="17" /></bezel>
+		<bezel element="Key_T">                                     <bounds x="351" y="330" width="10" height="10" /></bezel>
 
+		<!-- MPU Board Activity Switch -->
+		<bezel element="Text_Activity">                                      <bounds x="480" y="342" width="50" height="10" /></bezel>
+		<bezel element="Switch_Push-Button" inputtag="TEST" inputmask="0x02"><bounds x="490" y="331" width="20" height="10" /></bezel>
+		<bezel element="Key_0">                                              <bounds x="511" y="330" width="10" height="10" /></bezel>
+
+		<!-- MPU Board Power On Self Test LED -->
+		<bezel name="led0" element="LED_Green"><bounds x="618" y="328" width="10" height="10" /></bezel>
+		<bezel element="Text_MPU_LED">         <bounds x="609" y="342" width="30" height="10" /></bezel>
+
+		<!-- Sound Board Power On Self Test LED -->
+		<bezel name="sound_led0" element="LED_Green"><bounds x="618" y="358" width="10" height="10" /></bezel>
+		<bezel element="Text_Sound_LED">	 <bounds x="609" y="372" width="30" height="10" /></bezel>
 
 		<!-- Misc Solenoids -->
 		<bezel name="solenoid5"  element="Solenoid_Knocker"><bounds x="297" y="457" width="23" height="09" /></bezel>

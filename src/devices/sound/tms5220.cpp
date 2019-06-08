@@ -1821,9 +1821,10 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 			/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = false;
 			update_ready_state();
-			/* How long does /READY stay inactive, when /RS is pulled low? It might be always ~16 clocks (25 usec at 800khz as shown on the datasheet)
-			 but the patent schematic implies it might be as short as 4 clock cycles. */
-			m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
+			// The datasheet doesn't give an exact time when /READY should change, but the data is valid 6-11 usec after /RS goes low.
+			// It looks like /READY goes high soon after that (although the datasheet graph is not to scale).
+			// The value of 13 was measured on a real chip with an oscilloscope, and it fits the datasheet.
+			m_timer_io_ready->adjust(attotime::from_usec(13), 1);
 		}
 	}
 }

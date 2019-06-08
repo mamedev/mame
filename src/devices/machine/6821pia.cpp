@@ -237,12 +237,11 @@ uint8_t pia6821_device::get_in_a_value()
 		}
 	}
 
-	// - connected pins are always read
-	// - disconnected pins read the output buffer in output mode
-	// - disconnected pins are HI in input mode
-	ret = (~m_port_a_z_mask             & port_a_data) |
-			( m_port_a_z_mask &  m_ddr_a & m_out_a) |
-			( m_port_a_z_mask & ~m_ddr_a);
+	// For port A, when the port is in output mode, other devices can drive the pins too.
+	// If they load the lines so the voltage changes from what the PIA is outputting, that
+	// value will be read back.
+	// TODO: Figure out if any boards do this, and compensate.
+	ret = (m_out_a & m_ddr_a) | (port_a_data & ~m_ddr_a);
 
 	return ret;
 }
