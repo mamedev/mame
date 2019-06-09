@@ -48,8 +48,6 @@ DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Ap
 #define VIDEOTERM_SCREEN_NAME "vterm_screen"
 #define VIDEOTERM_MC6845_NAME "mc6845_vterm"
 
-#define MDA_CLOCK   16257000
-
 ROM_START( a2videoterm )
 	ROM_REGION(0x400, VIDEOTERM_ROM_REGION, 0)
 	ROM_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf) )
@@ -119,16 +117,61 @@ ROM_END
 
 void a2bus_videx80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER)); // 560x216?  (80x24 7x9 characters)
-	screen.set_raw(MDA_CLOCK, 882, 0, 720, 370, 0, 350);
+	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(17.43_MHz_XTAL, 1107, 0, 720, 315, 0, 216);
 	screen.set_screen_update(VIDEOTERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, MDA_CLOCK/9);
+	HD6845S(config, m_crtc, 17.43_MHz_XTAL / 9);
 	m_crtc->set_screen(VIDEOTERM_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
+	m_crtc->set_char_width(9);
 	m_crtc->set_update_row_callback(FUNC(a2bus_videx80_device::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(a2bus_videx80_device::vsync_changed));
+}
+
+void a2bus_ap16_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(16_MHz_XTAL, 1026, 0, 720, 313, 0, 216);
+
+	m_crtc->set_clock(16_MHz_XTAL / 9);
+}
+
+void a2bus_ap16alt_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(18_MHz_XTAL, 1152, 0, 720, 315, 0, 216);
+
+	m_crtc->set_clock(18_MHz_XTAL / 9);
+}
+
+void a2bus_vtc1_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(14'742'000, 945, 0, 720, 260, 0, 216); // clock uncertain
+
+	m_crtc->set_clock(14'742'000 / 9);
+}
+
+void a2bus_vtc2_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(17.43_MHz_XTAL, 1116, 0, 720, 260, 0, 216);
+}
+
+void a2bus_aevm80_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(18_MHz_XTAL, 1280, 0, 800, 234, 0, 216);
+
+	m_crtc->set_clock(18_MHz_XTAL / 10);
+	m_crtc->set_char_width(10);
+	m_crtc->set_update_row_callback(FUNC(a2bus_aevm80_device::crtc_update_row_alt), this);
 }
 
 //-------------------------------------------------
@@ -355,6 +398,43 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
 		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
 		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p = bg; p++;
+	}
+}
+
+MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row_alt )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	int i;
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		uint16_t offset = ( ma + i ) & 0x7ff;
+		uint8_t chr = m_ram[ offset ];
+		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
+		uint8_t fg = 15;
+		uint8_t bg = 0;
+
+		if ( i == cursor_x )
+		{
+			if ( m_framecnt & 0x08 )
+			{
+				data = 0xFF;
+			}
+		}
+
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p = bg; p++;
+		*p = bg; p++;
 	}
 }
 
