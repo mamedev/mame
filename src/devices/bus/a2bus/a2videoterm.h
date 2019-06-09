@@ -47,10 +47,11 @@ protected:
 	required_device<mc6845_device> m_crtc;
 	required_device<device_palette_interface> m_palette;
 
-private:
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_UPDATE_ROW(crtc_update_row_alt);
 
+private:
 	int m_rambank;
 };
 
@@ -67,6 +68,7 @@ class a2bus_ap16_device : public a2bus_videx80_device
 public:
 	a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
@@ -79,6 +81,7 @@ class a2bus_ap16alt_device : public a2bus_videx80_device
 public:
 	a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
@@ -90,6 +93,7 @@ class a2bus_vtc1_device : public a2bus_videx80_device
 public:
 	a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -98,6 +102,7 @@ class a2bus_vtc2_device : public a2bus_videx80_device
 public:
 	a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -106,6 +111,7 @@ class a2bus_aevm80_device : public a2bus_videx80_device
 public:
 	a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

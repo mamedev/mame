@@ -193,12 +193,11 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	u8 layer[5];
 	u8 scclayer[3];
-	u16 priority;
 
 	m_tc0100scn->tilemap_update();
 	m_tc0480scp->tilemap_update();
 
-	priority = m_tc0480scp->get_bg_priority();
+	const u16 priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
