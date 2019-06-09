@@ -79,6 +79,7 @@ VIDEO_START_MEMBER(rohga_state,wizdfire)
 	m_sprgen[1]->alloc_sprite_bitmap();
 }
 
+// reference : https://www.youtube.com/watch?v=FfxDihoQtT4
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities
 void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri, u16 primask)
 {
