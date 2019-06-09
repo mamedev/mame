@@ -606,10 +606,13 @@ const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
 
 bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
+	uint64_t size = io_generic_size(io);
+
 	m_prodos_order = false;
+	m_tracks = (size == (40 * 16 * 256)) ? 40 : 35;
 
 	int fpos = 0;
-	for(int track=0; track < APPLE2_TRACK_COUNT; track++) {
+	for(int track=0; track < m_tracks; track++) {
 		std::vector<uint32_t> track_data;
 		uint8_t sector_data[256*16];
 		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
@@ -781,7 +784,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 // data postamble is good
 #define DATAPOST 16
 		for (auto & elem : visualgrid) {
-			for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
+			for (int j = 0; j < m_tracks; j++) {
 				elem[j] = 0;
 			}
 		}
@@ -791,7 +794,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 		int pos_data = 0;
 
-		for(int track=0; track < APPLE2_TRACK_COUNT; track++) {
+		for(int track=0; track < m_tracks; track++) {
 				uint8_t sectdata[(256)*16];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 16;

@@ -57,6 +57,8 @@ private:
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
 
 	bool m_prodos_order;
+
+	int m_tracks;
 };
 
 extern const floppy_format_type FLOPPY_A216S_FORMAT;
