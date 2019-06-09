@@ -17,7 +17,7 @@ void rastan_state::rastan_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 spri
 {
 	/* bits 5-7 are the sprite palette bank */
 	sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
-	pri_mask = 0xf0; /* sprites over top bg layer */
+	pri_mask = 0; /* sprites over everything */
 }
 
 void rastan_state::spritectrl_w(u16 data)

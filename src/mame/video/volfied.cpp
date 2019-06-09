@@ -60,7 +60,7 @@ WRITE16_MEMBER(volfied_state::video_mask_w)
 void volfied_state::volfied_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
 	sprite_colbank = 0x100 | ((sprite_ctrl & 0x3c) << 2);
-	pri_mask = 0; /* above all */
+	pri_mask = 0; /* sprites over everything */
 }
 
 
