@@ -4095,6 +4095,7 @@ void toaplan2_state::batrider(machine_config &config)
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
+	m_vdp[0]->set_tile_callback(gp9001vdp_device::gp9001_cb_delegate(FUNC(toaplan2_state::batrider_bank_cb), this));
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
@@ -4162,6 +4163,7 @@ void toaplan2_state::bbakraid(machine_config &config)
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
+	m_vdp[0]->set_tile_callback(gp9001vdp_device::gp9001_cb_delegate(FUNC(toaplan2_state::batrider_bank_cb), this));
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)

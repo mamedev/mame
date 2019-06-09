@@ -89,7 +89,7 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 
 VIDEO_START_MEMBER(toaplan2_state,truxton2)
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	VIDEO_START_CALL_MEMBER(toaplan2);
 
 	/* Create the Text tilemap for this game */
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram.target()));
@@ -99,15 +99,15 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 
 VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	VIDEO_START_CALL_MEMBER(toaplan2);
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap();
 
 	/* This bootleg has additional layer offsets on the VDP */
-	m_vdp[0]->set_tm_extra_offsets(0, -0x1d6 - 26, -0x1ef - 15, 0, 0 );
-	m_vdp[0]->set_tm_extra_offsets(1, -0x1d8 - 22, -0x1ef - 15, 0, 0 );
-	m_vdp[0]->set_tm_extra_offsets(2, -0x1da - 18, -0x1ef - 15, 0, 0 );
+	m_vdp[0]->set_tm_extra_offsets(0, -0x1d6 - 26, -0x1ef - 15, 0, 0);
+	m_vdp[0]->set_tm_extra_offsets(1, -0x1d8 - 22, -0x1ef - 15, 0, 0);
+	m_vdp[0]->set_tm_extra_offsets(2, -0x1da - 18, -0x1ef - 15, 0, 0);
 	m_vdp[0]->set_sp_extra_offsets(8/*-0x1cc - 64*/, 8/*-0x1ef - 128*/, 0, 0);
 
 	m_vdp[0]->init_scroll_regs();
@@ -115,7 +115,7 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 
 VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	VIDEO_START_CALL_MEMBER(toaplan2);
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(0x1d4, 0x16b);
@@ -123,7 +123,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 
 VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	VIDEO_START_CALL_MEMBER(toaplan2);
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(4, 4);
@@ -131,7 +131,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 
 VIDEO_START_MEMBER(toaplan2_state,batrider)
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	VIDEO_START_CALL_MEMBER(toaplan2);
 
 	m_vdp[0]->disable_sprite_buffer(); // disable buffering on this game
 
@@ -141,7 +141,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	create_tx_tilemap(0x1d4, 0x16b);
 
 	/* Has special banking */
-	m_vdp[0]->set_gfxrom_banked();
+	save_item(NAME(m_gfxrom_bank));
 }
 
 WRITE16_MEMBER(toaplan2_state::tx_videoram_w)
@@ -210,9 +210,18 @@ WRITE16_MEMBER(toaplan2_state::batrider_pal_text_dma_w)
 
 WRITE8_MEMBER(toaplan2_state::batrider_objectbank_w)
 {
-	m_vdp[0]->set_gfxrom_bank(offset, data & 0x0f);
+	data &= 0xf;
+	if (m_gfxrom_bank[offset] != data)
+	{
+		m_gfxrom_bank[offset] = data;
+		m_vdp[0]->set_dirty();
+	}
 }
 
+void toaplan2_state::batrider_bank_cb(u8 layer, u32 &code)
+{
+	code = (m_gfxrom_bank[code >> 15] << 15) | (code & 0x7fff);
+}
 
 // Dogyuun doesn't appear to require fancy mixing?
 uint32_t toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -370,7 +379,6 @@ uint32_t toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_in
 	}
 	return 0;
 }
-
 
 
 WRITE_LINE_MEMBER(toaplan2_state::screen_vblank)

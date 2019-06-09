@@ -123,6 +123,7 @@ private:
 	uint8_t m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
 	uint8_t m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
 	uint8_t m_z80_busreq;
+	uint16_t m_gfxrom_bank[8];       /* Batrider object bank */
 
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
@@ -160,6 +161,7 @@ private:
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
 	DECLARE_WRITE8_MEMBER(batrider_objectbank_w);
+	void batrider_bank_cb(u8 layer, u32 &code);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
