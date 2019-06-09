@@ -1235,7 +1235,7 @@ void address_space::prepare_map()
 	m_map = std::make_unique<address_map>(m_device, m_spacenum);
 
 	// merge in the submaps
-	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness());
+	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness(), addr_shift());
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
@@ -1859,7 +1859,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 {
 	check_address("install_device_delegate", addrstart, addrend);
 	address_map map(*this, addrstart, addrend, unitmask, cswidth, m_device, delegate);
-	map.import_submaps(m_manager.machine(), device, data_width(), endianness());
+	map.import_submaps(m_manager.machine(), device, data_width(), endianness(), addr_shift());
 	populate_from_map(&map);
 }
 
