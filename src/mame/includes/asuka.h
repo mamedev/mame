@@ -93,13 +93,13 @@ private:
 	void msm5205_address_w(u8 data);
 	u16 cadash_share_r(offs_t offset);
 	void cadash_share_w(offs_t offset, u16 data);
-	void asuka_spritectrl_w(u16 data);
 	void msm5205_start_w(u8 data);
 	void msm5205_stop_w(u8 data);
 	void counters_w(u8 data);
-	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
+	void asuka_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
+	void bonzeadv_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
 	INTERRUPT_GEN_MEMBER(bonze_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
