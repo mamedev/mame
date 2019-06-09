@@ -161,11 +161,7 @@ template<int Layer>
 void gp9001vdp_device::tmap_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	const int tile_index = offset >> 1;
-	for (int i = 0; i < 4; i++)
-	{
-		m_tm[Layer].tmap->mark_tile_dirty((tile_index << 2) + i);
-	}
+	m_tm[Layer].tmap->mark_tile_dirty(offset >> 1);
 }
 
 
@@ -178,8 +174,7 @@ void gp9001vdp_device::map(address_map &map)
 //  map(0x3800, 0x3fff).ram(); // sprite mirror?
 }
 
-
-const gfx_layout gp9001vdp_device::layout =
+static const gfx_layout layout =
 {
 	8,8,            /* 8x8 */
 	RGN_FRAC(1,2),  /* Number of 8x8 sprites */
@@ -190,8 +185,21 @@ const gfx_layout gp9001vdp_device::layout =
 	8*8*2
 };
 
+// each 16x16 tile is actually 4 8x8 tile groups.
+static const gfx_layout layout_16x16 =
+{
+	16,16,          /* 16x16 */
+	RGN_FRAC(1,2),  /* Number of tiles */
+	4,              /* 4 bits per pixel */
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
+	{ STEP8(0,1), STEP8(8*8*2,1) },
+	{ STEP8(0,8*2), STEP8(16*8*2,8*2) },
+	16*16*2
+};
+
 GFXDECODE_MEMBER( gp9001vdp_device::gfxinfo )
-	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 0x1000 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout,       0, 0x1000 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_16x16, 0, 0x1000 )
 GFXDECODE_END
 
 
@@ -216,25 +224,23 @@ device_memory_interface::space_config_vector gp9001vdp_device::memory_space_conf
 	};
 }
 
-TILEMAP_MAPPER_MEMBER(gp9001vdp_device::gp9001_scan_rows)
-{
-	return (col & 1) | ((row & 1) << 1) | ((col & 0x3e) << 1) | ((row & 0x3e) << 6);
-}
-
 template<int Layer>
 TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 {
-	const int ram_offs = tile_index >> 2;
-	tile_index &= 3;
-	const u32 attrib = m_vram[Layer][(ram_offs << 1)];
+	const u32 attrib = m_vram[Layer][(tile_index << 1)];
 
-	u32 tile_number = m_vram[Layer][(ram_offs << 1) | 1] << 2;
+	u32 tile_number = m_vram[Layer][(tile_index << 1) | 1];
 	if (!m_gp9001_cb.isnull())
+	{
+		// each tile is 4 8x8 tile group, actually tile number for each tile is << 2 of real address
+		tile_number <<= 2;
 		m_gp9001_cb(Layer, tile_number);
+		tile_number >>= 2;
+	}
 
 	const u32 color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(0,
-			tile_number + tile_index,
+	SET_TILE_INFO_MEMBER(1,
+			tile_number,
 			color,
 			0);
 	//tileinfo.category = (attrib & 0x0f00) >> 8;
@@ -252,9 +258,9 @@ void gp9001vdp_device::device_add_mconfig(machine_config &config)
 
 void gp9001vdp_device::create_tilemaps()
 {
-	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<2>),this),tilemap_mapper_delegate(FUNC(gp9001vdp_device::gp9001_scan_rows),this),8,8,64,64);
-	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<1>),this),tilemap_mapper_delegate(FUNC(gp9001vdp_device::gp9001_scan_rows),this),8,8,64,64);
-	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<0>),this),tilemap_mapper_delegate(FUNC(gp9001vdp_device::gp9001_scan_rows),this),8,8,64,64);
+	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	m_tm[2].tmap->set_transparent_pen(0);
 	m_tm[1].tmap->set_transparent_pen(0);

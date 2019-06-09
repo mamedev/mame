@@ -70,7 +70,6 @@ protected:
 
 	address_space_config        m_space_config;
 
-	TILEMAP_MAPPER_MEMBER(gp9001_scan_rows);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 private:
@@ -124,7 +123,6 @@ private:
 		bool use_sprite_buffer;
 	};
 
-	static const gfx_layout layout;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	void voffs_w(u16 data, u16 mem_mask = ~0);
