@@ -210,8 +210,9 @@ private:
 	void draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram);
 	void draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth,int pageheight, int bytespertile, int palettepri, int drawfromram);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int spritetiletype);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
+	void draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette);
+	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int pal, int flipx, int pri, int xpos, int ypos, int bpp);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -565,17 +566,14 @@ void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap
 			ramend = 0x3980-0x200 + 0x700;
 		}
 
-
-		{
-			// normal
-			draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0 - rtm_xscroll, 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-			// wrap x
-			draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth) + 0 - rtm_xscroll, 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-			// wrap y
-			draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0 - rtm_xscroll, (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-			// wrap x+y
-			draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth) + 0 - rtm_xscroll, (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-		}
+		// normal
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0 - rtm_xscroll, 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
+		// wrap x
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth) + 0 - rtm_xscroll, 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
+		// wrap y
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0 - rtm_xscroll, (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
+		// wrap x+y
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth) + 0 - rtm_xscroll, (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);	
 	}
 }
 
@@ -603,7 +601,6 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	// however 'a' in m_tilecfg[0] is NOT set
 	// also m_tilecfg[0] has 0x80 set, which would be 4 bytes per tile, but it isn't?
 	// the layer seems to be disabled by setting m_tilecfg[0] to 0?
-
 
 	if (m_tilecfg[0] & 0x10)
 	{
@@ -700,15 +697,135 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 }
 
-void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int flipy, int xpos, int ypos, int spritetiletype)
+void radica_eu3a14_state::draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
 {
-	int tileno = offset + count;
-	gfx_element *gfx = m_gfxdecode->gfx(spritetiletype);
-	gfx->transpen(bitmap, cliprect, tileno, pal, flipx, flipy, xpos, ypos, 0);
+	if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+	{
+		if (pridst[realx] <= priority)
+		{
+			if (pix & mask)
+			{
+				dst[realx] = ((pix & mask) >> shift) | palette;
+				pridst[realx] = priority;
+			}
+		}
+	}
+}
+
+void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int palette, int flipx, int priority, int xpos, int ypos, int bpp)
+{
+	offset = offset * 2;
+
+	int bppdiv = 0;
+
+	switch (bpp)
+	{
+	default:
+	case 0x8:
+	case 0x7:
+	case 0x6:
+	case 0x5:
+		offset += line * 8;
+		bppdiv = 1;
+		break;
+
+	case 0x4:
+	case 0x3:
+		offset += line * 4;
+		bppdiv = 2;
+		break;
+		
+	case 0x2:
+		offset += line * 2;
+		bppdiv = 4;
+		break;
+
+	case 0x1:
+		offset += line * 1;
+		bppdiv = 8;
+		break;
+	}
+
+	uint8_t* gfxdata = &m_mainregion[offset & 0x3fffff];
+
+	if (ypos >= cliprect.min_y && ypos <= cliprect.max_y)
+	{
+		uint16_t* dst = &bitmap.pix16(ypos);
+		uint8_t* pridst = &m_prioritybitmap.pix8(ypos);
+
+		int count = 0;
+		for (int x = 0; x < 8/bppdiv;x++)
+		{
+			if (bpp == 8)
+			{
+				int pix,mask,shift;
+				if (flipx) { pix = gfxdata[7 - count]; } else { pix = gfxdata[count]; }
+				int realx = xpos + x * 1;
+				if (flipx) { mask = 0xff; shift = 0; } else { mask = 0xff; shift = 0; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+			}
+			else if (bpp == 7)
+			{
+				int pix,mask,shift;
+				if (flipx) { pix = gfxdata[7 - count]; } else { pix = gfxdata[count]; }
+				int realx = xpos + x * 1;
+				// stride doesn't change, data isn't packed, just don't use top bit
+				if (flipx) { mask = 0x7f; shift = 0; } else { mask = 0x7f; shift = 0; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+			}
+			else if (bpp == 6)
+			{
+				popmessage("6bpp sprite\n");
+			}
+			else if (bpp == 5)
+			{
+				popmessage("5bpp sprite\n");
+			}
+			else if (bpp == 4)
+			{
+				int pix,mask,shift;
+				if (flipx) { pix = gfxdata[3 - count]; } else { pix = gfxdata[count]; }
+				int realx = xpos + x * 2;
+				if (flipx) { mask = 0x0f; shift = 0; } else { mask = 0xf0; shift = 4; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+				realx++;
+				if (flipx) { mask = 0xf0; shift = 4; } else	{ mask = 0x0f; shift = 0; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+			}
+			else if (bpp == 3)
+			{
+				popmessage("3bpp sprite\n");
+			}
+			else if (bpp == 2)
+			{
+				int pix,mask,shift;
+				if (flipx) { pix = gfxdata[1 - count]; } else { pix = gfxdata[count]; }
+				int realx = xpos + x * 4;
+				if (flipx) { mask = 0x03; shift = 0; } else { mask = 0xc0; shift = 6; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+				realx++;
+				if (flipx) { mask = 0x0c; shift = 2; } else { mask = 0x30; shift = 4; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+				realx++;
+				if (flipx) { mask = 0x30; shift = 4; } else { mask = 0x0c; shift = 2; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+				realx++;
+				if (flipx) { mask = 0xc0; shift = 6; } else { mask = 0x03; shift = 0; }
+				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
+			}
+			else if (bpp == 1)
+			{
+				popmessage("1bpp sprite\n");
+			}
+
+			count++;
+		}
+	}
+
 }
 
 
-void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri)
+void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
 	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
@@ -729,7 +846,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		int attr = m_mainram[i + 0];
 		int y = m_mainram[i + 1];
 		int x = m_mainram[i + 2];
-		int attr2 = m_mainram[i + 3];
+		int palettepri = m_mainram[i + 3];
 
 		int h = attr & 0x0c;
 		int w = attr & 0x03;
@@ -738,16 +855,11 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		int height = 0;
 		int width = 0;
-		int pal = 0;
 
+		int pri = palettepri & 0x07;
 
-
-		int pri = attr2 & 0x07;
-
-
-		if (pri != drawpri)
-			continue;
-
+		int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
+		palette = palette << 4;
 
 		switch (h)
 		{
@@ -771,65 +883,20 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		height *= 4;
 
-		x -= 8;
+		x -= 6;
 		y -= 4;
 
 		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
 		int extra = m_mainram[i + 6];
-		int spritetiletype = 1;
 
 		int spritebase = (m_spritebase[1] << 8) | m_spritebase[0];
 
 		offset += (extra & 0xf8) << 13;
-		extra &= ~0xf8;
 		offset += spritebase << 7;
 
-		switch (extra & 0x07)
-		{
-		case 0x00: // 8bpp
-			offset >>= 1;
-			spritetiletype = 2;
-
-			if (attr2 & 0x08)
-				pal += 0x1;
-
-			break;
-
-		case 0x07: // 7bpp (rad_foot ingame)
-			offset >>= 1;
-			spritetiletype = 3;
-
-			//pal = (attr2 & 0x80) >> 7; // TODO: check which bits actually get used to select palette on 7bpp tiles
-
-			if (attr2 & 0x08) // this bit is confirmed as still being palette bank
-				pal += 0x2;
-
-			break;
-			
-		case 0x02: // 2bpp
-			offset <<= 1;
-			spritetiletype = 0;
-			pal = 0;
-			break;
-
-		case 0x04: // 4bpp
-			spritetiletype = 1;
-
-			pal = (attr2 & 0xf0) >> 4;
-
-			if (attr2 & 0x08)
-				pal += 0x10;
-			break;
-
-		case 0x01: // unknowns
-		case 0x03:
-		case 0x05:
-		case 0x06:
-			pal = machine().rand();
-			break;
-		}
-
-		offset = offset >> 1;
+		int bpp = extra & 0x07;
+		if (bpp == 0)
+			bpp = 8;
 
 		if (attr & 0x80)
 		{
@@ -842,7 +909,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 				{
 					int xoff = flipx ? (((width - 1) * 8) - (xx * 8)) : (xx * 8);
 
-					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, flipy, x + xoff, y + yoff, spritetiletype);
+					draw_sprite_line(screen, bitmap, cliprect, offset, count, palette, flipx, pri, x + xoff, y + yoff, bpp);
 					count++;
 				}
 			}
@@ -862,10 +929,7 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 	handle_palette(screen, bitmap, cliprect);
 	draw_background(screen, bitmap, cliprect);
 
-	for (int i = 0; i < 8; i++)
-	{
-		draw_sprites(screen, bitmap, cliprect, i);
-	}
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -1565,7 +1629,7 @@ void radica_eu3a14_state::machine_reset()
 	m_portdir[1] = 0x00;
 	m_portdir[2] = 0x00;
 
-	m_spriteaddr[0] = 0x14; // ?? rad_foot never writes, other games seem to use it to se sprite location
+	m_spriteaddr[0] = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
 }
 
 
@@ -1598,51 +1662,6 @@ INTERRUPT_GEN_MEMBER(radica_eu3a14_state::interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
 }
 
-
-static const gfx_layout helper8x1x2_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	2,
-	{ STEP2(0,1) },
-	{ STEP8(0,2) },
-	{ 0 },
-	8 * 2
-};
-
-static const gfx_layout helper8x1x4_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ 0 },
-	8 * 4
-};
-
-static const gfx_layout helper8x1x8_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ 0 },
-	8 * 8
-};
-
-// 7bpp layer here just drops a bit, doesn't change how things are packed so it's just a wasteful encoding that allows more palette selections (4 vs 2 of 8bpp)
-static const gfx_layout helper8x1x7_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	7,
-	{ 1,2,3,4,5,6,7 },
-	{ STEP8(0,8) },
-	{ 0 },
-	8 * 8
-};
 
 // background
 static const gfx_layout helper16x16x8_layout =
@@ -1691,11 +1710,6 @@ static const gfx_layout helper8x8x4_layout =
 
 
 static GFXDECODE_START( gfx_helper )
-	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x7_layout,    0x0, 4  )
-
 	// dummy standard decodes to see background tiles, not used for drawing
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x4_layout,  0x0, 32  )
@@ -1823,6 +1837,7 @@ ROM_END
 CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_adc, rad_gtg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_rsg,  0,        0, radica_eu3a14,     rad_rsg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
+// some Connectv branded Real Swing Golf units have a language selection, so there are likely other PAL revisions of this
 CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p,    rad_rsgp,      radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
