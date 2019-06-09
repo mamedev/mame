@@ -43,6 +43,7 @@ private:
 	required_device<intelfsh8_device> biosrom;
 	uint32_t ram_size;
 
+	virtual DECLARE_READ8_MEMBER(header_type_r) override;
 	DECLARE_READ8_MEMBER(unknown_r);
 	DECLARE_WRITE8_MEMBER(unknown_w);
 	DECLARE_READ32_MEMBER(ram_size_r);

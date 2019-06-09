@@ -8,7 +8,7 @@
                  SPRITE READ AND WRITE HANDLERS
 **************************************************************/
 
-WRITE16_MEMBER(asuka_state::asuka_spritectrl_w)
+void asuka_state::asuka_spritectrl_w(u16 data)
 {
 	/* Bits 2-5 are color bank; in asuka games bit 0 is global priority */
 	m_pc090oj->set_sprite_ctrl(((data & 0x3c) >> 2) | ((data & 0x1) << 15));
@@ -21,7 +21,7 @@ WRITE16_MEMBER(asuka_state::asuka_spritectrl_w)
 
 uint32_t asuka_state::screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -46,7 +46,7 @@ uint32_t asuka_state::screen_update_asuka(screen_device &screen, bitmap_ind16 &b
 
 uint32_t asuka_state::screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 

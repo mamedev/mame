@@ -574,77 +574,6 @@ WRITE_LINE_MEMBER(xbox_base_state::ide_interrupt_changed)
 }
 
 /*
- * SuperIO
- */
-
-READ8_MEMBER(xbox_base_state::superio_read)
-{
-	if (superiost.configuration_mode == false)
-		return 0;
-	if (offset == 0) // index port 0x2e
-		return superiost.index;
-	if (offset == 1)
-	{
-		// data port 0x2f
-		if (superiost.index < 0x30)
-			return superiost.registers[0][superiost.index];
-		return superiost.registers[superiost.selected][superiost.index];
-	}
-	return 0;
-}
-
-WRITE8_MEMBER(xbox_base_state::superio_write)
-{
-	if (superiost.configuration_mode == false)
-	{
-		// config port 0x2e
-		if ((offset == 0) && (data == 0x55))
-			superiost.configuration_mode = true;
-		return;
-	}
-	if ((offset == 0) && (data == 0xaa))
-	{
-		// config port 0x2e
-		superiost.configuration_mode = false;
-		return;
-	}
-	if (offset == 0)
-	{
-		// index port 0x2e
-		superiost.index = data;
-	}
-	if (offset == 1)
-	{
-		// data port 0x2f
-		if (superiost.index < 0x30)
-		{
-			superiost.registers[0][superiost.index] = data;
-			superiost.selected = superiost.registers[0][7];
-		} else
-		{
-			superiost.registers[superiost.selected][superiost.index] = data;
-			//if ((superiost.selected == 4) && (superiost.index == 0x30) && (data != 0))
-			//  ; // add handlers 0x3f8- +7
-		}
-	}
-}
-
-READ8_MEMBER(xbox_base_state::superiors232_read)
-{
-	if (offset == 5)
-		return 0x20;
-	return 0;
-}
-
-WRITE8_MEMBER(xbox_base_state::superiors232_write)
-{
-	if (offset == 0)
-	{
-		printf("%c", data);
-	}
-}
-
-/*
  * SMbus devices
  */
 
@@ -778,6 +707,114 @@ void xbox_eeprom_device::device_reset()
 {
 }
 
+/*
+ * Super-io connected to lpc bus
+ */
+
+DEFINE_DEVICE_TYPE(XBOX_SUPERIO, xbox_superio_device, "superio_device", "XBOX debug SuperIO")
+
+xbox_superio_device::xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XBOX_SUPERIO, tag, owner, clock)
+	, configuration_mode(false)
+	, index(0)
+	, selected(0)
+{
+
+}
+
+void xbox_superio_device::internal_io_map(address_map &map)
+{
+	map(0x002e, 0x002f).rw(FUNC(xbox_superio_device::read), FUNC(xbox_superio_device::write));
+	map(0x03f8, 0x03ff).rw(FUNC(xbox_superio_device::read_rs232), FUNC(xbox_superio_device::write_rs232));
+}
+
+void xbox_superio_device::map_extra(address_space *memory_space, address_space *io_space)
+{
+	memspace = memory_space;
+	iospace = io_space;
+	io_space->install_device(0, 0xffff, *this, &xbox_superio_device::internal_io_map);
+}
+
+void xbox_superio_device::set_host(int index, lpcbus_host_interface *host)
+{
+	lpchost = host;
+	lpcindex = index;
+}
+
+void xbox_superio_device::device_start()
+{
+	memset(registers, 0, sizeof(registers));
+	registers[0][0x26] = 0x2e; // Configuration port address byte 0
+}
+
+READ8_MEMBER(xbox_superio_device::read)
+{
+	if (configuration_mode == false)
+		return 0;
+	if (offset == 0) // index port 0x2e
+		return index;
+	if (offset == 1)
+	{
+		// data port 0x2f
+		if (index < 0x30)
+			return registers[0][index];
+		return registers[selected][index];
+	}
+	return 0;
+}
+
+WRITE8_MEMBER(xbox_superio_device::write)
+{
+	if (configuration_mode == false)
+	{
+		// config port 0x2e
+		if ((offset == 0) && (data == 0x55))
+			configuration_mode = true;
+		return;
+	}
+	if ((offset == 0) && (data == 0xaa))
+	{
+		// config port 0x2e
+		configuration_mode = false;
+		return;
+	}
+	if (offset == 0)
+	{
+		// index port 0x2e
+		index = data;
+	}
+	if (offset == 1)
+	{
+		// data port 0x2f
+		if (index < 0x30)
+		{
+			registers[0][index] = data;
+			selected = registers[0][7];
+		}
+		else
+		{
+			registers[selected][index] = data;
+			//if ((superiost.selected == 4) && (superiost.index == 0x30) && (data != 0))
+			//  ; // add handlers 0x3f8- +7
+		}
+	}
+}
+
+READ8_MEMBER(xbox_superio_device::read_rs232)
+{
+	if (offset == 5)
+		return 0x20;
+	return 0;
+}
+
+WRITE8_MEMBER(xbox_superio_device::write_rs232)
+{
+	if (offset == 0)
+	{
+		printf("%c", data);
+	}
+}
+
 void xbox_base_state::machine_start()
 {
 	find_debug_params();
@@ -798,19 +835,15 @@ void xbox_base_state::machine_start()
 		hack_usb();
 	}
 	);
-	// super-io
-	memset(&superiost, 0, sizeof(superiost));
-	superiost.configuration_mode = false;
-	superiost.registers[0][0x26] = 0x2e; // Configuration port address byte 0
 	// savestates
 	save_item(NAME(debug_irq_active));
 	save_item(NAME(debug_irq_number));
 }
 
+#if 0
 void xbox_base_state::xbox_base_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).ram(); // 128 megabytes
-#if 0
 	map(0xf0000000, 0xf7ffffff).ram().share("nv2a_share"); // 3d accelerator wants this
 	map(0xfd000000, 0xfdffffff).ram().rw(FUNC(xbox_base_state::geforce_r), FUNC(xbox_base_state::geforce_w));
 	map(0xfed00000, 0xfed003ff).rw(FUNC(xbox_base_state::ohci_usb_r), FUNC(xbox_base_state::ohci_usb_w));
@@ -818,15 +851,13 @@ void xbox_base_state::xbox_base_map(address_map &map)
 	map(0xfe800000, 0xfe87ffff).rw(FUNC(xbox_base_state::audio_apu_r), FUNC(xbox_base_state::audio_apu_w));
 	map(0xfec00000, 0xfec00fff).rw(FUNC(xbox_base_state::audio_ac93_r), FUNC(xbox_base_state::audio_ac93_w));
 	map(0xfef00000, 0xfef003ff).rw(FUNC(xbox_base_state::network_r), FUNC(xbox_base_state::network_w));
-#endif
 }
 
 void xbox_base_state::xbox_base_map_io(address_map &map)
 {
+	map(0x01f0, 0x01f7).rw(":pci:09.0:ide1", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
 	map(0x002e, 0x002f).rw(FUNC(xbox_base_state::superio_read), FUNC(xbox_base_state::superio_write));
-	map(0x01f0, 0x01f7).rw(":pci:09.0:ide", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
 	map(0x03f8, 0x03ff).rw(FUNC(xbox_base_state::superiors232_read), FUNC(xbox_base_state::superiors232_write));
-#if 0
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 	map(0x8000, 0x80ff).rw(FUNC(xbox_base_state::dummy_r), FUNC(xbox_base_state::dummy_w)); // lpc bridge
 	map(0xc000, 0xc00f).rw(FUNC(xbox_base_state::smbus_r), FUNC(xbox_base_state::smbus_w));
@@ -835,23 +866,22 @@ void xbox_base_state::xbox_base_map_io(address_map &map)
 	map(0xd200, 0xd27f).noprw(); // ac97
 	map(0xe000, 0xe007).rw(FUNC(xbox_base_state::networkio_r), FUNC(xbox_base_state::networkio_w));
 	map(0xff60, 0xff6f).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
-#endif
 }
+#endif
 
 void xbox_base_state::xbox_base(machine_config &config)
 {
 	/* basic machine hardware */
 	PENTIUM3(config, m_maincpu, 733333333); /* Wrong! family 6 model 8 stepping 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &xbox_base_state::xbox_base_map);
-	m_maincpu->set_addrmap(AS_IO, &xbox_base_state::xbox_base_map_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(xbox_base_state::irq_callback));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	PCI_ROOT(config,        ":pci", 0);
 	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);
-	NV2A_RAM(config,        ":pci:00.3", 0);
+	NV2A_RAM(config,        ":pci:00.3", 0, 128); // 128 megabytes
 	MCPX_ISALPC(config,     ":pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
+	XBOX_SUPERIO(config,    ":pci:01.0:0", 0);
 	MCPX_SMBUS(config,      ":pci:01.1", 0).interrupt_handler().set(FUNC(xbox_base_state::smbus_interrupt_changed));
 	XBOX_PIC16LC(config,    ":pci:01.1:110", 0); // these 3 are on smbus number 1
 	XBOX_CX25871(config,    ":pci:01.1:145", 0);
@@ -863,7 +893,7 @@ void xbox_base_state::xbox_base(machine_config &config)
 	MCPX_AC97_AUDIO(config, ":pci:06.0", 0);
 	MCPX_AC97_MODEM(config, ":pci:06.1", 0);
 	PCI_BRIDGE(config,      ":pci:08.0", 0, 0x10de01b8, 0);
-	MCPX_IDE(config,        ":pci:09.0", 0).interrupt_handler().set(FUNC(xbox_base_state::ide_interrupt_changed));
+	MCPX_IDE(config,        ":pci:09.0", 0).pri_interrupt_handler().set(FUNC(xbox_base_state::ide_interrupt_changed));
 	NV2A_AGP(config,        ":pci:1e.0", 0, 0x10de01b7, 0);
 	NV2A_GPU(config,        ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(FUNC(xbox_base_state::nv2a_interrupt_changed));
 

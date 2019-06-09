@@ -199,7 +199,7 @@ protected:
 	void sprite_extension_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void spritebank_w(offs_t offset, u16 data);
 	void koshien_spritebank_w(u16 data);
-	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
+	void cameltrya_porta_w(u8 data);
 	void mjnquest_gfxbank_w(u8 data);
 	TC0100SCN_CB_MEMBER(mjnquest_tmap_cb);
 
@@ -247,7 +247,7 @@ protected:
 	void update_spritebanks();
 	void handle_sprite_buffering();
 	void update_sprites_active_area();
-	void draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 priority);
+	void draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority, u8 priority_mask = 0xff);
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley);
 

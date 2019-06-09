@@ -7633,19 +7633,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="6659ab39" sha1="1459c9e2425fd19042d580872cf77d95debaa023"/>
+				<rom name="chessm23_disk1.img" size="737280" crc="6659ab39" sha1="1459c9e2425fd19042d580872cf77d95debaa023"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="d7182b95" sha1="bb474de5e0f7a3a5eecbf004ec1038a4a3d0ab9e"/>
+				<rom name="chessm23_disk2.img" size="737280" crc="d7182b95" sha1="bb474de5e0f7a3a5eecbf004ec1038a4a3d0ab9e"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Game 1990" />
 			<dataarea name="flop" size="737280">
-				<rom name="game1990.img" size="737280" crc="056e572d" sha1="620a44254c1f4e86c01a4d4b407b820f45993a1c"/>
+				<rom name="chessm23_game1990.img" size="737280" crc="056e572d" sha1="620a44254c1f4e86c01a4d4b407b820f45993a1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7661,13 +7661,13 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="a93939a6" sha1="2f3927e50dd82b93ca3fa1436f5b664abc18d061"/>
+				<rom name="chessm21_disk1.img" size="737280" crc="a93939a6" sha1="2f3927e50dd82b93ca3fa1436f5b664abc18d061"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Option 1" />
 			<dataarea name="flop" size="737280">
-				<rom name="option1.img" size="737280" crc="cba1616e" sha1="d773fbf810957c419d63cd4abb8466651ff1a832"/>
+				<rom name="chessm21_option1.img" size="737280" crc="cba1616e" sha1="d773fbf810957c419d63cd4abb8466651ff1a832"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7682,13 +7682,13 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="79005b25" sha1="2a7cc406dd1fbf0b351a117c8a092069a33dbdc3"/>
+				<rom name="chessm21o_disk1.img" size="737280" crc="79005b25" sha1="2a7cc406dd1fbf0b351a117c8a092069a33dbdc3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Option 1" />
 			<dataarea name="flop" size="737280">
-				<rom name="option1.img" size="737280" crc="cba1616e" sha1="d773fbf810957c419d63cd4abb8466651ff1a832"/>
+				<rom name="chessm21_option1.img" size="737280" crc="cba1616e" sha1="d773fbf810957c419d63cd4abb8466651ff1a832"/>
 			</dataarea>
 		</part>
 	</software>

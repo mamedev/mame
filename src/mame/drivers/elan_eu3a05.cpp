@@ -158,8 +158,8 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
-#include "audio/rad_eu3a05.h"
-#include "machine/rad_eu3a05gpio.h"
+#include "audio/elan_eu3a05.h"
+#include "machine/elan_eu3a05gpio.h"
 
 class radica_eu3a05_state : public driver_device
 {

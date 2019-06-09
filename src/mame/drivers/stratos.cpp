@@ -375,5 +375,5 @@ ROM_START( stratos )
 	ROM_FILL(0x00000, 0x10000, 0xff)
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME                            FLAGS */
-CONS( 1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "SciSys",  "Kasparov Chess Computer: Stratos", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME            FLAGS */
+CONS( 1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "SciSys",  "Kasparov Stratos", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

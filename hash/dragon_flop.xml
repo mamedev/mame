@@ -437,6 +437,18 @@
 		</part>
 	</software>
 
+	<software name="dunjunz">
+		<description>Dunjunz</description>
+		<year>2018</year>
+		<publisher>Teipen Mwnci</publisher>
+		<info name="author" value="Ciaran Anscomb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="Dunjunz (2018)(Teipen Mwnci).dsk" size="184320" crc="92e54430" sha1="efed7bcee9ef5d29d3ab813d3d06bbdf7339bb4c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dupdisk2">
 		<description>Duplidisk 2</description>
 		<year>1986</year>
@@ -448,7 +460,7 @@
 		</part>
 	</software>
 
-	<software name="dynafast124" cloneof="dynafast">
+	<software name="dynafast124" cloneof="dynafast140">
 		<description>DynaFast v1.2.4</description>
 		<year>1984</year>
 		<publisher>Compusense</publisher>
@@ -459,24 +471,13 @@
 		</part>
 	</software>
 
-	<software name="dynafast140" cloneof="dynafast">
+	<software name="dynafast140">
 		<description>DynaFast v1.4.0</description>
 		<year>1984</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Dynafast v1.4.0 (198x)(Compusense)[!].vdk" size="184332" crc="ef834916" sha1="dacf6282c51a9a1468232ab11f7b95b491961ee1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dynafast">
-		<description>DynaFast v1.5.0</description>
-		<year>1984</year>
-		<publisher>Compusense</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="102412">
-				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[!].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358"/>
 			</dataarea>
 		</part>
 	</software>
@@ -639,6 +640,7 @@
 		<description>Forth Compiler (DeltaDOS)</description>
 		<year>1985</year>
 		<publisher>N.D.U.G.</publisher>
+		<sharedfeat name="ext_default" value="premier_fdc"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102412">
 				<rom name="Forth Compiler (1985)(NDUG)[!][DELTA].vdk" size="102412" crc="44d0a07c" sha1="bfbcbec8ebe763eb382f105416dbf4d2a1e104f9"/>
@@ -1319,6 +1321,7 @@
 		<description>Telewriter Premier DOS</description>
 		<year>1985</year>
 		<publisher>Microdeal</publisher>
+		<sharedfeat name="ext_default" value="premier_fdc"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="256016">
 				<rom name="Telewriter (1985)(Microdeal)(DeltaDOS)[!].dmk" size="256016" crc="c9b2ed45" sha1="8e7cfda7289318972c8ec9595c1c125d312ddf42"/>
