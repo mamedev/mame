@@ -96,7 +96,18 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184345">
-				<rom name="Compusense - Flex - Dynacalc.vdk" size="184345" crc="9ddcb3cd" sha1="c0b187571f7e01ba43a8a0d8a1f42afa736f1791"/>
+				<rom name="Dynacalc (198x)(Compusense Ltd)[!][FLEX].vdk" size="184345" crc="9ddcb3cd" sha1="c0b187571f7e01ba43a8a0d8a1f42afa736f1791"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynafast">
+		<description>DynaFast v1.5.0</description>
+		<year>1984</year>
+		<publisher>Compusense</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102412">
+				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[!][FLEX].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358"/>
 			</dataarea>
 		</part>
 	</software>

@@ -29,6 +29,7 @@ class mtx_state : public driver_device
 public:
 	mtx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cassold(0)
 		, m_maincpu(*this, "z80")
 		, m_sn(*this, "sn76489a")
 		, m_z80ctc(*this, "z80ctc")
@@ -50,6 +51,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	bool m_cassold;
 	required_device<z80_device> m_maincpu;
 	required_device<sn76489a_device> m_sn;
 	required_device<z80ctc_device> m_z80ctc;

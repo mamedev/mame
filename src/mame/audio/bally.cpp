@@ -17,16 +17,17 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BALLY_AS2888,       bally_as2888_device,       "as2888",       "Bally AS2888 Sound Board")
-DEFINE_DEVICE_TYPE(BALLY_AS3022,       bally_as3022_device,       "as3022",       "Bally AS3022 Sound Board")
-DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,  bally_sounds_plus_device,  "sounds_plus",  "Bally Sounds Plus w/ Vocalizer Board")
-DEFINE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK, bally_cheap_squeak_device, "cheap_squeak", "Bally Cheap Squeak Board")
+DEFINE_DEVICE_TYPE(BALLY_AS2888,           bally_as2888_device,           "as2888",           "Bally AS2888 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_AS3022,           bally_as3022_device,           "as3022",           "Bally AS3022 Sound Board")
+DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,      bally_sounds_plus_device,      "sounds_plus",      "Bally Sounds Plus w/ Vocalizer Board")
+DEFINE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,     bally_cheap_squeak_device,     "cheap_squeak",     "Bally Cheap Squeak Board")
+DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK,    bally_squawk_n_talk_device,    "squawk_n_talk",    "Bally Squawk & Talk Board")
+DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK_AY, bally_squawk_n_talk_ay_device, "squawk_n_talk_ay", "Bally Squawk & Talk w/ AY8910 Board")
 
 
 //**************************************************************************
 //  AS2888
 //**************************************************************************
-
 static const discrete_mixer_desc as2888_digital_mixer_info =
 {
 		DISC_MIXER_IS_RESISTOR,                       /* type */
@@ -88,7 +89,6 @@ DISCRETE_SOUND_END
 //-------------------------------------------------
 //  sound_select - handle an external write to the board
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_as2888_device::sound_select)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_select_sync), this), data);
@@ -101,10 +101,8 @@ TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_select_sync)
 }
 
 //-------------------------------------------------
-//
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER(bally_as2888_device::sound_int)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_int_sync), this), state);
@@ -112,60 +110,58 @@ WRITE_LINE_MEMBER(bally_as2888_device::sound_int)
 
 TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_int_sync)
 {
-		if (param)
-		{
-				m_snd_sustain_timer->adjust(attotime::from_msec(5));
-				m_discrete->write(NODE_08, 11);  // 11 volt pulse
-		}
+	if (param)
+	{
+		m_snd_sustain_timer->adjust(attotime::from_msec(5));
+		m_discrete->write(NODE_08, 11);  // 11 volt pulse
+	}
 }
 
 //-------------------------------------------------
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
-
 void bally_as2888_device::device_add_mconfig(machine_config &config)
 {
 	DISCRETE(config, m_discrete, as2888_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
 
-		TIMER(config, "timer_s_freq").configure_periodic(FUNC(bally_as2888_device::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
-		TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(bally_as2888_device::timer_as2888));
+	TIMER(config, "timer_s_freq").configure_periodic(FUNC(bally_as2888_device::timer_s), attotime::from_hz(353000));     // Inverter clock on AS-2888 sound board
+	TIMER(config, m_snd_sustain_timer).configure_generic(FUNC(bally_as2888_device::timer_as2888));
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
 void bally_as2888_device::device_start()
 {
-		save_item(NAME(m_sound_select));
-		save_item(NAME(m_snd_sel));
-		save_item(NAME(m_snd_tone_gen));
-		save_item(NAME(m_snd_div));
+	save_item(NAME(m_sound_select));
+	save_item(NAME(m_snd_sel));
+	save_item(NAME(m_snd_tone_gen));
+	save_item(NAME(m_snd_div));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_s)
 {
-		m_snd_tone_gen--;
+	m_snd_tone_gen--;
 
-		if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
-		{
-				m_snd_tone_gen = m_snd_sel;
-				m_snd_div++;
+	if ((m_snd_tone_gen == 0) && (m_snd_sel != 0x01))
+	{
+		m_snd_tone_gen = m_snd_sel;
+		m_snd_div++;
 
-				m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
-				m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
-		}
+		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 {
-		m_snd_sel = m_snd_prom[m_sound_select];
-		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
-		m_snd_tone_gen = m_snd_sel;
+	m_snd_sel = m_snd_prom[m_sound_select];
+	m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
+	m_snd_tone_gen = m_snd_sel;
 
-		m_discrete->write(NODE_08, 0);
-		m_snd_sustain_timer->adjust(attotime::never);
+	m_discrete->write(NODE_08, 0);
+	m_snd_sustain_timer->adjust(attotime::never);
 }
 
 
@@ -173,9 +169,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 //  AS3022
 //**************************************************************************
 
-//**************************************************************************
+//--------------------------------------------------------------------------
 //  IO ports
-//**************************************************************************
+//--------------------------------------------------------------------------
 static INPUT_PORTS_START(as3022)
 		PORT_START("SW1")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
@@ -183,19 +179,18 @@ INPUT_PORTS_END
 
 ioport_constructor bally_as3022_device::device_input_ports() const
 {
-		return INPUT_PORTS_NAME(as3022);
+	return INPUT_PORTS_NAME(as3022);
 }
 
 INPUT_CHANGED_MEMBER(bally_as3022_device::sw1)
 {
-		if (newval != oldval)
-				m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+	if (newval != oldval)
+		m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 //-------------------------------------------------
 //  sound_select - handle an external write to the board
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_as3022_device::sound_select)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as3022_device::sound_select_sync), this), data);
@@ -208,10 +203,8 @@ TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_select_sync)
 }
 
 //-------------------------------------------------
-//
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER(bally_as3022_device::sound_int)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as3022_device::sound_int_sync), this), state);
@@ -222,23 +215,18 @@ TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_int_sync)
 	m_pia->ca1_w(param);
 }
 
-
 //-------------------------------------------------
-//
-//  irq_w - IRQ line state changes
+//  pia_irq_w - IRQ line state changes
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER(bally_as3022_device::irq_w)
+WRITE_LINE_MEMBER(bally_as3022_device::pia_irq_w)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
 //-------------------------------------------------
 //  CPU map, from schematics
 //-------------------------------------------------
-
 void bally_as3022_device::as3022_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -248,11 +236,9 @@ void bally_as3022_device::as3022_map(address_map &map)
 	map(0x1000, 0x1fff).rom();  // 4k RAM space, but could be jumpered for 2k
 }
 
-
 //-------------------------------------------------
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
-
 void bally_as3022_device::device_add_mconfig(machine_config &config)
 {
 	M6808(config, m_cpu, DERIVED_CLOCK(1, 1));
@@ -263,10 +249,17 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(bally_as3022_device::pia_porta_w));
 	m_pia->writepb_handler().set(FUNC(bally_as3022_device::pia_portb_w));
 	m_pia->cb2_handler().set(FUNC(bally_as3022_device::pia_cb2_w));
-	m_pia->irqa_handler().set(FUNC(bally_as3022_device::irq_w));
-	m_pia->irqb_handler().set(FUNC(bally_as3022_device::irq_w));
+	m_pia->irqa_handler().set(FUNC(bally_as3022_device::pia_irq_w));
+	m_pia->irqb_handler().set(FUNC(bally_as3022_device::pia_irq_w));
 
+	for (required_device<filter_rc_device> &filter : m_ay_filters)
+		// TODO: Calculate exact filter values. An AC filter is good enough for now
+		// and required as the chip likes to output a DC offset at idle.
+		FILTER_RC(config, filter).set_ac().add_route(ALL_OUTPUTS, *this, 1.0);
 	AY8910(config, m_ay, DERIVED_CLOCK(1, 4));
+	m_ay->add_route(0, "ay_filter0", 0.33);
+	m_ay->add_route(1, "ay_filter1", 0.33);
+	m_ay->add_route(2, "ay_filter2", 0.33);
 	m_ay->port_a_read_callback().set(FUNC(bally_as3022_device::ay_io_r));
 	m_ay->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
 }
@@ -275,7 +268,6 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
 void bally_as3022_device::device_start()
 {
 	// Set volumes to a sane default.
@@ -284,16 +276,14 @@ void bally_as3022_device::device_start()
 	m_ay->set_volume(2, 0);
 
 	save_item(NAME(m_bc1));
-		save_item(NAME(m_bdir));
-		save_item(NAME(m_sound_select));
-		save_item(NAME(m_ay_data));
+	save_item(NAME(m_bdir));
+	save_item(NAME(m_sound_select));
+	save_item(NAME(m_ay_data));
 }
-
 
 //-------------------------------------------------
 //  pia_porta_r - PIA port A reads
 //-------------------------------------------------
-
 READ8_MEMBER(bally_as3022_device::pia_porta_r)
 {
 	if (m_bc1 && !m_bdir)
@@ -308,11 +298,9 @@ READ8_MEMBER(bally_as3022_device::pia_porta_r)
 	}
 }
 
-
 //-------------------------------------------------
 //  pia_porta_w - PIA port A writes
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_as3022_device::pia_porta_w)
 {
 	if (m_bc1 && !m_bdir)
@@ -320,14 +308,12 @@ WRITE8_MEMBER(bally_as3022_device::pia_porta_w)
 		logerror("PIA port A bus contention!\n");
 	}
 	m_ay_data = data;
-	update_sound_selects();
+	update_ay_bus();
 }
-
 
 //-------------------------------------------------
 //  pia_portb_w - PIA port B writes
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_as3022_device::pia_portb_w)
 {
 	m_bc1 = BIT(data, 0);
@@ -336,9 +322,8 @@ WRITE8_MEMBER(bally_as3022_device::pia_portb_w)
 	{
 		m_ay_data = m_ay->data_r();
 	}
-	update_sound_selects();
+	update_ay_bus();
 }
-
 
 //-------------------------------------------------
 //  pia_cb2_w - PIA CB2 writes
@@ -360,19 +345,16 @@ WRITE_LINE_MEMBER(bally_as3022_device::pia_cb2_w)
 	}
 }
 
-
 //-------------------------------------------------
 //  ay_io_r - AY8912 IO A reads (B is unconnected)
 //-------------------------------------------------
-
 READ8_MEMBER(bally_as3022_device::ay_io_r)
 {
 	// The two high bits are unconnected, the others are inverted.
 	return ~m_sound_select & 0x3f;
 }
 
-
-void bally_as3022_device::update_sound_selects()
+void bally_as3022_device::update_ay_bus()
 {
 	if (m_bc1 && m_bdir)
 	{
@@ -384,6 +366,7 @@ void bally_as3022_device::update_sound_selects()
 	}
 }
 
+
 //**************************************************************************
 //  SOUNDS PLUS WITH VOCALIZER
 //**************************************************************************
@@ -391,7 +374,6 @@ void bally_as3022_device::update_sound_selects()
 //-------------------------------------------------
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
-
 void bally_sounds_plus_device::device_add_mconfig(machine_config &config)
 {
 	bally_as3022_device::device_add_mconfig(config);
@@ -399,15 +381,18 @@ void bally_sounds_plus_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &bally_sounds_plus_device::sounds_plus_map);
 	m_pia->writepb_handler().set(FUNC(bally_sounds_plus_device::vocalizer_pia_portb_w));
 
+	// TODO: Calculate exact filter values. An AC filter is good enough for now
+	// and required as the chip likes to output a DC offset at idle.
+	FILTER_RC(config, m_mc3417_filter).set_ac();
+	m_mc3417_filter->add_route(ALL_OUTPUTS, *this, 1.0);
 	MC3417(config, m_mc3417, 0);
 	// A gain of 2.2 is a guess. It sounds about loud enough and doesn't clip.
-	m_mc3417->add_route(ALL_OUTPUTS, *this, 2.2, AUTO_ALLOC_INPUT, 0);
+	m_mc3417->add_route(ALL_OUTPUTS, "mc3417_filter", 2.2);
 }
 
 //-------------------------------------------------
 //  CPU map, from schematics
 //-------------------------------------------------
-
 void bally_sounds_plus_device::sounds_plus_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -419,7 +404,6 @@ void bally_sounds_plus_device::sounds_plus_map(address_map &map)
 //-------------------------------------------------
 //  pia_portb_w - PIA port B writes
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_sounds_plus_device::vocalizer_pia_portb_w)
 {
 	bool speech_clock = BIT(data, 6);
@@ -434,9 +418,9 @@ WRITE8_MEMBER(bally_sounds_plus_device::vocalizer_pia_portb_w)
 //  Cheap Squeak
 //**************************************************************************
 
-//**************************************************************************
+//--------------------------------------------------------------------------
 //  IO ports
-//**************************************************************************
+//--------------------------------------------------------------------------
 static INPUT_PORTS_START(cheap_squeak)
 		PORT_START("SW1")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
@@ -444,19 +428,18 @@ INPUT_PORTS_END
 
 ioport_constructor bally_cheap_squeak_device::device_input_ports() const
 {
-		return INPUT_PORTS_NAME(cheap_squeak);
+	return INPUT_PORTS_NAME(cheap_squeak);
 }
 
 INPUT_CHANGED_MEMBER(bally_cheap_squeak_device::sw1)
 {
-		if (newval != oldval)
-				m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+	if (newval != oldval)
+		m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 //-------------------------------------------------
 //  sound_select - handle an external write to the board
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_cheap_squeak_device::sound_select)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_select_sync), this), data);
@@ -468,10 +451,8 @@ TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_select_sync)
 }
 
 //-------------------------------------------------
-//
 //  sound_int - handle an external sound interrupt to the board
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER(bally_cheap_squeak_device::sound_int)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_int_sync), this), state);
@@ -481,12 +462,12 @@ TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_int_sync)
 {
 	m_sound_int = param;
 	m_cpu->set_input_line(M6801_TIN_LINE, (m_sound_int ? ASSERT_LINE : CLEAR_LINE));
+	update_led();
 }
 
 //-------------------------------------------------
 //  CPU map, from schematics
 //-------------------------------------------------
-
 void bally_cheap_squeak_device::cheap_squeak_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -498,7 +479,6 @@ void bally_cheap_squeak_device::cheap_squeak_map(address_map &map)
 //-------------------------------------------------
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
-
 void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 {
 	M6803(config, m_cpu, DERIVED_CLOCK(1, 1));
@@ -508,26 +488,24 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_p2_cb().set(FUNC(bally_cheap_squeak_device::out_p2_cb));
 
 	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
-		voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-		vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-		vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
 void bally_cheap_squeak_device::device_start()
 {
 	m_sound_ack_w_handler.resolve();
-		save_item(NAME(m_sound_select));
-		save_item(NAME(m_sound_int));
+	save_item(NAME(m_sound_select));
+	save_item(NAME(m_sound_int));
 }
 
 //-------------------------------------------------
 //  out_p1_cb - IO port 1 write
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_cheap_squeak_device::out_p1_cb)
 {
 	m_dac->write(data);
@@ -536,7 +514,6 @@ WRITE8_MEMBER(bally_cheap_squeak_device::out_p1_cb)
 //-------------------------------------------------
 //  in_p2_cb - IO port 2 read
 //-------------------------------------------------
-
 READ8_MEMBER(bally_cheap_squeak_device::in_p2_cb)
 {
   int sound_int_bit = m_sound_int ? 1 : 0;
@@ -546,12 +523,288 @@ READ8_MEMBER(bally_cheap_squeak_device::in_p2_cb)
 //-------------------------------------------------
 //  out_p2_cb - IO port 2 write
 //-------------------------------------------------
-
 WRITE8_MEMBER(bally_cheap_squeak_device::out_p2_cb)
 {
-	bool sound_ack = data & 0x01;
+	m_sound_ack = BIT(data, 0);
 	if (!m_sound_ack_w_handler.isnull())
 	{
-		m_sound_ack_w_handler(sound_ack);
+		m_sound_ack_w_handler(m_sound_ack);
+	}
+	update_led();
+}
+
+void bally_cheap_squeak_device::update_led()
+{
+	// Either input or output can pull the led line high
+	bool led_state = m_sound_int || m_sound_ack;
+	machine().output().set_value("sound_led0", led_state);
+}
+
+
+//**************************************************************************
+//  Squawk & Talk
+//**************************************************************************
+
+//--------------------------------------------------------------------------
+//  IO ports
+//--------------------------------------------------------------------------
+static INPUT_PORTS_START(squawk_n_talk)
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_squawk_n_talk_device, sw1, 0)
+INPUT_PORTS_END
+
+ioport_constructor bally_squawk_n_talk_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(squawk_n_talk);
+}
+
+INPUT_CHANGED_MEMBER(bally_squawk_n_talk_device::sw1)
+{
+	if (newval != oldval)
+		m_cpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+}
+
+//-------------------------------------------------
+//  sound_select - handle an external write to the board
+//-------------------------------------------------
+WRITE8_MEMBER(bally_squawk_n_talk_device::sound_select)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_squawk_n_talk_device::sound_select_sync), this), data);
+}
+
+TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_select_sync)
+{
+	m_sound_select = param;
+}
+
+//-------------------------------------------------
+//  sound_int - handle an external sound interrupt to the board
+//-------------------------------------------------
+WRITE_LINE_MEMBER(bally_squawk_n_talk_device::sound_int)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_squawk_n_talk_device::sound_int_sync), this), state);
+}
+
+TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_int_sync)
+{
+	// the line runs though in inverter
+	m_pia2->cb1_w(!param);
+}
+
+//-------------------------------------------------
+//  CPU map, from schematics
+//-------------------------------------------------
+void bally_squawk_n_talk_device::squawk_n_talk_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();  // internal RAM, could also be jumpered to use a 6808
+	map(0x0080, 0x0083).mirror(0x4f6c).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).mirror(0x4f6c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1000).mirror(0x40ff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x8000, 0x8fff).mirror(0x4000).rom();  // U2
+	map(0x9000, 0x9fff).mirror(0x4000).rom();  // U3
+	map(0xa000, 0xafff).mirror(0x4000).rom();  // U4
+	map(0xb000, 0xbfff).mirror(0x4000).rom();  // U5
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+void bally_squawk_n_talk_device::device_add_mconfig(machine_config &config)
+{
+	M6802(config, m_cpu, DERIVED_CLOCK(1, 1));
+	m_cpu->set_addrmap(AS_PROGRAM, &bally_squawk_n_talk_device::squawk_n_talk_map);
+
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(m_tms5200, FUNC(tms5220_device::status_r));
+	m_pia1->writepa_handler().set(m_tms5200, FUNC(tms5220_device::data_w));
+	m_pia1->writepb_handler().set(FUNC(bally_squawk_n_talk_device::pia1_portb_w));
+	m_pia1->irqa_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
+	m_pia1->irqb_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
+
+	PIA6821(config, m_pia2, 0);
+	m_pia2->readpa_handler().set(FUNC(bally_squawk_n_talk_device::pia2_porta_r));
+	m_pia2->ca2_handler().set(FUNC(bally_squawk_n_talk_device::pia2_ca2_w));
+	m_pia2->irqa_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
+	m_pia2->irqb_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
+
+	FILTER_RC(config, m_dac_filter);
+	m_dac_filter->add_route(ALL_OUTPUTS, *this, 1.0);
+	m_dac_filter->set_rc(filter_rc_device::HIGHPASS, 2000, 0, 0, CAP_U(2));
+	AD558(config, "dac", 0).add_route(ALL_OUTPUTS, "dac_filter", 0.75);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+
+	// TODO: Calculate exact filter values. An AC filter is good enough for now
+	// and required as the chip likes to output a DC offset at idle.
+	FILTER_RC(config, m_speech_filter).set_ac();
+	m_speech_filter->add_route(ALL_OUTPUTS, *this, 1.0);
+	TMS5200(config, m_tms5200, 640000);
+	m_tms5200->add_route(ALL_OUTPUTS, "speech_filter", 1.0);
+	m_tms5200->ready_cb().set(m_pia1, FUNC(pia6821_device::ca2_w));
+	m_tms5200->irq_cb().set(m_pia1, FUNC(pia6821_device::cb1_w));
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void bally_squawk_n_talk_device::device_start()
+{
+	save_item(NAME(m_sound_select));
+}
+
+//-------------------------------------------------
+//  pia1_portb_w - PIA 1 port B write
+//-------------------------------------------------
+WRITE8_MEMBER(bally_squawk_n_talk_device::pia1_portb_w)
+{
+	m_tms5200->rsq_w(BIT(data, 0));
+	m_tms5200->wsq_w(BIT(data, 1));
+}
+
+//-------------------------------------------------
+//  pia2_porta_r - PIA 2 port A reads
+//-------------------------------------------------
+READ8_MEMBER(bally_squawk_n_talk_device::pia2_porta_r)
+{
+	// 5 lines and they go through inverters
+	return ~m_sound_select & 0x1f;
+}
+
+//-------------------------------------------------
+//  pia2_ca2_w - PIA 2 CA2 writes
+//-------------------------------------------------
+WRITE_LINE_MEMBER(bally_squawk_n_talk_device::pia2_ca2_w)
+{
+	machine().output().set_value("sound_led0", state);
+}
+
+//-------------------------------------------------
+//  pia_irq_w - IRQ line state changes
+//-------------------------------------------------
+WRITE_LINE_MEMBER(bally_squawk_n_talk_device::pia_irq_w)
+{
+	int combined_state = m_pia1->irq_a_state() | m_pia1->irq_b_state() | m_pia2->irq_a_state() | m_pia2->irq_b_state();
+	m_cpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+void bally_squawk_n_talk_ay_device::device_add_mconfig(machine_config &config)
+{
+	bally_squawk_n_talk_device::device_add_mconfig(config);
+
+	m_pia2->writepa_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_porta_w));
+	m_pia2->readpa_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_porta_r));
+	m_pia2->writepb_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_portb_w));
+	m_pia2->cb2_handler().set(FUNC(bally_squawk_n_talk_ay_device::pia2_cb2_w));
+
+	for (optional_device<filter_rc_device> &filter : m_ay_filters)
+		// TODO: Calculate exact filter values. An AC filter is good enough for now
+		// and required as the chip likes to output a DC offset at idle.
+		FILTER_RC(config, filter).set_ac().add_route(ALL_OUTPUTS, *this, 1.0);
+	AY8910(config, m_ay, DERIVED_CLOCK(1, 4));
+	m_ay->add_route(0, "ay_filter0", 0.33);
+	m_ay->add_route(1, "ay_filter1", 0.33);
+	m_ay->add_route(2, "ay_filter2", 0.33);
+	m_ay->port_a_read_callback().set(FUNC(bally_squawk_n_talk_ay_device::ay_io_r));
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void bally_squawk_n_talk_ay_device::device_start()
+{
+	// Set volumes to a sane default.
+	m_ay->set_volume(0, 0);
+	m_ay->set_volume(1, 0);
+	m_ay->set_volume(2, 0);
+
+	save_item(NAME(m_bc1));
+	save_item(NAME(m_bdir));
+	save_item(NAME(m_ay_data));
+}
+
+//-------------------------------------------------
+//  pia2_porta_r - PIA 2 port A reads
+//-------------------------------------------------
+READ8_MEMBER(bally_squawk_n_talk_ay_device::pia2_porta_r)
+{
+	if (m_bc1 && !m_bdir)
+	{
+		m_ay_data = m_ay->data_r();
+	}
+	// This should return the open bus, but this method is called even if the PIA
+	// is in output mode. Self test expects to see the same value.
+	return m_ay_data;
+}
+
+//-------------------------------------------------
+//  pia2_porta_w - PIA 2 port A writes
+//-------------------------------------------------
+WRITE8_MEMBER(bally_squawk_n_talk_ay_device::pia2_porta_w)
+{
+	if (m_bc1 && !m_bdir)
+	{
+		logerror("PIA2 port A bus contention!\n");
+	}
+	m_ay_data = data;
+	update_ay_bus();
+}
+
+//-------------------------------------------------
+//  pia2_portb_w - PIA 2 port B writes
+//-------------------------------------------------
+WRITE8_MEMBER(bally_squawk_n_talk_ay_device::pia2_portb_w)
+{
+	m_bc1 = BIT(data, 0);
+	m_bdir = BIT(data, 1);
+	if (m_bc1 && !m_bdir)
+	{
+		m_ay_data = m_ay->data_r();
+	}
+	update_ay_bus();
+}
+
+//-------------------------------------------------
+//  pia2_cb2_w - PIA 2 CB2 writes
+//-------------------------------------------------
+WRITE_LINE_MEMBER(bally_squawk_n_talk_ay_device::pia2_cb2_w)
+{
+	// This pin is hooked up to the amp, and disables sounds when hi
+	if (state)
+	{
+		m_ay->set_volume(0, 0);
+		m_ay->set_volume(1, 0);
+		m_ay->set_volume(2, 0);
+	}
+	else
+	{
+		m_ay->set_volume(0, 0xff);
+		m_ay->set_volume(1, 0xff);
+		m_ay->set_volume(2, 0xff);
+	}
+}
+
+//-------------------------------------------------
+//  ay_io_r - AY8910 read
+//-------------------------------------------------
+READ8_MEMBER(bally_squawk_n_talk_ay_device::ay_io_r)
+{
+	// 5 lines and they go through inverters
+	return ~m_sound_select & 0x1f;
+}
+
+void bally_squawk_n_talk_ay_device::update_ay_bus()
+{
+	if (m_bc1 && m_bdir)
+	{
+		m_ay->address_w(m_ay_data);
+	}
+	else if (!m_bc1 && m_bdir)
+	{
+		m_ay->data_w(m_ay_data);
 	}
 }

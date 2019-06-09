@@ -55,11 +55,9 @@ deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *
 void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size)
 {
 	const bool priority = !m_colpri_cb.isnull();
-	int start, end, inc;
-	if (priority)             { start = size - 4; end =   -4; inc = -4; }
-	else                      { start =        0; end = size; inc = +4; }
+	struct sprite_t *sprite_ptr = m_spritelist.get();
 
-	for (int offs = start; offs != end;)
+	for (int offs = 0; offs < size;)
 	{
 		u32 pri_mask = 0;
 		int flipy, incy, mult, parentFlipY;
@@ -75,7 +73,7 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		int flipx = data0 & 0x2000;
 		parentFlipY = flipy = data0 & 0x4000;
 		const int h = (1 << ((data0 & 0x1800) >> 11));   /* 1x, 2x, 4x, 8x height */
-		int w = (1 << ((data0 & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
+		const int w = (1 << ((data0 & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
 
 		int sx = data2 & 0x01ff;
 		int sy = data0 & 0x01ff;
@@ -98,17 +96,16 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		// thedeep strongly suggests that this check goes here, otherwise the radar breaks
 		if (!(spriteram[offs] & 0x8000))
 		{
-			offs += inc;
+			offs += 4;
 			continue;
 		}
 
-		int chainoffs = priority ? offs - ((w - 1) * 4) : offs; // or bandit breaks
 		for (int x = 0; x < w; x++)
 		{
-			if ((chainoffs < size) && (chainoffs >= 0))
+			if (offs < size)
 			{
 				// maybe, birdie try appears to specify the base code for each part..
-				u16 code = spriteram[chainoffs + 1] & 0x1fff;
+				u16 code = spriteram[offs + 1] & 0x1fff;
 
 				code &= ~(h - 1);
 
@@ -121,37 +118,57 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 					incy = 1;
 				}
 
-				for (int y = 0; y < h; y++)
+				if (!flash || (screen.frame_number() & 1))
 				{
-					if (!flash || (screen.frame_number() & 1))
+					sprite_ptr->height = h;
+					sprite_ptr->colour = colour;
+					sprite_ptr->flipx = flipx;
+					sprite_ptr->flipy = flipy;
+					if (priority)
 					{
-						if (priority)
+						sprite_ptr->pri_mask = pri_mask;
+						for (int y = 0; y < h; y++)
 						{
-							gfx->prio_transpen(bitmap, cliprect,
-								code - y * incy,
-								colour,
-								flipx, flipy,
-								sx + (mult * x), sy + (mult * y), screen.priority(), pri_mask, 0);
+							sprite_ptr->code[y] = code - y * incy;
+							sprite_ptr->x[y] = sx + (mult * x);
+							sprite_ptr->y[y] = sy + (mult * y);
 						}
-						else
+						sprite_ptr++;
+					}
+					else
+					{
+						for (int y = 0; y < h; y++)
 						{
+							sprite_ptr->code[y] = code - y * incy;
+							sprite_ptr->x[y] = sx + (mult * x);
+							sprite_ptr->y[y] = sy + (mult * y);
 							gfx->transpen(bitmap, cliprect,
-								code - y * incy,
-								colour,
-								flipx, flipy,
-								sx + (mult * x), sy + (mult * y), 0);
+								sprite_ptr->code[y],
+								sprite_ptr->colour,
+								sprite_ptr->flipx, sprite_ptr->flipy,
+								sprite_ptr->x[y], sprite_ptr->y[y], 0);
 						}
 					}
 				}
 			}
-			chainoffs += 4;
+			offs += 4;
 		}
-		while (w)
+	}
+
+	if (priority)
+	{
+		while (sprite_ptr != m_spritelist.get())
 		{
-			w--;
-			offs += inc;
-			if (offs == end)
-				return;
+			sprite_ptr--;
+
+			for (int y = 0; y < sprite_ptr->height; y++)
+			{
+				gfx->prio_transpen(bitmap, cliprect,
+						sprite_ptr->code[y],
+						sprite_ptr->colour,
+						sprite_ptr->flipx, sprite_ptr->flipy,
+						sprite_ptr->x[y], sprite_ptr->y[y], screen.priority(), sprite_ptr->pri_mask, 0);
+			};
 		}
 	}
 }
@@ -161,11 +178,9 @@ void deco_mxc06_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 void deco_mxc06_device::draw_sprites_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size)
 {
 	const bool priority = !m_colpri_cb.isnull();
-	int start, end, inc;
-	if (priority)             { start = size - 4; end =   -4; inc = -4; }
-	else                      { start =        0; end = size; inc = +4; }
+	struct sprite_t *sprite_ptr = m_spritelist.get();
 
-	for (int offs = start; offs != end; offs += inc)
+	for (int offs = 0; offs < size; offs += 4)
 	{
 		u32 pri_mask = 0;
 		u32 code =  spriteram[offs];
@@ -184,21 +199,38 @@ void deco_mxc06_device::draw_sprites_bootleg(screen_device &screen, bitmap_ind16
 
 		sx -= 0x100;
 
+		sprite_ptr->colour = colour;
+		sprite_ptr->flipx = flipx;
+		sprite_ptr->flipy = flipy;
+		sprite_ptr->code[0] = code;
+		sprite_ptr->x[0] = sx;
+		sprite_ptr->y[0] = sy;
 		if (priority)
 		{
-			gfx->prio_transpen(bitmap,cliprect,
-				code,
-				colour,
-				flipx,flipy,
-				sx,sy,screen.priority(),pri_mask,0);
+			sprite_ptr->pri_mask = pri_mask;
+			sprite_ptr++;
 		}
 		else
 		{
 			gfx->transpen(bitmap,cliprect,
-				code,
-				colour,
-				flipx,flipy,
-				sx,sy,0);
+				sprite_ptr->code[0],
+				sprite_ptr->colour,
+				sprite_ptr->flipx,sprite_ptr->flipy,
+				sprite_ptr->x[0],sprite_ptr->y[0],0);
+		}
+	}
+
+	if (priority)
+	{
+		while (sprite_ptr != m_spritelist.get())
+		{
+			sprite_ptr--;
+
+			gfx->prio_transpen(bitmap, cliprect,
+					sprite_ptr->code[0],
+					sprite_ptr->colour,
+					sprite_ptr->flipx, sprite_ptr->flipy,
+					sprite_ptr->x[0], sprite_ptr->y[0], screen.priority(), sprite_ptr->pri_mask, 0);
 		}
 	}
 }
@@ -207,6 +239,7 @@ void deco_mxc06_device::device_start()
 {
 	m_colpri_cb.bind_relative_to(*owner());
 	m_flip_screen = false;
+	m_spritelist = make_unique_clear<struct sprite_t[]>(0x400);
 
 	save_item(NAME(m_flip_screen));
 }

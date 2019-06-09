@@ -212,6 +212,8 @@ ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
+elan_eu3a05.cpp
+elan_eu3a14.cpp
 electron.cpp
 elekscmp.cpp
 elektronmono.cpp
@@ -468,6 +470,7 @@ mikrosha.cpp
 mightyframe.cpp
 milton6805.cpp
 milwaukee.cpp
+mindset.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp

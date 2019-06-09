@@ -98,6 +98,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_hopper(*this, "hopper")
+		, m_ticket(*this, "ticket")
 		, m_keyb(*this, "KEYB_%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
 		, m_system(*this, "SYSTEM")
@@ -203,7 +204,6 @@ private:
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
 	void xtrain_io(address_map &map);
-	void ptrain_io(address_map &map);
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -227,6 +227,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_ticket;
 	optional_ioport_array<5> m_keyb;
 	optional_ioport_array<4> m_dsw;
 	optional_ioport m_system;
@@ -1504,10 +1505,14 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 	switch (offset)
 	{
 		case 0: // D
+			m_hopper->motor_w(BIT(data, 2));
 			// 0x40 = serial out ? (at boot)
 			break;
 
 		case 1: // C
+			if (m_ticket.found())
+				m_ticket->motor_w(BIT(data, 0));
+
 			m_leds[0] = BIT(data, 1);   // re-double
 			m_leds[1] = BIT(data, 2);   // half double
 			break;
@@ -1521,8 +1526,10 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 3: // A
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+			machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
+			machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // hopper out
+			machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // ticket out
 
 			m_leds[7] = BIT(data, 4);   // start
 			break;
@@ -1533,8 +1540,6 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 
 READ8_MEMBER(subsino2_state::xtrain_subsino_r)
 {
-	// xtrain immediately ends the payout when this matches
-	// but mtrain refuses to payout if this doesn't match
 	static const char data[] = { "SUBSINO" };
 	return data[offset];
 }
@@ -1553,11 +1558,6 @@ void subsino2_state::xtrain_io(address_map &map)
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
-}
-
-void subsino2_state::ptrain_io(address_map &map)
-{
-	xtrain_io(map);
 	map(0x0313, 0x0319).r(FUNC(subsino2_state::xtrain_subsino_r));
 }
 
@@ -2212,45 +2212,53 @@ static INPUT_PORTS_START( xtrain )
 
 	// JAMMA inputs:
 	PORT_START("IN A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Re-Double") PORT_CODE(KEYCODE_N)  // re-double
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF   ) PORT_NAME("Half Double")             // half double
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")                   // start
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")          // hold 3 / small / decrease sample in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet")                     // bet
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)       PORT_NAME("Re-Double") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF) PORT_NAME("Half Double")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1)      PORT_NAME("Start")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hold 3 / Small")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET)  PORT_NAME("Bet")
 
 	PORT_START("IN B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take" )          // hold 1 / take
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")        // double up / help
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")            // hold 2 / big / increase sample in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1         )                                      // coin in
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hold 1 / Take" )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP) PORT_NAME("Double Up / Help")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2) PORT_NAME("Hold 2 / Big")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN1)       PORT_NAME("Coin In")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("IN C")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   )                                      // stats (keep pressed during boot for service mode)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )                                      // key in
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE       )  PORT_IMPULSE(1)                     // service mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                      // pay-out
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK) // keep pressed during boot for service mode
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
 
 	PORT_START("IN D")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) // reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM       )                                      // serial in?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // serial in?
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( ptrain )
+	PORT_INCLUDE(xtrain)
+
+	PORT_MODIFY("IN B")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                Water-Nymph
@@ -2570,12 +2578,15 @@ void subsino2_state::xtrain(machine_config &config)
 {
 	xplan(config);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xtrain_io);
+
+	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
 void subsino2_state::ptrain(machine_config &config)
 {
 	xtrain(config);
-	m_maincpu->set_addrmap(AS_IO, &subsino2_state::ptrain_io);
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
 void subsino2_state::expcard(machine_config &config)
@@ -3352,7 +3363,7 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove
 
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
-GAME( 1999, ptrain,   0,        ptrain,   xtrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 

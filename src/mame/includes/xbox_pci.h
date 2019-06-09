@@ -43,13 +43,27 @@ DECLARE_DEVICE_TYPE(NV2A_HOST, nv2a_host_device)
 
 class nv2a_ram_device : public pci_device {
 public:
+	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int memory_size)
+		: nv2a_ram_device(mconfig, tag, owner, clock)
+	{
+		ram_size = memory_size;
+	}
 	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void config_map(address_map &map) override;
 
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
 protected:
+	virtual void device_start() override;
+
 	DECLARE_READ32_MEMBER(config_register_r);
 	DECLARE_WRITE32_MEMBER(config_register_w);
+
+private:
+	int ram_size;
+	std::vector<uint32_t> ram;
 };
 
 DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
@@ -117,6 +131,12 @@ private:
 	required_device<pic8259_device> pic8259_2;
 	required_device<pit8254_device> pit8254;
 
+	uint16_t m_pm1_status;
+	uint16_t m_pm1_enable;
+	uint16_t m_pm1_control;
+	uint16_t m_pm1_timer;
+	uint16_t m_gpe0_status;
+	uint16_t m_gpe0_enable;
 	uint16_t m_global_smi_control;
 	uint8_t m_smi_command_port;
 	lpcbus_device_interface *lpcdevices[16];
@@ -332,17 +352,30 @@ class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto interrupt_handler() { return m_interrupt_handler.bind(); }
+	auto pri_interrupt_handler() { return m_pri_interrupt_handler.bind(); }
+	auto sec_interrupt_handler() { return m_sec_interrupt_handler.bind(); }
+
+	virtual void config_map(address_map &map) override;
+
+	DECLARE_WRITE32_MEMBER(class_rev_w);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 private:
-	devcb_write_line m_interrupt_handler;
-	void mcpx_ide_io(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	devcb_write_line m_pri_interrupt_handler;
+	devcb_write_line m_sec_interrupt_handler;
+	void ide_pri_command(address_map &map);
+	void ide_pri_control(address_map &map);
+	void ide_sec_command(address_map &map);
+	void ide_sec_control(address_map &map);
+	void ide_io(address_map &map);
+	DECLARE_WRITE_LINE_MEMBER(ide_pri_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ide_sec_interrupt);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)

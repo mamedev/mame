@@ -125,18 +125,9 @@ static const u8 s1945j_table[256] = {
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
 };
 
-WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
+void psikyo_state::s1945_mcu_w(offs_t offset, uint8_t data)
 {
-	// Accesses are always bytes, so resolve it
-	int suboff;
-
-	for (suboff = 0; suboff < 3; suboff++)
-		if ((0xff << (8 * suboff)) & mem_mask)
-			break;
-	data >>= 8 * suboff;
-	offset = offset * 4 + 4 + (3 - suboff);
-
-	switch (offset)
+	switch (offset + 4)
 	{
 	case 0x06:
 		m_s1945_mcu_inlatch = data;

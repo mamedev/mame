@@ -5353,4 +5353,75 @@
 		</part>
 	</software>
 
+	<software name="chmpbase">
+		<description>Championship Baseball</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-06-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234841">
+				<rom name="Championship Baseball side A.woz" size="234841" crc="d2b4c74b" sha1="d36792910f466809fd7021cbf34ece4225c31f4c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234841">
+				<rom name="Championship Baseball side B.woz" size="234841" crc="643f1049" sha1="4f29d8b36f113ae223d9b5e34198b894f7a55a16" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardoz">
+		<description>The Wizard of Oz</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2019-06-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later.- -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="234866">
+				<rom name="The Wizard of Oz disk A.woz" size="234866" crc="4522de5f" sha1="b2459cf8ea2791d82b5da58e7b0aa25caf140f94" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="234866">
+				<rom name="The Wizard of Oz disk B.woz" size="234866" crc="e9de932e" sha1="fa02f177b45bde15ffc06101031fd01ca8710033" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="234866">
+				<rom name="The Wizard of Oz disk C.woz" size="234866" crc="0ed1d4cb" sha1="78a9fb5edb2fd249e7804607cd7bd3ee248115af" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="234866">
+				<rom name="The Wizard of Oz disk D.woz" size="234866" crc="1c0e7e78" sha1="25d7e25b66c475d0881138ba302be722683df6e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="queenphb">
+		<description>The Queen of Phobos</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-06-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="181581">
+				<rom name="The Queen of Phobos.woz" size="181581" crc="6c31a42a" sha1="7617ff8f126edaab1daf8954ea7d6cac07bb1e77" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
