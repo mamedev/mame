@@ -174,17 +174,6 @@ void gp9001vdp_device::map(address_map &map)
 //  map(0x3800, 0x3fff).ram(); // sprite mirror?
 }
 
-static const gfx_layout layout =
-{
-	8,8,            /* 8x8 */
-	RGN_FRAC(1,2),  /* Number of 8x8 sprites */
-	4,              /* 4 bits per pixel */
-	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8*2) },
-	8*8*2
-};
-
 // each 16x16 tile is actually 4 8x8 tile groups.
 static const gfx_layout layout_16x16 =
 {
@@ -197,9 +186,20 @@ static const gfx_layout layout_16x16 =
 	16*16*2
 };
 
+static const gfx_layout layout =
+{
+	8,8,            /* 8x8 */
+	RGN_FRAC(1,2),  /* Number of 8x8 sprites */
+	4,              /* 4 bits per pixel */
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	8*8*2
+};
+
 GFXDECODE_MEMBER( gp9001vdp_device::gfxinfo )
-	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout,       0, 0x1000 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_16x16, 0, 0x1000 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout,       0, 0x1000 )
 GFXDECODE_END
 
 
@@ -239,7 +239,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 	}
 
 	const u32 color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -629,8 +629,8 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 {
 	const u16 *source = (m_sp.use_sprite_buffer) ? m_spriteram->buffer() : m_spriteram->live();
 
-	const u32 total_elements = gfx(0)->elements();
-	const u32 total_colors = gfx(0)->colors();
+	const u32 total_elements = gfx(1)->elements();
+	const u32 total_colors = gfx(1)->colors();
 
 	int old_x = (-(m_sp.scrollx)) & 0x1ff;
 	int old_y = (-(m_sp.scrolly)) & 0x1ff;
@@ -727,7 +727,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					color %= total_colors;
 					const pen_t *paldata = &palette().pen(color * 16);
 					{
-						const u8* srcdata = gfx(0)->get_data(sprite);
+						const u8* srcdata = gfx(1)->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
 						int xstart, xend, xinc;
