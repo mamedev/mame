@@ -3326,8 +3326,8 @@ ROM_START( gnw_dkjrp )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) )
 
-	ROM_REGION( 340603, "svg", 0)
-	ROM_LOAD( "gnw_dkjrp.svg", 0, 340603, CRC(4b6a4358) SHA1(f871ba8d5e0a8d16e02c30335cddd503a7d5a965) )
+	ROM_REGION( 340627, "svg", 0)
+	ROM_LOAD( "gnw_dkjrp.svg", 0, 340627, CRC(c4d6e48a) SHA1(420eec2bc094576526502e5a183dc6118ba1a245) )
 ROM_END
 
 
