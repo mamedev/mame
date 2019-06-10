@@ -149,9 +149,10 @@ void a2bus_vtc1_device::device_add_mconfig(machine_config &config)
 {
 	a2bus_videx80_device::device_add_mconfig(config);
 
-	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(14'742'000, 945, 0, 720, 260, 0, 216); // clock uncertain
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(18_MHz_XTAL, 1155, 0, 880, 260, 0, 216);
 
-	m_crtc->set_clock(14'742'000 / 9);
+	m_crtc->set_clock(18_MHz_XTAL / 11);
+	m_crtc->set_char_width(11);
 }
 
 void a2bus_vtc2_device::device_add_mconfig(machine_config &config)
@@ -169,7 +170,6 @@ void a2bus_aevm80_device::device_add_mconfig(machine_config &config)
 
 	m_crtc->set_clock(18_MHz_XTAL / 10);
 	m_crtc->set_char_width(10);
-	m_crtc->set_update_row_callback(FUNC(a2bus_aevm80_device::crtc_update_row_alt), this);
 }
 
 //-------------------------------------------------
@@ -214,7 +214,8 @@ a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr),
 	m_crtc(*this, VIDEOTERM_MC6845_NAME),
-	m_rambank(0)
+	m_rambank(0),
+	m_char_width(9)
 {
 }
 
@@ -236,6 +237,7 @@ a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const 
 a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC1, tag, owner, clock)
 {
+	m_char_width = 11;
 }
 
 a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -246,6 +248,7 @@ a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *
 a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, tag, owner, clock)
 {
+	m_char_width = 10;
 }
 
 //-------------------------------------------------
@@ -367,9 +370,8 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 {
 	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
-	int i;
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = m_ram[ offset ];
@@ -380,44 +382,10 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 		if ( i == cursor_x )
 			std::swap(fg, bg);
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
-		*p = bg; p++;
-	}
-}
-
-MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row_alt )
-{
-	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
-	int i;
-
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ma + i ) & 0x7ff;
-		uint8_t chr = m_ram[ offset ];
-		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
-		rgb_t fg = rgb_t::white();
-		rgb_t bg = rgb_t::black();
-
-		if ( i == cursor_x )
-			std::swap(fg, bg);
-
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
-		*p = bg; p++;
-		*p = bg; p++;
+		for (int j = m_char_width; j > 0; j--)
+		{
+			*p++ = BIT(data, 7) ? fg : bg;
+			data <<= 1;
+		}
 	}
 }
