@@ -200,10 +200,23 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 INPUT_PORTS_END
 
+static const gfx_layout layout_5bpp_hi =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP16(0, 1) },
+	{ STEP16(0, 16) },
+	16*16
+};
+
 static GFXDECODE_START( gfx_aquarium )
-	GFXDECODE_ENTRY( "txt", 0, gfx_8x8x4_packed_msb,   0x200, 16 )
-	GFXDECODE_ENTRY( "mid", 0, gfx_16x16x4_packed_msb, 0x400, 32 )
-	GFXDECODE_ENTRY( "bak", 0, gfx_16x16x4_packed_msb, 0x400, 32 )
+	GFXDECODE_ENTRY( "txt",    0, gfx_8x8x4_packed_msb,   0x200, 16 )
+	GFXDECODE_ENTRY( "mid",    0, gfx_16x16x4_packed_msb, 0x400, 32 ) // low 4bpp of 5bpp data
+	GFXDECODE_ENTRY( "bak",    0, gfx_16x16x4_packed_msb, 0x400, 32 ) // low 4bpp of 5bpp data
+	GFXDECODE_ENTRY( "bak_hi", 0, layout_5bpp_hi,         0x400, 32 ) // hi 1bpp of 5bpp data
+	GFXDECODE_ENTRY( "mid_hi", 0, layout_5bpp_hi,         0x400, 32 ) // hi 1bpp of 5bpp data
 GFXDECODE_END
 
 void aquarium_state::aquarium(machine_config &config)
@@ -313,49 +326,49 @@ ROM_START( aquariumj )
 	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-void aquarium_state::expand_gfx(int no, u8 *gfx_hi)
+void aquarium_state::expand_gfx(int low, int hi)
 {
 	/* The BG tiles are 5bpp, this rearranges the data from
 	   the roms containing the 1bpp data so we can decode it
 	   correctly */
-	gfx_element *gfx = m_gfxdecode->gfx(no);
+	gfx_element *gfx_l = m_gfxdecode->gfx(low);
+	gfx_element *gfx_h = m_gfxdecode->gfx(hi);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gfx->elements() * gfx->width() * gfx->height());
+	u8 *srcdata = auto_alloc_array(machine(), u8, gfx_l->elements() * gfx_l->width() * gfx_l->height());
 
 	// loop over elements
 	u8 *dest = srcdata;
-	for (int c = 0; c < gfx->elements(); c++)
+	for (int c = 0; c < gfx_l->elements(); c++)
 	{
-		const u8 *c0base = gfx->get_data(c);
+		const u8 *c0base = gfx_l->get_data(c);
+		const u8 *c1base = gfx_h->get_data(c);
 
 		// loop over height
-		for (int y = 0; y < gfx->height(); y++)
+		for (int y = 0; y < gfx_l->height(); y++)
 		{
 			const u8 *c0 = c0base;
+			const u8 *c1 = c1base;
 
-			for (int x = 0; x < gfx->width();)
+			for (int x = 0; x < gfx_l->width(); x++)
 			{
-				u8 hi = *gfx_hi++;
-				for (int i = 0; i < 8; i++)
-				{
-					*dest++ = (*c0++ & 0xf) | ((hi >> 3) & 0x10);
-					x++;
-					hi <<= 1;
-				}
+				u8 hi_data = *c1++;
+				*dest++ = (*c0++ & 0xf) | ((hi_data << 4) & 0x10);
 			}
-			c0base += gfx->rowbytes();
+			c0base += gfx_l->rowbytes();
+			c1base += gfx_h->rowbytes();
 		}
 	}
 
-	gfx->set_raw_layout(srcdata, gfx->width(), gfx->height(), gfx->elements(), 8 * gfx->width(), 8 * gfx->width() * gfx->height());
-	gfx->set_granularity(32);
+	gfx_l->set_raw_layout(srcdata, gfx_l->width(), gfx_l->height(), gfx_l->elements(), 8 * gfx_l->width(), 8 * gfx_l->width() * gfx_l->height());
+	gfx_l->set_granularity(32);
+	m_gfxdecode->set_gfx(hi, nullptr);
 }
 
 void aquarium_state::init_aquarium()
 {
-	expand_gfx(1, memregion("mid_hi")->base());
-	expand_gfx(2, memregion("bak_hi")->base());
+	expand_gfx(1, 4);
+	expand_gfx(2, 3);
 
 	u8 *Z80 = memregion("audiocpu")->base();
 
