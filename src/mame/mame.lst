@@ -10820,6 +10820,7 @@ warzardr1                       // 23/10/1996 (c) 1996 (Japan)
 
 @source:cpzodiac.cpp
 cpzodiac                        //
+cpzodiacj                       //
 
 @source:craft.cpp
 craft                           // Craft, by [lft]
