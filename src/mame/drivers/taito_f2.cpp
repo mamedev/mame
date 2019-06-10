@@ -2691,9 +2691,21 @@ INPUT_PORTS_END
                         GFX DECODING
 ***********************************************************/
 
+static const gfx_layout layout_6bpp_hi =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ STEP2(0,1) },
+	{ STEP4(3*2,-2), STEP4(7*2,-2), STEP4(11*2,-2), STEP4(15*2,-2) },
+	{ STEP16(0,16*2) },
+	16*16*2
+};
+
 static GFXDECODE_START( gfx_taitof2 )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
+	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   // low 4bpp of 6bpp sprites
 	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
+	GFXDECODE_ENTRY( "sprites_hi",  0, layout_6bpp_hi,         0, 256 )   // hi 2bpp of 6bpp sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_thundfox )
@@ -5355,8 +5367,8 @@ ROM_END
 void taitof2_state::init_finalb()
 {
 	/* convert from 2bits into 4bits format */
-	u8 *gfx_hi = memregion("sprites_hi")->base();
 	gfx_element *gx0 = m_gfxdecode->gfx(0);
+	gfx_element *gx1 = m_gfxdecode->gfx(2);
 
 	// allocate memory for the assembled data
 	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
@@ -5366,29 +5378,28 @@ void taitof2_state::init_finalb()
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
+		const u8 *c1base = gx1->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gx0->height(); y++)
 		{
 			const u8 *c0 = c0base;
+			const u8 *c1 = c1base;
 
-			for (int x = 0; x < gx0->width();)
+			for (int x = 0; x < gx0->width(); x++)
 			{
-				u8 hipix = *gfx_hi++;
-				for (int i = 0; i < 4; i++)
-				{
-					*dest++ = (*c0++ & 0xf) | ((hipix << 4) & 0x30);
-					x++;
-					hipix >>= 2;
-				}
+				u8 hipix = *c1++;
+				*dest++ = (*c0++ & 0xf) | ((hipix << 4) & 0x30);
 			}
 			c0base += gx0->rowbytes();
+			c1base += gx1->rowbytes();
 		}
 	}
 
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_colors(4096 / 64);
 	gx0->set_granularity(64);
+	m_gfxdecode->set_gfx(2, nullptr);
 }
 
 void taitof2_state::init_cameltry()

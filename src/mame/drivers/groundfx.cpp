@@ -194,9 +194,21 @@ static const gfx_layout tile16x16_layout =
 	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
+static const gfx_layout layout_scc_6bpp_hi =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ STEP2(0,1) },
+	{ STEP8(0,2) },
+	{ STEP8(0,8*2) },
+	8*8*2
+};
+
 static GFXDECODE_START( gfx_groundfx )
-	GFXDECODE_ENTRY( "sprites",   0x0, tile16x16_layout,    4096, 512 )
-	GFXDECODE_ENTRY( "tc0100scn", 0x0, gfx_8x8x4_packed_msb,   0, 512 )
+	GFXDECODE_ENTRY( "sprites",          0x0, tile16x16_layout,  4096, 512 )
+	GFXDECODE_ENTRY( "tc0100scn",        0x0, gfx_8x8x4_packed_msb, 0, 512 ) // low 4bpp of 6bpp scc tiles
+	GFXDECODE_ENTRY( "tc0100scn:hi_gfx", 0x0, layout_scc_6bpp_hi,   0, 512 ) // hi 2bpp of 6bpp scc tiles
 GFXDECODE_END
 
 
@@ -334,8 +346,8 @@ void groundfx_state::init_groundfx()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
 
 	/* make SCC tile GFX format suitable for gfxdecode */
-	u8 *gfx_hi = memregion("tc0100scn:hi_gfx")->base();
 	gfx_element *gx0 = m_gfxdecode->gfx(1);
+	gfx_element *gx1 = m_gfxdecode->gfx(2);
 
 	// allocate memory for the assembled data
 	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
@@ -345,28 +357,27 @@ void groundfx_state::init_groundfx()
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
+		const u8 *c1base = gx1->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gx0->height(); y++)
 		{
 			const u8 *c0 = c0base;
+			const u8 *c1 = c1base;
 
-			for (int x = 0; x < gx0->width();)
+			for (int x = 0; x < gx0->width(); x++)
 			{
-				u8 hipix = *gfx_hi++;
-				for (int i = 0; i < 4; i++)
-				{
-					*dest++ = (*c0++ & 0xf) | ((hipix >> 2) & 0x30);
-					x++;
-					hipix <<= 2;
-				}
+				u8 hipix = *c1++;
+				*dest++ = (*c0++ & 0xf) | ((hipix << 4) & 0x30);
 			}
 			c0base += gx0->rowbytes();
+			c1base += gx1->rowbytes();
 		}
 	}
 
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(64);
+	m_gfxdecode->set_gfx(2, nullptr);
 	m_tc0100scn->update_granularity();
 }
 
