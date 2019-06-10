@@ -328,7 +328,7 @@ void asuka_state::bonzeadv_map(address_map &map)
 	map(0x10c000, 0x10ffff).ram();
 	map(0x200000, 0x200007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
 	map(0x390000, 0x390001).portr("DSWA");
-	map(0x3a0000, 0x3a0001).w(FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x3b0000, 0x3b0001).portr("DSWB");
 	map(0x3c0000, 0x3c0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x3d0000, 0x3d0001).nopr();
@@ -347,7 +347,7 @@ void asuka_state::asuka_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x1076f0, 0x1076f1).nopr(); /* Mofflott init does dummy reads here */
 	map(0x200000, 0x20000f).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
-	map(0x3a0000, 0x3a0003).w(FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x3a0000, 0x3a0003).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0003, 0x3e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -361,7 +361,7 @@ void asuka_state::asuka_map(address_map &map)
 void asuka_state::cadash_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080003).w(FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x080000, 0x080003).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x0c0000, 0x0c0001).nopr();
 	map(0x0c0001, 0x0c0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x0c0003, 0x0c0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -381,7 +381,7 @@ void asuka_state::eto_map(address_map &map)
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x30000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x400000, 0x40000f).r(m_tc0220ioc, FUNC(tc0220ioc_device::read)).umask16(0x00ff);   /* service mode mirror */
-	map(0x4a0000, 0x4a0003).w(FUNC(asuka_state::asuka_spritectrl_w));
+	map(0x4a0000, 0x4a0003).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x4e0000, 0x4e0001).nopr();
 	map(0x4e0001, 0x4e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x4e0003, 0x4e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -760,8 +760,7 @@ INPUT_PORTS_END
 **************************************************************/
 
 static GFXDECODE_START( gfx_asuka )
-	GFXDECODE_ENTRY( "pc090oj",   0, gfx_16x16x4_packed_msb, 0, 256 )   /* OBJ */
-	GFXDECODE_ENTRY( "tc0100scn", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* SCR */
+	GFXDECODE_ENTRY( "tc0100scn", 0, gfx_8x8x4_packed_msb, 0, 256 )   /* SCR */
 GFXDECODE_END
 
 
@@ -784,7 +783,7 @@ void asuka_state::machine_reset()
 	m_adpcm_ff = false;
 }
 
-WRITE_LINE_MEMBER(asuka_state::screen_vblank_asuka)
+WRITE_LINE_MEMBER(asuka_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -842,19 +841,19 @@ void asuka_state::bonzeadv(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
-	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
-	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_screen_update(FUNC(asuka_state::screen_update));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
-	m_pc090oj->set_gfxdecode_tag("gfxdecode");
 	m_pc090oj->set_palette(m_tc0110pcr);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
@@ -900,20 +899,20 @@ void asuka_state::asuka(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
-	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_screen_update(FUNC(asuka_state::screen_update));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
-	m_pc090oj->set_usebuffer(1);
-	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette(m_tc0110pcr);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
@@ -971,20 +970,20 @@ void asuka_state::cadash(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
-	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_screen_update(FUNC(asuka_state::screen_update));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
-	m_pc090oj->set_usebuffer(1);
-	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette(m_tc0110pcr);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
@@ -1031,19 +1030,19 @@ void asuka_state::mofflott(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
-	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_screen_update(FUNC(asuka_state::screen_update));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
-	m_pc090oj->set_gfxdecode_tag("gfxdecode");
 	m_pc090oj->set_palette(m_tc0110pcr);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
@@ -1098,19 +1097,19 @@ void asuka_state::eto(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
-	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_screen_update(FUNC(asuka_state::screen_update));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
-	m_pc090oj->set_gfxdecode_tag("gfxdecode");
 	m_pc090oj->set_palette(m_tc0110pcr);
+	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
