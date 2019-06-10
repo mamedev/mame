@@ -196,7 +196,6 @@ static const gfx_layout tile16x16_layout =
 
 static GFXDECODE_START( gfx_groundfx )
 	GFXDECODE_ENTRY( "sprites",   0x0, tile16x16_layout,    4096, 512 )
-	GFXDECODE_ENTRY( "tc0480scp", 0x0, gfx_16x16x4_packed_lsb, 0, 512 )
 	GFXDECODE_ENTRY( "tc0100scn", 0x0, gfx_8x8x4_packed_msb,   0, 512 )
 GFXDECODE_END
 
@@ -250,17 +249,15 @@ void groundfx_state::groundfx(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(2);
+	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(50, 8);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn->set_palette(m_palette);
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
@@ -338,7 +335,7 @@ void groundfx_state::init_groundfx()
 
 	/* make SCC tile GFX format suitable for gfxdecode */
 	u8 *gfx_hi = memregion("tc0100scn:hi_gfx")->base();
-	gfx_element *gx0 = m_gfxdecode->gfx(2);
+	gfx_element *gx0 = m_gfxdecode->gfx(1);
 
 	// allocate memory for the assembled data
 	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());

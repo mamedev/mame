@@ -2708,8 +2708,7 @@ static GFXDECODE_START( gfx_yuyugogo )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_deadconx )
-	GFXDECODE_ENTRY( "sprites",   0, gfx_16x16x4_packed_lsb, 0, 256 )  /* sprites */
-	GFXDECODE_ENTRY( "tc0480scp", 0, gfx_16x16x4_packed_lsb, 0, 256 )  /* playfield */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0, 256 )  /* sprites */
 GFXDECODE_END
 
 static const gfx_layout footchmpbl_tilelayout =
@@ -2723,22 +2722,8 @@ static const gfx_layout footchmpbl_tilelayout =
 	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout footchmpbl_charlayout =
-{
-	8,8,  /* 16*16 sprites */
-	256,  /* the ROMs are mostly empty */
-	4,  /* 4 bits per pixel */
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8   /* every sprite takes 128 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_footchmpbl )
-	GFXDECODE_ENTRY( "sprites",   0, footchmpbl_tilelayout, 0, 256 )    /* sprites */
-	GFXDECODE_ENTRY( "tc0480scp", 0, footchmpbl_tilelayout, 0, 256 )    /* playfield */
-	GFXDECODE_ENTRY( "gfx3",      0, footchmpbl_charlayout, 0, 256 )    // gets wiped out by the dynamic decode atm
-	GFXDECODE_ENTRY( "gfx3",      0, footchmpbl_charlayout, 0, 256 )    // bootleg should clearly use this instead of the uploaded tiles
+	GFXDECODE_ENTRY( "sprites", 0, footchmpbl_tilelayout, 0, 256 )    /* sprites */
 GFXDECODE_END
 
 
@@ -3151,12 +3136,10 @@ void taitof2_state::footchmp(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_full_buffer_delayed));
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x1d + 3, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3166,6 +3149,7 @@ void taitof2_state::footchmpbl(machine_config &config)
 	footchmp(config);
 
 	/* video hardware */
+	m_tc0480scp->set_gfxlayout(TC0480SCP_LAYOUT_BOOTLEG);
 	m_gfxdecode->set_info(gfx_footchmpbl);
 }
 
@@ -3185,12 +3169,10 @@ void taitof2_state::hthero(machine_config &config)
 	TC0360PRI(config, m_tc0360pri, 0);
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x33 + 3, -0x04);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 }
 
 void taitof2_state::koshien(machine_config &config)
@@ -3345,13 +3327,11 @@ void taitof2_state::metalb(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_metalb));
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x32 + 3, -0x04);
 	m_tc0480scp->set_offsets_tx(1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 	m_tc0480scp->set_col_base(4096);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3414,12 +3394,10 @@ void taitof2_state::deadconx(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_deadconx));
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x1e + 3, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -3437,12 +3415,10 @@ void taitof2_state::deadconxj(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_deadconx));
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x34 + 3, -0x05);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 }
@@ -4750,7 +4726,7 @@ ROM_START( footchmpbl )
 	ROM_LOAD( "ob14.rom4",  0x180000, 0x80000, CRC(28fcaefa) SHA1(f92a19dc24d5faac57a5934e7001e5b0bf9d847c) )
 
 	// ?? more gfx? - should it ignore the uploaded text data and use these?
-	ROM_REGION( 0x40000, "gfx3", 0 )    /* SCR */
+	ROM_REGION( 0x40000, "tc0480scp:textrom", 0 )    /* SCR */
 	ROM_LOAD( "bk33.rom16", 0x000000, 0x10000, CRC(07a371fe) SHA1(27e7ba4ed7f0868206c9d7ca653322ca73929567) )
 	ROM_LOAD( "bk32.rom15", 0x010000, 0x10000, CRC(89020973) SHA1(30174e504734a851a016acf0746d726981edb8f1) )
 	ROM_LOAD( "bk31.rom14", 0x020000, 0x10000, CRC(02a0de4f) SHA1(7446d75608126e3d5693913e5dcb5636ae1e5500) )

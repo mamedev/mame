@@ -81,8 +81,6 @@ void superchs_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		int zoomy =          (data & 0x0001fc00) >> 10;
 		int y =              (data & 0x000003ff);
 
-		color |= 0x100;
-
 		if (!tilenum) continue;
 
 		flipy = !flipy;
