@@ -2703,6 +2703,11 @@ static const gfx_layout layout_6bpp_hi =
 };
 
 static GFXDECODE_START( gfx_taitof2 )
+	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
+	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_finalb )
 	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   // low 4bpp of 6bpp sprites
 	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
 	GFXDECODE_ENTRY( "sprites_hi",  0, layout_6bpp_hi,         0, 256 )   // hi 2bpp of 6bpp sprites
@@ -2868,7 +2873,7 @@ void taitof2_state::finalb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::finalb_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_taitof2);
+	m_gfxdecode->set_info(gfx_finalb);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,finalb)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
