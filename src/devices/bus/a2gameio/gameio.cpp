@@ -119,7 +119,7 @@ READ_LINE_MEMBER(apple2_gameio_device::sw0_r)
 	if (m_intf != nullptr)
 		return m_intf->sw0_r();
 
-	return 1;
+	return 0;
 }
 
 READ_LINE_MEMBER(apple2_gameio_device::sw1_r)
@@ -127,7 +127,7 @@ READ_LINE_MEMBER(apple2_gameio_device::sw1_r)
 	if (m_intf != nullptr)
 		return m_intf->sw1_r();
 
-	return 1;
+	return 0;
 }
 
 READ_LINE_MEMBER(apple2_gameio_device::sw2_r)
@@ -135,7 +135,7 @@ READ_LINE_MEMBER(apple2_gameio_device::sw2_r)
 	if (m_intf != nullptr)
 		return m_intf->sw2_r();
 
-	return 1;
+	return 0;
 }
 
 READ_LINE_MEMBER(apple2_gameio_device::sw3_r)
@@ -143,7 +143,7 @@ READ_LINE_MEMBER(apple2_gameio_device::sw3_r)
 	if (m_intf != nullptr)
 		return m_intf->sw3_r();
 
-	return 1;
+	return 0;
 }
 
 WRITE_LINE_MEMBER(apple2_gameio_device::an0_w)

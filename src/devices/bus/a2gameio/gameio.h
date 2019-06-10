@@ -88,10 +88,10 @@ protected:
 	virtual u8 pdl1_r() { return 0; }
 	virtual u8 pdl2_r() { return 0; }
 	virtual u8 pdl3_r() { return 0; }
-	virtual DECLARE_READ_LINE_MEMBER(sw0_r) { return 1; }
-	virtual DECLARE_READ_LINE_MEMBER(sw1_r) { return 1; }
-	virtual DECLARE_READ_LINE_MEMBER(sw2_r) { return 1; }
-	virtual DECLARE_READ_LINE_MEMBER(sw3_r) { return 1; }
+	virtual DECLARE_READ_LINE_MEMBER(sw0_r) { return 0; }
+	virtual DECLARE_READ_LINE_MEMBER(sw1_r) { return 0; }
+	virtual DECLARE_READ_LINE_MEMBER(sw2_r) { return 0; }
+	virtual DECLARE_READ_LINE_MEMBER(sw3_r) { return 0; }
 
 	// optional output overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(an0_w) { }
