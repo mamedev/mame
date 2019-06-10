@@ -5,14 +5,19 @@
 
 #pragma once
 
+enum
+{
+	TC0480SCP_LAYOUT_COMMON = 0, // default layout
+	TC0480SCP_LAYOUT_BOOTLEG // bootleg layout (footchmpbl need this)
+};
+
 class tc0480scp_device : public device_t, public device_gfx_interface
 {
 public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
+	void set_gfxlayout(int gfxlayout) { m_gfxlayout = gfxlayout; }
 	void set_col_base(int col) { m_col_base = col; }
 	void set_offsets(int x_offset, int y_offset)
 	{
@@ -68,18 +73,20 @@ private:
 	int                m_bgscrolly[4];
 	int                m_pri_reg;
 
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_default);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_bootleg);
+
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
 	tilemap_t          *m_tilemap[5][2];
 	s32                m_dblwidth;
 
-	int                m_gfxnum;
+	int                m_gfxlayout;
 	int                m_x_offset, m_y_offset;
 	int                m_text_xoffs, m_text_yoffs;
 	int                m_flip_xoffs, m_flip_yoffs;
 
 	int                m_col_base;
-
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

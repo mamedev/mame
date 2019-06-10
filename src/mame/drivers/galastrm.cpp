@@ -166,7 +166,6 @@ static const gfx_layout tile16x16_layout =
 
 static GFXDECODE_START( gfx_galastrm )
 	GFXDECODE_ENTRY( "sprites",   0x0, tile16x16_layout,       0, 4096/16 )
-	GFXDECODE_ENTRY( "tc0480scp", 0x0, gfx_16x16x4_packed_lsb, 0, 4096/16 )
 GFXDECODE_END
 
 
@@ -217,10 +216,8 @@ void galastrm_state::galastrm(machine_config &config)
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_tc0110pcr);
 	m_tc0480scp->set_offsets(-40, -3);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
 
