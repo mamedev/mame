@@ -7694,15 +7694,29 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="chessmen">
-		<!-- collection of chess engines for The ChessMachine, including The King 2.54 and Gideon 3.1 -->
-		<!-- not an official Tasc disk, some of the files were taken from (undumped) copy-protected disks -->
+		<!-- Collection of unencrypted chess engines for The ChessMachine, including The King 2.54 and Gideon 3.1 -->
+		<!-- Not an official Tasc disk, some of the files were taken from (undumped) copy-protected disks. -->
+		<!-- The 3rd disk contains ChessMachine-compatible engines extracted from other dedicated chess computers. -->
 		<description>The ChessMachine (RISC engines)</description>
 		<year>1991</year>
 		<publisher>Tasc</publisher>
 		<info name="usage" value="ChessMachine installation required, see README.TXT" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="chessmen.img" size="1474560" crc="737be161" sha1="edc6e6506778115b5238c6e8ad907ece42d99634"/>
+			<feature name="part_id" value="CM Gideon" />
+			<dataarea name="flop" size="737280">
+				<rom name="gideon.img" size="737280" crc="c858c60e" sha1="dd482fd7efc60615c2836a4fef23c520454370db"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="CM The King" />
+			<dataarea name="flop" size="737280">
+				<rom name="theking.img" size="737280" crc="23bb50c0" sha1="9f5cb7c610fdf8404df5af59b101ed2a3a644ff2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Other" />
+			<dataarea name="flop" size="737280">
+				<rom name="other.img" size="737280" crc="660256ab" sha1="df629b5f0479082d25262e24af1fda7f025cf1f0"/>
 			</dataarea>
 		</part>
 	</software>
