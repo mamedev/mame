@@ -11785,6 +11785,35 @@ ROM_START( sfz2jd )
 	ROM_LOAD( "phoenix.key",  0x000000, 0x000014, CRC(2cf772b0) SHA1(eff33c65a4f3862c231f9e4d6fefa7b34398dbf2) )
 ROM_END
 
+ROM_START( pzloop2jd )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pl2j_d.03a", 0x000000, 0x80000, CRC(1f5d41c9) SHA1(a205f8c73136d22c127ee547df724e300647c45a) )
+	ROM_LOAD16_WORD_SWAP( "pl2j_d.04a", 0x080000, 0x80000, CRC(60721b73) SHA1(48918d94b8a21c1bb2bd2fc6166cde6bb427d862) )
+	ROM_LOAD16_WORD_SWAP( "pl2j_d.05a", 0x100000, 0x80000, CRC(0c39799f) SHA1(3c16a814a5bbb2b00bd82a01f17e0ca797192c98) )
+	ROM_LOAD16_WORD_SWAP( "pl2j_d.06a", 0x180000, 0x80000, CRC(f3974d76) SHA1(01f8caf5a85d27b24a18a313e459f508ba98a123) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROMX_LOAD( "pl2-simm.01c",   0x0000000, 0x200000, CRC(137b13a7) SHA1(a1ca1bc8699ddfc54d5de1b39a9db9a5ac8b12e5) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.01d",   0x0000001, 0x200000, CRC(a2db1507) SHA1(61c84c8d698a846d54a571b5f7b4824e22136db7) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.01a",   0x0000002, 0x200000, CRC(7e80ff8e) SHA1(afcebfa995ace8b8973e75f1589980c5c4535bca) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.01b",   0x0000003, 0x200000, CRC(cd93e6ed) SHA1(e4afce48fe481d8291ed2475d5de446afad65351) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.03c",   0x0000004, 0x200000, CRC(0f52bbca) SHA1(e76c29d445062f5e16d06bdc4ab44640ba35aaac) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.03d",   0x0000005, 0x200000, CRC(a62712c3) SHA1(2abfe0209e188010a0ae969f0d9eb7d28820b3f2) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.03a",   0x0000006, 0x200000, CRC(b60c9f8e) SHA1(40c7985e04463fb2bd59b3bb6aa5897328d37ff3) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "pl2-simm.03b",   0x0000007, 0x200000, CRC(83fef284) SHA1(ef4429f54c456d6485a7d642d49dffafef4435fe) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "pl2.01",   0x00000, 0x08000, CRC(35697569) SHA1(13718923cffb9ec53cef9e22d8875370b5f3dd74) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "pl2-simm.05a",   0x000000, 0x200000, CRC(85d8fbe8) SHA1(c19d5e9084d07e610379b6e1b6be7bdf0b9b7f7f) ) // ROM on a simm
+	ROM_LOAD16_WORD_SWAP( "pl2-simm.05b",   0x200000, 0x200000, CRC(1ed62584) SHA1(28411f610f48cca6424a2d53e2a4ac691e826317) ) // ROM on a simm
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "phoenix.key",  0x000000, 0x000014, CRC(2cf772b0) SHA1(eff33c65a4f3862c231f9e4d6fefa7b34398dbf2) )
+ROM_END
+
 
 GAME( 1993, ddtodd,     ddtod,    dead_cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "bootleg", "Dungeons & Dragons: Tower of Doom (Euro 940412 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtrd,  ecofghtr, dead_cps2, ecofghtr,  cps2_state, init_ecofghtr, ROT0,   "bootleg", "Eco Fighters (World 931203 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -11830,4 +11859,5 @@ GAME( 2000, mmatrixd,   mmatrix,  dead_cps2, cps2_2p1b, cps2_state, init_cps2,  
 GAME( 2001, progearud,  progear,  dead_cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Progear (USA 010117 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, progearjd,  progear,  dead_cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Progear no Arashi (Japan 010117 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, progearjbl, progear,  dead_cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Progear no Arashi (Japan 010117) (decrypted bootleg)", MACHINE_SUPPORTS_SAVE ) // not an actual phoenix set, but works as one
+GAME( 2001, pzloop2jd,  pzloop2,  dead_cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010226 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, hsf2d,      hsf2,     dead_cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Hyper Street Fighter II: The Anniversary Edition (Asia 040202 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
