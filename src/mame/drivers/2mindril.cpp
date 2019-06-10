@@ -285,11 +285,35 @@ static const gfx_layout pivotlayout =
 	32*8
 };
 
+static const gfx_layout layout_6bpp_sprite_hi =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	6,
+	{ STEP2(0,1)/**/,0,0,0,0/**/ },
+	{ STEP4(3*2,-2), STEP4(7*2,-2), STEP4(11*2,-2), STEP4(15*2,-2) },
+	{ STEP16(0,16*2) },
+	16*16*2
+};
+
+static const gfx_layout layout_6bpp_tile_hi =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	6,
+	{ 8,0/**/,0,0,0,0/**/ },
+	{ STEP8(7,-1), STEP8(8*2+7,-1) },
+	{ STEP16(0,8*2*2) },
+	16*16*2
+};
+
 static GFXDECODE_START( gfx_2mindril )
-	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "tilemap", 0x000000, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) /* Tiles area */
-	GFXDECODE_ENTRY( "sprites", 0x000000, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) /* Sprites area */
-	GFXDECODE_ENTRY( nullptr,   0x000000, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
+	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
+	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
+	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_sprite_hi,  0x1000, 0x1000>>4 ) // hi 2bpp of 6bpp sprite data
 GFXDECODE_END
 
 

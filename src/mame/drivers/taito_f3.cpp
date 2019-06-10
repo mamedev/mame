@@ -392,11 +392,35 @@ static const gfx_layout pivotlayout =
 	32*8
 };
 
+static const gfx_layout layout_6bpp_sprite_hi =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	6,
+	{ STEP2(0,1)/**/,0,0,0,0/**/ },
+	{ STEP4(3*2,-2), STEP4(7*2,-2), STEP4(11*2,-2), STEP4(15*2,-2) },
+	{ STEP16(0,16*2) },
+	16*16*2
+};
+
+static const gfx_layout layout_6bpp_tile_hi =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	6,
+	{ 8,0/**/,0,0,0,0/**/ },
+	{ STEP8(7,-1), STEP8(8*2+7,-1) },
+	{ STEP16(0,8*2*2) },
+	16*16*2
+};
+
 static GFXDECODE_START( gfx_taito_f3 )
-	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "tilemap", 0x000000, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) /* Tiles area */
-	GFXDECODE_ENTRY( "sprites", 0x000000, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) /* Sprites area */
-	GFXDECODE_ENTRY( nullptr,   0x000000, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
+	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
+	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
+	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_sprite_hi,  0x1000, 0x1000>>4 ) // hi 2bpp of 6bpp sprite data
 GFXDECODE_END
 
 /******************************************************************************/
@@ -518,12 +542,25 @@ static const gfx_layout bubsympb_sprite_layout =
 	16*16
 };
 
+static const gfx_layout bubsympb_layout_5bpp_tile_hi =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	5,
+	{ 0/**/,0,0,0,0/**/ },
+	{ STEP8(7,-1), STEP8(15,-1) },
+	{ STEP16(0,16) },
+	16*16
+};
+
 
 static GFXDECODE_START( gfx_bubsympb )
-	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,                0,  64 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "tilemap", 0x000000, gfx_16x16x4_packed_lsb,    0, 512 ) /* Tiles area */
-	GFXDECODE_ENTRY( "sprites", 0x000000, bubsympb_sprite_layout, 4096, 256 ) /* Sprites area */
-	GFXDECODE_ENTRY( nullptr,   0x000000, pivotlayout,               0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, charlayout,                   0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,                  0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) /* Sprites area (6bpp planar) */
+	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb,       0, 512 ) // low 4bpp of 5bpp tilemap data
+	GFXDECODE_ENTRY( "tilemap_hi", 0, bubsympb_layout_5bpp_tile_hi, 0, 512 ) // hi 1bpp of 5bpp tilemap data
+	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) // dummy gfx duplicate for avoid crash
 GFXDECODE_END
 
 void taito_f3_state::bubsympb(machine_config &config)
@@ -2343,8 +2380,8 @@ ROM_START( bubsymphb )
 	ROM_LOAD32_BYTE("bsb_d13b.bin", 0x000002, 0x080000, CRC(430af2aa) SHA1(e935f9f4e0558a25bd4010b44dbb4f38a9d359e0) )
 	ROM_LOAD32_BYTE("bsb_d12b.bin", 0x000003, 0x080000, CRC(cb2e2abb) SHA1(7e3a90cb8af298bac2aef80778341833e473b671) )
 
-	ROM_REGION( 0x100000, "tilemap_hi", 0 )
-	ROM_LOAD16_BYTE("bsb_d11b.bin", 0x000000, 0x080000, CRC(d0607829) SHA1(546c629ec22bb98202c7127ccb77df0b8f3a1966) )
+	ROM_REGION( 0x080000, "tilemap_hi", 0 )
+	ROM_LOAD       ("bsb_d11b.bin", 0x000000, 0x080000, CRC(d0607829) SHA1(546c629ec22bb98202c7127ccb77df0b8f3a1966) )
 
 	ROM_REGION( 0x100000, "oki" , ROMREGION_ERASE00 ) // OKI6295 samples
 	ROM_LOAD("bsb_d11.bin", 0x000000, 0x080000, CRC(26bdc617) SHA1(993e7a52128fdd58f22d95521a629beb71ca7b91) ) // I haven't verified this dump.. but given how bad the rest is I'm not confident
@@ -4167,49 +4204,11 @@ void taito_f3_state::tile_decode()
 	*/
 
 	u8 *srcdata, *dest;
-	if (m_tilemaprom_hi)
-	{
-		u8 *tmap_hi = m_tilemaprom_hi;
-		gfx_element *pf_gfx = m_gfxdecode->gfx(1);
-
-		// allocate memory for the assembled data
-		srcdata = auto_alloc_array(machine(), u8, pf_gfx->elements() * pf_gfx->width() * pf_gfx->height());
-
-		// loop over elements
-		dest = srcdata;
-		for (int c = 0; c < pf_gfx->elements(); c++)
-		{
-			const u8 *c0base = pf_gfx->get_data(c);
-
-			// loop over height
-			for (int y = 0; y < pf_gfx->height(); y++)
-			{
-				const u8 *c0 = c0base;
-
-				for (int x = 0; x < pf_gfx->width();)
-				{
-					u8 msb = *tmap_hi++;
-					u8 lsb = *tmap_hi++;
-					for (int i = 0; i < 8; i++)
-					{
-						*dest++ = (*c0++ & 0xf) | ((msb << 4) & 0x10) | ((lsb << 5) & 0x20);
-						x++;
-						msb >>= 1;
-						lsb >>= 1;
-					}
-				}
-				c0base += pf_gfx->rowbytes();
-			}
-		}
-
-		pf_gfx->set_raw_layout(srcdata, pf_gfx->width(), pf_gfx->height(), pf_gfx->elements(), 8 * pf_gfx->width(), 8 * pf_gfx->width() * pf_gfx->height());
-	}
-
 	// all but bubsymphb (bootleg board with different sprite gfx layout), 2mindril (no sprite gfx roms)
-	if (m_spriterom_hi)
+	if (m_gfxdecode->gfx(5) != nullptr)
 	{
-		u8 *spr_hi = m_spriterom_hi;
 		gfx_element *spr_gfx = m_gfxdecode->gfx(2);
+		gfx_element *spr_gfx_hi = m_gfxdecode->gfx(5);
 
 		// allocate memory for the assembled data
 		srcdata = auto_alloc_array(machine(), u8, spr_gfx->elements() * spr_gfx->width() * spr_gfx->height());
@@ -4219,28 +4218,58 @@ void taito_f3_state::tile_decode()
 		for (int c = 0; c < spr_gfx->elements(); c++)
 		{
 			const u8 *c1base = spr_gfx->get_data(c);
+			const u8 *c3base = spr_gfx_hi->get_data(c);
 
 			// loop over height
 			for (int y = 0; y < spr_gfx->height(); y++)
 			{
 				const u8 *c1 = c1base;
+				const u8 *c3 = c3base;
 
-				for (int x = 0; x < spr_gfx->width();)
-				{
-					/* Expand 2bits into 4bits format */
-					u8 hipix = *spr_hi++;
-					for (int i = 0; i < 4; i++)
-					{
-						*dest++ = (*c1++ & 0xf) | ((hipix << 4) & 0x30);
-						x++;
-						hipix >>= 2;
-					}
-				}
+				/* Expand 2bits into 4bits format */
+				for (int x = 0; x < spr_gfx->width(); x++)
+					*dest++ = (*c1++ & 0xf) | (*c3++ & 0x30);
+
 				c1base += spr_gfx->rowbytes();
+				c3base += spr_gfx_hi->rowbytes();
 			}
 		}
 
 		spr_gfx->set_raw_layout(srcdata, spr_gfx->width(), spr_gfx->height(), spr_gfx->elements(), 8 * spr_gfx->width(), 8 * spr_gfx->width() * spr_gfx->height());
+		m_gfxdecode->set_gfx(5, nullptr);
+	}
+
+	if (m_gfxdecode->gfx(4) != nullptr)
+	{
+		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
+		gfx_element *pf_gfx_hi = m_gfxdecode->gfx(4);
+
+		// allocate memory for the assembled data
+		srcdata = auto_alloc_array(machine(), u8, pf_gfx->elements() * pf_gfx->width() * pf_gfx->height());
+
+		// loop over elements
+		dest = srcdata;
+		for (int c = 0; c < pf_gfx->elements(); c++)
+		{
+			const u8 *c0base = pf_gfx->get_data(c);
+			const u8 *c2base = pf_gfx_hi->get_data(c);
+
+			// loop over height
+			for (int y = 0; y < pf_gfx->height(); y++)
+			{
+				const u8 *c0 = c0base;
+				const u8 *c2 = c2base;
+
+				for (int x = 0; x < pf_gfx->width(); x++)
+					*dest++ = (*c0++ & 0xf) | (*c2++ & 0x30);
+
+				c0base += pf_gfx->rowbytes();
+				c2base += pf_gfx_hi->rowbytes();
+			}
+		}
+
+		pf_gfx->set_raw_layout(srcdata, pf_gfx->width(), pf_gfx->height(), pf_gfx->elements(), 8 * pf_gfx->width(), 8 * pf_gfx->width() * pf_gfx->height());
+		m_gfxdecode->set_gfx(4, nullptr);
 	}
 }
 
