@@ -42,12 +42,9 @@ protected:
 
 	uint8_t *m_rom, *m_chrrom;
 	uint8_t m_ram[512*4];
-	int m_framecnt;
 
 	required_device<mc6845_device> m_crtc;
-	required_device<device_palette_interface> m_palette;
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_alt);
 

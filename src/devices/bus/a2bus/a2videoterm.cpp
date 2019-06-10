@@ -18,7 +18,6 @@
     CC00-CDFF: VRAM window
 
     TODO:
-    Cursor is probably not completely right.
     Add font ROM select.
 
 *********************************************************************/
@@ -126,7 +125,6 @@ void a2bus_videx80_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
 	m_crtc->set_update_row_callback(FUNC(a2bus_videx80_device::crtc_update_row), this);
-	m_crtc->out_vsync_callback().set(FUNC(a2bus_videx80_device::vsync_changed));
 }
 
 void a2bus_ap16_device::device_add_mconfig(machine_config &config)
@@ -214,8 +212,8 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 
 a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0),
-	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_palette(*this, ":a2video"),
+	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr),
+	m_crtc(*this, VIDEOTERM_MC6845_NAME),
 	m_rambank(0)
 {
 }
@@ -263,14 +261,12 @@ void a2bus_videx80_device::device_start()
 	memset(m_ram, 0, 4*512);
 
 	save_item(NAME(m_ram));
-	save_item(NAME(m_framecnt));
 	save_item(NAME(m_rambank));
 }
 
 void a2bus_videx80_device::device_reset()
 {
 	m_rambank = 0;
-	m_framecnt = 0;
 }
 
 
@@ -369,7 +365,6 @@ void a2bus_videx80_device::write_c800(uint16_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -379,32 +374,26 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = m_ram[ offset ];
 		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
-		uint8_t fg = 15;
-		uint8_t bg = 0;
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
 
 		if ( i == cursor_x )
-		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
+			std::swap(fg, bg);
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p = ( data & 0x80 ) ? fg : bg; p++;
+		*p = ( data & 0x40 ) ? fg : bg; p++;
+		*p = ( data & 0x20 ) ? fg : bg; p++;
+		*p = ( data & 0x10 ) ? fg : bg; p++;
+		*p = ( data & 0x08 ) ? fg : bg; p++;
+		*p = ( data & 0x04 ) ? fg : bg; p++;
+		*p = ( data & 0x02 ) ? fg : bg; p++;
+		*p = ( data & 0x01 ) ? fg : bg; p++;
 		*p = bg; p++;
 	}
 }
 
 MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row_alt )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -414,34 +403,21 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row_alt )
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = m_ram[ offset ];
 		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
-		uint8_t fg = 15;
-		uint8_t bg = 0;
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
 
 		if ( i == cursor_x )
-		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
+			std::swap(fg, bg);
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p = ( data & 0x80 ) ? fg : bg; p++;
+		*p = ( data & 0x40 ) ? fg : bg; p++;
+		*p = ( data & 0x20 ) ? fg : bg; p++;
+		*p = ( data & 0x10 ) ? fg : bg; p++;
+		*p = ( data & 0x08 ) ? fg : bg; p++;
+		*p = ( data & 0x04 ) ? fg : bg; p++;
+		*p = ( data & 0x02 ) ? fg : bg; p++;
+		*p = ( data & 0x01 ) ? fg : bg; p++;
 		*p = bg; p++;
 		*p = bg; p++;
-	}
-}
-
-WRITE_LINE_MEMBER( a2bus_videx80_device::vsync_changed )
-{
-	if ( state )
-	{
-		m_framecnt++;
 	}
 }
