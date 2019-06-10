@@ -671,6 +671,7 @@ WRITE32_MEMBER(model2b_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
+		(strcmp(machine().system().name, "vonr" ) == 0) ||
 		(strcmp(machine().system().name, "rchase2" ) == 0))
 	{
 		m_copro_adsp->external_iop_write(offset, data);
@@ -5849,6 +5850,46 @@ ROM_START( vonj ) /* Virtual On Cyber Troopers Revision B (Japan), Model 2B */
 	ROM_LOAD16_WORD_SWAP("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808) )
 ROM_END
 
+ROM_START( vonr ) /* Virtual On Cyber Troopers Relay (Japan) */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-18671.15",  0x000000, 0x080000, CRC(fdc01c6b) SHA1(27f10bf02f31688009041b7c85a9527408adcb59) )
+	ROM_LOAD32_WORD("epr-18672.16",  0x000002, 0x080000, CRC(98961f34) SHA1(1bfd4dcf6789ae16832e2993ee08df942a8ed433) )
+	ROM_LOAD32_WORD("epr-18666.13",  0x100000, 0x080000, CRC(66edb432) SHA1(b67131b0158a58138380734dd5b9394b70010026) )
+	ROM_LOAD32_WORD("epr-18667.14",  0x100002, 0x080000, CRC(b593d31f) SHA1(1e9f23f4052ab1b0275307cc80e51352f13bc319) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-18648.11",  0x000000, 0x400000, CRC(2edbe489) SHA1(ded2e4b295be08970d13c387818c570c3afe8109) )
+	ROM_LOAD32_WORD("mpr-18649.12",  0x000002, 0x400000, CRC(e68c5aa6) SHA1(cdee1ba9247eda4282442d0522f8de7d7c86e1e6) )
+	ROM_LOAD32_WORD("mpr-18650.9",   0x800000, 0x400000, CRC(89a855b9) SHA1(5096db1da1f7e175000e89fca2a1dd3fd53030ea) )
+	ROM_LOAD32_WORD("mpr-18651.10",  0x800002, 0x400000, CRC(f4c23107) SHA1(f65984614111b12dd414db80751efe64fcf5ef16) )
+
+	ROM_REGION( 0x800000, "copro_data", 0 ) // Copro extra data (collision/height map/etc)
+	ROM_LOAD32_WORD("mpr-18662.29",  0x000000, 0x200000, CRC(a33d3335) SHA1(991bbe9dcbef8bfa96682e9d142623fc9b7c0879) )
+	ROM_LOAD32_WORD("mpr-18663.30",  0x000002, 0x200000, CRC(ea74a641) SHA1(a684e13c0afe2ef3f3108ae9b73389121368fc4e) )
+
+	ROM_REGION( 0x1000000, "polygons", ROMREGION_ERASEFF ) // Models
+	ROM_LOAD32_WORD("mpr-18654.17",  0x000000, 0x400000, CRC(6a0caf29) SHA1(9f009f44e62ae0f9dec7a34a163bc186d1c4cbbd) )
+	ROM_LOAD32_WORD("mpr-18655.21",  0x000002, 0x400000, CRC(a4293e78) SHA1(af512c994bedbdaf3a5eeed607e771dcd87810fc) )
+	ROM_LOAD32_WORD("mpr-18656.18",  0x800000, 0x400000, CRC(b4f51e76) SHA1(eb71ada331576f2a7219d238ea07a61bcbf6381a) )
+	ROM_LOAD32_WORD("mpr-18657.22",  0x800002, 0x400000, CRC(a9be4674) SHA1(a918c2a3de78a08104480097edfb9d6aeaeda873) )
+
+	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF ) // Textures
+	ROM_LOAD32_WORD("mpr-18660.27",  0x000000, 0x200000, CRC(e53663e5) SHA1(0a4908be654bad4f00d7d58f0e42f631996911c9) )
+	ROM_LOAD32_WORD("mpr-18658.25",  0x000002, 0x200000, CRC(3d0fcd01) SHA1(c8626c879bfcf7abd095cac5dc03a04ae8629423) )
+	ROM_LOAD32_WORD("mpr-18661.28",  0x800000, 0x200000, CRC(52b50410) SHA1(64ea7b2f86745954e0b8a15d71203444705240a2) )
+	ROM_LOAD32_WORD("mpr-18659.26",  0x800002, 0x200000, CRC(27aa8ae2) SHA1(e9b756e5b4b1c19e52e47af03c773fee544be420) )
+
+	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18670.31", 0x000000, 0x080000, CRC(3e715f76) SHA1(4fd997e379a8cdb94ec3b1986b3ab443fc6fa12a) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18652.32", 0x000000, 0x400000, CRC(037eee53) SHA1(e592f9e97abe0a7bc9009d8327b93da9bc43749c))
+	ROM_LOAD16_WORD_SWAP("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808))
+ROM_END
+
 ROM_START( vstriker ) /* Virtua Striker Revision A, Model 2B, ROM board ID# 834-11904 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18068a.15",  0x000000, 0x020000, CRC(afc69b54) SHA1(2127bde1de3cd6663c31cf2126847815234e09a4) )
@@ -6958,6 +6999,7 @@ GAME( 1995, indy500d,  indy500,  indy500,      indy500,   model2b_state, empty_i
 GAME( 1995, indy500to, indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, von,       0,        model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, vonj,      von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, vonr,      von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On Relay (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, schamp,    0,        model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, sfight,    schamp,   model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnx,  0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
