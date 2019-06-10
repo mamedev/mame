@@ -3306,7 +3306,7 @@ void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
 	screen.set_refresh_hz(50);
-	screen.set_size(1857, 1080);
+	screen.set_size(1983, 1080);
 	screen.set_visarea_full();
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
@@ -3326,8 +3326,8 @@ ROM_START( gnw_dkjrp )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) )
 
-	ROM_REGION( 340627, "svg", 0)
-	ROM_LOAD( "gnw_dkjrp.svg", 0, 340627, CRC(c4d6e48a) SHA1(420eec2bc094576526502e5a183dc6118ba1a245) )
+	ROM_REGION( 340751, "svg", 0)
+	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
 ROM_END
 
 
