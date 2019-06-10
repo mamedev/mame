@@ -8870,6 +8870,9 @@ bigbord2                        //
 bigevglf                        // A67 (c) 1986 Taito America Corporation (US)
 bigevglfj                       // A67 (c) 1986 Taito Corporation (Japan)
 
+@source:bigkarnk_ms.cpp
+bigkarnkm                       //
+
 @source:bigstrkb.cpp
 bigstrkb                        // bootleg on different hardware
 bigstrkba                       // alt set of 'bigstrkb' with Italian teams
