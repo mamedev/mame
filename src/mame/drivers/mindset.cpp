@@ -92,6 +92,22 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				*dest++ = pal[(sv >>  8) & 3];
 			}
 		}
+	} else if(true) {
+		for(u32 y=0; y<200; y++) {
+			const u16 *src = m_vram + 40*y;
+			u32 *dest = &bitmap.pix32(y);
+			for(u32 x=0; x<320; x+=8) {
+				u16 sv = *src++;
+				*dest++ = pal[(sv >>  6) & 3];
+				*dest++ = pal[(sv >>  4) & 3];
+				*dest++ = pal[(sv >>  2) & 3];
+				*dest++ = pal[(sv >>  0) & 3];
+				*dest++ = pal[(sv >> 14) & 3];
+				*dest++ = pal[(sv >> 12) & 3];
+				*dest++ = pal[(sv >> 10) & 3];
+				*dest++ = pal[(sv >>  8) & 3];
+			}
+		}
 	} else {
 		for(u32 y=0; y<25; y++) {
 			for(u32 x=0; x<40; x++) {
@@ -255,7 +271,7 @@ void mindset_state::gco_w(u16 data)
 	}
 
 	// 100 = done, 400 = collision?
-	m_gcos->write_word(0xbfd74, m_gcos->read_word(0xbfd74) | 0x0500);
+	m_gcos->write_word(0xbfd74, m_gcos->read_word(0xbfd74) | 0x0700);
 }
 
 void mindset_state::maincpu_mem(address_map &map)
