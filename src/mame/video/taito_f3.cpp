@@ -294,7 +294,7 @@ void taito_f3_state::device_post_load()
 {
 	/* force a reread of the dynamic tiles in the pixel layer */
 	m_gfxdecode->gfx(0)->mark_all_dirty();
-	m_gfxdecode->gfx(3)->mark_all_dirty();
+	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
 /******************************************************************************/
@@ -384,7 +384,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	const u8 extra_planes = ((tile >> (16 + 10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(3,
 			tile & 0xffff,
 			(tile >> 16) & 0x1ff & (~extra_planes),
 			TILE_FLIPYX(tile >> 30));
@@ -426,7 +426,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
 	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(3,
+	SET_TILE_INFO_MEMBER(1,
 			tile_index,
 			(vram_tile >> 9) & 0x3f,
 			flags);
@@ -561,15 +561,15 @@ void taito_f3_state::video_start()
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
 	m_tile_opaque_sp = std::make_unique<u8[]>(m_gfxdecode->gfx(2)->elements());
 	for (int i = 0; i < 8; i++)
-		m_tile_opaque_pf[i] = std::make_unique<u8[]>(m_gfxdecode->gfx(1)->elements());
+		m_tile_opaque_pf[i] = std::make_unique<u8[]>(m_gfxdecode->gfx(3)->elements());
 
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
 
 	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
 	/* top bits in the gfx data are cleared later.                      */
-	m_gfxdecode->gfx(1)->set_granularity(16);
 	m_gfxdecode->gfx(2)->set_granularity(16);
+	m_gfxdecode->gfx(3)->set_granularity(16);
 
 	m_flipscreen = 0;
 	memset(m_spriteram16_buffered.get(), 0, 0x10000);
@@ -579,7 +579,7 @@ void taito_f3_state::video_start()
 	save_item(NAME(m_control_1));
 
 	m_gfxdecode->gfx(0)->set_source((u8 *)m_charram.target());
-	m_gfxdecode->gfx(3)->set_source((u8 *)m_pivot_ram.target());
+	m_gfxdecode->gfx(1)->set_source((u8 *)m_pivot_ram.target());
 
 	m_sprite_lag = m_game_config->sprite_lag;
 
@@ -607,7 +607,7 @@ void taito_f3_state::video_start()
 	}
 
 	{
-		gfx_element *pf_gfx = m_gfxdecode->gfx(1);
+		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
 
 		for (int c = 0; c < pf_gfx->elements(); c++)
 		{
@@ -719,7 +719,7 @@ u16 taito_f3_state::pivot_r(offs_t offset)
 void taito_f3_state::pivot_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pivot_ram[offset]);
-	m_gfxdecode->gfx(3)->mark_dirty(offset >> 4);
+	m_gfxdecode->gfx(1)->mark_dirty(offset >> 4);
 }
 
 u16 taito_f3_state::lineram_r(offs_t offset)
@@ -1459,7 +1459,7 @@ void taito_f3_state::visible_tile_check(
 	int alpha_mode = line_t->alpha_mode[line];
 	if (!alpha_mode) return;
 
-	const u32 total_elements = m_gfxdecode->gfx(1)->elements();
+	const u32 total_elements = m_gfxdecode->gfx(3)->elements();
 
 	int tile_index = x_index_fx >> 16;
 	const int tile_num = (((line_t->x_zoom[line] * 320 + (x_index_fx & 0xffff) + 0xffff) >> 16) + (tile_index & 0xf) + 15) >> 4;

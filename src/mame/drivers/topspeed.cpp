@@ -177,7 +177,7 @@ From JP manual
                        CPU CONTROL
 **********************************************************/
 
-WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
+void topspeed_state::cpua_ctrl_w(u16 data)
 {
 	// Written only twice; once on startup at 0x00 then 0xc3 after init
 	m_cpua_ctrl = data;
@@ -188,11 +188,11 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
                        GAME INPUTS
 **********************************************************/
 
-READ8_MEMBER(topspeed_state::input_bypass_r)
+u8 topspeed_state::input_bypass_r()
 {
 	// Read port number
-	uint8_t port = m_tc0040ioc->port_r();
-	uint16_t steer = 0xff80 + m_steer.read_safe(0);
+	const u8 port = m_tc0040ioc->port_r();
+	const u16 steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
 	{
@@ -209,14 +209,14 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
-	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
+	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
 	ioport_port *port = ioport((const char *)param);
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
 // TODO: proper motorcpu hook-up
 
-READ16_MEMBER(topspeed_state::motor_r)
+u16 topspeed_state::motor_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -244,13 +244,13 @@ READ16_MEMBER(topspeed_state::motor_r)
 	}
 }
 
-WRITE16_MEMBER(topspeed_state::motor_w)
+void topspeed_state::motor_w(offs_t offset, u16 data)
 {
 	// Writes $900000-25 and $900200-219
 	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", m_subcpu->pc(), data, offset);
 }
 
-WRITE8_MEMBER(topspeed_state::coins_w)
+void topspeed_state::coins_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -268,7 +268,7 @@ void topspeed_state::msm5205_update(int chip)
 	if (m_msm_reset[chip])
 		return;
 
-	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
+	const u8 data = m_msm_rom[chip][m_msm_pos[chip]];
 
 	m_msm[chip]->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER(topspeed_state::msm5205_1_vck)
 	msm5205_update(0);
 }
 
-WRITE8_MEMBER(topspeed_state::msm5205_command_w)
+void topspeed_state::msm5205_command_w(offs_t offset, u8 data)
 {
 	int chip = (offset >> 12) & 1;
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 	}
 }
 
-WRITE8_MEMBER(topspeed_state::volume_w)
+void topspeed_state::volume_w(offs_t offset, u8 data)
 {
 	// The volume is controlled by two Taito TC0060DCA hybrid volume modules
 	filter_volume_device *filter = nullptr;
@@ -345,7 +345,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 		else
 		{
 			// Update on falling edge of /VCK
-			uint16_t oldpos = m_msm_pos[1];
+			u16 oldpos = m_msm_pos[1];
 
 			msm5205_update(1);
 
@@ -511,26 +511,15 @@ static const gfx_layout tile16x8_layout =
 	16,8,   // 16*8 sprites
 	RGN_FRAC(1,1),
 	4,      // 4 bits per pixel
-	{ STEP4(0,8) },
-	{ STEP8(8*4,1), STEP8(0,1) },
-	{ STEP8(0,8*4*2) },
+	{ STEP4(0,16) },
+	{ STEP16(0,1) },
+	{ STEP8(0,16*4) },
 	16*8*4    // every sprite takes 64 consecutive bytes
 };
 
-static const gfx_layout charlayout =
-{
-	8,8,    // 8*8 characters
-	RGN_FRAC(1,1),
-	4,      // 4 bits per pixel
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4    // every sprite takes 32 consecutive bytes
-};
-
 static GFXDECODE_START( gfx_topspeed )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    // Sprite parts
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 512 )         // Sprites & playfield
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x8_layout,      0, 256 ) // Sprite parts
+	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 	// Road Lines gfxdecodable ?
 GFXDECODE_END
 
@@ -541,8 +530,8 @@ GFXDECODE_END
 
 void topspeed_state::machine_start()
 {
-	membank("sndbank")->configure_entry(0, memregion("audiocpu")->base() + 0x10000);
-	membank("sndbank")->configure_entries(1, 3, memregion("audiocpu")->base() + 0x4000, 0x4000);
+	m_sndbank->configure_entry(0, memregion("audiocpu")->base() + 0x10000);
+	m_sndbank->configure_entries(1, 3, memregion("audiocpu")->base() + 0x4000, 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_ioc220_port));
@@ -613,7 +602,7 @@ void topspeed_state::topspeed(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(topspeed_state::screen_update_topspeed));
+	screen.set_screen_update(FUNC(topspeed_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_topspeed);
@@ -625,7 +614,7 @@ void topspeed_state::topspeed(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.port_write_handler().set_membank("sndbank").mask(0x03);
+	ymsnd.port_write_handler().set_membank(m_sndbank).mask(0x03);
 	ymsnd.add_route(0, "filter1l", 1.0);
 	ymsnd.add_route(1, "filter1r", 1.0);
 
@@ -673,30 +662,30 @@ ROM_START( topspeed )
 	ROM_REGION( 0x8000, "motorcpu", 0 )
 	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
+	ROM_REGION( 0x40000, "pc080sn", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-06.52",   0x000000, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
 	ROM_LOAD16_BYTE( "b14-07.54",   0x000001, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD64_BYTE( "b14-48.16",   0x000003, 0x20000, CRC(30c7f265) SHA1(3e52e2aabf2c456d0b57d9414f99bd942bafc887) ) // OBJ, bitplane 3
-	ROM_LOAD64_BYTE( "b14-49.12",   0x100003, 0x20000, CRC(32ba4265) SHA1(f468243d923726b7eff78d9bc55a3a092f211a24) )
-	ROM_LOAD64_BYTE( "b14-50.8",    0x000007, 0x20000, CRC(ec1ef311) SHA1(4cfa06aec9535f2044b763b071f73d23ca8ba354) )
-	ROM_LOAD64_BYTE( "b14-51.4",    0x100007, 0x20000, CRC(35041c5f) SHA1(71602267736396516366a8abf535db82acaa1c23) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_BYTE( "b14-48.16",   0x000007, 0x20000, CRC(30c7f265) SHA1(3e52e2aabf2c456d0b57d9414f99bd942bafc887) ) // OBJ, bitplane 3
+	ROM_LOAD64_BYTE( "b14-49.12",   0x100007, 0x20000, CRC(32ba4265) SHA1(f468243d923726b7eff78d9bc55a3a092f211a24) )
+	ROM_LOAD64_BYTE( "b14-50.8",    0x000006, 0x20000, CRC(ec1ef311) SHA1(4cfa06aec9535f2044b763b071f73d23ca8ba354) )
+	ROM_LOAD64_BYTE( "b14-51.4",    0x100006, 0x20000, CRC(35041c5f) SHA1(71602267736396516366a8abf535db82acaa1c23) )
 
-	ROM_LOAD64_BYTE( "b14-44.15",   0x000002, 0x20000, CRC(9f6c030e) SHA1(bb278fdcc29530685aa2e76da0712195f6ab0f5f) ) // OBJ, bitplane 2
-	ROM_LOAD64_BYTE( "b14-45.11",   0x100002, 0x20000, CRC(63e4ce03) SHA1(92e3f45754676dd15691e48c0d37490c1a3ec328) )
-	ROM_LOAD64_BYTE( "b14-46.7",    0x000006, 0x20000, CRC(d489adf2) SHA1(9f77916594d5ed05b79d7e8d8f534eb39f65edae) )
-	ROM_LOAD64_BYTE( "b14-47.3",    0x100006, 0x20000, CRC(b3a1f75b) SHA1(050dd3313b5392d131c5a62c544260b83af0b8ab) )
+	ROM_LOAD64_BYTE( "b14-44.15",   0x000005, 0x20000, CRC(9f6c030e) SHA1(bb278fdcc29530685aa2e76da0712195f6ab0f5f) ) // OBJ, bitplane 2
+	ROM_LOAD64_BYTE( "b14-45.11",   0x100005, 0x20000, CRC(63e4ce03) SHA1(92e3f45754676dd15691e48c0d37490c1a3ec328) )
+	ROM_LOAD64_BYTE( "b14-46.7",    0x000004, 0x20000, CRC(d489adf2) SHA1(9f77916594d5ed05b79d7e8d8f534eb39f65edae) )
+	ROM_LOAD64_BYTE( "b14-47.3",    0x100004, 0x20000, CRC(b3a1f75b) SHA1(050dd3313b5392d131c5a62c544260b83af0b8ab) )
 
-	ROM_LOAD64_BYTE( "b14-40.14",   0x000001, 0x20000, CRC(fa2a3cb3) SHA1(1e102ae6e916fda046a154b89056a18b724d51a3) ) // OBJ, bitplane 1
-	ROM_LOAD64_BYTE( "b14-41.10",   0x100001, 0x20000, CRC(09455a14) SHA1(dc703e1f9c4f16e330796e9945799e1038ce503b) )
-	ROM_LOAD64_BYTE( "b14-42.6",    0x000005, 0x20000, CRC(ab51f53c) SHA1(0ed9a2e607b0bd2b43b47e3ed29b00a8d8a09f25) )
-	ROM_LOAD64_BYTE( "b14-43.2",    0x100005, 0x20000, CRC(1e6d2b38) SHA1(453cd818a6cd8b238c72cc880c811227609767b8) )
+	ROM_LOAD64_BYTE( "b14-40.14",   0x000003, 0x20000, CRC(fa2a3cb3) SHA1(1e102ae6e916fda046a154b89056a18b724d51a3) ) // OBJ, bitplane 1
+	ROM_LOAD64_BYTE( "b14-41.10",   0x100003, 0x20000, CRC(09455a14) SHA1(dc703e1f9c4f16e330796e9945799e1038ce503b) )
+	ROM_LOAD64_BYTE( "b14-42.6",    0x000002, 0x20000, CRC(ab51f53c) SHA1(0ed9a2e607b0bd2b43b47e3ed29b00a8d8a09f25) )
+	ROM_LOAD64_BYTE( "b14-43.2",    0x100002, 0x20000, CRC(1e6d2b38) SHA1(453cd818a6cd8b238c72cc880c811227609767b8) )
 
-	ROM_LOAD64_BYTE( "b14-36.13",   0x000000, 0x20000, CRC(20a7c1b8) SHA1(053c6b733a5c33b9259dfc754ce30a880905bb11) ) // OBJ, bitplane 0
-	ROM_LOAD64_BYTE( "b14-37.9",    0x100000, 0x20000, CRC(801b703b) SHA1(dfbe276bd484815a7e69589eb56d54bc6e12e301) )
-	ROM_LOAD64_BYTE( "b14-38.5",    0x000004, 0x20000, CRC(de0c213e) SHA1(1313b2051e906d22edb55f4d45d3a424b31ca2a2) )
-	ROM_LOAD64_BYTE( "b14-39.1",    0x100004, 0x20000, CRC(798c28c5) SHA1(d2a8b9f84b3760f3800c5760ecee7ddcbafa6d6e) )
+	ROM_LOAD64_BYTE( "b14-36.13",   0x000001, 0x20000, CRC(20a7c1b8) SHA1(053c6b733a5c33b9259dfc754ce30a880905bb11) ) // OBJ, bitplane 0
+	ROM_LOAD64_BYTE( "b14-37.9",    0x100001, 0x20000, CRC(801b703b) SHA1(dfbe276bd484815a7e69589eb56d54bc6e12e301) )
+	ROM_LOAD64_BYTE( "b14-38.5",    0x000000, 0x20000, CRC(de0c213e) SHA1(1313b2051e906d22edb55f4d45d3a424b31ca2a2) )
+	ROM_LOAD64_BYTE( "b14-39.1",    0x100000, 0x20000, CRC(798c28c5) SHA1(d2a8b9f84b3760f3800c5760ecee7ddcbafa6d6e) )
 
 	ROM_REGION( 0x10000, "user1", 0 ) // Zoom tables for zoom sprite h/w
 	ROM_LOAD( "b14-30.88",          0x000000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) )
@@ -727,15 +716,15 @@ ROM_START( topspeedu )
 	ROM_REGION( 0x8000, "motorcpu", 0 )
 	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
+	ROM_REGION( 0x40000, "pc080sn", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-06.52",   0x00000, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
 	ROM_LOAD16_BYTE( "b14-07.54",   0x00001, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // OBJ: each rom has 1 bitplane, forming 16x8 tiles
-	ROM_LOAD32_BYTE( "b14-01",      0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )
-	ROM_LOAD32_BYTE( "b14-02",      0x00001, 0x80000, CRC(6889186b) SHA1(3c38e281e8bf416a401c76ebb2d8ca95d09974b6) )
-	ROM_LOAD32_BYTE( "b14-03",      0x00002, 0x80000, CRC(d1ed9e71) SHA1(26a6b2ca5bf6d70ad87f5c40c8e94ec542a2ec04) )
-	ROM_LOAD32_BYTE( "b14-04",      0x00003, 0x80000, CRC(b63f0519) SHA1(e9a6b49effba0cae1ae3536a8584d3efa34ca8c3) )
+	ROM_REGION( 0x200000, "sprites", 0 ) // OBJ: each rom has 1 bitplane, forming 16x8 tiles
+	ROM_LOAD64_WORD_SWAP( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )
+	ROM_LOAD64_WORD_SWAP( "b14-02", 0x00002, 0x80000, CRC(6889186b) SHA1(3c38e281e8bf416a401c76ebb2d8ca95d09974b6) )
+	ROM_LOAD64_WORD_SWAP( "b14-03", 0x00004, 0x80000, CRC(d1ed9e71) SHA1(26a6b2ca5bf6d70ad87f5c40c8e94ec542a2ec04) )
+	ROM_LOAD64_WORD_SWAP( "b14-04", 0x00006, 0x80000, CRC(b63f0519) SHA1(e9a6b49effba0cae1ae3536a8584d3efa34ca8c3) )
 
 	ROM_REGION( 0x10000, "user1", 0 ) // Zoom tables for zoom sprite h/w
 	ROM_LOAD( "b14-30.88",          0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) )
@@ -766,15 +755,15 @@ ROM_START( fullthrl )
 	ROM_REGION( 0x8000, "motorcpu", 0 )
 	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
+	ROM_REGION( 0x40000, "pc080sn", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-06.52",   0x00000, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
 	ROM_LOAD16_BYTE( "b14-07.54",   0x00001, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // OBJ: each rom has 1 bitplane, forming 16x8 tiles
-	ROM_LOAD32_BYTE( "b14-01",      0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )
-	ROM_LOAD32_BYTE( "b14-02",      0x00001, 0x80000, CRC(6889186b) SHA1(3c38e281e8bf416a401c76ebb2d8ca95d09974b6) )
-	ROM_LOAD32_BYTE( "b14-03",      0x00002, 0x80000, CRC(d1ed9e71) SHA1(26a6b2ca5bf6d70ad87f5c40c8e94ec542a2ec04) )
-	ROM_LOAD32_BYTE( "b14-04",      0x00003, 0x80000, CRC(b63f0519) SHA1(e9a6b49effba0cae1ae3536a8584d3efa34ca8c3) )
+	ROM_REGION( 0x200000, "sprites", 0 ) // OBJ: each rom has 1 bitplane, forming 16x8 tiles
+	ROM_LOAD64_WORD_SWAP( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )
+	ROM_LOAD64_WORD_SWAP( "b14-02", 0x00002, 0x80000, CRC(6889186b) SHA1(3c38e281e8bf416a401c76ebb2d8ca95d09974b6) )
+	ROM_LOAD64_WORD_SWAP( "b14-03", 0x00004, 0x80000, CRC(d1ed9e71) SHA1(26a6b2ca5bf6d70ad87f5c40c8e94ec542a2ec04) )
+	ROM_LOAD64_WORD_SWAP( "b14-04", 0x00006, 0x80000, CRC(b63f0519) SHA1(e9a6b49effba0cae1ae3536a8584d3efa34ca8c3) )
 
 	ROM_REGION( 0x10000, "user1", 0 ) // Zoom tables for zoom sprite h/w
 	ROM_LOAD( "b14-30.88",          0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) )

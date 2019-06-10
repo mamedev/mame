@@ -87,6 +87,8 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
 
+#include "bus/a2gameio/gameio.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -114,11 +116,7 @@ public:
 		m_video(*this, A2_VIDEO_TAG),
 		m_a2common(*this, "a2common"),
 		m_a2bus(*this, "a2bus"),
-		m_joy1x(*this, "joystick_1_x"),
-		m_joy1y(*this, "joystick_1_y"),
-		m_joy2x(*this, "joystick_2_x"),
-		m_joy2y(*this, "joystick_2_y"),
-		m_joybuttons(*this, "joystick_buttons"),
+		m_gameio(*this, "gameio"),
 		m_kbspecial(*this, "keyb_special"),
 		m_kbrepeat(*this, "keyb_repeat"),
 		m_resetdip(*this, "reset_dip"),
@@ -137,7 +135,7 @@ public:
 	required_device<a2_video_device> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
-	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
+	required_device<apple2_gameio_device> m_gameio;
 	required_ioport m_kbspecial;
 	required_ioport m_kbrepeat;
 	optional_ioport m_resetdip;
@@ -175,10 +173,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mix_w);
 	DECLARE_WRITE_LINE_MEMBER(scr_w);
 	DECLARE_WRITE_LINE_MEMBER(res_w);
-	DECLARE_WRITE_LINE_MEMBER(an0_w);
-	DECLARE_WRITE_LINE_MEMBER(an1_w);
 	DECLARE_WRITE_LINE_MEMBER(an2_w);
-	DECLARE_WRITE_LINE_MEMBER(an3_w);
 	DECLARE_READ8_MEMBER(c080_r);
 	DECLARE_WRITE8_MEMBER(c080_w);
 	DECLARE_READ8_MEMBER(c100_r);
@@ -219,7 +214,6 @@ private:
 	int m_cnxx_slot;
 
 	bool m_page2;
-	bool m_an0, m_an1, m_an2, m_an3;
 
 	uint8_t *m_ram_ptr;
 	int m_ram_size;
@@ -352,10 +346,6 @@ void apple2_state::machine_start()
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_page2));
-	save_item(NAME(m_an0));
-	save_item(NAME(m_an1));
-	save_item(NAME(m_an2));
-	save_item(NAME(m_an3));
 	save_item(NAME(m_anykeydown));
 
 	// setup video pointers
@@ -370,7 +360,6 @@ void apple2_state::machine_reset()
 	m_inh_slot = 0;
 	m_cnxx_slot = -1;
 	m_page2 = false;
-	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_anykeydown = false;
 }
 
@@ -553,25 +542,9 @@ WRITE_LINE_MEMBER(apple2_state::res_w)
 	m_video->m_hires = state;
 }
 
-WRITE_LINE_MEMBER(apple2_state::an0_w)
-{
-	m_an0 = state;
-}
-
-WRITE_LINE_MEMBER(apple2_state::an1_w)
-{
-	m_an1 = state;
-}
-
 WRITE_LINE_MEMBER(apple2_state::an2_w)
 {
-	m_an2 = state;
 	m_video->m_an2 = state;
-}
-
-WRITE_LINE_MEMBER(apple2_state::an3_w)
-{
-	m_an3 = state;
 }
 
 READ8_MEMBER(apple2_state::keyb_data_r)
@@ -630,7 +603,9 @@ READ8_MEMBER(apple2_state::utility_strobe_r)
 
 WRITE8_MEMBER(apple2_state::utility_strobe_w)
 {
-	// pulses pin 5 of game I/O connector
+	// low pulse on pin 5 of game I/O connector
+	m_gameio->strobe_w(0);
+	m_gameio->strobe_w(1);
 }
 
 READ8_MEMBER(apple2_state::switches_r)
@@ -651,18 +626,18 @@ READ8_MEMBER(apple2_state::flags_r)
 		return (m_cassette->input() > 0.0 ? 0x80 : 0) | uFloatingBus7;
 
 	case 1:  // button 0
-		return ((m_joybuttons->read() & 0x10) ? 0x80 : 0) | uFloatingBus7;
+		return (m_gameio->sw0_r() ? 0x80 : 0) | uFloatingBus7;
 
 	case 2:  // button 1
-		return ((m_joybuttons->read() & 0x20) ? 0x80 : 0) | uFloatingBus7;
+		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
 
 	case 3:  // button 2
 		// check if SHIFT key mod configured
 		if (m_sysconfig->read() & 0x04)
 		{
-			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
 		}
-		return ((m_joybuttons->read() & 0x40) ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+		return (m_gameio->sw2_r() ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 
 	case 4:  // joy 1 X axis
 		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
@@ -690,10 +665,10 @@ READ8_MEMBER(apple2_state::controller_strobe_r)
 
 WRITE8_MEMBER(apple2_state::controller_strobe_w)
 {
-	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
+	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 }
 
 READ8_MEMBER(apple2_state::c080_r)
@@ -1116,51 +1091,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::ay3600_repeat)
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( apple2_joystick )
-	PORT_START("joystick_1_x")      /* Joystick 1 X Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("P1 Joystick X")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-	PORT_CODE_DEC(KEYCODE_4_PAD)    PORT_CODE_INC(KEYCODE_6_PAD)
-	PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-	PORT_START("joystick_1_y")      /* Joystick 1 Y Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("P1 Joystick Y")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-	PORT_CODE_DEC(KEYCODE_8_PAD)    PORT_CODE_INC(KEYCODE_2_PAD)
-	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-
-	PORT_START("joystick_2_x")      /* Joystick 2 X Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("P2 Joystick X")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-	PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-	PORT_START("joystick_2_y")      /* Joystick 2 Y Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("P2 Joystick Y")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-
-	PORT_START("joystick_buttons")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_0_PAD)    PORT_CODE(JOYCODE_BUTTON1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_ENTER_PAD)PORT_CODE(JOYCODE_BUTTON2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(2)            PORT_CODE(JOYCODE_BUTTON1)
-INPUT_PORTS_END
-
-INPUT_PORTS_START( apple2_gameport )
-	PORT_INCLUDE( apple2_joystick )
-INPUT_PORTS_END
-
 INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
@@ -1317,9 +1247,6 @@ static INPUT_PORTS_START( apple2 )
 	PORT_START("keyb_repeat")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPT")         PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
 
-	/* other devices */
-	PORT_INCLUDE( apple2_gameport )
-
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
@@ -1419,10 +1346,13 @@ void apple2_state::apple2_common(machine_config &config)
 	m_softlatch->q_out_cb<1>().set(FUNC(apple2_state::mix_w));
 	m_softlatch->q_out_cb<2>().set(FUNC(apple2_state::scr_w));
 	m_softlatch->q_out_cb<3>().set(FUNC(apple2_state::res_w));
-	m_softlatch->q_out_cb<4>().set(FUNC(apple2_state::an0_w));
-	m_softlatch->q_out_cb<5>().set(FUNC(apple2_state::an1_w));
-	m_softlatch->q_out_cb<6>().set(FUNC(apple2_state::an2_w));
-	m_softlatch->q_out_cb<7>().set(FUNC(apple2_state::an3_w));
+	m_softlatch->q_out_cb<4>().set(m_gameio, FUNC(apple2_gameio_device::an0_w));
+	m_softlatch->q_out_cb<5>().set(m_gameio, FUNC(apple2_gameio_device::an1_w));
+	m_softlatch->q_out_cb<6>().set(m_gameio, FUNC(apple2_gameio_device::an2_w));
+	m_softlatch->q_out_cb<6>().append(FUNC(apple2_state::an2_w));
+	m_softlatch->q_out_cb<7>().set(m_gameio, FUNC(apple2_gameio_device::an3_w));
+
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
 	/* keyboard controller */
 	AY3600(config, m_ay3600, 0);

@@ -707,6 +707,7 @@ MACHINES["XC1700E"] = true
 
 BUSES["A1BUS"] = true
 BUSES["A2BUS"] = true
+BUSES["A2GAMEIO"] = true
 BUSES["A7800"] = true
 BUSES["A800"] = true
 BUSES["ABCBUS"] = true

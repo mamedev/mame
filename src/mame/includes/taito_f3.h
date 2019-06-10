@@ -65,8 +65,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
-		m_spriterom_hi(*this, "sprites_hi"),
-		m_tilemaprom_hi(*this, "tilemap_hi"),
 		m_textram(*this, "textram", 0),
 		m_spriteram(*this, "spriteram", 0),
 		m_charram(*this, "charram", 0),
@@ -154,9 +152,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<eeprom_serial_base_device> m_eeprom;
-
-	optional_region_ptr<u8> m_spriterom_hi; // all but 2mindril, bubsymphb
-	optional_region_ptr<u8> m_tilemaprom_hi;
 
 	required_shared_ptr<u16> m_textram;
 	required_shared_ptr<u16> m_spriteram;

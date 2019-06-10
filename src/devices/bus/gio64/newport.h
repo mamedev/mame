@@ -226,6 +226,7 @@ protected:
 	uint32_t cmap0_read();
 	void cmap0_write(uint32_t data);
 	uint32_t cmap1_read();
+	void cmap1_write(uint32_t data);
 	uint32_t xmap0_read();
 	void xmap0_write(uint32_t data);
 	uint32_t xmap1_read();
@@ -271,6 +272,8 @@ protected:
 	uint32_t convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
 	uint32_t convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in);
 
+	uint32_t do_endian_swap(uint32_t color);
+
 	struct bresenham_octant_info_t
 	{
 		int16_t incrx1;
@@ -311,6 +314,7 @@ protected:
 	std::unique_ptr<uint32_t[]> m_cid;
 	std::unique_ptr<uint32_t[]> m_vt_table;
 	cmap_t m_cmap0;
+	cmap_t m_cmap1;
 	uint32_t m_global_mask;
 	emu_timer *m_dcb_timeout_timer;
 

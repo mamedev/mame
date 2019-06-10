@@ -2126,6 +2126,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/a2gameio/gameio.h,BUSES["A2GAMEIO"] = true
+---------------------------------------------------
+
+if (BUSES["A2GAMEIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/a2gameio/gameio.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/gameio.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/joystick.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/nubus/nubus.h,BUSES["NUBUS"] = true
 ---------------------------------------------------
 

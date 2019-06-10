@@ -76,7 +76,7 @@ void volfied_state::main_map(address_map &map)
 	map(0x400000, 0x47ffff).rw(FUNC(volfied_state::video_ram_r), FUNC(volfied_state::video_ram_w));
 	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x600000, 0x600001).w(FUNC(volfied_state::video_mask_w));
-	map(0x700000, 0x700001).w(FUNC(volfied_state::sprite_ctrl_w));
+	map(0x700000, 0x700001).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0xd00000, 0xd00001).rw(FUNC(volfied_state::video_ctrl_r), FUNC(volfied_state::video_ctrl_w));
 	map(0xe00001, 0xe00001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xe00003, 0xe00003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -187,26 +187,6 @@ static INPUT_PORTS_START( volfiedj )
 INPUT_PORTS_END
 
 
-/**************************************************************
-                GFX DECODING
-**************************************************************/
-
-static const gfx_layout tilelayout =
-{
-	16, 16,
-	0x1800,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
-static GFXDECODE_START( gfx_volfied )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 4096, 256 )
-GFXDECODE_END
-
-
 /***********************************************************
                 MACHINE DRIVERS
 ***********************************************************/
@@ -270,12 +250,11 @@ void volfied_state::volfied(machine_config &config)
 	m_screen->set_screen_update(FUNC(volfied_state::screen_update));
 	m_screen->set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_volfied);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
 	PC090OJ(config, m_pc090oj, 0);
-	m_pc090oj->set_gfxdecode_tag("gfxdecode");
 	m_pc090oj->set_palette("palette");
+	m_pc090oj->set_colpri_callback(FUNC(volfied_state::volfied_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -313,7 +292,7 @@ ROM_START( volfied )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",   0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",   0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -345,7 +324,7 @@ ROM_START( volfiedo )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",  0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",  0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -377,7 +356,7 @@ ROM_START( volfiedu )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",   0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",   0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -409,7 +388,7 @@ ROM_START( volfieduo )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",  0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",  0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -441,7 +420,7 @@ ROM_START( volfiedj )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",   0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",   0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -473,7 +452,7 @@ ROM_START( volfiedjo )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",  0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",  0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )

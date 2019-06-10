@@ -496,19 +496,19 @@ static uint32_t apple2_get_track_size(floppy_image_legacy *floppy, int head, int
 LEGACY_FLOPPY_OPTIONS_START( apple2 )
 	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",  "Apple ][ DOS order disk image",    apple2_dsk_identify,    apple2_do_construct, nullptr,
 		HEADS([1])
-		TRACKS([35])
+		TRACKS([APPLE2_TRACK_COUNT])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",  "Apple ][ ProDOS order disk image", apple2_dsk_identify,    apple2_po_construct, nullptr,
 		HEADS([1])
-		TRACKS([35])
+		TRACKS([APPLE2_TRACK_COUNT])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",    "Apple ][ Nibble order disk image", apple2_nib_identify,    apple2_nib_construct, nullptr,
 		HEADS([1])
-		TRACKS([35])
+		TRACKS([APPLE2_TRACK_COUNT])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
@@ -562,10 +562,11 @@ bool a2_16sect_format::supports_save() const
 int a2_16sect_format::identify(io_generic *io, uint32_t form_factor)
 {
 		uint64_t size = io_generic_size(io);
-		uint32_t expected_size = 35 * 16 * 256;
+		//uint32_t expected_size = 35 * 16 * 256;
+		uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
 
 		// check standard size plus some oddball sizes in our softlist
-		if ((size == expected_size) || (size == 143403) || (size == 143363) || (size == 143358))
+		if ((size == expected_size) || (size == 35 * 16 * 256) || (size == 143403) || (size == 143363) || (size == 143358))
 		{
 			return 50;
 		}
@@ -605,10 +606,13 @@ const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
 
 bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
+	uint64_t size = io_generic_size(io);
+
 	m_prodos_order = false;
+	m_tracks = (size == (40 * 16 * 256)) ? 40 : 35;
 
 	int fpos = 0;
-	for(int track=0; track < 35; track++) {
+	for(int track=0; track < m_tracks; track++) {
 		std::vector<uint32_t> track_data;
 		uint8_t sector_data[256*16];
 		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
@@ -759,7 +763,7 @@ void a2_16sect_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 {
 		int g_tracks, g_heads;
-		int visualgrid[16][35]; // visualizer grid, cleared/initialized below
+		int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
 
 // lenient addr check: if unset, only accept an addr mark if the checksum was good
 // if set, accept an addr mark if the track and sector values are both sane
@@ -780,7 +784,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 // data postamble is good
 #define DATAPOST 16
 		for (auto & elem : visualgrid) {
-			for (int j = 0; j < 35; j++) {
+			for (int j = 0; j < m_tracks; j++) {
 				elem[j] = 0;
 			}
 		}
@@ -790,7 +794,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 		int pos_data = 0;
 
-		for(int track=0; track < 35; track++) {
+		for(int track=0; track < m_tracks; track++) {
 				uint8_t sectdata[(256)*16];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 16;
@@ -962,7 +966,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 		// display a little table of which sectors decoded ok
 		#ifdef VERBOSE_SAVE
 		int total_good = 0;
-		for (int j = 0; j < 35; j++) {
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 			printf("T%2d: ",j);
 			for (int i = 0; i < 16; i++) {
 				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
@@ -1037,7 +1041,7 @@ bool a2_rwts18_format::supports_save() const
 int a2_rwts18_format::identify(io_generic *io, uint32_t form_factor)
 {
 		uint64_t size = io_generic_size(io);
-		uint32_t expected_size = 35 * 16 * 256;
+		uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
 		return size == expected_size;
 }
 
@@ -1084,7 +1088,7 @@ bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 
         int head_count = 1;
 
-        for(int track=0; track < 35; track++) {
+        for(int track=0; track < APPLE2_TRACK_COUNT; track++) {
                 for(int head=0; head < head_count; head++) {
                         for(int si=0; si<16; si++) {
                                 uint8_t *data = sector_data + (256)*si;
@@ -1124,7 +1128,7 @@ void a2_rwts18_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 {
 		int g_tracks, g_heads;
-		int visualgrid[18][35]; // visualizer grid, cleared/initialized below
+		int visualgrid[18][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
 // lenient addr check: if unset, only accept an addr mark if the checksum was good
 // if set, accept an addr mark if the track and sector values are both sane
 #undef LENIENT_ADDR_CHECK
@@ -1146,7 +1150,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 // data postamble is good
 #define DATAPOST 16
 		for (auto & elem : visualgrid) {
-			for (int j = 0; j < 35; j++) {
+			for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 				elem[j] = 0;
 			}
 		}
@@ -1505,7 +1509,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 		}
 		// display a little table of which sectors decoded ok
 		int total_good = 0;
-		for (int j = 0; j < 35; j++) {
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 			printf("T%2d: ",j);
 			for (int i = 0; i < (j==0?16:6); i++) {
 				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");

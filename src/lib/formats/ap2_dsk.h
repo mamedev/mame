@@ -23,7 +23,8 @@
 
 #define APPLE2_NIBBLE_SIZE              416
 #define APPLE2_SMALL_NIBBLE_SIZE        374
-#define APPLE2_TRACK_COUNT              35
+//#define APPLE2_TRACK_COUNT              35
+#define APPLE2_TRACK_COUNT              40
 #define APPLE2_SECTOR_COUNT             16
 #define APPLE2_SECTOR_SIZE              256
 
@@ -56,6 +57,8 @@ private:
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
 
 	bool m_prodos_order;
+
+	int m_tracks;
 };
 
 extern const floppy_format_type FLOPPY_A216S_FORMAT;

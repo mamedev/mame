@@ -161,6 +161,7 @@ private:
 
 	void ip22_map(address_map &map);
 	void pio4_map(address_map &map);
+	void pio6_map(address_map &map);
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
@@ -252,7 +253,7 @@ void ip24_state::pio2_map(address_map &map)
 
 void ip24_state::pio6_map(address_map &map)
 {
-	map(0x00, 0xff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write)).umask16(0x00ff);
+	map(0x00, 0x2f).m("ioc2", FUNC(ioc2_guinness_device::map)).umask16(0x00ff);
 }
 
 void ip22_state::ip22_map(address_map &map)
@@ -263,7 +264,12 @@ void ip22_state::ip22_map(address_map &map)
 
 void ip22_state::pio4_map(address_map &map)
 {
-	map(0x00, 0xff).rw("ioc2", FUNC(ioc2_full_house_device::int2_r), FUNC(ioc2_full_house_device::int2_w)).umask16(0x00ff);
+	map(0x00, 0x0f).m("ioc2", FUNC(ioc2_full_house_device::int2_map)).umask16(0x00ff);
+}
+
+void ip22_state::pio6_map(address_map &map)
+{
+	map(0x00, 0x1f).m("ioc2", FUNC(ioc2_full_house_device::map)).umask16(0x00ff);
 }
 
 void ip24_state::machine_start()
@@ -328,7 +334,6 @@ void ip24_state::ip24_base(machine_config &config)
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO0, &ip24_state::pio0_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO1, &ip24_state::pio1_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO2, &ip24_state::pio2_map);
-	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::dma_r));
@@ -350,6 +355,8 @@ void ip24_state::ip24_base(machine_config &config)
 void ip24_state::ip24(machine_config &config)
 {
 	ip24_base(config);
+
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
 	VINO(config, m_vino);
@@ -414,6 +421,7 @@ void ip22_state::indigo2_4415(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO4, &ip22_state::pio4_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip22_state::pio6_map);
 	m_hpc3->hd_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::dma_r));

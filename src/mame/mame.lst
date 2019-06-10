@@ -1372,6 +1372,10 @@ prav8c                          // Pravetz 8C
 tk3000                          // Microdigital TK3000
 spectred
 ceci                            // China Education Computer-I
+cece                            // China Education Computer-E
+cecg                            // China Education Computer-G
+cecm                            // China Education Computer-M
+cec2000                         // China Education Computer-2000
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
@@ -8866,6 +8870,9 @@ bigbord2                        //
 bigevglf                        // A67 (c) 1986 Taito America Corporation (US)
 bigevglfj                       // A67 (c) 1986 Taito Corporation (Japan)
 
+@source:bigkarnk_ms.cpp
+bigkarnkm                       //
+
 @source:bigstrkb.cpp
 bigstrkb                        // bootleg on different hardware
 bigstrkba                       // alt set of 'bigstrkb' with Italian teams
@@ -10617,6 +10624,7 @@ progearjd                       //
 progearud                       //
 pzloop2                         // 02/03/2001 (c) 2001 Mitchell (Euro)
 pzloop2j                        // 26/02/2001 (c) 2001 Mitchell (Japan)
+pzloop2jd                       //
 pzloop2jr1                      // 05/02/2001 (c) 2001 Mitchell (Japan)
 qndream                         // 26/08/1996 (c) 1996 (Japan)
 ringdest                        // 02/09/1994 (c) 1994 (Euro)
@@ -10812,6 +10820,7 @@ warzardr1                       // 23/10/1996 (c) 1996 (Japan)
 
 @source:cpzodiac.cpp
 cpzodiac                        //
+cpzodiacj                       //
 
 @source:craft.cpp
 craft                           // Craft, by [lft]
@@ -22013,6 +22022,7 @@ vf2b                            // 1995.?? Virtua Fighter 2 (Revision B)
 vf2o                            // 1994.11 Virtua Fighter 2
 von                             // 1996.01 Cyber Troopers Virtual-On (USA, Revision B)
 vonj                            // 1996.01 Cyber Troopers Virtual-On (Japan, Revision B)
+vonr                            // 1996.01 Cyber Troopers Virtual-On Relay (Japan)
 vstriker                        // 1995.05 Virtua Striker (Revision A)
 vstrikero                       // 1995.05 Virtua Striker
 waverunr                        // 1996.10 Wave Runner (Japan, Revision A)

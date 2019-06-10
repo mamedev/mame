@@ -3065,8 +3065,7 @@ static GFXDECODE_START( gfx_chasehq )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_dblaxle )
-	GFXDECODE_ENTRY( "sprites",   0x0, tile16x8_layout,        0, 256 )    /* sprite parts */
-	GFXDECODE_ENTRY( "tc0480scp", 0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* playfield */
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x8_layout, 0, 256 )    /* sprite parts */
 GFXDECODE_END
 
 
@@ -3746,10 +3745,8 @@ void taitoz_state::dblaxle(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 
@@ -3815,10 +3812,8 @@ void taitoz_state::racingb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0150ROD(config, m_tc0150rod, 0);
 

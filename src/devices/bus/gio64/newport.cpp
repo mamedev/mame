@@ -12,18 +12,6 @@
     - XMAP9: Final display generator
     - CMAP: Palette mapper
     - VC2: Video timing controller / CRTC
-
-    Taken from the Linux Newport driver, slave addresses for Newport devices are:
-            VC2         0
-            Both CMAPs  1
-            CMAP 0      2
-            CMAP 1      3
-            Both XMAPs  4
-            XMAP 0      5
-            XMAP 1      6
-            RAMDAC      7
-            VIDEO (CC1) 8
-            VIDEO (AB1) 9
 */
 
 #include "emu.h"
@@ -36,11 +24,12 @@
 #define LOG_XMAP0       (1 << 4)
 #define LOG_XMAP1       (1 << 5)
 #define LOG_REX3        (1 << 6)
-#define LOG_COMMANDS    (1 << 7)
-#define LOG_REJECTS     (1 << 8)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3 | LOG_COMMANDS | LOG_REJECTS)
+#define LOG_RAMDAC		(1 << 7)
+#define LOG_COMMANDS    (1 << 8)
+#define LOG_REJECTS     (1 << 9)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
 
-#define VERBOSE         (0)//(LOG_REX3 | LOG_COMMANDS)
+#define VERBOSE         (0)//(LOG_REX3 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device,  "gio64_xl8",  "SGI 8-bit XL board")
@@ -350,7 +339,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 		//uint32_t *src = &m_vt_table[y * 2048];
 		uint32_t *src_ci = &m_rgbci[1344 * y];
 		uint32_t *src_pup = &m_pup[1344 * y];
-		uint32_t *src_olay = &m_pup[1344 * y];
+		uint32_t *src_olay = &m_olay[1344 * y];
 
 		m_vc2.m_did_frame_ptr = m_vc2.m_did_entry + (uint16_t)y;
 		m_vc2.m_did_line_ptr = m_vc2.m_ram[m_vc2.m_did_frame_ptr];
@@ -469,7 +458,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							break;
 						case 2: // 8-Bit Overlay
 						{
-							const uint32_t pix_in = (*src_olay >> 8) & 0xff;
+							const uint32_t pix_in = ((*src_olay >> 8) & 0xf) | ((*src_olay >> 12) & 0xf0);
 							if (pix_in)
 							{
 								*dest++ = m_cmap0.m_palette[aux_msb | pix_in];
@@ -749,6 +738,7 @@ void newport_base_device::ramdac_write(uint32_t data)
 	switch (m_rex3.m_dcb_reg_select)
 	{
 	case 0:
+		LOGMASKED(LOG_RAMDAC, "RAMDAC LUT index write: %08x\n", data);
 		m_ramdac_lut_index = (uint8_t)data;
 		break;
 	case 1:
@@ -756,6 +746,10 @@ void newport_base_device::ramdac_write(uint32_t data)
 		m_ramdac_lut_g[m_ramdac_lut_index] = (uint8_t)(data >> 16) << 8;
 		m_ramdac_lut_b[m_ramdac_lut_index] = (uint8_t)(data >> 24) << 0;
 		m_ramdac_lut_index++;
+		LOGMASKED(LOG_RAMDAC, "RAMDAC LUT entry write: %08x\n", data);
+		break;
+	default:
+		LOGMASKED(LOG_RAMDAC | LOG_UNKNOWN, "Unknown RAMDAC register %02x write: %08x\n", m_rex3.m_dcb_reg_select, data);
 		break;
 	}
 }
@@ -796,6 +790,26 @@ uint32_t newport_base_device::cmap0_read()
 	default:
 		LOGMASKED(LOG_CMAP0 | LOG_UNKNOWN, "Unknown CMAP0 Register %d Read\n", m_rex3.m_dcb_reg_select);
 		return 0;
+	}
+}
+
+void newport_base_device::cmap1_write(uint32_t data)
+{
+	switch (m_rex3.m_dcb_reg_select)
+	{
+	case 0x00:
+		LOGMASKED(LOG_CMAP1, "CMAP1 Palette Index Write: %04x\n", data & 0xffff);
+		m_cmap1.m_palette_idx = (uint16_t)data;
+		break;
+	case 0x02:
+		m_cmap1.m_palette[m_cmap1.m_palette_idx] = data >> 8;
+		//if (m_cmap1.m_palette_idx < 0x2000)
+			//set_pen_color(m_cmap1.m_palette_idx, rgb_t((uint8_t)(data >> 24), (uint8_t)(data >> 16), (uint8_t)(data >> 8)));
+		LOGMASKED(LOG_CMAP1, "CMAP1 Palette Entry %04x Write: %08x\n", m_cmap0.m_palette_idx, data >> 8);
+		break;
+	default:
+		LOGMASKED(LOG_CMAP1 | LOG_UNKNOWN, "Unknown CMAP1 Register %d Write: %08x\n", m_rex3.m_dcb_reg_select, data);
+		break;
 	}
 }
 
@@ -1827,10 +1841,15 @@ READ64_MEMBER(newport_base_device::rex3_r)
 	return ret;
 }
 
+uint32_t newport_base_device::do_endian_swap(uint32_t color)
+{
+    return (color >> 24) | (color << 24) | ((color >> 8) & 0x0000ff00) | ((color << 8) & 0x00ff0000);
+}
+
 uint32_t newport_base_device::get_host_color()
 {
-	static const uint32_t s_color_masks[4] = { 0xf, 0xff, 0xfff, 0xffffff };
-	const uint32_t color = (uint32_t)(m_rex3.m_host_dataport >> m_rex3.m_host_shift) & s_color_masks[m_rex3.m_hostdepth];
+	static const uint32_t s_color_masks[4] = { 0xf, 0xff, 0xfff, 0xffffffff };
+	uint32_t color = (uint32_t)(m_rex3.m_host_dataport >> m_rex3.m_host_shift) & s_color_masks[m_rex3.m_hostdepth];
 	if (m_rex3.m_rwpacked)
 	{
 		if ((m_rex3.m_rwdouble && m_rex3.m_host_shift > 0) || m_rex3.m_host_shift > 32)
@@ -1843,33 +1862,47 @@ uint32_t newport_base_device::get_host_color()
 	{
 	default:
 		// No conversion needed
-		return color;
+        break;
 	case 1:     // 4bpp -> 8bpp
-		return convert_4bpp_bgr_to_8bpp((uint8_t)color);
+		color = convert_4bpp_bgr_to_8bpp((uint8_t)color);
+        break;
 	case 2:     // 4bpp -> 12bpp
-		return convert_4bpp_bgr_to_12bpp((uint8_t)color);
+		color = convert_4bpp_bgr_to_12bpp((uint8_t)color);
+        break;
 	case 3:     // 4bpp -> 24bpp
-		return convert_4bpp_bgr_to_24bpp((uint8_t)color);
+		color = convert_4bpp_bgr_to_24bpp((uint8_t)color);
+        break;
 	case 4:     // 8bpp -> 4bpp
-		return convert_8bpp_bgr_to_4bpp((uint8_t)color);
+		color = convert_8bpp_bgr_to_4bpp((uint8_t)color);
+        break;
 	case 6:     // 8bpp -> 12bpp
-		return convert_8bpp_bgr_to_12bpp((uint8_t)color);
+		color = convert_8bpp_bgr_to_12bpp((uint8_t)color);
+        break;
 	case 7:     // 8bpp -> 24bpp
-		return convert_8bpp_bgr_to_24bpp((uint8_t)color);
+		color = convert_8bpp_bgr_to_24bpp((uint8_t)color);
+        break;
 	case 8:     // 12bpp -> 4bpp
-		return convert_12bpp_bgr_to_4bpp((uint16_t)color);
+		color = convert_12bpp_bgr_to_4bpp((uint16_t)color);
+        break;
 	case 9:     // 12bpp -> 8bpp
-		return convert_12bpp_bgr_to_8bpp((uint16_t)color);
+		color = convert_12bpp_bgr_to_8bpp((uint16_t)color);
+        break;
 	case 11:    // 12bpp -> 24bpp
-		return convert_12bpp_bgr_to_24bpp((uint16_t)color);
+		color = convert_12bpp_bgr_to_24bpp((uint16_t)color);
+        break;
 	case 12:    // 32bpp -> 4bpp
-		return convert_24bpp_bgr_to_4bpp(color);
+		color = convert_24bpp_bgr_to_4bpp(color);
+        break;
 	case 13:    // 32bpp -> 8bpp
-		return convert_24bpp_bgr_to_8bpp(color);
+		color = convert_24bpp_bgr_to_8bpp(color);
+        break;
 	case 14:    // 32bpp -> 12bpp
-		return convert_24bpp_bgr_to_12bpp(color);
+		color = convert_24bpp_bgr_to_12bpp(color);
+        break;
 	}
-	return color;
+	if (BIT(m_rex3.m_draw_mode1, 11))
+        color = do_endian_swap(color);
+    return color;
 }
 
 void newport_base_device::write_pixel(uint32_t color)
@@ -3486,7 +3519,49 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			}
 			m_rex3.m_draw_mode1 = data32;
 
-			static const uint32_t s_store_shift[4] = { 4, 0, 12, 0 };
+            static const uint32_t s_store_shift[8][4][2] = {
+                {   { 0,  0 }, // None, 4bpp, Buffer 0/1
+                    { 0,  0 }, // None, 8bpp, Buffer 0/1
+                    { 0,  0 }, // None, 12bpp, Buffer 0/1
+                    { 0,  0 }, // None, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  0 }, // RGB/CI, 4bpp, Buffer 0/1
+                    { 0,  8 }, // RGB/CI, 8bpp, Buffer 0/1
+                    { 0, 12 }, // RGB/CI, 12bpp, Buffer 0/1
+                    { 0,  0 }, // RGB/CI, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  0 }, // RGBA, 4bpp, Buffer 0/1
+                    { 0,  8 }, // RGBA, 8bpp, Buffer 0/1
+                    { 0, 12 }, // RGBA, 12bpp, Buffer 0/1
+                    { 0,  0 }, // RGBA, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
+                    { 0,  0 }, // Invalid, 8bpp, Buffer 0/1
+                    { 0,  0 }, // Invalid, 12bpp, Buffer 0/1
+                    { 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  8 }, // Overlay, 4bpp, Buffer 0/1
+                    { 0,  8 }, // Overlay, 8bpp, Buffer 0/1
+                    { 0,  8 }, // Overlay, 12bpp, Buffer 0/1
+                    { 0,  8 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  0 }, // Popup, 4bpp, Buffer 0/1
+                    { 0,  8 }, // Popup, 8bpp, Buffer 0/1
+                    { 0, 12 }, // Popup, 12bpp, Buffer 0/1
+                    { 0,  0 }, // Popup, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  0 }, // CID, 4bpp, Buffer 0/1
+                    { 0,  8 }, // CID, 8bpp, Buffer 0/1
+                    { 0, 12 }, // CID, 12bpp, Buffer 0/1
+                    { 0,  0 }, // CID, 24bpp, Buffer 0/1 (not valid)
+                },
+                {   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
+                    { 0,  0 }, // Invalid, 8bpp, Buffer 0/1
+                    { 0,  0 }, // Invalid, 12bpp, Buffer 0/1
+                    { 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
+                },
+            };
+
 			m_rex3.m_plane_enable = m_rex3.m_draw_mode1 & 7;
 			m_rex3.m_plane_depth = (m_rex3.m_draw_mode1 >> 3) & 3;
 			m_rex3.m_rwpacked = BIT(m_rex3.m_draw_mode1, 7);
@@ -3496,8 +3571,7 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			m_rex3.m_dfactor = (m_rex3.m_draw_mode1 >> 22) & 7;
 			m_rex3.m_logicop = (m_rex3.m_draw_mode1 >> 28) & 15;
 
-			m_rex3.m_store_shift = BIT(m_rex3.m_draw_mode1, 5) ? s_store_shift[m_rex3.m_plane_depth] : 0;
-
+			m_rex3.m_store_shift = s_store_shift[m_rex3.m_plane_enable][m_rex3.m_plane_depth][BIT(m_rex3.m_draw_mode1, 5)];
 			m_rex3.m_host_shift = 64 - s_host_shifts[m_rex3.m_hostdepth];
 		}
 		if (ACCESSING_BITS_0_31)
@@ -3804,11 +3878,25 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", (uint32_t)(data >> 32));
 			m_rex3.m_color_red = (int32_t)((data >> 32) & 0xffffff);
-            if (m_rex3.m_plane_depth == 2 && !BIT(m_rex3.m_draw_mode1, 15))
+			m_rex3.m_curr_color_red = m_rex3.m_color_red;
+            if (!BIT(m_rex3.m_draw_mode1, 15))
             {
-                m_rex3.m_color_i = m_rex3.m_color_red >> 9;
+                switch (m_rex3.m_plane_depth)
+                {
+                case 0: // 4bpp
+                    m_rex3.m_color_i = (uint32_t)((data >> 43) & 0xf);
+                    break;
+                case 1: // 8bpp
+                    m_rex3.m_color_i = (uint32_t)((data >> 43) & 0xff);
+                    break;
+                case 2: // 12bpp
+                    m_rex3.m_color_i = (uint32_t)((data >> 41) & 0xfff);
+                    break;
+                case 3: // 32bpp
+                    // Invalid for CI mode
+                    break;
+                }
             }
-            m_rex3.m_curr_color_red = m_rex3.m_color_red;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
@@ -3914,8 +4002,18 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		}
 		if (ACCESSING_BITS_0_31)
 		{
-			LOGMASKED(LOG_REX3, "REX3 Packed Color Fractions Write: %08x\n", (uint32_t)data);
+			LOGMASKED(LOG_REX3, "REX3 Packed Color Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_i = (uint32_t)data;
+            if (BIT(m_rex3.m_draw_mode1, 15))
+            {
+				m_rex3.m_color_red = (data & 0xff) << 11;
+				m_rex3.m_color_green = (data & 0xff00) << 3;
+				m_rex3.m_color_blue = (data & 0xff0000) >> 5;
+
+            	m_rex3.m_curr_color_red = m_rex3.m_color_red;
+            	m_rex3.m_curr_color_green = m_rex3.m_color_green;
+            	m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
+            }
 		}
 		break;
 	case 0x0228/8:
@@ -3986,13 +4084,13 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 				break;
 			case DCB_ADDR_CMAP01:
 				cmap0_write(data32);
-				//cmap1_write(data32);
+				cmap1_write(data32);
 				break;
 			case DCB_ADDR_CMAP0:
 				cmap0_write(data32);
 				break;
 			case DCB_ADDR_CMAP1:
-				//cmap1_write(data32);
+				cmap1_write(data32);
 				break;
 			case DCB_ADDR_XMAP01:
 				xmap0_write(data32);

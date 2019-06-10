@@ -11,13 +11,7 @@
 
 #pragma once
 
-#define IOC2_NEW_KBDC   (1)
-
-#if IOC2_NEW_KBDC
 #include "machine/at_keybc.h"
-#else
-#include "machine/8042kbdc.h"
-#endif
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "machine/pc_lpt.h"
@@ -29,9 +23,6 @@ class ioc2_device : public device_t
 {
 public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
-
-	void write(offs_t offset, uint8_t data);
-	uint8_t read(offs_t offset);
 
 	DECLARE_INPUT_CHANGED_MEMBER( power_button );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
@@ -91,53 +82,46 @@ protected:
 
 	void check_mappable_interrupt(int channel);
 
-	enum
-	{
-		PI1_DATA_REG       = 0x00/4,
-		PI1_CTRL_REG       = 0x04/4,
-		PI1_STATUS_REG     = 0x08/4,
-		PI1_DMA_CTRL_REG   = 0x0c/4,
-		PI1_INT_STATUS_REG = 0x10/4,
-		PI1_INT_MASK_REG   = 0x14/4,
-		PI1_TIMER1_REG     = 0x18/4,
-		PI1_TIMER2_REG     = 0x1c/4,
-		PI1_TIMER3_REG     = 0x20/4,
-		PI1_TIMER4_REG     = 0x24/4,
+	u8 pi1_dma_ctrl_r();
+	void pi1_dma_ctrl_w(u8 data);
+	u8 pi1_int_status_r();
+	void pi1_int_status_w(u8 data);
+	u8 pi1_int_mask_r();
+	void pi1_int_mask_w(u8 data);
+	u8 pi1_timer1_r();
+	u8 pi1_timer2_r();
+	u8 pi1_timer3_r();
+	u8 pi1_timer4_r();
+	void pi1_timer1_w(u8 data);
+	void pi1_timer2_w(u8 data);
+	void pi1_timer3_w(u8 data);
+	void pi1_timer4_w(u8 data);
+	u8 gc_select_r();
+	void gc_select_w(u8 data);
+	u8 gen_cntl_r();
+	void gen_cntl_w(u8 data);
+	u8 front_panel_r();
+	void front_panel_w(u8 data);
+	u8 system_id_r();
+	u8 read_r();
+	u8 dma_sel_r();
+	void dma_sel_w(u8 data);
+	u8 reset_r();
+	void reset_w(u8 data);
+	u8 write_r();
+	void write_w(u8 data);
+	template <int N> u8 local_status_r();
+	template <int N> u8 local_mask_r();
+	template <int N> void local_mask_w(u8 data);
+	u8 map_status_r();
+	template <int N> u8 map_mask_r();
+	template <int N> void map_mask_w(u8 data);
+	u8 map_pol_r();
+	void map_pol_w(u8 data);
+	void timer_int_clear_w(u8 data);
+	u8 error_status_r();
 
-		SERIAL1_CMD_REG    = 0x30/4,
-		SERIAL1_DATA_REG   = 0x34/4,
-		SERIAL2_CMD_REG    = 0x38/4,
-		SERIAL2_DATA_REG   = 0x3c/4,
-
-		KBD_MOUSE_REGS1    = 0x40/4,
-		KBD_MOUSE_REGS2    = 0x44/4,
-
-		GENCTRL_SELECT_REG = 0x48/4,
-		GENCTRL_REG        = 0x4c/4,
-
-		PANEL_REG          = 0x50/4,
-		SYSID_REG          = 0x58/4,
-		READ_REG           = 0x60/4,
-		DMA_SEL_REG        = 0x68/4,
-		RESET_REG          = 0x70/4,
-		WRITE_REG          = 0x78/4,
-
-		INT3_LOCAL0_STATUS_REG = 0x80/4,
-		INT3_LOCAL0_MASK_REG   = 0x84/4,
-		INT3_LOCAL1_STATUS_REG = 0x88/4,
-		INT3_LOCAL1_MASK_REG   = 0x8c/4,
-		INT3_MAP_STATUS_REG    = 0x90/4,
-		INT3_MAP_MASK0_REG     = 0x94/4,
-		INT3_MAP_MASK1_REG     = 0x98/4,
-		INT3_MAP_POLARITY_REG  = 0x9c/4,
-		INT3_TIMER_CLEAR_REG   = 0xa0/4,
-		INT3_ERROR_STATUS_REG  = 0xa4/4,
-
-		TIMER_COUNT0_REG       = 0xb0/4,
-		TIMER_COUNT1_REG       = 0xb4/4,
-		TIMER_COUNT2_REG       = 0xb8/4,
-		TIMER_CONTROL_REG      = 0xbc/4,
-	};
+	void base_map(address_map &map);
 
 	enum
 	{
@@ -165,11 +149,7 @@ protected:
 	required_device<scc85230_device> m_scc;
 	required_device<pc_lpt_device> m_pi1;   // we assume standard parallel port (SPP) mode
 											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner mode
-#if IOC2_NEW_KBDC
 	required_device<ps2_keyboard_controller_device> m_kbdc;
-#else
-	required_device<kbdc8042_device> m_kbdc;
-#endif
 	required_device<pit8254_device> m_pit;
 
 	virtual void handle_reset_reg_write(uint8_t data);
@@ -219,6 +199,7 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 
+	void map(address_map &map);
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -237,8 +218,8 @@ public:
 
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t int2_r(offs_t offset);
-	void int2_w(offs_t offset, uint8_t data);
+	void map(address_map &map);
+	void int2_map(address_map &map);
 
 protected:
 	uint8_t get_system_id() override { return 0x11; }
