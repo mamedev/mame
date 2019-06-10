@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "bus/a2gameio/gameio.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
@@ -81,6 +82,7 @@ public:
 		m_pic(*this, PIC8259_TAG),
 		m_fdc(*this, FDC_TAG),
 		m_floppy(*this, FDC_TAG ":%u", 0U),
+		m_gameio(*this, "gameio"),
 		m_printer(*this, "printer"),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
@@ -108,7 +110,6 @@ private:
 	uint8_t vram_page_r();
 	void vram_page_w(uint8_t data);
 	uint8_t game_io_r();
-	void game_io_w(uint8_t data);
 	uint8_t printer_status_r();
 	void printer_data_w(uint8_t data);
 	void disk_select_w(uint8_t data);
@@ -135,6 +136,7 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<fd1793_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<apple2_gameio_device> m_gameio;
 	required_device<centronics_device> m_printer;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -144,6 +146,10 @@ private:
 	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
 	uint8_t       m_vram_page;
 	uint8_t       m_printer_status;
+
+	double        m_x_calibration, m_y_calibration;
+	bool          m_ls123_strobe;
+	double        m_ls123_clear_time[4];
 
 	void video_debug(int ref, const std::vector<std::string> &params);
 };

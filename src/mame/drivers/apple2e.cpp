@@ -156,6 +156,8 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/transwarp.h"
 #include "bus/a2bus/a2vulcan.h"
 
+#include "bus/a2gameio/gameio.h"
+
 #include "bus/rs232/rs232.h"
 
 #include "screen.h"
@@ -220,11 +222,7 @@ public:
 		m_video(*this, A2_VIDEO_TAG),
 		m_a2bus(*this, A2_BUS_TAG),
 		m_a2eauxslot(*this, A2_AUXSLOT_TAG),
-		m_joy1x(*this, "joystick_1_x"),
-		m_joy1y(*this, "joystick_1_y"),
-		m_joy2x(*this, "joystick_2_x"),
-		m_joy2y(*this, "joystick_2_y"),
-		m_joybuttons(*this, "joystick_buttons"),
+		m_gameio(*this, "gameio"),
 		m_mouseb(*this, MOUSE_BUTTON_TAG),
 		m_mousex(*this, MOUSE_XAXIS_TAG),
 		m_mousey(*this, MOUSE_YAXIS_TAG),
@@ -263,7 +261,7 @@ public:
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
 	optional_device<a2eauxslot_device> m_a2eauxslot;
-	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
+	required_device<apple2_gameio_device> m_gameio;
 	optional_ioport m_mouseb, m_mousex, m_mousey;
 	optional_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
@@ -977,6 +975,10 @@ void apple2e_state::machine_reset()
 	m_video->m_monohgr = false;
 	if(m_iscecm)	m_video->m_monohgr = true;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
+	m_gameio->an0_w(0);
+	m_gameio->an1_w(0);
+	m_gameio->an2_w(0);
+	m_gameio->an3_w(0);
 	m_vbl = m_vblmask = false;
 	m_slotc3rom = false;
 	m_romswitch = false;
@@ -1534,6 +1536,14 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			}
 			break;
 
+		case 0x40:  // utility strobe (not available on IIc)
+			if (!is_iic)
+			{
+				m_gameio->strobe_w(0);
+				m_gameio->strobe_w(1);
+			}
+			break;
+
 		case 0x48:  // (IIc only) clear mouse X/Y interrupt flags
 			m_xirq = m_yirq = false;
 			lower_irq(IRQ_MOUSEXY);
@@ -1595,28 +1605,44 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			break;
 
 		case 0x58: // AN0 off
-			m_an0 = false; break;
+			m_an0 = false;
+			m_gameio->an0_w(0);
+			break;
 
 		case 0x59: // AN0 on
-			m_an0 = true; break;
+			m_an0 = true;
+			m_gameio->an0_w(1);
+			break;
 
 		case 0x5a: // AN1 off
-			m_an1 = false; break;
+			m_an1 = false;
+			m_gameio->an1_w(0);
+			break;
 
 		case 0x5b: // AN1 on
-			m_an1 = true; break;
+			m_an1 = true;
+			m_gameio->an1_w(1);
+			break;
 
 		case 0x5c: // AN2 off
-			m_an2 = false; break;
+			m_an2 = false;
+			m_gameio->an2_w(0);
+			break;
 
 		case 0x5d: // AN2 on
-			m_an2 = true; break;
+			m_an2 = true;
+			m_gameio->an2_w(1);
+			break;
 
 		case 0x5e: // AN3 off
-			m_an3 = false; break;
+			m_an3 = false;
+			m_gameio->an3_w(0);
+			break;
 
 		case 0x5f: // AN3 on
-			m_an3 = true; break;
+			m_an3 = true;
+			m_gameio->an3_w(1);
+			break;
 
 		case 0x68:  // IIgs STATE register, which ProDOS touches
 			break;
@@ -1630,10 +1656,10 @@ void apple2e_state::do_io(int offset, bool is_iic)
 				lower_irq(IRQ_VBL);
 			}
 
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
+			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 			break;
 
 		default:
@@ -1716,15 +1742,15 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 		case 0x61:  // button 0 or Open Apple
 		case 0x69:
-			return (((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
-			return (((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // button 2 or SHIFT key
 		case 0x6b:
-			return (((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
@@ -1967,11 +1993,11 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 		case 0x61:  // button 0 or Open Apple or mouse button 1
 		case 0x69:
-			return (((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
-			return (((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // mouse button 2 (no other function on IIc)
 		case 0x6b:
@@ -3125,51 +3151,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::ay3600_repeat)
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( apple2_joystick )
-	PORT_START("joystick_1_x")      /* Joystick 1 X Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("P1 Joystick X")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-	PORT_CODE_DEC(KEYCODE_4_PAD)    PORT_CODE_INC(KEYCODE_6_PAD)
-	PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-	PORT_START("joystick_1_y")      /* Joystick 1 Y Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("P1 Joystick Y")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-	PORT_CODE_DEC(KEYCODE_8_PAD)    PORT_CODE_INC(KEYCODE_2_PAD)
-	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-
-	PORT_START("joystick_2_x")      /* Joystick 2 X Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("P2 Joystick X")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-	PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-	PORT_START("joystick_2_y")      /* Joystick 2 Y Axis */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("P2 Joystick Y")
-	PORT_SENSITIVITY(JOYSTICK_SENSITIVITY)
-	PORT_KEYDELTA(JOYSTICK_DELTA)
-	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
-	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-
-	PORT_START("joystick_buttons")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_0_PAD)    PORT_CODE(JOYCODE_BUTTON1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_PLAYER(1)            PORT_CODE(KEYCODE_ENTER_PAD)PORT_CODE(JOYCODE_BUTTON2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(2)            PORT_CODE(JOYCODE_BUTTON1)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( apple2_gameport )
-	PORT_INCLUDE( apple2_joystick )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
@@ -3470,7 +3451,7 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-	PORT_INCLUDE( apple2_gameport )
+
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
@@ -3583,7 +3564,7 @@ static INPUT_PORTS_START( cece )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-	PORT_INCLUDE( apple2_gameport )
+
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
@@ -3696,7 +3677,7 @@ static INPUT_PORTS_START( cecg )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-	PORT_INCLUDE( apple2_gameport )
+
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
@@ -3809,7 +3790,7 @@ static INPUT_PORTS_START( cecm )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-	PORT_INCLUDE( apple2_gameport )
+
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
@@ -3922,19 +3903,17 @@ static INPUT_PORTS_START( cec2000 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-	PORT_INCLUDE( apple2_gameport )
+
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_gameport )
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_gameport )
 	PORT_INCLUDE( apple2c_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4065,7 +4044,6 @@ static INPUT_PORTS_START( apple2euk )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_gameport )
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
@@ -4187,7 +4165,6 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_gameport )
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
@@ -4309,7 +4286,6 @@ static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses th
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_gameport )
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
@@ -4431,7 +4407,6 @@ INPUT_PORTS_START( apple2ep )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_gameport )
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
@@ -4601,6 +4576,8 @@ void apple2e_state::apple2e(machine_config &config)
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
 	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");
+
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */
