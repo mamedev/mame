@@ -48,9 +48,16 @@ protected:
 	void display_mode();
 	void blit(u16 packet_seg, u16 packet_adr);
 
-	void gco_w(u16 data);
+	void gco_w(u16);
 	u16 dispctrl_r();
 	void dispctrl_w(u16 data);
+
+	int sys_t0_r();
+	int sys_t1_r();
+	u8 sys_p1_r();
+	u8 sys_p2_r();
+	void sys_p1_w(u8 data);
+	void sys_p2_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -78,6 +85,41 @@ void mindset_state::machine_reset()
 {
 }
 
+int mindset_state::sys_t0_r()
+{
+	logerror("SYS: read t0 (%03x)\n", m_syscpu->pc());
+	return 0;
+}
+
+int mindset_state::sys_t1_r()
+{
+	logerror("SYS: read t1\n");
+	return 0;
+}
+
+u8 mindset_state::sys_p1_r()
+{
+	logerror("SYS: read p1\n");
+	return 0;
+}
+
+u8 mindset_state::sys_p2_r()
+{
+	logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
+	return 0;
+}
+
+void mindset_state::sys_p1_w(u8 data)
+{
+	logerror("SYS: write p1 %02x\n", data);
+}
+
+void mindset_state::sys_p2_w(u8 data)
+{
+	m_maincpu->int3_w(data & 0x20);
+	logerror("SYS: write p2 %02x\n", data);
+}
+
 u16 mindset_state::dispctrl_r()
 {
 	return m_dispctrl;
@@ -85,8 +127,11 @@ u16 mindset_state::dispctrl_r()
 
 void mindset_state::dispctrl_w(u16 data)
 {
+	// 4000 = buffer choice (switch on int2, frame int instead of field int?)
+	u16 chg = m_dispctrl ^ data;
 	m_dispctrl = data;
-	//	logerror("display control %04x\n", data);
+	if(chg & ~0x0050)
+		logerror("display control %04x\n", m_dispctrl);
 }
 
 u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -308,7 +353,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	}
 }
 
-void mindset_state::gco_w(u16 data)
+void mindset_state::gco_w(u16)
 {
 	u16 packet_seg  = sw(m_gcos->read_word(0xbfd7a));
 	u16 packet_adr  = sw(m_gcos->read_word(0xbfd78));
@@ -337,6 +382,8 @@ void mindset_state::maincpu_mem(address_map &map)
 
 void mindset_state::maincpu_io(address_map &map)
 {
+	map(0x8280, 0x8283).rw(m_syscpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
+	map(0x82a0, 0x82a3).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x8300, 0x8301).w(FUNC(mindset_state::gco_w));
 	map(0x8320, 0x8321).lr16("8320", []() -> u16 { return 0xa005; }); // To pass the display test
 	map(0x8322, 0x8323).rw(FUNC(mindset_state::dispctrl_r), FUNC(mindset_state::dispctrl_w));
@@ -348,9 +395,15 @@ void mindset_state::mindset(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mindset_state::maincpu_mem);
 	m_maincpu->set_addrmap(AS_IO,      &mindset_state::maincpu_io);
 
-	I8042(config, m_syscpu, 12_MHz_XTAL/2);
+	I8042(config, m_syscpu, 12_MHz_XTAL);
+	m_syscpu->p1_in_cb().set(FUNC(mindset_state::sys_p1_r));
+	m_syscpu->p2_in_cb().set(FUNC(mindset_state::sys_p2_r));
+	m_syscpu->p1_out_cb().set(FUNC(mindset_state::sys_p1_w));
+	m_syscpu->p2_out_cb().set(FUNC(mindset_state::sys_p2_w));
+	m_syscpu->t0_in_cb().set(FUNC(mindset_state::sys_t0_r));
+	m_syscpu->t1_in_cb().set(FUNC(mindset_state::sys_t1_r));
 
-	I8042(config, m_soundcpu, 12_MHz_XTAL/2);
+	I8042(config, m_soundcpu, 12_MHz_XTAL);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -358,7 +411,11 @@ void mindset_state::mindset(machine_config &config)
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 319, 0, 199);
 	m_screen->set_screen_update(FUNC(mindset_state::screen_update));
+	// This is bad and wrong and I don't yet care
+	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
+	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 }
 
 static INPUT_PORTS_START(mindset)
