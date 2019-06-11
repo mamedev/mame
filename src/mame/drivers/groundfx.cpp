@@ -138,8 +138,8 @@ void groundfx_state::groundfx_map(address_map &map)
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));  // debugging
-	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* 6bpp tilemaps */
-	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x900000, 0x90ffff).rw(m_tc0620scc, FUNC(tc0620scc_device::ram_r), FUNC(tc0620scc_device::ram_w));    /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0620scc, FUNC(tc0620scc_device::ctrl_r), FUNC(tc0620scc_device::ctrl_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb003ff).ram();                     // ?? single bytes, blending ??
 	map(0xc00000, 0xc00007).nopr(); /* Network? */
@@ -194,21 +194,8 @@ static const gfx_layout tile16x16_layout =
 	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout layout_scc_6bpp_hi =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ STEP2(0,1) },
-	{ STEP8(0,2) },
-	{ STEP8(0,8*2) },
-	8*8*2
-};
-
 static GFXDECODE_START( gfx_groundfx )
-	GFXDECODE_ENTRY( "sprites",          0x0, tile16x16_layout,  4096, 512 )
-	GFXDECODE_ENTRY( "tc0100scn",        0x0, gfx_8x8x4_packed_msb, 0, 512 ) // low 4bpp of 6bpp scc tiles
-	GFXDECODE_ENTRY( "tc0100scn:hi_gfx", 0x0, layout_scc_6bpp_hi,   0, 512 ) // hi 2bpp of 6bpp scc tiles
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 4096, 512 )
 GFXDECODE_END
 
 
@@ -260,11 +247,9 @@ void groundfx_state::groundfx(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_groundfx);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_offsets(50, 8);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
+	TC0620SCC(config, m_tc0620scc, 0);
+	m_tc0620scc->set_offsets(50, 8);
+	m_tc0620scc->set_palette(m_palette);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
@@ -301,11 +286,11 @@ ROM_START( groundfx )
 	ROM_LOAD16_WORD_SWAP( "d51-06.50", 0x600000, 0x200000, CRC(d33ce2a0) SHA1(92c4504344672ea798cd6dd34f4b46848bf9f82b) )
 	ROM_LOAD16_WORD_SWAP( "d51-07.51", 0x800000, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "d51-10.95", 0x000001, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* SCC 8x8 tiles, 4bpp */
 	ROM_LOAD16_BYTE( "d51-11.96", 0x000000, 0x100000, CRC(fee5f5c6) SHA1(1be88747f9c71c348dd61a8f0040007df3a3e6a6) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "d51-12.97", 0x000000, 0x100000, CRC(d630287b) SHA1(2fa09e1821b7280d193ca9a2a270759c3c3189d1) )    /* SCC 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
@@ -344,41 +329,6 @@ void groundfx_state::init_groundfx()
 {
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
-
-	/* make SCC tile GFX format suitable for gfxdecode */
-	gfx_element *gx0 = m_gfxdecode->gfx(1);
-	gfx_element *gx1 = m_gfxdecode->gfx(2);
-
-	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
-
-	// loop over elements
-	u8 *dest = srcdata;
-	for (int c = 0; c < gx0->elements(); c++)
-	{
-		const u8 *c0base = gx0->get_data(c);
-		const u8 *c1base = gx1->get_data(c);
-
-		// loop over height
-		for (int y = 0; y < gx0->height(); y++)
-		{
-			const u8 *c0 = c0base;
-			const u8 *c1 = c1base;
-
-			for (int x = 0; x < gx0->width(); x++)
-			{
-				u8 hipix = *c1++;
-				*dest++ = (*c0++ & 0xf) | ((hipix << 4) & 0x30);
-			}
-			c0base += gx0->rowbytes();
-			c1base += gx1->rowbytes();
-		}
-	}
-
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
-	gx0->set_granularity(64);
-	m_gfxdecode->set_gfx(2, nullptr);
-	m_tc0100scn->update_granularity();
 }
 
 

@@ -596,19 +596,8 @@ static const gfx_layout tilelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( gfx_ninjaw_1 )
-	GFXDECODE_ENTRY( "sprites",     0, tilelayout,           0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb, 0, 256 )   /* scr tiles (screen 1) */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_ninjaw_2 )
-	GFXDECODE_ENTRY( "sprites",     0, tilelayout,           0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_2", 0, gfx_8x8x4_packed_msb, 0, 256 )   /* scr tiles (screen 2) */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_ninjaw_3 )
-	GFXDECODE_ENTRY( "sprites",     0, tilelayout,           0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_3", 0, gfx_8x8x4_packed_msb, 0, 256 )   /* scr tiles (screen 3) */
+static GFXDECODE_START( gfx_ninjaw )
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0, 256 )   /* sprites */
 GFXDECODE_END
 
 
@@ -737,9 +726,9 @@ void ninjaw_state::ninjaw(machine_config &config)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_ninjaw_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw_2);
-	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw_3);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_ninjaw);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw);
+	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw);
 
 	config.set_default_layout(layout_ninjaw);
 
@@ -768,31 +757,25 @@ void ninjaw_state::ninjaw(machine_config &config)
 	rscreen.set_palette(m_tc0110pcr[2]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
 
 	TC0100SCN(config, m_tc0100scn[2], 0);
-	m_tc0100scn[2]->set_gfx_region(1);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
-	m_tc0100scn[2]->set_gfxdecode_tag(m_gfxdecode[2]);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
 	TC0110PCR(config, m_tc0110pcr[2], 0);
@@ -849,9 +832,9 @@ void ninjaw_state::darius2(machine_config &config)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_ninjaw_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw_2);
-	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw_3);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_ninjaw);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw);
+	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw);
 
 	config.set_default_layout(layout_ninjaw);
 
@@ -880,31 +863,25 @@ void ninjaw_state::darius2(machine_config &config)
 	rscreen.set_palette(m_tc0110pcr[2]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
 
 	TC0100SCN(config, m_tc0100scn[2], 0);
-	m_tc0100scn[2]->set_gfx_region(1);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
-	m_tc0100scn[2]->set_gfxdecode_tag(m_gfxdecode[2]);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
 	TC0110PCR(config, m_tc0110pcr[2], 0);

@@ -165,7 +165,7 @@ static const gfx_layout tile16x16_layout =
 };
 
 static GFXDECODE_START( gfx_galastrm )
-	GFXDECODE_ENTRY( "sprites",   0x0, tile16x16_layout,       0, 4096/16 )
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 0, 4096/16 )
 GFXDECODE_END
 
 
@@ -210,9 +210,7 @@ void galastrm_state::galastrm(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_galastrm);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0); // TODO : no ROMs?
 	m_tc0100scn->set_offsets(-48, -56);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0480SCP(config, m_tc0480scp, 0);
@@ -237,6 +235,8 @@ ROM_START( galastrm )
 	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 )
 	ROM_LOAD16_BYTE( "c99_23.ic8",  0x100000, 0x20000,  CRC(5718ee92) SHA1(33cfa60c5bceb1525498f27b598067d2dc620431) )
 	ROM_LOAD16_BYTE( "c99_22.ic7",  0x100001, 0x20000,  CRC(b90f7c42) SHA1(e2fa9ee10ad61ae1a672c3357c0072b79ec7fbcb) )
+
+	ROM_REGION( 0x100, "tc0100scn", ROMREGION_ERASE00 ) // no roms for tc0100scn, dummy
 
 	ROM_REGION( 0x200000, "tc0480scp", 0 )
 	ROM_LOAD32_WORD( "c99-05.ic1",  0x000000, 0x100000, CRC(a91ffba4) SHA1(467af9646ddad5fbb520b6bc13517ed4deacf479) )  /* SCR 16x16 tiles */
