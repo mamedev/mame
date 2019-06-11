@@ -6,12 +6,31 @@
 
     TMS32030/1/2 emulator
 	
-	Todo: Serial communications for device linking
+	Todo: Serial communications for device linking (all straight through type cables)
 	-Known to be compatible with RS-232 (Midway V Unit and Gaelco 3d), and FireWire (Midway Zeus II).
-	-320C30 can support two serial ports naturally while 32031/2 only supports one.
-		+However, All Midway V Unit, Zeus II, and some Gaelco 3d (specfically Speed Up) pcbs have two serial ports for linking between more than two pcbs.
+	-Figure out all the baud rates, start bits, data bits, parity and stop bits for all games.
+	-320C30 can support two serial ports naturally while 32031/2 only supports one. However, All Midway V Unit, Zeus II, and some
+	Gaelco 3d pcbs (specfically Speed Up) has its serial port split into two for linking between more than two pcbs. Later dedicated
+	Cruis'n USA cabinets have two serial ports despite that game can only link up to two players max.
 	-Is FireWire only compatible with 320C32?
-
+	
+	Networking notes and procedures:
+	-A two way link (Cruis'n USA, Radikal Bikers and Surf Planet) is self explanatory. Connect the RS-232 cable between both pcbs
+	and set the correct network settings on both pcbs.
+	-A >2 way link (Speed Up, Cruis'n World, Off Road Challenge, Cruis'n Exotica and The Grid) requires the connected pcbs network
+	IDs in numerical order and a pcb to have a network ID set to 1/Master. The reasoning behind this is each network ID can only
+	communicate with the network ID numerically next to one another due to the serial port split into two; e.g. ID 1/Master controls
+	ID 2, ID 2 is controlled by ID 1 but controls ID 3, ID 3 controlled by ID 2 but controls ID 4, and so on in a large serial
+	circuit. Disconnecting anything connected to ID 1/Master will unlink all the slave pcbs while disconnecting a slave ID pcb will
+	unlink any pcbs that aren't connected to ID 1/Master.
+	
+	Theoretical example setup of linking four MAME instances using batch files/shell scripts:
+	
+	#1: mame64.exe <game> -w -cfg_directory cfg -nvram_directory nvram -rs232a localhost 5000 remotehost 5001
+	#2: mame64.exe <game> -w -cfg_directory cfg2 -nvram_directory nvram2 -rs232a localhost 5001 remotehost 5000 -rs232b localhost 5001 remotehost 5002
+	#3: mame64.exe <game> -w -cfg_directory cfg3 -nvram_directory nvram3 -rs232a localhost 5002 remotehost 5001 -rs232b localhost 5002 remotehost 5003
+	#4: mame64.exe <game> -w -cfg_directory cfg4 -nvram_directory nvram5 -rs232b localhost 5003 remotehost 5002
+	
 ***************************************************************************/
 
 #include "emu.h"
