@@ -239,6 +239,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 		m_requested_int[m_vblank_bit] = 1;
 		m_requested_int[4] = 1; // ???
 		update_irq_state();
+		if (m_vdp) m_vdp->screen_eof(ASSERT_LINE);
+		if (m_vdp2) m_vdp2->screen_eof(ASSERT_LINE);
+		if (m_vdp3) m_vdp3->screen_eof(ASSERT_LINE);
 	}
 	else if(scanline < 224 && (*m_irq_enable & 2) == 0)
 	{
