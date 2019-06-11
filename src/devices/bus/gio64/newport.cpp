@@ -3540,10 +3540,10 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
                     { 0,  0 }, // Invalid, 12bpp, Buffer 0/1
                     { 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
                 },
-                {   { 0,  8 }, // Overlay, 4bpp, Buffer 0/1
-                    { 0,  8 }, // Overlay, 8bpp, Buffer 0/1
-                    { 0,  8 }, // Overlay, 12bpp, Buffer 0/1
-                    { 0,  8 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
+                {   { 8, 16 }, // Overlay, 4bpp, Buffer 0/1
+                    { 8, 16 }, // Overlay, 8bpp, Buffer 0/1
+                    { 8, 16 }, // Overlay, 12bpp, Buffer 0/1
+                    { 8, 16 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
                 },
                 {   { 0,  0 }, // Popup, 4bpp, Buffer 0/1
                     { 0,  8 }, // Popup, 8bpp, Buffer 0/1
