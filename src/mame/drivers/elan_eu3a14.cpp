@@ -286,7 +286,6 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 
 	if (bpp == 8) // 8bpp selection
 	{
-
 		if (size == 8)
 		{
 			xstride = size / 1; baseaddr += tileno * 64; // 8x8 8bpp
@@ -298,7 +297,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 
 		palette &= 0x100; // only top bit valid, as there are only 2 palettes?
 	}
-	if (bpp == 4) // 4bpp selection
+	else if (bpp == 4) // 4bpp selection
 	{
 		if (size == 8)
 		{
