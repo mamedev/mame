@@ -376,14 +376,8 @@ INPUT_PORTS_END
                         GFX DECODING
 ***********************************************************/
 
-static GFXDECODE_START( gfx_warriorb_1 )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* scr tiles (screen 1) */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_warriorb_2 )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_2", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* scr tiles (screen 2) */
+static GFXDECODE_START( gfx_warriorb )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
 GFXDECODE_END
 
 /***********************************************************
@@ -422,8 +416,8 @@ void warriorb_state::darius2d(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb_2);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -436,9 +430,7 @@ void warriorb_state::darius2d(machine_config &config)
 	lscreen.set_palette(m_tc0110pcr[0]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(4, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
@@ -452,10 +444,8 @@ void warriorb_state::darius2d(machine_config &config)
 	rscreen.set_palette(m_tc0110pcr[1]);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
@@ -502,8 +492,8 @@ void warriorb_state::warriorb(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb_2);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -516,9 +506,7 @@ void warriorb_state::warriorb(machine_config &config)
 	lscreen.set_palette(m_tc0110pcr[0]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(4, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
@@ -532,11 +520,9 @@ void warriorb_state::warriorb(machine_config &config)
 	rscreen.set_palette(m_tc0110pcr[1]);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(1);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);

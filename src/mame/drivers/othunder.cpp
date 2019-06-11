@@ -562,8 +562,7 @@ static const gfx_layout tile16x8_layout =
 };
 
 static GFXDECODE_START( gfx_othunder )
-	GFXDECODE_ENTRY( "sprites",   0, tile16x8_layout,      0, 256 )   /* sprite parts */
-	GFXDECODE_ENTRY( "tc0100scn", 0, gfx_8x8x4_packed_msb, 0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "sprites", 0, tile16x8_layout, 0, 256 )   /* sprite parts */
 GFXDECODE_END
 
 
@@ -618,9 +617,7 @@ void othunder_state::othunder(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_othunder);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
 	m_tc0100scn->set_offsets(4, 0);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);

@@ -637,8 +637,7 @@ void wgp_state::cpu2_map(address_map &map)
 	map(0x140000, 0x143fff).ram().share("sharedram");
 	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-//  AM_RANGE(0x380000, 0x383fff) AM_READONLY       // LAN RAM
-//  AM_RANGE(0x380000, 0x383fff) AM_WRITEONLY    // LAN RAM
+//  map(0x380000, 0x383fff).ram();    // LAN RAM
 	map(0x380000, 0x380001).r(FUNC(wgp_state::lan_status_r));  // ??
 	// a lan input area is read somewhere above the status
 	// (make the status return 0 and log)...
@@ -831,11 +830,9 @@ INPUT_PORTS_END
                         GFX DECODING
 ***********************************************************/
 
-/* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx slot */
 static GFXDECODE_START( gfx_wgp )
-	GFXDECODE_ENTRY( "sprites",   0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn", 0x0, gfx_8x8x4_packed_msb,   0, 256 )    /* playfield */
-	GFXDECODE_ENTRY( "piv",       0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* piv */
+	GFXDECODE_ENTRY( "sprites", 0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* sprites */
+	GFXDECODE_ENTRY( "piv",     0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* piv */
 GFXDECODE_END
 
 
@@ -916,8 +913,6 @@ void wgp_state::wgp(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */

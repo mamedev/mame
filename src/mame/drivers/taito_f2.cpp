@@ -2703,29 +2703,12 @@ static const gfx_layout layout_6bpp_hi =
 };
 
 static GFXDECODE_START( gfx_taitof2 )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_finalb )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   // low 4bpp of 6bpp sprites
-	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
-	GFXDECODE_ENTRY( "sprites_hi",  0, layout_6bpp_hi,         0, 256 )   // hi 2bpp of 6bpp sprites
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_thundfox )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
-	GFXDECODE_ENTRY( "tc0100scn_2", 0, gfx_8x8x4_packed_msb,   0, 256 )   /* playfield */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_yuyugogo )
-	GFXDECODE_ENTRY( "sprites",     0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "tc0100scn_1", 0, gfx_8x8x1,              0, 256 )   /* playfield */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_deadconx )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0, 256 )  /* sprites */
+	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0, 256 )   // low 4bpp of 6bpp sprites
+	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_hi,         0, 256 )   // hi 2bpp of 6bpp sprites
 GFXDECODE_END
 
 static const gfx_layout footchmpbl_tilelayout =
@@ -2878,9 +2861,7 @@ void taitof2_state::finalb(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(1, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 }
 
@@ -2892,15 +2873,12 @@ void taitof2_state::dondokod(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::dondokod_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_taitof2);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,dondokod)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri_roz));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
@@ -2928,9 +2906,7 @@ void taitof2_state::megab(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -2944,27 +2920,22 @@ void taitof2_state::thundfox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::thundfox_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_thundfox);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,thundfox)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_thundfox));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_thundfox));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_offsets_flip(5, 0);
 	m_tc0100scn[0]->set_offsets_fliptx(4, 1);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(2);
 	m_tc0100scn[1]->set_offsets(3, 0);
 	m_tc0100scn[1]->set_offsets_flip(5, 0);
 	m_tc0100scn[1]->set_offsets_fliptx(4, 1);
 	m_tc0100scn[1]->set_multiscr_xoffs(tc0100scn_device::SINGLE_VDU);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[1]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -2978,14 +2949,11 @@ void taitof2_state::cameltry(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::cameltry_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_taitof2);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,dondokod)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri_roz));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
@@ -3005,12 +2973,10 @@ void taitof2_state::qtorimon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::qtorimon_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_yuyugogo);
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 }
 
@@ -3027,9 +2993,7 @@ void taitof2_state::liquidk(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3045,12 +3009,10 @@ void taitof2_state::quizhq(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::quizhq_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_yuyugogo);
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 }
 
@@ -3069,9 +3031,7 @@ void taitof2_state::ssi(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_thundfox));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 }
 
@@ -3090,9 +3050,7 @@ void taitof2_state::gunfront(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3112,9 +3070,7 @@ void taitof2_state::growl(machine_config &config)
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3133,8 +3089,6 @@ void taitof2_state::mjnquest(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,mjnquest)
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 	m_tc0100scn[0]->set_tile_callback(FUNC(taitof2_state::mjnquest_tmap_cb), this);
 }
@@ -3147,7 +3101,6 @@ void taitof2_state::footchmp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::footchmp_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_deadconx);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,footchmp)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_deadconx));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_full_buffer_delayed));
@@ -3178,7 +3131,6 @@ void taitof2_state::hthero(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::footchmp_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_deadconx);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,hthero)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_deadconx));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_full_buffer_delayed));
@@ -3206,10 +3158,8 @@ void taitof2_state::koshien(machine_config &config)
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(1, 0);
 	m_tc0100scn[0]->set_offsets_flip(2, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3225,14 +3175,12 @@ void taitof2_state::yuyugogo(machine_config &config)
 	m_palette->set_format(palette_device::RGBx_444, 4096);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_yuyugogo);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,yuyugogo)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_yesnoj));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
+	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 }
 
@@ -3258,9 +3206,7 @@ void taitof2_state::ninjak(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(1, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3278,11 +3224,9 @@ void taitof2_state::solfigtr(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_offsets_flip(6, 0);
 	m_tc0100scn[0]->set_offsets_fliptx(6, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3299,8 +3243,6 @@ void taitof2_state::qzquest(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 }
 
@@ -3312,14 +3254,11 @@ void taitof2_state::pulirula(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::pulirula_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_taitof2);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,pulirula)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri_roz));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
@@ -3337,7 +3276,6 @@ void taitof2_state::metalb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::metalb_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_deadconx);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,metalb)
@@ -3365,11 +3303,9 @@ void taitof2_state::qzchikyu(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_qzchikyu));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(0, 0);
 	m_tc0100scn[0]->set_offsets_flip(-4, 0);
 	m_tc0100scn[0]->set_offsets_fliptx(-11, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 }
 
@@ -3381,16 +3317,14 @@ void taitof2_state::yesnoj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::yesnoj_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_yuyugogo);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,yesnoj)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_yesnoj));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
+	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC8521(config, "rtc", XTAL(32'768));
@@ -3404,7 +3338,6 @@ void taitof2_state::deadconx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::deadconx_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_deadconx);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,deadconx)
@@ -3427,7 +3360,6 @@ void taitof2_state::deadconxj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::deadconx_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_deadconx);
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,deadconxj)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_deadconx));
 
@@ -3454,9 +3386,7 @@ void taitof2_state::dinorex(machine_config &config)
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3476,9 +3406,7 @@ void taitof2_state::qjinsei(machine_config &config)
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3498,9 +3426,7 @@ void taitof2_state::qcrayon(machine_config &config)
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3520,9 +3446,7 @@ void taitof2_state::qcrayon2(machine_config &config)
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
@@ -3536,15 +3460,11 @@ void taitof2_state::driftout(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::driftout_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_taitof2);
-
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,driftout)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri_roz));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
@@ -3588,9 +3508,7 @@ void taitof2_state::cameltrya(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,dondokod)
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
@@ -3652,9 +3570,7 @@ void taitof2_state::driveout(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,driftout)
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(3, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
@@ -5373,7 +5289,7 @@ void taitof2_state::init_finalb()
 {
 	/* convert from 2bits into 4bits format */
 	gfx_element *gx0 = m_gfxdecode->gfx(0);
-	gfx_element *gx1 = m_gfxdecode->gfx(2);
+	gfx_element *gx1 = m_gfxdecode->gfx(1);
 
 	// allocate memory for the assembled data
 	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
@@ -5404,7 +5320,7 @@ void taitof2_state::init_finalb()
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_colors(4096 / 64);
 	gx0->set_granularity(64);
-	m_gfxdecode->set_gfx(2, nullptr);
+	m_gfxdecode->set_gfx(1, nullptr);
 }
 
 void taitof2_state::init_cameltry()
