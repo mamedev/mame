@@ -278,10 +278,10 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
+void radica_eu3a14_state::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
 	int baseaddr = base * 256;
-	
+
 	int xstride = 8;
 
 	if (bpp == 8) // 8bpp selection
@@ -292,7 +292,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 		}
 		else
 		{
-			 xstride = size / 1; baseaddr += tileno * 256; // 16x16 8bpp
+			xstride = size / 1; baseaddr += tileno * 256; // 16x16 8bpp
 		}
 
 		palette &= 0x100; // only top bit valid, as there are only 2 palettes?
@@ -384,7 +384,6 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 				else if (bpp == 5)
 				{
 					popmessage("draw_background_tile bpp == 5");
-
 				}
 				else if (bpp == 4) // 4bpp
 				{
@@ -447,7 +446,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 							}
 						}
 					}
-		
+
 					realx++;
 
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
@@ -479,7 +478,6 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 				else if (bpp == 1)
 				{
 					popmessage("draw_background_tile bpp == 1");
-
 				}
 			}
 			count++;
