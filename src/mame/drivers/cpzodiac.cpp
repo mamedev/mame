@@ -210,18 +210,18 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( cpzodiac )
+ROM_START( cpzodiac ) // this set looks like a conversion from JP version
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ic16", 0x00000, 0x20000, CRC(d73c21ea) SHA1(2b60a1cf1a9834a88d0a2911b314939ca98b0893) ) // M27C1001
+	ROM_LOAD( "16.ic16", 0x00000, 0x20000, CRC(d73c21ea) SHA1(2b60a1cf1a9834a88d0a2911b314939ca98b0893) ) // M27C1001
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ic14", 0x00000, 0x10000, CRC(eb1a77bb) SHA1(7a9ed992144d4aade6fefbcb78b6737924fcca01) ) // M27C512
+	ROM_LOAD( "14.ic14", 0x00000, 0x10000, CRC(eb1a77bb) SHA1(7a9ed992144d4aade6fefbcb78b6737924fcca01) ) // M27C512
 
 	ROM_REGION( 0x200000, "ymsnd", 0 ) // daughterboard with 4*27C040 at ic32
-	ROM_LOAD( "ic17", 0x000000, 0x80000, CRC(0b457444) SHA1(022d9f030c9e9461a2ec954c9df00626e459d74a) )
-	ROM_LOAD( "ic18", 0x080000, 0x80000, CRC(4edf3a9b) SHA1(95021ca153f842958176c35430ed58fc897c6d2e) )
-	ROM_LOAD( "ic19", 0x100000, 0x80000, CRC(7c04ef12) SHA1(f5c5b2b1e28a65b0a33b332bcbf046aa462565c0) )
-	ROM_LOAD( "ic20", 0x180000, 0x80000, CRC(c91ee395) SHA1(940b87d55de2ff3ad55cae216ab8959ad4c9a7b9) )
+	ROM_LOAD( "17", 0x000000, 0x80000, CRC(0b457444) SHA1(022d9f030c9e9461a2ec954c9df00626e459d74a) )
+	ROM_LOAD( "18", 0x080000, 0x80000, CRC(4edf3a9b) SHA1(95021ca153f842958176c35430ed58fc897c6d2e) )
+	ROM_LOAD( "19", 0x100000, 0x80000, CRC(7c04ef12) SHA1(f5c5b2b1e28a65b0a33b332bcbf046aa462565c0) )
+	ROM_LOAD( "20", 0x180000, 0x80000, CRC(c91ee395) SHA1(940b87d55de2ff3ad55cae216ab8959ad4c9a7b9) )
 
 	ROM_REGION( 0x1000, "pals", 0 )
 	ROM_LOAD( "d52-02.ic38", 0x0000, 0x0aee, CRC(6be9b935) SHA1(d36af591b03873aee3098b7c74b53ac6370ca064) ) // PAL16L8BCN
