@@ -280,47 +280,47 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 
 void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
-	int bppdiv = 1;
 	int baseaddr = base * 256;
 	
-	int backtiletype = 0;
+	int xstride = 8;
 
-	if (bpp == 4) // 4bpp selection
+	if (bpp == 8) // 8bpp selection
 	{
-		backtiletype = 1; // 16x16 4bpp
 
 		if (size == 8)
 		{
-			backtiletype = 3; // 8x8 4bpp
+			xstride = size / 1; baseaddr += tileno * 64; // 8x8 8bpp
 		}
-	}
-	else if (bpp == 8) // 8bpp selection
-	{
-		backtiletype = 0; // 16x16 8bpp
-
-		if (size == 8)
+		else
 		{
-			backtiletype = 2; // 8x8 8bpp
+			 xstride = size / 1; baseaddr += tileno * 256; // 16x16 8bpp
 		}
 
 		palette &= 0x100; // only top bit valid, as there are only 2 palettes?
 	}
-	else // 2bpp?
+	if (bpp == 4) // 4bpp selection
 	{
-		backtiletype = 4;
+		if (size == 8)
+		{
+			xstride = size / 2; baseaddr += tileno * 32; // 8x8 4bpp
+		}
+		else
+		{
+			xstride = size / 2; baseaddr += tileno * 128; // 16x16 4bpp
+		}
+	}
+	else if (bpp == 2) // 2bpp?
+	{
+		xstride = size / 4; baseaddr += tileno * 64; // 16x16 2bpp
+	}
+	else
+	{
+		popmessage("draw_background_tile unsupported bpp %d\n", bpp);
+		return;
 	}
 
-	switch (backtiletype)
-	{
-	case 0x00: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
-	case 0x01: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
-	case 0x02: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
-	case 0x03: bppdiv = 2; baseaddr += tileno * 32;  break; // 8x8 4bpp
-	case 0x04: bppdiv = 4; baseaddr += tileno * 64; break; // 16x16 2bpp
 
-	default: break;
-	}
-	
+
 	uint8_t* gfxdata;
 
 	if (drawfromram)
@@ -332,7 +332,6 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 		gfxdata = &m_mainregion[baseaddr & 0x3fffff];
 	}
 
-	int xstride = size / bppdiv;
 
 	int count = 0;
 	for (int y = 0; y < size; y++)
@@ -359,7 +358,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 
 			if (realy >= cliprect.min_y && realy <= cliprect.max_y)
 			{
-				if (bppdiv == 1) // 8bpp
+				if (bpp == 8) // 8bpp
 				{
 					int realx = x + xposwithscroll;
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
@@ -375,9 +374,22 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 						}
 					}
 				}
-				else if (bppdiv == 2) // 4bpp
+				else if (bpp == 7)
 				{
-					int realx = (x * 2) + xpos;
+					popmessage("draw_background_tile bpp == 7");
+				}
+				else if (bpp == 6)
+				{
+					popmessage("draw_background_tile bpp == 6");
+				}
+				else if (bpp == 5)
+				{
+					popmessage("draw_background_tile bpp == 5");
+
+				}
+				else if (bpp == 4) // 4bpp
+				{
+					int realx = (x * 2) + xposwithscroll;
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0xf0)
@@ -404,9 +416,13 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 						}
 					}
 				}
-				else if (bppdiv == 4) // 2bpp (hnt3 ram text)
+				else if (bpp == 3)
 				{
-					int realx = (x * 4) + xpos;
+					popmessage("draw_background_tile bpp == 3");
+				}
+				else if (bpp == 2) // 2bpp (hnt3 ram text)
+				{
+					int realx = (x * 4) + xposwithscroll;
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
 						if (pix & 0xc0)
@@ -460,6 +476,11 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16 &bitmap, const recta
 							}
 						}
 					}
+				}
+				else if (bpp == 1)
+				{
+					popmessage("draw_background_tile bpp == 1");
+
 				}
 			}
 			count++;
