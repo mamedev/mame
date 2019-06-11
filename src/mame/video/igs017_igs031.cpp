@@ -254,26 +254,77 @@ void igs017_igs031_device::expand_sprites()
 
 ***************************************************************************/
 
-void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr)
+void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int offsx, int offsy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr)
 {
-	// prepare GfxElement on the fly
-
 	// Bounds checking
 	if (addr + dimx * dimy >= m_sprites_gfx_size)
 		return;
 
-	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	/* Start drawing */
+	const u16 pal = 0x100 + (color << 5);
+	const u8 *source_base = &m_sprites_gfx[addr];
+	const u8 transparent_color = 0x1f;
 
-	gfx.transpen(bitmap, cliprect,
-				0, color,
-				flipx, flipy,
-				sx, sy, 0x1f);
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
+
+	int x_index_base = flipx ? dimx - 1 : 0;
+	int y_index = flipy ? dimy - 1 : 0;
+
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
+
+	// end coordinates
+	int ex = sx + dimx;
+	int ey = sy + dimy;
+
+	if (sx < cliprect.min_x)
+	{ // clip left
+		int pixels = cliprect.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < cliprect.min_y)
+	{ // clip top
+		int pixels = cliprect.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > cliprect.max_x + 1)
+	{ // clip right
+		ex = cliprect.max_x + 1;
+	}
+	if (ey > cliprect.max_y + 1)
+	{ // clip bottom
+		ey = cliprect.max_y + 1;
+	}
+
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
+		{
+			const u8 *source = source_base + y_index * dimx;
+			u16 *dest = &bitmap.pix16(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
+			{
+				const u8 c = source[x_index];
+				if (c != transparent_color)
+					dest[x] = pal + c;
+
+				x_index += xinc;
+			}
+			y_index += yinc;
+		}
+	}
 }
 
 void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	u8 *s    =   m_spriteram;
-	u8 *end  =   m_spriteram + 0x800;
+	const u8 *s    =   m_spriteram;
+	const u8 *end  =   m_spriteram + 0x800;
 
 	for (; s < end; s += 8)
 	{
@@ -296,7 +347,7 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 		if (sy == -0x200)
 			break;
 
-		u32 color = (s[7] & 0xe0) >> 5;
+		const u32 color = (s[7] & 0xe0) >> 5;
 
 		draw_sprite(bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
 	}
