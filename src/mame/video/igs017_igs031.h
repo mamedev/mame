@@ -50,7 +50,7 @@ public:
 	void bg_w(offs_t offset, u8 data);
 
 	void expand_sprites();
-	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int offsx, int offsy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
