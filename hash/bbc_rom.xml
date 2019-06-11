@@ -3515,12 +3515,8 @@
 		<publisher>Permanent Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<feature name="slot" value="genie" />
-			<!-- Should be single 32K, 8K pages were dumped in-situ so may be corrupt and/or incorrect order. -->
 			<dataarea name="rom" size="32768">
-				<rom name="PMSGenie1-1.01.rom" size="8192" crc="3ee29106" sha1="8b4c14c0657fbb3b19fb85103cc39c06e026f280" offset="0x0000" status="baddump"/>
-				<rom name="PMSGenie2-1.01.rom" size="8192" crc="b828717b" sha1="4f8ff82bd05ace8cee99e6c7c8dbc35d6de3e92d" offset="0x2000" status="baddump"/>
-				<rom name="PMSGenie3-1.01.rom" size="8192" crc="297e99a8" sha1="4b225606cf052f72ef755fbc67d131ab6aa16438" offset="0x4000" status="baddump"/>
-				<rom name="PMSGenie4-1.01.rom" size="8192" crc="3d666c36" sha1="810869aeb66fec7599aaec01641c07b1a8968fdc" offset="0x6000" status="baddump"/>
+				<rom name="PMSGenie-1.01.rom" size="32768" crc="be152c01" sha1="34d8d21c71b1bf1f3648a4dda90fde5d8dc48cd2"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768" />
 			<dataarea name="ram" size="32768" />
@@ -3546,7 +3542,7 @@
 	</software>
 
 	<software name="genieclk">
-		<description>PMS Genie Real Time Clock</description>
+		<description>PMS Genie Real Time Clock 3.02</description>
 		<year>1988</year>
 		<publisher>Permanent Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -3558,12 +3554,23 @@
 	</software>
 
 	<software name="geniejr">
-		<description>PMS Genie Junior</description>
+		<description>PMS Genie Junior 1.01</description>
 		<year>1987</year>
 		<publisher>Permanent Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="PMSGenieJunior-1.01.rom" size="16384" crc="993b81e9" sha1="c3c4ce75fda27dada5b01383e19aff7c70c141b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geniejr11u" cloneof="geniejr">
+		<description>PMS Genie Junior 1.1u</description>
+		<year>1987</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PMSGenieJunior-1.1u.rom" size="16384" crc="e635d89e" sha1="9d046c9eaea8aa96b46efaa32e23e06a70e9e1ac"/>
 			</dataarea>
 		</part>
 	</software>
