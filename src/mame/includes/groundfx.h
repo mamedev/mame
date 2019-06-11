@@ -27,7 +27,7 @@ public:
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_tc0100scn(*this, "tc0100scn"),
+		m_tc0620scc(*this, "tc0620scc"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -45,7 +45,7 @@ private:
 	required_shared_ptr<u32> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<tc0100scn_device> m_tc0100scn;
+	required_device<tc0620scc_device> m_tc0620scc;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

@@ -330,8 +330,8 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
-	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* 6bpp tilemaps */
-	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x900000, 0x90ffff).rw(m_tc0620scc, FUNC(tc0620scc_device::ram_r), FUNC(tc0620scc_device::ram_w));        /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0620scc, FUNC(tc0620scc_device::ctrl_r), FUNC(tc0620scc_device::ctrl_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb003ff).ram();                         /* single bytes, blending ??? */
 	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
@@ -350,8 +350,8 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
-	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* 6bpp tilemaps */
-	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x900000, 0x90ffff).rw(m_tc0620scc, FUNC(tc0620scc_device::ram_r), FUNC(tc0620scc_device::ram_w));        /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0620scc, FUNC(tc0620scc_device::ctrl_r), FUNC(tc0620scc_device::ctrl_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb0000f).ram(); /* TC0360PRI */
 	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
@@ -497,21 +497,8 @@ static const gfx_layout tile16x16_layout =
 	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout layout_scc_6bpp_hi =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ STEP2(0,1) },
-	{ STEP8(0,2) },
-	{ STEP8(0,8*2) },
-	8*8*2
-};
-
 static GFXDECODE_START( gfx_undrfire )
-	GFXDECODE_ENTRY( "sprites",          0x0, tile16x16_layout,     0, 512 )
-	GFXDECODE_ENTRY( "tc0100scn",        0x0, gfx_8x8x4_packed_msb, 0, 512 ) // low 4bpp of 6bpp scc tiles
-	GFXDECODE_ENTRY( "tc0100scn:hi_gfx", 0x0, layout_scc_6bpp_hi,   0, 512 ) // hi 2bpp of 6bpp scc tiles
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 0, 512 )
 GFXDECODE_END
 
 /***********************************************************
@@ -557,11 +544,9 @@ void undrfire_state::undrfire(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_offsets(50, 8);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
+	TC0620SCC(config, m_tc0620scc, 0);
+	m_tc0620scc->set_offsets(50, 8);
+	m_tc0620scc->set_palette(m_palette);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
@@ -616,11 +601,9 @@ void undrfire_state::cbombers(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_offsets(50, 8);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette(m_palette);
+	TC0620SCC(config, m_tc0620scc, 0);
+	m_tc0620scc->set_offsets(50, 8);
+	m_tc0620scc->set_palette(m_palette);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
@@ -659,11 +642,11 @@ ROM_START( undrfire )
 	ROM_LOAD16_WORD_SWAP( "d67-06", 0x600000, 0x200000, CRC(a2a63488) SHA1(a1ed140cc3757c3c05a0a822089c6efc83bf4805) )
 	ROM_LOAD16_WORD_SWAP( "d67-07", 0x800000, 0x200000, CRC(189c0ee5) SHA1(de85b39dc67f31ef80800ff6ec9a391652eb12e4) )
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "d67-10", 0x000001, 0x100000, CRC(d79e6ce9) SHA1(8b38302971816d599cdaa3279cb6395441373c6f) )   /* PIV 8x8 tiles, 4bpp */
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
@@ -700,11 +683,11 @@ ROM_START( undrfireu )
 	ROM_LOAD16_WORD_SWAP( "d67-06", 0x600000, 0x200000, CRC(a2a63488) SHA1(a1ed140cc3757c3c05a0a822089c6efc83bf4805) )
 	ROM_LOAD16_WORD_SWAP( "d67-07", 0x800000, 0x200000, CRC(189c0ee5) SHA1(de85b39dc67f31ef80800ff6ec9a391652eb12e4) )
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "d67-10", 0x000001, 0x100000, CRC(d79e6ce9) SHA1(8b38302971816d599cdaa3279cb6395441373c6f) )   /* PIV 8x8 tiles, 4bpp */
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
@@ -740,11 +723,11 @@ ROM_START( undrfirej )
 	ROM_LOAD16_WORD_SWAP( "d67-06", 0x600000, 0x200000, CRC(a2a63488) SHA1(a1ed140cc3757c3c05a0a822089c6efc83bf4805) )
 	ROM_LOAD16_WORD_SWAP( "d67-07", 0x800000, 0x200000, CRC(189c0ee5) SHA1(de85b39dc67f31ef80800ff6ec9a391652eb12e4) )
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "d67-10", 0x000001, 0x100000, CRC(d79e6ce9) SHA1(8b38302971816d599cdaa3279cb6395441373c6f) )   /* PIV 8x8 tiles, 4bpp */
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
@@ -789,11 +772,11 @@ ROM_START( cbombers )
 	ROM_LOAD16_WORD_SWAP( "d83_14.ic44", 0xb00000, 0x100000, CRC(8b6f4f12) SHA1(6a28004d287f00627622376aa3d6704f2684a6f3) )
 	ROM_LOAD16_WORD_SWAP( "d83_15.ic42", 0xe00000, 0x100000, CRC(1b71175e) SHA1(60ad38ce97fd7995ff2f29d6b1a3b873dc2f0eb3) )
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "d83_16.ic19", 0x000001, 0x100000, CRC(d364cf1e) SHA1(ee43f50edf50ec840acfb98b1314140ee9693839) )
 	ROM_LOAD16_BYTE( "d83_17.ic5",  0x000000, 0x100000, CRC(0ffe737c) SHA1(5923a4edf9d0c8339f793840c2bdc691e2c651e6) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
@@ -844,11 +827,11 @@ ROM_START( cbombersj )
 	ROM_LOAD16_WORD_SWAP( "d83_14.ic44", 0xb00000, 0x100000, CRC(8b6f4f12) SHA1(6a28004d287f00627622376aa3d6704f2684a6f3) )
 	ROM_LOAD16_WORD_SWAP( "d83_15.ic42", 0xe00000, 0x100000, CRC(1b71175e) SHA1(60ad38ce97fd7995ff2f29d6b1a3b873dc2f0eb3) )
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "d83_16.ic19", 0x000001, 0x100000, CRC(d364cf1e) SHA1(ee43f50edf50ec840acfb98b1314140ee9693839) )
 	ROM_LOAD16_BYTE( "d83_17.ic5",  0x000000, 0x100000, CRC(0ffe737c) SHA1(5923a4edf9d0c8339f793840c2bdc691e2c651e6) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
@@ -930,13 +913,13 @@ ROM_START( cbombersp )
 	ROM_LOAD16_BYTE( "ic80_d511.bin",    0x0b00000, 0x80000, CRC(37da5baf) SHA1(a78ac413de08a1ff70ab14561b75df633a9e5be8) ) // bp 4
 	ROM_LOAD16_BYTE( "ic82_3d3d.bin",    0x0e00000, 0x80000, CRC(3e62970e) SHA1(82970accb4ce29034e7b97b74c831ec0314c5a8f) ) // bp 5
 
-	ROM_REGION( 0x200000, "tc0100scn", 0 )
+	ROM_REGION( 0x200000, "tc0620scc", 0 )
 	ROM_LOAD16_BYTE( "ic44_scc1.bin",  0x000000, 0x080000, CRC(868d0d3d) SHA1(29251d545548856296b5ae32a96f2eeef2418dc4) )
 	ROM_LOAD16_BYTE( "ic43_scc4.bin",  0x000001, 0x080000, CRC(2f170ee4) SHA1(2b8f07186c9f7589e1af131b8c377443a29bd149) )
 	ROM_LOAD16_BYTE( "ic58_f357.bin",  0x100000, 0x080000, CRC(16486967) SHA1(c2fd6c9f21232656b52ab589ac61f94aa728524e) )
 	ROM_LOAD16_BYTE( "ic57_1a62.bin",  0x100001, 0x080000, CRC(afd45e35) SHA1(6d7c0729c7d2b204473679b97923130e289f429d) )
 
-	ROM_REGION( 0x100000, "tc0100scn:hi_gfx", 0 )
+	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
 	ROM_LOAD       ( "ic45_5cc2.bin",  0x000000, 0x080000, CRC(7ae48d63) SHA1(2a8b291f0a683ed5b0c39d221737956b6fc72fa5) )
 	ROM_LOAD       ( "ic59_7cce.bin",  0x080000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
 
@@ -967,48 +950,9 @@ ROM_START( cbombersp )
 ROM_END
 
 
-void undrfire_state::driver_init()
-{
-	/* make SCC tile GFX format suitable for gfxdecode */
-	gfx_element *gx0 = m_gfxdecode->gfx(1);
-	gfx_element *gx1 = m_gfxdecode->gfx(2);
-
-	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
-
-	// loop over elements
-	u8 *dest = srcdata;
-	for (int c = 0; c < gx0->elements(); c++)
-	{
-		const u16 *c0base = gx0->get_data(c);
-		const u16 *c1base = gx1->get_data(c);
-
-		// loop over height
-		for (int y = 0; y < gx0->height(); y++)
-		{
-			const u16 *c0 = c0base;
-			const u16 *c1 = c1base;
-
-			for (int x = 0; x < gx0->width(); x++)
-			{
-				u8 hipix = *c1++;
-				*dest++ = (*c0++ & 0xf) | ((hipix << 4) & 0x30);
-			}
-			c0base += gx0->rowbytes();
-			c1base += gx1->rowbytes();
-		}
-	}
-
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
-	gx0->set_granularity(64);
-	m_gfxdecode->set_gfx(2, nullptr);
-	m_tc0100scn->update_granularity();
-}
-
-
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, driver_init, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, driver_init, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, driver_init, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, driver_init, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, driver_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, driver_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )

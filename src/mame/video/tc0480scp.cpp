@@ -157,6 +157,7 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 	, device_gfx_interface(mconfig, *this)
 	, m_pri_reg(0)
 	, m_dblwidth(0)
+	, m_gfxlayout(TC0480SCP_LAYOUT_COMMON)
 	, m_x_offset(0)
 	, m_y_offset(0)
 	, m_text_xoffs(0)

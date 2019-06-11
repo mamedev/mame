@@ -715,7 +715,7 @@ void mtech_state::megatech(machine_config &config)
 	screen.set_screen_update(FUNC(mtech_state::screen_update_main));
 	screen.screen_vblank().set(FUNC(mtech_state::screen_vblank_main));
 
-	m_vdp->irq().set_inputline(m_z80snd, 0);
+	m_vdp->n_int().set_inputline(m_z80snd, 0);
 
 	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
 	// check frq
@@ -727,7 +727,7 @@ void mtech_state::megatech(machine_config &config)
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("menu");
 	m_vdp1->set_is_pal(false);
-	m_vdp1->irq().set_inputline(m_bioscpu, 0);
+	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }

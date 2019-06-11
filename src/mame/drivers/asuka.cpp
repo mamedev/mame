@@ -755,15 +755,6 @@ static INPUT_PORTS_START( eto )
 INPUT_PORTS_END
 
 
-/**************************************************************
-                GFX DECODING
-**************************************************************/
-
-static GFXDECODE_START( gfx_asuka )
-	GFXDECODE_ENTRY( "tc0100scn", 0, gfx_8x8x4_packed_msb, 0, 256 )   /* SCR */
-GFXDECODE_END
-
-
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -845,16 +836,12 @@ void asuka_state::bonzeadv(machine_config &config)
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
-
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette(m_tc0110pcr);
 	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0);
-	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
@@ -903,8 +890,6 @@ void asuka_state::asuka(machine_config &config)
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
-
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
@@ -912,8 +897,6 @@ void asuka_state::asuka(machine_config &config)
 	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0);
-	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
@@ -974,8 +957,6 @@ void asuka_state::cadash(machine_config &config)
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
-
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
@@ -983,9 +964,7 @@ void asuka_state::cadash(machine_config &config)
 	m_pc090oj->set_colpri_callback(FUNC(asuka_state::bonzeadv_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(1, 0);
-	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
@@ -1034,17 +1013,13 @@ void asuka_state::mofflott(machine_config &config)
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
-
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette(m_tc0110pcr);
 	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(1, 0);
-	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
@@ -1101,17 +1076,13 @@ void asuka_state::eto(machine_config &config)
 	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank));
 	screen.set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, "gfxdecode", m_tc0110pcr, gfx_asuka);
-
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette(m_tc0110pcr);
 	m_pc090oj->set_colpri_callback(FUNC(asuka_state::asuka_colpri_cb), this);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0);
 	m_tc0100scn->set_offsets(1, 0);
-	m_tc0100scn->set_gfxdecode_tag("gfxdecode");
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);

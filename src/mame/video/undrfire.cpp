@@ -328,7 +328,6 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 {
 	u8 layer[5];
 	u8 scclayer[3];
-	u16 priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_X))
@@ -367,10 +366,10 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 	}
 #endif
 
-	m_tc0100scn->tilemap_update();
+	m_tc0620scc->tilemap_update();
 	m_tc0480scp->tilemap_update();
 
-	priority = m_tc0480scp->get_bg_priority();
+	const u16 priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -378,7 +377,7 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	scclayer[0] = m_tc0100scn->bottomlayer();
+	scclayer[0] = m_tc0620scc->bottomlayer();
 	scclayer[1] = scclayer[0] ^ 1;
 	scclayer[2] = 2;
 
@@ -392,8 +391,8 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]]==0)
@@ -435,7 +434,7 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
@@ -468,7 +467,6 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 {
 	u8 layer[5];
 	u8 scclayer[3];
-	u16 priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_X))
@@ -507,10 +505,10 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 	}
 #endif
 
-	m_tc0100scn->tilemap_update();
+	m_tc0620scc->tilemap_update();
 	m_tc0480scp->tilemap_update();
 
-	priority = m_tc0480scp->get_bg_priority();
+	const u16 priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -518,7 +516,7 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	scclayer[0] = m_tc0100scn->bottomlayer();
+	scclayer[0] = m_tc0620scc->bottomlayer();
 	scclayer[1] = scclayer[0] ^ 1;
 	scclayer[2] = 2;
 
@@ -533,8 +531,8 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
    serve some blending pupose ? */
 
 	// TODO : Wrong; TC0360PRI isn't hooked up
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]]==0)
@@ -576,7 +574,7 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 

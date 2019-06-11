@@ -17,7 +17,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_tc0100scn(*this, "tc0100scn"),
+		m_tc0620scc(*this, "tc0620scc"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "ram"),
@@ -34,8 +34,6 @@ public:
 
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
-
-	void driver_init() override;
 
 protected:
 	enum
@@ -58,7 +56,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-	required_device<tc0100scn_device> m_tc0100scn;
+	required_device<tc0620scc_device> m_tc0620scc;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_shared_ptr<u32> m_ram;

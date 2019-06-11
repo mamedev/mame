@@ -553,7 +553,7 @@ void fuuki32_state::fuuki32(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK)); // 33.8688MHz
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.irq_handler().set_inputline("soundcpu", 0);
 	ymf.add_route(0, "lspeaker", 0.50);
 	ymf.add_route(1, "rspeaker", 0.50);

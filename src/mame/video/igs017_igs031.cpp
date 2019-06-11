@@ -323,8 +323,8 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cl
 
 void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	u8 *s    =   m_spriteram;
-	u8 *end  =   m_spriteram + 0x800;
+	const u8 *s    =   m_spriteram;
+	const u8 *end  =   m_spriteram + 0x800;
 
 	for (; s < end; s += 8)
 	{
@@ -347,7 +347,7 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 		if (sy == -0x200)
 			break;
 
-		u32 color = (s[7] & 0xe0) >> 5;
+		const u32 color = (s[7] & 0xe0) >> 5;
 
 		draw_sprite(bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
 	}
