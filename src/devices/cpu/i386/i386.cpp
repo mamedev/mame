@@ -400,6 +400,7 @@ uint16_t i386_device::READ16PL(uint32_t ea, uint8_t privilege)
 	{
 	case 0:
 	case 2:
+	default:
 		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
@@ -432,6 +433,7 @@ uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
@@ -476,6 +478,7 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		value = READ32PL(ea, privilege);
 		value |= uint64_t(READ32PL(ea + 2, privilege)) << 32;
 		break;
@@ -1155,6 +1158,7 @@ uint16_t i386_device::READPORT16(offs_t port)
 	{
 	case 0:
 	case 2:
+	default:
 		check_ioperm(port, 3);
 		value = m_io->read_word(port);
 		break;
@@ -1202,6 +1206,7 @@ uint32_t i386_device::READPORT32(offs_t port)
 	switch (port & 3)
 	{
 	case 0:
+	default:
 		check_ioperm(port, 0xf);
 		value = m_io->read_dword(port);
 		break;
