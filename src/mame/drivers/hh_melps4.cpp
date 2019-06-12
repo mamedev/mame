@@ -12,7 +12,6 @@
 #include "includes/screenless.h"
 
 #include "cpu/melps4/m58846.h"
-#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"

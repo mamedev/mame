@@ -1854,8 +1854,6 @@ files {
 	MAME_DIR .. "src/mame/machine/chessbase.cpp",
 	MAME_DIR .. "src/mame/includes/chessbase.h",
 	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
-	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
-	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 	MAME_DIR .. "src/mame/drivers/scisys_cp2000.cpp",
 
 	MAME_DIR .. "src/mame/machine/fidelbase.cpp",
@@ -3038,20 +3036,22 @@ createMESSProjects(_target, _subtarget, "screenless")
 files {
 	MAME_DIR .. "src/mame/machine/screenless.cpp",
 	MAME_DIR .. "src/mame/includes/screenless.h",
+	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
+	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_hmcs40.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_melps4.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_pic16.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
-	MAME_DIR .. "src/mame/includes/hh_ucom4.h",
-	MAME_DIR .. "src/mame/drivers/tb303.cpp",
-	MAME_DIR .. "src/mame/drivers/tr606.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_melps4.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_tms1k.cpp",
 	MAME_DIR .. "src/mame/includes/hh_tms1k.h",
-	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp",
-	MAME_DIR .. "src/mame/drivers/tispeak.cpp",
-	MAME_DIR .. "src/mame/drivers/tispellb.cpp",
+	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp", -- subdriver of hh_tms1k
+	MAME_DIR .. "src/mame/drivers/tispeak.cpp",  -- "
+	MAME_DIR .. "src/mame/drivers/tispellb.cpp", -- "
+	MAME_DIR .. "src/mame/includes/hh_ucom4.h",
+	MAME_DIR .. "src/mame/drivers/tb303.cpp", -- subdriver of hh_ucom4
+	MAME_DIR .. "src/mame/drivers/tr606.cpp", -- "
 }
 
 -- Don't call this project "sega" or it collides with the arcade one

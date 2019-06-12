@@ -268,7 +268,7 @@ public:
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
-	void set_svg_region(const char *region) { m_svg_region = region; } // default region is basetag()
+	void set_svg_region(const char *region) { m_svg_region = region; } // default region is device tag
 
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }

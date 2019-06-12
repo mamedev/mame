@@ -10,7 +10,6 @@
 #define MAME_INCLUDES_HH_SM510_H
 
 #include "cpu/sm510/sm510.h"
-#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 

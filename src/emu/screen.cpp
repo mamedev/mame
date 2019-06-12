@@ -546,7 +546,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
-	, m_svg_region(nullptr)
+	, m_svg_region(tag)
 	, m_container(nullptr)
 	, m_width(100)
 	, m_height(100)
@@ -717,8 +717,6 @@ void screen_device::device_start()
 
 	if (m_type == SCREEN_TYPE_SVG)
 	{
-		if (!m_svg_region)
-			m_svg_region = basetag();
 		memory_region *reg = owner()->memregion(m_svg_region);
 		if (!reg)
 			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region);

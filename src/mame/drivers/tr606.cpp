@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "includes/hh_ucom4.h"
 
+#include "machine/timer.h"
+
 #include "tr606.lh"
 
 
