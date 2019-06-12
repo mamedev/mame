@@ -927,177 +927,88 @@ WRITE8_MEMBER( z80scc_device::zbus_w )
 }
 
 //-------------------------------------------------
-//  cd_ab_r - Universal Bus read
+//  dc_ab_r - Universal Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::cd_ab_r )
+uint8_t z80scc_device::z80scc_device::dc_ab_r(offs_t offset)
 {
-	int ba = BIT(offset, 0);
-	int cd = BIT(offset, 1);
-	z80scc_channel *channel = ba ? m_chanA : m_chanB;
+	int ab = BIT(offset, 0);
+	int dc = BIT(offset, 1);
+	z80scc_channel *channel = ab ? m_chanA : m_chanB;
 
 	/* Expell non-Universal Bus variants */
 	if ( !(m_variant & SET_Z85X3X))
 	{
-		logerror(" cd_ab_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
+		logerror(" dc_ab_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
 		return 0;
 	}
 
-	//    LOG("z80scc_device::cd_ba_r ba:%02x cd:%02x\n", ba, cd);
-	return cd ? channel->data_read() : channel->control_read();
+	//    LOG("z80scc_device::dc_ab_r ab:%02x dc:%02x\n", ab, dc);
+	return dc ? channel->data_read() : channel->control_read();
 }
 
 //-------------------------------------------------
-//  cd_ab_w - Universal Bus write
+//  dc_ab_w - Universal Bus write
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::cd_ab_w )
+void z80scc_device::dc_ab_w(offs_t offset, uint8_t data)
 {
-	int ba = BIT(offset, 0);
-	int cd = BIT(offset, 1);
-	z80scc_channel *channel = ba ? m_chanA : m_chanB;
+	int ab = BIT(offset, 0);
+	int dc = BIT(offset, 1);
+	z80scc_channel *channel = ab ? m_chanA : m_chanB;
 
 	/* Expell non-Universal Bus variants */
 	if ( !(m_variant & SET_Z85X3X) )
 	{
-		logerror(" cd_ab_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
+		logerror(" dc_ab_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
 		return;
 	}
 
-	LOG(" cd_ab_w %02x => ba:%02x cd:%02x (ofs %d)\n", data, ba, cd, offset&3);
-	if (cd)
+	LOG(" dc_ab_w %02x => ab:%02x dc:%02x (ofs %d)\n", data, ab, dc, offset&3);
+	if (dc)
 		channel->data_write(data);
 	else
 		channel->control_write(data);
 }
 
 //-------------------------------------------------
-//  cd_ba_r - Universal Bus read
+//  ab_dc_r - Universal Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::cd_ba_r )
+uint8_t z80scc_device::ab_dc_r(offs_t offset)
 {
-	int ba = BIT(offset, 0);
-	int cd = BIT(offset, 1);
-	z80scc_channel *channel = ba ? m_chanB : m_chanA;
+	int ab = BIT(offset, 1);
+	int dc = BIT(offset, 0);
+	z80scc_channel *channel = ab ? m_chanA : m_chanB;
 
 	/* Expell non-Universal Bus variants */
-	if ( !(m_variant & SET_Z85X3X))
+	if ( !(m_variant & SET_Z85X3X) )
 	{
-		logerror(" cd_ba_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
+		logerror(" ab_dc_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
 		return 0;
 	}
 
-	//    LOG("z80scc_device::cd_ba_r ba:%02x cd:%02x\n", ba, cd);
-	return cd ? channel->control_read() : channel->data_read();
+	//    LOG("z80scc_device::ab_dc_r ab:%02x dc:%02x\n", ab, dc);
+	return dc ? channel->data_read() : channel->control_read();
 }
 
+
 //-------------------------------------------------
-//  cd_ba_w - Universal Bus write
+//  ab_dc_w - Universal Bus read
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::cd_ba_w )
+void z80scc_device::ab_dc_w(offs_t offset, uint8_t data)
 {
-	int ba = BIT(offset, 0);
-	int cd = BIT(offset, 1);
-	z80scc_channel *channel = ba ? m_chanB : m_chanA;
+	int ab = BIT(offset, 1);
+	int dc = BIT(offset, 0);
+	z80scc_channel *channel = ab ? m_chanA : m_chanB;
 
 	/* Expell non-Universal Bus variants */
 	if ( !(m_variant & SET_Z85X3X) )
 	{
-		logerror(" cd_ba_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
+		logerror(" ab_dc_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
 		return;
 	}
 
-	//    LOG("z80scc_device::cd_ba_w ba:%02x cd:%02x\n", ba, cd);
-	if (cd)
-		channel->control_write(data);
-	else
-		channel->data_write(data);
-}
+	LOG("z80scc_device::ab_dc_w ab:%02x dc:%02x\n", ab, dc);
 
-
-//-------------------------------------------------
-//  ba_cd_r - Universal Bus read
-//-------------------------------------------------
-READ8_MEMBER( z80scc_device::ba_cd_r )
-{
-	int ba = BIT(offset, 1);
-	int cd = BIT(offset, 0);
-	z80scc_channel *channel = ba ? m_chanB : m_chanA;
-
-	/* Expell non-Universal Bus variants */
-	if ( !(m_variant & SET_Z85X3X) )
-	{
-		logerror(" ba_cd_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
-		return 0;
-	}
-
-	//    LOG("z80scc_device::ba_cd_r ba:%02x cd:%02x\n", ba, cd);
-	return cd ? channel->control_read() : channel->data_read();
-}
-
-
-//-------------------------------------------------
-//  ba_cd_w - Universal Bus write
-//-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::ba_cd_w )
-{
-	int ba = BIT(offset, 1);
-	int cd = BIT(offset, 0);
-	z80scc_channel *channel = ba ? m_chanB : m_chanA;
-
-	/* Expell non-Universal Bus variants */
-	if ( !(m_variant & SET_Z85X3X) )
-	{
-		logerror(" ba_cd_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
-		return;
-	}
-
-	LOG("z80scc_device::ba_cd_w ba:%02x cd:%02x\n", ba, cd);
-
-	if (cd)
-		channel->control_write(data);
-	else
-		channel->data_write(data);
-}
-
-//-------------------------------------------------
-//  ba_cd_inv_r - Universal Bus read
-//-------------------------------------------------
-READ8_MEMBER( z80scc_device::ba_cd_inv_r )
-{
-	int ba = BIT(offset, 1);
-	int cd = BIT(offset, 0);
-	z80scc_channel *channel = ba ? m_chanA : m_chanB;
-
-	/* Expell non-Universal Bus variants */
-	if ( !(m_variant & SET_Z85X3X) )
-	{
-		logerror(" ba_cd_inv_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
-		return 0;
-	}
-
-	//    LOG("z80scc_device::ba_cd_inv_r ba:%02x cd:%02x\n", ba, cd);
-	return cd ? channel->data_read() : channel->control_read();
-}
-
-
-//-------------------------------------------------
-//  ba_cd_inv_w - Universal Bus read
-//-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
-{
-	int ba = BIT(offset, 1);
-	int cd = BIT(offset, 0);
-	z80scc_channel *channel = ba ? m_chanA : m_chanB;
-
-	/* Expell non-Universal Bus variants */
-	if ( !(m_variant & SET_Z85X3X) )
-	{
-		logerror(" ba_cd_inv_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
-		return;
-	}
-
-	LOG("z80scc_device::ba_cd_inv_w ba:%02x cd:%02x\n", ba, cd);
-
-	if (cd)
+	if (dc)
 		channel->data_write(data);
 	else
 		channel->control_write(data);

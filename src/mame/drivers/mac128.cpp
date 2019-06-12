@@ -1293,8 +1293,8 @@ void mac128_state::mac512ke_map(address_map &map)
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0).mirror(0x100000);
 	map(0x600000, 0x6fffff).rw(FUNC(mac128_state::ram_600000_r), FUNC(mac128_state::ram_600000_w));
-	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
-	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
@@ -1305,8 +1305,8 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
 	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
-	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
-	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));

@@ -239,8 +239,8 @@ void sun3x_state::sun3_80_mem(address_map &map)
 	map(0x61001000, 0x61001003).rw(FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
 	map(0x61001004, 0x61001007).rw(FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
 	map(0x61001400, 0x61001403).rw(FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
-	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 	map(0x64000000, 0x640007ff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x66000000, 0x6600003f).rw(ESP_TAG, FUNC(ncr539x_device::read), FUNC(ncr539x_device::write)).umask32(0xff000000);
@@ -264,8 +264,8 @@ void sun3x_state::sun3_460_mem(address_map &map)
 	map(0x61001000, 0x61001003).rw(FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
 	map(0x61001004, 0x61001007).rw(FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
 	map(0x61001400, 0x61001403).rw(FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
-	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 
 	map(0x6f00003c, 0x6f00003f).rw(FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
