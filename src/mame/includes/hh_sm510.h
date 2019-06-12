@@ -67,7 +67,8 @@ public:
 	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	void set_display_size(u8 x, u8 y, u8 z);
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	TIMER_CALLBACK_MEMBER(display_decay_tick);
+	emu_timer *m_display_decay_timer;
 
 protected:
 	virtual void machine_start() override;

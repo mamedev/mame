@@ -107,7 +107,7 @@
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
  @MP4486A  TMS1000C  1983, Vulcan XL 25
- *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat
+ *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -3752,7 +3752,6 @@ void einvader_state::einvader(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
 	screen.set_refresh_hz(60);
 	screen.set_size(939, 1080);
 	screen.set_visarea_full();
@@ -3776,7 +3775,7 @@ ROM_START( einvader )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_einvader_output.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
 
-	ROM_REGION( 44398, "svg", 0)
+	ROM_REGION( 44398, "screen", 0)
 	ROM_LOAD( "einvader.svg", 0, 44398, CRC(48de88fd) SHA1(56a2b9c997a447277b45902ab542eda54e7d5a2f) )
 ROM_END
 
@@ -4845,7 +4844,6 @@ void ginv_state::ginv(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
 	screen.set_refresh_hz(60);
 	screen.set_size(236, 1080);
 	screen.set_visarea_full();
@@ -4867,7 +4865,7 @@ ROM_START( ginv )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
 
-	ROM_REGION( 142959, "svg", 0)
+	ROM_REGION( 142959, "screen", 0)
 	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
 ROM_END
 
@@ -4969,7 +4967,6 @@ void ginv1000_state::ginv1000(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
 	screen.set_refresh_hz(60);
 	screen.set_size(226, 1080);
 	screen.set_visarea_full();
@@ -4991,7 +4988,7 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 226185, "svg", 0)
+	ROM_REGION( 226185, "screen", 0)
 	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
 ROM_END
 
@@ -5119,7 +5116,6 @@ void ginv2000_state::ginv2000(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
 	screen.set_refresh_hz(60);
 	screen.set_size(364, 1080);
 	screen.set_visarea_full();
@@ -5141,7 +5137,7 @@ ROM_START( ginv2000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
 
-	ROM_REGION( 374443, "svg", 0)
+	ROM_REGION( 374443, "screen", 0)
 	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
 ROM_END
 
@@ -9256,9 +9252,9 @@ ROM_END
 /***************************************************************************
 
   Texas Instruments Electronic Digital Thermostat
-  * TMS0970 MCU, TMC0910B (die label 0970F-10E)
-  * 4-digit 7seg LED display
-  * temperature sensor, heat/cool outputs, fan
+  * TMS0970 MCU, label TMS0970NLL TMC0910B (die label 0970F-10E)
+  * 9-digit 7seg LED display, only 4 used
+  * temperature sensor, heat/cool/fan outputs
 
   This is a thermostat and digital clock. It's the 2nd one described in
   patents US4388692 and US4298946.
@@ -9325,8 +9321,8 @@ static INPUT_PORTS_START( tithermos )
 	PORT_START("IN.0") // SA
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Two Set PM 2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Four Set PM 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Temp Row PM 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Time Row PM 2")
 
 	PORT_START("IN.1") // SB
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -9334,8 +9330,8 @@ static INPUT_PORTS_START( tithermos )
 	PORT_START("IN.2") // SC
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Two Set PM 1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Four Set PM 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Temp Row PM 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Time Row PM 1")
 
 	PORT_START("IN.3") // SD
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
@@ -9348,14 +9344,14 @@ static INPUT_PORTS_START( tithermos )
 	PORT_START("IN.4") // SE
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Two Set AM 2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Four Set AM 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Temp Row AM 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Time Row AM 2")
 
 	PORT_START("IN.5") // SF
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Two Set AM 1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Four Set AM 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Temp Row AM 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Time Row AM 1")
 
 	PORT_START("IN.6") // SG
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
@@ -9367,9 +9363,14 @@ static INPUT_PORTS_START( tithermos )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
 	PORT_CONFNAME( 0x06, 0x04, "Mode")
 	PORT_CONFSETTING(    0x04, "Constant" )
-	PORT_CONFSETTING(    0x00, "Four Set" )
-	PORT_CONFSETTING(    0x02, "Two Set" )
+	PORT_CONFSETTING(    0x00, "Day/Night" )
+	PORT_CONFSETTING(    0x02, "Night" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // A/D output
+
+	PORT_START("IN.8")
+	PORT_CONFNAME( 0x01, 0x00, "Fan")
+	PORT_CONFSETTING(    0x00, "On" )
+	PORT_CONFSETTING(    0x01, "Auto" ) // same output as heat/cool
 INPUT_PORTS_END
 
 void tithermos_state::tithermos(machine_config &config)

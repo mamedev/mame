@@ -502,7 +502,6 @@ void einvaderc_state::einvaderc(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
 	screen.set_refresh_hz(60);
 	screen.set_size(913, 1080);
 	screen.set_visarea_full();
@@ -520,7 +519,7 @@ ROM_START( einvaderc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
 
-	ROM_REGION( 80636, "svg", 0)
+	ROM_REGION( 80636, "screen", 0)
 	ROM_LOAD( "einvaderc.svg", 0, 80636, CRC(a52d0166) SHA1(f69397ebcc518701f30a47b4d62e5a700825375a) )
 ROM_END
 

@@ -609,10 +609,6 @@ void screen_device::device_validity_check(validity_checker &valid) const
 			osd_printf_error("Missing SCREEN_UPDATE function\n");
 	}
 
-	// check for svg region
-	if (m_type == SCREEN_TYPE_SVG && !m_svg_region)
-		osd_printf_error("Missing SVG region information\n");
-
 	// check for zero frame rate
 	if (m_refresh == 0)
 		osd_printf_error("Invalid (zero) refresh rate\n");
@@ -721,6 +717,8 @@ void screen_device::device_start()
 
 	if (m_type == SCREEN_TYPE_SVG)
 	{
+		if (!m_svg_region)
+			m_svg_region = basetag();
 		memory_region *reg = owner()->memregion(m_svg_region);
 		if (!reg)
 			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region);
