@@ -199,51 +199,38 @@
 	<element name="sym_white">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x25cb;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="sym_black">    <text string="&#x25cf;" state="1">    <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="black"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
 	<element name="background"><rect><color red="0.63" green="0.63" blue="0.63" /></rect></element>
 
 	<element name="piece" defstate="0">
-		<text string="[K]" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[Q]" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[R]" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[B]" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[N]" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[P]" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<image file="chess/bk.png" state="1"/>
+		<image file="chess/bq.png" state="2"/>
+		<image file="chess/br.png" state="3"/>
+		<image file="chess/bb.png" state="4"/>
+		<image file="chess/bn.png" state="5"/>
+		<image file="chess/bp.png" state="6"/>
 
-		<text string="[K]" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[Q]" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[R]" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[B]" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[N]" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[P]" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<image file="chess/wk.png" state="7"/>
+		<image file="chess/wq.png" state="8"/>
+		<image file="chess/wr.png" state="9"/>
+		<image file="chess/wb.png" state="10"/>
+		<image file="chess/wn.png" state="11"/>
+		<image file="chess/wp.png" state="12"/>
 
 		<!-- selected pieces -->
-		<disk state="17"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="18"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="19"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="20"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="21"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="22"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="23"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="24"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="25"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="26"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="27"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
-		<disk state="28"> <color red="1.00" green="0.25" blue="1.00" /> </disk>
+		<image file="chess/bk.png" state="17"><color alpha="0.6" /></image>
+		<image file="chess/bq.png" state="18"><color alpha="0.6" /></image>
+		<image file="chess/br.png" state="19"><color alpha="0.6" /></image>
+		<image file="chess/bb.png" state="20"><color alpha="0.6" /></image>
+		<image file="chess/bn.png" state="21"><color alpha="0.6" /></image>
+		<image file="chess/bp.png" state="22"><color alpha="0.6" /></image>
 
-		<text string="[K]" state="17"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[Q]" state="18"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[R]" state="19"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[B]" state="20"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[N]" state="21"><color red="0.27" green="0.25" blue="0.25" /></text>
-		<text string="[P]" state="22"><color red="0.27" green="0.25" blue="0.25" /></text>
-
-		<text string="[K]" state="23"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[Q]" state="24"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[R]" state="25"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[B]" state="26"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[N]" state="27"><color red="0.71" green="0.7" blue="0.69" /></text>
-		<text string="[P]" state="28"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<image file="chess/wk.png" state="23"><color alpha="0.6" /></image>
+		<image file="chess/wq.png" state="24"><color alpha="0.6" /></image>
+		<image file="chess/wr.png" state="25"><color alpha="0.6" /></image>
+		<image file="chess/wb.png" state="26"><color alpha="0.6" /></image>
+		<image file="chess/wn.png" state="27"><color alpha="0.6" /></image>
+		<image file="chess/wp.png" state="28"><color alpha="0.6" /></image>
 	</element>
 
 <!-- build screen -->
