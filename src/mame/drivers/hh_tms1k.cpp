@@ -1213,7 +1213,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{
 		// offsense blips are brighter
-		set_display_levels(2, 0.005, 0.03);
+		set_display_levels(0.005, 0.03);
 	}
 
 	void prepare_display();
@@ -1345,7 +1345,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{
 		// offsense blips are brighter
-		set_display_levels(2, 0.005, 0.03);
+		set_display_levels(0.005, 0.03);
 	}
 
 	void prepare_display();

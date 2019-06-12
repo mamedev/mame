@@ -75,22 +75,20 @@ void screenless_state::reset_display_levels()
 	std::fill_n(m_ds_level, ARRAY_LENGTH(m_ds_level), 1.0);
 }
 
-void screenless_state::set_display_level(double level, u8 i)
+void screenless_state::set_display_level(u8 i, double level)
 {
 	// set a brightness level, range is 0.0 to 1.0
 	m_ds_level[i] = level;
 }
 
-void screenless_state::set_display_levels(int levels, ...)
+void screenless_state::set_display_levels(double l0, double l1, double l2, double l3)
 {
-	// set multiple brightness levels
-	va_list v;
-	va_start(v, levels);
-	for (int i = 0; i < levels; i++)
-		m_ds_level[i] = va_arg(v, double);
-	va_end(v);
-
-	m_ds_level[levels] = 1.0;
+	// init brightness level(s) (if you need to set more than 4, use set_display_level)
+	reset_display_levels();
+	m_ds_level[0] = l0;
+	m_ds_level[1] = l1;
+	m_ds_level[2] = l2;
+	m_ds_level[3] = l3;
 }
 
 void screenless_state::set_display_size(int maxx, int maxy)

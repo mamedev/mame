@@ -429,7 +429,7 @@ public:
 	melodym_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_pic16_state(mconfig, type, tag)
 	{
-		set_display_level(0.9);
+		set_display_levels(0.9);
 	}
 
 	DECLARE_WRITE8_MEMBER(write_b);
