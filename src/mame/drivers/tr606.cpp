@@ -90,7 +90,6 @@ void tr606_state::tr606(machine_config &config)
 	tp3_clock.set_start_delay(TP3_PERIOD - TP3_LOW);
 	TIMER(config, "tp3_clear").configure_periodic(FUNC(tr606_state::tp3_clear), TP3_PERIOD);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tr606);
 
 	/* sound hardware */

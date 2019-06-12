@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/screenless.h"
 
 #include "cpu/melps4/m58846.h"
 #include "machine/timer.h"
@@ -20,52 +21,29 @@
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
-class hh_melps4_state : public driver_device
+class hh_melps4_state : public screenless_state
 {
 public:
 	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+		screenless_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_out_a(*this, "%u.a", 0U),
-		m_out_digit(*this, "digit%u", 0U),
-		m_speaker(*this, "speaker"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		m_speaker(*this, "speaker")
 	{ }
 
 	// devices
 	required_device<m58846_device> m_maincpu;
 	optional_ioport_array<4> m_inp_matrix; // max 4
-	output_finder<0x20, 0x20> m_out_x;
-	output_finder<0x20> m_out_a;
-	output_finder<0x20> m_out_digit;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
-	u8 read_inputs(int columns);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-	// display common
-	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
-	int m_display_maxy;             // display matrix number of rows
-	int m_display_maxx;             // display matrix number of columns (max 31 for now)
-
 	u32 m_grid;                     // VFD current row data
 	u32 m_plate;                    // VFD current column data
 
-	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
-	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u8 m_display_decay[0x20][0x20]; // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
+	u8 read_inputs(int columns);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
 	virtual void machine_start() override;
@@ -77,29 +55,14 @@ protected:
 
 void hh_melps4_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-	m_out_a.resolve();
-	m_out_digit.resolve();
+	screenless_state::machine_start();
 
 	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-
 	m_inp_mux = 0;
 	m_grid = 0;
 	m_plate = 0;
 
 	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
@@ -116,69 +79,6 @@ void hh_melps4_state::machine_reset()
   Helper Functions
 
 ***************************************************************************/
-
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void hh_melps4_state::display_update()
-{
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		u32 active_state = 0;
-
-		for (int x = 0; x <= m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state |= (ds << x);
-
-			// output to y.x, or y.a when always-on
-			if (x != m_display_maxx)
-				m_out_x[y][x] = ds;
-			else
-				m_out_a[y] = ds;
-		}
-
-		// output to digity
-		if (m_display_segmask[y] != 0)
-			m_out_digit[y] = active_state & m_display_segmask[y];
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(hh_melps4_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x <= m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
-}
-
-void hh_melps4_state::set_display_size(int maxx, int maxy)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-}
-
-void hh_melps4_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
-{
-	set_display_size(maxx, maxy);
-
-	// update current state
-	u32 mask = (1 << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
-
-	if (update)
-		display_update();
-}
-
 
 // generic input handlers
 
@@ -310,11 +210,9 @@ void cfrogger_state::cfrogger(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", "svg"));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(500, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -436,11 +334,9 @@ void gjungler_state::gjungler(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", "svg"));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_melps4_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

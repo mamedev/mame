@@ -208,7 +208,7 @@ void mchess_state::mchess(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(977, 1080);
 	screen.set_visarea_full();
 

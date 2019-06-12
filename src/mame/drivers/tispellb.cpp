@@ -92,7 +92,7 @@ private:
 
 	virtual void power_off() override;
 	void prepare_display();
-	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
+	bool vfd_filament_on() { return display_element_on(16, 15); }
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -363,7 +363,6 @@ void tispellb_state::rev1(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_spellb);
 
 	/* no sound! */
@@ -383,7 +382,6 @@ void tispellb_state::rev2(machine_config &config)
 	TMS6100(config, m_tms6100, 350000);
 	m_tms6100->enable_4bit_mode(true);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_spellb);
 
 	/* sound hardware */

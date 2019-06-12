@@ -11,6 +11,9 @@ greatly affecting user playability of emulated electronic board games.
 As workaround for the chess games, use an external chess GUI on the side,
 such as Arena(in editmode).
 
+TODO:
+- use screenless class
+
 ******************************************************************************/
 
 #include "emu.h"

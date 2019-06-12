@@ -197,7 +197,6 @@ void cmulti8_state::cmulti8(machine_config &config)
 	m_maincpu->o().set(FUNC(cmulti8_state::write_o));
 	m_maincpu->r().set(FUNC(cmulti8_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_cmulti8);
 
 	/* no sound! */
@@ -425,7 +424,6 @@ void tisr16_state::tisr16(machine_config &config)
 	m_maincpu->o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->r().set(FUNC(tisr16_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tisr16);
 
 	/* no sound! */
@@ -588,7 +586,6 @@ void ti1250_state::ti1250(machine_config &config)
 	m_maincpu->o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ti1250);
 
 	/* no sound! */
@@ -760,7 +757,6 @@ void ti25503_state::ti25503(machine_config &config)
 	m_maincpu->o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->r().set(FUNC(ti25503_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ti25503);
 
 	/* no sound! */
@@ -874,7 +870,6 @@ void ti1000_state::ti1000(machine_config &config)
 	m_maincpu->o().set(FUNC(ti1000_state::write_o));
 	m_maincpu->r().set(FUNC(ti1000_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ti1270);
 
 	/* no sound! */
@@ -991,7 +986,6 @@ void wizatron_state::wizatron(machine_config &config)
 	m_maincpu->o().set(FUNC(wizatron_state::write_o));
 	m_maincpu->r().set(FUNC(wizatron_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
@@ -1083,7 +1077,6 @@ void lilprof_state::lilprof(machine_config &config)
 	m_maincpu->o().set(FUNC(lilprof_state::write_o));
 	m_maincpu->r().set(FUNC(wizatron_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
@@ -1211,7 +1204,6 @@ void lilprof78_state::lilprof78(machine_config &config)
 	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
 	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
@@ -1341,7 +1333,6 @@ void dataman_state::dataman(machine_config &config)
 	m_maincpu->r().set(FUNC(dataman_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_dataman);
 
 	/* no sound! */
@@ -1424,7 +1415,6 @@ void mathmarv_state::mathmarv(machine_config &config)
 	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mathmarv);
 
 	/* sound hardware */
@@ -1699,7 +1689,6 @@ void ti30_state::ti30(machine_config &config)
 	m_maincpu->r().set(FUNC(ti30_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ti30);
 
 	/* no sound! */

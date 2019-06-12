@@ -466,7 +466,7 @@ public:
 private:
 	virtual void power_off() override;
 	void prepare_display();
-	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
+	bool vfd_filament_on() { return display_element_on(16, 15); }
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
 	DECLARE_WRITE16_MEMBER(snmath_write_o);
@@ -1319,7 +1319,6 @@ void tispeak_state::snmath(machine_config &config)
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
 	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_snmath);
 
 	/* sound hardware */
@@ -1460,7 +1459,6 @@ void tispeak_state::vocaid(machine_config &config)
 	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
 	config.set_default_layout(layout_tntell);
 
@@ -1492,7 +1490,6 @@ void tispeak_state::k28m2(machine_config &config)
 	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_k28m2);
 
 	/* sound hardware */
