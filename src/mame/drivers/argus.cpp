@@ -105,6 +105,21 @@ Note :
     argus
     valtric
 
+- Information about the internal ROM tests (see also MT03219):
+    * argus: Checksum routine at $7fc9 (for banks at $7fc0). Checksum is a
+	  simple sum of the contents. Our dump gives a result of 0x95 while the
+	  game expects 0x9b, therefore it displays a checksum error. Checksums for
+	  the banked ROMs match.
+	* valtric: Checksum routine at $987c (for banks at $f000). Checksum is a
+	  XOR over the contents. The expected checksums are stored in ROM vt_06.bin
+	  starting at $d000 (main ROM first, then banks). For our dump, the
+	  expected checksums are all 0x00, but the calculated checksums differ,
+	  therefore displays a checksum error for all ROMs. This has been validated
+	  on real hardware to also fail there.
+	* butasan: Checksum routine is at $e0a8 (for banks at $ec74). Checksum is a
+	  simple sum over the contents. The test seems to be broken (or hacked) as
+	  it will only fail when the checksum is exactly 0x00.
+
 
 Known issues :
 ===============
