@@ -81,13 +81,14 @@ void screenless_state::set_display_level(double level, u8 i)
 	m_ds_level[i] = level;
 }
 
-void screenless_state::set_display_levels(u8 levels, ...)
+void screenless_state::set_display_levels(int levels, ...)
 {
 	// set multiple brightness levels
 	va_list v;
 	va_start(v, levels);
 	for (int i = 0; i < levels; i++)
 		m_ds_level[i] = va_arg(v, double);
+	va_end(v);
 
 	m_ds_level[levels] = 1.0;
 }

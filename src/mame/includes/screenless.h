@@ -46,7 +46,7 @@ protected:
 
 	void reset_display_levels();
 	void set_display_level(double level, u8 i = 0);
-	void set_display_levels(u8 levels, ...);
+	void set_display_levels(int levels, ...);
 
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(u32 digits, u32 mask);
