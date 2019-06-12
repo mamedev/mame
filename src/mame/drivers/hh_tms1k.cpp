@@ -1211,7 +1211,10 @@ class cqback_state : public hh_tms1k_state
 public:
 	cqback_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
-	{ }
+	{
+		// offsense blips are brighter
+		set_display_levels(2, 0.005, 0.03);
+	}
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1340,7 +1343,10 @@ class h2hfootb_state : public hh_tms1k_state
 public:
 	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
-	{ }
+	{
+		// offsense blips are brighter
+		set_display_levels(2, 0.005, 0.03);
+	}
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1460,6 +1466,7 @@ ROM_END
   * same PCB/hardware as above
 
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
+  To begin play, press start while holding left/right.
 
 ***************************************************************************/
 

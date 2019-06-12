@@ -28,7 +28,7 @@ public:
 		set_display_duration(attotime::from_hz(60));
 		set_display_factor(0.5);
 		reset_display_levels();
-		set_display_level(0.015);
+		set_display_level(0.02);
 	}
 
 protected:
