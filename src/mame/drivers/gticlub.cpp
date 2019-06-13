@@ -30,8 +30,8 @@
     Game                           | ID        | CPU PCB      | CG Board(s)    | notes
     -----------------------------------------------------------------------------------------------
     GTI Club                       | GX688     | GN672(A)     | GN678(B)       |
-    Operation Thunder Hurricane    | GX792     | GN672(A)     | GN678(B)       | extra board for gun controls(?)
-    Solar Assault                  | GX680     | GN672(A)     | GN678(B)       |
+    Operation: Thunder Hurricane   | GX680     | GN672(A)     | GN678(B)       | GN680(E) I/O board
+    Solar Assault                  | GX792     | GN672(A)     | GN678(B)       |
 
     Hang Pilot                     | GN685     | GN672(A)     | 2x ??          | 3dfx-based CG boards
 
@@ -120,10 +120,11 @@ Solar Assault               792A07  792A12  792A11  792A10  792A09  792A06  792A
 Solar Assault : Revised     - N/A -
 
 Note : Jet Wave uses the lower board (GN678) from GTI Club, but it uses a different top board (ZR107 PWB(A)300769A)
-Check zr107.c for details on the top board.
+Check zr107.cpp for details on the top board.
 
-Operation Thunder Hurricane uses an additional top board for sound, network and analog
-control functions...
+Operation Thunder Hurricane uses an additional top board gun/analog controls. Analog inputs are controlled by two CCD
+cameras, one from each gun. This specific variation uses a K056230 for networking between the cpu board to receive
+the analog values that way. Teraburst uses a different variation of this I/O board replacing the K056230 with a K056800 (see hornet.cpp).
 
 GN680 PWB(E)403381B
 |------------------------------------------|
@@ -143,12 +144,15 @@ GN680 PWB(E)403381B
 |CN5                                       |
 |------------------------------------------|
 Notes:
-      68000 @ 16MHz (32/2)
+      68EC000 @ 16MHz (32/2)
       CN11/12 - Power connectors
-      CN8/9   - 6-pin analog control connectors
-      CN10    - 4-pin sound output connector
+      CN8/9   - 6-pin analog control connectors (to CCD cameras)
+      CN10    - 4-pin power connector for IR emitters
+	  CN4/5   - Pin jack/network connectors (to cpu board)
       NRPS11  - Idec NRPS11 PC Board circuit protector
       LM1881  - Video sync separator (DIP8)
+	  056230  - Konami Custom (QFP80)
+	  
 
 
 Bottom Board
@@ -1026,7 +1030,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
 
-void gticlub_state::thunderh(machine_config &config)
+void gticlub_state::thunderh(machine_config &config) //todo: add 68000 and K056230 from the I/O board
 {
 	gticlub(config);
 
@@ -1279,7 +1283,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
+	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1309,7 +1313,7 @@ ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
+	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1505,12 +1509,12 @@ void gticlub_state::init_hangpltu()
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
 GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

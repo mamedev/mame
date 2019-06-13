@@ -16,7 +16,7 @@
     Silent Scope                     Konami   1999
     Silent Scope 2 : Fatal Judgement Konami   2000
     Silent Scope 2 : Dark Silhouette Konami   2000
-    Terraburst                       Konami   1998
+    Teraburst                        Konami   1998
 
     Hardware overview:
 
@@ -47,12 +47,13 @@
     Hardware configurations:
     ------------------------
 
-    Game              KONAMI ID  CPU PCB    GFX Board(s)  LAN PCB
-    --------------------------------------------------------------
+    Game              KONAMI ID  CPU PCB    GFX Board(s)  notes
+    ----------------------------------------------------------------------
     Gradius 4         GX837      GN715(A)   GN715(B)
     NBA Play By Play  GX778      GN715(A)   GN715(B)
+	Teraburst         GX715      GN715(A)   GN715(B)      GN680(E) I/O board
     Silent Scope      GQ830      GN715(A)   2x GN715(B)
-    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H)
+    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
 
 
     PCB Layouts
@@ -149,7 +150,7 @@
     NBA P/Play   778A01  -    -     778A09  778A10  778A11  778A12  778A04  778A05  -    -   778A08
     S/Scope      830B01  -    -     830A09  830A10  -       -       -       -       -    -   830A08
     S/Scope 2    931D01  -    -     931A09  931A10  931A11  -       931A04  -       -    -   931A08
-    Terraburst
+    Teraburst
 
 
     Bottom Board
@@ -222,8 +223,39 @@
     NBA P/Play   778A13  778A15  778A14  778A16
     S/Scope      -       -       -       -          (no ROMs, not used)
     S/Scope 2    -       -       -       -          (no ROMs, not used)
-    Terraburst
+    Teraburst
 
+
+    Teraburst uses a different variation of the I/O board used in Operation: Thunder Hurricane (see gticlub.cpp). Analog inputs are controlled by
+	two CCD cameras, one from each gun. This specific variation uses a K056800 which normally acts as a sound interface controller. Perhaps this
+	either sends analog inputs to the main pcb or isn't used at all. No network connection is involved in this setup as this board directly connects
+	to the main pcb via joining connector.
+
+    GN680 PWB(E)403381B
+    |------------------------------------------|
+    |CN11  CN12    CN8      CN9    CN10  DSW(4)|
+    |                 NRPS11     NRPS11        |
+    |                                          |
+    |                        LM1881   LM1881   |
+    |                                          |
+    |LED(x4)                                   |
+    |                                          |
+    |           68EC000FN16  8464              |
+    |    RESET_SW            8464              |
+    |32MHz                           715A17.20K|
+    |8464                 PAL(002962)          |
+    |      056800         PAL(002961)          |
+    |   PAL(056787A)      PAL(002960)          |
+    |   CN1                                    |
+    |------------------------------------------|
+    Notes:
+      68EC000 @ 16MHz (32/2)
+      CN11/12 - Power connectors
+      CN8/9   - 6-pin analog control connectors (to CCD cameras)
+	  CN1     - Lower joining connector to main pcb
+      NRPS11  - Idec NRPS11 PC Board circuit protector
+      LM1881  - Video sync separator (DIP8)
+	  056800  - Konami Custom (QFP80)
 
 
     LAN PCB: GQ931 PWB(H)      (C) 1999 Konami
@@ -958,7 +990,7 @@ static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
 	PORT_DIPSETTING(0x00, "4 Player")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(terabrst) //Uses a ccd camera and sensor for gun inputs much similar to thunderh. Need to hook that up as well as the gun board.
+static INPUT_PORTS_START(terabrst)
 	PORT_INCLUDE(hornet)
 
 	PORT_MODIFY("IN0")
@@ -1173,7 +1205,7 @@ void hornet_state::hornet_2board(machine_config &config)
 	m_konppc->set_num_boards(2);
 }
 
-void hornet_state::terabrst(machine_config &config)
+void hornet_state::terabrst(machine_config &config) //todo: add K056800 from I/O board
 {
 	hornet(config);
 
