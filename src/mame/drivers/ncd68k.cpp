@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /****************************************************************************
 
-    drivers/ncd17c.cpp
+    drivers/ncd68k.cpp
     NCD 16" monochrome X terminal
     NCD 17" color X terminal
     NCD 19" monochrome X terminal
