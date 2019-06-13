@@ -18217,9 +18217,9 @@ pcnfrk2m                        // 2000 - Percussion Freaks 2nd Mix (GE912 VER. 
 pcnfrk3m                        // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA)
 pcnfrk4m                        // 2000 - Percussion Freaks 4rd Mix (G*A25 VER. AAA)
 pcnfrk5m                        // 2001 - Percussion Freaks 5th Mix (G*B05 VER. KAA)
-pnchmn                          // 2000 - Punch Mania: Hokuto No Ken (GQ918 VER. JAB)
-pnchmn2                         // 2000 - Punch Mania 2: Hokuto No Ken (GQA09 JAA)
-pnchmna                         // 2000 - Punch Mania: Hokuto No Ken (GQ918 VER. JAB, ALT CD)
+pnchmn                          // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB)
+pnchmn2                         // 2000 - Punch Mania 2: Hokuto no Ken (GQA09 JAA)
+pnchmna                         // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB, ALT CD)
 powyakex                        // 1998 - Jikkyou Powerful Pro Yakyuu EX (GX802 VER. JAB)
 salarymc                        // 2000 - Salary Man Champ (G*A18 VER. JAA)
 stepchmp                        // 1999 - Step Champ (GE930 VER. JA)
@@ -29502,6 +29502,7 @@ panikuru                        // 2002.03 Panicuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
+taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
 
 @source:namcos11.cpp
 danceyes                        // 1996.10 Dancing Eyes (US, DC3/VER.C)
@@ -29866,7 +29867,7 @@ initdv2jo                       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv3e                        // 2004.05.18 Initial D Arcade Stage Ver. 3 (Export)
 initdv3j                        // 2004.01.30 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb                       // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
-inunoos                         // 2001.10 Inu No Osanpo / Dog Walking (Rev A)
+inunoos                         // 2001.10 Inu no Osanpo / Dog Walking (Rev A)
 jambo                           // 1999.09 Jambo! Safari (Rev A)
 jingystm                        // 2006.09 Jingi Storm
 karous                          // 2006.11 Karous
@@ -29962,7 +29963,7 @@ shaktam                         // 2000.12.28 Shakatto Tambourine (Rev B)
 shaktamb                        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu (2K1 AUT)
 shaktmsp                        // 2001.04.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika (2K1 SPR)
 shangril                        // 1999.08 Dengen Tenshi Taisen Janshi Shangri-la
-shikgam2                        // 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
+shikgam2                        // 2003.04 Shikigami no Shiro II / The Castle of Shikigami II
 shootopl                        // 2002.?? Shootout Pool
 shootpl                         // 2003.?? Shootout Pool Prize / Shootout Pool The Medal (Rev A)
 shootplm                        // 2004.?? Shootout Pool Prize / Shootout Pool The Medal Ver. B
