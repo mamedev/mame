@@ -3,17 +3,19 @@
 /***************************************************************************
 
     Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
-
+	Gemcrush (c) 1996 Star Fish
+	
     driver by Angelo Salese
 
     Uses a TC0091LVC, a variant of the one used on Taito L HW
 
     TODO:
-    - title screen (PCG uploads at 0x1b400?)
-    - inputs are grossly mapped;
+    - inputs are grossly mapped, lack of any input test doesn't help at all;
     - lamps?
     - service mode?
     - nvram?
+	- dfruit: (possible bug) has an X on top-left corner during gameplay, 
+	  is it supposed to be disabled somehow?
 
 ***************************************************************************/
 
@@ -71,9 +73,11 @@ private:
 	DECLARE_READ8_MEMBER(dfruit_irq_enable_r);
 	DECLARE_WRITE8_MEMBER(dfruit_irq_enable_w);
 
+	DECLARE_WRITE8_MEMBER(output_w);
+	
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
-	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	void dfruit_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
@@ -153,7 +157,7 @@ uint8_t dfruit_state::ram_bank_r(uint16_t offset, uint8_t bank_num)
 
 void dfruit_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
 {
-	m_vdp->space().write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+	m_vdp->space().write_byte(offset + (m_ram_bank[bank_num]) * 0x1000, data);;
 }
 
 READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }
@@ -188,7 +192,7 @@ void dfruit_state::tc0091lvc_map(address_map &map)
 void dfruit_state::dfruit_map(address_map &map)
 {
 	tc0091lvc_map(map);
-	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa005).rw("opn", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa008, 0xa008).nopr(); //watchdog
 }
@@ -196,12 +200,12 @@ void dfruit_state::dfruit_map(address_map &map)
 
 static INPUT_PORTS_START( dfruit )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Bookkeeping")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN0" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Alt Bookkeeping") // same as above
@@ -210,7 +214,7 @@ static INPUT_PORTS_START( dfruit )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -236,7 +240,7 @@ static INPUT_PORTS_START( dfruit )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -251,8 +255,8 @@ static INPUT_PORTS_START( dfruit )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "IN5" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -276,9 +280,28 @@ static INPUT_PORTS_START( dfruit )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+static INPUT_PORTS_START( gemcrush )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x02, 0x02, "IN0" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// guess: these hardlocks game if held for too much time unlike bit 0
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -297,6 +320,52 @@ static INPUT_PORTS_START( dfruit )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// guess: these works only on round select
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	
+	PORT_START("DSW")
+	// TODO: bits 0-2, coinage
+	PORT_DIPNAME( 0x01, 0x01, "IN5" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
@@ -349,7 +418,7 @@ static GFXDECODE_START( gfx_dfruit )
 	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_callback)
 {
 	int scanline = param;
 
@@ -369,6 +438,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 	}
 }
 
+WRITE8_MEMBER(dfruit_state::output_w)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_lockout_w(0, data & 4);
+	machine().bookkeeping().coin_lockout_w(1, data & 8);
+}
+
 #define MASTER_CLOCK XTAL(14'000'000)
 
 void dfruit_state::dfruit(machine_config &config)
@@ -376,10 +453,7 @@ void dfruit_state::dfruit(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/2); //!!! TC0091LVC !!!
 	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::dfruit_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::dfruit_irq_scanline), "screen", 0, 1);
-
-	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
-	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::scanline_callback), "screen", 0, 1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -397,7 +471,7 @@ void dfruit_state::dfruit(machine_config &config)
 	TC0091LVC(config, m_vdp, 0);
 	m_vdp->set_gfxdecode_tag("gfxdecode");
 
-	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	i8255_device &ppi(I8255A(config, "i8255"));
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
@@ -405,8 +479,9 @@ void dfruit_state::dfruit(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ym2203_device &opn(YM2203(config, "opn", MASTER_CLOCK/4));
-	opn.port_a_read_callback().set_ioport("IN4");
-	opn.port_b_read_callback().set_ioport("IN5");
+	//opn.port_a_read_callback().set_ioport("IN4");
+	opn.port_b_read_callback().set_ioport("DSW");
+	opn.port_a_write_callback().set(FUNC(dfruit_state::output_w));
 	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
@@ -424,4 +499,13 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 1993, dfruit, 0, dfruit, dfruit, dfruit_state, empty_init, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( gemcrush )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+    ROM_LOAD( "gcj_00.ic2",   0x000000, 0x040000, CRC(e1431390) SHA1(f1f63e23d4b73cc099adddeadcf1ea3e27688bcd) )
+
+ 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
+    ROM_LOAD( "gcj_01.ic10",  0x000000, 0x080000, CRC(5b9e7a6e) SHA1(345357feed8e80e6a06093fcb69f2b38063d057a) )
+ROM_END
+
+GAME( 1993, dfruit,    0,   dfruit,  dfruit,   dfruit_state, empty_init, ROT0,   "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", 0 )
+GAME( 1996, gemcrush,  0,   dfruit,  gemcrush, dfruit_state, empty_init, ROT270, "Star Fish", "Gemcrush (Japan)", MACHINE_NO_COCKTAIL )
