@@ -12,7 +12,6 @@
 #include "includes/screenless.h"
 
 #include "cpu/ucom4/ucom4.h"
-#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 

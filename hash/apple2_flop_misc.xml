@@ -836,6 +836,19 @@
 		</part>
 	</software>
 
+	<software name="antim15">
+		<description>Anti-M (version 1.5)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-05-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.5-2019-06-11.dsk" size="143360" crc="bacef478" sha1="826df7cb304ce5286cd1c2805fac888356898185" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ankh">
 		<description>Ankh</description>
 		<year>1984</year>

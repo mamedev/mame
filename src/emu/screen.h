@@ -183,12 +183,6 @@ public:
 		set_type(type);
 		set_color(color);
 	}
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *region)
-		: screen_device(mconfig, tag, owner, u32(0))
-	{
-		set_type(SCREEN_TYPE_SVG);
-		set_svg_region(region);
-	}
 	~screen_device();
 
 	// configuration readers
@@ -274,7 +268,7 @@ public:
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
-	void set_svg_region(const char *region) { m_svg_region = region; }
+	void set_svg_region(const char *region) { m_svg_region = region; } // default region is device tag
 
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }

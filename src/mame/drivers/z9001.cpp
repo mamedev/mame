@@ -1,14 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic , Robbbert
-/***************************************************************************
+/*************************************************************************************
 
-        Robotron Z9001 (KC85/1)
+Robotron Z9001 (KC85/1)
 
-        12/05/2009 Skeleton driver.
-        13/07/2011 Notes added. You can enter text via terminal input.
-                   Colour and flashing added.
+2009-05-12 Skeleton driver.
+2011-07-13 Notes added. You can enter text via terminal input.
+           Colour and flashing added.
+2019-06-13 Basic enabled
 
-The only kind of acceptable input is a filename that is in 8.3 format and
+All input should be in UPPER case.
+
+For KC87_10/11/20/21, type BASIC to start Basic.
+
+The only other kind of acceptable input is a filename that is in 8.3 format and
 begins with a letter. It will say 'start tape'. You can press ^C here to
 escape, or any key to continue.
 
@@ -21,11 +26,14 @@ Some other control keys:
 
 
 ToDo:
-- cassette in
-- proper keyboard
+- cassette in - interrupt-driven via PIO1 
+    via astb should cause interrupt but nothing happens.
+- proper keyboard - interrupt-driven via PIO2
+    pressing any key should program ctc/2 to a debounce delay and this then causes
+    another interrupt which reads keyboard and places ascii character at 0x0025.
 - get rid of temporary code
 
-****************************************************************************/
+**************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -87,6 +95,7 @@ void z9001_state::z9001_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xe7ff).ram();
 	map(0xe800, 0xebff).ram().share("colorram");
+	map(0xc000, 0xe7ff).rom();
 	map(0xec00, 0xefff).ram().share("videoram");
 	map(0xf000, 0xffff).rom();
 }
@@ -95,9 +104,9 @@ void z9001_state::z9001_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x83).mirror(4).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x88, 0x8B).mirror(4).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x90, 0x93).mirror(4).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x80, 0x83).mirror(4).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x88, 0x8B).mirror(4).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x90, 0x93).mirror(4).rw("pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
 /* Input ports */
@@ -106,9 +115,9 @@ INPUT_PORTS_END
 
 static const z80_daisy_config z9001_daisy_chain[] =
 {
-	{ "z80pio2" },
-	{ "z80pio1" },
-	{ "z80ctc" },
+	{ "pio2" },
+	{ "pio1" },
+	{ "ctc" },
 	{ nullptr }
 };
 
@@ -236,17 +245,17 @@ void z9001_state::z9001(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
 	TIMER(config, "z9001_timer").configure_periodic(FUNC(z9001_state::timer_callback), attotime::from_msec(10));
 
-	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(9'830'400) / 4));
+	z80pio_device& pio1(Z80PIO(config, "pio1", XTAL(9'830'400) / 4));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	pio1.out_pa_callback().set(FUNC(z9001_state::port88_w));
 
-	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(9'830'400) / 4)); // keyboard PIO
+	z80pio_device& pio2(Z80PIO(config, "pio2", XTAL(9'830'400) / 4)); // keyboard PIO
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(9'830'400) / 4));
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(9'830'400) / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
-	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg3));
 
 	CASSETTE(config, m_cass);
 }

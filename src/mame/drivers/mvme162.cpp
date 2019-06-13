@@ -244,7 +244,7 @@ void mvme162_state::mvme162_mem(address_map &map)
 		/*  SGS-Thompson M48T18 RAM and clock chip, only 4088 bytes used,  and 8 bytes for the RTC, out of 8Kb though */
 	map(0xfffc0000, 0xfffc7fff).rw("m48t18", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 
-	map(0xfff45000, 0xfff457ff).rw(m_sccterm, FUNC(scc85230_device::ba_cd_r), FUNC(scc85230_device::ba_cd_w)); /* Port 1&2 - Dual serial port Z80-SCC */
+	map(0xfff45000, 0xfff457ff).rw(m_sccterm, FUNC(scc85230_device::ab_dc_r), FUNC(scc85230_device::ab_dc_w)).umask32(0x00ff00ff); /* Port 1&2 - Dual serial port Z80-SCC */
 }
 
 /* Input ports */

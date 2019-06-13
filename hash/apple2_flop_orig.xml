@@ -5303,7 +5303,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234804">
-				<rom name="Sub Mission.woz" size="234804" crc="a028902c" sha1="9805fe623de40e0d6d39a9aad4abcc2024bf4572" />
+				<rom name="sub mission.woz" size="234804" crc="a028902c" sha1="9805fe623de40e0d6d39a9aad4abcc2024bf4572" />
 			</dataarea>
 		</part>
 	</software>
@@ -5318,7 +5318,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234773">
-				<rom name="Theatre Europe.woz" size="234773" crc="fd26a9f2" sha1="bc37e6a1805ba72ce8259c06ee3e82c7770afff1" />
+				<rom name="theatre europe.woz" size="234773" crc="fd26a9f2" sha1="bc37e6a1805ba72ce8259c06ee3e82c7770afff1" />
 			</dataarea>
 		</part>
 	</software>
@@ -5333,7 +5333,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234761">
-				<rom name="Station 5.woz" size="234761" crc="52124dfd" sha1="7baaa8a17d373182c28f3486423f770a35078cb9" />
+				<rom name="station 5.woz" size="234761" crc="52124dfd" sha1="7baaa8a17d373182c28f3486423f770a35078cb9" />
 			</dataarea>
 		</part>
 	</software>
@@ -5348,7 +5348,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234755">
-				<rom name="OGRE.woz" size="234755" crc="76123140" sha1="540dfe0e7ff7fe7a2c7bbb8d41b2cb85fbcaa6ea" />
+				<rom name="ogre.woz" size="234755" crc="76123140" sha1="540dfe0e7ff7fe7a2c7bbb8d41b2cb85fbcaa6ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -5364,13 +5364,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234841">
-				<rom name="Championship Baseball side A.woz" size="234841" crc="d2b4c74b" sha1="d36792910f466809fd7021cbf34ece4225c31f4c" />
+				<rom name="championship baseball side a.woz" size="234841" crc="d2b4c74b" sha1="d36792910f466809fd7021cbf34ece4225c31f4c" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234841">
-				<rom name="Championship Baseball side B.woz" size="234841" crc="643f1049" sha1="4f29d8b36f113ae223d9b5e34198b894f7a55a16" />
+				<rom name="championship baseball side b.woz" size="234841" crc="643f1049" sha1="4f29d8b36f113ae223d9b5e34198b894f7a55a16" />
 			</dataarea>
 		</part>
 	</software>
@@ -5386,25 +5386,25 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="234866">
-				<rom name="The Wizard of Oz disk A.woz" size="234866" crc="4522de5f" sha1="b2459cf8ea2791d82b5da58e7b0aa25caf140f94" />
+				<rom name="the wizard of oz disk a.woz" size="234866" crc="4522de5f" sha1="b2459cf8ea2791d82b5da58e7b0aa25caf140f94" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="234866">
-				<rom name="The Wizard of Oz disk B.woz" size="234866" crc="e9de932e" sha1="fa02f177b45bde15ffc06101031fd01ca8710033" />
+				<rom name="the wizard of oz disk b.woz" size="234866" crc="e9de932e" sha1="fa02f177b45bde15ffc06101031fd01ca8710033" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="234866">
-				<rom name="The Wizard of Oz disk C.woz" size="234866" crc="0ed1d4cb" sha1="78a9fb5edb2fd249e7804607cd7bd3ee248115af" />
+				<rom name="the wizard of oz disk c.woz" size="234866" crc="0ed1d4cb" sha1="78a9fb5edb2fd249e7804607cd7bd3ee248115af" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="234866">
-				<rom name="The Wizard of Oz disk D.woz" size="234866" crc="1c0e7e78" sha1="25d7e25b66c475d0881138ba302be722683df6e6" />
+				<rom name="the wizard of oz disk d.woz" size="234866" crc="1c0e7e78" sha1="25d7e25b66c475d0881138ba302be722683df6e6" />
 			</dataarea>
 		</part>
 	</software>
@@ -5419,7 +5419,112 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="181581">
-				<rom name="The Queen of Phobos.woz" size="181581" crc="6c31a42a" sha1="7617ff8f126edaab1daf8954ea7d6cac07bb1e77" />
+				<rom name="the queen of phobos.woz" size="181581" crc="6c31a42a" sha1="7617ff8f126edaab1daf8954ea7d6cac07bb1e77" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pentapus">
+		<description>Pentapus</description>
+		<year>1983</year>
+		<publisher>Turning Point Software</publisher>
+		<info name="release" value="2019-06-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="239919">
+				<rom name="pentapus.woz" size="239919" crc="2ca948a2" sha1="678a9ff6e0818d7b887e7bb61d00aa03b124e863" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starcr17">
+		<description>Starcross (Revision 17 / 821021)</description>
+		<year>1982</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-06-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="starcross r17.woz" size="234821" crc="ad2d2a05" sha1="d6892b49a820bfcb00acff5ce31fd76756629a04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavfreit">
+		<description>The Caverns of Freitag</description>
+		<year>1982</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-06-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234767">
+				<rom name="the caverns of freitag.woz" size="234767" crc="4ca00553" sha1="b232f1fb070a35f91d4e89ce509b32c80e7f9a64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airsim1">
+		<description>AIRSIM 1</description>
+		<year>1981</year>
+		<publisher>Mind Systems</publisher>
+		<info name="release" value="2019-06-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="212265">
+				<rom name="airsim-1 flight simulator.woz" size="212265" crc="150393c4" sha1="562ee98562a3d7e0602283ff75b7f4f8ec803322" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pensate">
+		<description>Pensate</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2019-06-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121589">
+				<rom name="pensate.woz" size="121589" crc="89dea29f" sha1="eeb9037392b0f180e3d6e4a8dab30e07ab0e80da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipedrm">
+		<description>Pipe Dream</description>
+		<year>1990</year>
+		<publisher>LucasFilm Games</publisher>
+		<info name="release" value="2019-06-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="pipe dream.woz" size="234800" crc="891fdc8f" sha1="5709a1639af6074fa3fa554fdc1c67151bb89d3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lafpak">
+		<description>Laf Pak</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-06-12"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="laf pak.woz" size="234778" crc="7e5e2002" sha1="8fbd21ff8d8b7f6194c0bdfbfa074aa716435e77" />
 			</dataarea>
 		</part>
 	</software>

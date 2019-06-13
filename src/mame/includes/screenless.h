@@ -27,8 +27,7 @@ public:
 		// set defaults (60hz frames, 0.5 interpolation, 1 brightness level)
 		set_display_duration(attotime::from_hz(60));
 		set_display_factor(0.5);
-		reset_display_levels();
-		set_display_level(0.015);
+		set_display_levels(0.02);
 	}
 
 protected:
@@ -45,8 +44,8 @@ protected:
 	void set_display_factor(double factor);
 
 	void reset_display_levels();
-	void set_display_level(double level, u8 i = 0);
-	void set_display_levels(u8 levels, ...);
+	void set_display_level(u8 i, double level);
+	void set_display_levels(double l0, double l1 = 1.0, double l2 = 1.0, double l3 = 1.0);
 
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(u32 digits, u32 mask);

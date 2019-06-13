@@ -30228,7 +30228,7 @@ nc100                           // 1992 NC100
 nc150                           // 1992 NC150
 nc200                           // 1993 NC200
 
-@source:ncd17c.cpp
+@source:ncd68k.cpp
 ncd16                           // 1989 Network Computing Devices
 ncd17c                          // 1990 Network Computing Devices
 ncd19                           // 1990 Network Computing Devices

@@ -778,8 +778,8 @@ void sun3_state::vmetype0space_novram_map(address_map &map)
 // type 1 device space
 void sun3_state::vmetype1space_map(address_map &map)
 {
-	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
 	map(0x00060000, 0x0006ffff).rw(FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
 	map(0x00080000, 0x0008000f).rw(FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));

@@ -146,7 +146,7 @@ public:
 		hh_amis2k_state(mconfig, type, tag)
 	{
 		// bumpers are dimmed
-		set_display_levels(2, 0.015, 0.1);
+		set_display_levels(0.02, 0.1);
 	}
 
 	void prepare_display();

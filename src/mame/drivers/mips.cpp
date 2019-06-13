@@ -318,7 +318,7 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x00c0, 0x00c1).lrw8("kbdc_data", [this]() { return m_kbdc->data_r(); }, [this](u8 data) { m_kbdc->data_w(data == 0xff ? 0xf6 : data); }).umask16(0xff);
 	map(0x00c4, 0x00c5).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask16(0xff);
 
-	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff);
+	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff);
 
 	map(0x0140, 0x0143).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
@@ -677,7 +677,7 @@ void rx3230_state::rx3230_map(address_map &map)
 	map(0x19000004, 0x19000007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask32(0xff);
 	map(0x19800000, 0x19800003).lr8("int_reg", [this]() { return m_int_reg; }).umask32(0xff);
 	map(0x1a000000, 0x1a000007).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff);
-	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff); // TODO: order?
+	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff); // TODO: order?
 
 	map(0x1c000000, 0x1c000fff).m(m_rambo, FUNC(mips_rambo_device::map));
 

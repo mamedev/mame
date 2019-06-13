@@ -143,6 +143,10 @@ void hh_sm510_state::machine_start()
 		}
 	}
 
+	// 1ms display decay ticks
+	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
+	m_display_decay_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
 	// zerofill
 	m_inp_mux = 0;
 	m_speaker_data = 0;
@@ -183,7 +187,7 @@ void hh_sm510_state::machine_reset()
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
 // deflicker here, especially needed for SM500/SM5A with the active shift register
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
+TIMER_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 {
 	u8 z_mask = (1 << m_display_z_len) - 1;
 	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
@@ -394,12 +398,9 @@ void kdribble_state::kdribble(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1524, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -412,7 +413,7 @@ ROM_START( kdribble )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "584", 0x0000, 0x1000, CRC(1d9022c8) SHA1(64567f9f161e830a0634d5c89917ab866c26c0f8) )
 
-	ROM_REGION( 450339, "svg", 0)
+	ROM_REGION( 450339, "screen", 0)
 	ROM_LOAD( "kdribble.svg", 0, 450339, CRC(86c3ecc4) SHA1(8dfaeb0f3b35d4b680daaa9f478a6f3decf6ea0a) )
 ROM_END
 
@@ -474,12 +475,9 @@ void ktopgun_state::ktopgun(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1515, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -493,7 +491,7 @@ ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
 
-	ROM_REGION( 425832, "svg", 0)
+	ROM_REGION( 425832, "screen", 0)
 	ROM_LOAD( "ktopgun.svg", 0, 425832, CRC(dc488ac0) SHA1(5a47e5639cb1e61dad3f2169efb99efe3d75896f) )
 ROM_END
 
@@ -556,12 +554,9 @@ void kcontra_state::kcontra(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1505, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -578,7 +573,7 @@ ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 
-	ROM_REGION( 721005, "svg", 0)
+	ROM_REGION( 721005, "screen", 0)
 	ROM_LOAD( "kcontra.svg", 0, 721005, CRC(b5370d0f) SHA1(2f401222d24fa32a4659ef2b64ddac8ac3973c69) )
 ROM_END
 
@@ -640,12 +635,9 @@ void ktmnt_state::ktmnt(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1505, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -662,7 +654,7 @@ ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US51
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
 
-	ROM_REGION( 610270, "svg", 0)
+	ROM_REGION( 610270, "screen", 0)
 	ROM_LOAD( "ktmnt.svg", 0, 610270, CRC(ad9412ed) SHA1(154ee44efcd340dafa1cb84c37a9c3cd42cb42ab) )
 ROM_END
 
@@ -721,12 +713,9 @@ void kgradius_state::kgradius(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1420, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -743,7 +732,7 @@ ROM_START( kgradius )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "771.melody", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
 
-	ROM_REGION( 638097, "svg", 0)
+	ROM_REGION( 638097, "screen", 0)
 	ROM_LOAD( "kgradius.svg", 0, 638097, CRC(3adbc0f1) SHA1(fe426bf2335ce30395ea14ecab6399a93c67816a) )
 ROM_END
 
@@ -800,12 +789,9 @@ void kloneran_state::kloneran(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1497, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -822,7 +808,7 @@ ROM_START( kloneran )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "781.melody", 0x000, 0x100, CRC(a393de36) SHA1(55089f04833ccb318524ab2b584c4817505f4019) )
 
-	ROM_REGION( 633120, "svg", 0)
+	ROM_REGION( 633120, "screen", 0)
 	ROM_LOAD( "kloneran.svg", 0, 633120, CRC(f55e5292) SHA1(d0a91b5cd8a1894e7abc9c505fff4a8e1d3bec7a) )
 ROM_END
 
@@ -883,12 +869,9 @@ void kblades_state::kblades(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1516, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -905,7 +888,7 @@ ROM_START( kblades )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "782.melody", 0x000, 0x100, CRC(e8bf48ba) SHA1(3852c014dc9136566322b4f9e2aab0e3ec3a7387) )
 
-	ROM_REGION( 455113, "svg", 0)
+	ROM_REGION( 455113, "screen", 0)
 	ROM_LOAD( "kblades.svg", 0, 455113, CRC(e22f44c8) SHA1(ac95a837e20f87f3afc6c234f7407cbfcc438011) )
 ROM_END
 
@@ -968,12 +951,9 @@ void knfl_state::knfl(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1449, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -990,7 +970,7 @@ ROM_START( knfl )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "786.melody", 0x000, 0x100, CRC(6c80263b) SHA1(d3c21e2f8491fef101907b8e0871b1e1c1ed58f5) )
 
-	ROM_REGION( 571134, "svg", 0)
+	ROM_REGION( 571134, "screen", 0)
 	ROM_LOAD( "knfl.svg", 0, 571134, CRC(f2c63235) SHA1(70b9232700f5498d3c63c63dd5904c0e19482cc2) )
 ROM_END
 
@@ -1052,12 +1032,9 @@ void kbilly_state::kbilly(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1490, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1074,7 +1051,7 @@ ROM_START( kbilly )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "788.melody", 0x000, 0x100, CRC(cd488bea) SHA1(8fc60081f46e392978d6950c74711fb7ebd154de) )
 
-	ROM_REGION( 598276, "svg", 0)
+	ROM_REGION( 598276, "screen", 0)
 	ROM_LOAD( "kbilly.svg", 0, 598276, CRC(2969319e) SHA1(5cd1b0a6eee3168142c1d24f167b9ef38ad88402) )
 ROM_END
 
@@ -1130,12 +1107,9 @@ void kbucky_state::kbucky(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1490, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1152,7 +1126,7 @@ ROM_START( kbucky )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "n58.melody", 0x000, 0x100, CRC(7e99e469) SHA1(3e9a3843c6ab392f5989f3366df87a2d26cb8620) )
 
-	ROM_REGION( 727841, "svg", 0)
+	ROM_REGION( 727841, "screen", 0)
 	ROM_LOAD( "kbucky.svg", 0, 727841, CRC(c1d78488) SHA1(9ba4fdbce977455b8f1ad4bd2b01faa44bd05bc7) )
 ROM_END
 
@@ -1212,12 +1186,9 @@ void kgarfld_state::kgarfld(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1500, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1234,7 +1205,7 @@ ROM_START( kgarfld )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "n62.melody", 0x000, 0x100, CRC(232b7d55) SHA1(76f6a19e8182ee3f00c9f4ef007b5dde75a9c00d) )
 
-	ROM_REGION( 581107, "svg", 0)
+	ROM_REGION( 581107, "screen", 0)
 	ROM_LOAD( "kgarfld.svg", 0, 581107, CRC(bf09a170) SHA1(075cb95535873018409eb15675183490c61b29b9) )
 ROM_END
 
@@ -1302,12 +1273,9 @@ void gnw_pchute_state::gnw_pchute(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1602, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1321,7 +1289,7 @@ ROM_START( gnw_pchute )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "pr-21", 0x0000, 0x0740, CRC(392b545e) SHA1(e71940cd4cee07ba1e62c1c7d9e9b19410e7232d) )
 
-	ROM_REGION( 169486, "svg", 0)
+	ROM_REGION( 169486, "screen", 0)
 	ROM_LOAD( "gnw_pchute.svg", 0, 169486, CRC(bf86e0f9) SHA1(d2fba49453afc4bd1f16613f833a8748b6a36764) )
 ROM_END
 
@@ -1391,12 +1359,9 @@ void gnw_octopus_state::gnw_octopus(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1586, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1410,7 +1375,7 @@ ROM_START( gnw_octopus )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "oc-22", 0x0000, 0x0740, CRC(bd27781d) SHA1(07b4feb9265c83b159f96c7e8ee1c61a2cc17dc5) )
 
-	ROM_REGION( 119681, "svg", 0)
+	ROM_REGION( 119681, "screen", 0)
 	ROM_LOAD( "gnw_octopus.svg", 0, 119681, CRC(39900430) SHA1(61b71c475365966257f5479eab992538ec235c11) )
 ROM_END
 
@@ -1482,12 +1447,9 @@ void gnw_popeye_state::gnw_popeye(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1604, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1501,7 +1463,7 @@ ROM_START( gnw_popeye )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "pp-23", 0x0000, 0x0740, CRC(49987769) SHA1(ad90659a3ce7169a4df16367c5307435d9f9d956) )
 
-	ROM_REGION( 218428, "svg", 0)
+	ROM_REGION( 218428, "screen", 0)
 	ROM_LOAD( "gnw_popeye.svg", 0, 218428, CRC(b2c3fdf2) SHA1(5e782f25f9ff432a292e67efc7f5653cf2a81b60) )
 ROM_END
 
@@ -1571,12 +1533,9 @@ void gnw_chef_state::gnw_chef(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1666, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1608,7 +1567,7 @@ ROM_START( gnw_chef )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "fp-24", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
 
-	ROM_REGION( 199453, "svg", 0)
+	ROM_REGION( 199453, "screen", 0)
 	ROM_LOAD( "gnw_chef.svg", 0, 199453, CRC(97aacb9a) SHA1(1d4b2cc70a541ad09bc13c09ce26a8c14c03c526) )
 ROM_END
 
@@ -1616,7 +1575,7 @@ ROM_START( merrycook )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "merrycook.bin", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
 
-	ROM_REGION( 143959, "svg", 0)
+	ROM_REGION( 143959, "screen", 0)
 	ROM_LOAD( "merrycook.svg", 0, 143959, CRC(36f41ff0) SHA1(47a7886f7825b781e1cf54215c86f5105d6c3b0e) )
 ROM_END
 
@@ -1700,12 +1659,9 @@ void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1711, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1757,7 +1713,7 @@ ROM_START( gnw_mmouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 102453, "svg", 0)
+	ROM_REGION( 102453, "screen", 0)
 	ROM_LOAD( "gnw_mmouse.svg", 0, 102453, BAD_DUMP CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
 ROM_END
 
@@ -1765,7 +1721,7 @@ ROM_START( gnw_egg )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
 
-	ROM_REGION( 102848, "svg", 0)
+	ROM_REGION( 102848, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 102848, BAD_DUMP CRC(742c2605) SHA1(984d430ad2ff47ad7a3f9b25b7d3f3d51b10cca5) )
 ROM_END
 
@@ -1773,7 +1729,7 @@ ROM_START( nupogodi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 156974, "svg", 0)
+	ROM_REGION( 156974, "screen", 0)
 	ROM_LOAD( "nupogodi.svg", 0, 156974, CRC(8d522ec6) SHA1(67afeca5eebd16449353ea43070a6b919f7ba408) )
 ROM_END
 
@@ -1781,7 +1737,7 @@ ROM_START( exospace )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "exospace.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
 
-	ROM_REGION( 66790, "svg", 0)
+	ROM_REGION( 66790, "screen", 0)
 	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
@@ -1854,12 +1810,9 @@ void gnw_fire_state::gnw_fire(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1624, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1873,7 +1826,7 @@ ROM_START( gnw_fire )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "fr-27", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
 
-	ROM_REGION( 163753, "svg", 0)
+	ROM_REGION( 163753, "screen", 0)
 	ROM_LOAD( "gnw_fire.svg", 0, 163753, CRC(d546fa42) SHA1(492c785aa0ed33ff1ac8c84066e5b6d7cb7d1566) )
 ROM_END
 
@@ -1943,12 +1896,9 @@ void gnw_tbridge_state::gnw_tbridge(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1587, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1962,7 +1912,7 @@ ROM_START( gnw_tbridge )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "tl-28", 0x0000, 0x1000, CRC(284e7224) SHA1(b50d7f3a527ffe50771ef55fdf8214929bfa2253) )
 
-	ROM_REGION( 242781, "svg", 0)
+	ROM_REGION( 242781, "screen", 0)
 	ROM_LOAD( "gnw_tbridge.svg", 0, 242781, CRC(c0473e53) SHA1(bb43f12f517a3b657b5b35b50baf176e01ce041d) )
 ROM_END
 
@@ -2032,12 +1982,9 @@ void gnw_fireatk_state::gnw_fireatk(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1655, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2051,7 +1998,7 @@ ROM_START( gnw_fireatk )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "id-29", 0x0000, 0x1000, CRC(5f6e8042) SHA1(63afc3acd8a2a996095fa8ba2dfccd48e5214478) )
 
-	ROM_REGION( 267755, "svg", 0)
+	ROM_REGION( 267755, "screen", 0)
 	ROM_LOAD( "gnw_fireatk.svg", 0, 267755, CRC(b13ee452) SHA1(4d1e7e10fd2352bdd805c25de8c0e16bcd8b2220) )
 ROM_END
 
@@ -2121,12 +2068,9 @@ void gnw_stennis_state::gnw_stennis(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1581, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2140,7 +2084,7 @@ ROM_START( gnw_stennis )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "sp-30", 0x0000, 0x1000, CRC(ba1d9504) SHA1(ff601765d88564b1570a59f5b1a4005c7b0fd66c) )
 
-	ROM_REGION( 227964, "svg", 0)
+	ROM_REGION( 227964, "screen", 0)
 	ROM_LOAD( "gnw_stennis.svg", 0, 227964, CRC(1bb5f99a) SHA1(2e999c75598448e3502e7bab16e987d80d6a301f) )
 ROM_END
 
@@ -2210,18 +2154,15 @@ void gnw_opanic_state::gnw_opanic(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1292/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1230/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -2236,10 +2177,10 @@ ROM_START( gnw_opanic )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "op-51", 0x0000, 0x1000, CRC(31c288c9) SHA1(4bfd0fba94a9927cefc925db8196b063c5dd9b19) )
 
-	ROM_REGION( 79616, "svg_top", 0)
+	ROM_REGION( 79616, "screen_top", 0)
 	ROM_LOAD( "gnw_opanic_top.svg", 0, 79616, CRC(208dccc5) SHA1(b3cd3dcc8a00ba3b1b8d93d902f756fe579e4dfc) )
 
-	ROM_REGION( 112809, "svg_bottom", 0)
+	ROM_REGION( 112809, "screen_bottom", 0)
 	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112809, CRC(919b9649) SHA1(f3d3c8ca3fed81782a1fcb5a7aff07faea86db07) )
 ROM_END
 
@@ -2307,18 +2248,15 @@ void gnw_dkong_state::gnw_dkong(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1266/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1266/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -2333,10 +2271,10 @@ ROM_START( gnw_dkong )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
 
-	ROM_REGION( 176706, "svg_top", 0)
+	ROM_REGION( 176706, "screen_top", 0)
 	ROM_LOAD( "gnw_dkong_top.svg", 0, 176706, CRC(db041556) SHA1(fb0f979dea3ecd25288d341fa80e35b5fd0a8349) )
 
-	ROM_REGION( 145397, "svg_bottom", 0)
+	ROM_REGION( 145397, "screen_bottom", 0)
 	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
 ROM_END
 
@@ -2400,18 +2338,15 @@ void gnw_mickdon_state::gnw_mickdon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1281/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1236/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -2426,10 +2361,10 @@ ROM_START( gnw_mickdon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm-53_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 126434, "svg_top", 0)
+	ROM_REGION( 126434, "screen_top", 0)
 	ROM_LOAD( "gnw_mickdon_top.svg", 0, 126434, CRC(ff05f489) SHA1(2a533c7b5d7249d79f8d7795a0d57fd3e32d3d32) )
 
-	ROM_REGION( 122870, "svg_bottom", 0)
+	ROM_REGION( 122870, "screen_bottom", 0)
 	ROM_LOAD( "gnw_mickdon_bottom.svg", 0, 122870, CRC(8f06ddf1) SHA1(69d4b785781600abcdfc01b3902df1d0ae3608cf) )
 ROM_END
 
@@ -2503,18 +2438,15 @@ void gnw_ghouse_state::gnw_ghouse(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1303/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1274/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -2529,10 +2461,10 @@ ROM_START( gnw_ghouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "gh-54", 0x0000, 0x1000, CRC(4df12b4d) SHA1(708be5fef8dbd9337f5ab35baaca5bdf21e1f36c) )
 
-	ROM_REGION( 159098, "svg_top", 0)
+	ROM_REGION( 159098, "screen_top", 0)
 	ROM_LOAD( "gnw_ghouse_top.svg", 0, 159098, CRC(96bc58d9) SHA1(eda6a0abde739fb71af3e150751a519e59ef021d) )
 
-	ROM_REGION( 149757, "svg_bottom", 0)
+	ROM_REGION( 149757, "screen_bottom", 0)
 	ROM_LOAD( "gnw_ghouse_bottom.svg", 0, 149757, CRC(d66ee72c) SHA1(dcbe1c81ee0c7ddb9692858749ce6934f4dd7f30) )
 ROM_END
 
@@ -2600,18 +2532,15 @@ void gnw_dkong2_state::gnw_dkong2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1241/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1237/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -2626,10 +2555,10 @@ ROM_START( gnw_dkong2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "jr-55_560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
 
-	ROM_REGION( 267443, "svg_top", 0)
+	ROM_REGION( 267443, "screen_top", 0)
 	ROM_LOAD( "gnw_dkong2_top.svg", 0, 267443, CRC(33b26edb) SHA1(600afdf22ff4ac4a4af2de9159287cc6e53dfe3a) )
 
-	ROM_REGION( 390558, "svg_bottom", 0)
+	ROM_REGION( 390558, "screen_bottom", 0)
 	ROM_LOAD( "gnw_dkong2_bottom.svg", 0, 390558, CRC(92d68958) SHA1(aba829bf89b93bf3a4e425c9a8f6eec9e5869bc4) )
 ROM_END
 
@@ -2699,18 +2628,15 @@ void gnw_mario_state::gnw_mario(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_svg_region("svg_left");
-	screen_left.set_refresh_hz(50);
+	screen_left.set_refresh_hz(60);
 	screen_left.set_size(2258/2, 1440/2);
 	screen_left.set_visarea_full();
 
 	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_svg_region("svg_right");
-	screen_right.set_refresh_hz(50);
+	screen_right.set_refresh_hz(60);
 	screen_right.set_size(2261/2, 1440/2);
 	screen_right.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualh);
 
 	/* sound hardware */
@@ -2725,10 +2651,10 @@ ROM_START( gnw_mario )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
 
-	ROM_REGION( 154874, "svg_left", 0)
+	ROM_REGION( 154874, "screen_left", 0)
 	ROM_LOAD( "gnw_mario_left.svg", 0, 154874, CRC(73ba4f4a) SHA1(d5df39808a1af8e8ad5e397b4a50313221ab6e3b) )
 
-	ROM_REGION( 202863, "svg_right", 0)
+	ROM_REGION( 202863, "screen_right", 0)
 	ROM_LOAD( "gnw_mario_right.svg", 0, 202863, CRC(dd2473c9) SHA1(51aca37abf8e4959b84c441aa2d114e16c7d6010) )
 ROM_END
 
@@ -2804,18 +2730,15 @@ void gnw_rshower_state::gnw_rshower(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_svg_region("svg_left");
-	screen_left.set_refresh_hz(50);
+	screen_left.set_refresh_hz(60);
 	screen_left.set_size(2126/2, 1440/2);
 	screen_left.set_visarea_full();
 
 	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_svg_region("svg_right");
-	screen_right.set_refresh_hz(50);
+	screen_right.set_refresh_hz(60);
 	screen_right.set_size(2146/2, 1440/2);
 	screen_right.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualh);
 
 	/* sound hardware */
@@ -2830,10 +2753,10 @@ ROM_START( gnw_rshower )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "lp-57", 0x0000, 0x1000, CRC(51a2c5c4) SHA1(d60542e6785ba7b6a44153a66c739787cf670816) )
 
-	ROM_REGION( 135698, "svg_left", 0)
+	ROM_REGION( 135698, "screen_left", 0)
 	ROM_LOAD( "gnw_rshower_left.svg", 0, 135698, CRC(f0b36d70) SHA1(252e5cc110112a874265477be11ab3adf8108726) )
 
-	ROM_REGION( 140280, "svg_right", 0)
+	ROM_REGION( 140280, "screen_right", 0)
 	ROM_LOAD( "gnw_rshower_right.svg", 0, 140280, CRC(0ce4d049) SHA1(7e1afa1fdbdf658a12a28192ba2d29e5fca807cb) )
 ROM_END
 
@@ -2903,18 +2826,15 @@ void gnw_lboat_state::gnw_lboat(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_svg_region("svg_left");
-	screen_left.set_refresh_hz(50);
+	screen_left.set_refresh_hz(60);
 	screen_left.set_size(2116/2, 1440/2);
 	screen_left.set_visarea_full();
 
 	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_svg_region("svg_right");
-	screen_right.set_refresh_hz(50);
+	screen_right.set_refresh_hz(60);
 	screen_right.set_size(2057/2, 1440/2);
 	screen_right.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualh);
 
 	/* sound hardware */
@@ -2929,10 +2849,10 @@ ROM_START( gnw_lboat )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "tc-58", 0x0000, 0x1000, CRC(1f88f6a2) SHA1(22fd62127dda43a0ada2fe89b0518eec8cbe2a25) )
 
-	ROM_REGION( 156272, "svg_left", 0)
+	ROM_REGION( 156272, "screen_left", 0)
 	ROM_LOAD( "gnw_lboat_left.svg", 0, 156272, CRC(1f0c18bd) SHA1(ca11c83b4b4d6a91ecb0300cff392e010064ba25) )
 
-	ROM_REGION( 155093, "svg_right", 0)
+	ROM_REGION( 155093, "screen_right", 0)
 	ROM_LOAD( "gnw_lboat_right.svg", 0, 155093, CRC(6f68780a) SHA1(63488693fbb1a8ad4d59da9e4e003eef709926f9) )
 ROM_END
 
@@ -2989,18 +2909,15 @@ void gnw_bjack_state::gnw_bjack(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1290/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1297/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -3018,10 +2935,10 @@ ROM_START( gnw_bjack )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) ) // decap needed for verification
 
-	ROM_REGION( 75217, "svg_top", 0)
+	ROM_REGION( 75217, "screen_top", 0)
 	ROM_LOAD( "gnw_bjack_top.svg", 0, 75205, CRC(5eb0956e) SHA1(f7acd148e5478d4c2ddf06cff23c5e40faee2c24) )
 
-	ROM_REGION( 112450, "svg_bottom", 0)
+	ROM_REGION( 112450, "screen_bottom", 0)
 	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112438, CRC(9d985b1d) SHA1(cf8af6ce18994f687a5e6fbdda62af4d07a07cf8) )
 ROM_END
 
@@ -3091,18 +3008,15 @@ void gnw_squish_state::gnw_squish(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1285/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1287/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -3117,10 +3031,10 @@ ROM_START( gnw_squish )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mg-61", 0x0000, 0x1000, CRC(79cd509c) SHA1(969e5425984ba9e5183c68b38b3588f53d1e8e5d) )
 
-	ROM_REGION( 70300, "svg_top", 0)
+	ROM_REGION( 70300, "screen_top", 0)
 	ROM_LOAD( "gnw_squish_top.svg", 0, 70300, CRC(f1358ba9) SHA1(414d29db64b83a50b20f31b857e4c3a77d19d3c8) )
 
-	ROM_REGION( 279606, "svg_bottom", 0)
+	ROM_REGION( 279606, "screen_bottom", 0)
 	ROM_LOAD( "gnw_squish_bottom.svg", 0, 279606, CRC(1d4ac23f) SHA1(d6eb78bae5ca18cc5fe5d8a300902766dd9601aa) )
 ROM_END
 
@@ -3193,18 +3107,15 @@ void gnw_zelda_state::gnw_zelda(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_svg_region("svg_top");
-	screen_top.set_refresh_hz(50);
+	screen_top.set_refresh_hz(60);
 	screen_top.set_size(1920/2, 1346/2);
 	screen_top.set_visarea_full();
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_bottom");
-	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_refresh_hz(60);
 	screen_bottom.set_size(1920/2, 1291/2);
 	screen_bottom.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
@@ -3222,10 +3133,10 @@ ROM_START( gnw_zelda )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "zl-65.melody", 0x000, 0x100, BAD_DUMP CRC(3a281b0f) SHA1(7a236775557939050bbcd6f9d0a598d219a032f2) ) // decap needed for verification
 
-	ROM_REGION( 282866, "svg_top", 0)
+	ROM_REGION( 282866, "screen_top", 0)
 	ROM_LOAD( "gnw_zelda_top.svg", 0, 282866, CRC(7bd167a0) SHA1(96955538d9c0ab94b144ff725524b601bdf9f28c) )
 
-	ROM_REGION( 424727, "svg_bottom", 0)
+	ROM_REGION( 424727, "screen_bottom", 0)
 	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424727, CRC(2f4b3239) SHA1(026a1d43dd298ec05f4067ae1a7181984ec8ff83) )
 ROM_END
 
@@ -3302,12 +3213,9 @@ void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 1049);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3324,7 +3232,7 @@ ROM_START( gnw_dkjrp )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) )
 
-	ROM_REGION( 340751, "svg", 0)
+	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
 ROM_END
 
@@ -3400,12 +3308,9 @@ void gnw_dkjr_state::gnw_dkjr(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1647, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3419,7 +3324,7 @@ ROM_START( gnw_dkjr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
 
-	ROM_REGION( 281161, "svg", 0)
+	ROM_REGION( 281161, "screen", 0)
 	ROM_LOAD( "gnw_dkjr.svg", 0, 281161, CRC(346b025c) SHA1(dad3f3f73d6c2ff4efb43ffd76e97ba0d5f0da73) )
 ROM_END
 
@@ -3490,12 +3395,9 @@ void gnw_mariocm_state::gnw_mariocm(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1647, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3509,7 +3411,7 @@ ROM_START( gnw_mariocm )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ml-102_577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
 
-	ROM_REGION( 302931, "svg", 0)
+	ROM_REGION( 302931, "screen", 0)
 	ROM_LOAD( "gnw_mariocm.svg", 0, 302931, CRC(5517ae80) SHA1(1902e36d0470ee5548addeb087ea3e7d2c2520a2) )
 ROM_END
 
@@ -3581,12 +3483,9 @@ void gnw_manhole_state::gnw_manhole(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1560, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3600,7 +3499,7 @@ ROM_START( gnw_manhole )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "nh-103", 0x0000, 0x1000, CRC(ec03acf7) SHA1(b74ae672d8f8a155b2ea4ecee9afbaed95ec0ceb) )
 
-	ROM_REGION( 223244, "svg", 0)
+	ROM_REGION( 223244, "screen", 0)
 	ROM_LOAD( "gnw_manhole.svg", 0, 223244, CRC(41848e77) SHA1(d7238d1a3f95d8d274f5ff767ebf783bb50e64eb) )
 ROM_END
 
@@ -3664,12 +3563,9 @@ void gnw_tfish_state::gnw_tfish(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1572, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3683,7 +3579,7 @@ ROM_START( gnw_tfish )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
 
-	ROM_REGION( 257278, "svg", 0)
+	ROM_REGION( 257278, "screen", 0)
 	ROM_LOAD( "gnw_tfish.svg", 0, 257278, CRC(fc970f4a) SHA1(a73f5ee35b60842707f13edc5d58869fb2ec98cf) )
 ROM_END
 
@@ -3756,12 +3652,9 @@ void gnw_smb_state::gnw_smb(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1677, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3778,7 +3671,7 @@ ROM_START( gnw_smb )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "ym-105.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
 
-	ROM_REGION( 648209, "svg", 0)
+	ROM_REGION( 648209, "screen", 0)
 	ROM_LOAD( "gnw_smb.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
 ROM_END
 
@@ -3855,12 +3748,9 @@ void gnw_climber_state::gnw_climber(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1677, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3887,7 +3777,7 @@ ROM_START( gnw_climber )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) ) // decap needed for verification
 
-	ROM_REGION( 542332, "svg", 0)
+	ROM_REGION( 542332, "screen", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
 ROM_END
 
@@ -3898,7 +3788,7 @@ ROM_START( gnw_climbcs )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) ) // dumped from NWS version
 
-	ROM_REGION( 564704, "svg", 0)
+	ROM_REGION( 564704, "screen", 0)
 	ROM_LOAD( "gnw_climbcs.svg", 0, 564704, CRC(60b25cc5) SHA1(1c101539a861257c5b0334ffdf9491c877759fa1) )
 ROM_END
 
@@ -3970,12 +3860,9 @@ void gnw_bfight_state::gnw_bfight(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1549, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3992,7 +3879,7 @@ ROM_START( gnw_bfight )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "bf-107.melody", 0x000, 0x100, BAD_DUMP CRC(aadc22a1) SHA1(f6e5572232eb9e83f6833073e1e1e99776245c50) ) // decap needed for verification
 
-	ROM_REGION( 558341, "svg", 0)
+	ROM_REGION( 558341, "screen", 0)
 	ROM_LOAD( "gnw_bfight.svg", 0, 558341, CRC(f0d61fe8) SHA1(b0b56224a967e4b26836c0f7e3015d13b42ae5cc) )
 ROM_END
 
@@ -4084,12 +3971,9 @@ void gnw_boxing_state::gnw_boxing(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 524);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4106,7 +3990,7 @@ ROM_START( gnw_boxing )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "bx-301_744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
 
-	ROM_REGION( 265174, "svg", 0)
+	ROM_REGION( 265174, "screen", 0)
 	ROM_LOAD( "gnw_boxing.svg", 0, 265174, CRC(e8a3ab25) SHA1(53e32542b582dcdf4ddd051f182738eee6c732c9) )
 ROM_END
 
@@ -4207,12 +4091,9 @@ void tgaunt_state::tgaunt(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1425, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4236,7 +4117,7 @@ ROM_START( tgaunt )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "583", 0x0000, 0x1000, CRC(598d8156) SHA1(9f776e8b9b4321e8118481e6b1304f8a38f9932e) )
 
-	ROM_REGION( 713020, "svg", 0)
+	ROM_REGION( 713020, "screen", 0)
 	ROM_LOAD( "tgaunt.svg", 0, 713020, CRC(1f65ae21) SHA1(57ca33d073d1096a7fc17f2bdac940868d1ae651) )
 ROM_END
 
@@ -4244,7 +4125,7 @@ ROM_START( trobhood )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "583", 0x0000, 0x1000, CRC(598d8156) SHA1(9f776e8b9b4321e8118481e6b1304f8a38f9932e) )
 
-	ROM_REGION( 704892, "svg", 0)
+	ROM_REGION( 704892, "screen", 0)
 	ROM_LOAD( "trobhood.svg", 0, 704892, CRC(291fd8db) SHA1(1de6bd0e203f16c44f7d661e44863a1a919f3da9) )
 ROM_END
 
@@ -4328,12 +4209,9 @@ void tddragon_state::tddragon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1467, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4347,7 +4225,7 @@ ROM_START( tddragon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "593", 0x0000, 0x1000, CRC(2642f778) SHA1(fee77acf93e057a8b4627389dfd481c6d9cbd02b) )
 
-	ROM_REGION( 511434, "svg", 0)
+	ROM_REGION( 511434, "screen", 0)
 	ROM_LOAD( "tddragon.svg", 0, 511434, CRC(641e7ceb) SHA1(bbfc37cc085e00921422f65d9aac9949f871e7b7) )
 ROM_END
 
@@ -4432,12 +4310,9 @@ void tkarnov_state::tkarnov(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1477, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4451,7 +4326,7 @@ ROM_START( tkarnov )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "582", 0x0000, 0x1000, CRC(cee85bdd) SHA1(143e39524f1dea523e0575f327ed189343cc87f5) )
 
-	ROM_REGION( 527377, "svg", 0)
+	ROM_REGION( 527377, "screen", 0)
 	ROM_LOAD( "tkarnov.svg", 0, 527377, CRC(971840fc) SHA1(48db7139fa875e60b44340fb475b6d1081ef5c10) )
 ROM_END
 
@@ -4535,12 +4410,9 @@ void tvindictr_state::tvindictr(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1459, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4554,7 +4426,7 @@ ROM_START( tvindictr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "595", 0x0000, 0x1000, CRC(b574d16f) SHA1(d2cb0f2e21ca2defe49a4b45f4c8e169ae9979ab) )
 
-	ROM_REGION( 314165, "svg", 0)
+	ROM_REGION( 314165, "screen", 0)
 	ROM_LOAD( "tvindictr.svg", 0, 314165, CRC(2241992c) SHA1(efd44879d1c0d5befd7ea07089418406fc101315) )
 ROM_END
 
@@ -4661,12 +4533,9 @@ void tgaiden_state::tgaiden(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4680,7 +4549,7 @@ ROM_START( tgaiden )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m82", 0x0000, 0x1000, CRC(278eafb0) SHA1(14396a0010bade0fde705969151200ed432321e7) )
 
-	ROM_REGION( 100000, "svg", 0)
+	ROM_REGION( 100000, "screen", 0)
 	ROM_LOAD( "tgaiden.svg", 0, 100000, NO_DUMP )
 ROM_END
 
@@ -4760,12 +4629,9 @@ void tbatman_state::tbatman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1442, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4779,7 +4645,7 @@ ROM_START( tbatman )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "597", 0x0000, 0x1000, CRC(8b7acc97) SHA1(fe811675dc5c5ef9f6f969685c933926c8b9e868) )
 
-	ROM_REGION( 551890, "svg", 0)
+	ROM_REGION( 551890, "screen", 0)
 	ROM_LOAD( "tbatman.svg", 0, 551890, CRC(65809ee3) SHA1(5fc38bdb2108d45dc99bce3379253423ea88e0fc) )
 ROM_END
 
@@ -4863,12 +4729,9 @@ void tsharr2_state::tsharr2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1493, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4882,7 +4745,7 @@ ROM_START( tsharr2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m91", 0x0000, 0x1000, CRC(b207ac79) SHA1(9889dfec26089313ba2bdac845a75a26742d09e1) )
 
-	ROM_REGION( 555126, "svg", 0)
+	ROM_REGION( 555126, "screen", 0)
 	ROM_LOAD( "tsharr2.svg", 0, 555126, CRC(ff43e29b) SHA1(0af02e65a1dcf95958296a292343430670b67ae5) )
 ROM_END
 
@@ -4963,12 +4826,9 @@ void tstrider_state::tstrider(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1479, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4982,7 +4842,7 @@ ROM_START( tstrider )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m92", 0x0000, 0x1000, CRC(4b488e8f) SHA1(b037c220c4a456f0dac67d759736f202a7609ee5) )
 
-	ROM_REGION( 554817, "svg", 0)
+	ROM_REGION( 554817, "screen", 0)
 	ROM_LOAD( "tstrider.svg", 0, 554817, CRC(be5de6bd) SHA1(cde0a3fe21af24d7d22d2ce0aec9c308f8696c7e) )
 ROM_END
 
@@ -5067,12 +4927,9 @@ void tgoldnaxe_state::tgoldnaxe(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1456, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5086,7 +4943,7 @@ ROM_START( tgoldnaxe )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m94", 0x0000, 0x1000, CRC(af183fbf) SHA1(23716e2a7c4bb4842b2af1a43fe88db44e18dc17) )
 
-	ROM_REGION( 605483, "svg", 0)
+	ROM_REGION( 605483, "screen", 0)
 	ROM_LOAD( "tgoldnaxe.svg", 0, 605483, CRC(533bea14) SHA1(08d419bd7af5de7216654dc7f978beed95192c2d) )
 ROM_END
 
@@ -5188,12 +5045,9 @@ void trobocop2_state::trobocop2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1487, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5217,7 +5071,7 @@ ROM_START( trobocop2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
 
-	ROM_REGION( 463532, "svg", 0)
+	ROM_REGION( 463532, "screen", 0)
 	ROM_LOAD( "trobocop2.svg", 0, 463532, CRC(c2b92868) SHA1(87912f02bea967c10ba1d8f7c810e3c44b0e3cff) )
 ROM_END
 
@@ -5225,7 +5079,7 @@ ROM_START( trockteer )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
 
-	ROM_REGION( 558086, "svg", 0)
+	ROM_REGION( 558086, "screen", 0)
 	ROM_LOAD( "trockteer.svg", 0, 558086, CRC(8afe0f88) SHA1(702127a4ff72be492f72b24bd8917ae0e15f247d) )
 ROM_END
 
@@ -5314,12 +5168,9 @@ void taltbeast_state::taltbeast(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1455, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5333,7 +5184,7 @@ ROM_START( taltbeast )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m88", 0x0000, 0x1000, CRC(1b3d15e7) SHA1(78371230dff872d6c07eefdbc4856c2a3336eb61) )
 
-	ROM_REGION( 667887, "svg", 0)
+	ROM_REGION( 667887, "screen", 0)
 	ROM_LOAD( "taltbeast.svg", 0, 667887, CRC(1ca9bbf1) SHA1(be844dddee4a95f70ea2adf875d3ee6cda2a6633) )
 ROM_END
 
@@ -5418,12 +5269,9 @@ void tsf2010_state::tsf2010(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1465, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5437,7 +5285,7 @@ ROM_START( tsf2010 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ma2", 0x0000, 0x1000, CRC(764b3757) SHA1(c5f90b860128658576bb837e9cabbb3045ad2756) )
 
-	ROM_REGION( 595149, "svg", 0)
+	ROM_REGION( 595149, "screen", 0)
 	ROM_LOAD( "tsf2010.svg", 0, 595149, CRC(b873856b) SHA1(1d070d4d9578bbc322d1edead208bbd44340b71a) )
 ROM_END
 
@@ -5518,12 +5366,9 @@ void tswampt_state::tswampt(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1450, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5537,7 +5382,7 @@ ROM_START( tswampt )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb0", 0x0000, 0x1000, CRC(8433530c) SHA1(60716d3bba92dc8ac3f1ee29c5734c9e894a1aff) )
 
-	ROM_REGION( 578505, "svg", 0)
+	ROM_REGION( 578505, "screen", 0)
 	ROM_LOAD( "tswampt.svg", 0, 578505, CRC(98ff2fbb) SHA1(a5a4e9934b86f69176549f99246b40f323441945) )
 ROM_END
 
@@ -5622,12 +5467,9 @@ void tspidman_state::tspidman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1440, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5641,7 +5483,7 @@ ROM_START( tspidman )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ma5", 0x0000, 0x1000, CRC(2624daed) SHA1(7c10434ae899637264de706045d48e3fce1d30a7) )
 
-	ROM_REGION( 605332, "svg", 0)
+	ROM_REGION( 605332, "screen", 0)
 	ROM_LOAD( "tspidman.svg", 0, 605332, CRC(6e687727) SHA1(c1a2ee450509e05d1db61e02f6a911207d2830c4) )
 ROM_END
 
@@ -5726,12 +5568,9 @@ void txmen_state::txmen(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1467, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5745,7 +5584,7 @@ ROM_START( txmen )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ma7", 0x0000, 0x1000, CRC(6f3ff34f) SHA1(aa24fbc3a4117ea51ebf951ee343a36c77692b72) )
 
-	ROM_REGION( 543232, "svg", 0)
+	ROM_REGION( 543232, "screen", 0)
 	ROM_LOAD( "txmen.svg", 0, 543232, CRC(51daf7f9) SHA1(b59ecbd83e05478f4b2654a019291c7e06893112) )
 ROM_END
 
@@ -5830,12 +5669,9 @@ void tddragon3_state::tddragon3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1514, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5849,7 +5685,7 @@ ROM_START( tddragon3 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ma6", 0x0000, 0x1000, CRC(8e2da0d9) SHA1(54dd05124b4c605975b0cb1eadd7456ff4a94d68) )
 
-	ROM_REGION( 615684, "svg", 0)
+	ROM_REGION( 615684, "screen", 0)
 	ROM_LOAD( "tddragon3.svg", 0, 615684, CRC(3f5df090) SHA1(c9248fbf3a4dec0ce3b32b10fb67f133595cc54d) )
 ROM_END
 
@@ -5934,12 +5770,9 @@ void tflash_state::tflash(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1444, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5953,7 +5786,7 @@ ROM_START( tflash )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb5", 0x0000, 0x1000, CRC(f7f1d082) SHA1(49a7a931450cf27fe69076c4e15ffb34814e25d4) )
 
-	ROM_REGION( 587820, "svg", 0)
+	ROM_REGION( 587820, "screen", 0)
 	ROM_LOAD( "tflash.svg", 0, 587820, CRC(aa1ad063) SHA1(aec6b15569d3d58ff9a4f7db779cda4a1c8efc35) )
 ROM_END
 
@@ -6038,12 +5871,9 @@ void tmchammer_state::tmchammer(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1471, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6060,7 +5890,7 @@ ROM_START( tmchammer )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "n63.melody", 0x000, 0x100, CRC(77c1a5a3) SHA1(c00ae3b7c64dd9db96eab520fe674a40571fc15f) )
 
-	ROM_REGION( 456446, "svg", 0)
+	ROM_REGION( 456446, "screen", 0)
 	ROM_LOAD( "tmchammer.svg", 0, 456446, CRC(79d6d45d) SHA1(bf6b8c6fdccad657377ad9f721dd22408f6ae775) )
 ROM_END
 
@@ -6145,12 +5975,9 @@ void tbtoads_state::tbtoads(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1454, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6164,7 +5991,7 @@ ROM_START( tbtoads )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb3", 0x0000, 0x1000, CRC(8fa4c55a) SHA1(2be97e63dfed51313e180d7388dd431058db5a51) )
 
-	ROM_REGION( 694365, "svg", 0)
+	ROM_REGION( 694365, "screen", 0)
 	ROM_LOAD( "tbtoads.svg", 0, 694365, CRC(3af488e9) SHA1(d0e9ec61fac23bb22e508da4fa8bf2a7b8f186cf) )
 ROM_END
 
@@ -6249,12 +6076,9 @@ void thook_state::thook(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1489, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6268,7 +6092,7 @@ ROM_START( thook )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb7", 0x0000, 0x1000, CRC(7eb1a6e2) SHA1(f4a09ab95c968b0ddbe56cd7bb2667881c145731) )
 
-	ROM_REGION( 680503, "svg", 0)
+	ROM_REGION( 680503, "screen", 0)
 	ROM_LOAD( "thook.svg", 0, 680503, CRC(28bd6da2) SHA1(e97b1dda219a766ffcca15d1b3279f5cee5e2fed) )
 ROM_END
 
@@ -6352,12 +6176,9 @@ void tbttf_state::tbttf(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1466, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6371,7 +6192,7 @@ ROM_START( tbttf )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc3", 0x0000, 0x1000, CRC(9c37a23c) SHA1(c09fa5caac8b574f8460265b98c0bea1d5e78c6a) )
 
-	ROM_REGION( 667700, "svg", 0)
+	ROM_REGION( 667700, "screen", 0)
 	ROM_LOAD( "tbttf.svg", 0, 667700, CRC(d1d19ec5) SHA1(7361943ccf1f4072bba6fd4e6acae3e2f3d7a0ea) )
 ROM_END
 
@@ -6458,12 +6279,9 @@ void taddams_state::taddams(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1464, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6477,7 +6295,7 @@ ROM_START( taddams )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc2", 0x0000, 0x1000, CRC(af33d432) SHA1(676ada238c389d1dd02dcb29731d69624f60b342) )
 
-	ROM_REGION( 554649, "svg", 0)
+	ROM_REGION( 554649, "screen", 0)
 	ROM_LOAD( "taddams.svg", 0, 554649, CRC(0b916c6d) SHA1(5a2456b4a0f31db94a78373baab46f3ff9732b92) )
 ROM_END
 
@@ -6562,12 +6380,9 @@ void thalone_state::thalone(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1448, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6581,7 +6396,7 @@ ROM_START( thalone )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc7", 0x0000, 0x1000, CRC(eceda335) SHA1(20c9ffcf914db61aba03716fe146bac42873ac82) )
 
-	ROM_REGION( 494235, "svg", 0)
+	ROM_REGION( 494235, "screen", 0)
 	ROM_LOAD( "thalone.svg", 0, 494235, CRC(0e32df1d) SHA1(1fff1d37a5fe66d4f59d12af3ce67665c0049800) )
 ROM_END
 
@@ -6662,12 +6477,9 @@ void txmenpx_state::txmenpx(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1464, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6681,7 +6493,7 @@ ROM_START( txmenpx )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "md3", 0x0000, 0x1000, CRC(11c2b09a) SHA1(f94b1e3e60f002398b39c98946469dd1a6aa8e77) )
 
-	ROM_REGION( 572538, "svg", 0)
+	ROM_REGION( 572538, "screen", 0)
 	ROM_LOAD( "txmenpx.svg", 0, 572538, CRC(9a89c753) SHA1(e3828a8c10c77ee5634128d0e9239e8cda19f988) )
 ROM_END
 
@@ -6766,12 +6578,9 @@ void thalone2_state::thalone2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1454, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6785,7 +6594,7 @@ ROM_START( thalone2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "md7", 0x0000, 0x1000, CRC(ac8a21e9) SHA1(9024f74e34056f90b7dbf439300797183f74eb00) )
 
-	ROM_REGION( 748886, "svg", 0)
+	ROM_REGION( 748886, "screen", 0)
 	ROM_LOAD( "thalone2.svg", 0, 748886, CRC(a5d8898e) SHA1(de8fae0169a3797a46b5c81d9b556df636a5674e) )
 ROM_END
 
@@ -6864,12 +6673,9 @@ void tsonic_state::tsonic(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1517, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6887,7 +6693,7 @@ ROM_START( tsonic )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "n71.melody", 0x000, 0x100, CRC(bae258c8) SHA1(81cb75d73fab4479cd92fcb13d9cb03cec2afdd5) )
 
-	ROM_REGION( 541450, "svg", 0)
+	ROM_REGION( 541450, "screen", 0)
 	ROM_LOAD( "tsonic.svg", 0, 541450, CRC(f01835e3) SHA1(25f924af55ffadd2aebf50a89f75571d788d5ac1) )
 ROM_END
 
@@ -6972,12 +6778,9 @@ void trobocop3_state::trobocop3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1464, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6991,7 +6794,7 @@ ROM_START( trobocop3 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc6", 0x0000, 0x1000, CRC(07b44e4c) SHA1(3165c85e16c062d2d9d0c0f1b1f6bd6079b4de15) )
 
-	ROM_REGION( 612103, "svg", 0)
+	ROM_REGION( 612103, "screen", 0)
 	ROM_LOAD( "trobocop3.svg", 0, 612103, CRC(9a162642) SHA1(b775f64e4616c4fc8d2c139938f148c9666e646a) )
 ROM_END
 
@@ -7072,12 +6875,9 @@ void tdummies_state::tdummies(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1441, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7091,7 +6891,7 @@ ROM_START( tdummies )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "me0", 0x0000, 0x1000, CRC(29efae4a) SHA1(0b26913a3fd2fde2b39549f0f7cbc3daaa41eb50) )
 
-	ROM_REGION( 525493, "svg", 0)
+	ROM_REGION( 525493, "screen", 0)
 	ROM_LOAD( "tdummies.svg", 0, 525493, CRC(a18a5216) SHA1(1238e8c489445e715d4fc53e597820845b386233) )
 ROM_END
 
@@ -7176,12 +6976,9 @@ void tsfight2_state::tsfight2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1444, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7195,7 +6992,7 @@ ROM_START( tsfight2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "me1", 0x0000, 0x1000, CRC(73384e94) SHA1(350417d101ce034b3974b4a1d2e04bcb3bf70605) )
 
-	ROM_REGION( 630403, "svg", 0)
+	ROM_REGION( 630403, "screen", 0)
 	ROM_LOAD( "tsfight2.svg", 0, 630403, CRC(eadc2c81) SHA1(20b2a797f6b9a008c1994eaee7b87e3fe828e837) )
 ROM_END
 
@@ -7280,12 +7077,9 @@ void twworld_state::twworld(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1429, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7299,7 +7093,7 @@ ROM_START( twworld )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "me7", 0x0000, 0x1000, CRC(dcb16d98) SHA1(539989e12bbc4a719818546c5edcfda02b98210e) )
 
-	ROM_REGION( 527859, "svg", 0)
+	ROM_REGION( 527859, "screen", 0)
 	ROM_LOAD( "twworld.svg", 0, 527859, CRC(0a2cffce) SHA1(d8c3f2fef60357e47ce0b44d588d0bb39112c8b9) )
 ROM_END
 
@@ -7380,12 +7174,9 @@ void tjpark_state::tjpark(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1454, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7399,7 +7190,7 @@ ROM_START( tjpark )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mf4", 0x0000, 0x1000, CRC(f66faf73) SHA1(4cfa743dcd6e44a3c1f56206d5824fddba16df01) )
 
-	ROM_REGION( 812575, "svg", 0)
+	ROM_REGION( 812575, "screen", 0)
 	ROM_LOAD( "tjpark.svg", 0, 812575, CRC(539c9b9c) SHA1(bf9a95586438df677d753deb17abc97f8837cbe3) )
 ROM_END
 
@@ -7478,12 +7269,9 @@ void tsonic2_state::tsonic2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1475, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7501,7 +7289,7 @@ ROM_START( tsonic2 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "n86.melody", 0x000, 0x100, CRC(c16fa2b2) SHA1(222772d311fd3b3b05d80cfd539c2c862bed0be5) )
 
-	ROM_REGION( 667887, "svg", 0)
+	ROM_REGION( 667887, "screen", 0)
 	ROM_LOAD( "tsonic2.svg", 0, 667887, CRC(ef82d40e) SHA1(f22efba565adb32634d8b46c31459ec833b13d98) )
 ROM_END
 
@@ -7591,12 +7379,9 @@ void tsddragon_state::tsddragon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1503, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7610,7 +7395,7 @@ ROM_START( tsddragon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mf5", 0x0000, 0x1000, CRC(264c8e82) SHA1(470eb2f09a58ef05eb0b7c8e11380ad1d8ce4e1a) )
 
-	ROM_REGION( 753533, "svg", 0)
+	ROM_REGION( 753533, "screen", 0)
 	ROM_LOAD( "tsddragon.svg", 0, 753533, CRC(fb526049) SHA1(552fe005a6e23e083867b7d1c10d20daa8913a14) )
 ROM_END
 
@@ -7696,12 +7481,9 @@ void tdennis_state::tdennis(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1467, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7715,7 +7497,7 @@ ROM_START( tdennis )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mf9", 0x0000, 0x1000, CRC(d95f54d5) SHA1(1b3a170f32deec98e54ad09c04b404f5ae03dcea) )
 
-	ROM_REGION( 754842, "svg", 0)
+	ROM_REGION( 754842, "screen", 0)
 	ROM_LOAD( "tdennis.svg", 0, 754842, CRC(3b1ed476) SHA1(adc94919daa9a6c42f1acd8ef5113b61859338b7) )
 ROM_END
 
@@ -7804,12 +7586,9 @@ void tnmarebc_state::tnmarebc(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1456, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7823,7 +7602,7 @@ ROM_START( tnmarebc )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mg0", 0x0000, 0x1000, CRC(5ef21421) SHA1(8fd458575111b89d7c33c969e76703bde5ad2c36) )
 
-	ROM_REGION( 631310, "svg", 0)
+	ROM_REGION( 631310, "screen", 0)
 	ROM_LOAD( "tnmarebc.svg", 0, 631310, CRC(f9c96205) SHA1(1947d358efd94ae3257ed959172a819798d2c9a1) )
 ROM_END
 
@@ -7908,12 +7687,9 @@ void ttransf2_state::ttransf2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1476, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7927,7 +7703,7 @@ ROM_START( ttransf2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mg2", 0x0000, 0x1000, CRC(65c0f456) SHA1(b1bc3887c5088b3fe359585658e5c5236c09af9e) )
 
-	ROM_REGION( 727662, "svg", 0)
+	ROM_REGION( 727662, "screen", 0)
 	ROM_LOAD( "ttransf2.svg", 0, 727662, CRC(52fd5ea1) SHA1(35ae9fe2cea14ee4c591df0458fed478c9feb044) )
 ROM_END
 
@@ -8008,12 +7784,9 @@ void topaliens_state::topaliens(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1450, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8027,7 +7800,7 @@ ROM_START( topaliens )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mj1", 0x0000, 0x1000, CRC(ccc196cf) SHA1(f18f7cf842cddecf90d05ab0f90257bb76514f54) )
 
-	ROM_REGION( 1214876, "svg", 0)
+	ROM_REGION( 1214876, "screen", 0)
 	ROM_LOAD( "topaliens.svg", 0, 1214876, CRC(683c70aa) SHA1(0fac5ba8ab5f9b73a3cbbff046be60550fa5f98a) )
 ROM_END
 
@@ -8113,12 +7886,9 @@ void tmkombat_state::tmkombat(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1468, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8132,7 +7902,7 @@ ROM_START( tmkombat )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mg6", 0x0000, 0x1000, CRC(f6375dc7) SHA1(a711199c2623979f19c11067ebfff9355256c2c3) )
 
-	ROM_REGION( 841829, "svg", 0)
+	ROM_REGION( 841829, "screen", 0)
 	ROM_LOAD( "tmkombat.svg", 0, 841829, CRC(9dc4f58c) SHA1(9c9b080d7f3b777407445c22195990c55c6352ca) )
 ROM_END
 
@@ -8217,12 +7987,9 @@ void tshadow_state::tshadow(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1484, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8236,7 +8003,7 @@ ROM_START( tshadow )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mj5", 0x0000, 0x1000, CRC(09822d73) SHA1(30cae8b783a4f388193aee248fa18c6c1042e0ec) )
 
-	ROM_REGION( 946450, "svg", 0)
+	ROM_REGION( 946450, "screen", 0)
 	ROM_LOAD( "tshadow.svg", 0, 946450, CRC(5cab680a) SHA1(8f8f660c08fc56287362b11c183655047fbd91ca) )
 ROM_END
 
@@ -8321,12 +8088,9 @@ void tskelwarr_state::tskelwarr(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1444, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8340,7 +8104,7 @@ ROM_START( tskelwarr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mk0", 0x0000, 0x1000, CRC(dc7827a1) SHA1(74ff143605684df0c70db604a5f22dbf512044d7) )
 
-	ROM_REGION( 1125002, "svg", 0)
+	ROM_REGION( 1125002, "screen", 0)
 	ROM_LOAD( "tskelwarr.svg", 0, 1125002, CRC(49c6ca24) SHA1(71f4ed98ab558deeb86820b7fbf7534a7b7d6b01) )
 ROM_END
 
@@ -8426,12 +8190,9 @@ void tbatfor_state::tbatfor(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1493, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8445,7 +8206,7 @@ ROM_START( tbatfor )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mk3", 0x0000, 0x1000, CRC(9993c382) SHA1(0c89e21024315ce7c086af5390c60f5766028c4f) )
 
-	ROM_REGION( 902364, "svg", 0)
+	ROM_REGION( 902364, "screen", 0)
 	ROM_LOAD( "tbatfor.svg", 0, 902364, CRC(56889c05) SHA1(dda393ca99196de38ad2e989ec6c292adc36ec5e) )
 ROM_END
 
@@ -8531,12 +8292,9 @@ void tjdredd_state::tjdredd(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1444, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8550,7 +8308,7 @@ ROM_START( tjdredd )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mk5", 0x0000, 0x1000, CRC(7beee5a7) SHA1(9a190197c5751b43a9ab2dc8c536934dc5fc5e83) )
 
-	ROM_REGION( 1051586, "svg", 0)
+	ROM_REGION( 1051586, "screen", 0)
 	ROM_LOAD( "tjdredd.svg", 0, 1051586, CRC(4fcdca0a) SHA1(d4b019fec94890ba6600baf2b2096dbcf3295180) )
 ROM_END
 
@@ -8636,12 +8394,9 @@ void tapollo13_state::tapollo13(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1467, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8655,7 +8410,7 @@ ROM_START( tapollo13 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_07", 0x0000, 0x1000, CRC(63d0deaa) SHA1(d5de99d5e0ee08ec2ebeef7189ebac1c008d2e7d) )
 
-	ROM_REGION( 643176, "svg", 0)
+	ROM_REGION( 643176, "screen", 0)
 	ROM_LOAD( "tapollo13.svg", 0, 643176, CRC(e2dac162) SHA1(4089fa485579d2b87ac49b1cf33d6c2c085ea4c5) )
 ROM_END
 
@@ -8741,12 +8496,9 @@ void tgoldeye_state::tgoldeye(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1461, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8760,7 +8512,7 @@ ROM_START( tgoldeye )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_06", 0x0000, 0x1000, CRC(fe053efb) SHA1(3c90c0fa43e6e5e1f76b306e402f902d19175c96) )
 
-	ROM_REGION( 938916, "svg", 0)
+	ROM_REGION( 938916, "screen", 0)
 	ROM_LOAD( "tgoldeye.svg", 0, 938916, CRC(6dddf962) SHA1(1ced43b4225b86eca415f9af7db5fb5e80040186) )
 ROM_END
 
@@ -8841,12 +8593,9 @@ void tsjam_state::tsjam(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1421, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8860,7 +8609,7 @@ ROM_START( tsjam )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_23", 0x0000, 0x1000, CRC(6eaabfbd) SHA1(f0ecbd6f65fe72ce2d8a452685be2e77a63fc9f0) )
 
-	ROM_REGION( 1046147, "svg", 0)
+	ROM_REGION( 1046147, "screen", 0)
 	ROM_LOAD( "tsjam.svg", 0, 1046147, CRC(6d24e1c9) SHA1(ddbfbd85f70ec964c68f982a8ee8070e3786a85e) )
 ROM_END
 
@@ -8941,12 +8690,9 @@ void tinday_state::tinday(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1463, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8960,7 +8706,7 @@ ROM_START( tinday )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_16", 0x0000, 0x1000, CRC(77c2c2f7) SHA1(06326b26d0f6757180724ba0bdeb4110cc7e29d6) )
 
-	ROM_REGION( 1162672, "svg", 0)
+	ROM_REGION( 1162672, "screen", 0)
 	ROM_LOAD( "tinday.svg", 0, 1162672, CRC(9b9a8047) SHA1(2aeaa71a54cf897d2a5d91133c733613ca229aae) )
 ROM_END
 
@@ -9040,12 +8786,9 @@ void tbatmana_state::tbatmana(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1478, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9063,7 +8806,7 @@ ROM_START( tbatmana )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "n81.melody", 0x000, 0x100, CRC(56ba8fe5) SHA1(5c286ae1bfc943bbe8c8f4cdc9c8b73d9b3c186e) )
 
-	ROM_REGION( 618831, "svg", 0)
+	ROM_REGION( 618831, "screen", 0)
 	ROM_LOAD( "tbatmana.svg", 0, 618831, CRC(fc38cb9d) SHA1(1b6c10dcd33bfcfef43d61f97fa8e530011c1e61) )
 ROM_END
 
@@ -9159,12 +8902,9 @@ void trshutvoy_state::trshutvoy(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1496, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9188,7 +8928,7 @@ ROM_START( trshutvoy )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
 
-	ROM_REGION( 221654, "svg", 0)
+	ROM_REGION( 221654, "screen", 0)
 	ROM_LOAD( "trshutvoy.svg", 0, 221654, CRC(470a7ff5) SHA1(b297601d8a5a9c4aef414605632849e0b1925caa) )
 ROM_END
 
@@ -9196,7 +8936,7 @@ ROM_START( tigarden )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
 
-	ROM_REGION( 409084, "svg", 0)
+	ROM_REGION( 409084, "screen", 0)
 	ROM_LOAD( "tigarden.svg", 0, 409084, CRC(cfda5138) SHA1(1bc4ed65ae0cdca3e1e9458d68ca4d6e0fc0e901) )
 ROM_END
 
@@ -9254,12 +8994,9 @@ void trsrescue_state::trsrescue(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1533, 1080);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9273,7 +9010,7 @@ ROM_START( trsrescue )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "0015_224b", 0x0000, 0x1000, CRC(f58a3832) SHA1(2d843b3520de66463e628cea9344a04015d1f5f1) )
 
-	ROM_REGION( 178600, "svg", 0)
+	ROM_REGION( 178600, "screen", 0)
 	ROM_LOAD( "trsrescue.svg", 0, 178600, CRC(2fa7b2d9) SHA1(5d1fc88db3129c9126f0c05ea55fb5f117e02871) )
 ROM_END
 
@@ -9362,12 +9099,9 @@ void nummunch_state::nummunch(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 875);
 	screen.set_visarea_full();
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9384,7 +9118,7 @@ ROM_START( nummunch )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "772.melody", 0x000, 0x100, CRC(96fe463a) SHA1(dcef5eee15a3f6d21e0db1b8ae3fbddc81633fc8) )
 
-	ROM_REGION( 140664, "svg", 0)
+	ROM_REGION( 140664, "screen", 0)
 	ROM_LOAD( "nummunch.svg", 0, 140664, CRC(879df7e2) SHA1(78d8500a445cbbea0090d4e97b781c1e4ed11dd3) )
 ROM_END
 

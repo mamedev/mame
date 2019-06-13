@@ -3483,6 +3483,64 @@ static INPUT_PORTS_START( fantzoneta )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ultracin )
+//  it uses two wheels (see https://youtu.be/Je7Bm9YgiPg?t=33), which seem to rely on bits 0x08, 0x40 and 0x80 of P1 and P2.
+//  for now it's roughly useable by keeping the direction pressed and then pressing the fake button 2. TODO: emulate wheels
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Advertise Sound Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "No Interval" )
+	PORT_DIPSETTING(    0x02, "4 Cycle" )
+	PORT_DIPSETTING(    0x03, "2 Cycle" )
+	PORT_DIPNAME( 0x04, 0x04, "Advertise Coin Indication" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "Coin" )
+	PORT_DIPSETTING(    0x04, "100 - 400 Yen" )
+	PORT_DIPNAME( 0x08, 0x08, "Game Time" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, "Short" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+INPUT_PORTS_END
+
 // we use common sys16b tags to simplify port reads
 static INPUT_PORTS_START( atomicp )
 	PORT_START("SERVICE")   // P1
@@ -9338,7 +9396,7 @@ GAME( 1994, toryumon,   0,        system16b_5797,        toryumon, segas16b_stat
 GAME( 1989, tturf,      0,        system16b_i8751,       tturf,    segas16b_state, init_tturf_5704,          ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan) (8751 317-0104)", 0 )
 GAME( 1989, tturfu,     tturf,    system16b_i8751,       tturf,    segas16b_state, init_generic_5358,        ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US) (8751 317-0099)", 0)
 
-GAME( 1996, ultracin,   0,        system16b_5797,        system16b_generic, segas16b_state, init_generic_5797, ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
+GAME( 1996, ultracin,   0,        system16b_5797,        ultracin, segas16b_state, init_generic_5797, ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
 
 GAME( 1988, wb3,        0,        system16b_i8751,       wb3,      segas16b_state, init_wb3_5704,            ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B) (8751 317-0098)", 0 )
 GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
