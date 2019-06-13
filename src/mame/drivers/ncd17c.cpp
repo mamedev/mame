@@ -3,11 +3,12 @@
 /****************************************************************************
 
     drivers/ncd17c.cpp
+    NCD 16" monochrome X terminal
     NCD 17" color X terminal
     NCD 19" monochrome X terminal
 
     Hardware:
-        - MC68020 CPU, no FPU, no MMU
+        - MC68020 CPU, optional FPU, no MMU
         - 2681 DUART (Logitech serial mouse)
         - AMD LANCE Ethernet controller
         - Bt478 RAMDAC
@@ -17,9 +18,9 @@
         68000     : 1 = DUART, 2 = keyboard, 3 = LANCE, 7 = vblank
 
         6805 port assignments:
-        A0 - I/O - PS/2 connector DATA
-        A1
-        A2 - not sure
+        A0 - IN  - keyboard data in
+        A1 - OUT - keyboard data out
+        A2 - OUT - keyboard clock out
         A3 - OUT - chip select on the 93C46 EEPROM
         A4 - OUT - when clear port B reads as the mailslot from the 68020
         A5 - IN  - set if the 68020 has nothing new for us
@@ -33,32 +34,60 @@
 
         C0-C3 = speaker (4-bit DAC?)  The 6805 timer is used to control this.
 
-        IRQ in = PS/2 clock line
+        IRQ in = keyboard clock in
 
 ****************************************************************************/
 
+/*
+ * WIP status
+ *   - ncd16   boots, QLC/BERT test failure
+ *   - ncd17c  nvram timeout or checksum failure
+ *   - NCD19   boots, tries to contact network (timeout)
+ *
+ * TODO
+ *   - tidy latches
+ *   - fix keyboard
+ *   - sound
+ *   - serial control lines
+ *   - refactor
+ */
 #include "emu.h"
-#include "bus/rs232/rs232.h"
+
+// processors
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
+
+// i/o devices
 #include "machine/mc68681.h"
 #include "machine/am79c90.h"
+#include "machine/eepromser.h"
+
+// busses and connectors
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/hlemouse.h"
+
+// video and audio
 #include "screen.h"
 
-class ncd_020_state : public driver_device
+class ncd_68k_state : public driver_device
 {
 public:
-	ncd_020_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_screen(*this, "screen"),
-		m_mainram(*this, "mainram"),
-		m_vram(*this, "vram"),
-		m_mainram16(*this, "mainram16"),
-		m_vram16(*this, "vram16"),
-		m_duart(*this, "duart"),
-		m_lance(*this, "am79c90")
+	ncd_68k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "mcu")
+		, m_screen(*this, "screen")
+		, m_mainram(*this, "mainram")
+		, m_vram(*this, "vram")
+		, m_mainram16(*this, "mainram16")
+		, m_vram16(*this, "vram16")
+		, m_duart(*this, "duart")
+		, m_lance(*this, "am79c90")
+		, m_kbd_con(*this, "kbd_con")
+		, m_serial(*this, "serial%u", 0U)
+		, m_eeprom(*this, "eeprom")
 	{
 	}
 
@@ -73,16 +102,15 @@ private:
 	void ncd_16_map(address_map &map);
 	void ncd_17c_map(address_map &map);
 	void ncd_19_map(address_map &map);
-	void ncd_mcu_map(address_map &map);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void common(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(lance_irq_w);
-	DECLARE_READ16_MEMBER(lance_dma_r);
-	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	u32 screen_update_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_17c(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ16_MEMBER(lance17c_dma_r);
+	DECLARE_WRITE16_MEMBER(lance17c_dma_w);
 	DECLARE_READ16_MEMBER(lance19_dma_r);
 	DECLARE_WRITE16_MEMBER(lance19_dma_w);
 	DECLARE_READ16_MEMBER(lance16_dma_r);
@@ -94,69 +122,69 @@ private:
 	DECLARE_WRITE16_MEMBER(to_mcu16_w);
 	DECLARE_READ32_MEMBER(mcu_status_r);
 	DECLARE_WRITE32_MEMBER(irq_w);
-	INTERRUPT_GEN_MEMBER(vblank);
-	DECLARE_READ8_MEMBER(mcu_ports_r);
-	DECLARE_WRITE8_MEMBER(mcu_ports_w);
+
+	u8 mcu_porta_r();
+	u8 mcu_portb_r();
+	void mcu_porta_w(u8 data);
+	void mcu_portb_w(u8 data);
+	void mcu_portc_w(u8 data);
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<m6805_device> m_mcu;
+	required_device<m6805_hmos_device> m_mcu;
 	required_device<screen_device> m_screen;
-	optional_shared_ptr<uint32_t> m_mainram;
-	optional_shared_ptr<uint32_t> m_vram;
-	optional_shared_ptr<uint16_t> m_mainram16;
-	optional_shared_ptr<uint16_t> m_vram16;
+	optional_shared_ptr<u32> m_mainram;
+	optional_shared_ptr<u32> m_vram;
+	optional_shared_ptr<u16> m_mainram16;
+	optional_shared_ptr<u16> m_vram16;
 	required_device<scn2681_device> m_duart;
 	required_device<am7990_device> m_lance;
-
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	required_device<pc_kbdc_device> m_kbd_con;
+	required_device_array<rs232_port_device, 2> m_serial;
+	required_device<eeprom_serial_93c46_16bit_device> m_eeprom;
 
 	u32 m_palette[256];
 	u8 m_r, m_g, m_b, m_entry, m_stage;
-	u8 m_porta, m_portb, m_portc, m_to020, m_from020;
-	bool m_unread_to020, m_unread_from020;
+	u8 m_portc, m_to_68k, m_from_68k;
+	u8 m_porta_in, m_porta_out;
+	u8 m_portb_in, m_portb_out;
 };
 
-#define VERBOSE_LEVEL ( 0 )
-
-#define ENABLE_VERBOSE_LOG (0)
-
-inline void ATTR_PRINTF(3,4) ncd_020_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-#if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
-#endif
-}
-
-void ncd_020_state::machine_reset()
+void ncd_68k_state::machine_reset()
 {
 	m_entry = 0;
 	m_stage = 0;
 	m_r = m_g = m_b = 0;
-	m_porta = m_portb = m_portc = 0;
-	m_to020 = m_from020 = 0;
-	m_unread_to020 = m_unread_from020 = false;
+	m_porta_in = m_porta_out = m_portb_in = m_portb_out = m_portc = 0;
+	m_to_68k = m_from_68k = 0;
+
+	m_porta_in |= 0x20;
 }
 
-INTERRUPT_GEN_MEMBER(ncd_020_state::vblank)
+u32 ncd_68k_state::screen_update_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+	static constexpr u32 palette[2] = { 0, 0xffffff };
+	u8 const *const vram = (u8 *)m_vram16.target();
+
+	for (int y = 0; y < 1024; y++)
+	{
+		u32 *scanline = &bitmap.pix32(y);
+		for (int x = 0; x < 1024 / 8; x++)
+		{
+			u8 const pixels = vram[(y * (1024 / 8)) + (x ^ 1)];
+
+			for (int b = 0; b < 8; b++)
+				*scanline++ = palette[BIT(pixels, 7 - b)];
+		}
+	}
+	return 0;
 }
 
-
-uint32_t ncd_020_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 ncd_68k_state::screen_update_17c(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
+	u32 *scanline;
 	int x, y;
-	uint8_t pixels;
-	uint8_t *vram = (uint8_t *)m_mainram.target();
+	u8 pixels;
+	u8 *vram = (u8 *)m_mainram.target();
 
 	for (y = 0; y < 768; y++)
 	{
@@ -171,17 +199,17 @@ uint32_t ncd_020_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-uint32_t ncd_020_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 ncd_68k_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	static constexpr uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t const *const vram = (uint8_t *)m_vram.target();
+	static constexpr u32 palette[2] = { 0, 0xffffff };
+	u8 const *const vram = (u8 *)m_vram.target();
 
 	for (int y = 0; y < 1024; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix32(y);
 		for (int x = 0; x < 1024/8; x++)
 		{
-			uint8_t const pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
+			u8 const pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
 
 			for (int b = 0; b < 8; b++)
 				*scanline++ = palette[BIT(pixels, 7 - b)];
@@ -191,163 +219,132 @@ uint32_t ncd_020_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-uint32_t ncd_020_state::screen_update_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	static constexpr uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t const *const vram = (uint8_t *)m_vram16.target();
-
-	for (int y = 0; y < 1024; y++)
-	{
-		uint32_t *scanline = &bitmap.pix32(y);
-		for (int x = 0; x < 1024/8; x++)
-		{
-			uint8_t const pixels = vram[(y * (1024/8)) + (x^1)];
-
-			for (int b = 0; b < 8; b++)
-				*scanline++ = palette[BIT(pixels, 7 - b)];
-		}
-	}
-	return 0;
-}
-
-void ncd_020_state::ncd_17c_map(address_map &map)
-{
-	map(0x00000000, 0x000bffff).rom().region("maincpu", 0);
-	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_020_state::from_mcu_r), FUNC(ncd_020_state::to_mcu_w));
-	map(0x001c8000, 0x001c803f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
-	map(0x001d0000, 0x001d0003).w(FUNC(ncd_020_state::bt478_palette_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::irq_w));
-	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
-	map(0x01000000, 0x02ffffff).ram();
-	map(0x03000000, 0x03ffffff).ram().share("mainram");
-}
-
-void ncd_020_state::ncd_19_map(address_map &map)
-{
-	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
-	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_020_state::from_mcu_r), FUNC(ncd_020_state::to_mcu_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::irq_w));
-	map(0x001e0000, 0x001e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
-	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
-	map(0x00400000, 0x0043ffff).ram().share("vram");
-	map(0x00800000, 0x00ffffff).ram().share("mainram");
-}
-
-void ncd_020_state::ncd_16_map(address_map &map)
+void ncd_68k_state::ncd_16_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom().region("maincpu", 0);
-	//map(0x0c0000, 0x0c0001).rw(FUNC(ncd_020_state::from_mcu16_r), FUNC(ncd_020_state::to_mcu16_w));
+	map(0x0c0000, 0x0c0001).rw(FUNC(ncd_68k_state::from_mcu16_r), FUNC(ncd_68k_state::to_mcu16_w));
 	map(0x0e0000, 0x0e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0x100000, 0x100003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 	map(0x200000, 0x21ffff).ram().share("vram16");
 	map(0x380000, 0x5fffff).ram().share("mainram16");
 }
 
-READ8_MEMBER(ncd_020_state::mcu_ports_r)
+void ncd_68k_state::ncd_17c_map(address_map &map)
 {
-	u8 rv = 0;
-
-	switch (offset)
-	{
-		case 0: // port A
-			rv = m_porta & ~(0xa5);
-			if (!m_unread_from020)
-			{
-				rv |= 0x20;
-			}
-			if (m_unread_to020)
-			{
-				rv |= 0x80;
-			}
-			break;
-
-		case 1: // port B
-			if (!(m_porta & 0x10))
-			{
-				rv = m_from020;
-			}
-			else
-			{
-				rv = m_portb;
-			}
-			break;
-
-		case 2: // port C
-			rv = m_portc & 0xf;
-			rv |= 0xf0;
-			break;
-	}
-
-	return rv;
+	map(0x00000000, 0x000bffff).rom().region("maincpu", 0);
+	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_68k_state::from_mcu_r), FUNC(ncd_68k_state::to_mcu_w));
+	map(0x001c8000, 0x001c803f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
+	map(0x001d0000, 0x001d0003).w(FUNC(ncd_68k_state::bt478_palette_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_68k_state::mcu_status_r), FUNC(ncd_68k_state::irq_w));
+	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
+	map(0x01000000, 0x02ffffff).ram();
+	map(0x03000000, 0x03ffffff).ram().share("mainram");
 }
 
-WRITE8_MEMBER(ncd_020_state::mcu_ports_w)
+void ncd_68k_state::ncd_19_map(address_map &map)
 {
-	switch (offset)
-	{
-		case 0: // port A
-			//if (data != m_porta) printf("%02x to port A\n", data);
-			if ((data & 0x40) && !(m_porta & 0x40))
-			{
-				//printf("Sending %02x to 020\n", m_portb);
-				m_to020 = m_portb;
-				m_unread_to020 = true;
-				m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
-			}
-			m_porta = data;
-			break;
-
-		case 1: // port B
-			//printf("%02x to port B\n", data);
-			m_portb = data;
-			break;
-
-		case 2: // port C
-			m_portc = data;
-			break;
-	}
+	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
+	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_68k_state::from_mcu_r), FUNC(ncd_68k_state::to_mcu_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_68k_state::mcu_status_r), FUNC(ncd_68k_state::irq_w));
+	map(0x001e0000, 0x001e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
+	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
+	map(0x00400000, 0x0043ffff).ram().share("vram");
+	map(0x00800000, 0x00ffffff).ram().share("mainram");
 }
 
-READ32_MEMBER(ncd_020_state::from_mcu_r)
+
+u8 ncd_68k_state::mcu_porta_r()
+{
+	return m_porta_in;
+}
+
+u8 ncd_68k_state::mcu_portb_r()
+{
+	// read from the mailbox or from the port B latch
+	if (!BIT(m_porta_out, 4))
+	{
+		// FIXME: ncd19 requires this, but ncd17c fails with an nvram timeout
+		m_porta_in |= 0x20;
+
+		return m_from_68k;
+	}
+	else
+		return m_portb_in;
+}
+
+void ncd_68k_state::mcu_porta_w(u8 data)
+{
+	//if (data != m_porta) printf("%02x to port A\n", data);
+	if ((data & 0x40) && !(m_porta_out & 0x40))
+	{
+		//logerror("Sending %02x to 68k\n", m_portb_out);
+		m_to_68k = m_portb_out;
+		m_porta_in |= 0x80;
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	}
+
+	m_kbd_con->data_write_from_mb(BIT(data, 1));
+	m_kbd_con->clock_write_from_mb(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 3));
+
+	m_porta_out = data;
+}
+
+void ncd_68k_state::mcu_portb_w(u8 data)
+{
+	// check if eeprom chip select asserted
+	if (BIT(m_porta_out, 3))
+	{
+		m_eeprom->clk_write(BIT(data, 0));
+		m_eeprom->di_write(BIT(data, 1));
+	}
+
+	m_portb_out = data;
+}
+
+void ncd_68k_state::mcu_portc_w(u8 data)
+{
+	m_portc = data;
+}
+
+READ32_MEMBER(ncd_68k_state::from_mcu_r)
 {
 	//printf("020 read %02x\n", m_to020);
-	m_unread_to020 = false;
+	m_porta_in &= ~0x80;
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	return m_to020<<24;
+	return m_to_68k << 24;
 }
 
-WRITE32_MEMBER(ncd_020_state::to_mcu_w)
+WRITE32_MEMBER(ncd_68k_state::to_mcu_w)
 {
 	//printf("Sending %02x to MCU\n", data);
-	m_from020 = data>>24;
-	m_unread_from020 = true;
-	m_maincpu->yield();
+	m_from_68k = data>>24;
+	m_porta_in &= ~0x20;
 }
 
-READ16_MEMBER(ncd_020_state::from_mcu16_r)
+READ16_MEMBER(ncd_68k_state::from_mcu16_r)
 {
 	//printf("68k read %02x\n", m_to020);
-	m_unread_to020 = false;
+	m_porta_in &= ~0x80;
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	return m_to020;
+	return m_to_68k;
 }
 
-WRITE16_MEMBER(ncd_020_state::to_mcu16_w)
+WRITE16_MEMBER(ncd_68k_state::to_mcu16_w)
 {
 	//printf("Sending %02x to MCU\n", data);
-	m_from020 = data&0xff;
-	m_unread_from020 = true;
-	m_maincpu->yield();
+	m_from_68k = data & 0xff;
+	m_porta_in &= ~0x20;
 }
 
-READ32_MEMBER(ncd_020_state::mcu_status_r)
+READ32_MEMBER(ncd_68k_state::mcu_status_r)
 {
 	u32 rv = 0;
-	if (!m_unread_from020)
+	if (!(m_porta_in & 0x20))
 	{
 		rv |= 0x01000000;
 	}
-	if (m_unread_to020)
+	if (m_porta_in & 0x80)
 	{
 		rv |= 0x02000000;
 	}
@@ -355,84 +352,12 @@ READ32_MEMBER(ncd_020_state::mcu_status_r)
 	return rv;
 }
 
-WRITE32_MEMBER(ncd_020_state::irq_w)
+WRITE32_MEMBER(ncd_68k_state::irq_w)
 {
-	if (data & 0x80000000)
-	{
-		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(M68K_IRQ_1, BIT(data, 31));
 }
 
-void ncd_020_state::ncd_mcu_map(address_map &map)
-{
-	map.global_mask(0x7ff);
-	map(0x0000, 0x0002).rw(FUNC(ncd_020_state::mcu_ports_r), FUNC(ncd_020_state::mcu_ports_w));
-	map(0x0040, 0x007f).ram();
-	map(0x0080, 0x00ff).rom().region("mcu", 0x80);
-	map(0x03c0, 0x07ff).rom().region("mcu", 0x3c0);
-}
-
-WRITE_LINE_MEMBER(ncd_020_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M68K_IRQ_4, state);
-}
-
-WRITE_LINE_MEMBER(ncd_020_state::lance_irq_w)
-{
-	m_maincpu->set_input_line(M68K_IRQ_3, state);
-}
-
-READ16_MEMBER(ncd_020_state::lance_dma_r)
-{
-	u32 const data = m_mainram.target()[offset >> 2];
-
-	return (offset & 2) ? u16(data) : u16(data >> 16);
-}
-
-WRITE16_MEMBER(ncd_020_state::lance_dma_w)
-{
-	u32 const existing = m_mainram.target()[offset >> 2];
-
-	if (offset & 2)
-		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
-	else
-		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
-}
-
-READ16_MEMBER(ncd_020_state::lance19_dma_r)
-{
-	if (offset < 0x800000)
-	{
-		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
-	}
-
-	offset &= 0x7fffff;
-	u32 const data = m_mainram.target()[offset >> 2];
-
-	return (offset & 2) ? u16(data) : u16(data >> 16);
-}
-
-WRITE16_MEMBER(ncd_020_state::lance19_dma_w)
-{
-	if (offset < 0x800000)
-	{
-		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
-	}
-
-	offset &= 0x7fffff;
-	u32 const existing = m_mainram.target()[offset >> 2];
-
-	if (offset & 2)
-		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
-	else
-		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
-}
-
-READ16_MEMBER(ncd_020_state::lance16_dma_r)
+READ16_MEMBER(ncd_68k_state::lance16_dma_r)
 {
 	//printf("lance16_r @ %x\n", offset);
 	if (offset < 0x380000)
@@ -442,10 +367,10 @@ READ16_MEMBER(ncd_020_state::lance16_dma_r)
 	}
 
 	offset -= 0x380000;
-	return m_mainram16.target()[offset>>1];
+	return m_mainram16.target()[offset >> 1];
 }
 
-WRITE16_MEMBER(ncd_020_state::lance16_dma_w)
+WRITE16_MEMBER(ncd_68k_state::lance16_dma_w)
 {
 	//printf("lance16_w: %04x @ %x\n", data, offset);
 	if (offset < 0x380000)
@@ -455,10 +380,56 @@ WRITE16_MEMBER(ncd_020_state::lance16_dma_w)
 	}
 
 	offset -= 0x380000;
-	COMBINE_DATA(&m_mainram16.target()[offset>>1]);
+	COMBINE_DATA(&m_mainram16.target()[offset >> 1]);
 }
 
-WRITE32_MEMBER(ncd_020_state::bt478_palette_w)
+READ16_MEMBER(ncd_68k_state::lance17c_dma_r)
+{
+	u32 const data = m_mainram.target()[offset >> 2];
+
+	return (offset & 2) ? u16(data) : u16(data >> 16);
+}
+
+WRITE16_MEMBER(ncd_68k_state::lance17c_dma_w)
+{
+	u32 const existing = m_mainram.target()[offset >> 2];
+
+	if (offset & 2)
+		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
+	else
+		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
+}
+
+READ16_MEMBER(ncd_68k_state::lance19_dma_r)
+{
+	if (offset < 0x800000)
+	{
+		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+	}
+
+	offset &= 0x7fffff;
+	u32 const data = m_mainram.target()[offset >> 2];
+
+	return (offset & 2) ? u16(data) : u16(data >> 16);
+}
+
+WRITE16_MEMBER(ncd_68k_state::lance19_dma_w)
+{
+	if (offset < 0x800000)
+	{
+		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+	}
+
+	offset &= 0x7fffff;
+	u32 const existing = m_mainram.target()[offset >> 2];
+
+	if (offset & 2)
+		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
+	else
+		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
+}
+
+WRITE32_MEMBER(ncd_68k_state::bt478_palette_w)
 {
 	if (mem_mask & 0xff000000)
 	{
@@ -497,126 +468,192 @@ WRITE32_MEMBER(ncd_020_state::bt478_palette_w)
 	}
 }
 
-void ncd_020_state::ncd_17c(machine_config &config)
+void ncd_68k_state::ncd_16(machine_config &config)
 {
-	/* basic machine hardware */
-	M68020(config, m_maincpu, 20000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_17c_map);
-	m_maincpu->set_periodic_int(FUNC(ncd_020_state::vblank), attotime::from_hz(70.06));
-
-	M6805(config, m_mcu, 3.6864_MHz_XTAL);  // MC6805P2
-	m_mcu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_mcu_map);
-
-	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(ncd_020_state::duart_irq_handler));
-
-	AM7990(config, m_lance);
-	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
-	m_lance->dma_in().set(FUNC(ncd_020_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(ncd_020_state::lance_dma_w));
-
-	// 56.260 kHz horizontal, 70.06 Hz vertical
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(77.4144_MHz_XTAL, 1376, 0, 1024, 803, 0, 768);
-	m_screen->set_screen_update(FUNC(ncd_020_state::screen_update));
-}
-
-void ncd_020_state::ncd_19(machine_config &config)
-{
-	/* basic machine hardware */
-	M68020(config, m_maincpu, 15000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_19_map);
-	m_maincpu->set_periodic_int(FUNC(ncd_020_state::vblank), attotime::from_hz(72));
-
-	M6805(config, m_mcu, 3.6864_MHz_XTAL);  // MC6805P2
-	m_mcu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_mcu_map);
-
-	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(ncd_020_state::duart_irq_handler));
-
-	AM7990(config, m_lance);
-	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
-	m_lance->dma_in().set(FUNC(ncd_020_state::lance19_dma_r));
-	m_lance->dma_out().set(FUNC(ncd_020_state::lance19_dma_w));
-
-	// 128 MHz dot clock generated by DP8530; 74.074 kHz horizontal, 70.1459 Hz vertical
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16_MHz_XTAL * 8, 1728, 0, 1280, 1056, 0, 1024);
-	m_screen->set_screen_update(FUNC(ncd_020_state::screen_update_19));
-}
-
-void ncd_020_state::ncd_16(machine_config &config)
-{
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12500000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_16_map);
-	m_maincpu->set_periodic_int(FUNC(ncd_020_state::vblank), attotime::from_hz(72));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_68k_state::ncd_16_map);
 
-	M6805(config, m_mcu, 3.6864_MHz_XTAL);  // MC68705P2
-	m_mcu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_mcu_map);
-
+	// duart
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(ncd_020_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
+	// keyboard controller
+	M68705P3(config, m_mcu, 3'750'000);
+
+	// ethernet
 	AM7990(config, m_lance);
-	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
-	m_lance->dma_in().set(FUNC(ncd_020_state::lance16_dma_r));
-	m_lance->dma_out().set(FUNC(ncd_020_state::lance16_dma_w));
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
+	m_lance->dma_in().set(FUNC(ncd_68k_state::lance16_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_68k_state::lance16_dma_w));
 
 	// 124.652 MHz dot clock generated by DP8530; 82.88 kHz horizontal, 70 Hz vertical
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(124'652'000, 1504, 0, 1024, 1184, 0, 1024);
-	m_screen->set_screen_update(FUNC(ncd_020_state::screen_update_16));
+	m_screen->set_screen_update(FUNC(ncd_68k_state::screen_update_16));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
+
+	common(config);
 }
 
-static INPUT_PORTS_START( ncd_17c )
+void ncd_68k_state::ncd_17c(machine_config &config)
+{
+	// basic machine hardware
+	M68020(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_68k_state::ncd_17c_map);
+
+	// duart
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	// keyboard controller
+	M6805P2(config, m_mcu, 3'750'000);
+
+	// ethernet
+	AM7990(config, m_lance);
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
+	m_lance->dma_in().set(FUNC(ncd_68k_state::lance17c_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_68k_state::lance17c_dma_w));
+
+	// 56.260 kHz horizontal, 70.06 Hz vertical
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(77.4144_MHz_XTAL, 1376, 0, 1024, 803, 0, 768);
+	m_screen->set_screen_update(FUNC(ncd_68k_state::screen_update_17c));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
+
+	common(config);
+}
+
+void ncd_68k_state::ncd_19(machine_config &config)
+{
+	// basic machine hardware
+	M68020(config, m_maincpu, 15000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_68k_state::ncd_19_map);
+
+	// duart
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	// keyboard controller
+	M6805P2(config, m_mcu, 3'750'000);
+
+	// ethernet
+	AM7990(config, m_lance);
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
+	m_lance->dma_in().set(FUNC(ncd_68k_state::lance19_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_68k_state::lance19_dma_w));
+
+	// 128 MHz dot clock generated by DP8530; 74.074 kHz horizontal, 70.1459 Hz vertical
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL * 8, 1728, 0, 1280, 1056, 0, 1024);
+	m_screen->set_screen_update(FUNC(ncd_68k_state::screen_update_19));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
+
+	common(config);
+}
+
+void ncd_68k_state::common(machine_config &config)
+{
+	// mcu ports
+	m_mcu->porta_w().set(FUNC(ncd_68k_state::mcu_porta_w));
+	m_mcu->portb_w().set(FUNC(ncd_68k_state::mcu_portb_w));
+	m_mcu->portc_w().set(FUNC(ncd_68k_state::mcu_portc_w));
+
+	m_mcu->porta_r().set(FUNC(ncd_68k_state::mcu_porta_r));
+	m_mcu->portb_r().set(FUNC(ncd_68k_state::mcu_portb_r));
+
+	// keyboard connector
+	PC_KBDC(config, m_kbd_con, 0);
+	m_kbd_con->out_clock_cb().set_inputline(m_mcu, M6805_IRQ_LINE).invert();
+	m_kbd_con->out_data_cb().set(
+		[this](int state)
+		{
+			if (state)
+				m_porta_in |= 0x01;
+			else
+				m_porta_in &= ~0x01;
+		});
+
+	// keyboard port
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	kbd.set_pc_kbdc_slot(m_kbd_con);
+
+	// mouse port
+	RS232_PORT(config, m_serial[0],
+		[this](device_slot_interface &device)
+		{
+			default_rs232_devices(device);
+			device.option_add("mouse", LOGITECH_HLE_SERIAL_MOUSE);
+		},
+		"mouse");
+	m_serial[0]->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	m_duart->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+
+	// auxiliary port
+	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	m_serial[1]->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	m_duart->b_tx_cb().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+
+	// eeprom
+	EEPROM_93C46_16BIT(config, m_eeprom);
+	m_eeprom->do_callback().set(
+		[this](int state)
+		{
+			if (state)
+				m_portb_in |= 0x04;
+			else
+				m_portb_in &= ~0x04;
+		});
+}
+
+static INPUT_PORTS_START(ncd_68k)
 INPUT_PORTS_END
 
-/***************************************************************************
-
-  ROM definition(s)
-
-***************************************************************************/
-
-ROM_START( ncd17c )
-	ROM_REGION32_BE(0xc0000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "ncd17c_v2.2.1_b0e.bin", 0x000000, 0x020000, CRC(c47648af) SHA1(563e17ea8f5c9d418fd81f1e797a226937c0e187) )
-	ROM_LOAD16_BYTE( "ncd17c_v2.2.1_b0o.bin", 0x000001, 0x020000, CRC(b6a8c3ca) SHA1(f02e33d88861ebcb402fb554719c1cb072a5fd14) )
-	ROM_LOAD16_BYTE( "ncd17c_v2.2.1_b1e.bin", 0x040000, 0x020000, CRC(25500987) SHA1(cebdf07c69f1c783a67b92d6efdfdd7067dc910f) )
-	ROM_LOAD16_BYTE( "ncd17c_v2.2.1_b1o.bin", 0x040001, 0x020000, CRC(a5d5ab8a) SHA1(51ddb7020abd5f83224bff48eab254375e9d27f9) )
-	ROM_LOAD16_BYTE( "ncd17c_v2.2.1_b2e.bin", 0x080000, 0x020000, CRC(390dac65) SHA1(3f9c886433dff87847135b8f3d8e8ead75d3abf3) )
-	ROM_LOAD16_BYTE( "ncd17c_v2.2.1_b2o.bin", 0x080001, 0x020000, CRC(2e5ebfaa) SHA1(d222c6cc743046a1c1dec1829c24fa918a54849d) )
-
-	ROM_REGION(0x800, "mcu", 0)
-	ROM_LOAD( "ncd4200005.bin", 0x000000, 0x000800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1) )
-ROM_END
-
-ROM_START( ncd19 )
-	ROM_REGION32_BE(0x10000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "ncd19_v2.1.1_e.bin", 0x000000, 0x008000, CRC(28786528) SHA1(8f4ad6a593c55cce0477169132ecf38577086f4e) )
-	ROM_LOAD16_BYTE( "ncd19_v2.1.1_o.bin", 0x000001, 0x008000, CRC(aeefbcf1) SHA1(0c28426d0ae7c18de02daee7d340c17dc461e7f4) )
-
-	ROM_REGION(0x800, "mcu", 0)
-	ROM_LOAD( "ncd4200005.bin", 0x000000, 0x000800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1) )
-ROM_END
-
-ROM_START( ncd16 )
+ROM_START(ncd16)
 	ROM_REGION16_BE(0xc0000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "b0e.bin",      0x000000, 0x020000, CRC(8996f939) SHA1(8d6c5649fa927ee16b8632c2f2949997014346d0) )
-	ROM_LOAD16_BYTE( "b0o.bin",      0x000001, 0x020000, CRC(3143e82c) SHA1(37b917304705a450b3272945d4cff851afb97dbe) )
-	ROM_LOAD16_BYTE( "b1e.bin",      0x040000, 0x020000, CRC(82712624) SHA1(7e2ff025bf4e9638bdd58b99dc4dabd86c0d21ee) )
-	ROM_LOAD16_BYTE( "b1o.bin",      0x040001, 0x020000, CRC(432aaa02) SHA1(960291a9b692449e4e787b88528c83a37b3562f2) )
-	ROM_LOAD16_BYTE( "b2e.bin",      0x080000, 0x020000, CRC(290116df) SHA1(1042764eb5f308046c0f019f31df457d360c9db1) )
-	ROM_LOAD16_BYTE( "b2o.bin",      0x080001, 0x020000, CRC(2b364281) SHA1(63c2b3093eee6d40f405ead911843ebeb5193b7a) )
+	ROM_LOAD16_BYTE("b0e.u3",  0x000000, 0x020000, CRC(8996f939) SHA1(8d6c5649fa927ee16b8632c2f2949997014346d0))
+	ROM_LOAD16_BYTE("b0o.u14", 0x000001, 0x020000, CRC(3143e82c) SHA1(37b917304705a450b3272945d4cff851afb97dbe))
+	ROM_LOAD16_BYTE("b1e.u2",  0x040000, 0x020000, CRC(82712624) SHA1(7e2ff025bf4e9638bdd58b99dc4dabd86c0d21ee))
+	ROM_LOAD16_BYTE("b1o.u13", 0x040001, 0x020000, CRC(432aaa02) SHA1(960291a9b692449e4e787b88528c83a37b3562f2))
+	ROM_LOAD16_BYTE("b2e.u1",  0x080000, 0x020000, CRC(290116df) SHA1(1042764eb5f308046c0f019f31df457d360c9db1))
+	ROM_LOAD16_BYTE("b2o.u12", 0x080001, 0x020000, CRC(2b364281) SHA1(63c2b3093eee6d40f405ead911843ebeb5193b7a))
 
-	ROM_REGION(0x80, "eeprom", 0)
-	ROM_LOAD( "eepr_96c43.bin", 0x000000, 0x000080, CRC(656c8444) SHA1(162a71e2d91a104f4251beb17a4a53f24d1e5e03) )
+	ROM_REGION16_LE(0x80, "eeprom", 0)
+	ROM_LOAD("93c46_0000a76f002b.u17", 0x00, 0x80, CRC(656c8444) SHA1(162a71e2d91a104f4251beb17a4a53f24d1e5e03))
 
 	ROM_REGION(0x800, "mcu", 0)
-	ROM_LOAD( "4903001_v2.00_key_scan_68705p3.bin", 0x000000, 0x000800, CRC(acec6140) SHA1(003a27cb22652d37b3be05d4ad4e924fc6c5c8de) )
+	ROM_LOAD("4903001_v2.00_key_scan.u10", 0x000, 0x800, CRC(acec6140) SHA1(003a27cb22652d37b3be05d4ad4e924fc6c5c8de))
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT               COMPANY                 FULLNAME           FLAGS
-COMP( 1989, ncd16,  0,      0,      ncd_16,  ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD 16", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-COMP( 1990, ncd17c, 0,      0,      ncd_17c, ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD 17C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-COMP( 1990, ncd19,  0,      0,      ncd_19,  ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD 19", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+ROM_START(ncd17c)
+	ROM_REGION32_BE(0xc0000, "maincpu", 0)
+	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b0e.u3",  0x000000, 0x020000, CRC(c47648af) SHA1(563e17ea8f5c9d418fd81f1e797a226937c0e187))
+	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b0o.u14", 0x000001, 0x020000, CRC(b6a8c3ca) SHA1(f02e33d88861ebcb402fb554719c1cb072a5fd14))
+	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b1e.u2",  0x040000, 0x020000, CRC(25500987) SHA1(cebdf07c69f1c783a67b92d6efdfdd7067dc910f))
+	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b1o.u13", 0x040001, 0x020000, CRC(a5d5ab8a) SHA1(51ddb7020abd5f83224bff48eab254375e9d27f9))
+	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b2e.u1",  0x080000, 0x020000, CRC(390dac65) SHA1(3f9c886433dff87847135b8f3d8e8ead75d3abf3))
+	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b2o.u12", 0x080001, 0x020000, CRC(2e5ebfaa) SHA1(d222c6cc743046a1c1dec1829c24fa918a54849d))
+
+	ROM_REGION16_LE(0x80, "eeprom", 0)
+	ROM_LOAD("93c46_0000a7103f0f.u17", 0x00, 0x80, CRC(f7515683) SHA1(3c5796d4fc1e18db8d12b5a4758f083f9dac3f36))
+
+	ROM_REGION(0x800, "mcu", 0)
+	ROM_LOAD("ncd4200005.u18", 0x000, 0x800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1))
+ROM_END
+
+ROM_START(ncd19)
+	ROM_REGION32_BE(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE("ncd19_v2.1.1_e.u3",  0x000000, 0x008000, CRC(28786528) SHA1(8f4ad6a593c55cce0477169132ecf38577086f4e))
+	ROM_LOAD16_BYTE("ncd19_v2.1.1_o.u14", 0x000001, 0x008000, CRC(aeefbcf1) SHA1(0c28426d0ae7c18de02daee7d340c17dc461e7f4))
+
+	ROM_REGION16_LE(0x80, "eeprom", 0)
+	ROM_LOAD("93c46_0000a71028bd.u17", 0x00, 0x80, CRC(c2cd34fe) SHA1(77bbbc46c717b15c4a075511e50dfb26cca74029))
+
+	ROM_REGION(0x800, "mcu", 0)
+	ROM_LOAD("ncd4200005.u18", 0x000, 0x800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1))
+ROM_END
+
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                      FULLNAME   FLAGS
+COMP(1989, ncd16,  0,      0,      ncd_16,  ncd_68k, ncd_68k_state, empty_init, "Network Computing Devices", "NCD 16",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP(1990, ncd17c, 0,      0,      ncd_17c, ncd_68k, ncd_68k_state, empty_init, "Network Computing Devices", "NCD 17C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP(1990, ncd19,  0,      0,      ncd_19,  ncd_68k, ncd_68k_state, empty_init, "Network Computing Devices", "NCD 19",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
