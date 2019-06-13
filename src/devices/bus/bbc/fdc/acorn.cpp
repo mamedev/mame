@@ -248,7 +248,7 @@ void bbc_acorn1770_device::write(offs_t offset, uint8_t data)
 		m_fdc_ie = !BIT(data, 4);
 
 		// bit 5: reset
-		if (!BIT(data, 5)) m_fdc->soft_reset();
+		m_fdc->mr_w(BIT(data, 5));
 	}
 }
 
