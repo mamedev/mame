@@ -721,7 +721,7 @@ WRITE_LINE_MEMBER(ioc2_device::gio_int2_w)
 
 WRITE_LINE_MEMBER(ioc2_device::hpc_dma_done_w)
 {
-	if (state == ASSERT_LINE)
+	if (state)
 		raise_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
 	else
 		lower_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
@@ -733,4 +733,20 @@ WRITE_LINE_MEMBER(ioc2_device::mc_dma_done_w)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 	else
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::scsi0_int_w)
+{
+	if (state)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::scsi1_int_w)
+{
+	if (state)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 }

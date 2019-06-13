@@ -12,7 +12,6 @@
 #pragma once
 
 #include "machine/hal2.h"
-#include "machine/ioc2.h"
 
 class hpc3_device : public device_t, public device_memory_interface
 {
@@ -33,16 +32,14 @@ public:
 
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T, typename U>
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&ioc2_tag, U &&hal2_tag)
+	template <typename T>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&hal2_tag)
 		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		set_ioc2_tag(std::forward<T>(ioc2_tag));
-		set_hal2_tag(std::forward<U>(hal2_tag));
+		set_hal2_tag(std::forward<T>(hal2_tag));
 	}
 
 	template <typename T> void set_gio64_space(T &&tag, int spacenum) { m_gio64_space.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_ioc2_tag(T &&tag) { m_ioc2.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_hal2_tag(T &&tag) { m_hal2.set_tag(std::forward<T>(tag)); }
 
 	template <int N> auto hd_rd_cb() { return m_hd_rd_cb[N].bind(); }
@@ -61,9 +58,7 @@ public:
 
 	void map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi0_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
 
 protected:
@@ -114,6 +109,7 @@ protected:
 	void dump_chain(uint32_t base);
 	void fetch_chain(int channel);
 	void decrement_chain(int channel);
+	void scsi_fifo_flush(int channel);
 	void scsi_drq(bool state, int channel);
 	//void scsi_dma(int channel);
 
@@ -160,7 +156,9 @@ protected:
 		HPC3_DMACTRL_IRQ    = 0x01,
 		HPC3_DMACTRL_ENDIAN = 0x02,
 		HPC3_DMACTRL_DIR    = 0x04,
+		HPC3_DMACTRL_FLUSH  = 0x08,
 		HPC3_DMACTRL_ENABLE = 0x10,
+		HPC3_DMACTRL_WRMASK = 0x20,
 	};
 
 	enum
@@ -173,7 +171,6 @@ protected:
 
 	required_address_space m_gio64_space;
 	address_space *m_pio_space[10];
-	required_device<ioc2_device> m_ioc2;
 	required_device<hal2_device> m_hal2;
 
 	devcb_read8 m_hd_rd_cb[2];
@@ -198,11 +195,11 @@ protected:
 	{
 		uint32_t m_cbp;
 		uint32_t m_nbdp;
-		uint32_t m_ctrl;
+		uint8_t m_ctrl;
 		uint32_t m_bc;
+		uint16_t m_count;
 		uint32_t m_dmacfg;
 		uint32_t m_piocfg;
-		bool m_irq;
 		bool m_drq;
 		bool m_big_endian;
 		bool m_to_device;

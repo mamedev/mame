@@ -39,7 +39,6 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 		{"PIO channel 8", ENDIANNESS_LITTLE, 16, 8, -1},
 		{"PIO channel 9", ENDIANNESS_LITTLE, 16, 8, -1}}
 	, m_gio64_space(*this, finder_base::DUMMY_TAG, -1)
-	, m_ioc2(*this, finder_base::DUMMY_TAG)
 	, m_hal2(*this, finder_base::DUMMY_TAG)
 	, m_hd_rd_cb{{*this}, {*this}}
 	, m_hd_wr_cb{{*this}, {*this}}
@@ -109,9 +108,9 @@ void hpc3_device::device_start()
 		save_item(NAME(m_scsi_dma[i].m_nbdp), i);
 		save_item(NAME(m_scsi_dma[i].m_ctrl), i);
 		save_item(NAME(m_scsi_dma[i].m_bc), i);
+		save_item(NAME(m_scsi_dma[i].m_count), i);
 		save_item(NAME(m_scsi_dma[i].m_dmacfg), i);
 		save_item(NAME(m_scsi_dma[i].m_piocfg), i);
-		save_item(NAME(m_scsi_dma[i].m_irq), i);
 		save_item(NAME(m_scsi_dma[i].m_drq), i);
 		save_item(NAME(m_scsi_dma[i].m_big_endian), i);
 		save_item(NAME(m_scsi_dma[i].m_to_device), i);
@@ -187,6 +186,9 @@ void hpc3_device::device_reset()
 		m_pbus_dma[i].m_active = false;
 		m_pbus_dma[i].m_timer->adjust(attotime::never);
 	}
+
+	m_intstat = 0;
+	m_dma_complete_int_cb(0);
 }
 
 void hpc3_device::map(address_map &map)
@@ -248,13 +250,19 @@ void hpc3_device::do_pbus_dma(uint32_t channel)
 
 		if (dma.m_bytes_left == 0)
 		{
+			if (BIT(dma.m_desc_flags, 29))
+			{
+				LOGMASKED(LOG_PBUS_DMA, "Raising channel %d IRQ\n", channel);
+				m_intstat |= 1 << channel;
+				m_dma_complete_int_cb(1);
+			}
 			if (!BIT(dma.m_desc_flags, 31))
 			{
 				dma.m_desc_ptr = dma.m_next_ptr;
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_DescPtr = %08x\n", channel, dma.m_desc_ptr); fflush(stdout);
 				dma.m_cur_ptr = m_gio64_space->read_dword(dma.m_desc_ptr);
 				dma.m_desc_flags = m_gio64_space->read_dword(dma.m_desc_ptr + 4);
-				dma.m_bytes_left = dma.m_desc_flags & 0x7fffffff;
+				dma.m_bytes_left = dma.m_desc_flags & 0x3fff;
 				dma.m_next_ptr = m_gio64_space->read_dword(dma.m_desc_ptr + 8);
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_CurPtr = %08x\n", channel, dma.m_cur_ptr); fflush(stdout);
 				LOGMASKED(LOG_PBUS_DMA, "Channel %d Next PBUS_DMA_BytesLeft = %08x\n", channel, dma.m_bytes_left); fflush(stdout);
@@ -320,15 +328,28 @@ READ32_MEMBER(hpc3_device::hd_enet_r)
 	case 0x3000/4:
 	{
 		const uint32_t channel = (offset & 0x2000/4) ? 1 : 0;
-		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d Buffer Count Read: %08x & %08x\n", machine().describe_context(), channel, m_scsi_dma[channel].m_bc, mem_mask);
-		return m_scsi_dma[channel].m_bc;
+		const uint32_t ret = (m_scsi_dma[channel].m_count & 0x3fff) | (m_scsi_dma[channel].m_bc & 0xffffc000);
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d Buffer Count Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
+		return ret;
 	}
 	case 0x1004/4:
 	case 0x3004/4:
 	{
 		const uint32_t channel = (offset & 0x2000/4) ? 1 : 0;
-		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d Control Read: %08x & %08x\n", machine().describe_context(), channel, m_scsi_dma[channel].m_ctrl, mem_mask);
-		return m_scsi_dma[channel].m_ctrl;
+		uint32_t ret = m_scsi_dma[channel].m_ctrl;
+		if (BIT(m_intstat, channel + 8))
+		{
+			ret |= HPC3_DMACTRL_IRQ;
+			if (!machine().side_effects_disabled())
+			{
+				LOGMASKED(LOG_SCSI_IRQ, "Lowering SCSI %d IRQ\n", channel);
+				m_intstat &= ~(0x100 << channel);
+				if (m_intstat == 0)
+					m_dma_complete_int_cb(0);
+			}
+		}
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d Control Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
+		return ret;
 	}
 	case 0x1008/4:
 	case 0x3008/4:
@@ -421,22 +442,41 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		m_scsi_dma[channel].m_nbdp = data;
 		break;
 	}
+	case 0x1000/4:
+	case 0x3000/4:
+	{
+		const uint32_t channel = (offset & 0x2000/4) ? 1 : 0;
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d Buffer Count Write: %08x\n", machine().describe_context(), channel, data);
+		m_scsi_dma[channel].m_bc = data;
+	}
 	case 0x1004/4:
 	case 0x3004/4:
 	{
 		const uint32_t channel = (offset & 0x2000/4) ? 1 : 0;
 		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI%d DMA Control Write: %08x\n", machine().describe_context(), channel, data);
 		const bool was_active = m_scsi_dma[channel].m_active;
-		m_scsi_dma[channel].m_ctrl = data;
+		if (data & HPC3_DMACTRL_WRMASK)
+		{
+			m_scsi_dma[channel].m_ctrl = data & ~HPC3_DMACTRL_IRQ & ~HPC3_DMACTRL_ENABLE & ~HPC3_DMACTRL_WRMASK;
+			if (was_active)
+				m_scsi_dma[channel].m_ctrl |= HPC3_DMACTRL_ENABLE;
+		}
+		else
+		{
+			m_scsi_dma[channel].m_ctrl = data & ~HPC3_DMACTRL_IRQ & ~HPC3_DMACTRL_WRMASK;
+			m_scsi_dma[channel].m_active = (m_scsi_dma[channel].m_ctrl & HPC3_DMACTRL_ENABLE);
+		}
 		m_scsi_dma[channel].m_to_device = (m_scsi_dma[channel].m_ctrl & HPC3_DMACTRL_DIR);
 		m_scsi_dma[channel].m_big_endian = (m_scsi_dma[channel].m_ctrl & HPC3_DMACTRL_ENDIAN);
-		m_scsi_dma[channel].m_active = (m_scsi_dma[channel].m_ctrl & HPC3_DMACTRL_ENABLE);
-		m_scsi_dma[channel].m_irq = (m_scsi_dma[channel].m_ctrl & HPC3_DMACTRL_IRQ);
 		if (!was_active && m_scsi_dma[channel].m_active)
 		{
 			fetch_chain(channel);
 		}
 		m_hd_reset_cb[channel](BIT(data, 6));
+		if (BIT(data, 3))
+		{
+			scsi_fifo_flush(channel);
+		}
 		if (m_scsi_dma[channel].m_drq && m_scsi_dma[channel].m_active)
 		{
 			do_scsi_dma(channel);
@@ -666,6 +706,17 @@ READ32_MEMBER(hpc3_device::pbusdma_r)
 		break;
 	case 0x1000/4:
 		ret = (dma.m_timer->remaining() != attotime::never) ? 2 : 0;
+		if (BIT(m_intstat, channel))
+		{
+			ret |= 1;
+			if (!machine().side_effects_disabled())
+			{
+				LOGMASKED(LOG_PBUS_DMA, "Lowering channel %d IRQ\n", channel);
+				m_intstat &= ~(1 << channel);
+				if (m_intstat == 0)
+					m_dma_complete_int_cb(0);
+			}
+		}
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Control Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
 		break;
 	default:
@@ -689,7 +740,7 @@ WRITE32_MEMBER(hpc3_device::pbusdma_w)
 		dma.m_cur_ptr = space.read_dword(dma.m_desc_ptr);
 		dma.m_desc_flags = space.read_dword(dma.m_desc_ptr + 4);
 		dma.m_next_ptr = space.read_dword(dma.m_desc_ptr + 8);
-		dma.m_bytes_left = dma.m_desc_flags & 0x7fffffff;
+		dma.m_bytes_left = dma.m_desc_flags & 0x3fff;
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_CurPtr = %08x\n", machine().describe_context(), dma.m_cur_ptr);
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_BytesLeft = %08x\n", machine().describe_context(), dma.m_bytes_left);
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS_DMA_NextPtr = %08x\n", machine().describe_context(), dma.m_next_ptr);
@@ -827,23 +878,29 @@ void hpc3_device::fetch_chain(int channel)
 	scsi_dma_t &dma = m_scsi_dma[channel];
 	const uint32_t desc_addr = dma.m_nbdp;
 	dma.m_cbp = m_gio64_space->read_dword(desc_addr);
-	dma.m_ctrl = m_gio64_space->read_dword(desc_addr+4);
+	dma.m_bc = m_gio64_space->read_dword(desc_addr+4);
 	dma.m_nbdp = m_gio64_space->read_dword(desc_addr+8);
-	dma.m_bc = dma.m_ctrl & 0x3fff;
+	dma.m_count = dma.m_bc & 0x3fff;
 
 	LOGMASKED(LOG_CHAIN, "Fetching chain from %08x:\n", desc_addr);
 	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", dma.m_cbp);
-	LOGMASKED(LOG_CHAIN, "    Ctrl: %08x\n", dma.m_ctrl);
+	LOGMASKED(LOG_CHAIN, "    Ctrl: %08x\n", dma.m_bc);
 	LOGMASKED(LOG_CHAIN, "    Next: %08x\n", dma.m_nbdp);
 }
 
 void hpc3_device::decrement_chain(int channel)
 {
 	scsi_dma_t &dma = m_scsi_dma[channel];
-	dma.m_bc--;
-	if (dma.m_bc == 0)
+	dma.m_count--;
+	if (dma.m_count == 0)
 	{
-		if (BIT(dma.m_ctrl, 31))
+		if (BIT(dma.m_bc, 29))
+		{
+			LOGMASKED(LOG_SCSI_IRQ, "Raising SCSI %d IRQ\n", channel);
+			m_intstat |= 0x100 << channel;
+			m_dma_complete_int_cb(1);
+		}
+		if (BIT(dma.m_bc, 31))
 		{
 			dma.m_active = false;
 			dma.m_ctrl &= ~HPC3_DMACTRL_ENABLE;
@@ -851,6 +908,23 @@ void hpc3_device::decrement_chain(int channel)
 		}
 		fetch_chain(channel);
 	}
+}
+
+void hpc3_device::scsi_fifo_flush(int channel)
+{
+	scsi_dma_t &dma = m_scsi_dma[channel];
+
+	LOGMASKED(LOG_SCSI_DMA, "Flushing SCSI %d FIFO\n", channel);
+
+	if (BIT(dma.m_bc, 29))
+	{
+		LOGMASKED(LOG_SCSI_IRQ, "Raising SCSI %d IRQ\n", channel);
+		m_intstat |= 0x100 << channel;
+		m_dma_complete_int_cb(1);
+	}
+
+	dma.m_active = false;
+	dma.m_ctrl &= ~(HPC3_DMACTRL_ENABLE | HPC3_DMACTRL_FLUSH);
 }
 
 void hpc3_device::scsi_drq(bool state, int channel)
@@ -892,38 +966,6 @@ WRITE_LINE_MEMBER(hpc3_device::scsi0_drq)
 WRITE_LINE_MEMBER(hpc3_device::scsi1_drq)
 {
 	scsi_drq(state, 1);
-}
-
-WRITE_LINE_MEMBER(hpc3_device::scsi0_irq)
-{
-	if (state)
-	{
-		LOGMASKED(LOG_SCSI_IRQ, "Raising SCSI 0 IRQ\n");
-		m_ioc2->raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
-		m_intstat |= 0x100;
-	}
-	else
-	{
-		LOGMASKED(LOG_SCSI_IRQ, "Lowering SCSI 0 IRQ\n");
-		m_ioc2->lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
-		m_intstat &= ~0x100;
-	}
-}
-
-WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
-{
-	if (state)
-	{
-		LOGMASKED(LOG_SCSI_IRQ, "Raising SCSI 1 IRQ\n");
-		m_ioc2->raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
-		m_intstat |= 0x200;
-	}
-	else
-	{
-		LOGMASKED(LOG_SCSI_IRQ, "Lowering SCSI 1 IRQ\n");
-		m_ioc2->lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
-		m_intstat &= ~0x200;
-	}
 }
 
 READ32_MEMBER(hpc3_device::intstat_r)
