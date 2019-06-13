@@ -3,7 +3,7 @@
 /***************************************************************************
 
     Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
-	Gemcrush (c) 1996 Star Fish
+    Gemcrush (c) 1996 Star Fish
 	
     driver by Angelo Salese
 
@@ -14,8 +14,8 @@
     - lamps?
     - service mode?
     - nvram?
-	- dfruit: (possible bug) has an X on top-left corner during gameplay, 
-	  is it supposed to be disabled somehow?
+    - dfruit: (possible bug) has an X on top-left corner after POST, 
+              is it supposed to be disabled somehow?
 
 ***************************************************************************/
 
