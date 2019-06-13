@@ -471,7 +471,7 @@ WRITE32_MEMBER(ncd_68k_state::bt478_palette_w)
 void ncd_68k_state::ncd_16(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12500000);
+	M68000(config, m_maincpu, 12.5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_68k_state::ncd_16_map);
 
 	// duart
@@ -503,7 +503,7 @@ void ncd_68k_state::ncd_17c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_68k_state::ncd_17c_map);
 
 	// duart
-	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	SCN2681(config, m_duart, 77.4144_MHz_XTAL / 21);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	// keyboard controller
@@ -527,7 +527,7 @@ void ncd_68k_state::ncd_17c(machine_config &config)
 void ncd_68k_state::ncd_19(machine_config &config)
 {
 	// basic machine hardware
-	M68020(config, m_maincpu, 15000000);
+	M68020(config, m_maincpu, 15_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_68k_state::ncd_19_map);
 
 	// duart
@@ -535,7 +535,7 @@ void ncd_68k_state::ncd_19(machine_config &config)
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	// keyboard controller
-	M6805P2(config, m_mcu, 3'750'000);
+	M6805P2(config, m_mcu, 15_MHz_XTAL / 4);
 
 	// ethernet
 	AM7990(config, m_lance);
