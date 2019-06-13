@@ -1529,7 +1529,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 		}
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address, data, 0xffffffffU);
+			m_space->write_dword(address0, data, 0xffffffffU);
 			break;
 
 		case 1:
