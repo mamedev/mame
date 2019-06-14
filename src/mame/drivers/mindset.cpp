@@ -605,7 +605,7 @@ ROM_START(mindset)
 	ROM_LOAD("253006-001.u16", 0, 0x800, CRC(7bea5edd) SHA1(30cdc0dedaa5246f4952df452a99ca22e3cd0636))
 
 	ROM_REGION(0x0800, "kbdcpu", 0)
-	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1) SHA1(1))
+	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1c6aa433) SHA1(1d01dbda4730f26125ba2564a608c2f8ddfc05b3) )
 ROM_END
 
 COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
