@@ -486,6 +486,7 @@ void fc100_state::machine_reset()
 	m_key_pressed = 0;
 	membank("bankr")->set_entry(0);
 	membank("bankw")->set_entry(0);
+	m_uart->write_cts(0);
 }
 
 WRITE8_MEMBER( fc100_state::port60_w )

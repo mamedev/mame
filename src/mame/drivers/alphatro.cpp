@@ -627,6 +627,7 @@ void alphatro_state::machine_reset()
 	m_cassold = 0;
 	m_fdc_irq = 0;
 	m_usart->write_rxd(0);
+	m_usart->write_cts(0);
 	m_beep->set_state(0);
 }
 
@@ -741,7 +742,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 16_MHz_XTAL / 4 / 13 / 128).add_route(ALL_OUTPUTS, "mono", 1.00); // nominally 2.4 kHz
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through SED-9420C
