@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_MACHINE_CHESSM_H
-#define MAME_MACHINE_CHESSM_H
+#ifndef MAME_MACHINE_CHESSMACHINE_H
+#define MAME_MACHINE_CHESSMACHINE_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device)
 
-#endif // MAME_MACHINE_CHESSM_H
+#endif // MAME_MACHINE_CHESSMACHINE_H

@@ -244,17 +244,18 @@ void hh_tms1k_state::machine_start()
 {
 	screenless_state::machine_start();
 
+	// resolve handlers
+	m_out_power.resolve();
+
 	// zerofill
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
-	m_power_led = false;
 	m_power_on = false;
 	m_grid = 0;
 	m_plate = 0;
 
 	// register for savestates
-	/* save_item(NAME(m_power_led)); */ // don't save!
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
 	save_item(NAME(m_inp_mux));
@@ -265,7 +266,7 @@ void hh_tms1k_state::machine_start()
 
 void hh_tms1k_state::machine_reset()
 {
-	m_power_on = true;
+	set_power(true);
 }
 
 
@@ -275,21 +276,6 @@ void hh_tms1k_state::machine_reset()
   Helper Functions
 
 ***************************************************************************/
-
-// display update
-
-void hh_tms1k_state::display_update()
-{
-	screenless_state::display_update();
-
-	// output optional power led
-	if (m_power_led != m_power_on)
-	{
-		m_power_led = m_power_on;
-		output().set_value("power_led", m_power_led ? 1 : 0);
-	}
-}
-
 
 // generic input handlers
 
@@ -337,7 +323,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
-	m_power_on = (bool)(uintptr_t)param;
+	set_power((bool)(uintptr_t)param);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -350,8 +336,14 @@ WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 
 void hh_tms1k_state::power_off()
 {
-	m_power_on = false;
+	set_power(false);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
+void hh_tms1k_state::set_power(bool state)
+{
+	m_power_on = state;
+	m_out_power = state ? 1 : 0;
 }
 
 

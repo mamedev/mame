@@ -101,7 +101,7 @@
 
 		<bezel element="text_off"><bounds x="10.6" y="69.8" width="3" height="1.6" /></bezel>
 		<bezel element="text_on"><bounds x="67.9" y="69.8" width="2.3" height="1.6" /></bezel>
-		<bezel name="power_led" element="led"><bounds x="70.1" y="70.1" width="1" height="1" /></bezel> <!-- fake -->
+		<bezel name="power" element="led"><bounds x="70.1" y="70.1" width="1" height="1" /></bezel> <!-- fake -->
 
 	</view>
 </mamelayout>

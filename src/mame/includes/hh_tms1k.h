@@ -32,20 +32,21 @@ public:
 		screenless_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_out_power(*this, "power")
 	{ }
 
 	// devices
 	required_device<tms1k_base_device> m_maincpu;
 	optional_ioport_array<18> m_inp_matrix; // max 18
 	optional_device<speaker_sound_device> m_speaker;
+	output_finder<> m_out_power; // power state, eg. led
 
 	// misc common
 	u16 m_r;                        // MCU R-pins data
 	u16 m_o;                        // MCU O-pins data
 	u32 m_inp_mux;                  // multiplexed inputs mask
 	bool m_power_on;
-	bool m_power_led;
 
 	u32 m_grid;                     // VFD/LED current row data
 	u32 m_plate;                    // VFD/LED current column data
@@ -56,6 +57,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 	virtual void power_off();
+	void set_power(bool state);
 
 	void switch_change(int sel, u32 mask, bool next);
 	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, true); }
@@ -64,8 +66,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	virtual void display_update() override;
 };
 
 

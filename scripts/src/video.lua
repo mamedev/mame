@@ -735,6 +735,17 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pwm.h,VIDEOS["PWM_DISPLAY"] = true
+--------------------------------------------------
+if (VIDEOS["PWM_DISPLAY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pwm.cpp",
+		MAME_DIR .. "src/devices/video/pwm.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/sed1200.h,VIDEOS["SED1200"] = true
 --------------------------------------------------
 if (VIDEOS["SED1200"]~=null) then

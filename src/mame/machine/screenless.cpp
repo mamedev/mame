@@ -7,7 +7,7 @@ Generic screenless base class
 This file contains helpers for strobed display elements.
 
 TODO:
-- multiple brightness levels doesn't work for SVGs
+- use pwm_display_device, remove this file
 
 ******************************************************************************/
 

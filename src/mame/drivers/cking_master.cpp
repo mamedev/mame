@@ -3,27 +3,22 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* cking_master.cpp, subdriver of machine/screenless.cpp
-
-TODO:
-- 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
-  (wait state is similar to MSX) but I can't be bothered, better solution
-  is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
-
-*******************************************************************************
-
 Chess King Master overview (yes, it's plainly named "Master"):
 - Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
 - 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
 - simple I/O via 2*74373 and a 74145
 - 8*8 chessboard buttons, 32+1 border leds, piezo
 
+TODO:
+- 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
+  (wait state is similar to MSX) but I can't be bothered, better solution
+  is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/z80/z80.h"
+#include "video/pwm.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -36,12 +31,13 @@ Chess King Master overview (yes, it's plainly named "Master"):
 
 namespace {
 
-class master_state : public screenless_state
+class master_state : public driver_device
 {
 public:
 	master_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
 		m_mainmap(*this, "mainmap"),
@@ -59,6 +55,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
 	required_device<timer_device> m_irq_on;
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
 	required_device<address_map_bank_device> m_mainmap;
@@ -83,8 +80,6 @@ private:
 
 void master_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill, register for savestates
 	m_inp_mux = 0;
 	save_item(NAME(m_inp_mux));
@@ -106,7 +101,7 @@ void master_state::control_w(u8 data)
 	u16 sel = 1 << m_inp_mux & 0x3ff;
 
 	// d4,d5: led data
-	display_matrix(2, 9, data >> 4 & 3, sel & 0x1ff);
+	m_display->matrix(sel & 0x1ff, data >> 4 & 3);
 
 	// d6,d7: speaker +/-
 	m_dac->write(data >> 6 & 3);
@@ -301,6 +296,7 @@ void master_state::master(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(22870)); // active for 22.87us
 	TIMER(config, "irq_off").configure_periodic(FUNC(master_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
+	PWM_DISPLAY(config, m_display).set_size(9, 2);
 	config.set_default_layout(layout_ck_master);
 
 	/* sound hardware */

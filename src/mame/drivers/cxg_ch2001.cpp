@@ -3,10 +3,6 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* cxg_ch2001.cpp, subdriver of machine/screenless.cpp
-
-*******************************************************************************
-
 CXG Chess 2001 overview:
 - Zilog Z8400APS @ 4 MHz (8MHz XTAL)
 - 2KB RAM HM6116, 16KB ROM D27128D
@@ -15,9 +11,8 @@ CXG Chess 2001 overview:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/z80/z80.h"
+#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -29,12 +24,13 @@ CXG Chess 2001 overview:
 
 namespace {
 
-class ch2001_state : public screenless_state
+class ch2001_state : public driver_device
 {
 public:
 	ch2001_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
 		m_speaker_off(*this, "speaker_off"),
@@ -50,6 +46,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
 	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
 	required_device<timer_device> m_speaker_off;
@@ -74,8 +71,6 @@ private:
 
 void ch2001_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill, register for savestates
 	m_inp_mux = 0;
 	save_item(NAME(m_inp_mux));
@@ -107,7 +102,7 @@ WRITE8_MEMBER(ch2001_state::leds_w)
 	// 74ls273 Q5-Q8: MC14028 A-D
 	// MC14028 Q0-Q7: led data, Q8,Q9: N/C
 	u8 led_data = 1 << (data >> 4 & 0xf) & 0xff;
-	display_matrix(8, 10, led_data, sel);
+	m_display->matrix(sel, led_data);
 }
 
 READ8_MEMBER(ch2001_state::input_r)
@@ -256,14 +251,15 @@ void ch2001_state::ch2001(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(18300)); // active for 18.3us
 	TIMER(config, "irq_off").configure_periodic(FUNC(ch2001_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, m_speaker_off).configure_generic(FUNC(ch2001_state::speaker_off));
-
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	config.set_default_layout(layout_cxg_ch2001);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+
+	TIMER(config, m_speaker_off).configure_generic(FUNC(ch2001_state::speaker_off));
 }
 
 

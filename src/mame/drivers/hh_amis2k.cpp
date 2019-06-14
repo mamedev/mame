@@ -13,9 +13,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/amis2000/amis2000.h"
+#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -26,20 +25,22 @@
 //#include "hh_amis2k_test.lh" // common test-layout - use external artwork
 
 
-class hh_amis2k_state : public screenless_state
+class hh_amis2k_state : public driver_device
 {
 public:
 	hh_amis2k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inp_matrix(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<amis2000_base_device> m_maincpu;
-	optional_ioport_array<4> m_inp_matrix; // max 4
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<4> m_inp_matrix; // max 4
 
 	// misc common
 	u16 m_a;                        // MCU address bus
@@ -59,8 +60,6 @@ protected:
 
 void hh_amis2k_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill
 	m_a = 0;
 	m_d = 0;
@@ -144,10 +143,7 @@ class wildfire_state : public hh_amis2k_state
 public:
 	wildfire_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_amis2k_state(mconfig, type, tag)
-	{
-		// bumpers are dimmed
-		set_display_levels(0.02, 0.1);
-	}
+	{ }
 
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -192,8 +188,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
 void wildfire_state::prepare_display()
 {
 	// A0-A2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(8, 12, m_d, ~m_a);
+	m_display->segmask(7, 0x7f);
+	m_display->matrix(~m_a, m_d);
 }
 
 WRITE8_MEMBER(wildfire_state::write_d)
@@ -249,6 +245,8 @@ void wildfire_state::wildfire(machine_config &config)
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
 	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
 
+	PWM_DISPLAY(config, m_display).set_size(12, 8);
+	m_display->set_bri_levels(0.02, 0.1); // bumpers are dimmed
 	config.set_default_layout(layout_wildfire);
 
 	/* sound hardware */

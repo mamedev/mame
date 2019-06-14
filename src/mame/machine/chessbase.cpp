@@ -12,7 +12,7 @@ As workaround for the chess games, use an external chess GUI on the side,
 such as Arena(in editmode).
 
 TODO:
-- use screenless class, this file will be removed eventually
+- use pwm_display_device, this file will be removed eventually
 
 ******************************************************************************/
 

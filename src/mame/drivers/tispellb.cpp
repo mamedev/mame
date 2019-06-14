@@ -254,7 +254,7 @@ INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 
 	if (on && !m_power_on)
 	{
-		m_power_on = true;
+		set_power(true);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 		if (m_subcpu)
