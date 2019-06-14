@@ -14,8 +14,9 @@
         * Moto Frenzy (1992)
         * Road Riot's Revenge Rally (1993)
 
-    Known bugs:
-        * Unemulated protection for Road Riot's Revenge
+    Known Bugs:
+        * Protection for Road Riot's Revenge
+		* Missing DSPCOM board (Moto Frenzy SD) and Clarn board (Road Riot's Revenge, Space Lords and Moto Frenzy mini dx), both ADSP2105 based.
 
 ****************************************************************************
 
@@ -2309,16 +2310,16 @@ void atarigx2_state::init_rrreveng()
  *
  *************************************/
 
-GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", 0 )
-GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", 0 )
-GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", 0 )
-GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", 0 )
+GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", | MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", | MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", | MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", | MACHINE_NODEVICE_LAN )
 
-GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
-GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
-GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
-GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
+GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", | MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", | MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", | MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", | MACHINE_NODEVICE_LAN )
 
-GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
