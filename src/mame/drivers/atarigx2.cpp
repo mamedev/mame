@@ -16,7 +16,7 @@
 
     Known Bugs:
         * Protection for Road Riot's Revenge
-		* Missing DSPCOM board (Moto Frenzy SD) and Clarn board (Road Riot's Revenge, Space Lords and Moto Frenzy mini dx), both ADSP2105 based.
+        * Missing DSPCOM board (Moto Frenzy SD) and Clarn board (Road Riot's Revenge, Space Lords and Moto Frenzy mini dx), both ADSP2105 based.
 
 ****************************************************************************
 
