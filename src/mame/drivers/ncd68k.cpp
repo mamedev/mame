@@ -587,7 +587,7 @@ void ncd_68k_state::common(machine_config &config)
 
 	// mouse and auxiliary ports
 	RS232_PORT(config, m_serial[0],
-		[this](device_slot_interface &device)
+		[](device_slot_interface &device)
 		{
 			default_rs232_devices(device);
 			device.option_add("mouse", LOGITECH_HLE_SERIAL_MOUSE);
