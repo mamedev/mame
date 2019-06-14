@@ -187,7 +187,7 @@
 		<info name="disc_matrix" value="AMIGA NOV 94 26 SEP 94   MPO   01 @@ 1" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 - volume 2 (europe)" sha1="effd825a8615f12b9d939ebb27a658180ffbaf60"/>
+				<disk name="amiga cd32 - volume 2 (europe)" sha1="e42e631874291ccf5062f6653b3c35385aa66f6b"/>
 			</diskarea>
 		</part>
 	</software>
