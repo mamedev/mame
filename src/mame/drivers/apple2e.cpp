@@ -493,13 +493,6 @@ private:
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define JOYSTICK_DELTA          80
-#define JOYSTICK_SENSITIVITY    50
-#define JOYSTICK_AUTOCENTER     80
 
 offs_t apple2e_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {

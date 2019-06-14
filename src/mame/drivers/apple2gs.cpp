@@ -630,14 +630,6 @@ private:
 }
 
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define JOYSTICK_DELTA          80
-#define JOYSTICK_SENSITIVITY    50
-#define JOYSTICK_AUTOCENTER     80
-
 offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
