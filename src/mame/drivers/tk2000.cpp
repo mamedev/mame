@@ -19,6 +19,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
+#include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -59,7 +60,8 @@ public:
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
-		m_upperbank(*this, A2_UPPERBANK_TAG)
+		m_upperbank(*this, A2_UPPERBANK_TAG),
+		m_softlatch(*this, "softlatch")
 	{ }
 
 	void tk2000(machine_config &config);
@@ -79,6 +81,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
+	required_device<addressable_latch_device> m_softlatch;
 
 	int m_speaker_state;
 	int m_cassette_state;
@@ -92,19 +95,30 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	void kbout_w(uint8_t data);
+	uint8_t kbin_r();
+	uint8_t casout_r();
+	void casout_w(uint8_t data);
+	uint8_t snd_r();
+	void snd_w(uint8_t data);
+	uint8_t switches_r(offs_t offset);
+	uint8_t cassette_r();
+	DECLARE_WRITE_LINE_MEMBER(color_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_a_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_b_w);
+	DECLARE_WRITE_LINE_MEMBER(printer_strobe_w);
+	DECLARE_WRITE_LINE_MEMBER(rom_ram_w);
+	DECLARE_WRITE_LINE_MEMBER(ctrl_key_w);
+	uint8_t c080_r(offs_t offset);
+	void c080_w(offs_t offset, uint8_t data);
+	uint8_t c100_r(offs_t offset);
+	void c100_w(offs_t offset, uint8_t data);
 
 	void apple2_map(address_map &map);
 	void inhbank_map(address_map &map);
 
-	void do_io(address_space &space, int offset);
 	uint8_t read_floatingbus();
 };
 
@@ -120,7 +134,6 @@ void tk2000_state::machine_start()
 	m_speaker->level_w(m_speaker_state);
 	m_cassette_state = 0;
 	m_cassette->output(-1.0f);
-	m_upperbank->set_bank(0);
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -166,125 +179,113 @@ uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 /***************************************************************************
     I/O
 ***************************************************************************/
-// most softswitches don't care about read vs write, so handle them here
-void tk2000_state::do_io(address_space &space, int offset)
+
+void tk2000_state::kbout_w(uint8_t data)
 {
-	if(machine().side_effects_disabled())
+	// write row mask for keyboard scan
+	switch (data)
 	{
-		return;
-	}
+	case 0:
+		break;
 
-	switch (offset)
-	{
-		case 0x20:
-			m_cassette_state ^= 1;
-			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
-			break;
-
-		case 0x50:  // monochrome
-			break;
-
-		case 0x51:  // color
-			break;
-
-		case 0x54:  // set page 1
-			m_video->scr_w(0);
-			break;
-
-		case 0x55:  // set page 2
-			m_video->scr_w(1);
-			break;
-
-		case 0x5a:  // ROM
-			m_upperbank->set_bank(0);
-			break;
-
-		case 0x5b:  // RAM
-			m_upperbank->set_bank(1);
-			break;
-
-		case 0x5e:
-			break;
-
-		default:
-			printf("do_io: unk access @ $C0%02X\n", offset & 0xff);
-			break;
+	case 0x01: m_strobe = m_row0->read(); break;
+	case 0x02: m_strobe = m_row1->read(); break;
+	case 0x04: m_strobe = m_row2->read(); break;
+	case 0x08: m_strobe = m_row3->read(); break;
+	case 0x10: m_strobe = m_row4->read(); break;
+	case 0x20: m_strobe = m_row5->read(); break;
+	case 0x40: m_strobe = m_row6->read(); break;
+	case 0x80: m_strobe = m_row7->read(); break;
 	}
 }
 
-READ8_MEMBER(tk2000_state::c000_r)
+uint8_t tk2000_state::kbin_r()
 {
-	switch (offset)
-	{
-		case 0x00:
-			return 0;
+	return m_strobe;
+}
 
-		case 0x10:  // keyboard strobe
-			return m_strobe;
-
-		case 0x60: // cassette in
-		case 0x68:
-			return m_cassette->input() > 0.0 ? 0x80 : 0;
-
-		default:
-			do_io(space, offset);
-			break;
-	}
-
+uint8_t tk2000_state::casout_r()
+{
+	if (!machine().side_effects_disabled())
+		casout_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(tk2000_state::c000_w)
+void tk2000_state::casout_w(uint8_t data)
 {
-	switch (offset)
-	{
-		case 0x00:  // write row mask for keyboard scan
-			switch (data)
-			{
-				case 0:
-					break;
-
-				case 0x01: m_strobe = m_row0->read(); break;
-				case 0x02: m_strobe = m_row1->read(); break;
-				case 0x04: m_strobe = m_row2->read(); break;
-				case 0x08: m_strobe = m_row3->read(); break;
-				case 0x10: m_strobe = m_row4->read(); break;
-				case 0x20: m_strobe = m_row5->read(); break;
-				case 0x40: m_strobe = m_row6->read(); break;
-				case 0x80: m_strobe = m_row7->read(); break;
-			}
-			break;
-
-		case 0x5f:
-			m_strobe = m_kbspecial->read();
-			break;
-
-		default:
-			do_io(space, offset);
-			break;
-	}
+	m_cassette_state ^= 1;
+	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 }
 
-READ8_MEMBER(tk2000_state::c080_r)
+uint8_t tk2000_state::snd_r()
+{
+	if (!machine().side_effects_disabled())
+		snd_w(0);
+	return read_floatingbus();
+}
+
+void tk2000_state::snd_w(uint8_t data)
+{
+	m_speaker_state ^= 1;
+	m_speaker->level_w(m_speaker_state);
+}
+
+uint8_t tk2000_state::switches_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
+	return read_floatingbus();
+}
+
+uint8_t tk2000_state::cassette_r()
+{
+	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+}
+
+WRITE_LINE_MEMBER(tk2000_state::color_w)
+{
+	// 0 = color, 1 = black/white
+}
+
+WRITE_LINE_MEMBER(tk2000_state::motor_a_w)
+{
+}
+
+WRITE_LINE_MEMBER(tk2000_state::motor_b_w)
+{
+}
+
+WRITE_LINE_MEMBER(tk2000_state::printer_strobe_w)
+{
+}
+
+WRITE_LINE_MEMBER(tk2000_state::rom_ram_w)
+{
+	// 0 = ROM, 1 = RAM
+	m_upperbank->set_bank(state);
+}
+
+WRITE_LINE_MEMBER(tk2000_state::ctrl_key_w)
+{
+	if (state)
+		m_strobe = m_kbspecial->read();
+}
+
+uint8_t tk2000_state::c080_r(offs_t offset)
 {
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(tk2000_state::c080_w)
+void tk2000_state::c080_w(offs_t offset, uint8_t data)
 {
 }
 
-READ8_MEMBER(tk2000_state::c100_r)
+uint8_t tk2000_state::c100_r(offs_t offset)
 {
 	return m_ram_ptr[offset + 0xc100];
 }
 
-WRITE8_MEMBER(tk2000_state::c100_w)
+void tk2000_state::c100_w(offs_t offset, uint8_t data)
 {
 	m_ram_ptr[offset + 0xc100] = data;
 }
@@ -423,7 +424,7 @@ uint8_t tk2000_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(tk2000_state::ram_r)
+uint8_t tk2000_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size)
 	{
@@ -433,7 +434,7 @@ READ8_MEMBER(tk2000_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(tk2000_state::ram_w)
+void tk2000_state::ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram_size)
 	{
@@ -444,7 +445,12 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 void tk2000_state::apple2_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rw(FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
-	map(0xc000, 0xc07f).rw(FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
+	map(0xc000, 0xc000).w(FUNC(tk2000_state::kbout_w)).nopr();
+	map(0xc010, 0xc010).r(FUNC(tk2000_state::kbin_r));
+	map(0xc020, 0xc020).rw(FUNC(tk2000_state::casout_r), FUNC(tk2000_state::casout_w));
+	map(0xc030, 0xc030).rw(FUNC(tk2000_state::snd_r), FUNC(tk2000_state::snd_w));
+	map(0xc050, 0xc05f).r(FUNC(tk2000_state::switches_r)).w(m_softlatch, FUNC(addressable_latch_device::write_a0));
+	map(0xc060, 0xc060).mirror(8).r(FUNC(tk2000_state::cassette_r));
 	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
@@ -585,6 +591,15 @@ void tk2000_state::tk2000(machine_config &config)
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&tk2000_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+
+	LS259(config, m_softlatch); // U36
+	m_softlatch->q_out_cb<0>().set(FUNC(tk2000_state::color_w));
+	m_softlatch->q_out_cb<1>().set(FUNC(tk2000_state::motor_a_w));
+	m_softlatch->q_out_cb<2>().set(m_video, FUNC(a2_video_device::scr_w));
+	m_softlatch->q_out_cb<3>().set(FUNC(tk2000_state::motor_b_w));
+	m_softlatch->q_out_cb<4>().set(FUNC(tk2000_state::printer_strobe_w));
+	m_softlatch->q_out_cb<5>().set(FUNC(tk2000_state::rom_ram_w));
+	m_softlatch->q_out_cb<7>().set(FUNC(tk2000_state::ctrl_key_w));
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
