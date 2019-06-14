@@ -1355,6 +1355,6 @@ GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek
 GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
 GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )
