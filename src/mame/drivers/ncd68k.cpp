@@ -44,11 +44,13 @@
  *   - ncd17c  nvram timeout or checksum failure
  *   - NCD19   boots, tries to contact network (timeout)
  *
+ * DUART IP2 is set when the 68k mailbox is full (inverse of mcu A5), probably
+ * both of these are tied to a latch with a flip-flop
+ *
  * TODO
  *   - tidy latches
  *   - fix keyboard
  *   - sound
- *   - serial control lines
  *   - refactor
  */
 #include "emu.h"
@@ -70,6 +72,12 @@
 
 // video and audio
 #include "screen.h"
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_MCU     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL|LOG_MCU)
+#include "logmacro.h"
 
 class ncd_68k_state : public driver_device
 {
@@ -116,12 +124,10 @@ private:
 	DECLARE_READ16_MEMBER(lance16_dma_r);
 	DECLARE_WRITE16_MEMBER(lance16_dma_w);
 	DECLARE_WRITE32_MEMBER(bt478_palette_w);
-	DECLARE_READ32_MEMBER(from_mcu_r);
-	DECLARE_WRITE32_MEMBER(to_mcu_w);
-	DECLARE_READ16_MEMBER(from_mcu16_r);
-	DECLARE_WRITE16_MEMBER(to_mcu16_w);
-	DECLARE_READ32_MEMBER(mcu_status_r);
-	DECLARE_WRITE32_MEMBER(irq_w);
+	u8 mcu_r();
+	void mcu_w(u8 data);
+	u8 mcu_status_r();
+	void irq_w(u8 data);
 
 	u8 mcu_porta_r();
 	u8 mcu_portb_r();
@@ -207,7 +213,7 @@ u32 ncd_68k_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap,
 	for (int y = 0; y < 1024; y++)
 	{
 		u32 *scanline = &bitmap.pix32(y);
-		for (int x = 0; x < 1024/8; x++)
+		for (int x = 0; x < 1280/8; x++)
 		{
 			u8 const pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
 
@@ -222,20 +228,23 @@ u32 ncd_68k_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap,
 void ncd_68k_state::ncd_16_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom().region("maincpu", 0);
-	map(0x0c0000, 0x0c0001).rw(FUNC(ncd_68k_state::from_mcu16_r), FUNC(ncd_68k_state::to_mcu16_w));
+	map(0x0c0000, 0x0c0001).rw(FUNC(ncd_68k_state::mcu_r), FUNC(ncd_68k_state::mcu_w)).umask16(0x00ff);
 	map(0x0e0000, 0x0e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0x100000, 0x100003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 	map(0x200000, 0x21ffff).ram().share("vram16");
 	map(0x380000, 0x5fffff).ram().share("mainram16");
+
+	//map(0xa00000, 0xa002ff).ram(); // QLC?
+	//map(0xbf0000, 0xbf000f).ram(); // BERT?
 }
 
 void ncd_68k_state::ncd_17c_map(address_map &map)
 {
 	map(0x00000000, 0x000bffff).rom().region("maincpu", 0);
-	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_68k_state::from_mcu_r), FUNC(ncd_68k_state::to_mcu_w));
+	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_68k_state::mcu_r), FUNC(ncd_68k_state::mcu_w)).umask32(0xff000000);
 	map(0x001c8000, 0x001c803f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x001d0000, 0x001d0003).w(FUNC(ncd_68k_state::bt478_palette_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_68k_state::mcu_status_r), FUNC(ncd_68k_state::irq_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_68k_state::mcu_status_r), FUNC(ncd_68k_state::irq_w)).umask32(0xff000000);
 	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
 	map(0x01000000, 0x02ffffff).ram();
 	map(0x03000000, 0x03ffffff).ram().share("mainram");
@@ -244,14 +253,13 @@ void ncd_68k_state::ncd_17c_map(address_map &map)
 void ncd_68k_state::ncd_19_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
-	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_68k_state::from_mcu_r), FUNC(ncd_68k_state::to_mcu_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_68k_state::mcu_status_r), FUNC(ncd_68k_state::irq_w));
+	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_68k_state::mcu_r), FUNC(ncd_68k_state::mcu_w)).umask32(0xff000000);
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_68k_state::mcu_status_r), FUNC(ncd_68k_state::irq_w)).umask32(0xff000000);
 	map(0x001e0000, 0x001e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
 	map(0x00400000, 0x0043ffff).ram().share("vram");
 	map(0x00800000, 0x00ffffff).ram().share("mainram");
 }
-
 
 u8 ncd_68k_state::mcu_porta_r()
 {
@@ -265,6 +273,7 @@ u8 ncd_68k_state::mcu_portb_r()
 	{
 		// FIXME: ncd19 requires this, but ncd17c fails with an nvram timeout
 		m_porta_in |= 0x20;
+		m_duart->ip2_w(0);
 
 		return m_from_68k;
 	}
@@ -274,12 +283,11 @@ u8 ncd_68k_state::mcu_portb_r()
 
 void ncd_68k_state::mcu_porta_w(u8 data)
 {
-	//if (data != m_porta) printf("%02x to port A\n", data);
 	if ((data & 0x40) && !(m_porta_out & 0x40))
 	{
-		//logerror("Sending %02x to 68k\n", m_portb_out);
 		m_to_68k = m_portb_out;
 		m_porta_in |= 0x80;
+
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	}
 
@@ -299,6 +307,8 @@ void ncd_68k_state::mcu_portb_w(u8 data)
 		m_eeprom->di_write(BIT(data, 1));
 	}
 
+	// TODO: what is bit 7 used as an output for?
+
 	m_portb_out = data;
 }
 
@@ -307,54 +317,48 @@ void ncd_68k_state::mcu_portc_w(u8 data)
 	m_portc = data;
 }
 
-READ32_MEMBER(ncd_68k_state::from_mcu_r)
+u8 ncd_68k_state::mcu_r()
 {
-	//printf("020 read %02x\n", m_to020);
+	LOGMASKED(LOG_MCU, "mcu_r 0x%02x\n", m_to_68k);
+
 	m_porta_in &= ~0x80;
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	return m_to_68k << 24;
-}
 
-WRITE32_MEMBER(ncd_68k_state::to_mcu_w)
-{
-	//printf("Sending %02x to MCU\n", data);
-	m_from_68k = data>>24;
-	m_porta_in &= ~0x20;
-}
-
-READ16_MEMBER(ncd_68k_state::from_mcu16_r)
-{
-	//printf("68k read %02x\n", m_to020);
-	m_porta_in &= ~0x80;
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 	return m_to_68k;
 }
 
-WRITE16_MEMBER(ncd_68k_state::to_mcu16_w)
+void ncd_68k_state::mcu_w(u8 data)
 {
-	//printf("Sending %02x to MCU\n", data);
-	m_from_68k = data & 0xff;
+	LOGMASKED(LOG_MCU, "mcu_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_from_68k = data;
+
 	m_porta_in &= ~0x20;
+	m_duart->ip2_w(1);
 }
 
-READ32_MEMBER(ncd_68k_state::mcu_status_r)
+u8 ncd_68k_state::mcu_status_r()
 {
-	u32 rv = 0;
+	u8 rv = 0;
 	if (!(m_porta_in & 0x20))
 	{
-		rv |= 0x01000000;
+		rv |= 0x01;
 	}
 	if (m_porta_in & 0x80)
 	{
-		rv |= 0x02000000;
+		rv |= 0x02;
 	}
+
+	LOGMASKED(LOG_MCU, "mcu_status_r 0x%02x\n", rv);
 
 	return rv;
 }
 
-WRITE32_MEMBER(ncd_68k_state::irq_w)
+void ncd_68k_state::irq_w(u8 data)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1, BIT(data, 31));
+	LOGMASKED(LOG_MCU, "irq_w %d (%s)\n", data, machine().describe_context());
+
+	m_maincpu->set_input_line(M68K_IRQ_1, BIT(data, 7));
 }
 
 READ16_MEMBER(ncd_68k_state::lance16_dma_r)
@@ -554,6 +558,9 @@ void ncd_68k_state::ncd_19(machine_config &config)
 
 void ncd_68k_state::common(machine_config &config)
 {
+	// HACK: this makes the ncd16 and ncd19 keyboard work
+	config.m_perfect_cpu_quantum = subtag("mcu");
+
 	// mcu ports
 	m_mcu->porta_w().set(FUNC(ncd_68k_state::mcu_porta_w));
 	m_mcu->portb_w().set(FUNC(ncd_68k_state::mcu_portb_w));
@@ -578,7 +585,7 @@ void ncd_68k_state::common(machine_config &config)
 	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	kbd.set_pc_kbdc_slot(m_kbd_con);
 
-	// mouse port
+	// mouse and auxiliary ports
 	RS232_PORT(config, m_serial[0],
 		[this](device_slot_interface &device)
 		{
@@ -586,13 +593,36 @@ void ncd_68k_state::common(machine_config &config)
 			device.option_add("mouse", LOGITECH_HLE_SERIAL_MOUSE);
 		},
 		"mouse");
-	m_serial[0]->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
-	m_duart->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
-
-	// auxiliary port
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
-	m_serial[1]->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+
+	// duart outputs
+	m_duart->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_duart->outport_cb().set(
+		[this](u8 data)
+		{
+			m_serial[0]->write_rts(BIT(data, 0));
+			m_serial[1]->write_rts(BIT(data, 1));
+			m_serial[0]->write_dtr(BIT(data, 2));
+			m_serial[1]->write_dtr(BIT(data, 3));
+
+			// TODO: bit 4 - usually set
+			// TODO: bit 5 - usually clear
+			// TODO: bit 6 - usually set
+			// TODO: bit 7 - set/cleared continuously
+		});
+
+	// duart inputs
+	// FIXME: rts/dsr external loopback test fails - dsr might not be correct?
+	m_serial[0]->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	m_serial[0]->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
+	m_serial[0]->dsr_handler().set(m_duart, FUNC(scn2681_device::ip3_w));
+	m_serial[0]->dcd_handler().set(m_duart, FUNC(scn2681_device::ip4_w));
+
+	m_serial[1]->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	m_serial[1]->cts_handler().set(m_duart, FUNC(scn2681_device::ip1_w));
+	m_serial[1]->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w));
+	m_serial[1]->dcd_handler().set(m_duart, FUNC(scn2681_device::ip6_w));
 
 	// eeprom
 	EEPROM_93C46_16BIT(config, m_eeprom);
