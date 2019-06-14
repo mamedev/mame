@@ -131,6 +131,18 @@ protected:
 	void set_databank(uint8_t bank);
 	uint8_t get_databank();
 
+	void write_special_stack(uint8_t data);
+	void dec_special_stack();
+	void inc_special_stack();
+	uint8_t read_special_stack();
+
+	/* we store the additional 'codebank' used for far calls in a different, private stack
+	   this seems to be neccessary for 'rad_hnt2' not to crash when bringing up the calibration / score table screens
+	   and also for ekara 'a1' cart not to crash shortly after going ingame
+	   it's possible however the stack format is just incorrect, so the exact reason for this being needed does
+	   need further research */
+	uint8_t m_special_stack[0x100];
+	uint8_t m_special_stackpos;
 };
 
 enum {
