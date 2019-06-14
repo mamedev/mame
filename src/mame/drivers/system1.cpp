@@ -4595,7 +4595,7 @@ ROM_START( gardiab )
 	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-ROM_START( gardiaj )
+ROM_START( gardiaj ) /* Sega game ID# 834-6119-02 GARDIA */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr-10250.ic90",   0x00000, 0x8000, CRC(c97943a7) SHA1(eb201987c7a78f7eb6838211c0af3394c0b2d95f) ) /* encrypted */
 	ROM_LOAD( "epr-10251.ic91",   0x10000, 0x8000, CRC(b2ed05dc) SHA1(c520bf7024c85dc759c27eccb0a31998f4d72b5f) )
