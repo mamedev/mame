@@ -201,22 +201,22 @@ TIMER_CALLBACK_MEMBER(mm5307_device::periodic_update)
 	{
 	// First low output phase
 	case 0:
-		m_periodic_timer->adjust(clocks_to_attotime(divisor & ~2) / 2);
+		m_periodic_timer->adjust(clocks_to_attotime((divisor & ~2) >> 1 | (divisor & 1)) / 2);
 		break;
 
 	// First high output phase
 	case 1:
-		m_periodic_timer->adjust(clocks_to_attotime(divisor >> 1));
+		m_periodic_timer->adjust(clocks_to_attotime((divisor + 2) >> 2));
 		break;
 
 	// Second low output phase
 	case 2:
-		m_periodic_timer->adjust(clocks_to_attotime((divisor & ~2) >> 1 | (divisor & 1)));
+		m_periodic_timer->adjust(clocks_to_attotime((divisor >> 2) + (divisor & 1)));
 		break;
 
 	// Second high output phase
 	case 3:
-		m_periodic_timer->adjust(clocks_to_attotime(divisor - ((divisor & 1) << 1)) / 2);
+		m_periodic_timer->adjust(clocks_to_attotime(((divisor + (divisor & 2)) >> 1) - ((divisor & 1) << 1)) / 2);
 		break;
 	}
 }
