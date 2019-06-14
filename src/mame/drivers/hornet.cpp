@@ -51,7 +51,7 @@
     ----------------------------------------------------------------------
     Gradius 4         GX837      GN715(A)   GN715(B)
     NBA Play By Play  GX778      GN715(A)   GN715(B)
-	Teraburst         GX715      GN715(A)   GN715(B)      GN680(E) I/O board
+    Teraburst         GX715      GN715(A)   GN715(B)      GN680(E) I/O board
     Silent Scope      GQ830      GN715(A)   2x GN715(B)
     Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
 
@@ -227,9 +227,9 @@
 
 
     Teraburst uses a different variation of the I/O board used in Operation: Thunder Hurricane (see gticlub.cpp). Analog inputs are controlled by
-	two CCD cameras, one from each gun. This specific variation uses a K056800 which normally acts as a sound interface controller. Perhaps this
-	either sends analog inputs to the main pcb or isn't used at all. No network connection is involved in this setup as this board directly connects
-	to the main pcb via joining connector.
+    two CCD cameras, one from each gun. This specific variation uses a K056800 which normally acts as a sound interface controller. Perhaps this
+    either sends analog inputs to the main pcb or isn't used at all. No network connection is involved in this setup as this board directly connects
+    to the main pcb via joining connector.
 
     GN680 PWB(E)403381B
     |------------------------------------------|
@@ -252,10 +252,10 @@
       68EC000 @ 16MHz (32/2)
       CN11/12 - Power connectors
       CN8/9   - 6-pin analog control connectors (to CCD cameras)
-	  CN1     - Lower joining connector to main pcb
+      CN1     - Lower joining connector to main pcb
       NRPS11  - Idec NRPS11 PC Board circuit protector
       LM1881  - Video sync separator (DIP8)
-	  056800  - Konami Custom (QFP80)
+      056800  - Konami Custom (QFP80)
 
 
     LAN PCB: GQ931 PWB(H)      (C) 1999 Konami
@@ -1692,4 +1692,4 @@ GAMEL( 2000, sscopec,   sscope,   hornet_2board, sscope,  hornet_state, init_hor
 GAMEL( 2000, sscopeb,   sscope,   hornet_2board, sscope,  hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,   sscope,   hornet_2board, sscope,  hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2,       sscope2, hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,       sscope2, hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
