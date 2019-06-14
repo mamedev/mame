@@ -85,8 +85,6 @@ private:
 
 	uint8_t m_strobe;
 
-	bool m_page2;
-
 	uint8_t *m_ram_ptr;
 	int m_ram_size;
 
@@ -128,7 +126,6 @@ void tk2000_state::machine_start()
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
 	save_item(NAME(m_strobe));
-	save_item(NAME(m_page2));
 
 	// setup video pointers
 	m_video->m_ram_ptr = m_ram_ptr;
@@ -139,7 +136,6 @@ void tk2000_state::machine_start()
 
 void tk2000_state::machine_reset()
 {
-	m_page2 = false;
 	m_strobe = 0;
 }
 
@@ -197,13 +193,11 @@ void tk2000_state::do_io(address_space &space, int offset)
 			break;
 
 		case 0x54:  // set page 1
-			m_page2 = false;
-			m_video->m_page2 = false;
+			m_video->scr_w(0);
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true;
-			m_video->m_page2 = true;
+			m_video->scr_w(1);
 			break;
 
 		case 0x5a:  // ROM
@@ -337,7 +331,7 @@ uint8_t tk2000_state::read_floatingbus()
 	//
 	Hires    = 1; //m_video->m_hires ? 1 : 0;
 	Mixed    = 0; //m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
+	Page2    = m_video->m_page2 ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
@@ -575,7 +569,7 @@ void tk2000_state::tk2000(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

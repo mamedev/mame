@@ -1794,11 +1794,11 @@ void apple2gs_state::do_io(address_space &space, int offset)
 		switch (offset)
 		{
 			case 0x5e:  // SETDHIRES
-				m_video->m_dhires = true;
+				m_video->dhires_w(0);
 				return;
 
 			case 0x5f:  // CLRDHIRES
-				m_video->m_dhires = false;
+				m_video->dhires_w(1);
 				return;
 		}
 	}
@@ -1824,40 +1824,40 @@ void apple2gs_state::do_io(address_space &space, int offset)
 			break;
 
 		case 0x50:  // graphics mode
-			m_video->m_graphics = true;
+			m_video->txt_w(0);
 			break;
 
 		case 0x51:  // text mode
-			m_video->m_graphics = false;
+			m_video->txt_w(1);
 			break;
 
 		case 0x52:  // no mix
-			m_video->m_mix = false;
+			m_video->mix_w(0);
 			break;
 
 		case 0x53:  // mixed mode
-			m_video->m_mix = true;
+			m_video->mix_w(1);
 			break;
 
 		case 0x54:  // set page 1
 			m_page2 = false;
-			m_video->m_page2 = false;
+			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
 			m_page2 = true;
-			m_video->m_page2 = true;
+			m_video->scr_w(1);
 			auxbank_update();
 			break;
 
 		case 0x56: // select lo-res
-			m_video->m_hires = false;
+			m_video->res_w(0);
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
-			m_video->m_hires = true;
+			m_video->res_w(1);
 			auxbank_update();
 			break;
 
@@ -4559,7 +4559,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	APPLE2_VIDEO(config, m_video, A2GS_14M);
+	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
 	APPLE2_COMMON(config, m_a2common, A2GS_14M);
 	m_a2common->set_GS_cputag(m_maincpu);

@@ -169,11 +169,6 @@ public:
 	DECLARE_READ8_MEMBER(flags_r);
 	DECLARE_READ8_MEMBER(controller_strobe_r);
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
-	DECLARE_WRITE_LINE_MEMBER(txt_w);
-	DECLARE_WRITE_LINE_MEMBER(mix_w);
-	DECLARE_WRITE_LINE_MEMBER(scr_w);
-	DECLARE_WRITE_LINE_MEMBER(res_w);
-	DECLARE_WRITE_LINE_MEMBER(an2_w);
 	DECLARE_READ8_MEMBER(c080_r);
 	DECLARE_WRITE8_MEMBER(c080_w);
 	DECLARE_READ8_MEMBER(c100_r);
@@ -212,8 +207,6 @@ private:
 
 	int m_inh_slot;
 	int m_cnxx_slot;
-
-	bool m_page2;
 
 	uint8_t *m_ram_ptr;
 	int m_ram_size;
@@ -345,7 +338,6 @@ void apple2_state::machine_start()
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_page2));
 	save_item(NAME(m_anykeydown));
 
 	// setup video pointers
@@ -359,7 +351,6 @@ void apple2_state::machine_reset()
 {
 	m_inh_slot = 0;
 	m_cnxx_slot = -1;
-	m_page2 = false;
 	m_anykeydown = false;
 }
 
@@ -509,43 +500,6 @@ uint32_t apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bit
 /***************************************************************************
     I/O
 ***************************************************************************/
-
-WRITE_LINE_MEMBER(apple2_state::txt_w)
-{
-	if (m_video->m_graphics == state) // avoid flickering from II+ refresh polling
-	{
-		// select graphics or text mode
-		m_screen->update_now();
-		m_video->m_graphics = !state;
-	}
-}
-
-WRITE_LINE_MEMBER(apple2_state::mix_w)
-{
-	// select mixed mode or nomix
-	m_screen->update_now();
-	m_video->m_mix = state;
-}
-
-WRITE_LINE_MEMBER(apple2_state::scr_w)
-{
-	// select primary or secondary page
-	m_screen->update_now();
-	m_page2 = state;
-	m_video->m_page2 = state;
-}
-
-WRITE_LINE_MEMBER(apple2_state::res_w)
-{
-	// select lo-res or hi-res
-	m_screen->update_now();
-	m_video->m_hires = state;
-}
-
-WRITE_LINE_MEMBER(apple2_state::an2_w)
-{
-	m_video->m_an2 = state;
-}
 
 READ8_MEMBER(apple2_state::keyb_data_r)
 {
@@ -837,7 +791,7 @@ uint8_t apple2_state::read_floatingbus()
 	//
 	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
 	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
+	Page2    = m_video->m_page2 ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
@@ -1325,7 +1279,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1342,14 +1296,14 @@ void apple2_state::apple2_common(machine_config &config)
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
-	m_softlatch->q_out_cb<0>().set(FUNC(apple2_state::txt_w));
-	m_softlatch->q_out_cb<1>().set(FUNC(apple2_state::mix_w));
-	m_softlatch->q_out_cb<2>().set(FUNC(apple2_state::scr_w));
-	m_softlatch->q_out_cb<3>().set(FUNC(apple2_state::res_w));
+	m_softlatch->q_out_cb<0>().set(m_video, FUNC(a2_video_device::txt_w));
+	m_softlatch->q_out_cb<1>().set(m_video, FUNC(a2_video_device::mix_w));
+	m_softlatch->q_out_cb<2>().set(m_video, FUNC(a2_video_device::scr_w));
+	m_softlatch->q_out_cb<3>().set(m_video, FUNC(a2_video_device::res_w));
 	m_softlatch->q_out_cb<4>().set(m_gameio, FUNC(apple2_gameio_device::an0_w));
 	m_softlatch->q_out_cb<5>().set(m_gameio, FUNC(apple2_gameio_device::an1_w));
 	m_softlatch->q_out_cb<6>().set(m_gameio, FUNC(apple2_gameio_device::an2_w));
-	m_softlatch->q_out_cb<6>().append(FUNC(apple2_state::an2_w));
+	m_softlatch->q_out_cb<6>().append(m_video, FUNC(a2_video_device::an2_w));
 	m_softlatch->q_out_cb<7>().set(m_gameio, FUNC(apple2_gameio_device::an3_w));
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);

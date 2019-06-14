@@ -1469,13 +1469,11 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
-					m_screen->update_now();
-					m_video->m_dhires = true;
+					m_video->dhires_w(0);
 					break;
 
 				case 0x5f:  // CLRDHIRES
-					m_screen->update_now();
-					m_video->m_dhires = false;
+					m_video->dhires_w(1);
 					break;
 			}
 		}
@@ -1543,57 +1541,40 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			break;
 
 		case 0x50:  // graphics mode
-			if (m_video->m_graphics == false) // avoid flickering from II+ refresh polling
-			{
-				m_screen->update_now();
-				m_video->m_graphics = true;
-			}
+			m_video->txt_w(0);
 			break;
 
 		case 0x51:  // text mode
-			m_screen->update_now();
-			m_video->m_graphics = false;
+			m_video->txt_w(1);
 			break;
 
 		case 0x52:  // no mix
-			m_screen->update_now();
-			m_video->m_mix = false;
+			m_video->mix_w(0);
 			break;
 
 		case 0x53:  // mixed mode
-			m_screen->update_now();
-			m_video->m_mix = true;
+			m_video->mix_w(1);
 			break;
 
 		case 0x54:  // set page 1
-			if (!m_video->m_80col)
-			{
-				m_screen->update_now();
-			}
 			m_page2 = false;
-			m_video->m_page2 = false;
+			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			if (!m_video->m_80col)
-			{
-				m_screen->update_now();
-			}
 			m_page2 = true;
-			m_video->m_page2 = true;
+			m_video->scr_w(1);
 			auxbank_update();
 			break;
 
 		case 0x56: // select lo-res
-			m_screen->update_now();
-			m_video->m_hires = false;
+			m_video->res_w(0);
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
-			m_screen->update_now();
-			m_video->m_hires = true;
+			m_video->res_w(1);
 			auxbank_update();
 			break;
 
@@ -4475,7 +4456,7 @@ void apple2e_state::apple2e(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
