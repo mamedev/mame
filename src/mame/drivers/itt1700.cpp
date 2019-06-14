@@ -19,8 +19,6 @@ This device may be related to the Intel 8251, but it is definitely not a SCN2651
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/itt1700_kbd.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
@@ -97,7 +95,7 @@ void itt1700_state::itt1700(machine_config &config)
 	upi.p1_out_cb().set("keyboard", FUNC(itt1700_keyboard_device::clock_w)).bit(0);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line1_w)).bit(1);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line2_w)).bit(2);
-	upi.p2_out_cb().set("dac", FUNC(dac_byte_interface::write)).mask(0x07);
+	// P20-P22 = PWM LEDs? (too high-frequency to be speaker output)
 	upi.t0_in_cb().set("keyboard", FUNC(itt1700_keyboard_device::sense_r));
 
 	ITT1700_KEYBOARD(config, "keyboard");
@@ -111,12 +109,6 @@ void itt1700_state::itt1700(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_update_row_callback(FUNC(itt1700_state::update_row), this);
-
-	SPEAKER(config, "speaker").front_center();
-
-	DAC_3BIT_BINARY_WEIGHTED(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START(itt1700)
