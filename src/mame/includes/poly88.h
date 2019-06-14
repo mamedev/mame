@@ -55,11 +55,10 @@ private:
 	emu_timer * m_usart_timer;
 	emu_timer * m_keyboard_timer;
 	int m_previous_level;
-	int m_clk_level;
 	int m_clk_level_tape;
-	DECLARE_WRITE8_MEMBER(poly88_baud_rate_w);
-	DECLARE_READ8_MEMBER(poly88_keyboard_r);
-	DECLARE_WRITE8_MEMBER(poly88_intr_w);
+	void baud_rate_w(uint8_t data);
+	uint8_t keyboard_r();
+	void intr_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

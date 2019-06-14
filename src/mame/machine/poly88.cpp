@@ -36,7 +36,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_usart_timer_callback)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
+void poly88_state::baud_rate_w(uint8_t data)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
 	m_brg->control_w(data & 15);
@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
 	//execute().set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(poly88_state::poly88_keyboard_r)
+uint8_t poly88_state::keyboard_r()
 {
 	uint8_t retVal = m_last_code;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -249,7 +249,7 @@ READ8_MEMBER(poly88_state::poly88_keyboard_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(poly88_state::poly88_intr_w)
+void poly88_state::intr_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
