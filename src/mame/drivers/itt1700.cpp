@@ -19,8 +19,11 @@ This device may be related to the Intel 8251, but it is definitely not a SCN2651
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/itt1700_kbd.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class itt1700_state : public driver_device
@@ -29,6 +32,7 @@ public:
 	itt1700_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_videoram(*this, "videoram")
 		, m_chargen(*this, "chargen")
 	{
 	}
@@ -42,18 +46,33 @@ private:
 	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_chargen;
 };
 
 
 MC6845_UPDATE_ROW(itt1700_state::update_row)
 {
+	u32 *px = &bitmap.pix32(y);
+	u16 page = 0x800;
+
+	for (int i = 0; i < x_count; i++)
+	{
+		u8 chr = m_videoram[((ma + i) & 0x7ff) | page];
+		u16 dots = m_chargen[u16(chr) << 4 | ra] << 1;
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
+
+		for (int n = 9; n > 0; n--, dots <<= 1)
+			*px++ = BIT(dots, 8) ? fg : bg;
+	}
 }
 
 void itt1700_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("maincpu", 0);
-	map(0x2000, 0x7fff).ram();
+	map(0x2000, 0x3fff).ram().share("videoram");
+	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x8000).nopr();
 }
 
@@ -78,6 +97,7 @@ void itt1700_state::itt1700(machine_config &config)
 	upi.p1_out_cb().set("keyboard", FUNC(itt1700_keyboard_device::clock_w)).bit(0);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line1_w)).bit(1);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line2_w)).bit(2);
+	upi.p2_out_cb().set("dac", FUNC(dac_byte_interface::write)).mask(0x07);
 	upi.t0_in_cb().set("keyboard", FUNC(itt1700_keyboard_device::sense_r));
 
 	ITT1700_KEYBOARD(config, "keyboard");
@@ -91,6 +111,12 @@ void itt1700_state::itt1700(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_update_row_callback(FUNC(itt1700_state::update_row), this);
+
+	SPEAKER(config, "speaker").front_center();
+
+	DAC_3BIT_BINARY_WEIGHTED(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START(itt1700)
