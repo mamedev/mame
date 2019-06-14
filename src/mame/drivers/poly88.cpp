@@ -69,7 +69,7 @@ void poly88_state::poly88_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x00, 0x01).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x04, 0x04).w(FUNC(poly88_state::poly88_baud_rate_w));
 	map(0x08, 0x08).w(FUNC(poly88_state::poly88_intr_w));
 	map(0xf8, 0xf8).r(FUNC(poly88_state::poly88_keyboard_r));
@@ -201,7 +201,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(poly88_state::poly88)
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(16'588'800) / 9); // uses 8224 clock generator
+	I8080A(config, m_maincpu, 16.5888_MHz_XTAL / 9); // uses 8224 clock generator
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly88_state::poly88_mem);
 	m_maincpu->set_addrmap(AS_IO, &poly88_state::poly88_io);
 	m_maincpu->set_vblank_int("screen", FUNC(poly88_state::poly88_interrupt));
@@ -230,9 +230,12 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 
 	/* uart */
-	I8251(config, m_uart, XTAL(16'588'800) / 9);
-	m_uart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
-	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
+	I8251(config, m_usart, 16.5888_MHz_XTAL / 9);
+	m_usart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
+	m_usart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
+
+	MM5307AA(config, m_brg, 16.5888_MHz_XTAL / 18);
+	m_brg->output_cb().set(FUNC(poly88_state::cassette_txc_rxc_w));
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/i8251.h"
+#include "machine/mm5307.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 
@@ -20,15 +21,15 @@ public:
 	enum
 	{
 		TIMER_USART,
-		TIMER_KEYBOARD,
-		TIMER_CASSETTE
+		TIMER_KEYBOARD
 	};
 
 	poly88_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_uart(*this, "uart"),
+		m_usart(*this, "usart"),
+		m_brg(*this, "brg"),
 		m_cassette(*this, "cassette"),
 		m_linec(*this, "LINEC"),
 		m_line0(*this, "LINE0"),
@@ -51,8 +52,8 @@ private:
 	uint8_t m_intr;
 	uint8_t m_last_code;
 	uint8_t m_int_vector;
-	emu_timer * m_cassette_timer;
 	emu_timer * m_usart_timer;
+	emu_timer * m_keyboard_timer;
 	int m_previous_level;
 	int m_clk_level;
 	int m_clk_level_tape;
@@ -65,7 +66,7 @@ private:
 	INTERRUPT_GEN_MEMBER(poly88_interrupt);
 	TIMER_CALLBACK_MEMBER(poly88_usart_timer_callback);
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
-	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
+	DECLARE_WRITE_LINE_MEMBER(cassette_txc_rxc_w);
 	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
@@ -77,7 +78,8 @@ private:
 	void poly88_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_uart;
+	required_device<i8251_device> m_usart;
+	required_device<mm5307_device> m_brg;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport m_linec;
 	required_ioport m_line0;
