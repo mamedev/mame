@@ -225,7 +225,7 @@ void poly88_state::machine_reset()
 {
 	m_intr = 0;
 	m_last_code = 0;
-
+	m_usart->write_cts(0);
 	m_brg->control_w(0);
 }
 
