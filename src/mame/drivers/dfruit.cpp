@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(dfruit_state::screen_vblank)
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff).bankr("0x6000-0x7fff");
+	map(0x6000, 0x7fff) Bankswitched ROM area
 
 	map(0xc000, 0xfdff) RAM Bank (connected in VRAMs, 4KB boundary)
 
