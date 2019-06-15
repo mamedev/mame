@@ -13,22 +13,18 @@
 #include "spg110_video.h"
 #include "spg2xx_audio.h"
 
-class spg110_device : public device_t, public device_mixer_interface
+class spg110_device : public unsp_device, public device_mixer_interface
 
 {
 public:
-	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T, typename U>
-	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	template <typename T>
+	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
 		: spg110_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_screen.set_tag(std::forward<U>(screen_tag));
+		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
-
-	void map(address_map &map);
 
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }
@@ -45,14 +41,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
 protected:
+	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+
+	void internal_map(address_map &map);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-
-	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 
 	required_device<spg2xx_io_device> m_spg_io;

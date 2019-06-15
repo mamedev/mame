@@ -16,7 +16,6 @@
 #include "emu.h"
 
 #include "machine/sunplus_gcm394.h"
-#include "machine/spg2xx.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -29,7 +28,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_spg(*this, "spg")
 		, m_bank(*this, "cartbank")
 		, m_io_p1(*this, "P1")
 		, m_io_p2(*this, "P2")
@@ -43,9 +41,8 @@ protected:
 
 	void switch_bank(uint32_t bank);
 
-	required_device<unsp_device> m_maincpu;
+	required_device<sunplus_gcm394_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<sunplus_gcm394_device> m_spg;
 
 	optional_memory_bank m_bank;
 
@@ -78,24 +75,22 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 
 void gcm394_game_state::base(machine_config &config)
 {
-	GCM394(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->porta_in().set(FUNC(gcm394_game_state::porta_r));
-	m_spg->portb_in().set(FUNC(gcm394_game_state::portb_r));
-
-	UNSP_20(config, m_maincpu, XTAL(27'000'000)); // code at 8019 uses extended opcode, so must be 2.0+?
+	GCM394(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
+	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update("spg", FUNC(sunplus_gcm394_device::screen_update));
-	m_screen->screen_vblank().set(m_spg, FUNC(sunplus_gcm394_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 }
 
@@ -125,7 +120,6 @@ void gcm394_game_state::machine_reset()
 void gcm394_game_state::mem_map_4m(address_map &map)
 {
 	map(0x000000, 0x01ffff).bankr("cartbank");
-	map(0x000000, 0x007fff).m(m_spg, FUNC(sunplus_gcm394_device::map));
 
 	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
 	map(0x020000, 0x3fffff).bankr("cartbank");

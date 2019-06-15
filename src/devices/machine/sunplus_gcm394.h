@@ -18,13 +18,12 @@
 #include "spg2xx_audio.h"
 
 
-class sunplus_gcm394_base_device : public device_t, public device_mixer_interface
+class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
 	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+	: unsp_20_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::internal_map), this))
 	, device_mixer_interface(mconfig, *this, 2)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_spg_video(*this, "spgvideo")
 	, m_spg_audio(*this, "spgaudio")
@@ -32,8 +31,6 @@ public:
 	, m_portb_in(*this)
 	{
 	}
-
-	void map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
@@ -49,7 +46,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<unsp_device> m_cpu;
+	void internal_map(address_map &map);
+
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
@@ -238,15 +236,14 @@ private:
 class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {
 public:
-	template <typename T, typename U>
-	sunplus_gcm394_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, T&& cpu_tag, U&& screen_tag)
+	template <typename T>
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
 		: sunplus_gcm394_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_screen.set_tag(std::forward<U>(screen_tag));
+		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	sunplus_gcm394_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

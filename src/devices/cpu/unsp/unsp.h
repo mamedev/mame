@@ -92,15 +92,8 @@ class unsp_device : public cpu_device
 
 public:
 	// construction/destruction
-	unsp_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
-	unsp_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
-
-	// HACK: IRQ line state can only be modified directly by hardware on-board the SPG SoC itself.
-	// Therefore, to avoid an unnecessary scheduler sync when the external spg2xx_device sets or
-	// clears an interrupt line, we provide this direct accessor.
-	// A more correct but longer-term solution will be to move spg2xx_device to be internal to
-	// a subclass of unsp_device rather than its own standalone device.
-	void set_state_unsynced(int inputnum, int state);
+	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~unsp_device();
 
 	uint8_t get_csb();
 
@@ -117,6 +110,8 @@ public:
 #endif
 
 protected:
+	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -139,6 +134,11 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// HACK: IRQ line state can only be modified directly by hardware on-board the SPG SoC itself.
+	// Therefore, to avoid an unnecessary scheduler sync when the derived spg2xx_device sets or
+	// clears an interrupt line, we provide this direct accessor.
+	void set_state_unsynced(int inputnum, int state);
 
 	enum : uint32_t
 	{
@@ -327,7 +327,9 @@ class unsp_11_device : public unsp_device
 public:
 	// construction/destruction
 	unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	unsp_11_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	unsp_11_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
 private:
 };
@@ -337,9 +339,10 @@ class unsp_12_device : public unsp_11_device
 public:
 	// construction/destruction
 	unsp_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	unsp_12_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
-private:
+protected:
+	unsp_12_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+
 	virtual void execute_fxxx_101_group(uint16_t op) override;
 	virtual void execute_exxx_group(uint16_t op) override;
 
@@ -352,7 +355,9 @@ public:
 	// construction/destruction
 	unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-private:
+protected:
+	unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_extended_group(uint16_t op) override;
 
