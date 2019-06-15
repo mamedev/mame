@@ -5529,4 +5529,49 @@
 		</part>
 	</software>
 
+	<software name="sherwood">
+		<description>Sherwood Forest</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-06-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="208154">
+				<rom name="Sherwood Forest.woz" size="208154" crc="49b76125" sha1="c2771aea964e43a3519cc52f61d6a17b4c009b42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrtcrct">
+		<description>Short Circuit</description>
+		<year>1984</year>
+		<publisher>Micro Lab</publisher>
+		<info name="release" value="2019-06-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="467733">
+				<rom name="Short Circuit.woz" size="467733" crc="d95cd68f" sha1="68b5bc28da9216515a0bfb13665fd05d50f70f32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnmistr9">
+		<description>Moonmist (Release 9 / 861022)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-06-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234832">
+				<rom name="Moonmist r9.woz" size="234832" crc="ec486f68" sha1="f5ed483302fa5f6f3a97cd6c6116b8ae5228431a" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
