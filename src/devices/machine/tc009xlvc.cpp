@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
 
 u8 tc0091lvc_device::rom_r(offs_t offset)
 {
-	if ((offset & 0x6000) == 0x6000) // bankswitched area
+	if ((offset & 0x6000) == 0x6000) // 0x6000-0x7fff bankswitched area
 		offset = (*m_rom_bank << 13) | (offset & 0x1fff);
 
 	return m_rom[offset & m_rom.mask()];
