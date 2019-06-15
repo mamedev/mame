@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( porta_w ) { write_porta(data); }
 	void write_porta(uint8_t data);
 	void write_porta_line(int line, bool state);
-	void set_a_input(uint8_t data, uint8_t z_mask);
+	void set_a_input(uint8_t data);
 	uint8_t a_output();
 	void set_port_a_input_overrides_output_mask(uint8_t mask) { m_a_input_overrides_output_mask = mask; }
 
@@ -175,7 +175,6 @@ private:
 	uint8_t m_out_a;
 	uint8_t m_a_input_overrides_output_mask;
 	uint8_t m_out_ca2;
-	uint8_t m_port_a_z_mask;
 	uint8_t m_ddr_a;
 	uint8_t m_ctl_a;
 	uint8_t m_irq_a1;

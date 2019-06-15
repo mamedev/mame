@@ -52,7 +52,7 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_cb2_handler(*this),
 		m_irqa_handler(*this),
 		m_irqb_handler(*this), m_in_a(0),
-		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_out_ca2(0), m_port_a_z_mask(0), m_ddr_a(0),
+		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_out_ca2(0), m_ddr_a(0),
 		m_ctl_a(0), m_irq_a1(0), m_irq_a2(0),
 		m_irq_a_state(0), m_in_b(0),
 		m_in_cb1(0), m_in_cb2(0), m_out_b(0), m_out_cb2(0), m_last_out_cb2_z(0), m_ddr_b(0),
@@ -90,7 +90,6 @@ void pia6821_device::device_start()
 	save_item(NAME(m_in_ca2));
 	save_item(NAME(m_out_a));
 	save_item(NAME(m_out_ca2));
-	save_item(NAME(m_port_a_z_mask));
 	save_item(NAME(m_ddr_a));
 	save_item(NAME(m_ctl_a));
 	save_item(NAME(m_irq_a1));
@@ -137,7 +136,6 @@ void pia6821_device::device_reset()
 	m_in_ca2 = true;
 	m_out_a = 0;
 	m_out_ca2 = 0;
-	m_port_a_z_mask = 0;
 	m_ddr_a = 0;
 	m_ctl_a = 0;
 	m_irq_a1 = 0;
@@ -888,14 +886,13 @@ void pia6821_device::write(offs_t offset, uint8_t data)
 //  set_a_input
 //-------------------------------------------------
 
-void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
+void pia6821_device::set_a_input(uint8_t data)
 {
 	assert_always(m_in_a_handler.isnull(), "pia6821_device::set_a_input() called when m_in_a_handler set");
 
 	LOG("Set PIA input port A = %02X\n", data);
 
 	m_in_a = data;
-	m_port_a_z_mask = z_mask;
 	m_in_a_pushed = true;
 }
 
@@ -906,7 +903,7 @@ void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
 
 void pia6821_device::write_porta(uint8_t data)
 {
-	set_a_input(data, 0);
+	set_a_input(data);
 }
 
 
@@ -916,14 +913,11 @@ void pia6821_device::write_porta(uint8_t data)
 
 void pia6821_device::write_porta_line(int line, bool state)
 {
-	if (!m_in_a_pushed)
-		m_port_a_z_mask = 0xff;
-
 	uint8_t mask = 1 << line;
 	if (state)
-		set_a_input(m_in_a | mask, m_port_a_z_mask & ~mask);
+		set_a_input(m_in_a | mask);
 	else
-		set_a_input(m_in_a & ~mask, m_port_a_z_mask & ~mask);
+		set_a_input(m_in_a & ~mask);
 }
 
 
