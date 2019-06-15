@@ -74,11 +74,28 @@ WRITE_LINE_MEMBER(dfruit_state::screen_vblank)
 	}
 }
 
+/*
+void dfruit_state::tc0091lvc_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).bankr("0x6000-0x7fff");
+
+	map(0xc000, 0xfdff) RAM Bank (connected in VRAMs, 4KB boundary)
+
+	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
+	map(0xff00, 0xff02).ram().share("irq_vector");
+	map(0xff03, 0xff03).ram().share("irq_enable");
+	map(0xff04, 0xff07).ram().w(FUNC(tc0091lvc_device::ram_bank_w)).share("ram_bank");
+	map(0xff08, 0xff08).ram().share("rom_bank");
+}
+*/
 
 void dfruit_state::dfruit_map(address_map &map)
 {
 	map(0x0000, 0xffff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
+
 	map(0x8000, 0x9fff).ram();
+
 	map(0xa000, 0xa003).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa005).rw("opn", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa008, 0xa008).nopr(); //watchdog
