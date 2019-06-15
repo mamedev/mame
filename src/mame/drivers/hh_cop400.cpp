@@ -907,7 +907,7 @@ INPUT_PORTS_END
 void funjacks_state::funjacks(machine_config &config)
 {
 	/* basic machine hardware */
-	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=56pF
+	COP410(config, m_maincpu, 750000); // approximation - RC osc. R=47K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funjacks_state::write_d));
 	m_maincpu->write_l().set(FUNC(funjacks_state::write_l));
@@ -917,7 +917,6 @@ void funjacks_state::funjacks(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 2);
-	m_display->set_bri_levels(0.15);
 	config.set_default_layout(layout_funjacks);
 
 	/* sound hardware */
@@ -1002,7 +1001,7 @@ INPUT_PORTS_END
 void funrlgl_state::funrlgl(machine_config &config)
 {
 	/* basic machine hardware */
-	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=91pF
+	COP410(config, m_maincpu, 750000); // approximation - RC osc. R=51K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funrlgl_state::write_d));
 	m_maincpu->write_l().set(FUNC(funrlgl_state::write_l));
@@ -1012,7 +1011,7 @@ void funrlgl_state::funrlgl(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
-	m_display->set_bri_levels(0.02, 0.1); // top led is brighter
+	m_display->set_bri_levels(0.01, 0.1); // top led is brighter
 	config.set_default_layout(layout_funrlgl);
 
 	/* sound hardware */

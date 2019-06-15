@@ -21,6 +21,11 @@ to "digity", for use with multi-state elements, eg. 7seg leds.
 If you use this device in a slot, or use multiple of them (or just don't want to use
 the default output tags), set a callback.
 
+Brightness tresholds (0.0 to 1.0) indicate how long an element was powered on in the last
+frame, eg. 0.01 means a minimum on-time for 1%. Some games use two levels of brightness
+by strobing elements longer.
+
+
 TODO:
 - multiple brightness levels doesn't work for SVGs
 
@@ -47,11 +52,12 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 	m_output_a_cb(*this),
 	m_output_digit_cb(*this)
 {
-	// set defaults (60hz frames, 0.5 interpolation, 1 brightness level)
+	// set defaults
 	set_refresh(attotime::from_hz(60));
 	set_interpolation(0.5);
-	set_bri_levels(0.02);
+	set_bri_levels(0.01);
 	set_bri_minimum(0);
+	set_bri_maximum(0.0);
 	set_size(0, 0);
 	reset_segmask();
 }
@@ -95,6 +101,7 @@ void pwm_display_device::device_start()
 	save_item(NAME(m_interpolation));
 	save_item(NAME(m_levels));
 	save_item(NAME(m_level_min));
+	save_item(NAME(m_level_max));
 
 	save_item(NAME(m_segmask));
 	save_item(NAME(m_rowsel));
@@ -126,10 +133,10 @@ pwm_display_device &pwm_display_device::set_bri_levels(double l0, double l1, dou
 {
 	// init brightness level(s) (if you need to set more than 4, use set_bri_one)
 	reset_bri_levels();
-	m_levels[0] = l0;
-	m_levels[1] = l1;
-	m_levels[2] = l2;
-	m_levels[3] = l3;
+	set_bri_one(0, l0);
+	set_bri_one(1, l1);
+	set_bri_one(2, l2);
+	set_bri_one(3, l3);
 
 	return *this;
 }
@@ -213,11 +220,22 @@ void pwm_display_device::schedule_frame()
 
 TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 {
-	update(); // final timeslice
-
 	const double frame_time = m_framerate.as_double();
 	const double factor0 = m_interpolation;
 	const double factor1 = 1.0 - factor0;
+
+	// determine brightness cutoff
+	double cutoff = m_level_max;
+	if (cutoff == 0.0)
+	{
+		u8 level;
+		for (level = 1; m_levels[level] < 1.0; level++) { ; }
+		cutoff = 4 * m_levels[level - 1];
+	}
+	if (cutoff > 1.0)
+		cutoff = 1.0;
+
+	update(); // final timeslice
 
 	for (int y = 0; y < m_height; y++)
 	{
@@ -227,7 +245,8 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 		{
 			// determine brightness level
 			double bri = m_bri[y][x] * factor1 + (m_acc[y][x].as_double() / frame_time) * factor0;
-			if (bri > 1.0) bri = 1.0; // shouldn't happen
+			if (bri > cutoff)
+				bri = cutoff;
 			m_bri[y][x] = bri;
 
 			u8 level;
@@ -253,7 +272,7 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 			}
 		}
 
-		// output to digity (does not support brightness levels)
+		// output to digity (does not support multiple brightness levels)
 		if (m_segmask[y] != 0)
 		{
 			row &= m_segmask[y];
