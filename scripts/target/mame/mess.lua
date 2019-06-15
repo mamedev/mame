@@ -1023,6 +1023,7 @@ FORMATS["ZX81_P"] = true
 function linkProjects_mame_mess(_target, _subtarget)
 	links {
 		"access",
+		"aci",
 		"acorn",
 		"act",
 		"adc",
@@ -1030,6 +1031,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"akai",
 		"alesis",
 		"altos",
+		"ami",
 		"amiga",
 		"ampro",
 		"amstrad",
@@ -1048,6 +1050,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"be",
 		"bitcorp",
 		"bnpo",
+		"brea",
 		"bondwell",
 		"booth",
 		"camputers",
@@ -1059,6 +1062,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"cce",
 		"ccs",
 		"chess",
+		"chessking",
 		"chromatics",
 		"chrysler",
 		"coleco",
@@ -1067,6 +1071,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"comx",
 		"concept",
 		"conitec",
+		"cxg",
 		"cybiko",
 		"dai",
 		"ddr",
@@ -1094,6 +1099,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"funtech",
 		"galaxy",
 		"gamepark",
+		"gi",
 		"gridcomp",
 		"grundy",
 		"hartung",
@@ -1144,6 +1150,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mupid",
 		"nakajima",
 		"nascom",
+		"natsemi",
 		"ncd",
 		"ne",
 		"nec",
@@ -1180,11 +1187,11 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"roland",
 		"rolm",
 		"sage",
+		"saitek",
 		"samcoupe",
 		"samsung",
 		"sanyo",
 		"saturn",
-		"screenless",
 		"segacons",
 		"sequential",
 		"sgi",
@@ -1213,7 +1220,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"televideo",
 		"tem",
 		"tesla",
-		"test",
 		"thomson",
 		"ti",
 		"tiger",
@@ -1446,6 +1452,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/acvirus.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "aci")
+files {
+	MAME_DIR .. "src/mame/drivers/aci_boris.cpp",
+	MAME_DIR .. "src/mame/drivers/aci_borisdpl.cpp",
+	MAME_DIR .. "src/mame/drivers/aci_ggm.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "acorn")
 files {
 	MAME_DIR .. "src/mame/drivers/aa310.cpp",
@@ -1521,6 +1534,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/altos486.cpp",
 	MAME_DIR .. "src/mame/drivers/altos8600.cpp",
 	MAME_DIR .. "src/mame/machine/acs8600_ics.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "ami")
+files {
+	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amiga")
@@ -1734,6 +1752,11 @@ files {
 	MAME_DIR .. "src/mame/video/b2m.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "brea")
+files {
+	MAME_DIR .. "src/mame/drivers/intellect02.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "bondwell")
 files {
 	MAME_DIR .. "src/mame/drivers/bw12.cpp",
@@ -1890,6 +1913,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "chessking")
+files {
+	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "chromatics")
 files {
 	MAME_DIR .. "src/mame/drivers/cgc7900.cpp",
@@ -1945,6 +1973,11 @@ files {
 	MAME_DIR .. "src/mame/includes/prof80.h",
 	MAME_DIR .. "src/mame/machine/prof80mmu.cpp",
 	MAME_DIR .. "src/mame/machine/prof80mmu.h",
+}
+
+createMESSProjects(_target, _subtarget, "cxg")
+files {
+	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")
@@ -2218,6 +2251,11 @@ files {
 	MAME_DIR .. "src/mame/includes/gp32.h",
 }
 
+createMESSProjects(_target, _subtarget, "gi")
+files {
+	MAME_DIR .. "src/mame/drivers/hh_pic16.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "gridcomp")
 files {
 	MAME_DIR .. "src/mame/drivers/gridcomp.cpp",
@@ -2254,7 +2292,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/modena.cpp",
 	MAME_DIR .. "src/mame/drivers/polgar.cpp",
 	MAME_DIR .. "src/mame/drivers/risc2500.cpp",
-	MAME_DIR .. "src/mame/drivers/stratos.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
 }
@@ -2264,6 +2301,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/b16.cpp",
 	MAME_DIR .. "src/mame/drivers/bmjr.cpp",
 	MAME_DIR .. "src/mame/drivers/bml3.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_hmcs40.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "homebrew")
@@ -2280,8 +2318,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/sitcom.cpp",
 	MAME_DIR .. "src/mame/drivers/slc1.cpp",
 	MAME_DIR .. "src/mame/drivers/slc1a.cpp",
+	MAME_DIR .. "src/mame/drivers/test_t400.cpp",
 	MAME_DIR .. "src/mame/drivers/uzebox.cpp",
 	MAME_DIR .. "src/mame/drivers/z80dev.cpp",
+	MAME_DIR .. "src/mame/drivers/zexall.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "homelab")
@@ -2518,6 +2558,7 @@ files {
 createMESSProjects(_target, _subtarget, "mb")
 files {
 	MAME_DIR .. "src/mame/drivers/microvsn.cpp",
+	MAME_DIR .. "src/mame/drivers/milton6805.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mchester")
@@ -2587,6 +2628,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "mitsubishi")
 files {
+	MAME_DIR .. "src/mame/drivers/hh_melps4.cpp",
 	MAME_DIR .. "src/mame/drivers/multi8.cpp",
 	MAME_DIR .. "src/mame/drivers/multi16.cpp",
 }
@@ -2642,6 +2684,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/nascom1.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "natsemi")
+files {
+	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "ncd")
 files {
 	MAME_DIR .. "src/mame/drivers/ncd68k.cpp",
@@ -2659,6 +2706,10 @@ files {
 createMESSProjects(_target, _subtarget, "nec")
 files {
 	MAME_DIR .. "src/mame/drivers/apc.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
+	MAME_DIR .. "src/mame/includes/hh_ucom4.h",
+	MAME_DIR .. "src/mame/drivers/tb303.cpp", -- subdriver of hh_ucom4
+	MAME_DIR .. "src/mame/drivers/tr606.cpp", -- "
 	MAME_DIR .. "src/mame/drivers/pce.cpp",
 	MAME_DIR .. "src/mame/includes/pce.h",
 	MAME_DIR .. "src/mame/machine/pce.cpp",
@@ -2996,15 +3047,16 @@ files {
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "saturn")
-files {
-	MAME_DIR .. "src/mame/drivers/st17xx.cpp",
-}
-
 createMESSProjects(_target, _subtarget, "sage")
 files {
 	MAME_DIR .. "src/mame/drivers/sage2.cpp",
 	MAME_DIR .. "src/mame/includes/sage2.h",
+}
+
+createMESSProjects(_target, _subtarget, "saitek")
+files {
+	MAME_DIR .. "src/mame/drivers/scisys_chesstrv.cpp",
+	MAME_DIR .. "src/mame/drivers/stratos.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samcoupe")
@@ -3033,27 +3085,9 @@ files {
 	MAME_DIR .. "src/mame/machine/mbc55x_kbd.h",
 }
 
--- for drivers that are subclass of screenless_state
-createMESSProjects(_target, _subtarget, "screenless")
+createMESSProjects(_target, _subtarget, "saturn")
 files {
-	MAME_DIR .. "src/mame/machine/screenless.cpp",
-	MAME_DIR .. "src/mame/includes/screenless.h",
-	MAME_DIR .. "src/mame/drivers/cking_master.cpp",
-	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_hmcs40.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_melps4.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_pic16.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_tms1k.cpp",
-	MAME_DIR .. "src/mame/includes/hh_tms1k.h",
-	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp", -- subdriver of hh_tms1k
-	MAME_DIR .. "src/mame/drivers/tispeak.cpp",  -- "
-	MAME_DIR .. "src/mame/drivers/tispellb.cpp", -- "
-	MAME_DIR .. "src/mame/includes/hh_ucom4.h",
-	MAME_DIR .. "src/mame/drivers/tb303.cpp", -- subdriver of hh_ucom4
-	MAME_DIR .. "src/mame/drivers/tr606.cpp", -- "
+	MAME_DIR .. "src/mame/drivers/st17xx.cpp",
 }
 
 -- Don't call this project "sega" or it collides with the arcade one
@@ -3396,12 +3430,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/sapi1.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "test")
-files {
-	MAME_DIR .. "src/mame/drivers/test_t400.cpp",
-	MAME_DIR .. "src/mame/drivers/zexall.cpp",
-}
-
 createMESSProjects(_target, _subtarget, "thomson")
 files {
 	MAME_DIR .. "src/mame/drivers/thomson.cpp",
@@ -3421,6 +3449,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/evmbug.cpp",
 	MAME_DIR .. "src/mame/drivers/exelv.cpp",
 	MAME_DIR .. "src/mame/drivers/geneve.cpp",
+	MAME_DIR .. "src/mame/machine/screenless.cpp", -- delete soon
+	MAME_DIR .. "src/mame/includes/screenless.h", -- delete soon
+	MAME_DIR .. "src/mame/drivers/hh_tms1k.cpp",
+	MAME_DIR .. "src/mame/includes/hh_tms1k.h",
+	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp", -- subdriver of hh_tms1k
+	MAME_DIR .. "src/mame/drivers/tispeak.cpp",  -- "
+	MAME_DIR .. "src/mame/drivers/tispellb.cpp", -- "
 	MAME_DIR .. "src/mame/drivers/ti74.cpp",
 	MAME_DIR .. "src/mame/drivers/ti85.cpp",
 	MAME_DIR .. "src/mame/includes/ti85.h",
@@ -3792,9 +3827,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/aaa.cpp",
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
-	MAME_DIR .. "src/mame/drivers/aci_boris.cpp",
-	MAME_DIR .. "src/mame/drivers/aci_borisdpl.cpp",
-	MAME_DIR .. "src/mame/drivers/aci_ggm.cpp",
 	MAME_DIR .. "src/mame/drivers/adm23.cpp",
 	MAME_DIR .. "src/mame/drivers/adm31.cpp",
 	MAME_DIR .. "src/mame/drivers/adm36.cpp",
@@ -3830,7 +3862,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/candela.cpp",
 	MAME_DIR .. "src/mame/drivers/cardinal.cpp",
 	MAME_DIR .. "src/mame/drivers/chaos.cpp",
-	MAME_DIR .. "src/mame/drivers/scisys_chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/cit101.cpp",
@@ -3906,7 +3937,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ikt5a.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
-	MAME_DIR .. "src/mame/drivers/intellect02.cpp",
 	MAME_DIR .. "src/mame/drivers/is48x.cpp",
 	MAME_DIR .. "src/mame/drivers/itt1700.cpp",
 	MAME_DIR .. "src/mame/machine/itt1700_kbd.cpp",
@@ -3936,7 +3966,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/microterm.cpp",
 	MAME_DIR .. "src/mame/drivers/microterm_f8.cpp",
 	MAME_DIR .. "src/mame/drivers/mightyframe.cpp",
-	MAME_DIR .. "src/mame/drivers/milton6805.cpp",
 	MAME_DIR .. "src/mame/drivers/milwaukee.cpp",
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
 	MAME_DIR .. "src/mame/drivers/miniframe.cpp",
