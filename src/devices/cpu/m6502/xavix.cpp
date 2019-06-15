@@ -197,7 +197,7 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 				return databank;
 			}
 
-			if ((adr & 0x7fff) >= 0x200)
+			if ((adr & 0x7fff) >= 0x100)
 			{
 				return m_extbus_space->read_byte((databank << 16) | adr);
 			}
@@ -264,6 +264,19 @@ void xavix_device::write_full_data(uint32_t addr, uint8_t val)
 	write_full_data((addr & 0xff0000)>>16, addr & 0xffff, val);
 }
 
+uint8_t xavix_device::read_stack(uint32_t addr)
+{
+	// address is always 0x100-0x1ff
+	return m_lowbus_space->read_byte(addr);
+}
+
+void xavix_device::write_stack(uint32_t addr, uint8_t val)
+{
+	// address is always 0x100-0x1ff
+	m_lowbus_space->write_byte(addr, val);
+}
+
+
 // data writes
 inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
 {
@@ -307,7 +320,7 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 			// actually it is more likely that all zero page and stack operations should go through their own handlers, and never reach here
 			// there is code that explicitly uses pull/push opcodes when in the high banks indicating that the stack area likely isn't
 			// mapped normally
-			if ((adr & 0x7fff) >= 0x200)
+			if ((adr & 0x7fff) >= 0x100)
 			{
 				m_extbus_space->write_byte((databank << 16) | adr, val);
 			}

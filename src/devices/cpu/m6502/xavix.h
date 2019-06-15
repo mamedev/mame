@@ -46,6 +46,14 @@ public:
 	O(xavsbc_idx);
 	O(xavsbc_idy);
 
+	O(plp_xav_imp);
+	O(pla_xav_imp);
+	O(php_xav_imp);
+	O(pha_xav_imp);
+	O(jsr_xav_adr);
+	O(rts_xav_imp);
+
+
 	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
 	template <typename Object> void set_vector_callback(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
@@ -143,6 +151,10 @@ protected:
 	   need further research */
 	uint8_t m_special_stack[0x100];
 	uint8_t m_special_stackpos;
+
+	uint8_t read_stack(uint32_t addr);
+	void write_stack(uint32_t addr, uint8_t val);
+
 };
 
 enum {

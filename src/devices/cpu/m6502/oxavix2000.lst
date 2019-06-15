@@ -4,29 +4,29 @@
 
 phy_imp
 	read_pc_noinc();
-	write(SP, Y);
+	write_stack(SP, Y);
 	dec_SP();
 	prefetch();
 
 phx_imp
 	read_pc_noinc();
-	write(SP, X);
+	write_stack(SP, X);
 	dec_SP();
 	prefetch();
 
 plx_imp
 	read_pc_noinc();
-	read(SP);
+	read_stack(SP);
 	inc_SP();
-	X = read(SP);
+	X = read_stack(SP);
 	set_nz(X);
 	prefetch();
 
 ply_imp
 	read_pc_noinc();
-	read(SP);
+	read_stack(SP);
 	inc_SP();
-	Y = read(SP);
+	Y = read_stack(SP);
 	set_nz(Y);
 	prefetch();
 
