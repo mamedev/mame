@@ -98,8 +98,8 @@ GFXDECODE_END
 
 void tc0091lvc_device::cpu_map(address_map &map)
 {
+	// 0x0000-0x7fff ROM (0x0000-0x5fff Fixed, 0x6000-0x7fff Bankswitched)
 	map(0x0000, 0x5fff).r(FUNC(tc0091lvc_device::rom_r));
-	// 0x6000-0x7fff bankswitched ROM
 	map(0x6000, 0x7fff).lr8("banked_rom_r", [this](offs_t offset) { return rom_r((*m_rom_bank << 13) | (offset & 0x1fff)); });
 
 	//map(0x8000, 0xbfff) external mappable area
