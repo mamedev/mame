@@ -27,10 +27,7 @@ u8 tc0091lvc_device::rom_r(offs_t offset)
 
 void tc0091lvc_device::vram_w(offs_t offset, u8 data)
 {
-	/* TODO : offset 0x0000 - 0x3fff is not used?
-	if (offset < 0x4000)
-		return;
-	*/
+	// TODO : offset 0x0000 - 0x3fff is not used?
 
 	m_vram[offset] = data;
 	gfx(2)->mark_dirty(offset / 32);
