@@ -30,10 +30,10 @@ u8 tc0091lvc_device::rom_r(offs_t offset)
 
 void tc0091lvc_device::vram_w(offs_t offset, u8 data)
 {
-	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
-	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
-	if (offset < 0x4000) // <0x4000 area is not mapped?
+	/* TODO : offset 0x0000 - 0x3fff is not used?
+	if (offset < 0x4000)
 		return;
+	*/
 
 	m_vram[offset] = data;
 	gfx(2)->mark_dirty(offset / 32);
