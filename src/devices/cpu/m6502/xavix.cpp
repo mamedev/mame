@@ -93,12 +93,19 @@ void xavix_device::device_start()
 	m_lowbus_space = &space(5);
 	m_extbus_space = &space(6);
 
-	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");;
+	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
 	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).callimport().formatstr("%2s");
+
+	save_item(NAME(m_special_stack));
+	save_item(NAME(m_special_stackpos));
 }
 
 void xavix_device::device_reset()
 {
+	m_special_stackpos = 0xff;
+	for (int i = 0; i < 0x100; i++)
+		m_special_stack[i] = 0x00;
+
 	set_codebank(0);
 	set_databank(0);
 	m6502_device::device_reset();
@@ -125,6 +132,28 @@ xavix_device::mi_xavix_normal::mi_xavix_normal(xavix_device *_base)
 {
 	base = _base;
 }
+
+void xavix_device::write_special_stack(uint8_t data)
+{
+	m_special_stack[m_special_stackpos&0xff] = data;
+}
+
+void xavix_device::dec_special_stack()
+{
+	m_special_stackpos--;
+}
+
+void xavix_device::inc_special_stack()
+{
+	m_special_stackpos++;
+}
+
+uint8_t xavix_device::read_special_stack()
+{
+	return m_special_stack[m_special_stackpos&0xff];
+}
+
+
 
 inline uint8_t xavix_device::read_full_data(uint32_t addr)
 {
@@ -194,7 +223,7 @@ inline uint8_t xavix_device::read_full_data_sp(uint8_t databank, uint16_t adr)
 			if (adr == 0xfe)
 				return m_codebank;
 			else if (adr == 0xff)
-				return databank;
+				return m_databank;
 
 			return m_lowbus_space->read_byte(adr);
 		}
@@ -275,6 +304,9 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 				return;
 			}
 
+			// actually it is more likely that all zero page and stack operations should go through their own handlers, and never reach here
+			// there is code that explicitly uses pull/push opcodes when in the high banks indicating that the stack area likely isn't
+			// mapped normally
 			if ((adr & 0x7fff) >= 0x200)
 			{
 				m_extbus_space->write_byte((databank << 16) | adr, val);
