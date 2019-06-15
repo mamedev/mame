@@ -102,11 +102,14 @@ GFXDECODE_END
 void tc0091lvc_device::cpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).r(FUNC(tc0091lvc_device::rom_r));
+
 	//map(0x8000, 0xbfff) external mappable area
+
 	map(0xc000, 0xcfff).m(m_bankdev[0], FUNC(address_map_bank_device::amap8));
 	map(0xd000, 0xdfff).m(m_bankdev[1], FUNC(address_map_bank_device::amap8));
 	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
+
 	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
 	map(0xff00, 0xff02).ram().share("irq_vector");
 	map(0xff03, 0xff03).ram().share("irq_enable");
