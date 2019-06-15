@@ -104,6 +104,7 @@ void tc0091lvc_device::cpu_map(address_map &map)
 
 	//map(0x8000, 0xbfff) external mappable area
 
+	// 0xc000-0xfdff RAM banks (Connected in VRAMs, 4KB boundary)
 	map(0xc000, 0xcfff).m(m_bankdev[0], FUNC(address_map_bank_device::amap8));
 	map(0xd000, 0xdfff).m(m_bankdev[1], FUNC(address_map_bank_device::amap8));
 	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
