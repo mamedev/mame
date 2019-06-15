@@ -102,7 +102,7 @@ void tc0091lvc_device::cpu_map(address_map &map)
 	map(0x0000, 0x5fff).r(FUNC(tc0091lvc_device::rom_r));
 	map(0x6000, 0x7fff).lr8("banked_rom_r", [this](offs_t offset) { return rom_r((*m_rom_bank << 13) | (offset & 0x1fff)); });
 
-	// 0x8000-0xbfff external mappable area
+	// 0x8000-0xbfff External mappable area
 
 	// 0xc000-0xfdff RAM banks (Connected in VRAMs, 4KB boundary)
 	map(0xc000, 0xcfff).m(m_bankdev[0], FUNC(address_map_bank_device::amap8));
@@ -110,6 +110,7 @@ void tc0091lvc_device::cpu_map(address_map &map)
 	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
 
+	// 0xfe00-0xffff Internal functions
 	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
 	map(0xff00, 0xff02).ram().share("irq_vector");
 	map(0xff03, 0xff03).ram().share("irq_enable");
