@@ -123,10 +123,10 @@ rti_xav_imp
 
 xavlda_idy
 	TMP2 = read_pc(); // we need to fetch the zero page part from zero page, but the rest as if zero page wasn't there, similar to the 6509
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	A = read_special(TMP+Y);
 	set_nz(A);
@@ -134,40 +134,40 @@ xavlda_idy
 
 xavadc_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	do_adc(read_special(TMP+Y));
 	prefetch();
 
 xavcmp_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	do_cmp(A, read_special(TMP+Y));
 	prefetch();
 
 xavsbc_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	do_sbc(read_special(TMP+Y));
 	prefetch();
 
 xaveor_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	A ^= read_special(TMP+Y);
 	set_nz(A);
@@ -175,10 +175,10 @@ xaveor_idy
 
 xavand_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	A &= read_special(TMP+Y);
 	set_nz(A);
@@ -186,10 +186,10 @@ xavand_idy
 
 xavora_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+		read(set_l(TMP, TMP+Y)); // dummy read
 	}
 	A |= read_special(TMP+Y);
 	set_nz(A);
@@ -197,88 +197,89 @@ xavora_idy
 
 xavora_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	A |= read_special(TMP);
 	set_nz(A);
 	prefetch();
 
 xavand_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	A &= read_special(TMP);
 	set_nz(A);
 	prefetch();
 
 xaveor_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	A ^= read_special(TMP);
 	set_nz(A);
 	prefetch();
 
 xavadc_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	do_adc(read_special(TMP));
 	prefetch();
 
 xavlda_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	A = read_special(TMP);
 	set_nz(A);
 	prefetch();
 
 xavcmp_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	do_cmp(A, read_special(TMP));
 	prefetch();
 
 xavsbc_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	do_sbc(read_special(TMP));
 	prefetch();
 
 xavsta_idy
 	TMP2 = read_pc();
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	read(set_l(TMP, TMP+Y));
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read_zeropage(set_l(TMP, TMP+Y)); // dummy read
 	write(TMP+Y, A); // TODO
 	prefetch();
 
 xavsta_idx
 	TMP2 = read_pc();
-	read(TMP2);
+	read_zeropage(TMP2); // dummy read
 	TMP2 += X;
-	TMP = read(TMP2 & 0xff);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
 	write(TMP, A); // TODO
 	prefetch();
 
+# opcodes below are modified to access stack through different handlers
 
 pha_xav_imp
 	read_pc_noinc();
@@ -328,3 +329,666 @@ rts_xav_imp
 	PC = set_h(PC, read_stack(SP));
 	read_pc();
 	prefetch();
+
+# opcodes below are modified to access zero page through different handlers
+
+adc_xav_zpg
+	TMP = read_pc();
+	TMP = read_zeropage(TMP);
+	do_adc(TMP);
+	prefetch();
+
+and_xav_zpg
+	TMP = read_pc();
+	A &= read_zeropage(TMP);
+	set_nz(A);
+	prefetch();
+
+asl_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_asl(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+bit_xav_zpg
+	TMP = read_pc();
+	do_bit(read_zeropage(TMP));
+	prefetch();
+
+cmp_xav_zpg
+	TMP = read_pc();
+	TMP = read_zeropage(TMP);
+	do_cmp(A, TMP);
+	prefetch();
+
+cpx_xav_zpg
+	TMP = read_pc();
+	TMP = read_zeropage(TMP);
+	do_cmp(X, TMP);
+	prefetch();
+
+cpy_xav_zpg
+	TMP = read_pc();
+	TMP = read_zeropage(TMP);
+	do_cmp(Y, TMP);
+	prefetch();
+
+dec_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2--;
+	set_nz(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+eor_xav_zpg
+	TMP = read_pc();
+	A ^= read_zeropage(TMP);
+	set_nz(A);
+	prefetch();
+
+inc_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2++;
+	set_nz(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+lda_xav_zpg
+	TMP = read_pc();
+	A = read_zeropage(TMP);
+	set_nz(A);
+	prefetch();
+
+ldx_xav_zpg
+	TMP = read_pc();
+	X = read_zeropage(TMP);
+	set_nz(X);
+	prefetch();
+
+ldy_xav_zpg
+	TMP = read_pc();
+	Y = read_zeropage(TMP);
+	set_nz(Y);
+	prefetch();
+
+lsr_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_lsr(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+ora_xav_zpg
+	TMP = read_pc();
+	A |= read_zeropage(TMP);
+	set_nz(A);
+	prefetch();
+
+rol_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_rol(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+ror_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_ror(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+sbc_xav_zpg
+	TMP = read_pc();
+	TMP = read_zeropage(TMP);
+	do_sbc(TMP);
+	prefetch();
+
+sta_xav_zpg
+	TMP = read_pc();
+	write_zeropage(TMP, A);
+	prefetch();
+
+stx_xav_zpg
+	TMP = read_pc();
+	write_zeropage(TMP, X);
+	prefetch();
+
+sty_xav_zpg
+	TMP = read_pc();
+	write_zeropage(TMP, Y);
+	prefetch();
+
+dcp_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2--;
+	write_zeropage(TMP, TMP2);
+	do_cmp(A, TMP2);
+	prefetch();
+
+isb_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2++;
+	write_zeropage(TMP, TMP2);
+	do_sbc(TMP2);
+	prefetch();
+
+lax_xav_zpg
+	TMP = read_pc();
+	A = X = read_zeropage(TMP);
+	set_nz(A);
+	prefetch();
+
+rla_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_rol(TMP2);
+	write_zeropage(TMP, TMP2);
+	A &= TMP2;
+	set_nz(A);
+	prefetch();
+
+rra_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_ror(TMP2);
+	write_zeropage(TMP, TMP2);
+	do_adc(TMP2);
+	prefetch();
+
+sax_xav_zpg
+	TMP = read_pc();
+	TMP2 = A & X;
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+slo_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_asl(TMP2);
+	write_zeropage(TMP, TMP2);
+	A |= TMP2;
+	set_nz(A);
+	prefetch();
+
+sre_xav_zpg
+	TMP = read_pc();
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_lsr(TMP2);
+	write_zeropage(TMP, TMP2);
+	A ^= TMP2;
+	set_nz(A);
+	prefetch();
+
+nop_xav_zpg
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	prefetch();
+
+# more zero page changes
+
+ldx_xav_zpy
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	X = read_zeropage(uint8_t(TMP+Y));
+	set_nz(X);
+	prefetch();
+
+stx_xav_zpy
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	write_zeropage(uint8_t(TMP+Y), X);
+	prefetch();
+
+lax_xav_zpy
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+Y);
+	A = X = read_zeropage(TMP);
+	set_nz(A);
+	prefetch();
+
+sax_xav_zpy
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy reaad
+	TMP = uint8_t(TMP+Y);
+	TMP2 = A & X;
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+# more zero page changes
+
+adc_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = read_zeropage(uint8_t(TMP+X));
+	do_adc(TMP);
+	prefetch();
+
+and_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	A &= read_zeropage(uint8_t(TMP+X));
+	set_nz(A);
+	prefetch();
+
+asl_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_asl(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+cmp_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = read_zeropage(uint8_t(TMP+X));
+	do_cmp(A, TMP);
+	prefetch();
+
+dec_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2--;
+	set_nz(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+eor_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	A ^= read_zeropage(uint8_t(TMP+X));
+	set_nz(A);
+	prefetch();
+
+inc_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2++;
+	set_nz(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+lda_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	A = read_zeropage(uint8_t(TMP+X));
+	set_nz(A);
+	prefetch();
+
+ldy_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	Y = read_zeropage(uint8_t(TMP+X));
+	set_nz(Y);
+	prefetch();
+
+lsr_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_lsr(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+ora_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	A |= read_zeropage(uint8_t(TMP+X));
+	set_nz(A);
+	prefetch();
+
+rol_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_rol(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+ror_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_ror(TMP2);
+	write_zeropage(TMP, TMP2);
+	prefetch();
+
+sbc_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = read_zeropage(uint8_t(TMP+X));
+	do_sbc(TMP);
+	prefetch();
+
+sta_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	write_zeropage(uint8_t(TMP+X), A);
+	prefetch();
+
+sty_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	write_zeropage(uint8_t(TMP+X), Y);
+	prefetch();
+
+dcp_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2--;
+	write_zeropage(TMP, TMP2);
+	do_cmp(A, TMP2);
+	prefetch();
+
+isb_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2++;
+	write_zeropage(TMP, TMP2);
+	do_sbc(TMP2);
+	prefetch();
+
+rla_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_rol(TMP2);
+	write_zeropage(TMP, TMP2);
+	A &= TMP2;
+	set_nz(A);
+	prefetch();
+
+rra_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_ror(TMP2);
+	write_zeropage(TMP, TMP2);
+	do_adc(TMP2);
+	prefetch();
+
+slo_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_asl(TMP2);
+	write_zeropage(TMP, TMP2);
+	A |= TMP2;
+	set_nz(A);
+	prefetch();
+
+sre_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP); // dummy read
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	write_zeropage(TMP, TMP2); // dummy write
+	TMP2 = do_lsr(TMP2);
+	write_zeropage(TMP, TMP2);
+	A ^= TMP2;
+	set_nz(A);
+	prefetch();
+
+nop_xav_zpx
+	TMP = read_pc();
+	read_zeropage(TMP);
+	read_zeropage(uint8_t(TMP+X));
+	prefetch();
+
+####
+
+slo_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_asl(TMP2);
+	write(TMP, TMP2);
+	A |= TMP2;
+	set_nz(A);
+	prefetch();
+
+# idx with zero page changes
+
+rla_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_rol(TMP2);
+	write(TMP, TMP2);
+	A &= TMP2;
+	set_nz(A);
+	prefetch();
+
+sre_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_lsr(TMP2);
+	write(TMP, TMP2);
+	A ^= TMP2;
+	set_nz(A);
+	prefetch();
+
+rra_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_ror(TMP2);
+	write(TMP, TMP2);
+	do_adc(TMP2);
+	prefetch();
+
+sax_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = A & X;
+	write(TMP, TMP2);
+	prefetch();
+
+lax_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dumm read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	A = X = read(TMP);
+	set_nz(A);
+	prefetch();
+
+dcp_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2--;
+	write(TMP, TMP2);
+	do_cmp(A, TMP2);
+	prefetch();
+
+isb_xav_idx
+	TMP2 = read_pc();
+	read_zeropage(TMP2); // dummy read
+	TMP2 += X;
+	TMP = read_zeropage(TMP2 & 0xff);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2++;
+	write(TMP, TMP2);
+	do_sbc(TMP2);
+	prefetch();
+
+# idy with zero page changes
+
+slo_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP += Y;
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_asl(TMP2);
+	write(TMP, TMP2);
+	A |= TMP2;
+	set_nz(A);
+	prefetch();
+
+rla_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP += Y;
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_rol(TMP2);
+	write(TMP, TMP2);
+	A &= TMP2;
+	set_nz(A);
+	prefetch();
+
+sre_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP += Y;
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_lsr(TMP2);
+	write(TMP, TMP2);
+	A ^= TMP2;
+	set_nz(A);
+	prefetch();
+
+rra_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP += Y;
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_ror(TMP2);
+	write(TMP, TMP2);
+	do_adc(TMP2);
+	prefetch();
+
+sha_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP2 = A & X & ((TMP >> 8)+1);
+	if(page_changing(TMP, Y))
+		TMP = set_h(TMP+Y, TMP2);
+	else
+		TMP += Y;
+	write(TMP, TMP2);
+	prefetch();
+
+lax_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y)); // dummy read
+	}
+	A = X = read(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+dcp_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP += Y;
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2--;
+	write(TMP, TMP2);
+	do_cmp(A, TMP2);
+	prefetch();
+
+isb_xav_idy
+	TMP2 = read_pc();
+	TMP = read_zeropage(TMP2);
+	TMP = set_h(TMP, read_zeropage((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+Y)); // dummy read
+	TMP += Y;
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2++;
+	write(TMP, TMP2);
+	do_sbc(TMP2);
+	prefetch();
+

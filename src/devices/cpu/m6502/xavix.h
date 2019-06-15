@@ -54,6 +54,87 @@ public:
 	O(rts_xav_imp);
 
 
+
+	O(adc_xav_zpg);
+	O(and_xav_zpg);
+	O(asl_xav_zpg);
+	O(bit_xav_zpg);
+	O(cmp_xav_zpg);
+	O(cpx_xav_zpg);
+	O(cpy_xav_zpg);
+	O(dec_xav_zpg);
+	O(eor_xav_zpg);
+	O(inc_xav_zpg);
+	O(lda_xav_zpg);
+	O(ldx_xav_zpg);
+	O(ldy_xav_zpg);
+	O(lsr_xav_zpg);
+	O(ora_xav_zpg);
+	O(rol_xav_zpg);
+	O(ror_xav_zpg);
+	O(sbc_xav_zpg);
+	O(sta_xav_zpg);
+	O(stx_xav_zpg);
+	O(sty_xav_zpg);
+	O(dcp_xav_zpg);
+	O(isb_xav_zpg);
+	O(lax_xav_zpg);
+	O(rla_xav_zpg);
+	O(rra_xav_zpg);
+	O(sax_xav_zpg);
+	O(slo_xav_zpg);
+	O(sre_xav_zpg);
+	O(nop_xav_zpg);
+
+	O(ldx_xav_zpy);
+	O(stx_xav_zpy);
+	O(lax_xav_zpy);
+	O(sax_xav_zpy);
+
+	O(adc_xav_zpx);
+	O(and_xav_zpx);
+	O(asl_xav_zpx);
+	O(cmp_xav_zpx);
+	O(dec_xav_zpx);
+	O(eor_xav_zpx);
+	O(inc_xav_zpx);
+	O(lda_xav_zpx);
+	O(ldy_xav_zpx);
+	O(lsr_xav_zpx);
+	O(ora_xav_zpx);
+	O(rol_xav_zpx);
+	O(ror_xav_zpx);
+	O(sbc_xav_zpx);
+	O(sta_xav_zpx);
+	O(sty_xav_zpx);
+	O(dcp_xav_zpx);
+	O(isb_xav_zpx);
+	O(rla_xav_zpx);
+	O(rra_xav_zpx);
+	O(slo_xav_zpx);
+	O(sre_xav_zpx);
+	O(nop_xav_zpx);
+
+	O(slo_xav_idx);
+	O(rla_xav_idx);
+	O(sre_xav_idx);
+	O(rra_xav_idx);
+	O(sax_xav_idx);
+	O(lax_xav_idx);
+	O(dcp_xav_idx);
+	O(isb_xav_idx);
+
+	O(slo_xav_idy);
+	O(rla_xav_idy);
+	O(sre_xav_idy);
+	O(rra_xav_idy);
+	O(sha_xav_idy);
+	O(lax_xav_idy);
+	O(dcp_xav_idy);
+	O(isb_xav_idy);
+
+
+
 	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
 	template <typename Object> void set_vector_callback(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
@@ -154,6 +235,9 @@ protected:
 
 	uint8_t read_stack(uint32_t addr);
 	void write_stack(uint32_t addr, uint8_t val);
+
+	uint8_t read_zeropage(uint32_t addr);
+	void write_zeropage(uint32_t addr, uint8_t val);
 
 };
 

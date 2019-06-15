@@ -18,9 +18,12 @@
     0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
                   of banking
     0x8000-0xffff is a banked area with individual code and data banks
-                  0x00ff contains the DATA bank, set manually in code
-                  0x00fe appears to be the current CODE bank, set with either the
-                         custom opcodes, or manually (if running from lowbus only?)
+  
+	Zero Page notes:
+
+    0x00ff contains the DATA bank, set manually in code
+    0x00fe appears to be the current CODE bank, set with either the
+            custom opcodes, or manually (if running from lowbus only?)
 
 ***************************************************************************/
 
@@ -172,7 +175,7 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 			}
 			else if (adr == 0xff)
 			{
-				return databank;
+				return m_databank;
 			}
 
 			return m_lowbus_space->read_byte(adr);
@@ -184,33 +187,7 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 	}
 	else
 	{
-		if (adr < 0x8000)
-		{
-			if (adr == 0xfe)
-			{
-				//logerror("%02x%04x returning codebank\n", m_codebank, PC);
-				return m_codebank;
-			}
-			else if (adr == 0xff)
-			{
-				//logerror("%02x%04x returning databank\n", m_codebank, PC);
-				return databank;
-			}
-
-			if ((adr & 0x7fff) >= 0x100)
-			{
-				return m_extbus_space->read_byte((databank << 16) | adr);
-			}
-			else
-			{
-				//logerror("%02x%04x returning lowbus %04x\n", m_codebank, PC, adr); // useful for debugging opcodes which must ignore lowbus (all indirect ones?)
-				return m_lowbus_space->read_byte(adr);
-			}
-		}
-		else
-		{
-			return m_extbus_space->read_byte((databank << 16) | adr);
-		}
+		return m_extbus_space->read_byte((databank << 16) | adr);
 	}
 }
 
@@ -221,9 +198,13 @@ inline uint8_t xavix_device::read_full_data_sp(uint8_t databank, uint16_t adr)
 		if (adr < 0x8000)
 		{
 			if (adr == 0xfe)
+			{
 				return m_codebank;
+			}
 			else if (adr == 0xff)
+			{
 				return m_databank;
+			}
 
 			return m_lowbus_space->read_byte(adr);
 		}
@@ -267,12 +248,48 @@ void xavix_device::write_full_data(uint32_t addr, uint8_t val)
 uint8_t xavix_device::read_stack(uint32_t addr)
 {
 	// address is always 0x100-0x1ff
-	return m_lowbus_space->read_byte(addr);
+	return m_lowbus_space->read_byte((addr & 0xff)+0x100);
 }
 
 void xavix_device::write_stack(uint32_t addr, uint8_t val)
 {
 	// address is always 0x100-0x1ff
+	m_lowbus_space->write_byte((addr & 0xff)+0x100, val);
+}
+
+uint8_t xavix_device::read_zeropage(uint32_t addr)
+{
+	// address is always 0x00-0xff
+	addr &= 0xff;
+
+	if (addr == 0xfe)
+	{
+		return m_codebank;
+	}
+	else if (addr == 0xff)
+	{
+		return m_databank;
+	}
+
+	return m_lowbus_space->read_byte(addr);
+}
+
+void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
+{
+	// address is always 0x00-0xff
+	addr &= 0xff;
+
+	if (addr == 0xfe)
+	{
+		m_codebank = val;
+		return;
+	}
+	else if (addr == 0xff)
+	{
+		m_databank = val;
+		return;
+	}
+
 	m_lowbus_space->write_byte(addr, val);
 }
 
@@ -304,6 +321,14 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 	}
 	else
 	{
+		m_extbus_space->write_byte((databank << 16) | adr, val);
+	}
+}
+
+inline void xavix_device::write_full_data_sp(uint8_t databank, uint16_t adr, uint8_t val)
+{
+	if (databank < 0x80)
+	{
 		if (adr < 0x8000)
 		{
 			if (adr == 0xfe)
@@ -317,31 +342,6 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 				return;
 			}
 
-			// actually it is more likely that all zero page and stack operations should go through their own handlers, and never reach here
-			// there is code that explicitly uses pull/push opcodes when in the high banks indicating that the stack area likely isn't
-			// mapped normally
-			if ((adr & 0x7fff) >= 0x100)
-			{
-				m_extbus_space->write_byte((databank << 16) | adr, val);
-			}
-			else
-			{
-				m_lowbus_space->write_byte(adr, val);
-			}
-		}
-		else
-		{
-			m_extbus_space->write_byte((databank << 16) | adr, val);
-		}
-	}
-}
-
-inline void xavix_device::write_full_data_sp(uint8_t databank, uint16_t adr, uint8_t val)
-{
-	if (databank < 0x80)
-	{
-		if (adr < 0x8000)
-		{
 			m_lowbus_space->write_byte(adr, val);
 		}
 		else

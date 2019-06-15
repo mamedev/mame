@@ -412,9 +412,9 @@ sty_abx
 	write(TMP+X, Y);
 	prefetch();
 
-stz_zpg
+stz_xav_zpg
 	TMP = read_pc();
-	write(TMP, 0x00);
+	write_zeropage(TMP, 0x00);
 	prefetch();
 
 stz_aba
@@ -423,7 +423,7 @@ stz_aba
 	write(TMP, 0x00);
 	prefetch();
 
-bit_zpx
+bit_xav_zpx
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
@@ -441,9 +441,9 @@ bit_imm
 		P |= F_Z;
 	prefetch();
 
-asr_zpg
+asr_xav_zpg
 	TMP = read_pc(); // TODO: verify this, should it write back or set A?
-	TMP = read(TMP);
+	TMP = read_zeropage(TMP);
 	do_asr(TMP);
 	prefetch();
 
@@ -456,7 +456,7 @@ asr_aba
 	write(TMP, TMP2);
 	prefetch();
 
-asr_zpx
+asr_xav_zpx
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
