@@ -102,7 +102,7 @@ void tc0091lvc_device::cpu_map(address_map &map)
 	map(0x0000, 0x5fff).r(FUNC(tc0091lvc_device::rom_r));
 	map(0x6000, 0x7fff).lr8("banked_rom_r", [this](offs_t offset) { return rom_r((*m_rom_bank << 13) | (offset & 0x1fff)); });
 
-	//map(0x8000, 0xbfff) external mappable area
+	// 0x8000-0xbfff external mappable area
 
 	// 0xc000-0xfdff RAM banks (Connected in VRAMs, 4KB boundary)
 	map(0xc000, 0xcfff).m(m_bankdev[0], FUNC(address_map_bank_device::amap8));
