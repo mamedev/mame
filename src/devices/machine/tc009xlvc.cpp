@@ -110,7 +110,7 @@ void tc0091lvc_device::cpu_map(address_map &map)
 	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
 
-	// 0xfe00-0xffff Internal functions
+	// 0xfe00-0xff08 Internal functions
 	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
 	map(0xff00, 0xff02).ram().share("irq_vector");
 	map(0xff03, 0xff03).ram().share("irq_enable");
