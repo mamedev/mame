@@ -79,17 +79,16 @@
     upper-left power pill: mcu cycle/interrupt timing related
   - Though very uncommon when compared to games with LED/lamp display, some
     games may manipulate VFD plate brightness by strobing it longer/shorter,
-    eg. cgalaxn when the player ship explodes.
+    eg. cgalaxn when a ship explodes.
   - bzaxxon 3D effect is difficult to simulate
   - improve/redo SVGs of: bzaxxon, bpengo, bbtime
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
+#include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
@@ -110,20 +109,22 @@
 //#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
-class hh_hmcs40_state : public screenless_state
+class hh_hmcs40_state : public driver_device
 {
 public:
 	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
 	u8 m_r[8];                      // MCU R ports write data (optional)
@@ -149,8 +150,6 @@ protected:
 
 void hh_hmcs40_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill
 	memset(m_r, 0, sizeof(m_r));
 	memset(m_int, 0, sizeof(m_int));
@@ -190,7 +189,7 @@ u16 hh_hmcs40_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -264,7 +263,7 @@ WRITE8_MEMBER(bambball_state::plate_w)
 
 	// update display
 	u16 plate = bitswap<16>(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(bambball_state::grid_w)
@@ -333,6 +332,7 @@ void bambball_state::bambball(machine_config &config)
 	screen.set_size(1920, 478);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_bambball);
 
 	/* sound hardware */
@@ -384,7 +384,7 @@ void bmboxing_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u32 plate = bitswap<16>(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
-	display_matrix(12, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bmboxing_state::plate_w)
@@ -480,6 +480,8 @@ void bmboxing_state::bmboxing(machine_config &config)
 	screen.set_size(1920, 529);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 12);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -531,7 +533,7 @@ void bfriskyt_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
-	display_matrix(22, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bfriskyt_state::plate_w)
@@ -607,6 +609,8 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 	screen.set_size(1920, 675);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(8, 22);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -666,7 +670,7 @@ WRITE8_MEMBER(packmon_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
-	display_matrix(20, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(packmon_state::grid_w)
@@ -726,6 +730,7 @@ void packmon_state::packmon(machine_config &config)
 	screen.set_size(1920, 680);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 20);
 	config.set_default_layout(layout_packmon);
 
 	/* sound hardware */
@@ -784,7 +789,7 @@ WRITE8_MEMBER(bzaxxon_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
-	display_matrix(20, 11, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(bzaxxon_state::grid_w)
@@ -853,6 +858,8 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 	screen.set_size(613, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(11, 20);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -907,7 +914,7 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	// update display
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<32>(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
-	display_matrix(29, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(zackman_state::grid_w)
@@ -974,6 +981,8 @@ void zackman_state::zackman(machine_config &config)
 	screen.set_size(487, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(8, 29);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1025,7 +1034,7 @@ void bpengo_state::prepare_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(25, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bpengo_state::plate_w)
@@ -1105,6 +1114,8 @@ void bpengo_state::bpengo(machine_config &config)
 	screen.set_size(1920, 759);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(8, 25);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1156,7 +1167,7 @@ void bbtime_state::prepare_display()
 {
 	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
-	display_matrix(28, 6, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bbtime_state::plate_w)
@@ -1232,6 +1243,8 @@ void bbtime_state::bbtime(machine_config &config)
 	screen.set_size(379, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(6, 28);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1284,7 +1297,7 @@ WRITE8_MEMBER(bdoramon_state::plate_w)
 	// update display
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,7,6);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(19, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(bdoramon_state::grid_w)
@@ -1339,6 +1352,8 @@ void bdoramon_state::bdoramon(machine_config &config)
 	screen.set_size(1920, 668);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1391,7 +1406,7 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 	// update display
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
-	display_matrix(18, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(bultrman_state::grid_w)
@@ -1437,6 +1452,8 @@ void bultrman_state::bultrman(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 673);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1485,7 +1502,7 @@ public:
 void machiman_state::prepare_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
-	display_matrix(19, 5, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(machiman_state::plate_w)
@@ -1535,6 +1552,8 @@ void machiman_state::machiman(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1534, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(5, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1599,7 +1618,7 @@ WRITE8_MEMBER(pairmtch_state::plate_w)
 	// R2x,R3x,R6x: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	display_matrix(12, 6, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE16_MEMBER(pairmtch_state::grid_w)
@@ -1615,7 +1634,7 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 
 	// D0-D5: vfd grid
 	m_grid = data & 0x3f;
-	display_matrix(12, 6, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 READ8_MEMBER(pairmtch_state::input_r)
@@ -1698,6 +1717,8 @@ void pairmtch_state::pairmtch(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 12);
 	config.set_default_layout(layout_pairmtch);
 
 	/* sound hardware */
@@ -1758,7 +1779,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 
 	// update display
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
-	display_matrix(20, 10, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(alnattck_state::grid_w)
@@ -1825,6 +1846,8 @@ void alnattck_state::alnattck(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 700);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1906,7 +1929,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 void cdkong_state::prepare_display()
 {
 	u32 plate = bitswap<32>(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
-	display_matrix(29, 11, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(cdkong_state::plate_w)
@@ -1967,6 +1990,8 @@ void cdkong_state::cdkong(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(605, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(11, 29);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2033,7 +2058,7 @@ void cgalaxn_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
 	u16 plate = bitswap<16>(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
-	display_matrix(15, 12, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
@@ -2111,6 +2136,8 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 	screen.set_size(526, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(12, 15);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2176,7 +2203,7 @@ WRITE8_MEMBER(cpacman_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
-	display_matrix(27, 11, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(cpacman_state::grid_w)
@@ -2240,6 +2267,8 @@ void cpacman_state::cpacman(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(11, 27);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2309,8 +2338,8 @@ WRITE8_MEMBER(cmspacmn_state::plate_w)
 
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	u64 plate = BIT(m_plate,15)<<32 | bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
-	display_matrix(33, 12, plate, grid);
+	u32 plate = bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
+	m_display->matrix(grid, u64(BIT(m_plate,15)) << 32 | plate);
 }
 
 WRITE16_MEMBER(cmspacmn_state::grid_w)
@@ -2375,6 +2404,8 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 	screen.set_size(481, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(12, 33);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2427,17 +2458,12 @@ public:
 void sag_state::prepare_display()
 {
 	// grid 0-7 are the 'pixels'
-	for (int y = 0; y < 8; y++)
-		m_display_state[y] = (m_grid >> y & 1) ? m_plate : 0;
+	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
 
 	// grid 8-11 are 7segs
-	set_display_segmask(0xf00, 0x7f);
+	m_display->segmask(0xf00, 0x7f);
 	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
-	for (int y = 8; y < 12; y++)
-		m_display_state[y] = (m_grid >> y & 1) ? seg : 0;
-
-	set_display_size(14, 12);
-	display_update();
+	m_display->matrix_partial(8, 4, m_grid >> 8, seg);
 }
 
 WRITE8_MEMBER(sag_state::plate_w)
@@ -2522,6 +2548,8 @@ void sag_state::sag(machine_config &config)
 	m_maincpu->write_d().set(FUNC(sag_state::grid_w));
 	m_maincpu->read_d().set(FUNC(sag_state::input_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8+4, 14);
 	config.set_default_layout(layout_sag);
 
 	/* sound hardware */
@@ -2582,7 +2610,7 @@ void egalaxn2_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
-	display_matrix(24, 15, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(egalaxn2_state::grid_w)
@@ -2662,6 +2690,8 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(505, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(15, 24);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2825,7 +2855,7 @@ void eturtles_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 	u32 plate = bitswap<32>(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
-	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
+	m_display->matrix(grid, plate | (grid >> 5 & 8)); // grid 8 also forces plate 3 high
 }
 
 WRITE8_MEMBER(eturtles_state::plate_w)
@@ -2950,6 +2980,8 @@ void eturtles_state::eturtles(machine_config &config)
 	screen.set_size(484, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(15, 30);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3001,7 +3033,7 @@ void estargte_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
 	u32 plate = bitswap<32>(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
-	display_matrix(29, 14, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 READ8_MEMBER(estargte_state::cop_data_r)
@@ -3070,6 +3102,8 @@ void estargte_state::estargte(machine_config &config)
 	screen.set_size(1920, 854);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(14, 29);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3129,7 +3163,7 @@ WRITE8_MEMBER(ghalien_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
-	display_matrix(20, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(ghalien_state::grid_w)
@@ -3197,6 +3231,8 @@ void ghalien_state::ghalien(machine_config &config)
 	screen.set_size(1920, 699);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 20);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3256,7 +3292,7 @@ WRITE8_MEMBER(gckong_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
-	display_matrix(32, 11, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(gckong_state::grid_w)
@@ -3327,6 +3363,7 @@ void gckong_state::gckong(machine_config &config)
 	screen.set_size(479, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(11, 32);
 	config.set_default_layout(layout_gckong);
 
 	/* sound hardware */
@@ -3383,7 +3420,7 @@ WRITE8_MEMBER(gdigdug_state::plate_w)
 
 	// update display
 	u32 plate = bitswap<32>(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
-	display_matrix(32, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(gdigdug_state::grid_w)
@@ -3453,6 +3490,8 @@ void gdigdug_state::gdigdug(machine_config &config)
 	screen.set_size(476, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 32);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3506,7 +3545,7 @@ public:
 void mwcbaseb_state::prepare_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
-	display_matrix(16, 8, m_plate, grid);
+	m_display->matrix(grid, m_plate);
 }
 
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
@@ -3622,6 +3661,8 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	screen.set_size(1920, 478);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_bri_levels(0.002); // cyan elements strobed very briefly?
 	config.set_default_layout(layout_mwcbaseb);
 
 	/* sound hardware */
@@ -3681,7 +3722,7 @@ void msthawk_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(21, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(msthawk_state::plate_w)
@@ -3760,6 +3801,7 @@ void msthawk_state::msthawk(machine_config &config)
 	screen.set_size(1920, 696);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 21);
 	config.set_default_layout(layout_msthawk);
 
 	/* sound hardware */
@@ -3813,7 +3855,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 
 	// update display
 	u32 plate = bitswap<32>(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
-	display_matrix(30, 8, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(pbqbert_state::grid_w)
@@ -3858,6 +3900,8 @@ void pbqbert_state::pbqbert(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(603, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 30);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3910,7 +3954,7 @@ void kingman_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
-	display_matrix(23, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(kingman_state::plate_w)
@@ -3983,6 +4027,8 @@ void kingman_state::kingman(machine_config &config)
 	screen.set_size(374, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 23);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4034,7 +4080,7 @@ void tmtron_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
 	u32 plate = bitswap<24>(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
-	display_matrix(23, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tmtron_state::plate_w)
@@ -4107,6 +4153,8 @@ void tmtron_state::tmtron(machine_config &config)
 	screen.set_size(1920, 662);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 23);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4162,7 +4210,7 @@ WRITE8_MEMBER(vinvader_state::plate_w)
 
 	// update display
 	u16 plate = bitswap<16>(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
-	display_matrix(12, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(vinvader_state::grid_w)
@@ -4196,7 +4244,7 @@ INPUT_PORTS_END
 void vinvader_state::vinvader(machine_config &config)
 {
 	/* basic machine hardware */
-	HD38750(config, m_maincpu, 400000); // approximation
+	HD38750(config, m_maincpu, 300000); // approximation
 	m_maincpu->read_r<0>().set_ioport("IN.0");
 	m_maincpu->write_r<1>().set(FUNC(vinvader_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(vinvader_state::plate_w));
@@ -4209,6 +4257,8 @@ void vinvader_state::vinvader(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(233, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

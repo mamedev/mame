@@ -9,9 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/melps4/m58846.h"
+#include "video/pwm.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"
@@ -20,20 +19,22 @@
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
-class hh_melps4_state : public screenless_state
+class hh_melps4_state : public driver_device
 {
 public:
 	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<m58846_device> m_maincpu;
-	optional_ioport_array<4> m_inp_matrix; // max 4
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
@@ -54,8 +55,6 @@ protected:
 
 void hh_melps4_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_grid = 0;
@@ -88,7 +87,7 @@ u8 hh_melps4_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -139,7 +138,7 @@ void cfrogger_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
 	u16 plate = bitswap<16>(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
-	display_matrix(16, 12, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(cfrogger_state::plate_w)
@@ -173,7 +172,7 @@ READ16_MEMBER(cfrogger_state::input_r)
 	// K0,K1: multiplexed inputs
 	// K2: N/C
 	// K3: fixed input
-	return (m_inp_matrix[2]->read() & 8) | (read_inputs(2) & 3);
+	return (m_inputs[2]->read() & 8) | (read_inputs(2) & 3);
 }
 
 // config
@@ -212,6 +211,8 @@ void cfrogger_state::cfrogger(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(500, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(12, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -262,7 +263,7 @@ void gjungler_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
-	display_matrix(18, 12, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(gjungler_state::plate_w)
@@ -295,7 +296,7 @@ READ16_MEMBER(gjungler_state::input_r)
 {
 	// K0,K1: multiplexed inputs
 	// K2,K3: fixed inputs
-	return (m_inp_matrix[2]->read() & 0xc) | (read_inputs(2) & 3);
+	return (m_inputs[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
 
 // config
@@ -336,6 +337,8 @@ void gjungler_state::gjungler(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(12, 18);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

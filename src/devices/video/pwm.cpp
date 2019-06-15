@@ -10,7 +10,7 @@ implies a powered-on display element (eg, a LED, or VFD sprite). The maximum mat
 size is 64 by 64, simply due to uint64_t constraints. If a larger size is needed,
 create an array of pwm_display_device.
 
-If display elements are directly addressable, you can use write_element or write_row
+If display elements are directly addressable, you can also use write_element or write_row
 to set them. In this case it is required to call update() to apply the changes.
 
 Display element states are sent to output tags "y.x" where y is the matrix row number,

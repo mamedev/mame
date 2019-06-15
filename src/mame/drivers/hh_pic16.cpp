@@ -77,14 +77,14 @@ public:
 	hh_pic16_state(const machine_config &mconfig, device_type type, const char *tag) :
 		screenless_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<pic16c5x_device> m_maincpu;
-	optional_ioport_array<6> m_inp_matrix; // max 6
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
 	u8 m_a;                         // MCU port A write data
@@ -146,7 +146,7 @@ u16 hh_pic16_state::read_inputs(int columns, u16 colmask)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (~m_inp_mux >> i & 1)
-			ret &= m_inp_matrix[i]->read();
+			ret &= m_inputs[i]->read();
 
 	return ret;
 }
@@ -158,7 +158,7 @@ u8 hh_pic16_state::read_rotated_inputs(int columns, u8 rowmask)
 
 	// read selected input columns
 	for (int i = 0; i < 8; i++)
-		if (1 << i & rowmask && ~m_inp_matrix[i]->read() & ~m_inp_mux & colmask)
+		if (1 << i & rowmask && ~m_inputs[i]->read() & ~m_inp_mux & colmask)
 			ret |= 1 << i;
 
 	// active low
@@ -689,7 +689,7 @@ void matchme_state::set_clock()
 {
 	// MCU clock is ~1.2MHz by default (R=18K, C=15pF), high speed setting adds a
 	// 10pF cap to speed it up by about 7.5%.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 1300000 : 1200000);
+	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 1300000 : 1200000);
 }
 
 WRITE8_MEMBER(matchme_state::write_b)
@@ -990,7 +990,7 @@ void tbaskb_state::prepare_display()
 READ8_MEMBER(tbaskb_state::read_a)
 {
 	// A2: skill switch, A3: multiplexed inputs
-	return m_inp_matrix[5]->read() | read_inputs(5, 8) | 3;
+	return m_inputs[5]->read() | read_inputs(5, 8) | 3;
 }
 
 WRITE8_MEMBER(tbaskb_state::write_b)
@@ -1229,7 +1229,7 @@ void hccbaskb_state::prepare_display()
 READ8_MEMBER(hccbaskb_state::read_a)
 {
 	// A2: skill switch, A3: multiplexed inputs
-	return m_inp_matrix[5]->read() | read_inputs(5, 8) | 3;
+	return m_inputs[5]->read() | read_inputs(5, 8) | 3;
 }
 
 WRITE8_MEMBER(hccbaskb_state::write_b)
@@ -1353,7 +1353,7 @@ void ttfball_state::prepare_display()
 READ8_MEMBER(ttfball_state::read_a)
 {
 	// A3: multiplexed inputs, A0-A2: other inputs
-	return m_inp_matrix[5]->read() | read_inputs(5, 8);
+	return m_inputs[5]->read() | read_inputs(5, 8);
 }
 
 WRITE8_MEMBER(ttfball_state::write_b)
@@ -1623,7 +1623,7 @@ void us2pfball_state::prepare_display()
 READ8_MEMBER(us2pfball_state::read_a)
 {
 	// A0,A1: multiplexed inputs, A4-A7: other inputs
-	return read_inputs(4, 3) | (m_inp_matrix[4]->read() & 0xf0) | 0x0c;
+	return read_inputs(4, 3) | (m_inputs[4]->read() & 0xf0) | 0x0c;
 }
 
 WRITE8_MEMBER(us2pfball_state::write_a)

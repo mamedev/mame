@@ -33,14 +33,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
-		m_inp_matrix(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<amis2000_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_ioport_array<4> m_inp_matrix; // max 4
+	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
 	u16 m_a;                        // MCU address bus
@@ -94,7 +94,7 @@ u8 hh_amis2k_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -187,8 +187,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
 
 void wildfire_state::prepare_display()
 {
-	// A0-A2 are 7segs
-	m_display->segmask(7, 0x7f);
 	m_display->matrix(~m_a, m_d);
 }
 
@@ -201,7 +199,8 @@ WRITE8_MEMBER(wildfire_state::write_d)
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
-	// A0-A11: digit/led select
+	// A0-A2: digit select
+	// A3-A11: led select
 	m_a = data;
 	prepare_display();
 
@@ -245,7 +244,9 @@ void wildfire_state::wildfire(machine_config &config)
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
 	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
 
+	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
+	m_display->set_segmask(7, 0x7f);
 	m_display->set_bri_levels(0.02, 0.1); // bumpers are dimmed
 	config.set_default_layout(layout_wildfire);
 

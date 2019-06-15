@@ -286,7 +286,7 @@ u8 hh_tms1k_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -298,7 +298,7 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 
 	// read selected input columns
 	for (int i = 0; i < 8; i++)
-		if (1 << i & rowmask && m_inp_matrix[i]->read() & m_inp_mux & colmask)
+		if (1 << i & rowmask && m_inputs[i]->read() & m_inp_mux & colmask)
 			ret |= 1 << i;
 
 	return ret;
@@ -307,7 +307,7 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 void hh_tms1k_state::switch_change(int sel, u32 mask, bool next)
 {
 	// config switches (for direct control)
-	ioport_field *inp = m_inp_matrix[sel]->field(mask);
+	ioport_field *inp = m_inputs[sel]->field(mask);
 
 	if (next && inp->has_next_setting())
 		inp->select_next_setting();
@@ -1694,7 +1694,7 @@ void h2hbaseb_state::set_clock()
 {
 	// MCU clock is from an RC circuit with C=47pF, and R value is depending on
 	// skill switch: R=51K(1) or 43K(2)
-	m_maincpu->set_unscaled_clock((m_inp_matrix[5]->read() & 1) ? 400000 : 350000);
+	m_maincpu->set_unscaled_clock((m_inputs[5]->read() & 1) ? 400000 : 350000);
 }
 
 void h2hbaseb_state::prepare_display()
@@ -1728,7 +1728,7 @@ WRITE16_MEMBER(h2hbaseb_state::write_o)
 READ8_MEMBER(h2hbaseb_state::read_k)
 {
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
-	return m_inp_matrix[4]->read() | read_inputs(4);
+	return m_inputs[4]->read() | read_inputs(4);
 }
 
 // config
@@ -3150,7 +3150,7 @@ WRITE16_MEMBER(ebball_state::write_o)
 READ8_MEMBER(ebball_state::read_k)
 {
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
-	return m_inp_matrix[5]->read() | read_inputs(5);
+	return m_inputs[5]->read() | read_inputs(5);
 }
 
 // config
@@ -3416,7 +3416,7 @@ void ebball3_state::set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=33pF) oscillating by default at ~340kHz,
 	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
 	// it up to around ~440kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 440000 : 340000);
+	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 440000 : 340000);
 }
 
 void ebball3_state::prepare_display()
@@ -3703,7 +3703,7 @@ void einvader_state::set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=56pF) oscillating by default at ~320kHz,
 	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
 	// it up to around ~400kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[0]->read() & 8) ? 400000 : 320000);
+	m_maincpu->set_unscaled_clock((m_inputs[0]->read() & 8) ? 400000 : 320000);
 }
 
 void einvader_state::prepare_display()
@@ -4099,7 +4099,7 @@ void raisedvl_state::set_clock()
 	// 0:   R=47K  -> ~350kHz
 	// 2,3: R=35K8 -> ~425kHz (combined)
 	// 4:   R=32K  -> ~465kHz (combined)
-	u8 inp = m_inp_matrix[1]->read();
+	u8 inp = m_inputs[1]->read();
 	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
 }
 
@@ -4363,7 +4363,7 @@ void f3in1_state::machine_reset()
 void f3in1_state::set_clock()
 {
 	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
-	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 400000 : 300000);
+	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 400000 : 300000);
 }
 
 void f3in1_state::prepare_display()
@@ -4811,7 +4811,7 @@ WRITE16_MEMBER(ginv_state::write_o)
 READ8_MEMBER(ginv_state::read_k)
 {
 	// K1-K4: multiplexed inputs (K8 is fire button)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -4935,7 +4935,7 @@ WRITE16_MEMBER(ginv1000_state::write_o)
 READ8_MEMBER(ginv1000_state::read_k)
 {
 	// K1,K2: multiplexed inputs (K8 is fire button)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -5079,7 +5079,7 @@ WRITE16_MEMBER(ginv2000_state::write_o)
 READ8_MEMBER(ginv2000_state::read_k)
 {
 	// K1,K2: multiplexed inputs (K8 is fire button)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -5347,7 +5347,7 @@ WRITE16_MEMBER(elecdet_state::write_o)
 READ8_MEMBER(elecdet_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[4]->read() | read_inputs(4);
+	return m_inputs[4]->read() | read_inputs(4);
 }
 
 // config
@@ -6419,7 +6419,7 @@ WRITE16_MEMBER(bship_state::write_o)
 READ8_MEMBER(bship_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[11]->read() | read_inputs(11);
+	return m_inputs[11]->read() | read_inputs(11);
 }
 
 // config
@@ -6605,7 +6605,7 @@ WRITE16_MEMBER(bshipb_state::write_o)
 READ8_MEMBER(bshipb_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[11]->read() | read_inputs(11);
+	return m_inputs[11]->read() | read_inputs(11);
 }
 
 // config
@@ -6831,7 +6831,7 @@ void ssimon_state::set_clock()
 	// 0 Simple: R=51K -> ~200kHz
 	// 1 Normal: R=37K -> ~275kHz
 	// 2 Super:  R=22K -> ~400kHz
-	u8 inp = m_inp_matrix[6]->read();
+	u8 inp = m_inputs[6]->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
 }
 
@@ -7893,7 +7893,7 @@ WRITE16_MEMBER(stopthief_state::write_o)
 READ8_MEMBER(stopthief_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -9060,7 +9060,7 @@ WRITE16_MEMBER(speechp_state::write_o)
 READ8_MEMBER(speechp_state::read_k)
 {
 	// K: multiplexed inputs
-	return m_inp_matrix[10]->read() | (read_inputs(10) & 7);
+	return m_inputs[10]->read() | (read_inputs(10) & 7);
 }
 
 // config
@@ -9902,7 +9902,7 @@ void tbreakup_state::machine_reset()
 void tbreakup_state::set_clock()
 {
 	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 500000 : 325000);
+	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 500000 : 325000);
 }
 
 void tbreakup_state::prepare_display()
@@ -9964,7 +9964,7 @@ READ8_MEMBER(tbreakup_state::read_k)
 {
 	// K4: fixed input
 	// K8: multiplexed inputs
-	return (m_inp_matrix[2]->read() & 4) | (read_inputs(2) & 8);
+	return (m_inputs[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
 // config
@@ -10079,7 +10079,7 @@ void phpball_state::prepare_display()
 {
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to 10.a and 9.a
-	u16 in1 = m_inp_matrix[1]->read() << 7 & 0x600;
+	u16 in1 = m_inputs[1]->read() << 7 & 0x600;
 
 	set_display_segmask(7, 0x7f);
 	display_matrix(7, 11, m_o, (m_r & 0x1ff) | in1);
@@ -10110,7 +10110,7 @@ WRITE16_MEMBER(phpball_state::write_o)
 READ8_MEMBER(phpball_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[1]->read() | read_inputs(1);
+	return m_inputs[1]->read() | read_inputs(1);
 }
 
 // config

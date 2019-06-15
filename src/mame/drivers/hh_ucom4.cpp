@@ -92,8 +92,6 @@
 
 void hh_ucom4_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill
 	memset(m_port, 0, sizeof(m_port));
 	m_int = 0;
@@ -131,7 +129,7 @@ u8 hh_ucom4_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -210,7 +208,7 @@ void ufombs_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
-	display_matrix(10, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(ufombs_state::grid_w)
@@ -274,6 +272,8 @@ void ufombs_state::ufombs(machine_config &config)
 	screen.set_size(243, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -330,7 +330,7 @@ public:
 void ssfball_state::prepare_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(ssfball_state::grid_w)
@@ -363,7 +363,7 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 READ8_MEMBER(ssfball_state::input_b_r)
 {
 	// B: input port 2, where B3 is multiplexed
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -429,6 +429,8 @@ void ssfball_state::ssfball(machine_config &config)
 	screen.set_size(1920, 482);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -490,7 +492,7 @@ public:
 void bmsoccer_state::prepare_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(bmsoccer_state::grid_w)
@@ -573,6 +575,8 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	screen.set_size(271, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -622,7 +626,7 @@ void bmsafari_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
-	display_matrix(10, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bmsafari_state::grid_w)
@@ -688,6 +692,8 @@ void bmsafari_state::bmsafari(machine_config &config)
 	screen.set_size(248, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -739,7 +745,7 @@ public:
 void splasfgt_state::prepare_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(splasfgt_state::grid_w)
@@ -847,6 +853,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 	screen.set_size(1920, 476);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -900,7 +908,7 @@ void bcclimbr_state::prepare_display()
 {
 	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(20, 6, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bcclimbr_state::grid_w)
@@ -959,6 +967,8 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	screen.set_size(310, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(6, 20);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -1014,7 +1024,7 @@ WRITE8_MEMBER(tactix_state::leds_w)
 {
 	// D,F: 4*4 led matrix
 	m_port[offset] = data;
-	display_matrix(4, 4, m_port[NEC_UCOM4_PORTD], m_port[NEC_UCOM4_PORTF]);
+	m_display->matrix(m_port[NEC_UCOM4_PORTF], m_port[NEC_UCOM4_PORTD]);
 }
 
 WRITE8_MEMBER(tactix_state::speaker_w)
@@ -1081,6 +1091,8 @@ void tactix_state::tactix(machine_config &config)
 	m_maincpu->write_f().set(FUNC(tactix_state::leds_w));
 	m_maincpu->write_g().set(FUNC(tactix_state::speaker_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	config.set_default_layout(layout_tactix);
 
 	/* sound hardware */
@@ -1136,9 +1148,8 @@ void ctntune_state::prepare_display()
 	u8 sel = m_port[NEC_UCOM4_PORTD] >> 3 & 1; // turn off display when power is off
 	u8 lamps = m_port[NEC_UCOM4_PORTD] & 3;
 	u8 digit = (m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE]) & 0x7f;
-	set_display_segmask(1, 0x7f);
 
-	display_matrix(7+2, 1, lamps << 7 | digit, sel);
+	m_display->matrix(sel, lamps << 7 | digit);
 }
 
 WRITE8_MEMBER(ctntune_state::_7seg_w)
@@ -1220,6 +1231,9 @@ void ctntune_state::ctntune(machine_config &config)
 	m_maincpu->write_f().set(FUNC(ctntune_state::_7seg_w));
 	m_maincpu->write_g().set(FUNC(ctntune_state::speaker_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 7+2);
+	m_display->set_segmask(1, 0x7f);
 	config.set_default_layout(layout_ctntune);
 
 	/* sound hardware */
@@ -1271,7 +1285,7 @@ void invspace_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
-	display_matrix(19, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(invspace_state::grid_w)
@@ -1329,6 +1343,8 @@ void invspace_state::invspace(machine_config &config)
 	screen.set_size(289, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 19);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -1380,7 +1396,7 @@ public:
 void efball_state::prepare_display()
 {
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
-	display_matrix(11, 10, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(efball_state::grid_w)
@@ -1447,6 +1463,8 @@ void efball_state::efball(machine_config &config)
 	m_maincpu->write_h().set(FUNC(efball_state::grid_w));
 	m_maincpu->write_i().set(FUNC(efball_state::plate_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 11);
 	config.set_default_layout(layout_efball);
 
 	/* sound hardware */
@@ -1501,7 +1519,7 @@ void galaxy2_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u16 plate = bitswap<16>(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
-	display_matrix(15, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(galaxy2_state::grid_w)
@@ -1558,6 +1576,8 @@ void galaxy2_state::galaxy2(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(304, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(10, 15);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1630,7 +1650,7 @@ void astrocmd_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
-	display_matrix(17, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(astrocmd_state::grid_w)
@@ -1695,6 +1715,8 @@ void astrocmd_state::astrocmd(machine_config &config)
 	screen.set_size(1920, 525);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 17);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -1748,7 +1770,7 @@ WRITE8_MEMBER(edracula_state::grid_w)
 	// C,D: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	display_matrix(18, 8, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE8_MEMBER(edracula_state::plate_w)
@@ -1760,7 +1782,7 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	// E,F,G,H,I01: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	display_matrix(18, 8, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 // config
@@ -1798,6 +1820,8 @@ void edracula_state::edracula(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 526);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1847,7 +1871,7 @@ public:
 WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
 	// uses ROW0-4, COL11-24
-	display_matrix(24, 8, data, 1 << offset);
+	m_display->matrix(1 << offset, data);
 }
 
 WRITE8_MEMBER(mcompgin_state::lcd_w)
@@ -1886,6 +1910,8 @@ void mcompgin_state::mcompgin(machine_config &config)
 	/* video hardware */
 	HLCD0530(config, m_lcd, 500); // C=0.01uF
 	m_lcd->write_cols().set(FUNC(mcompgin_state::lcd_output_w));
+
+	PWM_DISPLAY(config, m_display).set_size(8, 24);
 
 	config.set_default_layout(layout_mcompgin);
 
@@ -1932,7 +1958,7 @@ void mvbfree_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	display_matrix(10, 14, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(mvbfree_state::grid_w)
@@ -1993,6 +2019,8 @@ void mvbfree_state::mvbfree(machine_config &config)
 	m_maincpu->write_h().set(FUNC(mvbfree_state::grid_w));
 	m_maincpu->write_i().set(FUNC(mvbfree_state::speaker_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(14, 10);
 	config.set_default_layout(layout_mvbfree);
 
 	/* sound hardware */
@@ -2058,7 +2086,7 @@ WRITE8_MEMBER(grobot9_state::lamps_w)
 
 	// D,F,E0: lamps
 	m_port[offset] = data;
-	display_matrix(9, 1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8, 1);
+	m_display->matrix(1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8);
 }
 
 WRITE8_MEMBER(grobot9_state::input_w)
@@ -2114,6 +2142,9 @@ void grobot9_state::grobot9(machine_config &config)
 	m_maincpu->write_e().set(FUNC(grobot9_state::lamps_w));
 	m_maincpu->write_f().set(FUNC(grobot9_state::lamps_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 9);
+	m_display->set_bri_levels(0.25);
 	config.set_default_layout(layout_grobot9);
 
 	/* sound hardware */
@@ -2165,7 +2196,7 @@ void tccombat_state::prepare_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
-	display_matrix(20, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tccombat_state::grid_w)
@@ -2218,6 +2249,8 @@ void tccombat_state::tccombat(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(300, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2287,7 +2320,7 @@ void tmtennis_state::set_clock()
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
 	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
+	m_maincpu->set_unscaled_clock((m_inputs[1]->read() & 0x100) ? 260000 : 360000);
 }
 
 WRITE8_MEMBER(tmtennis_state::grid_w)
@@ -2295,7 +2328,7 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 	// G,H,I: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	display_matrix(12, 12, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE8_MEMBER(tmtennis_state::plate_w)
@@ -2303,7 +2336,7 @@ WRITE8_MEMBER(tmtennis_state::plate_w)
 	// C,D,F: vfd plate
 	int shift = (offset == NEC_UCOM4_PORTF) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	display_matrix(12, 12, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE8_MEMBER(tmtennis_state::port_e_w)
@@ -2380,6 +2413,8 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_size(1920, 417);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(12, 12);
+	m_display->set_bri_levels(0.005);
 	config.set_default_layout(layout_tmtennis);
 
 	/* sound hardware */
@@ -2440,7 +2475,7 @@ void tmpacman_state::prepare_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
-	display_matrix(19, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tmpacman_state::grid_w)
@@ -2499,6 +2534,8 @@ void tmpacman_state::tmpacman(machine_config &config)
 	screen.set_size(1920, 508);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -2552,7 +2589,7 @@ public:
 void tmscramb_state::prepare_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
-	display_matrix(17, 10, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(tmscramb_state::grid_w)
@@ -2610,6 +2647,8 @@ void tmscramb_state::tmscramb(machine_config &config)
 	screen.set_size(1920, 556);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 17);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -2663,7 +2702,7 @@ void tcaveman_state::prepare_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
-	display_matrix(19, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tcaveman_state::grid_w)
@@ -2716,6 +2755,8 @@ void tcaveman_state::tcaveman(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 559);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2790,7 +2831,7 @@ WRITE8_MEMBER(alnchase_state::output_w)
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
 	}
 
-	display_matrix(17, 9, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 READ8_MEMBER(alnchase_state::input_r)
@@ -2857,6 +2898,8 @@ void alnchase_state::alnchase(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(365, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 17);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

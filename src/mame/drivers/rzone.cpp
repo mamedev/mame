@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(rzone_state::sctrl_w)
 {
 	// SCTRL: 74165 SH/LD: reload inputs while low
 	if (!state || !m_sctrl)
-		m_inp_mux = m_inp_matrix[0]->read();
+		m_inp_mux = m_inputs[0]->read();
 
 	m_sctrl = state;
 }

@@ -133,7 +133,7 @@ void hh_sm510_state::machine_start()
 	// determine number of input lines (set it in the subclass constructor if different)
 	if (m_inp_lines == 0 && m_inp_fixed < 0)
 	{
-		for (; m_inp_matrix[m_inp_lines] != nullptr; m_inp_lines++) { ; }
+		for (; m_inputs[m_inp_lines] != nullptr; m_inp_lines++) { ; }
 
 		// when last input line is fixed(GND)
 		if (m_inp_fixed == -2)
@@ -252,10 +252,10 @@ u8 hh_sm510_state::read_inputs(int columns, int fixed)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	if (fixed >= 0)
-		ret |= m_inp_matrix[fixed]->read();
+		ret |= m_inputs[fixed]->read();
 
 	return ret;
 }

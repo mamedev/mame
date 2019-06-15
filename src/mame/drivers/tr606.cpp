@@ -92,6 +92,7 @@ void tr606_state::tr606(machine_config &config)
 	tp3_clock.set_start_delay(TP3_PERIOD - TP3_LOW);
 	TIMER(config, "tp3_clear").configure_periodic(FUNC(tr606_state::tp3_clear), TP3_PERIOD);
 
+	/* video hardware */
 	config.set_default_layout(layout_tr606);
 
 	/* sound hardware */

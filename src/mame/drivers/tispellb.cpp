@@ -177,7 +177,7 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 READ8_MEMBER(tispellb_state::main_read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[7]->read() | read_inputs(7);
+	return m_inputs[7]->read() | read_inputs(7);
 }
 
 

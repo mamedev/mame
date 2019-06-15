@@ -31,15 +31,15 @@ public:
 	hh_tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		screenless_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0),
 		m_out_power(*this, "power")
 	{ }
 
 	// devices
 	required_device<tms1k_base_device> m_maincpu;
-	optional_ioport_array<18> m_inp_matrix; // max 18
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<18> m_inputs; // max 18
 	output_finder<> m_out_power; // power state, eg. led
 
 	// misc common

@@ -9,26 +9,27 @@
 #ifndef MAME_INCLUDES_HH_UCOM4_H
 #define MAME_INCLUDES_HH_UCOM4_H
 
-#include "includes/screenless.h"
-
 #include "cpu/ucom4/ucom4.h"
+#include "video/pwm.h"
 #include "sound/spkrdev.h"
 
 
-class hh_ucom4_state : public screenless_state
+class hh_ucom4_state : public driver_device
 {
 public:
 	hh_ucom4_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<ucom4_cpu_device> m_maincpu;
-	optional_ioport_array<6> m_inp_matrix; // max 6
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
 	u8 m_port[9];                   // MCU port A-I write data (optional)

@@ -622,7 +622,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 READ8_MEMBER(tispeak_state::snspell_read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[8]->read() | read_inputs(8);
+	return m_inputs[8]->read() | read_inputs(8);
 }
 
 
@@ -676,7 +676,7 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 	u8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return k4 | m_inp_matrix[9]->read() | read_inputs(9);
+	return k4 | m_inputs[9]->read() | read_inputs(9);
 }
 
 
@@ -707,7 +707,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// external module, the game continues.
 
 	// pick overlay code from machine config, see comment section above for reference
-	m_overlay = m_inp_matrix[10]->read();
+	m_overlay = m_inputs[10]->read();
 
 	// try to get it from (external) layout
 	if (m_overlay == 0x20)

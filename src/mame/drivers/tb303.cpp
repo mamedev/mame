@@ -136,7 +136,7 @@ void tb303_state::update_leds()
 	    0.2 D208    1.2 D215    2.2 D220    3.2 D210
 	    0.3 D209    1.3 D216    2.3 D221    3.3 D212
 	*/
-	display_matrix(4, 4, m_port[NEC_UCOM4_PORTG], m_port[NEC_UCOM4_PORTH]);
+	m_display->matrix(m_port[NEC_UCOM4_PORTH], m_port[NEC_UCOM4_PORTG]);
 
 	// todo: battery led
 	// todo: 4 more leds(see top-left part)
@@ -160,7 +160,7 @@ READ8_MEMBER(tb303_state::input_r)
 	if (offset == NEC_UCOM4_PORTA && m_inp_mux == 0)
 	{
 		// todo..
-		return m_inp_matrix[4]->read();
+		return m_inputs[4]->read();
 	}
 	else
 		return read_inputs(4) >> (offset*4) & 0xf;
@@ -271,6 +271,8 @@ void tb303_state::tb303(machine_config &config)
 	tp3_clock.set_start_delay(TP3_PERIOD - TP3_LOW);
 	TIMER(config, "tp3_clear").configure_periodic(FUNC(tb303_state::tp3_clear), TP3_PERIOD);
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	config.set_default_layout(layout_tb303);
 
 	/* sound hardware */

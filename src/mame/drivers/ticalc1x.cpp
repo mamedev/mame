@@ -86,8 +86,8 @@ void cmulti8_state::prepare_display()
 	set_display_segmask(0xfffff, 0xff);
 
 	// M-digit is on in memory mode, upper row is off in single mode
-	u32 m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
-	u32 mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
+	u32 m = (m_inputs[10]->read() & 0x10) ? 0x100000 : 0;
+	u32 mask = (m_inputs[10]->read() & 0x20) ? 0xfffff : 0xffc00;
 
 	// R10 selects display row
 	u32 sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
@@ -1280,7 +1280,7 @@ WRITE16_MEMBER(dataman_state::write_o)
 READ8_MEMBER(dataman_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[5]->read() | read_inputs(5);
+	return m_inputs[5]->read() | read_inputs(5);
 }
 
 // config
@@ -1497,7 +1497,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 READ8_MEMBER(ti30_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[7]->read() | read_inputs(7);
+	return m_inputs[7]->read() | read_inputs(7);
 }
 
 // config

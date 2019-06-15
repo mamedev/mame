@@ -17,9 +17,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/cop400/cop400.h"
+#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
@@ -46,20 +45,22 @@
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
 
-class hh_cop400_state : public screenless_state
+class hh_cop400_state : public driver_device
 {
 public:
 	hh_cop400_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_speaker(*this, "speaker")
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
-	optional_ioport_array<6> m_inp_matrix; // max 6
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
 	u8 m_l;                         // MCU port L write data
@@ -82,8 +83,6 @@ protected:
 
 void hh_cop400_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill
 	m_l = 0;
 	m_g = 0;
@@ -123,7 +122,7 @@ u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (~m_inp_mux >> i & 1)
-			ret &= m_inp_matrix[i]->read();
+			ret &= m_inputs[i]->read();
 
 	return ret;
 }
@@ -179,7 +178,7 @@ WRITE8_MEMBER(ctstein_state::write_g)
 WRITE8_MEMBER(ctstein_state::write_l)
 {
 	// L0-L3: button lamps
-	display_matrix(4, 1, data & 0xf, 1);
+	m_display->matrix(1, data & 0xf);
 }
 
 READ8_MEMBER(ctstein_state::read_l)
@@ -220,6 +219,8 @@ void ctstein_state::ctstein(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_maincpu->read_l().set(FUNC(ctstein_state::read_l));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ctstein);
 
 	/* sound hardware */
@@ -293,16 +294,16 @@ WRITE8_MEMBER(h2hbaskbc_state::write_l)
 	u16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
 
 	// D2+G0,G1 are 7segs
-	set_display_segmask(3, 0x7f);
+	m_display->segmask(3, 0x7f);
 
 	// L0-L6: digit segments A-G, L0-L4: led data
-	display_matrix(7, 16, data, sel);
+	m_display->matrix(sel, data);
 }
 
 READ8_MEMBER(h2hbaskbc_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(4, 7) | (m_inp_matrix[4]->read() & 8);
+	return read_inputs(4, 7) | (m_inputs[4]->read() & 8);
 }
 
 // config
@@ -367,6 +368,8 @@ void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 	m_maincpu->read_in().set(FUNC(h2hbaskbc_state::read_in));
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	config.set_default_layout(layout_h2hbaskbc);
 
 	/* sound hardware */
@@ -431,18 +434,15 @@ public:
 
 void einvaderc_state::prepare_display()
 {
-	// D0-D2 are 7segs
-	set_display_segmask(7, 0x7f);
-
-	// update display
 	u8 l = bitswap<8>(m_l,7,6,0,1,2,3,4,5);
 	u16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
-	display_matrix(8, 10, l, grid);
+
+	m_display->matrix(grid, l);
 }
 
 WRITE8_MEMBER(einvaderc_state::write_d)
 {
-	// D: led grid 0-3
+	// D: led grid 0-3 (D0-D2 are 7segs)
 	m_d = data;
 	prepare_display();
 }
@@ -506,6 +506,8 @@ void einvaderc_state::einvaderc(machine_config &config)
 	screen.set_size(913, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_einvaderc);
 
 	/* sound hardware */
@@ -562,12 +564,12 @@ public:
 
 void unkeinv_state::prepare_display()
 {
-	display_matrix(8+8, 8+12, m_g << 4 | m_d, m_l, false);
+	m_display->matrix(m_l, m_g << 4 | m_d, false);
 
 	// positional led row is on L6,L7
-	u16 wand = m_display_state[7] << 8 | m_display_state[6];
-	m_display_state[8 + m_inp_matrix[1]->read()] = wand;
-	display_update();
+	u16 wand = m_display->read_row(7) << 8 | m_display->read_row(6);
+	m_display->write_row(8 + m_inputs[1]->read(), wand);
+	m_display->update();
 }
 
 WRITE8_MEMBER(unkeinv_state::write_g)
@@ -598,14 +600,14 @@ READ8_MEMBER(unkeinv_state::read_l)
 
 	// L0-L5+G2: positional odd
 	// L0-L5+G3: positional even
-	u8 pos = m_inp_matrix[1]->read();
+	u8 pos = m_inputs[1]->read();
 	if (m_g & 4 && pos & 1)
 		ret ^= (1 << (pos >> 1));
 	if (m_g & 8 && ~pos & 1)
 		ret ^= (1 << (pos >> 1));
 
 	// L7+G3: fire button
-	if (m_g & 8 && m_inp_matrix[0]->read())
+	if (m_g & 8 && m_inputs[0]->read())
 		ret ^= 0x80;
 
 	return ret & ~m_l;
@@ -633,6 +635,8 @@ void unkeinv_state::unkeinv(machine_config &config)
 	m_maincpu->read_l_tristate().set_constant(0xff);
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8+12, 8+8);
 	config.set_default_layout(layout_unkeinv);
 
 	/* sound hardware */
@@ -719,7 +723,7 @@ WRITE8_MEMBER(lchicken_state::write_l)
 	// L0-L3: led data
 	// L4-L6: led select
 	// L7: N/C
-	display_matrix(4, 3, ~data & 0xf, data >> 4 & 7);
+	m_display->matrix(data >> 4 & 7, ~data & 0xf);
 }
 
 WRITE8_MEMBER(lchicken_state::write_d)
@@ -795,6 +799,9 @@ void lchicken_state::lchicken(machine_config &config)
 	m_maincpu->read_si().set(FUNC(lchicken_state::read_si));
 
 	TIMER(config, "chicken_motor").configure_periodic(FUNC(lchicken_state::motor_sim_tick), attotime::from_msec(6000/0x100)); // ~6sec for a full rotation
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 4);
 	config.set_default_layout(layout_lchicken);
 
 	/* sound hardware */
@@ -843,14 +850,14 @@ WRITE8_MEMBER(funjacks_state::write_d)
 	// D: led grid + input mux
 	m_inp_mux = data;
 	m_d = ~data & 0xf;
-	display_matrix(2, 4, m_l, m_d);
+	m_display->matrix(m_d, m_l);
 }
 
 WRITE8_MEMBER(funjacks_state::write_l)
 {
 	// L0,L1: led state
 	m_l = data & 3;
-	display_matrix(2, 4, m_l, m_d);
+	m_display->matrix(m_d, m_l);
 }
 
 WRITE8_MEMBER(funjacks_state::write_g)
@@ -870,7 +877,7 @@ READ8_MEMBER(funjacks_state::read_g)
 {
 	// G1: speaker out state
 	// G2,G3: inputs
-	return m_inp_matrix[3]->read() | (m_g & 2);
+	return m_inputs[3]->read() | (m_g & 2);
 }
 
 // config
@@ -908,6 +915,9 @@ void funjacks_state::funjacks(machine_config &config)
 	m_maincpu->read_l().set(FUNC(funjacks_state::read_l));
 	m_maincpu->read_g().set(FUNC(funjacks_state::read_g));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 2);
+	m_display->set_bri_levels(0.15);
 	config.set_default_layout(layout_funjacks);
 
 	/* sound hardware */
@@ -957,7 +967,7 @@ WRITE8_MEMBER(funrlgl_state::write_d)
 {
 	// D: led grid
 	m_d = ~data & 0xf;
-	display_matrix(4, 4, m_l, m_d);
+	m_display->matrix(m_d, m_l);
 }
 
 WRITE8_MEMBER(funrlgl_state::write_l)
@@ -965,7 +975,7 @@ WRITE8_MEMBER(funrlgl_state::write_l)
 	// L0-L3: led state
 	// L4-L7: N/C
 	m_l = ~data & 0xf;
-	display_matrix(4, 4, m_l, m_d);
+	m_display->matrix(m_d, m_l);
 }
 
 WRITE8_MEMBER(funrlgl_state::write_g)
@@ -1000,6 +1010,9 @@ void funrlgl_state::funrlgl(machine_config &config)
 	m_maincpu->write_g().set(FUNC(funrlgl_state::write_g));
 	m_maincpu->read_g().set_ioport("IN.0");
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 4);
+	m_display->set_bri_levels(0.02, 0.1); // top led is brighter
 	config.set_default_layout(layout_funrlgl);
 
 	/* sound hardware */
@@ -1047,8 +1060,7 @@ public:
 
 void mdallas_state::prepare_display()
 {
-	set_display_segmask(0xff, 0xff);
-	display_matrix(8, 8, m_l, ~(m_d << 4 | m_g));
+	m_display->matrix(~(m_d << 4 | m_g), m_l);
 }
 
 WRITE8_MEMBER(mdallas_state::write_l)
@@ -1141,6 +1153,9 @@ void mdallas_state::mdallas(machine_config &config)
 	m_maincpu->read_in().set(FUNC(mdallas_state::read_in));
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_mdallas);
 
 	/* sound hardware */
@@ -1199,7 +1214,7 @@ WRITE8_MEMBER(plus1_state::write_l)
 READ8_MEMBER(plus1_state::read_l)
 {
 	// L: IN.1, mask with output
-	return m_inp_matrix[1]->read() & m_l;
+	return m_inputs[1]->read() & m_l;
 }
 
 // config
@@ -1287,7 +1302,7 @@ public:
 void lightfgt_state::prepare_display()
 {
 	u8 grid = (m_so | m_d << 1) ^ 0x1f;
-	display_matrix(5, 5, m_l, grid);
+	m_display->matrix(grid, m_l);
 }
 
 WRITE_LINE_MEMBER(lightfgt_state::write_so)
@@ -1364,6 +1379,8 @@ void lightfgt_state::lightfgt(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_maincpu->read_g().set(FUNC(lightfgt_state::read_g));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(5, 5);
 	config.set_default_layout(layout_lightfgt);
 
 	/* sound hardware */
@@ -1428,7 +1445,7 @@ READ8_MEMBER(bship82_state::read_in)
 WRITE_LINE_MEMBER(bship82_state::write_so)
 {
 	// SO: led
-	display_matrix(1, 1, state, 1);
+	m_display->matrix(1, state);
 }
 
 // config
@@ -1524,6 +1541,8 @@ void bship82_state::bship82(machine_config &config)
 	m_maincpu->write_so().set(FUNC(bship82_state::write_so));
 	m_maincpu->read_si().set_ioport("IN.4");
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship82);
 
 	/* sound hardware */
@@ -1575,10 +1594,7 @@ public:
 
 void qkracer_state::prepare_display()
 {
-	set_display_segmask(0xdf, 0x7f);
-	set_display_segmask(0x20, 0x41); // equals sign
-
-	display_matrix(7, 9, m_l, ~(m_d | m_g << 4 | m_sk << 8));
+	m_display->matrix(~(m_d | m_g << 4 | m_sk << 8), m_l);
 }
 
 WRITE8_MEMBER(qkracer_state::write_d)
@@ -1662,6 +1678,10 @@ void qkracer_state::qkracer(machine_config &config)
 	m_maincpu->read_in().set(FUNC(qkracer_state::read_in));
 	m_maincpu->write_sk().set(FUNC(qkracer_state::write_sk));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0xdf, 0x7f);
+	m_display->set_segmask(0x20, 0x41); // equals sign
 	config.set_default_layout(layout_qkracer);
 
 	/* no sound! */
@@ -1713,8 +1733,7 @@ public:
 
 void vidchal_state::prepare_display()
 {
-	set_display_segmask(0x3f, 0xff);
-	display_matrix(8, 7, m_l, m_d | m_sk << 6);
+	m_display->matrix(m_d | m_sk << 6, m_l);
 }
 
 WRITE8_MEMBER(vidchal_state::write_d)
@@ -1759,6 +1778,9 @@ void vidchal_state::vidchal(machine_config &config)
 	m_maincpu->read_in().set_ioport("IN.0");
 	m_maincpu->write_sk().set(FUNC(vidchal_state::write_sk));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6+1, 8);
+	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_vidchal);
 
 	/* sound hardware */
