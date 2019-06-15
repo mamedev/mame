@@ -1162,7 +1162,7 @@
 		<description>Overkill &amp; Lunar-C</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
-		<info name="serail" value="/DP130002 [Box], /CS090010 [Disc]" />
+		<info name="serial" value="/DP130002 [Box], /CS090010 [Disc]" />
 		<info name="barcode" value="5 018247 410457 >" />
 		<info name="disc_matrix" value="CDD2797 OVERKILL/LUNAR-C :   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
@@ -1275,7 +1275,7 @@
 		<description>Seek and Destroy</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
-		<info name="serail" value="/DP130006 [Box], /CS090017 [Disc]" />
+		<info name="serial" value="/DP130006 [Box], /CS090017 [Disc]" />
 		<info name="barcode" value="5 018247 547450" />
 		<info name="disc_matrix" value="CDD3065 / CS090017 1:0 MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
