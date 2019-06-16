@@ -44,7 +44,7 @@ u32 qvt103_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 void qvt103_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
-	map(0x6000, 0x6001).rw("kbdmcu", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x6000, 0x6001).rw("kbdmcu", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0xa000, 0xa03f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
 	map(0xc000, 0xffff).ram(); // not entirely contiguous?
@@ -91,7 +91,7 @@ void qvt103_state::qvt103(machine_config &config)
 	vpac.set_character_width(10);
 	vpac.int_callback().set("ctc", FUNC(z80ctc_device::trg3));
 
-	I8741(config, "kbdmcu", 6_MHz_XTAL);
+	I8741A(config, "kbdmcu", 6_MHz_XTAL);
 }
 
 /**************************************************************************************************************

@@ -367,7 +367,7 @@ void duet16_state::duet16(machine_config &config)
 	i8087.irq().set(m_pic, FUNC(pic8259_device::ir2_w)); // INT87
 	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	I8741(config, "i8741", 20_MHz_XTAL / 4);
+	I8741A(config, "i8741", 20_MHz_XTAL / 4);
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
