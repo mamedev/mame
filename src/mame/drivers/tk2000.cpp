@@ -82,11 +82,12 @@ private:
 	int m_speaker_state;
 	int m_cassette_state;
 
-	uint8_t m_strobe;
+	uint8_t m_kbout;
 
 	uint8_t *m_ram_ptr;
 	int m_ram_size;
 	bool m_printer_busy;
+	bool m_ctrl_key;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 
@@ -133,12 +134,14 @@ void tk2000_state::machine_start()
 	m_cassette_state = 0;
 	m_cassette->output(-1.0f);
 	m_printer_busy = false;
+	m_ctrl_key = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
-	save_item(NAME(m_strobe));
+	save_item(NAME(m_kbout));
 	save_item(NAME(m_printer_busy));
+	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
 	m_video->m_ram_ptr = m_ram_ptr;
@@ -149,7 +152,7 @@ void tk2000_state::machine_start()
 
 void tk2000_state::machine_reset()
 {
-	m_strobe = 0;
+	m_kbout = 0;
 }
 
 /***************************************************************************
@@ -188,10 +191,7 @@ WRITE_LINE_MEMBER(tk2000_state::printer_busy_w)
 void tk2000_state::kbout_w(uint8_t data)
 {
 	// write row mask for keyboard scan
-	m_strobe = 0xff;
-	for (int i = 0; i < 8; i++)
-		if (BIT(data, i))
-			m_strobe &= m_row[i]->read();
+	m_kbout = data;
 
 	m_printer->write_data0(BIT(data, 0));
 	m_printer->write_data1(BIT(data, 1));
@@ -205,7 +205,15 @@ void tk2000_state::kbout_w(uint8_t data)
 
 uint8_t tk2000_state::kbin_r()
 {
-	return m_strobe | (m_printer_busy ? 0x40 : 0);
+	uint8_t kbin = 0;
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_kbout, i))
+			kbin |= m_row[i]->read();
+
+	if (m_ctrl_key)
+		kbin |= m_kbspecial->read();
+
+	return kbin | (m_printer_busy ? 0x40 : 0);
 }
 
 uint8_t tk2000_state::casout_r()
@@ -267,8 +275,7 @@ WRITE_LINE_MEMBER(tk2000_state::rom_ram_w)
 
 WRITE_LINE_MEMBER(tk2000_state::ctrl_key_w)
 {
-	if (state)
-		m_strobe = m_kbspecial->read();
+	m_ctrl_key = state;
 }
 
 uint8_t tk2000_state::c080_r(offs_t offset)
