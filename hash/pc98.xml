@@ -11886,8 +11886,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="３Ｄ（ディー・オーどきどき）ディスク Ｖｏｌ．２" />
 		<info name="release" value="199109xx" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="d.o. doki doki disk vol. 2.hdm" size="1265664" crc="a7c042e8" sha1="6fd31e52dd44a2d6dab959d9313baeb83afec1e2" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="d.o. doki doki disk vol. 2.hdm" size="1261568" crc="a7c042e8" sha1="6fd31e52dd44a2d6dab959d9313baeb83afec1e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -31126,7 +31126,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk 2"/>
 			<dataarea name="flop" size="1261568">
-				<rom name="new 3d golf simulation (ver. 2.0) (system disk 1).hdm" size="1261568" crc="61c74384" sha1="fdfdd616188e22bd041d6dbecc635a23cdab7694" offset="0" />
+				<rom name="new 3d golf simulation (ver. 2.0) (system disk 2).hdm" size="1261568" crc="61c74384" sha1="fdfdd616188e22bd041d6dbecc635a23cdab7694" offset="0" />
 			</dataarea>
 		</part>
 	</software>
