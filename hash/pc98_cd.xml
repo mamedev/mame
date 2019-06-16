@@ -1285,10 +1285,10 @@
 		<rom name="Delicious Lunch Pack (1996)(ScooP).bin" size="9056256" crc="b7edf982" sha1="c7a3e3ae987f2ef4eed96fb41d1b3fc916bfdff7"/>
 		<rom name="Delicious Lunch Pack (1996)(ScooP).cue" size="100" crc="9e5b4353" sha1="5cb7bec576e601dd974c9ad916c2fa4ff69c3dba"/>
 		-->
-		<description>Delicious - Lunch Pack</description>
+		<description>Delicious Lunch Pack</description>
 		<year>1996</year>
-		<publisher>ScooP</publisher>
-		<info name="alt_title" value="デリシャスらんちぱっく" />
+		<publisher>スクープ (Scoop)</publisher>
+		<info name="alt_title" value="デリシャス らんちぱっく" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="delicious lunch pack (1996)(scoop)" sha1="529d1b311de74d39c7be2e7fa27f2ba1bab24156" />
@@ -1566,6 +1566,7 @@
 		</part>
 	</software>
 
+	<!-- Disk P is included with the game, and contains a patch for a minor bug where the last line of the message after level 11 is drawn off-screen -->
 	<software name="doom2">
 		<!--
 		Origin: redump.org
@@ -1576,6 +1577,12 @@
 		<year>1995</year>
 		<publisher>イマジニア (Imagineer)</publisher>
 		<info name="release" value="19950929" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk P"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="doom ii (disk p - patch file).hdm" size="1261568" crc="44d368e5" sha1="21c318a5f40402b1a0ae9acfa9d35009c25a2132" offset="0" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doom ii (japan)" sha1="d6e6ac62129f441e1e4ca0c551923e5f49cc2b68" />
@@ -1583,9 +1590,40 @@
 		</part>
 	</software>
 
+	<!-- PC-9821 / DOS/V hybrid -->
+	<software name="drgnlore">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Dragon Lore (Disc 1).ccd" size="771" crc="fbf1cb83" md5="5e9712fe93a7b3096d0afe8d4401981e" sha1="15e13b7dcbd5bf8cec68259e1294deeb706842ac"/>
+		<rom name="Dragon Lore (Disc 1).cue" size="82" crc="70b82b63" md5="9db6e499c9c09f38659dd0ef531d70aa" sha1="60fd857e8574a00196516f47efb560d871563ad8"/>
+		<rom name="Dragon Lore (Disc 1).img" size="741310416" crc="1c59fb4b" md5="be8010f46710c1fce21feea316f90fea" sha1="4fd81f2d05c3036ace452373cf0597848eeeca17"/>
+		<rom name="Dragon Lore (Disc 1).sub" size="30257568" crc="ce02414d" md5="6cb736851ddc7f45306dacef0d41c714" sha1="05e808b2983fa08e16c1dafbc3af2d597ecea8aa"/>
+		<rom name="Dragon Lore (Disc 2).ccd" size="772" crc="f64bfdc1" md5="70337d7149ba233265560af3968d8ddf" sha1="5daa2ebf7bc02999b359509876abbf43ae7afbbe"/>
+		<rom name="Dragon Lore (Disc 2).cue" size="82" crc="aff13bd6" md5="5420246f92127a659f7ac40ef4d60f67" sha1="882f81b4a818f71ca81ffb523552d0d6e2cc3b8f"/>
+		<rom name="Dragon Lore (Disc 2).img" size="662937072" crc="82da9d69" md5="083c944d7186afb5a168f92a5a94dc76" sha1="859aa76d949ce7b1a08e353efea90347051eac5b"/>
+		<rom name="Dragon Lore (Disc 2).sub" size="27058656" crc="d505c200" md5="29626fe78dcab6f4b1bd207e1ca92d31" sha1="3fa965f0b12b8d9abd2ed2dc291ffc1cef40c9ed"/>
+		-->
+		<description>Dragon Lore</description>
+		<year>1996</year>
+		<publisher>ケイエスエス (KSS)</publisher>
+		<info name="alt_title" value="ドラゴンロア" />
+		<info name="release" value="19960419" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon lore (disc 1)" sha1="50a8f19aa42fc307a6aebe3ae80cf139d49c2eed" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon lore (disc 2)" sha1="0251559705b17242ccf0f833642b0595f4cc45fc" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- PC-98x1 / DOS/V hybrid -->
-	<!-- Blank screen when running DS.BAT; also, there's apparently no way to install the game - maybe it's missing a floppy disk? -->
-	<software name="duelsucp" supported="no">
+	<!-- This is an expansion disk for Duel Succession. The installer only seems to run under Windows, but copying the files from the PC98 directory to the DS install directory works -->
+	<software name="duelsucp">
 		<!--
 		Origin: P2P
 		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).ccd" size="3636" crc="8317e961" sha1="57b2aa6bf0a6cf0db7c8d4dfab48d9bc84822736"/>
