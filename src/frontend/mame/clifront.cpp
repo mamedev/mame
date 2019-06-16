@@ -71,6 +71,7 @@
 
 // command options
 #define CLIOPTION_DTD                   "dtd"
+#define CLIOPTION_LIGHTXML				"lightxml"
 
 
 namespace {
@@ -114,6 +115,7 @@ const options_entry cli_option_entries[] =
 
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "FRONTEND COMMAND OPTIONS" },
 	{ CLIOPTION_DTD,                        "1",       OPTION_BOOLEAN,    "include DTD in XML output" },
+	{ CLIOPTION_LIGHTXML,                   "0",       OPTION_BOOLEAN,    "emit light XML output" },
 	{ nullptr }
 };
 
@@ -352,7 +354,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 void cli_frontend::listxml(const std::vector<std::string> &args)
 {
 	// create the XML and print it to stdout
-	info_xml_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD));
+	info_xml_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD), m_options.bool_value(CLIOPTION_LIGHTXML));
 	creator.output(stdout, args);
 }
 
