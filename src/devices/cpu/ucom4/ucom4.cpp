@@ -159,7 +159,7 @@ enum
 
 void ucom4_cpu_device::device_start()
 {
-	assert(NEC_UCOM4_PORTA == 0);
+	assert(PORTA == 0);
 
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
@@ -251,7 +251,7 @@ void ucom4_cpu_device::device_reset()
 	m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
 
 	// clear i/o
-	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
+	for (int i = PORTC; i <= PORTI; i++)
 		output_w(i, 0);
 }
 
@@ -271,10 +271,10 @@ u8 ucom4_cpu_device::input_r(int index)
 
 	switch (index)
 	{
-		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff); break;
-		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff); break;
-		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
-		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
+		case PORTA: inp = m_read_a(index, 0xff); break;
+		case PORTB: inp = m_read_b(index, 0xff); break;
+		case PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
+		case PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
 		default:
 			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
@@ -291,13 +291,13 @@ void ucom4_cpu_device::output_w(int index, u8 data)
 
 	switch (index)
 	{
-		case NEC_UCOM4_PORTC: m_write_c(index, data, 0xff); break;
-		case NEC_UCOM4_PORTD: m_write_d(index, data, 0xff); break;
-		case NEC_UCOM4_PORTE: m_write_e(index, data, 0xff); break;
-		case NEC_UCOM4_PORTF: m_write_f(index, data, 0xff); break;
-		case NEC_UCOM4_PORTG: m_write_g(index, data, 0xff); break;
-		case NEC_UCOM4_PORTH: m_write_h(index, data, 0xff); break;
-		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
+		case PORTC: m_write_c(index, data, 0xff); break;
+		case PORTD: m_write_d(index, data, 0xff); break;
+		case PORTE: m_write_e(index, data, 0xff); break;
+		case PORTF: m_write_f(index, data, 0xff); break;
+		case PORTG: m_write_g(index, data, 0xff); break;
+		case PORTH: m_write_h(index, data, 0xff); break;
+		case PORTI: m_write_i(index, data & 7, 0xff); break;
 
 		default:
 			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
@@ -314,7 +314,7 @@ u8 upd557l_cpu_device::input_r(int index)
 {
 	index &= 0xf;
 
-	if (index == NEC_UCOM4_PORTB)
+	if (index == PORTB)
 		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
 	else
 		return ucom4_cpu_device::input_r(index);
@@ -327,12 +327,12 @@ void upd557l_cpu_device::output_w(int index, u8 data)
 	index &= 0xf;
 	data &= 0xf;
 
-	if (index == NEC_UCOM4_PORTH || index == NEC_UCOM4_PORTI)
+	if (index == PORTH || index == PORTI)
 		logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
 	else
 	{
 		// only G0 for port G
-		if (index == NEC_UCOM4_PORTG)
+		if (index == PORTG)
 			data &= 1;
 
 		ucom4_cpu_device::output_w(index, data);

@@ -261,14 +261,14 @@ void ucom4_cpu_device::op_reb()
 {
 	// REB B: Reset a single bit of output port E
 	m_icount--;
-	output_w(NEC_UCOM4_PORTE, m_port_out[NEC_UCOM4_PORTE] & ~m_bitmask);
+	output_w(PORTE, m_port_out[PORTE] & ~m_bitmask);
 }
 
 void ucom4_cpu_device::op_seb()
 {
 	// SEB B: Set a single bit of output port E
 	m_icount--;
-	output_w(NEC_UCOM4_PORTE, m_port_out[NEC_UCOM4_PORTE] | m_bitmask);
+	output_w(PORTE, m_port_out[PORTE] | m_bitmask);
 }
 
 void ucom4_cpu_device::op_rpb()
@@ -376,7 +376,7 @@ void ucom4_cpu_device::op_tmb()
 void ucom4_cpu_device::op_tpa()
 {
 	// TPA B: skip next on bit(input port A)
-	m_skip = ((input_r(NEC_UCOM4_PORTA) & m_bitmask) != 0);
+	m_skip = ((input_r(PORTA) & m_bitmask) != 0);
 }
 
 void ucom4_cpu_device::op_tpb()
@@ -402,7 +402,7 @@ void ucom4_cpu_device::op_ia()
 {
 	// IA: Input port A to ACC
 	m_icount--;
-	m_acc = input_r(NEC_UCOM4_PORTA);
+	m_acc = input_r(PORTA);
 }
 
 void ucom4_cpu_device::op_ip()
@@ -415,7 +415,7 @@ void ucom4_cpu_device::op_oe()
 {
 	// OE: Output ACC to port E
 	m_icount--;
-	output_w(NEC_UCOM4_PORTE, m_acc);
+	output_w(PORTE, m_acc);
 }
 
 void ucom4_cpu_device::op_op()
@@ -427,8 +427,8 @@ void ucom4_cpu_device::op_op()
 void ucom4_cpu_device::op_ocd()
 {
 	// OCD X: Output X to ports C and D
-	output_w(NEC_UCOM4_PORTD, m_arg >> 4);
-	output_w(NEC_UCOM4_PORTC, m_arg & 0xf);
+	output_w(PORTD, m_arg >> 4);
+	output_w(PORTC, m_arg & 0xf);
 }
 
 
