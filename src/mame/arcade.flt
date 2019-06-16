@@ -1272,6 +1272,7 @@ tnzs.cpp
 toaplan1.cpp
 toaplan2.cpp
 toki.cpp
+toki_ms.cpp
 tomcat.cpp
 tonton.cpp
 toobin.cpp

@@ -38248,6 +38248,9 @@ tokiu                           // (c) 1989 Tad + Fabtek license (US)
 tokiua                          // (c) 1989 Tad + Fabtek license (US)
 tokip
 
+@source:toki_ms.cpp
+tokims
+
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985
 
