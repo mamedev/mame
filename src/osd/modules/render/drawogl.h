@@ -151,6 +151,8 @@ public:
 			m_blit_dim = nd;
 			notify_changed();
 		}
+		if ((m_blit_dim.width() == 0) || (m_blit_dim.height() == 0))
+			return nullptr;
 		win->target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), win->pixel_aspect());
 		return &win->target()->get_primitives();
 	}
