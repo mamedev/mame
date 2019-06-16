@@ -852,7 +852,7 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 		{
 			static const char* const s_reg_names[4] = { "Cursor X Origin", "Cursor Y Origin", "Cursor X Size", "Cursor Y Size" };
 			const uint8_t reg = (data >> 12) & 3;
-			LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: %s = %03x\n", machine().describe_context, s_reg_names[reg], data & 0xfff);
+			LOGMASKED(LOG_CTRLBUS | LOG_OUTPUT_TIMING, "%s: CPU write to Output Timing Card: %s = %03x\n", machine().describe_context(), s_reg_names[reg], data & 0xfff);
 			switch (reg)
 			{
 			case 0: // Cursor X Origin
