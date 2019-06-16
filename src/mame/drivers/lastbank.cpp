@@ -161,7 +161,6 @@ void lastbank_state::tc0091lvc_map(address_map &map)
 void lastbank_state::lastbank_map(address_map &map)
 {
 	tc0091lvc_map(map);
-
 	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
 	map(0xa800, 0xa800).portr("COINS");
 	map(0xa800, 0xa802).w(FUNC(lastbank_state::output_w));

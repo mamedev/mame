@@ -91,7 +91,6 @@ void dfruit_state::tc0091lvc_map(address_map &map)
 void dfruit_state::dfruit_map(address_map &map)
 {
 	tc0091lvc_map(map);
-
 	map(0xa000, 0xa003).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa005).rw("opn", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa008, 0xa008).nopr(); //watchdog
