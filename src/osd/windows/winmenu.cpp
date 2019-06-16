@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  winmenu.c - Win32 OSD core dummy menu implementation
+//  winmenu.cpp - Win32 OSD core dummy menu implementation
 //
 //============================================================
 
