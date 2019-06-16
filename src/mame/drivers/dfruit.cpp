@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(dfruit_state::screen_vblank)
 
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
-	map(0x0000, 0xfeff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
+	map(0x0000, 0xfdff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
 
 	map(0x8000, 0x9fff).ram();
 
