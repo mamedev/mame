@@ -3662,7 +3662,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
-	m_display->set_bri_levels(0.002); // cyan elements strobed very briefly?
+	m_display->set_bri_levels(0.001); // cyan elements strobed very briefly?
 	config.set_default_layout(layout_mwcbaseb);
 
 	/* sound hardware */

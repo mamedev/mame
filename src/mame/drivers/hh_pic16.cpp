@@ -39,8 +39,7 @@
 
   TODO:
   - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
-  - some of the games rely on the fact that faster/longer strobed leds appear brighter,
-    eg. hccbaskb(player led), ..
+  - us2pfball player led is brighter, but I can't get a stable picture
   - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg of the
     other? Or are they both made by the same subcontractor? I presume Toytronic.
@@ -49,9 +48,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/screenless.h"
-
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
@@ -71,18 +69,20 @@
 #include "hh_pic16_test.lh" // common test-layout - use external artwork
 
 
-class hh_pic16_state : public screenless_state
+class hh_pic16_state : public driver_device
 {
 public:
 	hh_pic16_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<pic16c5x_device> m_maincpu;
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<6> m_inputs; // max 6
 
@@ -107,8 +107,6 @@ protected:
 
 void hh_pic16_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// zerofill
 	m_a = 0;
 	m_b = 0;
@@ -214,8 +212,7 @@ public:
 
 void touchme_state::prepare_display()
 {
-	set_display_segmask(3, 0x7f);
-	display_matrix(7, 7, m_c, ~m_b & 0x7b);
+	m_display->matrix(~m_b & 0x7b, m_c);
 }
 
 void touchme_state::update_speaker()
@@ -290,6 +287,9 @@ void touchme_state::touchme(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 300000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_touchme);
 
 	/* sound hardware */
@@ -336,13 +336,12 @@ public:
 void pabball_state::prepare_display()
 {
 	// CD4028 BCD to decimal decoder
+	// CD4028 0-8: led select, 9: 7seg
 	u16 sel = m_c & 0xf;
 	if (sel & 8) sel &= 9;
 	sel = 1 << sel;
 
-	// CD4028 9 is 7seg
-	set_display_segmask(0x200, 0xff);
-	display_matrix(8, 10, m_b, sel);
+	m_display->matrix(sel, m_b);
 }
 
 WRITE8_MEMBER(pabball_state::write_b)
@@ -394,6 +393,9 @@ void pabball_state::pabball(machine_config &config)
 	m_maincpu->read_c().set_ioport("IN.1");
 	m_maincpu->write_c().set(FUNC(pabball_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x200, 0xff);
 	config.set_default_layout(layout_hh_pic16_test);
 
 	/* sound hardware */
@@ -428,9 +430,7 @@ class melodym_state : public hh_pic16_state
 public:
 	melodym_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_pic16_state(mconfig, type, tag)
-	{
-		set_display_levels(0.9);
-	}
+	{ }
 
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_READ8_MEMBER(read_c);
@@ -455,7 +455,7 @@ READ8_MEMBER(melodym_state::read_c)
 WRITE8_MEMBER(melodym_state::write_c)
 {
 	// C6: both lamps
-	display_matrix(1, 1, ~data >> 6 & 1, 1);
+	m_display->matrix(1, ~data >> 6 & 1);
 
 	// C7: speaker out
 	m_speaker->level_w(~data >> 7 & 1);
@@ -515,6 +515,9 @@ void melodym_state::melodym(machine_config &config)
 	m_maincpu->read_c().set(FUNC(melodym_state::read_c));
 	m_maincpu->write_c().set(FUNC(melodym_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
+	m_display->set_bri_levels(0.9);
 	config.set_default_layout(layout_melodym);
 
 	/* sound hardware */
@@ -566,12 +569,9 @@ public:
 
 void maniac_state::prepare_display()
 {
-	m_display_state[0] = ~m_b & 0x7f;
-	m_display_state[1] = ~m_c & 0x7f;
-
-	set_display_segmask(3, 0x7f);
-	set_display_size(7, 2);
-	display_update();
+	m_display->write_row(0, ~m_b & 0x7f);
+	m_display->write_row(1, ~m_c & 0x7f);
+	m_display->update();
 }
 
 void maniac_state::update_speaker()
@@ -619,6 +619,9 @@ void maniac_state::maniac(machine_config &config)
 	m_maincpu->write_b().set(FUNC(maniac_state::write_b));
 	m_maincpu->write_c().set(FUNC(maniac_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 7);
+	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_maniac);
 
 	/* sound hardware */
@@ -695,7 +698,7 @@ void matchme_state::set_clock()
 WRITE8_MEMBER(matchme_state::write_b)
 {
 	// B0-B7: lamps
-	display_matrix(8, 1, data, 1);
+	m_display->matrix(1, data);
 }
 
 READ8_MEMBER(matchme_state::read_c)
@@ -773,6 +776,8 @@ void matchme_state::matchme(machine_config &config)
 	m_maincpu->read_c().set(FUNC(matchme_state::read_c));
 	m_maincpu->write_c().set(FUNC(matchme_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 8);
 	config.set_default_layout(layout_matchme);
 
 	/* sound hardware */
@@ -875,7 +880,7 @@ WRITE8_MEMBER(leboom_state::write_b)
 WRITE8_MEMBER(leboom_state::write_c)
 {
 	// C4: single led
-	display_matrix(1, 1, data >> 4 & 1, 1);
+	m_display->matrix(1, data >> 4 & 1);
 
 	// C7: speaker on
 	m_c = data;
@@ -934,6 +939,8 @@ void leboom_state::leboom(machine_config &config)
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(leboom_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_leboom);
 
 	/* sound hardware */
@@ -982,9 +989,7 @@ public:
 
 void tbaskb_state::prepare_display()
 {
-	// B4,B5 are 7segs
-	set_display_segmask(0x30, 0x7f);
-	display_matrix(7, 6, m_c, m_b);
+	m_display->matrix(m_b, m_c);
 }
 
 READ8_MEMBER(tbaskb_state::read_a)
@@ -1001,7 +1006,8 @@ WRITE8_MEMBER(tbaskb_state::write_b)
 	// B0-B4: input mux
 	m_inp_mux = ~data & 0x1f;
 
-	// B0-B5: led select
+	// B0-B3: led select
+	// B4,B5: digit select
 	m_b = data;
 	prepare_display();
 }
@@ -1049,6 +1055,10 @@ void tbaskb_state::tbaskb(machine_config &config)
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(tbaskb_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0x30, 0x7f);
+	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
 	config.set_default_layout(layout_tbaskb);
 
 	/* sound hardware */
@@ -1101,15 +1111,10 @@ public:
 void rockpin_state::prepare_display()
 {
 	// 3 7seg leds from ports A and B
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 3, m_b, m_a, false);
+	m_display->matrix_partial(0, 3, m_a, m_b, false);
 
 	// 44 leds from ports C and D
-	for (int y = 0; y < 6; y++)
-		m_display_state[y+3] = (m_d >> y & 1) ? m_c : 0;
-
-	set_display_size(8, 3+6);
-	display_update();
+	m_display->matrix_partial(3, 6, m_d, m_c);
 }
 
 WRITE8_MEMBER(rockpin_state::write_a)
@@ -1171,6 +1176,9 @@ void rockpin_state::rockpin(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 450000/4).signal_handler().set_inputline(m_maincpu, PIC16C5x_RTCC);
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3+6, 8);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_rockpin);
 
 	/* sound hardware */
@@ -1221,9 +1229,7 @@ public:
 
 void hccbaskb_state::prepare_display()
 {
-	// B5,B6 are 7segs
-	set_display_segmask(0x60, 0x7f);
-	display_matrix(7, 7, m_c, m_b);
+	m_display->matrix(m_b, m_c);
 }
 
 READ8_MEMBER(hccbaskb_state::read_a)
@@ -1243,7 +1249,8 @@ WRITE8_MEMBER(hccbaskb_state::write_b)
 	// B7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
 
-	// B0-B6: led select
+	// B0-B4: led select
+	// B5,B6: digit select
 	m_b = data;
 	prepare_display();
 }
@@ -1288,6 +1295,10 @@ void hccbaskb_state::hccbaskb(machine_config &config)
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(hccbaskb_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(0x60, 0x7f);
+	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
 	config.set_default_layout(layout_hccbaskb);
 
 	/* sound hardware */
@@ -1346,8 +1357,7 @@ void ttfball_state::prepare_display()
 	const u8 _4511_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0,0,0,0,0,0 };
 	u16 led_data = (m_c & 0x20) ? (_4511_map[m_c & 0xf] | (~m_c << 3 & 0x80)) : (~m_c << 8 & 0x700);
 
-	set_display_segmask(0x7f, 0xff);
-	display_matrix(11, 9, led_data, m_b | (m_c << 1 & 0x100));
+	m_display->matrix(m_b | (m_c << 1 & 0x100), led_data);
 }
 
 READ8_MEMBER(ttfball_state::read_a)
@@ -1445,6 +1455,9 @@ void ttfball_state::ttfball(machine_config &config)
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(ttfball_state::write_c));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	m_display->set_segmask(0x7f, 0xff);
 	config.set_default_layout(layout_ttfball);
 
 	/* sound hardware */
@@ -1499,9 +1512,7 @@ public:
 
 void uspbball_state::prepare_display()
 {
-	// D0-D2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(16, 6, m_c << 8 | m_b, m_d);
+	m_display->matrix(m_d, m_c << 8 | m_b);
 }
 
 WRITE8_MEMBER(uspbball_state::write_a)
@@ -1526,7 +1537,8 @@ WRITE8_MEMBER(uspbball_state::write_c)
 
 WRITE8_MEMBER(uspbball_state::write_d)
 {
-	// D0-D5: led/digit select
+	// D0-D2: digit select
+	// D3-D5: led select
 	m_d = ~data;
 	prepare_display();
 }
@@ -1566,6 +1578,9 @@ void uspbball_state::uspbball(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 900000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 16);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_hh_pic16_test);
 
 	/* sound hardware */
@@ -1616,8 +1631,7 @@ public:
 
 void us2pfball_state::prepare_display()
 {
-	set_display_segmask(0xff, 0x7f);
-	display_matrix(7, 10, m_c, m_d | (m_a << 6 & 0x300));
+	m_display->matrix(m_d | (m_a << 6 & 0x300), m_c);
 }
 
 READ8_MEMBER(us2pfball_state::read_a)
@@ -1706,6 +1720,9 @@ void us2pfball_state::us2pfball(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 800000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_us2pfball);
 
 	/* sound hardware */

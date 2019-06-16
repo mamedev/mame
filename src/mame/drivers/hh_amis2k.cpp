@@ -247,7 +247,7 @@ void wildfire_state::wildfire(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(7, 0x7f);
-	m_display->set_bri_levels(0.02, 0.1); // bumpers are dimmed
+	m_display->set_bri_levels(0.01, 0.1); // bumpers are dimmed
 	config.set_default_layout(layout_wildfire);
 
 	/* sound hardware */

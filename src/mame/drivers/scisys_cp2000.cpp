@@ -3,8 +3,6 @@
 // thanks-to:bataais
 /******************************************************************************
 
-* scisys_cp2000.cpp, subdriver of machine/chessbase.cpp
-
 SciSys Chess Partner 2000, also sold by Novag with the same name.
 
 - 3850PK CPU at ~2MHz, 3853PK memory interface
@@ -14,10 +12,9 @@ SciSys Chess Partner 2000, also sold by Novag with the same name.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/chessbase.h"
-
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
+#include "video/pwm.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -28,32 +25,61 @@ SciSys Chess Partner 2000, also sold by Novag with the same name.
 
 namespace {
 
-class cp2000_state : public chessbase_state
+class cp2000_state : public driver_device
 {
 public:
 	cp2000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		chessbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac")
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void cp2000(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
+	required_ioport_array<12> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	// I/O handlers
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u8 m_select;
+	u16 m_cb_mux;
+	u8 m_kp_mux;
+	u8 m_7seg_data;
 };
+
+void cp2000_state::machine_start()
+{
+	// zerofill
+	m_select = 0;
+	m_cb_mux = 0;
+	m_kp_mux = 0;
+	m_7seg_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_select));
+	save_item(NAME(m_cb_mux));
+	save_item(NAME(m_kp_mux));
+	save_item(NAME(m_7seg_data));
+}
+
 
 
 /******************************************************************************
@@ -62,10 +88,16 @@ private:
 
 // CPU I/O ports
 
+void cp2000_state::prepare_display()
+{
+	m_display->matrix(m_select, m_7seg_data);
+}
+
 WRITE8_MEMBER(cp2000_state::control_w)
 {
 	// d0-d3: digit select
-	m_led_select = data;
+	m_select = ~data;
+	prepare_display();
 
 	// d4: keypad/chessboard select
 
@@ -75,23 +107,30 @@ WRITE8_MEMBER(cp2000_state::control_w)
 
 READ8_MEMBER(cp2000_state::input_r)
 {
-	u8 data = m_7seg_data;
+	u8 data = m_kp_mux;
 
 	// read chessboard buttons
-	u8 cb = (~m_led_select & 0x10) ? read_inputs(8) : 0;
-	data |= (m_inp_mux & 0xff00) ? (cb & 0xf0) : (cb << 4);
+	if (m_select & 0x10)
+	{
+		u8 cb = 0;
+		for (int i = 0; i < 8; i++)
+			if (BIT(m_cb_mux, i))
+				cb |= m_inputs[i]->read();
+
+		data |= (m_cb_mux & 0xff00) ? (cb & 0xf0) : (cb << 4);
+	}
 
 	// read keypad buttons
-	if (m_led_select & 0x10)
+	else
 	{
 		// d0-d3: multiplexed inputs from d4-d7
 		for (int i = 0; i < 4; i++)
-			if (BIT(m_7seg_data, i+4))
-				data |= m_inp_matrix[i+8]->read();
+			if (BIT(m_kp_mux, i+4))
+				data |= m_inputs[i+8]->read();
 
 		// d4-d7: multiplexed inputs from d0-d3
 		for (int i = 0; i < 4; i++)
-			if (m_7seg_data & m_inp_matrix[i+8]->read())
+			if (m_kp_mux & m_inputs[i+8]->read())
 				data |= 1 << (i+4);
 	}
 
@@ -101,16 +140,15 @@ READ8_MEMBER(cp2000_state::input_r)
 WRITE8_MEMBER(cp2000_state::digit_w)
 {
 	// d0-d3: chessboard input mux (demux)
-	m_inp_mux = 1 << (data & 0xf);
-	m_inp_mux |= m_inp_mux >> 8;
+	m_cb_mux = 1 << (data & 0xf);
+	m_cb_mux |= m_cb_mux >> 8;
 
 	// d0-d7: keypad input mux (direct)
+	m_kp_mux = data;
 
-	// also digit segment data, update display here
-	set_display_segmask(0xf, 0x7f);
-	u8 digit = bitswap<8>(data,0,2,1,3,4,5,6,7);
-	display_matrix(7, 4, digit, ~m_led_select);
-	m_7seg_data = data;
+	// also digit segment data
+	m_7seg_data = bitswap<8>(data,0,2,1,3,4,5,6,7);
+	prepare_display();
 }
 
 
@@ -139,7 +177,85 @@ void cp2000_state::main_io(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( cp2000 )
-	PORT_INCLUDE( generic_cb_buttons )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Rook")
@@ -183,7 +299,9 @@ void cp2000_state::cp2000(machine_config &config)
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(cp2000_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_scisys_cp2000);
 
 	/* sound hardware */

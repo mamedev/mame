@@ -71,11 +71,11 @@ private:
 	u8 main_trampoline_r(offs_t offset);
 	void main_trampoline_w(offs_t offset, u8 data);
 
-	u8 m_inp_mux;
-
 	// I/O handlers
 	u8 input_r();
 	void control_w(u8 data);
+
+	u8 m_inp_mux;
 };
 
 void master_state::machine_start()

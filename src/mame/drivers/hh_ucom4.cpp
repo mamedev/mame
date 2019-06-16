@@ -2144,7 +2144,6 @@ void grobot9_state::grobot9(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
-	m_display->set_bri_levels(0.25);
 	config.set_default_layout(layout_grobot9);
 
 	/* sound hardware */
@@ -2414,7 +2413,6 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 12);
-	m_display->set_bri_levels(0.005);
 	config.set_default_layout(layout_tmtennis);
 
 	/* sound hardware */

@@ -24,6 +24,7 @@ public:
 	pwm_display_device &reset_segmask() { std::fill_n(m_segmask, ARRAY_LENGTH(m_segmask), 0); return *this; }
 	pwm_display_device &set_bri_levels(double l0, double l1 = 1.0, double l2 = 1.0, double l3 = 1.0); // brightness threshold per level (0.0 - 1.0)
 	pwm_display_device &set_bri_minimum(u8 i) { m_level_min = i; return *this; } // minimum level index for element to be considered "on"
+	pwm_display_device &set_bri_maximum(double b) { m_level_max = b; return *this; } // maximum brightness level, 0.0 for auto
 
 	// output callbacks when not using the default output tags
 	auto output_x() { return m_output_x_cb.bind(); } // x = offset >> 6, y = offset & 0x3f
@@ -72,8 +73,9 @@ private:
 	attotime m_framerate_set;
 	attotime m_framerate;
 	double m_interpolation;
-	double m_levels[0x100];
+	double m_levels[0x41];
 	u8 m_level_min;
+	double m_level_max;
 
 	u64 m_segmask[0x40];
 	u64 m_rowsel;
