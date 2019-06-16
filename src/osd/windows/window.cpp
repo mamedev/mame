@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  window.c - Win32 window handling
+//  window.cpp - Win32 window handling
 //
 //============================================================
 
