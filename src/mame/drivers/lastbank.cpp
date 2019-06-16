@@ -63,6 +63,7 @@ private:
 	void lastbank_audio_io(address_map &map);
 	void lastbank_audio_map(address_map &map);
 	void lastbank_map(address_map &map);
+	void tc0091lvc_map(address_map &map);
 };
 
 void lastbank_state::machine_start()
@@ -145,27 +146,21 @@ CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
 	return BIT(m_sound_flags, 0) << 1 | BIT(m_sound_flags, 1);
 }
 
-/*
 void lastbank_state::tc0091lvc_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff) Bankswitched ROM area
+	map(0x0000, 0xfeff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
 
-	map(0xc000, 0xfdff) RAM Bank (connected in VRAMs, 4KB boundary)
+	map(0x8000, 0x9fff).ram().share("nvram");
 
-	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
-	map(0xff00, 0xff02).ram().share("irq_vector");
-	map(0xff03, 0xff03).ram().share("irq_enable");
-	map(0xff04, 0xff07).ram().w(FUNC(tc0091lvc_device::ram_bank_w)).share("ram_bank");
-	map(0xff08, 0xff08).ram().share("rom_bank");
+	map(0xff00, 0xff02).rw(m_vdp, FUNC(tc0091lvc_device::irq_vector_r), FUNC(tc0091lvc_device::irq_vector_w));
+	map(0xff03, 0xff03).rw(m_vdp, FUNC(tc0091lvc_device::irq_enable_r), FUNC(tc0091lvc_device::irq_enable_w));
+	map(0xff04, 0xff07).rw(m_vdp, FUNC(tc0091lvc_device::ram_bank_r), FUNC(tc0091lvc_device::ram_bank_w));
+	map(0xff08, 0xff08).rw(m_vdp, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
 }
-*/
 
 void lastbank_state::lastbank_map(address_map &map)
 {
-	map(0x0000, 0xffff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
-
-	map(0x8000, 0x9fff).ram().share("nvram");
+	tc0091lvc_map(map);
 
 	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
 	map(0xa800, 0xa800).portr("COINS");

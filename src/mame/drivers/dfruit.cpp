@@ -51,6 +51,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	void dfruit_map(address_map &map);
+	void tc0091lvc_map(address_map &map);
 };
 
 void dfruit_state::video_start()
@@ -74,27 +75,22 @@ WRITE_LINE_MEMBER(dfruit_state::screen_vblank)
 	}
 }
 
-/*
+
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff) Bankswitched ROM area
+	map(0x0000, 0xfeff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
 
-	map(0xc000, 0xfdff) RAM Bank (connected in VRAMs, 4KB boundary)
+	map(0x8000, 0x9fff).ram();
 
-	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
-	map(0xff00, 0xff02).ram().share("irq_vector");
-	map(0xff03, 0xff03).ram().share("irq_enable");
-	map(0xff04, 0xff07).ram().w(FUNC(tc0091lvc_device::ram_bank_w)).share("ram_bank");
-	map(0xff08, 0xff08).ram().share("rom_bank");
+	map(0xff00, 0xff02).rw(m_vdp, FUNC(tc0091lvc_device::irq_vector_r), FUNC(tc0091lvc_device::irq_vector_w));
+	map(0xff03, 0xff03).rw(m_vdp, FUNC(tc0091lvc_device::irq_enable_r), FUNC(tc0091lvc_device::irq_enable_w));
+	map(0xff04, 0xff07).rw(m_vdp, FUNC(tc0091lvc_device::ram_bank_r), FUNC(tc0091lvc_device::ram_bank_w));
+	map(0xff08, 0xff08).rw(m_vdp, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
 }
-*/
 
 void dfruit_state::dfruit_map(address_map &map)
 {
-	map(0x0000, 0xffff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
-
-	map(0x8000, 0x9fff).ram();
+	tc0091lvc_map(map);
 
 	map(0xa000, 0xa003).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa005).rw("opn", FUNC(ym2203_device::read), FUNC(ym2203_device::write));

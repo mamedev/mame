@@ -20,11 +20,6 @@
 
 DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
 
-u8 tc0091lvc_device::rom_r(offs_t offset)
-{
-	return m_rom[offset & m_rom.mask()];
-}
-
 void tc0091lvc_device::vram_w(offs_t offset, u8 data)
 {
 	// TODO : offset 0x0000 - 0x3fff is not used?
@@ -97,7 +92,7 @@ void tc0091lvc_device::cpu_map(address_map &map)
 {
 	// 0x0000-0x7fff ROM (0x0000-0x5fff Fixed, 0x6000-0x7fff Bankswitched)
 	map(0x0000, 0x5fff).r(FUNC(tc0091lvc_device::rom_r));
-	map(0x6000, 0x7fff).lr8("banked_rom_r", [this](offs_t offset) { return rom_r((*m_rom_bank << 13) | (offset & 0x1fff)); });
+	map(0x6000, 0x7fff).lr8("banked_rom_r", [this](offs_t offset) { return rom_r((m_rom_bank << 13) | (offset & 0x1fff)); });
 
 	// 0x8000-0xbfff External mappable area
 
@@ -107,12 +102,8 @@ void tc0091lvc_device::cpu_map(address_map &map)
 	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
 
-	// 0xfe00-0xff08 Internal functions
+	// 0xfe00-0xffff Internal functions
 	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
-	map(0xff00, 0xff02).ram().share("irq_vector");
-	map(0xff03, 0xff03).ram().share("irq_enable");
-	map(0xff04, 0xff07).ram().w(FUNC(tc0091lvc_device::ram_bank_w)).share("ram_bank");
-	map(0xff08, 0xff08).ram().share("rom_bank");
 }
 
 void tc0091lvc_device::banked_map(address_map &map)
@@ -132,10 +123,6 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 	, m_vram(*this, "vram")
 	, m_bitmap_ram(*this, "bitmap_ram")
 	, m_vregs(*this, "vregs")
-	, m_irq_vector(*this, "irq_vector")
-	, m_irq_enable(*this, "irq_enable")
-	, m_ram_bank(*this, "ram_bank")
-	, m_rom_bank(*this, "rom_bank")
 	, m_rom(*this, DEVICE_SELF)
 {
 }
@@ -177,14 +164,24 @@ void tc0091lvc_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 0x100);
 }
 
+
+void tc0091lvc_device::device_post_load()
+{
+	for (int i = 0; i < 4; i++)
+		m_bankdev[i]->set_bank(m_ram_bank[i]);
+}
+
+
 void tc0091lvc_device::device_start()
 {
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
 	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
 	std::fill_n(&m_vregs[0], m_vregs.bytes(), 0);
-	std::fill_n(&m_ram_bank[0], m_ram_bank.bytes(), 0);
+	std::fill(std::begin(m_ram_bank), std::end(m_ram_bank), 0);
 	for (int i = 0; i < 4; i++)
 		m_bankdev[i]->set_bank(m_ram_bank[i]);
+
+	m_rom_bank = 0;
 
 	m_sprram_buffer = make_unique_clear<u8[]>(0x400);
 
@@ -200,6 +197,10 @@ void tc0091lvc_device::device_start()
 	bg_tilemap[0]->set_scrolldx(28, -11);
 	bg_tilemap[1]->set_scrolldx(38, -21);
 
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_rom_bank));
 	save_pointer(NAME(m_sprram_buffer), 0x400);
 }
 
