@@ -258,7 +258,7 @@ public:
 WRITE8_MEMBER(bambball_state::plate_w)
 {
 	// R1x-R3x(,D0-D3): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -278,7 +278,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data & 0xf);
+	plate_w(space, 3 + 1, data & 0xf);
 }
 
 READ8_MEMBER(bambball_state::input_r)
@@ -390,7 +390,7 @@ void bmboxing_state::prepare_display()
 WRITE8_MEMBER(bmboxing_state::plate_w)
 {
 	// R1x-R3x: vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -1508,7 +1508,7 @@ void machiman_state::prepare_display()
 WRITE8_MEMBER(machiman_state::plate_w)
 {
 	// R0x-R3x,R6012: vfd plate
-	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 16 : offset * 4;
+	int shift = (offset == 6) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -1616,7 +1616,7 @@ public:
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
 	// R2x,R3x,R6x: vfd plate
-	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
+	int shift = (offset == 6) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	m_display->matrix(m_grid, m_plate);
 }
@@ -2071,11 +2071,11 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 WRITE8_MEMBER(cgalaxn_state::grid_w)
 {
 	// R10,R11: input mux
-	if (offset == hmcs40_cpu_device::PORT_R1X)
+	if (offset == 1)
 		m_inp_mux = data & 3;
 
 	// R1x-R3x: vfd grid
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -2197,7 +2197,7 @@ public:
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
 	// R1x-R6x(,D1,D2): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -2218,7 +2218,7 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
-	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data >> 1 & 3);
+	plate_w(space, 6 + 1, data >> 1 & 3);
 }
 
 READ8_MEMBER(cpacman_state::input_r)
@@ -2333,7 +2333,7 @@ public:
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
 	// R1x-R6x(,D0,D1): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -2354,7 +2354,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data & 3);
+	plate_w(space, 6 + 1, data & 3);
 }
 
 READ8_MEMBER(cmspacmn_state::input_r)
@@ -2629,7 +2629,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 WRITE8_MEMBER(egalaxn2_state::plate_w)
 {
 	// R1x-R6x: vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -3551,7 +3551,7 @@ void mwcbaseb_state::prepare_display()
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
 {
 	// R1x-R3x,R6x: vfd plate
-	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 12 : (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset == 6) ? 12 : (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -4205,7 +4205,7 @@ public:
 WRITE8_MEMBER(vinvader_state::plate_w)
 {
 	// R1x-R3x(,D4-D6): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -4222,7 +4222,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
-	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data >> 4 & 7);
+	plate_w(space, 3 + 1, data >> 4 & 7);
 }
 
 // config

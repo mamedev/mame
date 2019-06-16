@@ -368,7 +368,7 @@ READ8_MEMBER(alpha_8201_device::mcu_data_r)
 	else
 		logerror("%s: MCU side invalid read\n", tag());
 
-	if (offset == hmcs40_cpu_device::PORT_R0X)
+	if (offset == 0)
 		ret >>= 4;
 	return ret & 0xf;
 }
