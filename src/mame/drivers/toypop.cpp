@@ -279,6 +279,9 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		uint8_t width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
 		uint8_t height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
 
+		tile &= ~(width - 1);
+		tile &= ~((height - 1) << 1);
+
 		if (flip)
 		{
 			fx ^= 1;
