@@ -2,8 +2,6 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  ** subclass of hh_ucom4_state (includes/hh_ucom4.h, drivers/hh_ucom4.cpp) **
-
   Roland TR-606 Drumatix, early 1982
   * NEC uCOM-43 MCU, labeled D650C 128
   * 2*uPD444C 1024x4 Static CMOS SRAM
@@ -15,28 +13,38 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_ucom4.h"
-
+#include "cpu/ucom4/ucom4.h"
 #include "machine/timer.h"
 
 #include "tr606.lh"
 
 
-class tr606_state : public hh_ucom4_state
+class tr606_state : public driver_device
 {
 public:
 	tr606_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_ucom4_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void tr606(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	required_device<ucom4_cpu_device> m_maincpu;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-
-	virtual void machine_start() override;
 };
+
+void tr606_state::machine_start()
+{
+	// zerofill
+
+	// register for savestates
+}
 
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
 #define TP2_HZ      454545
@@ -72,15 +80,6 @@ INPUT_PORTS_END
   Machine Config
 
 ***************************************************************************/
-
-void tr606_state::machine_start()
-{
-	hh_ucom4_state::machine_start();
-
-	// zerofill
-
-	// register for savestates
-}
 
 void tr606_state::tr606(machine_config &config)
 {

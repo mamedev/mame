@@ -2705,9 +2705,6 @@ createMESSProjects(_target, _subtarget, "nec")
 files {
 	MAME_DIR .. "src/mame/drivers/apc.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
-	MAME_DIR .. "src/mame/includes/hh_ucom4.h",
-	MAME_DIR .. "src/mame/drivers/tb303.cpp", -- subdriver of hh_ucom4
-	MAME_DIR .. "src/mame/drivers/tr606.cpp", -- "
 	MAME_DIR .. "src/mame/drivers/pce.cpp",
 	MAME_DIR .. "src/mame/includes/pce.h",
 	MAME_DIR .. "src/mame/machine/pce.cpp",
@@ -3030,6 +3027,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/rmt32.cpp",
 	MAME_DIR .. "src/mame/drivers/rd110.cpp",
 	MAME_DIR .. "src/mame/drivers/rsc55.cpp",
+	MAME_DIR .. "src/mame/drivers/tb303.cpp",
+	MAME_DIR .. "src/mame/drivers/tr606.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rolm")

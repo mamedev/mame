@@ -5,9 +5,6 @@
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
   most of them (emulated ones) are VFD electronic games/toys.
-  List of child drivers:
-  - tb303: Roland TB-303
-  - tr606: Roland TR-606
 
   Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 
@@ -68,9 +65,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_ucom4.h"
-
+#include "cpu/ucom4/ucom4.h"
+#include "video/pwm.h"
 #include "video/hlcd0515.h"
+#include "sound/spkrdev.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,6 +84,42 @@
 #include "tmtennis.lh"
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+
+
+class hh_ucom4_state : public driver_device
+{
+public:
+	hh_ucom4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
+	{ }
+
+	// devices
+	required_device<ucom4_cpu_device> m_maincpu;
+	optional_device<pwm_display_device> m_display;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<6> m_inputs; // max 6
+
+	// misc common
+	u8 m_port[9];                   // MCU port A-I write data (optional)
+	u8 m_int;                       // MCU INT pin state
+	u16 m_inp_mux;                  // multiplexed inputs mask
+
+	u32 m_grid;                     // VFD current row data
+	u32 m_plate;                    // VFD current column data
+
+	u8 read_inputs(int columns);
+	void refresh_interrupts(void);
+	void set_interrupt(int state);
+	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
 
 
 // machine start/reset
