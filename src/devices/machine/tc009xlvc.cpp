@@ -103,7 +103,6 @@ void tc0091lvc_device::cpu_map(address_map &map)
 	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
 
 	// 0xfe00-0xffff Internal functions
-	map(0xfe00, 0xfeff).ram().w(FUNC(tc0091lvc_device::vregs_w)).share("vregs");
 }
 
 void tc0091lvc_device::banked_map(address_map &map)
@@ -122,7 +121,6 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 	, m_bankdev(*this, "bankdev_%u", 0U)
 	, m_vram(*this, "vram")
 	, m_bitmap_ram(*this, "bitmap_ram")
-	, m_vregs(*this, "vregs")
 	, m_rom(*this, DEVICE_SELF)
 {
 }
@@ -176,13 +174,13 @@ void tc0091lvc_device::device_start()
 {
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
 	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
-	std::fill_n(&m_vregs[0], m_vregs.bytes(), 0);
 	std::fill(std::begin(m_ram_bank), std::end(m_ram_bank), 0);
 	for (int i = 0; i < 4; i++)
 		m_bankdev[i]->set_bank(m_ram_bank[i]);
 
 	m_rom_bank = 0;
 
+	m_vregs = make_unique_clear<u8[]>(0x100);
 	m_sprram_buffer = make_unique_clear<u8[]>(0x400);
 
 	tx_tilemap    = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info), this),      TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -201,6 +199,7 @@ void tc0091lvc_device::device_start()
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_rom_bank));
+	save_pointer(NAME(m_vregs), 0x100);
 	save_pointer(NAME(m_sprram_buffer), 0x400);
 }
 

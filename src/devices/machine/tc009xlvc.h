@@ -20,9 +20,10 @@ public:
 
 	// memory handlers
 	u8 rom_r(offs_t offset) { return m_rom[offset & m_rom.mask()]; }
-	void vregs_w(offs_t offset, u8 data);
 
 	// internal functions
+	u8 vregs_r(offs_t offset) { return m_vregs[offset]; }
+	void vregs_w(offs_t offset, u8 data);
 	u8 irq_vector_r(offs_t offset) { return m_irq_vector[offset]; }
 	void irq_vector_w(offs_t offset, u8 data) { m_irq_vector[offset] = data; }
 	u8 irq_enable_r() { return m_irq_enable; }
@@ -67,12 +68,12 @@ private:
 	u8 m_irq_enable;
 	u8 m_ram_bank[4];
 	u8 m_rom_bank;
+	std::unique_ptr<u8[]> m_vregs;
 	std::unique_ptr<u8[]> m_sprram_buffer;
 
 	required_device_array<address_map_bank_device, 4> m_bankdev;
 	required_shared_ptr<u8> m_vram;
 	required_shared_ptr<u8> m_bitmap_ram;
-	required_shared_ptr<u8> m_vregs;
 	required_region_ptr<u8> m_rom;
 };
 
