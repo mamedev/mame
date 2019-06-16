@@ -91,8 +91,8 @@ private:
 	u16 m_sub_r;
 
 	virtual void power_off() override;
+	void power_subcpu();
 	void prepare_display();
-	bool vfd_filament_on() { return display_element_on(16, 15); }
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -109,7 +109,6 @@ private:
 
 	virtual void machine_start() override;
 };
-
 
 void tispellb_state::machine_start()
 {
@@ -136,20 +135,23 @@ void tispellb_state::machine_start()
 
 // common
 
+void tispellb_state::power_subcpu()
+{
+	if (m_subcpu)
+		m_subcpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+}
+
 void tispellb_state::power_off()
 {
 	hh_tms1k_state::power_off();
-
-	if (m_subcpu)
-		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	power_subcpu();
 }
 
 void tispellb_state::prepare_display()
 {
 	// almost same as snspell
-	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
-	set_display_segmask(0xff, 0x3fff);
-	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
+	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
+	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)
@@ -250,18 +252,8 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 
 INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 {
-	int on = (int)(uintptr_t)param;
-
-	if (on && !m_power_on)
-	{
-		set_power(true);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-
-		if (m_subcpu)
-			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else if (!on && m_power_on)
-		power_off();
+	hh_tms1k_state::power_button(field, param, oldval, newval);
+	power_subcpu();
 }
 
 static INPUT_PORTS_START( spellb )
@@ -363,6 +355,9 @@ void tispellb_state::rev1(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
 	/* no sound! */
@@ -382,6 +377,9 @@ void tispellb_state::rev2(machine_config &config)
 	TMS6100(config, m_tms6100, 350000);
 	m_tms6100->enable_4bit_mode(true);
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
 	/* sound hardware */

@@ -442,8 +442,6 @@ public:
 		m_ol_out(*this, "ol%u", 1U)
 	{ }
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
-
 	void init_snspell();
 	void init_tntell();
 	void init_lantutor();
@@ -467,7 +465,6 @@ public:
 private:
 	virtual void power_off() override;
 	void prepare_display();
-	bool vfd_filament_on() { return display_element_on(16, 15); }
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
 	DECLARE_WRITE16_MEMBER(snmath_write_o);
@@ -591,9 +588,8 @@ void tispeak_state::power_off()
 
 void tispeak_state::prepare_display()
 {
-	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
-	set_display_segmask(0x21ff, 0x3fff);
-	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
+	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
+	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
@@ -777,19 +773,6 @@ READ8_MEMBER(tispeak_state::k28_read_k)
   Inputs
 
 ***************************************************************************/
-
-INPUT_CHANGED_MEMBER(tispeak_state::power_button)
-{
-	int on = (int)(uintptr_t)param;
-
-	if (on && !m_power_on)
-	{
-		set_power(true);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else if (!on && m_power_on)
-		power_off();
-}
 
 static INPUT_PORTS_START( snspell )
 	PORT_START("IN.0") // R0
@@ -1320,6 +1303,9 @@ void tispeak_state::snmath(machine_config &config)
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
 	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0x21ff, 0x3fff);
 	config.set_default_layout(layout_snmath);
 
 	/* sound hardware */
