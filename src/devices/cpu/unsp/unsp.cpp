@@ -99,7 +99,7 @@ unsp_20_device::unsp_20_device(const machine_config &mconfig, const char *tag, d
 }
 
 unsp_20_device::unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
-	: unsp_12_device(mconfig, UNSP_20, tag, owner, clock, internal)
+	: unsp_12_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 20;
 }
