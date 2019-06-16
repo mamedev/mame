@@ -34,6 +34,7 @@
     Chip   RAM  ROM  I/O
     ----   ---  ---  ---
     8021    64   1k   21  (ROM, reduced instruction set)
+    8022    64   2k   26  (ROM, reduced instruction set, analog comparator)
 
     8035    64    0   27  (external ROM)
     8048    64   1k   27  (ROM)
@@ -72,12 +73,15 @@
 
     Chip   RAM  ROM  I/O
     ----   ---  ---  ---
-    8041   128   1k
-    8741   128   1k       (EPROM)
+    8041A   64   1k       (ROM)
+    8041AH 128   1k       (ROM)
+    8741A   64   1k       (EPROM)
+    8741AH 128   1k       (EPROM)
 
-    8042   256   2k
-    8242   256   2k
-    8242   256   2k
+    8042   128   2k       (ROM)
+    8042AH 256   2k       (ROM)
+    8742   128   2k       (EPROM)
+    8742AH 256   2k       (EPROM)
 
 ***************************************************************************/
 
