@@ -3453,8 +3453,7 @@ files {
 	MAME_DIR .. "src/mame/includes/screenless.h", -- delete soon
 	MAME_DIR .. "src/mame/drivers/hh_tms1k.cpp",
 	MAME_DIR .. "src/mame/includes/hh_tms1k.h",
-	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp", -- subdriver of hh_tms1k
-	MAME_DIR .. "src/mame/drivers/tispeak.cpp",  -- "
+	MAME_DIR .. "src/mame/drivers/tispeak.cpp",  -- subdriver of hh_tms1k
 	MAME_DIR .. "src/mame/drivers/tispellb.cpp", -- "
 	MAME_DIR .. "src/mame/drivers/ti74.cpp",
 	MAME_DIR .. "src/mame/drivers/ti85.cpp",
