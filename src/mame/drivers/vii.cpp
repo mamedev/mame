@@ -1946,6 +1946,7 @@ void vii_state::vii(machine_config &config)
 void icanguit_state::icanguit(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &icanguit_state::mem_map_4m);
 
 	spg2xx_base(config);
 
@@ -1968,6 +1969,7 @@ void icanguit_state::icanguit(machine_config &config)
 void icanguit_state::icanpian(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &icanguit_state::mem_map_4m);
 
 	spg2xx_base(config);
 
@@ -1989,6 +1991,7 @@ void icanguit_state::icanpian(machine_config &config)
 void tvgogo_state::tvgogo(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvgogo_state::mem_map_4m);
 
 	spg2xx_base(config);
 
@@ -2008,6 +2011,8 @@ void tvgogo_state::tvgogo(machine_config &config)
 void spg2xx_game_state::wireless60(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
@@ -2018,6 +2023,8 @@ void spg2xx_game_state::wireless60(machine_config &config)
 void spg2xx_game_state::jakks(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::jakks_porta_r));
@@ -2182,6 +2189,8 @@ void spg2xx_game_state::walle(machine_config &config)
 void spg2xx_game_state::rad_skat(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set_ioport("P1");
@@ -2196,6 +2205,8 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 void dreamlif_state::dreamlif(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreamlif_state::mem_map_4m);
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set_ioport("P1");
@@ -2213,6 +2224,8 @@ void spg2xx_game_state::rad_skatp(machine_config &config)
 void spg2xx_game_state::rad_sktv(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::rad_porta_r));
@@ -2227,6 +2240,8 @@ void spg2xx_game_state::rad_sktv(machine_config &config)
 void spg2xx_game_state::rad_crik(machine_config &config)
 {
 	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set_ioport("P1");
