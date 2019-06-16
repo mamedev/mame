@@ -16,6 +16,7 @@
 #include "machine/am2910.h"
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
+#include "machine/tdc1008.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -62,6 +63,10 @@ public:
 		, m_diskseq_prom(*this, "diskseq_prom")
 		, m_fddcpu(*this, "fddcpu")
 		, m_fdd_serial(*this, "fddserial")
+		, m_filter_cd(*this, "filter_cd")
+		, m_filter_ce(*this, "filter_ce")
+		, m_filter_cf(*this, "filter_cf")
+		, m_filter_cg(*this, "filter_cg")
 	{
 	}
 
@@ -145,6 +150,11 @@ private:
 	uint8_t m_fdd_ctrl;
 	uint8_t m_fdd_port1;
 	uint8_t m_fdd_track;
+
+	required_device<tdc1008_device> m_filter_cd;
+	required_device<tdc1008_device> m_filter_ce;
+	required_device<tdc1008_device> m_filter_cf;
+	required_device<tdc1008_device> m_filter_cg;
 
 	emu_timer *m_diskseq_clk;
 	emu_timer *m_field_in_clk;
@@ -1095,6 +1105,12 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_fdd_serial->rxd_handler().set(FUNC(dpb7000_state::fddcpu_debug_rx));
 
 	config.m_perfect_cpu_quantum = subtag("fddcpu");
+
+	// Filter Card
+	TDC1008(config, m_filter_cd);
+	TDC1008(config, m_filter_ce);
+	TDC1008(config, m_filter_cf);
+	TDC1008(config, m_filter_cg);
 }
 
 

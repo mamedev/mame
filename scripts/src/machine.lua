@@ -2773,6 +2773,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tdc1008.h,MACHINES["TDC1008"] = true
+---------------------------------------------------
+
+if (MACHINES["TDC1008"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tdc1008.cpp",
+		MAME_DIR .. "src/devices/machine/tdc1008.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/te7750.h,MACHINES["TE7750"] = true
 ---------------------------------------------------
 
