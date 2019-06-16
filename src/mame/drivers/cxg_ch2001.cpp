@@ -61,12 +61,12 @@ private:
 	// address maps
 	void main_map(address_map &map);
 
-	u8 m_inp_mux;
-
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u8 m_inp_mux;
 };
 
 void ch2001_state::machine_start()
