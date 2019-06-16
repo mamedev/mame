@@ -525,7 +525,7 @@ void mindset_state::mindset(machine_config &config)
 	m_syscpu->t0_in_cb().set(FUNC(mindset_state::sys_t0_r));
 	m_syscpu->t1_in_cb().set(FUNC(mindset_state::sys_t1_r));
 
-	I8042(config, m_soundcpu, 14.318181_MHz_XTAL/2);
+	I8042(config, m_soundcpu, 12_MHz_XTAL/2);
 
 	I8749(config, m_kbdcpu, 6_MHz_XTAL);
 	m_kbdcpu->p1_out_cb().set(FUNC(mindset_state::kbd_p1_w));

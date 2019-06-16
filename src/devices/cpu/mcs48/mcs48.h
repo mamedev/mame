@@ -88,7 +88,8 @@ DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes in
 /* Official Intel UPI-41 parts */
 DECLARE_DEVICE_TYPE(I8041, i8041_device)    /* 1k internal ROM,     128 bytes internal RAM */
 DECLARE_DEVICE_TYPE(I8741, i8741_device)    /* 1k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042, i8042_device)    /* 2k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042, i8042_device)    /* 2k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)/* 2k internal ROM,     256 bytes internal RAM */
 DECLARE_DEVICE_TYPE(I8242, i8242_device)    /* 2k internal ROM,     256 bytes internal RAM */
 DECLARE_DEVICE_TYPE(I8742, i8742_device)    /* 2k internal EEPROM,  256 bytes internal RAM */
 
@@ -654,6 +655,13 @@ class i8042_device : public upi41_cpu_device
 public:
 	// construction/destruction
 	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8042ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8242_device : public upi41_cpu_device

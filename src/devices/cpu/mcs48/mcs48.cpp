@@ -159,6 +159,7 @@ DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "Intel I8050")
 DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "Intel I8041")
 DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "Intel I8741")
 DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "Intel I8042")
+DEFINE_DEVICE_TYPE(I8042AH,i8042ah_device,"i8042ah","Intel I8042AH")
 DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "Intel I8242")
 DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "Intel I8742")
 DEFINE_DEVICE_TYPE(MB8884, mb8884_device, "mb8884", "MB8884")
@@ -320,6 +321,11 @@ i8741_device::i8741_device(const machine_config &mconfig, const char *tag, devic
 }
 
 i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8042, tag, owner, clock, 2048, 128)
+{
+}
+
+i8042ah_device::i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upi41_cpu_device(mconfig, I8042, tag, owner, clock, 2048, 256)
 {
 }
