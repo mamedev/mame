@@ -28,8 +28,10 @@ protected:
 
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcos;
 
+	u32 m_palette[16];
+	bool m_genlock[16];
 	u16 m_dispctrl;
-	u8 m_kbd_p1, m_kbd_p2;
+	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
 
 	static u16 gco_blend_0(u16, u16);
 	static u16 gco_blend_1(u16, u16);
@@ -54,6 +56,8 @@ protected:
 	void gco_w(u16);
 	u16 dispctrl_r();
 	void dispctrl_w(u16 data);
+	u16 dispreg_r();
+	void dispreg_w(u16 data);
 
 	int sys_t0_r();
 	int sys_t1_r();
@@ -99,8 +103,8 @@ void mindset_state::machine_reset()
 
 int mindset_state::sys_t0_r()
 {
-	logerror("SYS: read t0 (%03x)\n", m_syscpu->pc());
-	return true;
+	//	logerror("SYS: %d read t0 %d (%03x)\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0, m_syscpu->pc());
+	return (m_kbd_p2 & 0x40) != 0;
 }
 
 int mindset_state::sys_t1_r()
@@ -111,25 +115,25 @@ int mindset_state::sys_t1_r()
 
 u8 mindset_state::sys_p1_r()
 {
-	logerror("SYS: read p1\n");
+	//	logerror("SYS: read p1\n");
 	return 0xff;
 }
 
 u8 mindset_state::sys_p2_r()
 {
-	logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
+	//	logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
 	return 0xff;
 }
 
 void mindset_state::sys_p1_w(u8 data)
 {
-	logerror("SYS: write p1 %02x\n", data);
+	//	logerror("SYS: write p1 %02x\n", data);
 }
 
 void mindset_state::sys_p2_w(u8 data)
 {
-	m_maincpu->int3_w(data & 0x20);
-	logerror("SYS: write p2 %02x\n", data);
+	m_maincpu->int3_w(!(data & 0x80));
+	//	logerror("SYS: write p2 %02x\n", data);
 }
 
 void mindset_state::kbd_p1_w(u8 data)
@@ -139,8 +143,8 @@ void mindset_state::kbd_p1_w(u8 data)
 
 void mindset_state::kbd_p2_w(u8 data)
 {
-	if((m_kbd_p2 ^ data) & 0x40)
-		logerror("KBD: %d output bit %d\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0);
+	//	if((m_kbd_p2 ^ data) & 0x40)
+	//		logerror("KBD: %d output bit %d\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0);
 	m_kbd_p2 = data;
 }
 
@@ -176,62 +180,116 @@ void mindset_state::dispctrl_w(u16 data)
 	// 4000 = buffer choice (switch on int2, frame int instead of field int?)
 	u16 chg = m_dispctrl ^ data;
 	m_dispctrl = data;
-	if(chg & ~0x0050)
+	if(chg & 0xff00)
 		logerror("display control %04x\n", m_dispctrl);
+}
+
+u16 mindset_state::dispreg_r()
+{
+	// a..5 needed to pass the display test
+	// 0080 needed to allow uploading the palette
+	return 0xa086;
+}
+
+void mindset_state::dispreg_w(u16 data)
+{
+	switch(m_dispctrl & 0xf) {
+	case 1:
+		m_borderidx = data & 0xf;
+		break;
+	case 4: {
+		data = sw(data);
+		u8 r = 0x11*(((data & 0x4000) >> 11) | (data & 7));
+		u8 g = 0x11*(((data & 0x2000) >> 10) | ((data & 0x38) >> 3));
+		u8 b = 0x11*(((data & 0x1000) >>  9) | ((data & 0x1c0) >> 6));
+
+		if(!(data & 0x8000)) {
+			r = r * 0.75;
+			g = g * 0.75;
+			b = b * 0.75;
+		}
+		m_palette[m_borderidx] = (r << 16) | (g << 8) | b;
+		m_genlock[m_borderidx] = data & 0x0200;
+		logerror("palette[%x] = %04x -> %06x.%d\n", m_borderidx, data, m_palette[m_borderidx], m_genlock[m_borderidx]);
+		m_borderidx = (m_borderidx + 1) & 0xf;
+		break;
+	}
+
+	default:
+		logerror("display reg[%x] = %04x\n", m_dispctrl & 0xf, data);
+	}
 }
 
 u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	static const u32 pal[4] = { 0x000000, 0x555555, 0xaaaaaa, 0xffffff };
+	int mode_type = (m_dispctrl & 0x6000) >> 13;
+	bool interleave = m_dispctrl & 0x0800;
+	int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
+	bool large_pixels = m_dispctrl & 0x0100;
 
-	if(false) {
-		for(u32 y=0; y<200; y++) {
-			// Interleaved
-			const u16 *src = m_vram + 40*(y >> 1) + 4096*(y & 1);
-			u32 *dest = &bitmap.pix32(y);
-			for(u32 x=0; x<320; x+=8) {
-				u16 sv = *src++;
-				*dest++ = pal[(sv >>  6) & 3];
-				*dest++ = pal[(sv >>  4) & 3];
-				*dest++ = pal[(sv >>  2) & 3];
-				*dest++ = pal[(sv >>  0) & 3];
-				*dest++ = pal[(sv >> 14) & 3];
-				*dest++ = pal[(sv >> 12) & 3];
-				*dest++ = pal[(sv >> 10) & 3];
-				*dest++ = pal[(sv >>  8) & 3];
-			}
-		}
-	} else if(false) {
-		for(u32 y=0; y<200; y++) {
-			const u16 *src = m_vram + 40*y;
-			u32 *dest = &bitmap.pix32(y);
-			for(u32 x=0; x<320; x+=8) {
-				u16 sv = *src++;
-				*dest++ = pal[(sv >>  6) & 3];
-				*dest++ = pal[(sv >>  4) & 3];
-				*dest++ = pal[(sv >>  2) & 3];
-				*dest++ = pal[(sv >>  0) & 3];
-				*dest++ = pal[(sv >> 14) & 3];
-				*dest++ = pal[(sv >> 12) & 3];
-				*dest++ = pal[(sv >> 10) & 3];
-				*dest++ = pal[(sv >>  8) & 3];
-			}
-		}
-	} else {
-		for(u32 y=0; y<25; y++) {
-			for(u32 x=0; x<40; x++) {
-				u16 val = m_vram[y*40+x];
-				const u16 *src = m_vram + 0x1000 + ((val >> 1) & 0x7f);
-				for(u32 yy=0; yy<8; yy++) {
-					u8 pix = val & 1 ? *src >> 8 : *src;
-					src += 128;
-					u32 *dest = &bitmap.pix32(8*y+yy, 8*x);
-					for(u32 xx=0; xx<8; xx++)
-						*dest++ = pix & (0x80 >> xx) ? 0xffffff : 0x000000;					
+	switch(mode_type) {
+	case 0: // Native mode
+		if(large_pixels) {
+			if(!interleave) {
+				switch(pixels_per_byte_order) {
+				case 1: {
+					static int palind[4] = { 0, 1, 4, 5 };
+					const u16 *src = m_vram;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest = &bitmap.pix32(y);
+						for(u32 x=0; x<320; x+=8) {
+							u16 sv = *src++;
+							*dest++ = m_palette[palind[(sv >>  6) & 3]];
+							*dest++ = m_palette[palind[(sv >>  4) & 3]];
+							*dest++ = m_palette[palind[(sv >>  2) & 3]];
+							*dest++ = m_palette[palind[(sv >>  0) & 3]];
+							*dest++ = m_palette[palind[(sv >> 14) & 3]];
+							*dest++ = m_palette[palind[(sv >> 12) & 3]];
+							*dest++ = m_palette[palind[(sv >> 10) & 3]];
+							*dest++ = m_palette[palind[(sv >>  8) & 3]];
+						}
+					}
+					return 0;
+				}
 				}
 			}
 		}
+
+		logerror("Unimplemented native mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
+		break;
+
+	case 1: // IBM-compatible graphics mode
+		logerror("Unimplemented ibm-compatible graphics mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
+		break;
+
+	case 2: // IBM-compatible character mode
+		if(large_pixels) {
+			if(!interleave) {
+				for(u32 y=0; y<25; y++) {
+					for(u32 x=0; x<40; x++) {
+						u16 val = m_vram[y*40+x];
+						const u16 *src = m_vram + 0x1000 + ((val >> 1) & 0x7f);
+						for(u32 yy=0; yy<8; yy++) {
+							u8 pix = val & 1 ? *src >> 8 : *src;
+							src += 128;
+							u32 *dest = &bitmap.pix32(8*y+yy, 8*x);
+							for(u32 xx=0; xx<8; xx++)
+								*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];					
+						}
+					}
+				}
+				return 0;
+			}
+		}
+		logerror("Unimplemented ibm-compatible character mode (%dx%d)\n", large_pixels ? 320/8 : 640/8, interleave ? 400/8 : 200/8);
+		break;
+
+	case 3: // Unknown
+		logerror("Unknown graphics mode type 3\n");
+		break;
 	}
+
+	bitmap.fill(0);
 
 	return 0;
 }
@@ -320,82 +378,97 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	// x = go right to left (unimplemented)
 	// f = fast (no idea what it means)
 	// n = invert collision flag (unimplemented)
-	// p = pattern fill (unimplemented, use by fill_dest_buffer)
+	// p = pattern fill (unimplemented, used by fill_dest_buffer)
 	// i/f = increment source / don't (unimplemented, compare with p?, used by blt_copy_word)
 
-	auto blend = gco_blend[(mode >> 2) & 7];
+	if(mode & 0x200) {
+		u32 nw = width >> 4;
+		u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
 
-	u16 awmask = ((wmask << 16) | wmask) >> (15 - dst_sft);
-	u16 swmask, mwmask, ewmask;
-	if(dst_sft >= width) {
-		swmask = msk(dst_sft+1) & ~msk(dst_sft - width + 1);
-		mwmask = 0xffff;
-		ewmask = swmask;
-	} else {
-		swmask = msk(dst_sft+1);
-		mwmask = 0xffff;
-		ewmask = ~msk((dst_sft - width + 1) & 15);
-	}
-
-	swmask &= awmask;
-	mwmask &= awmask;
-	ewmask &= awmask;
-
-	u16 nw = ((width + (15 - dst_sft)) + 15) >> 4;
-
-	for(u32 y=0; y<height; y++) {
-		u16 src_cadr = src_adr;
-		u16 dst_cadr = dst_adr;
-			
-		u16 cmask = swmask;
-		u16 nw1 = nw;
-		u32 srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-		src_cadr += 2;
-		do {
-			srcs = (srcs << 16) | sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-			u16 src = (srcs >> (src_sft + 1)) & rmask;
-			u16 dst = sw(m_gcos->read_word((dst_seg << 4) + dst_cadr));
-			u16 res = blend(src, dst);
-			if(mode & 0x40) {
-				u16 tmask;
-				switch((mode >> 10) & 3) {
-				case 0:
-					tmask = dst;
-					break;
-				case 1:
-					tmask = ((dst & 0xaaaa) >> 1) | (dst & 0x5555);
-					tmask = tmask * 0x3;
-					break;
-				case 2:
-					tmask = ((dst & 0xcccc) >> 2) | (dst & 0x3333);
-					tmask = ((dst & 0x2222) >> 1) | (dst & 0x1111);
-					tmask = tmask * 0xf;
-					break;
-				case 3:
-					tmask = ((dst & 0xf0f0) >> 4) | (dst & 0x0f0f);
-					tmask = ((dst & 0x0c0c) >> 2) | (dst & 0x0303);
-					tmask = ((dst & 0x0202) >> 1) | (dst & 0x0101);
-					tmask = tmask * 0xff;
-					break;
-				}
-				cmask &= ~tmask;
+		for(u32 y=0; y<height; y++) {
+			u16 dst_cadr = dst_adr;
+			for(u32 w = 0; w != nw; w++) {
+				m_gcos->write_word((dst_seg << 4) + dst_cadr, src);
+				dst_cadr += 2;
 			}
+			dst_adr += dy;
+		}
 
-			res = (dst & ~cmask) | (res & cmask);
+	} else {
+		auto blend = gco_blend[(mode >> 2) & 7];
 
-			logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
+		u16 awmask = ((wmask << 16) | wmask) >> (15 - dst_sft);
+		u16 swmask, mwmask, ewmask;
+		if(dst_sft >= width) {
+			swmask = msk(dst_sft+1) & ~msk(dst_sft - width + 1);
+			mwmask = 0xffff;
+			ewmask = swmask;
+		} else {
+			swmask = msk(dst_sft+1);
+			mwmask = 0xffff;
+			ewmask = ~msk((dst_sft - width + 1) & 15);
+		}
+
+		swmask &= awmask;
+		mwmask &= awmask;
+		ewmask &= awmask;
+
+		u16 nw = ((width + (15 - dst_sft)) + 15) >> 4;
+
+		for(u32 y=0; y<height; y++) {
+			u16 src_cadr = src_adr;
+			u16 dst_cadr = dst_adr;
 			
-			m_gcos->write_word((dst_seg << 4) + dst_cadr, sw(res));
+			u16 cmask = swmask;
+			u16 nw1 = nw;
+			u32 srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr));
 			src_cadr += 2;
-			dst_cadr += 2;
+			do {
+				srcs = (srcs << 16) | sw(m_gcos->read_word((src_seg << 4) + src_cadr));
+				u16 src = (srcs >> (src_sft + 1)) & rmask;
+				u16 dst = sw(m_gcos->read_word((dst_seg << 4) + dst_cadr));
+				u16 res = blend(src, dst);
+				if(mode & 0x40) {
+					u16 tmask;
+					switch((mode >> 10) & 3) {
+					case 0:
+						tmask = dst;
+						break;
+					case 1:
+						tmask = ((dst & 0xaaaa) >> 1) | (dst & 0x5555);
+						tmask = tmask * 0x3;
+						break;
+					case 2:
+						tmask = ((dst & 0xcccc) >> 2) | (dst & 0x3333);
+						tmask = ((dst & 0x2222) >> 1) | (dst & 0x1111);
+						tmask = tmask * 0xf;
+						break;
+					case 3:
+						tmask = ((dst & 0xf0f0) >> 4) | (dst & 0x0f0f);
+						tmask = ((dst & 0x0c0c) >> 2) | (dst & 0x0303);
+						tmask = ((dst & 0x0202) >> 1) | (dst & 0x0101);
+						tmask = tmask * 0xff;
+						break;
+					}
+					cmask &= ~tmask;
+				}
 
-			nw1 --;
+				res = (dst & ~cmask) | (res & cmask);
 
-			cmask = nw1 == 1 ? ewmask : mwmask;
-		} while(nw1);
+				logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
+			
+				m_gcos->write_word((dst_seg << 4) + dst_cadr, sw(res));
+				src_cadr += 2;
+				dst_cadr += 2;
 
-		src_adr += sy;
-		dst_adr += dy;
+				nw1 --;
+
+				cmask = nw1 == 1 ? ewmask : mwmask;
+			} while(nw1);
+
+			src_adr += sy;
+			dst_adr += dy;
+		}
 	}
 }
 
@@ -409,6 +482,7 @@ void mindset_state::gco_w(u16)
 
 	switch(global_mode) {
 	case 0x0101:
+	case 0x0005:
 		blit(packet_seg, packet_adr);
 		break;
 	}
@@ -431,17 +505,19 @@ void mindset_state::maincpu_io(address_map &map)
 	map(0x8280, 0x8283).rw(m_syscpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x82a0, 0x82a3).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x8300, 0x8301).w(FUNC(mindset_state::gco_w));
-	map(0x8320, 0x8321).lr16("8320", []() -> u16 { return 0xa005; }); // To pass the display test
+	map(0x8320, 0x8321).rw(FUNC(mindset_state::dispreg_r), FUNC(mindset_state::dispreg_w));
 	map(0x8322, 0x8323).rw(FUNC(mindset_state::dispctrl_r), FUNC(mindset_state::dispctrl_w));
 }
 
 void mindset_state::mindset(machine_config &config)
 {
+	config.m_perfect_cpu_quantum = ":syscpu";
+
 	I80186(config, m_maincpu, 12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mindset_state::maincpu_mem);
 	m_maincpu->set_addrmap(AS_IO,      &mindset_state::maincpu_io);
 
-	I8042(config, m_syscpu, 12_MHz_XTAL);
+	I8042(config, m_syscpu, 14.318181_MHz_XTAL/2);
 	m_syscpu->p1_in_cb().set(FUNC(mindset_state::sys_p1_r));
 	m_syscpu->p2_in_cb().set(FUNC(mindset_state::sys_p2_r));
 	m_syscpu->p1_out_cb().set(FUNC(mindset_state::sys_p1_w));
@@ -449,7 +525,7 @@ void mindset_state::mindset(machine_config &config)
 	m_syscpu->t0_in_cb().set(FUNC(mindset_state::sys_t0_r));
 	m_syscpu->t1_in_cb().set(FUNC(mindset_state::sys_t1_r));
 
-	I8042(config, m_soundcpu, 12_MHz_XTAL);
+	I8042(config, m_soundcpu, 14.318181_MHz_XTAL/2);
 
 	I8749(config, m_kbdcpu, 6_MHz_XTAL);
 	m_kbdcpu->p1_out_cb().set(FUNC(mindset_state::kbd_p1_w));
@@ -605,7 +681,7 @@ ROM_START(mindset)
 	ROM_LOAD("253006-001.u16", 0, 0x800, CRC(7bea5edd) SHA1(30cdc0dedaa5246f4952df452a99ca22e3cd0636))
 
 	ROM_REGION(0x0800, "kbdcpu", 0)
-	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1c6aa433) SHA1(1d01dbda4730f26125ba2564a608c2f8ddfc05b3) )
+	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1c6aa433) SHA1(1d01dbda4730f26125ba2564a608c2f8ddfc05b3))
 ROM_END
 
 COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
