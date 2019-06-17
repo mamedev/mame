@@ -1806,6 +1806,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void edracula(machine_config &config);
@@ -1813,12 +1814,17 @@ public:
 
 // handlers
 
+void edracula_state::prepare_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 WRITE8_MEMBER(edracula_state::grid_w)
 {
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	m_display->matrix(m_grid, m_plate);
+	prepare_display();
 }
 
 WRITE8_MEMBER(edracula_state::plate_w)
@@ -1830,7 +1836,7 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	// E,F,G,H,I01: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	m_display->matrix(m_grid, m_plate);
+	prepare_display();
 }
 
 // config
@@ -2341,6 +2347,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(port_e_w);
@@ -2370,12 +2377,17 @@ void tmtennis_state::set_clock()
 	m_maincpu->set_unscaled_clock((m_inputs[1]->read() & 0x100) ? 260000 : 360000);
 }
 
+void tmtennis_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 WRITE8_MEMBER(tmtennis_state::grid_w)
 {
 	// G,H,I: vfd grid
 	int shift = (offset - PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	m_display->matrix(m_grid, m_plate);
+	update_display();
 }
 
 WRITE8_MEMBER(tmtennis_state::plate_w)
@@ -2383,7 +2395,7 @@ WRITE8_MEMBER(tmtennis_state::plate_w)
 	// C,D,F: vfd plate
 	int shift = (offset == PORTF) ? 8 : (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	m_display->matrix(m_grid, m_plate);
+	update_display();
 }
 
 WRITE8_MEMBER(tmtennis_state::port_e_w)

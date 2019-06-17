@@ -1601,6 +1601,7 @@ public:
 	required_device<hmcs40_cpu_device> m_audiocpu;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -1613,12 +1614,17 @@ public:
 
 // handlers: maincpu side
 
+void pairmtch_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
 	// R2x,R3x,R6x: vfd plate
 	int shift = (offset == 6) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	m_display->matrix(m_grid, m_plate);
+	update_display();
 }
 
 WRITE16_MEMBER(pairmtch_state::grid_w)
@@ -1634,7 +1640,7 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 
 	// D0-D5: vfd grid
 	m_grid = data & 0x3f;
-	m_display->matrix(m_grid, m_plate);
+	update_display();
 }
 
 READ8_MEMBER(pairmtch_state::input_r)
@@ -2461,7 +2467,6 @@ void sag_state::prepare_display()
 	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
 
 	// grid 8-11 are 7segs
-	m_display->segmask(0xf00, 0x7f);
 	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
 	m_display->matrix_partial(8, 4, m_grid >> 8, seg);
 }
@@ -2550,6 +2555,7 @@ void sag_state::sag(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+4, 14);
+	m_display->set_segmask(0xf00, 0x7f);
 	config.set_default_layout(layout_sag);
 
 	/* sound hardware */

@@ -141,7 +141,7 @@ pwm_display_device &pwm_display_device::set_bri_levels(double l0, double l1, dou
 	return *this;
 }
 
-void pwm_display_device::segmask(u64 digits, u64 mask)
+pwm_display_device &pwm_display_device::set_segmask(u64 digits, u64 mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int y = 0; y < m_height; y++)
@@ -150,6 +150,8 @@ void pwm_display_device::segmask(u64 digits, u64 mask)
 			m_segmask[y] = mask;
 		digits >>= 1;
 	}
+
+	return *this;
 }
 
 void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd)

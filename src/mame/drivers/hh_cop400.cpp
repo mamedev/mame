@@ -294,8 +294,6 @@ WRITE8_MEMBER(h2hbaskbc_state::write_l)
 	u16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
 
 	// D2+G0,G1 are 7segs
-	m_display->segmask(3, 0x7f);
-
 	// L0-L6: digit segments A-G, L0-L4: led data
 	m_display->matrix(sel, data);
 }
@@ -370,6 +368,7 @@ void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
+	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_h2hbaskbc);
 
 	/* sound hardware */
@@ -835,6 +834,7 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
@@ -845,19 +845,24 @@ public:
 
 // handlers
 
+void funjacks_state::update_display()
+{
+	m_display->matrix(m_d, m_l);
+}
+
 WRITE8_MEMBER(funjacks_state::write_d)
 {
 	// D: led grid + input mux
 	m_inp_mux = data;
 	m_d = ~data & 0xf;
-	m_display->matrix(m_d, m_l);
+	update_display();
 }
 
 WRITE8_MEMBER(funjacks_state::write_l)
 {
 	// L0,L1: led state
 	m_l = data & 3;
-	m_display->matrix(m_d, m_l);
+	update_display();
 }
 
 WRITE8_MEMBER(funjacks_state::write_g)
@@ -954,6 +959,7 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
@@ -962,11 +968,16 @@ public:
 
 // handlers
 
+void funrlgl_state::update_display()
+{
+	m_display->matrix(m_d, m_l);
+}
+
 WRITE8_MEMBER(funrlgl_state::write_d)
 {
 	// D: led grid
 	m_d = ~data & 0xf;
-	m_display->matrix(m_d, m_l);
+	update_display();
 }
 
 WRITE8_MEMBER(funrlgl_state::write_l)
@@ -974,7 +985,7 @@ WRITE8_MEMBER(funrlgl_state::write_l)
 	// L0-L3: led state
 	// L4-L7: N/C
 	m_l = ~data & 0xf;
-	m_display->matrix(m_d, m_l);
+	update_display();
 }
 
 WRITE8_MEMBER(funrlgl_state::write_g)

@@ -403,8 +403,7 @@ public:
 
 void matchnum_state::prepare_display()
 {
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(matchnum_state::write_r)
@@ -485,6 +484,9 @@ void matchnum_state::matchnum(machine_config &config)
 	m_maincpu->r().set(FUNC(matchnum_state::write_r));
 	m_maincpu->o().set(FUNC(matchnum_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_matchnum);
 
 	/* sound hardware */
@@ -543,9 +545,7 @@ public:
 
 void arrball_state::prepare_display()
 {
-	set_display_segmask(0x10, 0x7f);
-	set_display_segmask(0x20, 0x06); // left digit only segments B and C
-	display_matrix(7, 7, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(arrball_state::write_r)
@@ -596,6 +596,10 @@ void arrball_state::arrball(machine_config &config)
 	m_maincpu->r().set(FUNC(arrball_state::write_r));
 	m_maincpu->o().set(FUNC(arrball_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(0x10, 0x7f);
+	m_display->set_segmask(0x20, 0x06); // left digit only segments B and C
 	config.set_default_layout(layout_arrball);
 
 	/* sound hardware */
@@ -662,8 +666,7 @@ public:
 
 void mathmagi_state::prepare_display()
 {
-	set_display_segmask(0xff, 0x7f);
-	display_matrix(7, 11, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(mathmagi_state::write_r)
@@ -760,6 +763,9 @@ void mathmagi_state::mathmagi(machine_config &config)
 	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
 	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 7);
+	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_mathmagi);
 
 	/* no sound! */
@@ -926,15 +932,13 @@ private:
 
 void cmulti8_state::prepare_display()
 {
-	set_display_segmask(0xfffff, 0xff);
-
 	// M-digit is on in memory mode, upper row is off in single mode
 	u32 m = (m_inputs[10]->read() & 0x10) ? 0x100000 : 0;
 	u32 mask = (m_inputs[10]->read() & 0x20) ? 0xfffff : 0xffc00;
 
 	// R10 selects display row
 	u32 sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
-	display_matrix(8, 21, m_o, (sel & mask) | m);
+	m_display->matrix((sel & mask) | m, m_o);
 }
 
 WRITE16_MEMBER(cmulti8_state::write_r)
@@ -1040,6 +1044,9 @@ void cmulti8_state::cmulti8(machine_config &config)
 	m_maincpu->o().set(FUNC(cmulti8_state::write_o));
 	m_maincpu->r().set(FUNC(cmulti8_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(21, 8);
+	m_display->set_segmask(0xfffff, 0xff);
 	config.set_default_layout(layout_cmulti8);
 
 	/* no sound! */
@@ -1091,8 +1098,7 @@ public:
 
 void amaztron_state::prepare_display()
 {
-	set_display_segmask(0xc, 0x7f);
-	display_matrix(7, 4, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(amaztron_state::write_r)
@@ -1179,6 +1185,9 @@ void amaztron_state::amaztron(machine_config &config)
 	m_maincpu->r().set(FUNC(amaztron_state::write_r));
 	m_maincpu->o().set(FUNC(amaztron_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xc, 0x7f);
 	config.set_default_layout(layout_amaztron);
 
 	/* sound hardware */
@@ -1232,8 +1241,7 @@ public:
 
 void zodiac_state::prepare_display()
 {
-	set_display_segmask(0xff, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(zodiac_state::write_r)
@@ -1338,6 +1346,9 @@ void zodiac_state::zodiac(machine_config &config)
 	m_maincpu->r().set(FUNC(zodiac_state::write_r));
 	m_maincpu->o().set(FUNC(zodiac_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_zodiac);
 
 	/* sound hardware */
@@ -1379,10 +1390,7 @@ class cqback_state : public hh_tms1k_state
 public:
 	cqback_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
-	{
-		// offsense blips are brighter
-		set_display_levels(0.005, 0.03);
-	}
+	{ }
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1400,8 +1408,7 @@ void cqback_state::prepare_display()
 	if (m_r & 0x200)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(11, 9, seg, m_r & 0x1ff);
+	m_display->matrix(m_r & 0x1ff, seg);
 }
 
 WRITE16_MEMBER(cqback_state::write_r)
@@ -1467,6 +1474,10 @@ void cqback_state::cqback(machine_config &config)
 	m_maincpu->r().set(FUNC(cqback_state::write_r));
 	m_maincpu->o().set(FUNC(cqback_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	m_display->set_segmask(0x1ff, 0xff);
+	m_display->set_bri_levels(0.005, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_cqback);
 
 	/* sound hardware */
@@ -1511,10 +1522,7 @@ class h2hfootb_state : public hh_tms1k_state
 public:
 	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
-	{
-		// offsense blips are brighter
-		set_display_levels(0.005, 0.03);
-	}
+	{ }
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1527,8 +1535,7 @@ public:
 
 void h2hfootb_state::prepare_display()
 {
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(9, 9, m_o | (m_r >> 1 & 0x100), m_r & 0x1ff);
+	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 1 & 0x100));
 }
 
 WRITE16_MEMBER(h2hfootb_state::write_r)
@@ -1599,6 +1606,10 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
 	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+	m_display->set_segmask(0x1ff, 0x7f);
+	m_display->set_bri_levels(0.005, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_h2hfootb);
 
 	/* sound hardware */
@@ -1689,8 +1700,7 @@ void h2hbaskb_state::prepare_display()
 	if (m_r & 0x40) sel |= (m_r & 0x3f);
 	if (m_r & 0x80) sel |= (m_r & 0x3f) << 6;
 
-	set_display_segmask(0xc0, 0x7f);
-	display_matrix(7, 6+6, m_o, sel);
+	m_display->matrix(sel, m_o);
 }
 
 WRITE16_MEMBER(h2hbaskb_state::write_r)
@@ -1785,6 +1795,9 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 
 	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6+6, 7);
+	m_display->set_segmask(0xc0, 0x7f);
 	config.set_default_layout(layout_h2hbaskb);
 
 	/* sound hardware */
@@ -1875,8 +1888,7 @@ void h2hbaseb_state::set_clock()
 
 void h2hbaseb_state::prepare_display()
 {
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(9, 9, (m_r & 0x100) | m_o, (m_r & 0xff) | (m_r >> 1 & 0x100));
+	m_display->matrix((m_r & 0xff) | (m_r >> 1 & 0x100), (m_r & 0x100) | m_o);
 }
 
 WRITE16_MEMBER(h2hbaseb_state::write_r)
@@ -1946,6 +1958,9 @@ void h2hbaseb_state::h2hbaseb(machine_config &config)
 	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
 	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_h2hbaseb);
 
 	/* sound hardware */
@@ -1998,8 +2013,7 @@ public:
 
 void h2hboxing_state::prepare_display()
 {
-	set_display_segmask(0x600, 0x7f);
-	display_matrix(8, 11, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(h2hboxing_state::write_r)
@@ -2069,6 +2083,9 @@ void h2hboxing_state::h2hboxing(machine_config &config)
 	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
 	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_segmask(0x600, 0x7f);
 	config.set_default_layout(layout_h2hboxing);
 
 	/* sound hardware */
@@ -2167,11 +2184,8 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
 
 void quizwizc_state::prepare_display()
 {
-	// R6-R9 are 7segs
-	set_display_segmask(0x3c0, 0x7f);
-
 	// note: O7 is on VSS
-	display_matrix(8, 11, m_o, m_r | 0x400);
+	m_display->matrix(m_r | 0x400, m_o);
 }
 
 WRITE16_MEMBER(quizwizc_state::write_r)
@@ -2251,6 +2265,9 @@ void quizwizc_state::quizwizc(machine_config &config)
 	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
 	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10+1, 8);
+	m_display->set_segmask(0x3c0, 0x7f);
 	config.set_default_layout(layout_quizwizc);
 
 	/* sound hardware */
@@ -2354,11 +2371,8 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
 
 void tc4_state::prepare_display()
 {
-	// R5,R7-R9 are 7segs
-	set_display_segmask(0x3a0, 0x7f);
-
 	// note: R6 is an extra column
-	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
+	m_display->matrix(m_r, (m_o | (m_r << 2 & 0x100)));
 }
 
 WRITE16_MEMBER(tc4_state::write_r)
@@ -2438,6 +2452,9 @@ void tc4_state::tc4(machine_config &config)
 	m_maincpu->r().set(FUNC(tc4_state::write_r));
 	m_maincpu->o().set(FUNC(tc4_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 9);
+	m_display->set_segmask(0x3a0, 0x7f);
 	config.set_default_layout(layout_tc4);
 
 	/* sound hardware */
@@ -2503,9 +2520,7 @@ public:
 
 void cnbaskb_state::prepare_display()
 {
-	// R7,R8 are 7segs
-	set_display_segmask(0x180, 0x7f);
-	display_matrix(7, 9, m_o, m_r & 0x1fc);
+	m_display->matrix(m_r & 0x1fc, m_o);
 }
 
 WRITE16_MEMBER(cnbaskb_state::write_r)
@@ -2517,7 +2532,8 @@ WRITE16_MEMBER(cnbaskb_state::write_r)
 	// R10 is also tied to K1 (locks up at boot if it's not handled)
 	m_inp_mux = (data >> 8 & 4) | (data & 3);
 
-	// R2-R8: led select
+	// R2-R6: led select
+	// R7,R8: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -2565,6 +2581,9 @@ void cnbaskb_state::cnbaskb(machine_config &config)
 	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
 	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x180, 0x7f);
 	config.set_default_layout(layout_cnbaskb);
 
 	/* sound hardware */
@@ -2625,9 +2644,7 @@ public:
 
 void cmsport_state::prepare_display()
 {
-	// R5,R6 are 7segs
-	set_display_segmask(0x60, 0x7f);
-	display_matrix(8, 9, m_o, m_r & ~0x80);
+	m_display->matrix(m_r & ~0x80, m_o);
 }
 
 WRITE16_MEMBER(cmsport_state::write_r)
@@ -2638,7 +2655,8 @@ WRITE16_MEMBER(cmsport_state::write_r)
 	// R0,R9,R10: input mux
 	m_inp_mux = (data & 1) | (data >> 8 & 6);
 
-	// R0-R6,R8: led select
+	// R0-R4,R8: led select
+	// R5,R6: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -2689,6 +2707,9 @@ void cmsport_state::cmsport(machine_config &config)
 	m_maincpu->r().set(FUNC(cmsport_state::write_r));
 	m_maincpu->o().set(FUNC(cmsport_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x60, 0x7f);
 	config.set_default_layout(layout_cmsport);
 
 	/* sound hardware */
@@ -2751,11 +2772,7 @@ public:
 
 void cnfball_state::prepare_display()
 {
-	// declare 7segs, middle ones have DP
-	set_display_segmask(0xc3, 0x7f);
-	set_display_segmask(0x38, 0xff);
-
-	display_matrix(8+3, 10, m_o | (m_r << 6 & 0x700), m_grid);
+	m_display->matrix(m_grid, m_o | (m_r << 6 & 0x700));
 }
 
 WRITE16_MEMBER(cnfball_state::write_r)
@@ -2826,6 +2843,10 @@ void cnfball_state::cnfball(machine_config &config)
 	m_maincpu->r().set(FUNC(cnfball_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8+3);
+	m_display->set_segmask(0xc3, 0x7f);
+	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
 	config.set_default_layout(layout_cnfball);
 
 	/* sound hardware */
@@ -2888,8 +2909,7 @@ void cnfball2_state::prepare_display()
 	if (~m_r & 2)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(11, 9, seg, m_r >> 1 & 0x1ff);
+	m_display->matrix(m_r >> 1 & 0x1ff, seg);
 }
 
 WRITE16_MEMBER(cnfball2_state::write_r)
@@ -2964,6 +2984,9 @@ void cnfball2_state::cnfball2(machine_config &config)
 	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_cnfball2);
 
 	/* sound hardware */
@@ -3022,9 +3045,7 @@ public:
 
 void eleciq_state::prepare_display()
 {
-	// R7,R8 are 7segs
-	set_display_segmask(0x180, 0x7f);
-	display_matrix(7, 9, m_o, m_r & ~1);
+	m_display->matrix(m_r & ~1, m_o);
 }
 
 WRITE16_MEMBER(eleciq_state::write_r)
@@ -3035,7 +3056,8 @@ WRITE16_MEMBER(eleciq_state::write_r)
 	// R1-R6,R9: input mux
 	m_inp_mux = (data >> 1 & 0x3f) | (data >> 3 & 0x40);
 
-	// R1-R8: led select
+	// R1-R6: led select
+	// R7,R8: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -3108,6 +3130,9 @@ void eleciq_state::eleciq(machine_config &config)
 	m_maincpu->r().set(FUNC(eleciq_state::write_r));
 	m_maincpu->o().set(FUNC(eleciq_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x180, 0x7f);
 	config.set_default_layout(layout_eleciq);
 
 	/* sound hardware */
@@ -3162,9 +3187,7 @@ public:
 
 void esoccer_state::prepare_display()
 {
-	// R8,R9 are 7segs
-	set_display_segmask(0x300, 0x7f);
-	display_matrix(7, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(esoccer_state::write_r)
@@ -3175,7 +3198,8 @@ WRITE16_MEMBER(esoccer_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R7: led select
+	// R8,R9: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -3224,6 +3248,9 @@ void esoccer_state::esoccer(machine_config &config)
 	m_maincpu->r().set(FUNC(esoccer_state::write_r));
 	m_maincpu->o().set(FUNC(esoccer_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x300, 0x7f);
 	config.set_default_layout(layout_esoccer);
 
 	/* sound hardware */
@@ -3297,9 +3324,7 @@ public:
 
 void ebball_state::prepare_display()
 {
-	// R8 is a 7seg
-	set_display_segmask(0x100, 0x7f);
-	display_matrix(7, 9, ~m_o, m_r);
+	m_display->matrix(m_r, ~m_o);
 }
 
 WRITE16_MEMBER(ebball_state::write_r)
@@ -3310,7 +3335,8 @@ WRITE16_MEMBER(ebball_state::write_r)
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0-R8: led select
+	// R0-R7: led select
+	// R8: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -3369,6 +3395,9 @@ void ebball_state::ebball(machine_config &config)
 	m_maincpu->r().set(FUNC(ebball_state::write_r));
 	m_maincpu->o().set(FUNC(ebball_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x100, 0x7f);
 	config.set_default_layout(layout_ebball);
 
 	/* sound hardware */
@@ -3438,9 +3467,7 @@ public:
 
 void ebball2_state::prepare_display()
 {
-	// R0-R2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(8, 10, ~m_o, m_r ^ 0x7f);
+	m_display->matrix(m_r ^ 0x7f, ~m_o);
 }
 
 WRITE16_MEMBER(ebball2_state::write_r)
@@ -3451,7 +3478,8 @@ WRITE16_MEMBER(ebball2_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R2: digit select
+	// R3-R9: led select
 	m_r = data;
 	prepare_display();
 }
@@ -3503,6 +3531,9 @@ void ebball2_state::ebball2(machine_config &config)
 	m_maincpu->r().set(FUNC(ebball2_state::write_r));
 	m_maincpu->o().set(FUNC(ebball2_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_ebball2);
 
 	/* sound hardware */
@@ -3597,20 +3628,13 @@ void ebball3_state::set_clock()
 
 void ebball3_state::prepare_display()
 {
-	// update current state
-	for (int y = 0; y < 10; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+	m_display->matrix_partial(0, 10, m_r, m_o, false);
 
 	// R0,R1 are normal 7segs
-	set_display_segmask(3, 0x7f);
-
 	// R4,R7 contain segments(only F and B) for the two other digits
-	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
-	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
-	m_display_segmask[10] = m_display_segmask[11] = 0x22;
-
-	set_display_size(7, 10+2);
-	display_update();
+	m_display->write_row(10, (m_display->read_row(4) & 0x20) | (m_display->read_row(7) & 0x02));
+	m_display->write_row(11, ((m_display->read_row(4) & 0x10) | (m_display->read_row(7) & 0x01)) << 1);
+	m_display->update();
 }
 
 WRITE16_MEMBER(ebball3_state::write_r)
@@ -3621,7 +3645,8 @@ WRITE16_MEMBER(ebball3_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0,R1, digit select
+	// R2-R9: led select
 	m_r = data;
 	prepare_display();
 }
@@ -3689,6 +3714,10 @@ void ebball3_state::ebball3(machine_config &config)
 	m_maincpu->r().set(FUNC(ebball3_state::write_r));
 	m_maincpu->o().set(FUNC(ebball3_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10+2, 7);
+	m_display->set_segmask(3, 0x7f);
+	m_display->set_segmask(0xc00, 0x22);
 	config.set_default_layout(layout_ebball3);
 
 	/* sound hardware */
@@ -3754,9 +3783,7 @@ public:
 
 void esbattle_state::prepare_display()
 {
-	// R8,R9 are 7segs
-	set_display_segmask(0x300, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(esbattle_state::write_r)
@@ -3767,7 +3794,8 @@ WRITE16_MEMBER(esbattle_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R7: led select
+	// R8,R9: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -3811,6 +3839,9 @@ void esbattle_state::esbattle(machine_config &config)
 	m_maincpu->r().set(FUNC(esbattle_state::write_r));
 	m_maincpu->o().set(FUNC(esbattle_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x300, 0x7f);
 	config.set_default_layout(layout_esbattle);
 
 	/* sound hardware */
@@ -3884,9 +3915,7 @@ void einvader_state::set_clock()
 
 void einvader_state::prepare_display()
 {
-	// R7-R9 are 7segs
-	set_display_segmask(0x380, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(einvader_state::write_r)
@@ -3894,7 +3923,8 @@ WRITE16_MEMBER(einvader_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R6: led select
+	// R7-R9: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -3932,6 +3962,8 @@ void einvader_state::einvader(machine_config &config)
 	screen.set_size(939, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x380, 0x7f);
 	config.set_default_layout(layout_einvader);
 
 	/* sound hardware */
@@ -3985,9 +4017,7 @@ public:
 
 void efootb4_state::prepare_display()
 {
-	// R10-R15 are 7segs
-	set_display_segmask(0xfc00, 0x7f);
-	display_matrix(7, 16, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(efootb4_state::write_r)
@@ -3996,6 +4026,7 @@ WRITE16_MEMBER(efootb4_state::write_r)
 	m_inp_mux = data & 0x1f;
 
 	// R0-R9: led select
+	// R10-R15: digit select
 	m_r = data;
 	prepare_display();
 }
@@ -4061,6 +4092,9 @@ void efootb4_state::efootb4(machine_config &config)
 	m_maincpu->r().set(FUNC(efootb4_state::write_r));
 	m_maincpu->o().set(FUNC(efootb4_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 7);
+	m_display->set_segmask(0xfc00, 0x7f);
 	config.set_default_layout(layout_efootb4);
 
 	/* sound hardware */
@@ -4123,9 +4157,7 @@ public:
 
 void ebaskb2_state::prepare_display()
 {
-	// R0-R3 are 7segs
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(ebaskb2_state::write_r)
@@ -4136,7 +4168,8 @@ WRITE16_MEMBER(ebaskb2_state::write_r)
 	// R6-R9: input mux
 	m_inp_mux = data >> 6 & 0xf;
 
-	// R0-R9: led select
+	// R0-R3: digit select
+	// R4-R9: led select
 	m_r = data;
 	prepare_display();
 }
@@ -4193,6 +4226,9 @@ void ebaskb2_state::ebaskb2(machine_config &config)
 	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
 	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_ebaskb2);
 
 	/* sound hardware */
@@ -4281,9 +4317,7 @@ void raisedvl_state::set_clock()
 
 void raisedvl_state::prepare_display()
 {
-	// R0-R2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(raisedvl_state::write_r)
@@ -4294,7 +4328,8 @@ WRITE16_MEMBER(raisedvl_state::write_r)
 	// R0,R1: input mux
 	m_inp_mux = data & 3;
 
-	// R0-R9: led select
+	// R0-R2: digit select
+	// R3-R9: led select
 	m_r = data;
 	prepare_display();
 }
@@ -4338,6 +4373,9 @@ void raisedvl_state::raisedvl(machine_config &config)
 	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
 	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
