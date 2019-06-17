@@ -59,6 +59,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void latch_flags();
+
 	union input_reg
 	{
 		int8_t s;
@@ -84,9 +86,13 @@ protected:
 	bool m_clk_y;
 	bool m_clk_p;
 	bool m_prel;
+	bool m_rnd_in;
 	bool m_rnd;
+	bool m_tc_in;
 	bool m_tc;
+	bool m_acc_in;
 	bool m_acc;
+	bool m_sub_in;
 	bool m_sub;
 
 	input_reg m_x;

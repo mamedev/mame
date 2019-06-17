@@ -17,6 +17,7 @@
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "machine/tdc1008.h"
+#include "machine/tmc208k.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -67,6 +68,11 @@ public:
 		, m_filter_ce(*this, "filter_ce")
 		, m_filter_cf(*this, "filter_cf")
 		, m_filter_cg(*this, "filter_cg")
+		, m_combiner_ge(*this, "combiner_ge") // Lum I
+		, m_combiner_gd(*this, "combiner_gd") // Lum II
+		, m_combiner_gc(*this, "combiner_gc") // Chroma I
+		, m_combiner_gb(*this, "combiner_gb") // Chroma II
+		, m_combiner_ga(*this, "combiner_ga") // Ext I & II
 	{
 	}
 
@@ -155,6 +161,12 @@ private:
 	required_device<tdc1008_device> m_filter_ce;
 	required_device<tdc1008_device> m_filter_cf;
 	required_device<tdc1008_device> m_filter_cg;
+
+	required_device<tmc28ku_device> m_combiner_ge;
+	required_device<tmc28ku_device> m_combiner_gd;
+	required_device<tmc28ku_device> m_combiner_gc;
+	required_device<tmc28ku_device> m_combiner_gb;
+	required_device<tmc28ku_device> m_combiner_ga;
 
 	emu_timer *m_diskseq_clk;
 	emu_timer *m_field_in_clk;
@@ -855,7 +867,7 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 		}
 		break;
 
-	case 10: // Output Timing Card, cursor registers
+	case 10: // Output Timing Card - cursor registers, Combiner Card
 	{
 		const uint8_t hi_bits = (data >> 14) & 3;
 		if (hi_bits == 0) // Cursor Parameters
@@ -1111,6 +1123,13 @@ void dpb7000_state::dpb7000(machine_config &config)
 	TDC1008(config, m_filter_ce);
 	TDC1008(config, m_filter_cf);
 	TDC1008(config, m_filter_cg);
+
+	// Combiner Card
+	TMC28KU(config, m_combiner_ge);
+	TMC28KU(config, m_combiner_gd);
+	TMC28KU(config, m_combiner_gc);
+	TMC28KU(config, m_combiner_gb);
+	TMC28KU(config, m_combiner_ga);
 }
 
 

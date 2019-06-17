@@ -5,9 +5,6 @@
     tdc1008.cpp
     TRW TDC1008 VLSI Multiplier - Accumulator
 
-	TODO:
-	- Three-State Control lines (TSX, TSM, TSL) are not yet implemented.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -36,9 +33,13 @@ tdc1008_device::tdc1008_device(const machine_config &mconfig, const char *tag, d
 	, m_clk_y(false)
 	, m_clk_p(false)
 	, m_prel(false)
+	, m_rnd_in(false)
 	, m_rnd(false)
+	, m_tc_in(false)
 	, m_tc(false)
+	, m_acc_in(false)
 	, m_acc(false)
+	, m_sub_in(false)
 	, m_sub(false)
 	, m_xtp(*this)
 	, m_msp(*this)
@@ -63,9 +64,13 @@ void tdc1008_device::device_start()
 	save_item(NAME(m_clk_y));
 	save_item(NAME(m_clk_p));
 	save_item(NAME(m_prel));
+	save_item(NAME(m_rnd_in));
 	save_item(NAME(m_rnd));
+	save_item(NAME(m_tc_in));
 	save_item(NAME(m_tc));
+	save_item(NAME(m_acc_in));
 	save_item(NAME(m_acc));
+	save_item(NAME(m_sub_in));
 	save_item(NAME(m_sub));
 	save_item(NAME(m_x.u));
 	save_item(NAME(m_y.u));
@@ -92,9 +97,13 @@ void tdc1008_device::device_reset()
 	m_clk_y = false;
 	m_clk_p = false;
 	m_prel = false;
+	m_rnd_in = false;
 	m_rnd = false;
+	m_tc_in = false;
 	m_tc = false;
+	m_acc_in = false;
 	m_acc = false;
+	m_sub_in = false;
 	m_sub = false;
 
 	m_x.u = 0;
@@ -164,7 +173,10 @@ WRITE_LINE_MEMBER(tdc1008_device::clk_x_w)
 	bool old = m_clk_x;
 	m_clk_x = (bool)state;
 	if (!old && m_clk_x)
+	{
 		m_x.u = m_x_in;
+		latch_flags();
+	}
 }
 
 WRITE_LINE_MEMBER(tdc1008_device::clk_y_w)
@@ -172,7 +184,10 @@ WRITE_LINE_MEMBER(tdc1008_device::clk_y_w)
 	bool old = m_clk_y;
 	m_clk_y = (bool)state;
 	if (!old && m_clk_y)
+	{
 		m_y.u = m_y_in;
+		latch_flags();
+	}
 }
 
 WRITE_LINE_MEMBER(tdc1008_device::clk_p_w)
@@ -246,20 +261,28 @@ WRITE_LINE_MEMBER(tdc1008_device::prel_w)
 
 WRITE_LINE_MEMBER(tdc1008_device::rnd_w)
 {
-	m_rnd = (bool)state;
+	m_rnd_in = (bool)state;
 }
 
 WRITE_LINE_MEMBER(tdc1008_device::tc_w)
 {
-	m_tc = (bool)state;
+	m_tc_in = (bool)state;
 }
 
 WRITE_LINE_MEMBER(tdc1008_device::acc_w)
 {
-	m_acc = (bool)state;
+	m_acc_in = (bool)state;
 }
 
 WRITE_LINE_MEMBER(tdc1008_device::sub_w)
 {
-	m_sub = (bool)state;
+	m_sub_in = (bool)state;
+}
+
+void tdc1008_device::latch_flags()
+{
+	m_rnd = m_rnd_in;
+	m_tc = m_tc_in;
+	m_acc = m_acc_in;
+	m_sub = m_sub_in;
 }

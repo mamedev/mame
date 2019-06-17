@@ -2833,6 +2833,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tmc208k.h,MACHINES["TMC208K"] = true
+---------------------------------------------------
+
+if (MACHINES["TMC208K"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tmc208k.cpp",
+		MAME_DIR .. "src/devices/machine/tmc208k.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tmp68301.h,MACHINES["TMP68301"] = true
 ---------------------------------------------------
 
