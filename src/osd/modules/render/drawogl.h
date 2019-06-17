@@ -91,7 +91,7 @@ public:
 
 };
 
-/* sdl_info is the information about SDL for the current screen */
+/* renderer_ogl is the information about OpenGL for the current screen */
 class renderer_ogl : public osd_renderer
 {
 public:

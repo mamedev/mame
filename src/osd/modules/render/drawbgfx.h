@@ -30,7 +30,7 @@ class bgfx_view;
 class osd_options;
 class avi_write;
 
-/* sdl_info is the information about SDL for the current screen */
+/* renderer_bgfx is the information about BGFX for the current screen */
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
