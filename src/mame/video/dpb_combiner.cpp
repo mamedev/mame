@@ -5,9 +5,6 @@
     dpb_combiner.cpp
     DPB-7000/1 - Combiner Card
 
-	TODO:
-	- Hook up clocked logic (multipliers, blanking, etc.)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -140,7 +137,7 @@ void dpb7000_combiner_card_device::device_add_mconfig(machine_config &config)
 	TMC28KU(config, m_mult_ga);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(clock(), 910, 0, 640, 525, 0, 480);
+	m_screen->set_raw(DERIVED_CLOCK(1, 1), 910, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(dpb7000_combiner_card_device::screen_update));
 }
 

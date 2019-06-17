@@ -13,11 +13,13 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/6850acia.h"
+#include "machine/am25s55x.h"
 #include "machine/am2910.h"
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "machine/tdc1008.h"
 #include "video/mc6845.h"
+#include "video/dpb_brushproc.h"
 #include "video/dpb_combiner.h"
 #include "emupal.h"
 #include "screen.h"
@@ -68,6 +70,7 @@ public:
 		, m_filter_ce(*this, "filter_ce")
 		, m_filter_cf(*this, "filter_cf")
 		, m_filter_cg(*this, "filter_cg")
+		, m_brush_proc(*this, "brush_proc%u", 0U)
 		, m_combiner(*this, "combiner")
 	{
 	}
@@ -158,6 +161,7 @@ private:
 	required_device<tdc1008_device> m_filter_cf;
 	required_device<tdc1008_device> m_filter_cg;
 
+	required_device_array<dpb7000_brushproc_card_device, 2> m_brush_proc;
 	required_device<dpb7000_combiner_card_device> m_combiner;
 
 	emu_timer *m_diskseq_clk;
@@ -1180,6 +1184,10 @@ void dpb7000_state::dpb7000(machine_config &config)
 	TDC1008(config, m_filter_cf);
 	TDC1008(config, m_filter_cg);
 
+	// Brush Processor Cards
+	DPB7000_BRUSHPROC(config, m_brush_proc[0]);
+	DPB7000_BRUSHPROC(config, m_brush_proc[1]);
+
 	// Combiner Card
 	DPB7000_COMBINER(config, m_combiner, 14.318181_MHz_XTAL);
 }
@@ -1221,6 +1229,9 @@ ROM_START( dpb7000 )
 
 	ROM_REGION(0x800, "fddprom", 0)
 	ROM_LOAD("17446a-gd-m2716.bin", 0x000, 0x800, CRC(a0be00ca) SHA1(48c4f8c07b9f6bc9b68698e1e326782e0b01e1b0))
+
+	ROM_REGION(0x100, "brushstore_prom", 0)
+	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(84bf7029) SHA1(9d58322994f6f7e99a9c6478577559c8171670ed))
 
 	ROM_REGION(0xc00, "storeaddr_x_prom", 0)
 	ROM_LOAD("pb-032-17425b-bbb.bin", 0x000, 0x400, CRC(2051a6e4) SHA1(3bd8a9015e77b034a94fe072a9753649b76f9f69))

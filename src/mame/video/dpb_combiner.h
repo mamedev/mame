@@ -5,9 +5,6 @@
     dpb_combiner.h
     DPB-7000/1 - Combiner Card
 
-	TODO:
-	- Hook up clocked logic (multipliers, blanking, etc.)
-
 ***************************************************************************/
 
 #ifndef MAME_VIDEO_DPB_COMBINER_H

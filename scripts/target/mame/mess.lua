@@ -412,6 +412,7 @@ MACHINES["ADC083X"] = true
 MACHINES["ADC1038"] = true
 MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
+MACHINES["AM25S55X"] = true
 MACHINES["AM2847"] = true
 MACHINES["AM2910"] = true
 MACHINES["AM53CF96"] = true
@@ -3895,6 +3896,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/dpb7000.cpp",
 	MAME_DIR .. "src/mame/video/dpb_combiner.cpp",
 	MAME_DIR .. "src/mame/video/dpb_combiner.h",
+	MAME_DIR .. "src/mame/video/dpb_brushproc.cpp",
+	MAME_DIR .. "src/mame/video/dpb_brushproc.h",
 	MAME_DIR .. "src/mame/drivers/dps1.cpp",
 	MAME_DIR .. "src/mame/drivers/dsb46.cpp",
 	MAME_DIR .. "src/mame/drivers/dual68.cpp",
