@@ -217,15 +217,6 @@ public:
 		m_height = vtotal;
 		m_visarea.set(hbend, hbstart - 1, vbend, vbstart - 1);
 	}
-	void set_raw_fractional(u32 pixclock, double htotal, double hbend, double hbstart, double vtotal, double vbend, double vbstart)
-	{
-		m_clock = pixclock;
-		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
-		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
-		m_width = (int)ceil(htotal);
-		m_height = (int)ceil(vtotal);
-		m_visarea.set((int)ceil(hbend), (int)floor(hbstart) - 1, (int)ceil(vbend), (int)floor(vbstart) - 1);
-	}
 	void set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
 	template <typename T> void set_refresh_hz(T &&hz) { set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz))); }

@@ -140,7 +140,7 @@ void dpb7000_combiner_card_device::device_add_mconfig(machine_config &config)
 	TMC28KU(config, m_mult_ga);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw_fractional(clock(), 910, 0, 640, 262.5, 0, 240);
+	m_screen->set_raw(clock(), 910, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(dpb7000_combiner_card_device::screen_update));
 }
 
