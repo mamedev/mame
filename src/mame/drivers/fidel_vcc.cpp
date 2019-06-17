@@ -138,7 +138,7 @@ private:
 	void main_io(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 	DECLARE_READ8_MEMBER(ppi_portb_r);
@@ -163,7 +163,7 @@ void vcc_state::machine_start()
 
 // misc handlers
 
-void vcc_state::prepare_display()
+void vcc_state::update_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
@@ -183,7 +183,7 @@ WRITE8_MEMBER(vcc_state::ppi_porta_w)
 {
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 
 	// d0-d5: TSI C0-C5
 	// d7: TSI START line
@@ -210,7 +210,7 @@ WRITE8_MEMBER(vcc_state::ppi_portb_w)
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
 	m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(vcc_state::ppi_portc_r)

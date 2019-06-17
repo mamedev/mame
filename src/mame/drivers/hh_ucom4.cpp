@@ -243,7 +243,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -252,7 +252,7 @@ public:
 
 // handlers
 
-void ufombs_state::prepare_display()
+void ufombs_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
@@ -264,7 +264,7 @@ WRITE8_MEMBER(ufombs_state::grid_w)
 	// F,G,H0: vfd grid
 	int shift = (offset - PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ufombs_state::plate_w)
@@ -272,7 +272,7 @@ WRITE8_MEMBER(ufombs_state::plate_w)
 	// C,D012,I: vfd plate
 	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ufombs_state::speaker_w)
@@ -366,7 +366,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
@@ -375,7 +375,7 @@ public:
 
 // handlers
 
-void ssfball_state::prepare_display()
+void ssfball_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
 	m_display->matrix(m_grid, plate);
@@ -386,7 +386,7 @@ WRITE8_MEMBER(ssfball_state::grid_w)
 	// C,D(,E3): vfd grid 0-7(,8)
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ssfball_state::plate_w)
@@ -405,7 +405,7 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 	if (offset == PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 READ8_MEMBER(ssfball_state::input_b_r)
@@ -528,7 +528,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_a_r);
@@ -537,7 +537,7 @@ public:
 
 // handlers
 
-void bmsoccer_state::prepare_display()
+void bmsoccer_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
 	m_display->matrix(m_grid, plate);
@@ -552,7 +552,7 @@ WRITE8_MEMBER(bmsoccer_state::grid_w)
 	// C,D(,E3): vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(bmsoccer_state::plate_w)
@@ -569,7 +569,7 @@ WRITE8_MEMBER(bmsoccer_state::plate_w)
 	if (offset == PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 READ8_MEMBER(bmsoccer_state::input_a_r)
@@ -661,7 +661,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -670,7 +670,7 @@ public:
 
 // handlers
 
-void bmsafari_state::prepare_display()
+void bmsafari_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
@@ -682,7 +682,7 @@ WRITE8_MEMBER(bmsafari_state::grid_w)
 	// C,D(,E3): vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(bmsafari_state::plate_w)
@@ -695,7 +695,7 @@ WRITE8_MEMBER(bmsafari_state::plate_w)
 	if (offset == PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 WRITE8_MEMBER(bmsafari_state::speaker_w)
@@ -781,7 +781,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
@@ -790,7 +790,7 @@ public:
 
 // handlers
 
-void splasfgt_state::prepare_display()
+void splasfgt_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
 	m_display->matrix(m_grid, plate);
@@ -809,7 +809,7 @@ WRITE8_MEMBER(splasfgt_state::grid_w)
 	if (offset == PORTI)
 		plate_w(space, 4 + PORTC, data >> 2 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 WRITE8_MEMBER(splasfgt_state::plate_w)
@@ -821,7 +821,7 @@ WRITE8_MEMBER(splasfgt_state::plate_w)
 	// C,D,E,F23(,I2): vfd plate
 	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(splasfgt_state::input_b_r)
@@ -944,7 +944,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void bcclimbr(machine_config &config);
@@ -952,7 +952,7 @@ public:
 
 // handlers
 
-void bcclimbr_state::prepare_display()
+void bcclimbr_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
@@ -968,7 +968,7 @@ WRITE8_MEMBER(bcclimbr_state::grid_w)
 	// H,I01: vfd grid
 	int shift = (offset - PORTH) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(bcclimbr_state::plate_w)
@@ -976,7 +976,7 @@ WRITE8_MEMBER(bcclimbr_state::plate_w)
 	// C,D,E,F: vfd plate
 	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1181,7 +1181,7 @@ public:
 	// start button powers unit back on
 	DECLARE_INPUT_CHANGED_MEMBER(start_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(_7seg_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(input_w);
@@ -1191,7 +1191,7 @@ public:
 
 // handlers
 
-void ctntune_state::prepare_display()
+void ctntune_state::update_display()
 {
 	u8 sel = m_port[PORTD] >> 3 & 1; // turn off display when power is off
 	u8 lamps = m_port[PORTD] & 3;
@@ -1204,7 +1204,7 @@ WRITE8_MEMBER(ctntune_state::_7seg_w)
 {
 	// E,F012: 7seg data, F3: N/C
 	m_port[offset] = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ctntune_state::speaker_w)
@@ -1223,7 +1223,7 @@ WRITE8_MEMBER(ctntune_state::input_w)
 	// D0,D1: yellow, red lamp
 	m_port[offset] = data;
 	m_inp_mux = (m_port[PORTD] << 2 & 0x30) | m_port[PORTC];
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ctntune_state::input_r)
@@ -1321,7 +1321,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void invspace(machine_config &config);
@@ -1329,7 +1329,7 @@ public:
 
 // handlers
 
-void invspace_state::prepare_display()
+void invspace_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
@@ -1345,7 +1345,7 @@ WRITE8_MEMBER(invspace_state::grid_w)
 	// C,D,I1: vfd grid
 	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(invspace_state::plate_w)
@@ -1353,7 +1353,7 @@ WRITE8_MEMBER(invspace_state::plate_w)
 	// E,F,G,H123: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1433,7 +1433,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void efball(machine_config &config);
@@ -1441,7 +1441,7 @@ public:
 
 // handlers
 
-void efball_state::prepare_display()
+void efball_state::update_display()
 {
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
 	m_display->matrix(m_grid, plate);
@@ -1456,7 +1456,7 @@ WRITE8_MEMBER(efball_state::grid_w)
 	// F,G,H01: vfd grid
 	int shift = (offset - PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(efball_state::plate_w)
@@ -1464,7 +1464,7 @@ WRITE8_MEMBER(efball_state::plate_w)
 	// D,E,I: vfd plate
 	int shift = (offset == PORTI) ? 8 : (offset - PORTD) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1554,7 +1554,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void galaxy2b(machine_config &config);
@@ -1563,7 +1563,7 @@ public:
 
 // handlers
 
-void galaxy2_state::prepare_display()
+void galaxy2_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u16 plate = bitswap<16>(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
@@ -1579,7 +1579,7 @@ WRITE8_MEMBER(galaxy2_state::grid_w)
 	// C,D,E01: vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(galaxy2_state::plate_w)
@@ -1587,7 +1587,7 @@ WRITE8_MEMBER(galaxy2_state::plate_w)
 	// F,G,H,I: vfd plate
 	int shift = (offset - PORTF) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1686,7 +1686,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void astrocmd(machine_config &config);
@@ -1694,7 +1694,7 @@ public:
 
 // handlers
 
-void astrocmd_state::prepare_display()
+void astrocmd_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
@@ -1706,7 +1706,7 @@ WRITE8_MEMBER(astrocmd_state::grid_w)
 	// C,D(,E3): vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(astrocmd_state::plate_w)
@@ -1724,7 +1724,7 @@ WRITE8_MEMBER(astrocmd_state::plate_w)
 		grid_w(space, offset, data >> 3 & 1);
 	}
 	else
-		prepare_display();
+		update_display();
 }
 
 // config
@@ -1806,7 +1806,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void edracula(machine_config &config);
@@ -1814,7 +1814,7 @@ public:
 
 // handlers
 
-void edracula_state::prepare_display()
+void edracula_state::update_display()
 {
 	m_display->matrix(m_grid, m_plate);
 }
@@ -1824,7 +1824,7 @@ WRITE8_MEMBER(edracula_state::grid_w)
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(edracula_state::plate_w)
@@ -1836,7 +1836,7 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	// E,F,G,H,I01: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1999,7 +1999,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -2008,7 +2008,7 @@ public:
 
 // handlers
 
-void mvbfree_state::prepare_display()
+void mvbfree_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
@@ -2025,7 +2025,7 @@ WRITE8_MEMBER(mvbfree_state::grid_w)
 	if (offset == PORTE)
 		plate_w(space, 2 + PORTC, data & 3);
 	else
-		prepare_display();
+		update_display();
 }
 
 WRITE8_MEMBER(mvbfree_state::plate_w)
@@ -2033,7 +2033,7 @@ WRITE8_MEMBER(mvbfree_state::plate_w)
 	// C,D(,E01): vfd plate
 	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(mvbfree_state::speaker_w)
@@ -2237,7 +2237,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tccombat(machine_config &config);
@@ -2245,7 +2245,7 @@ public:
 
 // handlers
 
-void tccombat_state::prepare_display()
+void tccombat_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
@@ -2261,7 +2261,7 @@ WRITE8_MEMBER(tccombat_state::grid_w)
 	// C,D,I0: vfd grid
 	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tccombat_state::plate_w)
@@ -2269,7 +2269,7 @@ WRITE8_MEMBER(tccombat_state::plate_w)
 	// E,F123,G,H: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2521,7 +2521,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tmpacman(machine_config &config);
@@ -2529,7 +2529,7 @@ public:
 
 // handlers
 
-void tmpacman_state::prepare_display()
+void tmpacman_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
@@ -2541,7 +2541,7 @@ WRITE8_MEMBER(tmpacman_state::grid_w)
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tmpacman_state::plate_w)
@@ -2553,7 +2553,7 @@ WRITE8_MEMBER(tmpacman_state::plate_w)
 	// E023,F,G,H,I: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2636,7 +2636,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tmscramb(machine_config &config);
@@ -2644,7 +2644,7 @@ public:
 
 // handlers
 
-void tmscramb_state::prepare_display()
+void tmscramb_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
 	m_display->matrix(m_grid, plate);
@@ -2659,7 +2659,7 @@ WRITE8_MEMBER(tmscramb_state::grid_w)
 	// C,D,I01: vfd grid
 	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tmscramb_state::plate_w)
@@ -2667,7 +2667,7 @@ WRITE8_MEMBER(tmscramb_state::plate_w)
 	// E,F,G,H: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2748,7 +2748,7 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tcaveman(machine_config &config);
@@ -2756,7 +2756,7 @@ public:
 
 // handlers
 
-void tcaveman_state::prepare_display()
+void tcaveman_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
@@ -2768,7 +2768,7 @@ WRITE8_MEMBER(tcaveman_state::grid_w)
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tcaveman_state::plate_w)
@@ -2780,7 +2780,7 @@ WRITE8_MEMBER(tcaveman_state::plate_w)
 	// E012,F,G,H,I: vfd plate
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config

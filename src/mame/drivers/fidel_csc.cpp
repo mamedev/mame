@@ -233,7 +233,7 @@ protected:
 	void rsc_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(pia0_pa_w);
 	DECLARE_WRITE8_MEMBER(pia0_pb_w);
@@ -282,7 +282,7 @@ void su9_state::su9_set_cpu_freq()
 
 // misc handlers
 
-void csc_state::prepare_display()
+void csc_state::update_display()
 {
 	// 7442 0-8: led select, input mux
 	m_inp_mux = 1 << m_led_select & 0x3ff;
@@ -313,14 +313,14 @@ WRITE8_MEMBER(csc_state::pia0_pa_w)
 {
 	// d6,d7: 7442 A0,A1
 	m_led_select = (m_led_select & ~3) | (data >> 6 & 3);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(csc_state::pia0_pb_w)
 {
 	// d0-d7: led row data
 	m_led_data = data;
-	prepare_display();
+	update_display();
 }
 
 READ_LINE_MEMBER(csc_state::pia0_ca1_r)
@@ -339,14 +339,14 @@ WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 {
 	// 7442 A2
 	m_led_select = (m_led_select & ~4) | (state ? 4 : 0);
-	prepare_display();
+	update_display();
 }
 
 WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 {
 	// 7442 A3
 	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);
-	prepare_display();
+	update_display();
 }
 
 
@@ -359,7 +359,7 @@ WRITE8_MEMBER(csc_state::pia1_pa_w)
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
 	m_7seg_data = bitswap<8>(data,0,1,5,6,7,2,3,4);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(csc_state::pia1_pb_w)

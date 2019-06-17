@@ -71,7 +71,7 @@ private:
 	void main_trampoline_w(offs_t offset, u8 data);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
@@ -85,7 +85,7 @@ private:
 
 // misc handlers
 
-void ccx_state::prepare_display()
+void ccx_state::update_display()
 {
 	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
@@ -106,7 +106,7 @@ WRITE8_MEMBER(ccx_state::ppi_porta_w)
 
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ccx_state::ppi_portb_w)
@@ -114,7 +114,7 @@ WRITE8_MEMBER(ccx_state::ppi_portb_w)
 	// d0: lose led, d1: check(win) led
 	// d2-d5: digit select
 	m_led_select = bitswap<6>(data,0,1,5,4,3,2);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ccx_state::ppi_portc_r)

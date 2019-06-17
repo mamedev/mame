@@ -92,7 +92,7 @@ private:
 	void pc_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(segment_w);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -114,7 +114,7 @@ void elite_state::init_eag2100()
 
 // TTL/generic
 
-void elite_state::prepare_display()
+void elite_state::update_display()
 {
 	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
 	set_display_segmask(0x1ef, 0x7f);
@@ -131,14 +131,14 @@ WRITE8_MEMBER(elite_state::segment_w)
 	// a0-a2,d7: digit segment
 	m_7seg_data = (data & 0x80) >> offset;
 	m_7seg_data = bitswap<8>(m_7seg_data,7,6,4,5,0,2,1,3);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(elite_state::led_w)
 {
 	// a0-a2,d0: led data
 	m_led_data = (data & 1) << offset;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(elite_state::input_r)
@@ -166,7 +166,7 @@ WRITE8_MEMBER(elite_state::ppi_portc_w)
 	// 7442 0-8: led select, input mux
 	m_led_select = 1 << (data & 0xf) & 0x3ff;
 	m_inp_mux = m_led_select & 0x1ff;
-	prepare_display();
+	update_display();
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(m_led_select, 9));

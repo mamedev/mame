@@ -371,7 +371,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -380,7 +380,7 @@ public:
 
 // handlers
 
-void bmboxing_state::prepare_display()
+void bmboxing_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u32 plate = bitswap<16>(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
@@ -392,7 +392,7 @@ WRITE8_MEMBER(bmboxing_state::plate_w)
 	// R1x-R3x: vfd plate
 	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bmboxing_state::grid_w)
@@ -405,7 +405,7 @@ WRITE16_MEMBER(bmboxing_state::grid_w)
 
 	// D4-D12: vfd grid
 	m_grid = data >> 4 & 0x1ff;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(bmboxing_state::input_r)
@@ -518,7 +518,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -529,7 +529,7 @@ public:
 
 // handlers
 
-void bfriskyt_state::prepare_display()
+void bfriskyt_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
@@ -541,7 +541,7 @@ WRITE8_MEMBER(bfriskyt_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bfriskyt_state::grid_w)
@@ -562,7 +562,7 @@ WRITE16_MEMBER(bfriskyt_state::grid_w)
 
 	// D0-D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x3f0000);
-	prepare_display();
+	update_display();
 }
 
 void bfriskyt_state::update_int1()
@@ -1019,7 +1019,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1030,7 +1030,7 @@ public:
 
 // handlers
 
-void bpengo_state::prepare_display()
+void bpengo_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
@@ -1042,7 +1042,7 @@ WRITE8_MEMBER(bpengo_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bpengo_state::grid_w)
@@ -1060,7 +1060,7 @@ WRITE16_MEMBER(bpengo_state::grid_w)
 
 	// D0-D7: vfd grid
 	m_grid = data & 0xff;
-	prepare_display();
+	update_display();
 }
 
 void bpengo_state::update_int0()
@@ -1152,7 +1152,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1163,7 +1163,7 @@ public:
 
 // handlers
 
-void bbtime_state::prepare_display()
+void bbtime_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
@@ -1175,7 +1175,7 @@ WRITE8_MEMBER(bbtime_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bbtime_state::grid_w)
@@ -1193,7 +1193,7 @@ WRITE16_MEMBER(bbtime_state::grid_w)
 
 	// D4-D9: vfd grid
 	m_grid = data >> 4 & 0x3f;
-	prepare_display();
+	update_display();
 }
 
 void bbtime_state::update_int0()
@@ -1491,7 +1491,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	void machiman(machine_config &config);
@@ -1499,7 +1499,7 @@ public:
 
 // handlers
 
-void machiman_state::prepare_display()
+void machiman_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 	m_display->matrix(m_grid, plate);
@@ -1510,7 +1510,7 @@ WRITE8_MEMBER(machiman_state::plate_w)
 	// R0x-R3x,R6012: vfd plate
 	int shift = (offset == 6) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(machiman_state::grid_w)
@@ -1520,7 +1520,7 @@ WRITE16_MEMBER(machiman_state::grid_w)
 
 	// D0-D4: vfd grid
 	m_grid = data & 0x1f;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1892,7 +1892,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1932,7 +1932,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 	m_speaker_volume /= 1.02;
 }
 
-void cdkong_state::prepare_display()
+void cdkong_state::update_display()
 {
 	u32 plate = bitswap<32>(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
 	m_display->matrix(m_grid, plate);
@@ -1947,7 +1947,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cdkong_state::grid_w)
@@ -1958,7 +1958,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 
 	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2049,7 +2049,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE16_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -2060,7 +2060,7 @@ public:
 
 // handlers
 
-void cgalaxn_state::prepare_display()
+void cgalaxn_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
 	u16 plate = bitswap<16>(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
@@ -2071,7 +2071,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 {
 	// 2-player switch directly enables plate 14
 	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(cgalaxn_state::grid_w)
@@ -2083,7 +2083,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 	// R1x-R3x: vfd grid
 	int shift = (offset - 1) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cgalaxn_state::plate_w)
@@ -2095,7 +2095,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 
 	// D2-D15: vfd plate
 	m_plate = (m_plate & 0x4000) | (data >> 2 & 0x3fff);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cgalaxn_state::input_r)
@@ -2452,7 +2452,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
@@ -2461,7 +2461,7 @@ public:
 
 // handlers
 
-void sag_state::prepare_display()
+void sag_state::update_display()
 {
 	// grid 0-7 are the 'pixels'
 	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
@@ -2476,7 +2476,7 @@ WRITE8_MEMBER(sag_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(sag_state::grid_w)
@@ -2489,7 +2489,7 @@ WRITE16_MEMBER(sag_state::grid_w)
 
 	// D1-D12: vfd grid
 	m_grid = data >> 1 & 0xfff;
-	prepare_display();
+	update_display();
 }
 
 READ16_MEMBER(sag_state::input_r)
@@ -2603,7 +2603,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -2612,7 +2612,7 @@ public:
 
 // handlers
 
-void egalaxn2_state::prepare_display()
+void egalaxn2_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
@@ -2629,7 +2629,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 
 	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(egalaxn2_state::plate_w)
@@ -2637,7 +2637,7 @@ WRITE8_MEMBER(egalaxn2_state::plate_w)
 	// R1x-R6x: vfd plate
 	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(egalaxn2_state::input_r)
@@ -2829,7 +2829,7 @@ public:
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
-	virtual void prepare_display();
+	virtual void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -2857,7 +2857,7 @@ void eturtles_state::machine_start()
 
 // handlers: maincpu side
 
-void eturtles_state::prepare_display()
+void eturtles_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 	u32 plate = bitswap<32>(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
@@ -2871,7 +2871,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(eturtles_state::grid_w)
@@ -2888,7 +2888,7 @@ WRITE16_MEMBER(eturtles_state::grid_w)
 
 	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
-	prepare_display();
+	update_display();
 }
 
 void eturtles_state::update_int()
@@ -3028,14 +3028,14 @@ public:
 		eturtles_state(mconfig, type, tag)
 	{ }
 
-	virtual void prepare_display() override;
+	virtual void update_display() override;
 	DECLARE_READ8_MEMBER(cop_data_r);
 	void estargte(machine_config &config);
 };
 
 // handlers (most of it is in eturtles_state above)
 
-void estargte_state::prepare_display()
+void estargte_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
 	u32 plate = bitswap<32>(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
@@ -3538,7 +3538,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -3548,7 +3548,7 @@ public:
 
 // handlers
 
-void mwcbaseb_state::prepare_display()
+void mwcbaseb_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	m_display->matrix(grid, m_plate);
@@ -3559,7 +3559,7 @@ WRITE8_MEMBER(mwcbaseb_state::plate_w)
 	// R1x-R3x,R6x: vfd plate
 	int shift = (offset == 6) ? 12 : (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(mwcbaseb_state::grid_w)
@@ -3569,7 +3569,7 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 
 	// D0-D7: vfd grid
 	m_grid = data & 0xff;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(mwcbaseb_state::speaker_w)
@@ -3713,7 +3713,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -3724,7 +3724,7 @@ public:
 
 // handlers
 
-void msthawk_state::prepare_display()
+void msthawk_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
@@ -3736,7 +3736,7 @@ WRITE8_MEMBER(msthawk_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(msthawk_state::grid_w)
@@ -3757,7 +3757,7 @@ WRITE16_MEMBER(msthawk_state::grid_w)
 
 	// D0-D4: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	prepare_display();
+	update_display();
 }
 
 void msthawk_state::update_int0()
@@ -3945,7 +3945,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -3956,7 +3956,7 @@ public:
 
 // handlers
 
-void kingman_state::prepare_display()
+void kingman_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
@@ -3968,7 +3968,7 @@ WRITE8_MEMBER(kingman_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(kingman_state::grid_w)
@@ -3989,7 +3989,7 @@ WRITE16_MEMBER(kingman_state::grid_w)
 
 	// D0-D4: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	prepare_display();
+	update_display();
 }
 
 void kingman_state::update_int0()
@@ -4071,7 +4071,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -4082,7 +4082,7 @@ public:
 
 // handlers
 
-void tmtron_state::prepare_display()
+void tmtron_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
 	u32 plate = bitswap<24>(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
@@ -4094,7 +4094,7 @@ WRITE8_MEMBER(tmtron_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tmtron_state::grid_w)
@@ -4115,7 +4115,7 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 
 	// D0-D3,D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x2f0000);
-	prepare_display();
+	update_display();
 }
 
 void tmtron_state::update_int1()

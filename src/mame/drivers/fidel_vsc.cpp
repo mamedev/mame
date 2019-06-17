@@ -182,7 +182,7 @@ private:
 	DECLARE_WRITE8_MEMBER(main_io_trampoline_w);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
@@ -199,7 +199,7 @@ private:
 
 // misc handlers
 
-void vsc_state::prepare_display()
+void vsc_state::update_display()
 {
 	// 4 7seg leds+H, 8*8 chessboard leds
 	set_display_segmask(0xf, 0x7f);
@@ -221,14 +221,14 @@ WRITE8_MEMBER(vsc_state::ppi_porta_w)
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
 	m_7seg_data = bitswap<8>(data,7,6,2,1,0,5,4,3);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(vsc_state::ppi_portb_w)
 {
 	// d0-d7: led row data
 	m_led_data = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(vsc_state::ppi_portc_w)
@@ -237,7 +237,7 @@ WRITE8_MEMBER(vsc_state::ppi_portc_w)
 	// d0-d7: select leds, input mux low bits
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 	m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 

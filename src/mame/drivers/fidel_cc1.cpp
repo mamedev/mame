@@ -78,7 +78,7 @@ private:
 	void main_io(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
@@ -91,7 +91,7 @@ private:
 
 // misc handlers
 
-void cc1_state::prepare_display()
+void cc1_state::update_display()
 {
 	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
@@ -118,7 +118,7 @@ WRITE8_MEMBER(cc1_state::ppi_portb_w)
 {
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(cc1_state::ppi_portc_w)
@@ -130,7 +130,7 @@ WRITE8_MEMBER(cc1_state::ppi_portc_w)
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
 	m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 

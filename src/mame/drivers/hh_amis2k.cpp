@@ -145,7 +145,7 @@ public:
 		hh_amis2k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 	DECLARE_WRITE_LINE_MEMBER(write_f);
@@ -185,7 +185,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
 	m_speaker_volume /= 1.0025;
 }
 
-void wildfire_state::prepare_display()
+void wildfire_state::update_display()
 {
 	m_display->matrix(~m_a, m_d);
 }
@@ -194,7 +194,7 @@ WRITE8_MEMBER(wildfire_state::write_d)
 {
 	// D0-D7: led/7seg data
 	m_d = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(wildfire_state::write_a)
@@ -202,7 +202,7 @@ WRITE16_MEMBER(wildfire_state::write_a)
 	// A0-A2: digit select
 	// A3-A11: led select
 	m_a = data;
-	prepare_display();
+	update_display();
 
 	// A12: speaker on
 	speaker_update();

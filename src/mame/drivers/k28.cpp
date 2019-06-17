@@ -43,7 +43,7 @@ public:
 		m_vfd(*this, "vfd"),
 		m_vfd_delay(*this, "led_delay_%u", 0),
 		m_onbutton_timer(*this, "on_button"),
-		m_inp_matrix(*this, "IN.%u", 0),
+		m_inputs(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
@@ -64,7 +64,7 @@ private:
 	required_device<mm5445_device> m_vfd;
 	required_device_array<timer_device, 9> m_vfd_delay;
 	required_device<timer_device> m_onbutton_timer;
-	required_ioport_array<7> m_inp_matrix;
+	required_ioport_array<7> m_inputs;
 	output_finder<9, 16> m_out_x;
 	output_finder<9> m_out_digit;
 
@@ -215,7 +215,7 @@ READ8_MEMBER(k28_state::mcu_p1_r)
 	for (int i = 0; i < 7; i++)
 		if (m_inp_mux >> i & 1)
 		{
-			data |= m_inp_matrix[i]->read();
+			data |= m_inputs[i]->read();
 
 			// force press on-button at boot
 			if (i == 5 && m_onbutton_timer->enabled())

@@ -58,7 +58,7 @@ protected:
 	void sc9d_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -99,7 +99,7 @@ void sc9c_state::sc9c_set_cpu_freq()
 
 // TTL/generic
 
-void sc9_state::prepare_display()
+void sc9_state::update_display()
 {
 	// 8*8 chessboard leds + 1 corner led
 	display_matrix(8, 9, m_led_data, m_inp_mux);
@@ -111,7 +111,7 @@ WRITE8_MEMBER(sc9_state::control_w)
 	// 74245 Q0-Q8: input mux, led select
 	u16 sel = 1 << (data & 0xf) & 0x3ff;
 	m_inp_mux = sel & 0x1ff;
-	prepare_display();
+	update_display();
 
 	// 74245 Q9: speaker out
 	m_dac->write(BIT(sel, 9));
@@ -124,7 +124,7 @@ WRITE8_MEMBER(sc9_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (data & 1) << offset;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(sc9_state::input_r)
