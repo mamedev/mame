@@ -226,8 +226,8 @@ uint8_t pia6821_device::get_in_a_value()
 		}
 		else
 		{
-			// mark all pins disconnected
-			m_port_a_z_mask = 0xff;
+			// assume pins are disconnected and simulate the internal pullups.
+			port_a_data = 0xff;
 
 			if (!m_logged_port_a_not_connected && (m_ddr_a != 0xff))
 			{
@@ -237,12 +237,12 @@ uint8_t pia6821_device::get_in_a_value()
 		}
 	}
 
-	// - connected pins are always read
-	// - disconnected pins read the output buffer in output mode
-	// - disconnected pins are HI in input mode
-	ret = (~m_port_a_z_mask             & port_a_data) |
-			( m_port_a_z_mask &  m_ddr_a & m_out_a) |
-			( m_port_a_z_mask & ~m_ddr_a);
+	// For port A, when the port is in output mode other devices can drive the
+	// pins too. If the device pulls the voltage on the lines enough,a read of
+	// the output register will show the external device value on the driven pins.
+	ret = (~m_ddr_a & port_a_data)  // input pins
+		| (m_ddr_a & m_out_a & ~m_a_input_overrides_output_mask)  // normal output pins
+		| (m_ddr_a & port_a_data & m_a_input_overrides_output_mask);  // overridden output pins
 
 	return ret;
 }
