@@ -176,7 +176,7 @@
 	<software name="printcart">  <!-- Print Cartridges for Chinese Machine -->
 		<description>Zhōnghuá Jī Dǎyìn Hé</description>
 		<year>1993</year>
-		<publisher><&lt;unknown&gt;/publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="中华机打印盒"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -218,10 +218,10 @@
 		</part>
 	</software>
 
-	<software name="softcat">  <!-- Software Catalog Publication Tool v2.2-->
+	<software name="softcat">  <!-- Software Catalog Publication Tool v2.2 -->
 		<description>Ruǎnjiàn Mùlù Biānyìn Gōngjù V2.2</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;/publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="软件目录编印工具V2.2"/>
 
 		<part name="flop1" interface="floppy_5_25">
