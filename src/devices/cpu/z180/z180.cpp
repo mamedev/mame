@@ -94,7 +94,7 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 	m_asci_stat[0] = 0;
 	m_asci_tdr[0] = m_asci_tdr[1] = 0;
 	m_asci_rdr[0] = m_asci_rdr[1] = 0;
-	m_asci_tc[0].w = m_asci_tc[0].w = 0;
+	m_asci_tc[0].w = m_asci_tc[1].w = 0;
 	m_csio_trdr = 0;
 	m_tmdr[0].w = m_tmdr[1].w = 0;
 	m_rldr[0].w = m_rldr[1].w = 0xffff;
