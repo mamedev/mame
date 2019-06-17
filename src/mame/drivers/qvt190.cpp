@@ -32,6 +32,7 @@ public:
 	qvt190_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
 		, m_videoram(*this, "videoram")
 	{ }
@@ -44,12 +45,27 @@ private:
 	void qvt190_mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_videoram;
 };
 
 MC6845_UPDATE_ROW(qvt190_state::update_row)
 {
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+
+	for (int x = 0; x < x_count; x++)
+	{
+		uint16_t mem = (ma + x) & 0x7ff;
+		uint8_t chr = m_videoram[mem];
+		uint16_t gfx = m_p_chargen[(chr << 4) | ra];
+
+		if (x == cursor_x)
+			gfx = ~gfx;
+
+		for (int i = 0; i < 9; i++)
+			bitmap.pix32(y, x*9 + (8-i)) = palette[BIT(gfx, i) ? 2 : 0];
+	}
 }
 
 void qvt190_state::qvt190_mem_map(address_map &map)
@@ -83,7 +99,7 @@ GFXDECODE_END
 
 void qvt190_state::qvt190(machine_config &config)
 {
-	M6800(config, m_maincpu, XTAL(16'669'800) / 9);
+	M6800(config, m_maincpu, 16.6698_MHz_XTAL / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qvt190_state::qvt190_mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // V61C16P55L + battery
@@ -93,14 +109,14 @@ void qvt190_state::qvt190(machine_config &config)
 	ACIA6850(config, "acia2", 0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(16'669'800), 882, 0, 720, 315, 0, 300);
+	screen.set_raw(16.6698_MHz_XTAL, 882, 18, 738, 315, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-	GFXDECODE(config, "gfxdecode", "palette", chars);
+	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
-	mc6845_device &crtc(MC6845(config, "crtc", XTAL(16'669'800) / 9));
+	mc6845_device &crtc(MC6845(config, "crtc", 16.6698_MHz_XTAL / 9));
 	crtc.set_screen("screen");
 	crtc.set_char_width(9);
 	crtc.set_update_row_callback(FUNC(qvt190_state::update_row), this);
