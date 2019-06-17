@@ -33392,6 +33392,7 @@ qvt70                           //
 
 @source:qvt102.cpp
 qvt102                          // (c) 1983 Qume Corp.
+qvt102a                         // (c) 1983 Qume Corp.
 
 @source:qvt103.cpp
 qvt103                          // (c) 1983 Qume Corp.
