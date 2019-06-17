@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  winutf8.c - Win32 OSD core utility functions
+//  winutf8.cpp - Win32 OSD core utility functions
 //
 //============================================================
 

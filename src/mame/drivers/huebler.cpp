@@ -9,7 +9,7 @@
 
 /*
 
-    TODO:
+TODO:
 
     - keyboard repeat
     - shift lock is not PORT_TOGGLE, instead RS flipflop
@@ -18,10 +18,27 @@
     - eprom programmer
     - power off
 
+Cassette considerations
+
+    - It operates at 4883 baud but may not be fully compatible with real
+      hardware. A partial translation of the available text seems to
+      indicate an overcomplicated and unreliable interface. The one
+      implemented is 100% reliable at the same speed. I've been unable
+      to locate any real recordings to compare against.
+    - To save a range of memory: S name start end
+    - To load it back: L name
+    - To save an unnamed file: S "" start end
+    - To load an unnamed file: L
+    - When loading, if the name doesn't match, there's no message, and no
+      way to determine the name.
+    - For some reason, the system saves the file 3 times. Maybe it was an
+      attempt to guard against the inherent unreliable design.
 */
 
 #include "emu.h"
 #include "includes/huebler.h"
+#include "sound/wave.h"
+#include "speaker.h"
 #include "screen.h"
 
 /* Keyboard */
@@ -103,7 +120,7 @@ void amu880_state::amu880_io(address_map &map)
 	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x14, 0x17).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x18, 0x1b).rw(m_z80sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x18, 0x1b).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
 }
 
 /* Input Ports */
@@ -252,19 +269,36 @@ WRITE_LINE_MEMBER(amu880_state::ctc_z0_w)
 
 WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 {
-	/* cassette transmit/receive clock */
+	/* cassette clock @ 39kHz */
+	if (state)
+	{
+		m_cnt++;
+		switch (m_cnt & 7) // divide by 8 to get 4883Hz
+		{
+			case 0:
+				m_cassette->output(m_cassbit ? 1.0 : -1.0);
+				break;
+			case 2:
+				m_sio->txca_w(0);
+				m_sio->rxca_w(0);
+				break;
+			case 4:
+				m_sio->txca_w(1);
+				m_sio->rxca_w(1);
+				break;
+			case 6:
+				m_sio->rxa_w((m_cassette->input() > 0.04) ? 1 : 0);
+			default:
+				break;
+		}
+	}
 }
 
 /* Z80-SIO Interface */
 
-TIMER_DEVICE_CALLBACK_MEMBER( amu880_state::tape_tick )
-{
-	m_z80sio->rxa_w(m_cassette->input() < 0.0);
-}
-
 WRITE_LINE_MEMBER(amu880_state::cassette_w)
 {
-	m_cassette->output(state ? -1.0 : +1.0);
+	m_cassbit = state;
 }
 
 /* Z80 Daisy Chain */
@@ -329,11 +363,15 @@ void amu880_state::amu880(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_amu880);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	/* devices */
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set(FUNC(amu880_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(m_z80sio, FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 	ctc.zc_callback<2>().set(FUNC(amu880_state::ctc_z2_w));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(10'000'000)/4));
@@ -342,14 +380,12 @@ void amu880_state::amu880(machine_config &config)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(10'000'000)/4));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_z80sio, XTAL(10'000'000)/4); // U856
-	m_z80sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
-	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	Z80SIO0(config, m_sio, XTAL(10'000'000)/4); // U856
+	m_sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
-
-	TIMER(config, "tape").configure_periodic(FUNC(amu880_state::tape_tick), attotime::from_hz(44100));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

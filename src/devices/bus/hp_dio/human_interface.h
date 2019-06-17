@@ -61,7 +61,7 @@ private:
 	void update_gpib_irq();
 	void update_gpib_dma();
 
-	required_device<i8042_device> m_iocpu;
+	required_device<i8042ah_device> m_iocpu;
 	required_device<hp_hil_mlc_device> m_mlc;
 	required_device<sn76494_device> m_sound;
 	required_device<tms9914_device> m_tms9914;

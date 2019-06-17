@@ -386,7 +386,7 @@ tiny_rom_entry const *at_keyboard_controller_device::device_rom_region() const
 
 void at_keyboard_controller_device::device_add_mconfig(machine_config &config)
 {
-	I8042(config, m_mcu, DERIVED_CLOCK(1, 1));
+	I8042AH(config, m_mcu, DERIVED_CLOCK(1, 1));
 	m_mcu->p1_in_cb().set_ioport("P1");
 	m_mcu->p1_out_cb().set_nop();
 	m_mcu->p2_in_cb().set_constant(0xffU);
@@ -462,7 +462,7 @@ tiny_rom_entry const *ps2_keyboard_controller_device::device_rom_region() const
 
 void ps2_keyboard_controller_device::device_add_mconfig(machine_config &config)
 {
-	I8042(config, m_mcu, DERIVED_CLOCK(1, 1));
+	I8042AH(config, m_mcu, DERIVED_CLOCK(1, 1));
 	m_mcu->p1_in_cb().set(FUNC(ps2_keyboard_controller_device::p1_r));
 	m_mcu->p1_out_cb().set_nop();
 	m_mcu->p2_in_cb().set_constant(0xffU);

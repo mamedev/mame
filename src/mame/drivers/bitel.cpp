@@ -66,7 +66,7 @@ void bitel_state::feap90(machine_config &config)
 	I8031(config, m_maincpu, 12000000); // XTAL illegible
 	m_maincpu->set_addrmap(AS_PROGRAM, &bitel_state::prog_map);
 
-	I8042(config, "upi", 6000000).set_disable(); // XTAL illegible
+	I8042AH(config, "upi", 6000000).set_disable(); // XTAL illegible
 }
 
 ROM_START(t3210) // i8031, 8742, D80C39C // 4+2k ram onboard; 24kb in battery-backed expansion

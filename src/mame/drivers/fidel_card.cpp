@@ -206,7 +206,7 @@ private:
 	void brc_base(machine_config &config);
 
 	// devices/pointers
-	required_device<i8041_device> m_mcu;
+	required_device<i8041a_device> m_mcu;
 	required_device<i8243_device> m_i8243;
 
 	// address maps
@@ -314,7 +314,7 @@ void card_state::main_map(address_map &map)
 void card_state::main_io(address_map &map)
 {
 	map.global_mask(0x01);
-	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x00, 0x01).rw(m_mcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 }
 
 
@@ -548,7 +548,7 @@ void card_state::brc_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &card_state::main_io);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	I8041(config, m_mcu, 5_MHz_XTAL);
+	I8041A(config, m_mcu, 5_MHz_XTAL);
 	m_mcu->p1_out_cb().set(FUNC(card_state::mcu_p1_w));
 	m_mcu->p2_in_cb().set(FUNC(card_state::mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));

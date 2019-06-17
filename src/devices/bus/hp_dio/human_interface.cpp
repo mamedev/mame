@@ -26,7 +26,7 @@ namespace bus {
 
 void human_interface_device::device_add_mconfig(machine_config &config)
 {
-	i8042_device &iocpu(I8042(config, "iocpu", XTAL(5'000'000)));
+	i8042ah_device &iocpu(I8042AH(config, "iocpu", XTAL(5'000'000)));
 	iocpu.set_addrmap(AS_PROGRAM, &human_interface_device::iocpu_map);
 	iocpu.p1_out_cb().set(FUNC(human_interface_device::iocpu_port1_w));
 	iocpu.p2_out_cb().set(FUNC(human_interface_device::iocpu_port2_w));

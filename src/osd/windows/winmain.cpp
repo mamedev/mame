@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  winmain.c - Win32 main program
+//  winmain.cpp - Win32 main program
 //
 //============================================================
 

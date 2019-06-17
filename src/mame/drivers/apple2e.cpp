@@ -4864,6 +4864,8 @@ void apple2e_state::cec(machine_config &config)
 
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
+	SOFTWARE_LIST(config, "flop525_cec").set_original("cecflop");
+
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	config.device_remove("aux");
 	config.device_remove(A2_AUXSLOT_TAG);

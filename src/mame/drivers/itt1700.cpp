@@ -79,7 +79,7 @@ void itt1700_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x10).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x11, 0x11).w("crtc", FUNC(hd6845s_device::register_w));
-	map(0x20, 0x21).rw("upi", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x20, 0x21).rw("upi", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 }
 
 static INPUT_PORTS_START(itt1700)
@@ -91,7 +91,7 @@ void itt1700_state::itt1700(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itt1700_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &itt1700_state::io_map);
 
-	upi41_cpu_device &upi(I8741(config, "upi", 16.6698_MHz_XTAL / 3)); // clock guessed
+	upi41_cpu_device &upi(I8741A(config, "upi", 16.6698_MHz_XTAL / 3)); // clock guessed
 	upi.p1_out_cb().set("keyboard", FUNC(itt1700_keyboard_device::clock_w)).bit(0);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line1_w)).bit(1);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line2_w)).bit(2);

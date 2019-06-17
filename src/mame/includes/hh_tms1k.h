@@ -21,7 +21,7 @@
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"
 #include "cpu/tms1000/tp0320.h"
-
+#include "video/pwm.h"
 #include "sound/spkrdev.h"
 
 
@@ -31,6 +31,7 @@ public:
 	hh_tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		screenless_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "IN.%u", 0),
 		m_out_power(*this, "power")
@@ -38,6 +39,7 @@ public:
 
 	// devices
 	required_device<tms1k_base_device> m_maincpu;
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<18> m_inputs; // max 18
 	output_finder<> m_out_power; // power state, eg. led
