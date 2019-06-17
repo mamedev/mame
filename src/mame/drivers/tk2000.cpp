@@ -9,6 +9,8 @@
     This system is only vaguely Apple II compatible.
     The keyboard works entirely differently, which is a big deal.
 
+    TODO: emulate expansion connector (not wholly Apple II compatible)
+
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
 
