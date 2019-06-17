@@ -5574,4 +5574,26 @@
 		</part>
 	</software>
 
+	<software name="2400ad">
+		<description>2400 A.D.</description>
+		<year>1987</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-06-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="234759">
+				<rom name="2400 A.D. - Program Disk.woz" size="234759" crc="5b42e1f6" sha1="1f6ce95fccd334e8faaf9217735f14da3c9e8d99" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player disk"/>
+			<dataarea name="flop" size="234759">
+				<rom name="2400 A.D. - Player Disk.woz" size="234759" crc="98271568" sha1="a0a2546b2b1e7328000aa51de2024233ad06e410" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
