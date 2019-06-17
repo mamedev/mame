@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
 	void init_goldstar();
+	void init_jkrmast();
 	void init_cmast91();
 	void init_wcherry();
 	void init_super9();

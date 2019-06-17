@@ -217,7 +217,7 @@ private:
 	u32 m_barcode;
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(speech_w);
 	DECLARE_WRITE8_MEMBER(mcu_p1_w);
 	DECLARE_READ8_MEMBER(mcu_p2_r);
@@ -241,7 +241,7 @@ void card_state::machine_start()
 
 // misc handlers
 
-void card_state::prepare_display()
+void card_state::update_display()
 {
 	// 14seg led segments, d15(12) is extra led
 	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
@@ -267,7 +267,7 @@ void card_state::ioexp_port_w(uint8_t data)
 {
 	// P4x-P7x: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
-	prepare_display();
+	update_display();
 
 	// P71 is tone (not on speech model)
 	if (P == 3 && m_dac != nullptr)
@@ -281,7 +281,7 @@ WRITE8_MEMBER(card_state::mcu_p1_w)
 {
 	// P10-P17: select digits, input mux
 	m_inp_mux = m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(card_state::mcu_p2_r)

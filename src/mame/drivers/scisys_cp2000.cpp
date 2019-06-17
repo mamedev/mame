@@ -54,7 +54,7 @@ private:
 	void main_io(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -88,7 +88,7 @@ void cp2000_state::machine_start()
 
 // CPU I/O ports
 
-void cp2000_state::prepare_display()
+void cp2000_state::update_display()
 {
 	m_display->matrix(m_select, m_7seg_data);
 }
@@ -97,7 +97,7 @@ WRITE8_MEMBER(cp2000_state::control_w)
 {
 	// d0-d3: digit select
 	m_select = ~data;
-	prepare_display();
+	update_display();
 
 	// d4: keypad/chessboard select
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER(cp2000_state::digit_w)
 
 	// also digit segment data
 	m_7seg_data = bitswap<8>(data,0,2,1,3,4,5,6,7);
-	prepare_display();
+	update_display();
 }
 
 

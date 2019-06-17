@@ -16,6 +16,7 @@
 #pragma once
 
 #include "machine/tmc208k.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -33,8 +34,8 @@ public:
 	void reg_w(uint16_t data);
 	void lum1_w(uint8_t data);
 	void lum2_w(uint8_t data);
-	void blank_lum1(int state);
-	void blank_lum2(int state);
+	void blank1(int state);
+	void blank2(int state);
 	void chr1_w(uint8_t data);
 	void chr2_w(uint8_t data);
 	void chr_flag_w(int state);
@@ -58,20 +59,32 @@ protected:
 
 	void fsck_tick();
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void update_matte_selects();
+
 	uint8_t m_lum_in[2];
 	uint8_t m_latched_lum[2];
+	uint8_t m_selected_lum[2];
 	uint8_t m_chr_in[2];
 	uint8_t m_latched_chr[2];
+	uint8_t m_selected_chr[2];
 	uint8_t m_ext_in[2];
+	uint8_t m_selected_ext[2];
+	uint8_t m_latched_lum_sum;
+	uint8_t m_latched_chr_sum;
+	uint8_t m_lum_out;
+	uint8_t m_chr_out;
 
-	bool m_blank_lum[2];
+	bool m_blank[2];
 	bool m_chr_i_in;
 	bool m_chr_i;
 	bool m_palette_l;
 	bool m_cursor_enb;
 	bool m_cursor_col;
+	bool m_fsck;
 
-	uint8_t m_cursor_luma;
+	uint8_t m_cursor_y;
 	uint8_t m_cursor_u;
 	uint8_t m_cursor_v;
 	uint8_t m_invert_mask;
@@ -81,11 +94,18 @@ protected:
 	uint8_t m_matte_u[2];
 	uint8_t m_matte_v[2];
 
+	bool m_blank_or_suppress[2]; // FH
+	bool m_output_matte_y[2]; // EB
+	bool m_output_matte_u[2]; // EG
+	bool m_output_matte_v[2]; // EG
+	bool m_output_matte_ext[2]; // FA
+
 	devcb_write8 m_lum;
 	devcb_write8 m_chr;
 
-	emu_timer *m_fsck;
+	emu_timer *m_fsck_timer;
 
+	required_device<screen_device> m_screen;
 	required_device<tmc28ku_device> m_mult_ge;
 	required_device<tmc28ku_device> m_mult_gd;
 	required_device<tmc28ku_device> m_mult_gc;

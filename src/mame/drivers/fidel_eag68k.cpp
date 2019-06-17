@@ -201,7 +201,7 @@ protected:
 	void eagv10_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(input1_r);
 	DECLARE_READ8_MEMBER(input2_r);
@@ -265,7 +265,7 @@ private:
 
 // TTL/generic
 
-void eag_state::prepare_display()
+void eag_state::update_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
@@ -286,7 +286,7 @@ WRITE8_MEMBER(eag_state::mux_w)
 	u16 sel = 1 << (m_led_select & 0xf);
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(eag_state::input1_r)
@@ -305,14 +305,14 @@ WRITE8_MEMBER(eag_state::leds_w)
 {
 	// a1-a3,d0: led data
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(eag_state::digit_w)
 {
 	// a1-a3,d0(d8): digit segment data
 	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
-	prepare_display();
+	update_display();
 }
 
 

@@ -259,6 +259,34 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		break;
 
 	case 1: // IBM-compatible graphics mode
+		if(large_pixels) {
+			if(!interleave) {
+				switch(pixels_per_byte_order) {
+				case 1: {
+					static int palind[4] = { 0, 1, 4, 5 };
+					for(u32 yy=0; yy<2; yy++) {
+						const u16 *src = m_vram + 4096*yy;
+						for(u32 y=yy; y<200; y+=2) {
+							u32 *dest = &bitmap.pix32(y);
+							for(u32 x=0; x<320; x+=8) {
+								u16 sv = *src++;
+								*dest++ = m_palette[palind[(sv >>  6) & 3]];
+								*dest++ = m_palette[palind[(sv >>  4) & 3]];
+								*dest++ = m_palette[palind[(sv >>  2) & 3]];
+								*dest++ = m_palette[palind[(sv >>  0) & 3]];
+								*dest++ = m_palette[palind[(sv >> 14) & 3]];
+								*dest++ = m_palette[palind[(sv >> 12) & 3]];
+								*dest++ = m_palette[palind[(sv >> 10) & 3]];
+								*dest++ = m_palette[palind[(sv >>  8) & 3]];
+							}
+						}
+					}
+					return 0;
+				}
+				}
+			}
+		}
+
 		logerror("Unimplemented ibm-compatible graphics mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
 		break;
 
@@ -382,17 +410,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	// i/f = increment source / don't (unimplemented, compare with p?, used by blt_copy_word)
 
 	if(mode & 0x200) {
-		u32 nw = width >> 4;
-		u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
-
-		for(u32 y=0; y<height; y++) {
-			u16 dst_cadr = dst_adr;
-			for(u32 w = 0; w != nw; w++) {
-				m_gcos->write_word((dst_seg << 4) + dst_cadr, src);
-				dst_cadr += 2;
-			}
-			dst_adr += dy;
-		}
+		// Weird, does one with target bbe8:0000 which blows everything up
 
 	} else {
 		auto blend = gco_blend[(mode >> 2) & 7];
@@ -422,7 +440,8 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 			u16 cmask = swmask;
 			u16 nw1 = nw;
 			u32 srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-			src_cadr += 2;
+			if(mode & 0x100)
+				src_cadr += 2;
 			do {
 				srcs = (srcs << 16) | sw(m_gcos->read_word((src_seg << 4) + src_cadr));
 				u16 src = (srcs >> (src_sft + 1)) & rmask;
@@ -455,10 +474,11 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 				res = (dst & ~cmask) | (res & cmask);
 
-				logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
+				//				logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
 			
 				m_gcos->write_word((dst_seg << 4) + dst_cadr, sw(res));
-				src_cadr += 2;
+				if(mode & 0x100)
+					src_cadr += 2;
 				dst_cadr += 2;
 
 				nw1 --;
@@ -466,7 +486,8 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 				cmask = nw1 == 1 ? ewmask : mwmask;
 			} while(nw1);
 
-			src_adr += sy;
+			if(mode & 0x100)
+				src_adr += sy;
 			dst_adr += dy;
 		}
 	}
@@ -481,8 +502,8 @@ void mindset_state::gco_w(u16)
 	logerror("GCO: start %04x:%04x mode %04x (%05x)\n", packet_seg, packet_adr, global_mode, m_maincpu->pc());
 
 	switch(global_mode) {
-	case 0x0101:
 	case 0x0005:
+	case 0x0101:
 		blit(packet_seg, packet_adr);
 		break;
 	}

@@ -53,7 +53,7 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE64_MEMBER(lcd_output_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -68,7 +68,7 @@ private:
 
 // TTL/generic
 
-void cforte_state::prepare_display()
+void cforte_state::update_display()
 {
 	// 3 led rows
 	display_matrix(8, 3, m_led_data, m_led_select, false);
@@ -96,14 +96,14 @@ WRITE64_MEMBER(cforte_state::lcd_output_w)
 		m_display_state[dig+3] = bitswap<8>(m_display_state[dig+3],7,2,0,4,6,5,3,1);
 	}
 
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(cforte_state::mux_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = m_led_data = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(cforte_state::control_w)
@@ -119,7 +119,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
-	prepare_display();
+	update_display();
 
 	// d7: enable beeper
 	m_beeper->set_state(data >> 7 & 1);

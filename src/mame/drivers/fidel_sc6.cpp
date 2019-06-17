@@ -56,7 +56,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(select_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -91,7 +91,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sc6_state, cartridge)
 
 // MCU ports/generic
 
-void sc6_state::prepare_display()
+void sc6_state::update_display()
 {
 	// 2 7seg leds
 	set_display_segmask(3, 0x7f);
@@ -106,7 +106,7 @@ WRITE8_MEMBER(sc6_state::mux_w)
 	// 7442 0-8: input mux, 7seg data
 	m_inp_mux = sel & 0x1ff;
 	m_7seg_data = sel & 0x7f;
-	prepare_display();
+	update_display();
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
@@ -116,7 +116,7 @@ WRITE8_MEMBER(sc6_state::select_w)
 {
 	// P16,P17: digit select
 	m_led_select = ~data >> 6 & 3;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(sc6_state::input_r)

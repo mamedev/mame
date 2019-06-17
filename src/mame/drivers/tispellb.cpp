@@ -92,7 +92,7 @@ private:
 
 	virtual void power_off() override;
 	void power_subcpu();
-	void prepare_display();
+	void update_display();
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -147,7 +147,7 @@ void tispellb_state::power_off()
 	power_subcpu();
 }
 
-void tispellb_state::prepare_display()
+void tispellb_state::update_display()
 {
 	// almost same as snspell
 	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
@@ -158,7 +158,7 @@ WRITE16_MEMBER(tispellb_state::main_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
 	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_r)
@@ -173,7 +173,7 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 	m_r = data;
 	m_inp_mux = data & 0x7f;
 	m_grid = data & 0x80ff;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tispellb_state::main_read_k)

@@ -37,7 +37,7 @@ public:
 	boris_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
+		m_inputs(*this, "IN.%u", 0),
 		m_delay_display(*this, "delay_display_%u", 0),
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
@@ -53,7 +53,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_inp_matrix;
+	required_ioport_array<4> m_inputs;
 	required_device_array<timer_device, 8> m_delay_display;
 	output_finder<8> m_out_digit;
 
@@ -154,7 +154,7 @@ READ8_MEMBER(boris_state::input_r)
 	u8 data = m_io[0];
 	u8 sel = ~data & 7;
 	if (sel >= 4)
-		data |= m_inp_matrix[sel-4]->read() << 4;
+		data |= m_inputs[sel-4]->read() << 4;
 
 	return data;
 }

@@ -45,7 +45,7 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -58,7 +58,7 @@ private:
 
 // TTL/generic
 
-void as12_state::prepare_display()
+void as12_state::update_display()
 {
 	// 8*8(+1) chessboard leds
 	display_matrix(8, 9, m_led_data, m_inp_mux);
@@ -70,7 +70,7 @@ WRITE8_MEMBER(as12_state::control_w)
 	// 74245 Q0-Q8: input mux, led select
 	u16 sel = 1 << (data & 0xf) & 0x3ff;
 	m_inp_mux = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
-	prepare_display();
+	update_display();
 
 	// 74245 Q9: speaker out
 	m_dac->write(BIT(sel, 9));
@@ -83,7 +83,7 @@ WRITE8_MEMBER(as12_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (data & 1) << offset;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(as12_state::input_r)

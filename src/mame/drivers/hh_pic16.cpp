@@ -200,7 +200,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	void update_speaker();
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
@@ -210,7 +210,7 @@ public:
 
 // handlers
 
-void touchme_state::prepare_display()
+void touchme_state::update_display()
 {
 	m_display->matrix(~m_b & 0x7b, m_c);
 }
@@ -234,7 +234,7 @@ WRITE8_MEMBER(touchme_state::write_b)
 	// B0,B1: digit select
 	// B3-B6: leds
 	m_b = data;
-	prepare_display();
+	update_display();
 
 	// B7: speaker lead 1
 	update_speaker();
@@ -244,7 +244,7 @@ WRITE8_MEMBER(touchme_state::write_c)
 {
 	// C0-C6: digit segments
 	m_c = data;
-	prepare_display();
+	update_display();
 
 	// C7: speaker lead 2
 	update_speaker();
@@ -325,7 +325,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
 	void pabball(machine_config &config);
@@ -333,7 +333,7 @@ public:
 
 // handlers
 
-void pabball_state::prepare_display()
+void pabball_state::update_display()
 {
 	// CD4028 BCD to decimal decoder
 	// CD4028 0-8: led select, 9: 7seg
@@ -348,7 +348,7 @@ WRITE8_MEMBER(pabball_state::write_b)
 {
 	// B: led data
 	m_b = ~data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(pabball_state::write_c)
@@ -361,7 +361,7 @@ WRITE8_MEMBER(pabball_state::write_c)
 
 	// C0-C3: CD4028 A-D
 	m_c = data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -558,7 +558,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	void update_speaker();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
@@ -567,7 +567,7 @@ public:
 
 // handlers
 
-void maniac_state::prepare_display()
+void maniac_state::update_display()
 {
 	m_display->write_row(0, ~m_b & 0x7f);
 	m_display->write_row(1, ~m_c & 0x7f);
@@ -583,7 +583,7 @@ WRITE8_MEMBER(maniac_state::write_b)
 {
 	// B0-B6: left 7seg
 	m_b = data;
-	prepare_display();
+	update_display();
 
 	// B7: speaker lead 1
 	update_speaker();
@@ -593,7 +593,7 @@ WRITE8_MEMBER(maniac_state::write_c)
 {
 	// C0-C6: right 7seg
 	m_c = data;
-	prepare_display();
+	update_display();
 
 	// C7: speaker lead 2
 	update_speaker();
@@ -978,7 +978,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
@@ -987,7 +987,7 @@ public:
 
 // handlers
 
-void tbaskb_state::prepare_display()
+void tbaskb_state::update_display()
 {
 	m_display->matrix(m_b, m_c);
 }
@@ -1009,7 +1009,7 @@ WRITE8_MEMBER(tbaskb_state::write_b)
 	// B0-B3: led select
 	// B4,B5: digit select
 	m_b = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tbaskb_state::write_c)
@@ -1019,7 +1019,7 @@ WRITE8_MEMBER(tbaskb_state::write_c)
 
 	// C0-C6: led data
 	m_c = ~data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1098,7 +1098,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
@@ -1108,7 +1108,7 @@ public:
 
 // handlers
 
-void rockpin_state::prepare_display()
+void rockpin_state::update_display()
 {
 	// 3 7seg leds from ports A and B
 	m_display->matrix_partial(0, 3, m_a, m_b, false);
@@ -1124,28 +1124,28 @@ WRITE8_MEMBER(rockpin_state::write_a)
 
 	// A0-A2: select digit
 	m_a = ~data & 7;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(rockpin_state::write_b)
 {
 	// B0-B6: digit segments
 	m_b = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(rockpin_state::write_c)
 {
 	// C0-C7: led data
 	m_c = ~data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(rockpin_state::write_d)
 {
 	// D0-D5: led select
 	m_d = ~data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1218,7 +1218,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
@@ -1227,7 +1227,7 @@ public:
 
 // handlers
 
-void hccbaskb_state::prepare_display()
+void hccbaskb_state::update_display()
 {
 	m_display->matrix(m_b, m_c);
 }
@@ -1252,14 +1252,14 @@ WRITE8_MEMBER(hccbaskb_state::write_b)
 	// B0-B4: led select
 	// B5,B6: digit select
 	m_b = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(hccbaskb_state::write_c)
 {
 	// C0-C6: led data
 	m_c = ~data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1340,7 +1340,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
@@ -1349,7 +1349,7 @@ public:
 
 // handlers
 
-void ttfball_state::prepare_display()
+void ttfball_state::update_display()
 {
 	// C0-C2: led data
 	// C0-C3: 4511 A-D, C4: digit segment DP
@@ -1376,7 +1376,7 @@ WRITE8_MEMBER(ttfball_state::write_b)
 
 	// B0-B7: led select (see above)
 	m_b = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ttfball_state::write_c)
@@ -1389,7 +1389,7 @@ WRITE8_MEMBER(ttfball_state::write_c)
 
 	// C0-C7: led data/select (see above)
 	m_c = data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1500,7 +1500,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
@@ -1510,7 +1510,7 @@ public:
 
 // handlers
 
-void uspbball_state::prepare_display()
+void uspbball_state::update_display()
 {
 	m_display->matrix(m_d, m_c << 8 | m_b);
 }
@@ -1525,14 +1525,14 @@ WRITE8_MEMBER(uspbball_state::write_b)
 {
 	// B: digit segment data
 	m_b = bitswap<8>(data,0,1,2,3,4,5,6,7);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(uspbball_state::write_c)
 {
 	// C: led data
 	m_c = ~data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(uspbball_state::write_d)
@@ -1540,7 +1540,7 @@ WRITE8_MEMBER(uspbball_state::write_d)
 	// D0-D2: digit select
 	// D3-D5: led select
 	m_d = ~data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1618,7 +1618,7 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
@@ -1629,7 +1629,7 @@ public:
 
 // handlers
 
-void us2pfball_state::prepare_display()
+void us2pfball_state::update_display()
 {
 	m_display->matrix(m_d | (m_a << 6 & 0x300), m_c);
 }
@@ -1644,7 +1644,7 @@ WRITE8_MEMBER(us2pfball_state::write_a)
 {
 	// A2,A3: leds
 	m_a = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(us2pfball_state::write_b)
@@ -1660,14 +1660,14 @@ WRITE8_MEMBER(us2pfball_state::write_c)
 
 	// C0-C6: digit segments
 	m_c = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(us2pfball_state::write_d)
 {
 	// D0-D7: digit select
 	m_d = ~data;
-	prepare_display();
+	update_display();
 }
 
 // config

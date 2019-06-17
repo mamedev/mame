@@ -45,7 +45,7 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(select_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -58,7 +58,7 @@ private:
 
 // TTL
 
-void dsc_state::prepare_display()
+void dsc_state::update_display()
 {
 	// 4 7seg leds
 	set_display_segmask(0xf, 0x7f);
@@ -70,7 +70,7 @@ WRITE8_MEMBER(dsc_state::control_w)
 	// d0-d7: input mux, 7seg data
 	m_inp_mux = ~data;
 	m_7seg_data = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(dsc_state::select_w)
@@ -80,7 +80,7 @@ WRITE8_MEMBER(dsc_state::select_w)
 
 	// d0-d3: digit select
 	m_led_select = data & 0xf;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(dsc_state::input_r)

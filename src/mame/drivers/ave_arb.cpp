@@ -97,7 +97,7 @@ private:
 	u32 m_cart_mask;
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -133,7 +133,7 @@ READ8_MEMBER(arb_state::cartridge_r)
 
 // R6522 ports
 
-void arb_state::prepare_display()
+void arb_state::update_display()
 {
 	// 12 led column data lines via 3 7475
 	u16 mask = 0;
@@ -148,7 +148,7 @@ WRITE8_MEMBER(arb_state::leds_w)
 {
 	// PA0-PA7: led latch input
 	m_led_latch = ~data & 0xff;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(arb_state::control_w)
@@ -159,7 +159,7 @@ WRITE8_MEMBER(arb_state::control_w)
 
 	// PB4,PB5: led group select
 	m_led_select = data >> 4 & 3;
-	prepare_display();
+	update_display();
 
 	// PB7: speaker out
 	m_dac->write(BIT(data, 7));
