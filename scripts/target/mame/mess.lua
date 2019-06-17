@@ -2963,8 +2963,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/qvt70.cpp",
 	MAME_DIR .. "src/mame/drivers/qvt102.cpp",
 	MAME_DIR .. "src/mame/drivers/qvt103.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt190.cpp",
 	MAME_DIR .. "src/mame/drivers/qvt201.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "radio")

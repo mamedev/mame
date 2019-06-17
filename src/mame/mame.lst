@@ -33397,11 +33397,11 @@ qvt102a                         // (c) 1983 Qume Corp.
 @source:qvt103.cpp
 qvt103                          // (c) 1983 Qume Corp.
 
+@source:qvt190.cpp
+qvt190                          // Qume Corp.
+
 @source:qvt201.cpp
 qvt201                          // (c) 1986 Qume Corp.
-
-@source:qvt6800.cpp
-qvt190                          //
 
 @source:qx10.cpp
 qx10                            //
