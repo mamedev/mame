@@ -82,10 +82,10 @@ static const gfx_layout layout_16x16 =
 	8*8*4*4
 };
 
-GFXDECODE_MEMBER( tc0091lvc_device::gfxinfo )
-	GFXDECODE_DEVICE( "gfx",      0, layout_8x8,   0, 16 )
-	GFXDECODE_DEVICE( "gfx",      0, layout_16x16, 0, 16 )
-	GFXDECODE_DEVICE_RAM( "vram", 0, layout_8x8,   0, 16 )
+GFXDECODE_MEMBER(tc0091lvc_device::gfxinfo)
+	GFXDECODE_DEVICE("gfx",      0, layout_8x8,   0, 16)
+	GFXDECODE_DEVICE("gfx",      0, layout_16x16, 0, 16)
+	GFXDECODE_DEVICE_RAM("vram", 0, layout_8x8,   0, 16)
 GFXDECODE_END
 
 void tc0091lvc_device::cpu_map(address_map &map)
@@ -204,7 +204,7 @@ void tc0091lvc_device::device_start()
 }
 
 
-void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 global_flip )
+void tc0091lvc_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 global_flip)
 {
 	for (int count = 0; count < 0x3e7; count += 8)
 	{
