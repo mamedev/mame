@@ -13,6 +13,7 @@ Skeleton driver for Qume QVT-201 & QVT-202 display terminals.
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "video/scn2674.h"
+#include "emupal.h"
 #include "screen.h"
 
 class qvt201_state : public driver_device
@@ -99,6 +100,40 @@ void qvt201_state::mem_map(address_map &map)
 static INPUT_PORTS_START( qvt201 )
 INPUT_PORTS_END
 
+static const gfx_layout char_layout =
+{
+	8,10,
+	RGN_FRAC(1,1), // 256
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16
+};
+
+// ascii control code chars
+// those are also at 0x80 to 0x9f in the normal char decode
+// don't know why they are duplicated here
+static const gfx_layout ctrl_char_layout =
+{
+	8,10,
+	RGN_FRAC(1,4), // 32
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 10*8, 11*8, 12*8, 13*8, 14*8, 16*8+10*8, 16*8+11*8, 16*8+12*8, 16*8+13*8, 16*8+14*8 },
+	8*32
+};
+
+// 64 bytes of data remain undecoded
+// byte 10 and 11 from 0x400 to 0x7ff in the rom
+// (0x000 to 0x3ff are the control chars above, 0x800 to 0xfff is 0xff)
+
+static GFXDECODE_START(chars)
+	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0, ctrl_char_layout, 0, 1)
+GFXDECODE_END
+
 void qvt201_state::qvt201(machine_config &config)
 {
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL);
@@ -129,6 +164,10 @@ void qvt201_state::qvt201(machine_config &config)
 	screen.set_raw(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250);
 	//screen.set_raw(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250);
 	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	GFXDECODE(config, "gfxdecode", "palette", chars);
 
 	scn2672_device &crtc(SCN2672(config, "crtc", 48.654_MHz_XTAL / 30));
 	crtc.set_character_width(10); // 9 in 132-column mode
