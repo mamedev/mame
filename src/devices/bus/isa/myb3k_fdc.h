@@ -41,7 +41,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
-	required_device<mb8876_device> m_fdc;
+	required_device<wd_fdc_device_base> m_fdc;
 	optional_device_array<floppy_connector, 4> m_floppy_connectors;
 
 	offs_t io_base;

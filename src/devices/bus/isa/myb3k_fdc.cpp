@@ -106,7 +106,7 @@ void isa8_myb3k_fdc4710_device::device_add_mconfig(machine_config &config)
 /* Main difference from fdc4710 is that a Hitachi HA16632AP has replaced the discrete VFO enabling 720Kb disks */
 void isa8_myb3k_fdc4711_device::device_add_mconfig(machine_config &config)
 {
-	MB8876(config, m_fdc, XTAL(15'974'400) / 16);
+	FD1791(config, m_fdc, XTAL(15'974'400) / 16);
 	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy_connectors[2], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
