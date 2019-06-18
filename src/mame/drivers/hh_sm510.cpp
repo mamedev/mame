@@ -3152,8 +3152,10 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   This is the panorama version. There's also a tabletop version which is
-  assumed to use the same ROM and a new wide screen version which is a
-  different game.
+  assumed to use the same ROM/LCD, and a new wide screen version which is
+  a different game.
+
+  The tabletop version was also licensed to Coleco.
 
 ***************************************************************************/
 

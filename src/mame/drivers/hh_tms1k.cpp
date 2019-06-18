@@ -137,8 +137,6 @@
     electronically (mpla is usually the default, opla is often custom)
   - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-  - some of the games rely on the fact that faster/longer strobed leds appear brighter,
-    eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
   - fake-press ON button when emulation starts for machines that have it on the button matrix
     (doesn't look like any relies on it though)
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
@@ -1461,8 +1459,8 @@ static INPUT_PORTS_START( cqback )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) ) // TP1-TP2
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void cqback_state::cqback(machine_config &config)
@@ -1476,7 +1474,7 @@ void cqback_state::cqback(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x1ff, 0xff);
-	m_display->set_bri_levels(0.005, 0.03); // offense leds are brighter
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_cqback);
 
 	/* sound hardware */
@@ -1508,7 +1506,7 @@ ROM_END
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
   LED electronic football game. To distinguish between offense and defense,
-  offense blips (should) appear brighter. The hardware is similar to cqback.
+  offense blips appear brighter. The hardware is similar to cqback.
 
   known releases:
   - USA(1): Head to Head: Electronic Football
@@ -1593,8 +1591,8 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void h2hfootb_state::h2hfootb(machine_config &config)
@@ -1608,7 +1606,7 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 	m_display->set_segmask(0x1ff, 0x7f);
-	m_display->set_bri_levels(0.005, 0.03); // offense leds are brighter
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_h2hfootb);
 
 	/* sound hardware */
@@ -2454,6 +2452,7 @@ void tc4_state::tc4(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
 	m_display->set_segmask(0x3a0, 0x7f);
+	m_display->set_bri_levels(0.005, 0.05); // offense leds are brighter
 	config.set_default_layout(layout_tc4);
 
 	/* sound hardware */
@@ -2575,7 +2574,7 @@ INPUT_PORTS_END
 void cnbaskb_state::cnbaskb(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
 	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
 	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
@@ -2583,6 +2582,7 @@ void cnbaskb_state::cnbaskb(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x180, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cnbaskb);
 
 	/* sound hardware */
@@ -2701,7 +2701,7 @@ INPUT_PORTS_END
 void cmsport_state::cmsport(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(cmsport_state::read_k));
 	m_maincpu->r().set(FUNC(cmsport_state::write_r));
 	m_maincpu->o().set(FUNC(cmsport_state::write_o));
@@ -2709,6 +2709,7 @@ void cmsport_state::cmsport(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x60, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cmsport);
 
 	/* sound hardware */
@@ -2828,8 +2829,8 @@ static INPUT_PORTS_START( cnfball )
 	PORT_CONFSETTING(    0x00, "2" ) // professional
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 static const s16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
@@ -2837,7 +2838,7 @@ static const s16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 void cnfball_state::cnfball(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(cnfball_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
@@ -2846,6 +2847,7 @@ void cnfball_state::cnfball(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 8+3);
 	m_display->set_segmask(0xc3, 0x7f);
 	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cnfball);
 
 	/* sound hardware */
@@ -2878,6 +2880,8 @@ ROM_END
   * 9-digit LED grid, 1-bit sound
 
   This is a clone of Coleco's Quarterback, similar at hardware-level too.
+  Unlike the other LED Football games, this one looks like it doesn't make
+  the offense(player) leds brighter.
 
   known releases:
   - Hong Kong: Electronic Football II, Conic
@@ -2908,7 +2912,7 @@ void cnfball2_state::update_display()
 	if (~m_r & 2)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
-	m_display->matrix(m_r >> 1 & 0x1ff, seg);
+	m_display->matrix(m_r >> 2 & 0x1ff, seg);
 }
 
 WRITE16_MEMBER(cnfball2_state::write_r)
@@ -2977,7 +2981,7 @@ static const u16 cnfball2_output_pla[0x20] =
 void cnfball2_state::cnfball2(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->set_output_pla(cnfball2_output_pla);
 	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
@@ -3250,6 +3254,7 @@ void esoccer_state::esoccer(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0x300, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_esoccer);
 
 	/* sound hardware */
@@ -4228,6 +4233,7 @@ void ebaskb2_state::ebaskb2(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // ball carrier led is brighter
 	config.set_default_layout(layout_ebaskb2);
 
 	/* sound hardware */
@@ -4375,6 +4381,7 @@ void raisedvl_state::raisedvl(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(7, 0x7f);
+	m_display->set_bri_levels(0.01, 0.125); // ball is brighter
 	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
@@ -4656,6 +4663,7 @@ void f3in1_state::f3in1(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3c0, 0x7f);
+	m_display->set_bri_levels(0.003, 0.05); // player led is brighter
 	config.set_default_layout(layout_f3in1);
 
 	/* sound hardware */
@@ -8238,6 +8246,9 @@ ROM_END
   3: Poison Pool
   4: Trick Shots
 
+  BTANB: Some of the other (not cue) balls temporarily flash brighter sometimes,
+  eg. the bottom one when they're placed. This happens on the real device.
+
 ***************************************************************************/
 
 class bankshot_state : public hh_tms1k_state
@@ -8325,6 +8336,7 @@ void bankshot_state::bankshot(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_bri_levels(0.01, 0.08); // cue ball is brigher
 	config.set_default_layout(layout_bankshot);
 
 	/* sound hardware */
@@ -8850,6 +8862,7 @@ void tcfball_state::tcfball(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	m_display->set_segmask(0x77, 0x7f);
 	m_display->set_segmask(0x08, 0xff); // R3 has DP
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_tcfball);
 
 	/* sound hardware */
@@ -11591,6 +11604,7 @@ void ss7in1_state::ss7in1(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_bri_levels(0.005, 0.05); // player led is brighter
 	config.set_default_layout(layout_7in1ss);
 
 	/* sound hardware */
@@ -12075,6 +12089,7 @@ void ssports4_state::ssports4(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
 	m_display->set_segmask(0x303, 0x7f);
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_ssports4);
 
 	/* sound hardware */
