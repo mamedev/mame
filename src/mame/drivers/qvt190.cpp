@@ -85,7 +85,7 @@ INPUT_PORTS_END
 static const gfx_layout char_layout =
 {
 	8,12,
-	RGN_FRAC(1,1),
+	RGN_FRAC(1,1), // 512
 	1,
 	{ 0 },
 	{ STEP8(0,1) },
@@ -93,8 +93,24 @@ static const gfx_layout char_layout =
 	8*16
 };
 
+static const gfx_layout drawing_char_layout =
+{
+	8,12,
+	16,
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{
+		0x000*8+12*8, 0x000*8+13*8, 0x000*8+14*8, 0x000*8+15*8,
+		0x200*8+12*8, 0x200*8+13*8, 0x200*8+14*8, 0x200*8+15*8,
+		0x400*8+12*8, 0x400*8+13*8, 0x400*8+14*8, 0x400*8+15*8
+	},
+	8*16
+};
+
 static GFXDECODE_START(chars)
 	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0, drawing_char_layout, 0, 1)
 GFXDECODE_END
 
 void qvt190_state::qvt190(machine_config &config)

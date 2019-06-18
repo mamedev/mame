@@ -254,8 +254,6 @@
 
 void hh_tms1k_state::machine_start()
 {
-	screenless_state::machine_start();
-
 	// resolve handlers
 	m_out_power.resolve();
 
@@ -882,6 +880,7 @@ void bcheetah_state::bcheetah(machine_config &config)
 	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
 	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
 
+	/* no visual feedback! */
 	config.set_default_layout(layout_bcheetah);
 
 	/* no sound! */
@@ -4444,9 +4443,7 @@ public:
 
 void f2pbball_state::update_display()
 {
-	// R5-R8 are 7segs
-	set_display_segmask(0x1e0, 0x7f);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(f2pbball_state::write_r)
@@ -4457,7 +4454,8 @@ WRITE16_MEMBER(f2pbball_state::write_r)
 	// R9,R10(ANDed together): speaker out
 	m_speaker->level_w(data >> 10 & data >> 9 & 1);
 
-	// R0-R8: led select
+	// R0-R4: led select
+	// R5-R8: digit select
 	m_r = data;
 	update_display();
 }
@@ -4510,6 +4508,9 @@ void f2pbball_state::f2pbball(machine_config &config)
 	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
 	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1e0, 0x7f);
 	config.set_default_layout(layout_f2pbball);
 
 	/* sound hardware */
@@ -4582,9 +4583,7 @@ void f3in1_state::set_clock()
 
 void f3in1_state::update_display()
 {
-	// R6-R9 are 7segs
-	set_display_segmask(0x3c0, 0x7f);
-	display_matrix(8, 10, m_o, m_r & ~0x20);
+	m_display->matrix(m_r & ~0x20, m_o);
 }
 
 WRITE16_MEMBER(f3in1_state::write_r)
@@ -4595,7 +4594,8 @@ WRITE16_MEMBER(f3in1_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R4,R6-R9: led select
+	// R0-R4: led select
+	// R6-R9: digit select
 	m_r = data;
 	update_display();
 }
@@ -4653,6 +4653,9 @@ void f3in1_state::f3in1(machine_config &config)
 	m_maincpu->r().set(FUNC(f3in1_state::write_r));
 	m_maincpu->o().set(FUNC(f3in1_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3c0, 0x7f);
 	config.set_default_layout(layout_f3in1);
 
 	/* sound hardware */
@@ -4720,9 +4723,8 @@ void gpoker_state::machine_reset()
 
 void gpoker_state::update_display()
 {
-	set_display_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
 	u16 segs = bitswap<16>(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
-	display_matrix(14, 11, segs | (m_r >> 3 & 0xf00), m_r & 0x7ff);
+	m_display->matrix(m_r & 0x7ff, segs | (m_r >> 3 & 0xf00));
 }
 
 WRITE16_MEMBER(gpoker_state::write_r)
@@ -4813,6 +4815,9 @@ void gpoker_state::gpoker(machine_config &config)
 	m_maincpu->r().set(FUNC(gpoker_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 14);
+	m_display->set_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
 	config.set_default_layout(layout_gpoker);
 
 	/* sound hardware */
@@ -4931,18 +4936,15 @@ INPUT_PORTS_END
 
 void gjackpot_state::gjackpot(machine_config &config)
 {
+	gpoker(config);
+
 	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	TMS1670(config.replace(), m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
 	config.set_default_layout(layout_gjackpot);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // see gpoker
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -4997,7 +4999,7 @@ public:
 
 void ginv_state::update_display()
 {
-	display_matrix(12, 9, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE16_MEMBER(ginv_state::write_r)
@@ -5062,6 +5064,8 @@ void ginv_state::ginv(machine_config &config)
 	screen.set_size(236, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(9, 12);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -5121,7 +5125,7 @@ void ginv1000_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
-	display_matrix(12, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(ginv1000_state::write_r)
@@ -5184,6 +5188,8 @@ void ginv1000_state::ginv1000(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(226, 1080);
 	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(10, 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5255,7 +5261,7 @@ void ginv2000_state::machine_reset()
 
 void ginv2000_state::update_display()
 {
-	display_matrix(16, 10, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE8_MEMBER(ginv2000_state::expander_w)
@@ -5334,6 +5340,8 @@ void ginv2000_state::ginv2000(machine_config &config)
 	screen.set_size(364, 1080);
 	screen.set_visarea_full();
 
+	PWM_DISPLAY(config, m_display).set_size(10, 16);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -5396,13 +5404,11 @@ public:
 void fxmcr165_state::update_display()
 {
 	// 7seg digit from O0-O6
-	m_display_segmask[0] = 0x7f;
-	m_display_state[0] = bitswap<8>(m_o,7,2,6,5,4,3,1,0) & 0x7f;
+	m_display->write_row(0, bitswap<8>(m_o,7,2,6,5,4,3,1,0) & 0x7f);
 
 	// leds from R4-R10
-	m_display_state[1] = m_r >> 4 & 0x7f;
-	set_display_size(7, 2);
-	display_update();
+	m_display->write_row(1, m_r >> 4 & 0x7f);
+	m_display->update();
 }
 
 WRITE16_MEMBER(fxmcr165_state::write_r)
@@ -5484,6 +5490,9 @@ void fxmcr165_state::fxmcr165(machine_config &config)
 	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
 	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1+1, 7);
+	m_display->set_segmask(1, 0x7f);
 	config.set_default_layout(layout_fxmcr165);
 
 	/* sound hardware */
@@ -5544,8 +5553,7 @@ WRITE16_MEMBER(elecdet_state::write_r)
 	m_speaker->level_w((m_o & 0x80) ? (data >> 7 & 3) : 0);
 
 	// R0-R6: select digit
-	set_display_segmask(0x7f, 0x7f);
-	display_matrix(7, 7, bitswap<8>(m_o,7,5,2,1,4,0,6,3), data);
+	m_display->matrix(data, bitswap<8>(m_o,7,5,2,1,4,0,6,3));
 }
 
 WRITE16_MEMBER(elecdet_state::write_o)
@@ -5624,6 +5632,9 @@ void elecdet_state::elecdet(machine_config &config)
 	m_maincpu->o().set(FUNC(elecdet_state::write_o));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(0x7f, 0x7f);
 	config.set_default_layout(layout_elecdet);
 
 	/* sound hardware */
@@ -5683,9 +5694,7 @@ public:
 
 void starwbc_state::update_display()
 {
-	// R6,R8 are 7segs
-	set_display_segmask(0x140, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(starwbc_state::write_r)
@@ -5696,7 +5705,8 @@ WRITE16_MEMBER(starwbc_state::write_r)
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0,R2,R4,R6,R8: led select
+	// R0,R2,R4: led select
+	// R6,R8: digit select
 	m_r = data & 0x155;
 	update_display();
 }
@@ -5766,6 +5776,9 @@ void starwbc_state::starwbc(machine_config &config)
 	m_maincpu->r().set(FUNC(starwbc_state::write_r));
 	m_maincpu->o().set(FUNC(starwbc_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x140, 0x7f);
 	config.set_default_layout(layout_starwbc);
 
 	/* sound hardware */
@@ -5829,8 +5842,7 @@ public:
 
 void astro_state::update_display()
 {
-	set_display_segmask(0x3ff, 0xff);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(astro_state::write_r)
@@ -5914,6 +5926,9 @@ void astro_state::astro(machine_config &config)
 	m_maincpu->r().set(FUNC(astro_state::write_r));
 	m_maincpu->o().set(FUNC(astro_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3ff, 0xff);
 	config.set_default_layout(layout_astro);
 
 	/* no sound! */
@@ -5980,26 +5995,19 @@ public:
 void elecbowl_state::update_display()
 {
 	// standard 7segs
-	for (int y = 0; y < 4; y++)
-	{
-		m_display_segmask[y] = 0x7f;
-		m_display_state[y] = (m_r >> (y + 4) & 1) ? m_o : 0;
-	}
+	m_display->matrix_partial(0, 4, m_r >> 4, m_o, false);
 
 	// lamp muxes
-	u8 mask = 1 << (m_o & 7);
-	u8 d = (m_r & 2) ? mask : 0;
+	u8 sel = m_o & 7;
+	u8 state = m_r >> 1 & 1;
 	if (~m_r & 1)
-		m_display_state[5] = (m_display_state[5] & ~mask) | d;
+		m_display->write_element(5, sel, state);
 	if (~m_r & 4)
-		m_display_state[6] = (m_display_state[6] & ~mask) | d;
+		m_display->write_element(6, sel, state);
 
 	// digit 4 is from mux2 Q7
-	m_display_segmask[4] = 6;
-	m_display_state[4] = (m_display_state[6] & 0x80) ? 6 : 0;
-
-	set_display_size(8, 7);
-	display_update();
+	m_display->write_row(4, m_display->read_element(6, 7) ? 6 : 0);
+	m_display->update();
 }
 
 WRITE16_MEMBER(elecbowl_state::write_r)
@@ -6081,6 +6089,10 @@ void elecbowl_state::elecbowl(machine_config &config)
 	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
 	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 8);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0x10, 0x06); // 1
 	config.set_default_layout(layout_elecbowl);
 
 	/* sound hardware */
@@ -6113,7 +6125,7 @@ ROM_END
   * HLCD0569, 67-segment LCD panel, no sound
 
   This handheld is not a toy, read the manual for more information. In short,
-  it is a device for prediciting the winning chance of a gambling horserace.
+  it is a device for predicting the winning chance of a gambling horserace.
 
   known releases:
   - USA: Thoroughbred Horse Race Analyzer
@@ -6147,15 +6159,13 @@ WRITE32_MEMBER(horseran_state::lcd_output_w)
 		return;
 
 	// update lcd segments
-	display_matrix(24, 3, data, 1 << offset, false);
+	m_display->matrix_partial(0, 3, 1 << offset, data, false);
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
-		m_display_state[3 + (offset << 1 | i)] = bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
+		m_display->write_row(3 + (offset << 1 | i), bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
 
-	set_display_segmask(0x3f<<3, 0x7f);
-	set_display_size(24, 3+6);
-	display_update();
+	m_display->update();
 }
 
 WRITE16_MEMBER(horseran_state::write_r)
@@ -6251,6 +6261,8 @@ void horseran_state::horseran(machine_config &config)
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
 
+	PWM_DISPLAY(config, m_display).set_size(3+6, 24);
+	m_display->set_segmask(0x3f<<3, 0x7f);
 	config.set_default_layout(layout_horseran);
 
 	/* no sound! */
@@ -6505,8 +6517,7 @@ WRITE16_MEMBER(comp4_state::write_r)
 	// R2    R7
 	// R1    R6
 	// R0    R5
-	m_r = data;
-	display_matrix(11, 1, m_r, m_o);
+	m_display->matrix(m_o, data);
 }
 
 WRITE16_MEMBER(comp4_state::write_o)
@@ -6555,6 +6566,8 @@ void comp4_state::comp4(machine_config &config)
 	m_maincpu->r().set(FUNC(comp4_state::write_r));
 	m_maincpu->o().set(FUNC(comp4_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_comp4);
 
 	/* no sound! */
@@ -6625,7 +6638,7 @@ WRITE16_MEMBER(bship_state::write_r)
 WRITE16_MEMBER(bship_state::write_o)
 {
 	// O4: explosion light bulb
-	display_matrix(1, 1, data >> 4 & 1, 1);
+	m_display->matrix(1, data >> 4 & 1);
 
 	// other: sound
 }
@@ -6720,6 +6733,8 @@ void bship_state::bship(machine_config &config)
 	m_maincpu->r().set(FUNC(bship_state::write_r));
 	m_maincpu->o().set(FUNC(bship_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
@@ -6813,7 +6828,7 @@ WRITE16_MEMBER(bshipb_state::write_o)
 	m_sn->mixer_b_w(data >> 6 & 1);
 
 	// O7: 75494 to light bulb
-	display_matrix(1, 1, data >> 7 & 1, 1);
+	m_display->matrix(1, data >> 7 & 1);
 }
 
 READ8_MEMBER(bshipb_state::read_k)
@@ -6834,6 +6849,8 @@ void bshipb_state::bshipb(machine_config &config)
 	m_maincpu->r().set(FUNC(bshipb_state::write_r));
 	m_maincpu->o().set(FUNC(bshipb_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
@@ -6908,7 +6925,7 @@ WRITE16_MEMBER(simon_state::write_r)
 	// R5 -> 75494 IN3 -> red lamp
 	// R6 -> 75494 IN5 -> yellow lamp
 	// R7 -> 75494 IN2 -> blue lamp
-	display_matrix(4, 1, data >> 4, 1);
+	m_display->matrix(1, data >> 4);
 
 	// R8 -> 75494 IN0 -> speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -6968,6 +6985,8 @@ void simon_state::simon(machine_config &config)
 	m_maincpu->k().set(FUNC(simon_state::read_k));
 	m_maincpu->r().set(FUNC(simon_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_simon);
 
 	/* sound hardware */
@@ -7058,7 +7077,7 @@ WRITE16_MEMBER(ssimon_state::write_r)
 	// R5: green lamps
 	// R6: blue lamps
 	// R7: red lamps
-	display_matrix(4, 1, data >> 4, 1);
+	m_display->matrix(1, data >> 4);
 
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -7133,6 +7152,8 @@ void ssimon_state::ssimon(machine_config &config)
 	m_maincpu->k().set(FUNC(ssimon_state::read_k));
 	m_maincpu->r().set(FUNC(ssimon_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ssimon);
 
 	/* sound hardware */
@@ -7186,7 +7207,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	int m_gearbox_pos;
-	bool sensor_state() { return m_gearbox_pos < 0 && display_element_on(0, 0); }
+	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
 	void bigtrak(machine_config &config);
 
@@ -7225,7 +7246,7 @@ WRITE16_MEMBER(bigtrak_state::write_r)
 	// R6: N/C
 	// R7: IR led on
 	// R9: lamp on
-	display_matrix(2, 1, (data >> 7 & 1) | (data >> 8 & 2), 1);
+	m_display->matrix(1, (data >> 7 & 1) | (data >> 8 & 2));
 
 	// (O0,O7,)R10(tied together): speaker out
 	m_speaker->level_w((m_o & 1) | (m_o >> 6 & 2) | (data >> 8 & 4));
@@ -7327,6 +7348,8 @@ void bigtrak_state::bigtrak(machine_config &config)
 
 	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 2);
 	config.set_default_layout(layout_bigtrak);
 
 	/* sound hardware */
@@ -7379,7 +7402,7 @@ public:
 	{ }
 
 	void update_display();
-	bool sensor_led_on() { return display_element_on(0, 0); }
+	bool sensor_led_on() { return m_display->element_on(0, 0); }
 
 	int m_motor_pos;
 	int m_motor_pos_prev;
@@ -7461,27 +7484,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	m_motor_pos_prev = m_motor_pos;
 }
 
-
 void mbdtower_state::update_display()
 {
-	// declare display matrix size and the 2 7segs
-	set_display_size(7, 3);
-	set_display_segmask(6, 0x7f);
-
 	// update current state
 	if (~m_r & 0x10)
 	{
 		u8 o = bitswap<8>(m_o,7,0,4,3,2,1,6,5) & 0x7f;
-		m_display_state[2] = (m_o & 0x80) ? o : 0;
-		m_display_state[1] = (m_o & 0x80) ? 0 : o;
-		m_display_state[0] = (m_r >> 8 & 1) | (m_r >> 4 & 0xe);
+		m_display->write_row(2, (m_o & 0x80) ? o : 0);
+		m_display->write_row(1, (m_o & 0x80) ? 0 : o);
+		m_display->write_row(0, (m_r >> 8 & 1) | (m_r >> 4 & 0xe));
 
-		display_update();
+		m_display->update();
 	}
 	else
 	{
 		// display items turned off
-		display_matrix(7, 3, 0, 0);
+		m_display->matrix(0, 0);
 	}
 }
 
@@ -7572,6 +7590,9 @@ void mbdtower_state::mbdtower(machine_config &config)
 
 	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(6, 0x7f);
 	config.set_default_layout(layout_mbdtower);
 
 	/* sound hardware */
@@ -7625,7 +7646,7 @@ public:
 WRITE16_MEMBER(arcmania_state::write_r)
 {
 	// R1-R9: leds
-	display_matrix(9, 1, data >> 1, 1);
+	m_display->matrix(1, data >> 1);
 }
 
 WRITE16_MEMBER(arcmania_state::write_o)
@@ -7693,6 +7714,8 @@ void arcmania_state::arcmania(machine_config &config)
 	m_maincpu->r().set(FUNC(arcmania_state::write_r));
 	m_maincpu->o().set(FUNC(arcmania_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 9);
 	config.set_default_layout(layout_arcmania);
 
 	/* sound hardware */
@@ -7749,8 +7772,7 @@ WRITE16_MEMBER(cnsector_state::write_r)
 {
 	// R0-R5: select digit
 	// R6-R9: direction leds
-	set_display_segmask(0x3f, 0xff);
-	display_matrix(8, 10, m_o, data);
+	m_display->matrix(data, m_o);
 }
 
 WRITE16_MEMBER(cnsector_state::write_o)
@@ -7823,6 +7845,9 @@ void cnsector_state::cnsector(machine_config &config)
 	m_maincpu->r().set(FUNC(cnsector_state::write_r));
 	m_maincpu->o().set(FUNC(cnsector_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_cnsector);
 
 	/* no sound! */
@@ -7895,7 +7920,7 @@ WRITE16_MEMBER(merlin_state::write_r)
 	R7   R8   R9
 	     R10
 	*/
-	display_matrix(11, 1, data, 1);
+	m_display->matrix(1, data);
 }
 
 WRITE16_MEMBER(merlin_state::write_o)
@@ -7952,6 +7977,8 @@ void merlin_state::merlin(machine_config &config)
 	m_maincpu->r().set(FUNC(merlin_state::write_r));
 	m_maincpu->o().set(FUNC(merlin_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_merlin);
 
 	/* sound hardware */
@@ -8022,19 +8049,15 @@ INPUT_PORTS_END
 
 void mmerlin_state::mmerlin(machine_config &config)
 {
+	merlin(config);
+
 	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
+	TMS1400(config.replace(), m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
 	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
 	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
 	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
 
 	config.set_default_layout(layout_mmerlin);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, merlin_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -8084,8 +8107,7 @@ public:
 WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 3, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
+	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
 
 	// R3-R8(tied together): speaker out
 	int level = 0;
@@ -8156,6 +8178,9 @@ void stopthief_state::stopthief(machine_config &config)
 	m_maincpu->o().set(FUNC(stopthief_state::write_o));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_stopthief);
 
 	/* sound hardware */
@@ -8233,7 +8258,7 @@ public:
 
 void bankshot_state::update_display()
 {
-	display_matrix(8, 11, m_o, m_r & ~3);
+	m_display->matrix(m_r & ~3, m_o);
 }
 
 WRITE16_MEMBER(bankshot_state::write_r)
@@ -8298,6 +8323,8 @@ void bankshot_state::bankshot(machine_config &config)
 	m_maincpu->r().set(FUNC(bankshot_state::write_r));
 	m_maincpu->o().set(FUNC(bankshot_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	config.set_default_layout(layout_bankshot);
 
 	/* sound hardware */
@@ -8372,7 +8399,7 @@ public:
 
 void splitsec_state::update_display()
 {
-	display_matrix(7, 8, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(splitsec_state::write_r)
@@ -8426,6 +8453,8 @@ void splitsec_state::splitsec(machine_config &config)
 	m_maincpu->r().set(FUNC(splitsec_state::write_r));
 	m_maincpu->o().set(FUNC(splitsec_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	config.set_default_layout(layout_splitsec);
 
 	/* sound hardware */
@@ -8479,7 +8508,7 @@ public:
 WRITE16_MEMBER(lostreas_state::write_r)
 {
 	// R0-R10: leds
-	display_matrix(11, 1, data, 1);
+	m_display->matrix(1, data);
 }
 
 WRITE16_MEMBER(lostreas_state::write_o)
@@ -8555,6 +8584,8 @@ void lostreas_state::lostreas(machine_config &config)
 	m_maincpu->r().set(FUNC(lostreas_state::write_r));
 	m_maincpu->o().set(FUNC(lostreas_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_lostreas);
 
 	/* sound hardware */
@@ -8620,7 +8651,7 @@ WRITE16_MEMBER(alphie_state::write_r)
 	m_inp_mux = (data >> 1 & 0x1f) | 0x20;
 
 	// R6-R10: leds
-	display_matrix(5, 1, data >> 6, 1);
+	m_display->matrix(1, data >> 6);
 
 	// R0: power off on falling edge (turn back on with button)
 	if (~data & m_r & 1)
@@ -8695,6 +8726,8 @@ void alphie_state::alphie(machine_config &config)
 	m_maincpu->r().set(FUNC(alphie_state::write_r));
 	m_maincpu->o().set(FUNC(alphie_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 5);
 	config.set_default_layout(layout_alphie);
 
 	/* sound hardware */
@@ -8753,9 +8786,7 @@ void tcfball_state::update_display()
 	u16 mask = ((m_r >> 9 & 1) * 0x7f) | ((m_r >> 8 & 1) * 0x780);
 	u16 sel = ((m_r & 0x7f) | (m_r << 7 & 0x780)) & mask;
 
-	set_display_segmask(0x77, 0x7f);
-	set_display_segmask(0x08, 0xff); // R3 has DP
-	display_matrix(8, 11, m_o, sel);
+	m_display->matrix(sel, m_o);
 }
 
 WRITE16_MEMBER(tcfball_state::write_r)
@@ -8815,6 +8846,10 @@ void tcfball_state::tcfball(machine_config &config)
 	m_maincpu->r().set(FUNC(tcfball_state::write_r));
 	m_maincpu->o().set(FUNC(tcfball_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_segmask(0x77, 0x7f);
+	m_display->set_segmask(0x08, 0xff); // R3 has DP
 	config.set_default_layout(layout_tcfball);
 
 	/* sound hardware */
@@ -8885,19 +8920,13 @@ static const u16 tcfballa_output_pla[0x20] =
 
 void tcfballa_state::tcfballa(machine_config &config)
 {
+	tcfball(config);
+
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=50pF
+	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
 	m_maincpu->set_output_pla(tcfballa_output_pla);
-	m_maincpu->k().set(FUNC(tcfballa_state::read_k));
-	m_maincpu->r().set(FUNC(tcfballa_state::write_r));
-	m_maincpu->o().set(FUNC(tcfballa_state::write_o));
 
 	config.set_default_layout(layout_tcfballa);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -8961,8 +8990,7 @@ public:
 
 void tandy12_state::update_display()
 {
-	// O0-O7: button lamps 1-8, R0-R3: button lamps 9-12
-	display_matrix(13, 1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00), 1);
+	m_display->matrix(1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00));
 }
 
 WRITE16_MEMBER(tandy12_state::write_r)
@@ -8973,13 +9001,14 @@ WRITE16_MEMBER(tandy12_state::write_r)
 	// R5-R9: input mux
 	m_inp_mux = data >> 5 & 0x1f;
 
-	// other bits:
+	// R0-R3: button lamps 9-12
 	m_r = data;
 	update_display();
 }
 
 WRITE16_MEMBER(tandy12_state::write_o)
 {
+	// O0-O7: button lamps 1-8
 	m_o = data;
 	update_display();
 }
@@ -9067,6 +9096,8 @@ void tandy12_state::tandy12(machine_config &config)
 	m_maincpu->r().set(FUNC(tandy12_state::write_r));
 	m_maincpu->o().set(FUNC(tandy12_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 13);
 	config.set_default_layout(layout_tandy12);
 
 	/* sound hardware */
@@ -9135,7 +9166,7 @@ WRITE16_MEMBER(monkeysee_state::write_o)
 {
 	// O6,O7: leds
 	// other: N/C
-	display_matrix(2, 1, data >> 6, 1);
+	m_display->matrix(1, data >> 6);
 }
 
 READ8_MEMBER(monkeysee_state::read_k)
@@ -9186,6 +9217,8 @@ void monkeysee_state::monkeysee(machine_config &config)
 	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
 	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 2);
 	config.set_default_layout(layout_monkeysee);
 
 	/* sound hardware */
@@ -9244,8 +9277,7 @@ public:
 
 void speechp_state::update_display()
 {
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(speechp_state::write_r)
@@ -9346,6 +9378,9 @@ void speechp_state::speechp(machine_config &config)
 	m_maincpu->r().set(FUNC(speechp_state::write_r));
 	m_maincpu->o().set(FUNC(speechp_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_speechp);
 
 	/* sound hardware */
@@ -9403,14 +9438,13 @@ public:
 
 void tisr16_state::update_display()
 {
-	// update leds state
-	set_display_segmask(0xfff, 0xff);
-	display_matrix(8, 12, m_o, m_r, false);
+	m_display->matrix(m_r, m_o, false);
 
 	// exponent sign is from R10 O1, and R10 itself only uses segment G
-	m_display_state[11] = m_display_state[10] << 5 & 0x40;
-	m_display_state[10] &= 0x40;
-	display_update();
+	u8 r10 = m_display->read_row(10);
+	m_display->write_row(11, r10 << 5 & 0x40);
+	m_display->write_row(10, r10 & 0x40);
+	m_display->update();
 }
 
 WRITE16_MEMBER(tisr16_state::write_r)
@@ -9579,6 +9613,9 @@ void tisr16_state::tisr16(machine_config &config)
 	m_maincpu->o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->r().set(FUNC(tisr16_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(12, 8);
+	m_display->set_segmask(0xfff, 0xff);
 	config.set_default_layout(layout_tisr16);
 
 	/* no sound! */
@@ -9656,9 +9693,7 @@ private:
 WRITE16_MEMBER(ti1250_state::write_r)
 {
 	// R0-R8: select digit
-	set_display_segmask(0xff, 0xff);
-	set_display_segmask(0x100, 0x40); // R8 only has segment G connected
-	display_matrix(8, 9, m_o, data);
+	m_display->matrix(data, m_o);
 }
 
 WRITE16_MEMBER(ti1250_state::write_o)
@@ -9741,6 +9776,10 @@ void ti1250_state::ti1250(machine_config &config)
 	m_maincpu->o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0xff, 0xff);
+	m_display->set_segmask(0x100, 0x40); // R8 only has segment G connected
 	config.set_default_layout(layout_ti1250);
 
 	/* no sound! */
@@ -9833,8 +9872,7 @@ private:
 
 void ti25503_state::update_display()
 {
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(ti25503_state::write_r)
@@ -9912,6 +9950,9 @@ void ti25503_state::ti25503(machine_config &config)
 	m_maincpu->o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->r().set(FUNC(ti25503_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_ti25503);
 
 	/* no sound! */
@@ -9974,9 +10015,7 @@ private:
 WRITE16_MEMBER(ti30_state::write_r)
 {
 	// R0-R8: select digit
-	set_display_segmask(0x1fe, 0xff);
-	set_display_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
-	display_matrix(8, 9, m_o, data);
+	m_display->matrix(data, m_o);
 }
 
 WRITE16_MEMBER(ti30_state::write_o)
@@ -10182,6 +10221,10 @@ void ti30_state::ti30(machine_config &config)
 	m_maincpu->r().set(FUNC(ti30_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1fe, 0xff);
+	m_display->set_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
 	config.set_default_layout(layout_ti30);
 
 	/* no sound! */
@@ -10266,8 +10309,7 @@ private:
 WRITE16_MEMBER(ti1000_state::write_r)
 {
 	// R0-R7: select digit
-	set_display_segmask(0xff, 0xff);
-	display_matrix(8, 8, m_o, data);
+	m_display->matrix(data, m_o);
 }
 
 WRITE16_MEMBER(ti1000_state::write_o)
@@ -10327,6 +10369,9 @@ void ti1000_state::ti1000(machine_config &config)
 	m_maincpu->o().set(FUNC(ti1000_state::write_o));
 	m_maincpu->r().set(FUNC(ti1000_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_ti1270);
 
 	/* no sound! */
@@ -10378,18 +10423,16 @@ public:
 
 WRITE16_MEMBER(wizatron_state::write_r)
 {
+	// R0-R8: select digit
+
+	// 3rd digit only has A and G for =, though some newer hardware revisions
+	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
+
 	// 6th digit is custom(not 7seg), for math symbols, like this:
 	//   \./    GAB
 	//   ---     F
 	//   /.\    EDC
-
-	// 3rd digit only has A and G for =, though some newer hardware revisions
-	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
-	set_display_segmask(8, 0x41);
-
-	// R0-R8: select digit
-	set_display_segmask(0x1ff^8, 0x7f);
-	display_matrix(7, 9, m_o, data);
+	m_display->matrix(data, m_o);
 }
 
 WRITE16_MEMBER(wizatron_state::write_o)
@@ -10443,6 +10486,10 @@ void wizatron_state::wizatron(machine_config &config)
 	m_maincpu->o().set(FUNC(wizatron_state::write_o));
 	m_maincpu->r().set(FUNC(wizatron_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1ff^8, 0x7f);
+	m_display->set_segmask(8, 0x41); // equals sign
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
@@ -10528,15 +10575,11 @@ INPUT_PORTS_END
 
 void lilprof_state::lilprof(machine_config &config)
 {
+	wizatron(config);
+
 	/* basic machine hardware */
-	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(lilprof_state::read_k));
 	m_maincpu->o().set(FUNC(lilprof_state::write_o));
-	m_maincpu->r().set(FUNC(wizatron_state::write_r));
-
-	config.set_default_layout(layout_wizatron);
-
-	/* no sound! */
 }
 
 // roms
@@ -10592,15 +10635,14 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
 	u16 r = (data & 7) | (data << 1 & 0x1f0);
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(7, 9, seg, r, false);
+	m_display->matrix(r, seg, false);
 
 	// 3rd digit A/G(equals sign) is from O7
-	m_display_state[3] = (r != 0 && m_o & 0x80) ? 0x41 : 0;
+	m_display->write_row(3, (r != 0 && m_o & 0x80) ? 0x41 : 0);
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
-	m_display_state[6] = bitswap<8>(m_display_state[6],7,6,1,4,2,3,5,0);
-	display_update();
+	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
+	m_display->update();
 }
 
 WRITE16_MEMBER(lilprof78_state::write_o)
@@ -10661,6 +10703,9 @@ void lilprof78_state::lilprof78(machine_config &config)
 	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
 	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
@@ -10714,8 +10759,7 @@ public:
 void dataman_state::update_display()
 {
 	// note the extra segment on R9
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(8, 9, m_o | (m_r >> 2 & 0x80), m_r & 0x1ff);
+	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80));
 }
 
 WRITE16_MEMBER(dataman_state::write_r)
@@ -10790,6 +10834,9 @@ void dataman_state::dataman(machine_config &config)
 	m_maincpu->r().set(FUNC(dataman_state::write_r));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_dataman);
 
 	/* no sound! */
@@ -10865,12 +10912,10 @@ INPUT_PORTS_END
 
 void mathmarv_state::mathmarv(machine_config &config)
 {
+	dataman(config);
+
 	/* basic machine hardware */
-	TMS1980(config, m_maincpu, 300000); // assume same as dataman
-	m_maincpu->k().set(FUNC(dataman_state::read_k));
-	m_maincpu->o().set(FUNC(dataman_state::write_o));
 	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
 	config.set_default_layout(layout_mathmarv);
 
@@ -10938,8 +10983,7 @@ WRITE16_MEMBER(timaze_state::write_r)
 WRITE16_MEMBER(timaze_state::write_o)
 {
 	// O3210: 7seg EGCD?
-	set_display_segmask(1, 0x5c);
-	display_matrix(8, 1, bitswap<8>(data, 7,1,6,0,3,2,5,4), 1);
+	m_display->matrix(1, bitswap<8>(data, 7,1,6,0,3,2,5,4));
 }
 
 READ8_MEMBER(timaze_state::read_k)
@@ -10966,6 +11010,9 @@ void timaze_state::timaze(machine_config &config)
 	m_maincpu->r().set(FUNC(timaze_state::write_r));
 	m_maincpu->o().set(FUNC(timaze_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 8);
+	m_display->set_segmask(1, 0x5c);
 	config.set_default_layout(layout_timaze);
 
 	/* no sound! */
@@ -11021,8 +11068,7 @@ private:
 WRITE16_MEMBER(tithermos_state::write_r)
 {
 	// D1-D4: select digit
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 4, m_o, data);
+	m_display->matrix(data, m_o);
 
 	// D6: heat/cool
 	// D8: A/D reset
@@ -11121,6 +11167,9 @@ void tithermos_state::tithermos(machine_config &config)
 
 	CLOCK(config, "ac_line", 60).signal_handler().set_nop();
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_tithermos);
 
 	/* no sound! */
@@ -11178,7 +11227,7 @@ public:
 WRITE16_MEMBER(copycat_state::write_r)
 {
 	// R0-R3: leds
-	display_matrix(4, 1, data & 0xf, 1);
+	m_display->matrix(1, data & 0xf);
 
 	// R4-R7: input mux
 	// R8-R10: N/C
@@ -11238,6 +11287,8 @@ void copycat_state::copycat(machine_config &config)
 	m_maincpu->r().set(FUNC(copycat_state::write_r));
 	m_maincpu->o().set(FUNC(copycat_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_copycat);
 
 	/* sound hardware */
@@ -11298,7 +11349,7 @@ public:
 WRITE16_MEMBER(copycatm2_state::write_r)
 {
 	// R1-R4: leds
-	display_matrix(4, 1, data >> 1 & 0xf, 1);
+	m_display->matrix(1, data >> 1 & 0xf);
 }
 
 WRITE16_MEMBER(copycatm2_state::write_o)
@@ -11325,6 +11376,8 @@ void copycatm2_state::copycatm2(machine_config &config)
 	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
 	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_copycatm2);
 
 	/* sound hardware */
@@ -11380,7 +11433,7 @@ public:
 WRITE16_MEMBER(ditto_state::write_r)
 {
 	// R0-R3: leds
-	display_matrix(4, 1, data & 0xf, 1);
+	m_display->matrix(1, data & 0xf);
 }
 
 WRITE16_MEMBER(ditto_state::write_o)
@@ -11407,6 +11460,8 @@ void ditto_state::ditto(machine_config &config)
 	m_maincpu->r().set(FUNC(ditto_state::write_r));
 	m_maincpu->o().set(FUNC(ditto_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ditto);
 
 	/* sound hardware */
@@ -11466,9 +11521,7 @@ public:
 
 void ss7in1_state::update_display()
 {
-	// R0-R3 are 7segs
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(ss7in1_state::write_r)
@@ -11479,7 +11532,8 @@ WRITE16_MEMBER(ss7in1_state::write_r)
 	// R0-R2,R10: input mux
 	m_inp_mux = (data & 7) | (data >> 7 & 8);
 
-	// R0-R9: digit/led select
+	// R0-R3: digit select
+	// R4-R9: led select
 	m_r = data;
 	update_display();
 }
@@ -11534,6 +11588,9 @@ void ss7in1_state::ss7in1(machine_config &config)
 	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
 	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_7in1ss);
 
 	/* sound hardware */
@@ -11646,18 +11703,16 @@ void tbreakup_state::set_clock()
 void tbreakup_state::update_display()
 {
 	// 7seg leds from R0,R1 and O0-O6
-	for (int y = 0; y < 2; y++)
-	{
-		m_display_segmask[y] = 0x7f;
-		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
-	}
+	m_display->matrix_partial(0, 2, m_r, m_o & 0x7f, false);
+
+	// 22 round leds from O2-O7 and expander port 7
+	m_display->matrix_partial(2, 6, m_o >> 2, m_exp_port[6], false);
 
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
-		m_display_state[y+8] = m_exp_port[y];
+		m_display->write_row(y+8, m_exp_port[y]);
 
-	set_display_size(8, 14);
-	display_update();
+	m_display->update();
 }
 
 WRITE8_MEMBER(tbreakup_state::expander_w)
@@ -11688,10 +11743,6 @@ WRITE16_MEMBER(tbreakup_state::write_o)
 {
 	// O0-O3: TMS1025 port H
 	m_expander->write_h(space, 0, data & 0xf);
-
-	// 22 round leds from O2-O7 and expander port 7 (update here)
-	for (int y = 2; y < 8; y++)
-		m_display_state[y] = (data >> y & 1) ? m_exp_port[6] : 0;
 
 	// O0-O7: led state
 	m_o = data;
@@ -11742,6 +11793,9 @@ void tbreakup_state::tbreakup(machine_config &config)
 	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+6+6, 8);
+	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_tbreakup);
 
 	/* sound hardware */
@@ -11818,9 +11872,7 @@ void phpball_state::update_display()
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to 10.a and 9.a
 	u16 in1 = m_inputs[1]->read() << 7 & 0x600;
-
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 11, m_o, (m_r & 0x1ff) | in1);
+	m_display->matrix((m_r & 0x1ff) | in1, m_o);
 }
 
 WRITE16_MEMBER(phpball_state::write_r)
@@ -11872,6 +11924,9 @@ void phpball_state::phpball(machine_config &config)
 	m_maincpu->r().set(FUNC(phpball_state::write_r));
 	m_maincpu->o().set(FUNC(phpball_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 7);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_phpball);
 
 	/* sound hardware */
@@ -11927,11 +11982,8 @@ public:
 
 void ssports4_state::update_display()
 {
-	// R0,R1 and R8,R9 are 7segs
-	set_display_segmask(0x303, 0x7f);
-
 	// note: R2 is an extra column
-	display_matrix(9, 10, m_o | (m_r << 6 & 0x100), m_r);
+	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
 }
 
 WRITE16_MEMBER(ssports4_state::write_r)
@@ -11940,6 +11992,7 @@ WRITE16_MEMBER(ssports4_state::write_r)
 	m_speaker->level_w(data >> 10 & 1);
 
 	// R0-R9: led select/data
+	// R0,R1 and R8,R9 are 7segs
 	m_r = data;
 	update_display();
 }
@@ -12019,6 +12072,9 @@ void ssports4_state::ssports4(machine_config &config)
 	m_maincpu->r().set(FUNC(ssports4_state::write_r));
 	m_maincpu->o().set(FUNC(ssports4_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 9);
+	m_display->set_segmask(0x303, 0x7f);
 	config.set_default_layout(layout_ssports4);
 
 	/* sound hardware */
@@ -12091,7 +12147,7 @@ void xl25_state::update_halt()
 
 void xl25_state::update_display()
 {
-	display_matrix(3, 10, m_o >> 1, m_r);
+	m_display->matrix(m_r, m_o >> 1);
 }
 
 WRITE16_MEMBER(xl25_state::write_r)
@@ -12194,6 +12250,8 @@ void xl25_state::xl25(machine_config &config)
 	m_maincpu->r().set(FUNC(xl25_state::write_r));
 	m_maincpu->o().set(FUNC(xl25_state::write_o));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 3);
 	config.set_default_layout(layout_xl25);
 
 	/* sound hardware */

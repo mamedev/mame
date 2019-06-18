@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "includes/screenless.h"
-
 #include "cpu/tms1000/tms1000.h"
 #include "cpu/tms1000/tms1000c.h"
 #include "cpu/tms1000/tms1100.h"
@@ -25,11 +23,11 @@
 #include "sound/spkrdev.h"
 
 
-class hh_tms1k_state : public screenless_state
+class hh_tms1k_state : public driver_device
 {
 public:
 	hh_tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		screenless_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
