@@ -1211,7 +1211,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"svi",
 		"svision",
 		"swtpc",
-		"synertec",
+		"synertek",
 		"ta",
 		"tandberg",
 		"tangerin",
@@ -3330,8 +3330,9 @@ files {
 	MAME_DIR .. "src/mame/machine/swtpc09.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "synertec")
+createMESSProjects(_target, _subtarget, "synertek")
 files {
+	MAME_DIR .. "src/mame/drivers/ktm3.cpp",
 	MAME_DIR .. "src/mame/drivers/sym1.cpp",
 }
 
