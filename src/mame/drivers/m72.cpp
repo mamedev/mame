@@ -2905,6 +2905,9 @@ ROM_START( lohtb )
 	ROM_LOAD( "lohtb06.03",  0x30000, 0x10000, CRC(f923183c) SHA1(a6b578191864aefa81e0cad3ba12a2ca491c91cf) )
 
 	ROM_REGION( 0x10000, "samples", ROMREGION_ERASEFF ) /* -- no sample roms on bootleg, included with z80 code */
+
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD( "gal16v8-25qp.ic3", 0x0000, 0x0117, CRC(12d20edf) SHA1(30eb2d0e58661fc16ff22c65cba3694f73220ae8) )
 ROM_END
 
 ROM_START( lohtb2 )
