@@ -15,8 +15,8 @@
 
 #pragma once
 
+#include "machine/74381.h"
 #include "machine/am25s55x.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -59,6 +59,17 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void update_prom_signals();
+
+	void set_oe1(int state);
+	void set_oe2(int state);
+	void set_oe3(int state);
+	void set_oe4(int state);
+	void set_mask_sel_h(int state);
+	void set_16bit_h(int state);
+	void set_proc_sel_h(int state);
+	void set_k_eq_il(int state);
+
 	uint8_t m_store_in[2];
 	uint8_t m_ext_in;
 	uint8_t m_brush_in;
@@ -75,13 +86,23 @@ protected:
 	bool m_b_bus_ah;
 	bool m_fcs;
 
+	uint16_t m_prom_addr;
+	uint8_t *m_prom_base;
+	uint8_t m_prom_out;
+
 	devcb_write8 m_store1;
 	devcb_write8 m_store2;
 	devcb_write8 m_cbus;
 	devcb_write_line m_pck;
+
 	required_device<am25s558_device> m_mult_fa;
 	required_device<am25s558_device> m_mult_ga;
 	required_device<am25s558_device> m_mult_gd;
+	required_device<sn74s381_device> m_alu_he;
+	required_device<sn74s381_device> m_alu_ge;
+	required_device<sn74s381_device> m_alu_fe;
+	required_device<sn74s381_device> m_alu_ee;
+	required_memory_region m_prom;
 };
 
 // device type definition
