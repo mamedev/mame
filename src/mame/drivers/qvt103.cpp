@@ -13,6 +13,7 @@ Skeleton driver for Qume QVT-103 video display terminal.
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "video/crt9007.h"
+#include "emupal.h"
 #include "screen.h"
 
 class qvt103_state : public driver_device
@@ -60,6 +61,21 @@ void qvt103_state::io_map(address_map &map)
 static INPUT_PORTS_START( qvt103 )
 INPUT_PORTS_END
 
+static const gfx_layout char_layout =
+{
+	8,12,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 7, 0, 1, 2, 3, 4, 5, 6 }, // drawing chars look better with 0, 1, 2, 3, 4, 5, 6, 7
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8*16
+};
+
+static GFXDECODE_START(chars)
+	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
+GFXDECODE_END
+
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "dart" },
@@ -86,6 +102,10 @@ void qvt103_state::qvt103(machine_config &config)
 	screen.set_raw(29.376_MHz_XTAL * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300);
 	//screen.set_raw(29.376_MHz_XTAL, 170 * 9, 0, 132 * 9, 320, 0, 300);
 	screen.set_screen_update(FUNC(qvt103_state::screen_update));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	GFXDECODE(config, "gfxdecode", "palette", chars);
 
 	crt9007_device &vpac(CRT9007(config, "vpac", 29.376_MHz_XTAL / 15));
 	vpac.set_character_width(10);
