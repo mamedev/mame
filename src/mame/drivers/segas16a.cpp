@@ -2945,6 +2945,11 @@ ROM_END
 //  CPU: 68000
 //  i8751 315-5194
 //
+//  CPU/Video/Sound Board: 171-5335
+//  ROM Board:             171-5336
+//  Sega game ID: 833-5973 QUARTET (with an additional sticker "REV A")
+//     ROM board: 834-5974
+//
 ROM_START( quartet )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-7458a.9b",  0x000000, 0x8000, CRC(42e7b23e) SHA1(9df3b1b915723f9a927ef03d80ae7983a8c91a21) )
@@ -2984,16 +2989,21 @@ ROM_START( quartet )
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x0500, "plds", 0 )
-	ROM_LOAD( "pal16r6a.22g", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
-	ROM_LOAD( "pal16r6a.23g", 0x0200, 0x0104, NO_DUMP ) // PAL is read protected
-	ROM_LOAD( "pls153.8j",    0x0400, 0x00eb, CRC(0fe1eefd) SHA1(38ba6f57006af8c0d4d7f74aa4778ac1ee2a21fc) )
+	ROM_REGION( 0x0500, "plds", 0 ) // Unknown & undumped PAL 315-5202 @ 8L, 315-5107 @ 22G & 315-5141 @ 3C
+	ROM_LOAD( "315-5147.pal16r6a.23g", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "315-5143.pal16r6a.24g", 0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "315-5193.pls153.8j",    0x0400, 0x00eb, CRC(0fe1eefd) SHA1(38ba6f57006af8c0d4d7f74aa4778ac1ee2a21fc) )
 ROM_END
 
 //*************************************************************************************************************************
 //  Quartet, pre-System 16
 //  CPU: 68000
 //  i8751 315-5194
+//
+//  CPU/Video/Sound Board: 171-5335
+//  ROM Board:             171-5336
+//  Sega game ID: 833-5973 QUARTET
+//     ROM board: 834-5974
 //
 ROM_START( quarteta )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -3034,10 +3044,10 @@ ROM_START( quarteta )
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x0500, "plds", 0 )
-	ROM_LOAD( "pal16r6a.22g", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
-	ROM_LOAD( "pal16r6a.23g", 0x0200, 0x0104, NO_DUMP ) // PAL is read protected
-	ROM_LOAD( "pls153.8j",    0x0400, 0x00eb, CRC(0fe1eefd) SHA1(38ba6f57006af8c0d4d7f74aa4778ac1ee2a21fc) )
+	ROM_REGION( 0x0500, "plds", 0 ) // Unknown & undumped PAL 315-5202 @ 8L, 315-5107 @ 22G & 315-5141 @ 3C
+	ROM_LOAD( "315-5147.pal16r6a.23g", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "315-5143.pal16r6a.24g", 0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "315-5193.pls153.8j",    0x0400, 0x00eb, CRC(0fe1eefd) SHA1(38ba6f57006af8c0d4d7f74aa4778ac1ee2a21fc) )
 ROM_END
 
 
