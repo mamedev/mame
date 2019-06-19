@@ -401,7 +401,35 @@ ROM_END
 
 /*============================================================================
                             Salter Cardioline
-  ============================================================================*/
+  ============================================================================
+
+  There is a Salter I/O PCB with a MCU (undumped):
+
+  Salter PCB "CPU 6022" manufactured by "APEL Electronica"
+    ______________________________________________
+    |       ___________                __________ |
+    |       | JW1FSN  |  Cap 10000uF   |__FUSE__| |
+    |                                             --
+    | ________    ___            Power LED -> o   -- VAC (3 pin)
+    | |AD7424JN  |LM356P       VDC Out LED -> o   --
+    | __________________                          -- +/- OUT (2 pin)
+    | |_____PC817______|          M338K           --
+    |  o o o o o o o o  <- LEDS                   --
+    |  __________  _____                          -- CONTROL (9 pin)
+    |  |TD62083AP  |SW1|                          --
+    |     ______________   ________    __________ --
+    | XT1 |   MCU-1    |   |74HC14AP   |__FUSE__| -- +/- TURNS (3 pin)
+    |     |____________|                |J6|      --
+    |                                   | J5 |    |
+    |_____________________________________________|
+
+  XT1 = 8.000MHz
+  SW1 = 4 dipswitches (default all open)
+  J6 = 12V out for fan
+  J5 = 6 pin connector (unused)
+  MCU-1 = ST62T15C6 labeled as "1"
+
+*/
 
 static INPUT_PORTS_START( saltcrdi ) // dipswitches are on the REVERSE side of the PCB (!)
 	PORT_START("IN0")
@@ -2321,7 +2349,6 @@ GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, e
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 // Gym equipment
-GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING )
-// Pro Reclimber Tele
+GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // Same board and ROM as Pro Reclimber
 // Pro Stepper Tele
 // there are other devices in Cardioline series that don't use displays
