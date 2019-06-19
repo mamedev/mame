@@ -122,6 +122,7 @@ public:
 	void init_humlan();
 	void init_squeenb();
 	void init_qbeebing();
+	void init_treamary();
 	void init_xtrain();
 	void init_expcard();
 	void init_wtrnymph();
@@ -2935,6 +2936,29 @@ void subsino2_state::init_qbeebing()
 	// other patches?
 }
 
+ROM_START( treamary )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "27c040_u21.bin", 0x00000, 0x80000, CRC(b9163830) SHA1(853ccba636c4ee806602ca92a61d4c53ee3108b7) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c040_u25.bin", 0x000000, 0x80000, CRC(d17e5286) SHA1(a538a3b010eb0c7b5c16a4188f32f340fc890850) )
+	ROM_LOAD32_BYTE( "27c040_u26.bin", 0x000002, 0x80000, CRC(fdc6c45b) SHA1(bb37badeba975630fb09b98104fbc757bd39538c) )
+	ROM_LOAD32_BYTE( "27c040_u27.bin", 0x000001, 0x80000, CRC(dc3a477e) SHA1(6268872257f1b513b80a58a9e29861f3f2e2c177) )
+	ROM_LOAD32_BYTE( "27c040_u28.bin", 0x000003, 0x80000, CRC(58d88d8d) SHA1(4551121691e958d280dfd437e47c6e331b66ede6) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c040_u9.bin", 0x000000, 0x80000, CRC(5345ca39) SHA1(2b8f1dfeebb93a1d99c06912d89b268c642163df) )
+ROM_END
+
+
+void subsino2_state::init_treamary()
+{
+	// other patches?
+
+	// gets stuck on CHIP1 test, enters test mode if bypassed
+}
+
+
 /***************************************************************************
 
 Express Card / Top Card
@@ -3441,4 +3465,6 @@ GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,
 
 GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
-GAME( 2002, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing,  ROT0, "Subsino",                          "Queen Bee Bingo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing, ROT0, "Subsino",                          "Queen Bee Bingo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 200?, treamary, 0,        humlan,   humlan,   subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
