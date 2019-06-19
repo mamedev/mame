@@ -15847,6 +15847,10 @@ cpokerpk                        // (c) SGS (bootleg blue board)
 cpokerpkg                       // (c) SGS (bootleg green board)
 cpokert                         // (c) 1993? Tuning
 cpokerx                         // (c) 1993 IGS
+cpoker101                       // (c) 1993 IGS
+cpoker201f                      // (c) 1993 IGS
+cpoker210ks                     // (c) 1993 IGS
+cpoker300us                     // (c) 1993 IGS
 csk227it                        // (c) 198? IGS
 csk234it                        // (c) 198? IGS
 igs_ncs                         // (c) 198? IGS
@@ -36636,6 +36640,7 @@ bishjan                         // (c) 1999 Subsino
 expcard                         // (c) 1998 American Alpha
 humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1996 Subsino
+tbonusal                        // (c) 1996 American Alpha
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
 queenbee                        // (c) 2001 American Alpha
@@ -36647,6 +36652,8 @@ squeenb                         // (c) 2002 Subsino
 wtrnymph                        // (c) 1996 Subsino
 xplan                           // (c) 2006 Subsino
 xtrain                          // (c) 1999 Subsino
+qbeebing
+treamary
 
 @source:summit.cpp
 pushover                        // (c)1981 Summit Coin

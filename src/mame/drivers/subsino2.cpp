@@ -121,10 +121,13 @@ public:
 	void init_queenbeeb();
 	void init_humlan();
 	void init_squeenb();
+	void init_qbeebing();
+	void init_treamary();
 	void init_xtrain();
 	void init_expcard();
 	void init_wtrnymph();
 	void init_mtrain();
+	void init_tbonusal();
 	void init_saklove();
 	void init_xplan();
 	void init_ptrain();
@@ -1572,9 +1575,9 @@ static const gfx_layout ss9601_8x8_layout =
 	RGN_FRAC(1,1),
 	8,
 	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
+	{ 0, 16, 8, 24, 32, 48, 40, 56 },
+	{ STEP8(0,8 * 8) },
+	8 * 8 * 8
 };
 
 static GFXDECODE_START( gfx_ss9601 )
@@ -2652,8 +2655,8 @@ ROM_START( bishjan )
 
 	ROM_REGION( 0x400000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "3-v201.u25", 0x000000, 0x100000, CRC(e013e647) SHA1(a5b0f82f3454393c1ea5e635b0d37735a25e2ea5) )
-	ROM_LOAD32_BYTE( "4-v201.u26", 0x000001, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) )
-	ROM_LOAD32_BYTE( "5-v201.u27", 0x000002, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
+	ROM_LOAD32_BYTE( "4-v201.u26", 0x000002, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) )
+	ROM_LOAD32_BYTE( "5-v201.u27", 0x000001, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
 	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) )
 
 	ROM_REGION( 0x100000, "samples", 0 )    // SS9904
@@ -2722,8 +2725,8 @@ ROM_START( new2001 )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "new_2001_italy_3_v200.0.u25", 0x00000, 0x40000, CRC(621452d6) SHA1(a9654bb98df16b13e8bbc6dd4dada2e63ee05dc9) )
-	ROM_LOAD32_BYTE( "new_2001_italy_4_v200.1.u26", 0x00001, 0x40000, CRC(3073e2d2) SHA1(fb257c625e177d7aa12f1b176a3d1b93d5891cab) )
-	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00002, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
+	ROM_LOAD32_BYTE( "new_2001_italy_4_v200.1.u26", 0x00002, 0x40000, CRC(3073e2d2) SHA1(fb257c625e177d7aa12f1b176a3d1b93d5891cab) )
+	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00001, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
 	ROM_LOAD32_BYTE( "new_2001_italy_6_v200.3.u28", 0x00003, 0x40000, CRC(085599e3) SHA1(afd4bed369a96ba12037e6b8cf3a4cab84d12b21) )
 
 	ROM_REGION( 0x80000, "samples", 0 )    // SS9904
@@ -2758,8 +2761,8 @@ ROM_START( queenbee )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "27c4001 u25.bin", 0x000000, 0x80000, CRC(628ed650) SHA1(dadbc5f73f6a5773303d834a44d2eab836874cfe) )
-	ROM_LOAD32_BYTE( "27c4001 u26.bin", 0x000001, 0x80000, CRC(27a169df) SHA1(d36989c300051a0c41752638ab5134a9b04c50a4) )
-	ROM_LOAD32_BYTE( "27c4001 u27.bin", 0x000002, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
+	ROM_LOAD32_BYTE( "27c4001 u26.bin", 0x000002, 0x80000, CRC(27a169df) SHA1(d36989c300051a0c41752638ab5134a9b04c50a4) )
+	ROM_LOAD32_BYTE( "27c4001 u27.bin", 0x000001, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
 	ROM_LOAD32_BYTE( "27c4001 u28.bin", 0x000003, 0x80000, CRC(7f139a04) SHA1(595a114806756e6f77a6fe20a13515b211ffdf2a) )
 
 	ROM_REGION( 0x80000, "samples", 0 )
@@ -2787,8 +2790,8 @@ ROM_START( queenbeeb )
 	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
 	// following ROMs are taken from humlan for testing, it doesn't seem to be a case of just differently split ROMs.
 	// ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
-	// ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
-	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000002, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000001, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
 	// ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
 
 	ROM_REGION( 0x40000, "samples", 0 )
@@ -2855,8 +2858,8 @@ ROM_START( humlan )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
-	ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
-	ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000002, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000001, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
 	ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
 
 	ROM_REGION( 0x40000, "samples", 0 )    // SS9804
@@ -2892,8 +2895,8 @@ ROM_START( squeenb )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "u25", 0x000000, 0x80000, CRC(842c0a33) SHA1(defb79c158d5091ca8830e9f03dda382d03d51ef) )
-	ROM_LOAD32_BYTE( "u26", 0x000001, 0x80000, CRC(11b67abb) SHA1(e388e3aefbcceda1390c00e6590cbdd686982b2e) )
-	ROM_LOAD32_BYTE( "u27", 0x000002, 0x80000, CRC(d713131a) SHA1(74a95e1ef0d30da53a91a5232574687f816df2eb) )
+	ROM_LOAD32_BYTE( "u26", 0x000002, 0x80000, CRC(11b67abb) SHA1(e388e3aefbcceda1390c00e6590cbdd686982b2e) )
+	ROM_LOAD32_BYTE( "u27", 0x000001, 0x80000, CRC(d713131a) SHA1(74a95e1ef0d30da53a91a5232574687f816df2eb) )
 	ROM_LOAD32_BYTE( "u28", 0x000003, 0x80000, CRC(dfa39f39) SHA1(992f74c04cbf4af06a02812052ce701228d4e174) )
 
 	ROM_REGION( 0x80000, "samples", 0 )
@@ -2911,6 +2914,50 @@ void subsino2_state::init_squeenb()
 	rom[0x399a/2] = 0x5670; // IRQ 8
 	rom[0x3aa8/2] = 0x5670; // IRQ 0
 }
+
+ROM_START( qbeebing )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "rom 2    27c040", 0x00000, 0x80000, CRC(03ea15cd) SHA1(19d3c3dd9e0c57066a6bd854964fd6a9f43c989f) )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "rom 4   27c160  3374h", 0x000001, 0x200000, CRC(a01527a0) SHA1(41ea384dd9c15c58246856f104b7dce68be1737c) )
+	ROM_LOAD16_BYTE( "rom 3   27c160  08d7h", 0x000000, 0x200000, CRC(1fdf0fcb) SHA1(ed54172521f8d05bad37b670548106e4c4deb8af) )
+
+	ROM_REGION( 0x80000, "samples", ROMREGION_ERASE00 ) // no samples, missing?
+ROM_END
+
+void subsino2_state::init_qbeebing()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x25b6/2] = 0x4066;
+
+	// other patches?
+}
+
+ROM_START( treamary )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "27c040_u21.bin", 0x00000, 0x80000, CRC(b9163830) SHA1(853ccba636c4ee806602ca92a61d4c53ee3108b7) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c040_u25.bin", 0x000000, 0x80000, CRC(d17e5286) SHA1(a538a3b010eb0c7b5c16a4188f32f340fc890850) )
+	ROM_LOAD32_BYTE( "27c040_u26.bin", 0x000002, 0x80000, CRC(fdc6c45b) SHA1(bb37badeba975630fb09b98104fbc757bd39538c) )
+	ROM_LOAD32_BYTE( "27c040_u27.bin", 0x000001, 0x80000, CRC(dc3a477e) SHA1(6268872257f1b513b80a58a9e29861f3f2e2c177) )
+	ROM_LOAD32_BYTE( "27c040_u28.bin", 0x000003, 0x80000, CRC(58d88d8d) SHA1(4551121691e958d280dfd437e47c6e331b66ede6) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c040_u9.bin", 0x000000, 0x80000, CRC(5345ca39) SHA1(2b8f1dfeebb93a1d99c06912d89b268c642163df) )
+ROM_END
+
+
+void subsino2_state::init_treamary()
+{
+	// other patches?
+
+	// gets stuck on CHIP1 test, enters test mode if bypassed
+}
+
 
 /***************************************************************************
 
@@ -2956,8 +3003,8 @@ ROM_START( expcard )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "top_card_alpha_3_v1.4.u20", 0x00000, 0x80000, CRC(6e666d51) SHA1(924ac4fefa30cbe8bebe4f0d8ba6fff42fdd233e) )
-	ROM_LOAD32_BYTE( "top_card_alpha_4_v1.4.u19", 0x00001, 0x80000, CRC(1382fd45) SHA1(1d81b7e72e702f5a254e1ec5ec6adb5d8af5d467) )
-	ROM_LOAD32_BYTE( "top_card_alpha_5_v1.4.u18", 0x00002, 0x80000, CRC(bbe465ac) SHA1(7a5ee6f7696e5f768ac56ccfaf0914dd56a83339) )
+	ROM_LOAD32_BYTE( "top_card_alpha_4_v1.4.u19", 0x00002, 0x80000, CRC(1382fd45) SHA1(1d81b7e72e702f5a254e1ec5ec6adb5d8af5d467) )
+	ROM_LOAD32_BYTE( "top_card_alpha_5_v1.4.u18", 0x00001, 0x80000, CRC(bbe465ac) SHA1(7a5ee6f7696e5f768ac56ccfaf0914dd56a83339) )
 	ROM_LOAD32_BYTE( "top_card_alpha_6_v1.4.u17", 0x00003, 0x80000, CRC(315d7a81) SHA1(8dafa1d422d8fe306765413084e35f16e4c17d27) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3026,8 +3073,8 @@ ROM_START( mtrain )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "rom_4.u02", 0x00000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
-	ROM_LOAD32_BYTE( "rom_3.u03", 0x00001, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
-	ROM_LOAD32_BYTE( "rom_2.u04", 0x00002, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
+	ROM_LOAD32_BYTE( "rom_3.u03", 0x00002, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
+	ROM_LOAD32_BYTE( "rom_2.u04", 0x00001, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
 	ROM_LOAD32_BYTE( "rom_1.u05", 0x00003, 0x40000, CRC(96067e95) SHA1(bec7dffaf6920ff2bd85a43fb001a997583e25ee) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3070,6 +3117,42 @@ void subsino2_state::init_mtrain()
 
 }
 
+
+ROM_START( tbonusal )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code starts at 0x8100
+	ROM_LOAD( "n-alpha 1.6-u17.bin", 0x0000, 0x8100, CRC(1bdc1c92) SHA1(2cd7ec5a89865b76df2cfe9d18b2ab42923f8def) )
+	ROM_CONTINUE(              0x0000, 0x7f00 )
+	ROM_RELOAD(                0xa000, 0x6000 )
+
+	// there is a clear HD647180X0FS6 on the PCB, but is it operating in external mode? there is a program rom above at least
+	// if the internal ROM is unused / irrelevant then this doesn't need to be marked
+	//ROM_REGION( 0x10000, "mcu", 0 )
+	//ROM_LOAD( "hd647180", 0x00000, 0x08000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u2.bin", 0x000000, 0x80000, CRC(392943be) SHA1(776d36a94b8a70ec2eaf88dfd2804517656b53a0) )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u3.bin", 0x000002, 0x80000, CRC(24c8f62e) SHA1(692a96f233d8576a6921bfe23c97502ff26c62db) )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u4.bin", 0x000001, 0x80000, CRC(bed035a9) SHA1(6b141bb8fb7969338faa702bd03970331bbbe6e1) )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u5.bin", 0x000003, 0x80000, CRC(d00d48c6) SHA1(28b505a3f07c5d5bb8e8609c6d6e883260594588) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	// not populated on 4 different PCBs
+
+	ROM_REGION( 0x117, "plds", ROMREGION_ERASEFF )
+	// TODO list of GALs
+ROM_END
+
+void subsino2_state::init_tbonusal()
+{
+	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
+	
+	// patch serial protection test (it always enters test mode on boot otherwise)
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x0ea7] = 0x18;
+	rom[0xbbbf] = 0x18;
+}
+
 /***************************************************************************
 
 Sakura Love
@@ -3108,8 +3191,8 @@ ROM_START( saklove )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "3.u27", 0x000000, 0x80000, CRC(01aa8fbd) SHA1(d1d19ef52c8077ccf17cc2fde96fd56c626e33db) )
-	ROM_LOAD32_BYTE( "4.u28", 0x000001, 0x80000, CRC(f8db7ab6) SHA1(3af4e92ab27edc980eccecdbbbb431e1d2101059) )
-	ROM_LOAD32_BYTE( "5.u29", 0x000002, 0x80000, CRC(c6ca1764) SHA1(92bfa19e116d358b03164f2448a28e7524e3cc62) )
+	ROM_LOAD32_BYTE( "4.u28", 0x000002, 0x80000, CRC(f8db7ab6) SHA1(3af4e92ab27edc980eccecdbbbb431e1d2101059) )
+	ROM_LOAD32_BYTE( "5.u29", 0x000001, 0x80000, CRC(c6ca1764) SHA1(92bfa19e116d358b03164f2448a28e7524e3cc62) )
 	ROM_LOAD32_BYTE( "6.u30", 0x000003, 0x80000, CRC(5823c39e) SHA1(257e862ac736ff403ce9c70bbdeed340dfe168af) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3168,8 +3251,8 @@ ROM_START( xplan )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "x-plan_rom_3_v102b.u20", 0x00000, 0x80000, CRC(a027cbd1) SHA1(dac4226014794ef5bff84ddafee7da6691c00ece) )
-	ROM_LOAD32_BYTE( "x-plan_rom_4_v102b.u19", 0x00001, 0x80000, CRC(744be318) SHA1(1c1f2a9e1da77d9bc1bf897072df44a681a53079) )
-	ROM_LOAD32_BYTE( "x-plan_rom_5_v102b.u18", 0x00002, 0x80000, CRC(7e89c9b3) SHA1(9e3fea0d74cac48c068a15595f2342a2b0b3f747) )
+	ROM_LOAD32_BYTE( "x-plan_rom_4_v102b.u19", 0x00002, 0x80000, CRC(744be318) SHA1(1c1f2a9e1da77d9bc1bf897072df44a681a53079) )
+	ROM_LOAD32_BYTE( "x-plan_rom_5_v102b.u18", 0x00001, 0x80000, CRC(7e89c9b3) SHA1(9e3fea0d74cac48c068a15595f2342a2b0b3f747) )
 	ROM_LOAD32_BYTE( "x-plan_rom_6_v102b.u17", 0x00003, 0x80000, CRC(a86ca3b9) SHA1(46aa86b9c62aa0a4e519eb06c72c2d540489afee) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3228,8 +3311,8 @@ ROM_START( xtrain )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "x-train_rom_3_v1.2.u20", 0x00000, 0x80000, CRC(0e18ca82) SHA1(8fbc62a16ab109994086f58c9b9915a92bda0448) )
-	ROM_LOAD32_BYTE( "x-train_rom_4_v1.2.u19", 0x00001, 0x80000, CRC(959fa749) SHA1(d39fcedd1d13d9f86c1915d7dcff7d024739a6fa) )
-	ROM_LOAD32_BYTE( "x-train_rom_5_v1.2.u18", 0x00002, 0x80000, CRC(d0e8279f) SHA1(174483871c9e98936b37cc6cede71b64e19cae90) )
+	ROM_LOAD32_BYTE( "x-train_rom_4_v1.2.u19", 0x00002, 0x80000, CRC(959fa749) SHA1(d39fcedd1d13d9f86c1915d7dcff7d024739a6fa) )
+	ROM_LOAD32_BYTE( "x-train_rom_5_v1.2.u18", 0x00001, 0x80000, CRC(d0e8279f) SHA1(174483871c9e98936b37cc6cede71b64e19cae90) )
 	ROM_LOAD32_BYTE( "x-train_rom_6_v1.2.u17", 0x00003, 0x80000, CRC(289ae881) SHA1(b3f8db43d86078688ad56a04d1e7d7a825df60d7) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3291,8 +3374,8 @@ ROM_START( ptrain )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "panda-novam_3-v1.4.0.u20", 0x00000, 0x80000, CRC(2d5ab471) SHA1(3df42b7f762d738a4409498984e90c80625fae1f) )
-	ROM_LOAD32_BYTE( "panda-novam_4-v1.4.1.u19", 0x00001, 0x80000, CRC(a4b6985c) SHA1(1d3d23f7c9e775439a2d1a4c68b703bf51b0350f) )
-	ROM_LOAD32_BYTE( "panda-novam_5-v1.4.2.u18", 0x00002, 0x80000, CRC(716f7500) SHA1(971589a2530a0d4152bb68dbc7794985525a837d) )
+	ROM_LOAD32_BYTE( "panda-novam_4-v1.4.1.u19", 0x00002, 0x80000, CRC(a4b6985c) SHA1(1d3d23f7c9e775439a2d1a4c68b703bf51b0350f) )
+	ROM_LOAD32_BYTE( "panda-novam_5-v1.4.2.u18", 0x00001, 0x80000, CRC(716f7500) SHA1(971589a2530a0d4152bb68dbc7794985525a837d) )
 	ROM_LOAD32_BYTE( "panda-novam_6-v1.4.3.u17", 0x00003, 0x80000, CRC(10f0c21a) SHA1(400e53bf3dd6fe6f2dd679ed5151fb4400a6ec9f) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3325,8 +3408,8 @@ ROM_START( wtrnymph )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "ocean-n tetris_2 v1.21.u2", 0x00000, 0x40000, CRC(813aac90) SHA1(4555adf8dc363359b10f1d5cfae2dcebed411679) )
-	ROM_LOAD32_BYTE( "ocean-n tetris_3 v1.21.u3", 0x00001, 0x40000, CRC(83c39379) SHA1(e7f9315d19370c18b664b759e433052a88f8c146) )
-	ROM_LOAD32_BYTE( "ocean-n tetris_4 v1.21.u4", 0x00002, 0x40000, CRC(6fc64b42) SHA1(80110d7dae28cca5e39c8a7c2ceebf589116ae23) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_3 v1.21.u3", 0x00002, 0x40000, CRC(83c39379) SHA1(e7f9315d19370c18b664b759e433052a88f8c146) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_4 v1.21.u4", 0x00001, 0x40000, CRC(6fc64b42) SHA1(80110d7dae28cca5e39c8a7c2ceebf589116ae23) )
 	ROM_LOAD32_BYTE( "ocean-n tetris_5 v1.21.u5", 0x00003, 0x40000, CRC(8c7515ee) SHA1(a67b21c1e8ca8a098fe558c73561bca13962893e) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3355,6 +3438,8 @@ void subsino2_state::init_wtrnymph()
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
 
+GAME( 1995, tbonusal, 0,        mtrain,   mtrain,   subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
+
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
 GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, init_expcard,  ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
@@ -3379,3 +3464,7 @@ GAME( 2001, queenbeesa,queenbee,humlan,   humlan,   subsino2_state, empty_init, 
 GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
 GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+
+GAME( 2003, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing, ROT0, "Subsino",                          "Queen Bee Bingo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 200?, treamary, 0,        humlan,   humlan,   subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
