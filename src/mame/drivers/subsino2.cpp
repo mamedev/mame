@@ -3431,9 +3431,8 @@ void subsino2_state::init_ptrain()
 ***************************************************************************/
 
 ROM_START( treacity )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "alpha 208_27c1001_u33.bin", 0x00000, 0x20000, CRC(e743aac3) SHA1(762575000463a126df561c959dfa06180e955822) )
-	ROM_RELOAD(0x20000,0x20000)
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "alpha 207_27c4001_u7.bin",  0x00000, 0x80000, CRC(88d4d1f2) SHA1(35bc70904ceadeb7b1ccc35bb92585419da50fe1) )
@@ -3446,13 +3445,15 @@ ROM_END
 
 void subsino2_state::init_treacity()
 {
-	// TODO: patches
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xaff9] = 0x75;
 }
 
 ROM_START( treacity202 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "alpha 202_27c1001_u33.bin", 0x00000, 0x20000, CRC(1a698c3d) SHA1(c2107b67d86783b04d1ebdf78d1f358916c51219) )
-	ROM_RELOAD(0x20000,0x20000)
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "alpha 142_27c4001_u7.bin",  0x00000, 0x80000, CRC(c8e4e4d3) SHA1(b5dabfe2e8e5a19d218e3d58bbebbe83803feb23) )
@@ -3465,8 +3466,13 @@ ROM_END
 
 void subsino2_state::init_treacity202()
 {
-	// TODO: patches
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xae30] = 0x75;
 }
+
+
 
 
 /***************************************************************************
