@@ -3100,6 +3100,11 @@ ROM_END
 void subsino2_state::init_tbonusal()
 {
 	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
+	
+	// patch serial protection test (it always enters test mode on boot otherwise)
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x0ea7] = 0x18;
+	rom[0xbbbf] = 0x18;
 }
 
 /***************************************************************************
@@ -3387,7 +3392,7 @@ void subsino2_state::init_wtrnymph()
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
 
-GAME( 1996, tbonusal, 0,        mtrain,   mtrain,   subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
+GAME( 1995, tbonusal, 0,        mtrain,   mtrain,   subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
