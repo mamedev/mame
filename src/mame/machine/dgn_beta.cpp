@@ -438,7 +438,8 @@ int dgn_beta_state::GetKeyRow(dgn_beta_state *state, int RowNo)
 */
 READ8_MEMBER(dgn_beta_state::d_pia0_pa_r)
 {
-	return 0;
+	// The hardware has pullup resistors on port A.
+	return 0xff;
 }
 
 WRITE8_MEMBER(dgn_beta_state::d_pia0_pa_w)
@@ -558,7 +559,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_b)
 
 READ8_MEMBER(dgn_beta_state::d_pia1_pa_r)
 {
-	return 0;
+	// The hardware has pullup resistors on port A.
+	return 0xff;
 }
 
 WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
@@ -657,7 +659,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_b)
 */
 READ8_MEMBER(dgn_beta_state::d_pia2_pa_r)
 {
-	return 0;
+	// The hardware has pullup resistors on port A.
+	return 0xff;
 }
 
 WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
@@ -901,11 +904,6 @@ void dgn_beta_state::machine_reset()
 	m_EnableMapRegs = 0;
 	memset(m_PageRegs, 0, sizeof(m_PageRegs));    /* Reset page registers to 0 */
 	SetDefaultTask();
-
-	/* Set pullups on all PIA port A, to match what hardware does */
-	m_pia_0->set_port_a_z_mask(0xFF);
-	m_pia_1->set_port_a_z_mask(0xFF);
-	m_pia_2->set_port_a_z_mask(0xFF);
 
 	m_d_pia1_pa_last = 0x00;
 	m_d_pia1_pb_last = 0x00;
