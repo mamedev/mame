@@ -35,6 +35,8 @@ PCB Contents:
 1x UMC 8928LP-UM8272A floppy disk controller (lower board)
 1x UMC 8935CS-UM82C11 Printer Adapter Interface (lower board)
 1x UMC 8936CS-UM8250B Programmable asynchronous communications element (lower board)
+1x UMC 8937NS-UM82C8167 Real Time Clock (lower board)
+1x Yamaha V6363 CMDC QFP (lower board)
 There isn't any keyboard found connected to the pcb.
 ********************************************************************************************
 Filetto SW notes:
