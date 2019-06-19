@@ -3537,8 +3537,8 @@ GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,
 
 GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 199?, treacity,    0,       saklove, saklove,   subsino2_state, init_treacity,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
-GAME( 199?, treacity202, treacity,saklove, saklove,   subsino2_state, init_treacity202, ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
+GAME( 1997, treacity,    0,       saklove, saklove,   subsino2_state, init_treacity,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
+GAME( 1997, treacity202, treacity,saklove, saklove,   subsino2_state, init_treacity202, ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 
