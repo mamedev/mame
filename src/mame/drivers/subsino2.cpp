@@ -3144,7 +3144,9 @@ void subsino2_state::init_strain()
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
-	// patch 'version error'
+	// patch 'version error' (not sure this is correct, there's no title logo?)
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x141c] = 0x20;
 }
 
 
