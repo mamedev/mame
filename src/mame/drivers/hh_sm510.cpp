@@ -42,7 +42,7 @@ Game list (* denotes not emulated yet)
 
 Serial  Series MCU     Title
 ---------------------------------------------
-AC-01*    s    SM5A    Ball (aka Toss-Up)
+AC-01     s    SM5A    Ball (aka Toss-Up)
 FL-02*    s    SM5A?   Flagman
 MT-03*    s    SM5A?   Vermin (aka The Exterminator)
 RC-04*    s    SM5A?   Fire (aka Fireman Fireman)
@@ -1207,6 +1207,85 @@ ROM_START( kgarfld )
 
 	ROM_REGION( 581107, "screen", 0)
 	ROM_LOAD( "kgarfld.svg", 0, 581107, CRC(bf09a170) SHA1(075cb95535873018409eb15675183490c61b29b9) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Ball (model AC-01)
+  * PCB label AC-01
+  * Sharp SM5A label AC-01 5009 (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This game was distributed as Toss-Up by Mego/Time-Out in the USA.
+
+***************************************************************************/
+
+class gnw_ball_state : public hh_sm510_state
+{
+public:
+	gnw_ball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void gnw_ball(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_ball )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_ball_state::gnw_ball(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1671, 1080);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_ball )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ac-01", 0x0000, 0x0740, CRC(ac94e6e4) SHA1(8270cb61f9fbff252eafec411b4c67f0171f8687) )
+
+	ROM_REGION( 71584, "screen", 0)
+	ROM_LOAD( "gnw_ball.svg", 0, 71584, CRC(4998c774) SHA1(55bf0736c07acbea41ca3d65f6d2da1a06728270) )
 ROM_END
 
 
@@ -9147,6 +9226,9 @@ CONS( 1989, knfl,        0,          0, knfl,        knfl,        knfl_state,   
 CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state,      empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
+
+// Nintendo G&W: silver
+CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state,    empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE)
 
 // Nintendo G&W: wide screen
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
