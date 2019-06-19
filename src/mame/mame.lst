@@ -2315,6 +2315,7 @@ westvent                        // (c) 2007? Astro Corp.
 winbingo                        // (c) 2005? Astro Corp.
 winbingoa                       // (c) 2005? Astro Corp.
 zoo                             // (c) 2005? Astro Corp.
+magibomb
 
 @source:astrocde.cpp
 demndrgn                        // (c) 1982 Bally Midway
@@ -36640,6 +36641,7 @@ bishjan                         // (c) 1999 Subsino
 expcard                         // (c) 1998 American Alpha
 humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1996 Subsino
+strain
 tbonusal                        // (c) 1996 American Alpha
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
@@ -36654,6 +36656,8 @@ xplan                           // (c) 2006 Subsino
 xtrain                          // (c) 1999 Subsino
 qbeebing
 treamary
+treacity
+treacity202
 
 @source:summit.cpp
 pushover                        // (c)1981 Summit Coin

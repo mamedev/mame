@@ -31,7 +31,7 @@ Year  Game                CPU         Sound            Custom                   
 
 To do:
 
-- Implement serial communication (used for protection).
+- Implement serial communication, remove patches (used for protection).
 - Add sound to SS9804/SS9904 games.
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
@@ -127,10 +127,13 @@ public:
 	void init_expcard();
 	void init_wtrnymph();
 	void init_mtrain();
+	void init_strain();
 	void init_tbonusal();
 	void init_saklove();
 	void init_xplan();
 	void init_ptrain();
+	void init_treacity();
+	void init_treacity202();
 
 private:
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
@@ -1265,7 +1268,7 @@ READ8_MEMBER(subsino2_state::mtrain_prot_r)
 
 void subsino2_state::mtrain_map(address_map &map)
 {
-	map(0x00000, 0x06fff).rom();
+	map(0x00000, 0x077ff).rom();
 
 	map(0x07800, 0x07fff).ram().share("nvram");   // battery
 
@@ -3089,6 +3092,27 @@ ROM_START( mtrain )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( strain )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code starts at 0x8100!
+	ROM_LOAD( "v1.9_27c512_u17.bin", 0x0000, 0x8100, CRC(36379ab2) SHA1(b48374f80ffa107a7ea3e08eb432259e443dc4a6) )
+	ROM_CONTINUE(              0x0000, 0x7f00 )
+	ROM_RELOAD(                0xa000, 0x6000 )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u2.bin", 0x00000, 0x80000, CRC(0b77b3be) SHA1(daf1180cabce3e1bbb9a8f91c02e0fe4f0fd811e) )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u3.bin", 0x00002, 0x80000, CRC(c003661d) SHA1(49d76a9273928c35dcd6a6ab114d798f5553d79a) )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u4.bin", 0x00001, 0x80000, CRC(6392f562) SHA1(83881ec85a3dff82f32214b2654ee79e5e9a2d2a) )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u5.bin", 0x00003, 0x80000, CRC(85abe66c) SHA1(32698faf75bd0c42ab99b0c53b3ffa0891eedaca) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "v1.0_mx27c4000_u27.bin", 0x00000, 0x80000, CRC(d5bbebc7) SHA1(59fa804caa991dc2ad7f735b7c171defd836140a) )
+
+	ROM_REGION( 0x117, "plds", ROMREGION_ERASE00 )
+	// TODO: list these
+ROM_END
+
+
 /***************************************************************************
 
   Decryption of mtrain (same as crsbingo)
@@ -3114,8 +3138,15 @@ void subsino2_state::init_mtrain()
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0cec] = 0x18;
 	rom[0xb037] = 0x18;
-
 }
+
+void subsino2_state::init_strain()
+{
+	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
+
+	// patch 'version error'
+}
+
 
 
 ROM_START( tbonusal )
@@ -3390,6 +3421,52 @@ void subsino2_state::init_ptrain()
 	rom[0xe1b08-0xc0000] = 0xeb;
 }
 
+
+/***************************************************************************
+	Treasure City
+
+	unknown hardware
+***************************************************************************/
+
+ROM_START( treacity )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "alpha 208_27c1001_u33.bin", 0x00000, 0x20000, CRC(e743aac3) SHA1(762575000463a126df561c959dfa06180e955822) )
+	ROM_RELOAD(0x20000,0x20000)
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u7.bin",  0x00000, 0x80000, CRC(88d4d1f2) SHA1(35bc70904ceadeb7b1ccc35bb92585419da50fe1) )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u8.bin",  0x00002, 0x80000, CRC(7140638f) SHA1(a6072286b453e1290b2fc46060a0d777ad4ae1a8) )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u9.bin",  0x00001, 0x80000, CRC(57241f44) SHA1(f055488710ae624c1c7e92b2adf6b497c72514ea) )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u10.bin", 0x00003, 0x80000, CRC(338370f9) SHA1(0e06ed1b71fb44bfd617f4d5112f6d34f0b759bc) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+ROM_END
+
+void subsino2_state::init_treacity()
+{
+	// TODO: patches
+}
+
+ROM_START( treacity202 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "alpha 202_27c1001_u33.bin", 0x00000, 0x20000, CRC(1a698c3d) SHA1(c2107b67d86783b04d1ebdf78d1f358916c51219) )
+	ROM_RELOAD(0x20000,0x20000)
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u7.bin",  0x00000, 0x80000, CRC(c8e4e4d3) SHA1(b5dabfe2e8e5a19d218e3d58bbebbe83803feb23) )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u8.bin",  0x00002, 0x80000, CRC(a8fb65b4) SHA1(047fa2ccd08ce5282c015239f0f22d0ba20ea67b) )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u9.bin",  0x00001, 0x80000, CRC(b0c50891) SHA1(66ebebc327e00d5e8e9eb0a427d34683c4cca8aa) )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u10.bin", 0x00003, 0x80000, CRC(8545e8cd) SHA1(0d122a532df81fe2150c1eaf49b5a4e35c8134eb) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+ROM_END
+
+void subsino2_state::init_treacity202()
+{
+	// TODO: patches
+}
+
+
 /***************************************************************************
 
 Water-Nymph (Ver. 1.4)
@@ -3438,6 +3515,8 @@ void subsino2_state::init_wtrnymph()
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
 
+GAME( 1996, strain,   0,        mtrain,   mtrain,   subsino2_state, init_strain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",               MACHINE_NOT_WORKING )
+
 GAME( 1995, tbonusal, 0,        mtrain,   mtrain,   subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
@@ -3449,6 +3528,9 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
 GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 199?, treacity,    0,       ptrain, ptrain,   subsino2_state, init_treacity,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
+GAME( 199?, treacity202, treacity,ptrain, ptrain,   subsino2_state, init_treacity202, ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 
