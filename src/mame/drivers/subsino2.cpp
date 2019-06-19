@@ -3042,6 +3042,32 @@ ROM_START( mtrain )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( tbonusal )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code starts at 0x8100! (maybe)
+	ROM_LOAD( "n-alpha 1.6-u17.bin", 0x0000, 0x8100, CRC(1bdc1c92) SHA1(2cd7ec5a89865b76df2cfe9d18b2ab42923f8def) )
+	ROM_CONTINUE(              0x0000, 0x7f00 )
+	ROM_RELOAD(                0xa000, 0x6000 )
+
+	// there is a clear HD647180X0FS6 on the PCB, but is it operating in external mode? there is a program rom above at least
+	// if the internal ROM is unused / irrelevant then this doesn't need to be marked
+	//ROM_REGION( 0x10000, "mcu", 0 )
+	//ROM_LOAD( "hd647180", 0x00000, 0x08000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "tilemap", 0 ) // different format?
+	ROM_LOAD( "n-alpha 1.6-u2.bin", 0x000000, 0x80000, CRC(392943be) SHA1(776d36a94b8a70ec2eaf88dfd2804517656b53a0) )
+	ROM_LOAD( "n-alpha 1.6-u3.bin", 0x080000, 0x80000, CRC(24c8f62e) SHA1(692a96f233d8576a6921bfe23c97502ff26c62db) )
+	ROM_LOAD( "n-alpha 1.6-u4.bin", 0x100000, 0x80000, CRC(bed035a9) SHA1(6b141bb8fb7969338faa702bd03970331bbbe6e1) )
+	ROM_LOAD( "n-alpha 1.6-u5.bin", 0x180000, 0x80000, CRC(d00d48c6) SHA1(28b505a3f07c5d5bb8e8609c6d6e883260594588) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	// not populated on 4 different PCBs
+
+	ROM_REGION( 0x117, "plds", ROMREGION_ERASEFF )
+	// TODO list of GALs
+ROM_END
+
+
 /***************************************************************************
 
   Decryption of mtrain (same as crsbingo)
@@ -3354,6 +3380,8 @@ void subsino2_state::init_wtrnymph()
 }
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
+
+GAME( 1996, tbonusal, 0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
