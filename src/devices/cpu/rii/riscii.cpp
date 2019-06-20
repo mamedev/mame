@@ -5,7 +5,8 @@
     ELAN Microelectronics RISC II (RII) Series
 
     Architecture is very similar to the GI/Microchip PIC series, with
-    16-bit opcodes and a paged 8-bit register file.
+    16-bit opcodes and a banked 8-bit register file with special registers
+    for indirect access. (It has no relation to Berkeley RISC II.)
 
     Currently this device is just a stub with no actual execution core.
 
@@ -59,10 +60,10 @@ void riscii_series_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).callimport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().noshow();
 	state_add(RII_ACC, "ACC", m_acc);
-	state_add(RII_FSR0, "FSR0", m_fsr0);
-	state_add(RII_FSR1, "FSR1", m_fsr1.b.l);
 	state_add(RII_BSR, "BSR", m_bsr).mask(0x1f);
+	state_add(RII_FSR0, "FSR0", m_fsr0);
 	state_add(RII_BSR1, "BSR1", m_fsr1.b.h).mask(0x1f);
+	state_add(RII_FSR1, "FSR1", m_fsr1.b.l); // TODO: high bit forced to 1
 	state_add(RII_TABPTR, "TABPTR", m_tabptr).mask(0xffffff);
 	state_add(RII_STKPTR, "STKPTR", m_stkptr);
 	state_add(RII_CPUCON, "CPUCON", m_cpucon).mask(0x9f);
