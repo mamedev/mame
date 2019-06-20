@@ -2312,7 +2312,19 @@ INPUT_PORTS_START( photoy2k )
 	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
 INPUT_PORTS_END
 
+INPUT_PORTS_START( photoy2kj )
+	PORT_INCLUDE ( pgm )
 
+	PORT_START("RegionHack")    /* Region - supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x0002, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
+INPUT_PORTS_END
 
 INPUT_PORTS_START( kovsh )
 	PORT_INCLUDE ( pgm )

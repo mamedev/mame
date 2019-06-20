@@ -143,6 +143,7 @@ private:
 INPUT_PORTS_EXTERN( sango );
 INPUT_PORTS_EXTERN( sango_ch );
 INPUT_PORTS_EXTERN( photoy2k );
+INPUT_PORTS_EXTERN( photoy2kj );
 INPUT_PORTS_EXTERN( oldsplus );
 INPUT_PORTS_EXTERN( pstar );
 INPUT_PORTS_EXTERN( py2k2 );

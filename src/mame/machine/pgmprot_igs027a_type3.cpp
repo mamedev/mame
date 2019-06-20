@@ -162,6 +162,7 @@ void pgm_arm_type3_state::machine_reset()
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
 	if (!strcmp(machine().system().name, "happy6")) base = 0x3586;
 	if (!strcmp(machine().system().name, "happy6101")) base = 0x3586;
+	if (!strcmp(machine().system().name, "happy6100hk")) base = 0x3586;
 	if (!strcmp(machine().system().name, "svgpcb")) base = 0x3a8e;
 	if (!strcmp(machine().system().name, "svg")) base = 0x3c3e;
 	if (!strcmp(machine().system().name, "svgtw")) base = 0x3a8e;
@@ -507,7 +508,7 @@ void pgm_arm_type3_state::init_theglad()
 
 void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base)
 {
-	// we don't have the correct internal ROM for this version, so insead we use the one we have and patch the jump table in the external ROM
+	// we don't have the correct internal ROM for this version, so instead we use the one we have and patch the jump table in the external ROM
 	u32 subroutine_addresses[] =
 	{
 		0x00FC, 0x00E8, 0x0110, 0x0150, 0x0194, 0x06C8, 0x071C, 0x0728,
@@ -774,7 +775,20 @@ INPUT_PORTS_START( happy6 )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0003, "Singapore" )
-	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no english anything!
+	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no English anything!
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
+
+INPUT_PORTS_START( happy6hk )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x0002, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0003, "Singapore" )
+	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no English anything!
 	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
 INPUT_PORTS_END
 
