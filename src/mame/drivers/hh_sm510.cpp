@@ -15,6 +15,8 @@ RTC or NVRAM. Quitting MAME is akin to removing the handheld's battery.
 Use -autosave to at least make them remember the highscores.
 
 TODO:
+- improve display decay simulation? but SVG doesn't support setting brightness
+  per segment, adding pwm_display_device right now has no added value
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
@@ -46,7 +48,7 @@ AC-01     s    SM5A    Ball (aka Toss-Up)
 FL-02*    s    SM5A?   Flagman
 MT-03*    s    SM5A?   Vermin (aka The Exterminator)
 RC-04*    s    SM5A?   Fire (aka Fireman Fireman)
-IP-05*    g    SM5A?   Judge
+IP-05*    s    SM5A?   Judge
 MN-06*    g    SM5A?   Manhole
 CN-07*    g    SM5A?   Helmet (aka Headache)
 LN-08*    g    SM5A?   Lion
@@ -65,7 +67,7 @@ DK-52     ms   SM510   Donkey Kong
 DM-53     ms   SM510   Mickey & Donald
 GH-54     ms   SM510   Green House
 JR-55     ms   SM510   Donkey Kong II
-MW-56     ms   SM510   Mario
+MW-56     ms   SM510   Mario Bros.
 LP-57     ms   SM510   Rain Shower
 TC-58     ms   SM510   Life Boat
 PB-59*    ms   SM511?  Pinball
@@ -1220,7 +1222,7 @@ ROM_END
   * Sharp SM5A label AC-01 5009 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This game was distributed as Toss-Up by Mego/Time-Out in the USA.
+  In the USA, it was distributed as Toss-Up by Mego under their Time-Out series.
 
 ***************************************************************************/
 
@@ -1243,7 +1245,9 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // disable after boot
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
 	PORT_START("BA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
@@ -1318,9 +1322,11 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // * Infinite lives cheat here, but configuring it is weird:
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // * One of the R3 inputs needs to be held down, followed
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // * by pressing ACL, then release.
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // disable after boot
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // "
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
 
 	PORT_START("IN.2") // R4
@@ -1594,8 +1600,8 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND, only works after power-on
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1713,8 +1719,8 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND, only works after power-on
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1950,12 +1956,12 @@ static INPUT_PORTS_START( gnw_tbridge )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2036,12 +2042,12 @@ static INPUT_PORTS_START( gnw_fireatk )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2122,12 +2128,12 @@ static INPUT_PORTS_START( gnw_stennis )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2208,12 +2214,12 @@ static INPUT_PORTS_START( gnw_opanic )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2308,7 +2314,7 @@ static INPUT_PORTS_START( gnw_dkong )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2398,7 +2404,7 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2492,12 +2498,12 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2592,7 +2598,7 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2682,12 +2688,12 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2784,12 +2790,12 @@ static INPUT_PORTS_START( gnw_rshower )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -2880,12 +2886,12 @@ static INPUT_PORTS_START( gnw_lboat )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3062,12 +3068,12 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3162,12 +3168,12 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // Invincibility when playing on bottom screen only
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3270,12 +3276,12 @@ static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3364,12 +3370,12 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3451,12 +3457,12 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3539,12 +3545,12 @@ static INPUT_PORTS_START( gnw_manhole )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3625,7 +3631,7 @@ static INPUT_PORTS_START( gnw_tfish )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3715,7 +3721,7 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3811,7 +3817,7 @@ static INPUT_PORTS_START( gnw_climber )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -3923,7 +3929,7 @@ static INPUT_PORTS_START( gnw_bfight )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -4028,12 +4034,12 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -9227,7 +9233,7 @@ CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state, 
 CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: silver
+// Nintendo G&W: silver/gold (initial series is uncategorized, "silver" was made up later)
 CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state,    empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE)
 
 // Nintendo G&W: wide screen
