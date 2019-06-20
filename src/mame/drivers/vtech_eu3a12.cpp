@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
 
-// CPU die is an Elan EU3A12, it isn't clear what it is compatible with (16-bit?)
+// CPU die is an Elan EU3A12 (Elan "RISC II Series" quasi-PIC with 16-bit opcodes)
 
 #include "emu.h"
 #include "screen.h"
