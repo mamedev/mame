@@ -139,7 +139,11 @@ WRITE8_MEMBER(x68k_neptune_device::x68k_neptune_mem_write)
 
 WRITE_LINE_MEMBER(x68k_neptune_device::x68k_neptune_irq_w)
 {
-	machine().device("maincpu")->execute().set_input_line_vector(2, NEPTUNE_IRQ_VECTOR);
 	m_slot->irq2_w(state);
 	logerror("Neptune: IRQ2 set to %i\n",state);
+}
+
+uint8_t x68k_neptune_device::iack2()
+{
+	return NEPTUNE_IRQ_VECTOR;
 }
