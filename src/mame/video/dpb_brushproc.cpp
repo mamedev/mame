@@ -26,21 +26,31 @@ dpb7000_brushproc_card_device::dpb7000_brushproc_card_device(const machine_confi
 	: device_t(mconfig, DPB7000_BRUSHPROC, tag, owner, clock)
 	, m_ext_in(0)
 	, m_brush_in(0)
+	, m_cbus_in(0)
 	, m_k_in(0)
 	, m_k_enable(0)
 	, m_k_zero(false)
 	, m_k_invert(false)
+	, m_k_product(0)
+	, m_ext_product(0)
 	, m_func(0)
 	, m_sel_eh(false)
 	, m_b_bus_ah(false)
 	, m_fcs(false)
+	, m_use_store1_for_brush(false)
+	, m_use_store2_for_brush(false)
+	, m_use_ext_for_brush(false)
+	, m_use_store1_or_ext_for_brush(false)
+	, m_use_store2_for_store1(false)
+	, m_enable_store_ext_multiplicand(false)
+	, m_output_16bit(false)
+	, m_pal_proc_in(false)
+	, m_disable_k_data(false)
 	, m_prom_addr(0)
 	, m_prom_base(nullptr)
 	, m_prom_out(0)
 	, m_store1(*this)
 	, m_store2(*this)
-	, m_cbus(*this)
-	, m_pck(*this)
 	, m_mult_fa(*this, "mult_fa")
 	, m_mult_ga(*this, "mult_ga")
 	, m_mult_gd(*this, "mult_gd")
@@ -57,11 +67,15 @@ void dpb7000_brushproc_card_device::device_start()
 	save_item(NAME(m_store_in));
 	save_item(NAME(m_ext_in));
 	save_item(NAME(m_brush_in));
+	save_item(NAME(m_cbus_in));
 
 	save_item(NAME(m_k_in));
 	save_item(NAME(m_k_enable));
 	save_item(NAME(m_k_zero));
 	save_item(NAME(m_k_invert));
+	save_item(NAME(m_k_product));
+
+	save_item(NAME(m_ext_product));
 
 	save_item(NAME(m_func));
 
@@ -70,13 +84,22 @@ void dpb7000_brushproc_card_device::device_start()
 	save_item(NAME(m_b_bus_ah));
 	save_item(NAME(m_fcs));
 
+	save_item(NAME(m_oe));
+	save_item(NAME(m_use_store1_for_brush));
+	save_item(NAME(m_use_store2_for_brush));
+	save_item(NAME(m_use_ext_for_brush));
+	save_item(NAME(m_use_store1_or_ext_for_brush));
+	save_item(NAME(m_use_store2_for_store1));
+	save_item(NAME(m_enable_store_ext_multiplicand));
+	save_item(NAME(m_output_16bit));
+	save_item(NAME(m_pal_proc_in));
+	save_item(NAME(m_disable_k_data));
+
 	save_item(NAME(m_prom_addr));
 	save_item(NAME(m_prom_out));
 
 	m_store1.resolve_safe();
 	m_store2.resolve_safe();
-	m_cbus.resolve_safe();
-	m_pck.resolve_safe();
 }
 
 void dpb7000_brushproc_card_device::device_reset()
@@ -84,22 +107,52 @@ void dpb7000_brushproc_card_device::device_reset()
 	memset(m_store_in, 0, 2);
 	m_ext_in = 0;
 	m_brush_in = 0;
+	m_cbus_in = 0;
 
 	m_k_in = 0;
-	m_k_enable = 0;
-	m_k_zero = 0;
-	m_k_invert = 0;
+	m_k_enable = false;
+	m_k_zero = false;
+	m_k_invert = false;
+	m_k_product = 0;
+
+	m_ext_product = 0;
 
 	m_func = 0;
 
 	memset(m_sel_luma, 0, 2);
-	m_sel_eh = 0;
-	m_b_bus_ah = 0;
-	m_fcs = 0;
+	m_sel_eh = false;
+	m_b_bus_ah = false;
+	m_fcs = false;
+
+	memset(m_oe, 0, 4);
+	m_use_store1_for_brush = false;
+	m_use_store2_for_brush = false;
+	m_use_ext_for_brush = false;
+	m_use_store1_or_ext_for_brush = false;
+	m_use_store2_for_store1 = false;
+	m_enable_store_ext_multiplicand = false;
+	m_output_16bit = false;
+	m_pal_proc_in = false;
+	m_disable_k_data = false;
 
 	m_prom_addr = 0;
 	m_prom_base = m_prom->base();
 	m_prom_out = 0;
+
+	m_mult_fa->xm_w(0);
+	m_mult_fa->ym_w(0);
+	m_mult_fa->rs_w(0);
+	m_mult_fa->ru_w(1);
+
+	m_mult_ga->xm_w(0);
+	m_mult_ga->ym_w(0);
+	m_mult_ga->rs_w(0);
+	m_mult_ga->ru_w(1);
+
+	m_mult_gd->xm_w(0);
+	m_mult_gd->ym_w(0);
+	m_mult_gd->rs_w(0);
+	m_mult_gd->ru_w(1);
 }
 
 void dpb7000_brushproc_card_device::device_add_mconfig(machine_config &config)
@@ -144,14 +197,24 @@ void dpb7000_brushproc_card_device::brush_w(uint8_t data)
 	m_brush_in = data;
 }
 
+void dpb7000_brushproc_card_device::cbus_w(uint8_t data)
+{
+	m_cbus_in = data;
+	update_k_product();
+}
+
 void dpb7000_brushproc_card_device::k_w(uint8_t data)
 {
 	m_k_in = data;
+	if (m_k_enable && !m_disable_k_data)
+		update_k_product();
 }
 
 void dpb7000_brushproc_card_device::k_en_w(int state)
 {
 	m_k_enable = (bool)state;
+	if (m_k_enable && !m_disable_k_data)
+		update_k_product();
 }
 
 void dpb7000_brushproc_card_device::k_zero_w(int state)
@@ -255,35 +318,86 @@ void dpb7000_brushproc_card_device::update_prom_signals()
 		set_oe4(BIT(m_prom_out, 7));
 }
 
+void dpb7000_brushproc_card_device::update_k_product()
+{
+	const uint16_t x = (uint16_t)m_cbus_in;
+	const uint16_t y = (m_disable_k_data || !m_k_enable) ? 0x00ff : (uint16_t)m_k_in;
+	const uint8_t old = m_k_product;
+	m_k_product = (uint8_t)((x * y + 0x0080) >> 8);
+	if (old != m_k_product)
+		update_ext_product();
+}
+
+void dpb7000_brushproc_card_device::update_ext_product()
+{
+	//const uint16_t old = m_ext_product;
+	const uint16_t y = (uint16_t)m_k_product;
+	uint16_t x = 0;
+	if (!m_k_zero)
+	{
+		if (m_enable_store_ext_multiplicand)
+			x = (uint16_t)m_ext_in;
+		else
+			x = 0xff;
+	}
+	m_ext_product = (uint8_t)((x * y + 0x0080) >> 8);
+}
+
 void dpb7000_brushproc_card_device::set_oe1(int state)
 {
+	// When 0, force Store I or Store Ext. data onto Brush Data lanes
+	m_oe[0] = (bool)state;
+	m_use_store1_or_ext_for_brush = !m_oe[0];
+	m_use_store1_for_brush = m_use_store1_or_ext_for_brush && m_oe[2];
+	m_use_ext_for_brush = m_use_store1_or_ext_for_brush && !m_oe[2];
 }
 
 void dpb7000_brushproc_card_device::set_oe2(int state)
 {
+	// When 0, force Store II data onto Brush Data lanes
+	m_oe[1] = (bool)state;
+	m_use_store2_for_brush = !m_oe[1];
 }
 
 void dpb7000_brushproc_card_device::set_oe3(int state)
 {
+	// When 0, force Store Ext. data onto Store I data lanes (disables Store I data input)
+	m_oe[2] = (bool)state;
+	m_use_store1_for_brush = m_use_store1_or_ext_for_brush && m_oe[2];
+	m_use_ext_for_brush = m_use_store1_or_ext_for_brush && !m_oe[2];
 }
 
 void dpb7000_brushproc_card_device::set_oe4(int state)
 {
+	// When 0, force Store II data onto Store I data lanes (disables Store I data input)
+	m_oe[3] = (bool)state;
+	m_use_store2_for_store1 = !m_oe[3];
 }
 
 void dpb7000_brushproc_card_device::set_mask_sel_h(int state)
 {
+	// When 0, multiplies K product with 1.0 (0xff) instead of Store Ext. data.
+	m_enable_store_ext_multiplicand = (bool)state;
 }
 
 void dpb7000_brushproc_card_device::set_16bit_h(int state)
 {
+	// When 0, enables Store II data output, enables Cx carry-out, and enables Ru pin on multiplier GD.
+	m_output_16bit = (bool)(1 - state);
 }
 
 void dpb7000_brushproc_card_device::set_proc_sel_h(int state)
 {
+	// When 1, enables the PROC input pin on PAL 20L10 HB, not yet dumped.
+	m_pal_proc_in = (bool)state;
 }
 
 void dpb7000_brushproc_card_device::set_k_eq_il(int state)
 {
+	// When 1, disables K data lanes, which collectively get pulled to 1.0 (0xff).
+	const bool old = m_disable_k_data;
+	m_disable_k_data = (bool)state;
+	if (old != m_disable_k_data && !m_disable_k_data && m_k_enable)
+		update_k_product();
 }
 

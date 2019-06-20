@@ -21,6 +21,7 @@
 #include "video/mc6845.h"
 #include "video/dpb_brushproc.h"
 #include "video/dpb_combiner.h"
+#include "video/dpb_storeaddr.h"
 #include "emupal.h"
 #include "screen.h"
 #include <deque>
@@ -35,10 +36,9 @@
 #define LOG_FDC_PORT		(1 << 7)
 #define LOG_FDC_CMD			(1 << 8)
 #define LOG_OUTPUT_TIMING	(1 << 9)
-#define LOG_STORE_ADDR		(1 << 10)
 #define LOG_BRUSH_ADDR		(1 << 11)
 #define LOG_ALL				(LOG_UNKNOWN | LOG_UCODE | LOG_MORE_UCODE | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | \
-							 LOG_OUTPUT_TIMING | LOG_STORE_ADDR | LOG_BRUSH_ADDR)
+							 LOG_OUTPUT_TIMING | LOG_BRUSH_ADDR)
 
 #define VERBOSE				(LOG_ALL &~ LOG_FDC_CTRL)
 #include "logmacro.h"
@@ -70,6 +70,7 @@ public:
 		, m_filter_ce(*this, "filter_ce")
 		, m_filter_cf(*this, "filter_cf")
 		, m_filter_cg(*this, "filter_cg")
+		, m_store_addr(*this, "store_addr%u", 0U)
 		, m_brush_proc(*this, "brush_proc%u", 0U)
 		, m_combiner(*this, "combiner")
 	{
@@ -161,6 +162,7 @@ private:
 	required_device<tdc1008_device> m_filter_cf;
 	required_device<tdc1008_device> m_filter_cg;
 
+	required_device_array<dpb7000_storeaddr_card_device, 2> m_store_addr;
 	required_device_array<dpb7000_brushproc_card_device, 2> m_brush_proc;
 	required_device<dpb7000_combiner_card_device> m_combiner;
 
@@ -222,14 +224,6 @@ private:
 	uint16_t m_cursor_origin_y;
 	uint16_t m_cursor_size_x;
 	uint16_t m_cursor_size_y;
-
-	// Store Address Card
-	uint16_t m_rhscr[2];
-	uint16_t m_rvscr[2];
-	uint16_t m_rzoom[2];
-	uint16_t m_fld_sel[2];
-	uint16_t m_cxpos[2];
-	uint16_t m_cypos[2];
 
 	// Brush Address Card
 	uint16_t m_brush_addr_func;
@@ -436,14 +430,6 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_cursor_size_x));
 	save_item(NAME(m_cursor_size_y));
 
-	// Store Address Card
-	save_item(NAME(m_rhscr));
-	save_item(NAME(m_rvscr));
-	save_item(NAME(m_rzoom));
-	save_item(NAME(m_fld_sel));
-	save_item(NAME(m_cxpos));
-	save_item(NAME(m_cypos));
-
 	// Brush Address Card
 	save_item(NAME(m_brush_addr_func));
 	save_item(NAME(m_bif));
@@ -499,12 +485,8 @@ void dpb7000_state::machine_reset()
 	m_cursor_size_y = 0;
 
 	// Store Address Card
-	memset(m_rhscr, 0, sizeof(uint16_t) * 2);
-	memset(m_rvscr, 0, sizeof(uint16_t) * 2);
-	memset(m_rzoom, 0, sizeof(uint16_t) * 2);
-	memset(m_fld_sel, 0, sizeof(uint16_t) * 2);
-	memset(m_cxpos, 0, sizeof(uint16_t) * 2);
-	memset(m_cypos, 0, sizeof(uint16_t) * 2);
+	m_store_addr[0]->s_type_w(0);
+	m_store_addr[1]->s_type_w(1);
 
 	// Brush Address Card
 	m_brush_addr_func = 0;
@@ -848,48 +830,9 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 	}
 
 	case 2: // Store Address Card
-		switch ((data >> 12) & 7)
-		{
-			case 0:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), set RHSCR: %03x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data & 0xfff);
-				m_rhscr[1] = data & 0xfff;
-				if (BIT(data, 15))
-					m_rhscr[0] = data & 0xfff;
-				break;
-			case 1:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), set RVSCR: %03x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data & 0xfff);
-				m_rvscr[1] = data & 0xfff;
-				if (BIT(data, 15))
-					m_rvscr[0] = data & 0xfff;
-				break;
-			case 2:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), set R ZOOM: %03x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data & 0xfff);
-				m_rzoom[1] = data & 0xfff;
-				if (BIT(data, 15))
-					m_rzoom[0] = data & 0xfff;
-				break;
-			case 3:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), set FLDSEL: %03x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data & 0xfff);
-				m_fld_sel[1] = data & 0xfff;
-				if (BIT(data, 15))
-					m_fld_sel[0] = data & 0xfff;
-				break;
-			case 4:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), set CXPOS: %03x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data & 0xfff);
-				m_cxpos[1] = data & 0xfff;
-				if (BIT(data, 15))
-					m_cxpos[0] = data & 0xfff;
-				break;
-			case 5:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), set CYPOS: %03x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data & 0xfff);
-				m_cypos[1] = data & 0xfff;
-				if (BIT(data, 15))
-					m_cypos[0] = data & 0xfff;
-				break;
-			default:
-				LOGMASKED(LOG_CTRLBUS | LOG_STORE_ADDR, "%s: CPU write to Store Address Card (%s), unknown register: %04x\n", machine().describe_context(), BIT(data, 15) ? "II" : "Both", data);
-				break;
-		}
+		m_store_addr[1]->reg_w(data);
+		if (BIT(data, 15))
+			m_store_addr[0]->reg_w(data);
 		break;
 
 	case 8: // Brush Address Card, "Select 8" signal to PAL 16L8, BE
@@ -1184,6 +1127,10 @@ void dpb7000_state::dpb7000(machine_config &config)
 	TDC1008(config, m_filter_cf);
 	TDC1008(config, m_filter_cg);
 
+	// Store Address Cards
+	DPB7000_STOREADDR(config, m_store_addr[0]);
+	DPB7000_STOREADDR(config, m_store_addr[1]);
+
 	// Brush Processor Cards
 	DPB7000_BRUSHPROC(config, m_brush_proc[0]);
 	DPB7000_BRUSHPROC(config, m_brush_proc[1]);
@@ -1232,17 +1179,6 @@ ROM_START( dpb7000 )
 
 	ROM_REGION(0x100, "brushstore_prom", 0)
 	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(84bf7029) SHA1(9d58322994f6f7e99a9c6478577559c8171670ed))
-
-	ROM_REGION(0xc00, "storeaddr_x_prom", 0)
-	ROM_LOAD("pb-032-17425b-bbb.bin", 0x000, 0x400, CRC(2051a6e4) SHA1(3bd8a9015e77b034a94fe072a9753649b76f9f69))
-	ROM_LOAD("pb-032-17425b-bcb.bin", 0x400, 0x400, CRC(01aaa6f7) SHA1(e31bff0c68f74996368443bfb58a3524a838f270))
-	ROM_LOAD("pb-032-17425b-bdb.bin", 0x800, 0x400, CRC(20e2fb9e) SHA1(c4c77ec02ab6d3a1a28edf5543e57235a64a9d8d))
-
-	ROM_REGION(0xc00, "storeaddr_protx_prom", 0)
-	ROM_LOAD("pb-032-17425b-deb.bin", 0x000, 0x400, CRC(faeb44dd) SHA1(3eaf981245824332d216e97095bdc02ff04e4800))
-
-	ROM_REGION(0xc00, "storeaddr_proty_prom", 0)
-	ROM_LOAD("pb-032-17425b-edb.bin", 0x000, 0x400, CRC(183bfdc0) SHA1(175b052948e4e4a9421d8913479e7531b7e5f03c))
 
 	ROM_REGION(0x1200, "output_timing_proms", 0)
 	ROM_LOAD("pb-037-17418-bea.bin", 0x0000, 0x400, CRC(644e82a3) SHA1(d7634e03809abe2db924571c05821c1b2aca051b))

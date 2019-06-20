@@ -34,6 +34,7 @@ public:
 	void store2_w(uint8_t data);
 	void ext_w(uint8_t data);
 	void brush_w(uint8_t data);
+	void cbus_w(uint8_t data);
 
 	void k_w(uint8_t data);
 	void k_en_w(int state);
@@ -49,8 +50,6 @@ public:
 
 	auto store1() { return m_store1.bind(); }
 	auto store2() { return m_store2.bind(); }
-	auto cbus() { return m_cbus.bind(); }
-	auto pck() { return m_pck.bind(); }
 
 protected:
 	// device-level overrides
@@ -60,6 +59,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void update_prom_signals();
+	void update_k_product();
+	void update_ext_product();
 
 	void set_oe1(int state);
 	void set_oe2(int state);
@@ -73,11 +74,15 @@ protected:
 	uint8_t m_store_in[2];
 	uint8_t m_ext_in;
 	uint8_t m_brush_in;
+	uint8_t m_cbus_in;
 
 	uint8_t m_k_in;
 	bool m_k_enable;
 	bool m_k_zero;
 	bool m_k_invert;
+	uint8_t m_k_product;
+
+	uint8_t m_ext_product;
 
 	uint8_t m_func;
 
@@ -86,14 +91,23 @@ protected:
 	bool m_b_bus_ah;
 	bool m_fcs;
 
+	bool m_oe[4];
+	bool m_use_store1_for_brush;
+	bool m_use_store2_for_brush;
+	bool m_use_ext_for_brush;
+	bool m_use_store1_or_ext_for_brush;
+	bool m_use_store2_for_store1;
+	bool m_enable_store_ext_multiplicand;
+	bool m_output_16bit;
+	bool m_pal_proc_in;
+	bool m_disable_k_data;
+
 	uint16_t m_prom_addr;
 	uint8_t *m_prom_base;
 	uint8_t m_prom_out;
 
 	devcb_write8 m_store1;
 	devcb_write8 m_store2;
-	devcb_write8 m_cbus;
-	devcb_write_line m_pck;
 
 	required_device<am25s558_device> m_mult_fa;
 	required_device<am25s558_device> m_mult_ga;
