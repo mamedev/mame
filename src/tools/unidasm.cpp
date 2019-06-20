@@ -110,6 +110,7 @@ using util::BIT;
 #include "cpu/powerpc/ppc_dasm.h"
 #include "cpu/pps4/pps4dasm.h"
 #include "cpu/psx/psxdasm.h"
+#include "cpu/rii/riidasm.h"
 #include "cpu/rsp/rsp_dasm.h"
 #include "cpu/s2650/2650dasm.h"
 #include "cpu/saturn/saturnds.h"
@@ -434,6 +435,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "mips1be",         be,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
 	{ "mips1le",         le,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
+	{ "rii",             le, -1, []() -> util::disasm_interface * { return new riscii_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "s2650",           le,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },

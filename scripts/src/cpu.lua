@@ -2880,3 +2880,20 @@ if (CPUS["NS32000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
 end
+
+--------------------------------------------------
+-- Elan RISC II series
+--@src/devices/cpu/rii/riscii.h,CPUS["RII"] = true
+--------------------------------------------------
+
+if (CPUS["RII"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/rii/riscii.cpp",
+		MAME_DIR .. "src/devices/cpu/rii/riscii.h",
+	}
+end
+
+if (CPUS["RII"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.h")
+end
