@@ -48,18 +48,46 @@ public:
 	void creq_w(int state);
 	void cr_w(int state);
 
+	void prot_a_w(int state);
+	void prot_b_w(int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void set_cxpos(uint16_t data);
+
+	void tick_cxck();
+	void tick_cyck();
+
+	void update_prot_proms();
+
+	uint8_t *m_bb_base;
+	uint8_t *m_bc_base;
+	uint8_t *m_bd_base;
+	uint8_t *m_protx_base;
+	uint8_t *m_proty_base;
+
+	uint8_t m_bb_out;
+	uint8_t m_bc_out;
+	uint8_t m_bd_out;
+	bool m_protx;
+	bool m_proty;
+
 	uint16_t m_rhscr;
 	uint16_t m_rvscr;
 	uint16_t m_rzoom;
 	uint16_t m_fld_sel;
-	uint16_t m_cxpos;
 	uint16_t m_cypos;
+
+	int8_t m_orig_cx_stripe_addr;
+	int16_t m_orig_cx_stripe_num;
+	int16_t m_orig_cy_addr;
+	int8_t m_cx_stripe_addr;
+	int16_t m_cx_stripe_num;
+	int16_t m_cy_addr;
 
 	int m_s_type;
 
@@ -83,6 +111,14 @@ protected:
 	bool m_selvideo;
 	bool m_creq;
 	bool m_cread;
+
+	bool m_prot_a;
+	bool m_prot_b;
+
+	required_memory_region m_x_prom;
+	required_memory_region m_protx_prom;
+	required_memory_region m_proty_prom;
+	required_memory_region m_blanking_pal;
 };
 
 // device type definition
