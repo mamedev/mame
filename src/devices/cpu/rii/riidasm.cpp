@@ -79,16 +79,16 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 			if (BIT(opcode, 13))
 			{
 				util::stream_format(stream, "%-8s", "MOVPR");
-				format_register(stream, preg);
-				stream << ",";
 				format_register(stream, opcode & 0x00ff);
+				stream << ",";
+				format_register(stream, preg);
 			}
 			else
 			{
 				util::stream_format(stream, "%-8s", "MOVRP");
-				format_register(stream, opcode & 0x00ff);
-				stream << ",";
 				format_register(stream, preg);
+				stream << ",";
+				format_register(stream, opcode & 0x00ff);
 			}
 		}
 	}
