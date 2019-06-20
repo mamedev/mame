@@ -1207,3 +1207,14 @@ if (VIDEOS["DECSFB"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/video/bt47x.h,VIDEOS["BT47X"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT47X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt47x.cpp",
+		MAME_DIR .. "src/devices/video/bt47x.h",
+	}
+end
