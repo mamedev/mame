@@ -591,7 +591,7 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 	if (interlace)
 	{
 		ra >>= 1;
-		if (y > 0x176) return;
+		if (y > 0x191) return;
 	}
 
 	// redundant initializers to keep compiler happy
