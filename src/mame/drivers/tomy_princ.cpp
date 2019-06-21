@@ -62,4 +62,4 @@ ROM_START( princ )
 	ROM_LOAD("29f800t.u4", 0x00000, 0x100000, CRC(30b6b864) SHA1(7ada3af85dd8dd3f95ca8965ad8e642c26445293))
 ROM_END
 
-COMP( ????, princ,    0,       0,      tomy_princ,    tomy_princ, tomy_princ_state, empty_init, "Tomy", "Prin-C", MACHINE_IS_SKELETON )
+COMP( 1996?, princ,    0,       0,      tomy_princ,    tomy_princ, tomy_princ_state, empty_init, "Tomy", "Prin-C", MACHINE_IS_SKELETON )
