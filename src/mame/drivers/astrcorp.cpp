@@ -875,6 +875,22 @@ ROM_START( speeddrp )
 ROM_END
 
 /***************************************************************************
+ Magic Bomb
+***************************************************************************/
+
+ROM_START( magibomb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom1", 0x00000, 0x10000, CRC(f01ab462) SHA1(5c9052f66da166f926910562a6a8aea5397549db) )
+	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(ac3224ef) SHA1(810117dc89369eee0f4f5b6744cfbf0cb70ccce6) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(f7d14414) SHA1(af932df09aa970ec05cc12e590e152e7288c1f5c) )
+ROM_END
+
+/***************************************************************************
 
 Western Venture
 (c) ASTRO
@@ -1348,6 +1364,7 @@ GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, init_show
 GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, init_showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",         MACHINE_SUPPORTS_SAVE )
 GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",  MACHINE_SUPPORTS_SAVE )
 GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",           MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  magibomb,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Magic Bomb",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no gfx dumps, less complex looking encryption
 
 // Encrypted games (not working):
 GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                        MACHINE_NOT_WORKING )
