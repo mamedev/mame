@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_S3, isa16_svga_s3_device, "s3_764", "Number Nine 9
 void isa16_svga_s3_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
 
 	S3_VGA(config, "vga", 0).set_screen("screen");
@@ -149,7 +149,7 @@ DEFINE_DEVICE_TYPE(ISA16_S3VIRGE, isa16_s3virge_device, "s3virge", "S3 ViRGE Gra
 void isa16_s3virge_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 
 	S3VIRGE(config, "vga", 0).set_screen("screen");
@@ -230,7 +230,7 @@ DEFINE_DEVICE_TYPE(ISA16_S3VIRGEDX, isa16_s3virgedx_device, "s3virgedx", "S3 ViR
 void isa16_s3virgedx_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virgedx_vga_device::screen_update));
 
 	S3VIRGEDX(config, "vga", 0).set_screen("screen");
@@ -312,7 +312,7 @@ DEFINE_DEVICE_TYPE(ISA16_DMS3D2KPRO, isa16_stealth3d2kpro_device, "dms3d2kp", "D
 void isa16_stealth3d2kpro_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virgedx_rev1_vga_device::screen_update));
 
 	S3VIRGEDX1(config, "vga", 0).set_screen("screen");
