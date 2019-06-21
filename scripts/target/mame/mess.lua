@@ -2698,6 +2698,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ncd68k.cpp",
 	MAME_DIR .. "src/mame/drivers/ncdmips.cpp",
 	MAME_DIR .. "src/mame/drivers/ncdppc.cpp",
+	MAME_DIR .. "src/mame/machine/bert.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ne")
