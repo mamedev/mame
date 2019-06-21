@@ -33000,7 +33000,6 @@ prestige                        // PreComputer Prestige Elite
 snotec                          // Bandai Super Note Club (Japan)
 snotecex                        // Bandai Super Note Club EX (Japan)
 snotecu                         // Bandai Super Note Club U (Japan)
-princ                           // Tomy Prin-C (Japan)
 
 @source:primo.cpp
 primoa32                        // Primo A-32
@@ -38270,6 +38269,9 @@ tokims
 
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985
+
+@source:tomy_princ.cpp
+princ                           // Tomy Prin-C (Japan)
 
 @source:tonton.cpp
 tonton                          // (c) 199? Success / Taiyo Jidoki.

@@ -3508,6 +3508,7 @@ files {
 createMESSProjects(_target, _subtarget, "tomy")
 files {
 	MAME_DIR .. "src/mame/drivers/tutor.cpp",
+	MAME_DIR .. "src/mame/drivers/tomy_princ.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "toshiba")
