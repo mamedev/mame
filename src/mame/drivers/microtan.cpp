@@ -8,14 +8,14 @@
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *  for his site http:://www.geo255.redhotant.com
+ *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
- *  for his site http://www.ifrance.com/oric/microtan.html
+ *  for his site http://oric.free.fr/microtan.html
  *
  *  Microtan65 memory map
  *
  *  range     short     description
- *  0000-01FF SYSRAM    system ram
+ *  0000-01ff SYSRAM    system ram
  *                      0000-003f variables
  *                      0040-00ff basic
  *                      0100-01ff stack
@@ -26,7 +26,7 @@
  *  bc04      SPACEINV  space invasion sound (?)
  *  bfc0-bfcf VIA6522-0 VIA 6522 #0
  *  bfd0-bfd3 SIO       serial i/o
- *  bfe0-bfef VIA6522-1 VIA 6522 #0
+ *  bfe0-bfef VIA6522-1 VIA 6522 #1
  *  bff0      GFX_KBD   R: chunky graphics on W: reset KBD interrupt
  *  bff1      NMI       W: start delayed NMI
  *  bff2      HEX       W: hex. keypad column
@@ -50,6 +50,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist.h"
 
 
 void microtan_state::main_map(address_map &map)
@@ -207,7 +208,8 @@ static GFXDECODE_START( gfx_microtan )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(microtan_state::microtan)
+void microtan_state::microtan(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 6_MHz_XTAL / 8);  // 750 kHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &microtan_state::main_map);
@@ -236,8 +238,11 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", attotime::from_msec(500))
-	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", attotime::from_msec(500))
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(microtan_state, microtan), this), "dmp,m65");
+	snapshot.set_interface("mt65_snap");
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(microtan_state, microtan), this), "hex");
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -261,7 +266,10 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	m_via6522[1]->ca2_handler().set(FUNC(microtan_state::via_1_out_ca2));
 	m_via6522[1]->cb2_handler().set(FUNC(microtan_state::via_1_out_cb2));
 	m_via6522[1]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_1>));
-MACHINE_CONFIG_END
+
+	/* software lists */
+	SOFTWARE_LIST(config, "snap_list").set_original("mt65_snap");
+}
 
 ROM_START( microtan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
