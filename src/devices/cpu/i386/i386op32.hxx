@@ -767,6 +767,7 @@ void i386_device::i386_iret32()            // Opcode 0xcf
 		i386_load_segment_descriptor(CS);
 		CHANGE_PC(m_eip);
 	}
+	m_auto_clear_RF = false;
 	CYCLES(CYCLES_IRET);
 }
 
