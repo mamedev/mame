@@ -21,6 +21,7 @@
 
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
+#include "machine/timer.h"
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "imagedev/cassette.h"
@@ -48,7 +49,6 @@ public:
 protected:
 	enum
 	{
-		TIMER_READ_CASSETTE,
 		TIMER_PULSE_NMI
 	};
 
@@ -92,7 +92,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(read_cassette);
+	TIMER_DEVICE_CALLBACK_MEMBER(read_cassette);
 	TIMER_CALLBACK_MEMBER(pulse_nmi);
 	DECLARE_READ8_MEMBER(via_0_in_a);
 	DECLARE_WRITE8_MEMBER(via_0_out_a);

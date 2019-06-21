@@ -35,6 +35,20 @@
  *  f000-f7ff XBUG      XBUG ROM
  *  f800-ffff TANBUG    TANBUG ROM
  *
+ *  Tanbug commands:
+ *  B         Set breakpoint
+ *  C         copy (move) memory block
+ *  G         Go
+ *  L         Hex dump
+ *  M         Modify memory
+ *  N         Exit single-step mode
+ *  O         Hex calculator
+ *  P         Step once
+ *  R         Register examine/modify
+ *  S         Enter single-step mode
+ *  BAS       Start BASIC (You need to choose maximum memory via dipswitches)
+ *  WAR       Re-enter BASIC (warm start)
+ *
  *****************************************************************************/
 
 /* Core includes */
@@ -246,6 +260,7 @@ void microtan_state::microtan(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
+	TIMER(config, "read_cassette").configure_periodic(FUNC(microtan_state::read_cassette), attotime::from_hz(20000)); // cass read
 
 	/* acia */
 	mos6551_device &acia(MOS6551(config, "acia", 0));

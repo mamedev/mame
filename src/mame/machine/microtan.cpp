@@ -180,9 +180,6 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	case TIMER_READ_CASSETTE:
-		read_cassette(ptr, param);
-		break;
 	case TIMER_PULSE_NMI:
 		pulse_nmi(ptr, param);
 		break;
@@ -192,7 +189,7 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(microtan_state::read_cassette)
+TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::read_cassette)
 {
 	double level = m_cassette->input();
 
@@ -404,7 +401,6 @@ void microtan_state::init_microtan()
 	}
 
 
-	m_read_cassette_timer = timer_alloc(TIMER_READ_CASSETTE);
 	m_pulse_nmi_timer = timer_alloc(TIMER_PULSE_NMI);
 
 	m_via6522[0]->write_ca1(1);
