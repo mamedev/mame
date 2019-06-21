@@ -33604,10 +33604,10 @@ redalert                        // M27 (c) 1981 + "GDI presents"
 ww3                             // M27 (c) 1981
 
 @source:redclash.cpp
-redclash                        // (c) 1981 Tehkan
-redclasha                       // (c) 1981 Tehkan
-redclashk                       // (c) Kaneko (bootleg?)
-redclashs                       // (c) Suntronics (licensed?)
+redclash                        // (c) Kaneko
+redclasht                       // (c) 1981 Tehkan
+redclashta                      // (c) 1981 Tehkan
+redclashs                       // (c) Suntronics
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
