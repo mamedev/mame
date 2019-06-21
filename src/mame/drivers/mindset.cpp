@@ -435,6 +435,13 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 	if(mode & 0x200) {
 		// Weird, does one with target bbe8:0000 which blows everything up
+		if(dst_seg != 0xbbe8) {
+			u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
+			for(u16 w=0; w != width; w++) {
+				m_gcos->write_word((dst_seg << 4) + dst_adr, src);
+				dst_adr += 2;
+			}
+		}
 
 	} else {
 		auto blend = gco_blend[(mode >> 2) & 7];
