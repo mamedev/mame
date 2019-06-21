@@ -30,7 +30,7 @@ protected:
 
 	u32 m_palette[16];
 	bool m_genlock[16];
-	u16 m_dispctrl;
+	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr;
 	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
 
 	static u16 gco_blend_0(u16, u16);
@@ -194,9 +194,33 @@ u16 mindset_state::dispreg_r()
 void mindset_state::dispreg_w(u16 data)
 {
 	switch(m_dispctrl & 0xf) {
+	case 0:
+		m_screenpos = data;
+		logerror("screen position (%d, %d)\n", (data >> 8) & 15, (data >> 12) & 15);
+		break;
 	case 1:
 		m_borderidx = data & 0xf;
 		break;
+	case 2: {
+		m_intpos = data;
+		int intx = (159 - ((m_intpos >> 8) & 255)) * ((m_dispctrl & 0x100) ? 2 : 4);
+		int inty = 199 - (m_intpos & 255);
+		m_intaddr = 0;
+		int mode_type = (m_dispctrl & 0x6000) >> 13;
+		int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
+		bool large_pixels = m_dispctrl & 0x0100;
+		switch(mode_type) {
+		case 0:
+			m_intaddr = inty * (160 >> (pixels_per_byte_order - large_pixels + 1)) + (intx >> (pixels_per_byte_order - large_pixels + 2));
+			break;
+		case 1:
+			m_intaddr = (inty & 1) * 0x2000 + (inty >> 1) * 80 + (intx >> (3 - large_pixels)) ;
+			break;
+		}
+
+		logerror("interrupt position (%3d, %3d) %04x.%04x = %04x (%d,%d)\n", intx, inty, m_dispctrl, m_intpos, m_intaddr, pixels_per_byte_order, large_pixels);
+		break;
+	}
 	case 4: {
 		data = sw(data);
 		u8 r = 0x11*(((data & 0x4000) >> 11) | (data & 7));
@@ -561,6 +585,7 @@ void mindset_state::mindset(machine_config &config)
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 319, 0, 199);
 	m_screen->set_screen_update(FUNC(mindset_state::screen_update));
+	m_screen->scanline().set([this](int scanline) { m_maincpu->int2_w(scanline == 198); });
 	// This is bad and wrong and I don't yet care
 	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
