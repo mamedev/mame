@@ -516,7 +516,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	gaelco.add_route(1, "rspeaker", 1.0);
 }
 
-ROM_START( saltcrdi ) // REF 970410
+ROM_START( sltpcycl ) // REF 970410
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "bi-n-21-27c512.u21",   0x000000, 0x010000, CRC(1d2e9a68) SHA1(b9bb4eeefe90850b648dc45689a08f3c28147856) )
 	ROM_LOAD16_BYTE( "bi-n-23-27c512.u23",   0x000001, 0x010000, CRC(5865351d) SHA1(a62b8ec88ef41d96b65a03ccaeadbec21803df34) )
@@ -535,6 +535,25 @@ ROM_START( saltcrdi ) // REF 970410
 
 	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
 	ROM_LOAD( "st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
+
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
+ROM_END
+
+ROM_START( sltpstep )
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "st_u_21.u21",   0x000000, 0x010000, CRC(2274f931) SHA1(c7b32bbb46e349769376bfaffe663170873bd083) )
+	ROM_LOAD16_BYTE( "st_u_23.u23",   0x000001, 0x010000, CRC(07c69f55) SHA1(886bef76b2aff046fd1c9a4837f359cb59095125) )
+
+	ROM_REGION( 0x0280000, "gfx1", ROMREGION_ERASEFF ) /* GFX, no sound, machine has none? */
+	ROM_LOAD( "st_u_40.u40",   0x0000000, 0x0080000, CRC(813270de) SHA1(9a6ce7679bd5c6ecf0c3328d6ff9dc2240a95328) )
+	ROM_LOAD( "st_u_39.u39",   0x0080000, 0x0080000, CRC(1d42e124) SHA1(add866310511f4f406b80ed0d3983b79b80c701c) )
+	ROM_LOAD( "st_u_38.u38",   0x0100000, 0x0080000, CRC(9d0d795c) SHA1(ef7cf61f8c687ecc68678a634f65386cc25d8a8f) )
+	ROM_LOAD( "st_u_37.u37",   0x0180000, 0x0080000, CRC(5543d4d1) SHA1(1f9f358dfb252412468ddd68331bda5acbe99329) )
+	ROM_FILL(                              0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "cpu_6022-1-st62t15c6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
 	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
@@ -2349,6 +2368,6 @@ GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, e
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 // Gym equipment
-GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // Same board and ROM as Pro Reclimber
-// Pro Stepper Tele
-// there are other devices in Cardioline series that don't use displays
+GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // Same board and ROM as Pro Reclimber
+GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter Fitness Stepper V.1.0, Checksum F208)", MACHINE_NOT_WORKING )
+// there are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware
