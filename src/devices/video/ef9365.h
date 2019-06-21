@@ -106,7 +106,6 @@ private:
 	uint8_t m_state;                          //status register
 	uint8_t m_border[80];                     //border color
 
-	rgb_t palette[256];                     // 8 bitplanes max -> 256 colors max
 	int   nb_of_bitplanes;
 	int   nb_of_colors;
 	int   bitplane_xres;
