@@ -35,6 +35,8 @@ public:
 	riscii_series_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned prgbits, unsigned bankbits, uint8_t maxbank);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -50,9 +52,18 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+	void regs_map(address_map &map);
+
 	// address spaces
 	address_space_config m_program_config;
+	address_space_config m_regs_config;
 	address_space *m_program;
+	address_space *m_regs;
+
+	// model-specific parameters
+	const unsigned m_prgbits;
+	const uint8_t m_bankmask;
+	const uint8_t m_maxbank;
 
 	// internal state
 	u32 m_pc;
