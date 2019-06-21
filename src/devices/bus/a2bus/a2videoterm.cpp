@@ -4,7 +4,7 @@
 
     a2videoterm.c
 
-    Implementation of the Videx VideoTerm 80-column card
+    Implementation of the Videx Videoterm 80-column card
 
     Notes (from Videoterm user's manual, which contains
            schematics and firmware source listings).
@@ -35,11 +35,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device, "a2vidtrm", "Videx VideoTerm")
+DEFINE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device, "a2vidtrm", "Videx Videoterm 80 Column Display")
 DEFINE_DEVICE_TYPE(A2BUS_IBSAP16,        a2bus_ap16_device,      "a2ap16",   "IBS AP-16 80 column card")
 DEFINE_DEVICE_TYPE(A2BUS_IBSAP16ALT,     a2bus_ap16alt_device,   "a2ap16a",  "IBS AP-16 80 column card (alt. version)")
-DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "unknown VideoTerm clone #1")
-DEFINE_DEVICE_TYPE(A2BUS_VTC2,           a2bus_vtc2_device,      "a2vtc2",   "unknown VideoTerm clone #2")
+DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "unknown Videoterm clone")
 DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Applied Engineering Viewmaster 80")
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
@@ -48,11 +47,15 @@ DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Ap
 #define VIDEOTERM_MC6845_NAME "mc6845_vterm"
 
 ROM_START( a2videoterm )
-	ROM_REGION(0x400, VIDEOTERM_ROM_REGION, 0)
-	ROM_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf) )
+	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, ROMREGION_ERASEFF)
+	ROM_SYSTEM_BIOS(0, "v24_60hz", "Firmware v2.4 (60 Hz)")
+	ROMX_LOAD( "6.ic6.bin", 0x000000, 0x000800, CRC(5776fa24) SHA1(19f69011ed7d2551c39d5c1cac1f5a2defc8f8fb), ROM_BIOS(0) ) // dumped from clone card
+	ROM_SYSTEM_BIOS(1, "v24_50hz", "Firmware v2.4 (50 Hz)")
+	ROMX_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf), ROM_BIOS(1) )
 
-	ROM_REGION(0x5000, VIDEOTERM_GFX_REGION, 0)
+	ROM_REGION(0x5800, VIDEOTERM_GFX_REGION, 0)
 	ROM_LOAD( "videx videoterm character rom normal.bin", 0x000000, 0x000800, CRC(87f89f08) SHA1(410b54f33d13c82e3857f1be906d93a8c5b8d321) )
+	//ROM_LOAD( "5.ic5.bin", 0x000000, 0x000800, CRC(aafa7085) SHA1(54d7c358f1927ba8f3b61145215a806d8cb6b673) ) // dumped from clone card, identical to normal ROM except final byte is FF instead of 00
 	ROM_LOAD( "videx videoterm character rom normal uppercase.bin", 0x000800, 0x000800, CRC(3d94a7a4) SHA1(5518254f24bc945aab13bc71ecc9526d6dd8e033) )
 	ROM_LOAD( "videx videoterm character rom apl.bin", 0x001000, 0x000800, CRC(1adb704e) SHA1(a95df910eca33188cacee333b1325aa47edbcc25) )
 	ROM_LOAD( "videx videoterm character rom epson.bin", 0x001800, 0x000800, CRC(0c6ef8d0) SHA1(db72c0c120086f1aa4a87120c5d7993c4a9d3a18) )
@@ -62,6 +65,7 @@ ROM_START( a2videoterm )
 	ROM_LOAD( "videx videoterm character rom spanish.bin", 0x003800, 0x000800, CRC(439eac08) SHA1(d6f9f8eb7702440d9ae39129ea4f480b80fc4608) )
 	ROM_LOAD( "videx videoterm character rom super and subscript.bin", 0x004000, 0x000800, CRC(08b7c538) SHA1(7f4029d97be05680fe695debe07cea07666419e0) )
 	ROM_LOAD( "videx videoterm character rom symbol.bin", 0x004800, 0x000800, CRC(82bce582) SHA1(29dfa8c5257dbf25651c6bffa9cdb453482aa70e) )
+	ROM_LOAD( "4.ic4.bin", 0x005000, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) ) // dumped from clone card, contains inverse character set
 ROM_END
 
 ROM_START( a2ap16 )
@@ -89,15 +93,6 @@ ROM_START( vtc1 )
 	ROM_LOAD( "8.ic8.bin",    0x000800, 0x000800, CRC(fbd98d77) SHA1(0d9b1c3917e23ca35d5fbd405f05ff6e87122b92) )
 ROM_END
 
-ROM_START( vtc2 )
-	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
-	ROM_LOAD( "6.ic6.bin",    0x000000, 0x000800, CRC(5776fa24) SHA1(19f69011ed7d2551c39d5c1cac1f5a2defc8f8fb) )
-
-	ROM_REGION(0x1000, VIDEOTERM_GFX_REGION, 0)
-	ROM_LOAD( "5.ic5.bin",    0x000000, 0x000800, CRC(aafa7085) SHA1(54d7c358f1927ba8f3b61145215a806d8cb6b673) )
-	ROM_LOAD( "4.ic4.bin",    0x000800, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) )
-ROM_END
-
 ROM_START( a2aevm80 )
 	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
 	ROM_LOAD( "ae viewmaster 80 rom.bin", 0x000000, 0x000800, CRC(62a4b111) SHA1(159bf7c4add1435be215fddb648c0743fbcc49b5) )
@@ -117,7 +112,8 @@ ROM_END
 void a2bus_videx80_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_raw(17.43_MHz_XTAL, 1107, 0, 720, 315, 0, 216);
+	screen.set_raw(17.43_MHz_XTAL, 1116, 0, 720, 260, 0, 216);
+	//screen.set_raw(17.43_MHz_XTAL, 1107, 0, 720, 315, 0, 216);
 	screen.set_screen_update(VIDEOTERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
 	HD6845S(config, m_crtc, 17.43_MHz_XTAL / 9);
@@ -155,13 +151,6 @@ void a2bus_vtc1_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_char_width(11);
 }
 
-void a2bus_vtc2_device::device_add_mconfig(machine_config &config)
-{
-	a2bus_videx80_device::device_add_mconfig(config);
-
-	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(17.43_MHz_XTAL, 1116, 0, 720, 260, 0, 216);
-}
-
 void a2bus_aevm80_device::device_add_mconfig(machine_config &config)
 {
 	a2bus_videx80_device::device_add_mconfig(config);
@@ -194,11 +183,6 @@ const tiny_rom_entry *a2bus_ap16alt_device::device_rom_region() const
 const tiny_rom_entry *a2bus_vtc1_device::device_rom_region() const
 {
 	return ROM_NAME( vtc1 );
-}
-
-const tiny_rom_entry *a2bus_vtc2_device::device_rom_region() const
-{
-	return ROM_NAME( vtc2 );
 }
 
 const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
@@ -238,11 +222,6 @@ a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *
 	a2bus_videx80_device(mconfig, A2BUS_VTC1, tag, owner, clock)
 {
 	m_char_width = 11;
-}
-
-a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_VTC2, tag, owner, clock)
-{
 }
 
 a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
