@@ -134,8 +134,8 @@ void sh2_device::sh7604_map(address_map &map)
 //	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
 	// TODO: internal map takes way too much resources if mirrored with 0x1ffffe00
 	//       we eventually internalize again via trampoline & sh7604_device
-	//       additionally SH7604 doc mentions that there's a DRAM located at 0xffff8000, 
-	//       so this is not a full mirror? (needs confirmation)
+	//       Also area 0xffff8000-0xffffbfff is for synchronous DRAM mode,
+	//       so this isn't actually a full mirror
 	// SCI
 	map(0xfffffe00, 0xfffffe00).rw(FUNC(sh2_device::smr_r), FUNC(sh2_device::smr_w));
 	map(0xfffffe01, 0xfffffe01).rw(FUNC(sh2_device::brr_r), FUNC(sh2_device::brr_w));

@@ -729,6 +729,10 @@ WRITE32_MEMBER( sh2_device::vcrdiv_w )
 	sh2_recalc_irq();
 }
 
+/* 
+ * DIVU
+ */
+
 READ32_MEMBER( sh2_device::dvcr_r )
 {
 	return (m_divu_ovfie == true ? 2 : 0) | (m_divu_ovf == true ? 1 : 0); 
@@ -744,15 +748,11 @@ WRITE32_MEMBER( sh2_device::dvcr_w )
 		{
 			m_divu_ovfie = bool(BIT(data, 1));
 			if (m_divu_ovfie == true)
-				LOG("SH2: unemulated DIVU OVF interrupt enable\n");
+				logerror("SH2: unemulated DIVU OVF interrupt enable\n");
 		}
 		sh2_recalc_irq();
 	}
 }
- 
-/* 
- * DMAC
- */
 
 READ32_MEMBER( sh2_device::dvsr_r )
 {

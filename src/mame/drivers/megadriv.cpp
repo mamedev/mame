@@ -583,19 +583,19 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr)
 {
 	if (m_32x)
-		m_32x->_32x_render_videobuffer_to_screenbuffer(x, priority, lineptr);
+		m_32x->render_videobuffer_to_screenbuffer(x, priority, lineptr);
 }
 
 void md_cons_state::_32x_interrupt_callback(int scanline, int irq6)
 {
 	if (m_32x)
-		m_32x->_32x_interrupt_cb(scanline, irq6);
+		m_32x->interrupt_cb(scanline, irq6);
 }
 
 void md_cons_state::_32x_scanline_helper_callback(int scanline)
 {
 	if (m_32x)
-		m_32x->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
+		m_32x->render_videobuffer_to_screenbuffer_helper(scanline);
 }
 
 MACHINE_CONFIG_START(md_cons_state::genesis_32x)
