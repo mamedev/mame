@@ -37668,6 +37668,9 @@ tek4404                         // (c) 1984 Tektronix
 @source:tekxp33x.cpp
 tekxp330                        //
 
+@source:telex1192.cpp
+telex1192                       //
+
 @source:telex274.cpp
 telex274                        //
 

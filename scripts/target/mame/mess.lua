@@ -4055,6 +4055,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tasc.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
+	MAME_DIR .. "src/mame/drivers/telex1192.cpp",
 	MAME_DIR .. "src/mame/drivers/telex274.cpp",
 	MAME_DIR .. "src/mame/drivers/telex277d.cpp",
 	MAME_DIR .. "src/mame/drivers/terak.cpp",
