@@ -73,14 +73,17 @@ ALLOW_SAVE_TYPE(attotime); // m_acc
 void pwm_display_device::device_start()
 {
 	// resolve handlers
-	m_out_x.resolve();
-	m_out_a.resolve();
-	m_out_digit.resolve();
-
 	bool cb1 = m_output_x_cb.resolve_safe();
 	bool cb2 = m_output_a_cb.resolve_safe();
 	bool cb3 = m_output_digit_cb.resolve_safe();
 	m_external_output = cb1 || cb2 || cb3;
+
+	if (!m_external_output)
+	{
+		m_out_x.resolve();
+		m_out_a.resolve();
+		m_out_digit.resolve();
+	}
 
 	// initialize
 	std::fill_n(m_rowdata, ARRAY_LENGTH(m_rowdata), 0);
