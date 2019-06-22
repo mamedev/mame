@@ -206,7 +206,7 @@ void konmedal68k_state::kzaurus_main(address_map &map)
 	map(0x880000, 0x880003).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0xa02000, 0xa03fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
-	map(0xb00000, 0xb01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
 }
 
@@ -340,4 +340,18 @@ ROM_START( kzaurus )
 	ROM_LOAD( "540-a01-2f.bin", 0x000000, 0x080000, CRC(391c6ee6) SHA1(a345934687a8abf818350d0597843a1159395fc0) )
 ROM_END
 
+ROM_START( koropens )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
+	ROM_LOAD16_WORD_SWAP( "741-c05-2n.bin", 0x000000, 0x080000, CRC(5c3ebe2a) SHA1(f42e15db386e63992844ded4dc30a16aea9918ac) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD( "741-a06-14n.bin", 0x000000, 0x080000, CRC(dbd9b892) SHA1(d36dc192465b894fed03c83ac64738296ab12ca1) )
+	ROM_LOAD( "741-a07-17n.bin", 0x080000, 0x080000, CRC(a50c9a91) SHA1(3c44f78bdf016d39002b0d1e34c6dbc70872a92e) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "741-a01-2f.bin", 0x000000, 0x080000, CRC(56823bfb) SHA1(5c23af55ef0053345f853f4c6ea361182d3ce14a) )
+	ROM_LOAD( "741-a02-1f.bin", 0x080000, 0x080000, CRC(31918688) SHA1(70a1699a3914883f502e021dbb9c0847f4ebee04) )
+ROM_END
+
 GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, koropens, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
