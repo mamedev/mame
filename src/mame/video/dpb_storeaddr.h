@@ -51,6 +51,20 @@ public:
 	void prot_a_w(int state);
 	void prot_b_w(int state);
 
+	void rvl_w(int state);
+	void rhr_w(int state);
+	void plt_w(int state);
+	void zb_w(int state);
+	void rppck_w(int state);
+	void rb_w(int state);
+	void pflag_w(int state);
+	void b26_w(int state);
+
+	void ipen_w(int state);
+
+	auto ipsel() { return m_ipsel_out.bind(); }
+	auto rck() { return m_rck_out.bind(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,13 +76,22 @@ protected:
 	void tick_cxck();
 	void tick_cyck();
 
+	void update_blanking_pal();
 	void update_prot_proms();
+	void update_rck();
+	void update_v0();
+
+	void update_addr_mux_inputs();
+	void update_addr_mux_outputs();
+	void update_addr_select_inputs();
+	void update_addr_select_outputs();
 
 	uint8_t *m_bb_base;
 	uint8_t *m_bc_base;
 	uint8_t *m_bd_base;
 	uint8_t *m_protx_base;
 	uint8_t *m_proty_base;
+	uint8_t *m_blanking_base;
 
 	uint8_t m_bb_out;
 	uint8_t m_bc_out;
@@ -76,11 +99,24 @@ protected:
 	bool m_protx;
 	bool m_proty;
 
+	uint8_t m_df_in[2];
+	uint8_t m_df_out;
+	uint8_t m_ee_in[2];
+	uint8_t m_ee_out;
+
+	uint8_t m_dg_in[2];
+	uint8_t m_eg_in[2];
+	uint8_t m_fg_in[2];
+	uint8_t m_gg_in[2];
+	uint8_t m_addr;
+
 	uint16_t m_rhscr;
 	uint16_t m_rvscr;
-	uint16_t m_rzoom;
-	uint16_t m_fld_sel;
-	uint16_t m_cypos;
+	uint8_t m_rzoom;
+	uint8_t m_fld_sel;
+
+	uint8_t m_hzoom_count;
+	uint8_t m_vzoom_count;
 
 	int8_t m_orig_cx_stripe_addr;
 	int16_t m_orig_cx_stripe_num;
@@ -88,6 +124,12 @@ protected:
 	int8_t m_cx_stripe_addr;
 	int16_t m_cx_stripe_num;
 	int16_t m_cy_addr;
+
+	uint8_t m_rhscr_stripe_addr;
+	uint8_t m_rhscr_stripe_num;
+
+	uint16_t m_rvscr_counter;
+	uint16_t m_rvscr_with_v0;
 
 	int m_s_type;
 
@@ -115,6 +157,43 @@ protected:
 	bool m_prot_a;
 	bool m_prot_b;
 
+	bool m_rvl;
+	bool m_rhr;
+	bool m_plt;
+	bool m_zb;
+	bool m_rppck;
+	bool m_rb;
+	bool m_pflag;
+
+	bool m_mxr;
+	bool m_rc_sel;
+
+	bool m_window_enable;
+	bool m_b26;
+
+	bool m_blank_d;
+	bool m_blank_a;
+	bool m_blank_b;
+	uint8_t m_blank_q;
+
+	bool m_crc;
+	bool m_ipen;
+
+	// Output Signals
+	bool m_ipsel;
+	bool m_rck;
+	uint8_t m_ra;
+	bool m_opra;
+
+	// Output Handlers
+	devcb_write_line m_ipsel_out;
+	devcb_write_line m_rck_out;
+	devcb_write8 m_ra_out;
+	devcb_write_line m_opra_out;
+	devcb_write_line m_blk_out;
+	devcb_write8 m_addr_out;
+
+	// Devices
 	required_memory_region m_x_prom;
 	required_memory_region m_protx_prom;
 	required_memory_region m_proty_prom;

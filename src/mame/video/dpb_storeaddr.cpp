@@ -5,6 +5,12 @@
     dpb_storeaddr.cpp
     DPB-7000/1 - Store Address Card
 
+	TODO:
+	- Code is currently a more or less direct translation of the board
+	  schematic. It is highly inefficient, but accurate. An equally-
+	  accurate, but faster, version can be made once better understanding
+	  of the overall DPB-7000 system is had.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -29,21 +35,31 @@ dpb7000_storeaddr_card_device::dpb7000_storeaddr_card_device(const machine_confi
 	, m_bd_base(nullptr)
 	, m_protx_base(nullptr)
 	, m_proty_base(nullptr)
+	, m_blanking_base(nullptr)
 	, m_bb_out(0)
 	, m_bc_out(0)
 	, m_bd_out(0)
 	, m_protx(false)
 	, m_proty(false)
+	, m_df_out(0)
+	, m_ee_out(0)
+	, m_addr(0)
 	, m_rhscr(0)
 	, m_rvscr(0)
 	, m_rzoom(0)
 	, m_fld_sel(0)
+	, m_hzoom_count(0)
+	, m_vzoom_count(0)
 	, m_orig_cx_stripe_addr(0)
 	, m_orig_cx_stripe_num(0)
 	, m_orig_cy_addr(0)
 	, m_cx_stripe_addr(0)
 	, m_cx_stripe_num(0)
 	, m_cy_addr(0)
+	, m_rhscr_stripe_addr(0)
+	, m_rhscr_stripe_num(0)
+	, m_rvscr_counter(0)
+	, m_rvscr_with_v0(0)
 	, m_s_type(0)
 	, m_cen(false)
 	, m_cxd(false)
@@ -64,6 +80,33 @@ dpb7000_storeaddr_card_device::dpb7000_storeaddr_card_device(const machine_confi
 	, m_cread(false)
 	, m_prot_a(false)
 	, m_prot_b(false)
+	, m_rvl(false)
+	, m_rhr(false)
+	, m_plt(false)
+	, m_zb(false)
+	, m_rppck(false)
+	, m_rb(false)
+	, m_pflag(false)
+	, m_mxr(false)
+	, m_rc_sel(false)
+	, m_window_enable(false)
+	, m_b26(false)
+	, m_blank_d(false)
+	, m_blank_a(false)
+	, m_blank_b(false)
+	, m_blank_q(0)
+	, m_crc(false)
+	, m_ipen(false)
+	, m_ipsel(false)
+	, m_rck(false)
+	, m_ra(0)
+	, m_opra(false)
+	, m_ipsel_out(*this)
+	, m_rck_out(*this)
+	, m_ra_out(*this)
+	, m_opra_out(*this)
+	, m_blk_out(*this)
+	, m_addr_out(*this)
 	, m_x_prom(*this, "x_prom")
 	, m_protx_prom(*this, "protx_prom")
 	, m_proty_prom(*this, "proty_prom")
@@ -100,16 +143,36 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_protx));
 	save_item(NAME(m_proty));
 
+	save_item(NAME(m_df_in));
+	save_item(NAME(m_df_out));
+	save_item(NAME(m_ee_in));
+	save_item(NAME(m_ee_out));
+
+	save_item(NAME(m_dg_in));
+	save_item(NAME(m_eg_in));
+	save_item(NAME(m_fg_in));
+	save_item(NAME(m_gg_in));
+
 	save_item(NAME(m_rhscr));
 	save_item(NAME(m_rvscr));
 	save_item(NAME(m_rzoom));
 	save_item(NAME(m_fld_sel));
+
+	save_item(NAME(m_hzoom_count));
+	save_item(NAME(m_vzoom_count));
+
 	save_item(NAME(m_orig_cx_stripe_addr));
 	save_item(NAME(m_orig_cx_stripe_num));
 	save_item(NAME(m_orig_cy_addr));
 	save_item(NAME(m_cx_stripe_addr));
 	save_item(NAME(m_cx_stripe_num));
 	save_item(NAME(m_cy_addr));
+
+	save_item(NAME(m_rhscr_stripe_addr));
+	save_item(NAME(m_rhscr_stripe_num));
+
+	save_item(NAME(m_rvscr_counter));
+	save_item(NAME(m_rvscr_with_v0));
 
 	save_item(NAME(m_s_type));
 
@@ -133,20 +196,87 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_selvideo));
 	save_item(NAME(m_creq));
 	save_item(NAME(m_cread));
+
+	save_item(NAME(m_prot_a));
+	save_item(NAME(m_prot_b));
+
+	save_item(NAME(m_rvl));
+	save_item(NAME(m_rhr));
+	save_item(NAME(m_plt));
+	save_item(NAME(m_zb));
+	save_item(NAME(m_rppck));
+	save_item(NAME(m_rb));
+	save_item(NAME(m_pflag));
+
+	save_item(NAME(m_mxr));
+	save_item(NAME(m_rc_sel));
+
+	save_item(NAME(m_window_enable));
+	save_item(NAME(m_b26));
+
+	save_item(NAME(m_blank_d));
+	save_item(NAME(m_blank_a));
+	save_item(NAME(m_blank_b));
+	save_item(NAME(m_blank_q));
+
+	save_item(NAME(m_crc));
+	save_item(NAME(m_ipen));
+
+	save_item(NAME(m_ipsel));
+	save_item(NAME(m_rck));
+	save_item(NAME(m_ra));
+	save_item(NAME(m_opra));
+
+	m_ipsel_out.resolve_safe();
+	m_rck_out.resolve_safe();
+	m_ra_out.resolve_safe();
+	m_opra_out.resolve_safe();
+	m_blk_out.resolve_safe();
+	m_addr_out.resolve_safe();
 }
 
 void dpb7000_storeaddr_card_device::device_reset()
 {
+	m_bb_out = 0;
+	m_bc_out = 0;
+	m_bd_out = 0;
+	m_protx = false;
+	m_proty = false;
+
+	memset(m_df_in, 0, 2);
+	m_df_in[1] = 0xc;
+	m_df_out = 0;
+
+	memset(m_ee_in, 0, 2);
+	m_ee_in[1] = 0xc;
+	m_ee_out = 0;
+
+	memset(m_dg_in, 0, 2);
+	memset(m_eg_in, 0, 2);
+	memset(m_fg_in, 0, 2);
+	memset(m_gg_in, 0, 2);
+	m_addr = 0;
+
 	m_rhscr = 0;
 	m_rvscr = 0;
 	m_rzoom = 0;
 	m_fld_sel = 0;
+
+	m_hzoom_count = 0;
+	m_vzoom_count = 0;
+
 	m_orig_cx_stripe_addr = 0;
 	m_orig_cx_stripe_num = 0;
 	m_orig_cy_addr = 0;
 	m_cx_stripe_addr = 0;
 	m_cx_stripe_num = 0;
 	m_cy_addr = 0;
+
+	m_rhscr_stripe_addr = 0;
+	m_rhscr_stripe_num = 0;
+
+	m_rvscr_counter = 0;
+	m_rvscr_with_v0 = 0;
 
 	m_s_type = 0;
 
@@ -171,17 +301,42 @@ void dpb7000_storeaddr_card_device::device_reset()
 	m_creq = false;
 	m_cread = false;
 
+	m_prot_a = false;
+	m_prot_b = false;
+
+	m_rvl = false;
+	m_rhr = false;
+	m_plt = false;
+	m_zb = false;
+	m_rppck = false;
+	m_rb = false;
+	m_pflag = false;
+
+	m_mxr = false;
+	m_rc_sel = false;
+
+	m_window_enable = false;
+	m_b26 = false;
+
+	m_blank_d = false;
+	m_blank_a = false;
+	m_blank_b = false;
+	m_blank_q = 0;
+
+	m_crc = false;
+	m_ipen = false;
+
+	m_ipsel = false;
+	m_rck = false;
+	m_ra = 0;
+	m_opra = false;
+
 	m_bb_base = m_x_prom->base() + 0x000;
 	m_bc_base = m_x_prom->base() + 0x400;
 	m_bd_base = m_x_prom->base() + 0x800;
 	m_protx_base = m_protx_prom->base();
 	m_proty_base = m_proty_prom->base();
-
-	m_bb_out = 0;
-	m_bc_out = 0;
-	m_bd_out = 0;
-	m_protx = false;
-	m_proty = false;
+	m_blanking_base = m_blanking_pal->base();
 }
 
 void dpb7000_storeaddr_card_device::reg_w(uint16_t data)
@@ -189,20 +344,36 @@ void dpb7000_storeaddr_card_device::reg_w(uint16_t data)
 	switch ((data >> 12) & 7)
 	{
 		case 0:
+		{
 			LOG("%s: Store Address Card %d, set RHSCR: %03x\n", machine().describe_context(), m_s_type, data & 0xfff);
+			const uint16_t old = m_rhscr;
 			m_rhscr = data & 0xfff;
+			if (BIT(old, 0) != BIT(m_rhscr, 0))
+			{
+				update_rck();
+			}
 			break;
+		}
 		case 1:
 			LOG("%s: Store Address Card %d, set RVSCR: %03x\n", machine().describe_context(), m_s_type, data & 0xfff);
 			m_rvscr = data & 0xfff;
 			break;
 		case 2:
+		{
 			LOG("%s: Store Address Card %d, set R ZOOM: %03x\n", machine().describe_context(), m_s_type, data & 0xfff);
-			m_rzoom = data & 0xfff;
+			const uint8_t old = m_rzoom;
+			m_rzoom = data & 0xf;
+			if (BIT(old, 0) != BIT(m_rzoom, 0))
+			{
+				update_rck();
+			}
 			break;
+		}
 		case 3:
 			LOG("%s: Store Address Card %d, set FLDSEL: %03x\n", machine().describe_context(), m_s_type, data & 0xfff);
-			m_fld_sel = data & 0xfff;
+			m_fld_sel = data & 0xf;
+			m_window_enable = BIT(m_fld_sel, 2);
+			m_blank_b = !(m_window_enable && m_b26);
 			break;
 		case 4:
 			LOG("%s: Store Address Card %d, set CXPOS: %03x\n", machine().describe_context(), m_s_type, data & 0xfff);
@@ -270,6 +441,9 @@ void dpb7000_storeaddr_card_device::tick_cxck()
 	}
 	else if (!m_cen && !m_cxen)
 	{
+		const int8_t old_ca = m_cx_stripe_addr;
+		const int16_t old_cn = m_cx_stripe_num;
+
 		if (m_cxd)
 		{
 			m_cx_stripe_addr--;
@@ -277,7 +451,12 @@ void dpb7000_storeaddr_card_device::tick_cxck()
 			{
 				m_cx_stripe_addr = 9;
 				m_cx_stripe_num--;
+				m_crc = true;
 				update_prot_proms();
+			}
+			else
+			{
+				m_crc = false;
 			}
 		}
 		else
@@ -287,9 +466,29 @@ void dpb7000_storeaddr_card_device::tick_cxck()
 			{
 				m_cx_stripe_addr = 0;
 				m_cx_stripe_num++;
+				m_crc = true;
 				update_prot_proms();
 			}
+			else
+			{
+				m_crc = false;
+			}
 		}
+
+		if ((old_ca & 0x0e) != (m_cx_stripe_addr & 0x0e) && !m_rck)
+		{
+			m_ra &= 1;
+			m_ra |= m_cx_stripe_addr & 0x0e;
+			m_ra_out(m_ra);
+		}
+
+		const int16_t changed = old_cn ^ m_cx_stripe_num;
+		if (changed & 0x30)
+			update_addr_mux_inputs();
+		else if (changed & 0x40)
+			update_addr_mux_outputs();
+		else
+			update_addr_select_inputs();
 	}
 
 	if (!m_cen && !m_cxoen)
@@ -356,6 +555,7 @@ void dpb7000_storeaddr_card_device::tick_cyck()
 	}
 	else if (!m_cen && !m_cyen)
 	{
+		const int16_t old_cy = m_cy_addr;
 		if (m_cyd)
 		{
 			m_cy_addr--;
@@ -364,6 +564,13 @@ void dpb7000_storeaddr_card_device::tick_cyck()
 		{
 			m_cy_addr++;
 		}
+
+		const int16_t changed = old_cy ^ m_cy_addr;
+		if (changed & 0x300)
+			update_addr_mux_inputs();
+		else
+			update_addr_select_inputs();
+
 		update_prot_proms();
 	}
 
@@ -428,4 +635,278 @@ void dpb7000_storeaddr_card_device::update_prot_proms()
 	const uint16_t m_y_addr = ((uint8_t)(m_cy_addr >> 2)) | (m_prot_a ? 0x000 : 0x100) | (m_prot_b ? 0x000 : 0x200);
 	m_protx = BIT(m_protx_base[m_x_addr], 0);
 	m_proty = BIT(m_proty_base[m_y_addr], 0);
+}
+
+void dpb7000_storeaddr_card_device::rvl_w(int state)
+{
+	m_rvl = (bool)state;
+}
+
+void dpb7000_storeaddr_card_device::rhr_w(int state)
+{
+	const bool old = m_rhr;
+	m_rhr = (bool)state;
+	if (old && !m_rhr)
+	{
+		if (!m_plt && !m_rhr)
+		{
+			m_rvscr_counter = 0;
+		}
+
+		const uint8_t old_vzoom = m_vzoom_count;
+		if (!m_rvl || m_vzoom_count == 15)
+		{
+			m_vzoom_count = ~m_rzoom & 15;
+		}
+		else
+		{
+			m_vzoom_count++;
+		}
+
+		if (!m_rvl)
+		{
+			m_rvscr_counter = m_rvscr;
+		}
+		else if (m_zb || old_vzoom == 15)
+		{
+			const uint16_t old_counter = m_rvscr_counter;
+			m_rvscr_counter++;
+
+			if (((old_counter ^ m_rvscr_counter) & 0x3fc) != 0)
+				update_blanking_pal();
+
+			const int16_t changed = old_counter ^ m_rvscr_counter;
+			if (changed & 0x300)
+				update_addr_mux_inputs();
+			else
+				update_addr_select_inputs();
+		}
+		update_v0();
+	}
+}
+
+void dpb7000_storeaddr_card_device::plt_w(int state)
+{
+	m_plt = (bool)state;
+	update_rck();
+}
+
+void dpb7000_storeaddr_card_device::zb_w(int state)
+{
+	m_zb = (bool)state;
+}
+
+void dpb7000_storeaddr_card_device::rppck_w(int state)
+{
+	const bool old = m_rppck;
+	m_rppck = (bool)state;
+	if (old && !m_rppck)
+	{
+		if (!m_plt && !m_rppck)
+		{
+			m_rvscr_counter = 0;
+		}
+
+		const uint8_t old_hzoom = m_hzoom_count;
+		if (!m_rhr || m_hzoom_count == 15)
+		{
+			m_hzoom_count = ~m_rzoom & 15;
+		}
+
+		m_blank_q <<= 1;
+		if (m_blank_a && m_blank_b)
+		{
+			m_blank_q |= 1;
+		}
+		m_blk_out(BIT(m_blank_q, 7));
+
+		if (m_zb || old_hzoom == 15)
+		{
+			const uint8_t old_addr = m_rhscr_stripe_addr;
+			m_rhscr_stripe_addr++;
+			if ((old_addr & 0x08) != (m_rhscr_stripe_addr & 0x08))
+			{
+				m_blank_a = !m_blank_d;
+			}
+
+			if (m_rhscr_stripe_addr == 10)
+			{
+				m_rhscr_stripe_addr = 0;
+
+				const uint8_t old_stripe_num = m_rhscr_stripe_num;
+				m_rhscr_stripe_num++;
+				update_blanking_pal();
+				if ((old_stripe_num & 1) != (m_rhscr_stripe_num & 1) && m_rck)
+				{
+					m_opra = BIT(m_rhscr_stripe_num, 0);
+					m_opra_out(m_opra);
+				}
+
+				const int16_t changed = old_stripe_num ^ m_rhscr_stripe_num;
+				if (changed & 0x30)
+					update_addr_mux_inputs();
+				else if (changed & 0x40)
+					update_addr_mux_outputs();
+				else
+					update_addr_select_inputs();
+			}
+
+			const uint8_t old_ra = m_ra;
+			if (m_rck)
+			{
+				m_ra = m_rhscr_stripe_addr;
+			}
+			else
+			{
+				m_ra &= ~1;
+				m_ra |= BIT(m_rhscr_stripe_addr, 0);
+			}
+
+			if (old_ra != m_ra)
+				m_ra_out(m_ra);
+		}
+	}
+}
+
+void dpb7000_storeaddr_card_device::rb_w(int state)
+{
+	m_rb = (bool)state;
+}
+
+void dpb7000_storeaddr_card_device::pflag_w(int state)
+{
+	const bool old = m_pflag;
+	m_pflag = (bool)state;
+	if (old != m_pflag)
+		update_rck();
+}
+
+void dpb7000_storeaddr_card_device::b26_w(int state)
+{
+	m_b26 = (bool)state;
+	m_blank_b = !(m_window_enable && m_b26);
+}
+
+void dpb7000_storeaddr_card_device::ipen_w(int state)
+{
+	const bool old_en = m_ipen;
+	m_ipen = (bool)state;
+	if (!old_en && m_ipen)
+	{
+		const bool old_sel = m_ipsel;
+		m_ipsel = ((!m_crc || m_selvideo) != m_ipsel);
+		if (old_sel != m_ipsel)
+		    m_ipsel_out(m_ipsel);
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_rck()
+{
+	const bool scroll0 = BIT(m_rhscr, 0);
+	const bool zoom0 = BIT(m_rzoom, 0);
+	const bool old_rck = m_rck;
+	m_rck = (scroll0 && m_plt && !zoom0) != m_pflag;
+	if (old_rck != m_rck)
+	{
+		m_rck_out(m_rck);
+
+		const uint8_t old_ra = m_ra;
+		const bool old_opra = m_opra;
+		const bool ah_sel = !m_rck;
+		m_ra = (m_rhscr_stripe_addr & 1);
+		if (ah_sel)
+		{
+			m_ra |= m_cx_stripe_addr & 0x0e;
+			m_opra = false;
+		}
+		else
+		{
+			m_ra |= m_rhscr_stripe_addr & 0x0e;
+			m_opra = BIT(m_rhscr_stripe_num, 0);
+		}
+
+		if (old_ra != m_ra)
+			m_ra_out(m_ra);
+		if (old_opra != m_opra)
+			m_opra_out(m_opra);
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_v0()
+{
+	// FLDSEL1  VLSB  NAND1  FLDSEL0  V0
+	// 0        0     1      0        1
+	// 0        1     1      0        1
+	// 1        0     1      0        1
+	// 1        1     0      0        1
+	// 0        0     1      1        0
+	// 0        1     1      1        0
+	// 1        0     1      1        0
+	// 1        1     0      1        1
+	const bool v0 = !BIT(m_fld_sel, 0) || (BIT(m_fld_sel, 1) && BIT(m_rvscr_counter, 0));
+	m_rvscr_with_v0 = (m_rvscr_counter &~ 1) | (v0 ? 1 : 0);
+}
+
+void dpb7000_storeaddr_card_device::update_blanking_pal()
+{
+	uint16_t addr = (m_rhscr_stripe_num >> 4);
+	addr |= (m_rvscr_counter & 0xfc) << 2;
+	addr |= BIT(m_rhscr_stripe_num, 0) << 10;
+	addr |= (m_rvscr_counter & 0x300) << 3;
+	addr |= (m_rhscr_stripe_num & 0x0e) << 12;
+	const uint8_t blanking = m_blanking_base[addr];
+	m_blank_d = !(BIT(blanking, 0) && BIT(blanking, 1));
+}
+
+void dpb7000_storeaddr_card_device::update_addr_mux_inputs()
+{
+	m_df_in[0] = (m_cx_stripe_num & 0x30) >> 4;
+	const uint8_t cy_df_bits = (m_cy_addr & 0x300) >> 8;
+	m_df_in[0] |= cy_df_bits << 2;
+	m_df_in[1] = cy_df_bits | 0xc;
+
+	m_ee_in[0] = (m_rhscr_stripe_num & 0x30) >> 4;
+	const uint8_t ry_ee_bits = (m_rvscr_counter & 0x300) >> 8;
+	m_ee_in[0] |= ry_ee_bits << 2;
+	m_ee_in[1] = ry_ee_bits | 0xc;
+
+	update_addr_mux_outputs();
+}
+
+void dpb7000_storeaddr_card_device::update_addr_mux_outputs()
+{
+	m_df_out = m_df_in[BIT(m_cx_stripe_num, 6)];
+	m_ee_out = m_ee_in[BIT(m_rhscr_stripe_num, 6)];
+
+	update_addr_select_inputs();
+}
+
+void dpb7000_storeaddr_card_device::update_addr_select_inputs()
+{
+	m_dg_in[0] = BIT(m_rhscr_stripe_num, 0) | (BIT(m_ee_out,        0) << 1) | (BIT(m_cx_stripe_num, 0) << 2) | (BIT(m_df_out,  0) << 3);
+	m_dg_in[1] = BIT(m_rhscr_stripe_num, 1) | (BIT(m_ee_out,        1) << 1) | (BIT(m_cx_stripe_num, 1) << 2) | (BIT(m_df_out,  1) << 3);
+	m_eg_in[0] = BIT(m_rhscr_stripe_num, 2) | (BIT(m_rvscr_with_v0, 5) << 1) | (BIT(m_cx_stripe_num, 2) << 2) | (BIT(m_cy_addr, 5) << 3);
+	m_eg_in[1] = BIT(m_rhscr_stripe_num, 3) | (BIT(m_rvscr_with_v0, 6) << 1) | (BIT(m_cx_stripe_num, 3) << 2) | (BIT(m_cy_addr, 6) << 3);
+	m_fg_in[0] = BIT(m_rvscr_with_v0,    1) | (BIT(m_rvscr_with_v0, 7) << 1) | (BIT(m_cy_addr,       1) << 2) | (BIT(m_cy_addr, 7) << 3);
+	m_fg_in[1] = BIT(m_rvscr_with_v0,    2) | (BIT(m_ee_out,        2) << 1) | (BIT(m_cy_addr,       2) << 2) | (BIT(m_df_out,  2) << 3);
+	m_gg_in[0] = BIT(m_rvscr_with_v0,    3) | (BIT(m_ee_out,        3) << 1) | (BIT(m_cy_addr,       3) << 2) | (BIT(m_df_out,  3) << 3);
+	m_gg_in[1] = BIT(m_rvscr_with_v0,    4) | (BIT(m_rvscr_with_v0, 0) << 1) | (BIT(m_cy_addr,       4) << 2) | (BIT(m_cy_addr, 0) << 3);
+
+	update_addr_select_outputs();
+}
+
+void dpb7000_storeaddr_card_device::update_addr_select_outputs()
+{
+	const uint8_t sel = (m_mxr ? 1 : 0) | (m_rc_sel ? 2 : 0);
+	const uint8_t old = m_addr;
+	m_addr  = BIT(m_dg_in[0], sel);
+	m_addr |= BIT(m_dg_in[1], sel) << 1;
+	m_addr |= BIT(m_eg_in[0], sel) << 2;
+	m_addr |= BIT(m_eg_in[1], sel) << 3;
+	m_addr |= BIT(m_fg_in[0], sel) << 4;
+	m_addr |= BIT(m_fg_in[1], sel) << 5;
+	m_addr |= BIT(m_gg_in[0], sel) << 6;
+	m_addr |= BIT(m_gg_in[1], sel) << 7;
+	if (old != m_addr)
+		m_addr_out(m_addr);
 }
