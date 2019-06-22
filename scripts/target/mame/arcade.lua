@@ -135,6 +135,7 @@ CPUS["ST62XX"] = true
 CPUS["DSPP"] = true
 CPUS["HPC"] = true
 --CPUS["RII"] = true
+--CPUS["BCP"] = true
 
 --------------------------------------------------
 -- specify available sound cores

@@ -28,6 +28,7 @@ using util::BIT;
 #include "cpu/arm7/arm7dasm.h"
 #include "cpu/asap/asapdasm.h"
 #include "cpu/avr8/avr8dasm.h"
+#include "cpu/bcp/bcpdasm.h"
 #include "cpu/capricorn/capricorn_dasm.h"
 #include "cpu/ccpu/ccpudasm.h"
 #include "cpu/clipper/clipperd.h"
@@ -339,6 +340,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestlin",       be, -3, []() -> util::disasm_interface * { return new cquestlin_disassembler; } },
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
+	{ "dp8344",          le, -1, []() -> util::disasm_interface * { return new dp8344_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
 	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },

@@ -143,6 +143,7 @@ CPUS["HPC"] = true
 CPUS["MEG"] = true
 CPUS["DSPV"] = true
 CPUS["RII"] = true
+CPUS["BCP"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
