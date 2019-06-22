@@ -65,6 +65,7 @@ private:
 	void romident(const std::vector<std::string> &args);
 	void getsoftlist(const std::vector<std::string> &args);
 	void verifysoftlist(const std::vector<std::string> &args);
+	void version(const std::vector<std::string> &args);
 
 	// internal helpers
 	template <typename T, typename U> void apply_action(const std::vector<std::string> &args, T &&drvact, U &&devact);
