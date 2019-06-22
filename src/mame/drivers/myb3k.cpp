@@ -1039,7 +1039,7 @@ void myb3k_state::jb3000(machine_config &config)
 	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* software lists */
-	//SOFTWARE_LIST(config, "flop_list").set_original("jb3000_flop");
+	SOFTWARE_LIST(config, "flop_list").set_original("jb3000_flop");
 }
 
 void myb3k_state::stepone(machine_config &config)
