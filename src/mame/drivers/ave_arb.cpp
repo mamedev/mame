@@ -276,7 +276,8 @@ void arb_state::v2(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SENSORBOARD(config, m_board).set_preset(sensorboard_device::CHESS_MAGNETS);
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9+1, 12);

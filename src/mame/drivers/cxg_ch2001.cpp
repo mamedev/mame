@@ -180,7 +180,8 @@ void ch2001_state::ch2001(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(18300)); // active for 18.3us
 	TIMER(config, "irq_off").configure_periodic(FUNC(ch2001_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	SENSORBOARD(config, m_board).set_preset(sensorboard_device::CHESS_MAGNETS);
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);

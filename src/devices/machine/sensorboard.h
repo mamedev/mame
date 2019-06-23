@@ -16,26 +16,28 @@ class sensorboard_device : public device_t
 public:
 	sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	enum
+	enum sb_type
 	{
-		CHESS_BUTTONS = 0,
-		CHESS_MAGNETS,
-		CHESS_INDUCTIVE
+		BUTTONS = 0,
+		MAGNETS,
+		INDUCTIVE
 	};
 
 	// configuration helpers
-	sensorboard_device &set_preset(u8 preset) { init_preset(preset); return *this; } // device has presets for chess boards
+	sensorboard_device &set_type(sb_type t) { m_magnets = (t == MAGNETS); m_inductive = (t == INDUCTIVE); return *this; } // sensor type
 	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 10 * 10
 	sensorboard_device &set_spawnpoints(u8 i) { m_maxspawn = i; m_maxid = i; return *this; } // number of piece spawnpoints, max 16
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)
-	sensorboard_device &set_sensordelay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable
+	sensorboard_device &set_delay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable
 	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 3 : 0; return *this; } // enable UI inputs
 	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= 2; return *this; } // enable modifier keys
 
-	auto custom_init() { return m_custom_init_cb.bind(); }
-	auto custom_sensor() { return m_custom_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
-	auto custom_spawn() { return m_custom_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
-	auto custom_output() { return m_custom_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
+	auto init_cb() { return m_custom_init_cb.bind(); }
+	auto sensor_cb() { return m_custom_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
+	auto spawn_cb() { return m_custom_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
+	auto output_cb() { return m_custom_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
+
+	int preset_chess(); // init_cb() preset for chessboards
 
 	// read sensors
 	u8 read_sensor(u8 x, u8 y);
@@ -56,13 +58,14 @@ public:
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 
-	// internal input handlers
+	// input handlers
 	DECLARE_INPUT_CHANGED_MEMBER(sensor);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_spawn);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_hand);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_undo);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_init);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(check_sensor_busy) { return (m_sensorpos == -1) ? 0 : 1; }
 	DECLARE_CUSTOM_INPUT_MEMBER(check_bs_mask) { return m_bs_mask; }
 	DECLARE_CUSTOM_INPUT_MEMBER(check_ss_mask) { return m_ss_mask; }
 	DECLARE_CUSTOM_INPUT_MEMBER(check_ui_enabled) { return m_ui_enabled; }
@@ -87,11 +90,6 @@ private:
 	devcb_read8 m_custom_spawn_cb;
 	devcb_write16 m_custom_output_cb;
 
-	u8 m_history[1000][0x100];
-	u8 m_curstate[0x100];
-	u8 m_inistate[0x100];
-	u8 m_spawnstate[0x20];
-
 	bool m_magnets;
 	bool m_inductive;
 	u8 m_width;
@@ -106,6 +104,10 @@ private:
 	int m_sensorpos;
 	u8 m_ui_enabled;
 
+	u8 m_curstate[0x100];
+	u8 m_inistate[0x100];
+	u8 m_history[1000][0x100];
+
 	u8 m_uselect;
 	u32 m_upointer;
 	u32 m_ufirst;
@@ -119,8 +121,6 @@ private:
 	emu_timer *m_sensortimer;
 	void cancel_sensor();
 	TIMER_CALLBACK_MEMBER(sensor_off) { cancel_sensor(); }
-
-	void init_preset(u8 preset);
 };
 
 
