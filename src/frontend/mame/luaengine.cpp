@@ -779,8 +779,7 @@ void lua_engine::initialize()
 	emu["pause"] = [this](){ return machine().pause(); };
 	emu["unpause"] = [this](){ return machine().resume(); };
 	emu["step"] = [this]() {
-			mame_machine_manager::instance()->ui().set_single_step(true);
-			machine().resume();
+			machine().video().single_step();
 		};
 	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
@@ -2162,7 +2161,6 @@ void lua_engine::initialize()
  * ui:get_string_width(str, scale) - get str width with ui font at scale factor of current font size
  * ui:get_char_width(char) - get width of utf8 glyph char with ui font
  *
- * ui.single_step
  * ui.show_fps - fps display enabled
  * ui.show_profiler - profiler display enabled
  */
@@ -2172,7 +2170,6 @@ void lua_engine::initialize()
 			"options", [](mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); },
 			"show_fps", sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps),
 			"show_profiler", sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler),
-			"single_step", sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step),
 			"get_line_height", &mame_ui_manager::get_line_height,
 			"get_string_width", &mame_ui_manager::get_string_width,
 			// sol converts char32_t to a string

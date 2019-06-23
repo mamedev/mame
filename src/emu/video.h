@@ -74,6 +74,10 @@ public:
 	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
 
+	// single stepping
+	void single_step();
+	bool is_single_stepping() const { return m_single_step; }
+
 	// render a frame
 	void frame_update(bool from_debugger = false);
 
@@ -169,6 +173,10 @@ private:
 	s8                  m_frameskip_adjust;
 	bool                m_skipping_this_frame;      // flag: true if we are skipping the current frame
 	osd_ticks_t         m_average_oversleep;        // average number of ticks the OSD oversleeps
+
+	// single stepping
+	bool                m_single_step;				// are we currently single stepping?
+
 
 	// snapshot stuff
 	render_target *     m_snap_target;              // screen shapshot target

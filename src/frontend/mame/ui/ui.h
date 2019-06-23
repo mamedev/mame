@@ -159,12 +159,8 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
 	ui::machine_info &machine_info() const { assert(m_machine_info); return *m_machine_info; }
-
-	// setters
-	void set_single_step(bool single_step) { m_single_step = single_step; }
 
 	// methods
 	void initialize(running_machine &machine);
@@ -237,7 +233,6 @@ private:
 	std::function<uint32_t (render_container &)> m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
 	uint32_t                  m_handler_param;
-	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
 	bool                    m_show_profiler;

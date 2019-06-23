@@ -97,6 +97,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_frameskip_adjust(0)
 	, m_skipping_this_frame(false)
 	, m_average_oversleep(0)
+	, m_single_step(false)
 	, m_snap_target(nullptr)
 	, m_snap_native(true)
 	, m_snap_width(0)
@@ -236,6 +237,13 @@ void video_manager::frame_update(bool from_debugger)
 			skipped_it = true;
 		else
 			m_empty_skip_count = 0;
+	}
+
+	// if we're single-stepping, pause now
+	if (m_single_step)
+	{
+		machine().pause();
+		m_single_step = false;
 	}
 
 	// draw the user interface
@@ -1568,4 +1576,16 @@ void video_manager::end_recording(movie_format format)
 			osd_printf_error("Unknown movie format: %d\n", format);
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  single_step
+//-------------------------------------------------
+
+void video_manager::single_step()
+{
+	machine().rewind_capture();
+	m_single_step = true;
+	machine().resume();
 }
