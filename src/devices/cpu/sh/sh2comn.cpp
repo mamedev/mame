@@ -401,8 +401,8 @@ void sh2_device::sh2_dmac_check(int dmach)
 
 			m_dma_timer_active[dmach] = 1;
 
-			m_active_dma_src[dmach] &= SH12_AM;
-			m_active_dma_dst[dmach] &= SH12_AM;
+			m_active_dma_src[dmach] &= m_am;
+			m_active_dma_dst[dmach] &= m_am;
 
 			switch(m_active_dma_size[dmach])
 			{
@@ -1063,7 +1063,7 @@ void sh2_device::sh2_recalc_irq()
  SH-7021 on-chip device
  */
 
-void sh2a_device::sh7032_dma_exec(int ch)
+void sh702x_device::sh702x_dma_exec(int ch)
 {
 	const short dma_word_size[4] = { 0, +1, -1, 0 };
 	uint8_t rs = (m_dma[ch].chcr >> 8) & 0xf; /**< Resource Select bits */
@@ -1107,85 +1107,85 @@ void sh2a_device::sh7032_dma_exec(int ch)
 	printf("%02x %02x %02x %1d\n",sm,dm,rs,ts);
 }
 
-READ32_MEMBER(sh2a_device::dma_sar0_r)
+READ32_MEMBER(sh702x_device::dma_sar0_r)
 {
 	return m_dma[0].sar;
 }
 
-WRITE32_MEMBER(sh2a_device::dma_sar0_w)
+WRITE32_MEMBER(sh702x_device::dma_sar0_w)
 {
 	COMBINE_DATA(&m_dma[0].sar);
 }
 
-READ32_MEMBER(sh2a_device::dma_dar0_r)
+READ32_MEMBER(sh702x_device::dma_dar0_r)
 {
 	return m_dma[0].dar;
 }
 
-WRITE32_MEMBER(sh2a_device::dma_dar0_w)
+WRITE32_MEMBER(sh702x_device::dma_dar0_w)
 {
 	COMBINE_DATA(&m_dma[0].dar);
 }
 
-READ16_MEMBER(sh2a_device::dma_tcr0_r)
+READ16_MEMBER(sh702x_device::dma_tcr0_r)
 {
 	return m_dma[0].tcr;
 }
 
-WRITE16_MEMBER(sh2a_device::dma_tcr0_w)
+WRITE16_MEMBER(sh702x_device::dma_tcr0_w)
 {
 	//printf("%04x\n",data);
 	COMBINE_DATA(&m_dma[0].tcr);
 }
 
-READ16_MEMBER(sh2a_device::dma_chcr0_r)
+READ16_MEMBER(sh702x_device::dma_chcr0_r)
 {
 	return m_dma[0].chcr;
 }
 
-WRITE16_MEMBER(sh2a_device::dma_chcr0_w)
+WRITE16_MEMBER(sh702x_device::dma_chcr0_w)
 {
 	//printf("%04x CHCR0\n",data);
 	COMBINE_DATA(&m_dma[0].chcr);
-	sh7032_dma_exec(0);
+	sh702x_dma_exec(0);
 }
 
-READ16_MEMBER(sh2a_device::dmaor_r)
+READ16_MEMBER(sh702x_device::dmaor_r)
 {
 	return m_dmaor;
 }
 
-WRITE16_MEMBER(sh2a_device::dmaor_w)
+WRITE16_MEMBER(sh702x_device::dmaor_w)
 {
 	COMBINE_DATA(&m_dmaor);
-	sh7032_dma_exec(0);
+	sh702x_dma_exec(0);
 }
 
 /*!
   @brief Dummy debug interface
   */
-READ16_MEMBER(sh1_device::sh7032_r)
+READ16_MEMBER(sh703x_device::sh703x_r)
 {
-	return m_sh7032_regs[offset];
+	return m_sh703x_regs[offset];
 }
 
 /*!
   @brief Dummy debug interface
  */
-WRITE16_MEMBER(sh1_device::sh7032_w)
+WRITE16_MEMBER(sh703x_device::sh703x_w)
 {
-	COMBINE_DATA(&m_sh7032_regs[offset]);
+	COMBINE_DATA(&m_sh703x_regs[offset]);
 }
 
-READ16_MEMBER(sh2a_device::sh7021_r)
+READ16_MEMBER(sh702x_device::sh702x_r)
 {
-	return m_sh7021_regs[offset];
+	return m_sh702x_regs[offset];
 }
 
 /*!
   @brief Dummy debug interface
  */
-WRITE16_MEMBER(sh2a_device::sh7021_w)
+WRITE16_MEMBER(sh702x_device::sh702x_w)
 {
-	COMBINE_DATA(&m_sh7021_regs[offset]);
+	COMBINE_DATA(&m_sh702x_regs[offset]);
 }

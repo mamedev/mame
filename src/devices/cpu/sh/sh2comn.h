@@ -22,7 +22,8 @@ enum
 	CCLRA = 0x01
 };
 
-#define SH12_AM  0xc7ffffff
+#define SH12_AM           0xc7ffffff
+#define SH702X_SH703X_AM  0x0fffffff
 
 #define CHECK_PENDING_IRQ(message)              \
 do {                                            \

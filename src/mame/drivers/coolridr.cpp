@@ -349,7 +349,7 @@ public:
 	uint8_t  m_clipblitterMode[2]; // hack
 
 	required_device<sh2_device> m_maincpu;
-	required_device<sh2_device> m_subcpu;
+	required_device<sh7032_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
@@ -2925,40 +2925,39 @@ WRITE32_MEMBER(coolridr_state::sound_dma_w)
 
 void coolridr_state::system_h1_submap(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rom(); // note: SH7032 only supports 64KB
+	map(0x00000000, 0x0001ffff).mirror(0x08c00000).rom(); //external ROM (64K x 16 bit)
 
-	map(0x01000000, 0x0100ffff).ram(); //communication RAM
+	map(0x01000000, 0x0100ffff).mirror(0x08000000).ram(); //communication RAM
 
-	map(0x03000000, 0x0307ffff).rw(FUNC(coolridr_state::soundram_r<0>), FUNC(coolridr_state::soundram_w<0>)); //.share("soundram1");
-	map(0x03100000, 0x03100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x03200000, 0x0327ffff).rw(FUNC(coolridr_state::soundram_r<1>), FUNC(coolridr_state::soundram_w<1>)); //.share("soundram2");
-	map(0x03300000, 0x03300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x03000000, 0x0307ffff).mirror(0x08c00000).rw(FUNC(coolridr_state::soundram_r<0>), FUNC(coolridr_state::soundram_w<0>)); //.share("soundram1");
+	map(0x03100000, 0x03100fff).mirror(0x08c00000).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x03200000, 0x0327ffff).mirror(0x08c00000).rw(FUNC(coolridr_state::soundram_r<1>), FUNC(coolridr_state::soundram_w<1>)); //.share("soundram2");
+	map(0x03300000, 0x03300fff).mirror(0x08c00000).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 
-	map(0x04000000, 0x0400003f).rw(FUNC(coolridr_state::sound_dma_r), FUNC(coolridr_state::sound_dma_w)).share("sound_dma");
-//  map(0x04200000, 0x0420003f).ram(); /* unknown */
+	map(0x04000000, 0x0400003f).mirror(0x08c00000).rw(FUNC(coolridr_state::sound_dma_r), FUNC(coolridr_state::sound_dma_w)).share("sound_dma");
+//  map(0x04200000, 0x0420003f).mirror(0x08c00000).ram(); /* unknown */
 
-	map(0x05000000, 0x05000fff).ram();
-//  map(0x05fffe00, 0x05ffffff).rw(FUNC(coolridr_state::sh7032_r), FUNC(coolridr_state::sh7032_w)); // SH-7032H internal i/o
-	map(0x06000000, 0x060001ff).ram().share("nvram"); // backup RAM
-	map(0x06100000, 0x0610001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
-	map(0x06200000, 0x06200fff).ram(); //network related?
-	map(0x07ffe000, 0x07ffffff).ram(); // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
+//  map(0x05000000, 0x050001ff).mirror(0x00fffe00).rw(FUNC(coolridr_state::sh7032_r), FUNC(coolridr_state::sh7032_w)); // SH-7032H internal i/o
+	map(0x06000000, 0x060001ff).mirror(0x08c00000).ram().share("nvram"); // backup RAM
+	map(0x06100000, 0x0610001f).mirror(0x08c00000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
+	map(0x06200000, 0x06200fff).mirror(0x08c00000).ram(); //network related?
+	map(0x0d000000, 0x0d000fff).mirror(0x00c00000).ram();
 }
 
 void coolridr_state::coolridr_submap(address_map &map)
 {
 	system_h1_submap(map);
-	map(0x05200000, 0x052001ff).ram();
-	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x0d200000, 0x0d2001ff).mirror(0x00c00000).ram();
+	map(0x0d300000, 0x0d30ffff).mirror(0x00c00000).ram().share("share3"); /*Communication area RAM*/
 }
 
 void coolridr_state::aquastge_submap(address_map &map)
 {
 	system_h1_submap(map);
-	map(0x05200000, 0x0520ffff).ram();
-	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
-	map(0x05220000, 0x0537ffff).ram();
-	map(0x06000200, 0x06000207).nopw(); // program bug?
+	map(0x06000200, 0x06000207).mirror(0x08c00000).nopw(); // program bug?
+	map(0x0d200000, 0x0d20ffff).mirror(0x00c00000).ram();
+	map(0x0d210000, 0x0d21ffff).mirror(0x00c00000).ram().share("share3"); /*Communication area RAM*/
+	map(0x0d220000, 0x0d37ffff).mirror(0x00c00000).ram();
 }
 
 /* TODO: what is this for, volume mixing? MIDI? */
@@ -3241,7 +3240,7 @@ void coolridr_state::coolridr(machine_config &config)
 	M68000(config, m_soundcpu, 22579000/2); // 22.579 MHz XTAL / 2 = 11.2895 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH1(config, m_subcpu, 16000000);  // SH7032 HD6417032F20!! 16 MHz
+	SH7032(config, m_subcpu, 16000000, 1);  // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 

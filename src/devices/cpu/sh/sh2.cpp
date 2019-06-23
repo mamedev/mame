@@ -101,12 +101,27 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+// SH7020, SH7021 datasheet :
+// https://www.renesas.com/en-us/doc/products/mpumcu/001/e602074_sh7020.pdf
 
+// SH7032, SH7034(B) datasheet :
+// https://www.renesas.com/en-us/doc/products/mpumcu/001/rej09b0272_7032hm.pdf
 
+/*
+	TODO:
+		Split address maps per each external mapping areas (CS0-7, DRAM)
+*/
 
-DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "Hitachi SH-1")
-DEFINE_DEVICE_TYPE(SH2,  sh2_device,  "sh2",  "Hitachi SH-2")
-DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "Hitachi SH-2A")
+// SH-2 Family
+DEFINE_DEVICE_TYPE(SH2,    sh2_device,    "sh2",    "Hitachi SH-2") // SH7604
+// SH-1 Family
+DEFINE_DEVICE_TYPE(SH7020,         sh7020_device,         "sh7020",         "Hitachi SH7020 SH-1") // 16KB Mask ROM, 1KB RAM
+DEFINE_DEVICE_TYPE(SH7020_ROMLESS, sh7020_romless_device, "sh7020_romless", "Hitachi SH7020 SH-1 (ROMless)") // ROMless, 1KB RAM
+DEFINE_DEVICE_TYPE(SH7021,         sh7021_device,         "sh7021",         "Hitachi SH7021 SH-1") // 32KB Mask ROM or PROM, 1KB RAM
+DEFINE_DEVICE_TYPE(SH7032,         sh7032_device,         "sh7032",         "Hitachi SH7032 SH-1") // ROMless, 8KB RAM
+DEFINE_DEVICE_TYPE(SH7034,         sh7034_device,         "sh7034",         "Hitachi SH7034 SH-1") // 64KB Mask ROM or PROM, 4KB RAM
+DEFINE_DEVICE_TYPE(SH7034_ROMLESS, sh7034_romless_device, "sh7034_romless", "Hitachi SH7034 SH-1 (ROMless)") // ROMless, 4KB RAM
+// SH7034B is same as SH7034 with 3.3v only operation
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
@@ -129,9 +144,9 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0x40000000, 0xbfffffff).r(FUNC(sh2_device::sh2_internal_a5));
 
 //  TODO: cps3boot breaks with this enabled. Needs callback
-//  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
-	
-//	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
+//  map(0xc0000000, 0xc0000fff).ram(); // cache data array
+
+//  map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
 	// TODO: internal map takes way too much resources if mirrored with 0x1ffffe00
 	//       we eventually internalize again via trampoline & sh7604_device
 	//       Also area 0xffff8000-0xffffbfff is for synchronous DRAM mode,
@@ -143,7 +158,7 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xfffffe03, 0xfffffe03).rw(FUNC(sh2_device::tdr_r), FUNC(sh2_device::tdr_w));
 	map(0xfffffe04, 0xfffffe04).rw(FUNC(sh2_device::ssr_r), FUNC(sh2_device::ssr_w));
 	map(0xfffffe05, 0xfffffe05).r(FUNC(sh2_device::rdr_r));
-	
+
 	// FRC
 	map(0xfffffe10, 0xfffffe10).rw(FUNC(sh2_device::tier_r), FUNC(sh2_device::tier_w));
 	map(0xfffffe11, 0xfffffe11).rw(FUNC(sh2_device::ftcsr_r), FUNC(sh2_device::ftcsr_w));
@@ -162,7 +177,7 @@ void sh2_device::sh7604_map(address_map &map)
 
 	map(0xfffffe71, 0xfffffe71).rw(FUNC(sh2_device::drcr_r<0>), FUNC(sh2_device::drcr_w<0>));
 	map(0xfffffe72, 0xfffffe72).rw(FUNC(sh2_device::drcr_r<1>), FUNC(sh2_device::drcr_w<1>));
-	
+
 	// WTC
 	map(0xfffffe80, 0xfffffe81).rw(FUNC(sh2_device::wtcnt_r), FUNC(sh2_device::wtcnt_w));
 	map(0xfffffe82, 0xfffffe83).rw(FUNC(sh2_device::rstcsr_r), FUNC(sh2_device::rstcsr_w));
@@ -170,7 +185,7 @@ void sh2_device::sh7604_map(address_map &map)
 	// standby and cache control
 	map(0xfffffe91, 0xfffffe91).rw(FUNC(sh2_device::sbycr_r), FUNC(sh2_device::sbycr_w));
 	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh2_device::ccr_r), FUNC(sh2_device::ccr_w));
-	
+
 	// INTC second section
 	map(0xfffffee0, 0xfffffee1).rw(FUNC(sh2_device::intc_icr_r), FUNC(sh2_device::intc_icr_w));
 	map(0xfffffee2, 0xfffffee3).rw(FUNC(sh2_device::ipra_r), FUNC(sh2_device::ipra_w));
@@ -198,11 +213,11 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xffffff94, 0xffffff97).rw(FUNC(sh2_device::dar_r<1>), FUNC(sh2_device::dar_w<1>));
 	map(0xffffff98, 0xffffff9b).rw(FUNC(sh2_device::dmac_tcr_r<1>), FUNC(sh2_device::dmac_tcr_w<1>));
 	map(0xffffff9c, 0xffffff9f).rw(FUNC(sh2_device::chcr_r<1>), FUNC(sh2_device::chcr_w<1>));
-	
+
 	map(0xffffffa0, 0xffffffa3).rw(FUNC(sh2_device::vcrdma_r<0>), FUNC(sh2_device::vcrdma_w<0>));
 	map(0xffffffa8, 0xffffffab).rw(FUNC(sh2_device::vcrdma_r<1>), FUNC(sh2_device::vcrdma_w<1>));
 	map(0xffffffb0, 0xffffffb3).rw(FUNC(sh2_device::dmaor_r), FUNC(sh2_device::dmaor_w));
-	
+
 	// BSC
 	map(0xffffffe0, 0xffffffe3).rw(FUNC(sh2_device::bcr1_r), FUNC(sh2_device::bcr1_w));
 	map(0xffffffe4, 0xffffffe7).rw(FUNC(sh2_device::bcr2_r), FUNC(sh2_device::bcr2_w));
@@ -213,24 +228,32 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xfffffff8, 0xfffffffb).rw(FUNC(sh2_device::rtcor_r), FUNC(sh2_device::rtcor_w));
 }
 
-void sh2a_device::sh7021_map(address_map &map)
+void sh702x_device::sh702x_map(address_map &map)
 {
+/*  on-chip ROM; TODO : md bit is can be changeable when chip isn't operated
+	if (!m_romless && (m_md == 2))
+		map(0, (1 << m_rom_bit) - 1).mirror(0x08ffffff & ~((1 << m_rom_bit) - 1)).rom();
+*/
 //  fall-back
-	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh2a_device::sh7021_r), FUNC(sh2a_device::sh7021_w)); // SH-7032H internal i/o
+	map(0x05000000, 0x050001ff).mirror(0x00fffe00).rw(FUNC(sh702x_device::sh702x_r), FUNC(sh702x_device::sh702x_w)); // SH702X internal i/o, actually at 5fffe00
 //  overrides
-	map(0x05ffff40, 0x05ffff43).rw(FUNC(sh2a_device::dma_sar0_r), FUNC(sh2a_device::dma_sar0_w));
-	map(0x05ffff44, 0x05ffff47).rw(FUNC(sh2a_device::dma_dar0_r), FUNC(sh2a_device::dma_dar0_w));
-	map(0x05ffff48, 0x05ffff49).rw(FUNC(sh2a_device::dmaor_r), FUNC(sh2a_device::dmaor_w));
-	map(0x05ffff4a, 0x05ffff4b).rw(FUNC(sh2a_device::dma_tcr0_r), FUNC(sh2a_device::dma_tcr0_w));
-	map(0x05ffff4e, 0x05ffff4f).rw(FUNC(sh2a_device::dma_chcr0_r), FUNC(sh2a_device::dma_chcr0_w));
-//  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-//  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+	map(0x05000140, 0x05000143).mirror(0x00fffe00).rw(FUNC(sh702x_device::dma_sar0_r), FUNC(sh702x_device::dma_sar0_w));
+	map(0x05000144, 0x05000147).mirror(0x00fffe00).rw(FUNC(sh702x_device::dma_dar0_r), FUNC(sh702x_device::dma_dar0_w));
+	map(0x05000148, 0x05000149).mirror(0x00fffe00).rw(FUNC(sh702x_device::dmaor_r), FUNC(sh702x_device::dmaor_w));
+	map(0x0500014a, 0x0500014b).mirror(0x00fffe00).rw(FUNC(sh702x_device::dma_tcr0_r), FUNC(sh702x_device::dma_tcr0_w));
+	map(0x0500014e, 0x0500014f).mirror(0x00fffe00).rw(FUNC(sh702x_device::dma_chcr0_r), FUNC(sh702x_device::dma_chcr0_w));
+	map(0x0f000000, 0x0f0003ff).mirror(0x00fffc00).ram();// on-chip RAM, actually at 0xffffc00 (1 kb)
 }
 
-void sh1_device::sh7032_map(address_map &map)
+void sh703x_device::sh703x_map(address_map &map)
 {
+/*  on-chip ROM; TODO : md bit is can be changeable when chip isn't operated
+	if (!m_romless && (m_md == 2))
+		map(0x00000000, 0x0000ffff).mirror(0x08ff0000).rom();
+*/
 //  fall-back
-	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh1_device::sh7032_r), FUNC(sh1_device::sh7032_w)); // SH-7032H internal i/o
+	map(0x05000000, 0x050001ff).mirror(0x00fffe00).rw(FUNC(sh703x_device::sh703x_r), FUNC(sh703x_device::sh703x_w)); // SH703X internal i/o, actually at 5fffe00
+	map(0x0f000000, 0x0f000000 | ((1 << m_ram_bit) - 1)).mirror(0x00ffffff & ~((1 << m_ram_bit) - 1)).ram(); // on-chip RAM, actually at fffe000/ffff000
 }
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -263,13 +286,51 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	m_isdrc = allow_drc();
 }
 
-sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2a_device::sh7021_map), this), 28)
+sh702x_device::sh702x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 rom_bit, bool romless)
+	: sh2_device(mconfig, type, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh7021_device::sh702x_map), this), 28)
+	, m_rom_bit(rom_bit)
+	, m_romless(romless)
+	, m_md(0)
+{
+	m_am = SH702X_SH703X_AM;
+}
+
+sh7020_device::sh7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh702x_device(mconfig, SH7020, tag, owner, clock, 14, false)
 {
 }
 
-sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh1_device::sh7032_map), this), 28)
+sh7020_romless_device::sh7020_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh702x_device(mconfig, SH7020_ROMLESS, tag, owner, clock, 0, true)
+{
+}
+
+sh7021_device::sh7021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh702x_device(mconfig, SH7021, tag, owner, clock, 15, false)
+{
+}
+
+sh703x_device::sh703x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 ram_bit, bool romless)
+	: sh2_device(mconfig, type, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh7032_device::sh703x_map), this), 28)
+	, m_ram_bit(ram_bit)
+	, m_romless(romless)
+	, m_md(0)
+{
+	m_am = SH702X_SH703X_AM;
+}
+
+sh7032_device::sh7032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh703x_device(mconfig, SH7032, tag, owner, clock, 13, true)
+{
+}
+
+sh7034_device::sh7034_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh703x_device(mconfig, SH7032, tag, owner, clock, 12, false)
+{
+}
+
+sh7034_romless_device::sh7034_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh703x_device(mconfig, SH7032, tag, owner, clock, 12, true)
 {
 }
 
@@ -294,7 +355,7 @@ std::unique_ptr<util::disasm_interface> sh2_device::create_disassembler()
 uint8_t sh2_device::RB(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_byte(A & SH12_AM);
+		return m_program->read_byte(A & m_am);
 
 	return m_program->read_byte(A);
 }
@@ -302,7 +363,7 @@ uint8_t sh2_device::RB(offs_t A)
 uint16_t sh2_device::RW(offs_t A)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_word(A & SH12_AM);
+		return m_program->read_word(A & m_am);
 
 	return m_program->read_word(A);
 }
@@ -312,7 +373,7 @@ uint32_t sh2_device::RL(offs_t A)
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_dword(A & SH12_AM);
+		return m_program->read_dword(A & m_am);
 
 	return m_program->read_dword(A);
 }
@@ -321,7 +382,7 @@ void sh2_device::WB(offs_t A, uint8_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_byte(A & SH12_AM,V);
+		m_program->write_byte(A & m_am,V);
 		return;
 	}
 
@@ -332,7 +393,7 @@ void sh2_device::WW(offs_t A, uint16_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_word(A & SH12_AM,V);
+		m_program->write_word(A & m_am,V);
 		return;
 	}
 
@@ -343,7 +404,7 @@ void sh2_device::WL(offs_t A, uint32_t V)
 {
 	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_dword(A & SH12_AM,V);
+		m_program->write_dword(A & m_am,V);
 		return;
 	}
 
@@ -479,7 +540,7 @@ void sh2_device::execute_run()
 	{
 		debugger_instruction_hook(m_sh2_state->pc);
 
-		const uint16_t opcode = m_decrypted_program->read_word(m_sh2_state->pc >= 0x40000000 ? m_sh2_state->pc : m_sh2_state->pc & SH12_AM);
+		const uint16_t opcode = m_decrypted_program->read_word(m_sh2_state->pc >= 0x40000000 ? m_sh2_state->pc : m_sh2_state->pc & m_am);
 
 		if (m_sh2_state->m_delay)
 		{
@@ -648,7 +709,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_irq));
 	
-	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(SH12_AM).callimport();
+	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(m_am).callimport();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 
 	// Clear state
@@ -812,7 +873,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 	if (m_isdrc)
 	{
 		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
-		m_sh2_state->evec &= SH12_AM;
+		m_sh2_state->evec &= m_am;
 		m_sh2_state->irqsr = m_sh2_state->sr;
 
 		/* set I flags in SR */
@@ -1054,7 +1115,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	UML_CMP(block, I0, 0x40000000);     // cmp #0x40000000, r0
 	UML_JMPc(block, COND_AE, label);            // bae label
 
-	UML_AND(block, I0, I0, SH12_AM);     // and r0, r0, #AM (0xc7ffffff)
+	UML_AND(block, I0, I0, m_am);     // and r0, r0, #AM (0xc7ffffff)
 
 	UML_LABEL(block, label++);              // label:
 

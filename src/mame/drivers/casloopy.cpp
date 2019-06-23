@@ -81,9 +81,9 @@ Notes:
                     like a V60. The BIOS is tied directly to it.
       RH-7500     - Casio RH-7500 5C315 (QFP208). This is the graphics generator chip.
       RH-7501     - Casio RH-7501 5C350 (QFP64). This is probably the sound chip.
-      SH7021      - Hitachi HD6437021TE20 SuperH RISC Engine SH-2A CPU with 32k internal maskROM (TQFP100)
-                    The internal ROM (BIOS1) is not dumped. A SH-2A software programming manual is available here...
-                    http://documentation.renesas.com/eng/products/mpumcu/rej09b0051_sh2a.pdf
+      SH7021      - Hitachi HD6437021TE20 SuperH RISC Engine SH-1 CPU with 32k internal maskROM (TQFP100)
+                    The internal ROM (BIOS1) is not dumped. A SH-1 software programming manual is available here...
+                    https://www.renesas.com/us/en/doc/products/mpumcu/001/rej09b0171_superh.pdf
       CXA1645M    - Sony CXA1645M RGB Encoder (RGB -> Composite Video) (SOIC24)
       A1603C      - NEC uPA1603C Compound Field Effect Power Transistor Array (DIP16)
       HM514260    - Hitachi HM514260 256k x 16 DRAM (SOJ40)
@@ -183,7 +183,7 @@ protected:
 private:
 	required_shared_ptr<uint32_t> m_bios_rom;
 	required_shared_ptr<uint32_t> m_vregs;
-	required_device<cpu_device> m_maincpu;
+	required_device<sh7021_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -427,21 +427,17 @@ READ32_MEMBER(casloopy_state::cart_r)
 
 void casloopy_state::casloopy_map(address_map &map)
 {
-	map(0x00000000, 0x00007fff).ram().share("bios_rom");
-	map(0x01000000, 0x0107ffff).ram().share("wram");// stack pointer points here
-	map(0x04000000, 0x0401ffff).rw(FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w));
-	map(0x04040000, 0x0404ffff).rw(FUNC(casloopy_state::vram_r), FUNC(casloopy_state::vram_w)); // tilemap + PCG
-	map(0x04050000, 0x040503ff).ram(); // ???
-	map(0x04051000, 0x040511ff).rw(FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
-	map(0x04058000, 0x04058007).rw(FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
-	map(0x0405b000, 0x0405b00f).ram().share("vregs"); // RGB555 brightness control plus scrolling
-//  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
-//  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	map(0x06000000, 0x062fffff).r(FUNC(casloopy_state::cart_r));
-	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
-	map(0x09000000, 0x0907ffff).ram().share("wram");
-	map(0x0e000000, 0x0e2fffff).r(FUNC(casloopy_state::cart_r));
-	map(0x0f000000, 0x0f0003ff).ram().share("oram");
+	map(0x00000000, 0x00007fff).mirror(0x08ff8000).ram().share("bios_rom");// on-chip ROM
+	map(0x01000000, 0x0107ffff).mirror(0x08000000).ram().share("wram");// stack pointer points here
+	map(0x04000000, 0x0401ffff).mirror(0x08c00000).rw(FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w));
+	map(0x04040000, 0x0404ffff).mirror(0x08c00000).rw(FUNC(casloopy_state::vram_r), FUNC(casloopy_state::vram_w)); // tilemap + PCG
+	map(0x04050000, 0x040503ff).mirror(0x08c00000).ram(); // ???
+	map(0x04051000, 0x040511ff).mirror(0x08c00000).rw(FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
+	map(0x04058000, 0x04058007).mirror(0x08c00000).rw(FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
+	map(0x0405b000, 0x0405b00f).mirror(0x08c00000).ram().share("vregs"); // RGB555 brightness control plus scrolling
+//  map(0x05000000, 0x050001ff).mirror(0x00fffe00).rw(FUNC(casloopy_state::sh7021_r), FUNC(casloopy_state::sh7021_w));
+//  map(0x05fffe00, 0x05ffffff) - SH7021 internal i/o
+	map(0x06000000, 0x062fffff).mirror(0x08c00000).r(FUNC(casloopy_state::cart_r));
 }
 
 #if 0
@@ -520,7 +516,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	/* basic machine hardware */
-	SH2A(config, m_maincpu, 8000000);
+	SH7021(config, m_maincpu, 8000000, 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
 
 //  v60_device &subcpu(V60(config, "subcpu", 8000000));

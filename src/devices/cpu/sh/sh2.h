@@ -371,11 +371,11 @@ private:
 
 };
 
-class sh2a_device : public sh2_device
+class sh702x_device : public sh2_device
 {
 public:
-	// construction/destruction
-	sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// configuration
+	void set_md(u8 md) { m_md = md; }
 
 	DECLARE_READ32_MEMBER(dma_sar0_r);
 	DECLARE_WRITE32_MEMBER(dma_sar0_w);
@@ -387,13 +387,21 @@ public:
 	DECLARE_WRITE16_MEMBER(dma_tcr0_w);
 	DECLARE_READ16_MEMBER(dma_chcr0_r);
 	DECLARE_WRITE16_MEMBER(dma_chcr0_w);
-	DECLARE_READ16_MEMBER(sh7021_r);
-	DECLARE_WRITE16_MEMBER(sh7021_w);
-	void sh7032_dma_exec(int ch);
+	DECLARE_READ16_MEMBER(sh702x_r);
+	DECLARE_WRITE16_MEMBER(sh702x_w);
+	void sh702x_dma_exec(int ch);
 
-	void sh7021_map(address_map &map);
+	void sh702x_map(address_map &map);
+
+protected:
+	// construction/destruction
+	sh702x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 rom_bit, bool romless);
+
+	u8 m_rom_bit;
+	bool m_romless;
+	u8 m_md;
 private:
-	uint16_t m_sh7021_regs[0x200];
+	uint16_t m_sh702x_regs[0x200];
 	struct
 	{
 		uint32_t              sar;    /**< Source Address Register */
@@ -405,17 +413,102 @@ private:
 
 };
 
-class sh1_device : public sh2_device
+class sh7020_device : public sh702x_device
 {
 public:
 	// construction/destruction
-	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	sh7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, u8 md)
+		: sh7020_device(mconfig, tag, owner, clock)
+	{
+		set_md(md);
+	}
+	sh7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(sh7032_r);
-	DECLARE_WRITE16_MEMBER(sh7032_w);
-	void sh7032_map(address_map &map);
+};
+
+class sh7020_romless_device : public sh702x_device
+{
+public:
+	// construction/destruction
+	sh7020_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, u8 md)
+		: sh7020_romless_device(mconfig, tag, owner, clock)
+	{
+		set_md(md);
+	}
+	sh7020_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+};
+
+class sh7021_device : public sh702x_device
+{
+public:
+	// construction/destruction
+	sh7021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, u8 md)
+		: sh7021_device(mconfig, tag, owner, clock)
+	{
+		set_md(md);
+	}
+	sh7021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+};
+
+class sh703x_device : public sh2_device
+{
+public:
+	// configuration
+	void set_md(u8 md) { m_md = md; }
+
+	DECLARE_READ16_MEMBER(sh703x_r);
+	DECLARE_WRITE16_MEMBER(sh703x_w);
+	void sh703x_map(address_map &map);
+protected:
+	// construction/destruction
+	sh703x_device(const machine_config &mconfig, device_type type, const char *_tag, device_t *_owner, uint32_t _clock, u8 ram_bit, bool romless);
+
+	u8 m_ram_bit;
+	bool m_romless;
+	u8 m_md;
 private:
-	uint16_t m_sh7032_regs[0x200];
+	uint16_t m_sh703x_regs[0x200];
+};
+
+class sh7032_device : public sh703x_device
+{
+public:
+	// construction/destruction
+	sh7032_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock, u8 md)
+		: sh7032_device(mconfig, _tag, _owner, _clock)
+	{
+		set_md(md);
+	}
+	sh7032_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
+};
+
+class sh7034_device : public sh703x_device
+{
+public:
+	// construction/destruction
+	sh7034_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock, u8 md)
+		: sh7034_device(mconfig, _tag, _owner, _clock)
+	{
+		set_md(md);
+	}
+	sh7034_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
+};
+
+class sh7034_romless_device : public sh703x_device
+{
+public:
+	// construction/destruction
+	sh7034_romless_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock, u8 md)
+		: sh7034_romless_device(mconfig, _tag, _owner, _clock)
+	{
+		set_md(md);
+	}
+	sh7034_romless_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
 };
 
 
@@ -430,8 +523,12 @@ private:
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };
 
-DECLARE_DEVICE_TYPE(SH1,  sh1_device)
-DECLARE_DEVICE_TYPE(SH2,  sh2_device)
-DECLARE_DEVICE_TYPE(SH2A, sh2a_device)
+DECLARE_DEVICE_TYPE(SH2,            sh2_device)
+DECLARE_DEVICE_TYPE(SH7020,         sh7020_device)
+DECLARE_DEVICE_TYPE(SH7020_ROMLESS, sh7020_romless_device)
+DECLARE_DEVICE_TYPE(SH7021,         sh7021_device)
+DECLARE_DEVICE_TYPE(SH7032,         sh7032_device)
+DECLARE_DEVICE_TYPE(SH7034,         sh7034_device)
+DECLARE_DEVICE_TYPE(SH7034_ROMLESS, sh7034_romless_device)
 
 #endif // MAME_CPU_SH2_SH2_H
