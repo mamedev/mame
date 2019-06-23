@@ -13383,7 +13383,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
+	<!--
 	This game saves its configuration to the system disk, and this particular image has sound disabled.
 	To enable sound, select the "音源の設定" option on the main menu, choose FM or MIDI, and reset.
 	-->
@@ -13593,7 +13593,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vieen3">
 		<description>Dennou Sentai La Vie en Three</description>
 		<year>1994</year>
@@ -13930,9 +13930,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		Doesn't recognize disk changes, but it's possible to install the game to HDD.
-		Also, This game is supposed to play voice samples, but in MAME it just outputs a constant beep.
+	<!--
+	    Doesn't recognize disk changes, but it's possible to install the game to HDD.
+	    Also, This game is supposed to play voice samples, but in MAME it just outputs a constant beep.
 	-->
 	<software name="diadrum" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
@@ -16929,7 +16929,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="duelkawa">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Duel - Kawanakajima Scenario</description>
@@ -16986,7 +16986,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Disk changes don't work. It's possible to start the game if you skip the opening sequence, but it might not work correctly later. --> 
+	<!-- Disk changes don't work. It's possible to start the game if you skip the opening sequence, but it might not work correctly later. -->
 	<software name="dbuster2" supported="partial">
 		<description>Dungeon Buster 2 Revive</description>
 		<year>1991</year>
@@ -17033,10 +17033,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		This is a revised edition that adds:
-		- An optional 16-color compatible graphics driver, for older PC-9801 computers
-		- An updated installer that can use SMARTDRV.EXE instead of SMARTDRV.SYS, hence allowing DOS versions newer than 5.0 
+	<!--
+	    This is a revised edition that adds:
+	    - An optional 16-color compatible graphics driver, for older PC-9801 computers
+	    - An updated installer that can use SMARTDRV.EXE instead of SMARTDRV.SYS, hence allowing DOS versions newer than 5.0
 	-->
 	<software name="dhack">
 		<!-- Origin: Neo Kobe Collection -->
@@ -31111,7 +31111,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="3dgolfv2">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>New 3D Golf Simulation Ver. 2.0</description>
@@ -56583,7 +56583,7 @@ SPACE EMPIRE
 		<info name="usage" value="Create a user disk with the ユーザーディスクを作成する option, then boot from it" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk"/>
-			<dataarea name="flop" size="1264636"> 
+			<dataarea name="flop" size="1264636">
 				<rom name="dragonslayer eiyu densetsu 4 (1996)(falcom)(disk 1 of 8)(program disk).fdd" size="1264636" crc="46b6761c" sha1="d58d43647d6f9b4c6fa61d67ed6a25c3f9dfa5a4" offset="0" />
 			</dataarea>
 		</part>

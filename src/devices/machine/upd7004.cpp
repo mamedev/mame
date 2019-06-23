@@ -6,9 +6,9 @@
 
     10-bit 8 Channel A/D Converter
 
-	TODO:
-	- Serial modes
-	- 2s complement output
+    TODO:
+    - Serial modes
+    - 2s complement output
 
 ***************************************************************************/
 

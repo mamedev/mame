@@ -44,14 +44,14 @@ protected:
 
 	enum
 	{
-		IAR_TYPE			= 0xf000,
-		IAR_TYPE_SHIFT		= 12,
-		IAR_NUM				= 0x0f00,
-		IAR_NUM_SHIFT		= 8,
-		IAR_ACCESS_SEL		= 0x0080,
-		IAR_PARAM			= 0x000c,
-		IAR_PARAM_SHIFT		= 2,
-		IAR_RB_INDEX		= 0x0003
+		IAR_TYPE            = 0xf000,
+		IAR_TYPE_SHIFT      = 12,
+		IAR_NUM             = 0x0f00,
+		IAR_NUM_SHIFT       = 8,
+		IAR_ACCESS_SEL      = 0x0080,
+		IAR_PARAM           = 0x000c,
+		IAR_PARAM_SHIFT     = 2,
+		IAR_RB_INDEX        = 0x0003
 	};
 
 	enum

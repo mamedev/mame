@@ -2,22 +2,22 @@
 // copyright-holders:David Haywood, Nicola Salmoria
 
 /*
-	Gals Panic (Modular System bootleg)
+    Gals Panic (Modular System bootleg)
 
-	PCB stack was marked as 'New Quiz' (aka New Qix?)
+    PCB stack was marked as 'New Quiz' (aka New Qix?)
 
-	this is a clone of the expro02.cpp version of Gals Panic
-	
-	the hardware changes make it messy enough to have its own driver tho 
+    this is a clone of the expro02.cpp version of Gals Panic
 
-	The Modular System cage contains 6! main boards for this game.
+    the hardware changes make it messy enough to have its own driver tho
 
-	MOD-6M - 68k board (CPU + 6 ROMs + RAM)
-	COMP MOD-A - RAM board for Framebuffer gfx, 24Mhz XTAL
-	MOD1/5 - Sound board (Z80, 2xYM2203C) (various wire mods and small sub-boards) Dipswitches also on here  (same/similar to the Euro League Modular board?)
-	MOD51/3 - Sprite board (ROM sockets used for plug in board below)
-	COMP AEREO MOD/5-1 (MODULAR SYSTEM 2) - Sprite ROM board, plugs into above, 24 sprite ROMs
-	MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (CAR-0484/1 SOLD) with no chips, just routing along one edge
+    The Modular System cage contains 6! main boards for this game.
+
+    MOD-6M - 68k board (CPU + 6 ROMs + RAM)
+    COMP MOD-A - RAM board for Framebuffer gfx, 24Mhz XTAL
+    MOD1/5 - Sound board (Z80, 2xYM2203C) (various wire mods and small sub-boards) Dipswitches also on here  (same/similar to the Euro League Modular board?)
+    MOD51/3 - Sprite board (ROM sockets used for plug in board below)
+    COMP AEREO MOD/5-1 (MODULAR SYSTEM 2) - Sprite ROM board, plugs into above, 24 sprite ROMs
+    MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (CAR-0484/1 SOLD) with no chips, just routing along one edge
 */
 
 
@@ -95,7 +95,7 @@ void galspanic_ms_state::newquiz_map(address_map &map)
 	map(0x800004, 0x800005).portr("SYSTEM");
 
 	map(0x80000e, 0x80000f).r(FUNC(galspanic_ms_state::comad_timer_r));
-	
+
 	map(0xb00000, 0xbfffff).rom().region("user1", 0); // reads girl data here
 
 	map(0xc80000, 0xc8ffff).ram();
@@ -154,7 +154,7 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 uint32_t galspanic_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
-//	m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+//  m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -276,17 +276,17 @@ void galspanic_ms_state::newquiz(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_galspanic_ms);
 
 // does not use original video hardware, will implement different hardware in driver instead
-//	KANEKO_TMAP(config, m_view2);
-//	m_view2->set_colbase(0x400);
-//	m_view2->set_offset(0x5b, 0x8, 256, 224);
-//	m_view2->set_palette(m_palette);
-//	m_view2->set_tile_callback(kaneko_view2_tilemap_device::view2_cb_delegate(FUNC(galspanic_ms_state::tile_callback), this));
+//  KANEKO_TMAP(config, m_view2);
+//  m_view2->set_colbase(0x400);
+//  m_view2->set_offset(0x5b, 0x8, 256, 224);
+//  m_view2->set_palette(m_palette);
+//  m_view2->set_tile_callback(kaneko_view2_tilemap_device::view2_cb_delegate(FUNC(galspanic_ms_state::tile_callback), this));
 
-//	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
-//	m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
-//	m_kaneko_spr->set_offsets(0, -0x40);
-//	m_kaneko_spr->set_palette(m_palette);
-//	m_kaneko_spr->set_color_base(0x100);
+//  KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+//  m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
+//  m_kaneko_spr->set_offsets(0, -0x40);
+//  m_kaneko_spr->set_palette(m_palette);
+//  m_kaneko_spr->set_color_base(0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -308,7 +308,7 @@ ROM_START( galpanicms )
 	ROM_LOAD16_BYTE( "cpu_ic11.bin", 0x000001, 0x40000, CRC(10967497) SHA1(65d1e5554f47a3f7a88fa1354035dff640faac2f) ) // AM27C020
 	ROM_LOAD16_BYTE( "cpu_ic26.bin", 0x080000, 0x40000, CRC(c7e2135b) SHA1(8cf0c21c9b64e48da458bc29cfb15e1a5189c551) ) //  D27C020
 	ROM_LOAD16_BYTE( "cpu_ic25.bin", 0x080001, 0x40000, CRC(406c2e3e) SHA1(ae229f01bdf0dea72a89c63b60f513a338fd8061) ) // AM27C020
-	
+
 	ROM_REGION( 0x200000, "kan_spr", ROMREGION_ERASEFF ) // sprites (seems to be the same as Gals Panic but alt ROM arrangement / decoding)
 	ROM_LOAD32_BYTE( "5_gp_501.ic1",         0x000003, 0x010000, CRC(55ce19e8) SHA1(6aee3a43c731f017427b9316a6d2a536d7d44d35) ) // all TMS27C512
 	ROM_LOAD32_BYTE( "5_gp_510.ic10",        0x000002, 0x010000, CRC(95cfabc0) SHA1(36708945b4a7c153e67c5f8d8a8a71e7b6cb0ca3) )
@@ -350,7 +350,7 @@ ROM_START( galpanicms )
 	ROM_LOAD( "snd_p0115_74s288.ic20", 0x0000, 0x20, CRC(50bba48d) SHA1(0d677a67d3c3faca49ea3fe372d2df6802daefb0) )
 
 	ROM_REGION( 0x100, "prom", 0 )
-	ROM_LOAD( "51_502_63s141n.ic10", 0x0000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // same as Euro League modular bootleg	
+	ROM_LOAD( "51_502_63s141n.ic10", 0x0000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // same as Euro League modular bootleg
 
 	ROM_REGION( 0x117, "gal", 0 )
 	ROM_LOAD( "a_a-147_gal16v8-20hb1.ic47", 0x0000, 0x117, CRC(39102e72) SHA1(227e25df1555c226e5ae8fc7bcb0f2e2996e24cb) )

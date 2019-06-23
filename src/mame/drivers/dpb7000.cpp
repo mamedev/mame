@@ -26,21 +26,21 @@
 #include "screen.h"
 #include <deque>
 
-#define LOG_UNKNOWN			(1 << 0)
-#define LOG_UCODE			(1 << 1)
-#define LOG_MORE_UCODE		(1 << 2)
-#define LOG_CSR				(1 << 3)
-#define LOG_CTRLBUS			(1 << 4)
-#define LOG_SYS_CTRL		(1 << 5)
-#define LOG_FDC_CTRL		(1 << 6)
-#define LOG_FDC_PORT		(1 << 7)
-#define LOG_FDC_CMD			(1 << 8)
-#define LOG_OUTPUT_TIMING	(1 << 9)
-#define LOG_BRUSH_ADDR		(1 << 10)
-#define LOG_ALL				(LOG_UNKNOWN | LOG_UCODE | LOG_MORE_UCODE | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | \
+#define LOG_UNKNOWN         (1 << 0)
+#define LOG_UCODE           (1 << 1)
+#define LOG_MORE_UCODE      (1 << 2)
+#define LOG_CSR             (1 << 3)
+#define LOG_CTRLBUS         (1 << 4)
+#define LOG_SYS_CTRL        (1 << 5)
+#define LOG_FDC_CTRL        (1 << 6)
+#define LOG_FDC_PORT        (1 << 7)
+#define LOG_FDC_CMD         (1 << 8)
+#define LOG_OUTPUT_TIMING   (1 << 9)
+#define LOG_BRUSH_ADDR      (1 << 10)
+#define LOG_ALL             (LOG_UNKNOWN | LOG_UCODE | LOG_MORE_UCODE | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | \
 							 LOG_OUTPUT_TIMING | LOG_BRUSH_ADDR)
 
-#define VERBOSE				(LOG_ALL &~ LOG_FDC_CTRL)
+#define VERBOSE             (LOG_ALL &~ LOG_FDC_CTRL)
 #include "logmacro.h"
 
 class dpb7000_state : public driver_device
@@ -111,11 +111,11 @@ private:
 
 	enum : uint16_t
 	{
-		SYSCTRL_AUTO_START		= 0x0001,
-		SYSCTRL_REQ_B_EN		= 0x0020,
-		SYSCTRL_REQ_A_EN		= 0x0040,
-		SYSCTRL_REQ_A_IN		= 0x0080,
-		SYSCTRL_REQ_B_IN		= 0x8000
+		SYSCTRL_AUTO_START      = 0x0001,
+		SYSCTRL_REQ_B_EN        = 0x0020,
+		SYSCTRL_REQ_A_EN        = 0x0040,
+		SYSCTRL_REQ_A_IN        = 0x0080,
+		SYSCTRL_REQ_B_IN        = 0x8000
 	};
 
 	DECLARE_READ16_MEMBER(cpu_sysctrl_r);
@@ -172,31 +172,31 @@ private:
 
 	enum : uint8_t
 	{
-		DSEQ_STATUS_READY_BIT			= 0,	// C5
-		DSEQ_STATUS_FAULT_BIT			= 1,	// C6
-		DSEQ_STATUS_ONCYL_BIT			= 2,	// C7
-		DSEQ_STATUS_SKERR_BIT			= 3,	// C8
-		DSEQ_STATUS_INDEX_BIT			= 4,	// C9
-		DSEQ_STATUS_SECTOR_BIT			= 5,	// C10
-		DSEQ_STATUS_AMFND_BIT			= 6,	// C11
-		DSEQ_STATUS_WTPROT_BIT			= 7,	// C12
-		DSEQ_STATUS_SELECTED_BIT		= 8,	// C13
-		DSEQ_STATUS_SEEKEND_BIT			= 9,	// C14
-		DSEQ_STATUS_SYNC_DET_BIT		= 10,	// C15
-		DSEQ_STATUS_RAM_ADDR_OVFLO_BIT	= 11,	// C16
+		DSEQ_STATUS_READY_BIT           = 0,    // C5
+		DSEQ_STATUS_FAULT_BIT           = 1,    // C6
+		DSEQ_STATUS_ONCYL_BIT           = 2,    // C7
+		DSEQ_STATUS_SKERR_BIT           = 3,    // C8
+		DSEQ_STATUS_INDEX_BIT           = 4,    // C9
+		DSEQ_STATUS_SECTOR_BIT          = 5,    // C10
+		DSEQ_STATUS_AMFND_BIT           = 6,    // C11
+		DSEQ_STATUS_WTPROT_BIT          = 7,    // C12
+		DSEQ_STATUS_SELECTED_BIT        = 8,    // C13
+		DSEQ_STATUS_SEEKEND_BIT         = 9,    // C14
+		DSEQ_STATUS_SYNC_DET_BIT        = 10,   // C15
+		DSEQ_STATUS_RAM_ADDR_OVFLO_BIT  = 11,   // C16
 
-		DSEQ_CTRLOUT_CK_SEL_1		= (1 << 0),	// S40
-		DSEQ_CTRLOUT_CK_SEL_0		= (1 << 1),	// S41
-		DSEQ_CTRLOUT_ADDR_W_PERMIT	= (1 << 2),	// S42
-		DSEQ_CTRLOUT_ZERO_RAM		= (1 << 3),	// S43
-		DSEQ_CTRLOUT_WRITE_RAM		= (1 << 4),	// S44
-		DSEQ_CTRLOUT_WORD_READ_RAM	= (1 << 5),	// S45
-		DSEQ_CTRLOUT_WRITE_SYNC		= (1 << 6),	// S46
-		DSEQ_CTRLOUT_SYNC_DET_EN	= (1 << 7),	// S47
+		DSEQ_CTRLOUT_CK_SEL_1       = (1 << 0), // S40
+		DSEQ_CTRLOUT_CK_SEL_0       = (1 << 1), // S41
+		DSEQ_CTRLOUT_ADDR_W_PERMIT  = (1 << 2), // S42
+		DSEQ_CTRLOUT_ZERO_RAM       = (1 << 3), // S43
+		DSEQ_CTRLOUT_WRITE_RAM      = (1 << 4), // S44
+		DSEQ_CTRLOUT_WORD_READ_RAM  = (1 << 5), // S45
+		DSEQ_CTRLOUT_WRITE_SYNC     = (1 << 6), // S46
+		DSEQ_CTRLOUT_SYNC_DET_EN    = (1 << 7), // S47
 
-		DSEQ_CTRLOUT_WRITE_ZERO		= (1 << 5), // S53
-		DSEQ_CTRLOUT_LINE_CK		= (1 << 6), // S54
-		DSEQ_CTRLOUT_DISC_CLEAR		= (1 << 7), // S55
+		DSEQ_CTRLOUT_WRITE_ZERO     = (1 << 5), // S53
+		DSEQ_CTRLOUT_LINE_CK        = (1 << 6), // S54
+		DSEQ_CTRLOUT_DISC_CLEAR     = (1 << 7), // S55
 	};
 
 	// Computer Card
@@ -207,17 +207,17 @@ private:
 	int m_diskseq_cp;
 	bool m_diskseq_reset;
 	bool m_diskseq_halt;
-	uint8_t m_diskseq_line_cnt;			// EF/EE
-	uint8_t m_diskseq_ed_cnt;			// ED
-	uint8_t m_diskseq_head_cnt;			// EC
-	uint16_t m_diskseq_cyl_from_cpu;	// AE/BH
-	uint16_t m_diskseq_cmd_from_cpu;	// DD/CC
+	uint8_t m_diskseq_line_cnt;         // EF/EE
+	uint8_t m_diskseq_ed_cnt;           // ED
+	uint8_t m_diskseq_head_cnt;         // EC
+	uint16_t m_diskseq_cyl_from_cpu;    // AE/BH
+	uint16_t m_diskseq_cmd_from_cpu;    // DD/CC
 	uint8_t m_diskseq_cyl_to_ctrl;
 	uint8_t m_diskseq_cmd_to_ctrl;
-	uint8_t m_diskseq_status_in;		// CG
-	uint8_t m_diskseq_status_out;		// BC
-	uint8_t m_diskseq_ucode_latch[7];	// GG/GF/GE/GD/GC/GB/GA
-	uint8_t m_diskseq_cc_inputs[4];		// Inputs to FE/FD/FC/FB
+	uint8_t m_diskseq_status_in;        // CG
+	uint8_t m_diskseq_status_out;       // BC
+	uint8_t m_diskseq_ucode_latch[7];   // GG/GF/GE/GD/GC/GB/GA
+	uint8_t m_diskseq_cc_inputs[4];     // Inputs to FE/FD/FC/FB
 
 	// Output Timing Card
 	uint16_t m_cursor_origin_x;
@@ -786,10 +786,10 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 	{
 		static const char* const s_func_names[16] =
 		{
-			"Live Video",			"Brush Store Read",		"Brush Store Write",		"Framestore Read",
-			"Framestore Write",		"Fast Wipe Video",		"Fast Wipe Brush Store",	"Fast Wipe Framestore",
-			"Draw",					"Draw with Stencil I",	"Draw with Stencil II",		"Copy to Framestore",
-			"Copy to Brush Store",	"Paste with Stencil I",	"Paste with Stencil II",	"Copy to same Framestore (Invert)"
+			"Live Video",           "Brush Store Read",     "Brush Store Write",        "Framestore Read",
+			"Framestore Write",     "Fast Wipe Video",      "Fast Wipe Brush Store",    "Fast Wipe Framestore",
+			"Draw",                 "Draw with Stencil I",  "Draw with Stencil II",     "Copy to Framestore",
+			"Copy to Brush Store",  "Paste with Stencil I", "Paste with Stencil II",    "Copy to same Framestore (Invert)"
 		};
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);

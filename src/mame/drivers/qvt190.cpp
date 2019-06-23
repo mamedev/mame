@@ -2,18 +2,18 @@
 // copyright-holders:
 /****************************************************************************
 
-	Qume QVT-190
+    Qume QVT-190
 
-	Hardware:
-	- MC68B00P
-	- 2x MC68B50P
-	- MC68B45P
-	- V61C16P55L
-	- M5M5165P-70L
-	- ABHGA101006
-	- button battery, 7-DIL-jumper
+    Hardware:
+    - MC68B00P
+    - 2x MC68B50P
+    - MC68B45P
+    - V61C16P55L
+    - M5M5165P-70L
+    - ABHGA101006
+    - button battery, 7-DIL-jumper
 
-	Crystal: unreadable (but likely to be 16.6698)
+    Crystal: unreadable (but likely to be 16.6698)
 
 ****************************************************************************/
 

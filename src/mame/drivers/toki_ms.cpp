@@ -2,16 +2,16 @@
 // copyright-holders:David Haywood
 
 /*
-	Toki (Modular System)
+    Toki (Modular System)
 
-	as with most of the 'Modular System' setups, the hardware is heavily modified from the original
-	and consists of a multi-board stack in a cage, hence different driver.
+    as with most of the 'Modular System' setups, the hardware is heavily modified from the original
+    and consists of a multi-board stack in a cage, hence different driver.
 
-	TODO: PCB list
+    TODO: PCB list
 
 
-	NOTES:
-	PCB lacks raster effect on title screen
+    NOTES:
+    PCB lacks raster effect on title screen
 
 */
 
@@ -147,7 +147,7 @@ ROM_START( tokims )
 	ROM_LOAD32_BYTE( "5_tk_504.ic6",         0x0c0003, 0x010000, CRC(cec71122) SHA1(283d38f998b1ca4fa080bf9fac797f5ac91dd072) )
 	ROM_LOAD32_BYTE( "5_tk_508.ic15",        0x0c0002, 0x010000, CRC(1873ae38) SHA1(a1633ab5c417e9851e285a6b322c06e7d2d0bccd) )
 	ROM_LOAD32_BYTE( "5_tk_512.ic21",        0x0c0001, 0x010000, CRC(0228110f) SHA1(33a29f9f458ca9d0af3c8da8a5b67bab79cecdec) )
-	ROM_LOAD32_BYTE( "5_tk_516.ic27",        0x0c0000, 0x010000, CRC(f4e29429) SHA1(706050b51e0afbddf6ec5c8f14d3649bb05c8550) )  
+	ROM_LOAD32_BYTE( "5_tk_516.ic27",        0x0c0000, 0x010000, CRC(f4e29429) SHA1(706050b51e0afbddf6ec5c8f14d3649bb05c8550) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "8_tk_825.ic9",      0x000000, 0x10000, CRC(6d04def0) SHA1(36f23b0893dfae6cf4c6f4414ff54bb13cfdad41) )
@@ -177,7 +177,7 @@ ROM_START( tokims )
 
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "1_10110_82s123.ic20",     0x0000, 0x0100, NO_DUMP )
-	
+
 	ROM_REGION( 0x100, "protpal", 0 ) // all read protected
 	ROM_LOAD( "5_5140_palce16v8h-25pc.ic9", 0, 1, NO_DUMP )
 	ROM_LOAD( "5_5240_palce16v8h-25pc.ic8", 0, 1, NO_DUMP )

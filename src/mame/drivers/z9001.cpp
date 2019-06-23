@@ -26,7 +26,7 @@ Some other control keys:
 
 
 ToDo:
-- cassette in - interrupt-driven via PIO1 
+- cassette in - interrupt-driven via PIO1
     via astb should cause interrupt but nothing happens.
 - proper keyboard - interrupt-driven via PIO2
     pressing any key should program ctc/2 to a debounce delay and this then causes

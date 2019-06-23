@@ -510,10 +510,10 @@ READ8_MEMBER( sh2_device::rdr_r )
 	return 0;
 }
 
-/* 
+/*
  * FRC
  */
- 
+
 READ8_MEMBER( sh2_device::tier_r )
 {
 	return m_tier;
@@ -529,10 +529,10 @@ WRITE8_MEMBER( sh2_device::tier_w )
 
 READ8_MEMBER( sh2_device::ftcsr_r )
 {
-	// TODO: to be tested 
+	// TODO: to be tested
 	if (!m_ftcsr_read_cb.isnull())
 		m_ftcsr_read_cb((((m_tier<<24) | (m_ftcsr<<16)) & 0xffff0000) | m_frc);
-	
+
 	return m_ftcsr;
 }
 
@@ -610,7 +610,7 @@ READ16_MEMBER( sh2_device::frc_icr_r )
 	return m_frc_icr;
 }
 
-/* 
+/*
  * INTC
  */
 
@@ -641,7 +641,7 @@ WRITE16_MEMBER( sh2_device::ipra_w )
 	m_irq_level.wdt = (m_ipra >> 4) & 0xf;
 	sh2_recalc_irq();
 }
- 
+
 READ16_MEMBER( sh2_device::iprb_r )
 {
 	return m_iprb & 0xff00;
@@ -729,13 +729,13 @@ WRITE32_MEMBER( sh2_device::vcrdiv_w )
 	sh2_recalc_irq();
 }
 
-/* 
+/*
  * DIVU
  */
 
 READ32_MEMBER( sh2_device::dvcr_r )
 {
-	return (m_divu_ovfie == true ? 2 : 0) | (m_divu_ovf == true ? 1 : 0); 
+	return (m_divu_ovfie == true ? 2 : 0) | (m_divu_ovf == true ? 1 : 0);
 }
 
 WRITE32_MEMBER( sh2_device::dvcr_w )
@@ -835,7 +835,7 @@ WRITE32_MEMBER( sh2_device::dvdntl_w )
 	}
 }
 
-/* 
+/*
  * WTC
  */
 
@@ -907,12 +907,12 @@ READ8_MEMBER( sh2_device::ccr_r )
 WRITE8_MEMBER( sh2_device::ccr_w )
 {
 	/*
-		xx-- ---- Way 0/1
-		---x ---- Cache Purge (CP), write only
-		---- x--- Two-Way Mode (TW)
-		---- -x-- Data Replacement Disable (OD)
-		---- --x- Instruction Replacement Disable (ID)
-		---- ---x Cache Enable (CE)
+	    xx-- ---- Way 0/1
+	    ---x ---- Cache Purge (CP), write only
+	    ---- x--- Two-Way Mode (TW)
+	    ---- -x-- Data Replacement Disable (OD)
+	    ---- --x- Instruction Replacement Disable (ID)
+	    ---- ---x Cache Enable (CE)
 	*/
 	m_ccr = data;
 }

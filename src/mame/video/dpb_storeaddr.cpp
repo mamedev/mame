@@ -5,11 +5,11 @@
     dpb_storeaddr.cpp
     DPB-7000/1 - Store Address Card
 
-	TODO:
-	- Code is currently a more or less direct translation of the board
-	  schematic. It is highly inefficient, but accurate. An equally-
-	  accurate, but faster, version can be made once better understanding
-	  of the overall DPB-7000 system is had.
+    TODO:
+    - Code is currently a more or less direct translation of the board
+      schematic. It is highly inefficient, but accurate. An equally-
+      accurate, but faster, version can be made once better understanding
+      of the overall DPB-7000 system is had.
 
 ***************************************************************************/
 
@@ -1180,7 +1180,7 @@ void dpb7000_storeaddr_card_device::ipen_w(int state)
 		const bool old_sel = m_ipsel;
 		m_ipsel = ((!m_crc || m_selvideo) != m_ipsel);
 		if (old_sel != m_ipsel)
-		    m_ipsel_out(m_ipsel);
+			m_ipsel_out(m_ipsel);
 	}
 }
 

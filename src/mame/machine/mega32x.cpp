@@ -1422,7 +1422,7 @@ void sega_32x_device::sh2_common_map(address_map &map)
 	map(0x00004008, 0x00004013).rw(FUNC(sega_32x_device::dreq_common_r), FUNC(sega_32x_device::dreq_common_w));
 
 	map(0x00004014, 0x0000401f).nopr();
-	
+
 	map(0x00004020, 0x0000402f).rw(FUNC(sega_32x_device::m68k_m_commsram_r), FUNC(sega_32x_device::m68k_m_commsram_w));
 	map(0x00004030, 0x0000403f).rw(FUNC(sega_32x_device::pwm_r), FUNC(sega_32x_device::pwm_w));
 

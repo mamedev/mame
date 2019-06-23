@@ -68,7 +68,7 @@
 #define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
-#define CLICOMMAND_VERSION				"version"
+#define CLICOMMAND_VERSION              "version"
 
 // command options
 #define CLIOPTION_DTD                   "dtd"
@@ -112,7 +112,7 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft",   "0",       OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST    ";glist",   "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist",   "0",       OPTION_COMMAND,    "verify software list by name" },
-	{ CLICOMMAND_VERSION,					"0",       OPTION_COMMAND,    "get MAME version" },
+	{ CLICOMMAND_VERSION,                   "0",       OPTION_COMMAND,    "get MAME version" },
 
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "FRONTEND COMMAND OPTIONS" },
 	{ CLIOPTION_DTD,                        "1",       OPTION_BOOLEAN,    "include DTD in XML output" },
@@ -1585,7 +1585,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 		{ CLICOMMAND_ROMIDENT,          1,  1, &cli_frontend::romident,         "(file or directory path)" },
 		{ CLICOMMAND_GETSOFTLIST,       0,  1, &cli_frontend::getsoftlist,      "[system name|*]" },
 		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, &cli_frontend::verifysoftlist,   "[system name|*]" },
-		{ CLICOMMAND_VERSION,			0,  0, &cli_frontend::version,			"" }
+		{ CLICOMMAND_VERSION,           0,  0, &cli_frontend::version,          "" }
 	};
 
 	for (const auto &info_command : s_info_commands)

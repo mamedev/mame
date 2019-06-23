@@ -2425,7 +2425,7 @@ static INPUT_PORTS_START( saklove )
 INPUT_PORTS_END
 
 /***************************************************************************
-                             Treasure City   
+                             Treasure City
 ***************************************************************************/
 
 static INPUT_PORTS_START( treacity )
@@ -3629,7 +3629,7 @@ ROM_END
 void subsino2_state::init_tbonusal()
 {
 	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
-	
+
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0ea7] = 0x18;
@@ -3875,9 +3875,9 @@ void subsino2_state::init_ptrain()
 
 
 /***************************************************************************
-	Treasure City
+    Treasure City
 
-	unknown hardware
+    unknown hardware
 ***************************************************************************/
 
 ROM_START( treacity )

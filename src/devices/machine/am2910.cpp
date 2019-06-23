@@ -5,21 +5,21 @@
     am2910.cpp
     AMD Am2910 Microprogram Controller emulation
 
-	TODO:
-	- Check /RLD behavior
-	- Find and fix bugs that almost surely exist
+    TODO:
+    - Check /RLD behavior
+    - Find and fix bugs that almost surely exist
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "am2910.h"
 
-#define LOG_INSN	(1 << 0)
-#define LOG_STACK	(1 << 1)
-#define LOG_ERROR	(1 << 2)
-#define LOG_ALL		(LOG_INSN | LOG_STACK | LOG_ERROR)
+#define LOG_INSN    (1 << 0)
+#define LOG_STACK   (1 << 1)
+#define LOG_ERROR   (1 << 2)
+#define LOG_ALL     (LOG_INSN | LOG_STACK | LOG_ERROR)
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 /*****************************************************************************/
@@ -162,12 +162,12 @@ void am2910_device::execute()
 	m_pc += (uint16_t)m_ci;
 	switch (m_i)
 	{
-	case 0:		// JZ, Jump Zero
+	case 0:     // JZ, Jump Zero
 		LOGMASKED(LOG_INSN, "%04x: JZ\n", m_pc);
 		m_pc = 0;
 		m_sp = 0;
 		break;
-	case 1:		// CJS, Conditional Jump-To-Subroutine PL
+	case 1:     // CJS, Conditional Jump-To-Subroutine PL
 		LOGMASKED(LOG_INSN, "%04x: CJS\n", m_pc);
 		if (test_pass())
 		{
@@ -175,22 +175,22 @@ void am2910_device::execute()
 			m_pc = m_d;
 		}
 		break;
-	case 2:		// JMAP, Jump Map
+	case 2:     // JMAP, Jump Map
 		LOGMASKED(LOG_INSN, "%04x: JMAP\n", m_pc);
 		m_pc = m_d;
 		break;
-	case 3:		// CJP, Conditional Jump PL
+	case 3:     // CJP, Conditional Jump PL
 		LOGMASKED(LOG_INSN, "%04x: CJP\n", m_pc);
 		if (test_pass())
 			m_pc = m_d;
 		break;
-	case 4:		// PUSH, Push / Conditional Load Counter
+	case 4:     // PUSH, Push / Conditional Load Counter
 		LOGMASKED(LOG_INSN, "%04x: PUSH\n", m_pc);
 		push(m_pc);
 		if (test_pass())
 			m_r = m_d;
 		break;
-	case 5:		// JSRP, Conditional JSB R/PL
+	case 5:     // JSRP, Conditional JSB R/PL
 		LOGMASKED(LOG_INSN, "%04x: JSRP\n", m_pc);
 		push(m_pc);
 		if (test_pass())
@@ -198,21 +198,21 @@ void am2910_device::execute()
 		else
 			m_pc = m_r;
 		break;
-	case 6:		// CJV, Conditional Jump Vector
+	case 6:     // CJV, Conditional Jump Vector
 		LOGMASKED(LOG_INSN, "%04x: CJV\n", m_pc);
 		if (test_pass())
 		{
 			m_pc = m_d;
 		}
 		break;
-	case 7:		// JRP, Conditional Jump R/PL
+	case 7:     // JRP, Conditional Jump R/PL
 		LOGMASKED(LOG_INSN, "%04x: JRP\n", m_pc);
 		if (test_pass())
 			m_pc = m_d;
 		else
 			m_pc = m_r;
 		break;
-	case 8:		// RFCT, Repeat Loop, Counter != 0
+	case 8:     // RFCT, Repeat Loop, Counter != 0
 		LOGMASKED(LOG_INSN, "%04x: RFCT\n", m_pc);
 		if (m_r != 0)
 		{
@@ -220,7 +220,7 @@ void am2910_device::execute()
 			m_pc = m_stack[m_sp];
 		}
 		break;
-	case 9:		// RPCT, Repeat PL, Counter != 0
+	case 9:     // RPCT, Repeat PL, Counter != 0
 		LOGMASKED(LOG_INSN, "%04x: RPCT\n", m_pc);
 		if (m_r != 0)
 		{
@@ -228,12 +228,12 @@ void am2910_device::execute()
 			m_pc = m_d;
 		}
 		break;
-	case 10:	// CRTN, Conditional Return
+	case 10:    // CRTN, Conditional Return
 		LOGMASKED(LOG_INSN, "%04x: CRTN\n", m_pc);
 		if (test_pass())
 			m_pc = m_stack[m_sp];
 		break;
-	case 11:	// CJPP, Conditional Jump PL & Pop
+	case 11:    // CJPP, Conditional Jump PL & Pop
 		LOGMASKED(LOG_INSN, "%04x: CJPP\n", m_pc);
 		if (test_pass())
 		{
@@ -241,19 +241,19 @@ void am2910_device::execute()
 			pop();
 		}
 		break;
-	case 12:	// LDCT, Load Counter & Continue
+	case 12:    // LDCT, Load Counter & Continue
 		LOGMASKED(LOG_INSN, "%04x: LDCT\n", m_pc);
 		m_r = m_d;
 		break;
-	case 13:	// LOOP, Test End Loop
+	case 13:    // LOOP, Test End Loop
 		LOGMASKED(LOG_INSN, "%04x: LOOP\n", m_pc);
 		if (!test_pass())
 			m_pc = m_stack[m_sp];
 		break;
-	case 14:	// CONT, Continue
+	case 14:    // CONT, Continue
 		LOGMASKED(LOG_INSN, "%04x: CONT\n", m_pc);
 		break;
-	case 15:	// TWB, Three-Way Branch
+	case 15:    // TWB, Three-Way Branch
 		LOGMASKED(LOG_INSN, "%04x: TWB\n", m_pc);
 		if (!test_pass())
 		{

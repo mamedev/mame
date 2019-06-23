@@ -751,10 +751,10 @@ void nforcepc_state::nforcepc(machine_config &config)
 	PCI_BRIDGE(config, ":pci:08.0", 0, 0x10de01b8, 0); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
 	// 10ec:8139 Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+ (behind bridge)
 	MCPX_IDE(config, ":pci:09.0", 0); // 10de:01bc NVIDIA Corporation nForce IDE
-	/*	subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);
-		.interrupt_handler().set(FUNC(nforcepc_state::ide_interrupt_changed));
-		ide.irq_pri().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq14_w));
-		ide.irq_sec().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq15_w));*/
+	/*  subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);
+	    .interrupt_handler().set(FUNC(nforcepc_state::ide_interrupt_changed));
+	    ide.irq_pri().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq14_w));
+	    ide.irq_sec().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq15_w));*/
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
 	SST_49LF020(config, "bios", 0);
 }

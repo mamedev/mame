@@ -130,8 +130,8 @@ void sh2_device::sh7604_map(address_map &map)
 
 //  TODO: cps3boot breaks with this enabled. Needs callback
 //  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
-	
-//	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
+
+//  map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
 	// TODO: internal map takes way too much resources if mirrored with 0x1ffffe00
 	//       we eventually internalize again via trampoline & sh7604_device
 	//       Also area 0xffff8000-0xffffbfff is for synchronous DRAM mode,
@@ -143,7 +143,7 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xfffffe03, 0xfffffe03).rw(FUNC(sh2_device::tdr_r), FUNC(sh2_device::tdr_w));
 	map(0xfffffe04, 0xfffffe04).rw(FUNC(sh2_device::ssr_r), FUNC(sh2_device::ssr_w));
 	map(0xfffffe05, 0xfffffe05).r(FUNC(sh2_device::rdr_r));
-	
+
 	// FRC
 	map(0xfffffe10, 0xfffffe10).rw(FUNC(sh2_device::tier_r), FUNC(sh2_device::tier_w));
 	map(0xfffffe11, 0xfffffe11).rw(FUNC(sh2_device::ftcsr_r), FUNC(sh2_device::ftcsr_w));
@@ -162,7 +162,7 @@ void sh2_device::sh7604_map(address_map &map)
 
 	map(0xfffffe71, 0xfffffe71).rw(FUNC(sh2_device::drcr_r<0>), FUNC(sh2_device::drcr_w<0>));
 	map(0xfffffe72, 0xfffffe72).rw(FUNC(sh2_device::drcr_r<1>), FUNC(sh2_device::drcr_w<1>));
-	
+
 	// WTC
 	map(0xfffffe80, 0xfffffe81).rw(FUNC(sh2_device::wtcnt_r), FUNC(sh2_device::wtcnt_w));
 	map(0xfffffe82, 0xfffffe83).rw(FUNC(sh2_device::rstcsr_r), FUNC(sh2_device::rstcsr_w));
@@ -170,7 +170,7 @@ void sh2_device::sh7604_map(address_map &map)
 	// standby and cache control
 	map(0xfffffe91, 0xfffffe91).rw(FUNC(sh2_device::sbycr_r), FUNC(sh2_device::sbycr_w));
 	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh2_device::ccr_r), FUNC(sh2_device::ccr_w));
-	
+
 	// INTC second section
 	map(0xfffffee0, 0xfffffee1).rw(FUNC(sh2_device::intc_icr_r), FUNC(sh2_device::intc_icr_w));
 	map(0xfffffee2, 0xfffffee3).rw(FUNC(sh2_device::ipra_r), FUNC(sh2_device::ipra_w));
@@ -198,11 +198,11 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xffffff94, 0xffffff97).rw(FUNC(sh2_device::dar_r<1>), FUNC(sh2_device::dar_w<1>));
 	map(0xffffff98, 0xffffff9b).rw(FUNC(sh2_device::dmac_tcr_r<1>), FUNC(sh2_device::dmac_tcr_w<1>));
 	map(0xffffff9c, 0xffffff9f).rw(FUNC(sh2_device::chcr_r<1>), FUNC(sh2_device::chcr_w<1>));
-	
+
 	map(0xffffffa0, 0xffffffa3).rw(FUNC(sh2_device::vcrdma_r<0>), FUNC(sh2_device::vcrdma_w<0>));
 	map(0xffffffa8, 0xffffffab).rw(FUNC(sh2_device::vcrdma_r<1>), FUNC(sh2_device::vcrdma_w<1>));
 	map(0xffffffb0, 0xffffffb3).rw(FUNC(sh2_device::dmaor_r), FUNC(sh2_device::dmaor_w));
-	
+
 	// BSC
 	map(0xffffffe0, 0xffffffe3).rw(FUNC(sh2_device::bcr1_r), FUNC(sh2_device::bcr1_w));
 	map(0xffffffe4, 0xffffffe7).rw(FUNC(sh2_device::bcr2_r), FUNC(sh2_device::bcr2_w));
@@ -575,7 +575,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_irq_vector.divu));
 	save_item(NAME(m_irq_vector.dmac[0]));
 	save_item(NAME(m_irq_vector.dmac[1]));
-	
+
 	save_item(NAME(m_ipra));
 	save_item(NAME(m_iprb));
 	save_item(NAME(m_vcra));
@@ -590,14 +590,14 @@ void sh2_device::device_start()
 
 	save_item(NAME(m_vecmd));
 	save_item(NAME(m_nmie));
-	
+
 	// DIVU
 	save_item(NAME(m_divu_ovf));
 	save_item(NAME(m_divu_ovfie));
 	save_item(NAME(m_dvsr));
 	save_item(NAME(m_dvdntl));
 	save_item(NAME(m_dvdnth));
-	
+
 	// WTC
 	save_item(NAME(m_wtcnt));
 	save_item(NAME(m_wtcsr));
@@ -617,11 +617,11 @@ void sh2_device::device_start()
 	save_item(NAME(m_dmac[1].tcr));
 	save_item(NAME(m_dmac[0].chcr));
 	save_item(NAME(m_dmac[1].chcr));
-	
+
 	// misc
 	save_item(NAME(m_sbycr));
 	save_item(NAME(m_ccr));
-	
+
 	// BSC
 	save_item(NAME(m_bcr1));
 	save_item(NAME(m_bcr2));
@@ -630,7 +630,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_rtcsr));
 	save_item(NAME(m_rtcor));
 	save_item(NAME(m_rtcnt));
-	
+
 	/*
 	for (int i = 0; i < 16; ++i)
 	{
@@ -647,7 +647,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_internal_irq_vector));
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_irq));
-	
+
 	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(SH12_AM).callimport();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 
