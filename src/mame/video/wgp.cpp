@@ -8,7 +8,7 @@
 // reference : https://www.youtube.com/watch?v=Sb3I3eQQvcU
 /*******************************************************************/
 
-template<unsigned Offset> 
+template<unsigned Offset>
 TILE_GET_INFO_MEMBER(wgp_state::get_piv_tile_info)
 {
 	const u16 tilenum = m_pivram[tile_index + Offset];    /* 3 blocks of $2000 */

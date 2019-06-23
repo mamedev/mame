@@ -241,10 +241,10 @@
 	</software>
 
 	<!-- Also found as:
-		Description: Phonics - Leap's Friends From A to Z
-		Year: 2001
-		Serial: 500-00263
-		U1: MX23L8111
+	    Description: Phonics - Leap's Friends From A to Z
+	    Year: 2001
+	    Serial: 500-00263
+	    U1: MX23L8111
 	-->
 	<software name="prlpfrnds" supported="no">
 		<description>Pre Reading - Leap's Friends From A to Z (UK)</description>
@@ -490,12 +490,12 @@
 	</software>
 
 	<!-- Also found as:
-		Description: Phonics Programme - Lesson 2 - Short Vowels a and i - Tad's Good Night
-		Year: 2003
-		Serial: 500-01367
-		PCB: 57000-003-3317
-		PCB Rev: REV.03
-		U1: HY23V16202
+	    Description: Phonics Programme - Lesson 2 - Short Vowels a and i - Tad's Good Night
+	    Year: 2003
+	    Serial: 500-01367
+	    PCB: 57000-003-3317
+	    PCB Rev: REV.03
+	    U1: HY23V16202
 	-->
 	<software name="tadsgngt" supported="no">
 		<description>Tad's Good Night (UK)</description>

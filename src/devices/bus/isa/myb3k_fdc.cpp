@@ -259,7 +259,7 @@ WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_command )
 	LOGCMD(" - Drive %d\n", selected_drive);
 	LOGCMD(" - Side  %d\n", selected_side);
 	LOGCMD(" - Density %s\n", dden ? "MFM" : "FM");
-	
+
 	if (has_motor_control)
 		LOGCMD(" - Motor %s\n", motor_on ? "ON" : "OFF");
 
@@ -268,7 +268,7 @@ WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_command )
 
 	if (floppy_connector.found())
 		floppy = floppy_connector->get_device();
-	
+
 	m_fdc->set_floppy(floppy);
 
 	if (floppy != nullptr)
@@ -277,7 +277,7 @@ WRITE8_MEMBER( isa8_myb3k_fdc471x_device_base::myb3k_fdc_command )
 
 		if (has_motor_control)
 			floppy->mon_w(motor_on ? 0 : 1); // Active low and inverter on incoming data line
-	} 
+	}
 
 	m_fdc->dden_w(dden ? 0 : 1); // active low == MFM
 }
@@ -307,7 +307,7 @@ READ8_MEMBER( isa8_myb3k_fdc4712_device::myb3k_fdc_status )
 
 	auto floppy_connector = m_floppy_connectors[selected_drive];
 	floppy_image_device *floppy = nullptr;
-	
+
 	if (floppy_connector.found())
 		floppy = floppy_connector->get_device();
 

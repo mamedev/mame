@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER( slave_401c_w );
 	DECLARE_WRITE16_MEMBER( master_401e_w );
 	DECLARE_WRITE16_MEMBER( slave_401e_w );
-	
+
 	SH2_DMA_FIFO_DATA_AVAILABLE_CB(_32x_fifo_available_callback);
 
 	void render_videobuffer_to_screenbuffer_helper(int scanline);

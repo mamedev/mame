@@ -361,8 +361,8 @@
 		<bezel element="text_uib2"><bounds x="1.5" y="11.75" width="7" height="2" /></bezel>
 		<bezel element="text_uib3"><bounds x="1.5" y="15.25" width="7" height="2" /></bezel>
 
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x100"><bounds x="1" y="11.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x80"><bounds x="1" y="15" width="8" height="2.5" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x200"><bounds x="1" y="11.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x100"><bounds x="1" y="15" width="8" height="2.5" /><color alpha="0.25" /></bezel>
 
 		<!-- spawn -->
 		<bezel element="text_uis1"><bounds x="0" y="20.5" width="10" height="2" /></bezel>
@@ -402,7 +402,7 @@
 
 		<bezel element="cwhite"><bounds x="1" y="60.5" width="8" height="2.5" /></bezel>
 		<bezel element="text_uih2"><bounds x="1.5" y="60.75" width="7" height="2" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x04"><bounds x="1" y="60.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x08"><bounds x="1" y="60.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
 
 		<!-- undo -->
 		<bezel element="text_uiu1"><bounds x="0" y="66" width="10" height="2" /></bezel>
@@ -415,10 +415,10 @@
 		<bezel element="text_uiu2c"><bounds x="5.2" y="69.5" width="1.7" height="4" /></bezel>
 		<bezel element="text_uiu2d"><bounds x="7.3" y="69.5" width="1.7" height="4" /></bezel>
 
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x08"><bounds x="1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x10"><bounds x="3.1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x20"><bounds x="5.2" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
-		<bezel element="hlub" inputtag="board:UI" inputmask="0x40"><bounds x="7.3" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x10"><bounds x="1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x20"><bounds x="3.1" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x40"><bounds x="5.2" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
+		<bezel element="hlub" inputtag="board:UI" inputmask="0x80"><bounds x="7.3" y="68.5" width="1.7" height="6" /><color alpha="0.25" /></bezel>
 
 		<bezel name="count_ui0" element="text_uiu3a"><bounds x="0" y="75" width="4" height="2" /></bezel>
 		<bezel name="count_ui1" element="text_uiu3c"><bounds x="6" y="75" width="4" height="2" /></bezel>

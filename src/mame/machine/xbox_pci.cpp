@@ -1104,7 +1104,7 @@ void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 	if (~pclass & 1)
 		io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
 	/*if (~pclass & 4)
-		io_space->install_device(0x3f0, 0x3f7, *this, &mcpx_ide_device::ide_sec_command);*/
+	    io_space->install_device(0x3f0, 0x3f7, *this, &mcpx_ide_device::ide_sec_command);*/
 }
 
 WRITE32_MEMBER(mcpx_ide_device::class_rev_w)

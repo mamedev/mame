@@ -18,7 +18,7 @@ In here, they're used for forcing sensor/piece inputs (a normal click activates
 both at the same time).
 
 If you use this device in a slot, or add multiple of them, make sure to override
-the outputs with custom_output() to avoid collisions.
+the outputs with output_cb() to avoid collisions.
 
 
 TODO:
@@ -51,12 +51,15 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_custom_spawn_cb(*this),
 	m_custom_output_cb(*this)
 {
-	m_sensordelay = attotime::from_msec(75);
+	memset(m_inistate, 0, ARRAY_LENGTH(m_inistate));
 	m_magnets = false;
 	m_inductive = false;
 	m_ui_enabled = 3;
-	memset(m_inistate, 0, ARRAY_LENGTH(m_inistate));
-	memset(m_spawnstate, 0, ARRAY_LENGTH(m_spawnstate));
+
+	// set defaults for most common use case (aka chess)
+	set_size(8, 8);
+	set_spawnpoints(12);
+	m_sensordelay = attotime::from_msec(75);
 }
 
 
@@ -80,21 +83,18 @@ void sensorboard_device::device_start()
 		m_out_count.resolve();
 	}
 
-	for (int i = 0; i < m_maxspawn; i++)
-		m_spawnstate[i] = i + 1;
-
 	// custom init (meant for setting m_inistate)
 	m_custom_init_cb();
 	memcpy(m_curstate, m_inistate, m_height * m_width);
 	memcpy(m_history[0], m_curstate, m_height * m_width);
 
-	// output spawn icons (done only once)
 	for (int i = 0; i < m_maxspawn; i++)
 	{
+		// output spawn icons (done only once)
 		if (m_custom_output_cb.isnull())
-			m_out_pui[i + 1] = m_spawnstate[i];
+			m_out_pui[i + 1] = i + 1;
 		else
-			m_custom_output_cb(i + 0x101, m_spawnstate[i]);
+			m_custom_output_cb(i + 0x101, i + 1);
 	}
 
 	m_undotimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::undo_tick),this));
@@ -113,11 +113,6 @@ void sensorboard_device::device_start()
 	m_usize = ARRAY_LENGTH(m_history);
 
 	// register for savestates
-	save_item(NAME(m_history));
-	save_item(NAME(m_curstate));
-	save_item(NAME(m_inistate));
-	save_item(NAME(m_spawnstate));
-
 	save_item(NAME(m_magnets));
 	save_item(NAME(m_inductive));
 	save_item(NAME(m_width));
@@ -131,6 +126,11 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_droppos));
 	save_item(NAME(m_sensorpos));
 	save_item(NAME(m_ui_enabled));
+
+	save_item(NAME(m_curstate));
+	save_item(NAME(m_inistate));
+	save_item(NAME(m_history));
+
 	save_item(NAME(m_uselect));
 	save_item(NAME(m_upointer));
 	save_item(NAME(m_ufirst));
@@ -139,13 +139,9 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_sensordelay));
 }
 
-void sensorboard_device::init_preset(u8 preset)
+int sensorboard_device::preset_chess()
 {
-	// called at driver machine config
-	m_magnets = (preset != CHESS_BUTTONS);
-	m_inductive = (preset == CHESS_INDUCTIVE);
-	set_size(8, 8);
-	set_spawnpoints(12);
+	// set chessboard start position
 
 	// 1 = white pawn      7 = black pawn
 	// 2 = white knight    8 = black knight
@@ -154,7 +150,6 @@ void sensorboard_device::init_preset(u8 preset)
 	// 5 = white queen    11 = black queen
 	// 6 = white king     12 = black king
 
-	// initial board state
 	write_init(0, 0, 4);
 	write_init(7, 0, 4);
 	write_init(1, 0, 2);
@@ -171,15 +166,11 @@ void sensorboard_device::init_preset(u8 preset)
 		write_init(x, 7, read_init(x, 0) + 6);
 	}
 
-	if (m_inductive)
-	{
-		set_sensordelay(attotime::never);
-		set_max_id(0xff);
-	}
+	return 1;
 
 	// note that for inductive boards, 2 additional callbacks are needed:
-	// custom_init() for reassigning the piece ids for initial board state
-	// custom_spawn() for checking if a piece is available and reassigning the piece id
+	// additional init_cb() for reassigning the piece ids for initial board state
+	// spawn_cb() for checking if a piece is available and reassigning the piece id
 }
 
 void sensorboard_device::device_reset()
@@ -493,7 +484,7 @@ TIMER_CALLBACK_MEMBER(sensorboard_device::undo_tick)
 	refresh();
 
 	// schedule next timeout
-	if (m_inp_ui->read() & 0x78)
+	if (m_inp_ui->read() & 0xf0)
 		m_undotimer->adjust(attotime::from_msec(500), param);
 }
 
@@ -506,7 +497,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_undo)
 		m_uselect = select;
 		m_undotimer->adjust(attotime::zero, select);
 	}
-	else if ((m_inp_ui->read() & 0x78) == 0 || select == m_uselect)
+	else if ((m_inp_ui->read() & 0xf0) == 0 || select == m_uselect)
 		m_undotimer->adjust(attotime::never);
 }
 
@@ -677,13 +668,14 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_START("UI")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Modifier Force Sensor") // hold while clicking to force sensor (ignore piece)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Modifier Force Piece") // hold while clicking to force piece (ignore sensor)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_hand, 0) PORT_NAME("Remove Piece")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 0) PORT_NAME("Undo Buffer First")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 1) PORT_NAME("Undo Buffer Previous")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 2) PORT_NAME("Undo Buffer Next")
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 3) PORT_NAME("Undo Buffer Last")
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 0) PORT_NAME("Board Clear")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 1) PORT_NAME("Board Reset")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sensorboard_device, check_sensor_busy, nullptr) // check if any sensor is busy / pressed (read-only)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_hand, 0) PORT_NAME("Remove Piece")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 0) PORT_NAME("Undo Buffer First")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 1) PORT_NAME("Undo Buffer Previous")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 2) PORT_NAME("Undo Buffer Next")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 3) PORT_NAME("Undo Buffer Last")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 0) PORT_NAME("Board Clear")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_init, 1) PORT_NAME("Board Reset")
 
 	PORT_START("BS_CHECK") // board size (internal use)
 	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sensorboard_device, check_bs_mask, nullptr)

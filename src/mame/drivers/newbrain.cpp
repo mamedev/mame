@@ -432,11 +432,11 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 // Therefore the motors are left permanently on until the above issues can be fixed.
 void newbrain_state::tm()
 {
-//	cassette_state tm1 = (!m_cop_g1 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
-//	cassette_state tm2 = (!m_cop_g3 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
+//  cassette_state tm1 = (!m_cop_g1 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
+//  cassette_state tm2 = (!m_cop_g3 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
 
-//	m_cassette1->change_state(tm1, CASSETTE_MASK_MOTOR);
-//	m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
+//  m_cassette1->change_state(tm1, CASSETTE_MASK_MOTOR);
+//  m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
 }
 
 WRITE8_MEMBER( newbrain_state::cop_g_w )

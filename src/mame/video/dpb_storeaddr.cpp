@@ -5,11 +5,11 @@
     dpb_storeaddr.cpp
     DPB-7000/1 - Store Address Card
 
-	TODO:
-	- Code is currently a more or less direct translation of the board
-	  schematic. It is highly inefficient, but accurate. An equally-
-	  accurate, but faster, version can be made once better understanding
-	  of the overall DPB-7000 system is had.
+    TODO:
+    - Code is currently a more or less direct translation of the board
+      schematic. It is highly inefficient, but accurate. An equally-
+      accurate, but faster, version can be made once better understanding
+      of the overall DPB-7000 system is had.
 
 ***************************************************************************/
 
@@ -41,6 +41,8 @@ dpb7000_storeaddr_card_device::dpb7000_storeaddr_card_device(const machine_confi
 	, m_bd_out(0)
 	, m_protx(false)
 	, m_proty(false)
+	, m_delay_timer(nullptr)
+	, m_delay_step(0)
 	, m_df_out(0)
 	, m_ee_out(0)
 	, m_addr(0)
@@ -80,6 +82,12 @@ dpb7000_storeaddr_card_device::dpb7000_storeaddr_card_device(const machine_confi
 	, m_cread(false)
 	, m_prot_a(false)
 	, m_prot_b(false)
+	, m_preread(false)
+	, m_rreq_pending(false)
+	, m_rreq_active(false)
+	, m_creq_pending(false)
+	, m_creq_active(false)
+	, m_store_busy(false)
 	, m_rvl(false)
 	, m_rhr(false)
 	, m_plt(false)
@@ -88,7 +96,15 @@ dpb7000_storeaddr_card_device::dpb7000_storeaddr_card_device(const machine_confi
 	, m_rb(false)
 	, m_pflag(false)
 	, m_mxr(false)
-	, m_rc_sel(false)
+	, m_ras(false)
+	, m_cas(false)
+	, m_laac(false)
+	, m_t6(false)
+	, m_clrw(false)
+	, m_opstr(false)
+	, m_cck_clear(false)
+	, m_creq_sel(false)
+	, m_write_active(false)
 	, m_window_enable(false)
 	, m_b26(false)
 	, m_blank_d(false)
@@ -101,12 +117,27 @@ dpb7000_storeaddr_card_device::dpb7000_storeaddr_card_device(const machine_confi
 	, m_rck(false)
 	, m_ra(0)
 	, m_opra(false)
+	, m_opwa(false)
+	, m_opwb(false)
+	, m_cck(false)
+	, m_csel(false)
 	, m_ipsel_out(*this)
 	, m_rck_out(*this)
 	, m_ra_out(*this)
 	, m_opra_out(*this)
+	, m_oprb_out(*this)
 	, m_blk_out(*this)
 	, m_addr_out(*this)
+	, m_r_busy_out(*this)
+	, m_ras_out(*this)
+	, m_cas_out(*this)
+	, m_opwb_out(*this)
+	, m_opstr_out(*this)
+	, m_w_out(*this)
+	, m_opwa_out(*this)
+	, m_csel_out(*this)
+	, m_cck_out(*this)
+	, m_cbusy_out(*this)
 	, m_x_prom(*this, "x_prom")
 	, m_protx_prom(*this, "protx_prom")
 	, m_proty_prom(*this, "proty_prom")
@@ -142,6 +173,8 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_bd_out));
 	save_item(NAME(m_protx));
 	save_item(NAME(m_proty));
+
+	save_item(NAME(m_delay_step));
 
 	save_item(NAME(m_df_in));
 	save_item(NAME(m_df_out));
@@ -200,6 +233,13 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_prot_a));
 	save_item(NAME(m_prot_b));
 
+	save_item(NAME(m_preread));
+	save_item(NAME(m_rreq_pending));
+	save_item(NAME(m_rreq_active));
+	save_item(NAME(m_creq_pending));
+	save_item(NAME(m_creq_active));
+	save_item(NAME(m_store_busy));
+
 	save_item(NAME(m_rvl));
 	save_item(NAME(m_rhr));
 	save_item(NAME(m_plt));
@@ -209,7 +249,18 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_pflag));
 
 	save_item(NAME(m_mxr));
-	save_item(NAME(m_rc_sel));
+	save_item(NAME(m_ras));
+	save_item(NAME(m_cas));
+	save_item(NAME(m_store_busy));
+	save_item(NAME(m_laac));
+	save_item(NAME(m_t6));
+	save_item(NAME(m_clrw));
+	save_item(NAME(m_opstr));
+	save_item(NAME(m_cck_clear));
+
+	save_item(NAME(m_creq_sel));
+
+	save_item(NAME(m_write_active));
 
 	save_item(NAME(m_window_enable));
 	save_item(NAME(m_b26));
@@ -226,13 +277,32 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_rck));
 	save_item(NAME(m_ra));
 	save_item(NAME(m_opra));
+	save_item(NAME(m_opwa));
+	save_item(NAME(m_opwb));
+	save_item(NAME(m_clrw));
+	save_item(NAME(m_cck));
+	save_item(NAME(m_csel));
 
 	m_ipsel_out.resolve_safe();
 	m_rck_out.resolve_safe();
 	m_ra_out.resolve_safe();
 	m_opra_out.resolve_safe();
+	m_oprb_out.resolve_safe();
 	m_blk_out.resolve_safe();
 	m_addr_out.resolve_safe();
+	m_r_busy_out.resolve_safe();
+	m_ras_out.resolve_safe();
+	m_cas_out.resolve_safe();
+	m_opwb_out.resolve_safe();
+	m_opstr_out.resolve_safe();
+	m_w_out.resolve_safe();
+	m_opwa_out.resolve_safe();
+	m_csel_out.resolve_safe();
+	m_cck_out.resolve_safe();
+	m_cbusy_out.resolve_safe();
+
+	m_delay_timer = timer_alloc(DELAY_TIMER);
+	m_delay_timer->adjust(attotime::never);
 }
 
 void dpb7000_storeaddr_card_device::device_reset()
@@ -242,6 +312,9 @@ void dpb7000_storeaddr_card_device::device_reset()
 	m_bd_out = 0;
 	m_protx = false;
 	m_proty = false;
+
+	m_delay_timer->adjust(attotime::never);
+	m_delay_step = 0;
 
 	memset(m_df_in, 0, 2);
 	m_df_in[1] = 0xc;
@@ -304,6 +377,13 @@ void dpb7000_storeaddr_card_device::device_reset()
 	m_prot_a = false;
 	m_prot_b = false;
 
+	m_preread = false;
+	m_rreq_pending = false;
+	m_rreq_active = false;
+	m_creq_pending = false;
+	m_creq_active = false;
+	m_store_busy = false;
+
 	m_rvl = false;
 	m_rhr = false;
 	m_plt = false;
@@ -313,7 +393,18 @@ void dpb7000_storeaddr_card_device::device_reset()
 	m_pflag = false;
 
 	m_mxr = false;
-	m_rc_sel = false;
+	m_ras = false;
+	m_cas = false;
+	m_store_busy = false;
+	m_laac = false;
+	m_t6 = false;
+	m_clrw = false;
+	m_opstr = false;
+	m_cck_clear = false;
+
+	m_creq_sel = false;
+
+	m_write_active = false;
 
 	m_window_enable = false;
 	m_b26 = false;
@@ -330,6 +421,11 @@ void dpb7000_storeaddr_card_device::device_reset()
 	m_rck = false;
 	m_ra = 0;
 	m_opra = false;
+	m_opwa = false;
+	m_opwb = false;
+	m_clrw = false;
+	m_cck = false;
+	m_csel = false;
 
 	m_bb_base = m_x_prom->base() + 0x000;
 	m_bc_base = m_x_prom->base() + 0x400;
@@ -337,6 +433,202 @@ void dpb7000_storeaddr_card_device::device_reset()
 	m_protx_base = m_protx_prom->base();
 	m_proty_base = m_proty_prom->base();
 	m_blanking_base = m_blanking_pal->base();
+}
+
+void dpb7000_storeaddr_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == DELAY_TIMER)
+	{
+		tick_delay_step();
+	}
+}
+
+void dpb7000_storeaddr_card_device::tick_delay_step()
+{
+	m_delay_step++;
+	switch (m_delay_step & 15)
+	{
+	case 1:
+		ras_w(true);
+		break;
+	case 3:
+		mxr_w(false);
+		break;
+	case 5:
+		cas_w(true);
+		break;
+	case 6:
+		t6_w(true);
+		break;
+	case 10:
+		t6_w(false);
+		laac_w(true);
+		break;
+	case 11:
+		ras_w(false);
+		break;
+	case 12:
+		cas_w(false);
+		laac_w(false);
+		break;
+	case 13:
+		clrw_w(true);
+		break;
+	case 14:
+		clrw_w(false);
+		break;
+	case 15:
+	default:
+		// Do nothing
+		break;
+	}
+}
+
+void dpb7000_storeaddr_card_device::mxr_w(bool state)
+{
+	m_mxr = state;
+	update_addr_select_outputs();
+}
+
+void dpb7000_storeaddr_card_device::opwb_w(bool state)
+{
+	const bool old = m_opwb;
+	m_opwb = state;
+	if (old != m_opwb)
+	{
+		m_opwb_out(!m_opwb);
+		update_r_busy(m_ras);
+
+		m_opwa_out(!(m_opwb || BIT(m_rhscr_stripe_num, 0)));
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_opwa()
+{
+	const bool old = m_opwa;
+	m_opwa = !(m_opwb || BIT(m_rhscr_stripe_num, 0));
+	if (old != m_opwa)
+	{
+		m_opwa_out(m_opwa);
+		update_req_clears();
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_req_clears()
+{
+	if (m_laac)
+	{
+		if (m_opwa)
+		{
+			m_creq_pending = false;
+			m_creq_active = false;
+		}
+		else
+		{
+			m_rreq_pending = false;
+			m_rreq_active = false;
+		}
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_opstr()
+{
+	const bool old = m_opstr;
+	m_opstr = !(m_t6 && !m_write_active);
+	if (old != m_opstr)
+	{
+		m_opstr_out(m_opstr);
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_cck()
+{
+	const bool old_clear = m_cck_clear;
+	m_cck_clear = !(m_opwb && m_t6);
+
+	if (old_clear != m_cck_clear)
+	{
+		const bool old_csel = m_csel;
+		m_csel = BIT(m_cx_stripe_addr, 0);
+		if (old_csel != m_csel)
+		{
+			m_csel_out(m_csel);
+		}
+	}
+
+	const bool old = m_cck;
+	m_cck = !m_cck_clear;
+	if (old != m_cck)
+	{
+		m_cck_out(m_cck);
+	}
+}
+
+void dpb7000_storeaddr_card_device::ras_w(bool state)
+{
+	const bool old_ras = m_ras;
+	m_ras = state;
+	if (old_ras != m_ras)
+	{
+		m_ras_out(!m_ras);
+		update_r_busy(old_ras);
+	}
+}
+
+void dpb7000_storeaddr_card_device::update_r_busy(bool old_ras)
+{
+	const bool old_r_busy = m_opwb || !old_ras;
+	const bool r_busy = m_opwb || !m_ras;
+	if (old_r_busy != r_busy)
+	{
+		m_r_busy_out(r_busy);
+	}
+}
+
+void dpb7000_storeaddr_card_device::cas_w(bool state)
+{
+	const bool old_cas = m_cas;
+	m_cas = state;
+	if (old_cas != m_cas)
+	{
+		m_cas_out(!m_cas);
+	}
+}
+
+void dpb7000_storeaddr_card_device::laac_w(bool state)
+{
+	const bool old_laac = m_laac;
+	m_laac = state;
+	if (old_laac != m_laac)
+	{
+		update_req_clears();
+	}
+}
+
+void dpb7000_storeaddr_card_device::t6_w(bool state)
+{
+	const bool old = m_t6;
+	m_t6 = state;
+	if (old != m_t6)
+	{
+		update_opstr();
+		update_cck();
+	}
+}
+
+void dpb7000_storeaddr_card_device::clrw_w(bool state)
+{
+	const bool old = m_clrw;
+	m_clrw = state;
+	if (old != m_clrw)
+	{
+		if (m_clrw)
+		{
+			opwb_w(false);
+			m_write_active = false;
+			update_opstr();
+		}
+	}
 }
 
 void dpb7000_storeaddr_card_device::reg_w(uint16_t data)
@@ -595,22 +887,87 @@ void dpb7000_storeaddr_card_device::cyoen_w(int state)
 
 void dpb7000_storeaddr_card_device::clrc_w(int state)
 {
+	const bool old = m_clrc;
 	m_clrc = (bool)state;
+	if (old != m_clrc && !m_clrc)
+	{
+		m_creq_pending = false;
+		m_creq_active = true;
+	}
 }
 
 void dpb7000_storeaddr_card_device::selvideo_w(int state)
 {
+	const bool old = m_selvideo;
 	m_selvideo = (bool)state;
+	if (!old && m_selvideo && BIT(m_cx_stripe_addr, 3))
+	{
+		request_c_read();
+	}
 }
 
 void dpb7000_storeaddr_card_device::creq_w(int state)
 {
+	const bool old = m_creq;
 	m_creq = (bool)state;
+	if (!old && m_creq)
+	{
+		request_c_read();
+	}
 }
 
 void dpb7000_storeaddr_card_device::cr_w(int state)
 {
 	m_cread = (bool)state;
+}
+
+void dpb7000_storeaddr_card_device::request_r_read()
+{
+	m_rreq_pending = true;
+	check_r_read();
+}
+
+void dpb7000_storeaddr_card_device::check_r_read()
+{
+	if (m_rreq_pending && !m_creq_active)
+	{
+		m_rreq_active = true;
+		m_creq_sel = false;
+		update_addr_select_outputs();
+		check_cycle_start();
+	}
+}
+
+void dpb7000_storeaddr_card_device::request_c_read()
+{
+	const bool old = m_creq_pending;
+	m_creq_pending = true;
+	if (!old && m_creq_pending)
+	{
+		m_cbusy_out(!m_creq_pending);
+	}
+	check_c_read();
+}
+
+void dpb7000_storeaddr_card_device::check_c_read()
+{
+	if (m_creq_pending && !m_rreq_active)
+	{
+		m_creq_active = true;
+		m_creq_sel = true;
+		update_addr_select_outputs();
+		check_cycle_start();
+
+		const bool old_write = m_write_active;
+		m_write_active = !(m_protx || m_proty || m_cread || BIT(m_cy_addr, 10));
+		if (old_write != m_write_active)
+		{
+			update_opstr();
+			m_w_out(m_write_active);
+		}
+
+		opwb_w(true);
+	}
 }
 
 void dpb7000_storeaddr_card_device::prot_a_w(int state)
@@ -627,6 +984,26 @@ void dpb7000_storeaddr_card_device::prot_b_w(int state)
 	m_prot_b = (bool)state;
 	if (old != m_prot_b)
 		update_prot_proms();
+}
+
+void dpb7000_storeaddr_card_device::preread_w(int state)
+{
+	const bool old = m_preread;
+	m_preread = (bool)state;
+	if (!old && m_preread)
+	{
+		request_r_read();
+	}
+}
+
+void dpb7000_storeaddr_card_device::check_cycle_start()
+{
+	if ((m_creq_active || m_rreq_active) && !m_store_busy)
+	{
+		m_store_busy = true;
+		mxr_w(true);
+		m_delay_timer->adjust(attotime::from_nsec(25), 0, attotime::from_nsec(25));
+	}
 }
 
 void dpb7000_storeaddr_card_device::update_prot_proms()
@@ -648,6 +1025,12 @@ void dpb7000_storeaddr_card_device::rhr_w(int state)
 	m_rhr = (bool)state;
 	if (old && !m_rhr)
 	{
+		if (!m_rhr)
+		{
+			m_rreq_pending = false;
+			m_rreq_active = false;
+		}
+
 		if (!m_plt && !m_rhr)
 		{
 			m_rvscr_counter = 0;
@@ -735,6 +1118,7 @@ void dpb7000_storeaddr_card_device::rppck_w(int state)
 
 				const uint8_t old_stripe_num = m_rhscr_stripe_num;
 				m_rhscr_stripe_num++;
+				update_opwa();
 				update_blanking_pal();
 				if ((old_stripe_num & 1) != (m_rhscr_stripe_num & 1) && m_rck)
 				{
@@ -796,7 +1180,7 @@ void dpb7000_storeaddr_card_device::ipen_w(int state)
 		const bool old_sel = m_ipsel;
 		m_ipsel = ((!m_crc || m_selvideo) != m_ipsel);
 		if (old_sel != m_ipsel)
-		    m_ipsel_out(m_ipsel);
+			m_ipsel_out(m_ipsel);
 	}
 }
 
@@ -809,6 +1193,11 @@ void dpb7000_storeaddr_card_device::update_rck()
 	if (old_rck != m_rck)
 	{
 		m_rck_out(m_rck);
+		m_oprb_out(m_rck);
+		if (!old_rck && m_rck)
+		{
+			update_cck();
+		}
 
 		const uint8_t old_ra = m_ra;
 		const bool old_opra = m_opra;
@@ -897,7 +1286,7 @@ void dpb7000_storeaddr_card_device::update_addr_select_inputs()
 
 void dpb7000_storeaddr_card_device::update_addr_select_outputs()
 {
-	const uint8_t sel = (m_mxr ? 1 : 0) | (m_rc_sel ? 2 : 0);
+	const uint8_t sel = (m_mxr ? 1 : 0) | (m_creq_sel ? 2 : 0);
 	const uint8_t old = m_addr;
 	m_addr  = BIT(m_dg_in[0], sel);
 	m_addr |= BIT(m_dg_in[1], sel) << 1;

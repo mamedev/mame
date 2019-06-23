@@ -2,25 +2,25 @@
 // copyright-holders: Dirk Best
 /****************************************************************************
 
-	Qume QVT-70 terminal
+    Qume QVT-70 terminal
 
-	Hardware:
-	- Z80 (Z8040008VSC)
-	- Z80 DART (Z0847006PSC)
-	- QUME 303489-01 QFP144
-	- DTC 801000-02 QFP100
-	- ROM 128k + 64k
-	- CXK5864CM-70LL (8k, next to ROMs)
-	- W242575-70LL (32k) + 5x CXK5864CM-70LL (8k)
-	- DS1231
-	- Beeper + Battery
-	- XTAL unreadable
+    Hardware:
+    - Z80 (Z8040008VSC)
+    - Z80 DART (Z0847006PSC)
+    - QUME 303489-01 QFP144
+    - DTC 801000-02 QFP100
+    - ROM 128k + 64k
+    - CXK5864CM-70LL (8k, next to ROMs)
+    - W242575-70LL (32k) + 5x CXK5864CM-70LL (8k)
+    - DS1231
+    - Beeper + Battery
+    - XTAL unreadable
 
-	Features:
-	- 65 hz with 16x16 characters
-	- 78 hz with 16x13 characters
-	- 64 background/foreground colors
-	- 80/132 columns
+    Features:
+    - 65 hz with 16x16 characters
+    - 78 hz with 16x13 characters
+    - 64 background/foreground colors
+    - 80/132 columns
 
 ****************************************************************************/
 
@@ -62,7 +62,7 @@ void qvt70_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0x8000).w(FUNC(qvt70_state::bankswitch_w));
 	map(0xa000, 0xbfff).ram();
-//	map(0xc000, 0xffff).ram();
+//  map(0xc000, 0xffff).ram();
 }
 
 void qvt70_state::bank_map(address_map &map)
@@ -74,7 +74,7 @@ void qvt70_state::bank_map(address_map &map)
 	map(0x20000, 0x27fff).rom().region("maincpu", 0x20000);
 	map(0x28000, 0x2ffff).rom().region("maincpu", 0x28000);
 	map(0x30000, 0x37fff).ram();
-//	map(0x38000, 0x3ffff)
+//  map(0x38000, 0x3ffff)
 }
 
 void qvt70_state::io_map(address_map &map)

@@ -472,7 +472,7 @@ void _4enlinea_state::k7_io_map(address_map &map)
 	map(0x0100, 0x0100).w(m_ay, FUNC(ay8910_device::address_w));
 	map(0x0101, 0x0101).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x0102, 0x0102).w(m_ay, FUNC(ay8910_device::data_w));
-//	0x03bf W (0x40)
+//  0x03bf W (0x40)
 }
 
 
@@ -679,8 +679,8 @@ ROM_START( k7_olym )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "odk7_v3.11_27c512.ic18", 0x00000, 0x10000, CRC(063d24fe) SHA1(ad4509438d2028ede779f5aa9a918d1020c1db41) )
 
-    // The EEPROM contains a custom message (operators can set on-screen messages).
-    // A clean one for default need to be created... 
+	// The EEPROM contains a custom message (operators can set on-screen messages).
+	// A clean one for default need to be created...
 	ROM_REGION( 0x0800, "eeprom", 0 )
 	ROM_LOAD( "x24c16p.bin", 0x0000, 0x0800, CRC(4c6685b2) SHA1(38c4f64f038d7ce185d6fd0b6eec4c9818f64e8e) )
 

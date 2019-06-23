@@ -637,7 +637,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_irq_vector.divu));
 	save_item(NAME(m_irq_vector.dmac[0]));
 	save_item(NAME(m_irq_vector.dmac[1]));
-	
+
 	save_item(NAME(m_ipra));
 	save_item(NAME(m_iprb));
 	save_item(NAME(m_vcra));
@@ -652,14 +652,14 @@ void sh2_device::device_start()
 
 	save_item(NAME(m_vecmd));
 	save_item(NAME(m_nmie));
-	
+
 	// DIVU
 	save_item(NAME(m_divu_ovf));
 	save_item(NAME(m_divu_ovfie));
 	save_item(NAME(m_dvsr));
 	save_item(NAME(m_dvdntl));
 	save_item(NAME(m_dvdnth));
-	
+
 	// WTC
 	save_item(NAME(m_wtcnt));
 	save_item(NAME(m_wtcsr));
@@ -679,11 +679,11 @@ void sh2_device::device_start()
 	save_item(NAME(m_dmac[1].tcr));
 	save_item(NAME(m_dmac[0].chcr));
 	save_item(NAME(m_dmac[1].chcr));
-	
+
 	// misc
 	save_item(NAME(m_sbycr));
 	save_item(NAME(m_ccr));
-	
+
 	// BSC
 	save_item(NAME(m_bcr1));
 	save_item(NAME(m_bcr2));
@@ -692,7 +692,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_rtcsr));
 	save_item(NAME(m_rtcor));
 	save_item(NAME(m_rtcnt));
-	
+
 	/*
 	for (int i = 0; i < 16; ++i)
 	{
@@ -709,7 +709,7 @@ void sh2_device::device_start()
 	save_item(NAME(m_internal_irq_vector));
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_irq));
-	
+
 	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(m_am).callimport();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 

@@ -51,6 +51,8 @@ public:
 	void prot_a_w(int state);
 	void prot_b_w(int state);
 
+	void preread_w(int state);
+
 	void rvl_w(int state);
 	void rhr_w(int state);
 	void plt_w(int state);
@@ -70,21 +72,48 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	static constexpr device_timer_id DELAY_TIMER = 0;
 
 	void set_cxpos(uint16_t data);
 
 	void tick_cxck();
 	void tick_cyck();
 
+	void update_r_busy(bool old_ras);
+
 	void update_blanking_pal();
 	void update_prot_proms();
 	void update_rck();
 	void update_v0();
+	void update_opwa();
+	void update_opstr();
+	void update_req_clears();
+	void update_cck();
 
 	void update_addr_mux_inputs();
 	void update_addr_mux_outputs();
 	void update_addr_select_inputs();
 	void update_addr_select_outputs();
+
+	void check_cycle_start();
+	void tick_delay_step();
+
+	void request_r_read();
+	void check_r_read();
+	void request_c_read();
+	void check_c_read();
+
+	void opwb_w(bool state);
+
+	// Timed control signals
+	void mxr_w(bool state);
+	void ras_w(bool state);
+	void cas_w(bool state);
+	void laac_w(bool state);
+	void t6_w(bool state);
+	void clrw_w(bool state);
 
 	uint8_t *m_bb_base;
 	uint8_t *m_bc_base;
@@ -98,6 +127,9 @@ protected:
 	uint8_t m_bd_out;
 	bool m_protx;
 	bool m_proty;
+
+	emu_timer *m_delay_timer;
+	uint8_t m_delay_step;
 
 	uint8_t m_df_in[2];
 	uint8_t m_df_out;
@@ -157,6 +189,13 @@ protected:
 	bool m_prot_a;
 	bool m_prot_b;
 
+	bool m_preread;
+	bool m_rreq_pending;
+	bool m_rreq_active;
+	bool m_creq_pending;
+	bool m_creq_active;
+	bool m_store_busy;
+
 	bool m_rvl;
 	bool m_rhr;
 	bool m_plt;
@@ -166,7 +205,17 @@ protected:
 	bool m_pflag;
 
 	bool m_mxr;
-	bool m_rc_sel;
+	bool m_ras;
+	bool m_cas;
+	bool m_laac;
+	bool m_t6;
+	bool m_clrw;
+	bool m_opstr;
+	bool m_cck_clear;
+
+	bool m_creq_sel;
+
+	bool m_write_active;
 
 	bool m_window_enable;
 	bool m_b26;
@@ -184,14 +233,29 @@ protected:
 	bool m_rck;
 	uint8_t m_ra;
 	bool m_opra;
+	bool m_opwa;
+	bool m_opwb;
+	bool m_cck;
+	bool m_csel;
 
 	// Output Handlers
 	devcb_write_line m_ipsel_out;
 	devcb_write_line m_rck_out;
 	devcb_write8 m_ra_out;
 	devcb_write_line m_opra_out;
+	devcb_write_line m_oprb_out;
 	devcb_write_line m_blk_out;
 	devcb_write8 m_addr_out;
+	devcb_write_line m_r_busy_out;
+	devcb_write_line m_ras_out;
+	devcb_write_line m_cas_out;
+	devcb_write_line m_opwb_out;
+	devcb_write_line m_opstr_out;
+	devcb_write_line m_w_out;
+	devcb_write_line m_opwa_out;
+	devcb_write_line m_csel_out;
+	devcb_write_line m_cck_out;
+	devcb_write_line m_cbusy_out;
 
 	// Devices
 	required_memory_region m_x_prom;

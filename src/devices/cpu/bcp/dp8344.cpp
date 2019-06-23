@@ -154,6 +154,8 @@ void dp8344_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_ccr).noshow();
+	state_add(BCP_BA, "BA", m_ba);
+	state_add(BCP_BB, "BB", m_bb);
 	state_add(BCP_CCR, "CCR", m_ccr);
 	state_add(BCP_NCF, "NCF", m_ncf);
 	state_add(BCP_ICR, "ICR", m_icr);
@@ -181,9 +183,6 @@ void dp8344_device::device_start()
 	state_add(BCP_TR, "TR", m_tr);
 	state_add(BCP_ASP, "ASP", m_asp).mask(0xf);
 	state_add(BCP_DSP, "DSP", m_dsp).mask(0xf);
-
-	state_add(BCP_BA, "BA", m_ba);
-	state_add(BCP_BB, "BB", m_bb);
 
 	// save states
 	save_item(NAME(m_pc));

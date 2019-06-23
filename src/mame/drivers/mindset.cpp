@@ -103,7 +103,7 @@ void mindset_state::machine_reset()
 
 int mindset_state::sys_t0_r()
 {
-	//	logerror("SYS: %d read t0 %d (%03x)\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0, m_syscpu->pc());
+	//  logerror("SYS: %d read t0 %d (%03x)\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0, m_syscpu->pc());
 	return (m_kbd_p2 & 0x40) != 0;
 }
 
@@ -115,25 +115,25 @@ int mindset_state::sys_t1_r()
 
 u8 mindset_state::sys_p1_r()
 {
-	//	logerror("SYS: read p1\n");
+	//  logerror("SYS: read p1\n");
 	return 0xff;
 }
 
 u8 mindset_state::sys_p2_r()
 {
-	//	logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
+	//  logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
 	return 0xff;
 }
 
 void mindset_state::sys_p1_w(u8 data)
 {
-	//	logerror("SYS: write p1 %02x\n", data);
+	//  logerror("SYS: write p1 %02x\n", data);
 }
 
 void mindset_state::sys_p2_w(u8 data)
 {
 	m_maincpu->int3_w(!(data & 0x80));
-	//	logerror("SYS: write p2 %02x\n", data);
+	//  logerror("SYS: write p2 %02x\n", data);
 }
 
 void mindset_state::kbd_p1_w(u8 data)
@@ -143,8 +143,8 @@ void mindset_state::kbd_p1_w(u8 data)
 
 void mindset_state::kbd_p2_w(u8 data)
 {
-	//	if((m_kbd_p2 ^ data) & 0x40)
-	//		logerror("KBD: %d output bit %d\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0);
+	//  if((m_kbd_p2 ^ data) & 0x40)
+	//      logerror("KBD: %d output bit %d\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0);
 	m_kbd_p2 = data;
 }
 
@@ -326,7 +326,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 							src += 128;
 							u32 *dest = &bitmap.pix32(8*y+yy, 8*x);
 							for(u32 xx=0; xx<8; xx++)
-								*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];					
+								*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];
 						}
 					}
 				}
@@ -467,7 +467,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 		for(u32 y=0; y<height; y++) {
 			u16 src_cadr = src_adr;
 			u16 dst_cadr = dst_adr;
-			
+
 			u16 cmask = swmask;
 			u16 nw1 = nw;
 			u32 srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr));
@@ -505,8 +505,8 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 				res = (dst & ~cmask) | (res & cmask);
 
-				//				logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
-			
+				//              logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
+
 				m_gcos->write_word((dst_seg << 4) + dst_cadr, sw(res));
 				if(mode & 0x100)
 					src_cadr += 2;
@@ -594,9 +594,9 @@ void mindset_state::mindset(machine_config &config)
 	m_screen->set_screen_update(FUNC(mindset_state::screen_update));
 	m_screen->scanline().set([this](int scanline) { m_maincpu->int2_w(scanline == 198); });
 	// This is bad and wrong and I don't yet care
-	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	//  m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
-	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+	//  m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
 }
 
 static INPUT_PORTS_START(mindset)

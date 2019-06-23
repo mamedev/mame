@@ -4,7 +4,7 @@
 
     Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
     Gemcrush (c) 1996 Star Fish
-	
+
     driver by Angelo Salese
 
     Uses a TC0091LVC, a variant of the one used on Taito L HW
@@ -14,7 +14,7 @@
     - lamps?
     - service mode?
     - nvram?
-    - dfruit: (possible bug) has an X on top-left corner after POST, 
+    - dfruit: (possible bug) has an X on top-left corner after POST,
               is it supposed to be disabled somehow?
 
 ***************************************************************************/
@@ -199,7 +199,7 @@ static INPUT_PORTS_START( gemcrush )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -225,7 +225,7 @@ static INPUT_PORTS_START( gemcrush )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( gemcrush )
 	// guess: these works only on round select
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DS1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -350,10 +350,10 @@ ROM_END
 
 ROM_START( gemcrush )
 	ROM_REGION( 0x40000, "tc0091lvc", ROMREGION_ERASE00 )
-    ROM_LOAD( "gcj_00.ic2",   0x000000, 0x040000, CRC(e1431390) SHA1(f1f63e23d4b73cc099adddeadcf1ea3e27688bcd) ) /* ST M27C2001 EPROM */
+	ROM_LOAD( "gcj_00.ic2",   0x000000, 0x040000, CRC(e1431390) SHA1(f1f63e23d4b73cc099adddeadcf1ea3e27688bcd) ) /* ST M27C2001 EPROM */
 
- 	ROM_REGION( 0x80000, "tc0091lvc:gfx", ROMREGION_ERASE00 )
-    ROM_LOAD( "gcj_01.ic10",  0x000000, 0x080000, CRC(5b9e7a6e) SHA1(345357feed8e80e6a06093fcb69f2b38063d057a) ) /* HN27C4096 EPROM */
+	ROM_REGION( 0x80000, "tc0091lvc:gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "gcj_01.ic10",  0x000000, 0x080000, CRC(5b9e7a6e) SHA1(345357feed8e80e6a06093fcb69f2b38063d057a) ) /* HN27C4096 EPROM */
 ROM_END
 
 GAME( 1993, dfruit,    0,   dfruit,  dfruit,   dfruit_state, empty_init, ROT0,   "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", 0 )

@@ -5,8 +5,8 @@
     dpb_brushproc.h
     DPB-7000/1 - Brush Processor Card
 
-	TODO:
-	- Everything
+    TODO:
+    - Everything
 
 ***************************************************************************/
 

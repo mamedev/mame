@@ -143,9 +143,9 @@
                    ---- ---- ---- --0- : 1= NBG0 layer disable
                    ---- ---- ---- ---t : 1= Text layer disable
 
-	reference
-	- arabfgt : https://www.youtube.com/watch?v=98QivDAGz3I
-	- darkedge : https://www.youtube.com/watch?v=riO1yb95z7s
+    reference
+    - arabfgt : https://www.youtube.com/watch?v=98QivDAGz3I
+    - darkedge : https://www.youtube.com/watch?v=riO1yb95z7s
 */
 
 #include "emu.h"

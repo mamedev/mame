@@ -263,8 +263,9 @@ offs_t dp8344_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			// AC00-ADFF: XORA Rs,[mIr] (3 T-states)
 			util::stream_format(stream, "%-8s", aop_to_string((inst & 0x0e00) >> 9));
 			format_register(stream, inst & 0x001f);
-			stream << ",";
+			stream << ",[";
 			format_modified_index_register(stream, (inst & 0x0060) >> 5, (inst & 0x0180) >> 7);
+			stream << "]";
 		}
 		else if (!BIT(inst, 8))
 		{
@@ -464,7 +465,7 @@ offs_t dp8344_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		// F400-F7FF: ORA  Rs,Rd (2 T-states)
 		// F800-FBFF: XORA Rs,Rd (2 T-states)
 		// FC00-FFFF: MOVE Rs,Rd (2 T-states)
-		util::stream_format(stream, "%-8s", aop_to_string((inst & 0x0e00) >> 9));
+		util::stream_format(stream, "%-8s", aop_to_string((inst & 0x1c00) >> 10));
 		format_register(stream, inst & 0x001f);
 		stream << ",";
 		format_register(stream, (inst & 0x03e0) >> 5);

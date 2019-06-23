@@ -1754,7 +1754,7 @@ ROM_END
 / they only swapped in Italian texts and maybe changed some game rules.
 / The main CPU board is using a 6502 CPU with all 16 address lines
 / (System 80B only used 14), 2K of static RAM, and a 27256 EPROM.
-/ 
+/
 / Obviously they forgot to adjust the ROM checksums of the game
 / because it reports an error when running the memory test.
 / The game works just fine however, and when comparing the game code

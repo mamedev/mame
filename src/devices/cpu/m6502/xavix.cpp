@@ -18,8 +18,8 @@
     0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
                   of banking
     0x8000-0xffff is a banked area with individual code and data banks
-  
-	Zero Page notes:
+
+    Zero Page notes:
 
     0x00ff contains the DATA bank, set manually in code
     0x00fe appears to be the current CODE bank, set with either the

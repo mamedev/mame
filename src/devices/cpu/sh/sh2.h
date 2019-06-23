@@ -95,7 +95,7 @@ public:
 	DECLARE_READ8_MEMBER( ssr_r );
 	DECLARE_WRITE8_MEMBER( ssr_w );
 	DECLARE_READ8_MEMBER( rdr_r );
-	
+
 	// FRT / FRC
 	DECLARE_READ8_MEMBER( tier_r );
 	DECLARE_WRITE8_MEMBER( tier_w );
@@ -110,7 +110,7 @@ public:
 	DECLARE_READ8_MEMBER( tocr_r );
 	DECLARE_WRITE8_MEMBER( tocr_w );
 	DECLARE_READ16_MEMBER( frc_icr_r );
-	
+
 	// INTC
 	DECLARE_READ16_MEMBER( ipra_r );
 	DECLARE_WRITE16_MEMBER( ipra_w );
@@ -130,7 +130,7 @@ public:
 	DECLARE_WRITE32_MEMBER( vcrdiv_w );
 	DECLARE_READ16_MEMBER( intc_icr_r );
 	DECLARE_WRITE16_MEMBER( intc_icr_w );
-	
+
 	// DIVU
 	DECLARE_READ32_MEMBER( dvsr_r );
 	DECLARE_WRITE32_MEMBER( dvsr_w );
@@ -143,21 +143,21 @@ public:
 
 	DECLARE_READ32_MEMBER( dvcr_r );
 	DECLARE_WRITE32_MEMBER( dvcr_w );
-	
+
 	// DMAC
 	template <int Channel> READ32_MEMBER(vcrdma_r)
 	{
 		return m_vcrdma[Channel] & 0x7f;
 	}
-	
+
 	template <int Channel> WRITE32_MEMBER(vcrdma_w)
 	{
 		COMBINE_DATA(&m_vcrdma[Channel]);
 		m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
 		sh2_recalc_irq();
 	}
-	
-	template <int Channel> READ8_MEMBER(drcr_r)	{ return m_dmac[Channel].drcr & 3; }
+
+	template <int Channel> READ8_MEMBER(drcr_r) { return m_dmac[Channel].drcr & 3; }
 	template <int Channel> WRITE8_MEMBER(drcr_w) { m_dmac[Channel].drcr = data & 3; sh2_recalc_irq(); }
 	template <int Channel> READ32_MEMBER(sar_r) { return m_dmac[Channel].sar; }
 	template <int Channel> WRITE32_MEMBER(sar_w) { COMBINE_DATA(&m_dmac[Channel].sar); }
@@ -166,8 +166,8 @@ public:
 	template <int Channel> READ32_MEMBER(dmac_tcr_r) { return m_dmac[Channel].tcr; }
 	template <int Channel> WRITE32_MEMBER(dmac_tcr_w) { COMBINE_DATA(&m_dmac[Channel].tcr); m_dmac[Channel].tcr &= 0xffffff; }
 	template <int Channel> READ32_MEMBER(chcr_r) { return m_dmac[Channel].chcr; }
-	template <int Channel> WRITE32_MEMBER(chcr_w) 
-	{ 
+	template <int Channel> WRITE32_MEMBER(chcr_w)
+	{
 		uint32_t old;
 		old = m_dmac[Channel].chcr;
 		COMBINE_DATA(&m_dmac[Channel].chcr);
@@ -186,19 +186,19 @@ public:
 			sh2_dmac_check(1);
 		}
 	}
-	
+
 	// WTC
 	DECLARE_READ16_MEMBER( wtcnt_r );
 	DECLARE_WRITE16_MEMBER( wtcnt_w );
 	DECLARE_READ16_MEMBER( rstcsr_r );
 	DECLARE_WRITE16_MEMBER( rstcsr_w );
-	
+
 	// misc
 	DECLARE_READ8_MEMBER( sbycr_r );
 	DECLARE_WRITE8_MEMBER( sbycr_w );
 	DECLARE_READ8_MEMBER( ccr_r );
 	DECLARE_WRITE8_MEMBER( ccr_w );
-	
+
 	// BSC
 	DECLARE_READ32_MEMBER( bcr1_r );
 	DECLARE_WRITE32_MEMBER( bcr1_w );
@@ -215,7 +215,7 @@ public:
 	DECLARE_READ32_MEMBER( rtcnt_r );
 	DECLARE_WRITE32_MEMBER( rtcnt_w );
 
-	
+
 	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
 	void func_fastirq();
@@ -283,16 +283,16 @@ private:
 	uint16_t m_ipra, m_iprb;
 	uint16_t m_vcra, m_vcrb, m_vcrc, m_vcrd, m_vcrwdt, m_vcrdiv, m_intc_icr, m_vcrdma[2];
 	bool m_vecmd, m_nmie;
-	
+
 	// DIVU
 	bool m_divu_ovf, m_divu_ovfie;
 	uint32_t m_dvsr, m_dvdntl, m_dvdnth;
-	
+
 	// WTC
 	uint8_t m_wtcnt, m_wtcsr;
 	uint8_t m_rstcsr;
 	uint16_t m_wtcw[2];
-	
+
 	// DMAC
 	struct {
 		uint8_t drcr;
@@ -302,13 +302,13 @@ private:
 		uint32_t chcr;
 	} m_dmac[2];
 	uint8_t m_dmaor;
-	
+
 	// misc
 	uint8_t m_sbycr, m_ccr;
-	
+
 	// BSC
 	uint32_t m_bcr1, m_bcr2, m_wcr, m_mcr, m_rtcsr, m_rtcor, m_rtcnt;
-	
+
 	int8_t  m_nmi_line_state;
 
 	uint64_t  m_frc_base;

@@ -182,15 +182,15 @@ If you calibrate the guns correctly the game runs as expected:
 2) Using P2 controls fire at the indicated spots.
 3) Using P3 controls fire at the indicated spots.
 
-	The locations of the shots fired in attract mode are defined by a table
-	starting at $65000. The value taken from there is combined with data from
-	the gun calibration to calculate the final position of the shots.
-	Unexpected calibration values will therefore cause the game to show the
-	shots in weird positions (see MT07333).
+    The locations of the shots fired in attract mode are defined by a table
+    starting at $65000. The value taken from there is combined with data from
+    the gun calibration to calculate the final position of the shots.
+    Unexpected calibration values will therefore cause the game to show the
+    shots in weird positions (see MT07333).
 
-	The EEPROM data starts with the 16 bit calibration values for all six axes
-	in the order: Minimum axis 0, middle axis 0, maximum axis 0 (repeat for
-	the other 5 axes).
+    The EEPROM data starts with the 16 bit calibration values for all six axes
+    in the order: Minimum axis 0, middle axis 0, maximum axis 0 (repeat for
+    the other 5 axes).
 
 ***************************************************************************/
 
