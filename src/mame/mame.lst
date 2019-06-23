@@ -21587,6 +21587,7 @@ mice2_6809                      // (c) 1986 Microtek International, Inc.
 
 @source:micral.cpp
 micral                          //
+questarm
 
 @source:micro20.cpp
 micro20                         // (c) 1984 GMX
