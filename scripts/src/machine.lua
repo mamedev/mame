@@ -60,8 +60,6 @@ files {
 	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 }
-
-
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
@@ -2665,30 +2663,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/sda2006.h,MACHINES["SDA2006"] = true
----------------------------------------------------
-
-if (MACHINES["SDA2006"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/sda2006.cpp",
-		MAME_DIR .. "src/devices/machine/sda2006.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/sensorboard.h,MACHINES["SENSORBOARD"] = true
----------------------------------------------------
-
-if (MACHINES["SENSORBOARD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/sensorboard.cpp",
-		MAME_DIR .. "src/devices/machine/sensorboard.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
 ---------------------------------------------------
 
@@ -2696,6 +2670,18 @@ if (MACHINES["SERFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/serflash.cpp",
 		MAME_DIR .. "src/devices/machine/serflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sda2006.h,MACHINES["SDA2006"] = true
+---------------------------------------------------
+
+if (MACHINES["SDA2006"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sda2006.cpp",
+		MAME_DIR .. "src/devices/machine/sda2006.h",
 	}
 end
 
