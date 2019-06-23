@@ -228,6 +228,7 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xfffffff8, 0xfffffffb).rw(FUNC(sh2_device::rtcor_r), FUNC(sh2_device::rtcor_w));
 }
 
+// in SH7020/SH7030, Internal i/o uses are 05000000-05ffffff, so external is only in 0d000000-0dffffff for cs5.
 void sh702x_device::sh702x_map(address_map &map)
 {
 /*  on-chip ROM; TODO : md bit is can be changeable when chip isn't operated
