@@ -279,8 +279,8 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	}
 
 	// configure the custom rendering
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -302,7 +302,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw the top box
 	draw_text_box(
 			tempbuf, tempbuf + 1,
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
@@ -384,7 +384,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw the bottom box
 	draw_text_box(
 			tempbuf, tempbuf + 4,
-			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, true,
 			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color(), 1.0f);
 }

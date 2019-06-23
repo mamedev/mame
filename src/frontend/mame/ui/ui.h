@@ -33,18 +33,10 @@ class machine_info;
     CONSTANTS
 ***************************************************************************/
 
-/* preferred font height; use ui_get_line_height() to get actual height */
-#define UI_TARGET_FONT_ROWS     get_font_rows()
-
-#define UI_TARGET_FONT_HEIGHT   (1.0f / (float)UI_TARGET_FONT_ROWS)
 #define UI_MAX_FONT_HEIGHT      (1.0f / 15.0f)
 
 /* width of lines drawn in the UI */
 #define UI_LINE_WIDTH           (1.0f / 500.0f)
-
-/* border between outlines and inner text on left/right and top/bottom sides */
-#define UI_BOX_LR_BORDER        (UI_TARGET_FONT_HEIGHT * 0.25f)
-#define UI_BOX_TB_BORDER        (UI_TARGET_FONT_HEIGHT * 0.25f)
 
 /* handy colors */
 #define UI_GREEN_COLOR          rgb_t(0xef,0x10,0x60,0x10)
@@ -246,6 +238,12 @@ public:
 	// slider controls
 	std::vector<ui::menu_item>&  get_slider_list(void);
 
+	// metrics
+	float target_font_height() const { return m_target_font_height; }
+	float box_lr_border() const { return target_font_height() * 0.25f; }
+	float box_tb_border() const { return target_font_height() * 0.25f; }
+	void update_target_font_height();
+
 	// other
 	void process_natural_keyboard();
 	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
@@ -276,6 +274,7 @@ private:
 	bool                    m_mouse_show;
 	ui_options              m_ui_options;
 	ui_colors				m_ui_colors;
+	float					m_target_font_height;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 
@@ -334,7 +333,6 @@ private:
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-int get_font_rows(running_machine *machine = nullptr);
 
 template <typename Format, typename... Params>
 inline void mame_ui_manager::popup_time(int seconds, Format &&fmt, Params &&... args)

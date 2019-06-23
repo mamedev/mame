@@ -228,7 +228,7 @@ void menu_select_launch::software_parts::populate(float &customtop, float &custo
 		item_append(elem->first, elem->second, 0, (void *)&*elem);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -261,7 +261,7 @@ void menu_select_launch::software_parts::custom_render(void *selectedref, float 
 	char const *const text[] = { _("Software part selection:") };
 	draw_text_box(
 			std::begin(text), std::end(text),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
@@ -308,7 +308,7 @@ void menu_select_launch::bios_selection::populate(float &customtop, float &custo
 		item_append(elem.first, "", 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -367,7 +367,7 @@ void menu_select_launch::bios_selection::custom_render(void *selectedref, float 
 	char const *const text[] = { _("BIOS selection:") };
 	draw_text_box(
 			std::begin(text), std::end(text),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
@@ -590,7 +590,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 
 	// determine the text for the header
 	make_topbox_text(tempbuf[0], tempbuf[1], tempbuf[2]);
-	float const y1 = origy1 - 3.0f * UI_BOX_TB_BORDER - ui().get_line_height();
+	float const y1 = origy1 - 3.0f * ui().box_tb_border() - ui().get_line_height();
 	draw_text_box(
 			tempbuf, tempbuf + 3,
 			origx1, origx2, origy1 - top, y1,
@@ -598,7 +598,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// draw toolbar
-	draw_toolbar(origx1, y1, origx2, origy1 - UI_BOX_TB_BORDER);
+	draw_toolbar(origx1, y1, origx2, origy1 - ui().box_tb_border());
 
 	// determine the text to render below
 	ui_software_info const *swinfo;
@@ -704,13 +704,13 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	// draw the footer
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
-			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
 			ui().colors().text_color(), color, 1.0f);
 
 	// is favorite? draw the star
 	if (isstar)
-		draw_star(origx1 + UI_BOX_LR_BORDER, origy2 + (2.0f * UI_BOX_TB_BORDER));
+		draw_star(origx1 + ui().box_lr_border(), origy2 + (2.0f * ui().box_tb_border()));
 }
 
 
@@ -883,7 +883,7 @@ float menu_select_launch::draw_left_panel(
 	// calculate line height
 	float const line_height(ui().get_line_height());
 	float const text_size(ui().options().infos_size());
-	float const sc(y2 - y1 - (2.0f * UI_BOX_TB_BORDER));
+	float const sc(y2 - y1 - (2.0f * ui().box_tb_border()));
 	float line_height_max(line_height * text_size);
 	if ((Filter::COUNT * line_height_max) > sc)
 	{
@@ -904,12 +904,12 @@ float menu_select_launch::draw_left_panel(
 	// outline the box and inset by the border width
 	float const origy1(y1);
 	float const origy2(y2);
-	x2 = x1 + left_width + 2.0f * UI_BOX_LR_BORDER;
+	x2 = x1 + left_width + 2.0f * ui().box_lr_border();
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
+	x1 += ui().box_lr_border();
+	x2 -= ui().box_lr_border();
+	y1 += ui().box_tb_border();
+	y2 -= ui().box_tb_border();
 
 	// now draw the rows
 	auto const active_filter(filters.find(current));
@@ -964,8 +964,8 @@ float menu_select_launch::draw_left_panel(
 		y1 += line_height_max;
 	}
 
-	x1 = x2 + UI_BOX_LR_BORDER;
-	x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
+	x1 = x2 + ui().box_lr_border();
+	x2 = x1 + 2.0f * ui().box_lr_border();
 	y1 = origy1;
 	y2 = origy2;
 	float const space = x2 - x1;
@@ -987,7 +987,7 @@ float menu_select_launch::draw_left_panel(
 	}
 
 	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
-	return x2 + UI_BOX_LR_BORDER;
+	return x2 + ui().box_lr_border();
 }
 
 
@@ -1181,10 +1181,10 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
+	x1 += ui().box_lr_border();
+	x2 -= ui().box_lr_border();
+	y1 += ui().box_tb_border();
+	y2 -= ui().box_tb_border();
 
 	texture_ptr_vector const &t_texture(m_is_swlist ? m_cache->sw_toolbar_texture() : m_cache->toolbar_texture());
 	bitmap_vector const &t_bitmap(m_is_swlist ? m_cache->sw_toolbar_bitmap() : m_cache->toolbar_bitmap());
@@ -1205,7 +1205,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 			{
 				set_hover(HOVER_B_FAV + z);
 				color = rgb_t::white();
-				float ypos = y2 + ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+				float ypos = y2 + ui().get_line_height() + 2.0f * ui().box_tb_border();
 				ui().draw_text_box(container(), _(hover_msg[z]), ui::text_layout::CENTER, 0.5f, ypos, ui().colors().background_color());
 			}
 
@@ -1751,8 +1751,8 @@ void menu_select_launch::draw(uint32_t flags)
 	float const ud_arrow_width = line_height * machine().render().ui_aspect();
 	float const gutter_width = 0.52f * ud_arrow_width;
 	float const icon_offset = m_has_icons ? (1.5f * ud_arrow_width) : 0.0f;
-	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * UI_BOX_LR_BORDER : 0.3f;
-	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
+	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * ui().box_lr_border() : 0.3f;
+	float visible_width = 1.0f - 4.0f * ui().box_lr_border();
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
 
@@ -1770,7 +1770,7 @@ void menu_select_launch::draw(uint32_t flags)
 		map_mouse();
 
 	// account for extra space at the top and bottom
-	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+	float visible_main_menu_height = 1.0f - 2.0f * ui().box_tb_border() - visible_extra_menu_height;
 	m_visible_lines = int(std::trunc(visible_main_menu_height / line_height));
 	visible_main_menu_height = float(m_visible_lines) * line_height;
 
@@ -1787,18 +1787,18 @@ void menu_select_launch::draw(uint32_t flags)
 	visible_top += get_customtop();
 
 	// compute left box size
-	float x1 = visible_left - UI_BOX_LR_BORDER;
-	float y1 = visible_top - UI_BOX_TB_BORDER;
-	float x2 = x1 + 2.0f * UI_BOX_LR_BORDER;
-	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
+	float x1 = visible_left - ui().box_lr_border();
+	float y1 = visible_top - ui().box_tb_border();
+	float x2 = x1 + 2.0f * ui().box_lr_border();
+	float y2 = visible_top + visible_main_menu_height + ui().box_tb_border() + extra_height;
 
 	// add left box
 	visible_left = draw_left_panel(x1, y1, x2, y2);
-	visible_width -= right_panel_size + visible_left - 2.0f * UI_BOX_LR_BORDER;
+	visible_width -= right_panel_size + visible_left - 2.0f * ui().box_lr_border();
 
 	// compute and add main box
-	x1 = visible_left - UI_BOX_LR_BORDER;
-	x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
+	x1 = visible_left - ui().box_lr_border();
+	x2 = visible_left + visible_width + ui().box_lr_border();
 	float line = visible_top + (float(m_visible_lines) * line_height);
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
@@ -1986,8 +1986,8 @@ void menu_select_launch::draw(uint32_t flags)
 
 	draw_right_panel(x1, y1, x2, y2);
 
-	x1 = primary_left - UI_BOX_LR_BORDER;
-	x2 = primary_left + primary_width + UI_BOX_LR_BORDER;
+	x1 = primary_left - ui().box_lr_border();
+	x2 = primary_left + primary_width + ui().box_lr_border();
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
@@ -2014,7 +2014,7 @@ void menu_select_launch::draw(uint32_t flags)
 void menu_select_launch::draw_right_panel(float origx1, float origy1, float origx2, float origy2)
 {
 	bool const hide((ui_globals::panels_status == HIDE_RIGHT_PANEL) || (ui_globals::panels_status == HIDE_BOTH));
-	float const x2(hide ? origx2 : (origx1 + 2.0f * UI_BOX_LR_BORDER));
+	float const x2(hide ? origx2 : (origx1 + 2.0f * ui().box_lr_border()));
 	float const space(x2 - origx1);
 	float const lr_arrow_width(0.4f * space * machine().render().ui_aspect());
 
@@ -2305,18 +2305,18 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 	{
 		ui().draw_textured_box(
 				container(),
-				origx1 + ((middle - title_size) * 0.5f), origy1 + UI_BOX_TB_BORDER,
-				origx1 + ((middle + title_size) * 0.5f), origy1 + UI_BOX_TB_BORDER + line_height,
+				origx1 + ((middle - title_size) * 0.5f), origy1 + ui().box_tb_border(),
+				origx1 + ((middle + title_size) * 0.5f), origy1 + ui().box_tb_border() + line_height,
 				bgcolor, rgb_t(43, 43, 43),
 				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
 	ui().draw_text_full(container(),
-			snaptext.c_str(), origx1, origy1 + UI_BOX_TB_BORDER, origx2 - origx1,
+			snaptext.c_str(), origx1, origy1 + ui().box_tb_border(), origx2 - origx1,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
-	draw_common_arrow(origx1, origy1 + UI_BOX_TB_BORDER, origx2, origy2, m_image_view, FIRST_VIEW, LAST_VIEW, title_size);
+	draw_common_arrow(origx1, origy1 + ui().box_tb_border(), origx2, origy2, m_image_view, FIRST_VIEW, LAST_VIEW, title_size);
 
 	return searchstr;
 }
@@ -2348,7 +2348,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 	if (tmp_bitmap.valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
-		float panel_height = origy2 - origy1 - 0.02f - (3.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
+		float panel_height = origy2 - origy1 - 0.02f - (3.0f * ui().box_tb_border()) - (2.0f * line_height);
 		int screen_width = machine().render().ui_target().width();
 		int screen_height = machine().render().ui_target().height();
 
@@ -2426,8 +2426,8 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		float const line_height = ui().get_line_height();
 		float const x1 = origx1 + 0.01f;
 		float const x2 = origx2 - 0.01f;
-		float const y1 = origy1 + (2.0f * UI_BOX_TB_BORDER) + line_height;
-		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
+		float const y1 = origy1 + (2.0f * ui().box_tb_border()) + line_height;
+		float const y2 = origy2 - ui().box_tb_border() - line_height;
 
 		// apply texture
 		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -2508,7 +2508,7 @@ float menu_select_launch::draw_collapsed_left_panel(float x1, float y1, float x2
 
 	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
 
-	return x2 + UI_BOX_LR_BORDER;
+	return x2 + ui().box_lr_border();
 }
 
 
@@ -2601,7 +2601,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		return;
 	}
 
-	origy1 += UI_BOX_TB_BORDER;
+	origy1 += ui().box_tb_border();
 	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float oy1 = origy1 + line_height;

@@ -136,8 +136,8 @@ void menu_dats_view::populate(float &customtop, float &custombottom)
 	(m_issoft == true) ? get_data_sw() : get_data();
 
 	item_append(menu_item_type::SEPARATOR, (FLAG_UI_DATS | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW));
-	customtop = 2.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
-	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
+	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 
 	if (!paused)
 		machine().resume();
@@ -152,7 +152,7 @@ void menu_dats_view::draw(uint32_t flags)
 	float const line_height = ui().get_line_height();
 	float const ud_arrow_width = line_height * machine().render().ui_aspect();
 	float const gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	float const visible_width = 1.0f - (2.0f * UI_BOX_LR_BORDER);
+	float const visible_width = 1.0f - (2.0f * ui().box_lr_border());
 	float const visible_left = (1.0f - visible_width) * 0.5f;
 	float const extra_height = 2.0f * line_height;
 	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
@@ -166,7 +166,7 @@ void menu_dats_view::draw(uint32_t flags)
 	map_mouse();
 
 	// account for extra space at the top and bottom
-	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+	float visible_main_menu_height = 1.0f - 2.0f * ui().box_tb_border() - visible_extra_menu_height;
 	m_visible_lines = int(std::trunc(visible_main_menu_height / line_height));
 	visible_main_menu_height = float(m_visible_lines) * line_height;
 
@@ -175,9 +175,9 @@ void menu_dats_view::draw(uint32_t flags)
 
 	// compute left box size
 	float x1 = visible_left;
-	float y1 = visible_top - UI_BOX_TB_BORDER;
+	float y1 = visible_top - ui().box_tb_border();
 	float x2 = x1 + visible_width;
-	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
+	float y2 = visible_top + visible_main_menu_height + ui().box_tb_border() + extra_height;
 	float line = visible_top + float(m_visible_lines) * line_height;
 
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
@@ -297,22 +297,22 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 	ui().draw_text_full(container(), driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
+	width += 2 * ui().box_lr_border();
 	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
-	float y2 = origy1 - 2.0f * UI_BOX_TB_BORDER - ui().get_line_height();
+	float y2 = origy1 - 2.0f * ui().box_tb_border() - ui().get_line_height();
 
 	// draw a box
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
+	x1 += ui().box_lr_border();
+	x2 -= ui().box_lr_border();
+	y1 += ui().box_tb_border();
 
 	ui().draw_text_full(container(), driver.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 		mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
@@ -328,16 +328,16 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	float space = (1.0f - maxwidth) / (m_items_list.size() * 2);
 
 	// compute our bounds
-	x1 -= UI_BOX_LR_BORDER;
-	x2 += UI_BOX_LR_BORDER;
-	y1 = y2 + UI_BOX_TB_BORDER;
-	y2 += ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	x1 -= ui().box_lr_border();
+	x2 += ui().box_lr_border();
+	y1 = y2 + ui().box_tb_border();
+	y2 += ui().get_line_height() + 2.0f * ui().box_tb_border();
 
 	// draw a box
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	y1 += UI_BOX_TB_BORDER;
+	y1 += ui().box_tb_border();
 
 	// draw the text within it
 	int x = 0;
@@ -361,22 +361,22 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
 	ui().draw_text_full(container(), revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
+	width += 2 * ui().box_lr_border();
 	maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
 	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
+	y1 = origy2 + ui().box_tb_border();
 	y2 = origy2 + bottom;
 
 	// draw a box
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
+	x1 += ui().box_lr_border();
+	x2 -= ui().box_lr_border();
+	y1 += ui().box_tb_border();
 
 	// draw the text within it
 	ui().draw_text_full(container(), revision.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
@@ -395,7 +395,7 @@ void menu_dats_view::get_data()
 
 	float const line_height = ui().get_line_height();
 	float const gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	float const visible_width = 1.0f - (2.0f * UI_BOX_LR_BORDER);
+	float const visible_width = 1.0f - (2.0f * ui().box_lr_border());
 	float const effective_width = visible_width - 2.0f * gutter_width;
 
 	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, effective_width, xstart, xend);
@@ -417,7 +417,7 @@ void menu_dats_view::get_data_sw()
 	else
 		mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option - 1, buffer);
 
-	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * ui().box_lr_border()), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));

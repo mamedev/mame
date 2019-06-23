@@ -640,7 +640,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 		return;
 
 	// add borders
-	y1 = y2 + UI_BOX_TB_BORDER;
+	y1 = y2 + ui().box_tb_border();
 	y2 = y1 + bottom;
 
 	// draw extra menu area
@@ -693,7 +693,7 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 	ui().draw_text_full(container(),
 						dip->name,
 						0,
-						y1 + (DIP_SWITCH_HEIGHT - UI_TARGET_FONT_HEIGHT) / 2,
+						y1 + (DIP_SWITCH_HEIGHT - ui().target_font_height()) / 2,
 						x1 - ui().get_string_width(" "),
 						ui::text_layout::RIGHT,
 						ui::text_layout::NEVER,

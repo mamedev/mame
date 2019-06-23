@@ -115,7 +115,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 	case phase::CONSENT:
 		draw_text_box(
 				std::begin(m_prompt), std::end(m_prompt),
-				x, x2, y - top, y - UI_BOX_TB_BORDER,
+				x, x2, y - top, y - ui().box_tb_border(),
 				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
 				ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		break;
@@ -140,7 +140,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 void menu_audit::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Start Audit"), "", 0, ITEMREF_START);
-	customtop = (ui().get_line_height() * 2.0f) + (UI_BOX_TB_BORDER * 3.0f);
+	customtop = (ui().get_line_height() * 2.0f) + (ui().box_tb_border() * 3.0f);
 }
 
 void menu_audit::handle()
