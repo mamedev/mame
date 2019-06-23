@@ -175,7 +175,7 @@ void menu_custom_ui::custom_render(void *selectedref, float top, float bottom, f
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().options().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 //-------------------------------------------------
@@ -364,7 +364,7 @@ void menu_font_ui::custom_render(void *selectedref, float top, float bottom, flo
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().options().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	if (uintptr_t(selectedref) == INFOS_SIZE)
 	{
@@ -373,14 +373,14 @@ void menu_font_ui::custom_render(void *selectedref, float top, float bottom, flo
 				std::begin(bottomtext), std::end(bottomtext),
 				origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
 				ui::text_layout::LEFT, ui::text_layout::NEVER, false,
-				UI_TEXT_COLOR, UI_GREEN_COLOR, m_info_size);
+				ui().options().text_color(), UI_GREEN_COLOR, m_info_size);
 	}
 }
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
-#define SET_COLOR_UI(var, opt) var[M##opt].color = opt; var[M##opt].option = OPTION_##opt
+#define SET_COLOR_UI(var, opt) var[M##opt].color = mui.options().rgb_value(OPTION_##opt); var[M##opt].option = OPTION_##opt
 
 menu_colors_ui::menu_colors_ui(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
@@ -483,7 +483,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().options().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// bottom text
 	// get the text for 'UI Select'
@@ -492,7 +492,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_RED_COLOR, 1.0f);
+			ui().options().text_color(), UI_RED_COLOR, 1.0f);
 
 	// compute maxwidth
 	char const *const topbuf = _("Menu Preview");
@@ -535,7 +535,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	// draw the text within it
 	ui().draw_text_full(container(), topbuf, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									mame_ui_manager::NORMAL, ui().options().text_color(), ui().options().text_bg_color(), nullptr, nullptr);
 
 	// compute our bounds for menu preview
 	float line_height = ui().get_line_height();
@@ -808,7 +808,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 
 	// draw the text within it
 	ui().draw_text_full(container(), m_title.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR);
+						mame_ui_manager::NORMAL, ui().options().text_color(), ui().options().text_bg_color());
 
 	std::string sampletxt(_("Color preview ="));
 	ui().draw_text_full(container(), sampletxt.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,

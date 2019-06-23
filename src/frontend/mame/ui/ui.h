@@ -50,22 +50,6 @@ class machine_info;
 #define UI_GREEN_COLOR          rgb_t(0xef,0x10,0x60,0x10)
 #define UI_YELLOW_COLOR         rgb_t(0xef,0x60,0x60,0x10)
 #define UI_RED_COLOR            rgb_t(0xf0,0x60,0x10,0x10)
-#define UI_BORDER_COLOR         decode_ui_color(0)
-#define UI_BACKGROUND_COLOR     decode_ui_color(1)
-#define UI_GFXVIEWER_BG_COLOR   decode_ui_color(2)
-#define UI_UNAVAILABLE_COLOR    decode_ui_color(3)
-#define UI_TEXT_COLOR           decode_ui_color(4)
-#define UI_TEXT_BG_COLOR        decode_ui_color(5)
-#define UI_SUBITEM_COLOR        decode_ui_color(6)
-#define UI_CLONE_COLOR          decode_ui_color(7)
-#define UI_SELECTED_COLOR       decode_ui_color(8)
-#define UI_SELECTED_BG_COLOR    decode_ui_color(9)
-#define UI_MOUSEOVER_COLOR      decode_ui_color(10)
-#define UI_MOUSEOVER_BG_COLOR   decode_ui_color(11)
-#define UI_MOUSEDOWN_COLOR      decode_ui_color(12)
-#define UI_MOUSEDOWN_BG_COLOR   decode_ui_color(13)
-#define UI_DIPSW_COLOR          decode_ui_color(14)
-#define UI_SLIDER_COLOR         decode_ui_color(15)
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((uint32_t)~0)
@@ -305,7 +289,6 @@ private:
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-rgb_t decode_ui_color(int id, running_machine *machine = nullptr);
 int get_font_rows(running_machine *machine = nullptr);
 
 template <typename Format, typename... Params>

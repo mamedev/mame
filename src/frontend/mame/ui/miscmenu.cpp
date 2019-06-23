@@ -804,7 +804,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().options().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 void menu_machine_configure::setup_bios()
@@ -920,7 +920,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().options().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 } // namespace ui
