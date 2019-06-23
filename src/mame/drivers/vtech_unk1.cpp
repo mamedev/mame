@@ -3,6 +3,9 @@
 
 // Unknown CPU type
 
+// gl6600cx uses a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
+// http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
+
 /*
 
 Leader 8008 CX (German version)
@@ -80,6 +83,11 @@ void gl8008cx_state::gl8008cx(machine_config &config)
 	screen.set_screen_update(FUNC(gl8008cx_state::screen_update));
 }
 
+ROM_START( gl6600cx )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "54-06400-00.u1", 0x000000, 0x200000, CRC(b05cd075) SHA1(b1d9eb02ca56350eb9e89518db89c0a2a845ebd8))
+ROM_END
+
 ROM_START( gl8008cx )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "27-6393-11.u1", 0x0000, 0x200000, CRC(fd49db46) SHA1(fc55bb31f42068f9d6cc8e2c2f419c3c4edb4fe6) )
@@ -97,5 +105,6 @@ ROM_START( bs9009cx )
 ROM_END
 
 
+COMP( 1999, gl6600cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )
 COMP( 1999, gl8008cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
 COMP( 1999, bs9009cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)

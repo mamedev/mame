@@ -920,11 +920,6 @@ ROM_START( gjrstar3 )
 	ROM_LOAD( "54-06056-000-000.u3", 0x000000, 0x040000, CRC(72522179) SHA1(ede9491713ad018012cf925a519bcafe126f1ad3))
 ROM_END
 
-ROM_START( gl6600cx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "54-06400-00.u1", 0x000000, 0x200000, CRC(b05cd075) SHA1(b1d9eb02ca56350eb9e89518db89c0a2a845ebd8))
-ROM_END
-
 ROM_START( gkidabc )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD("27-5730-00.bin", 0x00000, 0x20000, CRC(64664708) SHA1(74212c2dec1caa41dbc933b50f857904a8ac623b))
@@ -961,8 +956,3 @@ COMP( 1996, gjrstar2, gjrstar, 0,      prestige, prestige, prestige_state, empty
 COMP( 1998, gjrstar3, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)",    MACHINE_IS_SKELETON )
 COMP( 1998, gj5000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",         MACHINE_IS_SKELETON )
 COMP( 2012, cars2lap, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "CARS 2 Laptop (Germany)",              MACHINE_IS_SKELETON )
-
-
-// gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
-// http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
-COMP( 1999, gl6600cx, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6600CX (Germany)",       MACHINE_IS_SKELETON )
