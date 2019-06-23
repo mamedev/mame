@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic,Luca Bruno
 /***************************************************************************
 
-    luaengine.c
+    luaengine.cpp
 
     Controls execution of the core MAME system.
 
@@ -798,9 +798,10 @@ void lua_engine::initialize()
 			m_menu.push_back(name);
 		};
 	emu["show_menu"] = [this](const char *name) {
-			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
+			mame_ui_manager *mui = mame_ui();
+			if (!mui) return;
 			render_container &container = machine().render().ui_container();
-			ui::menu_plugin::show_menu(mui, container, (char *)name);
+			ui::menu_plugin::show_menu(*mui, container, (char *)name);
 		};
 	emu["register_callback"] = [this](sol::function cb, const std::string &name) {
 			std::string field = "cb_" + name;
@@ -2026,14 +2027,17 @@ void lua_engine::initialize()
  */
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
-			"draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
+			"draw_box", [this](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
+					mame_ui_manager *mui = mame_ui();
+					if (!mui) return;
+
 					int sc_width = sdev.visible_area().width();
 					int sc_height = sdev.visible_area().height();
 					x1 = std::min(std::max(0.0f, x1), float(sc_width-1)) / float(sc_width);
 					y1 = std::min(std::max(0.0f, y1), float(sc_height-1)) / float(sc_height);
 					x2 = std::min(std::max(0.0f, x2), float(sc_width-1)) / float(sc_width);
 					y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
-					mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
+					mui->draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
 				},
 			"draw_line", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color) {
 					int sc_width = sdev.visible_area().width();
@@ -2045,6 +2049,9 @@ void lua_engine::initialize()
 					sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				},
 			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color, sol::object bcolor) {
+					mame_ui_manager *mui = mame_ui();
+					if (!mui) return;
+
 					int sc_width = sdev.visible_area().width();
 					int sc_height = sdev.visible_area().height();
 					auto justify = ui::text_layout::LEFT;
@@ -2067,13 +2074,13 @@ void lua_engine::initialize()
 						luaL_error(m_lua_state, "Error in param 1 to draw_text");
 						return;
 					}
-					rgb_t textcolor = mame_machine_manager::instance()->ui().colors().text_color();
+					rgb_t textcolor = mui->colors().text_color();
 					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());
 					if(bcolor.is<uint32_t>())
 						bgcolor = rgb_t(bcolor.as<uint32_t>());
-					mame_machine_manager::instance()->ui().draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
+					mui->draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
 										justify, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, textcolor, bgcolor);
 				},
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
@@ -2380,7 +2387,7 @@ void lua_engine::initialize()
 			"machine", &machine_manager::machine,
 			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
 			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
-			"ui", &mame_machine_manager::ui);
+			"ui", [this](mame_machine_manager &m) { return mame_ui(); });
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
 }
@@ -2453,4 +2460,16 @@ void lua_engine::load_script(const char *filename)
 void lua_engine::load_string(const char *value)
 {
 	run(sol().load(value));
+}
+
+//-------------------------------------------------
+//  mame_ui - retrieves the MAME UI manager
+//-------------------------------------------------
+
+mame_ui_manager *lua_engine::mame_ui()
+{
+	mame_ui_manager *ui = dynamic_cast<mame_ui_manager *>(&machine().ui());
+	if (!ui)
+		luaL_error(m_lua_state, "Functionaliry requires built in MAME UI");
+	return ui;
 }
