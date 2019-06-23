@@ -2,34 +2,43 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cd32" description="Amiga CD-32 CD-ROMs">
 
-	<!--
+	<!-- 
 	UNDUMPED:
 
+	1001 Girl
 	Acid Attack Compilation (Guardian, Roadkill, Super Skidmarks)
 	Amiga CD Football (Sports: Football)
+	Amiga Workbench 3.0
 	Arabian Nights [Poland]
+	Assassins 4
 	Brian The Lion
-	Brutal Football: Brutal Sports Series
 	Brutal: Paws Of Fury
 	Camel Racer
-	Cannon Fodder
-	Castles II: Siege And Conquest
 	CD32 Scene - Volume 1
+	CD Exchange Vol 1
+	CD Micro French
 	Cedric And The Lost Sceptre
 	Clockwiser
 	Der Clou!
 	The Clue!
+	Communicator
+	Communicator II
+	Communicator III
 	Dangerous Streets [CDD3433 DS NTSC/PAL ·   MASTERED BY NIMBUS]
 	Dangerous Streets & Wing Commander
+	Dansbands-karaoke 1
 	Death Mask
 	Deep Core [Rev. 0]
+	Defender Of The Crown: Extended Collector's Edition [2017]
 	Defender of the Crown II
 	Defender of the Crown II [US Version]
 	Dennis
+	Diamonds & Pearls
 	Diggers
 	Diggers & Oscar
 	Diggers & Oscar [Rev. 1]
 	Diggers & Oscar [Rev. 1, Alt]
+	Enciclopedia Electronica Multimediale Grolier
 	Erben der Erde: Die große Suche
 	Exile
 	Extractors: The Hanging Worlds Of Zarg [Prototype]
@@ -38,13 +47,17 @@
 	Fields Of Glory
 	Fightin' Spirit
 	Final Gate, The
+	Firenze – Art, History & Mystery
+	Folioworx Player
+	Frog Feast
 	Fury Of The Furries
 	Gamers' Delight
 	Gangster Pursuit
 	Gloom 3: Zombie Edition
+	The Grolier Electronic Encyclopedia
 	Guardian [Alt]
 	Guardian [Alt 2]
-	Gulp!
+	Guinness Disc Of Records - Second Edition
 	Gunship 2000
 	Heimdall 2: Into The Hall Of Worlds
 	HeroQuest II: Legacy Of Sorasil
@@ -62,6 +75,7 @@
 	John Barnes European Football
 	Jungle Strike
 	Kang Fu
+	Karaoke: Julsånger I
 	Kingpin: Arcade Sports Bowling
 	Labyrinth Of Time, The
 	Lamborghini American Challenge
@@ -73,18 +87,68 @@
 	Lost Vikings, The
 	Lunar-C
 	Mag!!!
+	Magic Island
 	Manchester United: Premier League Champions
+	Mathematik
 	Microcosm
 	Microcosm [Demo]
 	More! Lemmings
 	Morph [Kixx]
+	Multimedia Toolkit
+	Network CD
+	Network CD 2
 	Nick Faldo's Championship Golf
 	Nigel Mansell's World Championship
 	Nigel Mansell's World Championship [US Version]
 	Oscar
 	Overkill
+	PhotoLite
+	Pinball Prelude
+	Pinocchio
+	Pirates! Gold
+	Premiere
+	Prey: An Alien Encounter
+	Project-X Special Edition & F17 Challenge [Rev 0]
+	Project-X Special Edition & F17 Challenge [Rev 1]
+	Ryder Cup: Johnnie Walker
+	Sabre Team
+	Sensible Soccer: European Champions v1.1
+	Sensible Soccer: International Edition v1.2
+	Sexual Fantasies
 	Shadow Fighter [Alt]
+	Sharks!
+	Sixth Sense Investigations
+	Sixth Sense Investigations [German]
+	Sleepwalker
+	Soccer Kid
 	Soccer Superstars
+	Socrates
+	Speedball 2: Brutal Deluxe
+	Star Crusader
+	Striker
+	Subwar 2050 [German]
+	Super League Manager
+	Super Street Fighter II Turbo
+	Superfrog [TEAM SEVENTEEN 8032 SUPERFROG]
+	Superfrog [Islona]
+	Theme Park [Yellow Disc] / Theme Park [Blue Disc]
+	Thomas The Tank Engine's Pinball
+	Top Gear 2
+	UFO: Enemy Unknown [Limited Edition]
+	Universe
+	VanCity Direct TV
+	Video Creator
+	Vital Light [CD 32 VITA LIFE   MADE IN THE U.K. BY CD-SYSTEMS   01087]
+	Wendetta 2175
+	Wendetta 2175 [Amiga Future Magazine]
+	Whale's Voyage [CDD2737 GERMAN ·   MASTERED BY NIMBUS]
+	Whizz
+	Will Bridge: Initiation Junior
+	Word Construction Set
+	World Atlas
+	World of Sound
+	Worthy
+	Your Privacy Assured
 	-->
 
 	<!-- http://redump.org/disc/24202/ -->
@@ -498,7 +562,7 @@
 
 	<!-- http://redump.org/disc/3435/ -->
 	<software name="arcdpool">
-		<description>Arcade Pool</description>
+		<description>Arcade Pool (set 1)</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022235 170353" />
@@ -513,7 +577,7 @@
 	<!-- Has an earlier build date, so might actually be an earlier version -->
 	<!-- http://redump.org/disc/3220/ -->
 	<software name="arcdpool1" cloneof="arcdpool">
-		<description>Arcade Pool (Alt)</description>
+		<description>Arcade Pool (set 2)</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022235 170353" />
@@ -663,6 +727,20 @@
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/36197/ -->
+	<software name="brutalf" supported="no">
+		<description>Brutal Sports Series: Football</description>
+		<year>1994</year>
+		<publisher>Millennium</publisher>
+		<info name="alt_title" value="Brutal Football" /> <!-- Cover title -->
+		<info name="disc_matrix" value="CDD3361 BRUTAL FOOTBALL : MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="brutal football (europe)" sha1="360d2d53cf83c7d22edca4845ff4f5f77e240037"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Doesn't boot -->
 	<!-- http://redump.org/disc/16190/ -->
 	<software name="bubba" supported="no">
@@ -703,6 +781,34 @@
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bump n burn (europe)" sha1="15c624de3acbbc6e23b45deefbe5b007e4eaf8ab"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3427/ -->
+	<software name="cannfodd" supported="no">
+		<description>Cannon Fodder</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="barcode" value="5 013715 060455" />
+		<info name="disc_matrix" value="ABLEX 80343-4 @ 4" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cannon fodder (europe)" sha1="11a0c5316bf765cae1f9280d4f2ec2843dc8c2d0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/16152/ -->
+	<software name="castles2" supported="no">
+		<description>Castles II: Siege &amp; Conquest</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="barcode" value="5 026102 008091" />
+		<info name="disc_matrix" value="**CASTLE/2**   121634-X4-3335-2 DISCTRONICS, S castle 2 01 Disctronics Interplay 13" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="castles ii - siege and conquest (europe)" sha1="b0b85836d783ac6e349de557a7f83f9eaf432068"/>
 			</diskarea>
 		</part>
 	</software>
@@ -969,6 +1075,17 @@
 		</part>
 	</software>
 
+	<software name="frogfd" supported="no">
+		<description>Frog Feast (Demo)</description>
+		<year>2007</year>
+		<publisher>Rastersoft</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Frog" sha1="a3dd1f3ff331c65dcf2180b41c03ea61264fe3de"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Doesn't boot -->
 	<!-- http://redump.org/disc/18926/ -->
 	<software name="frontier" supported="no">
@@ -1025,6 +1142,20 @@
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="guardian (europe)" sha1="4a1101de8fd10e4c2f6c59894ac97663d360a623"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3369/ -->
+	<software name="gulp" supported="no">
+		<description>Gulp!</description>
+		<year>1994</year>
+		<publisher>I.C.E.</publisher>
+		<info name="release" value="199409xx" />
+		<info name="disc_matrix" value="GULPCD32 ·   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gulp! (europe) (en,fr,de,es,it)" sha1="574eee872637153009dc1a4cc36ee1dd0e5d9a79"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1172,6 +1303,34 @@
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/3287/ -->
+	<software name="pgaeuro" supported="no">
+		<description>PGA European Tour</description>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<info name="disc_matrix" value="ABLEX 80581" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pga european tour (europe)" sha1="aa2b02803af1f8df1abe8add07d9cae59888960c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3134/ -->
+	<software name="pierre" supported="no">
+		<description>Pierre Le Chef is... Out to Lunch</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<info name="serial" value="/DP130020 [Box], /CS090033 [Disc]" />
+		<info name="barcode" value="5 018247 415452" />
+		<info name="disc_matrix" value="CS090033   14   DADC AUSTRIA" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pierre le chef is ... out to lunch (europe)" sha1="ed836b5870d85afe28df72acc3a321577f1d0f93"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Playable, like the Ami1200 AGA version -->
 	<software name="pballfnt">
 		<description>Pinball Fantasies CD Edition</description>
@@ -1196,6 +1355,47 @@
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/29269/ -->
+	<software name="pwrdrive" supported="no">
+		<description>Power Drive</description>
+		<year>1994</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="barcode" value="5 013442 560518 >" />
+		<info name="disc_matrix" value="USG005 10347691 01 &amp;   MADE IN U.K. BY PDO" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power drive (europe) (en,fr,de,es,it)" sha1="10e66363ef495aa37b4ceac9590c77b77256d23a" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/29180/ -->
+	<software name="pwrgames" supported="no">
+		<description>Power-Games</description>
+		<year>1994</year>
+		<publisher>Media Team</publisher>
+		<info name="disc_matrix" value="50439 618 01 >" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power-games (europe) (en,de)" sha1="2fa54f496f5f7b0f9c168d1d0dcf357d5c4edf11"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3430/ -->
+	<software name="prey" supported="no">
+		<description>Prey: An Alien Encounter</description>
+		<year>1994</year>
+		<publisher>Almathera</publisher>
+		<info name="barcode" value="5 024913 000068 >" />
+		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-6021 * A   2" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="prey - an alien encounter (europe)" sha1="a63ee5d54f70fe53a966ddcd0c2a7085d7c7426a"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Doesn't boot? -->
 	<!-- http://redump.org/disc/36196/ -->
 	<software name="projxubb" supported="no">
@@ -1211,12 +1411,12 @@
 		</part>
 	</software>
 
-	<!-- Bundled with Issue 2 (Apr 1995) of Amiga CD32 Special -->
+	<!-- Bundled with Issue 2 (Apr 1995) of Amiga CD32 Special Magazine -->
 	<!-- http://redump.org/disc/3129/ -->
 	<software name="quik" supported="partial">
 		<description>Quik the Thunder Rabbit</description>
 		<year>1994</year>
-		<publisher>Titus</publisher>
+		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="199504xx" />
 		<info name="disc_matrix" value="CDR 00535 QUIK PC WISE" />
 		<part name="cdrom" interface="cd32_cdrom">
@@ -1244,7 +1444,7 @@
 	<!-- Doesn't boot -->
 	<!-- http://redump.org/disc/3295/ -->
 	<software name="roadkill" supported="no">
-		<description>Roadkill</description>
+		<description>Roadkill (set 1)</description>
 		<year>1995</year>
 		<publisher>Acid</publisher>
 		<info name="barcode" value="9 417810 100133" />
@@ -1258,7 +1458,7 @@
 
 	<!-- http://redump.org/disc/3295/ -->
 	<software name="roadkill1" supported="no" cloneof="roadkill">
-		<description>Roadkill (Alt)</description>
+		<description>Roadkill (set 2)</description>
 		<year>1995</year>
 		<publisher>Acid</publisher>
 		<info name="disc_matrix" value="GH 32 23 AUG 95 MPO 01 @@@ 9 00" />
@@ -1285,6 +1485,20 @@
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/3132/ -->
+	<software name="jambala" supported="no">
+		<description>The Seven Gates of Jambala</description>
+		<year>1994</year>
+		<publisher>Unique</publisher>
+		<info name="barcode" value="5 013248 004537 >" />
+		<info name="disc_matrix" value="PC WISE LTD 0685 350505 JAMBALA" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="seven gates of jambala, the (europe)" sha1="2536a8fea70e753c640dc9392f2331f6dd565dd1"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Problems with graphics -->
 	<!-- http://redump.org/disc/3332/ -->
 	<software name="shadfght" supported="partial">
@@ -1296,6 +1510,33 @@
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="shadow fighter (europe)" sha1="ea78034b0c53fcbf9188cddc7f095bb5a1b47e25"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3215/ -->
+	<software name="sheerdlt" supported="no">
+		<description>Sheer Delight</description>
+		<year>1994</year>
+		<publisher>Better Concepts</publisher>
+		<info name="disc_matrix" value="ZENEX: SHEERS DELIGHT Technidisc #1122-094-030F 09/30/94D" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sheer delight (europe)" sha1="507488ca70ece79e134abd1284cb467a8fa38d32"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3216/ -->
+	<software name="simonsrc" supported="no">
+		<description>Simon the Sorcerer</description>
+		<year>1994</year>
+		<publisher>Adventuresoft</publisher>
+		<info name="barcode" value="5 026924 000129 >" />
+		<info name="disc_matrix" value="CDD4166 SIMON CD32 :   MASTERED BY NIMBUS, CDD4166 SIMON CD32 NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simon the sorcerer (europe)" sha1="31f19ec35b25a8292a9a0bd07c40e2f23a713be9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1315,6 +1556,74 @@
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/3432/ -->
+	<software name="speris" supported="no">
+		<description>The Speris Legacy</description>
+		<year>1996</year>
+		<publisher>Team 17</publisher>
+		<info name="barcode" value="5 022358 170612" />
+		<info name="disc_matrix" value="CDR 01062   SPERIS LEGACY CD32   PC WISE" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="speris legacy, the (europe)" sha1="ec1383aa5cc6f743771ded75b51addf607cbc915"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3307/ -->
+	<software name="strippot" supported="no">
+		<description>Strip Pot</description>
+		<year>1994</year>
+		<publisher>Guildhall Leisure</publisher>
+		<info name="disc_matrix" value="DAMONT   STRIP POTCD-32   CDM01" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strip pot (europe)" sha1="f4fa71da618aaf532fb66d133383c6369e16366c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3123/ -->
+	<software name="sw2050" supported="no">
+		<description>Subwar 2050</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="disc_matrix" value="CDD5418 SUBWAR CD32 ·   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="subwar 2050 (europe) (en,fr,de)" sha1="27f896040b4f86e29e1f70dcafed27a6638451b8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3230/ -->
+	<software name="solympix" supported="no">
+		<description>Summer Olympix</description>
+		<year>1994</year>
+		<publisher>Flair</publisher>
+		<info name="barcode" value="5 021423 000885" />
+		<info name="disc_matrix" value="CDD3207 SO ·   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="summer olympix (europe)" sha1="7f52aba39ce7d8dfb6f0cafca1909d0244db8bd4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/16193/ -->
+	<software name="methbros" supported="no">
+		<description>Super Methane Bros.</description>
+		<year>1994</year>
+		<publisher>Apache</publisher>
+		<info name="barcode" value="5 027760 000021" />
+		<info name="disc_matrix" value="MANUFACTURED BY KAO IRELAND   BR002451-01" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super methane bros. (europe)" sha1="6a37c24062494a512ac521fb51d46384875db2c4"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Doesn't work -->
 	<!-- http://redump.org/disc/3131/ -->
 	<software name="suprputt" supported="no">
@@ -1330,26 +1639,121 @@
 		</part>
 	</software>
 
-	<!-- bad screen mode -->
+	<!-- http://redump.org/disc/36295/ -->
 	<software name="sskid" supported="no">
-		<description>Super Skidmarks</description>
+		<description>Super Skidmarks (set 1)</description>
 		<year>1995</year>
 		<publisher>Guildhall Leisure</publisher>
+		<info name="barcode" value="9 417810 100089" />
+		<info name="disc_matrix" value="GH 1 21 APR 95   MPO   01 @@@ 1" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super skidmarks v2.2 (1995)(guildhall leisure)[!][gh 1 10 aug 95]" sha1="af57f7c92804f460a3d2ae89b5b881414205a21e"/>
+				<disk name="super skidmarks (europe)" sha1="9c978f5412163ac0acd03c89758cbab86b1d9a5f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- bad screen mode -->
+	<!-- This is the same version as its parent, however the CD structure differs between the two. -->
+	<!-- http://redump.org/disc/25416/ -->
+	<software name="sskid1" cloneof="sskid" supported="no">
+		<description>Super Skidmarks (set 2)</description>
+		<year>1995</year>
+		<publisher>Guildhall Leisure</publisher>
+		<info name="barcode" value="9 417810 100089" />
+		<info name="disc_matrix" value="GH 1 10 AUG 95   MPO   03 @@@ 1" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super skidmarks (europe) (alt)" sha1="ff15f0c45b71c26df7da0d1dce1b16b64517a528"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- runs and can be 'played', but gfx are badly scaled -->
+	<!-- http://redump.org/disc/7832/ -->
 	<software name="sstardst" supported="no">
 		<description>Super Stardust</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Team 17</publisher>
+		<info name="barcode" value="5 022358 170445" />
+		<info name="disc_matrix" value="CDR00344 SUPER STARDUST CD32" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super stardust (1994)(team 17)[!]" sha1="2fee9d76e9b47a9fb72c2f8833d07cb4fbc6ab82"/>
+				<disk name="super stardust (europe)" sha1="e875bf9ede995a2b2de78ae2d8c8b6962d6674fd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3217/ -->
+	<software name="suprfrog" supported="no">
+		<description>Superfrog</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="barcode" value="5 022358 170384" />
+		<info name="disc_matrix" value="CDD4979 SUPER FROG ·   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="superfrog (europe)" sha1="fe741cff2a47021cc4ee33f46369589ae12e5d0f"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- http://redump.org/disc/3366/ -->
+	<!-- 
+	<software name="suprfrog" supported="no">
+		<description>Superfrog (Rev 1)</description>
+		<year>1999</year>
+		<publisher>Islona</publisher>
+		<info name="barcode" value="5 022358 170384" />
+		<info name="disc_matrix" value="FD7989 THAMESDOWN 01793 421300 ZFS1" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="superfrog (europe) (rev 1)" sha1=""/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- http://redump.org/disc/3434/ -->
+	<software name="surfninj" supported="no">
+		<description>Surf Ninjas</description>
+		<year>1994</year>
+		<publisher>MicroValue</publisher>
+		<info name="barcode" value="5 021423 000892" />
+		<info name="disc_matrix" value="CDD3434 SURF NINJAS ·   -MASTERED BY NIMBUS-" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="surf ninjas (europe)" sha1="67fb1ac867011d903c3d421179e2c0b4e69266bf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Some releases included a free copy of Alfred Chicken -->
+	<!-- http://redump.org/disc/3092/ -->
+	<software name="syndicat" supported="no">
+		<description>Syndicate</description>
+		<year>1995</year>
+		<publisher>Mindscape</publisher>
+		<info name="serial" value="DP130055 [Box], CS090112 [Disc]"/>
+		<info name="barcode" value="5018247906455" />
+		<info name="disc_matrix" value="S CD 35 01   MINDSCAPE   DISCTRONICS, S CD 35 01   MINDSCAPE   DISCTRONICS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="syndicate (europe) (en,fr,it)" sha1="d887224380f180aa4e52a1ebc04f4121a1a598b7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/31362/ -->
+	<software name="themeprk" supported="no">
+		<description>Theme Park</description>
+		<year>1995</year>
+		<publisher>Mindscape</publisher>
+		<info name="serial" value="DP130042 [Box], CS090088 [Disc]"/>
+		<info name="disc_matrix" value="DADC AUSTRIA   CS090088   15" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="theme park (europe) (en,fr,de,it)" sha1="94458c802249df0d0b6b21414b2ea1f60f208ed2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1369,26 +1773,170 @@
 		</part>
 	</software>
 
-	<!-- Playable but missing some graphical effects -->
-	<software name="vital" supported="partial">
-		<description>Vital Light</description>
+	<!-- http://redump.org/disc/36281/ -->
+	<software name="tp" supported="no">
+		<description>Trivial Pursuit</description>
 		<year>1994</year>
-		<publisher>Millennium</publisher>
+		<publisher>Domark</publisher>
+		<info name="alt_title" value="Trivial Pursuit: The CD 32 Edition" /> <!-- Cover title -->
+		<info name="barcode" value="5 022231 036189" />
+		<info name="disc_matrix" value="CDD3224 :   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="vital light (1994)(millennium)[!][10328981]" sha1="89921bfda42deab7a73e4c55ea4244673788a1bd"/>
+				<disk name="trivial pursuit - the cd32 edition (europe)" sha1="cf1ba7ca069b804eaa34881ec1cfb875a68d8daa"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Manual copy protection, no idea if it actually works, menu colours are bad tho, anybody got a cheat for the code screen? -->
-	<software name="wormstdc" supported="no">
-		<description>Worms - The Director's Cut</description>
-		<year>1995</year>
-		<publisher>Ocean</publisher>
+	<!-- http://redump.org/disc/25927/ -->
+	<software name="trolls" supported="no">
+		<description>Trolls</description>
+		<year>1993</year>
+		<publisher>Flair</publisher>
+		<info name="barcode" value="5 021423 000915" />
+		<info name="disc_matrix" value="CDD2771 TROLLS   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="worms - the director's cut (1995)(ocean)(m3)[!]" sha1="7c42b4cf6c089aadd0ed41f8725174ab9c7a0378"/>
+				<disk name="trolls (europe)" sha1="cf1f60ca86170c2fe396c3eb76e80a5572ec670d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3124/ -->
+	<software name="ufo" supported="no">
+		<description>UFO: Enemy Unknown</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="disc_matrix" value="MP 133177 DOIR CD 32 PC WISE CDR00278 UFO" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ufo - enemy unknown (europe) (en,fr,de)" sha1="c40c51d2435ed427992e163b4aea64586132ed55"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/22004/ -->
+	<software name="ubb" supported="no">
+		<description>Ultimate Body Blows</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="barcode" value="5 022358 170261" />
+		<info name="disc_matrix" value="CDD3321 UBB ::   ·MASTERED BY NIMBUS·" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultimate body blows (europe)" sha1="737f46a3d4ed22f8d69ebff24e66e6bdc170ad81"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Playable but missing some graphical effects -->
+	<!-- http://redump.org/disc/3126/ -->
+	<software name="vital" supported="partial">
+		<description>Vital Light</description>
+		<year>1994</year>
+		<publisher>Millennium</publisher>
+		<info name="disc_matrix" value="VITAL LIGHT 10328981 01 &amp;   MADE IN U.K. BY PDO" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vital light (europe)" sha1="552ad81da4c89b08dca3c5fef5f8d64b08bf23e4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Bundled with Issue 3 (Aug 1995) of Amiga CD32 Special Magazine -->
+	<!-- http://redump.org/disc/3127/ -->
+	<software name="vital1" cloneof="vital" supported="partial">
+		<description>Vital Light (Amiga CD32 Special)</description>
+		<year>1995</year>
+		<publisher>Paragon Publishing</publisher>
+		<info name="release" value="199508xx" />
+		<info name="disc_matrix" value="VITA LIFE MADE IN THE U.K. BY CD-SYSTEMS 01429" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vital light (europe) (alt)" sha1="0696ea358fc0f503d56a3327253501926cacbe52"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3294/ -->
+	<software name="wembley" supported="no">
+		<description>Wembley International Soccer</description>
+		<year>1994</year>
+		<publisher>Audiogenic</publisher>
+		<info name="barcode" value="9 781851 108466" />
+		<info name="disc_matrix" value="WEMBLEY 1 10292711 02 &amp;   MADE IN U.K. BY PDO" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wembley international soccer (europe)" sha1="2bbaf85b56d35c34599a2a975da0806b6b1324ef"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/18011/ -->
+	<software name="whalevoy" supported="no">
+		<description>Whale's Voyage</description>
+		<year>1993</year>
+		<publisher>Flair</publisher>
+		<info name="disc_matrix" value="CDD2736 ENGLISH ·   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="whale's voyage (europe)" sha1="c44d30e4466aa65faa28a4c47e6ab56b41703464"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/18710/ -->
+	<software name="wildcup" supported="no">
+		<description>Wild Cup Soccer</description>
+		<year>1994</year>
+		<publisher>Millennium</publisher>
+		<info name="disc_matrix" value="WILD CUP SOCCER 10312431 01 &amp;   MADE IN U.K. BY PDO" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wild cup soccer (europe)" sha1="e5c2b907f62d133ee8187c3b680130f9ef65582d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Manual copy protection -->
+	<!-- http://redump.org/disc/16702/ -->
+	<software name="worms" supported="no">
+		<description>Worms</description>
+		<year>1995</year>
+		<publisher>Team 17</publisher>
+		<info name="barcode" value="5 022358 170643" />
+		<info name="disc_matrix" value="CDR00865   WORMS CD32   PC WISE" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="worms (europe) (en,fr,de)" sha1="daf98201fb405a934424e70a0287a412d3df2c62"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/16327/ -->
+	<software name="zool" supported="no">
+		<description>Zool: Ninja of the "Nth" Dimension</description>
+		<year>1993</year>
+		<publisher>Gremlin</publisher>
+		<info name="barcode" value="5013658033332" />
+		<info name="disc_matrix" value="ROM DISCTRONICS ROM S ZOOL 1 02" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zool - ninja of the nth dimension (europe)" sha1="87128d563ccfa8c98d55712f1bf8ae28f21537b8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/29209/ -->
+	<software name="zool2" supported="no">
+		<description>Zool 2</description>
+		<year>1994</year>
+		<publisher>Gremlin</publisher>
+		<info name="barcode" value="5 013658 033523" />
+		<info name="disc_matrix" value="CDD4242 ZOOL 2 CD32 PAL ·   -MASTERED BY NIMBUS-" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zool 2 (europe)" sha1="d8389e41dd4c73a32ed71dd6070433815b80da71"/>
 			</diskarea>
 		</part>
 	</software>
