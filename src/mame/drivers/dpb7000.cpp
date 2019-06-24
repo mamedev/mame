@@ -19,6 +19,7 @@
 #include "machine/input_merger.h"
 #include "machine/tdc1008.h"
 #include "video/dpb_brushproc.h"
+#include "video/dpb_brushstore.h"
 #include "video/dpb_combiner.h"
 #include "video/dpb_framestore.h"
 #include "video/dpb_storeaddr.h"
@@ -73,6 +74,7 @@ public:
 		, m_filter_cg(*this, "filter_cg")
 		, m_store_addr(*this, "store_addr%u", 0U)
 		, m_brush_proc(*this, "brush_proc%u", 0U)
+		, m_brush_store(*this, "brush_store")
 		, m_combiner(*this, "combiner")
 		, m_framestore(*this, "framestore%u", 0U)
 	{
@@ -166,6 +168,7 @@ private:
 
 	required_device_array<dpb7000_storeaddr_card_device, 2> m_store_addr;
 	required_device_array<dpb7000_brushproc_card_device, 2> m_brush_proc;
+	required_device<dpb7000_brush_store_card_device> m_brush_store;
 	required_device<dpb7000_combiner_card_device> m_combiner;
 	required_device_array<dpb7000_framestore_card_device, 6> m_framestore;
 
@@ -1149,6 +1152,9 @@ void dpb7000_state::dpb7000(machine_config &config)
 	DPB7000_BRUSHPROC(config, m_brush_proc[0]);
 	DPB7000_BRUSHPROC(config, m_brush_proc[1]);
 
+	// Brush Store Card
+	DPB7000_BRUSHSTORE(config, m_brush_store);
+
 	// Combiner Card
 	DPB7000_COMBINER(config, m_combiner, 14.318181_MHz_XTAL);
 
@@ -1217,9 +1223,6 @@ ROM_START( dpb7000 )
 
 	ROM_REGION(0x800, "fddprom", 0)
 	ROM_LOAD("17446a-gd-m2716.bin", 0x000, 0x800, CRC(a0be00ca) SHA1(48c4f8c07b9f6bc9b68698e1e326782e0b01e1b0))
-
-	ROM_REGION(0x100, "brushstore_prom", 0)
-	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(84bf7029) SHA1(9d58322994f6f7e99a9c6478577559c8171670ed))
 
 	ROM_REGION(0x1200, "output_timing_proms", 0)
 	ROM_LOAD("pb-037-17418-bea.bin", 0x0000, 0x400, CRC(644e82a3) SHA1(d7634e03809abe2db924571c05821c1b2aca051b))
