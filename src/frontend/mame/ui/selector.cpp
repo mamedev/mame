@@ -117,7 +117,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			ui().options().text_color(), UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// get the text for 'UI Select'
 	tempbuf[0] = string_format(_("Double click or press %1$s to select"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD)));
@@ -125,7 +125,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-			ui().options().text_color(), UI_RED_COLOR, 1.0f);
+			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
 }
 
 //-------------------------------------------------

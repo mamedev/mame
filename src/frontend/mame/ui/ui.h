@@ -123,6 +123,49 @@ enum class ui_callback_type
 	VIEWER
 };
 
+// ======================> ui_colors
+
+class ui_colors
+{
+public:
+	rgb_t border_color() const { return m_border_color; }
+	rgb_t background_color() const { return m_background_color; }
+	rgb_t gfxviewer_bg_color() const { return m_gfxviewer_bg_color; }
+	rgb_t unavailable_color() const { return m_unavailable_color; }
+	rgb_t text_color() const { return m_text_color; }
+	rgb_t text_bg_color() const { return m_text_bg_color; }
+	rgb_t subitem_color() const { return m_subitem_color; }
+	rgb_t clone_color() const { return m_clone_color; }
+	rgb_t selected_color() const { return m_selected_color; }
+	rgb_t selected_bg_color() const { return m_selected_bg_color; }
+	rgb_t mouseover_color() const { return m_mouseover_color; }
+	rgb_t mouseover_bg_color() const { return m_mouseover_bg_color; }
+	rgb_t mousedown_color() const { return m_mousedown_color; }
+	rgb_t mousedown_bg_color() const { return m_mousedown_bg_color; }
+	rgb_t dipsw_color() const { return m_dipsw_color; }
+	rgb_t slider_color() const { return m_slider_color; }
+
+	void refresh(const ui_options &options);
+
+private:
+	rgb_t m_border_color;
+	rgb_t m_background_color;
+	rgb_t m_gfxviewer_bg_color;
+	rgb_t m_unavailable_color;
+	rgb_t m_text_color;
+	rgb_t m_text_bg_color;
+	rgb_t m_subitem_color;
+	rgb_t m_clone_color;
+	rgb_t m_selected_color;
+	rgb_t m_selected_bg_color;
+	rgb_t m_mouseover_color;
+	rgb_t m_mouseover_bg_color;
+	rgb_t m_mousedown_color;
+	rgb_t m_mousedown_bg_color;
+	rgb_t m_dipsw_color;
+	rgb_t m_slider_color;
+};
+
 // ======================> mame_ui_manager
 
 class mame_ui_manager : public ui_manager, public slider_changed_notifier
@@ -145,6 +188,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
+	ui_colors &colors() { return m_ui_colors; }
 	ui::machine_info &machine_info() const { assert(m_machine_info); return *m_machine_info; }
 
 	// setters
@@ -231,6 +275,7 @@ private:
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
 	ui_options              m_ui_options;
+	ui_colors				m_ui_colors;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 

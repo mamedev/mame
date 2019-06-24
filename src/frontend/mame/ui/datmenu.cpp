@@ -180,7 +180,7 @@ void menu_dats_view::draw(uint32_t flags)
 	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
 	float line = visible_top + float(m_visible_lines) * line_height;
 
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().options().background_color());
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	m_visible_lines = (std::min)(visible_items, m_visible_lines);
 	top_line = (std::max)(0, top_line);
@@ -200,16 +200,16 @@ void menu_dats_view::draw(uint32_t flags)
 		float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 		float const line_y1 = line_y + line_height;
 
-		rgb_t fgcolor = ui().options().text_color();
-		rgb_t bgcolor = ui().options().text_bg_color();
+		rgb_t fgcolor = ui().colors().text_color();
+		rgb_t bgcolor = ui().colors().text_bg_color();
 
 		if (!linenum && top_line)
 		{
 			// if we're on the top line, display the up arrow
 			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
-				fgcolor = ui().options().mouseover_color();
-				bgcolor = ui().options().mouseover_bg_color();
+				fgcolor = ui().colors().mouseover_color();
+				bgcolor = ui().colors().mouseover_bg_color();
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				set_hover(HOVER_ARROW_UP);
 			}
@@ -223,8 +223,8 @@ void menu_dats_view::draw(uint32_t flags)
 			// if we're on the bottom line, display the down arrow
 			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
-				fgcolor = ui().options().mouseover_color();
-				bgcolor = ui().options().mouseover_bg_color();
+				fgcolor = ui().colors().mouseover_color();
+				bgcolor = ui().colors().mouseover_bg_color();
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				set_hover(HOVER_ARROW_DOWN);
 			}
@@ -253,8 +253,8 @@ void menu_dats_view::draw(uint32_t flags)
 		float const line_y0 = line;
 		float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 		float const line_y1 = line + line_height;
-		rgb_t const fgcolor = ui().options().selected_color();
-		rgb_t const bgcolor = ui().options().selected_bg_color();
+		rgb_t const fgcolor = ui().colors().selected_color();
+		rgb_t const bgcolor = ui().colors().selected_bg_color();
 
 		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 			set_hover(count);
@@ -263,7 +263,7 @@ void menu_dats_view::draw(uint32_t flags)
 		{
 			container().add_line(
 					visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-					UI_LINE_WIDTH, ui().options().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
@@ -315,7 +315,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	ui().draw_text_full(container(), driver.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-		mame_ui_manager::NORMAL, ui().options().text_color(), ui().options().text_bg_color(), nullptr, nullptr);
+		mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
 
 	maxwidth = 0;
 	for (auto & elem : m_items_list)
@@ -334,7 +334,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y2 += ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().options().background_color());
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
 	y1 += UI_BOX_TB_BORDER;
@@ -344,11 +344,11 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	for (auto & elem : m_items_list)
 	{
 		x1 += space;
-		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : ui().options().text_color();
-		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : ui().options().text_bg_color();
+		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : ui().colors().text_color();
+		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : ui().colors().text_bg_color();
 		ui().draw_text_full(container(), elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NONE, fcolor, bcolor, &width, nullptr);
 
-		if (bcolor != ui().options().text_bg_color())
+		if (bcolor != ui().colors().text_bg_color())
 			ui().draw_textured_box(container(), x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 
@@ -380,7 +380,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 	// draw the text within it
 	ui().draw_text_full(container(), revision.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NORMAL, ui().options().text_color(), ui().options().text_bg_color(), nullptr, nullptr);
+		mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
 }
 
 //-------------------------------------------------
