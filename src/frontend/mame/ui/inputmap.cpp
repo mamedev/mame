@@ -644,7 +644,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 	y2 = y1 + bottom;
 
 	// draw extra menu area
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().options().background_color());
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	// iterate over DIP switches
@@ -698,7 +698,7 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 						ui::text_layout::RIGHT,
 						ui::text_layout::NEVER,
 						mame_ui_manager::NORMAL,
-						ui().options().text_color(),
+						ui().colors().text_color(),
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA),
 						nullptr ,
 						nullptr);
@@ -714,7 +714,7 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		float innerx1;
 
 		/* first outline the switch */
-		ui().draw_outlined_box(container(), x1, y1, x1 + switch_field_width, y2, ui().options().background_color());
+		ui().draw_outlined_box(container(), x1, y1, x1 + switch_field_width, y2, ui().colors().background_color());
 
 		/* compute x1/x2 for the inner filled in switch */
 		innerx1 = x1 + (switch_field_width - switch_width) / 2;
@@ -724,13 +724,13 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		{
 			float innery1 = (dip->state & (1 << toggle)) ? y1_on : y1_off;
 			container().add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
-								(selectedmask & (1 << toggle)) ? ui().options().dipsw_color() : ui().options().text_color(),
+								(selectedmask & (1 << toggle)) ? ui().colors().dipsw_color() : ui().colors().text_color(),
 								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
 			container().add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
-								ui().options().unavailable_color(),
+								ui().colors().unavailable_color(),
 								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 

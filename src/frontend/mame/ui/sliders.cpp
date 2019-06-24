@@ -230,7 +230,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		x2 = 1.0f - UI_BOX_LR_BORDER;
 
 		// draw extra menu area
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().options().background_color());
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 		y1 += UI_BOX_TB_BORDER;
 
 		// determine the text height
@@ -250,19 +250,19 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		current_x = bar_left + bar_width * percentage;
 
 		// fill in the percentage
-		container().add_rect(bar_left, bar_top, current_x, bar_bottom, ui().options().slider_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_rect(bar_left, bar_top, current_x, bar_bottom, ui().colors().slider_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the top and bottom lines
-		container().add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, ui().options().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		container().add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, ui().options().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw default marker
-		container().add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, ui().options().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ui().options().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the actual text
 		ui().draw_text_full(container(), tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().options().text_color(), ui().options().text_bg_color(), nullptr, &text_height);
+					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
 	}
 }
 

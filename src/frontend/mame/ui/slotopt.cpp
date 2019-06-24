@@ -222,7 +222,7 @@ void menu_slot_devices::custom_render(void *selectedref, float top, float bottom
 				std::begin(text), std::end(text),
 				origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
 				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-				ui().options().text_color(), ui().options().background_color(), 1.0f);
+				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
 }
 

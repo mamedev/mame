@@ -178,6 +178,7 @@ void mame_ui_manager::init()
 	ui_gfx_init(machine());
 
 	get_font_rows(&machine());
+	m_ui_colors.refresh(options());
 
 	// more initialization
 	using namespace std::placeholders;
@@ -2190,4 +2191,24 @@ void mame_ui_manager::save_main_option()
 void mame_ui_manager::menu_reset()
 {
 	ui::menu::stack_reset(machine());
+}
+
+void ui_colors::refresh(const ui_options &options)
+{
+	m_border_color = options.border_color();
+	m_background_color = options.background_color();
+	m_gfxviewer_bg_color = options.gfxviewer_bg_color();
+	m_unavailable_color = options.unavailable_color();
+	m_text_color = options.text_color();
+	m_text_bg_color = options.text_bg_color();
+	m_subitem_color = options.subitem_color();
+	m_clone_color = options.clone_color();
+	m_selected_color = options.selected_color();
+	m_selected_bg_color = options.selected_bg_color();
+	m_mouseover_color = options.mouseover_color();
+	m_mouseover_bg_color = options.mouseover_bg_color();
+	m_mousedown_color = options.mousedown_color();
+	m_mousedown_bg_color = options.mousedown_bg_color();
+	m_dipsw_color = options.dipsw_color();
+	m_slider_color = options.slider_color();
 }
