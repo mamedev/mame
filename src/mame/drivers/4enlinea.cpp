@@ -183,6 +183,14 @@
   - Interlaced video mode.
   - Sound.
   - More work...
+  
+**************************************************************************
+
+Known games on this or simmilar hardware:
+- [DUMPED]  4 en Línea (Compumatic)
+- [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
+- [MISSING] Sport Dart TV (Compumatic)
+- [MISSING] Dart Queen (Compumatic / Daryde)
 
 *************************************************************************/
 
