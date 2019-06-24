@@ -65,7 +65,22 @@ public:
 	void ipen_w(int state);
 
 	auto ipsel() { return m_ipsel_out.bind(); }
+	auto csel() { return m_csel_out.bind(); }
 	auto rck() { return m_rck_out.bind(); }
+	auto cck() { return m_cck_out.bind(); }
+	auto ra() { return m_ra_out.bind(); }
+	auto opstr() { return m_opstr_out.bind(); }
+	auto opwa() { return m_opwa_out.bind(); }
+	auto opwb() { return m_opwb_out.bind(); }
+	auto opra() { return m_opra_out.bind(); }
+	auto oprb() { return m_oprb_out.bind(); }
+	auto blk() { return m_blk_out.bind(); }
+	auto a() { return m_addr_out.bind(); }
+	auto r_busy() { return m_r_busy_out.bind(); }
+	auto ras() { return m_ras_out.bind(); }
+	auto cas() { return m_cas_out.bind(); }
+	auto write() { return m_w_out.bind(); }
+	auto cbusy() { return m_cbusy_out.bind(); }
 
 protected:
 	// device-level overrides
