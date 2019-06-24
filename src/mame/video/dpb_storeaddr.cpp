@@ -251,7 +251,6 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_mxr));
 	save_item(NAME(m_ras));
 	save_item(NAME(m_cas));
-	save_item(NAME(m_store_busy));
 	save_item(NAME(m_laac));
 	save_item(NAME(m_t6));
 	save_item(NAME(m_clrw));
@@ -279,7 +278,6 @@ void dpb7000_storeaddr_card_device::device_start()
 	save_item(NAME(m_opra));
 	save_item(NAME(m_opwa));
 	save_item(NAME(m_opwb));
-	save_item(NAME(m_clrw));
 	save_item(NAME(m_cck));
 	save_item(NAME(m_csel));
 

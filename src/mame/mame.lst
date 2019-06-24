@@ -32991,7 +32991,6 @@ gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 gl6000sl                        // Genius Leader 6000SL (Germany)
-gl6600cx                        // Genius Leader 6600CX (Germany)
 gl7007sl                        // Genius Leader 7007SL (Germany)
 glcolor                         // Genius Leader Color (Germany)
 glmcolor                        // Genius Leader Magic Color (Germany)
@@ -39286,6 +39285,7 @@ vreadere
 
 @source:vtech_unk1.cpp
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
+gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
 gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
 
 @source:vtech_unk2.cpp

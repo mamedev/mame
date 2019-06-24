@@ -18,10 +18,11 @@
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "machine/tdc1008.h"
-#include "video/mc6845.h"
 #include "video/dpb_brushproc.h"
 #include "video/dpb_combiner.h"
+#include "video/dpb_framestore.h"
 #include "video/dpb_storeaddr.h"
+#include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
 #include <deque>
@@ -73,6 +74,7 @@ public:
 		, m_store_addr(*this, "store_addr%u", 0U)
 		, m_brush_proc(*this, "brush_proc%u", 0U)
 		, m_combiner(*this, "combiner")
+		, m_framestore(*this, "framestore%u", 0U)
 	{
 	}
 
@@ -165,10 +167,22 @@ private:
 	required_device_array<dpb7000_storeaddr_card_device, 2> m_store_addr;
 	required_device_array<dpb7000_brushproc_card_device, 2> m_brush_proc;
 	required_device<dpb7000_combiner_card_device> m_combiner;
+	required_device_array<dpb7000_framestore_card_device, 6> m_framestore;
 
 	emu_timer *m_diskseq_clk;
 	emu_timer *m_field_in_clk;
 	emu_timer *m_field_out_clk;
+
+	enum : size_t
+	{
+		FRAMESTORE_A0 = 0,
+		FRAMESTORE_A1,
+		FRAMESTORE_A2,
+		FRAMESTORE_B0,
+		FRAMESTORE_B1,
+		FRAMESTORE_B2,
+		FRAMESTORE_COUNT
+	};
 
 	enum : uint8_t
 	{
@@ -1137,6 +1151,33 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	// Combiner Card
 	DPB7000_COMBINER(config, m_combiner, 14.318181_MHz_XTAL);
+
+	// Framestore Cards
+	for (size_t i = 0; i < FRAMESTORE_COUNT; i++)
+	{
+		DPB7000_FRAMESTORE(config, m_framestore[i]);
+	}
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		for (size_t j = 0; j < FRAMESTORE_COUNT; j++)
+		{
+			m_store_addr[i]->ipsel().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ipsel_w));
+			m_store_addr[i]->csel().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::csel_w));
+			m_store_addr[i]->rck().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::rck_w));
+			m_store_addr[i]->cck().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::cck_w));
+			m_store_addr[i]->ra().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ra_w));
+			m_store_addr[i]->opstr().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opstr_w));
+			m_store_addr[i]->opwa().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opwa_w));
+			m_store_addr[i]->opwb().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opwb_w));
+			m_store_addr[i]->opra().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opra_w));
+			m_store_addr[i]->oprb().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::oprb_w));
+			m_store_addr[i]->a().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::a_w));
+			m_store_addr[i]->ras().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ras_w));
+			m_store_addr[i]->cas().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::cas_w));
+			m_store_addr[i]->write().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::write_w));
+		}
+	}
 }
 
 
