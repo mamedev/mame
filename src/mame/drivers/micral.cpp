@@ -47,6 +47,12 @@ Other things...
 - keyboard
 - unknown ports
 
+--------------------
+Honeywell Bull Questar/M
+
+http://www.histoireinform.com/Histoire/+infos6/chr6inf3.htm
+https://www.esocop.org/docs/Questar.pdf
+
 *********************************************************************************/
 
 #include "emu.h"
@@ -435,7 +441,23 @@ ROM_START( micral )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
+ROM_START( questarm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "qm_547_1.rom", 0xf800, 0x0800, CRC(8e6dc953) SHA1(b31375af8c6769578d2000fff3e751e94e7ae4d4) )
+
+	// using the keyboard ROM from 'micral' for now
+	ROM_REGION( 0x400, "keyboard", 0 )
+	ROM_LOAD( "2010221.rom", 0x000, 0x400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
+
+	ROM_REGION( 0x2000, "vram", ROMREGION_ERASEFF )
+
+	// Using the chargen from 'c10' for now.
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+ROM_END
+
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME         FLAGS
-COMP( 1981, micral, 0,      0,      micral,  micral, micral_state, init_micral, "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME         FLAGS
+COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, init_micral, "Bull R2E",       "Micral 80-22G", MACHINE_IS_SKELETON )
+COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, init_micral, "Honeywell Bull", "Questar/M",     MACHINE_IS_SKELETON )
