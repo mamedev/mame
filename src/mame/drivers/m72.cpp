@@ -305,9 +305,9 @@ The protection device does
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
-	uint16_t val = param & 0xffff;
-	uint16_t offset = (param >> 16) & 0x07ff;
-	uint16_t mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
+	const u16 val = param & 0xffff;
+	const u16 offset = (param >> 16) & 0x07ff;
+	const u16 mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
 
 	logerror("MB8421/MB8431 left_w(0x%03x, 0x%04x, 0x%04x)\n", offset, val, mem_mask);
 	m_dpram->left_w(offset, val, mem_mask);
@@ -315,8 +315,8 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 {
-	uint8_t val = param & 0xff;
-	uint16_t offset = (param >> 9) & 0x07ff;
+	const u8 val = param & 0xff;
+	const u16 offset = (param >> 9) & 0x07ff;
 
 	if (BIT(param, 8))
 		m_dpram->right_w(offset, val << 8, 0xff00);
@@ -325,29 +325,30 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 }
 
 
-WRITE16_MEMBER(m72_state::main_mcu_w)
+void m72_state::main_mcu_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
-WRITE8_MEMBER(m72_state::mcu_data_w)
+void m72_state::mcu_data_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | uint32_t(data));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | u32(data));
 }
 
-READ8_MEMBER(m72_state::mcu_data_r)
+u8 m72_state::mcu_data_r(offs_t offset)
 {
 	return (m_dpram->right_r(offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
-READ8_MEMBER(m72_state::mcu_sample_r)
+u8 m72_state::mcu_sample_r()
 {
-	uint8_t sample;
-	sample = memregion("samples")->base()[m_mcu_sample_addr++];
+	const u8 sample = m_samples_region[m_mcu_sample_addr];
+	if (!machine().side_effects_disabled())
+		m_mcu_sample_addr++;
 	return sample;
 }
 
-WRITE8_MEMBER(m72_state::mcu_port1_w)
+void m72_state::mcu_port1_w(u8 data)
 {
 	m_mcu_sample_latch = data;
 
@@ -355,19 +356,19 @@ WRITE8_MEMBER(m72_state::mcu_port1_w)
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(m72_state::mcu_low_w)
+void m72_state::mcu_low_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
-	logerror("low: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
+	logerror("low: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-WRITE8_MEMBER(m72_state::mcu_high_w)
+void m72_state::mcu_high_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
-	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
+	logerror("high: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-READ8_MEMBER(m72_state::snd_cpu_sample_r)
+u8 m72_state::snd_cpu_sample_r()
 {
 	return m_mcu_sample_latch;
 }
@@ -377,11 +378,6 @@ void m72_state::init_m72_8751()
 	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
 
-	/* sound cpu */
-	address_space &sndio = m_soundcpu->space(AS_IO);
-	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_byte_interface::data_w),(dac_byte_interface *)m_dac));
-	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
-
 	/* lohtb2 */
 #if 0
 	/* running the mcu at twice the speed, the following
@@ -390,7 +386,7 @@ void m72_state::init_m72_8751()
 	 * prefetching on the V30.
 	 */
 	{
-		uint8_t *rom=memregion("mcu")->base();
+		u8 *rom=memregion("mcu")->base();
 
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
@@ -430,17 +426,16 @@ the NMI handler in the other games.
 #if 0
 int m72_state::find_sample(int num)
 {
-	uint8_t *rom = memregion("samples")->base();
-	int len = memregion("samples")->bytes();
+	int len = m_samples_region.length();
 	int addr = 0;
 
 	while (num--)
 	{
 		/* find end of sample */
-		while (addr < len &&  rom[addr]) addr++;
+		while (addr < len &&  m_samples_region[addr]) addr++;
 
 		/* skip 0 filler between samples */
-		while (addr < len && !rom[addr]) addr++;
+		while (addr < len && !m_samples_region[addr]) addr++;
 	}
 
 	return addr;
@@ -552,7 +547,7 @@ running, but they have not been derived from the real 8751 code.
 #define CRC_LEN 18
 
 /* Battle Chopper / Mr. Heli */
-static const uint8_t bchopper_code[CODE_LEN] =
+static const u8 bchopper_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -572,11 +567,11 @@ static const uint8_t bchopper_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x68,0x01,0x40,0x00    // jmp  0040:$0168
 };
-static const uint8_t bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
+static const u8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
 												0x54,0x91,0x94,0xeb, 0x00,0x00 };
 
 /* Ninja Spirit */
-static const uint8_t nspirit_code[CODE_LEN] =
+static const u8 nspirit_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -595,10 +590,10 @@ static const uint8_t nspirit_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
 };
-static const uint8_t nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
+static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
 /* Image Fight */
-static const uint8_t imgfight_code[CODE_LEN] =
+static const u8 imgfight_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -623,11 +618,11 @@ static const uint8_t imgfight_code[CODE_LEN] =
 };
 
 // these are for the japan set where we have the mcu anyway...
-static const uint8_t imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
+static const u8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
 												0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 /* Legend of Hero Tonma */
-static const uint8_t loht_code[CODE_LEN] =
+static const u8 loht_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -645,21 +640,21 @@ static const uint8_t loht_code[CODE_LEN] =
 	0xea,0x5d,0x01,0x40,0x00    // jmp  0040:$015d
 
 };
-static const uint8_t loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
+static const u8 loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
 												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
 
 
 
 /* Dragon Breed */
-static const uint8_t dbreedm72_code[CODE_LEN] =
+static const u8 dbreedm72_code[CODE_LEN] =
 {
 	0xea,0x6c,0x00,0x00,0x00    // jmp  0000:$006c
 };
-static const uint8_t dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
+static const u8 dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
 /* Air Duel */
-static const uint8_t airduelm72_code[CODE_LEN] =
+static const u8 airduelm72_code[CODE_LEN] =
 {
 	0x68,0x00,0xd0,             // push 0d000h
 	0x1f,                       // pop ds
@@ -669,20 +664,20 @@ static const uint8_t airduelm72_code[CODE_LEN] =
 	0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
 	0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
 };
-static const uint8_t airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
+static const u8 airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
 												0x00,0x00 };
 
 /* Daiku no Gensan */
-static const uint8_t dkgenm72_code[CODE_LEN] =
+static const u8 dkgenm72_code[CODE_LEN] =
 {
 	0xea,0x3d,0x00,0x00,0x10    // jmp  1000:$003d
 };
-static const uint8_t dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
+static const u8 dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
 
-void m72_state::copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes)
+void m72_state::copy_le(u16 *dest, const u8 *src, u8 bytes)
 {
 	int i;
 
@@ -707,9 +702,9 @@ WRITE16_MEMBER(m72_state::protection_w)
 		copy_le(&m_protection_ram[0x0fe0],m_protection_crc,CRC_LEN);
 }
 
-void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *crc)
+void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 {
-	m_protection_ram = std::make_unique<uint16_t[]>(0x1000/2);
+	m_protection_ram = std::make_unique<u16[]>(0x1000/2);
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
@@ -746,7 +741,7 @@ void m72_state::init_loht()
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
-	memset(m_videoram2,0,0x4000);
+	memset(m_videoram[1],0,0x4000);
 }
 
 
@@ -774,28 +769,64 @@ void m72_state::init_gallop()
 }
 
 
-
-
-
-
-READ16_MEMBER(m72_state::soundram_r)
+template<unsigned N>
+u16 m72_state::palette_r(offs_t offset)
 {
-	return m_soundram[offset * 2 + 0] | (m_soundram[offset * 2 + 1] << 8);
+	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
+	offset &= ~0x100;
+
+	return m_paletteram[N][offset] | 0xffe0;    /* only D0-D4 are connected */
 }
 
-WRITE16_MEMBER(m72_state::soundram_w)
+inline void m72_state::changecolor(offs_t color, u8 r, u8 g, u8 b)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundram[offset * 2 + 0] = data;
-	if (ACCESSING_BITS_8_15)
-		m_soundram[offset * 2 + 1] = data >> 8;
+	m_palette->set_pen_color(color,pal5bit(r),pal5bit(g),pal5bit(b));
+}
+
+template<unsigned N>
+void m72_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
+	offset &= ~0x100;
+
+	COMBINE_DATA(&m_paletteram[N][offset]);
+	offset &= 0x0ff;
+	changecolor(offset + (N << 8),
+			m_paletteram[N][offset + 0x000],
+			m_paletteram[N][offset + 0x200],
+			m_paletteram[N][offset + 0x400]);
+}
+
+template<unsigned N>
+void m72_state::scrollx_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_screen->update_partial(m_screen->vpos());
+	COMBINE_DATA(&m_scrollx[N]);
+}
+
+template<unsigned N>
+void m72_state::scrolly_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_screen->update_partial(m_screen->vpos());
+	COMBINE_DATA(&m_scrolly[N]);
+}
+
+
+u8 m72_state::soundram_r(offs_t offset)
+{
+	return m_soundram[offset];
+}
+
+void m72_state::soundram_w(offs_t offset, u8 data)
+{
+	m_soundram[offset] = data;
 }
 
 void m72_state::m72_cpu1_common_map(address_map &map)
 {
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
 	map(0xe0000, 0xeffff).rw(FUNC(m72_state::soundram_r), FUNC(m72_state::soundram_w));
@@ -842,8 +873,8 @@ void m72_state::m81_cpu1_common_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
 	map(0xffff0, 0xfffff).rom();
@@ -872,7 +903,7 @@ void m72_state::m84_cpu1_common_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xb0000, 0xb0001).w(FUNC(m72_state::irq_line_w));
 	map(0xb4000, 0xb4001).nopw();  /* ??? */
-	map(0xbc000, 0xbc001).w(FUNC(m72_state::dmaon_w));
+	map(0xbc000, 0xbc000).w(FUNC(m72_state::dmaon_w));
 	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
 	map(0xe0000, 0xe3fff).ram();   /* work RAM */
@@ -884,8 +915,8 @@ void m72_state::rtype2_map(address_map &map)
 	m84_cpu1_common_map(map);
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xd8000, 0xd8bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xd8000, 0xd8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 }
 
 void m72_state::hharryu_map(address_map &map)
@@ -893,8 +924,8 @@ void m72_state::hharryu_map(address_map &map)
 	m84_cpu1_common_map(map);
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 }
 
 void m72_state::kengo_map(address_map &map)
@@ -902,8 +933,8 @@ void m72_state::kengo_map(address_map &map)
 	m84_cpu1_common_map(map);
 	map(0x80000, 0x83fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0x84000, 0x87fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 }
 
 
@@ -911,16 +942,16 @@ void m72_state::m82_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0xa0000, 0xa03ff).ram().share("majtitle_rowscr");
-	map(0xa4000, 0xa4bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xa4000, 0xa4bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 	map(0xac000, 0xaffff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xb0000, 0xbffff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");  /* larger than the other games */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
 	map(0xc8000, 0xc83ff).ram().share("spriteram2");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
 	map(0xd0000, 0xd3fff).ram();   /* work RAM */
 	map(0xe0000, 0xe0001).w(FUNC(m72_state::irq_line_w));
 	map(0xe4000, 0xe4001).writeonly(); /* playfield enable? 1 during screen transitions, 0 otherwise */
-	map(0xec000, 0xec001).w(FUNC(m72_state::dmaon_w));
+	map(0xec000, 0xec000).w(FUNC(m72_state::dmaon_w));
 	map(0xffff0, 0xfffff).rom();
 }
 
@@ -934,13 +965,13 @@ void m72_state::m72_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::port02_w)); /* coin counters, reset sound cpu, other stuff? */
-	map(0x04, 0x05).w(FUNC(m72_state::dmaon_w));
+	map(0x04, 0x04).w(FUNC(m72_state::dmaon_w));
 	map(0x06, 0x07).w(FUNC(m72_state::irq_line_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 }
 
@@ -958,10 +989,10 @@ void m72_state::m84_portmap(address_map &map)
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
 void m72_state::m84_v33_portmap(address_map &map)
@@ -971,10 +1002,10 @@ void m72_state::m84_v33_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 //  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
 }
 
@@ -988,10 +1019,10 @@ void m72_state::poundfor_portmap(address_map &map)
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::poundfor_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
 void m72_state::m82_portmap(address_map &map)
@@ -1002,10 +1033,10 @@ void m72_state::m82_portmap(address_map &map)
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 
 	// these ports control the tilemap sizes, rowscroll etc. that m82 has, exact bit usage not known (maybe one for each layer?)
 	map(0x8c, 0x8d).w(FUNC(m72_state::m82_tm_ctrl_w));
@@ -1019,13 +1050,13 @@ void m72_state::m81_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));  /* coin counters, reset sound cpu, other stuff? */
-	map(0x04, 0x05).w(FUNC(m72_state::dmaon_w));
+	map(0x04, 0x04).w(FUNC(m72_state::dmaon_w));
 	map(0x06, 0x07).w(FUNC(m72_state::irq_line_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
 
@@ -1051,12 +1082,18 @@ void m72_state::rtype_sound_portmap(address_map &map)
 
 void m72_state::sound_portmap(address_map &map)
 {
+	rtype_sound_portmap(map);
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x02, 0x02).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
+}
+
+void m72_state::sound_protected_portmap(address_map &map)
+{
+	rtype_sound_portmap(map);
+	map.global_mask(0xff);
+	map(0x82, 0x82).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x84, 0x84).r(FUNC(m72_state::snd_cpu_sample_r));
 }
 
 void m72_state::rtype2_sound_portmap(address_map &map)
@@ -1848,6 +1885,8 @@ void m72_state::m72_base(machine_config &config)
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
 	PALETTE(config, m_palette).set_entries(512);
 
@@ -1865,7 +1904,7 @@ void m72_state::m72(machine_config &config)
 {
 	m72_base(config);
 	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
-	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(32000000/8/512));
+	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));
 	/* IRQs are generated by main Z80 and YM2151 */
 }
 
@@ -1874,6 +1913,8 @@ void m72_state::m72_8751(machine_config &config)
 	m72_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m72_protected_map);
 	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_protected_portmap);
+
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_protected_portmap);
 
 	MB8421_MB8431_16BIT(config, m_dpram);
 	//m_dpram->intl_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w)); // not actually used?
@@ -1916,7 +1957,7 @@ void m72_state::m72_xmultipl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::xmultiplm72_map);
 
 	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(32000000/8/512));
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
 	/* IRQs are generated by main Z80 and YM2151 */
 }
 
@@ -1926,7 +1967,7 @@ void m72_state::m72_dbreed(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedm72_map);
 
 	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(32000000/8/512));
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
 	/* IRQs are generated by main Z80 and YM2151 */
 }
 
@@ -1944,7 +1985,7 @@ void m72_state::m81_hharry(machine_config &config)
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(128*55));
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharry)
 
@@ -1980,13 +2021,15 @@ void m72_state::rtype2(machine_config &config)
 	Z80(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(128*55)); /* clocked by V1? (Vigilante) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/lUszf9Ong7U) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	PIC8259(config, m_upd71059c, 0);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
@@ -2023,7 +2066,7 @@ void m72_state::cosmccop(machine_config &config)
 	Z80(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(128*55)); /* clocked by V1? (Vigilante) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/Sol2Yq2S5hQ) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MCFG_MACHINE_START_OVERRIDE(m72_state,kengo)
@@ -2032,6 +2075,8 @@ void m72_state::cosmccop(machine_config &config)
 	// upd71059c isn't needed because the V35 has its own IRQ controller
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
@@ -2067,16 +2112,19 @@ void m72_state::m82(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m82_map);
 	m_maincpu->set_addrmap(AS_IO, &m72_state::m82_portmap);
 	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
+
 	Z80(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(128*55)); /* clocked by V1? (Vigilante) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/lLQDPe-8Ha0) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	PIC8259(config, m_upd71059c, 0);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_majtitle);
 	PALETTE(config, m_palette).set_entries(512);
 
@@ -2106,7 +2154,7 @@ void m72_state::poundfor(machine_config &config)
 	Z80(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::poundfor_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(128*55));   /* clocked by V1? (Vigilante) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));   /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	PIC8259(config, m_upd71059c, 0);
@@ -2121,6 +2169,8 @@ void m72_state::poundfor(machine_config &config)
 	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
