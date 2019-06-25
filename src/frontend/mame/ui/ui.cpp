@@ -515,7 +515,7 @@ float mame_ui_manager::get_string_width(const char *s, float text_size)
 
 void mame_ui_manager::draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
-	draw_outlined_box(container, x0, y0, x1, y1, options().border_color(), backcolor);
+	draw_outlined_box(container, x0, y0, x1, y1, colors().border_color(), backcolor);
 }
 
 
