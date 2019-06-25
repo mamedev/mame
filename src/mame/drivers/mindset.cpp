@@ -280,6 +280,24 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		if(large_pixels) {
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
+				case 0: {
+					const u16 *src = m_vram;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest = &bitmap.pix32(2*y+field);
+						for(u32 x=0; x<320; x+=4) {
+							u16 sv = *src++;
+							*dest++ = m_palette[(sv >>  4) & 15];
+							*dest++ = m_palette[(sv >>  4) & 15];
+							*dest++ = m_palette[(sv >>  0) & 15];
+							*dest++ = m_palette[(sv >>  0) & 15];
+							*dest++ = m_palette[(sv >> 12) & 15];
+							*dest++ = m_palette[(sv >> 12) & 15];
+							*dest++ = m_palette[(sv >>  8) & 15];
+							*dest++ = m_palette[(sv >>  8) & 15];
+						}
+					}
+					return 0;
+				}
 				case 1: {
 					static int palind[4] = { 0, 1, 4, 5 };
 					const u16 *src = m_vram;
@@ -504,7 +522,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 		// Weird, does one with target bbe8:0000 which blows everything up
 		if(dst_seg != 0xbbe8) {
 			u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
-			for(u16 w=0; w != width; w++) {
+			for(u16 w=0; w != width/2; w++) {
 				m_gcos->write_word((dst_seg << 4) + dst_adr, src);
 				dst_adr += 2;
 			}
