@@ -25,11 +25,13 @@ protected:
 	required_device<i8749_device> m_kbdcpu;
 	required_device<screen_device> m_screen;
 	required_device<i8272a_device> m_fdc;
+	required_device<floppy_connector> m_fdco[2];
 	required_shared_ptr<u16> m_vram;
 	required_ioport_array<11> m_kbd_row;
 
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcos;
 
+	floppy_image_device *m_floppy[2];
 	u32 m_palette[16];
 	bool m_genlock[16];
 	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
@@ -104,6 +106,7 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_kbdcpu(*this, "kbdcpu"),
 	m_screen(*this, "screen"),
 	m_fdc(*this, "fdc"),
+	m_fdco{{*this, "fdc:0"}, {*this, "fdc:1"}},
 	m_vram(*this, "vram"),
 	m_kbd_row(*this, "K%02u", 0U)
 {
@@ -112,6 +115,8 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 void mindset_state::machine_start()
 {
 	m_gcos = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
+	for(int i=0; i<2; i++)
+		m_floppy[i] = m_fdco[i]->get_device();
 }
 
 void mindset_state::machine_reset()
@@ -669,8 +674,8 @@ void mindset_state::fdc_ctrl_w(u8 data)
 	logerror("fdc control %02x\n", data);
 	if(data & 0x04)
 		m_fdc->reset();
-	subdevice<floppy_connector>(":fdc:0")->get_device()->mon_w(false);
-	subdevice<floppy_connector>(":fdc:1")->get_device()->mon_w(false);
+	m_floppy[data & 1]->mon_w(!(data & 2));
+	m_floppy[(data & 1)^1]->mon_w(true);
 }
 
 void mindset_state::fdc_int_w(int state)
@@ -782,8 +787,8 @@ void mindset_state::mindset(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mindset_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	m_fdc->set_ready_line_connected(false);
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "525dd", mindset_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "525dd", mindset_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
 }
 
 static INPUT_PORTS_START(mindset)
