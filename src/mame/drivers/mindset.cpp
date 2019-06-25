@@ -273,100 +273,37 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 	bool large_pixels = m_dispctrl & 0x0100;
 
-	int field = screen.frame_number() & 1;
-
 	switch(mode_type) {
 	case 0: // Native mode
 		if(large_pixels) {
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
 				case 0: {
-					const u16 *src = m_vram;
-					for(u32 y=0; y<200; y++) {
-						u32 *dest = &bitmap.pix32(2*y+field);
-						for(u32 x=0; x<320; x+=4) {
-							u16 sv = *src++;
-							*dest++ = m_palette[(sv >>  4) & 15];
-							*dest++ = m_palette[(sv >>  4) & 15];
-							*dest++ = m_palette[(sv >>  0) & 15];
-							*dest++ = m_palette[(sv >>  0) & 15];
-							*dest++ = m_palette[(sv >> 12) & 15];
-							*dest++ = m_palette[(sv >> 12) & 15];
-							*dest++ = m_palette[(sv >>  8) & 15];
-							*dest++ = m_palette[(sv >>  8) & 15];
+					for(int field=0; field<2; field++) {
+						const u16 *src = m_vram;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
+							for(u32 x=0; x<320; x+=4) {
+								u16 sv = *src++;
+								*dest++ = m_palette[(sv >>  4) & 15];
+								*dest++ = m_palette[(sv >>  4) & 15];
+								*dest++ = m_palette[(sv >>  0) & 15];
+								*dest++ = m_palette[(sv >>  0) & 15];
+								*dest++ = m_palette[(sv >> 12) & 15];
+								*dest++ = m_palette[(sv >> 12) & 15];
+								*dest++ = m_palette[(sv >>  8) & 15];
+								*dest++ = m_palette[(sv >>  8) & 15];
+							}
 						}
 					}
 					return 0;
 				}
 				case 1: {
 					static int palind[4] = { 0, 1, 4, 5 };
-					const u16 *src = m_vram;
-					for(u32 y=0; y<200; y++) {
-						u32 *dest = &bitmap.pix32(2*y+field);
-						for(u32 x=0; x<320; x+=8) {
-							u16 sv = *src++;
-							*dest++ = m_palette[palind[(sv >>  6) & 3]];
-							*dest++ = m_palette[palind[(sv >>  6) & 3]];
-							*dest++ = m_palette[palind[(sv >>  4) & 3]];
-							*dest++ = m_palette[palind[(sv >>  4) & 3]];
-							*dest++ = m_palette[palind[(sv >>  2) & 3]];
-							*dest++ = m_palette[palind[(sv >>  2) & 3]];
-							*dest++ = m_palette[palind[(sv >>  0) & 3]];
-							*dest++ = m_palette[palind[(sv >>  0) & 3]];
-							*dest++ = m_palette[palind[(sv >> 14) & 3]];
-							*dest++ = m_palette[palind[(sv >> 14) & 3]];
-							*dest++ = m_palette[palind[(sv >> 12) & 3]];
-							*dest++ = m_palette[palind[(sv >> 12) & 3]];
-							*dest++ = m_palette[palind[(sv >> 10) & 3]];
-							*dest++ = m_palette[palind[(sv >> 10) & 3]];
-							*dest++ = m_palette[palind[(sv >>  8) & 3]];
-							*dest++ = m_palette[palind[(sv >>  8) & 3]];
-						}
-					}
-					return 0;
-				}
-				}
-			}
-		} else {
-			if(!interleave) {
-				switch(pixels_per_byte_order) {
-				case 0: {
-					static int palind[4] = { 0, 1, 4, 5 };
-					m_palette[1] = 0xffffff;
-					const u16 *src = m_vram;
-					for(u32 y=0; y<200; y++) {
-						u32 *dest = &bitmap.pix32(2*y+field);
-						for(u32 x=0; x<640; x+=8) {
-							u16 sv = *src++;
-							*dest++ = m_palette[palind[(sv >>  6) & 3]];
-							*dest++ = m_palette[palind[(sv >>  4) & 3]];
-							*dest++ = m_palette[palind[(sv >>  2) & 3]];
-							*dest++ = m_palette[palind[(sv >>  0) & 3]];
-							*dest++ = m_palette[palind[(sv >> 14) & 3]];
-							*dest++ = m_palette[palind[(sv >> 12) & 3]];
-							*dest++ = m_palette[palind[(sv >> 10) & 3]];
-							*dest++ = m_palette[palind[(sv >>  8) & 3]];
-						}
-					}
-					return 0;
-				}
-				}
-			}
-		}
-
-		logerror("Unimplemented native mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
-		break;
-
-	case 1: // IBM-compatible graphics mode
-		if(large_pixels) {
-			if(!interleave) {
-				switch(pixels_per_byte_order) {
-				case 1: {
-					static int palind[4] = { 0, 1, 4, 5 };
-					for(u32 yy=0; yy<2; yy++) {
-						const u16 *src = m_vram + 4096*yy;
-						for(u32 y=yy; y<200; y+=2) {
-							u32 *dest = &bitmap.pix32(2*y+1);
+					for(int field=0; field<2; field++) {
+						const u16 *src = m_vram;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
 							for(u32 x=0; x<320; x+=8) {
 								u16 sv = *src++;
 								*dest++ = m_palette[palind[(sv >>  6) & 3]];
@@ -392,6 +329,75 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				}
 				}
 			}
+		} else {
+			if(!interleave) {
+				switch(pixels_per_byte_order) {
+				case 0: {
+					static int palind[4] = { 0, 1, 4, 5 };
+					for(int field=0; field<2; field++) {
+						m_palette[1] = 0xffffff;
+						const u16 *src = m_vram;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
+							for(u32 x=0; x<640; x+=8) {
+								u16 sv = *src++;
+								*dest++ = m_palette[palind[(sv >>  6) & 3]];
+								*dest++ = m_palette[palind[(sv >>  4) & 3]];
+								*dest++ = m_palette[palind[(sv >>  2) & 3]];
+								*dest++ = m_palette[palind[(sv >>  0) & 3]];
+								*dest++ = m_palette[palind[(sv >> 14) & 3]];
+								*dest++ = m_palette[palind[(sv >> 12) & 3]];
+								*dest++ = m_palette[palind[(sv >> 10) & 3]];
+								*dest++ = m_palette[palind[(sv >>  8) & 3]];
+							}
+						}
+					}
+					return 0;
+				}
+				}
+			}
+		}
+
+		logerror("Unimplemented native mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
+		break;
+
+	case 1: // IBM-compatible graphics mode
+		if(large_pixels) {
+			if(!interleave) {
+				switch(pixels_per_byte_order) {
+				case 1: {
+					static int palind[4] = { 0, 1, 4, 5 };
+					for(int field=0; field<2; field++) {
+						for(u32 yy=0; yy<2; yy++) {
+							const u16 *src = m_vram + 4096*yy;
+							for(u32 y=yy; y<200; y+=2) {
+								u32 *dest = &bitmap.pix32(2*y+1);
+								for(u32 x=0; x<320; x+=8) {
+									u16 sv = *src++;
+									*dest++ = m_palette[palind[(sv >>  6) & 3]];
+									*dest++ = m_palette[palind[(sv >>  6) & 3]];
+									*dest++ = m_palette[palind[(sv >>  4) & 3]];
+									*dest++ = m_palette[palind[(sv >>  4) & 3]];
+									*dest++ = m_palette[palind[(sv >>  2) & 3]];
+									*dest++ = m_palette[palind[(sv >>  2) & 3]];
+									*dest++ = m_palette[palind[(sv >>  0) & 3]];
+									*dest++ = m_palette[palind[(sv >>  0) & 3]];
+									*dest++ = m_palette[palind[(sv >> 14) & 3]];
+									*dest++ = m_palette[palind[(sv >> 14) & 3]];
+									*dest++ = m_palette[palind[(sv >> 12) & 3]];
+									*dest++ = m_palette[palind[(sv >> 12) & 3]];
+									*dest++ = m_palette[palind[(sv >> 10) & 3]];
+									*dest++ = m_palette[palind[(sv >> 10) & 3]];
+									*dest++ = m_palette[palind[(sv >>  8) & 3]];
+									*dest++ = m_palette[palind[(sv >>  8) & 3]];
+								}
+							}
+						}
+					}
+					return 0;
+				}
+				}
+			}
 		}
 
 		logerror("Unimplemented ibm-compatible graphics mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
@@ -400,17 +406,38 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	case 2: // IBM-compatible character mode
 		if(large_pixels) {
 			if(!interleave) {
-				for(u32 y=0; y<25; y++) {
-					for(u32 x=0; x<40; x++) {
-						u16 val = m_vram[y*40+x];
-						const u16 *src = m_vram + 0x1000 + ((val >> 1) & 0x7f);
-						for(u32 yy=0; yy<8; yy++) {
-							u8 pix = val & 1 ? *src >> 8 : *src;
-							src += 128;
-							u32 *dest = &bitmap.pix32(16*y+2*yy+field, 16*x);
-							for(u32 xx=0; xx<8; xx++) {
-								*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];
-								*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];
+				for(int field=0; field<2; field++) {
+					for(u32 y=0; y<25; y++) {
+						for(u32 x=0; x<40; x++) {
+							u16 val = m_vram[y*40+x];
+							const u16 *src = m_vram + 0x1000 + ((val >> 1) & 0x7f);
+							for(u32 yy=0; yy<8; yy++) {
+								u8 pix = val & 1 ? *src >> 8 : *src;
+								src += 128;
+								u32 *dest = &bitmap.pix32(16*y+2*yy+field, 16*x);
+								for(u32 xx=0; xx<8; xx++) {
+									*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];
+									*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];
+								}
+							}
+						}
+					}
+				}
+				return 0;
+			}
+		} else {
+			if(!interleave) {
+				for(int field=0; field<2; field++) {
+					for(u32 y=0; y<25; y++) {
+						for(u32 x=0; x<80; x++) {
+							u16 val = m_vram[y*80+x];
+							const u16 *src = m_vram + 0x1000 + ((val >> 1) & 0x7f);
+							for(u32 yy=0; yy<8; yy++) {
+								u8 pix = val & 1 ? *src >> 8 : *src;
+								src += 128;
+								u32 *dest = &bitmap.pix32(16*y+2*yy+field, 8*x);
+								for(u32 xx=0; xx<8; xx++)
+									*dest++ = pix & (0x80 >> xx) ? m_palette[4] : m_palette[0];
 							}
 						}
 					}
@@ -547,6 +574,10 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 		mwmask &= awmask;
 		ewmask &= awmask;
 
+		bool preload = dst_sft > src_sft;
+		int src_do_sft = 15 - src_sft;
+		int dst_do_sft = (preload ? 31 : 15) - dst_sft;
+
 		u16 nw = ((width + (15 - dst_sft)) + 15) >> 4;
 
 		for(u32 y=0; y<height; y++) {
@@ -555,12 +586,15 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 			u16 cmask = swmask;
 			u16 nw1 = nw;
-			u32 srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-			if(mode & 0x100)
-				src_cadr += 2;
+			u32 srcs = 0;
+			if(preload) {
+				srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr)) << src_do_sft;
+				if(mode & 0x100)
+					src_cadr += 2;
+			}
 			do {
-				srcs = (srcs << 16) | sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-				u16 src = (srcs >> (src_sft + 1)) & rmask;
+				srcs = (srcs << 16) | (sw(m_gcos->read_word((src_seg << 4) + src_cadr)) << src_do_sft);
+				u16 src = (srcs >> dst_do_sft) & rmask;
 				u16 dst = sw(m_gcos->read_word((dst_seg << 4) + dst_cadr));
 				u16 res = blend(src, dst);
 				if(mode & 0x40) {

@@ -1212,6 +1212,31 @@ ROM_START( dwex )
 	ROM_LOAD( "ex_m0400.u1",  0x400000, 0x200000, CRC(42d54fd5) SHA1(ad915b514aa6cae6f72dea78e6208f40b08ceac0) )
 ROM_END
 
+ROM_START( dwex101cn )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_BYTE( "ex_v101cn.u12",     0x100001, 0x080000, CRC(4f951f42) SHA1(830a943ce34c63ce418f60d913fae333377a9704) )
+	ROM_LOAD16_BYTE( "ex_v101cn.u13",     0x100000, 0x080000, CRC(66172511) SHA1(eb1a6fc9c22f04fcca0395a4b5c2972438c60a78) )
+
+	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
+	ROM_LOAD( "ex_data.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+
+	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "ex_t0400.u18", 0x180000, 0x200000, CRC(9ecc950d) SHA1(fd97f43818a3eb18254636166871fa09bd0d6c07) )
+
+	ROM_REGION( 0x1800000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "ex_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) )
+	ROM_LOAD( "ex_a0401.u10",    0x0400000, 0x200000, CRC(d36c06a4) SHA1(f192e8bfdfbe3d82a49d8f0d3cb0603e39719773) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "ex_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "ex_m0400.u1",  0x400000, 0x200000, CRC(42d54fd5) SHA1(ad915b514aa6cae6f72dea78e6208f40b08ceac0) )
+ROM_END
+
 
 ROM_START( kov )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -4829,7 +4854,8 @@ GAME( 1998, drgw3105,     drgw3,     pgm_022_025_dw3,       dw3,       pgm_022_0
 GAME( 1998, drgw3103,     drgw3,     pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 103)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japan only, has an extra game mode option!
 GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw3,       dw3j,      pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1998, dwex,         pgm,       pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 2000, dwex,         pgm,       pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 2001, dwex101cn,    dwex,      pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX (ver. 101CN)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
 //超級比一比/Chāojí bǐ yī bǐ (Taiwan)
 //大家来找碴/Dàjiā lái zhǎo chá/Daai6gaa1 Loi4 Zaau2 Caa4 (China, Hong Kong)
