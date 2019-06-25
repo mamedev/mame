@@ -21,15 +21,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// number of levels of frameskipping supported
-constexpr int FRAMESKIP_LEVELS = 12;
-constexpr int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -38,6 +29,7 @@ constexpr int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 class video_manager
 {
 	friend class screen_device;
+	friend class frame_manager;
 
 public:
 	// movie format options
@@ -52,16 +44,13 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	bool skip_this_frame() const { return m_skipping_this_frame; }
 	int speed_factor() const { return m_speed; }
-	int frameskip() const { return m_auto_frameskip ? -1 : m_frameskip_level; }
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
 	bool is_recording() const;
 
 	// setters
-	void set_frameskip(int frameskip);
 	void set_throttled(bool throttled = true) { m_throttled = throttled; }
 	void set_throttle_rate(float throttle_rate) { m_throttle_rate = throttle_rate; }
 	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
@@ -73,10 +62,6 @@ public:
 	void toggle_record_mng() { toggle_record_movie(MF_MNG); }
 	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
-
-	// single stepping
-	void single_step();
-	bool is_single_stepping() const { return m_single_step; }
 
 	// render a frame
 	void frame_update(bool from_debugger = false);
@@ -126,7 +111,6 @@ private:
 	bool finish_screen_updates();
 	void update_throttle(attotime emutime);
 	osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
-	void update_frameskip();
 	void update_refresh_speed();
 	void recompute_speed(const attotime &emutime);
 
@@ -165,18 +149,6 @@ private:
 	u32                 m_seconds_to_run;           // number of seconds to run before quitting
 	bool                m_auto_frameskip;           // flag: true if we're automatically frameskipping
 	u32                 m_speed;                    // overall speed (*1000)
-
-	// frameskipping
-	u8                  m_empty_skip_count;         // number of empty frames we have skipped
-	u8                  m_frameskip_level;          // current frameskip level
-	u8                  m_frameskip_counter;        // counter that counts through the frameskip steps
-	s8                  m_frameskip_adjust;
-	bool                m_skipping_this_frame;      // flag: true if we are skipping the current frame
-	osd_ticks_t         m_average_oversleep;        // average number of ticks the OSD oversleeps
-
-	// single stepping
-	bool                m_single_step;				// are we currently single stepping?
-
 
 	// snapshot stuff
 	render_target *     m_snap_target;              // screen shapshot target
@@ -217,8 +189,6 @@ private:
 		u32                 m_avi_frame;                // current movie frame number
 	};
 	std::vector<avi_info_t> m_avis;
-
-	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;

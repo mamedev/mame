@@ -176,6 +176,7 @@ public:
 	input_manager &input() const { assert(m_input != nullptr); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
 	video_manager &video() const { assert(m_video != nullptr); return *m_video; }
+	frame_manager &frame() const { assert(m_frame != nullptr); return *m_frame; }
 	network_manager &network() const { assert(m_network != nullptr); return *m_network; }
 	bookkeeping_manager &bookkeeping() const { assert(m_network != nullptr); return *m_bookkeeping; }
 	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
@@ -320,6 +321,7 @@ private:
 	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
 	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
+	std::unique_ptr<frame_manager> m_frame;            // internal data from frame.cpp
 	ui_manager *m_ui;                                  // internal data from ui.cpp
 	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp

@@ -734,7 +734,7 @@ void namcos22_state::register_normals(int addr, float m[4][4])
 
 void namcos22_state::draw_direct_poly(const u16 *src)
 {
-	if (machine().video().skip_this_frame())
+	if (machine().frame().skip_this_frame())
 		return;
 
 	int polys_enabled = m_is_ss22 ? nthbyte(m_mixer, 0x1f) & 1 : 1;
@@ -1446,7 +1446,7 @@ WRITE_LINE_MEMBER(namcos22_state::screen_vblank)
 		// still need to determine active state if frame was skipped
 		if (m_skipped_this_frame)
 			render_frame_active();
-		m_skipped_this_frame = machine().video().skip_this_frame();
+		m_skipped_this_frame = machine().frame().skip_this_frame();
 	}
 }
 

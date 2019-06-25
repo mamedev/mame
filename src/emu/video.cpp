@@ -32,29 +32,6 @@
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// frameskipping tables
-const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
-{
-	{ false, false, false, false, false, false, false, false, false, false, false, false },
-	{ false, false, false, false, false, false, false, false, false, false, false, true  },
-	{ false, false, false, false, false, true , false, false, false, false, false, true  },
-	{ false, false, false, true , false, false, false, true , false, false, false, true  },
-	{ false, false, true , false, false, true , false, false, true , false, false, true  },
-	{ false, true , false, false, true , false, true , false, false, true , false, true  },
-	{ false, true , false, true , false, true , false, true , false, true , false, true  },
-	{ false, true , false, true , true , false, true , false, true , true , false, true  },
-	{ false, true , true , false, true , true , false, true , true , false, true , true  },
-	{ false, true , true , true , false, true , true , true , false, true , true , true  },
-	{ false, true , true , true , true , true , false, true , true , true , true , true  },
-	{ false, true , true , true , true , true , true , true , true , true , true , true  }
-};
-
-
-
-//**************************************************************************
 //  VIDEO MANAGER
 //**************************************************************************
 
@@ -91,13 +68,6 @@ video_manager::video_manager(running_machine &machine)
 	, m_seconds_to_run(machine.options().seconds_to_run())
 	, m_auto_frameskip(machine.options().auto_frameskip())
 	, m_speed(original_speed_setting())
-	, m_empty_skip_count(0)
-	, m_frameskip_level(machine.options().frameskip())
-	, m_frameskip_counter(0)
-	, m_frameskip_adjust(0)
-	, m_skipping_this_frame(false)
-	, m_average_oversleep(0)
-	, m_single_step(false)
 	, m_snap_target(nullptr)
 	, m_snap_native(true)
 	, m_snap_width(0)
@@ -193,29 +163,6 @@ video_manager::video_manager(running_machine &machine)
 
 
 //-------------------------------------------------
-//  set_frameskip - set the current actual
-//  frameskip (-1 means autoframeskip)
-//-------------------------------------------------
-
-void video_manager::set_frameskip(int frameskip)
-{
-	// -1 means autoframeskip
-	if (frameskip == -1)
-	{
-		m_auto_frameskip = true;
-		m_frameskip_level = 0;
-	}
-
-	// any other level is a direct control
-	else if (frameskip >= 0 && frameskip <= MAX_FRAMESKIP)
-	{
-		m_auto_frameskip = false;
-		m_frameskip_level = frameskip;
-	}
-}
-
-
-//-------------------------------------------------
 //  frame_update - handle frameskipping and UI,
 //  plus updating the screen during normal
 //  operations
@@ -223,28 +170,7 @@ void video_manager::set_frameskip(int frameskip)
 
 void video_manager::frame_update(bool from_debugger)
 {
-	// only render sound and video if we're in the running phase
-	machine_phase const phase = machine().phase();
-	bool skipped_it = m_skipping_this_frame;
-	if (phase == machine_phase::RUNNING && (!machine().paused() || machine().options().update_in_pause()))
-	{
-		bool anything_changed = finish_screen_updates();
-
-		// if none of the screens changed and we haven't skipped too many frames in a row,
-		// mark this frame as skipped to prevent throttling; this helps for games that
-		// don't update their screen at the monitor refresh rate
-		if (!anything_changed && !m_auto_frameskip && m_frameskip_level == 0 && m_empty_skip_count++ < 3)
-			skipped_it = true;
-		else
-			m_empty_skip_count = 0;
-	}
-
-	// if we're single-stepping, pause now
-	if (m_single_step)
-	{
-		machine().pause();
-		m_single_step = false;
-	}
+	bool skipped_it = machine().frame().frame_update();
 
 	// draw the user interface
 	emulator_info::draw_user_interface(machine());
@@ -267,14 +193,14 @@ void video_manager::frame_update(bool from_debugger)
 
 	// update frameskipping
 	if (!from_debugger)
-		update_frameskip();
+		machine().frame().update_frameskip();
 
 	// update speed computations
 	if (!from_debugger && !skipped_it)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
-	if (phase == machine_phase::RUNNING)
+	if (machine().phase() == machine_phase::RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
 		screen_device *const screen = screen_device_iterator(machine().root_device()).first();
@@ -784,14 +710,14 @@ bool video_manager::is_recording() const
 //  forward
 //-------------------------------------------------
 
-inline bool video_manager::effective_autoframeskip() const
+bool video_manager::effective_autoframeskip() const
 {
 	// if we're fast forwarding or paused, autoframeskip is disabled
 	if (m_fastforward || machine().paused())
 		return false;
 
 	// otherwise, it's up to the user
-	return m_auto_frameskip;
+	return machine().frame().auto_frameskip();
 }
 
 
@@ -801,14 +727,14 @@ inline bool video_manager::effective_autoframeskip() const
 //  forward
 //-------------------------------------------------
 
-inline int video_manager::effective_frameskip() const
+int video_manager::effective_frameskip() const
 {
 	// if we're fast forwarding, use the maximum frameskip
 	if (m_fastforward)
 		return FRAMESKIP_LEVELS - 1;
 
 	// otherwise, it's up to the user
-	return m_frameskip_level;
+	return machine().frame().frameskip_level();
 }
 
 
@@ -818,7 +744,7 @@ inline int video_manager::effective_frameskip() const
 //  forward and user interface
 //-------------------------------------------------
 
-inline bool video_manager::effective_throttle() const
+bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
 	if (machine().paused()) //|| machine().ui().is_menu_active())
@@ -1057,10 +983,12 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	osd_ticks_t current_ticks = osd_ticks();
 	while (current_ticks < target_ticks)
 	{
+		osd_ticks_t average_oversleep = machine().frame().average_oversleep();
+
 		// compute how much time to sleep for, taking into account the average oversleep
 		osd_ticks_t delta = target_ticks - current_ticks;
-		if (delta > m_average_oversleep / 1000)
-			delta -= m_average_oversleep / 1000;
+		if (delta > average_oversleep / 1000)
+			delta -= average_oversleep / 1000;
 		else
 			delta = 0;
 
@@ -1081,10 +1009,10 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 			{
 				// take 99% of the previous average plus 1% of the new value
 				osd_ticks_t const oversleep_milliticks = 1000 * (actual_ticks - delta);
-				m_average_oversleep = (m_average_oversleep * 99 + oversleep_milliticks) / 100;
+				machine().frame().set_average_oversleep((average_oversleep * 99 + oversleep_milliticks) / 100);
 
 				if (LOG_THROTTLE)
-					machine().logerror("Slept for %d ticks, got %d ticks, avgover = %d\n", (int)delta, (int)actual_ticks, (int)m_average_oversleep);
+					machine().logerror("Slept for %d ticks, got %d ticks, avgover = %d\n", (int)delta, (int)actual_ticks, (int)machine().frame().average_oversleep());
 			}
 		}
 		current_ticks = new_ticks;
@@ -1092,59 +1020,6 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	g_profiler.stop();
 
 	return current_ticks;
-}
-
-
-//-------------------------------------------------
-//  update_frameskip - update frameskipping
-//  counters and periodically update autoframeskip
-//-------------------------------------------------
-
-void video_manager::update_frameskip()
-{
-	// if we're throttling and autoframeskip is on, adjust
-	if (effective_throttle() && effective_autoframeskip() && m_frameskip_counter == 0)
-	{
-		// calibrate the "adjusted speed" based on the target
-		double adjusted_speed_percent = m_speed_percent / (double) m_throttle_rate;
-
-		// if we're too fast, attempt to increase the frameskip
-		double speed = m_speed * 0.001;
-		if (adjusted_speed_percent >= 0.995 * speed)
-		{
-			// but only after 3 consecutive frames where we are too fast
-			if (++m_frameskip_adjust >= 3)
-			{
-				m_frameskip_adjust = 0;
-				if (m_frameskip_level > 0)
-					m_frameskip_level--;
-			}
-		}
-
-		// if we're too slow, attempt to increase the frameskip
-		else
-		{
-			// if below 80% speed, be more aggressive
-			if (adjusted_speed_percent < 0.80 *  speed)
-				m_frameskip_adjust -= (0.90 * speed - m_speed_percent) / 0.05;
-
-			// if we're close, only force it up to frameskip 8
-			else if (m_frameskip_level < 8)
-				m_frameskip_adjust--;
-
-			// perform the adjustment
-			while (m_frameskip_adjust <= -2)
-			{
-				m_frameskip_adjust += 2;
-				if (m_frameskip_level < MAX_FRAMESKIP)
-					m_frameskip_level++;
-			}
-		}
-	}
-
-	// increment the frameskip counter and determine if we will skip the next frame
-	m_frameskip_counter = (m_frameskip_counter + 1) % FRAMESKIP_LEVELS;
-	m_skipping_this_frame = s_skiptable[effective_frameskip()][m_frameskip_counter];
 }
 
 
@@ -1576,16 +1451,4 @@ void video_manager::end_recording(movie_format format)
 			osd_printf_error("Unknown movie format: %d\n", format);
 			break;
 	}
-}
-
-
-//-------------------------------------------------
-//  single_step
-//-------------------------------------------------
-
-void video_manager::single_step()
-{
-	machine().rewind_capture();
-	m_single_step = true;
-	machine().resume();
 }

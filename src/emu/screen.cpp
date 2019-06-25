@@ -1044,7 +1044,7 @@ bool screen_device::update_partial(int scanline)
 	if (!(m_video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		// if skipping this frame, bail
-		if (machine().video().skip_this_frame())
+		if (machine().frame().skip_this_frame())
 		{
 			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
 			return false;
@@ -1121,7 +1121,7 @@ void screen_device::update_now()
 	if (!(m_video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		// if skipping this frame, bail
-		if (machine().video().skip_this_frame())
+		if (machine().frame().skip_this_frame())
 		{
 			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
 			return;
@@ -1523,7 +1523,7 @@ bool screen_device::update_quads()
 		if (m_type != SCREEN_TYPE_VECTOR && (m_video_attributes & VIDEO_SELF_RENDER) == 0)
 		{
 			// if we're not skipping the frame and if the screen actually changed, then update the texture
-			if (!machine().video().skip_this_frame() && m_changed)
+			if (!machine().frame().skip_this_frame() && m_changed)
 			{
 				m_texture[m_curbitmap]->set_bitmap(m_bitmap[m_curbitmap], m_visarea, m_bitmap[m_curbitmap].texformat());
 				m_curtexture = m_curbitmap;

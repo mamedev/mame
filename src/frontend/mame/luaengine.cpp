@@ -779,7 +779,7 @@ void lua_engine::initialize()
 	emu["pause"] = [this](){ return machine().pause(); };
 	emu["unpause"] = [this](){ return machine().resume(); };
 	emu["step"] = [this]() {
-			machine().video().single_step();
+			machine().frame().step_single_frame();
 		};
 	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
@@ -1192,6 +1192,7 @@ void lua_engine::initialize()
  *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
+ * machine:frame() - get frame_manager
  * machine:render() - get render_manager
  * machine:ioport() - get ioport_manager
  * machine:parameters() - get parameter_manager
@@ -1217,6 +1218,7 @@ void lua_engine::initialize()
 			"load", &running_machine::schedule_load,
 			"system", &running_machine::system,
 			"video", &running_machine::video,
+			"frame", &running_machine::frame,
 			"render", &running_machine::render,
 			"ioport", &running_machine::ioport,
 			"parameters", &running_machine::parameters,
@@ -1815,12 +1817,10 @@ void lua_engine::initialize()
  * video:end_recording() - stop AVI recording
  * video:is_recording() - get recording status
  * video:snapshot() - save shot of all screens
- * video:skip_this_frame() - is current frame going to be skipped
  * video:speed_factor() - get speed factor
  * video:speed_percent() - get percent from realtime
  * video:frame_update()
  *
- * video.frameskip - current frameskip
  * video.throttled - throttle state
  * video.throttle_rate - throttle rate
  */
@@ -1843,13 +1843,23 @@ void lua_engine::initialize()
 				},
 			"snapshot", &video_manager::save_active_screen_snapshots,
 			"is_recording", &video_manager::is_recording,
-			"skip_this_frame", &video_manager::skip_this_frame,
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
 			"frame_update", &video_manager::frame_update,
-			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
+
+/*  frame_manager library
+ *
+ * manager:machine():frame()
+ *
+ * frame:skip_this_frame() - is current frame going to be skipped
+ *
+ * frame.frameskip - current frameskip
+ */
+	sol().registry().new_usertype<frame_manager>("frame", "new", sol::no_constructor,
+			"skip_this_frame", &frame_manager::skip_this_frame,
+			"frameskip", sol::property(&frame_manager::frameskip, &frame_manager::set_frameskip));
 
 
 /*  input_manager library

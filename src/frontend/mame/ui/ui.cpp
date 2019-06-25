@@ -394,7 +394,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	container.empty();
 
 	// if we're paused, dim the whole screen
-	if (machine().phase() >= machine_phase::RESET && (machine().video().is_single_stepping() || machine().paused()))
+	if (machine().phase() >= machine_phase::RESET && (machine().frame().is_single_stepping() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
 		if (ui::menu::stack_has_special_main_menu(machine()))
@@ -862,10 +862,10 @@ void mame_ui_manager::process_natural_keyboard()
 void mame_ui_manager::increase_frameskip()
 {
 	// get the current value and increment it
-	int newframeskip = machine().video().frameskip() + 1;
+	int newframeskip = machine().frame().frameskip() + 1;
 	if (newframeskip > MAX_FRAMESKIP)
 		newframeskip = -1;
-	machine().video().set_frameskip(newframeskip);
+	machine().frame().set_frameskip(newframeskip);
 
 	// display the FPS counter for 2 seconds
 	show_fps_temp(2.0);
@@ -879,10 +879,10 @@ void mame_ui_manager::increase_frameskip()
 void mame_ui_manager::decrease_frameskip()
 {
 	// get the current value and decrement it
-	int newframeskip = machine().video().frameskip() - 1;
+	int newframeskip = machine().frame().frameskip() - 1;
 	if (newframeskip < -1)
 		newframeskip = MAX_FRAMESKIP;
-	machine().video().set_frameskip(newframeskip);
+	machine().frame().set_frameskip(newframeskip);
 
 	// display the FPS counter for 2 seconds
 	show_fps_temp(2.0);
@@ -1191,7 +1191,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// pause single step
 	if (machine().ui_input().pressed(IPT_UI_PAUSE_SINGLE))
-		machine().video().single_step();
+		machine().frame().step_single_frame();
 
 	// rewind single step
 	if (machine().ui_input().pressed(IPT_UI_REWIND_SINGLE))
