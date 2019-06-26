@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mc_dma_done_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi0_int_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi1_int_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_int_w);
 
 	void raise_local_irq(int channel, uint8_t mask);
 	void lower_local_irq(int channel, uint8_t mask);
