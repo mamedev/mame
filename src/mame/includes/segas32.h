@@ -32,6 +32,7 @@ public:
 	void init_dbzvrvs(void);
 	void init_f1en(void);
 	void init_f1lap(void);
+	void init_f1lapt(void);
 	void init_ga2(void);
 	void init_harddunk(void);
 	void init_holo(void);
