@@ -710,6 +710,7 @@ MACHINES["AIC6250"] = true
 MACHINES["DC7085"] = true
 MACHINES["I82357"] = true
 MACHINES["XC1700E"] = true
+MACHINES["EDLC"] = true
 
 --------------------------------------------------
 -- specify available bus cores
