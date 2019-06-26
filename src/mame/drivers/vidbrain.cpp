@@ -314,7 +314,7 @@ WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 {
 	if (state)
 	{
-		m_smi->ext_int_w(0);
+		m_smi->ext_int_w(1);
 	}
 }
 
@@ -362,7 +362,7 @@ READ8_MEMBER(vidbrain_state::memory_read_byte)
 void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_uv->ext_int_w(0);
-	m_smi->ext_int_w(1);
+	m_smi->ext_int_w(0);
 }
 
 

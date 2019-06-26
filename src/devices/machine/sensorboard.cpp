@@ -51,7 +51,6 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_custom_spawn_cb(*this),
 	m_custom_output_cb(*this)
 {
-	memset(m_inistate, 0, ARRAY_LENGTH(m_inistate));
 	m_magnets = false;
 	m_inductive = false;
 	m_ui_enabled = 3;
@@ -71,7 +70,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 void sensorboard_device::device_start()
 {
 	// resolve handlers
-	m_custom_init_cb.resolve_safe(0);
+	m_custom_init_cb.resolve_safe();
 	m_custom_sensor_cb.resolve_safe(0);
 	m_custom_spawn_cb.resolve();
 	m_custom_output_cb.resolve();
@@ -83,9 +82,8 @@ void sensorboard_device::device_start()
 		m_out_count.resolve();
 	}
 
-	// custom init (meant for setting m_inistate)
-	m_custom_init_cb();
-	memcpy(m_curstate, m_inistate, m_height * m_width);
+	clear_board();
+	m_custom_init_cb(1);
 	memcpy(m_history[0], m_curstate, m_height * m_width);
 
 	for (int i = 0; i < m_maxspawn; i++)
@@ -128,7 +126,6 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_ui_enabled));
 
 	save_item(NAME(m_curstate));
-	save_item(NAME(m_inistate));
 	save_item(NAME(m_history));
 
 	save_item(NAME(m_uselect));
@@ -139,7 +136,7 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_sensordelay));
 }
 
-int sensorboard_device::preset_chess()
+void sensorboard_device::preset_chess(int state)
 {
 	// set chessboard start position
 
@@ -150,23 +147,21 @@ int sensorboard_device::preset_chess()
 	// 5 = white queen    11 = black queen
 	// 6 = white king     12 = black king
 
-	write_init(0, 0, 4);
-	write_init(7, 0, 4);
-	write_init(1, 0, 2);
-	write_init(6, 0, 2);
-	write_init(2, 0, 3);
-	write_init(5, 0, 3);
-	write_init(3, 0, 5);
-	write_init(4, 0, 6);
+	write_piece(0, 0, 4);
+	write_piece(7, 0, 4);
+	write_piece(1, 0, 2);
+	write_piece(6, 0, 2);
+	write_piece(2, 0, 3);
+	write_piece(5, 0, 3);
+	write_piece(3, 0, 5);
+	write_piece(4, 0, 6);
 
 	for (int x = 0; x < 8; x++)
 	{
-		write_init(x, 1, 1);
-		write_init(x, 6, 7);
-		write_init(x, 7, read_init(x, 0) + 6);
+		write_piece(x, 1, 1);
+		write_piece(x, 6, 7);
+		write_piece(x, 7, read_piece(x, 0) + 6);
 	}
-
-	return 1;
 
 	// note that for inductive boards, 2 additional callbacks are needed:
 	// additional init_cb() for reassigning the piece ids for initial board state
@@ -177,6 +172,9 @@ void sensorboard_device::device_reset()
 {
 	cancel_sensor();
 	cancel_hand();
+
+	clear_board();
+	m_custom_init_cb(0);
 	refresh();
 }
 
@@ -416,7 +414,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 		return;
 
 	u8 pos = (u8)(uintptr_t)param;
-	if (pos >= m_maxspawn)
+	if (pos > m_maxspawn)
 		return;
 
 	cancel_sensor();
@@ -506,16 +504,14 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 	if (!newval)
 		return;
 
-	u8 select = (u8)(uintptr_t)param;
+	u8 init = (u8)(uintptr_t)param;
 	cancel_sensor();
 	cancel_hand();
 
-	// clear board
-	memset(m_curstate, 0, m_height * m_width);
+	clear_board();
 
-	// reset to initial position
-	if (select)
-		memcpy(m_curstate, m_inistate, m_height * m_width);
+	if (init)
+		m_custom_init_cb(0);
 
 	refresh();
 }

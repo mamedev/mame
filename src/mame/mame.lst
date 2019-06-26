@@ -30964,6 +30964,9 @@ ccmk2                           // Chess Champion MK II
 nocto                           //
 npresto                         //
 
+@source:novag_savant.cpp
+savant                          //
+
 @source:novag_scon.cpp
 supercon                        //
 
