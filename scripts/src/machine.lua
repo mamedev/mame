@@ -4079,3 +4079,15 @@ if (MACHINES["XC1700E"]~=null) then
 		MAME_DIR .. "src/devices/machine/xc1700e.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/edlc.h,MACHINES["EDLC"] = true
+---------------------------------------------------
+
+if (MACHINES["EDLC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/edlc.cpp",
+		MAME_DIR .. "src/devices/machine/edlc.h",
+	}
+end

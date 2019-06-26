@@ -32386,7 +32386,8 @@ photoy2k104                     //
 puzlstar                        // (c) 1999 Puzzle Star
 puzzli2                         // (c) 1999 Puzzli 2
 puzzli2s                        // (c) 2001 Puzzli 2 Super
-py2k2                           // (c) 2001 Photo Y2K2
+py2k2                           // (c) 2001 Photo Y2K2 (M101XX)
+py2k2100                        // (c) 2000 Photo Y2K2 (ver. 100)
 svg                             // (c) 2003 Spectral vs Generation
 svgpcb                          //
 svgtw                           //
@@ -34955,6 +34956,7 @@ f1enj                           // 1991.11 F-1 Exhaust Note (Japan)
 f1enu                           // 1992.01 F-1 Exhaust Note (US)
 f1lap                           // 1993.?? F-1 Super Lap (World)
 f1lapj                          // 1993.09 F-1 Super Lap (Japan)
+f1lapt                          // 1993.?? F-1 Super Lap (World) - Factory Unprotected
 ga2                             // 1992.?? Golden Axe II (World)
 ga2j                            // 1992.10 Golden Axe Death Adder no Fukusyuu (Japan)
 ga2u                            // 1992.09 Golden Axe II (US)

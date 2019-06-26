@@ -49,7 +49,7 @@ dpb7000_brush_store_card_device::dpb7000_brush_store_card_device(const machine_c
 
 ROM_START( dpb7000_brush_store )
 	ROM_REGION(0x100, "pal", 0)
-	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(12345678) SHA1(1234567812345678123456781234567812345678))
+	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(84bf7029) SHA1(9d58322994f6f7e99a9c6478577559c8171670ed))
 ROM_END
 
 const tiny_rom_entry *dpb7000_brush_store_card_device::device_rom_region() const

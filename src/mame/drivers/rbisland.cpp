@@ -747,11 +747,11 @@ ROM_START( rbisland )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, CRC(08c588a6) SHA1(7e38342be68d37f7106df069dd2021c509be1244) )
+	ROM_LOAD( "cchip_b22-15.53", 0x0000, 0x2000, CRC(08c588a6) SHA1(7e38342be68d37f7106df069dd2021c509be1244) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
-	ROM_CONTINUE(                     0x10000, 0xc000 )
+	ROM_LOAD( "b22-14.43", 0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
+	ROM_CONTINUE(          0x10000, 0xc000 )
 
 	ROM_REGION( 0x80000, "pc080sn", 0 )
 	ROM_LOAD16_WORD_SWAP( "b22-01.2", 0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )  /* tiles */
@@ -772,11 +772,11 @@ ROM_START( rbislando )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, CRC(08c588a6) SHA1(7e38342be68d37f7106df069dd2021c509be1244) )
+	ROM_LOAD( "cchip_b22-15.53", 0x0000, 0x2000, CRC(08c588a6) SHA1(7e38342be68d37f7106df069dd2021c509be1244) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
-	ROM_CONTINUE(                     0x10000, 0xc000 )
+	ROM_LOAD( "b22-14.43", 0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
+	ROM_CONTINUE(          0x10000, 0xc000 )
 
 	ROM_REGION( 0x80000, "pc080sn", 0 )
 	ROM_LOAD16_WORD_SWAP( "b22-01.2", 0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )  /* tiles */
@@ -797,16 +797,11 @@ ROM_START( rbislande )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	/* This is handcrafted using data changes from the old simulation code and a lookup table to swizzle the world numbers
-	   There are calls at 01BF / 01E1 that also read the world number, but appear to expect it to not get swizzled so
-	   these have not been patched.  This should match the old simulation, but will possibly not 100% match hardware
-	   behavior and is definitely not the structure the real ROM would have, so is marked as BAD_DUMP.
-	*/
-	ROM_LOAD( "fake_cchip_b39-05.53",            0x0000, 0x2000, BAD_DUMP CRC(935d805a) SHA1(e8b68be266db11542763fade49e53f46463f9462) )
+	ROM_LOAD( "cchip_b39-05.53", 0x0000, 0x2000, CRC(397735e3) SHA1(86e78dbe7930f826dc8fce0ba56f5e79216df852) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
-	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
-	ROM_CONTINUE(                     0x10000, 0xc000 )
+	ROM_LOAD( "b22-14.43", 0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
+	ROM_CONTINUE(          0x10000, 0xc000 )
 
 	ROM_REGION( 0x80000, "pc080sn", 0 )
 	ROM_LOAD16_WORD_SWAP( "b22-01.2", 0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )  /* tiles */

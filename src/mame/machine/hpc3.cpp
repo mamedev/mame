@@ -40,6 +40,15 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 		{"PIO channel 9", ENDIANNESS_LITTLE, 16, 8, -1}}
 	, m_gio64_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_hal2(*this, finder_base::DUMMY_TAG)
+	, m_enet_rd_cb(*this)
+	, m_enet_wr_cb(*this)
+	, m_enet_rxrd_cb(*this)
+	, m_enet_txwr_cb(*this)
+	, m_enet_d8_rd_cb(*this)
+	, m_enet_d8_wr_cb(*this)
+	, m_enet_reset_cb(*this)
+	, m_enet_loopback_cb(*this)
+	, m_enet_intr_out_cb(*this)
 	, m_hd_rd_cb{{*this}, {*this}}
 	, m_hd_wr_cb{{*this}, {*this}}
 	, m_hd_dma_rd_cb{{*this}, {*this}}
@@ -74,6 +83,15 @@ device_memory_interface::space_config_vector hpc3_device::memory_space_config() 
 
 void hpc3_device::device_resolve_objects()
 {
+	m_enet_rd_cb.resolve();
+	m_enet_wr_cb.resolve_safe();
+	m_enet_rxrd_cb.resolve_safe(0);
+	m_enet_txwr_cb.resolve_safe();
+	m_enet_d8_rd_cb.resolve_safe(0);
+	m_enet_d8_wr_cb.resolve_safe();
+	m_enet_reset_cb.resolve_safe();
+	m_enet_loopback_cb.resolve_safe();
+	m_enet_intr_out_cb.resolve_safe();
 	for (int index = 0; index < 2; index++)
 	{
 		m_hd_rd_cb[index].resolve();
@@ -556,6 +574,31 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), data, mem_mask);
 		break;
 	}
+}
+
+WRITE_LINE_MEMBER(hpc3_device::enet_txrdy_w)
+{
+	// TODO
+}
+
+WRITE_LINE_MEMBER(hpc3_device::enet_rxrdy_w)
+{
+	// TODO
+}
+
+WRITE_LINE_MEMBER(hpc3_device::enet_rxdc_w)
+{
+	// TODO
+}
+
+WRITE_LINE_MEMBER(hpc3_device::enet_txret_w)
+{
+	// TODO
+}
+
+WRITE_LINE_MEMBER(hpc3_device::enet_intr_in_w)
+{
+	// TODO
 }
 
 template<hpc3_device::fifo_type_t Type>
