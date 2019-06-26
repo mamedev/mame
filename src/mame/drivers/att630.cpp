@@ -17,6 +17,7 @@ public:
 	att630_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_vram(*this, "vram")
 	{ }
 
 	void att630(machine_config &config);
@@ -27,22 +28,31 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u16> m_vram;
 };
 
 u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	for (int y = 0; y < 1024; y++)
+		for (int x = 0; x < 1024; x++)
+			bitmap.pix32(y, x) = BIT(m_vram[y * (1024 / 16) + x / 16], 15 - (x % 16)) ? rgb_t::white() : rgb_t::black();
+
 	return 0;
 }
 
 void att630_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x040000, 0x0fffff).noprw(); // additional space for rom
+	map(0x100000, 0x1fffff).noprw(); // cartridge space
 	map(0x200000, 0x20001f).rw("duart1", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x200020, 0x20003f).rw("duart2", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
-	map(0x760000, 0x77ffff).ram();
-	map(0x780000, 0x7bffff).ram();
-	map(0x7c0000, 0x7fffff).ram();
-	map(0xe00000, 0xe03fff).noprw(); // 0x00ff mask
+	map(0x400000, 0x6fffff).noprw(); // expansion i/o card
+//	map(0x700000, 0x75ffff).noprw(); // video controller
+	map(0x760000, 0x77ffff).ram().share("vram");
+	map(0x780000, 0x7fffff).ram(); // program ram
+	map(0xe00000, 0xe03fff).noprw(); // 0x00ff mask (bram)
+	map(0xfee000, 0xffffff).noprw(); // nvram (size unknown)
 }
 
 static INPUT_PORTS_START( att630 )
@@ -58,9 +68,11 @@ void att630_state::att630(machine_config &config)
 	screen.set_raw(87.18336_MHz_XTAL, 1376, 0, 1024, 1056, 0, 1024);
 	screen.set_screen_update(FUNC(att630_state::screen_update));
 
-	SCN2681(config, "duart1", 3.6864_MHz_XTAL);
+	scn2681_device &duart1(SCN2681(config, "duart1", 3.6864_MHz_XTAL));
+	duart1.irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	SCN2681(config, "duart2", 3.6864_MHz_XTAL);
+	scn2681_device &duart2(SCN2681(config, "duart2", 3.6864_MHz_XTAL));
+	duart2.irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 }
 
 
