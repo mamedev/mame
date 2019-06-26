@@ -5089,12 +5089,8 @@ GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,     pstar,     pgm_arm_t
 //超級比一比2/Chāojí bǐ yī bǐ 2 (Taiwan)
 //大家来找碴2/Dàjiā lái zhǎo chá 2/Daai6gaa1 Loi4 Zaau2 Caa4 2 (China, Hong Kong)
 //リアルアンドフェイク 2 Photo Y2K/Riaruandofeiku(Real and Fake) 2 Photo Y2K (Japan)
-<<<<<<< HEAD
-GAME( 2001, py2k2,        pgm,       pgm_arm_type1_sim,     py2k2,     pgm_arm_type1_state,  init_py2k2,    ROT0,   "IGS", "Photo Y2K 2 / Chaoji Bi Yi Bi 2 / Dajia Lai Zhao Cha 2 / Real and Fake 2 Photo Y2K (M101XX 05/25/01 11:02:54)", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
-=======
 GAME( 2001, py2k2,        pgm,       pgm_arm_type1_sim,     py2k2,     pgm_arm_type1_state,  init_py2k2,    ROT0,   "IGS", "Photo Y2K 2 / Chaoji Bi Yi Bi 2 / Dajia Lai Zhao Cha 2 / Real and Fake 2 Photo Y2K (M101XX 05/25/01 11:02:54)", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
 GAME( 2000, py2k2100,     py2k2,     pgm_arm_type1_sim,     py2k2,     pgm_arm_type1_state,  init_py2k2,    ROT0,   "IGS", "Photo Y2K 2 / Chaoji Bi Yi Bi 2 / Dajia Lai Zhao Cha 2 / Real and Fake 2 Photo Y2K (ver. 100, Japanese Board)", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
->>>>>>> 952b2d2de4da444f8b1906ebecb86e246f1b0ce2
 
 //閃亮三合一/Shǎn liàng sān hé yī (Taiwan, Hong Kong, Oversea)
 //闪亮三合一/Shǎn liàng sān hé yī (China)
