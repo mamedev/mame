@@ -41,7 +41,7 @@ keypad legend:
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
+#include "video/pwm.h"
 #include "sound/beep.h"
 #include "speaker.h"
 #include "bus/generic/slot.h"
@@ -61,13 +61,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
-		m_delay_update(*this, "delay_update"),
-		m_delay_display(*this, "delay_display_%u", 0),
-		m_keypad(*this, "IN.%u", 0),
+		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
 		m_cart(*this, "cartslot"),
-		m_out_digit(*this, "digit%u", 0U),
-		m_out_led(*this, "led%u", 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine configs
@@ -82,24 +79,17 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
-	required_device<timer_device> m_delay_update;
-	required_device_array<timer_device, 6> m_delay_display;
-	required_ioport_array<2> m_keypad;
+	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
-	output_finder<4> m_out_digit;
-	output_finder<2> m_out_led;
+	required_ioport_array<2> m_inputs;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
 	// display stuff
 	void update_display();
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_update) { update_display(); }
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
-
 	u8 m_digit_data;
 	u8 m_led_select;
-	u8 m_led_active;
 
 	// address maps
 	void main_map(address_map &map);
@@ -113,19 +103,13 @@ private:
 
 void intel02_state::machine_start()
 {
-	// resolve handlers
-	m_out_led.resolve();
-	m_out_digit.resolve();
-
 	// zerofill
 	m_digit_data = 0;
 	m_led_select = 0;
-	m_led_active = 0;
 
 	// register for savestates
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_led_select));
-	save_item(NAME(m_led_active));
 }
 
 INPUT_CHANGED_MEMBER(intel02_state::reset_button)
@@ -154,42 +138,21 @@ DEVICE_IMAGE_LOAD_MEMBER(intel02_state, cartridge)
 }
 
 
-// misc display handling
+// I8255 PPI
 
 void intel02_state::update_display()
 {
-	// latch digits (low 4 bits of led select)
-	for (int i = 0; i < 4; i++)
-	{
-		if (BIT(m_led_select, i))
-			m_out_digit[i] = m_digit_data;
-		else if (!BIT(m_led_active, i))
-			m_out_digit[i] = 0;
-	}
-
-	// led select d4: lose led, d5: win led
-	m_out_led[0] = BIT(m_led_active, 4);
-	m_out_led[1] = BIT(m_led_active, 5);
+	m_display->matrix(m_led_select, m_digit_data);
 }
-
-TIMER_DEVICE_CALLBACK_MEMBER(intel02_state::delay_display)
-{
-	u8 mask = 1 << param;
-	m_led_active = (m_led_active & ~mask) | (m_led_select & mask);
-	update_display();
-}
-
-
-// I8255 PPI
 
 READ8_MEMBER(intel02_state::input_r)
 {
 	// d0-d3: buttons through a maze of logic gates
 	// basically giving each button its own 4-bit scancode
-	u8 data = count_leading_zeros(m_keypad[0]->read()) - 17;
+	u8 data = count_leading_zeros(m_inputs[0]->read()) - 17;
 
 	// d4: Vcc, d5-d7: buttons (direct)
-	return data | (~m_keypad[1]->read() << 4 & 0xf0);
+	return data | (~m_inputs[1]->read() << 4 & 0xf0);
 }
 
 WRITE8_MEMBER(intel02_state::digit_w)
@@ -202,21 +165,8 @@ WRITE8_MEMBER(intel02_state::digit_w)
 WRITE8_MEMBER(intel02_state::control_w)
 {
 	// d0-d5: select digit/leds
-	for (int i = 0; i < 6; i++)
-	{
-		if (BIT(data, i))
-			m_led_active |= 1 << i;
-
-		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
-		else if (BIT(m_led_select, i))
-			m_delay_display[i]->adjust(attotime::from_msec(25), i);
-	}
-
 	m_led_select = data;
-
-	// don't update display immediately
-	if (!m_delay_update->enabled())
-		m_delay_update->adjust(attotime::from_usec(15));
+	update_display();
 
 	// d6: N/C (it's a delay timer on CC3)
 
@@ -295,10 +245,8 @@ void intel02_state::intel02(machine_config &config)
 	m_ppi8255->tri_pc_callback().set_constant(0x80);
 
 	/* video hardware */
-	TIMER(config, m_delay_update).configure_generic(FUNC(intel02_state::delay_update));
-	for (int i = 0; i < 6; i++)
-		TIMER(config, m_delay_display[i]).configure_generic(FUNC(intel02_state::delay_display));
-
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_intellect02);
 
 	/* sound hardware */
