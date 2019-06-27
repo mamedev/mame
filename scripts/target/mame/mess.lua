@@ -599,6 +599,7 @@ MACHINES["SCC2698B"] = true
 MACHINES["SCUDSP"] = true
 MACHINES["SECFLASH"] = true
 MACHINES["SEIBU_COP"] = true
+MACHINES["SENSORBOARD"] = true
 --MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SMIOC"] = true
@@ -1051,6 +1052,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"at",
 		"atari",
 		"att",
+		"ave",
 		"bally",
 		"bandai",
 		"banctec",
@@ -1713,6 +1715,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/unixpc.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "ave")
+files {
+	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "bally")
 files {
 	MAME_DIR .. "src/mame/drivers/astrohome.cpp",
@@ -1885,7 +1892,6 @@ createMESSProjects(_target, _subtarget, "chess")
 files {
 	MAME_DIR .. "src/mame/machine/chessbase.cpp",
 	MAME_DIR .. "src/mame/includes/chessbase.h",
-	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
 
 	MAME_DIR .. "src/mame/machine/fidelbase.cpp",
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
