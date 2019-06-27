@@ -77,6 +77,10 @@ extern int mouseLX;
 extern int mouseLY;
 extern int mouseBUT[4];
 
+extern int lightgunX;
+extern int lightgunY;
+extern int lightgunBUT[4];
+
 extern unsigned short retrokbd_state[RETROK_LAST];
 
 extern char mediaType[10];

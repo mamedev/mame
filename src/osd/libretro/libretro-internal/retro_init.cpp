@@ -343,6 +343,8 @@ static void Set_Default_Option(void)
       Add_Option("-mouse");
    else
       Add_Option("-nomouse");
+   printf("yoshi debug: hardcoding lightgun for now! \n");
+   Add_Option("-lightgun");
 
    if(write_config_enable)
       Add_Option("-writeconfig");

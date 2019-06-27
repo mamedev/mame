@@ -44,6 +44,10 @@ extern int mouseLX;
 extern int mouseLY;
 extern int mouseBUT[4];
 
+extern int lightgunX;
+extern int lightgunY;
+extern int lightgunBUT[4];
+
 extern Joystate joystate[4];
 
 extern int fb_width;
