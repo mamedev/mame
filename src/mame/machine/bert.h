@@ -15,6 +15,7 @@ public:
 	bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void map(address_map &map);
+	void set_qlc_mode(bool state);
 
 protected:
 	virtual void device_start() override;
@@ -30,6 +31,8 @@ private:
 	u16 m_control;
 	u16 m_history;
 	u32 m_step;
+	bool m_qlc_mode;
+	u32 m_qlc_src;
 };
 
 DECLARE_DEVICE_TYPE(BERT, bert_device)

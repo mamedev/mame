@@ -25,7 +25,8 @@ void bert_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_history));
 	save_item(NAME(m_step));
-
+	save_item(NAME(m_qlc_mode));
+	save_item(NAME(m_qlc_src));
 	m_memory = m_memory_space->cache<1, 0, ENDIANNESS_BIG>();
 }
 
@@ -34,6 +35,8 @@ void bert_device::device_reset()
 	m_control = 0;
 	m_history = 0;
 	m_step = 0;
+	m_qlc_mode = false;
+	m_qlc_src = 0;
 }
 
 void bert_device::map(address_map &map)
@@ -41,8 +44,18 @@ void bert_device::map(address_map &map)
 	map(0x000000, 0x7fffff).rw(FUNC(bert_device::read), FUNC(bert_device::write));
 }
 
+void bert_device::set_qlc_mode(bool state)
+{
+	m_qlc_mode = state;
+}
+
 u16 bert_device::read(offs_t offset)
 {
+	if(m_qlc_mode) {
+		m_qlc_src = offset << 1;
+		return 0;
+	}
+
 	constexpr u16 type = 0x00ca;
 	u16 data = m_memory->read_word(offset << 1);
 	u16 res;
@@ -66,6 +79,13 @@ u16 bert_device::read(offs_t offset)
 
 void bert_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
+	if(m_qlc_mode) {
+		u32 dest = offset << 1;
+		for(u32 i=0; i<512; i+=2)
+			m_memory->write_word(dest + i, m_memory->read_word(m_qlc_src + i));
+		return;
+	}
+
 	m_step = 0;
 	m_memory->write_word(offset << 1, data, mem_mask);
 	if(!offset) {
