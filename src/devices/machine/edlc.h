@@ -18,8 +18,13 @@ public:
 
 	seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	// host interface
+	// command/status interface
 	void map(address_map &map);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	void reset_w(int state);
+
+	// data interface
 	u8 fifo_r();
 	int rxeof_r();
 	void fifo_w(u8 data);
@@ -33,7 +38,7 @@ protected:
 	// device_network_interface overrides
 	virtual int recv_start_cb(u8 *buf, int length) override;
 
-	// command/status interface
+	// command/status registers
 	template <unsigned N> void station_address_w(u8 data) { m_station_address[N] = data; }
 	u8 rx_status_r();
 	u8 tx_status_r();
@@ -61,7 +66,7 @@ protected:
 		RXS_G = 0x20, // received good frame
 		RXS_O = 0x80, // old/new status
 
-		RXS_M = 0x3f, // mask
+		RXS_M = 0x3f, // interrupt mask
 	};
 	enum rx_command_mask : u8
 	{
@@ -88,7 +93,7 @@ protected:
 		TXS_S = 0x08, // transmission successful
 		TXS_O = 0x80, // old/new status
 
-		TXS_M = 0x0f, // mask
+		TXS_M = 0x0f, // interrupt mask
 	};
 	enum tx_command_mask : u8
 	{
@@ -110,6 +115,7 @@ private:
 	devcb_write_line m_out_txrdy;
 
 	int m_int_state;
+	int m_reset_state;
 	u8 m_station_address[6];
 	u8 m_rx_status;
 	u8 m_tx_status;

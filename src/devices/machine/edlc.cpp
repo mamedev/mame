@@ -5,8 +5,9 @@
  * An emulation of the SEEQ 8003 Ethernet Data Link Controller.
  *
  * This implementation uses transmit/receive fifos which hold entire frames,
- * rather than the 16-byte fifos of the real device to simplify logic. Also,
- * the bidirectional RxTxEOF line is split into separate read/write handlers
+ * rather than the 16-byte fifos of the real device to simplify logic. In
+ * hardware, RxTxEOF is effectively the 9th bit of the data bus, however to
+ * simplify emulation is implemented as two separate read/write line handlers
  * which must be used strictly as follows:
  *
  *   - rxeof_r() must be read before fifo_r()
@@ -52,16 +53,20 @@ void seeq8003_device::device_start()
 	m_out_txrdy.resolve_safe();
 
 	save_item(NAME(m_int_state));
+	save_item(NAME(m_reset_state));
 	save_item(NAME(m_station_address));
 	save_item(NAME(m_rx_status));
 	save_item(NAME(m_tx_status));
 	save_item(NAME(m_rx_command));
 	save_item(NAME(m_tx_command));
+	//save_item(NAME(m_rx_fifo));
+	//save_item(NAME(m_tx_fifo));
 
 	m_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seeq8003_device::transmit), this));
 	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seeq8003_device::interrupt), this));
 
 	m_int_state = 0;
+	m_reset_state = 1;
 }
 
 void seeq8003_device::device_reset()
@@ -75,6 +80,8 @@ void seeq8003_device::device_reset()
 	m_tx_fifo.clear();
 	m_out_rxrdy(0);
 
+	// TODO: deassert RxDC and TxRET
+
 	if (m_dev)
 		m_out_txrdy(1);
 
@@ -84,7 +91,7 @@ void seeq8003_device::device_reset()
 int seeq8003_device::recv_start_cb(u8 *buf, int length)
 {
 	// check receiver disabled
-	if ((m_rx_command & RXC_M) == RXC_M0)
+	if (!m_reset_state || ((m_rx_command & RXC_M) == RXC_M0))
 		return 0;
 
 	if (address_filter(buf))
@@ -112,8 +119,57 @@ void seeq8003_device::map(address_map &map)
 	map(7, 7).rw(FUNC(seeq8003_device::tx_status_r), FUNC(seeq8003_device::tx_command_w));
 }
 
+u8 seeq8003_device::read(offs_t offset)
+{
+	u8 data = 0xff;
+
+	switch (offset)
+	{
+	case 6: data = rx_status_r(); break;
+	case 7: data = tx_status_r(); break;
+	}
+
+	return data;
+}
+
+void seeq8003_device::write(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+	case 0: station_address_w<0>(data); break;
+	case 1: station_address_w<1>(data); break;
+	case 2: station_address_w<2>(data); break;
+	case 3: station_address_w<3>(data); break;
+	case 4: station_address_w<4>(data); break;
+	case 5: station_address_w<5>(data); break;
+	case 6: rx_command_w(data); break;
+	case 7: tx_command_w(data); break;
+	}
+}
+
+void seeq8003_device::reset_w(int state)
+{
+	if (m_reset_state && !state)
+	{
+		// enter reset state
+		m_out_txrdy(0);
+
+		// TODO: assert RxDC and TxRET
+	}
+	else if (!m_reset_state && state)
+	{
+		// leave reset state
+		device_reset();
+	}
+
+	m_reset_state = state;
+}
+
 u8 seeq8003_device::fifo_r()
 {
+	if (!m_reset_state)
+		return 0xff;
+
 	if (m_rx_fifo.empty())
 		fatalerror("seeq8003_device::fifo_r: fifo empty\n");
 
@@ -138,6 +194,9 @@ int seeq8003_device::rxeof_r()
 
 void seeq8003_device::fifo_w(u8 data)
 {
+	if (!m_reset_state)
+		return;
+
 	if (m_tx_fifo.full())
 		fatalerror("seeq8003_device::fifo_w: fifo full\n");
 
@@ -149,7 +208,7 @@ void seeq8003_device::fifo_w(u8 data)
 
 void seeq8003_device::txeof_w(int state)
 {
-	if (state)
+	if (m_reset_state && state)
 	{
 		// disable tx fifo
 		m_out_txrdy(0);
@@ -164,8 +223,11 @@ u8 seeq8003_device::rx_status_r()
 	u8 const data = m_rx_status;
 
 	// clear interrupt
-	m_rx_status |= RXS_O;
-	m_int_timer->adjust(attotime::zero);
+	if (m_reset_state && !machine().side_effects_disabled())
+	{
+		m_rx_status |= RXS_O;
+		m_int_timer->adjust(attotime::zero);
+	}
 
 	return data;
 }
@@ -175,8 +237,11 @@ u8 seeq8003_device::tx_status_r()
 	u8 const data = m_tx_status;
 
 	// clear interrupt
-	m_tx_status |= TXS_O;
-	m_int_timer->adjust(attotime::zero);
+	if (m_reset_state && !machine().side_effects_disabled())
+	{
+		m_tx_status |= TXS_O;
+		m_int_timer->adjust(attotime::zero);
+	}
 
 	return data;
 }

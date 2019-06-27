@@ -338,13 +338,13 @@ void ip24_state::ip24_base(machine_config &config)
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO0, &ip24_state::pio0_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO1, &ip24_state::pio1_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO2, &ip24_state::pio2_map);
-	//m_hpc3->enet_rd_cb().set(m_edlc, FUNC(seeq8003_device::read));
-	//m_hpc3->enet_wr_cb().set(m_edlc, FUNC(seeq8003_device::write));
+	m_hpc3->enet_rd_cb().set(m_edlc, FUNC(seeq8003_device::read));
+	m_hpc3->enet_wr_cb().set(m_edlc, FUNC(seeq8003_device::write));
 	m_hpc3->enet_rxrd_cb().set(m_edlc, FUNC(seeq8003_device::fifo_r));
 	m_hpc3->enet_txwr_cb().set(m_edlc, FUNC(seeq8003_device::fifo_w));
 	m_hpc3->enet_d8_rd_cb().set(m_edlc, FUNC(seeq8003_device::rxeof_r));
 	m_hpc3->enet_d8_wr_cb().set(m_edlc, FUNC(seeq8003_device::txeof_w));
-	//m_hpc3->enet_reset_cb().set(m_edlc, FUNC(seeq8003_device::reset_w));
+	m_hpc3->enet_reset_cb().set(m_edlc, FUNC(seeq8003_device::reset_w));
 	m_hpc3->enet_intr_out_cb().set(m_ioc2, FUNC(ioc2_device::enet_int_w));
 	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
