@@ -18,8 +18,7 @@ The display (both the LCD and the sensors) didn't last long, probably none exist
 anymore in original working order.
 
 TODO:
-- doesn't work, Z80 side stops communicating and gets in an infinite loop
-- hook up inputs
+- get rid of m_wait_in hack when Z80 core accurately emulates WAIT pin
 - internal artwork
 
 ******************************************************************************/
@@ -101,6 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_w);
 	DECLARE_READ8_MEMBER(input_r);
 
+	bool m_wait_in;
 	u8 m_inp_mux;
 	u8 m_databus;
 	u8 m_control;
@@ -110,12 +110,14 @@ private:
 void savant_state::machine_start()
 {
 	// zerofill
+	m_wait_in = false;
 	m_inp_mux = 0;
 	m_databus = 0;
 	m_control = 0;
 	m_lcd_data = 0;
 
 	// register for savestates
+	save_item(NAME(m_wait_in));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_databus));
 	save_item(NAME(m_control));
@@ -136,19 +138,22 @@ READ8_MEMBER(savant_state::nvram_r)
 	return m_nvram[offset] & 0xf;
 }
 
-READ8_MEMBER(savant_state::stall_r)
-{
-	// TODO: seen in disasm
-	return 0;
-}
-
 WRITE8_MEMBER(savant_state::stall_w)
 {
 	// any access to port C0 puts the Z80 into WAIT, sets BUSRQ, and sets MCU EXT INT
-	m_databus = data;
+	m_databus = offset >> 8;
 	m_psu->ext_int_w(1);
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+}
+
+READ8_MEMBER(savant_state::stall_r)
+{
+	m_wait_in = true;
+	stall_w(space, offset, 0);
+
+	// return value is databus (see control_w)
+	return 0;
 }
 
 READ8_MEMBER(savant_state::mcustatus_r)
@@ -191,18 +196,22 @@ READ8_MEMBER(savant_state::control_r)
 WRITE8_MEMBER(savant_state::control_w)
 {
 	// d0: clear EXT INT, clear Z80 WAIT
-	if (~data & m_control & 1)
+	if (data & ~m_control & 1)
 	{
 		m_psu->ext_int_w(0);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+
+		// hack to set Z80 A after IN A,($C0)
+		if (m_wait_in)
+		{
+			m_maincpu->set_state_int(Z80_A, m_databus);
+			m_wait_in = false;
+		}
 	}
 
 	// d1: clear Z80 BUSRQ
-	if (~data & m_control & 2)
-	{
-		//m_maincpu->set_state_int(Z80_A, m_databus);
+	if (data & ~m_control & 2)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, CLEAR_LINE);
-	}
 
 	// d2: return data for Z80
 
@@ -242,14 +251,12 @@ READ8_MEMBER(savant_state::input_r)
 		if (BIT(m_inp_mux, i))
 			data |= m_board->read_rank(i);
 
-	data = bitswap<8>(data,0,1,2,3,7,6,5,4);
-
 	// read keypad
 	for (int i = 0; i < 3; i++)
 		if (BIT(m_control >> 5, i))
 			data |= m_inputs[i]->read();
 
-	return data;
+	return bitswap<8>(data,3,2,1,0,4,5,6,7);
 }
 
 
@@ -267,13 +274,12 @@ void savant_state::main_map(address_map &map)
 
 void savant_state::main_io(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0xc0, 0xc0).mirror(0x38).rw(FUNC(savant_state::stall_r), FUNC(savant_state::stall_w));
-	map(0xc1, 0xc1).mirror(0x38).unmapw(); // clock
-	map(0xc2, 0xc2).mirror(0x38).unmapw(); // printer
-	map(0xc3, 0xc3).mirror(0x38).unmapr(); // printer
-	map(0xc4, 0xc4).mirror(0x38).r(FUNC(savant_state::mcustatus_r));
-	map(0xc5, 0xc5).mirror(0x38).unmapw(); // printer
+	map(0xc0, 0xc0).mirror(0x0038).select(0xff00).rw(FUNC(savant_state::stall_r), FUNC(savant_state::stall_w));
+	map(0xc1, 0xc1).mirror(0xff38).unmapw(); // clock
+	map(0xc2, 0xc2).mirror(0xff38).unmapw(); // printer
+	map(0xc3, 0xc3).mirror(0xff38).unmapr(); // printer
+	map(0xc4, 0xc4).mirror(0xff38).r(FUNC(savant_state::mcustatus_r));
+	map(0xc5, 0xc5).mirror(0xff38).unmapw(); // printer
 }
 
 void savant_state::mcu_map(address_map &map)
@@ -297,34 +303,34 @@ void savant_state::mcu_io(address_map &map)
 
 static INPUT_PORTS_START( savant )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Review")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Print Board")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Sound on/off / Knight")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Solve Mate")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Show Moves")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Form Size")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Best Move / Bishop")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Clear Board")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Trace Forward")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Print List")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Set Rate / Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Classic Game")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Return")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Auto Play")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Mate Alert / Queen")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Change Color")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Trace Back")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Print Moves")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Set Level / Pawn")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("New Game")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Go")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Promote")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Set Up")
 INPUT_PORTS_END
 
 
@@ -385,9 +391,9 @@ void savant_state::savant(machine_config &config)
 
 ROM_START( savant )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD("5605_1f_orange.u13", 0x0000, 0x2000, CRC(1feb8e29) SHA1(1c9a9f6ca7b02ea002ea9dc07b0870b3b0a4cdb9) ) // TMM2364
-	ROM_LOAD("5606_1g_white.u14",  0x2000, 0x2000, CRC(9d95cf14) SHA1(eb29774d05c2f17b54363417297e535b4217e222) ) // "
-	ROM_LOAD("5607_1e_blue.u15",   0x4000, 0x2000, CRC(131fb097) SHA1(2423d369cc9d9c62e6040e7c34941833f7ec7aa0) ) // "
+	ROM_LOAD("5605_1f_orange.u13", 0x0000, 0x2000, CRC(0f24fd37) SHA1(b9426b53623d2a98aa2b3099010a7579b0f51db5) ) // TMM2364
+	ROM_LOAD("5606_1g_white.u14",  0x2000, 0x2000, CRC(e8b2eddd) SHA1(5f148a3c1c2cd099bd19a48d972a01e5e26ef2ff) ) // "
+	ROM_LOAD("5607_1e_blue.u15",   0x4000, 0x2000, CRC(a07f845a) SHA1(e45218fdf955777e571a71ae9d501567b760a3c0) ) // "
 	// 3 more ROM sockets not populated(yellow, red, gold), manual mentions possible expansion
 
 	ROM_REGION( 0x0800, "mcu", 0 )
