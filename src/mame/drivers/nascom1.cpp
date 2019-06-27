@@ -18,6 +18,10 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 
+#include "machine/timer.h"
+#include "sound/wave.h"
+#include "speaker.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
@@ -39,7 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_hd6402(*this, "hd6402"),
-		m_cassette(*this, "cassette"),
+		m_cass(*this, "cassette"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -67,7 +71,7 @@ protected:
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 
 	required_device<ay31015_device> m_hd6402;
-	required_device<cassette_image_device> m_cassette;
+	required_device<cassette_image_device> m_cass;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -81,9 +85,13 @@ private:
 	int m_tape_index;
 	uint8_t m_kb_select;
 	uint8_t m_kb_control;
+	bool m_cassinbit, m_cassoutbit, m_cassold;
+	u16 m_cass_cnt[2];
 
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
+	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( nascom );
@@ -154,7 +162,7 @@ READ8_MEMBER( nascom_state::nascom1_port_00_r )
 
 WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 {
-	m_cassette->change_state(
+	m_cass->change_state(
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	// d0 falling edge: increment keyboard matrix column select counter
@@ -200,11 +208,41 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 
 READ_LINE_MEMBER( nascom_state::nascom1_hd6402_si )
 {
-	return 1;
+	return m_cassinbit;
 }
 
 WRITE_LINE_MEMBER( nascom_state::nascom1_hd6402_so )
 {
+	m_cassoutbit = state;
+}
+
+WRITE_LINE_MEMBER( nascom_state::kansas_w )
+{
+	// incoming 3906.25Hz
+	if (state)
+	{
+		if (m_cassoutbit)
+			m_cass->output(BIT(m_cass_cnt[0], 0) ? -1.0 : +1.0); // 1953.125Hz
+		else
+			m_cass->output(0.0);
+
+		m_cass_cnt[0]++;
+	}
+	m_hd6402->write_tcp(state);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( nascom_state::kansas_r )
+{
+	// cassette - pulses = 1; no pulses = 0
+	m_cass_cnt[1]++;
+	bool cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cassold)
+	{
+		m_cassold = cass_ws;
+		m_cassinbit = (m_cass_cnt[1] < 40) ? 1 : 0;
+		m_cass_cnt[1] = 0;
+	}
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
@@ -669,12 +707,16 @@ void nascom_state::nascom(machine_config &config)
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
-	uart_clock.signal_handler().set(m_hd6402, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().set(FUNC(nascom_state::kansas_w));
 	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 
 	// cassette is connected to the uart
-	CASSETTE(config, m_cassette);
-	m_cassette->set_interface("nascom_cass");
+	CASSETTE(config, m_cass);
+	m_cass->set_interface("nascom_cass");
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(nascom_state::kansas_r), attotime::from_hz(40000));
 
 	// pio
 	Z80PIO(config, "z80pio", 16_MHz_XTAL / 8);
