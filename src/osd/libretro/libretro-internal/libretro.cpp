@@ -40,6 +40,7 @@ int NEWGAME_FROM_OSD  = 0;
 char RPATH[512];
 
 static char option_mouse[50];
+static char option_lightgun[50];
 static char option_cheats[50];
 static char option_renderer[50];
 static char option_osd[50];
@@ -138,6 +139,7 @@ void retro_set_audio_sample(retro_audio_sample_t cb) { }
 void retro_set_environment(retro_environment_t cb)
 {
    sprintf(option_mouse, "%s_%s", core, "mouse_enable");
+   sprintf(option_lightgun, "%s_%s", core, "lightgun_mode");
    sprintf(option_cheats, "%s_%s", core, "cheats_enable");
    sprintf(option_renderer,"%s_%s",core,"alternate_renderer");
    sprintf(option_osd,"%s_%s",core,"boot_to_osd");
@@ -162,6 +164,7 @@ void retro_set_environment(retro_environment_t cb)
     { option_saves, "Save state naming; game|system" },
     { option_auto_save, "Auto save/load states; disabled|enabled" },
     { option_mouse, "Enable in-game mouse; disabled|enabled" },
+    { option_lightgun, "Lightgun mode; none|touchscreen|lightgun" },
     { option_buttons_profiles, "Profile Buttons according to games (Restart); enabled|disabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
     { option_cheats, "Enable cheats; disabled|enabled" },
@@ -208,6 +211,18 @@ static void check_variables(void)
          mouse_enable = false;
       if (!strcmp(var.value, "enabled"))
          mouse_enable = true;
+   }
+
+   var.key   = option_lightgun;
+   var.value = NULL;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (!strcmp(var.value, "touchscreen"))
+         lightgun_mode = RETRO_SETTING_LIGHTGUN_MODE_POINTER;
+      else if (!strcmp(var.value, "lightgun"))
+         lightgun_mode = RETRO_SETTING_LIGHTGUN_MODE_LIGHTGUN;
+      else
+         lightgun_mode = RETRO_SETTING_LIGHTGUN_MODE_DISABLED;
    }
 
    var.key   = option_buttons_profiles;

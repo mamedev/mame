@@ -46,6 +46,7 @@ int mame_reset = -1;
 /* core options */
 bool nobuffer_enable = false;
 bool mouse_enable = false;
+int  lightgun_mode = RETRO_SETTING_LIGHTGUN_MODE_DISABLED;
 bool cheats_enable = false;
 bool alternate_renderer = false;
 bool boot_to_osd_enable = false;
@@ -343,8 +344,11 @@ static void Set_Default_Option(void)
       Add_Option("-mouse");
    else
       Add_Option("-nomouse");
-   printf("yoshi debug: hardcoding lightgun for now! \n");
-   Add_Option("-lightgun");
+
+   if ( lightgun_mode != RETRO_SETTING_LIGHTGUN_MODE_DISABLED )
+      Add_Option("-lightgun");
+   else
+      Add_Option("-nolightgun");
 
    if(write_config_enable)
       Add_Option("-writeconfig");

@@ -651,32 +651,39 @@ ovmy=vmy;
 
 void retro_osd_interface::process_lightgun_state(running_machine &machine)
 {
-   int16_t gun_x;
-   int16_t gun_y;
    int16_t gun_x_raw, gun_y_raw;
 
-   // handle pointer only for now: look at libretro.cpp for libretro specific option for
-   // pointer / real lightgun
-   gun_x_raw = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
-   gun_y_raw = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
-   printf("yoshi debug! gun_x_raw = %i , gun_y_raw = %i \n",gun_x_raw, gun_y_raw);
-   // just guessing now, but could be wrong
-   lightgunX = gun_x_raw * 2;
-   lightgunY = gun_y_raw * 2;
+   if ( lightgun_mode == RETRO_SETTING_LIGHTGUN_MODE_DISABLED ) {
+      return;
+   }
 
-   // handle pointer presses
-   // use multi-touch to support different button inputs
    for (int i = 0; i < 4; i++) {
       lightgunBUT[i] = 0;
    }
-   int touch_count = input_state_cb( 0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_COUNT );
-   if ( touch_count > 0 && touch_count <= 4 ) {
-      lightgunBUT[touch_count-1] = 0x80;
+
+   if ( lightgun_mode == RETRO_SETTING_LIGHTGUN_MODE_POINTER ) {
+      gun_x_raw = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
+      gun_y_raw = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+
+      // handle pointer presses
+      // use multi-touch to support different button inputs
+      int touch_count = input_state_cb( 0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_COUNT );
+      if ( touch_count > 0 && touch_count <= 4 ) {
+         lightgunBUT[touch_count-1] = 0x80;
+      }
+   } else { // lightgun is default when enabled
+      gun_x_raw = input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_X );
+      gun_y_raw = input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_Y );
+
+      if ( input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_TRIGGER ) ) {
+         lightgunBUT[0] = 0x80;
+      }
+      if ( input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_AUX_A ) ) {
+         lightgunBUT[1] = 0x80;
+      }
    }
-   for (int i = 0; i < 4; i++) {
-      printf("lightgunBUT[%i] = %i : ",i,lightgunBUT[i]);
-   }
-   printf("\n");
+   lightgunX = gun_x_raw * 2;
+   lightgunY = gun_y_raw * 2;
 }
 
 //============================================================
@@ -1073,17 +1080,14 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		retro_lightgun_device *devinfo;
-      printf("yoshi debug: lightgun_enabled = %i \n", lightgun_enabled());
 		if (!input_enabled() || !lightgun_enabled())
 			return;
-      printf("yoshi debug: creating retro lightgun device!");
 		devinfo = devicelist()->create_device<retro_lightgun_device>(machine, "Retro lightgun 1", "Retro lightgun 1", *this);
 		if (devinfo == nullptr)
 			return;
 
 		lightgunX=fb_width/2;
 		lightgunY=fb_height/2;
-      printf("yoshi debug: retro lightgun: adding input items!");
 		devinfo->device()->add_item(
 				"X",
 				static_cast<input_item_id>(ITEM_ID_XAXIS),
