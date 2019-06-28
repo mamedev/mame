@@ -93,7 +93,7 @@ undoukai                        // A17 (c) 1984 Taito
 4d410                           // (c) SGI 1991
 
 @source:4dpi.cpp
-sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz
+4d20                            // IP6: Personal Iris 4D/20, R2000 @12.5MHz
 
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 System Compumatic
