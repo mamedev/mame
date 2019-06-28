@@ -45,7 +45,7 @@ public:
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_keypad(*this, "IN.0")
 	{ }
 
 	// machine drivers
@@ -58,7 +58,7 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	optional_device<dac_bit_interface> m_dac;
-	required_ioport_array<1> m_inputs;
+	required_ioport m_keypad;
 
 	// I/O handlers
 	void update_display();
@@ -152,14 +152,14 @@ READ8_MEMBER(presto_state::input_r)
 	u8 data = 0;
 
 	// P10-P17: multiplexed inputs
-	// read chessboard
+	// read chessboard buttons
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
 			data |= m_board->read_rank(i);
 
-	// read keypad
+	// read sidepanel keypad
 	if (m_kp_select)
-		data |= m_inputs[0]->read();
+		data |= m_keypad->read();
 
 	return ~data;
 }

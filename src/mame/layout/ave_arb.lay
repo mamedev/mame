@@ -31,68 +31,68 @@
 	</element>
 
 	<element name="text_1">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="1"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_2">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="2"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_3">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="3"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_4">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="4"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_5">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="5"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_6">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="6"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_7">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="7"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_8">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="8"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
 	<element name="text_a">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="A"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_b">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="B"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_c">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="C"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_d">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="D"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_e">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="E"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_f">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="F"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_g">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="G"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_h">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
 		<text string="H"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
@@ -137,7 +137,7 @@
 
 <!-- sb board -->
 
-	<element name="cblack"><rect><color red="0.5" green="0.37" blue="0.3" /></rect></element>
+	<element name="cblack"><rect><color red="0.5" green="0.3" blue="0.25" /></rect></element>
 	<element name="cwhite"><rect><color red="0.85" green="0.83" blue="0.7" /></rect></element>
 
 	<element name="hlbb" defstate="0">

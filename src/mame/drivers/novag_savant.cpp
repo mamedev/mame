@@ -20,7 +20,6 @@ anymore in original working order.
 
 TODO:
 - get rid of m_wait_in hack when Z80 core accurately emulates WAIT pin
-- internal artwork
 
 ******************************************************************************/
 
@@ -38,7 +37,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "novag_savant.lh" // clickable
+#include "novag_savant.lh" // clickable
 
 
 namespace {
@@ -62,6 +61,9 @@ public:
 
 	// machine drivers
 	void savant(machine_config &config);
+
+	// user-controlled light switch (9 light bulbs behind LCD panel)
+	DECLARE_INPUT_CHANGED_MEMBER(light_switch) { output().set_value("backlight", newval); }
 
 protected:
 	virtual void machine_start() override;
@@ -332,6 +334,11 @@ static INPUT_PORTS_START( savant )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Promote")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Set Up")
+
+	PORT_START("LIGHT")
+	PORT_CONFNAME( 0x01, 0x01, "LCD Backlight" ) PORT_CHANGED_MEMBER(DEVICE_SELF, savant_state, light_switch, nullptr)
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -376,7 +383,7 @@ void savant_state::savant(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24+27);
-	//config.set_default_layout(layout_novag_savant);
+	config.set_default_layout(layout_novag_savant);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -413,4 +420,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, savant, 0,      0, savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, savant, 0,      0, savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
