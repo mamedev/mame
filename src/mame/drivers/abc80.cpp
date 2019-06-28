@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// devices
 	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);

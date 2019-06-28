@@ -197,7 +197,7 @@ void vector06_state::vector06(machine_config &config)
 	m_ppi8255_2->out_pc_callback().set(FUNC(vector06_state::vector06_romdisk_portc_w));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 

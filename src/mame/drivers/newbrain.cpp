@@ -838,10 +838,10 @@ void newbrain_state::newbrain(machine_config &config)
 	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim");
 
 	CASSETTE(config, m_cassette1);
-	m_cassette1->set_default_state(cassette_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	CASSETTE(config, m_cassette2);
-	m_cassette2->set_default_state(cassette_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	RS232_PORT(config, RS232_V24_TAG, default_rs232_devices, nullptr);
 	RS232_PORT(config, RS232_PRN_TAG, default_rs232_devices, nullptr);

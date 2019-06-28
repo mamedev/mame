@@ -633,7 +633,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
 	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(comx35_state, comx), this), "comx");
 
-	CASSETTE(config, m_cassette).set_default_state((cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// expansion bus
 	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));

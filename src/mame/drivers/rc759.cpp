@@ -573,7 +573,7 @@ void rc759_state::rc759(machine_config &config)
 
 	// cassette
 	CASSETTE(config, m_cas);
-	m_cas->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cas->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// sound
 	SPEAKER(config, "mono").front_center();

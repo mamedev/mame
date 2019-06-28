@@ -634,7 +634,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(pmd85_cassette_formats);
 	m_cassette->set_create_opts(&pmd85_cassette_options);
-	m_cassette->set_default_state((cassette_state) (CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("pmd85_cass");
 
 	/* software lists */

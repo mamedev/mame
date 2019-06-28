@@ -60,7 +60,7 @@
 #include "machine/bankdev.h"
 #include "machine/kb3600.h"
 #include "machine/timer.h"
-
+#include "sound/wave.h"
 #include "sound/spkrdev.h"
 
 #include "bus/a2bus/a2diskii.h"
@@ -1091,6 +1091,7 @@ void agat7_state::agat7(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
@@ -1131,7 +1132,7 @@ void agat7_state::agat7(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
 	CASSETTE(config,m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 }
 
 

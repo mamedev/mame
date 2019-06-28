@@ -764,11 +764,11 @@ void sol20_state::sol20(machine_config &config)
 
 	// devices
 	CASSETTE(config, m_cass1).set_formats(sol20_cassette_formats);
-	m_cass1->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass1->set_interface("sol20_cass");
 
 	CASSETTE(config, m_cass2).set_formats(sol20_cassette_formats);
-	m_cass2->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass2->set_interface("sol20_cass");
 
 	AY51013(config, m_uart); // TMS6011NC

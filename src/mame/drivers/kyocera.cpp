@@ -1352,7 +1352,7 @@ void kc85_state::kc85(machine_config &config)
 	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "trsm100_cart", "bin,rom");
@@ -1401,7 +1401,7 @@ void pc8201_state::pc8201(machine_config &config)
 	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "pc8201_cart", "bin,rom");
@@ -1457,7 +1457,7 @@ void trsm100_state::trsm100(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
 
@@ -1526,7 +1526,7 @@ void tandy200_state::tandy200(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "tandy200_cart", "bin,rom");
