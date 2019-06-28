@@ -2067,7 +2067,7 @@ void lua_engine::initialize()
 						luaL_error(m_lua_state, "Error in param 1 to draw_text");
 						return;
 					}
-					rgb_t textcolor = UI_TEXT_COLOR;
+					rgb_t textcolor = mame_machine_manager::instance()->ui().colors().text_color();
 					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());

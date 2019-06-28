@@ -246,7 +246,7 @@ protected:
 			ui().draw_text_full(
 					container(), get_c_str(*it),
 					x1, y1, x2 - x1, justify, wrap,
-					mame_ui_manager::NORMAL, fgcolor, UI_TEXT_BG_COLOR,
+					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
 			y1 += ui().get_line_height();
 		}

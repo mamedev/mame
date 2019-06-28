@@ -117,7 +117,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 				std::begin(m_prompt), std::end(m_prompt),
 				x, x2, y - top, y - UI_BOX_TB_BORDER,
 				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-				UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+				ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		break;
 
 	case phase::AUDIT:
