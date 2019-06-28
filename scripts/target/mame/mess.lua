@@ -1918,7 +1918,6 @@ files {
 
 	MAME_DIR .. "src/mame/machine/novagbase.cpp",
 	MAME_DIR .. "src/mame/includes/novagbase.h",
-	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 }
@@ -2815,6 +2814,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "novag")
 files {
+	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_mk1.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_mk2.cpp",

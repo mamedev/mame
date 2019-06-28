@@ -5,7 +5,7 @@
 Novag Super Constellation Chess Computer (model 844)
 
 Hardware notes:
-- UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
+- UMC UM6502C @ 4 MHz (8MHz XTAL), 512Hz? IRQ(source unknown?)
 - 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 - external ports for clock and printer, not emulated here
@@ -203,13 +203,13 @@ void scon_state::scon(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 8_MHz_XTAL/2); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &scon_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(scon_state::irq0_line_hold), attotime::from_hz(600)); // guessed
+	m_maincpu->set_periodic_int(FUNC(scon_state::irq0_line_hold), attotime::from_hz(512)); // guessed
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_delay(attotime::from_msec(200));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
