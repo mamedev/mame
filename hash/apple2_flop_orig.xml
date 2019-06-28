@@ -5529,4 +5529,108 @@
 		</part>
 	</software>
 
+	<software name="sherwood">
+		<description>Sherwood Forest</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-06-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="208154">
+				<rom name="sherwood forest.woz" size="208154" crc="49b76125" sha1="c2771aea964e43a3519cc52f61d6a17b4c009b42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrtcrct">
+		<description>Short Circuit</description>
+		<year>1984</year>
+		<publisher>Micro Lab</publisher>
+		<info name="release" value="2019-06-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="467733">
+				<rom name="short circuit.woz" size="467733" crc="d95cd68f" sha1="68b5bc28da9216515a0bfb13665fd05d50f70f32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnmistr9">
+		<description>Moonmist (Release 9 / 861022)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-06-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234832">
+				<rom name="moonmist r9.woz" size="234832" crc="ec486f68" sha1="f5ed483302fa5f6f3a97cd6c6116b8ae5228431a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2400ad">
+		<description>2400 A.D.</description>
+		<year>1987</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-06-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="234759">
+				<rom name="2400 a.d. - program disk.woz" size="234759" crc="5b42e1f6" sha1="1f6ce95fccd334e8faaf9217735f14da3c9e8d99" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player disk"/>
+			<dataarea name="flop" size="234759">
+				<rom name="2400 a.d. - player disk.woz" size="234759" crc="98271568" sha1="a0a2546b2b1e7328000aa51de2024233ad06e410" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmansion">
+		<description>Maniac Mansion</description>
+		<year>1987</year>
+		<publisher>LucasFilm Games</publisher>
+		<info name="release" value="2019-06-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234764">
+				<rom name="maniac mansion side a.woz" size="234764" crc="b5e15813" sha1="5f6ed27c94b6c97614a5ffe3752ee89ea961425e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234764">
+				<rom name="maniac mansion side b.woz" size="234764" crc="b0050215" sha1="4b088c42b306b82402e3dc7b040f6dce0f61ebb3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suspr14">
+		<description>Suspect (Release 14 / 841005)</description>
+		<year>1984</year>
+		<publisher>infocom</publisher>
+		<info name="release" value="2019-06-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="suspect r14.woz" size="234813" crc="3d0e94fc" sha1="b0cbdae08b120573db2c1b382b14d78e8bff0f94" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

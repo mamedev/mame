@@ -126,7 +126,7 @@ WRITE8_MEMBER(a2600_base_state::switch_A_w)
 //  switch( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 //  {
 //  case 0x0a:  /* KidVid voice module */
-//      m_cassette->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+//      m_cassette->change_state(( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : (CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), CASSETTE_MOTOR_DISABLED );
 //      break;
 //  }
 }

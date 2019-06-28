@@ -3,10 +3,9 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* novag_delta1.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
-
 Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
 
+Hardware notes:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
 - 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 - 4-digit 7seg panel, no sound, no chessboard
@@ -14,10 +13,10 @@ Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/novagbase.h"
-
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
+#include "machine/timer.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "novag_delta1.lh" // clickable
@@ -25,12 +24,18 @@ Novag Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
 
 namespace {
 
-class delta1_state : public novagbase_state
+class delta1_state : public driver_device
 {
 public:
 	delta1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		novagbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
+
+	// New Game button is directly tied to F3850 EXT RES pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 	// machine drivers
 	void delta1(machine_config &config);
@@ -39,25 +44,45 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<5> m_inputs;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	// I/O handlers
+	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; }
+	u8 m_mux_data;
+	u8 m_led_select;
+	u8 m_inp_mux;
+	u8 m_7seg_data;
+	bool m_7seg_rc;
 	bool m_blink;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 };
 
 void delta1_state::machine_start()
 {
-	novagbase_state::machine_start();
-
-	// zerofill/register for savestates
+	// zerofill
+	m_mux_data = 0;
+	m_led_select = 0;
+	m_inp_mux = 0;
+	m_7seg_rc = false;
 	m_blink = false;
+
+	// register for savestates
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_7seg_rc));
 	save_item(NAME(m_blink));
 
 	// game reads from uninitialized RAM while it's thinking
@@ -72,34 +97,44 @@ void delta1_state::machine_start()
 
 // CPU I/O ports
 
+void delta1_state::update_display()
+{
+	m_display->matrix(m_led_select, (m_blink && m_7seg_rc) ? 0 : m_7seg_data);
+}
+
 WRITE8_MEMBER(delta1_state::mux_w)
 {
 	// IO00-02: MC14028B A-C (D to GND)
 	// MC14028B Q3-Q7: input mux
 	// MC14028B Q4-Q7: digit select through 75492
-	u16 sel = 1 << (~data & 7);
+	u8 sel = 1 << (~data & 7);
 	m_inp_mux = sel >> 3 & 0x1f;
+	m_led_select = sel >> 4;
+	update_display();
 
-	// update display here
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 4, m_7seg_data, sel >> 4);
-
-	m_led_select = data;
+	m_mux_data = data;
 }
 
 READ8_MEMBER(delta1_state::input_r)
 {
+	u8 data = 0;
+
 	// IO04-07: multiplexed inputs
 	// IO03: GND
-	return read_inputs(5) << 4 | m_led_select | 8;
+	for (int i = 0; i < 5; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	return data << 4 | m_mux_data | 8;
 }
 
 WRITE8_MEMBER(delta1_state::digit_w)
 {
 	// IO17: R/C circuit to segment commons (for automated blinking)
 	// IO10-16: digit segments A-G
-	data = (data & 0x80 && m_blink) ? 0 : (data & 0x7f);
-	m_7seg_data = bitswap<7>(data, 0,1,2,3,4,5,6);
+	m_7seg_rc = bool(BIT(data, 7));
+	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
+	update_display();
 }
 
 
@@ -178,9 +213,12 @@ void delta1_state::delta1(machine_config &config)
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
-	TIMER(config, "display_blink").configure_periodic(FUNC(delta1_state::blink), attotime::from_msec(250)); // approximation
-	TIMER(config, "display_decay").configure_periodic(FUNC(delta1_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_novag_delta1);
+
+	TIMER(config, "display_blink").configure_periodic(FUNC(delta1_state::blink), attotime::from_msec(250)); // approximation
 }
 
 

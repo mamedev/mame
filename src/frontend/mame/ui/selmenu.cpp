@@ -904,7 +904,7 @@ float menu_select_launch::draw_left_panel(
 	// outline the box and inset by the border width
 	float const origy1(y1);
 	float const origy2(y2);
-	x2 = x1 + left_width + 2.0f * ui().box_lr_border();
+	x2 = x1 + left_width + 2.0f * ui().box_lr_border();;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 	x1 += ui().box_lr_border();
 	x2 -= ui().box_lr_border();

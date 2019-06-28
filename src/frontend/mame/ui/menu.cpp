@@ -719,7 +719,7 @@ void menu::draw(uint32_t flags)
 				{
 					float heading_width = ui().get_string_width(itemtext);
 					container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - ui().box_lr_border(), line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + ui().box_lr_border(), line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().options().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + ui().box_lr_border(), line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				ui().draw_text_full(container(), itemtext, effective_left, line_y0, effective_width,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
@@ -878,19 +878,11 @@ void menu::draw_text_box()
 		target_y = 1.0f - ui().box_tb_border() - target_height;
 
 	// add a box around that
-<<<<<<< HEAD
-	ui().draw_outlined_box(container(), target_x - UI_BOX_LR_BORDER - gutter_width,
-							target_y - UI_BOX_TB_BORDER,
-							target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-							target_y + target_height + UI_BOX_TB_BORDER,
-							(m_items[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : ui().colors().background_color());
-=======
 	ui().draw_outlined_box(container(), target_x - ui().box_lr_border() - gutter_width,
 							target_y - ui().box_tb_border(),
 							target_x + target_width + gutter_width + ui().box_lr_border(),
 							target_y + target_height + ui().box_tb_border(),
-							(m_items[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : ui().options().background_color());
->>>>>>> Replaced UI_TARGET_FONT_[ROWS|HEIGHT] and UI_BOX_[LR|TD]_BORDER macros with
+							(m_items[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : ui().colors().background_color());
 	ui().draw_text_full(container(), text, target_x, target_y, target_width,
 			ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
 

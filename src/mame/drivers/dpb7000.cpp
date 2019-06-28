@@ -18,29 +18,31 @@
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "machine/tdc1008.h"
-#include "video/mc6845.h"
 #include "video/dpb_brushproc.h"
+#include "video/dpb_brushstore.h"
 #include "video/dpb_combiner.h"
+#include "video/dpb_framestore.h"
 #include "video/dpb_storeaddr.h"
+#include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
 #include <deque>
 
-#define LOG_UNKNOWN			(1 << 0)
-#define LOG_UCODE			(1 << 1)
-#define LOG_MORE_UCODE		(1 << 2)
-#define LOG_CSR				(1 << 3)
-#define LOG_CTRLBUS			(1 << 4)
-#define LOG_SYS_CTRL		(1 << 5)
-#define LOG_FDC_CTRL		(1 << 6)
-#define LOG_FDC_PORT		(1 << 7)
-#define LOG_FDC_CMD			(1 << 8)
-#define LOG_OUTPUT_TIMING	(1 << 9)
-#define LOG_BRUSH_ADDR		(1 << 10)
-#define LOG_ALL				(LOG_UNKNOWN | LOG_UCODE | LOG_MORE_UCODE | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | \
+#define LOG_UNKNOWN         (1 << 0)
+#define LOG_UCODE           (1 << 1)
+#define LOG_MORE_UCODE      (1 << 2)
+#define LOG_CSR             (1 << 3)
+#define LOG_CTRLBUS         (1 << 4)
+#define LOG_SYS_CTRL        (1 << 5)
+#define LOG_FDC_CTRL        (1 << 6)
+#define LOG_FDC_PORT        (1 << 7)
+#define LOG_FDC_CMD         (1 << 8)
+#define LOG_OUTPUT_TIMING   (1 << 9)
+#define LOG_BRUSH_ADDR      (1 << 10)
+#define LOG_ALL             (LOG_UNKNOWN | LOG_UCODE | LOG_MORE_UCODE | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | \
 							 LOG_OUTPUT_TIMING | LOG_BRUSH_ADDR)
 
-#define VERBOSE				(LOG_ALL &~ LOG_FDC_CTRL)
+#define VERBOSE             (LOG_ALL &~ LOG_FDC_CTRL)
 #include "logmacro.h"
 
 class dpb7000_state : public driver_device
@@ -72,7 +74,9 @@ public:
 		, m_filter_cg(*this, "filter_cg")
 		, m_store_addr(*this, "store_addr%u", 0U)
 		, m_brush_proc(*this, "brush_proc%u", 0U)
+		, m_brush_store(*this, "brush_store")
 		, m_combiner(*this, "combiner")
+		, m_framestore(*this, "framestore%u", 0U)
 	{
 	}
 
@@ -111,11 +115,11 @@ private:
 
 	enum : uint16_t
 	{
-		SYSCTRL_AUTO_START		= 0x0001,
-		SYSCTRL_REQ_B_EN		= 0x0020,
-		SYSCTRL_REQ_A_EN		= 0x0040,
-		SYSCTRL_REQ_A_IN		= 0x0080,
-		SYSCTRL_REQ_B_IN		= 0x8000
+		SYSCTRL_AUTO_START      = 0x0001,
+		SYSCTRL_REQ_B_EN        = 0x0020,
+		SYSCTRL_REQ_A_EN        = 0x0040,
+		SYSCTRL_REQ_A_IN        = 0x0080,
+		SYSCTRL_REQ_B_IN        = 0x8000
 	};
 
 	DECLARE_READ16_MEMBER(cpu_sysctrl_r);
@@ -164,39 +168,52 @@ private:
 
 	required_device_array<dpb7000_storeaddr_card_device, 2> m_store_addr;
 	required_device_array<dpb7000_brushproc_card_device, 2> m_brush_proc;
+	required_device<dpb7000_brush_store_card_device> m_brush_store;
 	required_device<dpb7000_combiner_card_device> m_combiner;
+	required_device_array<dpb7000_framestore_card_device, 6> m_framestore;
 
 	emu_timer *m_diskseq_clk;
 	emu_timer *m_field_in_clk;
 	emu_timer *m_field_out_clk;
 
+	enum : size_t
+	{
+		FRAMESTORE_A0 = 0,
+		FRAMESTORE_A1,
+		FRAMESTORE_A2,
+		FRAMESTORE_B0,
+		FRAMESTORE_B1,
+		FRAMESTORE_B2,
+		FRAMESTORE_COUNT
+	};
+
 	enum : uint8_t
 	{
-		DSEQ_STATUS_READY_BIT			= 0,	// C5
-		DSEQ_STATUS_FAULT_BIT			= 1,	// C6
-		DSEQ_STATUS_ONCYL_BIT			= 2,	// C7
-		DSEQ_STATUS_SKERR_BIT			= 3,	// C8
-		DSEQ_STATUS_INDEX_BIT			= 4,	// C9
-		DSEQ_STATUS_SECTOR_BIT			= 5,	// C10
-		DSEQ_STATUS_AMFND_BIT			= 6,	// C11
-		DSEQ_STATUS_WTPROT_BIT			= 7,	// C12
-		DSEQ_STATUS_SELECTED_BIT		= 8,	// C13
-		DSEQ_STATUS_SEEKEND_BIT			= 9,	// C14
-		DSEQ_STATUS_SYNC_DET_BIT		= 10,	// C15
-		DSEQ_STATUS_RAM_ADDR_OVFLO_BIT	= 11,	// C16
+		DSEQ_STATUS_READY_BIT           = 0,    // C5
+		DSEQ_STATUS_FAULT_BIT           = 1,    // C6
+		DSEQ_STATUS_ONCYL_BIT           = 2,    // C7
+		DSEQ_STATUS_SKERR_BIT           = 3,    // C8
+		DSEQ_STATUS_INDEX_BIT           = 4,    // C9
+		DSEQ_STATUS_SECTOR_BIT          = 5,    // C10
+		DSEQ_STATUS_AMFND_BIT           = 6,    // C11
+		DSEQ_STATUS_WTPROT_BIT          = 7,    // C12
+		DSEQ_STATUS_SELECTED_BIT        = 8,    // C13
+		DSEQ_STATUS_SEEKEND_BIT         = 9,    // C14
+		DSEQ_STATUS_SYNC_DET_BIT        = 10,   // C15
+		DSEQ_STATUS_RAM_ADDR_OVFLO_BIT  = 11,   // C16
 
-		DSEQ_CTRLOUT_CK_SEL_1		= (1 << 0),	// S40
-		DSEQ_CTRLOUT_CK_SEL_0		= (1 << 1),	// S41
-		DSEQ_CTRLOUT_ADDR_W_PERMIT	= (1 << 2),	// S42
-		DSEQ_CTRLOUT_ZERO_RAM		= (1 << 3),	// S43
-		DSEQ_CTRLOUT_WRITE_RAM		= (1 << 4),	// S44
-		DSEQ_CTRLOUT_WORD_READ_RAM	= (1 << 5),	// S45
-		DSEQ_CTRLOUT_WRITE_SYNC		= (1 << 6),	// S46
-		DSEQ_CTRLOUT_SYNC_DET_EN	= (1 << 7),	// S47
+		DSEQ_CTRLOUT_CK_SEL_1       = (1 << 0), // S40
+		DSEQ_CTRLOUT_CK_SEL_0       = (1 << 1), // S41
+		DSEQ_CTRLOUT_ADDR_W_PERMIT  = (1 << 2), // S42
+		DSEQ_CTRLOUT_ZERO_RAM       = (1 << 3), // S43
+		DSEQ_CTRLOUT_WRITE_RAM      = (1 << 4), // S44
+		DSEQ_CTRLOUT_WORD_READ_RAM  = (1 << 5), // S45
+		DSEQ_CTRLOUT_WRITE_SYNC     = (1 << 6), // S46
+		DSEQ_CTRLOUT_SYNC_DET_EN    = (1 << 7), // S47
 
-		DSEQ_CTRLOUT_WRITE_ZERO		= (1 << 5), // S53
-		DSEQ_CTRLOUT_LINE_CK		= (1 << 6), // S54
-		DSEQ_CTRLOUT_DISC_CLEAR		= (1 << 7), // S55
+		DSEQ_CTRLOUT_WRITE_ZERO     = (1 << 5), // S53
+		DSEQ_CTRLOUT_LINE_CK        = (1 << 6), // S54
+		DSEQ_CTRLOUT_DISC_CLEAR     = (1 << 7), // S55
 	};
 
 	// Computer Card
@@ -207,17 +224,17 @@ private:
 	int m_diskseq_cp;
 	bool m_diskseq_reset;
 	bool m_diskseq_halt;
-	uint8_t m_diskseq_line_cnt;			// EF/EE
-	uint8_t m_diskseq_ed_cnt;			// ED
-	uint8_t m_diskseq_head_cnt;			// EC
-	uint16_t m_diskseq_cyl_from_cpu;	// AE/BH
-	uint16_t m_diskseq_cmd_from_cpu;	// DD/CC
+	uint8_t m_diskseq_line_cnt;         // EF/EE
+	uint8_t m_diskseq_ed_cnt;           // ED
+	uint8_t m_diskseq_head_cnt;         // EC
+	uint16_t m_diskseq_cyl_from_cpu;    // AE/BH
+	uint16_t m_diskseq_cmd_from_cpu;    // DD/CC
 	uint8_t m_diskseq_cyl_to_ctrl;
 	uint8_t m_diskseq_cmd_to_ctrl;
-	uint8_t m_diskseq_status_in;		// CG
-	uint8_t m_diskseq_status_out;		// BC
-	uint8_t m_diskseq_ucode_latch[7];	// GG/GF/GE/GD/GC/GB/GA
-	uint8_t m_diskseq_cc_inputs[4];		// Inputs to FE/FD/FC/FB
+	uint8_t m_diskseq_status_in;        // CG
+	uint8_t m_diskseq_status_out;       // BC
+	uint8_t m_diskseq_ucode_latch[7];   // GG/GF/GE/GD/GC/GB/GA
+	uint8_t m_diskseq_cc_inputs[4];     // Inputs to FE/FD/FC/FB
 
 	// Output Timing Card
 	uint16_t m_cursor_origin_x;
@@ -786,10 +803,10 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 	{
 		static const char* const s_func_names[16] =
 		{
-			"Live Video",			"Brush Store Read",		"Brush Store Write",		"Framestore Read",
-			"Framestore Write",		"Fast Wipe Video",		"Fast Wipe Brush Store",	"Fast Wipe Framestore",
-			"Draw",					"Draw with Stencil I",	"Draw with Stencil II",		"Copy to Framestore",
-			"Copy to Brush Store",	"Paste with Stencil I",	"Paste with Stencil II",	"Copy to same Framestore (Invert)"
+			"Live Video",           "Brush Store Read",     "Brush Store Write",        "Framestore Read",
+			"Framestore Write",     "Fast Wipe Video",      "Fast Wipe Brush Store",    "Fast Wipe Framestore",
+			"Draw",                 "Draw with Stencil I",  "Draw with Stencil II",     "Copy to Framestore",
+			"Copy to Brush Store",  "Paste with Stencil I", "Paste with Stencil II",    "Copy to same Framestore (Invert)"
 		};
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);
@@ -1135,8 +1152,38 @@ void dpb7000_state::dpb7000(machine_config &config)
 	DPB7000_BRUSHPROC(config, m_brush_proc[0]);
 	DPB7000_BRUSHPROC(config, m_brush_proc[1]);
 
+	// Brush Store Card
+	DPB7000_BRUSHSTORE(config, m_brush_store);
+
 	// Combiner Card
 	DPB7000_COMBINER(config, m_combiner, 14.318181_MHz_XTAL);
+
+	// Framestore Cards
+	for (size_t i = 0; i < FRAMESTORE_COUNT; i++)
+	{
+		DPB7000_FRAMESTORE(config, m_framestore[i]);
+	}
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		for (size_t j = 0; j < FRAMESTORE_COUNT; j++)
+		{
+			m_store_addr[i]->ipsel().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ipsel_w));
+			m_store_addr[i]->csel().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::csel_w));
+			m_store_addr[i]->rck().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::rck_w));
+			m_store_addr[i]->cck().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::cck_w));
+			m_store_addr[i]->ra().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ra_w));
+			m_store_addr[i]->opstr().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opstr_w));
+			m_store_addr[i]->opwa().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opwa_w));
+			m_store_addr[i]->opwb().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opwb_w));
+			m_store_addr[i]->opra().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::opra_w));
+			m_store_addr[i]->oprb().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::oprb_w));
+			m_store_addr[i]->a().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::a_w));
+			m_store_addr[i]->ras().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::ras_w));
+			m_store_addr[i]->cas().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::cas_w));
+			m_store_addr[i]->write().set(m_framestore[j], FUNC(dpb7000_framestore_card_device::write_w));
+		}
+	}
 }
 
 
@@ -1176,9 +1223,6 @@ ROM_START( dpb7000 )
 
 	ROM_REGION(0x800, "fddprom", 0)
 	ROM_LOAD("17446a-gd-m2716.bin", 0x000, 0x800, CRC(a0be00ca) SHA1(48c4f8c07b9f6bc9b68698e1e326782e0b01e1b0))
-
-	ROM_REGION(0x100, "brushstore_prom", 0)
-	ROM_LOAD("pb-02a-17421-ada.bin", 0x000, 0x100, CRC(84bf7029) SHA1(9d58322994f6f7e99a9c6478577559c8171670ed))
 
 	ROM_REGION(0x1200, "output_timing_proms", 0)
 	ROM_LOAD("pb-037-17418-bea.bin", 0x0000, 0x400, CRC(644e82a3) SHA1(d7634e03809abe2db924571c05821c1b2aca051b))

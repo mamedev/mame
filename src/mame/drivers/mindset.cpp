@@ -6,6 +6,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
+#include "formats/pc_dsk.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -23,15 +24,19 @@ protected:
 	required_device<i8042_device> m_syscpu, m_soundcpu;
 	required_device<i8749_device> m_kbdcpu;
 	required_device<screen_device> m_screen;
+	required_device<i8272a_device> m_fdc;
+	required_device<floppy_connector> m_fdco[2];
 	required_shared_ptr<u16> m_vram;
 	required_ioport_array<11> m_kbd_row;
 
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcos;
 
+	floppy_image_device *m_floppy[2];
 	u32 m_palette[16];
 	bool m_genlock[16];
-	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr;
+	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
 	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
+	bool m_fdc_intext, m_fdc_int;
 
 	static u16 gco_blend_0(u16, u16);
 	static u16 gco_blend_1(u16, u16);
@@ -71,13 +76,29 @@ protected:
 	int kbd_t1_r();
 	u8 kbd_d_r();
 
+	void snd_p1_w(u8 data);
+	void snd_p2_w(u8 data);
+
+	void fdc_ctrl_w(u8 data);
+	void fdc_int_w(int state);
+	u16 fdc_clear_interrupt();
+	void fdc_dma_count_w(u16 data);
+	u8 fdc_dma_r();
+	void fdc_dma_w(u8 data);
+
 	u16 keyscan();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };
+
+FLOPPY_FORMATS_MEMBER(mindset_state::floppy_formats)
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
 
 mindset_state::mindset_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -87,6 +108,8 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_soundcpu(*this, "soundcpu"),
 	m_kbdcpu(*this, "kbdcpu"),
 	m_screen(*this, "screen"),
+	m_fdc(*this, "fdc"),
+	m_fdco{{*this, "fdc:0"}, {*this, "fdc:1"}},
 	m_vram(*this, "vram"),
 	m_kbd_row(*this, "K%02u", 0U)
 {
@@ -95,45 +118,49 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 void mindset_state::machine_start()
 {
 	m_gcos = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
+	for(int i=0; i<2; i++)
+		m_floppy[i] = m_fdco[i]->get_device();
 }
 
 void mindset_state::machine_reset()
 {
+	m_fdc_intext = m_fdc_int = false;
 }
 
 int mindset_state::sys_t0_r()
 {
-	//	logerror("SYS: %d read t0 %d (%03x)\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0, m_syscpu->pc());
+	//  logerror("SYS: %d read t0 %d (%03x)\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0, m_syscpu->pc());
 	return (m_kbd_p2 & 0x40) != 0;
 }
 
 int mindset_state::sys_t1_r()
 {
 	logerror("SYS: read t1\n");
-	return true;
+	return !m_fdc_int;
 }
 
 u8 mindset_state::sys_p1_r()
 {
-	//	logerror("SYS: read p1\n");
+	//  logerror("SYS: read p1\n");
 	return 0xff;
 }
 
 u8 mindset_state::sys_p2_r()
 {
-	//	logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
+	//  logerror("SYS: read p2 (%03x)\n", m_syscpu->pc());
 	return 0xff;
 }
 
 void mindset_state::sys_p1_w(u8 data)
 {
-	//	logerror("SYS: write p1 %02x\n", data);
+	//	m_maincpu->int0_w(!((data & 0x40) || m_fdc->get_irq()));
+	logerror("SYS: fdc write p1 %02x irq %d\n", data, !!(data & 0x40));
 }
 
 void mindset_state::sys_p2_w(u8 data)
 {
 	m_maincpu->int3_w(!(data & 0x80));
-	//	logerror("SYS: write p2 %02x\n", data);
+	//  logerror("SYS: write p2 %02x\n", data);
 }
 
 void mindset_state::kbd_p1_w(u8 data)
@@ -143,8 +170,8 @@ void mindset_state::kbd_p1_w(u8 data)
 
 void mindset_state::kbd_p2_w(u8 data)
 {
-	//	if((m_kbd_p2 ^ data) & 0x40)
-	//		logerror("KBD: %d output bit %d\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0);
+	//  if((m_kbd_p2 ^ data) & 0x40)
+	//      logerror("KBD: %d output bit %d\n", m_kbdcpu->total_cycles(), (m_kbd_p2 & 0x40) != 0);
 	m_kbd_p2 = data;
 }
 
@@ -156,6 +183,16 @@ u8 mindset_state::kbd_d_r()
 int mindset_state::kbd_t1_r()
 {
 	return keyscan() & 0x100;
+}
+
+void mindset_state::snd_p1_w(u8 data)
+{
+	//	logerror("snd p1 %02x\n", data);
+}
+
+void mindset_state::snd_p2_w(u8 data)
+{
+	//	logerror("snd p2 %02x\n", data);
 }
 
 u16 mindset_state::keyscan()
@@ -177,7 +214,6 @@ u16 mindset_state::dispctrl_r()
 
 void mindset_state::dispctrl_w(u16 data)
 {
-	// 4000 = buffer choice (switch on int2, frame int instead of field int?)
 	u16 chg = m_dispctrl ^ data;
 	m_dispctrl = data;
 	if(chg & 0xff00)
@@ -200,6 +236,7 @@ void mindset_state::dispreg_w(u16 data)
 		break;
 	case 1:
 		m_borderidx = data & 0xf;
+		logerror("border color %x\n", m_borderidx);
 		break;
 	case 2: {
 		m_intpos = data;
@@ -246,31 +283,46 @@ void mindset_state::dispreg_w(u16 data)
 
 u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int mode_type = (m_dispctrl & 0x6000) >> 13;
+	// Temporary gross hack
+	if(cliprect.max_y != 399)
+		return 0;
+	const u16 *bank = m_dispctrl & 0x4000 ? m_vram + 8000 : m_vram;
+	bool ibm_mode = m_dispctrl & 0x2000;
 	bool interleave = m_dispctrl & 0x0800;
 	int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 	bool large_pixels = m_dispctrl & 0x0100;
 
-	switch(mode_type) {
-	case 0: // Native mode
+	if(ibm_mode) {
 		if(large_pixels) {
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
 				case 1: {
 					static int palind[4] = { 0, 1, 4, 5 };
-					const u16 *src = m_vram;
-					for(u32 y=0; y<200; y++) {
-						u32 *dest = &bitmap.pix32(y);
-						for(u32 x=0; x<320; x+=8) {
-							u16 sv = *src++;
-							*dest++ = m_palette[palind[(sv >>  6) & 3]];
-							*dest++ = m_palette[palind[(sv >>  4) & 3]];
-							*dest++ = m_palette[palind[(sv >>  2) & 3]];
-							*dest++ = m_palette[palind[(sv >>  0) & 3]];
-							*dest++ = m_palette[palind[(sv >> 14) & 3]];
-							*dest++ = m_palette[palind[(sv >> 12) & 3]];
-							*dest++ = m_palette[palind[(sv >> 10) & 3]];
-							*dest++ = m_palette[palind[(sv >>  8) & 3]];
+					for(int field=0; field<2; field++) {
+						for(u32 yy=0; yy<2; yy++) {
+							const u16 *src = bank + 4096*yy;
+							for(u32 y=yy; y<200; y+=2) {
+								u32 *dest = &bitmap.pix32(2*y+1);
+								for(u32 x=0; x<320; x+=8) {
+									u16 sv = *src++;
+									*dest++ = m_palette[palind[(sv >>  6) & 3]];
+									*dest++ = m_palette[palind[(sv >>  6) & 3]];
+									*dest++ = m_palette[palind[(sv >>  4) & 3]];
+									*dest++ = m_palette[palind[(sv >>  4) & 3]];
+									*dest++ = m_palette[palind[(sv >>  2) & 3]];
+									*dest++ = m_palette[palind[(sv >>  2) & 3]];
+									*dest++ = m_palette[palind[(sv >>  0) & 3]];
+									*dest++ = m_palette[palind[(sv >>  0) & 3]];
+									*dest++ = m_palette[palind[(sv >> 14) & 3]];
+									*dest++ = m_palette[palind[(sv >> 14) & 3]];
+									*dest++ = m_palette[palind[(sv >> 12) & 3]];
+									*dest++ = m_palette[palind[(sv >> 12) & 3]];
+									*dest++ = m_palette[palind[(sv >> 10) & 3]];
+									*dest++ = m_palette[palind[(sv >> 10) & 3]];
+									*dest++ = m_palette[palind[(sv >>  8) & 3]];
+									*dest++ = m_palette[palind[(sv >>  8) & 3]];
+								}
+							}
 						}
 					}
 					return 0;
@@ -279,20 +331,118 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			}
 		}
 
-		logerror("Unimplemented native mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
-		break;
-
-	case 1: // IBM-compatible graphics mode
+		logerror("Unimplemented ibm-compatible graphics mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
+	} else {
 		if(large_pixels) {
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
+				case 0: {
+					for(int field=0; field<2; field++) {
+						const u16 *src = bank;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
+							for(u32 x=0; x<320; x+=4) {
+								u16 sv = *src++;
+								*dest++ = m_palette[(sv >>  4) & 15];
+								*dest++ = m_palette[(sv >>  4) & 15];
+								*dest++ = m_palette[(sv >>  0) & 15];
+								*dest++ = m_palette[(sv >>  0) & 15];
+								*dest++ = m_palette[(sv >> 12) & 15];
+								*dest++ = m_palette[(sv >> 12) & 15];
+								*dest++ = m_palette[(sv >>  8) & 15];
+								*dest++ = m_palette[(sv >>  8) & 15];
+							}
+						}
+					}
+					return 0;
+				}
 				case 1: {
 					static int palind[4] = { 0, 1, 4, 5 };
-					for(u32 yy=0; yy<2; yy++) {
-						const u16 *src = m_vram + 4096*yy;
-						for(u32 y=yy; y<200; y+=2) {
-							u32 *dest = &bitmap.pix32(y);
+					for(int field=0; field<2; field++) {
+						const u16 *src = bank;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
 							for(u32 x=0; x<320; x+=8) {
+								u16 sv = *src++;
+								*dest++ = m_palette[palind[(sv >>  6) & 3]];
+								*dest++ = m_palette[palind[(sv >>  6) & 3]];
+								*dest++ = m_palette[palind[(sv >>  4) & 3]];
+								*dest++ = m_palette[palind[(sv >>  4) & 3]];
+								*dest++ = m_palette[palind[(sv >>  2) & 3]];
+								*dest++ = m_palette[palind[(sv >>  2) & 3]];
+								*dest++ = m_palette[palind[(sv >>  0) & 3]];
+								*dest++ = m_palette[palind[(sv >>  0) & 3]];
+								*dest++ = m_palette[palind[(sv >> 14) & 3]];
+								*dest++ = m_palette[palind[(sv >> 14) & 3]];
+								*dest++ = m_palette[palind[(sv >> 12) & 3]];
+								*dest++ = m_palette[palind[(sv >> 12) & 3]];
+								*dest++ = m_palette[palind[(sv >> 10) & 3]];
+								*dest++ = m_palette[palind[(sv >> 10) & 3]];
+								*dest++ = m_palette[palind[(sv >>  8) & 3]];
+								*dest++ = m_palette[palind[(sv >>  8) & 3]];
+							}
+						}
+					}
+					return 0;
+				}
+				case 2: {
+					static int palind[4] = { 0, 1 };
+					for(int field=0; field<2; field++) {
+						const u16 *src = bank;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
+							for(u32 x=0; x<320; x+=16) {
+								u16 sv = *src++;
+								*dest++ = m_palette[palind[(sv >>  7) & 1]];
+								*dest++ = m_palette[palind[(sv >>  7) & 1]];
+								*dest++ = m_palette[palind[(sv >>  6) & 1]];
+								*dest++ = m_palette[palind[(sv >>  6) & 1]];
+								*dest++ = m_palette[palind[(sv >>  5) & 1]];
+								*dest++ = m_palette[palind[(sv >>  5) & 1]];
+								*dest++ = m_palette[palind[(sv >>  4) & 1]];
+								*dest++ = m_palette[palind[(sv >>  4) & 1]];
+								*dest++ = m_palette[palind[(sv >>  3) & 1]];
+								*dest++ = m_palette[palind[(sv >>  3) & 1]];
+								*dest++ = m_palette[palind[(sv >>  2) & 1]];
+								*dest++ = m_palette[palind[(sv >>  2) & 1]];
+								*dest++ = m_palette[palind[(sv >>  1) & 1]];
+								*dest++ = m_palette[palind[(sv >>  1) & 1]];
+								*dest++ = m_palette[palind[(sv >>  0) & 1]];
+								*dest++ = m_palette[palind[(sv >>  0) & 1]];
+								*dest++ = m_palette[palind[(sv >> 15) & 1]];
+								*dest++ = m_palette[palind[(sv >> 15) & 1]];
+								*dest++ = m_palette[palind[(sv >> 14) & 1]];
+								*dest++ = m_palette[palind[(sv >> 14) & 1]];
+								*dest++ = m_palette[palind[(sv >> 13) & 1]];
+								*dest++ = m_palette[palind[(sv >> 13) & 1]];
+								*dest++ = m_palette[palind[(sv >> 12) & 1]];
+								*dest++ = m_palette[palind[(sv >> 12) & 1]];
+								*dest++ = m_palette[palind[(sv >> 11) & 1]];
+								*dest++ = m_palette[palind[(sv >> 11) & 1]];
+								*dest++ = m_palette[palind[(sv >> 10) & 1]];
+								*dest++ = m_palette[palind[(sv >> 10) & 1]];
+								*dest++ = m_palette[palind[(sv >>  9) & 1]];
+								*dest++ = m_palette[palind[(sv >>  9) & 1]];
+								*dest++ = m_palette[palind[(sv >>  8) & 1]];
+								*dest++ = m_palette[palind[(sv >>  8) & 1]];
+							}
+						}
+					}
+					return 0;
+				}
+				}
+			}
+		} else {
+			if(!interleave) {
+				switch(pixels_per_byte_order) {
+				case 0: {
+					static int palind[4] = { 0, 1, 4, 5 };
+					for(int field=0; field<2; field++) {
+						m_palette[1] = 0xffffff;
+						const u16 *src = bank;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
+							for(u32 x=0; x<640; x+=8) {
 								u16 sv = *src++;
 								*dest++ = m_palette[palind[(sv >>  6) & 3]];
 								*dest++ = m_palette[palind[(sv >>  4) & 3]];
@@ -307,38 +457,40 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					}
 					return 0;
 				}
-				}
-			}
-		}
-
-		logerror("Unimplemented ibm-compatible graphics mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
-		break;
-
-	case 2: // IBM-compatible character mode
-		if(large_pixels) {
-			if(!interleave) {
-				for(u32 y=0; y<25; y++) {
-					for(u32 x=0; x<40; x++) {
-						u16 val = m_vram[y*40+x];
-						const u16 *src = m_vram + 0x1000 + ((val >> 1) & 0x7f);
-						for(u32 yy=0; yy<8; yy++) {
-							u8 pix = val & 1 ? *src >> 8 : *src;
-							src += 128;
-							u32 *dest = &bitmap.pix32(8*y+yy, 8*x);
-							for(u32 xx=0; xx<8; xx++)
-								*dest++ = pix & (0x80 >> xx) ? m_palette[1] : m_palette[0];					
+				case 1: {
+					static int palind[4] = { 0, 4 };
+					for(int field=0; field<2; field++) {
+						const u16 *src = bank;
+						for(u32 y=0; y<200; y++) {
+							u32 *dest = &bitmap.pix32(2*y+field);
+							for(u32 x=0; x<640; x+=16) {
+								u16 sv = *src++;
+								*dest++ = m_palette[palind[(sv >>  7) & 1]];
+								*dest++ = m_palette[palind[(sv >>  6) & 1]];
+								*dest++ = m_palette[palind[(sv >>  5) & 1]];
+								*dest++ = m_palette[palind[(sv >>  4) & 1]];
+								*dest++ = m_palette[palind[(sv >>  3) & 1]];
+								*dest++ = m_palette[palind[(sv >>  2) & 1]];
+								*dest++ = m_palette[palind[(sv >>  1) & 1]];
+								*dest++ = m_palette[palind[(sv >>  0) & 1]];
+								*dest++ = m_palette[palind[(sv >> 15) & 1]];
+								*dest++ = m_palette[palind[(sv >> 14) & 1]];
+								*dest++ = m_palette[palind[(sv >> 13) & 1]];
+								*dest++ = m_palette[palind[(sv >> 12) & 1]];
+								*dest++ = m_palette[palind[(sv >> 11) & 1]];
+								*dest++ = m_palette[palind[(sv >> 10) & 1]];
+								*dest++ = m_palette[palind[(sv >>  9) & 1]];
+								*dest++ = m_palette[palind[(sv >>  8) & 1]];
+							}
 						}
 					}
+					return 0;
 				}
-				return 0;
+				}
 			}
 		}
-		logerror("Unimplemented ibm-compatible character mode (%dx%d)\n", large_pixels ? 320/8 : 640/8, interleave ? 400/8 : 200/8);
-		break;
 
-	case 3: // Unknown
-		logerror("Unknown graphics mode type 3\n");
-		break;
+		logerror("Unimplemented native mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
 	}
 
 	bitmap.fill(0);
@@ -414,6 +566,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	u16 dst_seg = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 22) & 0xffff)));
 	u16 wmask   = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 24) & 0xffff)));
 	u16 kmask   = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 26) & 0xffff)));
+	if(1)
 	logerror("GCO: p src %04x:%04x.%x dst %04x:%04x.%x sz %xx%x step %x:%x mask %04x:%04x k %x:%x mode %c%c%c%d%c%d%c%c%c\n", src_seg, src_adr, src_sft, dst_seg, dst_adr, dst_sft, width, height, sy, dy, rmask, wmask, (kmask >> 8) & 15, kmask & 15,
 			 mode & 0x80 ? 'k' : '-',
 			 mode & 0x40 ? 't' : 'o',
@@ -430,17 +583,14 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	// x = go right to left (unimplemented)
 	// f = fast (no idea what it means)
 	// n = invert collision flag (unimplemented)
-	// p = pattern fill (unimplemented, used by fill_dest_buffer)
-	// i/f = increment source / don't (unimplemented, compare with p?, used by blt_copy_word)
+	// p = pattern fill (semi-implemented, used by fill_dest_buffer)
+	// i/f = increment source / don't (used by blt_copy_word)
 
 	if(mode & 0x200) {
-		// Weird, does one with target bbe8:0000 which blows everything up
-		if(dst_seg != 0xbbe8) {
-			u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
-			for(u16 w=0; w != width; w++) {
-				m_gcos->write_word((dst_seg << 4) + dst_adr, src);
-				dst_adr += 2;
-			}
+		u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
+		for(u16 w=0; w != width/2; w++) {
+			m_gcos->write_word((dst_seg << 4) + dst_adr, src);
+			dst_adr += 2;
 		}
 
 	} else {
@@ -462,20 +612,27 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 		mwmask &= awmask;
 		ewmask &= awmask;
 
+		bool preload = dst_sft > src_sft;
+		int src_do_sft = 15 - src_sft;
+		int dst_do_sft = (preload ? 31 : 15) - dst_sft;
+
 		u16 nw = ((width + (15 - dst_sft)) + 15) >> 4;
 
 		for(u32 y=0; y<height; y++) {
 			u16 src_cadr = src_adr;
 			u16 dst_cadr = dst_adr;
-			
+
 			u16 cmask = swmask;
 			u16 nw1 = nw;
-			u32 srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-			if(mode & 0x100)
-				src_cadr += 2;
+			u32 srcs = 0;
+			if(preload) {
+				srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr)) << src_do_sft;
+				if(mode & 0x100)
+					src_cadr += 2;
+			}
 			do {
-				srcs = (srcs << 16) | sw(m_gcos->read_word((src_seg << 4) + src_cadr));
-				u16 src = (srcs >> (src_sft + 1)) & rmask;
+				srcs = (srcs << 16) | (sw(m_gcos->read_word((src_seg << 4) + src_cadr)) << src_do_sft);
+				u16 src = (srcs >> dst_do_sft) & rmask;
 				u16 dst = sw(m_gcos->read_word((dst_seg << 4) + dst_cadr));
 				u16 res = blend(src, dst);
 				if(mode & 0x40) {
@@ -505,8 +662,6 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 				res = (dst & ~cmask) | (res & cmask);
 
-				//				logerror("GCO: %04x * %04x = %04x @ %04x\n", src, dst, res, cmask);
-			
 				m_gcos->write_word((dst_seg << 4) + dst_cadr, sw(res));
 				if(mode & 0x100)
 					src_cadr += 2;
@@ -530,6 +685,7 @@ void mindset_state::gco_w(u16)
 	u16 packet_adr  = sw(m_gcos->read_word(0xbfd78));
 	u16 global_mode = sw(m_gcos->read_word(0xbfd76));
 
+	if(1)
 	logerror("GCO: start %04x:%04x mode %04x (%05x)\n", packet_seg, packet_adr, global_mode, m_maincpu->pc());
 
 	switch(global_mode) {
@@ -545,6 +701,57 @@ void mindset_state::gco_w(u16)
 	// Can trigger an irq, on mode & 2 (or is it 200?) (0x40 on 8282, ack on 0x41, which means the system 8042...)
 }
 
+void mindset_state::fdc_ctrl_w(u8 data)
+{
+	logerror("fdc control %02x\n", data);
+	if(data & 0x04)
+		m_fdc->reset();
+	m_floppy[data & 1]->mon_w(!(data & 2));
+	m_floppy[(data & 1)^1]->mon_w(true);
+}
+
+void mindset_state::fdc_int_w(int state)
+{
+	if(!m_fdc_intext && state)
+		m_fdc_int = true;
+	m_fdc_intext = state;
+	m_maincpu->int0_w(m_fdc_int);
+}
+
+u16 mindset_state::fdc_clear_interrupt()
+{
+	m_fdc_int = false;
+	m_maincpu->int0_w(m_fdc_int);
+	return 0x0000;
+}
+
+void mindset_state::fdc_dma_count_w(u16 data)
+{
+	m_fdc_dma_count = data;
+	logerror("fdc dma count %x\n", m_fdc_dma_count);
+}
+
+u8 mindset_state::fdc_dma_r()
+{
+	u8 res = m_fdc->dma_r();
+	if(!m_fdc_dma_count) {
+		m_fdc->tc_w(1);
+		m_fdc->tc_w(0);
+	} else
+		m_fdc_dma_count--;
+	return res;
+}
+
+void mindset_state::fdc_dma_w(u8 data)
+{
+	m_fdc->dma_w(data);
+	if(!m_fdc_dma_count) {
+		m_fdc->tc_w(1);
+		m_fdc->tc_w(0);
+	} else
+		m_fdc_dma_count--;
+}
+
 void mindset_state::maincpu_mem(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram();
@@ -554,11 +761,29 @@ void mindset_state::maincpu_mem(address_map &map)
 
 void mindset_state::maincpu_io(address_map &map)
 {
+	map(0x8050, 0x8050).w(FUNC(mindset_state::fdc_ctrl_w));
+	map(0x8054, 0x8054).rw(FUNC(mindset_state::fdc_dma_r), FUNC(mindset_state::fdc_dma_w));
+	map(0x8058, 0x8059).w(FUNC(mindset_state::fdc_dma_count_w));
+	map(0x805c, 0x805d).r(FUNC(mindset_state::fdc_clear_interrupt));
+	map(0x8060, 0x8060).r(m_fdc, FUNC(i8272a_device::msr_r));
+	map(0x8062, 0x8062).rw(m_fdc, FUNC(i8272a_device::fifo_r), FUNC(i8272a_device::fifo_w));
+
+	map(0x8080, 0x8080).lr8("id13", []() -> u8 { return 0x13; }); // sound
+	map(0x80c0, 0x80c0).lr8("id3f", []() -> u8 { return 0x3f; }); // serial type 1, maybe?
+	map(0x8100, 0x8100).lr8("id5f", []() -> u8 { return 0x5f; }); // serial type 2
+	map(0x8140, 0x8140).lr8("id70", []() -> u8 { return 0x70; }); // parallel printer, init writes 0x82 at +6
+	map(0x8180, 0x8180).lr8("id73", []() -> u8 { return 0x73; }); // serial type 3
+
 	map(0x8280, 0x8283).rw(m_syscpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x82a0, 0x82a3).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x8300, 0x8301).w(FUNC(mindset_state::gco_w));
 	map(0x8320, 0x8321).rw(FUNC(mindset_state::dispreg_r), FUNC(mindset_state::dispreg_w));
 	map(0x8322, 0x8323).rw(FUNC(mindset_state::dispctrl_r), FUNC(mindset_state::dispctrl_w));
+}
+
+static void pc_dd_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
 }
 
 void mindset_state::mindset(machine_config &config)
@@ -578,6 +803,8 @@ void mindset_state::mindset(machine_config &config)
 	m_syscpu->t1_in_cb().set(FUNC(mindset_state::sys_t1_r));
 
 	I8042(config, m_soundcpu, 12_MHz_XTAL/2);
+	m_soundcpu->p1_out_cb().set(FUNC(mindset_state::snd_p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(mindset_state::snd_p2_w));
 
 	I8749(config, m_kbdcpu, 6_MHz_XTAL);
 	m_kbdcpu->p1_out_cb().set(FUNC(mindset_state::kbd_p1_w));
@@ -589,14 +816,19 @@ void mindset_state::mindset(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(100));
-	m_screen->set_size(320, 200);
-	m_screen->set_visarea(0, 319, 0, 199);
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 639, 0, 399);
 	m_screen->set_screen_update(FUNC(mindset_state::screen_update));
+	// Should be at the position indicated by display reg 2
 	m_screen->scanline().set([this](int scanline) { m_maincpu->int2_w(scanline == 198); });
-	// This is bad and wrong and I don't yet care
-	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
-	//	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+
+	I8272A(config, m_fdc, 16_MHz_XTAL/2, true);
+	m_fdc->intrq_wr_callback().set(FUNC(mindset_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_fdc->set_ready_line_connected(false);
+	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
 }
 
 static INPUT_PORTS_START(mindset)

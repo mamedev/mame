@@ -820,7 +820,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	/* cassette */
 	CASSETTE(config, m_cassette, 0);
 	m_cassette->set_formats(oric_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
 
 	/* via */
 	VIA6522(config, m_via, 12_MHz_XTAL / 12);

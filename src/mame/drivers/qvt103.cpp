@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
+		, m_vram(*this, "vram")
 	{ }
 
 	void qvt103(machine_config &config);
@@ -35,20 +36,40 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
+	required_shared_ptr<u8> m_vram;
 };
 
 u32 qvt103_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	for (int col = 0; col < 25; col++)
+	{
+		for (int row = 0; row < 80; row++)
+		{
+			uint8_t code = m_vram[col * 80 + row] & 0x7f;
+
+			for (int y = 0; y < 12; y++)
+			{
+				uint16_t gfx = m_p_chargen[code << 4 | y];
+
+				for (int x = 0; x < 8; x++)
+					bitmap.pix32(col*12 + y, row*8 + (7 - x)) = BIT(gfx, x) ? rgb_t::white() : rgb_t::black();
+			}
+		}
+	}
+
 	return 0;
 }
 
 void qvt103_state::mem_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
 	map(0x6000, 0x6001).rw("kbdmcu", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
+//	map(0x6000, 0x6001).lr8("test", [this]() -> u8 { return machine().rand(); }); // uncomment to pass kbd test
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0xa000, 0xa03f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
-	map(0xc000, 0xffff).ram(); // not entirely contiguous?
+	map(0xc000, 0xdfff).ram(); // not entirely contiguous?
+	map(0xe000, 0xffff).ram().share("vram");
 }
 
 void qvt103_state::io_map(address_map &map)

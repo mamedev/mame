@@ -51,6 +51,7 @@ Other games:
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "video/pwm.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -71,12 +72,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_ca1_off(*this, "ca1_off"),
-		m_delay_update(*this, "delay_update"),
-		m_inputs(*this, "IN.%u", 0),
-		m_out_digit(*this, "digit%u", 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void ggm(machine_config &config);
@@ -91,18 +91,16 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_device<timer_device> m_ca1_off;
-	required_device<timer_device> m_delay_update;
 	required_ioport_array<6> m_inputs;
-	output_finder<8> m_out_digit;
 
 	void main_map(address_map &map);
 
 	void update_reset(ioport_value state);
 	void update_display();
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_update) { update_display(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
 	u8 m_digit_select;
@@ -124,9 +122,6 @@ private:
 
 void ggm_state::machine_start()
 {
-	// resolve handlers
-	m_out_digit.resolve();
-
 	// zerofill
 	m_digit_select = 0;
 	m_digit_data = 0;
@@ -162,10 +157,8 @@ void ggm_state::update_reset(ioport_value state)
 		m_via->reset();
 
 		// clear display
-		m_digit_data = 0;
-		m_digit_select = 0xff;
-		update_display();
 		m_digit_select = 0;
+		update_display();
 	}
 }
 
@@ -199,17 +192,17 @@ READ8_MEMBER(ggm_state::cartridge_r)
 void ggm_state::update_display()
 {
 	u16 data = bitswap<16>(m_digit_data,15,7,2,11,10,3,1,9,6,14,12,5,0,4,13,8);
-
-	for (int i = 0; i < 8; i++)
-		if (BIT(m_digit_select, i))
-			m_out_digit[i] = data & 0x3fff;
+	m_display->matrix(m_digit_select, data);
 }
 
 WRITE_LINE_MEMBER(ggm_state::shift_clock_w)
 {
 	// shift display segment data on rising edge
 	if (state && !m_shift_clock)
+	{
 		m_digit_data = m_digit_data << 1 | (m_shift_data & 1);
+		update_display();
+	}
 
 	m_shift_clock = state;
 }
@@ -221,12 +214,9 @@ WRITE_LINE_MEMBER(ggm_state::shift_data_w)
 
 WRITE8_MEMBER(ggm_state::select_w)
 {
-	// update display on rising edge, but delay a bit until shifter is ready
-	if (~m_digit_select & data && !m_delay_update->enabled())
-		m_delay_update->adjust(attotime::from_usec(50));
-
 	// input mux, digit select
 	m_digit_select = data;
+	update_display();
 }
 
 WRITE8_MEMBER(ggm_state::control_w)
@@ -372,7 +362,9 @@ void ggm_state::ggm(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	TIMER(config, m_delay_update).configure_generic(FUNC(ggm_state::delay_update));
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_segmask(0xff, 0x3fff);
+	m_display->set_bri_levels(0.05);
 	config.set_default_layout(layout_aci_ggm);
 
 	/* sound hardware */

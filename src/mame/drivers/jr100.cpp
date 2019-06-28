@@ -400,7 +400,7 @@ void jr100_state::jr100(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	CASSETTE(config, m_cassette, 0);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* quickload */
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));

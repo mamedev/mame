@@ -230,14 +230,9 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		x2 = 1.0f - ui().box_lr_border();
 
 		// draw extra menu area
-<<<<<<< HEAD
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
-		y1 += UI_BOX_TB_BORDER;
-=======
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().options().background_color());
 		y1 += ui().box_tb_border();
->>>>>>> Replaced UI_TARGET_FONT_[ROWS|HEIGHT] and UI_BOX_[LR|TD]_BORDER macros with
-
+		
 		// determine the text height
 		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * ui().box_lr_border(),
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);

@@ -2897,3 +2897,20 @@ if (CPUS["RII"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.h")
 end
+
+--------------------------------------------------
+-- National Semiconductor BCP
+--@src/devices/cpu/bcp/dp8344.h,CPUS["BCP"] = true
+--------------------------------------------------
+
+if (CPUS["BCP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/bcp/dp8344.cpp",
+		MAME_DIR .. "src/devices/cpu/bcp/dp8344.h",
+	}
+end
+
+if (CPUS["BCP"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.h")
+end

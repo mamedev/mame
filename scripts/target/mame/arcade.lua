@@ -135,6 +135,7 @@ CPUS["ST62XX"] = true
 CPUS["DSPP"] = true
 CPUS["HPC"] = true
 --CPUS["RII"] = true
+--CPUS["BCP"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -587,8 +588,9 @@ MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
---MACHINES["SECFLASH"] = true
 MACHINES["SDA2006"] = true
+--MACHINES["SECFLASH"] = true
+--MACHINES["SENSORBOARD"] = true
 MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true

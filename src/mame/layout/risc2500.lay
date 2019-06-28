@@ -218,19 +218,19 @@
 		<image file="chess/wp.png" state="12"/>
 
 		<!-- selected pieces -->
-		<image file="chess/bk.png" state="17"><color alpha="0.6" /></image>
-		<image file="chess/bq.png" state="18"><color alpha="0.6" /></image>
-		<image file="chess/br.png" state="19"><color alpha="0.6" /></image>
-		<image file="chess/bb.png" state="20"><color alpha="0.6" /></image>
-		<image file="chess/bn.png" state="21"><color alpha="0.6" /></image>
-		<image file="chess/bp.png" state="22"><color alpha="0.6" /></image>
+		<image file="chess/bk.png" state="17"><color alpha="0.5" /></image>
+		<image file="chess/bq.png" state="18"><color alpha="0.5" /></image>
+		<image file="chess/br.png" state="19"><color alpha="0.5" /></image>
+		<image file="chess/bb.png" state="20"><color alpha="0.5" /></image>
+		<image file="chess/bn.png" state="21"><color alpha="0.5" /></image>
+		<image file="chess/bp.png" state="22"><color alpha="0.5" /></image>
 
-		<image file="chess/wk.png" state="23"><color alpha="0.6" /></image>
-		<image file="chess/wq.png" state="24"><color alpha="0.6" /></image>
-		<image file="chess/wr.png" state="25"><color alpha="0.6" /></image>
-		<image file="chess/wb.png" state="26"><color alpha="0.6" /></image>
-		<image file="chess/wn.png" state="27"><color alpha="0.6" /></image>
-		<image file="chess/wp.png" state="28"><color alpha="0.6" /></image>
+		<image file="chess/wk.png" state="23"><color alpha="0.5" /></image>
+		<image file="chess/wq.png" state="24"><color alpha="0.5" /></image>
+		<image file="chess/wr.png" state="25"><color alpha="0.5" /></image>
+		<image file="chess/wb.png" state="26"><color alpha="0.5" /></image>
+		<image file="chess/wn.png" state="27"><color alpha="0.5" /></image>
+		<image file="chess/wp.png" state="28"><color alpha="0.5" /></image>
 	</element>
 
 <!-- build screen -->

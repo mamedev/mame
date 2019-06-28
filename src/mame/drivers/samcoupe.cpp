@@ -532,7 +532,7 @@ void samcoupe_state::samcoupe(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("samcoupe_cass");
 	SOFTWARE_LIST(config, "cass_list").set_original("samcoupe_cass");
 

@@ -2,15 +2,15 @@
 // copyright-holders:David Haywood
 
 /*
-	Big Karnak (Modular System)
+    Big Karnak (Modular System)
 
-	this appears to be a different revision than the gaelco.cpp version, so could be original code, or
-	based off one that is otherwise undumped.
+    this appears to be a different revision than the gaelco.cpp version, so could be original code, or
+    based off one that is otherwise undumped.
 
-	as with most of the 'Modular System' setups, the hardware is heavily modified from the original
-	and consists of a multi-board stack in a cage, hence different driver.
+    as with most of the 'Modular System' setups, the hardware is heavily modified from the original
+    and consists of a multi-board stack in a cage, hence different driver.
 
-	TODO: PCB list
+    TODO: PCB list
 
 */
 
@@ -139,7 +139,7 @@ ROM_START( bigkarnkm )
 	ROM_LOAD32_BYTE( "5_ka.ic15",        0x100002, 0x020000, CRC(802128e4) SHA1(20cfdf28aa7ada404ceca236c6eb554dcaa8e633) )
 	ROM_LOAD32_BYTE( "5_ka.ic21",        0x100001, 0x020000, CRC(5ccc0f99) SHA1(ae2b2d4b2aa77a099ad2711032e6a05ab52789b9) )
 	ROM_LOAD32_BYTE( "5_ka.ic27",        0x100000, 0x020000, CRC(55509d96) SHA1(ddd064695ca7e8c2377f13484e385bf7ea7df610) )
-   
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "8_ka_814.ic14",      0x000003, 0x020000, CRC(50e6cab6) SHA1(5af8b27f35a59611484ea35a2883b1e59d5c7517) )
 	ROM_LOAD32_BYTE( "8_ka_821.ic21",      0x000002, 0x020000, CRC(90c1d93e) SHA1(581a1e2f30e8b467c8d8f5c8e528c78c0c3904f2) )
@@ -152,7 +152,7 @@ ROM_START( bigkarnkm )
 
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "51_p0502_n82s129n.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // common PROM found on all? Modular System sets?
-	
+
 	ROM_REGION( 0x100000, "pals", 0 )
 	ROM_LOAD( "51_p0503_pal16r6acn.ic48",       0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) ) // matches one of the Euro League Modular System PALs
 

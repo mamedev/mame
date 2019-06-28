@@ -24,11 +24,11 @@ public:
 	// construction/destruction
 	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(cc_w);	// !CC
-	DECLARE_WRITE_LINE_MEMBER(ccen_w);	// !CCEN
-	DECLARE_WRITE_LINE_MEMBER(ci_w);	// CI
-	DECLARE_WRITE_LINE_MEMBER(rld_w);	// !RLD
-	DECLARE_WRITE_LINE_MEMBER(cp_w);	// CP
+	DECLARE_WRITE_LINE_MEMBER(cc_w);    // !CC
+	DECLARE_WRITE_LINE_MEMBER(ccen_w);  // !CCEN
+	DECLARE_WRITE_LINE_MEMBER(ci_w);    // CI
+	DECLARE_WRITE_LINE_MEMBER(rld_w);   // !RLD
+	DECLARE_WRITE_LINE_MEMBER(cp_w);    // CP
 	void d_w(uint16_t data);
 	void i_w(uint8_t data);
 

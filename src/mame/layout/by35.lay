@@ -1198,7 +1198,7 @@
 
 		<!-- Sound Board Power On Self Test LED -->
 		<bezel name="sound_led0" element="LED_Green"><bounds x="618" y="358" width="10" height="10" /></bezel>
-		<bezel element="Text_Sound_LED">	 <bounds x="609" y="372" width="30" height="10" /></bezel>
+		<bezel element="Text_Sound_LED">     <bounds x="609" y="372" width="30" height="10" /></bezel>
 
 		<!-- Misc Solenoids -->
 		<bezel name="solenoid5"  element="Solenoid_Knocker"><bounds x="297" y="457" width="23" height="09" /></bezel>

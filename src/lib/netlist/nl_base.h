@@ -1705,7 +1705,6 @@ namespace netlist
 		{
 			m_list_active.push_front(&term);
 			railterminal().device().do_inc_active();
-#ifndef _MSC_VER // interim hack
 			if (m_in_queue == queue_status::DELAYED_DUE_TO_INACTIVE)
 			{
 				if (m_next_scheduled_time > exec().time())
@@ -1721,7 +1720,6 @@ namespace netlist
 				update_inputs();
 			}
 			else
-#endif // _MSC_VER
 				term.set_copied_input(m_cur_Q);
 		}
 		else

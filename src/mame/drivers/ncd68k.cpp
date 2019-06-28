@@ -40,7 +40,7 @@
 
 /*
  * WIP status
- *   - ncd16   QLC/BERT test failures, boots from prom, crc error booting from network
+ *   - ncd16   boots from prom, crc error booting from network
  *   - ncd17c  nvram timeout or checksum failure
  *   - ncd19   loads server from network, then hangs
  *
@@ -503,6 +503,20 @@ void ncd16_state::configure(machine_config &config)
 	BERT(config, m_bert, 0).set_memory(m_maincpu, AS_PROGRAM);
 
 	common(config);
+
+	m_duart->outport_cb().set(
+		[this](u8 data)
+		{
+			m_serial[0]->write_rts(BIT(data, 0));
+			m_serial[1]->write_rts(BIT(data, 1));
+			m_serial[0]->write_dtr(BIT(data, 2));
+			m_serial[1]->write_dtr(BIT(data, 3));
+			m_bert->set_qlc_mode(BIT(data, 5));
+
+			// TODO: bit 4 - usually set
+			// TODO: bit 6 - usually set
+			// TODO: bit 7 - set/cleared continuously
+		});
 }
 
 void ncd17c_state::configure(machine_config &config)

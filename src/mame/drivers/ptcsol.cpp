@@ -764,11 +764,11 @@ void sol20_state::sol20(machine_config &config)
 
 	// devices
 	CASSETTE(config, m_cass1).set_formats(sol20_cassette_formats);
-	m_cass1->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass1->set_interface("sol20_cass");
 
 	CASSETTE(config, m_cass2).set_formats(sol20_cassette_formats);
-	m_cass2->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass2->set_interface("sol20_cass");
 
 	AY51013(config, m_uart); // TMS6011NC
@@ -815,6 +815,9 @@ ROM_START( sol20 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
 	ROM_LOAD( "6575.bin", 0x0800, 0x0800, BAD_DUMP CRC(cfdb76c2) SHA1(ab00798161d13f07bee3cf0e0070a2f0a805591f) )
+
+	ROM_REGION( 0x100, "keyboard", 0 )
+	ROM_LOAD( "8574.u18", 0x000, 0x100, NO_DUMP ) // 256x4 bipolar PROM or mask ROM; second half unused
 ROM_END
 
 /* Driver */

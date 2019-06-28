@@ -93,7 +93,7 @@ undoukai                        // A17 (c) 1984 Taito
 4d410                           // (c) SGI 1991
 
 @source:4dpi.cpp
-sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz
+4d20                            // IP6: Personal Iris 4D/20, R2000 @12.5MHz
 
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 System Compumatic
@@ -21590,6 +21590,7 @@ mice2_6809                      // (c) 1986 Microtek International, Inc.
 
 @source:micral.cpp
 micral                          //
+questarm
 
 @source:micro20.cpp
 micro20                         // (c) 1984 GMX
@@ -30963,6 +30964,9 @@ ccmk2                           // Chess Champion MK II
 nocto                           //
 npresto                         //
 
+@source:novag_savant.cpp
+savant                          //
+
 @source:novag_scon.cpp
 supercon                        //
 
@@ -32300,7 +32304,8 @@ drgw3103                        //
 drgw3105                        //
 dw2001                          // (c) 2001 Dragon World 2001
 dw2v100x                        //
-dwex                            // (c) 1998 Dragon World 3 EX
+dwex                            // (c) 2000 Dragon World 3 EX V100
+dwex101cn                       // (c) 2001 Dragon World 3 EX V101CN
 dwpc                            // (c) 2001 Dragon World Pretty Chance
 espgal                          // (c) 2003 Espgaluda
 espgalbl                        //
@@ -32384,7 +32389,8 @@ photoy2k104                     //
 puzlstar                        // (c) 1999 Puzzle Star
 puzzli2                         // (c) 1999 Puzzli 2
 puzzli2s                        // (c) 2001 Puzzli 2 Super
-py2k2                           // (c) 2001 Photo Y2K2
+py2k2                           // (c) 2001 Photo Y2K2 (M101XX)
+py2k2100                        // (c) 2000 Photo Y2K2 (ver. 100)
 svg                             // (c) 2003 Spectral vs Generation
 svgpcb                          //
 svgtw                           //
@@ -32991,7 +32997,6 @@ gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 gl6000sl                        // Genius Leader 6000SL (Germany)
-gl6600cx                        // Genius Leader 6600CX (Germany)
 gl7007sl                        // Genius Leader 7007SL (Germany)
 glcolor                         // Genius Leader Color (Germany)
 glmcolor                        // Genius Leader Magic Color (Germany)
@@ -34954,6 +34959,7 @@ f1enj                           // 1991.11 F-1 Exhaust Note (Japan)
 f1enu                           // 1992.01 F-1 Exhaust Note (US)
 f1lap                           // 1993.?? F-1 Super Lap (World)
 f1lapj                          // 1993.09 F-1 Super Lap (Japan)
+f1lapt                          // 1993.?? F-1 Super Lap (World) - Factory Unprotected
 ga2                             // 1992.?? Golden Axe II (World)
 ga2j                            // 1992.10 Golden Axe Death Adder no Fukusyuu (Japan)
 ga2u                            // 1992.09 Golden Axe II (US)
@@ -37668,6 +37674,9 @@ tek4404                         // (c) 1984 Tektronix
 @source:tekxp33x.cpp
 tekxp330                        //
 
+@source:telex1192.cpp
+telex1192                       //
+
 @source:telex274.cpp
 telex274                        //
 
@@ -39283,6 +39292,7 @@ vreadere
 
 @source:vtech_unk1.cpp
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
+gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
 gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
 
 @source:vtech_unk2.cpp

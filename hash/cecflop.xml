@@ -174,7 +174,7 @@
 	</software>
 
 	<software name="printcart">  <!-- Print Cartridges for Chinese Machine -->
-		<description>Zhōnghuá Jī Dǎyìn Hé</description>
+		<description>Zhōnghuájī Dǎyìn Hé</description>
 		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="中华机打印盒"/>

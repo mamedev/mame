@@ -456,6 +456,7 @@ void bcs3_state::bcs3a(machine_config &config)
 	m_screen->set_screen_update(FUNC(bcs3_state::screen_update_bcs3a));
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -487,6 +488,7 @@ void bcs3_state::bcs3b(machine_config &config)
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

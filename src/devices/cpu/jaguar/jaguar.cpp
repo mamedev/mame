@@ -6,11 +6,11 @@
     Core implementation for the portable Jaguar DSP emulator.
     Written by Aaron Giles
 
-	TODO:
-	- Implement pipeline, actually instruction cycles;
-	  Currently implementation is similar to single stepping
-	  with single cycle
-	- Implement and acknowlodge remain registers
+    TODO:
+    - Implement pipeline, actually instruction cycles;
+      Currently implementation is similar to single stepping
+      with single cycle
+    - Implement and acknowlodge remain registers
 
 ***************************************************************************/
 

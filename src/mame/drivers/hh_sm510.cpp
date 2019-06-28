@@ -34,7 +34,7 @@ Misc Nintendo Game & Watch notes:
 
 Trivia: Most of the Nintendo G&W have built-in cheats, likely kept in by
 Nintendo to test the game. These were not accessible to users of course,
-but for the sake of fun they're (usually) available on MAME.
+but for the sake of fun they're available on MAME.
 
 BTANB: On some of the earlier G&W games, eg. gnw_fire, gnw_mmouse, gnw_pchute,
 gnw_popeye, the controls still work after game over, this happens on the real
@@ -1245,7 +1245,7 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -1322,7 +1322,7 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1405,7 +1405,7 @@ public:
 
 static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1493,7 +1493,7 @@ public:
 
 static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // when cheat is activated, not all segments are lit on the ACL reset screen
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1601,7 +1601,7 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1720,7 +1720,7 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1856,7 +1856,7 @@ public:
 
 static INPUT_PORTS_START( gnw_fire )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1957,12 +1957,12 @@ static INPUT_PORTS_START( gnw_tbridge )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2043,12 +2043,12 @@ static INPUT_PORTS_START( gnw_fireatk )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2129,12 +2129,12 @@ static INPUT_PORTS_START( gnw_stennis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2215,12 +2215,12 @@ static INPUT_PORTS_START( gnw_opanic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2315,7 +2315,7 @@ static INPUT_PORTS_START( gnw_dkong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2405,7 +2405,7 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2499,12 +2499,12 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2599,7 +2599,7 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2689,12 +2689,12 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2791,12 +2791,12 @@ static INPUT_PORTS_START( gnw_rshower )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2887,12 +2887,12 @@ static INPUT_PORTS_START( gnw_lboat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3069,12 +3069,12 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3169,12 +3169,12 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // Invincibility when playing on bottom screen only
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // " -- Invincibility when playing on bottom screen only
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3277,12 +3277,12 @@ static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3371,12 +3371,12 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3458,12 +3458,12 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3546,12 +3546,12 @@ static INPUT_PORTS_START( gnw_manhole )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3632,7 +3632,7 @@ static INPUT_PORTS_START( gnw_tfish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3722,7 +3722,7 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3818,7 +3818,7 @@ static INPUT_PORTS_START( gnw_climber )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3930,7 +3930,7 @@ static INPUT_PORTS_START( gnw_bfight )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4035,12 +4035,12 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END

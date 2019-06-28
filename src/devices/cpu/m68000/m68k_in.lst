@@ -8064,6 +8064,9 @@ f400 ff20 cinv     l .          4:16
 	//  u8 scope = (ir >> 3) & 3;
 	//  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
 	switch (cache) {
+	case 1:
+		// TODO: data cache
+		break;
 	case 2:
 	case 3:
 		// we invalidate/push the whole instruction cache

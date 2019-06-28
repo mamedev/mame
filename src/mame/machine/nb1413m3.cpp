@@ -325,7 +325,7 @@ WRITE8_MEMBER( nb1413m3_device::sndrombank1_alt_w )
 			m_counter = 0;
 		}
 	}
-	
+
 	m_nmi_enable = ((data & 0x80) >> 7);
 	//m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }

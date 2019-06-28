@@ -24,6 +24,7 @@
 #include "emu.h"
 #include "includes/aquarius.h"
 
+#include "sound/wave.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -373,6 +374,7 @@ void aquarius_state::aquarius(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
 	ay8910.port_a_read_callback().set_ioport("RIGHT");
@@ -381,7 +383,7 @@ void aquarius_state::aquarius(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "aquarius_cart");

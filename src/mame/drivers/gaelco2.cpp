@@ -527,9 +527,9 @@ void gaelco2_state::saltcrdi(machine_config &config)
   02AB = MC68HC000FN12
   SW1 = 8 dipswitches (soldered on the back side of the PCB, all off by default)
   U24 = Unpopulated socket for 424C257
- 
-  There is also a Salter I/O PCB with a MCU (undumped) labeled as "2". 
-  The I/O PCB layout is slightly different than the one found on the Pro Stepper machine.  
+
+  There is also a Salter I/O PCB with a MCU (undumped) labeled as "2".
+  The I/O PCB layout is slightly different than the one found on the Pro Stepper machine.
 */
 ROM_START( sltpcycl ) // REF 970410
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
@@ -592,7 +592,7 @@ ROM_END
   E208 = MC68HC000FN16
   SW1 = 8 dipswitches (soldered on the back side of the PCB, all off by default)
   U24 = Unpopulated socket for 424C257
- 
+
   There is also a Salter I/O PCB with a MCU (undumped):
 
   Salter PCB "CPU 6022" manufactured by "APEL Electronica"

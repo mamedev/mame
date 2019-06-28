@@ -84,9 +84,18 @@ void save_manager::allow_registration(bool allowed)
 		std::sort(m_entry_list.begin(), m_entry_list.end(),
 			[](std::unique_ptr<state_entry> const& a, std::unique_ptr<state_entry> const& b) { return a->m_name < b->m_name; });
 
+		int dupes_found = 0;
 		for (int i = 0; i < m_entry_list.size() - 1; i++)
+		{
 			if (m_entry_list[i]->m_name == m_entry_list[i + 1]->m_name)
-				fatalerror("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name.c_str());
+			{
+				osd_printf_error("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name.c_str());
+				dupes_found++;
+			}
+		}
+
+		if (dupes_found)
+			fatalerror("%d duplicate save state entries found.\n", dupes_found);
 
 		dump_registry();
 

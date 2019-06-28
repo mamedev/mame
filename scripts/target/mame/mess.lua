@@ -143,6 +143,7 @@ CPUS["HPC"] = true
 CPUS["MEG"] = true
 CPUS["DSPV"] = true
 CPUS["RII"] = true
+CPUS["BCP"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -598,6 +599,7 @@ MACHINES["SCC2698B"] = true
 MACHINES["SCUDSP"] = true
 MACHINES["SECFLASH"] = true
 MACHINES["SEIBU_COP"] = true
+MACHINES["SENSORBOARD"] = true
 --MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SMIOC"] = true
@@ -708,6 +710,7 @@ MACHINES["AIC6250"] = true
 MACHINES["DC7085"] = true
 MACHINES["I82357"] = true
 MACHINES["XC1700E"] = true
+MACHINES["EDLC"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1050,6 +1053,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"at",
 		"atari",
 		"att",
+		"ave",
 		"bally",
 		"bandai",
 		"banctec",
@@ -1712,6 +1716,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/unixpc.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "ave")
+files {
+	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "bally")
 files {
 	MAME_DIR .. "src/mame/drivers/astrohome.cpp",
@@ -1884,7 +1893,6 @@ createMESSProjects(_target, _subtarget, "chess")
 files {
 	MAME_DIR .. "src/mame/machine/chessbase.cpp",
 	MAME_DIR .. "src/mame/includes/chessbase.h",
-	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
 
 	MAME_DIR .. "src/mame/machine/fidelbase.cpp",
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
@@ -1911,10 +1919,7 @@ files {
 	MAME_DIR .. "src/mame/machine/novagbase.cpp",
 	MAME_DIR .. "src/mame/includes/novagbase.h",
 	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_presto.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_scon.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 }
 
@@ -2810,8 +2815,12 @@ files {
 
 createMESSProjects(_target, _subtarget, "novag")
 files {
+	MAME_DIR .. "src/mame/drivers/novag_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_mk1.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_mk2.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_presto.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_scon.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",
 	MAME_DIR .. "src/mame/includes/ssystem3.h",
 	MAME_DIR .. "src/mame/video/ssystem3.cpp",
@@ -3902,6 +3911,10 @@ files {
 	MAME_DIR .. "src/mame/video/dpb_combiner.h",
 	MAME_DIR .. "src/mame/video/dpb_brushproc.cpp",
 	MAME_DIR .. "src/mame/video/dpb_brushproc.h",
+	MAME_DIR .. "src/mame/video/dpb_brushstore.cpp",
+	MAME_DIR .. "src/mame/video/dpb_brushstore.h",
+	MAME_DIR .. "src/mame/video/dpb_framestore.cpp",
+	MAME_DIR .. "src/mame/video/dpb_framestore.h",
 	MAME_DIR .. "src/mame/video/dpb_storeaddr.cpp",
 	MAME_DIR .. "src/mame/video/dpb_storeaddr.h",
 	MAME_DIR .. "src/mame/drivers/dps1.cpp",
@@ -4048,6 +4061,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tasc.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
+	MAME_DIR .. "src/mame/drivers/telex1192.cpp",
 	MAME_DIR .. "src/mame/drivers/telex274.cpp",
 	MAME_DIR .. "src/mame/drivers/telex277d.cpp",
 	MAME_DIR .. "src/mame/drivers/terak.cpp",

@@ -56,8 +56,8 @@
 		<bezel element="text_l2"><bounds x="8.5" y="7.9" width="8" height="1.5" /></bezel>
 		<bezel element="text_l3"><bounds x="8.5" y="16.4" width="8" height="1.5" /></bezel>
 
-		<bezel name="led1" element="led"><bounds x="16" y="8" width="1.5" height="1.5" /></bezel>
-		<bezel name="led0" element="led"><bounds x="16" y="16.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="5.a" element="led"><bounds x="16" y="8" width="1.5" height="1.5" /></bezel>
+		<bezel name="4.a" element="led"><bounds x="16" y="16.5" width="1.5" height="1.5" /></bezel>
 
 		<bezel name="digit0" element="digit"><bounds x="20" y="10" width="4" height="6" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="24" y="10" width="4" height="6" /></bezel>

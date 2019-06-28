@@ -253,7 +253,7 @@ void apogee_state::apogee(machine_config &config)
 	PALETTE(config, m_palette, FUNC(apogee_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
@@ -267,7 +267,7 @@ void apogee_state::apogee(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rka_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("apogee_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apogee");

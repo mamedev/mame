@@ -899,7 +899,7 @@ public:
 	virtual void validity_check(validity_checker &valid) const override;
 
 	void resolve();
-	bool resolve_safe(Result dflt);
+	void resolve_safe(Result dflt);
 
 	Result operator()(address_space &space, offs_t offset = 0, std::make_unsigned_t<Result> mem_mask = DefaultMask);
 	Result operator()(offs_t offset, std::make_unsigned_t<Result> mem_mask = DefaultMask);
@@ -958,13 +958,11 @@ void devcb_read<Result, DefaultMask>::resolve()
 }
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
-bool devcb_read<Result, DefaultMask>::resolve_safe(Result dflt)
+void devcb_read<Result, DefaultMask>::resolve_safe(Result dflt)
 {
 	resolve();
-	bool resolved = !m_functions.empty();
-	if (!resolved)
+	if (m_functions.empty())
 		m_functions.emplace_back([dflt] (address_space &space, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return dflt; });
-	return resolved;
 }
 
 template <typename Result, std::make_unsigned_t<Result> DefaultMask>
@@ -2371,7 +2369,7 @@ public:
 	virtual void validity_check(validity_checker &valid) const override;
 
 	void resolve();
-	bool resolve_safe();
+	void resolve_safe();
 
 	void operator()(address_space &space, offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask = DefaultMask);
 	void operator()(address_space &space, Input data);
@@ -2422,13 +2420,11 @@ void devcb_write<Input, DefaultMask>::resolve()
 }
 
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>
-bool devcb_write<Input, DefaultMask>::resolve_safe()
+void devcb_write<Input, DefaultMask>::resolve_safe()
 {
 	resolve();
-	bool resolved = !m_functions.empty();
-	if (!resolved)
+	if (m_functions.empty())
 		m_functions.emplace_back([] (address_space &space, offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { });
-	return resolved;
 }
 
 template <typename Input, std::make_unsigned_t<Input> DefaultMask>

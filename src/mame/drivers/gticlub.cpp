@@ -148,11 +148,11 @@ Notes:
       CN11/12 - Power connectors
       CN8/9   - 6-pin analog control connectors (to CCD cameras)
       CN10    - 4-pin power connector for IR emitters
-	  CN4/5   - Pin jack/network connectors (to cpu board)
+      CN4/5   - Pin jack/network connectors (to cpu board)
       NRPS11  - Idec NRPS11 PC Board circuit protector
       LM1881  - Video sync separator (DIP8)
-	  056230  - Konami Custom (QFP80)
-	  
+      056230  - Konami Custom (QFP80)
+
 
 
 Bottom Board

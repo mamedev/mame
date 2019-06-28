@@ -60,6 +60,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 }
+
+
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
@@ -2663,18 +2665,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
----------------------------------------------------
-
-if (MACHINES["SERFLASH"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/serflash.cpp",
-		MAME_DIR .. "src/devices/machine/serflash.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/sda2006.h,MACHINES["SDA2006"] = true
 ---------------------------------------------------
 
@@ -2682,6 +2672,30 @@ if (MACHINES["SDA2006"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sda2006.cpp",
 		MAME_DIR .. "src/devices/machine/sda2006.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sensorboard.h,MACHINES["SENSORBOARD"] = true
+---------------------------------------------------
+
+if (MACHINES["SENSORBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sensorboard.cpp",
+		MAME_DIR .. "src/devices/machine/sensorboard.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
+---------------------------------------------------
+
+if (MACHINES["SERFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/serflash.cpp",
+		MAME_DIR .. "src/devices/machine/serflash.h",
 	}
 end
 
@@ -4063,5 +4077,17 @@ if (MACHINES["XC1700E"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/xc1700e.cpp",
 		MAME_DIR .. "src/devices/machine/xc1700e.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/edlc.h,MACHINES["EDLC"] = true
+---------------------------------------------------
+
+if (MACHINES["EDLC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/edlc.cpp",
+		MAME_DIR .. "src/devices/machine/edlc.h",
 	}
 end

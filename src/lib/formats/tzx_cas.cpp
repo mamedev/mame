@@ -230,6 +230,13 @@ static void tzx_output_wave( int16_t **buffer, int length )
 	}
 }
 
+static int pause_one_millisec( int16_t **buffer )
+{
+	int pause_samples = millisec_to_samplecount(1);
+	tzx_output_wave(buffer, pause_samples);
+	return pause_samples;
+}
+
 static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int pilot, int pilot_length, int sync1, int sync2, int bit0, int bit1, int bits_in_last_byte )
 {
 	int pilot_samples = tcycles_to_samplecount(pilot);
@@ -284,11 +291,10 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 	/* pause */
 	if (pause > 0)
 	{
-		int start_pause_samples = millisec_to_samplecount(1);
+		size += pause_one_millisec(buffer);
+
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
@@ -320,11 +326,10 @@ static int tzx_handle_direct(int16_t **buffer, const uint8_t *bytes, int pause, 
 	/* pause */
 	if (pause > 0)
 	{
-		int start_pause_samples = millisec_to_samplecount(1);
+		size += pause_one_millisec(buffer);
+
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
@@ -464,11 +469,10 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 	/* pause */
 	if (pause > 0)
 	{
-		int start_pause_samples = millisec_to_samplecount(1);
+		size += pause_one_millisec(buffer);
+
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
@@ -738,6 +742,8 @@ static int tzx_cas_do_work( int16_t **buffer )
 
 		}
 	}
+	// Adding 1 ms. pause to ensure that the last edge is properly finished at the end of tape
+	size += pause_one_millisec(buffer);
 	return size;
 }
 
