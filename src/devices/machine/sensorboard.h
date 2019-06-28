@@ -18,13 +18,14 @@ public:
 
 	enum sb_type
 	{
-		BUTTONS = 0,
+		NOSENSORS = 0,
+		BUTTONS,
 		MAGNETS,
 		INDUCTIVE
 	};
 
 	// configuration helpers
-	sensorboard_device &set_type(sb_type t) { m_magnets = (t == MAGNETS); m_inductive = (t == INDUCTIVE); return *this; } // sensor type
+	sensorboard_device &set_type(sb_type type); // sensor type
 	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 10 * 10
 	sensorboard_device &set_spawnpoints(u8 i) { m_maxspawn = i; m_maxid = i; return *this; } // number of piece spawnpoints, max 16
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)

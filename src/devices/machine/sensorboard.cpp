@@ -58,7 +58,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	// set defaults for most common use case (aka chess)
 	set_size(8, 8);
 	set_spawnpoints(12);
-	m_sensordelay = attotime::from_msec(75);
+	set_delay(attotime::from_msec(75));
 }
 
 
@@ -184,6 +184,20 @@ void sensorboard_device::device_reset()
 //  public handlers
 //-------------------------------------------------
 
+sensorboard_device &sensorboard_device::set_type(sb_type type)
+{
+	m_inductive = (type == INDUCTIVE);
+	m_magnets = (type == MAGNETS) || m_inductive;
+
+	if (type == NOSENSORS)
+	{
+		set_mod_enable(false);
+		set_delay(attotime::never);
+	}
+
+	return *this;
+}
+
 u8 sensorboard_device::read_sensor(u8 x, u8 y)
 {
 	if (x >= m_width || y >= m_height)
@@ -192,7 +206,7 @@ u8 sensorboard_device::read_sensor(u8 x, u8 y)
 	u8 live_state = BIT(m_inp_rank[y]->read(), x);
 	int pos = (y << 4 & 0xf0) | (x & 0x0f);
 
-	if (m_magnets || m_inductive)
+	if (m_magnets)
 	{
 		u8 piece = read_piece(x, y);
 		u8 state = (piece != 0 && pos != m_handpos && pos != m_droppos) ? 1 : 0;
@@ -383,7 +397,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 		return;
 
 	// auto click / sensor delay
-	if (m_sensordelay != attotime::never && (m_magnets || m_inductive || (pos != m_handpos && ~m_inp_ui->read() & 2)))
+	if (m_sensordelay != attotime::never && (m_magnets || (pos != m_handpos && ~m_inp_ui->read() & 2)))
 	{
 		m_sensorpos = pos;
 		m_sensortimer->adjust(m_sensordelay);
