@@ -4,7 +4,8 @@
 /******************************************************************************
 
 Novag Savant, chess computer with touchscreen. It was followed by Savant II and
-Savant Royale on similar hardware. The chess engine is MyChess by David Kittinger.
+Savant Royale on similar hardware, the latter was a German limited release overclock
+version of Savant II. The chess engine is MyChess by David Kittinger.
 
 Hardware overview:
 - Zilog Z80B @ 6MHz
