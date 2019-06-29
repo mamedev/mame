@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Sandro Ronco
 /******************************************************************************
 
 Tasc ChessSystem
@@ -27,14 +27,22 @@ references:
 - https://www.schach-computer.info/wiki/index.php?title=Tasc_SmartBoard
 - https://www.miclangschach.de/index.php?n=Main.TascR30
 
-TODO:
-- everything
+notes:
+- holding LEFT+RIGHT on boot load the QC TestMode
+- holding UP+DOWN on boot load the TestMode
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
+#include "machine/nvram.h"
+#include "machine/smartboard.h"
 #include "machine/timer.h"
+#include "video/t6963c.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+#include "tascr30.lh"
 
 
 namespace {
@@ -45,9 +53,14 @@ public:
 	tasc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_lcd(*this, "lcd"),
+		m_smartboard(*this, "smartboard"),
 		m_rom(*this, "maincpu"),
+		m_speaker(*this, "speaker"),
 		m_mainram(*this, "mainram"),
-		m_disable_bootrom(*this, "disable_bootrom")
+		m_disable_bootrom(*this, "disable_bootrom"),
+		m_inputs(*this, "IN.%u", 0U),
+		m_out_leds(*this, "pled%u", 0U)
 	{ }
 
 	void tasc(machine_config &config);
@@ -59,13 +72,19 @@ protected:
 private:
 	// devices/pointers
 	required_device<arm_cpu_device> m_maincpu;
+	required_device<lm24014h_device> m_lcd;
+	required_device<tasc_sb30_device> m_smartboard;
 	required_region_ptr<u32> m_rom;
+	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<u32> m_mainram;
 	required_device<timer_device> m_disable_bootrom;
+	required_ioport_array<4> m_inputs;
+	output_finder<2> m_out_leds;
 
 	void main_map(address_map &map);
 
 	bool m_bootrom_enabled;
+	uint32_t m_mux;
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { m_bootrom_enabled = false; }
 
 	// I/O handlers
@@ -76,12 +95,15 @@ private:
 
 void tasc_state::machine_start()
 {
+	m_out_leds.resolve();
 	save_item(NAME(m_bootrom_enabled));
+	save_item(NAME(m_mux));
 }
 
 void tasc_state::machine_reset()
 {
 	m_bootrom_enabled = true;
+	m_mux = 0;
 }
 
 
@@ -96,21 +118,39 @@ READ32_MEMBER(tasc_state::bootrom_r)
 
 READ32_MEMBER(tasc_state::p1000_r)
 {
-	logerror("p1000_r\n");
-
 	// disconnect bootrom from the bus after next opcode
 	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
 		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(5));
 
-	return 0;
+	uint32_t data = m_smartboard->read();
+
+	for(int i=0; i<4; i++)
+	{
+		if (BIT(m_mux, i))
+			data |= (m_inputs[i]->read() << 24);
+	}
+
+	return data;
 }
 
 WRITE32_MEMBER(tasc_state::p1000_w)
 {
-	// similar to risc2500 where msb is select, lsb is data
-	logerror("p1000_w: %02X %02X\n", data >> 24, data & 0xff);
-}
+	if (ACCESSING_BITS_24_31)
+	{
+		if (BIT(data, 27))
+			m_lcd->write(BIT(data, 26), data & 0xff);
 
+		m_smartboard->write((data >> 24) & 0xff);
+	}
+	else
+	{
+		m_out_leds[0] = BIT(data, 0);
+		m_out_leds[1] = BIT(data, 1);
+		m_speaker->level_w((data >> 2) & 3);
+	}
+
+	COMBINE_DATA(&m_mux);
+}
 
 
 /******************************************************************************
@@ -123,7 +163,7 @@ void tasc_state::main_map(address_map &map)
 	map(0x00000000, 0x0000000b).r(FUNC(tasc_state::bootrom_r));
 	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::p1000_r), FUNC(tasc_state::p1000_w));
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
-	//map(0x03000000, 0x03003fff).ram();
+	map(0x03000000, 0x0307ffff).ram().share("nvram").umask32(0x000000ff);
 }
 
 
@@ -133,6 +173,25 @@ void tasc_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( tasc )
+	PORT_START("IN.0")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)		PORT_NAME("PLAY")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LEFT)	PORT_NAME("LEFT")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("IN.1")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE)	PORT_NAME("BACK")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_RIGHT)	PORT_NAME("RIGHT")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("IN.2")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M)		PORT_NAME("MENU")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_UP)	PORT_NAME("UP")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L)		PORT_NAME("Left Clock")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER)	PORT_NAME("ENTER")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DOWN)	PORT_NAME("DOWN")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)		PORT_NAME("Right Clock")
 INPUT_PORTS_END
 
 
@@ -150,6 +209,21 @@ void tasc_state::tasc(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_hold), attotime::from_hz(250));
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(tasc_state::disable_bootrom));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+
+	LM24014H(config, m_lcd, 0);
+	m_lcd->set_fs(1);	// font size 6x8
+
+	TASC_SB30(config, m_smartboard, 0);
+
+	config.set_default_layout(layout_tascr30);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	static const int16_t speaker_levels[3] = { 0, 32767, -32768 };
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.75);
+	m_speaker->set_levels(3, speaker_levels);
 }
 
 
@@ -189,4 +263,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1993, tascr30, 0,      0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1993, tascr30, 0,      0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

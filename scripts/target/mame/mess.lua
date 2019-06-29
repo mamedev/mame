@@ -1222,6 +1222,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ta",
 		"tandberg",
 		"tangerin",
+		"tasc",
 		"tatung",
 		"teamconc",
 		"tektroni",
@@ -3366,6 +3367,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/oric.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "tasc")
+files {
+	MAME_DIR .. "src/mame/drivers/tasc.cpp",
+	MAME_DIR .. "src/mame/machine/smartboard.cpp",
+	MAME_DIR .. "src/mame/machine/smartboard.h",
+}
+
 createMESSProjects(_target, _subtarget, "tatung")
 files {
 	MAME_DIR .. "src/mame/drivers/einstein.cpp",
@@ -4054,7 +4062,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/systel1.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
-	MAME_DIR .. "src/mame/drivers/tasc.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/telex1192.cpp",
