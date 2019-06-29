@@ -1,12 +1,24 @@
 // license:GPL-2.0+
 // copyright-holders:Dirk Best,Paul Danials
-/***************************************************************************
+/******************************************************************************************************
 
-    Nascom 1/2/3
+Nascom 1/2/3
 
-    Single board computer
+Single board computer
 
-***************************************************************************/
+
+To Do:
+- TTY
+- Nascom2 has two dipswitch banks, and a memory control header
+- Nascom3 (Gemini), nothing usable found
+
+Cassette:
+  It outputs a string of pulses at 1953.125Hz to indicate a 1, and blank tape for 0. This means that
+  no tape will present a 0 to the UART instead of the expected 1 (idle). Part of the cassette
+  schematic is missing, so a few liberties have been taken. The result is you can save a file and
+  load it back. Haven't found wav files on the net to test with.
+
+*****************************************************************************************************/
 
 #include "emu.h"
 
@@ -87,6 +99,7 @@ private:
 	uint8_t m_kb_control;
 	bool m_cassinbit, m_cassoutbit, m_cassold;
 	u16 m_cass_cnt[2];
+	u8 m_port00;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
@@ -162,8 +175,10 @@ READ8_MEMBER( nascom_state::nascom1_port_00_r )
 
 WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 {
-	m_cass->change_state(
-		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	u8 bits = data ^ m_port00;
+
+	if (BIT(bits, 4))
+		m_cass->change_state(BIT(data, 4) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	// d0 falling edge: increment keyboard matrix column select counter
 	if (m_kb_control & ~data & 1)
@@ -193,7 +208,7 @@ WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
 
 READ8_MEMBER( nascom_state::nascom1_port_02_r )
 {
-	uint8_t data = 0x31;
+	uint8_t data = 0x31; // bits 0,4,5 not used
 
 	m_hd6402->write_swe(0);
 	data |= m_hd6402->or_r(  ) ? 0x02 : 0;
@@ -224,7 +239,7 @@ WRITE_LINE_MEMBER( nascom_state::kansas_w )
 		if (m_cassoutbit)
 			m_cass->output(BIT(m_cass_cnt[0], 0) ? -1.0 : +1.0); // 1953.125Hz
 		else
-			m_cass->output(0.0);
+			m_cass->output(1.0);
 
 		m_cass_cnt[0]++;
 	}
@@ -240,11 +255,18 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom_state::kansas_r )
 	if (cass_ws != m_cassold)
 	{
 		m_cassold = cass_ws;
-		m_cassinbit = (m_cass_cnt[1] < 40) ? 1 : 0;
+		m_cassinbit = 1;
 		m_cass_cnt[1] = 0;
+	}
+	else
+	if (m_cass_cnt[1] > 10)
+	{
+		m_cass_cnt[1] = 10;
+		m_cassinbit = !cass_ws;
 	}
 }
 
+// This stuff has never been connected up - what's it for?
 DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
 {
 	m_tape_size = image.length();
@@ -377,6 +399,7 @@ void nascom_state::machine_reset()
 {
 	m_kb_select = 0;
 	m_kb_control = 0;
+	m_port00 = 0;
 
 	// Set up hd6402 pins
 	m_hd6402->write_swe(1);
@@ -705,6 +728,7 @@ void nascom_state::nascom(machine_config &config)
 	AY31015(config, m_hd6402);
 	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
+	m_hd6402->set_auto_rdav(true);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
 	uart_clock.signal_handler().set(FUNC(nascom_state::kansas_w));

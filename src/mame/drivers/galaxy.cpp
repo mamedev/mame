@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal")
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(gtp_cassette_formats);
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(gtp_cassette_formats);

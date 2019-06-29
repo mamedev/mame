@@ -37,6 +37,8 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "sound/wave.h"
+#include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -587,7 +589,9 @@ void e100_state::e100(machine_config &config)
 	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
 	 */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

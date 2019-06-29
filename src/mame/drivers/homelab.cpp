@@ -776,7 +776,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	CASSETTE(config, m_cass);
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
@@ -809,7 +809,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	CASSETTE(config, m_cass);
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
@@ -842,7 +842,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 

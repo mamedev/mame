@@ -161,6 +161,7 @@ Notes: (All IC's shown)
 #include "machine/ram.h"
 #include "sound/dave.h"
 #include "video/nick.h"
+#include "sound/wave.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -600,6 +601,8 @@ void ep64_state::ep64(machine_config &config)
 	m_dave->irq_wr().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 	m_dave->add_route(0, "lspeaker", 0.25);
 	m_dave->add_route(1, "rspeaker", 0.25);
+	WAVE(config, "wave1", m_cassette1).add_route(ALL_OUTPUTS, "lspeaker", 0.05);
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "rspeaker", 0.05);
 
 	// devices
 	EP64_EXPANSION_BUS_SLOT(config, m_exp, nullptr);

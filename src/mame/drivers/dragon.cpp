@@ -220,7 +220,7 @@ void dragon_state::dragon_base(machine_config &config)
 	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("dragon_cass");
 
 	PRINTER(config, m_printer, 0);

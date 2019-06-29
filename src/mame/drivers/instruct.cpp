@@ -442,7 +442,7 @@ void instruct_state::instruct(machine_config &config)
 	/* cassette */
 	CASSETTE(config, m_cass);
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */
