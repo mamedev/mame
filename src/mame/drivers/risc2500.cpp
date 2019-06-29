@@ -321,7 +321,7 @@ void risc2500_state::risc2500(machine_config &config)
 	ARM(config, m_maincpu, XTAL(28'322'000) / 2); // VY86C010
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc2500_state::risc2500_mem);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
-	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_hold), attotime::from_hz(250));
+	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_hold), attotime::from_hz(256));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);

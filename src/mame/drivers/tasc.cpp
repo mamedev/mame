@@ -31,6 +31,9 @@ notes:
 - holding LEFT+RIGHT on boot load the QC TestMode
 - holding UP+DOWN on boot load the TestMode
 
+TODO:
+- sound is too high pitched, same problem as in risc2500
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -206,7 +209,7 @@ void tasc_state::tasc(machine_config &config)
 	ARM(config, m_maincpu, 30_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tasc_state::main_map);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
-	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_hold), attotime::from_hz(250));
+	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_hold), attotime::from_hz(256));
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(tasc_state::disable_bootrom));
 

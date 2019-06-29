@@ -3,8 +3,7 @@
 /*
 
 Generic sensorboard device, meant for tracking pieces, primarily made for
-electronic chessboards. It supports buttons, magnets, and inductive sensors
-(latter is not emulated in any driver yet but the device is ready for it).
+electronic chessboards. It supports buttons, magnets, and inductive sensors.
 
 Concept/idea by Ralph Schaefer, but his code got removed from MAME when he
 couldn't be reached for source relicensing. This device is made from scratch.
