@@ -165,10 +165,7 @@ void mk1_state::update_reset(ioport_value state)
 
 	// clear display
 	if (state)
-	{
-		m_digit_select = 0;
-		update_display();
-	}
+		m_display->clear();
 }
 
 

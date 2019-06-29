@@ -13,6 +13,8 @@ TODO:
 - verify cartridge pinout, right now assume A0-A14 (max known cart size is 24KB).
   Boris/Sargon cartridge is A0-A11 and 2 CS lines.
 - auto-switch keypad overlays? no need for it yet
+- (probably won't) add chesspieces to artwork? this machine supports more board
+  games than just chess: checkers, reversi, and even a blackjack game
 
 *******************************************************************************
 
@@ -103,7 +105,7 @@ private:
 	void update_display();
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
-	u8 m_digit_select;
+	u8 m_inp_mux;
 	u16 m_digit_data;
 	u8 m_shift_data;
 	u8 m_shift_clock;
@@ -123,13 +125,13 @@ private:
 void ggm_state::machine_start()
 {
 	// zerofill
-	m_digit_select = 0;
+	m_inp_mux = 0;
 	m_digit_data = 0;
 	m_shift_data = 0;
 	m_shift_clock = 0;
 
 	// register for savestates
-	save_item(NAME(m_digit_select));
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_shift_clock));
@@ -155,10 +157,7 @@ void ggm_state::update_reset(ioport_value state)
 	if (state)
 	{
 		m_via->reset();
-
-		// clear display
-		m_digit_select = 0;
-		update_display();
+		m_display->clear();
 	}
 }
 
@@ -192,7 +191,7 @@ READ8_MEMBER(ggm_state::cartridge_r)
 void ggm_state::update_display()
 {
 	u16 data = bitswap<16>(m_digit_data,15,7,2,11,10,3,1,9,6,14,12,5,0,4,13,8);
-	m_display->matrix(m_digit_select, data);
+	m_display->matrix(m_inp_mux, data);
 }
 
 WRITE_LINE_MEMBER(ggm_state::shift_clock_w)
@@ -215,7 +214,7 @@ WRITE_LINE_MEMBER(ggm_state::shift_data_w)
 WRITE8_MEMBER(ggm_state::select_w)
 {
 	// input mux, digit select
-	m_digit_select = data;
+	m_inp_mux = data;
 	update_display();
 }
 
@@ -233,7 +232,7 @@ READ8_MEMBER(ggm_state::input_r)
 
 	// PB1-PB5: multiplexed inputs
 	for (int i = 0; i < 4; i++)
-		if (BIT(m_digit_select, i))
+		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
 	data = ~data << 1 & 0x3e;

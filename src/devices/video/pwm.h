@@ -38,6 +38,7 @@ public:
 	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd = true);
 	void matrix(u64 rowsel, u64 rowdata, bool upd = true) { matrix_partial(0, m_height, rowsel, rowdata, upd); }
 	void update(); // apply changes to m_rowdata
+	void clear() { matrix(0, 0); }
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }
