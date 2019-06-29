@@ -1190,7 +1190,7 @@ PCB Number: IGS PCB-0178
 ROM_START( dwex )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_BYTE( "ex_v100.u12",     0x100001, 0x080000, CRC(bc171799) SHA1(142329dffbca199f3e748a52146a03e27b36db6a) )
+	ROM_LOAD16_BYTE( "ex_v100.u12",     0x100001, 0x080000, CRC(bc171799) SHA1(142329dffbca199f3e748a52146a03e27b36db6a) ) // V100 08/16/00 09:39:27
 	ROM_LOAD16_BYTE( "ex_v100.u13",     0x100000, 0x080000, CRC(7afe6322) SHA1(a52d71af1d6de16c5a3df23eacdab3466693ba8d) )
 
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
@@ -1215,7 +1215,7 @@ ROM_END
 ROM_START( dwex101cn )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_BYTE( "ex_v101cn.u12",     0x100001, 0x080000, CRC(4f951f42) SHA1(830a943ce34c63ce418f60d913fae333377a9704) )
+	ROM_LOAD16_BYTE( "ex_v101cn.u12",     0x100001, 0x080000, CRC(4f951f42) SHA1(830a943ce34c63ce418f60d913fae333377a9704) ) // V100 12/12/01 09:45:00
 	ROM_LOAD16_BYTE( "ex_v101cn.u13",     0x100000, 0x080000, CRC(66172511) SHA1(eb1a6fc9c22f04fcca0395a4b5c2972438c60a78) )
 
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
@@ -3152,7 +3152,7 @@ Notes:
 ROM_START( puzzli2 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v100.u5",     0x100000, 0x200000, CRC(1abb4595) SHA1(860bb49efc3cb55b6b9846f5ab787d6fd586432d) )
+	ROM_LOAD16_WORD_SWAP( "v100.u5",     0x100000, 0x200000, CRC(1abb4595) SHA1(860bb49efc3cb55b6b9846f5ab787d6fd586432d) ) // PUZZLI-2 V0001
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
@@ -3176,7 +3176,7 @@ ROM_END
 ROM_START( puzzli2s )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_BYTE( "2sp_v200.u3",     0x100000, 0x080000, CRC(2a5ba8a6) SHA1(4c87b849fd6f39152e3e2ef699b78ce24b3fb6d0) )
+	ROM_LOAD16_BYTE( "2sp_v200.u3",     0x100000, 0x080000, CRC(2a5ba8a6) SHA1(4c87b849fd6f39152e3e2ef699b78ce24b3fb6d0) ) // PUZZLI-2 V200
 	ROM_LOAD16_BYTE( "2sp_v200.u4",     0x100001, 0x080000, CRC(fa5c86c1) SHA1(11c219722b891b775c0f7f9bc8276cdd8f74d657) )
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
@@ -3988,8 +3988,6 @@ ROM_START( killbldp )
 	/* there are some differences around 0x2e80, investigate - maybe above is badly dumped?, padding at 0x3ac0 is also different */
 	ROM_LOAD( "killbldp_igs027a_alt.bin", 0x000000, 0x04000, CRC(98316b06) SHA1(09be9fad24d68980a0a5beae60ced48012286216) ) // from a bootleg
 
-
-
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v300x.u26", 0x000000, 0x200000,  CRC(144388c8) SHA1(d7469df077c1a674129f18210584ba4d05a61888) ) // 05-09-16 23:52:32 V300
 
@@ -4087,7 +4085,6 @@ ROM_START( svgpcb )
 	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) )
 
-
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "svg_v100jp.u64", 0x000000, 0x400000, CRC(399d4a8b) SHA1(b120e8386a259e6fd7941acf3c33cf288eda616c) ) // 05/12/05 15:31:35 V100
 	ROM_LOAD( "svg_v100jp.u65", 0x400000, 0x400000, CRC(6e1c33b1) SHA1(66f26b2f4c0b3dcf6d1bb1df48e2ddbcc9d9432d) )
@@ -4124,7 +4121,6 @@ ROM_START( happy6 )
 	ROM_LOAD( "happy6_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "happy6_igs027a_v100_china.bin", 0x0188, 0x3e78, CRC(ed530445) SHA1(05c92d649701be2541557b1334dd6c820ca1009e) )
 
-
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102cn.u26", 0x000000, 0x400000, CRC(310510fb) SHA1(e0e80a04e9f7bf27e6581a8935c960bad33bb6de) ) // 03/16/04 14:29:17 V102
 
@@ -4147,7 +4143,7 @@ ROM_END
 ROM_START( happy6101 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "happy6in1_v100cn.u5",      0x100000, 0x080000, CRC(a25418e8) SHA1(acd7e7b69956cb4ce8e26c6420cb97bb4bf404e7) )
+	ROM_LOAD16_WORD_SWAP( "happy6in1_v100cn.u5",      0x100000, 0x080000, CRC(a25418e8) SHA1(acd7e7b69956cb4ce8e26c6420cb97bb4bf404e7) ) // V100 12/22/03 15:35:33
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	// data before 0x188 is read-protected and cannot be read even with a trojan (as with most 2001/2+ IGS titles)
@@ -4155,9 +4151,8 @@ ROM_START( happy6101 )
 	ROM_LOAD( "happy6_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "happy6_igs027a_v100_china.bin", 0x0188, 0x3e78, CRC(ed530445) SHA1(05c92d649701be2541557b1334dd6c820ca1009e) )
 
-
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "happy6in1_v101cn.u26", 0x000000, 0x400000, CRC(4a48ca1c) SHA1(3bebc091787903d45cb84c7302046602a903f59c) )
+	ROM_LOAD( "happy6in1_v101cn.u26", 0x000000, 0x400000, CRC(4a48ca1c) SHA1(3bebc091787903d45cb84c7302046602a903f59c) ) // 01/09/04 19:51:11 V101
 
 	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -4178,7 +4173,7 @@ ROM_END
 ROM_START( happy6100hk )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "h6n1_prog_v100hk.u5",      0x100000, 0x080000, CRC(a25418e8) SHA1(acd7e7b69956cb4ce8e26c6420cb97bb4bf404e7) )
+	ROM_LOAD16_WORD_SWAP( "h6n1_prog_v100hk.u5",      0x100000, 0x080000, CRC(a25418e8) SHA1(acd7e7b69956cb4ce8e26c6420cb97bb4bf404e7) ) // V100 12/22/03 15:35:33
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	// data before 0x188 is read-protected and cannot be read even with a trojan (as with most 2001/2+ IGS titles)
@@ -4186,9 +4181,8 @@ ROM_START( happy6100hk )
 	ROM_LOAD( "happy6_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "happy6_igs027a_v100_china.bin", 0x0188, 0x3e78, BAD_DUMP CRC(ed530445) SHA1(05c92d649701be2541557b1334dd6c820ca1009e) ) // needs the HK version
 
-
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "h6n1_arm_v100hk.u26", 0x000000, 0x400000, CRC(8f2feb1f) SHA1(acbc6620a296e8a6819bf088886bcbfc329f286d) )
+	ROM_LOAD( "h6n1_arm_v100hk.u26", 0x000000, 0x400000, CRC(8f2feb1f) SHA1(acbc6620a296e8a6819bf088886bcbfc329f286d) ) // 12/22/03 11:28:36 V100
 
 	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -4881,8 +4875,9 @@ GAME( 1998, drgw3105,     drgw3,     pgm_022_025_dw3,       dw3,       pgm_022_0
 GAME( 1998, drgw3103,     drgw3,     pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 103)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japan only, has an extra game mode option!
 GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw3,       dw3j,      pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 2000, dwex,         pgm,       pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 2001, dwex101cn,    dwex,      pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX (ver. 101CN)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+// Share title screen graphics and region as drgw3
+GAME( 2000, dwex,         pgm,       pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX / Zhongguo Long 3 EX / Dungfong Zi Zyu 3 EX / Chuugokuryuu 3 EX (ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 2001, dwex101cn,    dwex,      pgm_022_025_dw3,       dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX / Zhongguo Long 3 EX / Dungfong Zi Zyu 3 EX / Chuugokuryuu 3 EX (ver. 101CN)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
 //超級比一比/Chāojí bǐ yī bǐ (Taiwan)
 //大家来找碴/Dàjiā lái zhǎo chá/Daai6gaa1 Loi4 Zaau2 Caa4 (China, Hong Kong)
@@ -4975,12 +4970,12 @@ GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3_24m,     pgm,       pgm_arm_t
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05.Master Ver, 68k Label V101)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05.Master Ver, 68k Label V100)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
-GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
-GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm,       pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
+GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm,       pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
 
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
