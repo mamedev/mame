@@ -107,7 +107,6 @@ void tasc_sb30_device::device_add_mconfig(machine_config &config)
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::INDUCTIVE);
 	m_board->set_max_id(32);
-	m_board->set_mod_enable(false);
 	m_board->init_cb().set(FUNC(tasc_sb30_device::init_cb));
 	m_board->spawn_cb().set(FUNC(tasc_sb30_device::spawn_cb));
 }

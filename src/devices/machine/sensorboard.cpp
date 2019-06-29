@@ -194,6 +194,9 @@ sensorboard_device &sensorboard_device::set_type(sb_type type)
 		set_delay(attotime::never);
 	}
 
+	if (m_inductive)
+		set_mod_enable(false);
+
 	return *this;
 }
 
