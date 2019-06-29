@@ -42,7 +42,7 @@ public:
 		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
-		m_lcd(*this, "lcd"),
+		m_lcd(*this, "hlcd0538"),
 		m_beeper(*this, "beeper"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
