@@ -99,7 +99,7 @@ void cforte_state::machine_start()
     Devices, I/O
 ******************************************************************************/
 
-// TTL/generic
+// HLCD0538
 
 WRITE64_MEMBER(cforte_state::lcd_output_w)
 {
@@ -121,6 +121,9 @@ WRITE64_MEMBER(cforte_state::lcd_output_w)
 
 	m_display->update();
 }
+
+
+// TTL/generic
 
 void cforte_state::update_display()
 {
