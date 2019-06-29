@@ -50,6 +50,21 @@ protected:
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void update_pal_addr();
+	void update_pal_output();
+
+	void data_in_w(bool state);
+	void fast_wipe_w(bool state);
+	void store_write_w(bool state);
+	void oe_k_w(bool state);
+	void oe_chr_w(bool state);
+	void oe_lum_w(bool state);
+	void oe_brush_w(bool state);
+	void brush_write_w(bool state);
+
+	void update_write_enables();
+	void update_input_latches();
+
 	enum : size_t
 	{
 		STRIPE_CHR,
@@ -59,16 +74,21 @@ protected:
 	};
 
 	uint8_t *m_pal_base;
+	uint8_t m_pal_addr;
+	uint8_t m_pal_data;
 
 	uint8_t m_addr;
 	uint8_t m_a0_chr;
+	uint16_t m_data;
+
+	bool m_is_read;
+	bool m_is_write;
 
 	bool m_ras;
 	bool m_cas;
 
 	uint8_t m_rav[STRIPE_COUNT];
 	uint8_t m_cav[STRIPE_COUNT];
-	bool m_bck;
 
 	bool m_lumen;
 	bool m_chren;
@@ -80,13 +100,23 @@ protected:
 	uint8_t m_func;
 	bool m_b_bus_a;
 
+	bool m_data_in;
+	bool m_fast_wipe;
+	bool m_store_write;
+	bool m_oe[STRIPE_COUNT];
+	bool m_oe_brush;
+	bool m_brush_write;
+
+	bool m_write_enable[STRIPE_COUNT];
+	uint8_t m_brush_latches[STRIPE_COUNT];
+	uint8_t m_stripe_outputs[STRIPE_COUNT];
+	uint8_t m_input_latches[STRIPE_COUNT]; // AC (Y), AB (U), ABB (V)
+
 	std::unique_ptr<uint8_t[]> m_stripes[STRIPE_COUNT];
 
 	// Output Lines
 	devcb_write_line m_store_write_out;
-	devcb_write8 m_k_data_out;
-	devcb_write8 m_lum_data_out;
-	devcb_write8 m_chr_data_out;
+	devcb_write8 m_data_out[STRIPE_COUNT];
 
 	// Devices
 	required_memory_region m_pal;
