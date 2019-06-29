@@ -651,7 +651,7 @@ namespace netlist
 			}
 
 			void push_to_queue(netlist_time delay) NL_NOEXCEPT;
-			bool is_queued() const noexcept { return false; }
+			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
 			void update_devs() NL_NOEXCEPT;
