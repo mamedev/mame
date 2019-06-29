@@ -3168,12 +3168,12 @@ static INPUT_PORTS_START( gnw_gcliff )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
-	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_START("BA")
 	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_START("B")
 	PORT_CONFNAME( 0x01, 0x01, "Level skip (Cheat)") // " -- Left or right skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
