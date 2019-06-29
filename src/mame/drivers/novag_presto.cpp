@@ -5,13 +5,6 @@
 
 Novag Presto / Novag Octo
 
-TODO:
-- controls are too sensitive, is there a bug in the CPU core timer emulation?
-  6MHz: valid (single) button press registered between 307ms and 436ms,
-  12MHz: between 154ms and 218ms, 15MHz: between 123ms and 174ms.
-
-*******************************************************************************
-
 Hardware notes (Presto):
 - NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
 - buzzer, 16+4 LEDs, 8*8 chessboard buttons
@@ -19,6 +12,11 @@ Hardware notes (Presto):
 Octo has a NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
 The buzzer has a little electronic circuit going on, not sure whatfor.
 Otherwise, it's identical to Presto. The MCU internal ROM is same too.
+
+TODO:
+- controls are too sensitive, is there a bug in the CPU core timer emulation?
+  6MHz: valid (single) button press registered between 307ms and 436ms,
+  12MHz: between 154ms and 218ms, 15MHz: between 123ms and 174ms.
 
 ******************************************************************************/
 

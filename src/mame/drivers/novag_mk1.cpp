@@ -9,6 +9,10 @@ Initial version by PeT mess@utanet.at 2000,2001.
 TODO:
 - cncchess sound is wrong, it should be a long dual-tone alarm sound
 
+BTANB:
+- digits may flash briefly after entering a command, eg. the "b" or "P" digit
+  after setting board preset, this happens on the real device
+
 *******************************************************************************
 
 The MK I was a clone of Data Cash Systems's CompuChess (1977, one of the first
@@ -67,6 +71,7 @@ Fairchild 3850PK CPU @ 2MHz (LC circuit), 3853PK
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
+#include "video/pwm.h"
 #include "sound/beep.h"
 #include "speaker.h"
 
@@ -84,13 +89,10 @@ public:
 	mk1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_beeper_off(*this, "beeper_off"),
 		m_beeper(*this, "beeper"),
-		m_keypad(*this, "LINE%u", 1U),
-		m_delay_display(*this, "delay_display_%u", 0),
-		m_out_digit(*this, "digit%u", 0U),
-		m_out_led(*this, "led%u", 0U),
-		m_out_leda(*this, "led%ua", 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void cmpchess(machine_config &config);
@@ -106,13 +108,10 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
-	required_ioport_array<4> m_keypad;
-	required_device_array<timer_device, 4> m_delay_display;
-	output_finder<4> m_out_digit;
-	output_finder<4> m_out_led;
-	output_finder<4> m_out_leda;
+	required_ioport_array<4> m_inputs;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -120,8 +119,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
-	void clear_digit(int i);
 	void update_display();
 	void update_reset(ioport_value state);
 
@@ -143,11 +140,6 @@ private:
 
 void mk1_state::machine_start()
 {
-	// resolve handlers
-	m_out_digit.resolve();
-	m_out_led.resolve();
-	m_out_leda.resolve();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_digit_select = 0;
@@ -166,14 +158,6 @@ void mk1_state::machine_reset()
 	update_reset(ioport("RESET")->read());
 }
 
-void mk1_state::clear_digit(int i)
-{
-	// clear digit + connected leds
-	m_out_digit[i] = 0;
-	m_out_led[i] = 0;
-	m_out_leda[i] = 0;
-}
-
 void mk1_state::update_reset(ioport_value state)
 {
 	// reset switch is tied to F3850 RESET pin
@@ -182,9 +166,8 @@ void mk1_state::update_reset(ioport_value state)
 	// clear display
 	if (state)
 	{
-		m_digit_select = 0xff;
-		for (int i = 0; i < 4; i++)
-			clear_digit(i);
+		m_digit_select = 0;
+		update_display();
 	}
 }
 
@@ -193,36 +176,6 @@ void mk1_state::update_reset(ioport_value state)
 /******************************************************************************
     Devices, I/O
 ******************************************************************************/
-
-// display handling
-
-TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::delay_display)
-{
-	// clear digits if inactive
-	if (BIT(m_digit_select, param))
-		clear_digit(param);
-}
-
-void mk1_state::update_display()
-{
-	// output digits if active
-	for (int i = 0; i < 4; i++)
-	{
-		if (!BIT(m_digit_select, i))
-		{
-			// display panel goes into automated blink mode if DP segment is held high,
-			// and DP segment itself by default only appears to be active if no other segments are
-			u8 dmask = (m_digit_data == 1) ? 0x80 : 0x7f;
-			u8 bmask = (m_blink && m_digit_data & 1) ? 0 : 0xff;
-			m_out_digit[i] = bitswap<8>(m_digit_data,0,2,1,3,4,5,6,7) & dmask & bmask;
-
-			// output led separately too
-			m_out_led[i] = (m_out_digit[i] & 0x80) ? 1 : 0;
-			m_out_leda[i] = m_digit_data & bmask & 1; // for ignoring dmask above
-		}
-	}
-}
-
 
 // I/O handlers
 
@@ -238,10 +191,23 @@ READ8_MEMBER(mk1_state::beeper_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
+void mk1_state::update_display()
+{
+	// display panel goes into automated blink mode if DP segment is held high,
+	// and DP segment itself by default only appears to be active if no other segments are
+	u8 dmask = (m_digit_data == 1) ? 0x80 : 0x7f;
+	u8 bmask = (m_blink && m_digit_data & 1) ? 0 : 0xff;
+	u8 bstate = m_digit_data & bmask & 1; // DP state for ignoring dmask
+
+	u8 digit_data = bitswap<8>(m_digit_data,0,2,1,3,4,5,6,7) & dmask & bmask;
+	m_display->matrix(m_digit_select, bstate << 8 | digit_data);
+}
+
 WRITE8_MEMBER(mk1_state::digit_data_w)
 {
 	// digit segment data
 	m_digit_data = data;
+	update_display();
 }
 
 READ8_MEMBER(mk1_state::digit_data_r)
@@ -252,12 +218,7 @@ READ8_MEMBER(mk1_state::digit_data_r)
 WRITE8_MEMBER(mk1_state::digit_select_w)
 {
 	// d0-d3: digit select (active low)
-	// they're strobed, so on rising edge, delay them going off to prevent flicker or stuck display
-	for (int i = 0; i < 4; i++)
-		if (BIT(~m_digit_select & data, i))
-			m_delay_display[i]->adjust(attotime::from_msec(20), i);
-
-	m_digit_select = data;
+	m_digit_select = ~data & 0xf;
 	update_display();
 }
 
@@ -273,13 +234,13 @@ READ8_MEMBER(mk1_state::input_r)
 
 	// d0-d3: multiplexed inputs from d4-d7
 	for (int i = 0; i < 4; i++)
-		if (m_inp_mux & m_keypad[i]->read())
+		if (m_inp_mux & m_inputs[i]->read() << 4)
 			data |= 1 << i;
 
 	// d4-d7: multiplexed inputs from d0-d3
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_inp_mux, i))
-			data |= m_keypad[i]->read();
+			data |= m_inputs[i]->read() << 4;
 
 	return data;
 }
@@ -318,58 +279,58 @@ void mk1_state::cnc_io(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( cmpchess )
-	PORT_START("LINE1")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A / White King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("B / White Queen")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("C / White Bishop")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("D / Play")
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("D / Play")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("C / White Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("B / White Queen")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A / White King")
 
-	PORT_START("LINE2")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / White Knight")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / White Rook")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / White Pawn")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_M) PORT_NAME("H / md") // more data
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_M) PORT_NAME("H / md") // more data
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / White Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / White Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / White Knight")
 
-	PORT_START("LINE3")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1 / Black King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Black Queen")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Black Bishop")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / fp") // find piece(position)
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / fp") // find piece(position)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Black Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Black Queen")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1 / Black King")
 
-	PORT_START("LINE4")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Black Knight")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Black Rook")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Black Pawn")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / ep") // enter piece(position)
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / ep") // enter piece(position)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Black Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Black Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Black Knight")
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, mk1_state, reset_switch, nullptr) PORT_NAME("Reset Switch") // L.S. switch on the MK I
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cncchess )
-	PORT_START("LINE1")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1 / Black Pawn")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Black Rook")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Black Knight")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Black Bishop")
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Black Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Black Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Black Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1 / Black Pawn")
 
-	PORT_START("LINE2")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Black Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Black King")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_S) PORT_NAME("7 / SP") // search piece (same as fp)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_I) PORT_NAME("8 / IP") // insert piece (same as ep)
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_I) PORT_NAME("8 / IP") // insert piece (same as ep)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_S) PORT_NAME("7 / SP") // search piece (same as fp)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Black King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Black Queen")
 
-	PORT_START("LINE3")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A / White Pawn")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("B / White Rook")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("C / White Knight")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("D / White Bishop")
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("D / White Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("C / White Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("B / White Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A / White Pawn")
 
-	PORT_START("LINE4")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / White Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / White King")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_M) PORT_NAME("G / MD") // more data
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("H / GO")
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("H / GO")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_M) PORT_NAME("G / MD") // more data
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / White King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / White Queen")
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mk1_state, reset_switch, nullptr) PORT_NAME("Reset")
@@ -393,11 +354,11 @@ void mk1_state::cmpchess(machine_config &config)
 	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
-	for (int i = 0; i < 4; i++)
-		TIMER(config, m_delay_display[i]).configure_generic(FUNC(mk1_state::delay_display));
+	PWM_DISPLAY(config, m_display).set_size(4, 8+1);
+	m_display->set_segmask(0xf, 0xff);
+	config.set_default_layout(layout_cmpchess);
 
 	TIMER(config, "blink_display").configure_periodic(FUNC(mk1_state::blink), attotime::from_msec(250)); // approximation
-	config.set_default_layout(layout_cmpchess);
 }
 
 void mk1_state::mk1(machine_config &config)

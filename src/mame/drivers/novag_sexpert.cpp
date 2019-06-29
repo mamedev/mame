@@ -5,11 +5,6 @@
 
 Novag Super Expert (model 878/887/902) / Novag Super Forte
 
-TODO:
-- sforte lcd_data_w implementation is wrong, especially led handling
-
-*******************************************************************************
-
 Hardware notes (Super Expert)
 - 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
 - 8KB RAM battery-backed, 3*32KB ROM
@@ -22,6 +17,9 @@ I/O via TTL, hardware design was very awkward.
 
 Super Forte is very similar, just a cheaper plastic case and chessboard buttons
 instead of magnet sensors.
+
+TODO:
+- sforte lcd_data_w implementation is wrong, especially led handling
 
 ******************************************************************************/
 

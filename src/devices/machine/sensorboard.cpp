@@ -221,12 +221,15 @@ u8 sensorboard_device::read_sensor(u8 x, u8 y)
 	}
 	else
 	{
+		// buttons are forced
+		if (m_inp_ui->read() & 1)
+			return live_state;
+
 		// buttons are blocked
-		if (m_inp_ui->read() & 2)
+		else if (m_inp_ui->read() & 2)
 			return 0;
 
-		// buttons are forced
-		if (m_sensordelay == attotime::never || m_inp_ui->read() & 1)
+		else if (m_sensordelay == attotime::never)
 			return live_state;
 
 		return (pos == m_sensorpos) ? 1 : 0;
