@@ -5,7 +5,8 @@
 Tasc ChessSystem
 
 Commonly known as Tasc R30, it's basically a dedicated ChessMachine.
-The chess engine is also compatible with Tasc's The ChessMachine software.
+The King chess engines are also compatible with Tasc's The ChessMachine software
+on PC, however the prototype Gideon 2.1(internally: Rebel 2.01) is not.
 
 R30 hardware notes:
 - ARM6 CPU(P60ARM/CG) @ 30MHz
@@ -110,6 +111,7 @@ void tasc_state::machine_reset()
 }
 
 
+
 /******************************************************************************
     I/O
 ******************************************************************************/
@@ -154,6 +156,7 @@ WRITE32_MEMBER(tasc_state::p1000_w)
 
 	COMBINE_DATA(&m_mux);
 }
+
 
 
 /******************************************************************************
@@ -216,9 +219,9 @@ void tasc_state::tasc(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	LM24014H(config, m_lcd, 0);
-	m_lcd->set_fs(1);	// font size 6x8
+	m_lcd->set_fs(1); // font size 6x8
 
-	TASC_SB30(config, m_smartboard, 0);
+	TASC_SB30(config, m_smartboard);
 
 	config.set_default_layout(layout_tascr30);
 
@@ -244,17 +247,19 @@ void tasc_state::tasc(machine_config &config)
 ROM_START( tascr30 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v25")
-	//ROM_SYSTEM_BIOS( 0, "v21", "System V0.31, Gideon 2.1" ) // 3-May-93, 3-Feb-93 (unreleased)
-	ROM_SYSTEM_BIOS( 0, "v22", "System V0.31, The King 2.20" ) // 3-May-93, 23-Apr-93
-	ROM_SYSTEM_BIOS( 1, "v223", "System V0.31, The King 2.23" ) // 3-May-93, 16-May-93 (unreleased)
-	ROM_SYSTEM_BIOS( 2, "v25", "System V1.01, The King 2.50" ) // 17-Mar-95, 26-Feb-95
+	ROM_SYSTEM_BIOS( 0, "v21", "System V0.31, Gideon 2.1" ) // 3-May-93, 3-Feb-93 (prototype, later released in 2012)
+	ROM_SYSTEM_BIOS( 1, "v22", "System V0.31, The King 2.20" ) // 3-May-93, 23-Apr-93
+	ROM_SYSTEM_BIOS( 2, "v223", "System V0.31, The King 2.23" ) // 3-May-93, 16-May-93 (unreleased)
+	ROM_SYSTEM_BIOS( 3, "v25", "System V1.01, The King 2.50" ) // 17-Mar-95, 26-Feb-95
 
-	ROM_LOAD32_WORD_BIOS(      0, "lo_22.bin",  0x00000, 0x20000, CRC(d30f81fe) SHA1(81957c7266bedec66b2c14b97008c4261bd67828) )
-	ROM_LOAD32_WORD_SWAP_BIOS( 0, "hi_22.bin",  0x00002, 0x20000, CRC(aeac3b46) SHA1(a757e0086636dfd3bf78e61cee46c7d92b39d3b9) )
-	ROM_LOAD32_WORD_BIOS(      1, "lo_223.bin", 0x00000, 0x20000, CRC(37251b1a) SHA1(4be768e861002b20ba59a18329f488dba0a0c9bf) )
-	ROM_LOAD32_WORD_SWAP_BIOS( 1, "hi_223.bin", 0x00002, 0x20000, CRC(e546be93) SHA1(943ae65cf97ec4389b9730c6006e805935333072) )
-	ROM_LOAD32_WORD_BIOS(      2, "lo_25.bin",  0x00000, 0x20000, CRC(9711c158) SHA1(87c60d2097cb437482df11916543f6ef7f18b0d3) )
-	ROM_LOAD32_WORD_SWAP_BIOS( 2, "hi_25.bin",  0x00002, 0x20000, CRC(df913abf) SHA1(1bc2ea4b6514bf9fec18f52c264f1440ba7c8c01) )
+	ROM_LOAD32_WORD_BIOS(      0, "lo_21.bin",  0x00000, 0x20000, CRC(7041d051) SHA1(266843f375a8621320fc2cd1300775fb7a505c6e) )
+	ROM_LOAD32_WORD_SWAP_BIOS( 0, "hi_21.bin",  0x00002, 0x20000, CRC(7345ee08) SHA1(9cad608bd32d804468b23196151be0a5f8cee214) )
+	ROM_LOAD32_WORD_BIOS(      1, "lo_22.bin",  0x00000, 0x20000, CRC(d30f81fe) SHA1(81957c7266bedec66b2c14b97008c4261bd67828) )
+	ROM_LOAD32_WORD_SWAP_BIOS( 1, "hi_22.bin",  0x00002, 0x20000, CRC(aeac3b46) SHA1(a757e0086636dfd3bf78e61cee46c7d92b39d3b9) )
+	ROM_LOAD32_WORD_BIOS(      2, "lo_223.bin", 0x00000, 0x20000, CRC(37251b1a) SHA1(4be768e861002b20ba59a18329f488dba0a0c9bf) )
+	ROM_LOAD32_WORD_SWAP_BIOS( 2, "hi_223.bin", 0x00002, 0x20000, CRC(e546be93) SHA1(943ae65cf97ec4389b9730c6006e805935333072) )
+	ROM_LOAD32_WORD_BIOS(      3, "lo_25.bin",  0x00000, 0x20000, CRC(9711c158) SHA1(87c60d2097cb437482df11916543f6ef7f18b0d3) )
+	ROM_LOAD32_WORD_SWAP_BIOS( 3, "hi_25.bin",  0x00002, 0x20000, CRC(df913abf) SHA1(1bc2ea4b6514bf9fec18f52c264f1440ba7c8c01) )
 ROM_END
 
 } // anonymous namespace
@@ -265,5 +270,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME     PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1993, tascr30, 0,      0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

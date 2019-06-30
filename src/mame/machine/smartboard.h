@@ -24,7 +24,7 @@ class tasc_sb30_device : public device_t
 {
 public:
 	// construction/destruction
-	tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t read();
 	void write(uint8_t data);

@@ -2,13 +2,14 @@
 // copyright-holders:Sandro Ronco
 /******************************************************************************
 
-    Saitek RISC 2500, Mephisto Montreux
+Saitek RISC 2500, Mephisto Montreux
 
-    The chess engine is also compatible with Tasc's The ChessMachine software.
+The chess engine is also compatible with Tasc's The ChessMachine software.
+Was the hardware+software subcontracted to Tasc? It has similarities with Tasc R30.
 
-    TODO:
-     - Sound is too short and high pitch, better when you underclock the cpu.
-       Is cpu cycle timing wrong? or waitstate on p1000_w?
+TODO:
+- Sound is too short and high pitch, better when you underclock the cpu.
+  Is cpu cycle timing wrong? or waitstate on p1000_w?
 
 ******************************************************************************/
 
