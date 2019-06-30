@@ -48,7 +48,7 @@
 		<description>007 - NightFire (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-A7OE-USA, AGB-A7OP"/>
+		<info name="serial" value="AGB-A7OE-USA, AGB-A7OP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -679,11 +679,14 @@
 		<description>Aero the Acro-Bat - Rascal Rival Revenge (Euro)</description>
 		<year>2002</year>
 		<publisher>Metro 3D</publisher>
-		<info name="serial" value="AGB-AAOP"/>
+		<info name="serial" value="AGB-AAOP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="aero the acro-bat - rascal rival revenge (europe).bin" size="4194304" crc="a7e98ebe" sha1="11050975c211550a8bea751212ceb8856daea759"/>
+				<rom name="agb-aaop-0.u1" size="4194304" crc="a7e98ebe" sha1="11050975c211550a8bea751212ceb8856daea759"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2385,7 +2388,7 @@
 		<description>Batman Begins (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-BBGE-USA, AGB-BBGP"/>
+		<info name="serial" value="AGB-BBGE-USA, AGB-BBGP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -3285,7 +3288,7 @@
 			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
-				<rom name="boktai - the sun is in your hand (usa).bin" size="16777216" crc="e715ac45" sha1="7164326283df46a3941ec7b6ceca889cbc40e660"/>
+				<rom name="agb-u3ie-0.u1" size="16777216" crc="e715ac45" sha1="7164326283df46a3941ec7b6ceca889cbc40e660"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3295,11 +3298,18 @@
 		<description>Boktai 2 - Solar Boy Django (Euro)</description>
 		<year>2005</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-U32P"/>
+		<info name="serial" value="AGB-U32P-EUR-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E18-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="u4" value="U4 74LV4040 [74LV4040A]" />
+			<feature name="u5" value="U5 TLV272 [T272C]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
-				<rom name="boktai 2 - solar boy django (europe) (en,fr,de,es,it).bin" size="16777216" crc="748189b5" sha1="eeacdf5a9d3d2173a4a96689b72dc6b7ad92153c"/>
+				<rom name="agb-u32p-0.u1" size="16777216" crc="748189b5" sha1="eeacdf5a9d3d2173a4a96689b72dc6b7ad92153c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3320,7 +3330,7 @@
 			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
-				<rom name="boktai 2 - solar boy django (usa).bin" size="16777216" crc="e1ffb2d1" sha1="cd10d8ed82f4daf4072774f70d015e39a5d32d0b"/>
+				<rom name="agb-u32e-0.u1" size="16777216" crc="e1ffb2d1" sha1="cd10d8ed82f4daf4072774f70d015e39a5d32d0b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5665,10 +5675,12 @@
 		<description>Contra Advance - The Alien Wars EX (Euro)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AAWP"/>
+		<info name="serial" value="AGB-AAWP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="contra advance - the alien wars ex (europe).bin" size="4194304" crc="5f443b14" sha1="4132dfa8d1d858f6b120f28b026fe2bfa1f22ee7"/>
+				<rom name="agb-aawp-0.u1" size="4194304" crc="5f443b14" sha1="4132dfa8d1d858f6b120f28b026fe2bfa1f22ee7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8881,11 +8893,14 @@
 		<description>Duel Masters - Kaijudo Showdown (Euro)</description>
 		<year>2005</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-BD6P"/>
+		<info name="serial" value="AGB-BD6P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="duel masters - kaijudo showdown (europe) (en,fr,de,es,it).bin" size="16777216" crc="52e0aa95" sha1="254647471acf5c878fcc8742638e1d955a67bc6f"/>
+				<rom name="agb-bd6p-0.u1" size="16777216" crc="52e0aa95" sha1="254647471acf5c878fcc8742638e1d955a67bc6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11364,8 +11379,9 @@
 		<description>Fire Emblem - The Sacred Stones (USA, Aus)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-BE8E-USA"/>
+		<info name="serial" value="AGB-BE8E-USA, DIS-AGB-BE8E-USA, AGB-BE8U-AUS"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-01" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="fire emblem - the sacred stones (usa, australia).bin" size="16777216" crc="a47246ae" sha1="c25b145e37456171ada4b0d440bf88a19f4d509f"/>
@@ -14548,11 +14564,14 @@
 		<description>Herbie - Fully Loaded (Euro)</description>
 		<year>2005</year>
 		<publisher>Disney Interactive</publisher>
-		<info name="serial" value="AGB-B8FP"/>
+		<info name="serial" value="AGB-B8FP-EUU, AGB-B8FP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" /> <!-- Also with AGB-E03-21 -->
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="herbie - fully loaded (europe) (en,fr,de).bin" size="8388608" crc="2521a98c" sha1="0a2f427cc781e0d8bc7b59d6cd05f0714795f38e"/>
+				<rom name="agb-b8fp-0.u1" size="8388608" crc="2521a98c" sha1="0a2f427cc781e0d8bc7b59d6cd05f0714795f38e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20955,6 +20974,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="AGB-BRKE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="megaman battle network 5 team colonel (usa).bin" size="8388608" crc="a552f683" sha1="5f472f78d8de2df01d5039e045c043cb40969a39"/>
@@ -20981,6 +21001,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="AGB-BRBE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="megaman battle network 5 team protoman (usa).bin" size="8388608" crc="a73e83a4" sha1="b3774e96b1f107bb8b1db79b216be41b9bc5bac0"/>
@@ -22559,11 +22580,14 @@
 		<description>Mortal Kombat - Deadly Alliance (Euro)</description>
 		<year>2003</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="AGB-AXDP"/>
+		<info name="serial" value="AGB-AXDP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="mortal kombat - deadly alliance (europe) (en,fr,de,es,it).bin" size="16777216" crc="fb291cca" sha1="00b63d479efbc1edbd2c48e2e9f93c9bc8e911bc"/>
+				<rom name="agb-axdp-0.u1" size="16777216" crc="fb291cca" sha1="00b63d479efbc1edbd2c48e2e9f93c9bc8e911bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24984,9 +25008,12 @@
 		<year>2003</year>
 		<publisher>Ignition Entertainment</publisher>
 		<info name="serial" value="AGB-A2TP-EUR"/>
+		<info name="alt_title" value="Pinball Tycoon: Trigger Finger Challenge (Box)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="pinball tycoon (europe).bin" size="4194304" crc="5d52be1e" sha1="7fe9334b8fa8930393e70732be8187d00bb95236"/>
+				<rom name="agb-a2tp-0.u1" size="4194304" crc="5d52be1e" sha1="7fe9334b8fa8930393e70732be8187d00bb95236"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25475,10 +25502,10 @@
 	</software>
 
 	<software name="pokeemer">
-		<description>Pokémon - Emerald Version (Euro, USA)</description>
+		<description>Pokémon - Emerald Version (Euro, USA, Aus)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-BPEE-USA, AGB-BPEP-EUR"/>
+		<info name="serial" value="AGB-BPEE-USA, AGB-BPEP-EUR, AGB-BPEP-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E05-01" />
 			<feature name="u1" value="U1 GPIO ROM" />
@@ -25710,11 +25737,16 @@
 		<description>Pokémon - Ruby Version (Euro, USA, Rev. 2)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AXVE-USA, AGB-AXVP"/>
+		<info name="serial" value="AGB-AXVE-USA, AGB-AXVP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO ROM" />
+			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
-				<rom name="pokemon - ruby version (usa, europe) (rev 2).bin" size="16777216" crc="aeac73e6" sha1="5b64eacf892920518db4ec664e62a086dd5f5bc8"/>
+				<rom name="agb-axvp-2.u1" size="16777216" crc="aeac73e6" sha1="5b64eacf892920518db4ec664e62a086dd5f5bc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25868,11 +25900,16 @@
 		<description>Pokémon - Sapphire Version (Euro, USA, Rev. 2)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AXPE-USA, AGB-AXPP"/>
+		<info name="serial" value="AGB-AXPE-USA, AGB-AXPP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO ROM" />
+			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
+			<feature name="u3" value="U3 RTC [S3511]" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
-				<rom name="pokemon - sapphire version (usa, europe) (rev 2).bin" size="16777216" crc="9cc4410e" sha1="89b45fb172e6b55d51fc0e61989775187f6fe63c"/>
+				<rom name="agb-axpp-2.u1" size="16777216" crc="9cc4410e" sha1="89b45fb172e6b55d51fc0e61989775187f6fe63c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26648,9 +26685,12 @@
 		<publisher>Zoo Digital Publishing</publisher>
 		<info name="serial" value="AGB-BP5P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E02-30" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="4194304">
-				<rom name="premier manager 2005-2006 (europe) (en,fr,de,it).bin" size="4194304" crc="3b04673b" sha1="b601870153037897c00602d3c0c7c08b68a16b1f"/>
+				<rom name="agb-bp5p-0.u1" size="4194304" crc="3b04673b" sha1="b601870153037897c00602d3c0c7c08b68a16b1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31696,6 +31736,7 @@
 		<publisher>Vivendi Universal</publisher>
 		<info name="serial" value="AGB-BSTE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="spyro orange - the cortex conspiracy (usa).bin" size="16777216" crc="a9915baf" sha1="e76783d027fb1cd6426bfe3d482c595b585e32ae"/>
@@ -36344,10 +36385,10 @@
 	<!-- Game with rumble and gyroscope (AGB-019A).
 	    Has a sub-board (AGB-MOG-01) with "U1 CG-L43" (miniature angular rate sensor: https://4donline.ihs.com/images/VipMasterIC/IC/TOKN/TOKND00194/TOKND00194-23.pdf) -->
 	<software name="wariotws">
-		<description>WarioWare - Twisted! (USA)</description>
+		<description>WarioWare - Twisted! (USA, Aus)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-RZWE-USA"/>
+		<info name="serial" value="AGB-RZWE-USA, AGB-RZWE-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-MOM-01" />
 			<feature name="u1" value="U1 GPIO MASKROM [MX23L12807-12C]" />
@@ -36633,11 +36674,14 @@
 		<description>Wings (Euro)</description>
 		<year>2004</year>
 		<publisher>Zoo Digital Publishing</publisher>
-		<info name="serial" value="AGB-AWQP"/>
+		<info name="serial" value="AGB-AWQP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="wings (europe).bin" size="8388608" crc="6e0d29fc" sha1="deba84aa8d5b19a2777f1d2556cb84e4bb895c77"/>
+				<rom name="agb-awqp-0.u1" size="8388608" crc="6e0d29fc" sha1="deba84aa8d5b19a2777f1d2556cb84e4bb895c77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39257,10 +39301,14 @@
 		<description>2 Games in 1 Double Pack: Scooby-Doo! - Mystery Mayhem + Scooby-Doo and the Cyber Chase (Euro)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BCVP-EUR" />
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="2 games in 1 - scooby-doo! - mystery mayhem + scooby-doo and the cyber chase (europe) (en,fr,de+en).bin" size="8388608" crc="99566698" sha1="d60e1002bc8d436ceed5fedae63525703c00287a"/>
+				<rom name="agb-bcvp-0.u1" size="8388608" crc="99566698" sha1="d60e1002bc8d436ceed5fedae63525703c00287a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39644,11 +39692,15 @@
 		<description>Spyro 2 - Season of Flame + Crash Nitro Kart (Euro)</description>
 		<year>2005</year>
 		<publisher>Vivendi Universal</publisher>
+		<info name="serial" value="AGB-B52P-EUR"/>
 		<info name="alt_title" value="Crash &amp; Spyro Super Pack Volume 2 (Box)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="crash &amp; spyro super pack volume 2 (europe) (en,fr,de,es,it,nl).bin" size="16777216" crc="7b3c4f90" sha1="53061bf5148c296c12476145cda0df88dd7d42af"/>
+				<rom name="agb-b52p-0.u1" size="16777216" crc="7b3c4f90" sha1="53061bf5148c296c12476145cda0df88dd7d42af"/>
 			</dataarea>
 		</part>
 	</software>
