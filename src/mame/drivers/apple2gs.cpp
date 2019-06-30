@@ -2051,7 +2051,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 	}
 
 	slow_cycle();
-	u8 uFloatingBus7 = read_floatingbus();
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
