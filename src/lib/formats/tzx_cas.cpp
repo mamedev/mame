@@ -348,11 +348,12 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 	switch (starttype)
 	{
 	case 0x00:
-		toggle_wave_data();
+		// pulse level has already been toggled so don't change
 		break;
 
 	case 0x01:
-		// don't change
+		// pulse level has already been toggled so revert
+		toggle_wave_data();
 		break;
 
 	case 0x02:
@@ -383,9 +384,7 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 		}
 		else
 		{
-			toggle_wave_data();
-			i = maxp;
-			continue;
+			break;
 		}
 	}
 
@@ -425,7 +424,7 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 		const uint8_t *table2 = symtable + (2 * npp + 1)*asp;
 
 		// the Pilot and sync data stream has an RLE encoding
-		for (int i = 0; i < totp; i+=3)
+		for (int i = 0; i < totp*3; i+=3)
 		{
 			uint8_t symbol = table2[i + 0];
 			uint16_t repetitions = table2[i + 1] + (table2[i + 2] << 8);
