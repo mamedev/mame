@@ -247,14 +247,14 @@
 			<param name="y" start="1" increment="10" />
 			<param name="i" start="8" increment="-1" />
 
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x01"><bounds x="1"  y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x02"><bounds x="11" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x04"><bounds x="21" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x08"><bounds x="31" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x10"><bounds x="41" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x20"><bounds x="51" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x40"><bounds x="61" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
-			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x80"><bounds x="71" y="~y~" width="10" height="10" /><color alpha="0.1" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x01"><bounds x="1"  y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x02"><bounds x="11" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x04"><bounds x="21" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x08"><bounds x="31" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x10"><bounds x="41" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x20"><bounds x="51" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x40"><bounds x="61" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
+			<bezel element="hlbb" inputtag="smartboard:board:RANK.~i~" inputmask="0x80"><bounds x="71" y="~y~" width="10" height="10" /><color alpha="0.04" /></bezel>
 
 			<bezel name="piece_a~i~" element="piece"><bounds x="1"  y="~y~" width="10" height="10" /></bezel>
 			<bezel name="piece_b~i~" element="piece"><bounds x="11" y="~y~" width="10" height="10" /></bezel>

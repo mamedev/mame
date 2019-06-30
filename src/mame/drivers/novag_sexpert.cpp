@@ -18,9 +18,6 @@ I/O via TTL, hardware design was very awkward.
 Super Forte is very similar, just a cheaper plastic case and chessboard buttons
 instead of magnet sensors.
 
-TODO:
-- sforte lcd_data_w implementation is wrong, especially led handling
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -160,6 +157,9 @@ public:
 	// machine drivers
 	void sforte(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// address maps
 	void sforte_map(address_map &map);
@@ -167,7 +167,16 @@ private:
 	// I/O handlers
 	virtual DECLARE_WRITE8_MEMBER(lcd_control_w) override;
 	virtual DECLARE_WRITE8_MEMBER(lcd_data_w) override;
+
+	TIMER_CALLBACK_MEMBER(beep) { m_beeper->set_state(param); }
+	emu_timer *m_beeptimer;
 };
+
+void sforte_state::machine_start()
+{
+	sexpert_state::machine_start();
+	m_beeptimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sforte_state::beep),this));
+}
 
 
 
@@ -278,23 +287,24 @@ WRITE8_MEMBER(sforte_state::lcd_control_w)
 
 	// LCD pins: same as sexpert
 	sexpert_state::lcd_control_w(space, offset, data);
+	lcd_data_w(space, 0, m_lcd_data); // refresh inp mux
 }
 
 WRITE8_MEMBER(sforte_state::lcd_data_w)
 {
-	// d0-d2: input mux/led select
-	m_inp_mux = 1 << (data & 7);
+	// d0-d2: 74145 to input mux/led select
+	// 74145 D from lcd control d2 (HD44780 E)
+	m_inp_mux = 1 << ((m_lcd_control << 1 & 8) | (data & 7));
 
-	// if lcd is disabled, misc control
-	if (~m_lcd_control & 4)
-	{
-		// d5,d6: led data, but not both at same time?
-		m_led_data = ((data & 0x60) != 0x60) ? (data >> 5 & 3) : 0;
-		update_display();
+	// d5,d6: led data
+	m_led_data = ~data >> 5 & 3;
+	update_display();
 
-		// d7: enable beeper
-		m_beeper->set_state(data >> 7 & 1);
-	}
+	// d7: enable beeper
+	// capacitor for noise filter (sound glitches otherwise)
+	u8 param = data >> 7 & 1;
+	if (param != m_beeptimer->param())
+		m_beeptimer->adjust(attotime::from_msec(1), param);
 
 	// LCD pins: same as sexpert
 	sexpert_state::lcd_data_w(space, offset, data);
