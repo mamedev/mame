@@ -595,10 +595,10 @@ void zr107_state::sharc_memmap(address_map &map)
 
 static INPUT_PORTS_START( zr107 )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("View Button")       // View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shift Up")      // Shift up
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift Down")        // Shift down
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("AT/MT Switch")  PORT_TOGGLE // AT/MT switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("AT/MT Switch") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -633,99 +633,65 @@ static INPUT_PORTS_START( midnrun )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // COIN2?
-	PORT_DIPNAME( 0x0c, 0x00, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c, 0x0c, "Network ID" ) PORT_DIPLOCATION("SW:4,3")
 	PORT_DIPSETTING( 0x0c, "1" )
 	PORT_DIPSETTING( 0x08, "2" )
 	PORT_DIPSETTING( 0x04, "3" )
 	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" )
-	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
-	PORT_DIPSETTING( 0x00, "Twin" )
+	PORT_DIPSETTING( 0x00, "'T'Gate" ) //unused
+	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x01, "Single" )
+	PORT_DIPSETTING( 0x00, "Twin" ) //unused
 
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( windheat )
-	PORT_INCLUDE( zr107 )
-
-	PORT_START("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // COIN2?
-	PORT_DIPNAME( 0x0c, 0x00, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
-	PORT_DIPSETTING( 0x0c, "1" )
-	PORT_DIPSETTING( 0x08, "2" )
-	PORT_DIPSETTING( 0x04, "3" )
-	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" )
-	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
-	PORT_DIPSETTING( 0x00, "Twin" )
-
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_START("ANALOG3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jetwave )
 	PORT_INCLUDE( zr107 )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("View Shift")        // View Shift
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("T-Center")      // T-Center
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_BUTTON3 ) PORT_NAME("Angle")         // Angle
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Turn")     // Left Turn
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Turn")        // Right Turn
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("T-Center") //Non-analog acell
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Angle")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Left Turn") //Non-analog left
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right Turn") //Non-analog right
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x00, "DIP 1" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP 2" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP 3" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x00, "DIP 4" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c, 0x0c, "Network ID" ) PORT_DIPLOCATION("SW:4,3")
+	PORT_DIPSETTING( 0x0c, "1" )
+	PORT_DIPSETTING( 0x08, "2" )
+	PORT_DIPSETTING( 0x04, "3" )
+	PORT_DIPSETTING( 0x00, "4" )
+	PORT_DIPNAME( 0x02, 0x00, "Drive System" ) PORT_DIPLOCATION("SW:2") //Sensors for force feedback. Todo: "Disable" the sensors so this switch can be set to off without errors.
+	PORT_DIPSETTING( 0x02, "On" ) // Enables the sensors/normal use.
+	PORT_DIPSETTING( 0x00, "Off" ) //Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
+	PORT_DIPNAME( 0x01, 0x01, "Running Mode" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x01, "Product" ) //Enables the analog inputs; normal usage
+	PORT_DIPSETTING( 0x00, "Check" ) //Disables them for use with a JAMMA interface; intended for development purposes.
 
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering") PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x00,0x90) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	
+	PORT_START("ANALOG3") //actually required else MAME will crash if this port is removed.
+	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1159,10 +1125,10 @@ ROM_END
 GAME( 1995, midnrun,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1995, midnrunj, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1995, midnruna, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheat, 0,        midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatu,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatj,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheata,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheat, 0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatu,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatj,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheata,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1996, jetwave,  0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
