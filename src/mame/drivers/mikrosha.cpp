@@ -241,7 +241,7 @@ void mikrosha_state::mikrosha(machine_config &config)
 	PALETTE(config, m_palette, FUNC(mikrosha_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
 	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));

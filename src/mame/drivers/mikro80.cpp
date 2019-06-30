@@ -190,7 +190,7 @@ void mikro80_state::mikro80(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rk8_cassette_formats);

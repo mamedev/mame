@@ -233,6 +233,7 @@ void mk14_state::mk14(machine_config &config)
 	ic8.out_b().set("dac8", FUNC(dac_byte_interface::data_w));
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 }
 
 /* ROM definition */

@@ -2,9 +2,16 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        PP-01 driver by Miodrag Milanovic
+PP-01 driver by Miodrag Milanovic
 
-        08/09/2008 Preliminary driver.
+2008-09-08 Preliminary driver.
+
+MONIT to enter the Monitor
+M - ?
+N - ?
+P - to return
+S - ?
+Z - ?
 
 ****************************************************************************/
 
@@ -220,7 +227,7 @@ void pp01_state::pp01(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	//WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	//WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	I8251(config, "uart", 0);

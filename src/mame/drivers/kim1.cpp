@@ -60,6 +60,8 @@ TODO:
 
 #include "emu.h"
 #include "includes/kim1.h"
+#include "sound/wave.h"
+#include "speaker.h"
 #include "kim1.lh"
 
 //**************************************************************************
@@ -263,6 +265,9 @@ void kim1_state::kim1(machine_config &config)
 	m_cass->set_formats(kim1_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->set_interface ("kim1_cass");
+
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	TIMER(config, "led_timer").configure_periodic(FUNC(kim1_state::kim1_update_leds), attotime::from_hz(60));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));

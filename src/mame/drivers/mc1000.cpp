@@ -31,6 +31,7 @@
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "video/mc6847.h"
 
@@ -576,6 +577,7 @@ void mc1000_state::mc1000(machine_config &config)
 	ay8910.port_b_read_callback().set(FUNC(mc1000_state::keydata_r));
 	ay8910.port_a_write_callback().set(FUNC(mc1000_state::keylatch_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	CASSETTE(config, m_cassette);

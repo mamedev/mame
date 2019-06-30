@@ -802,7 +802,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	AY8912(config, m_psg, 12_MHz_XTAL / 12);
 	m_psg->set_flags(AY8910_DISCRETE_OUTPUT);

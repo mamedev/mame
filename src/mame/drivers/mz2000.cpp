@@ -932,7 +932,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 }

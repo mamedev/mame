@@ -116,7 +116,7 @@ void orion_state::orion128(machine_config &config)
 	PALETTE(config, m_palette, FUNC(orion_state::orion128_palette), 18);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	auto &cassette(CASSETTE(config, "cassette"));
 	cassette.set_formats(rko_cassette_formats);
@@ -189,7 +189,7 @@ void orion_z80_state::orionz80(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	auto &ay8912(AY8912(config, "ay8912", 1773400));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -262,7 +262,7 @@ void orion_pro_state::orionpro(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	auto &ay8912(AY8912(config, "ay8912", 1773400));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 

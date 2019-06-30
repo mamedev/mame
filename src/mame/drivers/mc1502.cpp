@@ -291,7 +291,7 @@ void mc1502_state::mc1502(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, "isa", mc1502_isa8_cards, "rom", false);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette); // FIXME: really no output routes for the cassette sound?
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
