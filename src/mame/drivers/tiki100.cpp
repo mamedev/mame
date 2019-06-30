@@ -24,6 +24,7 @@
 
 #include "emu.h"
 #include "includes/tiki100.h"
+#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -771,12 +772,13 @@ void tiki100_state::tiki100(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	TIMER(config, "tape").configure_periodic(FUNC(tiki100_state::tape_tick), attotime::from_hz(44100));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
 	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
 	m_psg->port_a_write_callback().set(FUNC(tiki100_state::video_scroll_w));

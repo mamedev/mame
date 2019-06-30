@@ -27,6 +27,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -597,6 +598,7 @@ void tk2000_state::tk2000(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&tk2000_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);

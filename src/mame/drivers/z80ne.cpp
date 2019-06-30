@@ -97,6 +97,8 @@
 #include "formats/dmk_dsk.h"
 #include "machine/ram.h"
 #include "softlist.h"
+#include "sound/wave.h"
+#include "speaker.h"
 
 /* Layout */
 #include "z80ne.lh"
@@ -438,6 +440,10 @@ void z80ne_state::z80ne(machine_config &config)
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("z80ne_cass");
 
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave1", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	config.set_default_layout(layout_z80ne);
 
 	/* internal ram */
@@ -515,6 +521,10 @@ void z80ne_state::z80netb(machine_config &config)
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("z80ne_cass");
 
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave1", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	lx387(config);
 
 	/* video hardware */
@@ -557,6 +567,10 @@ void z80netf_state::z80netf(machine_config &config)
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("z80ne_cass");
+
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave1", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	lx387(config);
 

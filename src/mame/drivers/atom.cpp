@@ -853,7 +853,7 @@ void atom_state::atombb(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(atom_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("atom_cass");
 
 	/* internal ram */

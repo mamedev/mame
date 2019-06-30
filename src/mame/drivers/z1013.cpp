@@ -392,7 +392,7 @@ void z1013_state::z1013(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(1'000'000)));

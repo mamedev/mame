@@ -237,7 +237,7 @@ void z9001_state::z9001(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */

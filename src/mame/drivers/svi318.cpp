@@ -459,7 +459,7 @@ void svi3x8_state::ppi_port_c_w(uint8_t data)
 	// bit 4-6, cassette
 	m_cassette->change_state(BIT(data, 4) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	m_cassette->output(BIT(data, 5) ? -1.0 : +1.0);
-	m_cassette->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+	//m_cassette->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 	// bit 7, mix psg sound (keyboard click)
 	m_speaker->level_w(BIT(data, 7));
@@ -531,8 +531,8 @@ void svi3x8_state::svi318(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'635) / 6));
 	psg.port_a_read_callback().set_ioport("JOY");
 	psg.port_b_write_callback().set(FUNC(svi3x8_state::bank_w));

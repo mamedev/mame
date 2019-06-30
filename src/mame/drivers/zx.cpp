@@ -339,6 +339,9 @@ void zx_state::zx80(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("zx80_cass");
 
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	/* software lists */
 	SOFTWARE_LIST(config, m_softlist).set_original("zx80_cass");
 
@@ -367,9 +370,7 @@ void zx_state::zx81_spk(machine_config &config)
 	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
-	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void zx_state::ts1000(machine_config &config)

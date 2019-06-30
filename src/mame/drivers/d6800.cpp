@@ -440,7 +440,7 @@ void d6800_state::d6800(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	TIMER(config, "kansas_w").configure_periodic(FUNC(d6800_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(d6800_state::kansas_r), attotime::from_hz(40000));

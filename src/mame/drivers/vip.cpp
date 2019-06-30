@@ -754,8 +754,9 @@ void vip_state::vip(machine_config &config)
 	// devices
 	QUICKLOAD(config, "quickload", "bin,c8,c8x").set_load_callback(FUNC(vip_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("vip_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// software lists
 	SOFTWARE_LIST(config, "cass_list").set_original("vip");

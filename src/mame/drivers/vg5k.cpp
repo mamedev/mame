@@ -393,16 +393,15 @@ void vg5k_state::vg5k(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
+	WAVE(config, "wave", m_cassette).add_route(0, "speaker", 0.05);
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cassette */
-	WAVE(config, "wave", m_cassette).add_route(0, "speaker", 0.25);
-
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vg5k_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("vg5k_cass");
 
 	/* printer */

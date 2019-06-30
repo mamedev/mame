@@ -34,6 +34,7 @@
 #include "emu.h"
 #include "includes/tmc2000e.h"
 
+#include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -299,6 +300,7 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
@@ -311,7 +313,7 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("40K");
