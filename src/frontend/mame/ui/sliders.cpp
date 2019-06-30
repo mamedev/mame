@@ -193,7 +193,7 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		}
 	}
 
-	custombottom = 2.0f * ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	custombottom = 2.0f * ui().get_line_height() + 2.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -224,23 +224,23 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		tempstring.insert(0, " ").insert(0, curslider->description);
 
 		// move us to the bottom of the screen, and expand to full width
-		y2 = 1.0f - UI_BOX_TB_BORDER;
+		y2 = 1.0f - ui().box_tb_border();
 		y1 = y2 - bottom;
-		x1 = UI_BOX_LR_BORDER;
-		x2 = 1.0f - UI_BOX_LR_BORDER;
+		x1 = ui().box_lr_border();
+		x2 = 1.0f - ui().box_lr_border();
 
 		// draw extra menu area
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
-		y1 += UI_BOX_TB_BORDER;
-
+		y1 += ui().box_tb_border();
+		
 		// determine the text height
-		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * ui().box_lr_border(),
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);
 
 		// draw the thermometer
-		bar_left = x1 + UI_BOX_LR_BORDER;
+		bar_left = x1 + ui().box_lr_border();
 		bar_area_top = y1;
-		bar_width = x2 - x1 - 2.0f * UI_BOX_LR_BORDER;
+		bar_width = x2 - x1 - 2.0f * ui().box_lr_border();
 		bar_area_height = line_height;
 
 		// compute positions
@@ -261,7 +261,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the actual text
-		ui().draw_text_full(container(), tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui().draw_text_full(container(), tempstring.c_str(), x1 + ui().box_lr_border(), y1 + line_height, x2 - x1 - 2.0f * ui().box_lr_border(),
 					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
 	}
 }

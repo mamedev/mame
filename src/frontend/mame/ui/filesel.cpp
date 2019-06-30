@@ -86,8 +86,8 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
+	x1 += ui().box_lr_border();
+	y1 += ui().box_tb_border();
 
 	size_t hit_start = 0, hit_span = 0;
 	if (is_mouse_hit()
@@ -464,7 +464,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 		set_selection((void *)selected_entry);
 
 	// set up custom render proc
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 

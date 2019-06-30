@@ -102,7 +102,7 @@ void menu_selector::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 	m_initial = -1;
 }
 
@@ -115,7 +115,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	std::string tempbuf[1] = { std::string(_("Selection List - Search: ")).append(m_search).append("_") };
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
@@ -123,7 +123,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	tempbuf[0] = string_format(_("Double click or press %1$s to select"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD)));
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
-			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
 			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
 }

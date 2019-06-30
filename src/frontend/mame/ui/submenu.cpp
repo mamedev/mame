@@ -415,7 +415,7 @@ void submenu::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	custombottom = customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -427,7 +427,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	char const *const toptext[] = { _(m_options[0].description) };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
@@ -439,7 +439,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			char const *const bottomtext[] = { selected_sm_option.entry->description() };
 			draw_text_box(
 					std::begin(bottomtext), std::end(bottomtext),
-					origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
 					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
 		}
