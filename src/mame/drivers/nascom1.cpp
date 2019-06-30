@@ -107,7 +107,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
-	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( nascom );
+	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( snapshot_cb );
 };
 
 class nascom1_state : public nascom_state
@@ -291,7 +291,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 //**************************************************************************
 
 template<int Dest>
-SNAPSHOT_LOAD_MEMBER( nascom_state, nascom )
+SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 {
 	uint8_t line[29];
 
@@ -749,11 +749,11 @@ void nascom_state::nascom(machine_config &config)
 	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
 
 	// devices
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom<0>), this), "nas", attotime::from_msec(500));
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "nas", attotime::from_msec(500)));
+	snapshot.set_load_callback(FUNC(nascom_state::snapshot_cb<0>), this);
 	snapshot.set_interface("nascom_snap");
-	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar"));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom<1>), this), "chr", attotime::from_msec(500));
+	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", "chr", attotime::from_msec(500)));
+	snapchar.set_load_callback(FUNC(nascom_state::snapshot_cb<1>), this);
 	snapchar.set_interface("nascom_char");
 }
 

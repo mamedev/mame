@@ -56,7 +56,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 	void es40_palette(palette_device &palette) const;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( jtc );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -590,7 +590,7 @@ static INPUT_PORTS_START( jtces40 )
 	PORT_START("Y15")
 INPUT_PORTS_END
 
-QUICKLOAD_LOAD_MEMBER( jtc_state, jtc )
+QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	u16 i, quick_addr, quick_length;
@@ -809,7 +809,8 @@ static GFXDECODE_START( gfx_jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(jtc_state::basic)
+void jtc_state::basic(machine_config &config)
+{
 	/* basic machine hardware */
 	UB8830D(config, m_maincpu, XTAL(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jtc_state::jtc_mem);
@@ -831,8 +832,8 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	m_centronics->busy_handler().set(FUNC(jtc_state::write_centronics_busy));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", attotime::from_seconds(2))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "jtc,bin", attotime::from_seconds(2)).set_load_callback(FUNC(jtc_state::quickload_cb), this);
+}
 
 void jtc_state::jtc(machine_config &config)
 {

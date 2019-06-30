@@ -64,7 +64,7 @@ private:
 	void kbd_put(u8 data);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void phunsy_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -282,7 +282,7 @@ static GFXDECODE_START( gfx_phunsy )
 GFXDECODE_END
 
 // quickloads can start from various addresses, and the files have no header.
-QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
+QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t i;
@@ -373,8 +373,7 @@ void phunsy_state::phunsy(machine_config &config)
 	CASSETTE(config, m_cass);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(phunsy_state, phunsy), this), "bin", attotime::from_seconds(2));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(2)).set_load_callback(FUNC(phunsy_state::quickload_cb), this);
 }
 
 

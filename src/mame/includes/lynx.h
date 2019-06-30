@@ -204,7 +204,7 @@ private:
 	uint32_t lynx_time_factor(int val);
 	void lynx_uart_reset();
 	image_verify_result lynx_verify_cart(char *header, int kind);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
 

@@ -69,7 +69,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void poly8813_io(address_map &map);
 	void poly8813_mem(address_map &map);

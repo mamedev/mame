@@ -245,7 +245,7 @@ public:
 
 	void amstrad_handle_snapshot(unsigned char *pSnapshot);
 	void amstrad_rethinkMemory();
-	DECLARE_SNAPSHOT_LOAD_MEMBER( amstrad );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 

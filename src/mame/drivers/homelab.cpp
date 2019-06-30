@@ -80,7 +80,7 @@ private:
 	DECLARE_MACHINE_RESET(brailab4);
 	DECLARE_VIDEO_START(brailab4);
 	INTERRUPT_GEN_MEMBER(homelab_frame);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -663,7 +663,7 @@ static GFXDECODE_START( gfx_homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
-QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
+QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i=0;
@@ -750,7 +750,8 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 }
 
 /* Machine driver */
-MACHINE_CONFIG_START(homelab_state::homelab)
+void homelab_state::homelab(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab2_mem);
@@ -779,10 +780,11 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	CASSETTE(config, m_cass);
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+}
 
-MACHINE_CONFIG_START(homelab_state::homelab3)
+void homelab_state::homelab3(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab3_mem);
@@ -812,10 +814,11 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	CASSETTE(config, m_cass);
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(2))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+}
 
-MACHINE_CONFIG_START(homelab_state::brailab4)
+void homelab_state::brailab4(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::brailab4_mem);
@@ -847,8 +850,8 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	CASSETTE(config, m_cass);
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", attotime::from_seconds(18))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+}
 
 void homelab_state::init_brailab4()
 {

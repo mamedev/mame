@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
 	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
 	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// needed by dg680 class
 	required_device<cpu_device> m_maincpu; // S2650 or Z80
@@ -228,7 +228,7 @@ static GFXDECODE_START( gfx_dg640 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dg640_charlayout, 0, 1 )
 GFXDECODE_END
 
-QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
+QUICKLOAD_LOAD_MEMBER(binbug_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -337,8 +337,7 @@ void binbug_state::binbug(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(binbug_state, binbug), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb), this);
 }
 
 

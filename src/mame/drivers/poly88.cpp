@@ -199,7 +199,8 @@ static GFXDECODE_START( gfx_poly88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(poly88_state::poly88)
+void poly88_state::poly88(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080A(config, m_maincpu, 16.5888_MHz_XTAL / 9); // uses 8224 clock generator
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly88_state::poly88_mem);
@@ -238,8 +239,8 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	m_brg->output_cb().set(FUNC(poly88_state::cassette_txc_rxc_w));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))
-MACHINE_CONFIG_END
+	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb), this);
+}
 
 void poly88_state::poly8813(machine_config &config)
 {

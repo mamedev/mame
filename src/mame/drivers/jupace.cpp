@@ -130,7 +130,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pio_bc_w);
 	DECLARE_READ8_MEMBER(sby_r);
 	DECLARE_WRITE8_MEMBER(ald_w);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void ace_io(address_map &map);
 	void ace_mem(address_map &map);
@@ -169,7 +169,7 @@ private:
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( ace_state, ace )
+SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
 	cpu_device *cpu = m_maincpu;
 	uint8_t *RAM = memregion(cpu->tag())->base();
@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("jupace_cass");
 
-	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", attotime::from_seconds(1))
+	SNAPSHOT(config, "snapshot", "ace", attotime::from_seconds(1)).set_load_callback(FUNC(ace_state::snapshot_cb), this);
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));

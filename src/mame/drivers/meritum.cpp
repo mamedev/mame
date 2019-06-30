@@ -73,7 +73,7 @@ private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(trs80_cmd);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map);
@@ -319,7 +319,7 @@ void meritum_state::machine_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( meritum_state, trs80_cmd )
+QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -393,7 +393,8 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(meritum_state::meritum)
+void meritum_state::meritum(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 10_MHz_XTAL / 4); // U880D @ 2.5 MHz or 1.67 MHz by jumper selection
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritum_state::mem_map);
@@ -439,8 +440,8 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 
 	/* devices */
 	CASSETTE(config, m_cassette);
-	MCFG_QUICKLOAD_ADD("quickload", meritum_state, trs80_cmd, "cmd", attotime::from_seconds(1))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb), this);
+}
 
 /***************************************************************************
 

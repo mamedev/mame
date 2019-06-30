@@ -56,7 +56,7 @@ void comx35_state::image_fread_memory(device_image_interface &image, uint16_t ad
     QUICKLOAD_LOAD_MEMBER( comx35_state, comx )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( comx35_state, comx )
+QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -630,8 +630,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_kbe->d11_callback().set_ioport("D11");
 	m_kbe->da_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF3);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(comx35_state, comx), this), "comx");
+	QUICKLOAD(config, "quickload", "comx").set_load_callback(FUNC(comx35_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 

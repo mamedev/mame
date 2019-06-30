@@ -751,8 +751,7 @@ void super80_state::super80(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(super80_state, super80), this), "bin", attotime::from_seconds(3));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -845,8 +844,7 @@ void super80_state::super80v(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(super80_state, super80), this), "bin", attotime::from_seconds(3));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

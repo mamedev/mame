@@ -106,7 +106,7 @@ private:
 	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void ravens2_io(address_map &map);
 	void ravens_io(address_map &map);
@@ -274,7 +274,7 @@ void ravens_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
+QUICKLOAD_LOAD_MEMBER(ravens_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -351,8 +351,7 @@ void ravens_state::ravens(machine_config &config)
 	config.set_default_layout(layout_ravens);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cass);
@@ -376,8 +375,7 @@ void ravens_state::ravens2(machine_config &config)
 	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cass);

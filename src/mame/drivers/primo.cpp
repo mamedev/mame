@@ -246,7 +246,8 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050   /* sample frequency */
 };
 
-MACHINE_CONFIG_START(primo_state::primoa32)
+void primo_state::primoa32(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo32_mem);
@@ -270,8 +271,8 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss")
-	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp")
+	SNAPSHOT(config, "snapshot", "pss").set_load_callback(FUNC(primo_state::snapshot_cb), this);
+	QUICKLOAD(config, "quickload", "pp").set_load_callback(FUNC(primo_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(primo_ptp_format);
@@ -284,7 +285,7 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart1, generic_plain_slot, nullptr, "bin,rom");
 	GENERIC_CARTSLOT(config, m_cart2, generic_plain_slot, nullptr, "bin,rom");
-MACHINE_CONFIG_END
+}
 
 void primo_state::primoa48(machine_config &config)
 {

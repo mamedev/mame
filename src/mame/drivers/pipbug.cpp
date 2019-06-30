@@ -60,7 +60,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
 	required_device<rs232_port_device> m_rs232;
 	required_device<s2650_device> m_maincpu;
-	DECLARE_QUICKLOAD_LOAD_MEMBER(pipbug);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void pipbug_data(address_map &map);
 	void pipbug_mem(address_map &map);
 };
@@ -96,7 +96,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
+QUICKLOAD_LOAD_MEMBER(pipbug_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -174,8 +174,7 @@ void pipbug_state::pipbug(machine_config &config)
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pipbug_state, pipbug), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(pipbug_state::quickload_cb), this);
 }
 
 

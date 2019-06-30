@@ -254,7 +254,7 @@ void poly88_state::intr_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
+SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t* data= auto_alloc_array(machine(), uint8_t, snapshot_size);

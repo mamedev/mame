@@ -615,11 +615,12 @@ void ti85_state::ti85(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(ti85_state::ti85d)
+void ti85_state::ti85d(machine_config &config)
+{
 	ti85(config);
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb), this);
 	//TI85SERIAL(config, "tiserial");
-MACHINE_CONFIG_END
+}
 
 
 void ti85_state::ti82(machine_config &config)
@@ -662,16 +663,17 @@ void ti85_state::ti83(machine_config &config)
 	T6A04(config, "t6a04", 0).set_size(96, 64);
 }
 
-MACHINE_CONFIG_START(ti85_state::ti86)
+void ti85_state::ti86(machine_config &config)
+{
 	ti85(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti86_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti86_io);
 
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86)
+	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85)
 
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
-MACHINE_CONFIG_END
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb), this);
+}
 
 void ti85_state::ti83p(machine_config &config)
 {

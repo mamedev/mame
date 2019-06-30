@@ -95,8 +95,8 @@ private:
 	TIMER_CALLBACK_MEMBER(cassette_tc);
 	TIMER_CALLBACK_MEMBER(serial_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sorcerer_io(address_map &map);

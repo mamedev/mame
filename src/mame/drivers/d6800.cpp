@@ -92,7 +92,7 @@ private:
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void d6800_map(address_map &map);
 
@@ -367,7 +367,7 @@ void d6800_state::machine_reset()
 
 /* Machine Drivers */
 
-QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
+QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -407,7 +407,8 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	return result;
 }
 
-MACHINE_CONFIG_START(d6800_state::d6800)
+void d6800_state::d6800(machine_config &config)
+{
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(4'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &d6800_state::d6800_map);
@@ -445,8 +446,8 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(d6800_state::kansas_r), attotime::from_hz(40000));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", attotime::from_seconds(1))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb), this);
+}
 
 /* ROMs */
 

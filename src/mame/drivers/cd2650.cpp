@@ -85,7 +85,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t m_term_data;
 	bool m_cassbit;
@@ -245,7 +245,7 @@ void cd2650_state::kbd_put(u8 data)
 		m_term_data = data;
 }
 
-QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
+QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 {
 	int i;
 	image_init_result result = image_init_result::FAIL;
@@ -342,8 +342,7 @@ void cd2650_state::cd2650(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cd2650_state, cd2650), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(cd2650_state::quickload_cb), this);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

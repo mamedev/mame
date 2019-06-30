@@ -109,8 +109,8 @@ private:
 	image_init_result parse_zillion_hex(uint8_t *snapshot_buff, char *src);
 	void set_cpu_regs(const uint8_t *snapshot_buff, int base);
 	void snapshot_copy(uint8_t *snapshot_buff, int snapshot_size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void main_map(address_map &map);
 };

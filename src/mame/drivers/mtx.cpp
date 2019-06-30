@@ -322,10 +322,8 @@ void mtx_state::mtx512(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(mtx_state, mtx), this), "mtx", attotime::from_seconds(1));
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mtx_state, mtx), this), "run", attotime::from_seconds(1));
+	SNAPSHOT(config, "snapshot", "mtx", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::snapshot_cb), this);
+	QUICKLOAD(config, "quickload", "run", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);

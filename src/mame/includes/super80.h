@@ -97,7 +97,7 @@ private:
 	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
 	void super80m_palette(palette_device &palette) const;
-	DECLARE_QUICKLOAD_LOAD_MEMBER(super80);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

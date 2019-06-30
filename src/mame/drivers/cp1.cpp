@@ -46,7 +46,7 @@ private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	DECLARE_READ8_MEMBER(i8155_read);
 	DECLARE_WRITE8_MEMBER(i8155_write);
@@ -244,7 +244,7 @@ void cp1_state::machine_reset()
 	m_cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
-QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
+QUICKLOAD_LOAD_MEMBER(cp1_state::quickload_cb)
 {
 	char line[0x10];
 	int addr = 0;
@@ -294,7 +294,7 @@ void cp1_state::cp1(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cp1_state, quickload), this), "obj", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "obj", attotime::from_seconds(1)).set_load_callback(FUNC(cp1_state::quickload_cb), this);
 }
 
 /* ROM definition */

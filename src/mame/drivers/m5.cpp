@@ -1527,7 +1527,7 @@ void brno_state::brno(machine_config &config)
 	// only one floppy drive
 	//config.device_remove(WD2797_TAG":1");
 
-	//MCFG_SNAPSHOT_ADD("snapshot", brno_state, brno, "rmd", 0)
+	//SNAPSHOT(config, "snapshot", "rmd", 0).set_load_callback(brno_state::snapshot_cb), this);
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");

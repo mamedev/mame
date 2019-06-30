@@ -128,8 +128,8 @@ private:
 	DECLARE_MACHINE_RESET(mbeett);
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_newkb);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bin);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);

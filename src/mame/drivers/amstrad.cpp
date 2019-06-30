@@ -903,7 +903,8 @@ void amstrad_centronics_devices(device_slot_interface &device)
 	device.option_add("digiblst", CENTRONICS_DIGIBLASTER);
 }
 
-MACHINE_CONFIG_START(amstrad_state::amstrad_base)
+void amstrad_state::amstrad_base(machine_config &config)
+{
 	/* Machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_state::amstrad_mem);
@@ -954,7 +955,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna")
+	SNAPSHOT(config, "snapshot", "sna").set_load_callback(FUNC(amstrad_state::snapshot_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
@@ -962,8 +963,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	m_cassette->set_interface("cpc_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("cpc_cass");
-
-MACHINE_CONFIG_END
+}
 
 void amstrad_state::cpc464(machine_config &config)
 {
@@ -1029,7 +1029,8 @@ void amstrad_state::kccomp(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(amstrad_state::cpcplus)
+void amstrad_state::cpcplus(machine_config &config)
+{
 	/* Machine hardware */
 	Z80(config, m_maincpu, 40_MHz_XTAL / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_state::amstrad_mem);
@@ -1079,7 +1080,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna")
+	SNAPSHOT(config, "snapshot", "sna").set_load_callback(FUNC(amstrad_state::snapshot_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
@@ -1104,7 +1105,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K,320K,576K");
-MACHINE_CONFIG_END
+}
 
 
 void amstrad_state::gx4000(machine_config &config)

@@ -93,7 +93,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 
-	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void laser110_mem(address_map &map);
 	void laser210_mem(address_map &map);
@@ -119,7 +119,7 @@ private:
     SNAPSHOT LOADING
 ***************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
+SNAPSHOT_LOAD_MEMBER(vtech1_state::snapshot_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t header[24];
@@ -459,8 +459,7 @@ void vtech1_state::laser110(machine_config &config)
 	m_memexp->set_io_space(m_maincpu, AS_IO);
 
 	// snapshot
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", attotime::from_double(1.5));
+	SNAPSHOT(config, "snapshot", "vz", attotime::from_double(1.5)).set_load_callback(FUNC(vtech1_state::snapshot_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);

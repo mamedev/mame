@@ -252,11 +252,10 @@ void microtan_state::microtan(machine_config &config)
 	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(microtan_state, microtan), this), "dmp,m65");
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "dmp,m65"));
+	snapshot.set_load_callback(FUNC(microtan_state::snapshot_cb), this);
 	snapshot.set_interface("mt65_snap");
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(microtan_state, microtan), this), "hex");
+	QUICKLOAD(config, "quickload", "hex").set_load_callback(FUNC(microtan_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

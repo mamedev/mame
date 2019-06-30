@@ -79,7 +79,7 @@ private:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(k7659_port_b_r);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void z1013_io(address_map &map);
@@ -307,7 +307,7 @@ READ8_MEMBER( z1013_state::k7659_port_b_r )
 	return 0xff;
 }
 
-SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
+SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 {
 /* header layout
 0000,0001 - load address
@@ -371,7 +371,8 @@ static GFXDECODE_START( gfx_z1013 )
 GFXDECODE_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(z1013_state::z1013)
+void z1013_state::z1013(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(1'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &z1013_state::z1013_mem);
@@ -401,8 +402,8 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80")
-MACHINE_CONFIG_END
+	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb), this);
+}
 
 void z1013_state::z1013k76(machine_config &config)
 {

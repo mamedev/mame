@@ -749,7 +749,7 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 	}
 }
 
-SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
+SNAPSHOT_LOAD_MEMBER(microtan_state::snapshot_cb)
 {
 	uint8_t *snapshot_buff = (uint8_t*)image.ptr();
 	if (!snapshot_buff)
@@ -762,7 +762,7 @@ SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 	return image_init_result::PASS;
 }
 
-QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
+QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
 {
 	int snapshot_size = 8263;   /* magic size */
 	std::vector<uint8_t> snapshot_buff(snapshot_size, 0);

@@ -94,8 +94,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE_LINE_MEMBER(cb2_w);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
-
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void mem_map(address_map &map);
 
@@ -321,7 +320,7 @@ uint32_t jr100_state::readByLittleEndian(uint8_t *buf,int pos)
 	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
 }
 
-QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
+QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 {
 	int quick_length;
 	uint8_t buf[0x10000];
@@ -403,8 +402,7 @@ void jr100_state::jr100(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jr100_state, jr100), this), "prg", attotime::from_seconds(2));
+	QUICKLOAD(config, "quickload", "prg", attotime::from_seconds(2)).set_load_callback(FUNC(jr100_state::quickload_cb), this);
 }
 
 

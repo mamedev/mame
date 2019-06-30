@@ -3240,7 +3240,7 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 
 
 /* load snapshot */
-SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
+SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot;
 

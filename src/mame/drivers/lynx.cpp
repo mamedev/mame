@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o");
+	QUICKLOAD(config, "quickload", "o").set_load_callback(FUNC(lynx_state::quickload_cb), this);
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "lynx_cart")
 	MCFG_GENERIC_EXTENSIONS("lnx,lyx")
@@ -155,7 +155,7 @@ ROM_END
 #endif
 
 
-QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
+QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	std::vector<uint8_t> data;

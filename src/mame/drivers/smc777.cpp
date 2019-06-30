@@ -112,7 +112,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void smc777_io(address_map &map);
 	void smc777_mem(address_map &map);
@@ -413,7 +413,7 @@ WRITE8_MEMBER(smc777_state::fbuf_w)
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( smc777_state, smc777 )
+QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -1108,7 +1108,8 @@ static void smc777_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(smc777_state::smc777)
+void smc777_state::smc777(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
@@ -1143,7 +1144,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
-	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", attotime::from_seconds(3))
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1154,7 +1155,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( smc777 )

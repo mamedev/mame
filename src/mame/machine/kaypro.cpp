@@ -249,7 +249,7 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
+QUICKLOAD_LOAD_MEMBER(kaypro_state::quickload_cb)
 {
 	uint8_t *RAM = memregion("rambank")->base();
 

@@ -421,7 +421,8 @@ INPUT_PORTS_END
 
 
 /* machine definition */
-MACHINE_CONFIG_START(lviv_state::lviv)
+void lviv_state::lviv(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lviv_state::mem_map);
@@ -461,7 +462,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav")
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);
@@ -472,7 +473,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(lviv)

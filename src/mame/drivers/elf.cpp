@@ -224,7 +224,7 @@ void elf2_state::machine_start()
 
 /* Machine Driver */
 
-QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
+QUICKLOAD_LOAD_MEMBER(elf2_state::quickload_cb)
 {
 	int size = image.length();
 
@@ -279,7 +279,7 @@ void elf2_state::elf2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(elf2_state, elf), this), "bin");
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(elf2_state::quickload_cb), this);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");

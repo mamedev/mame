@@ -131,10 +131,10 @@ Hardware:   PPIA 8255
 ***************************************************************************/
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
+    QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
+QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 {
 	/*
 
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("atom_cass");
 
-	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm")
+	QUICKLOAD(config, "quickload", "atm").set_load_callback(FUNC(atom_state::quickload_cb), this);
 
 	/* utility rom slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")

@@ -151,7 +151,7 @@ public:
 	void kbd_w(u8 data);
 	DECLARE_WRITE8_MEMBER( csg_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	enum
 	{
