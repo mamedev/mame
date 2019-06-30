@@ -194,7 +194,7 @@ uint8_t tasc_sb30_device::spawn_cb(offs_t offset)
 		if      (piece_available(1 + SB30_WHITE_ROOK1)) piece_id = SB30_WHITE_ROOK1;
 		else if (piece_available(1 + SB30_WHITE_ROOK2)) piece_id = SB30_WHITE_ROOK2;
 	}
-	else if (offset == 5)
+	else if (offset == 5 && piece_available(1 + SB30_WHITE_QUEEN))
 		piece_id = SB30_WHITE_QUEEN;
 
 	else if (offset == 6 && piece_available(1 + SB30_WHITE_KING))
@@ -216,7 +216,7 @@ uint8_t tasc_sb30_device::spawn_cb(offs_t offset)
 		if      (piece_available(1 + SB30_BLACK_ROOK1)) piece_id = SB30_BLACK_ROOK1;
 		else if (piece_available(1 + SB30_BLACK_ROOK2)) piece_id = SB30_BLACK_ROOK2;
 	}
-	else if (offset == 11)
+	else if (offset == 11 && piece_available(1 + SB30_BLACK_QUEEN))
 		piece_id = SB30_BLACK_QUEEN;
 
 	else if (offset == 12 && piece_available(1 + SB30_BLACK_KING))

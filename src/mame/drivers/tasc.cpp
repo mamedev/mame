@@ -33,6 +33,7 @@ notes:
 - holding UP+DOWN on boot load the TestMode
 
 TODO:
+- bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
 - sound is too high pitched, same problem as in risc2500
 
 ******************************************************************************/
@@ -271,4 +272,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1993, tascr30, 0,      0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, tascr30, 0,      0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )

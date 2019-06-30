@@ -8,8 +8,11 @@ The chess engine is also compatible with Tasc's The ChessMachine software.
 Was the hardware+software subcontracted to Tasc? It has similarities with Tasc R30.
 
 TODO:
-- Sound is too short and high pitch, better when you underclock the cpu.
-  Is cpu cycle timing wrong? or waitstate on p1000_w?
+- bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
+- Sound is too short and high pitched, better when you underclock the cpu.
+  Is cpu cycle timing wrong? I suspect conditional branch timing due to cache miss
+  (pipeline has to refill). The delay loop between writing to the speaker is simply:
+  SUBS R2, R2, #$1, BNE $2000cd8
 
 ******************************************************************************/
 
@@ -367,5 +370,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
-CONS( 1992, risc,     0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek bought Hegener & Glaser
+CONS( 1992, risc,     0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener & Glaser
