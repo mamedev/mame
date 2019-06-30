@@ -2140,7 +2140,7 @@ public:
 		m_pinout(0)
 	{ }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u16 m_pinout; // cartridge R pins
 
 	void update_display();
@@ -2163,7 +2163,7 @@ void quizwizc_state::machine_start()
 
 // handlers
 
-DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
@@ -2275,7 +2275,7 @@ void quizwizc_state::quizwizc(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(device_image_load_delegate(&quizwizc_state::device_image_load_cartridge, this));
+	cartslot.set_device_load(FUNC(quizwizc_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("quizwiz");
 }
 
@@ -2328,7 +2328,7 @@ public:
 		m_pinout(0)
 	{ }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 m_pinout; // cartridge K pins
 
 	void update_display();
@@ -2351,7 +2351,7 @@ void tc4_state::machine_start()
 
 // handlers
 
-DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
@@ -2463,7 +2463,7 @@ void tc4_state::tc4(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
 	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
-	cartslot.set_device_load(device_image_load_delegate(&tc4_state::device_image_load_cartridge, this));
+	cartslot.set_device_load(FUNC(tc4_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tc4");
 }

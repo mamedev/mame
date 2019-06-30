@@ -728,7 +728,8 @@ static void alphatro_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(alphatro_state::alphatro)
+void alphatro_state::alphatro(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphatro_state::alphatro_map);
@@ -787,9 +788,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	RAM(config, "ram").set_default_size("64K");
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(alphatro_state, cart_load)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "alphatro_cart", "bin").set_device_load(FUNC(alphatro_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("alphatro_cart");
 
 	/* 0000 banking */
@@ -800,7 +799,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 
 	/* F000 banking */
 	ADDRESS_MAP_BANK(config, "monbank").set_map(&alphatro_state::monbank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x1000);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

@@ -232,7 +232,7 @@ private:
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -266,7 +266,7 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
+DEVICE_IMAGE_LOAD_MEMBER( leapster_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -308,7 +308,8 @@ void leapster_state::leapster_aux(address_map &map)
 	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 }
 
-MACHINE_CONFIG_START(leapster_state::leapster)
+void leapster_state::leapster(machine_config &config)
+{
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	ARCA5(config, m_maincpu, 96000000/10);
@@ -323,13 +324,11 @@ MACHINE_CONFIG_START(leapster_state::leapster)
 	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "leapster_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(leapster_state, leapster_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("leapster");
-MACHINE_CONFIG_END
+}
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))

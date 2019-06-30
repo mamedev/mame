@@ -100,7 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER( vdp_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
@@ -435,7 +435,7 @@ void rx78_state::machine_reset()
 		prg.install_read_handler(0x2000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
+DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -470,7 +470,8 @@ static GFXDECODE_START( gfx_rx78 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(rx78_state::rx78)
+void rx78_state::rx78(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/7); // unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &rx78_state::rx78_mem);
@@ -491,9 +492,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	PALETTE(config, m_palette).set_entries(16+1); //+1 for the background color
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "rx78_cart", "bin,rom").set_device_load(FUNC(rx78_state::cart_load), this);
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
@@ -507,7 +506,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( rx78 )

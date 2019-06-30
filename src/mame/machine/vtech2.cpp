@@ -46,7 +46,7 @@ void vtech2_state::init_laser()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( vtech2_state, cart_load )
+DEVICE_IMAGE_LOAD_MEMBER( vtech2_state::cart_load )
 {
 	m_cart_size = m_cart->common_get_size("rom");
 

@@ -210,7 +210,7 @@ private:
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
@@ -221,7 +221,7 @@ private:
 	uint32_t  m_rom_size;
 };
 
-DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
+DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 {
 	m_rom_size = m_cart->common_get_size("rom");
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -391,7 +391,8 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 }
 
 
-MACHINE_CONFIG_START(tourvision_state::tourvision)
+void tourvision_state::tourvision(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tourvision_state::pce_mem);
@@ -431,13 +432,12 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tourvision_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(tourvision_state, tourvision_cart)
-	MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tourvision_cart", "bin"));
+	cartslot.set_device_load(FUNC(tourvision_state::cart_load), this);
+	cartslot.set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");
-MACHINE_CONFIG_END
+}
 
 #define TOURVISION_BIOS \
 	ROM_REGION( 0x8000, "subcpu", 0 ) \

@@ -260,7 +260,7 @@ private:
 	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
 	bool m_porta_key_mode;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamekey_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
 
 	required_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -290,7 +290,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(vii_portb_w);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_vii);
 
 	virtual void poll_controls();
 
@@ -322,7 +322,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(icanguit_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_icanguit);
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -358,7 +358,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tvgogo_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_tvgogo);
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -1740,7 +1740,7 @@ void icanguit_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(icanguit_state, icanguit_cart)
+DEVICE_IMAGE_LOAD_MEMBER(icanguit_state::cart_load_icanguit)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1776,7 +1776,7 @@ void tvgogo_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state, tvgogo_cart)
+DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1876,7 +1876,7 @@ void vii_state::poll_controls()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(vii_state, vii_cart)
+DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1938,7 +1938,7 @@ void vii_state::vii(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&vii_state::device_image_load_vii_cart, this));
+	m_cart->set_device_load(FUNC(vii_state::cart_load_vii), this);
 
 	SOFTWARE_LIST(config, "vii_cart").set_original("vii");
 }
@@ -1960,7 +1960,7 @@ void icanguit_state::icanguit(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanguit_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&icanguit_state::device_image_load_icanguit_cart, this));
+	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanguit_cart").set_original("icanguit");
@@ -1982,7 +1982,7 @@ void icanguit_state::icanpian(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&icanguit_state::device_image_load_icanguit_cart, this));
+	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
@@ -2001,7 +2001,7 @@ void tvgogo_state::tvgogo(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tvgogo_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&tvgogo_state::device_image_load_tvgogo_cart, this));
+	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");
@@ -2052,7 +2052,7 @@ void jakks_gkr_state::machine_start()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state, gamekey_cart)
+DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state::cart_load_gamekey)
 {
 	return m_cart->call_load();
 }

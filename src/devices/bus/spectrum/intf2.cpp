@@ -58,7 +58,7 @@ void spectrum_intf2_device::device_add_mconfig(machine_config &config)
 {
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "spectrum_cart", "bin,rom");
-	m_cart->set_device_load(device_image_load_delegate(&spectrum_intf2_device::device_image_load_spectrum_cart, this));
+	m_cart->set_device_load(FUNC(spectrum_intf2_device::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("spectrum_cart");
 }
@@ -93,7 +93,7 @@ void spectrum_intf2_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device, spectrum_cart)
+DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

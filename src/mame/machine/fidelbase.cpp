@@ -78,7 +78,7 @@ void fidelbase_state::machine_reset()
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(fidelbase_state, scc_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(fidelbase_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 

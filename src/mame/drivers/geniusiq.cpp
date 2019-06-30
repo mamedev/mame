@@ -216,8 +216,8 @@ private:
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(cart_unload);
 
 	void geniusiq_mem(address_map &map);
 
@@ -667,7 +667,7 @@ void geniusiq_state::machine_reset()
 	m_mouse_gfx_posy = 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
+DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -692,13 +692,14 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
+DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state::cart_unload)
 {
 	m_cart_state = IQ128_NO_CART;
 }
 
 
-MACHINE_CONFIG_START(geniusiq_state::iq128)
+void geniusiq_state::iq128(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(32'000'000)/2); // The main crystal is at 32MHz, not sure whats the CPU freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusiq_state::geniusiq_mem);
@@ -719,13 +720,13 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	AMD_29F010(config, "flash");
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "iq128_cart")
-	MCFG_GENERIC_LOAD(geniusiq_state, iq128_cart)
-	MCFG_GENERIC_UNLOAD(geniusiq_state, iq128_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "iq128_cart"));
+	cartslot.set_device_load(FUNC(geniusiq_state::cart_load), this);
+	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("iq128");
-MACHINE_CONFIG_END
+}
 
 void geniusiq_state::iqtv512(machine_config &config)
 {

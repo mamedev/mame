@@ -100,7 +100,7 @@ private:
 	void v2_map(address_map &map);
 
 	// cartridge
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_READ8_MEMBER(cartridge_r);
 	u32 m_cart_mask;
 
@@ -142,7 +142,7 @@ void arb_state::machine_start()
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(arb_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0x7fff;
@@ -299,7 +299,7 @@ void arb_state::arb(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&arb_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(arb_state::cart_load), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("arb");

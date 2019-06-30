@@ -59,7 +59,7 @@ protected:
 	u8 m_speech_bank; // speech rom higher address bits
 
 	// cross-compatible cartridges(opening book modules)
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	virtual DECLARE_READ8_MEMBER(cartridge_r);
 
 	// periodic interrupts

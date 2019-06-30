@@ -53,7 +53,7 @@ private:
 	// address maps
 	void main_map(address_map &map);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -71,7 +71,7 @@ private:
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(sc6_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(sc6_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -195,7 +195,7 @@ void sc6_state::sc6(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_sc6", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&sc6_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(sc6_state::cart_load), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");

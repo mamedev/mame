@@ -182,7 +182,7 @@ private:
 	DECLARE_WRITE32_MEMBER(audio_w);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(flash);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(flash_load);
 
 	static const int CPU_FREQ[16];
 };
@@ -958,7 +958,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(pockstat_state, flash)
+DEVICE_IMAGE_LOAD_MEMBER(pockstat_state::flash_load)
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];
@@ -1007,7 +1007,7 @@ void pockstat_state::pockstat(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pockstat_cart", "gme");
 	m_cart->set_width(GENERIC_ROM32_WIDTH);
 	m_cart->set_endian(ENDIANNESS_LITTLE);
-	m_cart->set_device_load(device_image_load_delegate(&pockstat_state::device_image_load_flash, this));
+	m_cart->set_device_load(FUNC(pockstat_state::flash_load), this);
 }
 
 /* ROM definition */

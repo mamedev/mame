@@ -46,7 +46,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -76,7 +76,7 @@ void vtech_storio_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(vtech_storio_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(vtech_storio_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -105,7 +105,7 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_storio_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&vtech_storio_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }

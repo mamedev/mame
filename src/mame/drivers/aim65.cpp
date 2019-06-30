@@ -205,7 +205,8 @@ static DEVICE_INPUT_DEFAULTS_START( serial_term )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(aim65_state::aim65)
+void aim65_state::aim65(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, AIM65_CLOCK); /* 1 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &aim65_state::mem_map);
@@ -276,41 +277,22 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	//m_rs232->rxd_handler().set(m_via0, FUNC(via6522_device::write_pb6));  // function disabled in 6522via.cpp
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(serial_term));
 
-	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_z26_cart")
-	MCFG_GENERIC_EXTENSIONS("z26")
-	MCFG_GENERIC_LOAD(aim65_state, z26_load)
-
-	MCFG_GENERIC_SOCKET_ADD("z25", generic_plain_slot, "aim65_z25_cart")
-	MCFG_GENERIC_EXTENSIONS("z25")
-	MCFG_GENERIC_LOAD(aim65_state, z25_load)
-
-	MCFG_GENERIC_SOCKET_ADD("z24", generic_plain_slot, "aim65_z24_cart")
-	MCFG_GENERIC_EXTENSIONS("z24")
-	MCFG_GENERIC_LOAD(aim65_state, z24_load)
+	GENERIC_SOCKET(config, "z26", generic_plain_slot, "aim65_z26_cart", "z26").set_device_load(FUNC(aim65_state::z26_load), this);
+	GENERIC_SOCKET(config, "z25", generic_plain_slot, "aim65_z25_cart", "z25").set_device_load(FUNC(aim65_state::z25_load), this);
+	GENERIC_SOCKET(config, "z24", generic_plain_slot, "aim65_z24_cart", "z24").set_device_load(FUNC(aim65_state::z24_load), this);
 
 	/* PROM/ROM module sockets */
-	MCFG_GENERIC_SOCKET_ADD("z12", generic_plain_slot, "rm65_z12_cart")
-	MCFG_GENERIC_EXTENSIONS("z12")
-	MCFG_GENERIC_LOAD(aim65_state, z12_load)
-
-	MCFG_GENERIC_SOCKET_ADD("z13", generic_plain_slot, "rm65_z13_cart")
-	MCFG_GENERIC_EXTENSIONS("z13")
-	MCFG_GENERIC_LOAD(aim65_state, z13_load)
-
-	MCFG_GENERIC_SOCKET_ADD("z14", generic_plain_slot, "rm65_z14_cart")
-	MCFG_GENERIC_EXTENSIONS("z14")
-	MCFG_GENERIC_LOAD(aim65_state, z14_load)
-
-	MCFG_GENERIC_SOCKET_ADD("z15", generic_plain_slot, "rm65_z15_cart")
-	MCFG_GENERIC_EXTENSIONS("z15")
-	MCFG_GENERIC_LOAD(aim65_state, z15_load)
+	GENERIC_SOCKET(config, "z12", generic_plain_slot, "rm65_z12_cart", "z12").set_device_load(FUNC(aim65_state::z12_load), this);
+	GENERIC_SOCKET(config, "z13", generic_plain_slot, "rm65_z13_cart", "z13").set_device_load(FUNC(aim65_state::z13_load), this);
+	GENERIC_SOCKET(config, "z14", generic_plain_slot, "rm65_z14_cart", "z14").set_device_load(FUNC(aim65_state::z14_load), this);
+	GENERIC_SOCKET(config, "z15", generic_plain_slot, "rm65_z15_cart", "z15").set_device_load(FUNC(aim65_state::z15_load), this);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("aim65_cart");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

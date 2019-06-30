@@ -482,7 +482,7 @@ private:
 	DECLARE_WRITE16_MEMBER(k28_write_o);
 	DECLARE_WRITE16_MEMBER(k28_write_r);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	u8 tntell_get_hexchar(const char c);
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
@@ -535,7 +535,7 @@ void tispeak_state::init_cartridge()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(tispeak_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -1328,7 +1328,7 @@ void tispeak_state::sns_cd2801(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
-	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
@@ -1379,7 +1379,7 @@ void tispeak_state::snread(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
-	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snread");
 }
@@ -1398,7 +1398,7 @@ void tispeak_state::lantutor(machine_config &config)
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantutor", "vsm,bin");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("lantutor");
 }
@@ -1423,7 +1423,7 @@ void tispeak_state::snspellc(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
-	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
@@ -1463,7 +1463,7 @@ void tispeak_state::tntell(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm");
-	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tntell");
 }
@@ -1488,7 +1488,7 @@ void tispeak_state::k28m2(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm");
-	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("k28m2");
 }

@@ -169,7 +169,7 @@ void ggm_state::update_reset(ioport_value state)
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(ggm_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 {
 	u32 size = m_cart->common_get_size("rom");
 	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0x7fff;
@@ -373,7 +373,7 @@ void ggm_state::ggm(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&ggm_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(ggm_state::cartridge), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ggm");

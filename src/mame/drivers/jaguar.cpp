@@ -1924,7 +1924,7 @@ void jaguar_state::jaguar(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
-	cartslot.set_device_load(device_image_load_delegate(&jaguar_state::device_image_load_jaguar_cart, this));
+	cartslot.set_device_load(FUNC(jaguar_state::cart_load), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("jaguar");
@@ -2083,7 +2083,7 @@ void jaguar_state::cart_start()
 	memset(m_cart_base, 0, memshare("cart")->bytes());
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
+DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 {
 	uint32_t size, load_offset = 0;
 

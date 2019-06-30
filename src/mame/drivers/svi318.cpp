@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ramdis_w );
 	DECLARE_WRITE_LINE_MEMBER( ctrl1_w );
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void svi3x8_io(address_map &map);
 	void svi3x8_io_bank(address_map &map);
@@ -498,7 +498,7 @@ WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
 //  CARTRIDGE
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state::cart_load )
 {
 	uint32_t size = m_cart_rom->common_get_size("rom");
 
@@ -513,7 +513,8 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(svi3x8_state::svi318)
+void svi3x8_state::svi318(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(10'738'635) / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &svi3x8_state::svi3x8_mem);
@@ -545,9 +546,7 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	SOFTWARE_LIST(config, "cass_list").set_original("svi318_cass");
 
 	// cartridge slot
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svi318_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(svi3x8_state, cartridge)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "svi318_cart", "bin,rom").set_device_load(FUNC(svi3x8_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("svi318_cart");
 
 	// expander bus
@@ -558,7 +557,7 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	m_expander->ctrl1_handler().set(FUNC(svi3x8_state::ctrl1_w));
 	m_expander->excsr_handler().set(m_vdp, FUNC(tms9928a_device::read));
 	m_expander->excsw_handler().set(m_vdp, FUNC(tms9928a_device::write));
-MACHINE_CONFIG_END
+}
 
 void svi3x8_state::svi318p(machine_config &config)
 {

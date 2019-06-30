@@ -488,7 +488,8 @@ void pegasus_state::init_pegasus()
 	pegasus_decrypt_rom(base);
 }
 
-MACHINE_CONFIG_START(pegasus_state::pegasus)
+void pegasus_state::pegasus(machine_config &config)
+{
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, XTAL(4'000'000));  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	m_maincpu->set_addrmap(AS_PROGRAM, &pegasus_state::pegasus_mem);
@@ -526,27 +527,18 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_GENERIC_SOCKET_ADD("exp00", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp00_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp01", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp01_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp02", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp02_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp0c", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp0c_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp0d", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp0d_load)
+	GENERIC_SOCKET(config, "exp00", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp00_load), this);
+	GENERIC_SOCKET(config, "exp01", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp01_load), this);
+	GENERIC_SOCKET(config, "exp02", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp02_load), this);
+	GENERIC_SOCKET(config, "exp0c", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0c_load), this);
+	GENERIC_SOCKET(config, "exp0d", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0d_load), this);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");
-MACHINE_CONFIG_END
+}
 
 void pegasus_state::pegasusm(machine_config &config)
 {

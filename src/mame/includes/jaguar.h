@@ -274,7 +274,7 @@ private:
 
 	image_init_result quickload_cb(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);
 	void dsp_rom_map(address_map &map);

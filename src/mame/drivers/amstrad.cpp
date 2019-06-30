@@ -807,14 +807,14 @@ FLOPPY_FORMATS_MEMBER( amstrad_state::aleste_floppy_formats )
 	FLOPPY_MSX_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(amstrad_state::cpcplus_cartslot)
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gx4000_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,cpr")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(amstrad_state, amstrad_plus_cartridge)
+void amstrad_state::cpcplus_cartslot(machine_config &config)
+{
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gx4000_cart", "bin,cpr"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(amstrad_state::amstrad_plus_cartridge), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gx4000");
-MACHINE_CONFIG_END
+}
 
 void cpc464_exp_cards(device_slot_interface &device)
 {

@@ -336,7 +336,7 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* rom extension board */
 	GENERIC_SOCKET(config, m_extrom, generic_plain_slot, "mtx_rom", "bin,rom");
-	m_extrom->set_device_load(device_image_load_delegate(&mtx_state::device_image_load_extrom_load, this));
+	m_extrom->set_device_load(FUNC(mtx_state::extrom_load), this);
 
 	/* rs232 board with disk drive bus */
 	MTX_EXP_SLOT(config, m_exp, mtx_expansion_devices, nullptr);
@@ -348,7 +348,7 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* cartridge slot */
 	GENERIC_CARTSLOT(config, m_rompak, generic_plain_slot, "mtx_cart", "bin,rom");
-	m_rompak->set_device_load(device_image_load_delegate(&mtx_state::device_image_load_rompak_load, this));
+	m_rompak->set_device_load(FUNC(mtx_state::rompak_load), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("mtx_cass");

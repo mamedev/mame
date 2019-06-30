@@ -399,7 +399,7 @@ WRITE8_MEMBER(mtx_state::hrx_attr_w)
     EXTENSION BOARD ROMS
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( mtx_state, extrom_load )
+DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 {
 	uint32_t size = m_extrom->common_get_size("rom");
 
@@ -419,7 +419,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state, extrom_load )
     ROMPAK ROMS
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( mtx_state, rompak_load )
+DEVICE_IMAGE_LOAD_MEMBER( mtx_state::rompak_load )
 {
 	uint32_t size = m_rompak->common_get_size("rom");
 

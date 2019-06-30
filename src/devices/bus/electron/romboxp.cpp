@@ -94,13 +94,13 @@ void electron_romboxp_device::device_add_mconfig(machine_config &config)
 
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 4/12
-	m_rom[0]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom1_load, this));
+	m_rom[0]->set_device_load(FUNC(electron_romboxp_device::rom1_load), this);
 	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 5/13
-	m_rom[1]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom2_load, this));
+	m_rom[1]->set_device_load(FUNC(electron_romboxp_device::rom2_load), this);
 	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 6/14 also ROM/RAM
-	m_rom[2]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom3_load, this));
+	m_rom[2]->set_device_load(FUNC(electron_romboxp_device::rom3_load), this);
 	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 7/15
-	m_rom[3]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom4_load, this));
+	m_rom[3]->set_device_load(FUNC(electron_romboxp_device::rom4_load), this);
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart[0], DERIVED_CLOCK(1, 1), electron_cart, nullptr); // ROM SLOT 0/1

@@ -51,7 +51,7 @@ private:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_otherram;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(monon_color_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void monon_color_map(address_map &map);
 };
@@ -118,7 +118,8 @@ void monon_color_state::monon_color_map(address_map &map)
 	map(0x9000, 0x9fff).ram().share("otherram"); // lots of jumps to here, is there some kind of BIOS? none of the code appears to map here?
 }
 
-MACHINE_CONFIG_START(monon_color_state::monon_color)
+void monon_color_state::monon_color(machine_config &config)
+{
 	/* basic machine hardware */
 	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
 	m_maincpu->set_addrmap(AS_PROGRAM, &monon_color_state::monon_color_map);
@@ -137,17 +138,16 @@ MACHINE_CONFIG_START(monon_color_state::monon_color)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "monon_color_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM8_WIDTH)
-	MCFG_GENERIC_LOAD(monon_color_state, monon_color_cart)
-	MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "monon_color_cart", "bin"));
+	cartslot.set_width(GENERIC_ROM8_WIDTH);
+	cartslot.set_device_load(FUNC(monon_color_state::cart_load), this);
+	cartslot.set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("monon_color");
-MACHINE_CONFIG_END
+}
 
-DEVICE_IMAGE_LOAD_MEMBER( monon_color_state, monon_color_cart )
+DEVICE_IMAGE_LOAD_MEMBER( monon_color_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	std::vector<uint8_t> temp;

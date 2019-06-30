@@ -484,7 +484,8 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-MACHINE_CONFIG_START(vtech2_state::laser350)
+void vtech2_state::laser350(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3694700);        /* 3.694700 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
@@ -521,13 +522,11 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vtech_cart")
-	MCFG_GENERIC_EXTENSIONS("rom,bin")
-	MCFG_GENERIC_LOAD(vtech2_state, cart_load)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load), this);
 
 	/* 5.25" Floppy drive */
 	LEGACY_FLOPPY(config, FLOPPY_0, 0, &vtech2_floppy_interface);
-MACHINE_CONFIG_END
+}
 
 
 void vtech2_state::laser500(machine_config &config)

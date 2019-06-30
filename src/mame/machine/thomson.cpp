@@ -269,7 +269,7 @@ void thomson_state::thom_set_caps_led( int led )
 
 /***************************** TO7 / T9000 *************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 {
 	int i,j;
 	uint8_t* pos = memregion("maincpu" )->base() + 0x10000;
@@ -1369,7 +1369,7 @@ WRITE8_MEMBER( thomson_state::mo5_gatearray_w )
 
 
 
-DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 {
 	uint8_t* pos = memregion("maincpu")->base() + 0x10000;
 	uint64_t size, i;

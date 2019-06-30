@@ -541,7 +541,7 @@ void eag_state::eag_base(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(device_image_load_delegate(&eag_state::device_image_load_scc_cartridge, this));
+	m_cart->set_device_load(FUNC(eag_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }

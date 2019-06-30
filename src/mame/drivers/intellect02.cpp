@@ -84,7 +84,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// display stuff
 	void update_display();
@@ -128,7 +128,7 @@ INPUT_CHANGED_MEMBER(intel02_state::reset_button)
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(intel02_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(intel02_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -256,7 +256,7 @@ void intel02_state::intel02(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "intellect02", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&intel02_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(intel02_state::cart_load), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("intellect02");

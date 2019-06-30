@@ -113,7 +113,7 @@ private:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
 	void ti74_palette(palette_device &palette) const;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 	void main_map(address_map &map);
@@ -137,7 +137,7 @@ private:
 
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -518,8 +518,8 @@ void ti74_state::machine_start()
 	save_item(NAME(m_power));
 }
 
-MACHINE_CONFIG_START(ti74_state::ti74)
-
+void ti74_state::ti74(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS70C46(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti74_state::main_map);
@@ -547,15 +547,13 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update), this);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti74_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
-	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti74_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ti74_cart");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ti74_state::ti95)
-
+void ti74_state::ti95(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS70C46(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti74_state::main_map);
@@ -583,12 +581,10 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update), this);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti95_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
-	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti95_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ti95_cart");
-MACHINE_CONFIG_END
+}
 
 
 

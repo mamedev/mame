@@ -754,7 +754,8 @@ void ace_state::machine_start()
 //  machine_config( ace )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ace_state::ace)
+void ace_state::ace(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(6'500'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_state::ace_mem);
@@ -811,7 +812,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("jupace_cass");
-MACHINE_CONFIG_END
+}
 
 
 

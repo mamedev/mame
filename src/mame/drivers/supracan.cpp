@@ -227,7 +227,7 @@ private:
 	TIMER_CALLBACK_MEMBER(supracan_line_on_callback);
 	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
 	TIMER_CALLBACK_MEMBER(supracan_video_callback);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	int supracan_tilemap_get_region(int layer);
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
@@ -1737,7 +1737,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
+DEVICE_IMAGE_LOAD_MEMBER( supracan_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1881,8 +1881,8 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 	}
 }
 
-MACHINE_CONFIG_START(supracan_state::supracan)
-
+void supracan_state::supracan(machine_config &config)
+{
 	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
 	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(supracan_state::supracan_irq));
@@ -1905,13 +1905,13 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supracan);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_GENERIC_LOAD(supracan_state, supracan_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "supracan_cart"));
+	cartslot.set_width(GENERIC_ROM16_WIDTH);
+	cartslot.set_endian(ENDIANNESS_BIG);
+	cartslot.set_device_load(FUNC(supracan_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("supracan");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( supracan )

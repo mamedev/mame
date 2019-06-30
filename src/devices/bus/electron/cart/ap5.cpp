@@ -26,9 +26,9 @@ void electron_ap5_device::device_add_mconfig(machine_config &config)
 {
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_romslot[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 14
-	m_romslot[0]->set_device_load(device_image_load_delegate(&electron_ap5_device::device_image_load_rom1_load, this));
+	m_romslot[0]->set_device_load(FUNC(electron_ap5_device::rom1_load), this);
 	GENERIC_SOCKET(config, m_romslot[1], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 15
-	m_romslot[1]->set_device_load(device_image_load_delegate(&electron_ap5_device::device_image_load_rom2_load, this));
+	m_romslot[1]->set_device_load(FUNC(electron_ap5_device::rom2_load), this);
 
 	/* via */
 	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));

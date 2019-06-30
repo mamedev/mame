@@ -221,7 +221,7 @@ private:
 	inline void draw_point(uint8_t x, uint8_t y, uint8_t color);
 	inline void draw_udk();
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( x07_card );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( card_load );
 
 	/* general */
 	uint8_t m_sleep;

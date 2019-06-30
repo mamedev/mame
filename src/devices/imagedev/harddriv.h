@@ -33,8 +33,8 @@ public:
 	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~harddisk_image_device();
 
-	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }
-	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
+	template <typename... T> void set_device_load(T &&... args) { m_device_image_load = load_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload = unload_delegate(std::forward<T>(args)...); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
@@ -73,9 +73,9 @@ protected:
 	chd_file        m_diffchd;              /* handle to the diff CHD */
 	hard_disk_file  *m_hard_disk_handle;
 
-	device_image_load_delegate      m_device_image_load;
-	device_image_func_delegate      m_device_image_unload;
-	const char *                    m_interface;
+	load_delegate   m_device_image_load;
+	unload_delegate m_device_image_unload;
+	const char *    m_interface;
 };
 
 // device type definition

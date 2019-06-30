@@ -105,8 +105,8 @@ private:
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_nascom1_cassette );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_nascom1_cassette );
 	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( snapshot_cb );
 };
 
@@ -148,8 +148,8 @@ private:
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1) { return load_cart(image, m_socket1, 1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2) { return load_cart(image, m_socket2, 2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
 	void nascom2_io(address_map &map);
 	void nascom2_mem(address_map &map);
@@ -267,7 +267,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom_state::kansas_r )
 }
 
 // This stuff has never been connected up - what's it for?
-DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
+DEVICE_IMAGE_LOAD_MEMBER( nascom_state::load_nascom1_cassette )
 {
 	m_tape_size = image.length();
 	m_tape_image = (uint8_t*)image.ptr();
@@ -279,7 +279,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
+DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state::unload_nascom1_cassette )
 {
 	m_tape_image = nullptr;
 	m_tape_size = m_tape_index = 0;
@@ -786,9 +786,9 @@ void nascom2_state::nascom2(machine_config &config)
 
 	// generic sockets for ram/rom (todo: support ram here)
 	GENERIC_SOCKET(config, m_socket1, generic_plain_slot, "nascom_socket", "bin,rom");
-	m_socket1->set_device_load(device_image_load_delegate(&nascom2_state::device_image_load_socket1, this));
+	m_socket1->set_device_load(FUNC(nascom2_state::socket1_load), this);
 	GENERIC_SOCKET(config, m_socket2, generic_plain_slot, "nascom_socket", "bin,rom");
-	m_socket2->set_device_load(device_image_load_delegate(&nascom2_state::device_image_load_socket2, this));
+	m_socket2->set_device_load(FUNC(nascom2_state::socket2_load), this);
 
 	// nasbus expansion bus
 	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));

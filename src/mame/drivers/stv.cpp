@@ -1240,8 +1240,7 @@ void stv_state::batmanfr(machine_config &config)
 }
 
 #define STV_CARTSLOT_ADD(_tag, _load) \
-	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "stv_cart")  \
-		.set_device_load(device_image_load_delegate(&stv_state::device_image_load_##_load, this));
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "stv_cart").set_device_load(FUNC(stv_state::_load), this);
 
 void stv_state::stv_cartslot(machine_config &config)
 {

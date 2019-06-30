@@ -61,7 +61,7 @@ protected:
 
 	void m68705prg(machine_config &config);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom_load)
 	{
 		auto const desired(m_mcu_region.bytes());
 		auto const actual(m_eprom_image->common_get_size("rom"));
@@ -78,7 +78,7 @@ protected:
 		}
 	}
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mcu)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mcu_load)
 	{
 		auto const desired(m_mcu_region.bytes());
 		auto const actual(m_mcu_image->common_get_size("rom"));
@@ -232,10 +232,10 @@ void m68705prg_state_base::m68705prg(machine_config &config)
 	config.m_perfect_cpu_quantum = subtag("mcu");
 
 	GENERIC_SOCKET(config, m_eprom_image, generic_plain_slot, "eprom", "bin,rom");
-	m_eprom_image->set_device_load(device_image_load_delegate(&m68705prg_state_base::device_image_load_eprom, this));
+	m_eprom_image->set_device_load(FUNC(m68705prg_state_base::eprom_load), this);
 
 	GENERIC_SOCKET(config, m_mcu_image, generic_plain_slot, "mcu", "bin,rom");
-	m_mcu_image->set_device_load(device_image_load_delegate(&m68705prg_state_base::device_image_load_mcu, this));
+	m_mcu_image->set_device_load(FUNC(m68705prg_state_base::mcu_load), this);
 
 	config.set_default_layout(layout_m68705prg);
 }
