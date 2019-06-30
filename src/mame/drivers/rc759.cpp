@@ -22,6 +22,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
+#include "sound/wave.h"
 #include "video/i82730.h"
 
 #include "bus/centronics/ctronics.h"
@@ -579,6 +580,7 @@ void rc759_state::rc759(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SN76489A(config, m_snd, 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WAVE(config, "wave", m_cas).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// internal centronics
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

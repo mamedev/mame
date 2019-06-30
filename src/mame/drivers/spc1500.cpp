@@ -920,7 +920,7 @@ void spc1500_state::spc1500(machine_config &config)
 	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
 	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(spc1500_state::centronics_busy_w));

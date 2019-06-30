@@ -500,7 +500,7 @@ void rx78_state::rx78(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SN76489A(config, "sn1", XTAL(28'636'363)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown divider
 

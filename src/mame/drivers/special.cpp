@@ -389,7 +389,7 @@ void special_state::special(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -502,7 +502,7 @@ void special_state::erik(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	/* Devices */
 	CASSETTE(config, m_cassette);

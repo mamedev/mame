@@ -31,6 +31,7 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/saa1099.h"
+#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -545,6 +546,7 @@ void samcoupe_state::samcoupe(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SAA1099(config, "saa1099", SAMCOUPE_XTAL_X1/3).add_route(ALL_OUTPUTS, "mono", 0.50); /* 8 MHz */
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K");

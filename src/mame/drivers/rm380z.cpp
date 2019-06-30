@@ -167,6 +167,8 @@ Module timer tag static_vblank_timer name m_expire.seconds
 
 #include "emu.h"
 #include "includes/rm380z.h"
+#include "sound/wave.h"
+#include "speaker.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -256,9 +258,10 @@ void rm380z_state::rm380z(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED);
-	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* RAM configurations */
 	RAM(config, RAM_TAG).set_default_size("56K");

@@ -17,6 +17,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/input_merger.h"
 #include "sound/spkrdev.h"
+#include "sound/wave.h"
 #include "video/mc6847.h"
 #include "bus/centronics/ctronics.h"
 #include "emupal.h"
@@ -38,6 +39,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_centronics(*this, "centronics")
 		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
 		, m_irqs(*this, "irqs")
 		, m_y(*this, "Y%u", 0)
 		, m_video_ram(*this, "video_ram")
@@ -46,14 +48,14 @@ public:
 	virtual void machine_start() override;
 	void shine_mem(address_map &map);
 
+	void shine(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(via0_pa_r);
 	DECLARE_WRITE8_MEMBER(via0_pb_w);
 	DECLARE_WRITE8_MEMBER(floppy_w);
 	DECLARE_READ8_MEMBER(vdg_videoram_r);
 
-	void shine(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<ram_device> m_ram;
@@ -63,6 +65,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cass;
 	required_device<input_merger_device> m_irqs;
 	required_ioport_array<8> m_y;
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -247,6 +250,7 @@ void shine_state::shine(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("32K");
@@ -267,8 +271,8 @@ void shine_state::shine(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[0], "525qd", FLOPPY_525_QD, true, floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	auto &cassette(CASSETTE(config, "cassette"));
-	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 }
 
 
