@@ -22,6 +22,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 #include "diserial.h"
 #include "emupal.h"
@@ -1507,6 +1508,7 @@ void px4_state::px4(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WAVE(config, "wave", m_ext_cas).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	TIMER(config, "one_sec").configure_periodic(FUNC(px4_state::upd7508_1sec_callback), attotime::from_seconds(1));
 	TIMER(config, "frc").configure_periodic(FUNC(px4_state::frc_tick), attotime::from_hz(XTAL(7'372'800) / 2 / 6));

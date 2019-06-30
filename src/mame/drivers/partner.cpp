@@ -192,7 +192,7 @@ void partner_state::partner(machine_config &config)
 	PALETTE(config, m_palette, FUNC(partner_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	auto &dma8257(I8257(config, "dma8257", 16_MHz_XTAL / 9));
 	dma8257.out_hrq_cb().set(FUNC(partner_state::hrq_w));

@@ -327,7 +327,7 @@ void pencil2_state::pencil2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, "sn76489a", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00); // guess
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette */
 	CASSETTE(config, m_cass);

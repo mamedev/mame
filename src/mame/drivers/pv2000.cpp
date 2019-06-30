@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 
 	SN76489A(config, "sn76489a", XTAL(7'159'090)/2).add_route(ALL_OUTPUTS, "mono", 1.00); /* 3.579545 MHz */
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette */
 	CASSETTE(config, m_cass);

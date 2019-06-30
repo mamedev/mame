@@ -759,7 +759,7 @@ void sol20_state::sol20(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 2.00); // music board
-	WAVE(config, "wave", m_cass1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave1", m_cass1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	WAVE(config, "wave2", m_cass2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	// devices

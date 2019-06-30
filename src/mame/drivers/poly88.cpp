@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

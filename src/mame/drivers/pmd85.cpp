@@ -628,7 +628,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

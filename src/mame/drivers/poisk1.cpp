@@ -33,6 +33,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
+#include "sound/wave.h"
 #include "video/cgapal.h"
 
 #include "emupal.h"
@@ -687,6 +688,7 @@ void p1_state::poisk1(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);
