@@ -81,20 +81,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HARDDISK, harddisk_image_device)
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_HARDDISK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, HARDDISK, 0)
-
-#define MCFG_HARDDISK_LOAD(_class,_method)                                \
-	downcast<harddisk_image_device &>(*device).set_device_load(device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
-
-#define MCFG_HARDDISK_UNLOAD(_class,_method)                            \
-	downcast<harddisk_image_device &>(*device).set_device_unload(device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
-
-#define MCFG_HARDDISK_INTERFACE(_interface)                         \
-	downcast<harddisk_image_device &>(*device).set_interface(_interface);
-
 #endif // MAME_DEVICES_IMAGEDEV_HARDDRIV_H
