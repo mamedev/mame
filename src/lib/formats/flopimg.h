@@ -333,6 +333,8 @@ protected:
 		SECTOR_INFO_GCR6,       //!< Sector info byte, gcr6-encoded
 		OFFSET_ID_O,            //!< Offset (track*2+head) byte, odd bits, mfm-encoded
 		OFFSET_ID_E,            //!< Offset (track*2+head) byte, even bits, mfm-encoded
+		OFFSET_ID_FM,           //!< Offset (track*2+head) byte, fm-encoded
+		OFFSET_ID,              //!< Offset (track*2+head) byte, mfm-encoded
 		SECTOR_ID_O,            //!< Sector id byte, odd bits, mfm-encoded
 		SECTOR_ID_E,            //!< Sector id byte, even bits, mfm-encoded
 		REMAIN_O,               //!< Remaining sector count, odd bits, mfm-encoded, total sector count in p1
@@ -345,6 +347,8 @@ protected:
 		SECTOR_DATA_GCR5,       //!< Sector data to gcr5-encode, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_MAC,        //!< Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
 		SECTOR_DATA_8N1,        //!< Sector data to 8N1-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_MX,         //!< Sector data to MX-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_DS9,        //!< Sector data to DS9-encode, which in p1, -1 for the current one per the sector id
 
 		CRC_CCITT_START,        //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_CCITT_FM_START,     //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
