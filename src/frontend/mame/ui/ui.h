@@ -194,7 +194,7 @@ public:
 
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
-	void update_and_render(render_container &container);
+	virtual void draw() override;
 	render_font *get_font();
 	float get_line_height();
 	float get_char_width(char32_t ch);

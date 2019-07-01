@@ -239,7 +239,7 @@ void video_manager::frame_update(bool from_debugger)
 	}
 
 	// draw the user interface
-	emulator_info::draw_user_interface(machine());
+	machine().ui().draw();
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();

@@ -113,6 +113,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_manager(manager),
+		m_ui(nullptr),
 		m_current_phase(machine_phase::PREINIT),
 		m_paused(false),
 		m_hard_reset_pending(false),
@@ -206,6 +207,7 @@ void running_machine::start()
 	// create the video manager
 	m_video = std::make_unique<video_manager>(*this);
 	m_ui = manager().create_ui(*this);
+	m_ui->set_startup_text("Initializing...", true);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);

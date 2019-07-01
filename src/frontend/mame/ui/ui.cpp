@@ -379,17 +379,19 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 
 
 //-------------------------------------------------
-//  update_and_render - update the UI and
-//  render it; called by video.c
+//  draw - update the UI and
+//  render it; called by video.cpp
 //-------------------------------------------------
 
-void mame_ui_manager::update_and_render(render_container &container)
+void mame_ui_manager::draw()
 {
+	render_container &container(m_machine.render().ui_container());
+
 	// always start clean
 	container.empty();
 
 	// if we're paused, dim the whole screen
-	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
+	if (m_machine.phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
 		if (ui::menu::stack_has_special_main_menu(machine()))

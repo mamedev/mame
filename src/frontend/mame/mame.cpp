@@ -288,8 +288,6 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
 
-	m_ui->set_startup_text("Initializing...", true);
-
 	return m_ui.get();
 }
 
@@ -343,11 +341,6 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int 
 {
 	std::vector<std::string> args(argv, argv + argc);
 	return start_frontend(options, osd, args);
-}
-
-void emulator_info::draw_user_interface(running_machine& machine)
-{
-	mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
 }
 
 void emulator_info::periodic_check()
