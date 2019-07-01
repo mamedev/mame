@@ -27,9 +27,6 @@ Keypad legend:
 
 Read the official manual(s) on how to play.
 
-Peripherals, compatible with various boards:
-- Fidelity Challenger Printer - thermal printer, MCU=D8048C243
-
 Program/data cartridges, for various boards, some cross-compatible:
 - CB9: Challenger Book Openings 1 - 8KB (label not known)
 - CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02

@@ -124,8 +124,8 @@ PA.7 - button row 8
 PB.0 - button column I
 PB.1 - button column J
 PB.2 - hi/lo TSI speaker volume
-PB.3 - violet wire
-PB.4 - white wire (and TSI BUSY line)
+PB.3 - violet wire to printer port?
+PB.4 - white wire to printer port? (and TSI BUSY line)
 PB.5 - selection jumper input (see below)
 PB.6 - TSI start line
 PB.7 - TSI ROM A12 line
@@ -141,6 +141,13 @@ properly.
 Anyways, the two jumpers are connected to button columns A and B and the common
 connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
 expect that the software reads these once on startup only.
+
+printer:
+--------
+This is the 1st Fidelity chess computer with a printer port. Many later Fidelity chess
+computers also have support for it. Two models were released:
+FP: Challenger Printer - thermal printer, MCU=D8048C243
+IFP: Impact Printer - also compatible with C64 apparently.
 
 ******************************************************************************/
 

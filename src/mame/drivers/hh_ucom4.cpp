@@ -877,7 +877,6 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 void splasfgt_state::splasfgt(machine_config &config)
 {
 	/* basic machine hardware */

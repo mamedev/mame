@@ -358,34 +358,34 @@
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uib3">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu2a">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2b">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2c">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2d">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
 		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu3a" defstate="0">
@@ -402,14 +402,16 @@
 
 	<group name="sb_ui">
 		<bounds x="0" y="0" width="10" height="80" />
+		<bezel element="cblack"><bounds x="0" y="0" width="10" height="1" /></bezel>
 		<bezel element="cblack"><bounds x="0" y="7" width="10" height="1" /></bezel>
+		<bezel element="cblack"><bounds x="0" y="79" width="10" height="1" /></bezel>
 		<bezel element="text_uit1"><bounds x="0" y="2" width="10" height="2" /></bezel>
 		<bezel element="text_uit2"><bounds x="0" y="4" width="10" height="2" /></bezel>
 
 		<!-- board -->
 		<bezel element="text_uib1"><bounds x="0" y="9" width="10" height="2" /></bezel>
-		<bezel element="white"><bounds x="1" y="11.5" width="8" height="2.5" /></bezel>
-		<bezel element="white"><bounds x="1" y="15" width="8" height="2.5" /></bezel>
+		<bezel element="cwhite"><bounds x="1" y="11.5" width="8" height="2.5" /></bezel>
+		<bezel element="cwhite"><bounds x="1" y="15" width="8" height="2.5" /></bezel>
 
 		<bezel element="text_uib2"><bounds x="1.5" y="11.75" width="7" height="2" /></bezel>
 		<bezel element="text_uib3"><bounds x="1.5" y="15.25" width="7" height="2" /></bezel>
@@ -419,8 +421,8 @@
 
 		<!-- spawn -->
 		<bezel element="text_uis1"><bounds x="0" y="20.5" width="10" height="2" /></bezel>
-		<bezel element="white"><bounds x="1" y="23" width="8" height="12" /></bezel>
-		<bezel element="white"><bounds x="1" y="36" width="8" height="12" /></bezel>
+		<bezel element="cwhite"><bounds x="1" y="23" width="8" height="12" /></bezel>
+		<bezel element="cwhite"><bounds x="1" y="36" width="8" height="12" /></bezel>
 
 		<bezel name="piece_ui1" element="piece"><bounds x="1" y="23" width="4" height="4" /></bezel>
 		<bezel name="piece_ui2" element="piece"><bounds x="1" y="27" width="4" height="4" /></bezel>
@@ -453,16 +455,16 @@
 		<bezel element="cblack"><bounds x="1" y="53.5" width="8" height="6" /></bezel>
 		<bezel name="piece_ui0" element="piece"><bounds x="2" y="53.5" width="6" height="6" /></bezel>
 
-		<bezel element="white"><bounds x="1" y="60.5" width="8" height="2.5" /></bezel>
+		<bezel element="cwhite"><bounds x="1" y="60.5" width="8" height="2.5" /></bezel>
 		<bezel element="text_uih2"><bounds x="1.5" y="60.75" width="7" height="2" /></bezel>
 		<bezel element="hlub" inputtag="board:UI" inputmask="0x08"><bounds x="1" y="60.5" width="8" height="2.5" /><color alpha="0.25" /></bezel>
 
 		<!-- undo -->
 		<bezel element="text_uiu1"><bounds x="0" y="66" width="10" height="2" /></bezel>
-		<bezel element="white"><bounds x="1" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="white"><bounds x="3.1" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="white"><bounds x="5.2" y="68.5" width="1.7" height="6" /></bezel>
-		<bezel element="white"><bounds x="7.3" y="68.5" width="1.7" height="6" /></bezel>
+		<bezel element="cwhite"><bounds x="1" y="68.5" width="1.7" height="6" /></bezel>
+		<bezel element="cwhite"><bounds x="3.1" y="68.5" width="1.7" height="6" /></bezel>
+		<bezel element="cwhite"><bounds x="5.2" y="68.5" width="1.7" height="6" /></bezel>
+		<bezel element="cwhite"><bounds x="7.3" y="68.5" width="1.7" height="6" /></bezel>
 		<bezel element="text_uiu2a"><bounds x="1" y="69.5" width="1.7" height="4" /></bezel>
 		<bezel element="text_uiu2b"><bounds x="3.1" y="69.5" width="1.7" height="4" /></bezel>
 		<bezel element="text_uiu2c"><bounds x="5.2" y="69.5" width="1.7" height="4" /></bezel>
@@ -549,14 +551,12 @@
 <!-- build screen -->
 
 	<view name="Internal Layout (Full)">
-		<bounds left="-5.5" right="31.775" top="-12.3" bottom="39.3" />
+		<bounds left="-5" right="31.775" top="-11.8" bottom="39.3" />
 
-		<bezel element="white"><bounds x="-5.5" y="-4.975" width="37.275" height="32.55" /></bezel>
-		<bezel element="blackb"><bounds x="-5.5" y="-4.5875" width="5" height="31.775" /></bezel>
-		<group ref="sb_board"><bounds x="0" y="-4.2" width="31" height="31" /></group>
-		<group ref="sb_ui"><bounds x="-5" y="-4.975" width="4.06875" height="32.55" /></group>
+		<group ref="sb_board"><bounds x="0" y="-3.8" width="31" height="31" /></group>
+		<group ref="sb_ui"><bounds x="-4.5" y="-3.8" width="3.875" height="31" /></group>
 
-		<group ref="digits"><bounds x="8" y="-11.2" width="15" height="5" /></group>
+		<group ref="digits"><bounds x="8" y="-10.4" width="15" height="5" /></group>
 		<group ref="buttons"><bounds x="-1" y="28.5" width="32" height="10.1" /></group>
 	</view>
 
