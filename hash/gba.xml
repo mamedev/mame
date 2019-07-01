@@ -1084,7 +1084,7 @@
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" />
+			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" /> <!-- Also with [9853] -->
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bapp-0.u1" size="8388608" crc="698377d2" sha1="4701c8d26cc608109bc01d0ee189ab1fb646ead8"/>
@@ -2296,11 +2296,14 @@
 		<description>Barnyard (Euro)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BBYP"/>
+		<info name="serial" value="AGB-BBYX-EUU, AGB-BBYX-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="barnyard (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="f2b06467" sha1="2fe05e2c9dfc02efe415c735f95fa1d4cd12eeb7"/>
+				<rom name="agb-bbyx-0.u1" size="8388608" crc="f2b06467" sha1="2fe05e2c9dfc02efe415c735f95fa1d4cd12eeb7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11469,10 +11472,12 @@
 		<description>Flushed Away (Euro)</description>
 		<year>2006</year>
 		<publisher>D3 Publisher</publisher>
-		<info name="serial" value="AGB-BLHP"/>
+		<info name="serial" value="AGB-BLHP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="16777216">
-				<rom name="flushed away (europe) (en,fr,de,es,it).bin" size="16777216" crc="62e435de" sha1="f80fe42d364f9da301607ceab9751c771e068417"/>
+				<rom name="agb-blhp-0.u1" size="16777216" crc="62e435de" sha1="f80fe42d364f9da301607ceab9751c771e068417"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18124,11 +18129,14 @@
 		<description>The Legend of Spyro - A New Beginning (Euro)</description>
 		<year>2006</year>
 		<publisher>Sierra Entertainment</publisher>
-		<info name="serial" value="AGB-B3YP"/>
+		<info name="serial" value="AGB-B3YP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="legend of spyro, the - a new beginning (europe) (en,fr,de,es,it,nl).bin" size="16777216" crc="63df4d36" sha1="722b70f7ac87be0b8b6576fe8c8a82279f955e50"/>
+				<rom name="agb-b3yp-0.u1" size="16777216" crc="63df4d36" sha1="722b70f7ac87be0b8b6576fe8c8a82279f955e50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23526,7 +23534,7 @@
 		<description>Need for Speed Carbon - Own the City (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-BN7E-USA, AGB-BN7P"/>
+		<info name="serial" value="AGB-BN7E-USA, AGB-BN7P-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -24406,11 +24414,14 @@
 		<description>Over the Hedge - Hammy Goes Nuts! (Euro)</description>
 		<year>2006</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BH7P"/>
+		<info name="serial" value="AGB-BH7P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="over the hedge - hammy goes nuts! (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="8f1b100d" sha1="f616dffa5a4be92c75af8952218946893921436d"/>
+				<rom name="agb-bh7p-0.u1" size="8388608" crc="8f1b100d" sha1="f616dffa5a4be92c75af8952218946893921436d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27411,7 +27422,7 @@
 		<description>Rebelstar - Tactical Command (Euro)</description>
 		<year>2006</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-BRLP"/>
+		<info name="serial" value="AGB-BRLP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
@@ -27977,9 +27988,15 @@
 		<info name="release" value="20031212"/>
 		<info name="alt_title" value="ロックマン エグゼ4 トーナメント レッドサン"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="rockman exe 4 - tournament red sun (japan) (rev 1).bin" size="8388608" crc="cf0e8b05" sha1="03a22270b7068ee7762726da4519c20f584951b7"/>
+				<rom name="agb-b4wj-1.u1" size="8388608" crc="cf0e8b05" sha1="03a22270b7068ee7762726da4519c20f584951b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30307,11 +30324,14 @@
 		<description>The Sims 2 - Pets (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-B4OE-USA, AGB-B4OP"/>
+		<info name="serial" value="AGB-B4OE-USA, AGB-B4OP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E02-30" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
-				<rom name="sims 2, the - pets (usa, europe).bin" size="33554432" crc="ec1f4029" sha1="2e95efa31441f7effaf4dd5f9db97143ca53232d"/>
+				<rom name="agb-b4op-0.u1" size="33554432" crc="ec1f4029" sha1="2e95efa31441f7effaf4dd5f9db97143ca53232d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36819,6 +36839,27 @@
 	</software>
 
 	<software name="wizardry">
+		<description>Wizardry Summoner (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Media Rings Corporation</publisher>
+		<info name="serial" value="AGB-AWZJ-JPN"/>
+		<info name="release" value="20011221"/>
+		<info name="alt_title" value="ウィザードリィサマナー"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-awzj-1.u1" size="4194304" crc="b3c77a61" sha1="c4ddb35319b8ed0f2e3d281ad93e42a0db757cd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardry1" cloneof="wizardry">
 		<description>Wizardry Summoner (Jpn)</description>
 		<year>2001</year>
 		<publisher>Media Rings Corporation</publisher>
@@ -38188,6 +38229,27 @@
 	</software>
 
 	<software name="zoidsaga">
+		<description>Zoids Saga (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Tomy</publisher>
+		<info name="serial" value="AGB-ATZJ-JPN"/>
+		<info name="release" value="20011130"/>
+		<info name="alt_title" value="ゾイドサーガ"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-atzj-1.u1" size="8388608" crc="28e8b0d9" sha1="70bb546a7d00126d452c1d2c1ccddafb2cb91b37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoidsaga1" cloneof="zoidsaga">
 		<description>Zoids Saga (Jpn)</description>
 		<year>2001</year>
 		<publisher>Tomy</publisher>
@@ -39919,9 +39981,13 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-BI4E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
-				<rom name="4 games on one game pak (racing) (usa) (en,fr,de,es,it,nl).bin" size="33554432" crc="04a40017" sha1="a99bbc7ec018af85260669917939004baabf4ac1"/>
+				<rom name="agb-bi4e-0.u1" size="33554432" crc="04a40017" sha1="a99bbc7ec018af85260669917939004baabf4ac1"/>
 			</dataarea>
 		</part>
 	</software>
