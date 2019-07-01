@@ -651,7 +651,7 @@ namespace netlist
 			}
 
 			void push_to_queue(netlist_time delay) NL_NOEXCEPT;
-			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+			bool is_queued() const noexcept { return ((queue_status)m_in_queue) == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
 			void update_devs() NL_NOEXCEPT;
@@ -1705,7 +1705,7 @@ namespace netlist
 		{
 			m_list_active.push_front(&term);
 			railterminal().device().do_inc_active();
-			if (m_in_queue == queue_status::DELAYED_DUE_TO_INACTIVE)
+			if (((queue_status)m_in_queue) == queue_status::DELAYED_DUE_TO_INACTIVE)
 			{
 				if (m_next_scheduled_time > exec().time())
 				{
