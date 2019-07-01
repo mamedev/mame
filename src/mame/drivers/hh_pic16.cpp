@@ -273,8 +273,6 @@ static INPUT_PORTS_START( touchme )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 touchme_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
 void touchme_state::touchme(machine_config &config)
 {
 	/* basic machine hardware */
@@ -295,7 +293,8 @@ void touchme_state::touchme(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, touchme_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -609,8 +608,6 @@ static INPUT_PORTS_START( maniac )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
-static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
 void maniac_state::maniac(machine_config &config)
 {
 	/* basic machine hardware */
@@ -627,7 +624,8 @@ void maniac_state::maniac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, maniac_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -1158,8 +1156,6 @@ static INPUT_PORTS_START( rockpin )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Ball")
 INPUT_PORTS_END
 
-static const s16 rockpin_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
 void rockpin_state::rockpin(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1184,7 +1180,8 @@ void rockpin_state::rockpin(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, rockpin_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

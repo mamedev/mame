@@ -232,8 +232,6 @@ static const u8 wildfire_7seg_table[0x10] =
 	0x7f, 0x6f, 0x77, 0x73, 0x39, 0x38, 0x79, 0x40  // 8, 9, ?, P, ?, L, ?, -
 };
 
-static s16 wildfire_speaker_levels[0x8000];
-
 void wildfire_state::wildfire(machine_config &config)
 {
 	/* basic machine hardware */
@@ -257,9 +255,10 @@ void wildfire_state::wildfire(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	static s16 speaker_levels[0x8000];
 	for (int i = 0; i < 0x8000; i++)
-		wildfire_speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, wildfire_speaker_levels);
+		speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, speaker_levels);
 }
 
 // roms

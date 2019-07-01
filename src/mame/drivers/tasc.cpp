@@ -228,9 +228,9 @@ void tasc_state::tasc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	static const int16_t speaker_levels[3] = { 0, 32767, -32768 };
+	static const int16_t speaker_levels[4] = { 0, 32767, -32768, 0 };
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.75);
-	m_speaker->set_levels(3, speaker_levels);
+	m_speaker->set_levels(4, speaker_levels);
 }
 
 
