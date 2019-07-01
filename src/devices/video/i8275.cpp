@@ -209,22 +209,22 @@ void i8275_device::vrtc_start()
 	//LOG("I8275 y %u x %u VRTC 1\n", y, x);
 	m_write_vrtc(1);
 
-	if (m_status & ST_VE)
-	{
-		// reset field attributes
-		m_field_attr = 0;
+	// reset field attributes
+	m_field_attr = 0;
 
-		m_buffer_idx = CHARACTERS_PER_ROW;
-		m_dma_stop = false;
-		m_end_of_screen = false;
+	// Intel datasheets imply DMA requests begin only after a "Start Display" command is issued.
+	// WY-100, however, expects a BRDY cycle from the 8276 after the program first configures and stops the display.
+	// This suggests that DMA bursts proceed as normal in this case, but any characters sent will not be displayed.
+	m_buffer_idx = CHARACTERS_PER_ROW;
+	m_dma_stop = false;
+	m_end_of_screen = !(m_status & ST_VE);
 
-		m_cursor_blink++;
-		m_cursor_blink &= 0x1f;
+	m_cursor_blink++;
+	m_cursor_blink &= 0x1f;
 
-		m_char_blink++;
-		m_char_blink &= 0x3f;
-		m_stored_attr = 0;
-	}
+	m_char_blink++;
+	m_char_blink &= 0x3f;
+	m_stored_attr = 0;
 }
 
 
@@ -285,7 +285,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if (m_scanline == 0)
 			vrtc_end();
 
-		if ((m_status & ST_VE) && lc == 0 && m_scanline < m_vrtc_scanline)
+		if (lc == 0 && m_scanline < m_vrtc_scanline)
 		{
 			if (!m_dma_stop && m_buffer_idx < CHARACTERS_PER_ROW)
 			{
@@ -320,7 +320,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if (m_scanline == m_vrtc_scanline)
 			vrtc_start();
 
-		if ((m_status & ST_VE) && m_scanline == m_vrtc_drq_scanline)
+		if (!m_dma_stop && m_scanline == m_vrtc_drq_scanline)
 		{
 			// swap line buffers
 			m_buffer_dma = !m_buffer_dma;
@@ -609,9 +609,7 @@ WRITE8_MEMBER( i8275_device::write )
 		m_param[m_param_idx] = data;
 
 		if (m_param_idx == REG_SCN4)
-		{
 			recompute_parameters();
-		}
 
 		m_param_idx++;
 	}
