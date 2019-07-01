@@ -31,68 +31,68 @@
 	</element>
 
 	<element name="text_1">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="1"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_2">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="2"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_3">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="3"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_4">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="4"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_5">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="5"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_6">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="6"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_7">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="7"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_8">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="8"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
 	<element name="text_a">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="A"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_b">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="B"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_c">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="C"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_d">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="D"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_e">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="E"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_f">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="F"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_g">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="G"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 	<element name="text_h">
-		<rect><color red="0.5" green="0.3" blue="0.25" /></rect>
+		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<text string="H"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
@@ -137,8 +137,8 @@
 
 <!-- sb board -->
 
-	<element name="cblack"><rect><color red="0.5" green="0.3" blue="0.25" /></rect></element>
-	<element name="cwhite"><rect><color red="0.85" green="0.83" blue="0.7" /></rect></element>
+	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
+	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
 
 	<element name="hlbb" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
@@ -303,34 +303,34 @@
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib2">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uib3">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih2">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu2a">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2b">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2c">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu2d">
-		<rect><color red="0.85" green="0.83" blue="0.7" /></rect>
+		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu3a" defstate="0">
@@ -432,30 +432,30 @@
 		<bounds left="-14" right="106.5" top="-2" bottom="88" />
 
 		<bezel element="cblack"><bounds x="-2" y="-2" width="90" height="90" /></bezel>
-		<bezel element="black"><bounds x="2" y="2" width="82" height="82" /></bezel>
+		<bezel element="black"><bounds x="2.5" y="2.5" width="81" height="81" /></bezel>
 		<group ref="sb_board"><bounds x="3" y="3" width="80" height="80" /></group>
 
 		<group ref="sb_ui"><bounds x="-13" y="3" width="10" height="80" /></group>
 
 	<!-- chessboard coords -->
 
-		<bezel element="text_8"><bounds x="-0.8" y="7" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="-0.8" y="17" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="-0.8" y="27" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="-0.8" y="37" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="-0.8" y="47" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="-0.8" y="57" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="-0.8" y="67" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="-0.8" y="77" width="2" height="2" /></bezel>
+		<bezel element="text_8"><bounds x="-0.6" y="7"  width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="-0.6" y="17" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="-0.6" y="27" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="-0.6" y="37" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="-0.6" y="47" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="-0.6" y="57" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="-0.6" y="67" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="-0.6" y="77" width="2" height="2" /></bezel>
 
-		<bezel element="text_a"><bounds x="7" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_b"><bounds x="17" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_c"><bounds x="27" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_d"><bounds x="37" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_e"><bounds x="47" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_f"><bounds x="57" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_g"><bounds x="67" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_h"><bounds x="77" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_a"><bounds x="7"  y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_b"><bounds x="17" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_c"><bounds x="27" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_d"><bounds x="37" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_e"><bounds x="47" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_f"><bounds x="57" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_g"><bounds x="67" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_h"><bounds x="77" y="84.75" width="2" height="2" /></bezel>
 
 	<!-- right side -->
 
