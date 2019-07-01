@@ -89,7 +89,6 @@ private:
 	memory_region *m_cart_rom;
 
 	static constexpr uint32_t TIMER_COUNT = 3;
-	static constexpr uint32_t DEFAULT_CLOCK = 2000000;
 
 	enum : uint32_t
 	{
@@ -983,6 +982,8 @@ DEVICE_IMAGE_LOAD_MEMBER(pockstat_state::flash_load)
 
 void pockstat_state::pockstat(machine_config &config)
 {
+	static constexpr uint32_t DEFAULT_CLOCK = 2000000;
+
 	/* basic machine hardware */
 	ARM7(config, m_maincpu, DEFAULT_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pockstat_state::mem_map);
