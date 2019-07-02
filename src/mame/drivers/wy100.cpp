@@ -12,7 +12,6 @@
     Known emulation bugs:
     - Return key often gets corrupted when looped back
     - Frequent screen glitches when writing to the display
-    - Key click is missing
     - No dimming of protected characters
 
 *******************************************************************************/
@@ -21,10 +20,13 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "machine/mc2661.h"
 #include "machine/wy50kb.h"
+#include "sound/spkrdev.h"
 #include "video/i8275.h"
 #include "screen.h"
+#include "speaker.h"
 
 class wy100_state : public driver_device
 {
@@ -224,6 +226,7 @@ void wy100_state::wy100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy100_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &wy100_state::io_map);
 	m_maincpu->p1_out_cb().set("keyboard", FUNC(wy100_keyboard_device::scan_w)).mask(0x7f).invert();
+	m_maincpu->p1_out_cb().append("spkrgate", FUNC(input_merger_device::in_w<0>)).bit(7);
 	m_maincpu->p2_out_cb().set(FUNC(wy100_state::p2_w));
 	m_maincpu->t0_in_cb().set("keyboard", FUNC(wy100_keyboard_device::sense_r)).invert();
 	m_maincpu->t1_in_cb().set(FUNC(wy100_state::t1_r));
@@ -257,6 +260,12 @@ void wy100_state::wy100(machine_config &config)
 	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character), this);
 	m_crtc[0]->drq_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc[0]->drq_wr_callback().append(FUNC(wy100_state::brdy_w));
+	m_crtc[0]->lc_wr_callback().set("spkrgate", FUNC(input_merger_device::in_w<1>)).bit(3);
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.5);
+	input_merger_device &spkrgate(INPUT_MERGER_ALL_HIGH(config, "spkrgate"));
+	spkrgate.output_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	RS232_PORT(config, m_modem, default_rs232_devices, "loopback");
 	m_modem->dcd_handler().set(m_pci, FUNC(mc2661_device::dcd_w));
@@ -277,4 +286,4 @@ ROM_START(wy100)
 ROM_END
 
 
-COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

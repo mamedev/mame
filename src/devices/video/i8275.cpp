@@ -105,6 +105,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_write_drq(*this),
 	m_write_hrtc(*this),
 	m_write_vrtc(*this),
+	m_write_lc(*this),
 	m_status(0),
 	m_param_idx(0),
 	m_param_end(0),
@@ -152,6 +153,7 @@ void i8275_device::device_start()
 	m_write_irq.resolve_safe();
 	m_write_hrtc.resolve_safe();
 	m_write_vrtc.resolve_safe();
+	m_write_lc.resolve_safe();
 
 	// allocate timers
 	m_hrtc_on_timer = timer_alloc(TIMER_HRTC_ON);
@@ -280,6 +282,8 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 	case TIMER_SCANLINE:
 		//LOG("I8275 y %u x %u HRTC 0\n", y, x);
+		int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
+		m_write_lc(line_counter);
 		m_write_hrtc(0);
 
 		if (m_scanline == 0)
@@ -331,7 +335,6 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		if ((m_status & ST_VE) && m_scanline < m_vrtc_scanline)
 		{
-			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
 			bool end_of_row = false;
 			bool blank_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
 			int fifo_idx = 0;

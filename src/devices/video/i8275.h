@@ -80,6 +80,7 @@ public:
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
+	auto lc_wr_callback() { return m_write_lc.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -181,6 +182,7 @@ protected:
 	devcb_write_line   m_write_drq;
 	devcb_write_line   m_write_hrtc;
 	devcb_write_line   m_write_vrtc;
+	devcb_write8       m_write_lc;
 
 	draw_character_delegate m_display_cb;
 	int m_hpixels_per_column;
