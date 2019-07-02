@@ -9817,6 +9817,9 @@ chance32                        // (c) 19?? PAL Company
 @source:changela.cpp
 changela                        // ??? (c) 1983 Taito Corporation
 
+@source:changyu.cpp
+changyu
+
 @source:channelf.cpp
 channelf                        // Fairchild Channel F VES - 1976
 channlf2                        // Fairchild Channel F II - 1978
