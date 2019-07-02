@@ -156,6 +156,8 @@ u16 chessbase_state::read_inputs(int columns)
 
 // chessboard generic inputs
 
+#if 0
+
 INPUT_PORTS_START( generic_cb_buttons )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
@@ -319,3 +321,5 @@ INPUT_PORTS_START( generic_cb_magnets )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
 INPUT_PORTS_END
+
+#endif

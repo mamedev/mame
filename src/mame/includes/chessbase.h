@@ -64,7 +64,7 @@ protected:
 };
 
 
-INPUT_PORTS_EXTERN( generic_cb_buttons );
-INPUT_PORTS_EXTERN( generic_cb_magnets );
+//INPUT_PORTS_EXTERN( generic_cb_buttons );
+//INPUT_PORTS_EXTERN( generic_cb_magnets );
 
 #endif // MAME_INCLUDES_CHESSBASE_H
