@@ -729,7 +729,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 		case 3:
 		{
 			m_dr[dr] = rm32;
-			dri_changed(dr);
+			dri_changed();
 			CYCLES(CYCLES_MOV_DR0_3_REG);
 			break;
 		}
