@@ -28,6 +28,9 @@ int mouseLY;
 int mouseBUT[4];
 Joystate joystate[4];
 
+int lightgunX, lightgunY;
+int lightgunBUT[4];
+
 #ifndef RETROK_TILDE
 #define RETROK_TILDE 178
 #endif
@@ -646,6 +649,43 @@ ovmy=vmy;
 	//printf("vm(%d,%d) mc(%d,%d) mr(%d,%d)\n",vmx,vmy,mouse_x,mouse_y,mouseLX,mouseLY);
 }
 
+void retro_osd_interface::process_lightgun_state(running_machine &machine)
+{
+   int16_t gun_x_raw, gun_y_raw;
+
+   if ( lightgun_mode == RETRO_SETTING_LIGHTGUN_MODE_DISABLED ) {
+      return;
+   }
+
+   for (int i = 0; i < 4; i++) {
+      lightgunBUT[i] = 0;
+   }
+
+   if ( lightgun_mode == RETRO_SETTING_LIGHTGUN_MODE_POINTER ) {
+      gun_x_raw = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
+      gun_y_raw = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+
+      // handle pointer presses
+      // use multi-touch to support different button inputs
+      int touch_count = input_state_cb( 0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_COUNT );
+      if ( touch_count > 0 && touch_count <= 4 ) {
+         lightgunBUT[touch_count-1] = 0x80;
+      }
+   } else { // lightgun is default when enabled
+      gun_x_raw = input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_X );
+      gun_y_raw = input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_SCREEN_Y );
+
+      if ( input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_TRIGGER ) ) {
+         lightgunBUT[0] = 0x80;
+      }
+      if ( input_state_cb( 0, RETRO_DEVICE_LIGHTGUN, 0, RETRO_DEVICE_ID_LIGHTGUN_AUX_A ) ) {
+         lightgunBUT[1] = 0x80;
+      }
+   }
+   lightgunX = gun_x_raw * 2;
+   lightgunY = gun_y_raw * 2;
+}
+
 //============================================================
 //  retro_keyboard_device
 //============================================================
@@ -988,7 +1028,102 @@ public:
 	}
 };
 
+//============================================================
+//  retro_lightgun_device
+//============================================================
+
+// This device is purely event driven so the implementation is in the module
+class retro_lightgun_device : public event_based_device<KeyPressEventArgs>
+{
+public:
+
+	retro_lightgun_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module)
+	{
+	}
+
+	void poll() override
+	{
+event_based_device::poll();
+
+	}
+
+	void reset() override
+	{
+		lightgunX=fb_width/2;
+		lightgunY=fb_height/2;
+  		int i;
+ 		for(i = 0; i < 4; i++)lightgunBUT[i]=0;
+	}
+
+protected:
+	void process_event(KeyPressEventArgs &args) /*override*/
+	{
+//		printf("here\n");
+	}
+};
+
+//============================================================
+//  lightgun_input_retro - retro lightgun input module
+//============================================================
+
+class lightgun_input_retro : public retroinput_module
+{
+private:
+
+public:
+	lightgun_input_retro()
+		: retroinput_module(OSD_LIGHTGUNINPUT_PROVIDER, "retro")
+	{
+	}
+
+	virtual void input_init(running_machine &machine) override
+	{
+		retro_lightgun_device *devinfo;
+		if (!input_enabled() || !lightgun_enabled())
+			return;
+		devinfo = devicelist()->create_device<retro_lightgun_device>(machine, "Retro lightgun 1", "Retro lightgun 1", *this);
+		if (devinfo == nullptr)
+			return;
+
+		lightgunX=fb_width/2;
+		lightgunY=fb_height/2;
+		devinfo->device()->add_item(
+				"X",
+				static_cast<input_item_id>(ITEM_ID_XAXIS),
+				generic_axis_get_state<std::int32_t>,
+				&lightgunX);
+		devinfo->device()->add_item(
+				"Y",
+				static_cast<input_item_id>(ITEM_ID_YAXIS),
+				generic_axis_get_state<std::int32_t>,
+				&lightgunY);
+
+		int button;
+		for (button = 0; button < 4; button++)
+		{
+			lightgunBUT[button]=0;
+			devinfo->device()->add_item(
+				default_button_name(button),
+				static_cast<input_item_id>(ITEM_ID_BUTTON1 + button),
+				generic_button_get_state<std::int32_t>,
+				&lightgunBUT[button]);
+		}
+
+		m_global_inputs_enabled = true;
+
+	}
+
+	bool handle_input_event(void) override
+	{
+		if (!input_enabled() || !lightgun_enabled())
+			return false;
+		return true;
+
+	}
+};
 
 MODULE_DEFINITION(KEYBOARDINPUT_RETRO, keyboard_input_retro)
 MODULE_DEFINITION(MOUSEINPUT_RETRO, mouse_input_retro)
 MODULE_DEFINITION(JOYSTICKINPUT_RETRO, joystick_input_retro)
+MODULE_DEFINITION(LIGHTGUNINPUT_RETRO, lightgun_input_retro)

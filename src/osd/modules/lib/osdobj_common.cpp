@@ -284,7 +284,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 #else
-	//FIXME LIBRETRO LIGHTGUN
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RETRO);
 #endif
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 #ifndef __LIBRETRO__

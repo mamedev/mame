@@ -106,6 +106,7 @@ public:
  	void process_mouse_state(running_machine &machine);
 	void process_keyboard_state(running_machine &machine);
  	void process_joypad_state(running_machine &machine);
+	void process_lightgun_state(running_machine &machine);
 
 	virtual retro_options &options() override { return m_options; }
 

@@ -43,6 +43,14 @@ enum
    RETROPAD_R3,
    RETROPAD_TOTAL
 };
+
+enum
+{
+   RETRO_SETTING_LIGHTGUN_MODE_DISABLED,
+   RETRO_SETTING_LIGHTGUN_MODE_POINTER,
+   RETRO_SETTING_LIGHTGUN_MODE_LIGHTGUN
+};
+
 extern int NEWGAME_FROM_OSD;
 
 extern char g_rom_dir[1024];
@@ -54,6 +62,7 @@ extern int retro_pause;
 extern bool experimental_cmdline;
 extern bool hide_gameinfo;
 extern bool mouse_enable;
+extern int  lightgun_mode;
 extern bool cheats_enable;
 extern bool alternate_renderer;
 extern bool boot_to_osd_enable;
@@ -76,6 +85,10 @@ extern bool video_changed;
 extern int mouseLX;
 extern int mouseLY;
 extern int mouseBUT[4];
+
+extern int lightgunX;
+extern int lightgunY;
+extern int lightgunBUT[4];
 
 extern unsigned short retrokbd_state[RETROK_LAST];
 

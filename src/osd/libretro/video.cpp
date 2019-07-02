@@ -127,6 +127,7 @@ void retro_osd_interface::update(bool skip_redraw)
    process_mouse_state(machine());
    process_keyboard_state(machine());
    process_joypad_state(machine());
+   process_lightgun_state(machine());
    RLOOP=0;
 }
 
