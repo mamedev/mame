@@ -15,9 +15,6 @@
 #include "includes/chessbase.h"
 
 #include "machine/bankdev.h"
-#include "machine/timer.h"
-#include "sound/dac.h"
-#include "sound/s14001a.h"
 
 class fidelbase_state : public chessbase_state
 {
@@ -25,11 +22,7 @@ public:
 	fidelbase_state(const machine_config &mconfig, device_type type, const char *tag) :
 		chessbase_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mainmap(*this, "mainmap"),
-		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
-		m_language(*this, "language"),
-		m_dac(*this, "dac")
+		m_mainmap(*this, "mainmap")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(div_changed) { div_refresh(newval); }
@@ -38,13 +31,6 @@ protected:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<address_map_bank_device> m_mainmap;
-	optional_device<s14001a_device> m_speech;
-	optional_region_ptr<u8> m_speech_rom;
-	optional_region_ptr<u8> m_language;
-	optional_device<dac_bit_interface> m_dac;
-
-	u8 m_speech_data;
-	u8 m_speech_bank; // speech rom higher address bits
 
 	// dynamic cpu divider
 	void div_trampoline_w(offs_t offset, u8 data);

@@ -53,6 +53,8 @@ It was probably only released in Germany.
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "sound/s14001a.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -76,6 +78,10 @@ public:
 		m_irq_on(*this, "irq_on"),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
+		m_dac(*this, "dac"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_language(*this, "language"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -88,11 +94,18 @@ public:
 
 	void init_eag2100();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
+	required_device<dac_bit_interface> m_dac;
+	required_device<s14001a_device> m_speech;
+	required_region_ptr<u8> m_speech_rom;
+	required_region_ptr<u8> m_language;
 	required_device<generic_slot_device> m_cart;
 
 	// address maps
@@ -116,12 +129,26 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 	DECLARE_READ8_MEMBER(ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_speech_bank;
 };
 
 void elite_state::init_eag2100()
 {
 	m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
 }
+
+void elite_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_bank));
+}
+
 
 
 /******************************************************************************

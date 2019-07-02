@@ -597,13 +597,12 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="61" right="198" top="0" bottom="86" />
+		<bounds left="61" right="198.25" top="0" bottom="86" />
 
-		<bezel element="black"><bounds x="102" y="2" width="82" height="82" /></bezel>
-		<group ref="sb_board"><bounds x="103" y="3" width="80" height="80" /></group>
+		<group ref="sb_board"><bounds x="102" y="2" width="82" height="82" /></group>
 
 		<!-- putting sb_ui on the right side, since chesscomputer has its own ui on the left -->
-		<group ref="sb_ui"><bounds x="186" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="186" y="2" width="10.25" height="82" /></group>
 
 	<!-- left side display -->
 

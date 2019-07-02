@@ -70,6 +70,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq) { sexpert_set_cpu_freq(); }
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
@@ -82,9 +85,6 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void sexpert_set_cpu_freq();
 

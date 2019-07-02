@@ -95,11 +95,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
+
+	// machine drivers
 	void cmpchess(machine_config &config);
 	void mk1(machine_config &config);
 	void cnc(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
 	virtual void machine_start() override;
@@ -113,6 +114,7 @@ private:
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
 
+	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 	void cnc_io(address_map &map);
@@ -122,6 +124,7 @@ private:
 	void update_display();
 	void update_reset(ioport_value state);
 
+	// I/O handlers
 	DECLARE_READ8_MEMBER(beeper_r);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);

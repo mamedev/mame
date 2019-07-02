@@ -22,6 +22,7 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -40,6 +41,7 @@ public:
 	as12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
+		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -49,6 +51,7 @@ public:
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 
 	// address maps

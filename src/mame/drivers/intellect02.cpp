@@ -84,21 +84,20 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	// display stuff
-	void update_display();
-	u8 m_digit_data;
-	u8 m_led_select;
-
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
 	// I/O handlers
+	void update_display();
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(control_w);
+
+	u8 m_digit_data;
+	u8 m_led_select;
 };
 
 void intel02_state::machine_start()

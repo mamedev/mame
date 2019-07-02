@@ -42,6 +42,7 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -55,12 +56,15 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 
 namespace {
 
+// SC9 / shared
+
 class sc9_state : public fidelbase_state
 {
 public:
 	sc9_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
+		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -73,6 +77,7 @@ public:
 protected:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 
 	// address maps
@@ -92,6 +97,8 @@ protected:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(input_d7_r);
 };
+
+// SC9C
 
 class sc9c_state : public sc9_state
 {

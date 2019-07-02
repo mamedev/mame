@@ -44,6 +44,7 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -55,13 +56,16 @@ Designer Mach IV Master 2325 (model 6129) overview:
 
 namespace {
 
+// Designer Display / shared
+
 class desdis_state : public fidelbase_state
 {
 public:
 	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
-		m_rombank(*this, "rombank")
+		m_rombank(*this, "rombank"),
+		m_dac(*this, "dac")
 	{ }
 
 	// machine drivers
@@ -74,6 +78,7 @@ protected:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	optional_memory_bank m_rombank;
+	required_device<dac_bit_interface> m_dac;
 
 	// address maps
 	void fdes2100d_map(address_map &map);
@@ -87,6 +92,13 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(lcd_w);
 	virtual DECLARE_READ8_MEMBER(input_r);
 };
+
+void desdis_state::init_fdes2100d()
+{
+	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
+}
+
+// Designer Master
 
 class desmas_state : public desdis_state
 {
@@ -111,14 +123,6 @@ private:
 	virtual DECLARE_WRITE8_MEMBER(lcd_w) override { desdis_state::lcd_w(space, offset, ~data); }
 };
 
-
-// init
-
-void desdis_state::init_fdes2100d()
-{
-	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
-}
-
 void desmas_state::init_fdes2265()
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
@@ -134,6 +138,7 @@ void desmas_state::init_fdes2265()
 	for (int i = 0; i < len; i++)
 		rom[i] = buf[bitswap<24>(i, 23,22,21,20,19,18,17,16, 15,14,13,12,11,8,10,9, 7,6,5,4,3,2,1,0)];
 }
+
 
 
 /******************************************************************************

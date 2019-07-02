@@ -31,7 +31,6 @@ Read the official manual(s) on how to play.
 
 #include "emu.h"
 #include "includes/fidelbase.h"
-#include "machine/timer.h"
 
 
 // machine start/reset
@@ -41,12 +40,8 @@ void fidelbase_state::machine_start()
 	chessbase_state::machine_start();
 
 	// zerofill/register for savestates
-	m_speech_data = 0;
-	m_speech_bank = 0;
 	m_div_config = 0;
 
-	save_item(NAME(m_speech_data));
-	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_div_status));
 	save_item(NAME(m_div_config));
 	save_item(NAME(m_div_scale));

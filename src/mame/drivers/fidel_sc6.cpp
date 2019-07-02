@@ -26,6 +26,7 @@ SC6 program is contained in BO6 and CG6.
 #include "includes/fidelbase.h"
 
 #include "cpu/mcs48/mcs48.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -44,6 +45,7 @@ public:
 	sc6_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -53,6 +55,7 @@ public:
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 
 	// address maps

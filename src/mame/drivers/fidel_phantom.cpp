@@ -28,6 +28,7 @@ Fidelity Phantom (model 6100) overview:
 #include "includes/fidelbase.h"
 
 #include "cpu/m6502/r65c02.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -42,7 +43,8 @@ class phantom_state : public fidelbase_state
 public:
 	phantom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_rombank(*this, "rombank")
+		m_rombank(*this, "rombank"),
+		m_dac(*this, "dac")
 	{ }
 
 	void fphantom(machine_config &config);
@@ -54,6 +56,7 @@ protected:
 private:
 	// devices/pointers
 	required_memory_bank m_rombank;
+	required_device<dac_bit_interface> m_dac;
 
 	void main_map(address_map &map);
 };

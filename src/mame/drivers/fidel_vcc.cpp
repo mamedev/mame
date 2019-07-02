@@ -107,6 +107,7 @@ determination and give you a language option on power up or something.
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "sound/s14001a.h"
 #include "speaker.h"
 
 // internal artwork
@@ -120,7 +121,10 @@ class vcc_state : public fidelbase_state
 public:
 	vcc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_ppi8255(*this, "ppi8255")
+		m_ppi8255(*this, "ppi8255"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_language(*this, "language")
 	{ }
 
 	// RE button is tied to Z80 RESET pin
@@ -135,6 +139,9 @@ protected:
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
+	required_device<s14001a_device> m_speech;
+	required_region_ptr<u8> m_speech_rom;
+	required_region_ptr<u8> m_language;
 
 	// address maps
 	void main_map(address_map &map);
@@ -148,11 +155,19 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_speech_bank;
 };
 
 void vcc_state::machine_start()
 {
 	fidelbase_state::machine_start();
+
+	// zerofill
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_bank));
 
 	// game relies on RAM filled with FF at power-on
 	for (int i = 0; i < 0x400; i++)

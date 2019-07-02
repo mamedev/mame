@@ -31,6 +31,7 @@ the S14001A in the 70s), this time a 65C02 software solution.
 
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -55,6 +56,9 @@ public:
 
 	void init_chesster();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
@@ -67,11 +71,12 @@ private:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
-	int m_numbanks;
-
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	int m_numbanks;
+	u8 m_speech_bank;
 };
 
 void chesster_state::init_chesster()
@@ -79,6 +84,18 @@ void chesster_state::init_chesster()
 	m_numbanks = memregion("rombank")->bytes() / 0x4000;
 	m_rombank->configure_entries(0, m_numbanks, memregion("rombank")->base(), 0x4000);
 }
+
+void chesster_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_bank));
+}
+
 
 
 /******************************************************************************

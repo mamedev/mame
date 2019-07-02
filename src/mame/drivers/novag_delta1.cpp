@@ -53,6 +53,8 @@ private:
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
+
 	// I/O handlers
 	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -65,8 +67,6 @@ private:
 	u8 m_7seg_data;
 	bool m_7seg_rc;
 	bool m_blink;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 };
 
 void delta1_state::machine_start()

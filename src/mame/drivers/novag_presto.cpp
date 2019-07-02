@@ -53,6 +53,8 @@ public:
 	void octo(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
@@ -69,8 +71,6 @@ protected:
 	bool m_kp_select;
 	u8 m_inp_mux;
 	u8 m_led_select;
-
-	virtual void machine_start() override;
 };
 
 void presto_state::machine_start()

@@ -159,6 +159,7 @@ B0000x-xxxxxx: see V7, -800000
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -172,6 +173,8 @@ B0000x-xxxxxx: see V7, -800000
 
 namespace {
 
+// EAG / shared
+
 class eag_state : public fidelbase_state
 {
 public:
@@ -180,6 +183,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_ram(*this, "ram"),
+		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -201,6 +205,7 @@ protected:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
 	optional_device<ram_device> m_ram;
+	required_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
 
 	// address maps
@@ -222,6 +227,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 };
+
+// EAG V5
 
 class eagv5_state : public eag_state
 {
@@ -251,6 +258,8 @@ private:
 	DECLARE_READ8_MEMBER(main_ack_r);
 	DECLARE_READ8_MEMBER(sub_ack_r);
 };
+
+// Excel 68000
 
 class excel68k_state : public eag_state
 {

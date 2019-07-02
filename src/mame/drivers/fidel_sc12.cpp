@@ -53,6 +53,7 @@ If control Q4 is set, printer data can be read from I0.
 #include "includes/fidelbase.h"
 
 #include "cpu/m6502/r65c02.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "machine/timer.h"
 #include "bus/generic/slot.h"
@@ -72,6 +73,7 @@ public:
 	sc12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
+		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -82,6 +84,7 @@ public:
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 
 	// address maps

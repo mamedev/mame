@@ -158,6 +158,7 @@ IFP: Impact Printer - also compatible with C64 apparently.
 #include "machine/i8255.h"
 #include "machine/z80pio.h"
 #include "machine/timer.h"
+#include "sound/s14001a.h"
 #include "speaker.h"
 
 // internal artwork
@@ -173,17 +174,26 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_z80pio(*this, "z80pio"),
-		m_ppi8255(*this, "ppi8255")
+		m_ppi8255(*this, "ppi8255"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_language(*this, "language")
 	{ }
 
 	// machine drivers
 	void vsc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
+	required_device<s14001a_device> m_speech;
+	required_region_ptr<u8> m_speech_rom;
+	required_region_ptr<u8> m_language;
 
 	// address maps
 	void main_map(address_map &map);
@@ -204,7 +214,21 @@ private:
 	DECLARE_READ8_MEMBER(pio_porta_r);
 	DECLARE_READ8_MEMBER(pio_portb_r);
 	DECLARE_WRITE8_MEMBER(pio_portb_w);
+
+	u8 m_speech_bank;
 };
+
+void vsc_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_bank));
+}
+
 
 
 /******************************************************************************

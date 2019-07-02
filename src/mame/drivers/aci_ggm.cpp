@@ -105,12 +105,6 @@ private:
 	void update_display();
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
-	u8 m_inp_mux;
-	u16 m_digit_data;
-	u8 m_shift_data;
-	u8 m_shift_clock;
-	u32 m_cart_mask;
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 	DECLARE_READ8_MEMBER(cartridge_r);
 
@@ -120,6 +114,12 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(shift_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(shift_data_w);
+
+	u8 m_inp_mux;
+	u16 m_digit_data;
+	u8 m_shift_data;
+	u8 m_shift_clock;
+	u32 m_cart_mask;
 };
 
 void ggm_state::machine_start()

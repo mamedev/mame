@@ -134,6 +134,8 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/timer.h"
+#include "sound/s14001a.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -150,7 +152,10 @@ class excel_state : public fidelbase_state
 public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_irq_on(*this, "irq_on")
+		m_irq_on(*this, "irq_on"),
+		m_dac(*this, "dac"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech")
 	{ }
 
 	// machine drivers
@@ -166,9 +171,15 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<dac_bit_interface> m_dac;
+	optional_device<s14001a_device> m_speech;
+	optional_region_ptr<u8> m_speech_rom;
 
 	// address maps
 	void fexcel_map(address_map &map);
@@ -182,7 +193,24 @@ private:
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(ttl_w);
 	DECLARE_READ8_MEMBER(ttl_r);
+
+	u8 m_speech_data;
+	u8 m_speech_bank;
 };
+
+void excel_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_speech_data = 0;
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_data));
+	save_item(NAME(m_speech_bank));
+}
+
 
 
 /******************************************************************************

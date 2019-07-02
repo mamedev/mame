@@ -199,6 +199,8 @@ PCB label 510-1035A01
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+#include "sound/s14001a.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -210,13 +212,19 @@ PCB label 510-1035A01
 
 namespace {
 
+// CSC / shared
+
 class csc_state : public fidelbase_state
 {
 public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
-		m_pia(*this, "pia%u", 0)
+		m_pia(*this, "pia%u", 0),
+		m_dac(*this, "dac"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_language(*this, "language")
 	{ }
 
 	// machine drivers
@@ -226,9 +234,15 @@ public:
 	void rsc(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	optional_device_array<pia6821_device, 2> m_pia;
+	required_device<dac_bit_interface> m_dac;
+	optional_device<s14001a_device> m_speech;
+	optional_region_ptr<u8> m_speech_rom;
+	optional_region_ptr<u8> m_language;
 
 	// address maps
 	void csc_map(address_map &map);
@@ -253,7 +267,22 @@ protected:
 	DECLARE_WRITE8_MEMBER(pia1_pb_w);
 	DECLARE_READ8_MEMBER(pia1_pb_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+
+	u8 m_speech_bank;
 };
+
+void csc_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_bank));
+}
+
+// SU9
 
 class su9_state : public csc_state
 {
@@ -281,6 +310,7 @@ void su9_state::su9_set_cpu_freq()
 	u8 inp = ioport("FAKE")->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? (3_MHz_XTAL) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
 }
+
 
 
 /******************************************************************************

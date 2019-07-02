@@ -19,6 +19,7 @@ Fidelity Sensory Chess Challenger 8 overview:
 #include "includes/fidelbase.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -32,13 +33,17 @@ class scc_state : public fidelbase_state
 {
 public:
 	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_dac(*this, "dac")
 	{ }
 
 	// machine drivers
 	void scc(machine_config &config);
 
 private:
+	// devices/pointers
+	required_device<dac_bit_interface> m_dac;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
