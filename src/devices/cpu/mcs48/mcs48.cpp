@@ -5,7 +5,7 @@
     - EA pin - defined by architecture, must implement:
       1 means external access, bypassing internal ROM
       reimplement as a push, not a pull
-    - add CMOS devices, 1 new opcode (01 HALT)
+    - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
     - make timer update cleaner:
       timer is updated on S4 while I/O happens on S5
@@ -13,6 +13,7 @@
       right now this is implemented with a hack in the mov_a_t handler
       in theory it should also be possible to see the timer flag before the interrupt is taken
       mov_t_a should also update the T register after it's incremented
+    - IRQ timing is similarly hacked due to WY-100 needing to take JNI branch before servicing interrupt
 */
 
 /***************************************************************************
@@ -1102,6 +1103,7 @@ void mcs48_cpu_device::device_start()
 	m_dbbi = 0;
 	m_dbbo = 0;
 	m_irq_state = 0;
+	m_pending_irq_state = 0;
 
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);
@@ -1226,12 +1228,14 @@ void mcs48_cpu_device::device_reset()
 
 int mcs48_cpu_device::check_irqs()
 {
+	bool pending_irq = std::exchange(m_pending_irq_state, m_irq_state);
+
 	/* if something is in progress, we do nothing */
 	if (m_irq_in_progress)
 		return 0;
 
 	/* external interrupts take priority */
-	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
+	if ((pending_irq || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
 		m_irq_in_progress = true;
 
