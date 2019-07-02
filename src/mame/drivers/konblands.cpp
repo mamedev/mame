@@ -276,8 +276,8 @@ WRITE_LINE_MEMBER(konblands_state::ld_command_strobe_cb)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(konblands_state::konblands)
-
+void konblands_state::konblands(machine_config &config)
+{
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_CLOCK/12);
 	m_maincpu->set_addrmap(AS_PROGRAM, &konblands_state::konblands_map);
@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	m_laserdisc->set_overlay_palette("palette");
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_konblands);
 

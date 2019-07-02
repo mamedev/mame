@@ -529,7 +529,7 @@ static void vc4000_cart(device_slot_interface &device)
 void vc4000_state::vc4000(machine_config &config)
 {
 	/* basic machine hardware */
-//  MCFG_DEVICE_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+//  S2650(config, m_maincpu, 865000);        /* 3550000/4, 3580000/3, 4430000/3 */
 	S2650(config, m_maincpu, 3546875/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
 	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));

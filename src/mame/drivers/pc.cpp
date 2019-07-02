@@ -755,7 +755,6 @@ Options: 8087 FPU, K101 memory upgrade in 64K steps, 1.2MB floppy and controller
 void pc_state::ncrpc4i(machine_config & config)
 {
 	pccga(config);
-	//MCFG_DEVICE_MODIFY("mb:isa")
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 

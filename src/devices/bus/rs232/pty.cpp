@@ -50,12 +50,12 @@ WRITE_LINE_MEMBER(pseudo_terminal_device::update_serial)
 }
 
 static INPUT_PORTS_START(pseudo_terminal)
-	MCFG_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", pseudo_terminal_device, update_serial)
-	MCFG_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", pseudo_terminal_device, update_serial)
-	MCFG_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", pseudo_terminal_device, update_serial)
-	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", pseudo_terminal_device, update_serial)
-	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", pseudo_terminal_device, update_serial)
-	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", pseudo_terminal_device, update_serial)
+	PORT_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", pseudo_terminal_device, update_serial)
+	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", pseudo_terminal_device, update_serial)
+	PORT_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", pseudo_terminal_device, update_serial)
+	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", pseudo_terminal_device, update_serial)
+	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", pseudo_terminal_device, update_serial)
+	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", pseudo_terminal_device, update_serial)
 INPUT_PORTS_END
 
 ioport_constructor pseudo_terminal_device::device_input_ports() const

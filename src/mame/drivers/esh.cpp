@@ -359,7 +359,8 @@ void esh_state::machine_start()
 
 
 /* DRIVER */
-MACHINE_CONFIG_START(esh_state::esh)
+void esh_state::esh(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, PCB_CLOCK/6);                       /* The denominator is a Daphne guess based on PacMan's hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &esh_state::z80_0_mem);
@@ -376,7 +377,7 @@ MACHINE_CONFIG_START(esh_state::esh)
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	PALETTE(config, m_palette, FUNC(esh_state::esh_palette), 256);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esh);
@@ -387,7 +388,7 @@ MACHINE_CONFIG_START(esh_state::esh)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 // we just disable even lines so we can simulate line blinking
 #define ROM_INTERLACED_GFX \

@@ -1835,7 +1835,7 @@ void racedrivc_panorama_side_board_device_state::device_add_mconfig(machine_conf
 	/* basic machine hardware */        /* multisync board without MSP */
 	adsp(config);                       /* ADSP board */
 //  dsk(config);                        /* DSK board */
-//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+//  HARDDRIV_SOUND_BOARD(config, "sound_board", 0); /* driver sound board */
 }
 
 /* Stun Runner */

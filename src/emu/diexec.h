@@ -76,32 +76,6 @@ enum
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DEVICE_DISABLE() \
-	dynamic_cast<device_execute_interface &>(*device).set_disable();
-#define MCFG_DEVICE_VBLANK_INT_DRIVER(_tag, _class, _func) \
-	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), _tag);
-#define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
-	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), _tag);
-#define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(), nullptr);
-#define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
-	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), attotime::from_hz(_rate));
-#define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
-	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), attotime::from_hz(_rate));
-#define MCFG_DEVICE_PERIODIC_INT_REMOVE()  \
-	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(), attotime());
-#define MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(_class, _func) \
-	dynamic_cast<device_execute_interface &>(*device).set_irq_acknowledge_callback(device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr));
-#define MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(_devtag, _class, _func) \
-	dynamic_cast<device_execute_interface &>(*device).set_irq_acknowledge_callback(device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr));
-#define MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()  \
-	dynamic_cast<device_execute_interface &>(*device).set_irq_acknowledge_callback(device_irq_acknowledge_delegate());
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

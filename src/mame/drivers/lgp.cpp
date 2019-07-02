@@ -410,7 +410,8 @@ void lgp_state::lgp_palette(palette_device &palette) const
 }
 
 /* DRIVER */
-MACHINE_CONFIG_START(lgp_state::lgp)
+void lgp_state::lgp(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, CPU_PCB_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lgp_state::main_program_map);
@@ -430,7 +431,7 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	PALETTE(config, m_palette, FUNC(lgp_state::lgp_palette), 256);
 
@@ -439,7 +440,7 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( lgp )

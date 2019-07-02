@@ -421,14 +421,11 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	pcat_common(config);
 
-	PCI_BUS_LEGACY(config, m_pcibus, 0);
-	m_pcibus->set_busnum(0);
-	m_pcibus->set_device(0,
-		pci_bus_legacy_read_delegate(&xtom3d_state::intel82439tx_pci_r, "xtom3d_state::intel82439tx_pci_r", DEVICE_SELF, (xtom3d_state *)0),
-		pci_bus_legacy_write_delegate(&xtom3d_state::intel82439tx_pci_w, "xtom3d_state::intel82439tx_pci_w", DEVICE_SELF, (xtom3d_state *)0));
-	m_pcibus->set_device(7,
-		pci_bus_legacy_read_delegate(&xtom3d_state::intel82371ab_pci_r, "xtom3d_state::intel82371ab_pci_r", DEVICE_SELF, (xtom3d_state *)0),
-		pci_bus_legacy_write_delegate(&xtom3d_state::intel82371ab_pci_w, "xtom3d_state::intel82371ab_pci_w", DEVICE_SELF, (xtom3d_state *)0));
+	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
+	m_pcibus->set_device_read (0, FUNC(xtom3d_state::intel82439tx_pci_r), this);
+	m_pcibus->set_device_write(0, FUNC(xtom3d_state::intel82439tx_pci_w), this);
+	m_pcibus->set_device_read (7, FUNC(xtom3d_state::intel82371ab_pci_r), this);
+	m_pcibus->set_device_write(7, FUNC(xtom3d_state::intel82371ab_pci_w), this);
 
 	/* video hardware */
 	pcvideo_vga(config);

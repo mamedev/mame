@@ -647,8 +647,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(firefox_state::firefox)
-
+void firefox_state::firefox(machine_config &config)
+{
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_XTAL/8); // 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &firefox_state::main_map);
@@ -696,8 +696,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 0.50);
 	m_laserdisc->add_route(1, "rspeaker", 0.50);
-
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	X2212(config, "nvram_1c").set_auto_save(true);
 	X2212(config, "nvram_1d").set_auto_save(true);
@@ -737,7 +736,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	TMS5220(config, m_tms, MASTER_XTAL/2/11);
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
 	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
-MACHINE_CONFIG_END
+}
 
 
 

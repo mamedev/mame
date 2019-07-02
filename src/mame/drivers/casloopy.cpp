@@ -517,8 +517,8 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state::cart_load )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(casloopy_state::casloopy)
-
+void casloopy_state::casloopy(machine_config &config)
+{
 	/* basic machine hardware */
 	SH2A(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

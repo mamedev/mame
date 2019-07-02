@@ -104,9 +104,6 @@ enum class image_verify_result { PASS, FAIL };
 #define DEVICE_IMAGE_UNLOAD_MEMBER(_name)        	void _name(device_image_interface &image)
 #define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)	DEVICE_IMAGE_UNLOAD_MEMBER(_name)
 
-#define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-	dynamic_cast<device_image_interface &>(*device).set_user_loadable(_usrload);
-
 
 // ======================> device_image_interface
 

@@ -377,7 +377,8 @@ void segald_state::machine_start()
 
 
 /* DRIVER */
-MACHINE_CONFIG_START(segald_state::astron)
+void segald_state::astron(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, SCHEMATIC_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segald_state::mainmem);
@@ -391,7 +392,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segald);
 	PALETTE(config, m_palette).set_entries(256);
@@ -399,7 +400,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( astron )

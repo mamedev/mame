@@ -531,9 +531,7 @@ void decstation_state::threemin_map(address_map &map)
 
 void decstation_state::ncr5394(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
+	downcast<ncr53c94_device *>(device)->set_clock(10000000);
 }
 
 static void dec_scsi_devices(device_slot_interface &device)

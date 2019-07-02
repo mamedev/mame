@@ -470,10 +470,6 @@ INPUT_PORTS_END
 void pong_state::pong(machine_config &config)
 {
 	/* basic machine hardware */
-	//MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	//MCFG_NETLIST_SETUP(pong)
-	//MCFG_NETLIST_SETUP_MEMBER(this, &pong_state::NETLIST_NAME(pong))
-
 	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(this, &pong_state::NETLIST_NAME(pong));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr0", "ic_b9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );

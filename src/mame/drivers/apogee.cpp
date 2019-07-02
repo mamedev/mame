@@ -235,7 +235,7 @@ void apogee_state::apogee(machine_config &config)
 	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
 	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	//I8255(config, "ppi8255_2");
 
 	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);

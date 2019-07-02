@@ -48,8 +48,8 @@ WRITE8_MEMBER(at586_state::boot_state_w)
 
 void at586_state::tx_config(device_t *device)
 {
-	MCFG_I82439TX_CPU( "maincpu" )
-	MCFG_I82439TX_REGION( "isa" )
+	downcast<i82439tx_device *>(device)->set_cpu("maincpu");
+	downcast<i82439tx_device *>(device)->set_region("isa");
 }
 
 void at586_state::sb_config(device_t *device)

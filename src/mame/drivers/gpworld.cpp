@@ -497,8 +497,8 @@ static GFXDECODE_START( gfx_gpworld )
 GFXDECODE_END
 
 /* DRIVER */
-MACHINE_CONFIG_START(gpworld_state::gpworld)
-
+void gpworld_state::gpworld(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, GUESSED_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gpworld_state::mainmem);
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gpworld);
 	PALETTE(config, m_palette).set_entries(1024);
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( gpworld )

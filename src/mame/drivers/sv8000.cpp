@@ -414,7 +414,7 @@ void sv8000_state::sv8000(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sv8000");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( sv8000 )

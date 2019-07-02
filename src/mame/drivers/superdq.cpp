@@ -336,14 +336,13 @@ void superdq_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(superdq_state::superdq)
-
+void superdq_state::superdq(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &superdq_state::superdq_map);
 	m_maincpu->set_addrmap(AS_IO, &superdq_state::superdq_io);
 	m_maincpu->set_vblank_int("screen", FUNC(superdq_state::superdq_vblank));
-
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(superdq_state::screen_update_superdq));
@@ -352,7 +351,7 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superdq);
 	PALETTE(config, m_palette, FUNC(superdq_state::superdq_palette), 32);
@@ -362,7 +361,7 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	SPEAKER(config, "rspeaker").front_right();
 
 	SN76496(config, "snsnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "lspeaker", 0.8);
-MACHINE_CONFIG_END
+}
 
 
 

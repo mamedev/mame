@@ -521,7 +521,7 @@ void exelv_state::exl100(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+	//SPEECHROM(config, "vsm", 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

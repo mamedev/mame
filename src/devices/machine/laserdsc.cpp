@@ -642,7 +642,7 @@ void laserdisc_device::init_disc()
 {
 	// get a handle to the disc to play
 	if (!m_getdisc_callback.isnull())
-		m_disc = m_getdisc_callback(*this);
+		m_disc = m_getdisc_callback();
 	else
 		m_disc = machine().rom_load().get_disk_handle(tag());
 
@@ -1017,7 +1017,7 @@ void laserdisc_device::process_track_data()
 
 	// pass the audio to the callback
 	if (!m_audio_callback.isnull())
-		m_audio_callback(*this, m_samplerate, m_audiocursamples, m_avhuff_config.audio[0], m_avhuff_config.audio[1]);
+		m_audio_callback(m_samplerate, m_audiocursamples, m_avhuff_config.audio[0], m_avhuff_config.audio[1]);
 
 	// shift audio data if we read it into the beginning of the buffer
 	if (m_audiocursamples != 0 && m_audiobufin != 0)
@@ -1133,4 +1133,22 @@ void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *p
 		if (!changed)
 			ldnode->delete_node();
 	}
+}
+
+void laserdisc_device::add_ntsc_screen(machine_config &config, const char *_tag)
+{
+	set_screen(_tag);
+	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));
+}
+
+void laserdisc_device::add_pal_screen(machine_config &config, const char *_tag)
+{
+	set_screen(_tag);
+	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624);
+	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));
 }
