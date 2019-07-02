@@ -52,7 +52,11 @@ It was probably only released in Germany.
 #include "cpu/m6502/r65c02.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -69,7 +73,10 @@ class elite_state : public fidelbase_state
 public:
 	elite_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_ppi8255(*this, "ppi8255")
+		m_irq_on(*this, "irq_on"),
+		m_ppi8255(*this, "ppi8255"),
+		m_rombank(*this, "rombank"),
+		m_cart(*this, "cartslot")
 	{ }
 
 	// machine drivers
@@ -83,13 +90,22 @@ public:
 
 private:
 	// devices/pointers
+	required_device<timer_device> m_irq_on;
 	optional_device<i8255_device> m_ppi8255;
+	optional_memory_bank m_rombank;
+	required_device<generic_slot_device> m_cart;
 
 	// address maps
 	void eas_map(address_map &map);
 	void eag_map(address_map &map);
 	void eag2100_map(address_map &map);
 	void pc_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -111,6 +127,18 @@ void elite_state::init_eag2100()
 /******************************************************************************
     Devices, I/O
 ******************************************************************************/
+
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(elite_state::cart_load)
+{
+	u32 size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
 
 // TTL/generic
 
@@ -211,7 +239,7 @@ void elite_state::eas_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2000, 0x5fff).r(FUNC(elite_state::cartridge_r));
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();
 	map(0x7030, 0x7037).w(FUNC(elite_state::led_w)).nopr();
@@ -224,7 +252,7 @@ void elite_state::eag_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram.ic8");
-	map(0x2000, 0x5fff).r(FUNC(elite_state::cartridge_r));
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();
 	map(0x7030, 0x7037).w(FUNC(elite_state::led_w)).nopr();
@@ -243,7 +271,7 @@ void elite_state::pc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x17ff).ram();
-	map(0x2000, 0x5fff).r(FUNC(elite_state::cartridge_r));
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x7000, 0x7000).w(FUNC(elite_state::ppi_porta_w));
 	map(0x7010, 0x7010).r(FUNC(elite_state::ppi_portb_r));
 	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();

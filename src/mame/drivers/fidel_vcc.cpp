@@ -123,6 +123,9 @@ public:
 		m_ppi8255(*this, "ppi8255")
 	{ }
 
+	// RE button is tied to Z80 RESET pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
 	// machine drivers
 	void vcc(machine_config &config);
 

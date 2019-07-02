@@ -198,6 +198,7 @@ PCB label 510-1035A01
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -214,6 +215,7 @@ class csc_state : public fidelbase_state
 public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on"),
 		m_pia(*this, "pia%u", 0)
 	{ }
 
@@ -225,12 +227,17 @@ public:
 
 protected:
 	// devices/pointers
+	required_device<timer_device> m_irq_on;
 	optional_device_array<pia6821_device, 2> m_pia;
 
 	// address maps
 	void csc_map(address_map &map);
 	void su9_map(address_map &map);
 	void rsc_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();

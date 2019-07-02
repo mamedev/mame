@@ -158,7 +158,11 @@ B0000x-xxxxxx: see V7, -800000
 #include "machine/gen_latch.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -174,7 +178,9 @@ public:
 	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "ram")
+		m_irq_on(*this, "irq_on"),
+		m_ram(*this, "ram"),
+		m_cart(*this, "cartslot")
 	{ }
 
 	// machine drivers
@@ -193,12 +199,20 @@ protected:
 
 	// devices/pointers
 	required_device<m68000_base_device> m_maincpu;
+	optional_device<timer_device> m_irq_on;
 	optional_device<ram_device> m_ram;
+	optional_device<generic_slot_device> m_cart;
 
 	// address maps
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv10_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -262,6 +276,18 @@ private:
 /******************************************************************************
     Devices, I/O
 ******************************************************************************/
+
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(eag_state::cart_load)
+{
+	u32 size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
 
 // TTL/generic
 
@@ -382,7 +408,7 @@ void eag_state::eag_map(address_map &map)
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask16(0xff00).nopr();
 	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask16(0x00ff);
 	map(0x400000, 0x400007).w(FUNC(eag_state::mux_w)).umask16(0x00ff);
-	map(0x400000, 0x407fff).r(FUNC(eag_state::cartridge_r)).umask16(0xff00);
+	map(0x400000, 0x407fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask16(0xff00);
 	map(0x604000, 0x607fff).ram().share("nvram");
 	map(0x700003, 0x700003).r(FUNC(eag_state::input2_r));
 }
@@ -411,7 +437,7 @@ void eag_state::eagv7_map(address_map &map)
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
 	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
 	map(0x400000, 0x400007).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
-	map(0x400000, 0x407fff).r(FUNC(eag_state::cartridge_r)).umask32(0xff00ff00);
+	map(0x400000, 0x407fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask32(0xff00ff00);
 	map(0x604000, 0x607fff).ram().share("nvram");
 	map(0x700003, 0x700003).r(FUNC(eag_state::input2_r));
 	map(0x800000, 0x807fff).ram();
@@ -424,7 +450,7 @@ void eag_state::eagv10_map(address_map &map)
 	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
 	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(eag_state::input1_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
 	map(0x00c00000, 0x00c00007).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
-	map(0x00c00000, 0x00c07fff).r(FUNC(eag_state::cartridge_r)).umask32(0xff00ff00);
+	map(0x00c00000, 0x00c07fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask32(0xff00ff00);
 	map(0x00e04000, 0x00e07fff).ram().share("nvram");
 	map(0x00f00003, 0x00f00003).r(FUNC(eag_state::input2_r));
 	map(0x01000000, 0x0101ffff).ram();

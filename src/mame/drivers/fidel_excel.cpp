@@ -133,6 +133,7 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -148,7 +149,8 @@ class excel_state : public fidelbase_state
 {
 public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on")
 	{ }
 
 	// machine drivers
@@ -165,9 +167,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
 private:
+	// devices/pointers
+	required_device<timer_device> m_irq_on;
+
 	// address maps
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	DECLARE_READ8_MEMBER(speech_r);

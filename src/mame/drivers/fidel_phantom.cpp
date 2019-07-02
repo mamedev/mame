@@ -41,7 +41,8 @@ class phantom_state : public fidelbase_state
 {
 public:
 	phantom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_rombank(*this, "rombank")
 	{ }
 
 	void fphantom(machine_config &config);
@@ -51,6 +52,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	// devices/pointers
+	required_memory_bank m_rombank;
+
 	void main_map(address_map &map);
 };
 

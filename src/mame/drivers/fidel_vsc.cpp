@@ -157,6 +157,7 @@ IFP: Impact Printer - also compatible with C64 apparently.
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/z80pio.h"
+#include "machine/timer.h"
 #include "speaker.h"
 
 // internal artwork
@@ -170,6 +171,7 @@ class vsc_state : public fidelbase_state
 public:
 	vsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255")
 	{ }
@@ -179,6 +181,7 @@ public:
 
 private:
 	// devices/pointers
+	required_device<timer_device> m_irq_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
 
@@ -187,6 +190,10 @@ private:
 	void main_io(address_map &map);
 	DECLARE_READ8_MEMBER(main_io_trampoline_r);
 	DECLARE_WRITE8_MEMBER(main_io_trampoline_w);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();

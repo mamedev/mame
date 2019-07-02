@@ -64,6 +64,9 @@ public:
 		m_delay(*this, "delay")
 	{ }
 
+	// RE button is tied to 8224 RESIN pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
 	// machine drivers
 	void cc1(machine_config &config);
 	void cc3(machine_config &config);

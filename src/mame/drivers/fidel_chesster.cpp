@@ -30,6 +30,7 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "includes/fidelbase.h"
 
 #include "cpu/m6502/r65c02.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -43,7 +44,9 @@ class chesster_state : public fidelbase_state
 {
 public:
 	chesster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank")
 	{ }
 
 	// machine drivers
@@ -53,8 +56,16 @@ public:
 	void init_chesster();
 
 private:
+	// devices/pointers
+	required_device<timer_device> m_irq_on;
+	required_memory_bank m_rombank;
+
 	// address maps
 	void main_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	int m_numbanks;
 

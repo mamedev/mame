@@ -27,16 +27,11 @@ Keypad legend:
 
 Read the official manual(s) on how to play.
 
-Program/data cartridges, for various boards, some cross-compatible:
-- CB9: Challenger Book Openings 1 - 8KB (label not known)
-- CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
-- *CG64: 64 Greatest Games
-- *EOA-EOE: Challenger Book Openings - Chess Encyclopedia A-E (5 modules)
-
 ******************************************************************************/
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+#include "machine/timer.h"
 
 
 // machine start/reset
@@ -72,34 +67,6 @@ void fidelbase_state::machine_reset()
 /***************************************************************************
     Helper Functions
 ***************************************************************************/
-
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(fidelbase_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-
-	// max size is 16KB?
-	if (size > 0x4000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return image_init_result::FAIL;
-	}
-
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-READ8_MEMBER(fidelbase_state::cartridge_r)
-{
-	if (m_cart->exists())
-		return m_cart->read_rom(offset);
-	else
-		return 0;
-}
-
 
 // Offset-dependent CPU divider on some 6502-based machines
 

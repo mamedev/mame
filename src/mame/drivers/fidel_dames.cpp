@@ -21,6 +21,7 @@ It's a checkers game for once instead of chess
 #include "includes/fidelbase.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -34,15 +35,23 @@ class dsc_state : public fidelbase_state
 {
 public:
 	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on")
 	{ }
 
 	// machine drivers
 	void dsc(machine_config &config);
 
 private:
+	// devices/pointers
+	required_device<timer_device> m_irq_on;
+
 	// address maps
 	void main_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();

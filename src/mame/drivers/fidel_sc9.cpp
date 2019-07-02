@@ -23,13 +23,29 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
+Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
+extra book opening databases and recorded games.
+
+Known modules (*denotes undumped):
+- CB9: Challenger Book Openings 1 - 8KB (label not known)
+- CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
+- *CG64: 64 Greatest Games
+- *EOA-EOE: Challenger Book Openings - Chess Encyclopedia A-E (5 modules)
+
+The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ line.
+IRQ and write strobe are unused. Maximum known size is 16KB.
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "includes/fidelbase.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -43,7 +59,9 @@ class sc9_state : public fidelbase_state
 {
 public:
 	sc9_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on"),
+		m_cart(*this, "cartslot")
 	{ }
 
 	// machine drivers
@@ -53,9 +71,19 @@ public:
 	void playmatic(machine_config &config);
 
 protected:
+	// devices/pointers
+	required_device<timer_device> m_irq_on;
+	required_device<generic_slot_device> m_cart;
+
 	// address maps
 	void sc9_map(address_map &map);
 	void sc9d_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -96,6 +124,18 @@ void sc9c_state::sc9c_set_cpu_freq()
 /******************************************************************************
     Devices, I/O
 ******************************************************************************/
+
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(sc9_state::cart_load)
+{
+	u32 size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
 
 // TTL/generic
 
@@ -149,7 +189,7 @@ void sc9_state::sc9_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x5fff).r(FUNC(sc9_state::cartridge_r));
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(sc9_state::control_w));
 	map(0x8000, 0x8007).mirror(0x1ff8).w(FUNC(sc9_state::led_w)).nopr();
 	map(0xa000, 0xa000).mirror(0x1fff).r(FUNC(sc9_state::input_r));

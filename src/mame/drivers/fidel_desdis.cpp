@@ -43,6 +43,7 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -58,7 +59,9 @@ class desdis_state : public fidelbase_state
 {
 public:
 	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		fidelbase_state(mconfig, type, tag),
+		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank")
 	{ }
 
 	// machine drivers
@@ -68,8 +71,16 @@ public:
 	void init_fdes2100d();
 
 protected:
+	// devices/pointers
+	required_device<timer_device> m_irq_on;
+	optional_memory_bank m_rombank;
+
 	// address maps
 	void fdes2100d_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	virtual DECLARE_WRITE8_MEMBER(control_w);
